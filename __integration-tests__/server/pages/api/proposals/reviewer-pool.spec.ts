@@ -2,7 +2,7 @@ import type { ProposalReviewerPool } from '@charmverse/core/permissions';
 import type { Proposal, Role, Space, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 
-import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { addSpaceOperations } from 'lib/permissions/spaces';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { randomETHWalletAddress } from 'testing/generateStubs';
@@ -46,7 +46,7 @@ describe('GET /api/proposals/reviewer-pool - Return eligible reviewers', () => {
         .expect(200)
     ).body as ProposalReviewerPool;
 
-    const computed = await premiumPermissionsApiClient.proposals.getProposalReviewerPool({
+    const computed = await permissionsApiClient.proposals.getProposalReviewerPool({
       resourceId: proposal.categoryId as string
     });
 

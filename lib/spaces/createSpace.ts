@@ -51,7 +51,6 @@ export type CreateSpaceProps = {
   extraAdmins?: string[];
   spaceTemplate?: SpaceTemplateType;
   webhookUrl?: string;
-  skipTracking?: boolean;
 };
 
 export async function createWorkspace({

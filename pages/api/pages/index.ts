@@ -13,7 +13,7 @@ import { createPage } from 'lib/pages/server/createPage';
 import { PageNotFoundError } from 'lib/pages/server/errors';
 import { getPage } from 'lib/pages/server/getPage';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
-import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
@@ -83,7 +83,7 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<Page>
   });
 
   try {
-    await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
+    await permissionsApiClient.pages.setupPagePermissionsAfterEvent({
       event: 'created',
       pageId: page.id
     });
