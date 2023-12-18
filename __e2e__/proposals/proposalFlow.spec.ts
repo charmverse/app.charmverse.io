@@ -81,6 +81,10 @@ test.describe.serial('Proposal Flow', () => {
     await authorBrowserProposalPage.saveDraftButton.click();
 
     const response = await authorBrowserProposalPage.waitForJsonResponse<PageWithProposal>('**/api/proposals');
+
+    // Glitch where created proposal didn't show. This fixed it
+    await authorBrowserProposalListPage.page.reload();
+
     pageWithProposal = response;
     proposalId = pageWithProposal.proposal.id;
 
