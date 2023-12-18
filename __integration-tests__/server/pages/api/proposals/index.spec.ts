@@ -1,4 +1,5 @@
 import type { Space, User, ProposalCategory } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
@@ -52,23 +53,32 @@ describe('POST /api/proposals - Create a proposal', () => {
 
     const createdProposal = (
       await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(201)
-    ).body as CreatedProposal;
+    ).body as { id: string };
 
-    expect(createdProposal.proposal).toMatchObject<Partial<ProposalWithUsers>>({
+    const proposal = await prisma.proposal.findUniqueOrThrow({
+      where: {
+        id: createdProposal.id
+      },
+      include: {
+        authors: true,
+        reviewers: true
+      }
+    });
+    expect(proposal).toMatchObject<Partial<ProposalWithUsers>>({
       authors: expect.arrayContaining([
         {
-          proposalId: createdProposal?.proposal.id as string,
+          proposalId: createdProposal?.id as string,
           userId: user.id
         },
         {
-          proposalId: createdProposal?.proposal.id as string,
+          proposalId: createdProposal?.id as string,
           userId: otherUser.id
         }
       ]),
       reviewers: expect.arrayContaining([
         expect.objectContaining({
           id: expect.any(String),
-          proposalId: createdProposal?.proposal.id as string,
+          proposalId: createdProposal?.id as string,
           userId: user.id
         })
       ])
