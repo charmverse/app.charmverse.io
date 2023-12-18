@@ -37,10 +37,11 @@ export const CharmedButton = forwardRef<HTMLButtonElement, InputProps<ElementTyp
 
   useEffect(() => {
     clearTimeout(loadingTimeout.current);
-    loadingTimeout.current = setTimeout(() => {
-      setDelayedLoading(true);
-    }, 300);
-
+    if (loading) {
+      loadingTimeout.current = setTimeout(() => {
+        setDelayedLoading(true);
+      }, 300);
+    }
     return () => clearTimeout(loadingTimeout.current);
   }, [loading, setDelayedLoading]);
 
