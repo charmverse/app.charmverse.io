@@ -23,7 +23,8 @@ export function FormFieldsEditor() {
             options: [],
             private: false,
             required: true,
-            type: 'short_text'
+            type: 'short_text',
+            id: v4()
           }
         ]}
       />
