@@ -17,6 +17,7 @@ import { getAddress, parseEther, parseUnits } from 'viem';
 import charmClient from 'charmClient';
 import { OpenWalletSelectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/OpenWalletSelectorButton';
 import { Button } from 'components/common/Button';
+import TokenLogo from 'components/common/TokenLogo';
 import type { GnosisProposeTransactionResult } from 'hooks/useGnosisPayment';
 import { getPaymentErrorMessage, useGnosisPayment } from 'hooks/useGnosisPayment';
 import { useMultiRewardPayment } from 'hooks/useMultiRewardPayment';
@@ -284,6 +285,8 @@ export function RewardPaymentButton({
     );
   }
 
+  const chainInfo = getChainById(reward.chainId as number);
+
   return (
     <>
       <Button
@@ -316,8 +319,9 @@ export function RewardPaymentButton({
             {shortenHex(account ?? '')}
           </MenuItem>
           <Divider />
-          <MenuItem dense sx={{ pointerEvents: 'none', color: 'secondary.main' }}>
-            Gnosis wallets
+          <MenuItem dense sx={{ pointerEvents: 'none', color: 'secondary.main', gap: 1 }}>
+            <span style={{ margin: 'auto' }}>Gnosis wallet</span>
+            <TokenLogo height={16} src={chainInfo?.iconUrl as string} sx={{ margin: 'auto' }} />
           </MenuItem>
           {existingSafesData
             ?.filter((s) => !s.isHidden && chainIdToUse === s.chainId)
