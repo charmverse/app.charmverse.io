@@ -1,7 +1,7 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import type { Page, Proposal, ProposalCategory, Space, User } from '@charmverse/core/prisma-client';
 import { testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
-import { stringUtils } from '@charmverse/core/utilities';
+import { arrayUtils, stringUtils } from '@charmverse/core/utilities';
 import request from 'supertest';
 
 import { baseUrl, loginUser } from 'testing/mockApiCall';
@@ -83,20 +83,20 @@ describe('GET /api/spaces/[id]/pages - Get Pages in a space', () => {
     ).body as PageMeta[];
 
     const expectedPageIds = stringUtils.sortUuids(
-      stringUtils.extractUuids([
+      arrayUtils.extractUuids([
         pageWithSpacePermission,
         publicPage,
         proposalVisibleInClassicModel,
         proposalVisibleInProposalsEvaluationPermissionsModel
       ])
     );
-    expect(stringUtils.sortUuids(stringUtils.extractUuids(response))).toEqual(expectedPageIds);
+    expect(stringUtils.sortUuids(arrayUtils.extractUuids(response))).toEqual(expectedPageIds);
   });
 
   it('should return public pages for a user outside the space and respond with status code 200', async () => {
     const response = (await request(baseUrl).get(`/api/spaces/${space.id}/pages`).expect(200)).body as PageMeta[];
 
-    expect(stringUtils.extractUuids(response)).toEqual([publicPage.id]);
+    expect(arrayUtils.extractUuids(response)).toEqual([publicPage.id]);
   });
   it('should return pages a user can access based on the new proposal evaluations model and respond with status code 200', async () => {
     const response = (
@@ -107,13 +107,13 @@ describe('GET /api/spaces/[id]/pages - Get Pages in a space', () => {
     ).body as PageMeta[];
 
     const expectedPageIds = stringUtils.sortUuids(
-      stringUtils.extractUuids([
+      arrayUtils.extractUuids([
         pageWithSpacePermission,
         publicPage,
         proposalVisibleInProposalsEvaluationPermissionsModel
       ])
     );
-    expect(stringUtils.sortUuids(stringUtils.extractUuids(response))).toEqual(expectedPageIds);
+    expect(stringUtils.sortUuids(arrayUtils.extractUuids(response))).toEqual(expectedPageIds);
   });
 
   // This test should be kept last as it mutates
