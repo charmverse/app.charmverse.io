@@ -240,7 +240,11 @@ export default function PageTitleWithBreadcrumbs({
         applicationId={router.query.applicationId as string}
       />
     );
-  } else if (pageType === 'proposal' || pageType === 'proposal_template') {
+  } else if (
+    pageType === 'proposal' ||
+    pageType === 'proposal_template' ||
+    router.route === '/[domain]/proposals/new'
+  ) {
     const sectionName = mappedFeatures.proposals.title;
     return <ProposalPageTitle basePath={`/${router.query.domain}`} sectionName={sectionName} />;
   } else if (router.route === '/[domain]/[pageId]') {

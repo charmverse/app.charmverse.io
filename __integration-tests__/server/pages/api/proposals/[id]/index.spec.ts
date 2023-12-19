@@ -5,9 +5,7 @@ import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import type { PageWithProposal } from 'lib/pages';
 import { addSpaceOperations } from 'lib/permissions/spaces/addSpaceOperations';
-import { getProposal } from 'lib/proposal/getProposal';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateRole } from 'testing/setupDatabase';
@@ -123,10 +121,13 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       .expect(200);
 
     // Make sure update went through
-    const updated = await getProposal({ proposalId: page.proposalId! });
+    const proposal = await prisma.proposal.findUniqueOrThrow({
+      where: { id: page.proposalId! },
+      include: { reviewers: true }
+    });
 
-    expect(updated.proposal?.reviewers).toHaveLength(1);
-    expect(updated.proposal?.reviewers.some((r) => r.userId === adminUser.id)).toBe(true);
+    expect(proposal.reviewers).toHaveLength(1);
+    expect(proposal.reviewers.some((r) => r.userId === adminUser.id)).toBe(true);
   });
 
   it('should update a proposal templates settings if the user is a space admin', async () => {
@@ -166,10 +167,17 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       .expect(200);
 
     // Make sure update went through
-    const updated = await getProposal({ proposalId: proposalTemplate.id });
-    expect(updated.proposal?.reviewers).toHaveLength(2);
-    expect(updated.proposal?.reviewers.some((r) => r.roleId === role.id)).toBe(true);
-    expect(updated.proposal?.reviewers.some((r) => r.userId === adminUser.id)).toBe(true);
+    const proposal = await prisma.proposal.findUniqueOrThrow({
+      where: {
+        id: proposalTemplate.id
+      },
+      include: {
+        reviewers: true
+      }
+    });
+    expect(proposal.reviewers).toHaveLength(2);
+    expect(proposal.reviewers.some((r) => r.roleId === role.id)).toBe(true);
+    expect(proposal.reviewers.some((r) => r.userId === adminUser.id)).toBe(true);
   });
 
   it('should allow an admin to update any discussion stage proposal', async () => {

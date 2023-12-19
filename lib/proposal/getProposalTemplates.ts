@@ -6,6 +6,7 @@ import { generateCategoryIdQuery } from '@charmverse/core/proposals';
 import { stringUtils } from '@charmverse/core/utilities';
 
 import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { mapDbProposalToProposal } from 'lib/proposal/mapDbProposalToProposal';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 import type { ProposalWithUsersAndRubric } from './interface';
@@ -53,7 +54,7 @@ export async function getProposalTemplates({ spaceId, userId }: SpaceResourcesRe
     categoryIds = accessibleCategories.map((c) => c.id);
   }
 
-  return prisma.proposal.findMany({
+  const templates = await prisma.proposal.findMany({
     where: {
       spaceId,
       page: {
@@ -64,13 +65,30 @@ export async function getProposalTemplates({ spaceId, userId }: SpaceResourcesRe
     include: {
       authors: true,
       reviewers: true,
+      rewards: true, // note that rewards table is not really used by templates, but makes life easier when we call mapDbProposalToProposal()
       category: true,
       page: true,
+      evaluations: {
+        orderBy: {
+          index: 'asc'
+        },
+        include: {
+          permissions: true,
+          reviewers: true,
+          rubricCriteria: true,
+          rubricAnswers: true,
+          draftRubricAnswers: true,
+          vote: true
+        }
+      },
+      draftRubricAnswers: true,
+      rubricAnswers: true,
       rubricCriteria: {
         orderBy: {
           index: 'asc'
         }
       }
     }
-  }) as Promise<ProposalTemplate[]>;
+  });
+  return templates.map((proposal) => mapDbProposalToProposal({ proposal })) as ProposalTemplate[];
 }

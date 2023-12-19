@@ -1,19 +1,19 @@
 import { IconButton, Tooltip } from '@mui/material';
 
-import { SIDEBAR_VIEWS } from 'components/[pageId]/DocumentPage/components/Sidebar/PageSidebar';
+import { SIDEBAR_VIEWS } from 'components/[pageId]/DocumentPage/components/Sidebar/constants';
 import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 
 export function ToggleEvaluationButton({ isInsideDialog, pageId }: { isInsideDialog?: boolean; pageId?: string }) {
-  const { activeView, setActiveView, persistActiveView } = usePageSidebar();
+  const { activeView, closeSidebar, setActiveView, persistActiveView } = usePageSidebar();
   const { navigateToSpacePath } = useCharmRouter();
 
-  const isActive = activeView === 'proposal_evaluation';
+  const isActive = activeView?.includes('proposal');
 
-  function openEvaluation() {
+  function toggleEvaluation() {
     // close sidebar if open
     if (isActive) {
-      setActiveView(null);
+      closeSidebar();
     } else if (!isInsideDialog) {
       // open inside full page
       setActiveView('proposal_evaluation');
@@ -28,7 +28,7 @@ export function ToggleEvaluationButton({ isInsideDialog, pageId }: { isInsideDia
 
   return (
     <Tooltip arrow title={isActive ? 'Close evaluation' : 'Open evaluation'}>
-      <IconButton onClick={openEvaluation} sx={{ backgroundColor: isActive ? 'var(--input-bg)' : '' }}>
+      <IconButton onClick={toggleEvaluation} sx={{ backgroundColor: isActive ? 'var(--input-bg)' : '' }}>
         {SIDEBAR_VIEWS.proposal_evaluation.icon}
       </IconButton>
     </Tooltip>

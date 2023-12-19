@@ -287,19 +287,19 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
         style="align-items: flex-start; width: 100px; overflow-x: hidden;"
       >
         <div
-          class="css-1s6sld2-MuiStack-root"
+          class="MuiStack-root css-1s6sld2-MuiStack-root"
           data-test="closed-select-input"
         >
           <div
-            class="css-1a59yxd-MuiStack-root"
+            class="MuiStack-root css-1a59yxd-MuiStack-root"
             data-test="select-preview"
           >
             <div
-              class=" css-b3ouwx-MuiStack-root"
+              class="MuiStack-root css-b3ouwx-MuiStack-root"
               data-mui-internal-clone-element="true"
             >
               <div
-                class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-1v6zf4t-MuiChip-root"
+                class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
               >
                 <span
                   class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
@@ -316,15 +316,15 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
         style="align-items: flex-start; width: 100px; overflow-x: hidden;"
       >
         <div
-          class="css-1s6sld2-MuiStack-root"
+          class="MuiStack-root css-1s6sld2-MuiStack-root"
           data-test="closed-select-input"
         >
           <div
-            class="css-1a59yxd-MuiStack-root"
+            class="MuiStack-root css-1a59yxd-MuiStack-root"
             data-test="select-preview"
           >
             <div
-              class=" css-b3ouwx-MuiStack-root"
+              class="MuiStack-root css-b3ouwx-MuiStack-root"
               data-mui-internal-clone-element="true"
             />
           </div>
@@ -477,11 +477,11 @@ exports[`components/table/TableRow should match snapshot, read-only 1`] = `
             >
               <div>
                 <div
-                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-readOnly css-2umbt5-MuiInputBase-root"
+                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-readOnly MuiInputBase-readOnly css-2umbt5-MuiInputBase-root"
                   spellcheck="true"
                 >
                   <input
-                    class="MuiInputBase-input Mui-readOnly Editable readonly octo-propertyvalue css-yz9k0d-MuiInputBase-input"
+                    class="MuiInputBase-input Mui-readOnly Editable readonly octo-propertyvalue MuiInputBase-readOnly css-yz9k0d-MuiInputBase-input"
                     placeholder="Untitled"
                     readonly=""
                     type="text"
@@ -608,19 +608,19 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
         style="align-items: flex-start; width: 100px; overflow-x: hidden;"
       >
         <div
-          class="css-1s6sld2-MuiStack-root"
+          class="MuiStack-root css-1s6sld2-MuiStack-root"
           data-test="closed-select-input"
         >
           <div
-            class="css-1a59yxd-MuiStack-root"
+            class="MuiStack-root css-1a59yxd-MuiStack-root"
             data-test="select-preview"
           >
             <div
-              class=" css-b3ouwx-MuiStack-root"
+              class="MuiStack-root css-b3ouwx-MuiStack-root"
               data-mui-internal-clone-element="true"
             >
               <div
-                class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-1v6zf4t-MuiChip-root"
+                class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
               >
                 <span
                   class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
@@ -637,15 +637,15 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
         style="align-items: flex-start; width: 100px; overflow-x: hidden;"
       >
         <div
-          class="css-1s6sld2-MuiStack-root"
+          class="MuiStack-root css-1s6sld2-MuiStack-root"
           data-test="closed-select-input"
         >
           <div
-            class="css-1a59yxd-MuiStack-root"
+            class="MuiStack-root css-1a59yxd-MuiStack-root"
             data-test="select-preview"
           >
             <div
-              class=" css-b3ouwx-MuiStack-root"
+              class="MuiStack-root css-b3ouwx-MuiStack-root"
               data-mui-internal-clone-element="true"
             />
           </div>

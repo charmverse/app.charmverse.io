@@ -1,4 +1,4 @@
-import type { ApplicationStatus, ProposalStatus } from '@charmverse/core/prisma-client';
+import type { ApplicationStatus, ProposalStatus } from '@charmverse/core/prisma';
 import { stringUtils } from '@charmverse/core/utilities';
 import PersonIcon from '@mui/icons-material/Person';
 import { Box, Chip, Link, Stack, Typography } from '@mui/material';

@@ -117,3 +117,8 @@ body {
   /* wallet connect modal */
   --wcm-z-index: 1500;
 }
+
+// override MUI styles
+.MuiFormLabel-asterisk {
+  color: var(--danger-text);
+}

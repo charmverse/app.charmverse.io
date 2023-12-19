@@ -13,7 +13,6 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPageActionsMenuButton';
 import { DocumentHeaderElements } from 'components/common/PageLayout/components/Header/components/DocumentHeaderElements';
-import { useNewProposal } from 'components/proposals/components/ProposalDialog/hooks/useNewProposal';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -21,33 +20,17 @@ import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
-import type { ProposalPageAndPropertiesInput } from './NewProposalPage';
-import { NewProposalPage } from './NewProposalPage';
-
 interface Props {
   pageId?: string;
-  newProposal: Partial<ProposalPageAndPropertiesInput> | null;
   closeDialog: () => void;
 }
 
-function ProposalDialogBase({ pageId, newProposal, closeDialog }: Props) {
+function ProposalDialogBase({ pageId, closeDialog }: Props) {
   const mounted = useRef(false);
   const { updatePage } = usePages();
   // This is needed so that the surrounding currentPage context provides the correct pageId
   const { setCurrentPageId } = useCurrentPage();
   const { editMode, resetPageProps, setPageProps } = useCharmEditor();
-  const {
-    formInputs,
-    setFormInputs,
-    clearFormInputs,
-    contentUpdated,
-    createProposal,
-    isCreatingProposal,
-    disabledTooltip
-  } = useNewProposal({
-    newProposal
-  });
-
   const { space } = useCurrentSpace();
   const { page, isLoading: isPageLoading, refreshPage } = usePage({ pageIdOrPath: pageId });
 
@@ -112,24 +95,11 @@ function ProposalDialogBase({ pageId, newProposal, closeDialog }: Props) {
 
   function close() {
     closeDialog();
-    clearFormInputs();
     setShowConfirmDialog(false);
-  }
-
-  function saveForm() {
-    createProposal();
-    close();
   }
 
   return (
     <Dialog
-      onClose={() => {
-        if (contentUpdated) {
-          setShowConfirmDialog(true);
-        } else {
-          close();
-        }
-      }}
       toolbar={
         pageId ? (
           <Box display='flex' justifyContent='space-between'>
@@ -161,28 +131,13 @@ function ProposalDialogBase({ pageId, newProposal, closeDialog }: Props) {
           </Stack>
         ) : null
       }
-      footerActions={
-        isLoading || page || !newProposal ? null : (
-          <Button
-            disabled={Boolean(disabledTooltip) || isCreatingProposal}
-            disabledTooltip={disabledTooltip}
-            onClick={saveForm}
-            loading={isCreatingProposal}
-            data-test='create-proposal-button'
-          >
-            Save
-          </Button>
-        )
-      }
     >
       {isLoading ? (
         <LoadingComponent isLoading />
       ) : page ? (
         // Document page is used in a few places, so it is responsible for retrieving its own permissions
         <DocumentPage page={page} refreshPage={refreshPage} readOnly={readOnly} savePage={savePage} />
-      ) : (
-        <NewProposalPage formInputs={formInputs} setFormInputs={setFormInputs} contentUpdated={contentUpdated} />
-      )}
+      ) : null}
       <ConfirmDeleteModal
         onClose={() => {
           setShowConfirmDialog(false);

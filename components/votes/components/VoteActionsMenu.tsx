@@ -16,7 +16,7 @@ import { useUser } from 'hooks/useUser';
 
 interface VoteActionsProps {
   deleteVote?: (voteId: string) => Promise<void>;
-  cancelVote: (voteId: string) => Promise<void>;
+  cancelVote?: (voteId: string) => Promise<void>;
   isProposalVote: boolean;
   removeFromPage?: (voteId: string) => void;
   updateDeadline?: (voteId: string, deadline: Date) => Promise<void>;
@@ -86,7 +86,7 @@ export function VoteActionsMenu({
           actionsPopup.close();
         }}
       >
-        {vote.status === 'InProgress' && !hasPassedDeadline && vote.context === 'inline' && (
+        {vote.status === 'InProgress' && !hasPassedDeadline && cancelVote && (
           <MenuItem
             dense
             onClick={() => {
