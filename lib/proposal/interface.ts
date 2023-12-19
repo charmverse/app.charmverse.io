@@ -43,6 +43,7 @@ export type ProposalRubricData = {
 export type VoteSettings = Pick<Vote, 'type' | 'threshold' | 'maxChoices'> & {
   durationDays: number;
   options: string[];
+  publishToSnapshot: boolean;
 };
 
 export type PopulatedEvaluation = ProposalRubricData &

@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import AddCircle from '@mui/icons-material/AddCircle';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import {
-  Box,
+  Divider,
   FormControlLabel,
   FormLabel,
   IconButton,
@@ -11,6 +11,7 @@ import {
   Radio,
   RadioGroup,
   Stack,
+  Switch,
   TextField,
   Tooltip,
   Typography
@@ -41,7 +42,8 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
   const [voteType, setVoteType] = useState<VoteType>(value?.type ?? VoteType.Approval);
   const [options, setOptions] = useState<string[]>(value?.options ?? []);
   const [maxChoices, setMaxChoices] = useState(value?.maxChoices ?? 1);
-  const [durationDays, setDurationDays] = useState(5);
+  const [durationDays, setDurationDays] = useState(value?.durationDays ?? 5);
+  const [publishToSnapshot, setPublishToSnapshot] = useState(value?.publishToSnapshot ?? false);
 
   useEffect(() => {
     if (voteType === VoteType.SingleChoice) {
@@ -65,6 +67,7 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
           type: voteType,
           options,
           maxChoices: voteType === VoteType.Approval ? 1 : maxChoices,
+          publishToSnapshot,
           durationDays
         });
       }
@@ -131,7 +134,7 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
       )}
 
       {maxChoices === 1 && (
-        <Stack direction='row' alignItems='center' gap={2} justifyContent='space-between'>
+        <Stack direction='row' alignItems='center' gap={2} justifyContent='space-between' mb={2}>
           <FormLabel>
             <Typography component='span' variant='subtitle1'>
               Pass Threshold (%)
@@ -140,6 +143,21 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
           <NumericFieldWithButtons disabled={readOnly} value={passThreshold} onChange={setPassThreshold} max={100} />
         </Stack>
       )}
+
+      <Divider sx={{ my: 1 }} />
+
+      <Stack direction='row' alignItems='center' gap={2} justifyContent='space-between'>
+        <FormLabel>
+          <Typography component='span' variant='subtitle1'>
+            Publish to Snapshot
+          </Typography>
+        </FormLabel>
+        <Switch
+          disabled={readOnly}
+          checked={publishToSnapshot}
+          onChange={(e, checked) => setPublishToSnapshot(checked)}
+        />
+      </Stack>
     </StyledVoteSettings>
   );
 }
