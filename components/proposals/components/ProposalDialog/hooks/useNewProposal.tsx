@@ -111,7 +111,7 @@ export function useNewProposal({ newProposal }: Props) {
       return 'Reviewers are required';
     }
 
-    if (formInputs.proposalType === 'structured' && formInputs.formFields?.length === 0) {
+    if (formInputs.proposalType === 'structured' && (formInputs.formFields ?? [])?.length === 0) {
       return 'Form fields are required for structured proposals';
     }
 

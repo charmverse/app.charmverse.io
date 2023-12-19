@@ -100,14 +100,13 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: P
     });
   }
 
-  function toggleCollapse(fieldId: string) {
-    const isCollapsed = collapsedFieldIds.includes(fieldId);
-    if (isCollapsed) {
+  const toggleCollapse = (fieldId: string) => {
+    if (collapsedFieldIds.includes(fieldId)) {
       setCollapsedFieldIds(collapsedFieldIds.filter((id) => id !== fieldId));
     } else {
       setCollapsedFieldIds([...collapsedFieldIds, fieldId]);
     }
-  }
+  };
 
   const proposalPageContent = (
     <>

@@ -66,6 +66,7 @@ export function FormFieldsEditor({
     const newFormFields = [...formFields];
     newFormFields.splice(index, 0, {
       ...newFormFields[index],
+      id: v4(),
       index: index + 1,
       options: newFormFields[index].options?.map((option) => ({ ...option, id: v4() })) ?? []
     });

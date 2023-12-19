@@ -66,7 +66,7 @@ export const fieldTypePlaceholderRecord: Record<FormFieldType, string> = {
   url: 'Enter a URL',
   email: 'Enter an email address',
   select: 'Select an option',
-  multiselect: 'Select on or more options',
+  multiselect: 'Select one or more options',
   wallet: 'Enter a wallet address or ENS',
   date: 'Select a date',
   label: 'Your answer',

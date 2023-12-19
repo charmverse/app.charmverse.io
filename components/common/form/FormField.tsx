@@ -43,7 +43,7 @@ const FormFieldContainer = styled(Stack, {
       ? `0px 2px 0px ${theme.palette.primary.main}`
       : 'none'};
   padding: ${(props) => props.theme.spacing(1)};
-  gap: ${(props) => props.theme.spacing(1)};
+  padding-left: 0;
   flex-direction: row;
   align-items: flex-start;
   width: 100%;
@@ -230,9 +230,10 @@ export function FormField(
   const isAdjacentActive = canDrop && isOverCurrent;
 
   return (
-    <Stack flexDirection='row' gap={1} alignItems='flex-start' ref={mergeRefs([dragPreview, drop])}>
+    <Stack flexDirection='row' gap={0.5} alignItems='flex-start' ref={mergeRefs([dragPreview, drop])}>
       <div ref={drag}>
         <DragIndicatorIcon
+          fontSize='small'
           color='secondary'
           sx={{
             cursor: 'pointer'
