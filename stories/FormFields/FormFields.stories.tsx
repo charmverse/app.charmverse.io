@@ -1,4 +1,3 @@
-import type { Prisma } from '@charmverse/core/prisma-client';
 import { capitalize } from 'lodash';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 import { members } from 'stories/lib/mockData';
@@ -8,6 +7,7 @@ import { formFieldTypes } from 'components/common/form/constants';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { FormFieldInputs as CustomFormFieldInputs } from 'components/common/form/FormFieldInputs';
 import { FormFieldsEditor as CustomFormFieldsEditor } from 'components/common/form/FormFieldsEditor';
+import type { TFormFieldInput } from 'components/common/form/interfaces';
 import { createDocumentWithText } from 'lib/prosemirror/constants';
 import { brandColorNames } from 'theme/colors';
 
@@ -56,11 +56,10 @@ export function FormFieldsInputs() {
             name: `${label} title`,
             options,
             private: index % 2 !== 0,
-            required: index % 2 === 0,
+            required: index % 2 !== 0,
             type: formFieldType,
             id: v4(),
-            value: '',
-            placeholder: `Placeholder for ${label.toLocaleLowerCase()}`
+            value: ''
           };
         })}
       />
@@ -86,7 +85,7 @@ export function FormFieldsInputsDisplay() {
             }
           }
           const label = capitalize(formFieldType.replaceAll(/_/g, ' '));
-          let value: Prisma.JsonValue = '';
+          let value: TFormFieldInput['value'] = '';
           switch (formFieldType) {
             case 'phone': {
               value = '+1 123 456 7890';
@@ -97,7 +96,10 @@ export function FormFieldsInputsDisplay() {
               break;
             }
             case 'long_text': {
-              value = createDocumentWithText("This is a long text field's value");
+              value = {
+                content: createDocumentWithText("This is a long text field's value"),
+                contentText: "This is a long text field's value"
+              };
               break;
             }
             case 'wallet': {
@@ -125,7 +127,7 @@ export function FormFieldsInputsDisplay() {
               break;
             }
             case 'short_text': {
-              value = createDocumentWithText('This is a short text field value');
+              value = 'This is a short text field value';
               break;
             }
             case 'url': {
@@ -149,8 +151,7 @@ export function FormFieldsInputsDisplay() {
             required: index % 2 === 0,
             type: formFieldType,
             id: v4(),
-            value,
-            placeholder: `Placeholder for ${label.toLocaleLowerCase()}`
+            value
           };
         })}
       />

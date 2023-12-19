@@ -4,13 +4,24 @@ import type { SxProps } from '@mui/material';
 import type { ReactNode } from 'react';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
-// TODO: We might need more generic types in the future
 export type FieldType = MemberPropertyType | FormFieldType;
+
+export interface TFormFieldInput {
+  id: string;
+  value:
+    | string
+    | string[]
+    | {
+        content: PageContent;
+        contentText: string;
+      };
+}
 
 export type ControlFieldProps = {
   onChange?: (value: any) => void;
-  value?: Prisma.JsonValue;
+  value?: TFormFieldInput['value'];
 };
 
 export type SelectFieldProps = {

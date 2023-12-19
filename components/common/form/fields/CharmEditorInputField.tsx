@@ -15,11 +15,11 @@ export const CharmEditorInputField = forwardRef<HTMLDivElement, Props>(
     return (
       <FieldWrapper sx={fieldWrapperSx} {...inputProps}>
         <CharmEditor
-          onContentChange={({ doc }) => {
-            inputProps.onChange?.(doc);
+          onContentChange={({ doc, rawText }) => {
+            inputProps.onChange?.({ content: doc, contentText: rawText });
           }}
           readOnly={inputProps.disabled}
-          content={inputProps.value as PageContent}
+          content={(inputProps.value as { content: PageContent; contentText: string })?.content ?? undefined}
           placeholderText={placeholder}
           disableNestedPages
           disablePageSpecificFeatures
@@ -28,9 +28,10 @@ export const CharmEditorInputField = forwardRef<HTMLDivElement, Props>(
           style={{
             left: 0,
             backgroundColor: 'var(--input-bg)',
-            border: error ? '1px solid var(--text-red)' : '1px solid var(--input-border)',
+            border: error ? `1px solid ${theme.palette.error.main}` : '1px solid var(--input-border)',
             minHeight: 150,
-            color: inputProps.disabled ? theme.palette.text.disabled : ''
+            color: inputProps.disabled ? theme.palette.text.disabled : '',
+            borderRadius: theme.spacing(0.5)
           }}
         />
       </FieldWrapper>

@@ -49,6 +49,7 @@ export const DateInputField = forwardRef<HTMLDivElement, Props>(
               fullWidth
               inputProps={{
                 ...props.inputProps,
+                readOnly: true,
                 placeholder
               }}
               disabled={disabled}

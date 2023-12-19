@@ -25,18 +25,22 @@ import { mergeRefs } from 'lib/utilities/react';
 
 import PopperPopup from '../PopperPopup';
 
-import { fieldTypeIconRecord, fieldTypeLabelRecord, formFieldTypes } from './constants';
+import { fieldTypeIconRecord, fieldTypeLabelRecord, fieldTypePlaceholderRecord, formFieldTypes } from './constants';
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
 import type { SelectOptionType } from './fields/Select/interfaces';
 import type { FormFieldInput } from './interfaces';
 
-const FormFieldContainer = styled(Stack)<{ dragDirection?: 'top' | 'bottom' }>`
+const FormFieldContainer = styled(Stack, {
+  shouldForwardProp(propName) {
+    return propName !== 'dragDirection';
+  }
+})<{ dragDirection?: 'top' | 'bottom' }>`
   border: 1px solid ${({ theme }) => theme.palette.divider};
   box-shadow: ${({ dragDirection, theme }) =>
     dragDirection === 'top'
-      ? `0px -2px 0px ${theme.palette.action.focus}`
+      ? `0px -2px 0px ${theme.palette.primary.main}`
       : dragDirection === 'bottom'
-      ? `0px 2px 0px ${theme.palette.action.focus}`
+      ? `0px 2px 0px ${theme.palette.primary.main}`
       : 'none'};
   padding: ${(props) => props.theme.spacing(1)};
   gap: ${(props) => props.theme.spacing(1)};
@@ -137,7 +141,7 @@ function ExpandedFormField({
           onCreateOption={onCreateOption}
           onDeleteOption={onDeleteOption}
           onUpdateOption={onUpdateOption}
-          placeholder='Your answer'
+          placeholder={fieldTypePlaceholderRecord[formField.type]}
           // Enable select and multiselect fields to be able to create options
           disabled={formField.type !== 'select' && formField.type !== 'multiselect'}
           value={formField.type === 'date' ? new Date().toString() : ''}
@@ -256,7 +260,7 @@ export function FormField(
               label={formField.name}
               required={formField.required}
               options={formField.options}
-              placeholder={formField.type === 'date' ? new Date().toString() : 'Your answer'}
+              placeholder={fieldTypePlaceholderRecord[formField.type]}
             />
           ) : (
             <ExpandedFormField {...props} />

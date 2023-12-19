@@ -10,7 +10,6 @@ import FieldLabel from '../FieldLabel';
 
 import { CharmEditorInputField } from './CharmEditorInputField';
 import { DateInputField } from './DateInputField';
-import { InlineCharmEditorInputField } from './InlineCharmEditorInputField';
 import { PersonInputField } from './PersonInputField';
 
 type TextProps = {
@@ -32,11 +31,9 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
       case 'email':
       case 'url':
       case 'phone':
+      case 'short_text':
       case 'wallet': {
         return <TextInputField {...fieldProps} ref={ref} />;
-      }
-      case 'short_text': {
-        return <InlineCharmEditorInputField {...fieldProps} ref={ref} />;
       }
       case 'long_text': {
         return <CharmEditorInputField {...fieldProps} ref={ref} />;

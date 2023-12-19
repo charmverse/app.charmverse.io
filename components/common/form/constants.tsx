@@ -57,3 +57,18 @@ export const fieldTypeIconRecord: Record<FormFieldType, ReactNode> = {
   label: <TextFieldsIcon fontSize='small' />,
   person: <PersonIcon fontSize='small' />
 };
+
+export const fieldTypePlaceholderRecord: Record<FormFieldType, string> = {
+  short_text: 'Enter your text',
+  long_text: "Type '/' for command",
+  number: 'Enter a number',
+  phone: 'Enter a phone number',
+  url: 'Enter a URL',
+  email: 'Enter an email address',
+  select: 'Select an option',
+  multiselect: 'Select on or more options',
+  wallet: 'Enter a wallet address or ENS',
+  date: 'Select a date',
+  label: 'Your answer',
+  person: 'Select one or more people'
+};

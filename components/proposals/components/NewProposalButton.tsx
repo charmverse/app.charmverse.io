@@ -119,7 +119,7 @@ export function NewProposalButton({
         pages={proposalTemplatePages}
         addPageFromTemplate={createProposalFromTemplate}
         createTemplate={() =>
-          isCharmverseSpace ? createProposalTemplate('free-form') : proposalTemplateCreateModalState.open()
+          !isCharmverseSpace ? createProposalTemplate('free-form') : proposalTemplateCreateModalState.open()
         }
         editTemplate={(pageId) => showProposal(pageId)}
         deleteTemplate={deleteProposalTemplate}

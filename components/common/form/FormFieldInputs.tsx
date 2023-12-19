@@ -1,18 +1,15 @@
-import type { FormField, Prisma } from '@charmverse/core/prisma-client';
+import type { FormField } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { Box, Chip, Stack } from '@mui/material';
 import { Controller } from 'react-hook-form';
 
 import { Button } from '../Button';
 
+import { fieldTypePlaceholderRecord } from './constants';
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
 import type { SelectOptionType } from './fields/Select/interfaces';
 import { useFormFields } from './hooks/useFormFields';
-
-interface TFormFieldInput {
-  id: string;
-  value: Prisma.JsonValue;
-}
+import type { TFormFieldInput } from './interfaces';
 
 const FormFieldInputsContainer = styled(Stack)`
   border: 1px solid ${(props) => props.theme.palette.divider};
@@ -25,7 +22,7 @@ export function FormFieldInputs({
   onSave
 }: {
   formFields: (Pick<FormField, 'type' | 'name' | 'required' | 'options' | 'id' | 'description' | 'private'> & {
-    value: Prisma.JsonValue;
+    value: TFormFieldInput['value'];
     placeholder?: string;
   })[];
   onSave?: (formFieldInputs: TFormFieldInput[]) => void;
@@ -48,7 +45,7 @@ export function FormFieldInputs({
             render={({ field }) => (
               <FieldTypeRenderer
                 {...field}
-                placeholder={formField.placeholder}
+                placeholder={formField.placeholder ?? fieldTypePlaceholderRecord[formField.type]}
                 endAdornment={formField.private ? <Chip sx={{ ml: 1 }} label='Private' size='small' /> : undefined}
                 description={formField.description ?? ''}
                 disabled={!onSave}

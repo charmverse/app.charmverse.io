@@ -1,5 +1,6 @@
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { isValidName } from 'ethers/lib/utils';
 import type { FieldValues } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { isAddress } from 'viem';
@@ -33,24 +34,32 @@ export function useFormFields({
     reset
   } = useForm({
     mode: 'onChange',
-    defaultValues: fields.reduce<Record<string, Prisma.JsonValue>>((acc, prop) => {
-      acc[prop.id] =
-        prop.type === 'multiselect' || prop.type === 'person'
-          ? // Convert to array if not already as yup expects array
-            Array.isArray(prop.value)
-            ? prop.value
-            : []
-          : prop.type === 'short_text' || prop.type === 'long_text'
-          ? prop.value ?? emptyDocument
-          : prop.value ?? '';
-      return acc;
-    }, {}),
+    defaultValues: fields
+      .filter((field) => field.type !== 'label')
+      .reduce<Record<string, Prisma.JsonValue>>((acc, prop) => {
+        const value =
+          prop.type === 'multiselect' || prop.type === 'person'
+            ? // Convert to array if not already as yup expects array
+              Array.isArray(prop.value)
+              ? prop.value
+              : []
+            : prop.type === 'long_text'
+            ? prop.value || {
+                content: emptyDocument,
+                contentText: ''
+              }
+            : prop.value || '';
+        acc[prop.id] = value;
+
+        return acc;
+      }, {}),
     resolver: yupResolver(
       yup.object(
         fields.reduce((acc, property) => {
           const isRequired = property.required;
           switch (property.type) {
             case 'text':
+            case 'short_text':
             case 'text_multiline': {
               acc[property.id] = yup.string().test('is-required', 'Required', (value) => {
                 return isRequired ? !!value : true;
@@ -59,20 +68,31 @@ export function useFormFields({
             }
             case 'date': {
               acc[property.id] = yup.string().test('is-date', 'Invalid date', (value) => {
-                return isRequired ? (value ? !Number.isNaN(Date.parse(value)) : false) : true;
+                if (isRequired && !value) {
+                  return false;
+                }
+                return value ? !Number.isNaN(new Date(value)) : true;
               });
               break;
             }
             case 'email': {
               acc[property.id] = yup.string().test('is-email', 'Invalid email', (value) => {
-                return isRequired ? (value ? isValidEmail(value) : false) : true;
+                if (isRequired && !value) {
+                  return false;
+                }
+
+                return value ? isValidEmail(value) : true;
               });
 
               break;
             }
             case 'number': {
               acc[property.id] = yup.string().test('is-number', 'Invalid number', (value) => {
-                return isRequired ? (value ? !Number.isNaN(value) : false) : true;
+                if (isRequired && !value) {
+                  return false;
+                }
+
+                return value ? !Number.isNaN(value) : true;
               });
               break;
             }
@@ -82,7 +102,11 @@ export function useFormFields({
             }
             case 'select': {
               acc[property.id] = yup.string().test('is-uuid', 'Invalid uuid', (value) => {
-                return isRequired ? (value ? isUUID(value) : false) : true;
+                if (isRequired && !value) {
+                  return false;
+                }
+
+                return value ? isUUID(value) : true;
               });
               break;
             }
@@ -92,38 +116,50 @@ export function useFormFields({
                 .array()
                 .of(yup.string().uuid())
                 .test('is-uuid', 'Invalid uuid', (value) => {
-                  return isRequired
-                    ? value
-                      ? value.length === 0
-                        ? false
-                        : value.every((v) => (v ? isUUID(v) : false))
-                      : false
-                    : true;
+                  if (isRequired && !value) {
+                    return false;
+                  }
+
+                  return value ? value.every((v) => (v ? isUUID(v) : false)) : true;
                 });
               break;
             }
             case 'phone': {
               acc[property.id] = yup.string().test('is-phone', 'Invalid phone number', (value) => {
-                return isRequired ? (value ? !!value.match(/^(0|[1-9]\d*)(\.\d+)?$/) : false) : true;
+                if (isRequired && !value) {
+                  return false;
+                }
+
+                return value ? !!value.match(/^\+?[0-9]+$/) : true;
               });
               break;
             }
             case 'wallet': {
               acc[property.id] = yup.string().test('is-wallet', 'Invalid wallet address', (value) => {
-                return isRequired ? (value ? isAddress(value) : false) : true;
+                if (isRequired && !value) {
+                  return false;
+                }
+
+                return value ? isAddress(value) || value.endsWith('.eth') || isValidName(value) : true;
               });
               break;
             }
             case 'url': {
               acc[property.id] = yup.string().test('is-url', 'Invalid url', (value) => {
-                return isRequired ? (value ? isUrl(value) : false) : true;
+                if (isRequired && !value) {
+                  return false;
+                }
+                return value ? isUrl(value) : true;
               });
               break;
             }
-            case 'long_text':
-            case 'short_text': {
+            case 'long_text': {
               acc[property.id] = yup.object().test('is-required', 'Required', (value) => {
-                return isRequired ? !checkIsContentEmpty(value as PageContent) : true;
+                if (isRequired && !value) {
+                  return false;
+                }
+
+                return 'content' in value ? !checkIsContentEmpty(value.content as PageContent) : true;
               });
               break;
             }
