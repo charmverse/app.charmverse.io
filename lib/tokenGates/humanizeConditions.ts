@@ -5,7 +5,7 @@ import { formatEther, isAddress } from 'viem';
 import { shortWalletAddress } from 'lib/utilities/blockchain';
 import { isTruthy } from 'lib/utilities/types';
 
-import type { TokenGate } from './interfaces';
+import type { TokenGate, TokenGateConditions } from './interfaces';
 import { ALL_LIT_CHAINS } from './utils';
 
 const humanizeComparator = (comparator: string) => {
@@ -38,6 +38,7 @@ export type HumanizeConditionsContent = {
 
 export type HumanizeCondition = {
   image?: string;
+  standardContractType?: string;
   content: HumanizeConditionsContent[];
 };
 
@@ -47,7 +48,7 @@ export function humanizeUnlockConditionsData(conditions: TokenGate<'unlock'>['co
       image: conditions.image,
       content: [
         { type: 'text', content: 'Unlock Protocol -' },
-        { type: 'text', content: conditions.name }
+        { type: 'text', content: conditions.name || 'Lock' }
       ]
     }
   ];
@@ -103,6 +104,7 @@ export function humanizeLitConditionsData(conditions: TokenGate<'lit'>['conditio
           // Owner of ${tokenName} on ${chain}
           return {
             image,
+            standardContractType: acc.standardContractType,
             content: [
               { type: 'text', content: 'Owner of' },
               { ...etherscanUrl, content: tokenName, props: { fontWeight: 'bold' } },
@@ -121,6 +123,7 @@ export function humanizeLitConditionsData(conditions: TokenGate<'lit'>['conditio
           // Owns any POAP
           return {
             image,
+            standardContractType: acc.standardContractType,
             content: [{ type: 'text', content: `Owns any POAP` }]
           };
         } else if (acc.standardContractType === 'POAP' && acc.method === 'tokenURI') {
@@ -128,6 +131,7 @@ export function humanizeLitConditionsData(conditions: TokenGate<'lit'>['conditio
           // Owner of a ${value} POAP on ${chain}
           return {
             image,
+            standardContractType: acc.standardContractType,
             content: [
               { type: 'text', content: 'Owner of a' },
               {
@@ -144,6 +148,7 @@ export function humanizeLitConditionsData(conditions: TokenGate<'lit'>['conditio
           // Owner of a POAP from event ID ${value} on ${chain}
           return {
             image,
+            standardContractType: acc.standardContractType,
             content: [
               { type: 'text', content: 'Owner of a POAP from event ID' },
               { type: 'text', content: value, props: { fontWeight: 'bold' } },
@@ -212,16 +217,17 @@ export function humanizeLitConditionsData(conditions: TokenGate<'lit'>['conditio
           };
         } else if (acc.standardContractType === 'ERC721' && acc.method === 'balanceOf') {
           // any erc721 in collection
-          // Owns ${comparator} ${value} of ${tokenName} nft on ${chain}
+          // Owns ${comparator} ${value} of ${tokenName} NFT on ${chain}
           return {
             image,
+            standardContractType: acc.standardContractType,
             content: [
               { type: 'text', content: `Owns` },
               { type: 'text', content: comparator },
               { type: 'text', content: value },
               { type: 'text', content: `of` },
               { type: 'text', content: tokenName, props: { fontWeight: 'bold' } },
-              { type: 'text', content: `nft on` },
+              { type: 'text', content: `NFT on` },
               { type: 'text', content: chain }
             ]
           };
@@ -293,7 +299,7 @@ export function humanizeLitConditionsData(conditions: TokenGate<'lit'>['conditio
   return humanReadableConditions || [];
 }
 
-export function humanizeConditionsData(tokenGate: TokenGate, walletAddress: string) {
+export function humanizeConditionsData<T extends TokenGateConditions>(tokenGate: T, walletAddress: string) {
   const { type, conditions } = tokenGate;
 
   switch (type) {

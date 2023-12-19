@@ -1,9 +1,5 @@
-import type {
-  AuthSig,
-  JsonSigningResourceId,
-  JsonStoreSigningRequest,
-  UnifiedAccessControlConditions
-} from '@lit-protocol/types';
+import type { AuthSig, JsonSigningResourceId, JsonStoreSigningRequest } from '@lit-protocol/types';
+import type { PopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
 import { v4 as uuid } from 'uuid';
@@ -12,7 +8,7 @@ import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import { useSaveSigningCondition, useCreateTokenGate } from 'charmClient/hooks/tokenGates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { Lock, TokenGate } from 'lib/tokenGates/interfaces';
+import type { TokenGateConditions } from 'lib/tokenGates/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 
 import { createAuthSigs, getAllChains } from '../utils/helpers';
@@ -27,51 +23,44 @@ export type ConditionsModalResult = Pick<JsonStoreSigningRequest, 'unifiedAccess
 };
 
 type IContext = {
-  handleUnifiedAccessControlConditions: (conditions: UnifiedAccessControlConditions) => void;
-  onSubmit: (type: TokenGate['type']) => Promise<void>;
-  unifiedAccessControlConditions: UnifiedAccessControlConditions;
   flow: Flow;
-  lock?: Lock;
-  setFlow: (flow: Flow) => void;
-  resetModal: () => void;
-  handleLock: (lock: Lock) => void;
+  tokenGate?: TokenGateConditions;
   displayedPage: DisplayedPage;
+  popupState: PopupState;
+  setFlow: (flow: Flow) => void;
+  onSubmit: () => Promise<void>;
+  resetModal: () => void;
+  handleTokenGate: (tokenGate: TokenGateConditions) => void;
   setDisplayedPage: (page: DisplayedPage) => void;
-  onClose: () => void;
   loadingToken: boolean;
   error?: string;
 };
 
 export const TokenGateModalContext = createContext<Readonly<IContext>>({
-  handleUnifiedAccessControlConditions: () => undefined,
+  handleTokenGate: () => undefined,
   onSubmit: async () => undefined,
-  unifiedAccessControlConditions: [],
+  popupState: {} as PopupState,
   flow: 'single',
   setFlow: () => undefined,
   resetModal: () => undefined,
   displayedPage: 'home',
   setDisplayedPage: () => undefined,
-  onClose: () => undefined,
-  handleLock: () => undefined,
   loadingToken: false,
-  lock: undefined,
+  tokenGate: undefined,
   error: undefined
 });
 
 export function TokenGateModalProvider({
   children,
-  onClose,
+  popupState,
   refreshTokenGates
 }: {
   children: ReactNode;
-  onClose: () => void;
+  popupState: PopupState;
   refreshTokenGates: () => void;
 }) {
   const [displayedPage, setDisplayedPage] = useState<DisplayedPage>('home');
-  const [unifiedAccessControlConditions, setUnifiedAccessControlConditions] = useState<UnifiedAccessControlConditions>(
-    []
-  );
-  const [lock, setLock] = useState<Lock>();
+  const [tokenGate, setTokenGate] = useState<TokenGateConditions>();
   const litClient = useLitProtocol();
   const { error: tokenError, isMutating: tokenLoading, trigger: createTokenGate } = useCreateTokenGate();
   const { error: litError, isMutating: litLoading, trigger: saveSigningCondition } = useSaveSigningCondition(litClient);
@@ -80,87 +69,98 @@ export function TokenGateModalProvider({
   const { space } = useCurrentSpace();
   const spaceId = space?.id || '';
 
-  const handleUnifiedAccessControlConditions = (conditions: UnifiedAccessControlConditions) => {
-    const andOperator = { operator: 'and' };
-    const orOperator = { operator: 'or' };
-    const operator = flow === 'multiple_all' ? andOperator : flow === 'multiple_one' ? orOperator : undefined;
-    setUnifiedAccessControlConditions((prevState) => [...prevState, operator, ...conditions].filter(isTruthy));
-  };
+  const handleTokenGate = (_tokenGate: TokenGateConditions) => {
+    setTokenGate((prevState) => {
+      if (_tokenGate.type === 'lit' && (!prevState || prevState.type === 'lit')) {
+        const andOperator = { operator: 'and' };
+        const orOperator = { operator: 'or' };
+        const operator = flow === 'multiple_all' ? andOperator : flow === 'multiple_one' ? orOperator : undefined;
 
-  const handleLock = (_lock: Lock) => {
-    setLock(_lock);
-  };
-
-  const clearAllAccessControlConditions = () => {
-    setUnifiedAccessControlConditions([]);
+        return {
+          type: _tokenGate.type,
+          conditions: {
+            unifiedAccessControlConditions: [
+              ...(prevState?.conditions?.unifiedAccessControlConditions || []),
+              operator,
+              ...(_tokenGate.conditions.unifiedAccessControlConditions || [])
+            ].filter(isTruthy)
+          }
+        };
+      } else {
+        return _tokenGate;
+      }
+    });
   };
 
   const resetModal = () => {
     setFlow('single');
     setDisplayedPage('home');
-    clearAllAccessControlConditions();
+    setTokenGate(undefined);
   };
 
   const createUnifiedAccessControlConditions = async () => {
-    const authSigTypes = createAuthSigs(unifiedAccessControlConditions);
-    const chains = getAllChains(unifiedAccessControlConditions);
+    if (tokenGate?.type === 'lit' && tokenGate?.conditions?.unifiedAccessControlConditions) {
+      const unifiedAccessControlConditions = tokenGate.conditions.unifiedAccessControlConditions;
+      const authSigTypes = createAuthSigs(unifiedAccessControlConditions);
+      const chains = getAllChains(unifiedAccessControlConditions);
 
-    const conditions: ConditionsModalResult = {
-      unifiedAccessControlConditions,
-      permanent: true,
-      chains,
-      authSigTypes
-    };
+      const conditions: ConditionsModalResult = {
+        unifiedAccessControlConditions,
+        permanent: true,
+        chains,
+        authSigTypes
+      };
 
-    const tokenGateId = uuid();
-    const resourceId: JsonSigningResourceId = {
-      baseUrl: 'https://app.charmverse.io',
-      path: `${Math.random()}`,
-      orgId: spaceId,
-      role: 'member',
-      extraData: JSON.stringify({
-        tokenGateId
-      })
-    };
+      const tokenGateId = uuid();
+      const resourceId: JsonSigningResourceId = {
+        baseUrl: 'https://app.charmverse.io',
+        path: `${Math.random()}`,
+        orgId: spaceId,
+        role: 'member',
+        extraData: JSON.stringify({
+          tokenGateId
+        })
+      };
 
-    const authSig: AuthSig = walletAuthSignature ?? (await requestSignature());
+      const authSig: AuthSig = walletAuthSignature ?? (await requestSignature());
 
-    if (!authSig || !authSigTypes[0]) {
-      return;
-    }
+      if (!authSig || !authSigTypes[0]) {
+        return;
+      }
 
-    const litSuccess = await saveSigningCondition({
-      unifiedAccessControlConditions: conditions.unifiedAccessControlConditions,
-      chain: authSigTypes[0], // etherum or solana
-      authSig,
-      resourceId
-    });
-
-    if (litSuccess) {
-      await createTokenGate({
-        conditions,
-        resourceId,
-        spaceId,
-        type: 'lit',
-        id: tokenGateId
+      const litSuccess = await saveSigningCondition({
+        unifiedAccessControlConditions: conditions.unifiedAccessControlConditions,
+        chain: authSigTypes[0], // etherum or solana
+        authSig,
+        resourceId
       });
 
-      refreshTokenGates();
-    }
+      if (litSuccess) {
+        await createTokenGate({
+          conditions,
+          resourceId,
+          spaceId,
+          type: 'lit',
+          id: tokenGateId
+        });
 
-    resetModal();
-    onClose();
+        refreshTokenGates();
+      }
+
+      resetModal();
+      popupState.close();
+    }
   };
 
   const createUnlockProtocolGate = async () => {
-    if (lock) {
+    if (tokenGate?.type === 'unlock' && tokenGate.conditions) {
       const id = uuid();
 
       await createTokenGate({
         conditions: {
-          contract: lock.contract,
-          chainId: lock.chainId,
-          name: lock.name || ''
+          contract: tokenGate.conditions.contract,
+          chainId: tokenGate.conditions.chainId,
+          name: tokenGate.conditions.name || ''
         },
         type: 'unlock',
         resourceId: {},
@@ -170,47 +170,43 @@ export function TokenGateModalProvider({
 
       refreshTokenGates();
       resetModal();
-      onClose();
+      popupState.close();
     }
   };
 
-  const onSubmit = async (type: TokenGate['type']) => {
-    if (type === 'unlock') {
+  const onSubmit = async () => {
+    if (tokenGate?.type === 'unlock') {
       await createUnlockProtocolGate();
-    } else if (type === 'lit') {
+    } else if (tokenGate?.type === 'lit') {
       await createUnifiedAccessControlConditions();
     }
   };
 
-  const value = useMemo(
+  const value: IContext = useMemo(
     () => ({
-      handleUnifiedAccessControlConditions,
       onSubmit,
       resetModal,
       setDisplayedPage,
+      handleTokenGate,
       setFlow,
-      onClose,
-      handleLock,
-      unifiedAccessControlConditions,
+      popupState,
       displayedPage,
-      lock,
+      tokenGate,
       flow,
       loadingToken: tokenLoading || litLoading,
       error: tokenError?.message || typeof litError?.message === 'string' ? litError?.message : undefined
     }),
     [
       flow,
-      lock,
-      unifiedAccessControlConditions,
       displayedPage,
       tokenLoading,
       litLoading,
+      tokenGate,
+      popupState,
       tokenError?.message,
       litError?.message,
       resetModal,
-      onClose,
-      handleLock,
-      handleUnifiedAccessControlConditions
+      handleTokenGate
     ]
   );
 

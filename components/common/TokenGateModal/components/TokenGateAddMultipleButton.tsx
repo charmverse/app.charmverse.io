@@ -19,7 +19,7 @@ export function TokenGateAddMultipleButton({ onClick }: { onClick: (flow: Flow) 
         endIcon={<KeyboardArrowDownIcon />}
         {...bindTrigger(menuPopupState)}
       >
-        Add another gate
+        Add condition
       </Button>
       <Menu
         id='multiple-gates-menu'
