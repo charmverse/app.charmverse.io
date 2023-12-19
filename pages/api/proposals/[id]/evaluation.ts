@@ -55,9 +55,11 @@ async function updateEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
   if (proposal.page?.type === 'proposal_template' && !isAdmin) {
     throw new AdministratorOnlyError();
   }
+
   // A proposal can only be updated when its in draft or discussion status and only the proposal author can update it
   const proposalPermissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
     resourceId: proposal.id,
+    useProposalEvaluationPermissions: proposal?.status === 'published',
     userId
   });
 

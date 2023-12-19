@@ -31,10 +31,6 @@ export function useGetProposalDetails(proposalId: MaybeString) {
   return useGET<ProposalWithUsersAndRubric>(proposalId ? `/api/proposals/${proposalId}` : null);
 }
 
-export function useGetAllReviewerUserIds(proposalId: MaybeString) {
-  return useGET<string[]>(proposalId ? `/api/proposals/${proposalId}/get-user-reviewerids` : null);
-}
-
 export function useGetIsReviewer(proposalId: MaybeString) {
   return useGET<boolean>(proposalId ? `/api/proposals/${proposalId}/is-reviewer` : null);
 }

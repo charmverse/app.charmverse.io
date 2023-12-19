@@ -16,10 +16,14 @@ export type EvaluationTypeOrDraft = ProposalEvaluationType | 'draft';
 // Currently this is just used for proposals but there's no reason not to add logic for other page types here
 export function ProposalStickyFooter({
   proposal,
-  refreshProposal
+  refreshProposal,
+  isEvaluationSidebarOpen,
+  openEvaluationSidebar
 }: {
   proposal: ProposalWithUsersAndRubric;
   refreshProposal: VoidFunction;
+  isEvaluationSidebarOpen: boolean;
+  openEvaluationSidebar: (evaluationId?: string) => void;
 }) {
   const currentEvaluation = proposal.evaluations.find((e) => e.id === proposal.currentEvaluationId);
   const currentEvaluationIndex = proposal?.evaluations.findIndex((e) => e.id === currentEvaluation?.id) ?? -1;
@@ -55,14 +59,17 @@ export function ProposalStickyFooter({
             currentStep={currentEvaluation}
             nextStep={nextStep}
             proposalId={proposal.id}
+            disabledTooltip={
+              !proposal.permissions.move ? 'You do not have permission to move this proposal' : undefined
+            }
             onSubmit={refreshProposal}
           />
         )}
         {hasSidebarEvaluation && (
           <OpenEvaluationButton
-            disabled={!proposal.permissions.move}
+            disabled={!proposal.permissions.move || isEvaluationSidebarOpen}
             isEvaluationSidebarOpen={false}
-            onClick={refreshProposal}
+            onClick={() => openEvaluationSidebar(currentEvaluation?.id)}
           />
         )}
       </Box>

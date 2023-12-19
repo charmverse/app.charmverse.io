@@ -299,7 +299,6 @@ function DocumentPage({
       });
     }
   }, [printRef, _printRef]);
-
   return (
     <>
       {!!page?.deletedAt && (
@@ -481,6 +480,7 @@ function DocumentPage({
                     spaceId={page.spaceId}
                     proposalId={proposalId}
                     proposalEvaluationId={activeEvaluationId}
+                    readOnlyProposalPermissions={!proposal?.permissions.edit}
                     pagePermissions={pagePermissions}
                     editorState={editorState}
                     sidebarView={sidebarView}
@@ -507,7 +507,12 @@ function DocumentPage({
           </PageEditorContainer>
         </Box>
         {isCharmVerse && proposal && page.type === 'proposal' && (
-          <ProposalStickyFooter proposal={proposal} refreshProposal={refreshProposal} />
+          <ProposalStickyFooter
+            proposal={proposal}
+            refreshProposal={refreshProposal}
+            isEvaluationSidebarOpen={sidebarView === 'proposal_evaluation'}
+            openEvaluationSidebar={openEvaluationSidebar}
+          />
         )}
       </PrimaryColumn>
     </>

@@ -11,15 +11,18 @@ import { EvaluationSettings } from './components/EvaluationSettings';
 export type Props = {
   proposal?: Pick<ProposalPropertiesInput, 'categoryId' | 'evaluations'>;
   onChangeEvaluation?: (evaluationId: string, updated: Partial<ProposalEvaluationValues>) => void;
-  goToEvaluation: (evaluationId: string) => void;
+  goToEvaluation: (evaluationId?: string) => void;
+  readOnly: boolean;
   showHeader: boolean;
 };
 
-export function EvaluationSettingsSidebar({ proposal, showHeader, goToEvaluation, onChangeEvaluation }: Props) {
-  const isAdmin = useIsAdmin();
-
-  const canEdit = isAdmin;
-
+export function EvaluationSettingsSidebar({
+  proposal,
+  showHeader,
+  goToEvaluation,
+  onChangeEvaluation,
+  readOnly
+}: Props) {
   const evaluationsWithConfig = proposal?.evaluations.filter((e) => e.type !== 'feedback');
 
   return (
@@ -37,7 +40,7 @@ export function EvaluationSettingsSidebar({ proposal, showHeader, goToEvaluation
             <Card key={evaluation.id} variant='outlined' sx={{ p: 1, mb: 2 }}>
               <EvaluationSettings
                 categoryId={proposal.categoryId}
-                readOnly={!canEdit}
+                readOnly={readOnly}
                 evaluation={evaluation}
                 onChange={(updated) => {
                   onChangeEvaluation?.(evaluation.id, updated);

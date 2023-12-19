@@ -26,12 +26,20 @@ export function ProposalSidebarHeader({
 }: {
   activeEvaluationId?: string | null;
   evaluations: EvaluationOption[];
-  goToEvaluation: (evalId: string) => void;
+  goToEvaluation: (evaluationId?: string) => void;
   goToSettings: VoidFunction;
 }) {
   const selectableEvaluations = useMemo(() => {
     return evaluations.filter((evaluation) => evaluationTypesWithSidebar.includes(evaluation.type));
   }, [evaluations]);
+
+  function toggleSettings() {
+    if (activeEvaluationId) {
+      goToSettings();
+    } else {
+      goToEvaluation();
+    }
+  }
   if (selectableEvaluations.length === 0) {
     return null;
   }
@@ -46,7 +54,7 @@ export function ProposalSidebarHeader({
         />
         <Tooltip title={SIDEBAR_VIEWS.proposal_evaluation_settings.tooltip}>
           <div>
-            <IconButton onClick={goToSettings} size='small'>
+            <IconButton onClick={toggleSettings} size='small'>
               <SettingsIcon color={activeEvaluationId ? 'secondary' : 'inherit'} fontSize='small' />
             </IconButton>
           </div>

@@ -25,7 +25,11 @@ export function PassFailSidebar({ proposal, evaluation, isCurrent, refreshPropos
 
   const isReviewer = proposal?.permissions.evaluate;
   const completedDate = evaluation.completedAt ? getRelativeTimeInThePast(new Date(evaluation.completedAt)) : null;
-  const disabledTooltip = !isCurrent ? 'Evaluation is not current' : !isReviewer ? 'You are not a reviewer' : null;
+  const disabledTooltip = !isCurrent
+    ? 'This evaluation step is not active'
+    : !isReviewer
+    ? 'You are not a reviewer'
+    : null;
 
   async function onSubmitReview(result: NonNullable<PopulatedEvaluation['result']>) {
     await updateProposalEvaluation({

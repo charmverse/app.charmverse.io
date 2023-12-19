@@ -4,8 +4,6 @@ import { useUpdateProposalEvaluation } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
 import { useSnackbar } from 'hooks/useSnackbar';
 
-import type { ProposalEvaluationValues } from '../../EvaluationSettingsSidebar/components/EvaluationSettings';
-
 export type Props = {
   proposalId: string;
   disabledTooltip?: string;
