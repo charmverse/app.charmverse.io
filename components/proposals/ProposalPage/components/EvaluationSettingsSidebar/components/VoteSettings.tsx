@@ -72,7 +72,7 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
         });
       }
     }
-  }, [voteType, options, maxChoices, durationDays, passThreshold]);
+  }, [voteType, options, maxChoices, durationDays, passThreshold, publishToSnapshot]);
 
   return (
     <StyledVoteSettings>
