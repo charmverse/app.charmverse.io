@@ -15,13 +15,11 @@ import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
 import { LoadingIcon } from 'components/common/LoadingComponent';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
-import { AttachRewardButton } from 'components/proposals/components/ProposalRewards/AttachRewardButton';
 import { ProposalRewards } from 'components/proposals/components/ProposalRewards/ProposalRewards';
 import { CustomPropertiesAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/CustomPropertiesAdapter';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { isProdEnv } from 'config/constants';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { ProposalFields, ProposalPropertiesField } from 'lib/proposal/blocks/interfaces';
@@ -169,16 +167,6 @@ export function ProposalPropertiesBase({
     }
   }
 
-  async function handleEvaluationChange({ evaluationId, toDraft }: { evaluationId?: string; toDraft?: boolean }) {
-    if (toDraft) {
-      await updateProposalStatus?.('draft');
-    } else if (evaluationId) {
-      // move to the next evaluation step
-      // console.log('handleEvaluationChange', evaluationId);
-      await changeEvaluationStep?.(evaluationId);
-    }
-  }
-
   const isAuthor = proposalFormInputs.authors.includes(user?.id ?? '');
   const proposalCategoryId = proposalFormInputs.categoryId;
   const proposalCategory = categories?.find((category) => category.id === proposalCategoryId);
@@ -220,10 +208,6 @@ export function ProposalPropertiesBase({
     lensProposalPropertyState = 'show_link';
   } else {
     lensProposalPropertyState = lensProfile && account ? 'show_toggle' : 'hide';
-  }
-
-  function handleClickEvaluationStep(evaluationId: string) {
-    openEvaluation?.(evaluationId);
   }
 
   return (
