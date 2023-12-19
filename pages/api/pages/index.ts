@@ -11,7 +11,6 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { createPage } from 'lib/pages/server/createPage';
 import { PageNotFoundError } from 'lib/pages/server/errors';
 import { getPage } from 'lib/pages/server/getPage';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
@@ -19,14 +18,7 @@ import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).post(
-  providePermissionClients({
-    key: 'spaceId',
-    location: 'body',
-    resourceIdType: 'space'
-  }),
-  createPageHandler
-);
+handler.use(requireUser).post(createPageHandler);
 
 async function createPageHandler(req: NextApiRequest, res: NextApiResponse<Page>) {
   const data = req.body as Prisma.PageUncheckedCreateInput;
@@ -54,7 +46,7 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<Page>
       throw new UnauthorisedActionError('You do not have permissions to create a page.');
     }
   } else {
-    const permissions = await req.basePermissionsClient.spaces.computeSpacePermissions({
+    const permissions = await permissionsApiClient.spaces.computeSpacePermissions({
       resourceId: spaceId,
       userId
     });

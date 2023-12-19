@@ -6,25 +6,16 @@ import { prismaToBlock } from 'lib/focalboard/block';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { duplicatePage } from 'lib/pages/duplicatePage';
 import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { duplicatePage } from 'lib/pages/duplicatePage';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { PageNotFoundError } from 'lib/public-api';
 import { withSessionRoute } from 'lib/session/withSession';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireUser)
-  .use(
-    providePermissionClients({
-      key: 'id',
-      location: 'query',
-      resourceIdType: 'page'
-    })
-  )
-  .post(duplicatePageRoute);
+handler.use(requireUser).post(duplicatePageRoute);
 
 async function duplicatePageRoute(req: NextApiRequest, res: NextApiResponse<DuplicatePageResponse>) {
   const pageId = req.query.id as string;
@@ -46,7 +37,7 @@ async function duplicatePageRoute(req: NextApiRequest, res: NextApiResponse<Dupl
     throw new PageNotFoundError(pageId);
   }
 
-  const spacePermissions = await req.basePermissionsClient.spaces.computeSpacePermissions({
+  const spacePermissions = await permissionsApiClient.spaces.computeSpacePermissions({
     resourceId: pageToDuplicate.spaceId,
     userId
   });

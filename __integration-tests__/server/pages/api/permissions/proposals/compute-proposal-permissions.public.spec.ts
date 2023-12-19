@@ -2,7 +2,7 @@ import type { ProposalCategoryPermission, Space, User } from '@charmverse/core/p
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
-import { publicPermissionsClient } from 'lib/permissions/api/client';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 let space: Space;
@@ -31,7 +31,7 @@ describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute
 
     const userCookie = await loginUser(user.id);
 
-    const computed = await publicPermissionsClient.proposals.computeProposalPermissions({
+    const computed = await permissionsApiClient.proposals.computeProposalPermissions({
       resourceId: proposal.id,
       userId: user.id
     });
@@ -59,7 +59,7 @@ describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute
     });
     const userCookie = await loginUser(user.id);
 
-    const computed = await publicPermissionsClient.proposals.computeProposalPermissions({
+    const computed = await permissionsApiClient.proposals.computeProposalPermissions({
       resourceId: proposal.id,
       userId: user.id
     });
@@ -87,7 +87,7 @@ describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute
     });
 
     // Non logged in user test case
-    const publicComputed = await publicPermissionsClient.proposals.computeProposalPermissions({
+    const publicComputed = await permissionsApiClient.proposals.computeProposalPermissions({
       resourceId: proposal.id,
       userId: undefined
     });
