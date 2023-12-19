@@ -1,4 +1,4 @@
-import { Chip, MenuItem, TextField } from '@mui/material';
+import { Chip, MenuItem, Stack, TextField } from '@mui/material';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import { forwardRef, useEffect, useRef, useState } from 'react';
 import { v4 } from 'uuid';
@@ -18,7 +18,7 @@ type SelectProps = {
   disabled?: boolean;
   canEditOptions?: boolean;
   noOptionsText?: string;
-  onChange: (option: string | string[]) => void;
+  onChange?: (option: string | string[]) => void;
   onCreateOption?: (option: SelectOptionType) => void;
   onUpdateOption?: (option: SelectOptionType) => void;
   onDeleteOption?: (option: SelectOptionType) => void;
@@ -35,6 +35,8 @@ type Props = Omit<ControlFieldProps, 'value'> & FieldProps & SelectProps;
 export const SelectField = forwardRef<HTMLDivElement, Props>(
   (
     {
+      description,
+      endAdornment,
       required,
       label,
       iconLabel,
@@ -52,6 +54,8 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
       className,
       forcePopupIcon = 'auto',
       noOptionsText,
+      helperText,
+      fieldWrapperSx,
       ...inputProps
     },
     ref
@@ -84,7 +88,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
         onCreateOption(tempValueOption);
       }
 
-      inputProps.onChange(newValue || '');
+      inputProps.onChange?.(newValue || '');
     }
 
     useEffect(() => {
@@ -107,7 +111,15 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
     }, [isOpened, isOptionEditOpened]);
 
     return (
-      <FieldWrapper label={label} required={required} inline={inline} iconLabel={iconLabel}>
+      <FieldWrapper
+        endAdornment={endAdornment}
+        description={description}
+        label={label}
+        required={required}
+        inline={inline}
+        iconLabel={iconLabel}
+        sx={fieldWrapperSx}
+      >
         <Autocomplete
           data-test='autocomplete'
           className={className}
@@ -144,18 +156,20 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
               />
             );
           }}
-          renderTags={(value, getTagProps) =>
-            value.map((option, index) => (
-              // eslint-disable-next-line react/jsx-key
-              <Chip
-                {...getTagProps({ index })}
-                style={{ margin: 0 }} // margin is added when dropdown is open for some reason, making the input height increase
-                size='small'
-                label={option.name}
-                color={option.color}
-              />
-            ))
-          }
+          renderTags={(value, getTagProps) => (
+            <Stack flexDirection='row' gap={1}>
+              {value.map((option, index) => (
+                // eslint-disable-next-line react/jsx-key
+                <Chip
+                  {...getTagProps({ index })}
+                  style={{ margin: 0 }} // margin is added when dropdown is open for some reason, making the input height increase
+                  size='small'
+                  label={option.name}
+                  color={option.color}
+                />
+              ))}
+            </Stack>
+          )}
           noOptionsText={noOptionsText || 'No options available'}
           renderInput={(params) => (
             <TextField
@@ -164,6 +178,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
               size='small'
               placeholder={!selectedOptions.length ? placeholder : undefined}
               error={!!inputProps.error}
+              helperText={helperText}
             />
           )}
           getOptionLabel={(option: SelectOptionType) => {

@@ -11,6 +11,8 @@ import PageHeader, { getPageTop } from 'components/[pageId]/DocumentPage/compone
 import { PageTemplateBanner } from 'components/[pageId]/DocumentPage/components/PageTemplateBanner';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
+import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
+import type { FormFieldInput } from 'components/common/form/interfaces';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -30,6 +32,8 @@ export type ProposalPageAndPropertiesInput = ProposalPropertiesInput & {
   headerImage: string | null;
   icon: string | null;
   type: PageType;
+  proposalType?: 'structured' | 'free-form';
+  formFields?: FormFieldInput[];
 };
 
 type Props = {
@@ -45,6 +49,7 @@ const StyledContainer = styled(PageEditorContainer)`
 // Note: this component is only used before a page is saved to the DB
 export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: Props) {
   const { space: currentSpace } = useCurrentSpace();
+  const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>([]);
   const [, { width: containerWidth }] = useElementSize();
   const { user } = useUser();
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
@@ -95,64 +100,98 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: P
     });
   }
 
+  const toggleCollapse = (fieldId: string) => {
+    if (collapsedFieldIds.includes(fieldId)) {
+      setCollapsedFieldIds(collapsedFieldIds.filter((id) => id !== fieldId));
+    } else {
+      setCollapsedFieldIds([...collapsedFieldIds, fieldId]);
+    }
+  };
+
+  const proposalPageContent = (
+    <>
+      <PageHeader
+        headerImage={formInputs.headerImage}
+        icon={formInputs.icon}
+        readOnly={false}
+        updatedAt={new Date().toString()}
+        title={formInputs.title || ''}
+        // readOnly={readOnly || !!enableSuggestingMode}
+        setPage={(updatedPage) => {
+          setFormInputs(updatedPage);
+        }}
+        placeholder='Title (required)'
+      />
+      <div className='focalboard-body font-family-default'>
+        <div className='CardDetail content'>
+          <ProposalPropertiesBase
+            isFromTemplate={isFromTemplateSource}
+            isTemplateRequired={isTemplateRequired}
+            readOnlyRubricCriteria={readOnlyRubricCriteria}
+            readOnlyReviewers={readOnlyReviewers}
+            readOnlyProposalEvaluationType={isFromTemplateSource}
+            proposalStatus='draft'
+            proposalFormInputs={formInputs}
+            isTemplate={formInputs.type === 'proposal_template'}
+            setProposalFormInputs={setFormInputs}
+            onChangeRubricCriteria={(rubricCriteria) => {
+              setFormInputs({
+                ...formInputs,
+                rubricCriteria
+              });
+            }}
+            readOnlyCustomProperties={readOnlyCustomProperties}
+          />
+        </div>
+      </div>
+    </>
+  );
+
   return (
     <div className={`document-print-container ${fontClassName}`}>
       <Box display='flex' flexDirection='column'>
         <PageTemplateBanner pageType={formInputs.type} isNewPage />
         {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
-        <StyledContainer data-test='page-charmeditor' top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
-          <Box minHeight={450}>
-            <CharmEditor
-              placeholderText={`Describe the proposal. Type '/' to see the list of available commands`}
-              content={formInputs.content as PageContent}
-              autoFocus={false}
-              enableVoting={false}
-              containerWidth={containerWidth}
-              pageType='proposal'
-              disableNestedPages
-              onContentChange={updateProposalContent}
-              focusOnInit
-              isContentControlled
-              key={`${String(formInputs.proposalTemplateId)}.${readOnlyEditor}`}
-            >
+        {formInputs.proposalType === 'structured' ? (
+          <StyledContainer data-test='page-charmeditor' top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
+            <Box minHeight={450}>
               {/* temporary? disable editing of page title when in suggestion mode */}
-              <PageHeader
-                headerImage={formInputs.headerImage}
-                icon={formInputs.icon}
-                readOnly={false}
-                updatedAt={new Date().toString()}
-                title={formInputs.title || ''}
-                // readOnly={readOnly || !!enableSuggestingMode}
-                setPage={(updatedPage) => {
-                  setFormInputs(updatedPage);
+              {proposalPageContent}
+              <FormFieldsEditor
+                collapsedFieldIds={collapsedFieldIds}
+                toggleCollapse={toggleCollapse}
+                formFields={formInputs.formFields || []}
+                setFormFields={(formFields) => {
+                  setFormInputs({
+                    ...formInputs,
+                    formFields: typeof formFields === 'function' ? formFields(formInputs.formFields || []) : formFields
+                  });
                 }}
-                placeholder='Title (required)'
               />
-              <div className='focalboard-body font-family-default'>
-                <div className='CardDetail content'>
-                  <ProposalPropertiesBase
-                    isFromTemplate={isFromTemplateSource}
-                    isTemplateRequired={isTemplateRequired}
-                    readOnlyRubricCriteria={readOnlyRubricCriteria}
-                    readOnlyReviewers={readOnlyReviewers}
-                    readOnlyProposalEvaluationType={isFromTemplateSource}
-                    proposalStatus='draft'
-                    proposalFormInputs={formInputs}
-                    isTemplate={formInputs.type === 'proposal_template'}
-                    setProposalFormInputs={setFormInputs}
-                    onChangeRubricCriteria={(rubricCriteria) => {
-                      setFormInputs({
-                        ...formInputs,
-                        rubricCriteria
-                      });
-                    }}
-                    readOnlyCustomProperties={readOnlyCustomProperties}
-                  />
-                </div>
-              </div>
-            </CharmEditor>
-          </Box>
-        </StyledContainer>
+            </Box>
+          </StyledContainer>
+        ) : (
+          <StyledContainer data-test='page-charmeditor' top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
+            <Box minHeight={450}>
+              <CharmEditor
+                placeholderText={`Describe the proposal. Type '/' to see the list of available commands`}
+                content={formInputs.content as PageContent}
+                autoFocus={false}
+                enableVoting={false}
+                containerWidth={containerWidth}
+                pageType='proposal'
+                disableNestedPages
+                onContentChange={updateProposalContent}
+                focusOnInit
+                isContentControlled
+                key={`${String(formInputs.proposalTemplateId)}.${readOnlyEditor}`}
+              >
+                {/* temporary? disable editing of page title when in suggestion mode */}
+                {proposalPageContent}
+              </CharmEditor>
+            </Box>
+          </StyledContainer>
+        )}
       </Box>
     </div>
   );

@@ -1,4 +1,4 @@
-import type { SystemError } from '@charmverse/core/dist/cjs/errors';
+import type { SystemError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { Application, UserGnosisSafe } from '@charmverse/core/prisma';
 import { BigNumber } from '@ethersproject/bignumber';

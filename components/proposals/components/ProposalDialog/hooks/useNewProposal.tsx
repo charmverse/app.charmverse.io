@@ -110,13 +110,28 @@ export function useNewProposal({ newProposal }: Props) {
     if (formInputs.reviewers.length === 0) {
       return 'Reviewers are required';
     }
+
+    if (formInputs.proposalType === 'structured' && (formInputs.formFields ?? [])?.length === 0) {
+      return 'Form fields are required for structured proposals';
+    }
+
+    if (formInputs.proposalType === 'structured' && formInputs.formFields?.some((formField) => !formField.name)) {
+      return 'Form fields must have a name';
+    }
+
+    if (formInputs.proposalType === 'free-form' && !formInputs.content) {
+      return 'Content is required for free-form proposals';
+    }
   }, [
     currentSpace?.requireProposalTemplate,
     formInputs.categoryId,
     formInputs.proposalTemplateId,
     formInputs.reviewers.length,
     formInputs.title,
-    formInputs.type
+    formInputs.type,
+    formInputs.proposalType,
+    formInputs.formFields,
+    formInputs.content
   ]);
 
   return {
@@ -135,6 +150,7 @@ export function emptyState({
   ...inputs
 }: Partial<ProposalPageAndPropertiesInput> & { userId?: string } = {}): ProposalPageAndPropertiesInput {
   return {
+    proposalType: 'free-form',
     categoryId: null,
     content: null,
     contentText: '',

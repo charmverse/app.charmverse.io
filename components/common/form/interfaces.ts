@@ -1,14 +1,27 @@
-import type { MemberPropertyType } from '@charmverse/core/prisma';
+import type { MemberPropertyType, FormFieldType } from '@charmverse/core/prisma';
+import type { FormField, Prisma } from '@charmverse/core/prisma-client';
+import type { SxProps } from '@mui/material';
 import type { ReactNode } from 'react';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
-// TODO: We might need more generic types in the future
-export type FieldType = MemberPropertyType;
+export type FieldType = MemberPropertyType | FormFieldType;
+
+export interface TFormFieldInput {
+  id: string;
+  value:
+    | string
+    | string[]
+    | {
+        content: PageContent;
+        contentText: string;
+      };
+}
 
 export type ControlFieldProps = {
   onChange?: (value: any) => void;
-  value?: string;
+  value?: TFormFieldInput['value'];
 };
 
 export type SelectFieldProps = {
@@ -28,4 +41,14 @@ export type FieldProps = {
   disabled?: boolean;
   required?: boolean;
   helperText?: ReactNode;
+  description?: PageContent;
+  endAdornment?: ReactNode;
+  fieldWrapperSx?: SxProps;
 } & SelectFieldProps;
+
+export type FormFieldInput = Pick<
+  FormField,
+  'id' | 'description' | 'name' | 'index' | 'required' | 'private' | 'type'
+> & {
+  options?: SelectOptionType[];
+};

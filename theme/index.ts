@@ -387,6 +387,13 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
           }
         }
       },
+      MuiFormHelperText: {
+        styleOverrides: {
+          root: {
+            marginLeft: 0
+          }
+        }
+      },
       MuiSelect: {
         defaultProps: {
           size: 'small'
