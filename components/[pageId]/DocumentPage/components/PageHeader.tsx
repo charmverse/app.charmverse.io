@@ -140,6 +140,7 @@ function PageControls({
     const _icon = randomEmojiList[randomIntFromInterval(0, randomEmojiList.length - 1)];
     setPage({ icon: _icon });
   }
+
   return (
     <Controls className='page-controls'>
       {!readOnly && !icon && (
