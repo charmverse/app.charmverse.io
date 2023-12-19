@@ -48,7 +48,6 @@ export function FormFieldsInputs() {
   return (
     <GlobalContext>
       <CustomFormFieldInputs
-        disabled
         formFields={formFieldTypes.map((formFieldType, index) => {
           const options: SelectOptionType[] = [];
           if (formFieldType.match(/select|multiselect/)) {
@@ -83,6 +82,7 @@ export function FormFieldsInputsDisplay() {
   return (
     <GlobalContext>
       <CustomFormFieldInputs
+        disabled
         formFields={formFieldTypes.map((formFieldType, index) => {
           const options: SelectOptionType[] = [];
           if (formFieldType.match(/select|multiselect/)) {

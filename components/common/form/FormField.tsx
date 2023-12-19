@@ -180,16 +180,16 @@ function ExpandedFormField({
         </Stack>
       )}
 
-      <Stack>
-        <Stack gap={0.5} flexDirection='row' alignItems='center'>
-          <Switch
-            size='small'
-            checked={formField.private}
-            onChange={(e) => updateFormField({ private: e.target.checked, id: formField.id })}
-          />
+      <Stack flexDirection='row' gap={0.5} alignItems='center'>
+        <Switch
+          size='small'
+          checked={formField.private}
+          onChange={(e) => updateFormField({ private: e.target.checked, id: formField.id })}
+        />
+        <Stack>
           <Typography>Private</Typography>
+          <Typography variant='caption'>Only Authors, Reviewers and Admins can see the input</Typography>
         </Stack>
-        <Typography variant='caption'>Only Authors, Reviewers and Admins can see the input</Typography>
       </Stack>
     </>
   );
@@ -259,7 +259,7 @@ export function FormField(
       </div>
       <FormFieldContainer dragDirection={isAdjacentActive ? ((offset?.y ?? 0) < 0 ? 'top' : 'bottom') : undefined}>
         {isOpen ? (
-          <ExpandMoreIcon onClick={toggleOpen} sx={{ cursor: 'pointer' }} />
+          <ExpandMoreIcon onClick={toggleOpen} sx={{ cursor: 'pointer', mt: 1 }} />
         ) : (
           <ChevronRightIcon onClick={toggleOpen} sx={{ cursor: 'pointer' }} />
         )}
