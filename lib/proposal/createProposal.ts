@@ -132,7 +132,9 @@ export async function createProposal({
 
     reviewersInput = evaluations.flatMap((evaluation, index) =>
       evaluation.reviewers.map((reviewer) => ({
-        ...reviewer,
+        roleId: reviewer.roleId,
+        systemRole: reviewer.systemRole,
+        userId: reviewer.userId,
         proposalId,
         evaluationId: evaluationIds[index]
       }))
