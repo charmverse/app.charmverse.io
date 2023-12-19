@@ -152,7 +152,25 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: P
       <Box display='flex' flexDirection='column'>
         <PageTemplateBanner pageType={formInputs.type} isNewPage />
         {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
-        {formInputs.proposalType === 'free-form' ? (
+        {formInputs.proposalType === 'structured' ? (
+          <StyledContainer data-test='page-charmeditor' top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
+            <Box minHeight={450}>
+              {/* temporary? disable editing of page title when in suggestion mode */}
+              {proposalPageContent}
+              <FormFieldsEditor
+                collapsedFieldIds={collapsedFieldIds}
+                toggleCollapse={toggleCollapse}
+                formFields={formInputs.formFields || []}
+                setFormFields={(formFields) => {
+                  setFormInputs({
+                    ...formInputs,
+                    formFields: typeof formFields === 'function' ? formFields(formInputs.formFields || []) : formFields
+                  });
+                }}
+              />
+            </Box>
+          </StyledContainer>
+        ) : (
           <StyledContainer data-test='page-charmeditor' top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
             <Box minHeight={450}>
               <CharmEditor
@@ -171,24 +189,6 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: P
                 {/* temporary? disable editing of page title when in suggestion mode */}
                 {proposalPageContent}
               </CharmEditor>
-            </Box>
-          </StyledContainer>
-        ) : (
-          <StyledContainer data-test='page-charmeditor' top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
-            <Box minHeight={450}>
-              {/* temporary? disable editing of page title when in suggestion mode */}
-              {proposalPageContent}
-              <FormFieldsEditor
-                collapsedFieldIds={collapsedFieldIds}
-                toggleCollapse={toggleCollapse}
-                formFields={formInputs.formFields || []}
-                setFormFields={(formFields) => {
-                  setFormInputs({
-                    ...formInputs,
-                    formFields: typeof formFields === 'function' ? formFields(formInputs.formFields || []) : formFields
-                  });
-                }}
-              />
             </Box>
           </StyledContainer>
         )}
