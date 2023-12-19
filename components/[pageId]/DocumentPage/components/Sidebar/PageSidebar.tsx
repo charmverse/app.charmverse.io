@@ -183,7 +183,7 @@ function SidebarContents({
   isProposalTemplate,
   isNewProposal
 }: SidebarProps) {
-  const isCharmVerse = useIsCharmverseSpace();
+  const isCharmVerse = !!proposal?.evaluations.length;
   return (
     <>
       {sidebarView === 'proposal_evaluation' &&

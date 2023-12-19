@@ -18,7 +18,7 @@ export function OpenEvaluationButton({
     <Button
       disabled={!!disabledTooltip}
       disabledTooltip={disabledTooltip}
-      startIcon={SIDEBAR_VIEWS.proposal_evaluation.icon}
+      endIcon={SIDEBAR_VIEWS.proposal_evaluation.icon}
       onClick={onClick}
     >
       Evaluate
