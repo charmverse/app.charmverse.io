@@ -1,4 +1,4 @@
-import { isDevEnv, isTestEnv } from 'config/constants';
+import { isDevEnv } from 'config/constants';
 
 import { useCurrentSpace } from './useCurrentSpace';
 
@@ -16,7 +16,6 @@ export function useIsCharmverseSpace(allowedDomains = defaultDomains) {
   if (allowedDomains.includes(currentSpace?.domain ?? '') || currentSpace?.domain.startsWith('cvt-')) {
     return true;
   }
-
   // enable in test and dev mode
-  return isDevEnv || isTestEnv;
+  return isDevEnv;
 }

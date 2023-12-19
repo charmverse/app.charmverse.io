@@ -62,7 +62,6 @@ test.describe.serial('Proposal Flow', () => {
     await expect(authorBrowserProposalListPage.emptyState).toBeVisible();
     await authorBrowserProposalListPage.createProposalButton.click();
 
-    await authorBrowserProposalPage.waitForDialog();
     await expect(authorBrowserProposalPage.saveDraftButton).toBeDisabled();
 
     // enter required fields
