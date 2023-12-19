@@ -48,7 +48,7 @@ export function FormFieldsInputs() {
   return (
     <GlobalContext>
       <CustomFormFieldInputs
-        onSave={() => {}}
+        disabled
         formFields={formFieldTypes.map((formFieldType, index) => {
           const options: SelectOptionType[] = [];
           if (formFieldType.match(/select|multiselect/)) {

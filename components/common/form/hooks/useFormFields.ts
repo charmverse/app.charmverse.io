@@ -23,7 +23,7 @@ export function useFormFields({
     required: boolean;
     type: FieldType;
   }[];
-  onSubmit: (values: FieldValues) => void;
+  onSubmit?: (values: FieldValues) => void;
 }) {
   const {
     control,
@@ -200,7 +200,7 @@ export function useFormFields({
         return;
       }
       handleSubmit((_values) => {
-        onSubmit(_values);
+        onSubmit?.(_values);
         // Reset dirty state after submit
         reset(_values, {
           keepDirty: false,
