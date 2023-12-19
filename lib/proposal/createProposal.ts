@@ -7,6 +7,8 @@ import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { arrayUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
+import type { FormFieldInput } from 'components/common/form/interfaces';
+import { createForm } from 'lib/form/createForm';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { createPage } from 'lib/pages/server/createPage';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
@@ -39,6 +41,7 @@ export type CreateProposalInput = {
   rubricCriteria?: RubricDataInput[];
   publishToLens?: boolean;
   fields?: ProposalFields;
+  formFields?: FormFieldInput[];
 };
 
 export type CreatedProposal = {
@@ -56,7 +59,8 @@ export async function createProposal({
   evaluationType,
   rubricCriteria,
   publishToLens,
-  fields
+  fields,
+  formFields
 }: CreateProposalInput) {
   if (!categoryId) {
     throw new InvalidInputError('Proposal must be linked to a category');
@@ -75,6 +79,11 @@ export async function createProposal({
 
   if (!validation.valid) {
     throw new InsecureOperationError(`You cannot create a proposal with authors or reviewers outside the space`);
+  }
+
+  let formId: string | null = null;
+  if (formFields?.length && pageProps?.type === 'proposal_template') {
+    formId = await createForm(formFields);
   }
 
   // Using a transaction to ensure both the proposal and page gets created together
@@ -104,7 +113,8 @@ export async function createProposal({
               }
             }
           : undefined,
-        fields
+        fields,
+        form: formId ? { connect: { id: formId } } : undefined
       },
       include: {
         authors: true,

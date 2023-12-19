@@ -1,8 +1,9 @@
 import { InsecureOperationError, InvalidInputError } from '@charmverse/core/errors';
 import type { ProposalCategory, Space, User } from '@charmverse/core/prisma';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
-import { v4 as uuid } from 'uuid';
+import { v4 as uuid, v4 } from 'uuid';
 
+import type { FormFieldInput } from 'components/common/form/interfaces';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generateProposalCategory } from 'testing/utils/proposals';
 
@@ -86,6 +87,70 @@ describe('Creates a page and proposal with relevant configuration', () => {
         ]
       })
     );
+  });
+
+  it('Create proposal template with form', async () => {
+    const reviewerUser = await generateSpaceUser({
+      isAdmin: false,
+      spaceId: space.id
+    });
+    const extraUser = await generateSpaceUser({
+      isAdmin: false,
+      spaceId: space.id
+    });
+
+    const pageTitle = 'page title 124';
+
+    const formFields: FormFieldInput[] = [
+      {
+        id: v4(),
+        type: 'short_text',
+        name: 'name',
+        description: 'description',
+        index: 0,
+        options: [],
+        private: false,
+        required: true
+      },
+      {
+        id: v4(),
+        type: 'long_text',
+        name: 'long name',
+        description: 'another description',
+        index: 1,
+        options: [],
+        private: true,
+        required: true
+      }
+    ];
+
+    const { page, proposal } = await createProposal({
+      pageProps: {
+        contentText: '',
+        title: pageTitle,
+        type: 'proposal_template'
+      },
+      categoryId: proposalCategory.id,
+      userId: user.id,
+      spaceId: space.id,
+      authors: [user.id, extraUser.id],
+      reviewers: [
+        {
+          group: 'user',
+          id: reviewerUser.id
+        }
+      ],
+      formFields
+    });
+
+    expect(page).toMatchObject(
+      expect.objectContaining({
+        title: pageTitle,
+        type: 'proposal_template'
+      })
+    );
+
+    expect(proposal.formId).toBeDefined();
   });
 
   it('should throw an error if trying to create a proposal with authors or reviewers outside the space', async () => {
