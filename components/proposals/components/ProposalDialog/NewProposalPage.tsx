@@ -185,7 +185,7 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: P
                 setFormFields={(formFields) => {
                   setFormInputs({
                     ...formInputs,
-                    formFields
+                    formFields: typeof formFields === 'function' ? formFields(formInputs.formFields || []) : formFields
                   });
                 }}
               />
