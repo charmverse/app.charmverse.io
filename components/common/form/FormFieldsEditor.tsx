@@ -2,6 +2,8 @@ import AddIcon from '@mui/icons-material/Add';
 import { Stack } from '@mui/material';
 import { v4 } from 'uuid';
 
+import { emptyDocument } from 'lib/prosemirror/constants';
+
 import { Button } from '../Button';
 
 import type { SelectOptionType } from './fields/Select/interfaces';
@@ -51,7 +53,7 @@ export function FormFieldsEditor({
       {
         type: 'short_text',
         name: 'Title',
-        description: '',
+        description: emptyDocument,
         index: formFields.length,
         options: [],
         private: false,
@@ -123,7 +125,7 @@ export function FormFieldsEditor({
   }
 
   return (
-    <Stack p={1} gap={1}>
+    <Stack gap={1}>
       {formFields.map((formField) => (
         <FormField
           toggleOpen={() => {

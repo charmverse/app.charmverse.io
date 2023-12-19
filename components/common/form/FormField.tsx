@@ -1,4 +1,5 @@
 import { type FormFieldType } from '@charmverse/core/prisma-client';
+import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { MoreHoriz } from '@mui/icons-material';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown';
@@ -21,8 +22,11 @@ import {
 } from '@mui/material';
 import { useDrag, useDrop } from 'react-dnd';
 
+import { emptyDocument } from 'lib/prosemirror/constants';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import { mergeRefs } from 'lib/utilities/react';
 
+import { CharmEditor } from '../CharmEditor';
 import PopperPopup from '../PopperPopup';
 
 import { fieldTypeIconRecord, fieldTypeLabelRecord, fieldTypePlaceholderRecord, formFieldTypes } from './constants';
@@ -69,6 +73,8 @@ function ExpandedFormField({
   onDeleteOption,
   onUpdateOption
 }: Omit<FormFieldProps, 'isCollapsed'>) {
+  const theme = useTheme();
+
   return (
     <>
       <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
@@ -126,14 +132,25 @@ function ExpandedFormField({
         placeholder='Title (required)'
         error={!formField.name}
       />
-      <TextField
-        value={formField.description}
-        onChange={(e) => updateFormField({ description: e.target.value, id: formField.id })}
-        sx={{
-          backgroundColor: 'background.light',
-          border: 'none'
+      <CharmEditor
+        isContentControlled
+        content={(formField.description ?? emptyDocument) as PageContent}
+        onContentChange={({ doc }) => {
+          updateFormField({
+            description: doc,
+            id: formField.id
+          });
         }}
-        placeholder='Add your description here (optional)'
+        colorMode='dark'
+        style={{
+          left: 0,
+          paddingLeft: theme.spacing(2)
+        }}
+        disableMention
+        disableNestedPages
+        disablePageSpecificFeatures
+        disableRowHandles
+        placeholderText='Add your description here (optional)'
       />
       <FieldTypeRenderer
         type={formField.type as any}
@@ -254,7 +271,7 @@ export function FormField(
               }}
               endAdornment={formField.private ? <Chip sx={{ mx: 1 }} label='Private' size='small' /> : undefined}
               type={formField.type as any}
-              description={formField.description ?? ''}
+              description={formField.description as PageContent}
               disabled
               label={formField.name}
               required={formField.required}

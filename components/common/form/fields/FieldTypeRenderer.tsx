@@ -6,10 +6,9 @@ import { SelectField } from 'components/common/form/fields/SelectField';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 import type { ControlFieldProps, FieldProps, FieldType } from 'components/common/form/interfaces';
 
-import FieldLabel from '../FieldLabel';
-
 import { CharmEditorInputField } from './CharmEditorInputField';
 import { DateInputField } from './DateInputField';
+import { FieldWrapper } from './FieldWrapper';
 import { PersonInputField } from './PersonInputField';
 
 type TextProps = {
@@ -18,7 +17,7 @@ type TextProps = {
   ControlFieldProps;
 
 type SelectProps = {
-  type: Extract<FieldType, 'select' | 'multiselect'>;
+  type: 'select' | 'multiselect';
 } & FieldProps &
   Required<ControlFieldProps>;
 
@@ -54,23 +53,7 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
       }
 
       case 'label': {
-        return fieldProps.label || fieldProps.description ? (
-          <Stack
-            my={1}
-            sx={{
-              ...fieldProps.fieldWrapperSx
-            }}
-          >
-            <Box alignItems='center' display='flex' gap={1}>
-              <FieldLabel noWrap>{fieldProps.label}</FieldLabel>
-            </Box>
-            {fieldProps.description && (
-              <Typography variant='body2' mb={1}>
-                {fieldProps.description}
-              </Typography>
-            )}
-          </Stack>
-        ) : null;
+        return <FieldWrapper {...fieldProps} />;
       }
 
       case 'select': {

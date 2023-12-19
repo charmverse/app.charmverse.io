@@ -14,7 +14,7 @@ import { brandColorNames } from 'theme/colors';
 
 export function FormFieldsEditor() {
   const field: FormFieldInput = {
-    description: 'This is a description',
+    description: createDocumentWithText('This is a description'),
     index: 0,
     name: 'Title',
     options: [],
@@ -64,7 +64,7 @@ export function FormFieldsInputs() {
           }
           const label = capitalize(formFieldType.replaceAll(/_/g, ' '));
           return {
-            description: `This is a description for ${label.toLocaleLowerCase()}`,
+            description: createDocumentWithText(`This is a description for ${label.toLocaleLowerCase()}`),
             name: `${label} title`,
             options,
             private: index % 2 !== 0,
@@ -156,7 +156,7 @@ export function FormFieldsInputsDisplay() {
             }
           }
           return {
-            description: `This is a description for ${label.toLocaleLowerCase()}`,
+            description: createDocumentWithText(`This is a description for ${label.toLocaleLowerCase()}`),
             name: `${label} title`,
             options,
             private: index % 2 !== 0,

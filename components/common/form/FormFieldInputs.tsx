@@ -3,6 +3,8 @@ import styled from '@emotion/styled';
 import { Box, Chip, Stack } from '@mui/material';
 import { Controller } from 'react-hook-form';
 
+import type { PageContent } from 'lib/prosemirror/interfaces';
+
 import { Button } from '../Button';
 
 import { fieldTypePlaceholderRecord } from './constants';
@@ -45,9 +47,10 @@ export function FormFieldInputs({
             render={({ field }) => (
               <FieldTypeRenderer
                 {...field}
+                value={(field.value ?? '') as TFormFieldInput['value']}
                 placeholder={formField.placeholder ?? fieldTypePlaceholderRecord[formField.type]}
                 endAdornment={formField.private ? <Chip sx={{ ml: 1 }} label='Private' size='small' /> : undefined}
-                description={formField.description ?? ''}
+                description={formField.description as PageContent}
                 disabled={!onSave}
                 type={formField.type}
                 label={formField.name}

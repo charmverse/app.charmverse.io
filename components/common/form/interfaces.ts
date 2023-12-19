@@ -41,7 +41,7 @@ export type FieldProps = {
   disabled?: boolean;
   required?: boolean;
   helperText?: ReactNode;
-  description?: string;
+  description?: PageContent;
   endAdornment?: ReactNode;
   fieldWrapperSx?: SxProps;
 } & SelectFieldProps;

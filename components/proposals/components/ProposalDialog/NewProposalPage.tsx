@@ -32,7 +32,7 @@ export type ProposalPageAndPropertiesInput = ProposalPropertiesInput & {
   headerImage: string | null;
   icon: string | null;
   type: PageType;
-  proposalType: 'structured' | 'free-form';
+  proposalType?: 'structured' | 'free-form';
   formFields?: FormFieldInput[];
 };
 

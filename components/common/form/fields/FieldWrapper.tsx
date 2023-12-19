@@ -3,15 +3,19 @@ import { Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import type { ReactNode } from 'react';
 
+import { CharmEditor } from 'components/common/CharmEditor';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
+import type { PageContent } from 'lib/prosemirror/interfaces';
+
 import FieldLabel from '../FieldLabel';
 
 type Props = {
-  children: ReactNode;
+  children?: ReactNode;
   label?: string;
   inline?: boolean;
   iconLabel?: ReactNode;
   required?: boolean;
-  description?: string;
+  description?: PageContent;
   endAdornment?: ReactNode;
   sx?: SxProps;
 };
@@ -39,11 +43,9 @@ export function FieldWrapper({ sx, endAdornment, description, required, children
           )}
         </Box>
       )}
-      {description && (
-        <Typography variant='body2' mb={1}>
-          {description}
-        </Typography>
-      )}
+      {description && !checkIsContentEmpty(description as PageContent) ? (
+        <CharmEditor readOnly isContentControlled content={description as PageContent} />
+      ) : null}
       {children}
     </Box>
   );
