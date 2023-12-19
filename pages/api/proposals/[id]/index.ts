@@ -66,8 +66,17 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
     resourceId: proposal?.id,
     userId
   });
+
   if (permissions.view !== true) {
-    throw new NotFoundError();
+    // TODO: use Mo's new core permissions client
+    const pagePermissions = await req.basePermissionsClient.pages.computePagePermissions({
+      // Proposal id is the same as page
+      resourceId: proposal?.id,
+      userId
+    });
+    if (pagePermissions.read !== true) {
+      throw new NotFoundError();
+    }
   }
 
   const { spaceRole } = await hasAccessToSpace({

@@ -96,7 +96,7 @@ test.beforeAll(async () => {
   discussionProposal = await testUtilsProposals.generateProposal({
     spaceId: space.id,
     userId: proposalAuthor.id,
-    proposalStatus: 'published',
+    proposalStatus: 'discussion',
     evaluationInputs: [
       {
         evaluationType: 'feedback',
@@ -144,7 +144,7 @@ test.describe.serial('View proposal', () => {
 
     // Test to make sure the reviewers show up in the table
     const discussionProposalReviewers = await proposalListPage.getProposalRowReviewersLocators(discussionProposal.id);
-    await proposalListPage.page.pause();
+
     // 1 role reviewer + 1 user reviewer
     expect(discussionProposalReviewers).toHaveLength(2);
 
@@ -196,14 +196,13 @@ test.describe.serial('View proposal', () => {
     const draftRow = proposalListPage.getProposalRowLocator(draftProposal.id);
     await expect(draftRow).not.toBeVisible();
 
-    await proposalListPage.page.pause();
-
     const feedbackRow = proposalListPage.getProposalRowLocator(discussionProposal.id);
     await expect(feedbackRow).toBeVisible();
 
     const feedbackRowStatusBadge = feedbackRow.locator('data-test=proposal-status-badge');
-    await expect((await feedbackRowStatusBadge.allInnerTexts())[0]).toEqual('Evaluation in progress');
+    await expect((await feedbackRowStatusBadge.allInnerTexts())[0]).toEqual('Feedback');
   });
+
   test('Proposal can be edited by the author and made public', async ({
     page,
     proposalListPage,

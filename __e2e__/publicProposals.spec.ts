@@ -17,7 +17,7 @@ test.beforeAll(async () => {
   browser = await chromium.launch();
 });
 
-test.describe.serial('Make a proposals page public and visit it', async () => {
+test.describe('Make a proposals page public and visit it', async () => {
   let proposal: Page & { proposal: ProposalWithUsers };
 
   test('visit a public proposal page', async () => {
@@ -71,7 +71,6 @@ test.describe.serial('Make a proposals page public and visit it', async () => {
     await expect(titleLocator).toBeVisible();
     await expect(titleLocator).toHaveText(title);
 
-    // Uncomment when bug is fixed
     const roleChip = page.getByText(roleName);
     await expect(roleChip).toBeVisible();
   });
