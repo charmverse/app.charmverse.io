@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch } from 'lib/middleware';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import type { UpdateProposalLensPropertiesRequest } from 'lib/proposal/updateProposalLensProperties';
 import { updateProposalLensProperties } from 'lib/proposal/updateProposalLensProperties';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -12,9 +12,7 @@ import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(providePermissionClients({ key: 'id', location: 'query', resourceIdType: 'proposal' }))
-  .put(updateProposalController);
+handler.put(updateProposalController);
 
 async function updateProposalController(req: NextApiRequest, res: NextApiResponse) {
   const proposalId = req.query.id as string;
@@ -56,7 +54,7 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
     throw new AdministratorOnlyError();
   }
   // A proposal can only be updated when its in draft or discussion status and only the proposal author can update it
-  const proposalPermissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
+  const proposalPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
     resourceId: proposal.id,
     userId
   });

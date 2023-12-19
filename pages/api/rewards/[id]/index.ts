@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { getRewardOrThrow } from 'lib/rewards/getReward';
 import type { RewardWithUsers, RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
 import { rollupRewardStatus } from 'lib/rewards/rollupRewardStatus';
@@ -14,17 +14,7 @@ import { UnauthorisedActionError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireUser)
-  .use(
-    providePermissionClients({
-      key: 'id',
-      location: 'query',
-      resourceIdType: 'bounty'
-    })
-  )
-  .get(getRewardController)
-  .put(updateReward);
+handler.use(requireUser).get(getRewardController).put(updateReward);
 
 async function getRewardController(req: NextApiRequest, res: NextApiResponse<RewardWithUsersAndPageMeta>) {
   const { id } = req.query;
@@ -43,7 +33,7 @@ async function getRewardController(req: NextApiRequest, res: NextApiResponse<Rew
 
   const pageId = rewardPage.id;
 
-  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
+  const permissions = await permissionsApiClient.pages.computePagePermissions({
     resourceId: pageId,
     userId: req.session.user?.id
   });
@@ -73,7 +63,7 @@ async function updateReward(req: NextApiRequest, res: NextApiResponse<RewardWith
 
   const pageId = rewardPage.id;
 
-  const rewardPagePermissions = await req.basePermissionsClient.pages.computePagePermissions({
+  const rewardPagePermissions = await permissionsApiClient.pages.computePagePermissions({
     resourceId: pageId,
     userId
   });

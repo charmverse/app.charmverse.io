@@ -6,7 +6,7 @@ import nc from 'next-connect';
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { PageNotFoundError } from 'lib/pages/server';
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
-import { getPermissionsClient } from 'lib/permissions/api';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';
@@ -14,8 +14,6 @@ import { isUUID } from 'lib/utilities/strings';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireKeys<PermissionCompute>(['resourceId'], 'body')).post(computePagePermissions);
-
-//
 async function computePagePermissions(req: NextApiRequest, res: NextApiResponse<PagePermissionFlags>) {
   const input = req.body as PermissionCompute;
 
@@ -46,15 +44,11 @@ async function computePagePermissions(req: NextApiRequest, res: NextApiResponse<
     }
   }
 
-  const permissions = await getPermissionsClient({
+  const permissions = await permissionsApiClient.pages.computePagePermissions({
     resourceId,
-    resourceIdType: 'page'
-  }).then(({ client }) =>
-    client.pages.computePagePermissions({
-      resourceId,
-      userId: req.session.user?.id
-    })
-  );
+    userId: req.session.user?.id
+  });
+
   res.status(200).json(permissions);
 }
 

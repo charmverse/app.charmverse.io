@@ -5,6 +5,7 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { getAllReviewerUserIds } from 'lib/proposal/getAllReviewerIds';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import { mapDbProposalToProposal } from 'lib/proposal/mapDbProposalToProposal';
@@ -48,7 +49,7 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
   if (!proposal) {
     throw new NotFoundError();
   }
-  const computed = await req.basePermissionsClient.pages.computePagePermissions({
+  const computed = await permissionsApiClient.pages.computePagePermissions({
     // Proposal id is the same as page
     resourceId: proposal?.id,
     userId
@@ -121,7 +122,7 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
     throw new AdministratorOnlyError();
   }
   // A proposal can only be updated when its in draft or discussion status and only the proposal author can update it
-  const proposalPermissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
+  const proposalPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
     resourceId: proposal.id,
     userId
   });

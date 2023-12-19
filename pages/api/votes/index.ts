@@ -7,7 +7,7 @@ import nc from 'next-connect';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
-import { getPermissionsClient } from 'lib/permissions/api/routers';
+import { getPermissionsClient, permissionsApiClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { createVote as createVoteService } from 'lib/votes';
@@ -29,16 +29,10 @@ async function getVotes(req: NextApiRequest, res: NextApiResponse<ExtendedVote[]
   const userId = req.session?.user?.id;
 
   if (pageId) {
-    const computed = await getPermissionsClient({
+    const computed = await permissionsApiClient.pages.computePagePermissions({
       resourceId: pageId,
-      resourceIdType: 'page'
-    }).then(({ client }) =>
-      client.pages.computePagePermissions({
-        resourceId: pageId,
-        userId
-      })
-    );
-
+      userId
+    });
     if (computed.read !== true) {
       throw new UnauthorisedActionError('You do not have access to the page');
     }
@@ -124,15 +118,10 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
     : null;
   // User must be proposal author or a space admin to create a poll
   if (existingPage?.type === 'proposal' && existingPage.proposalId && newVote.context === 'proposal') {
-    const permissions = await getPermissionsClient({
-      resourceId: existingPage.proposalId,
-      resourceIdType: 'proposal'
-    }).then(({ client }) =>
-      client.proposals.computeProposalPermissions({
-        resourceId: existingPage.proposalId as string,
-        userId
-      })
-    );
+    const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
+      resourceId: existingPage.proposalId as string,
+      userId
+    });
 
     if (!permissions.create_vote) {
       throw new UnauthorisedActionError(
@@ -140,16 +129,10 @@ async function createVote(req: NextApiRequest, res: NextApiResponse<ExtendedVote
       );
     }
   } else if (pageId) {
-    const userPagePermissions = await getPermissionsClient({
+    const userPagePermissions = await permissionsApiClient.pages.computePagePermissions({
       resourceId: pageId,
-      resourceIdType: 'page'
-    }).then(({ client }) =>
-      client.pages.computePagePermissions({
-        resourceId: pageId,
-        userId
-      })
-    );
-
+      userId
+    });
     if (!userPagePermissions.create_poll) {
       throw new UnauthorisedActionError('You do not have permissions to create a vote.');
     }

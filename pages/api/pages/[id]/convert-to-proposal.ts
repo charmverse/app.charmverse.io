@@ -6,6 +6,7 @@ import nc from 'next-connect';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { convertPageToProposal } from 'lib/proposal/convertPageToProposal';
 import { disconnectProposalChildren } from 'lib/proposal/disconnectProposalChildren';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -49,7 +50,7 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageM
     throw new NotFoundError();
   }
 
-  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
+  const permissions = await permissionsApiClient.pages.computePagePermissions({
     resourceId: pageId,
     userId
   });

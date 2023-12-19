@@ -5,28 +5,19 @@ import nc from 'next-connect';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
 import { syncPageCommentsWithLensPost } from 'lib/pages/comments/syncPageCommentsWithLensPost';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(
-    providePermissionClients({
-      key: 'id',
-      location: 'query',
-      resourceIdType: 'page'
-    })
-  )
-  .use(requireUser)
-  .post(syncProposalCommentsHandler);
+handler.use(requireUser).post(syncProposalCommentsHandler);
 
 async function syncProposalCommentsHandler(req: NextApiRequest, res: NextApiResponse<PageCommentWithVote[]>) {
   const { id: pageId } = req.query as any as { id: string };
 
   const userId = req.session.user?.id;
 
-  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
+  const permissions = await permissionsApiClient.pages.computePagePermissions({
     resourceId: pageId,
     userId
   });

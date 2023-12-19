@@ -4,20 +4,13 @@ import nc from 'next-connect';
 
 import { NotFoundError, onError, onNoMatch } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { UserVoteExtendedDTO } from 'lib/votes/interfaces';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(
-    providePermissionClients({
-      key: 'id',
-      location: 'query',
-      resourceIdType: 'vote'
-    })
-  )
-  .get(getUserVotes);
+handler.get(getUserVotes);
 
 async function getUserVotes(req: NextApiRequest, res: NextApiResponse<UserVoteExtendedDTO[] | { error: any }>) {
   const voteId = req.query.id as string;
@@ -39,7 +32,7 @@ async function getUserVotes(req: NextApiRequest, res: NextApiResponse<UserVoteEx
     throw new NotFoundError('Vote not found');
   }
 
-  const computed = await req.basePermissionsClient.pages.computePagePermissions({
+  const computed = await permissionsApiClient.pages.computePagePermissions({
     resourceId: vote.page.id,
     userId: req.session?.user?.id
   });

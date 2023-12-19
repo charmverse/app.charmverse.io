@@ -5,7 +5,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { Formatters, PropertyContext } from 'components/common/BoardEditor/focalboard/src/octoUtils';
 import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtils';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
-import { getPermissionsClient } from 'lib/permissions/api';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { formatDate, formatDateTime } from 'lib/utilities/dates';
 
 import type { Board, IPropertyTemplate, PropertyType } from './board';
@@ -26,25 +26,20 @@ export async function loadAndGenerateCsv({
 
   const { targetPage, flatChildren } = await resolvePageTree({ pageId: databaseId, flattenChildren: true });
 
-  const permissionsClient = await getPermissionsClient({ resourceId: targetPage.id, resourceIdType: 'page' });
-
-  const accessibleCardIds =
-    permissionsClient.type === 'free'
-      ? flatChildren.map((c) => c.id)
-      : await permissionsClient.client.pages
-          .bulkComputePagePermissions({
-            userId,
-            pageIds: flatChildren.map((c) => c.id)
-          })
-          .then((permissions) =>
-            Object.entries(permissions)
-              .filter(([pageId, computed]) => !!computed.read)
-              .map(([pageId]) => pageId)
-          );
+  const accessibleCardIds = await permissionsApiClient.pages
+    .bulkComputePagePermissions({
+      userId,
+      pageIds: flatChildren.map((c) => c.id)
+    })
+    .then((permissions) =>
+      Object.entries(permissions)
+        .filter(([pageId, computed]) => !!computed.read)
+        .map(([pageId]) => pageId)
+    );
 
   const space = await prisma.space.findUniqueOrThrow({
     where: {
-      id: permissionsClient.spaceId
+      id: targetPage.spaceId
     },
     select: {
       domain: true,

@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch } from 'lib/middleware';
-import { getPermissionsClient } from 'lib/permissions/api/routers';
+import { getPermissionsClient, permissionsApiClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
 
 // TODO: frontend should tell us which space to use
@@ -25,12 +25,11 @@ async function getViews(req: NextApiRequest, res: NextApiResponse<Block[] | { er
     }
   });
 
-  const computed = await getPermissionsClient({ resourceId: page.id, resourceIdType: 'page' }).then(({ client }) =>
-    client.pages.computePagePermissions({
-      resourceId: page.id,
-      userId: req.session.user?.id
-    })
-  );
+  const computed = await permissionsApiClient.pages.computePagePermissions({
+    resourceId: page.id,
+    userId: req.session.user?.id
+  });
+
   if (computed.read !== true) {
     return res.status(404).json({ error: 'page not found' });
   }

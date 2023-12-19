@@ -6,7 +6,7 @@ import { validate } from 'uuid';
 
 import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/constants';
 import { archivePages } from 'lib/pages/archivePages';
-import { getPermissionsClient } from 'lib/permissions/api';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { convertAndSavePage } from 'lib/prosemirror/conversions/convertOldListNodes';
@@ -270,14 +270,10 @@ export class DocumentEventHandler {
       if (!isValidPageId) {
         throw new Error(`Invalid page id: ${pageId}`);
       }
-      const permissions = await getPermissionsClient({ resourceId: pageId, resourceIdType: 'page' }).then(
-        ({ client }) =>
-          client.pages.computePagePermissions({
-            resourceId: pageId,
-            userId
-          })
-      );
-
+      const permissions = await permissionsApiClient.pages.computePagePermissions({
+        resourceId: pageId,
+        userId
+      });
       if (permissions.edit_content !== true && permissions.comment !== true) {
         log.warn('Denied permission to user', { permissions, pageId, userId });
         this.sendError('You do not have permission to edit this page');

@@ -4,7 +4,7 @@ import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { getPermissionsClient } from 'lib/permissions/api';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { ThreadWithComments } from 'lib/threads';
 import { toggleThreadStatus } from 'lib/threads';
@@ -39,13 +39,10 @@ async function resolveThread(req: NextApiRequest, res: NextApiResponse<ThreadWit
     throw new DataNotFoundError(`Could not find thread with id ${threadId}`);
   }
 
-  const permissionSet = await getPermissionsClient({ resourceId: thread.pageId, resourceIdType: 'page' }).then(
-    ({ client }) =>
-      client.pages.computePagePermissions({
-        resourceId: thread.pageId,
-        userId
-      })
-  );
+  const permissionSet = await permissionsApiClient.pages.computePagePermissions({
+    resourceId: thread.pageId,
+    userId
+  });
 
   if (!permissionSet.comment) {
     throw new ActionNotPermittedError();

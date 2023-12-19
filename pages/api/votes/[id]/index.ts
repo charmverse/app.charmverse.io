@@ -5,6 +5,7 @@ import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { deleteVote as deleteVoteService, getVote as getVoteService, updateVote as updateVoteService } from 'lib/votes';
@@ -28,11 +29,36 @@ handler
   .delete(deleteVote);
 
 async function getVoteController(req: NextApiRequest, res: NextApiResponse<Vote | { error: any }>) {
+  const userId = req.session.user.id;
+
   const voteId = req.query.id as string;
   const vote = await getVoteService(voteId, req.session.user.id);
   if (!vote) {
     return res.status(404).json({ error: 'No vote found' });
   }
+
+  await (vote.pageId
+    ? permissionsApiClient.pages
+        .computePagePermissions({
+          resourceId: vote.pageId,
+          userId
+        })
+        .then((permissions) => {
+          if (!permissions.read) {
+            throw new DataNotFoundError(`Vote with id ${voteId} not found.`);
+          }
+        })
+    : req.basePermissionsClient.forum
+        .computePostPermissions({
+          resourceId: vote.postId as string,
+          userId
+        })
+        .then((permissions) => {
+          if (!permissions.view_post) {
+            throw new DataNotFoundError(`Vote with id ${voteId} not found.`);
+          }
+        }));
+
   return res.status(200).json(vote);
 }
 
@@ -65,7 +91,7 @@ async function updateVote(req: NextApiRequest, res: NextApiResponse<Vote | { err
 
   if (vote.pageId) {
     if (vote.page?.proposalId) {
-      const proposalPermissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
+      const proposalPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
         userId,
         resourceId: vote.pageId
       });
@@ -74,7 +100,7 @@ async function updateVote(req: NextApiRequest, res: NextApiResponse<Vote | { err
         throw new UnauthorisedActionError('You do not have permissions to update the vote.');
       }
     } else {
-      const pagePermissions = await req.basePermissionsClient.pages.computePagePermissions({
+      const pagePermissions = await permissionsApiClient.pages.computePagePermissions({
         userId,
         resourceId: vote.pageId
       });
@@ -132,7 +158,7 @@ async function deleteVote(req: NextApiRequest, res: NextApiResponse<Vote | null 
   }
 
   if (vote.pageId) {
-    const pagePermissions = await req.basePermissionsClient.pages.computePagePermissions({
+    const pagePermissions = await permissionsApiClient.pages.computePagePermissions({
       userId,
       resourceId: vote.pageId
     });

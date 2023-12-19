@@ -7,7 +7,7 @@ import type { CommentCreate } from 'lib/comments';
 import { addComment } from 'lib/comments';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { getPermissionsClient } from 'lib/permissions/api';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
@@ -47,15 +47,10 @@ async function addCommentController(req: NextApiRequest, res: NextApiResponse) {
     throw new PageNotFoundError(pageId);
   }
 
-  const permissionSet = await getPermissionsClient({
+  const permissionSet = await permissionsApiClient.pages.computePagePermissions({
     resourceId: thread.pageId,
-    resourceIdType: 'page'
-  }).then(({ client }) =>
-    client.pages.computePagePermissions({
-      resourceId: thread.pageId,
-      userId
-    })
-  );
+    userId
+  });
 
   if (!permissionSet.comment) {
     throw new ActionNotPermittedError();

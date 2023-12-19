@@ -1,7 +1,6 @@
 import { UndesirableOperationError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { resolvePageTree } from '@charmverse/core/pages';
-import type { PermissionsClient } from '@charmverse/core/permissions';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { unsealData } from 'iron-session';
@@ -11,7 +10,7 @@ import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/co
 import { ActionNotPermittedError } from 'lib/middleware';
 import { archivePages } from 'lib/pages/archivePages';
 import { createPage } from 'lib/pages/server/createPage';
-import { getPermissionsClient, permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
@@ -34,8 +33,6 @@ export class SpaceEventHandler {
   spaceId: string | null = null;
 
   private relay: AbstractWebsocketBroadcaster;
-
-  private permissionsClient?: PermissionsClient;
 
   constructor(
     relay: AbstractWebsocketBroadcaster,
@@ -766,20 +763,7 @@ export class SpaceEventHandler {
   }
 
   async checkUserCanDeletePage({ pageId, parentId }: { pageId: string; parentId?: string | null }): Promise<void> {
-    const permissionsClient =
-      this.permissionsClient ??
-      (
-        await getPermissionsClient({
-          resourceId: pageId,
-          resourceIdType: 'page'
-        })
-      ).client;
-
-    if (!this.permissionsClient) {
-      this.permissionsClient = permissionsClient;
-    }
-
-    const childPagePermissions = await permissionsClient.pages.computePagePermissions({
+    const childPagePermissions = await permissionsApiClient.pages.computePagePermissions({
       resourceId: pageId,
       userId: this.userId as string
     });
@@ -787,7 +771,7 @@ export class SpaceEventHandler {
     let canDelete = childPagePermissions.edit_content || childPagePermissions.delete;
 
     if (!canDelete && parentId) {
-      const parentPagePermissions = await permissionsClient.pages.computePagePermissions({
+      const parentPagePermissions = await permissionsApiClient.pages.computePagePermissions({
         resourceId: parentId,
         userId: this.userId as string
       });

@@ -2,22 +2,19 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { getAllReviewerUserIds } from 'lib/proposal/getAllReviewerIds';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(providePermissionClients({ key: 'id', location: 'query', resourceIdType: 'proposal' }))
-  .use(requireUser)
-  .get(getReviewerIds);
+handler.use(requireUser).get(getReviewerIds);
 
 async function getReviewerIds(req: NextApiRequest, res: NextApiResponse<string[]>) {
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const permissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
+  const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
     resourceId: proposalId,
     userId
   });

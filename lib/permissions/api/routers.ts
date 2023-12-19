@@ -4,17 +4,14 @@ import type {
   PermissionsEngine,
   PremiumPermissionsClient
 } from '@charmverse/core/permissions';
-import { PermissionsApiClient, getSpacePermissionsType } from '@charmverse/core/permissions';
-
-import { permissionsApiAuthKey, permissionsApiUrl } from 'config/constants';
+import { PermissionsApiClient, getSpaceInfoViaResource } from '@charmverse/core/permissions';
 
 import { PublicPermissionsClient } from './client';
+import { PermissionsApiClientWithPermissionsSwitch } from './overridenPermissionsApiClient';
 
 export const publicClient = new PublicPermissionsClient();
-export const permissionsApiClient = new PermissionsApiClient({
-  authKey: permissionsApiAuthKey,
-  baseUrl: permissionsApiUrl
-});
+export const permissionsApiClient = new PermissionsApiClientWithPermissionsSwitch();
+
 export type SpacePermissionsClient = {
   type: PermissionsEngine;
   client: PermissionsClient | PremiumPermissionsClient;
@@ -28,7 +25,7 @@ export async function getPermissionsClient({
   resourceId,
   resourceIdType = 'space'
 }: GetPermissionClient): Promise<SpacePermissionsClient> {
-  const spaceInfo = await getSpacePermissionsType({
+  const spaceInfo = await getSpaceInfoViaResource({
     resourceId,
     resourceIdType
   });

@@ -2,8 +2,8 @@ import { log } from '@charmverse/core/log';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { onError, onNoMatch } from 'lib/middleware';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { ContentToCompress, MarkdownPageToCompress } from 'lib/utilities/file';
@@ -12,23 +12,14 @@ import { paginatedPrismaTask } from 'lib/utilities/paginatedPrismaTask';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(
-    requireUser,
-    providePermissionClients({
-      key: 'id',
-      resourceIdType: 'space',
-      location: 'query'
-    })
-  )
-  .post(requestZip);
+handler.post(requestZip);
 
 export type ZippedDataRequest = Pick<ContentToCompress, 'csv'> & { pageIds: string[] };
 
 async function requestZip(req: NextApiRequest, res: NextApiResponse) {
   const pageIdsToExport: string[] = req.body.pageIds ?? [];
 
-  const accessiblePageIds = await req.basePermissionsClient.pages
+  const accessiblePageIds = await permissionsApiClient.pages
     .bulkComputePagePermissions({
       pageIds: pageIdsToExport,
       userId: req.session.user.id

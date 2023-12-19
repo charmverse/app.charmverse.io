@@ -7,8 +7,7 @@ import nc from 'next-connect';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { logFirstUserPageCreation, logFirstWorkspacePageCreation } from 'lib/metrics/postToDiscord';
-import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { modifyChildPages } from 'lib/pages/modifyChildPages';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { createPage } from 'lib/pages/server/createPage';
 import { PageNotFoundError } from 'lib/pages/server/errors';
 import { getPage } from 'lib/pages/server/getPage';
@@ -16,22 +15,18 @@ import { providePermissionClients } from 'lib/permissions/api/permissionsClientM
 import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
-import { isTruthy } from 'lib/utilities/types';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireUser)
-  .post(
-    providePermissionClients({
-      key: 'spaceId',
-      location: 'body',
-      resourceIdType: 'space'
-    }),
-    createPageHandler
-  )
-  .delete(deletePages);
+handler.use(requireUser).post(
+  providePermissionClients({
+    key: 'spaceId',
+    location: 'body',
+    resourceIdType: 'space'
+  }),
+  createPageHandler
+);
 
 async function createPageHandler(req: NextApiRequest, res: NextApiResponse<Page>) {
   const data = req.body as Prisma.PageUncheckedCreateInput;
@@ -50,7 +45,7 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<Page>
 
   // When creating a nested page, check that a user can edit the parent page
   if (data.parentId) {
-    const permissions = await req.basePermissionsClient.pages.computePagePermissions({
+    const permissions = await permissionsApiClient.pages.computePagePermissions({
       resourceId: data.parentId,
       userId
     });
@@ -118,59 +113,4 @@ async function createPageHandler(req: NextApiRequest, res: NextApiResponse<Page>
     throw error;
   }
 }
-
-async function deletePages(req: NextApiRequest, res: NextApiResponse) {
-  const pageIds = req.query.pageIds as string[];
-  const userId = req.session.user.id;
-
-  for (const pageId of pageIds) {
-    const permissions = await req.basePermissionsClient.pages.computePagePermissions({
-      resourceId: pageId,
-      userId
-    });
-
-    if (permissions.delete !== true) {
-      throw new ActionNotPermittedError('You are not allowed to delete this page.');
-    }
-  }
-
-  const pagesToDelete = await prisma.page.findMany({
-    where: {
-      id: {
-        in: pageIds
-      }
-    },
-    select: {
-      id: true,
-      spaceId: true
-    }
-  });
-
-  const spaceIds = [...new Set(pagesToDelete.map((p) => p.spaceId).filter(isTruthy))];
-
-  // A user can delete only a batch of pages from a single space
-  if (spaceIds.length > 1) {
-    throw new ActionNotPermittedError("You can't delete pages from multiple spaces at once");
-  }
-
-  const spaceId = spaceIds[0];
-
-  const modifiedChildPageIds: string[] = [];
-  for (const pageToDelete of pagesToDelete) {
-    const childPageIds = await modifyChildPages(pageToDelete.id, userId, 'delete');
-    modifiedChildPageIds.push(...childPageIds);
-    updateTrackPageProfile(pageToDelete.id);
-    trackUserAction('delete_page', { userId, pageId: pageToDelete.id, spaceId: pageToDelete.spaceId });
-  }
-
-  log.info('User deleted pages', {
-    userId,
-    pageIds,
-    childPageIds: modifiedChildPageIds,
-    spaceId
-  });
-
-  return res.status(200).end();
-}
-
 export default withSessionRoute(handler);

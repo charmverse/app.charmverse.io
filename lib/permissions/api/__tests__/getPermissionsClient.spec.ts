@@ -3,6 +3,7 @@ import type { SubscriptionTier } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 
 import { PublicPermissionsClient } from '../client';
+import { PermissionsApiClientWithPermissionsSwitch } from '../overridenPermissionsApiClient';
 import { getPermissionsClient } from '../routers';
 
 describe('getPermissionsClient', () => {
@@ -40,5 +41,12 @@ describe('getPermissionsClient', () => {
       expect(clientInfo.type).toBe('premium');
       expect(clientInfo.spaceId).toBe(space.id);
     }
+  });
+});
+describe('test', () => {
+  it('should do stuff', async () => {
+    const client = new PermissionsApiClientWithPermissionsSwitch();
+
+    await client.pages.computePagePermissions({ resourceId: '123', userId: '123' });
   });
 });

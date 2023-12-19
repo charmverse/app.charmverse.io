@@ -1,11 +1,8 @@
-import type {
-  PermissionCompute,
-  ProposalPermissionFlags,
-  ProposalPermissionsSwitch
-} from '@charmverse/core/permissions';
+import type { PermissionCompute, ProposalPermissionFlags } from '@charmverse/core/permissions';
 import type { Space, User } from '@charmverse/core/prisma';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
+import { v4 as uuid } from 'uuid';
 
 import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { upsertProposalCategoryPermission } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
@@ -147,7 +144,32 @@ describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute
 
     expect(publicResult).toMatchObject(expect.objectContaining(publicComputed));
   });
+});
 
+describe('GET /api/permissions/proposals/compute-proposal-permissions - Compute permissions for a proposal in a space with the new model', () => {
+  let space: Space;
+  let user: User;
+  let reviewer: User;
+  let secondReviewer: User;
+
+  let userCookie: string;
+  let reviewerCookie: string;
+  let secondReviewerCookie: string;
+
+  beforeAll(async () => {
+    ({ space, user } = await testUtilsUser.generateUserAndSpace({ isAdmin: false, spaceName: `cvt-${uuid()}` }));
+    reviewer = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id
+    });
+    secondReviewer = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id
+    });
+
+    userCookie = await loginUser(user.id);
+
+    reviewerCookie = await loginUser(reviewer.id);
+    secondReviewerCookie = await loginUser(secondReviewer.id);
+  });
   it('should use the new proposal permissions model if use flag is true', async () => {
     const proposalCategoryWithoutPermissions = await testUtilsProposals.generateProposalCategory({
       spaceId: space.id,
@@ -167,9 +189,8 @@ describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute
         .post('/api/permissions/proposals/compute-proposal-permissions')
         .set('Cookie', userCookie)
         .send({
-          resourceId: userDraftProposal.id,
-          useProposalEvaluationPermissions: true
-        } as PermissionCompute & ProposalPermissionsSwitch)
+          resourceId: userDraftProposal.id
+        } as PermissionCompute)
         .expect(200)
     ).body as ProposalPermissionFlags;
 
@@ -178,9 +199,8 @@ describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute
         .post('/api/permissions/proposals/compute-proposal-permissions')
         .set('Cookie', reviewerCookie)
         .send({
-          resourceId: userDraftProposal.id,
-          useProposalEvaluationPermissions: true
-        } as PermissionCompute & ProposalPermissionsSwitch)
+          resourceId: userDraftProposal.id
+        } as PermissionCompute)
         .expect(200)
     ).body as ProposalPermissionFlags;
 
@@ -189,9 +209,8 @@ describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute
         .post('/api/permissions/proposals/compute-proposal-permissions')
         .set('Cookie', secondReviewerCookie)
         .send({
-          resourceId: userDraftProposal.id,
-          useProposalEvaluationPermissions: true
-        } as PermissionCompute & ProposalPermissionsSwitch)
+          resourceId: userDraftProposal.id
+        } as PermissionCompute)
         .expect(200)
     ).body as ProposalPermissionFlags;
 
@@ -211,9 +230,8 @@ describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute
         .post('/api/permissions/proposals/compute-proposal-permissions')
         .set('Cookie', userCookie)
         .send({
-          resourceId: userInReviewProposal.id,
-          useProposalEvaluationPermissions: true
-        } as PermissionCompute & ProposalPermissionsSwitch)
+          resourceId: userInReviewProposal.id
+        } as PermissionCompute)
         .expect(200)
     ).body as ProposalPermissionFlags;
 
@@ -222,9 +240,8 @@ describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute
         .post('/api/permissions/proposals/compute-proposal-permissions')
         .set('Cookie', reviewerCookie)
         .send({
-          resourceId: userInReviewProposal.id,
-          useProposalEvaluationPermissions: true
-        } as PermissionCompute & ProposalPermissionsSwitch)
+          resourceId: userInReviewProposal.id
+        } as PermissionCompute)
         .expect(200)
     ).body as ProposalPermissionFlags;
 
@@ -233,9 +250,8 @@ describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute
         .post('/api/permissions/proposals/compute-proposal-permissions')
         .set('Cookie', secondReviewerCookie)
         .send({
-          resourceId: userInReviewProposal.id,
-          useProposalEvaluationPermissions: true
-        } as PermissionCompute & ProposalPermissionsSwitch)
+          resourceId: userInReviewProposal.id
+        } as PermissionCompute)
         .expect(200)
     ).body as ProposalPermissionFlags;
 
