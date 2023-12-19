@@ -320,6 +320,8 @@ export function NewProposalPage({
   );
 
   useEffect(() => {
+    // clear out page title on load
+    setPageTitle('');
     if (isCharmVerse) {
       setActiveView('proposal_evaluation_settings');
       setDefaultView(null);
