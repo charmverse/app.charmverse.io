@@ -15,11 +15,15 @@ export function mapDbProposalToProposal({
   permissions
 }: {
   proposal: Proposal & {
-    evaluations: PopulatedEvaluation[];
+    evaluations: (ProposalEvaluation & {
+      reviewers: ProposalReviewer[];
+      rubricAnswers: any[];
+      draftRubricAnswers: any[];
+    })[];
     rewards: { id: string }[];
-    reviewers: { evaluationId: string | null }[];
-    rubricAnswers: { evaluationId: string | null }[];
-    draftRubricAnswers: { evaluationId: string | null }[];
+    reviewers: ProposalReviewer[];
+    rubricAnswers: any[];
+    draftRubricAnswers: any[];
   };
   permissions?: ProposalPermissionFlags;
 }): ProposalWithUsersAndRubric {
