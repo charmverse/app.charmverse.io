@@ -1,5 +1,6 @@
 import AddIcon from '@mui/icons-material/Add';
 import { Stack } from '@mui/material';
+import type { Dispatch, SetStateAction } from 'react';
 import { v4 } from 'uuid';
 
 import { emptyDocument } from 'lib/prosemirror/constants';
@@ -17,7 +18,7 @@ export function FormFieldsEditor({
   toggleCollapse
 }: {
   formFields: FormFieldInput[];
-  setFormFields: (newFormFields: FormFieldInput[]) => void;
+  setFormFields: Dispatch<SetStateAction<FormFieldInput[]>>;
   collapsedFieldIds: string[];
   toggleCollapse: (fieldId: string) => void;
 }) {
@@ -30,20 +31,21 @@ export function FormFieldsEditor({
       id: string;
     }
   ) {
-    const updatedFieldIndex = formFields.findIndex((f) => f.id === updatedFormField.id);
-    const newFormFields = [...formFields];
-    // If the index was changed, we need to move the form field to the new index
-    const newIndex = updatedFormField.index;
-    if (typeof newIndex === 'number') {
-      newFormFields.splice(newIndex, 0, newFormFields.splice(updatedFieldIndex, 1)[0]);
-    }
-    setFormFields(
-      newFormFields.map((formField, index) => ({
+    setFormFields((fields) => {
+      const newFormFields = [...fields];
+      const updatedFieldIndex = newFormFields.findIndex((f) => f.id === updatedFormField.id);
+      // If the index was changed, we need to move the form field to the new index
+      const newIndex = updatedFormField.index;
+      if (typeof newIndex === 'number') {
+        newFormFields.splice(newIndex, 0, newFormFields.splice(updatedFieldIndex, 1)[0]);
+      }
+
+      return newFormFields.map((formField, index) => ({
         ...formField,
         ...(index === (newIndex ?? updatedFieldIndex) ? updatedFormField : {}),
         index
-      }))
-    );
+      }));
+    });
   }
 
   function addNewFormField() {
