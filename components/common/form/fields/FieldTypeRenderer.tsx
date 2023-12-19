@@ -1,4 +1,3 @@
-import { Box, Stack, Typography } from '@mui/material';
 import { forwardRef } from 'react';
 
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';

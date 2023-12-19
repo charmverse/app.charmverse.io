@@ -29,7 +29,7 @@ const LINKEDIN_URL_REGEX =
 
 export function useRequiredMemberProperties({ userId }: { userId: string }) {
   const { user: currentUser } = useUser();
-  const { memberPropertyValues } = useMemberPropertyValues(userId);
+  const { memberPropertyValues, isLoading: isLoadingMemberProperties } = useMemberPropertyValues(userId);
   const { space: currentSpace } = useCurrentSpace();
   const { data: userDetails, isLoading: isLoadingUserDetails } = useSWRImmutable(`/current-user-details`, () =>
     charmClient.getUserDetails()
@@ -120,6 +120,7 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
 
   return {
     ...data,
+    isLoadingMemberProperties,
     isLoadingUserDetails,
     userDetails
   };

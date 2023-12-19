@@ -1,11 +1,9 @@
 import type { FormField } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
-import { Box, Chip, Stack } from '@mui/material';
+import { Chip, Stack } from '@mui/material';
 import { Controller } from 'react-hook-form';
 
 import type { PageContent } from 'lib/prosemirror/interfaces';
-
-import { Button } from '../Button';
 
 import { fieldTypePlaceholderRecord } from './constants';
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';

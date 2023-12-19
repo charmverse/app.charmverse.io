@@ -51,9 +51,13 @@ function LoggedInUserOnboardingDialog({ user, space }: { space: Space; user: Log
     log.info('[user-journey] Show onboarding flow');
   }, []);
 
-  const { hasEmptyRequiredProperties } = useRequiredMemberProperties({
+  const { hasEmptyRequiredProperties, isLoadingMemberProperties, isLoadingUserDetails } = useRequiredMemberProperties({
     userId: user.id
   });
+
+  if (isLoadingMemberProperties || isLoadingUserDetails) {
+    return null;
+  }
 
   if (onboardingStep) {
     return (
