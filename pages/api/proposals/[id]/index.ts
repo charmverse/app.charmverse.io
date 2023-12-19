@@ -51,7 +51,7 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
       },
       authors: true,
       category: true,
-      page: { select: { sourceTemplateId: true } },
+      page: { select: { id: true, sourceTemplateId: true } },
       reviewers: true,
       rewards: true
     }
@@ -62,19 +62,19 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
   }
   // TODO: use Mo's new core permissions client
   const permissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
-    // Proposal id is the same as page
     resourceId: proposal?.id,
+    useProposalEvaluationPermissions: proposal?.status === 'published',
     userId
   });
 
   if (permissions.view !== true) {
-    // TODO: use Mo's new core permissions client
-    const pagePermissions = await req.basePermissionsClient.pages.computePagePermissions({
-      // Proposal id is the same as page
-      resourceId: proposal?.id,
-      userId
-    });
-    if (pagePermissions.read !== true) {
+    const pagePermissions = proposal?.page?.id
+      ? await req.basePermissionsClient.pages.computePagePermissions({
+          resourceId: proposal.page.id,
+          userId
+        })
+      : null;
+    if (!pagePermissions?.read) {
       throw new NotFoundError();
     }
   }
@@ -138,6 +138,7 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
   // A proposal can only be updated when its in draft or discussion status and only the proposal author can update it
   const proposalPermissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
     resourceId: proposal.id,
+    useProposalEvaluationPermissions: proposal?.status === 'published',
     userId
   });
 
