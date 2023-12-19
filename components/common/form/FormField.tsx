@@ -123,7 +123,7 @@ function ExpandedFormField({
       <TextField
         value={formField.name}
         onChange={(e) => updateFormField({ name: e.target.value, id: formField.id })}
-        placeholder='Title'
+        placeholder='Title (required)'
         error={!formField.name}
       />
       <TextField
@@ -135,19 +135,17 @@ function ExpandedFormField({
         }}
         placeholder='Add your description here (optional)'
       />
-      {formField.type !== 'label' && (
-        <FieldTypeRenderer
-          type={formField.type as any}
-          onCreateOption={onCreateOption}
-          onDeleteOption={onDeleteOption}
-          onUpdateOption={onUpdateOption}
-          placeholder={fieldTypePlaceholderRecord[formField.type]}
-          // Enable select and multiselect fields to be able to create options
-          disabled={formField.type !== 'select' && formField.type !== 'multiselect'}
-          value={formField.type === 'date' ? new Date().toString() : ''}
-          options={formField.options}
-        />
-      )}
+      <FieldTypeRenderer
+        type={formField.type as any}
+        onCreateOption={onCreateOption}
+        onDeleteOption={onDeleteOption}
+        onUpdateOption={onUpdateOption}
+        placeholder={fieldTypePlaceholderRecord[formField.type]}
+        // Enable select and multiselect fields to be able to create options
+        disabled={formField.type !== 'select' && formField.type !== 'multiselect'}
+        value={formField.type === 'date' ? new Date().toString() : ''}
+        options={formField.options}
+      />
       <Divider
         sx={{
           my: 1

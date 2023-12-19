@@ -54,7 +54,7 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
       }
 
       case 'label': {
-        return (
+        return fieldProps.label || fieldProps.description ? (
           <Stack
             my={1}
             sx={{
@@ -70,7 +70,7 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
               </Typography>
             )}
           </Stack>
-        );
+        ) : null;
       }
 
       case 'select': {
