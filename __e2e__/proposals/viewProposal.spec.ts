@@ -144,7 +144,7 @@ test.describe.serial('View proposal', () => {
 
     // Test to make sure the reviewers show up in the table
     const discussionProposalReviewers = await proposalListPage.getProposalRowReviewersLocators(discussionProposal.id);
-
+    await proposalListPage.page.pause();
     // 1 role reviewer + 1 user reviewer
     expect(discussionProposalReviewers).toHaveLength(2);
 

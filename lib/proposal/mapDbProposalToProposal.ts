@@ -1,8 +1,11 @@
 import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
+import type { ProposalReviewer } from '@charmverse/core/prisma';
 import type { Proposal } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import type { ProposalEvaluation } from '@prisma/client';
+
+import type { PopulatedEvaluation } from 'lib/proposal/interface';
 
 import { getOldProposalStatus } from './getOldProposalStatus';
 import type { ProposalWithUsersAndRubric } from './interface';
@@ -12,7 +15,7 @@ export function mapDbProposalToProposal({
   permissions
 }: {
   proposal: Proposal & {
-    evaluations: ProposalEvaluation[];
+    evaluations: PopulatedEvaluation[];
     rewards: { id: string }[];
     reviewers: { evaluationId: string | null }[];
     rubricAnswers: { evaluationId: string | null }[];
@@ -29,9 +32,9 @@ export function mapDbProposalToProposal({
     evaluationType: currentEvaluation?.type || proposal.evaluationType,
     status: getOldProposalStatus(proposal),
     // Support old model: filter out evaluation-specific reviewers and rubric answers
-    rubricAnswers: proposal.rubricAnswers.filter((answer) => !answer.evaluationId),
-    draftRubricAnswers: proposal.draftRubricAnswers.filter((answer) => !answer.evaluationId),
-    reviewers: proposal.reviewers.filter((reviewer) => !reviewer.evaluationId),
+    rubricAnswers: currentEvaluation?.rubricAnswers || proposal.rubricAnswers,
+    draftRubricAnswers: currentEvaluation?.draftRubricAnswers || proposal.draftRubricAnswers,
+    reviewers: currentEvaluation?.reviewers || proposal.reviewers,
     rewardIds: rewards.map((r) => r.id) || null
   };
 
@@ -44,7 +47,7 @@ export function mapDbProposalToProposalLite({
   permissions
 }: {
   proposal: ProposalWithUsers & {
-    evaluations: ProposalEvaluation[];
+    evaluations: (ProposalEvaluation & { reviewers: ProposalReviewer[] })[];
     rewards: { id: string }[];
   };
   permissions?: ProposalPermissionFlags;
@@ -58,7 +61,7 @@ export function mapDbProposalToProposalLite({
     currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
     evaluationType: evaluationWithOldType?.type || proposal.evaluationType,
     status: getOldProposalStatus(proposal),
-    reviewers: proposal.reviewers.filter((reviewer) => !reviewer.evaluationId),
+    reviewers: currentEvaluation?.reviewers || proposal.reviewers,
     rewardIds: rewards.map((r) => r.id) || null
   };
 
