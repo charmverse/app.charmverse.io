@@ -45,7 +45,8 @@ type SidebarProps = {
   pagePermissions?: PagePermissionFlags | null;
   sidebarView: PageSidebarView | null;
   openSidebar?: (view: PageSidebarView) => void; // leave undefined to hide navigation
-  openEvaluationSidebar?: (evaluationId: string) => void;
+  openEvaluationSidebar?: (evaluationId?: string) => void;
+  readOnlyProposalPermissions?: boolean;
   // eslint-disable-next-line react/no-unused-prop-types
   closeSidebar: () => void;
   proposalId?: string | null;
@@ -170,6 +171,7 @@ function SidebarContents({
   pageId,
   spaceId,
   pagePermissions,
+  readOnlyProposalPermissions,
   editorState,
   threads,
   openSidebar,
@@ -205,6 +207,7 @@ function SidebarContents({
       {sidebarView === 'proposal_evaluation_settings' && (
         <EvaluationSettingsSidebar
           proposal={proposalInput}
+          readOnly={!!readOnlyProposalPermissions}
           showHeader={!isNewProposal && !isProposalTemplate}
           onChangeEvaluation={onChangeEvaluation}
           goToEvaluation={(evaluationId) => {

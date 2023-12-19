@@ -481,6 +481,7 @@ function DocumentPage({
                     spaceId={page.spaceId}
                     proposalId={proposalId}
                     proposalEvaluationId={activeEvaluationId}
+                    readOnlyProposalPermissions={!proposal?.permissions.edit}
                     pagePermissions={pagePermissions}
                     editorState={editorState}
                     sidebarView={sidebarView}

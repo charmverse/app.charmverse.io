@@ -30,7 +30,7 @@ export function EvaluationSidebar({
   refreshProposal,
   goToSettings
 }: Props) {
-  const [activeEvaluationId, setActiveEvaluationId] = useState<string | null>(evaluationIdFromContext);
+  const [activeEvaluationId, setActiveEvaluationId] = useState<string | null | undefined>(evaluationIdFromContext);
   const currentEvaluation = getCurrentEvaluation(proposal?.evaluations || []);
 
   const evaluation = proposal?.evaluations.find((e) => e.id === activeEvaluationId);
