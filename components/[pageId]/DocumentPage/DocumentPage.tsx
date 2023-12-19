@@ -26,7 +26,6 @@ import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmRouter } from 'hooks/useCharmRouter';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useLgScreen } from 'hooks/useMediaScreens';
 import { useThreads } from 'hooks/useThreads';
 import { useVotes } from 'hooks/useVotes';
@@ -90,7 +89,6 @@ function DocumentPage({
   enableSidebar
 }: DocumentPageProps) {
   const { castVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
-  const isCharmVerse = useIsCharmverseSpace();
   const isLargeScreen = useLgScreen();
   const { navigateToSpacePath, router } = useCharmRouter();
   const {
@@ -120,6 +118,9 @@ function DocumentPage({
     refreshProposal,
     onChangeEvaluation
   } = useProposal({ proposalId });
+
+  // base the feature flag off the proposal instead of the space
+  const isCharmVerse = !!proposal?.evaluations.length;
 
   // We can only edit the proposal from the top level
   const readonlyProposalProperties = !page.proposalId || readOnly;
@@ -455,6 +456,7 @@ function DocumentPage({
                     openEvaluation={openEvaluation}
                     proposal={proposal}
                     refreshProposal={refreshProposal}
+                    isCharmVerse={isCharmVerse}
                   />
                 )}
                 {reward && (

@@ -89,6 +89,7 @@ type ProposalPropertiesProps = {
   isEvaluationSidebarOpen?: boolean;
   canSeeEvaluation?: boolean;
   isReviewer?: boolean;
+  isCharmVerse: boolean;
   rewardIds?: string[] | null;
 };
 
@@ -120,10 +121,10 @@ export function ProposalPropertiesBase({
   canSeeEvaluation,
   readOnlyCustomProperties,
   isReviewer,
+  isCharmVerse,
   rewardIds
 }: ProposalPropertiesProps) {
   const { user } = useUser();
-  const isCharmVerse = useIsCharmverseSpace();
   const { proposalCategoriesWithCreatePermission, categories } = useProposalCategories();
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');

@@ -331,6 +331,7 @@ export function NewProposalPage({
                           });
                         }}
                         readOnlyCustomProperties={readOnlyCustomProperties}
+                        isCharmVerse={isCharmVerse}
                       />
                     </div>
                   </div>

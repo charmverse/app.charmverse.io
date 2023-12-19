@@ -41,6 +41,7 @@ interface ProposalPropertiesProps {
   proposalPage: PageWithContent;
   proposal?: ProposalWithUsersAndRubric;
   refreshProposal: VoidFunction;
+  isCharmVerse: boolean;
 }
 
 export function ProposalProperties({
@@ -55,7 +56,8 @@ export function ProposalProperties({
   openEvaluation,
   proposalPage,
   proposal,
-  refreshProposal
+  refreshProposal,
+  isCharmVerse
 }: ProposalPropertiesProps) {
   const { mutate: mutateNotifications } = useNotifications();
   const { trigger: updateProposal } = useUpdateProposal({ proposalId });
@@ -220,6 +222,7 @@ export function ProposalProperties({
           openEvaluation={openEvaluation}
           isReviewer={isReviewer}
           rewardIds={proposal?.rewardIds}
+          isCharmVerse={isCharmVerse}
         />
         {isPublishingToLens && (
           <CreateLensPublication
