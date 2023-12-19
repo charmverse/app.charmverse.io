@@ -384,21 +384,6 @@ export function NewProposalPage({
               )}
             </Box>
           </StyledContainer>
-          <CharmEditor
-            placeholderText={`Describe the proposal. Type '/' to see the list of available commands`}
-            content={formInputs.content as PageContent}
-            autoFocus={false}
-            enableVoting={false}
-            containerWidth={containerWidth}
-            pageType='proposal'
-            disableNestedPages
-            onContentChange={updateProposalContent}
-            focusOnInit
-            isContentControlled
-            key={`${String(formInputs.proposalTemplateId)}.${readOnlyEditor}`}
-          >
-            {proposalPageContent}
-          </CharmEditor>
         </Box>
         <StickyFooterContainer>
           <Button
