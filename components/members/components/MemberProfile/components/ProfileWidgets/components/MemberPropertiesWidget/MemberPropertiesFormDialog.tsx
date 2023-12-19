@@ -81,10 +81,9 @@ export function DialogContainer({
 export function MemberPropertiesFormDialog({ userId, onClose }: Props) {
   const { refreshPropertyValues } = useMemberPropertyValues(userId);
 
-  const { control, errors, isValid, setValue, isDirty, isSubmitting, values, onSubmit } =
-    useRequiredMemberPropertiesForm({
-      userId
-    });
+  const { control, errors, isValid, isDirty, isSubmitting, onSubmit, onFormChange } = useRequiredMemberPropertiesForm({
+    userId
+  });
 
   async function saveForm() {
     await onSubmit();
@@ -92,15 +91,12 @@ export function MemberPropertiesFormDialog({ userId, onClose }: Props) {
   }
 
   function onMemberDetailsChange(fields: UpdateMemberPropertyValuePayload[]) {
-    fields.forEach((field) => {
-      setValue(field.memberPropertyId, field.value);
-    });
+    onFormChange(fields.map((field) => ({ id: field.memberPropertyId, value: field.value })));
   }
 
   return (
     <DialogContainer title='Edit profile' onClose={onClose}>
       <MemberPropertiesForm
-        values={values}
         control={control}
         errors={errors}
         userId={userId}
@@ -111,7 +107,15 @@ export function MemberPropertiesFormDialog({ userId, onClose }: Props) {
         <Button disableElevation color='secondary' variant='outlined' onClick={onClose}>
           Cancel
         </Button>
-        <Button disableElevation disabled={!isDirty || !isValid} loading={isSubmitting} onClick={saveForm}>
+        <Button
+          disableElevation
+          disabledTooltip={
+            !isValid ? 'Please fill out all required fields' : !isDirty ? 'No changes to save' : undefined
+          }
+          disabled={!isDirty || !isValid}
+          loading={isSubmitting}
+          onClick={saveForm}
+        >
           Save
         </Button>
       </Box>

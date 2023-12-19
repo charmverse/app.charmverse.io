@@ -23,6 +23,8 @@ import { PropertyLabel } from 'components/common/BoardEditor/components/properti
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
+import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
+import type { FormFieldInput } from 'components/common/form/interfaces';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useCharmRouter } from 'hooks/useCharmRouter';
@@ -43,7 +45,6 @@ import type { ProposalPropertiesInput } from './components/ProposalProperties/Pr
 import { ProposalPropertiesBase } from './components/ProposalProperties/ProposalPropertiesBase';
 import { TemplateSelect } from './components/TemplateSelect';
 import { WorkflowSelect } from './components/WorkflowSelect';
-import type { NewProposalInput } from './hooks/useNewProposal';
 import { useNewProposal } from './hooks/useNewProposal';
 
 export type ProposalPageAndPropertiesInput = ProposalPropertiesInput & {
@@ -53,6 +54,8 @@ export type ProposalPageAndPropertiesInput = ProposalPropertiesInput & {
   headerImage: string | null;
   icon: string | null;
   type: PageType;
+  proposalType?: 'structured' | 'free_form';
+  formFields?: FormFieldInput[];
 };
 
 const StyledContainer = styled(PageEditorContainer)`
@@ -69,6 +72,7 @@ export function NewProposalPage({
 }) {
   const { navigateToSpacePath } = useCharmRouter();
   const { space: currentSpace } = useCurrentSpace();
+  const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>([]);
   const isCharmVerse = useIsCharmverseSpace();
   const { activeView: sidebarView, setActiveView, closeSidebar } = usePageSidebar();
   const { proposalTemplates, isLoadingTemplates } = useProposalTemplates();
@@ -94,6 +98,14 @@ export function NewProposalPage({
   const [readOnlyEditor, setReadOnlyEditor] = useState(false);
   const isAdmin = useIsAdmin();
   const isReviewer = formInputs.reviewers?.some((r) => r.id === user?.id);
+
+  function toggleCollapse(fieldId: string) {
+    if (collapsedFieldIds.includes(fieldId)) {
+      setCollapsedFieldIds(collapsedFieldIds.filter((id) => id !== fieldId));
+    } else {
+      setCollapsedFieldIds([...collapsedFieldIds, fieldId]);
+    }
+  }
 
   usePreventReload(contentUpdated);
 
@@ -204,6 +216,109 @@ export function NewProposalPage({
   );
   const internalSidebarView = defaultSidebarView || sidebarView;
 
+  const proposalPageContent = (
+    <>
+      <PageHeader
+        headerImage={formInputs.headerImage}
+        icon={formInputs.icon}
+        readOnly={false}
+        updatedAt={new Date().toString()}
+        title={formInputs.title || ''}
+        // readOnly={readOnly || !!enableSuggestingMode}
+        setPage={(updatedPage) => {
+          setFormInputs(updatedPage);
+          if ('title' in updatedPage) {
+            setPageTitle(updatedPage.title || '');
+          }
+        }}
+        placeholder='Title (required)'
+      />
+      {isCharmVerse && (
+        <>
+          <Box my={2} mb={1}>
+            <EvaluationStepper evaluations={formInputs.evaluations} disabled isDraft={true} />
+          </Box>
+          <Divider />
+        </>
+      )}
+      <div className='focalboard-body font-family-default'>
+        <div className='CardDetail content'>
+          <div className='octo-propertylist'>
+            {/* Select a template for new proposals */}
+            {!isTemplate && (
+              <Box className='octo-propertyrow' mb='0 !important'>
+                <PropertyLabel readOnly highlighted required={isTemplateRequired}>
+                  Template
+                </PropertyLabel>
+                <Box display='flex' flex={1}>
+                  <TemplateSelect
+                    options={templateOptions}
+                    value={proposalTemplatePage ?? null}
+                    onChange={(template) => {
+                      if (template === null) {
+                        clearTemplate();
+                        // if user has not updated the content, then just overwrite everything
+                      } else if (formInputs.contentText?.length === 0) {
+                        applyTemplate(template.id);
+                      } else {
+                        // set value to trigger a prompt
+                        setSelectedProposalTemplateId(template?.id ?? null);
+                      }
+                    }}
+                  />
+                </Box>
+              </Box>
+            )}
+            {isCharmVerse && (
+              <Box className='octo-propertyrow' mb='0 !important'>
+                <PropertyLabel readOnly required highlighted>
+                  Workflow
+                </PropertyLabel>
+                <WorkflowSelect value={workflowId} onChange={selectEvaluationWorkflow} options={workflowOptions} />
+              </Box>
+            )}
+            <ProposalPropertiesBase
+              isFromTemplate={isFromTemplateSource}
+              readOnlyRubricCriteria={readOnlyRubricCriteria}
+              readOnlyReviewers={readOnlyReviewers}
+              readOnlyProposalEvaluationType={isFromTemplateSource}
+              proposalStatus='draft'
+              proposalFormInputs={formInputs}
+              isTemplate={formInputs.type === 'proposal_template'}
+              setProposalFormInputs={setFormInputs}
+              onChangeRubricCriteria={(rubricCriteria) => {
+                setFormInputs({
+                  ...formInputs,
+                  rubricCriteria
+                });
+              }}
+              readOnlyCustomProperties={readOnlyCustomProperties}
+              isCharmVerse={isCharmVerse}
+            />
+          </div>
+        </div>
+      </div>
+      {currentSpace && (
+        <PageSidebar
+          isNewProposal
+          id='page-action-sidebar'
+          spaceId={currentSpace.id}
+          sidebarView={internalSidebarView || null}
+          closeSidebar={closeSidebar}
+          openSidebar={setActiveView}
+          proposalInput={formInputs}
+          onChangeEvaluation={(evaluationId, updates) => {
+            const evaluations = formInputs.evaluations.map((e) => (e.id === evaluationId ? { ...e, ...updates } : e));
+            setFormInputs({
+              ...formInputs,
+              evaluations
+            });
+          }}
+        />
+      )}
+    </>
+  );
+
   useEffect(() => {
     if (isCharmVerse) {
       setActiveView('proposal_evaluation_settings');
@@ -233,136 +348,61 @@ export function NewProposalPage({
           {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
           <StyledContainer data-test='page-charmeditor' top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
             <Box minHeight={450}>
-              <CharmEditor
-                placeholderText={`Describe the proposal. Type '/' to see the list of available commands`}
-                content={formInputs.content as PageContent}
-                autoFocus={false}
-                enableVoting={false}
-                containerWidth={containerWidth}
-                pageType='proposal'
-                disableNestedPages
-                onContentChange={updateProposalContent}
-                focusOnInit
-                isContentControlled
-                key={`${String(formInputs.proposalTemplateId)}.${readOnlyEditor}`}
-              >
-                {/* temporary? disable editing of page title when in suggestion mode */}
-                <PageHeader
-                  headerImage={formInputs.headerImage}
-                  icon={formInputs.icon}
-                  readOnly={false}
-                  updatedAt={new Date().toString()}
-                  title={formInputs.title || ''}
-                  // readOnly={readOnly || !!enableSuggestingMode}
-                  setPage={(updatedPage) => {
-                    setFormInputs(updatedPage);
-                    if ('title' in updatedPage) {
-                      setPageTitle(updatedPage.title || '');
-                    }
-                  }}
-                  placeholder='Title (required)'
-                />
-                {isCharmVerse && (
-                  <>
-                    <Box my={2} mb={1}>
-                      <EvaluationStepper
-                        evaluations={formInputs.evaluations}
-                        disabled
-                        isDraft={true} // proposalStatus === 'draft'}
-                        // onClick={handleClickEvaluationStep}
-                      />
-                    </Box>
-                    <Divider />
-                  </>
-                )}
-                <div className='focalboard-body font-family-default'>
-                  <div className='CardDetail content'>
-                    <div className='octo-propertylist'>
-                      {/* Select a template for new proposals */}
-                      {!isTemplate && (
-                        <Box className='octo-propertyrow' mb='0 !important'>
-                          <PropertyLabel readOnly highlighted required={isTemplateRequired}>
-                            Template
-                          </PropertyLabel>
-                          <Box display='flex' flex={1}>
-                            <TemplateSelect
-                              options={templateOptions}
-                              value={proposalTemplatePage ?? null}
-                              onChange={(template) => {
-                                if (template === null) {
-                                  clearTemplate();
-                                  // if user has not updated the content, then just overwrite everything
-                                } else if (formInputs.contentText?.length === 0) {
-                                  applyTemplate(template.id);
-                                } else {
-                                  // set value to trigger a prompt
-                                  setSelectedProposalTemplateId(template?.id ?? null);
-                                }
-                              }}
-                            />
-                          </Box>
-                        </Box>
-                      )}
-                      {isCharmVerse && (
-                        <Box className='octo-propertyrow' mb='0 !important'>
-                          <PropertyLabel readOnly required highlighted>
-                            Workflow
-                          </PropertyLabel>
-                          <WorkflowSelect
-                            value={workflowId}
-                            onChange={selectEvaluationWorkflow}
-                            options={workflowOptions}
-                          />
-                        </Box>
-                      )}
-                      <ProposalPropertiesBase
-                        isFromTemplate={isFromTemplateSource}
-                        readOnlyRubricCriteria={readOnlyRubricCriteria}
-                        readOnlyReviewers={readOnlyReviewers}
-                        readOnlyProposalEvaluationType={isFromTemplateSource}
-                        proposalStatus='draft'
-                        proposalFormInputs={formInputs}
-                        isTemplate={formInputs.type === 'proposal_template'}
-                        setProposalFormInputs={setFormInputs}
-                        onChangeRubricCriteria={(rubricCriteria) => {
-                          setFormInputs({
-                            ...formInputs,
-                            rubricCriteria
-                          });
-                        }}
-                        readOnlyCustomProperties={readOnlyCustomProperties}
-                        isCharmVerse={isCharmVerse}
-                      />
-                    </div>
-                  </div>
-                </div>
-                {currentSpace && (
-                  <PageSidebar
-                    isNewProposal
-                    id='page-action-sidebar'
-                    spaceId={currentSpace.id}
-                    sidebarView={internalSidebarView || null}
-                    closeSidebar={closeSidebar}
-                    openSidebar={setActiveView}
-                    proposalInput={formInputs}
-                    onChangeEvaluation={(evaluationId, updates) => {
-                      const evaluations = formInputs.evaluations.map((e) =>
-                        e.id === evaluationId ? { ...e, ...updates } : e
-                      );
+              {formInputs.proposalType === 'structured' ? (
+                <>
+                  {proposalPageContent}
+                  <FormFieldsEditor
+                    collapsedFieldIds={collapsedFieldIds}
+                    toggleCollapse={toggleCollapse}
+                    formFields={formInputs.formFields || []}
+                    setFormFields={(formFields) => {
                       setFormInputs({
                         ...formInputs,
-                        evaluations
+                        formFields:
+                          typeof formFields === 'function' ? formFields(formInputs.formFields || []) : formFields
                       });
                     }}
                   />
-                )}
-              </CharmEditor>
+                </>
+              ) : (
+                <CharmEditor
+                  placeholderText={`Describe the proposal. Type '/' to see the list of available commands`}
+                  content={formInputs.content as PageContent}
+                  autoFocus={false}
+                  enableVoting={false}
+                  containerWidth={containerWidth}
+                  pageType='proposal'
+                  disableNestedPages
+                  onContentChange={updateProposalContent}
+                  focusOnInit
+                  isContentControlled
+                  key={`${String(formInputs.proposalTemplateId)}.${readOnlyEditor}`}
+                >
+                  {/* temporary? disable editing of page title when in suggestion mode */}
+                  {proposalPageContent}
+                </CharmEditor>
+              )}
             </Box>
           </StyledContainer>
+          <CharmEditor
+            placeholderText={`Describe the proposal. Type '/' to see the list of available commands`}
+            content={formInputs.content as PageContent}
+            autoFocus={false}
+            enableVoting={false}
+            containerWidth={containerWidth}
+            pageType='proposal'
+            disableNestedPages
+            onContentChange={updateProposalContent}
+            focusOnInit
+            isContentControlled
+            key={`${String(formInputs.proposalTemplateId)}.${readOnlyEditor}`}
+          >
+            {proposalPageContent}
+          </CharmEditor>
         </Box>
         <StickyFooterContainer>
           <Button
-            disabled={Boolean(disabledTooltip) || !contentUpdated || isCreatingProposal}
+            disabled={Boolean(disabledTooltip) || isCreatingProposal}
             disabledTooltip={disabledTooltip}
             onClick={saveForm}
             loading={isCreatingProposal}

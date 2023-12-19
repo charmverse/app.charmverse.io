@@ -507,7 +507,8 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         color: 'gray'
       },
       fields: null,
-      workflowId: null
+      workflowId: null,
+      formId: null
     }
   },
   {
@@ -1639,7 +1640,8 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         color: 'gray'
       },
       fields: null,
-      workflowId: null
+      workflowId: null,
+      formId: null
     }
   },
   {
@@ -2059,7 +2061,8 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         color: 'gray'
       },
       fields: null,
-      workflowId: null
+      workflowId: null,
+      formId: null
     }
   },
   {
@@ -2407,7 +2410,8 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         color: 'pink'
       },
       fields: null,
-      workflowId: null
+      workflowId: null,
+      formId: null
     }
   },
   {
@@ -3097,7 +3101,8 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         color: 'pink'
       },
       fields: null,
-      workflowId: null
+      workflowId: null,
+      formId: null
     }
   },
   {
@@ -3785,7 +3790,8 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
         color: 'pink'
       },
       fields: null,
-      workflowId: null
+      workflowId: null,
+      formId: null
     }
   }
 ];

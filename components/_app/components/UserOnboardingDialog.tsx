@@ -51,9 +51,13 @@ function LoggedInUserOnboardingDialog({ user, space }: { space: Space; user: Log
     log.info('[user-journey] Show onboarding flow');
   }, []);
 
-  const { hasEmptyRequiredProperties } = useRequiredMemberProperties({
+  const { hasEmptyRequiredProperties, isLoadingMemberProperties, isLoadingUserDetails } = useRequiredMemberProperties({
     userId: user.id
   });
+
+  if (isLoadingMemberProperties || isLoadingUserDetails) {
+    return null;
+  }
 
   if (onboardingStep) {
     return (
@@ -102,14 +106,13 @@ function UserOnboardingDialog({
   hasEmptyRequiredProperties?: boolean;
   setIsOnboardingModalOpen: (isOpen: boolean) => void;
 }) {
-  const { requiredProperties, requiredPropertiesWithoutValue } = useRequiredMemberProperties({
+  const { requiredPropertiesWithoutValue } = useRequiredMemberProperties({
     userId: currentUser.id
   });
   const {
     control: memberPropertiesControl,
     errors: memberPropertiesErrors,
     isValid: isMemberPropertiesValid,
-    values: memberPropertiesValues,
     onFormChange: onMemberPropertiesChange,
     isDirty: isMemberPropertiesDirty,
     isSubmitting: isMemberPropertiesSubmitting,
@@ -221,11 +224,12 @@ function UserOnboardingDialog({
           <ConnectedAccounts user={currentUser} setIsOnboardingModalOpen={setIsOnboardingModalOpen} />
           <Legend mt={4}>Member details</Legend>
           <MemberPropertiesForm
-            values={memberPropertiesValues}
             control={memberPropertiesControl}
             errors={memberPropertiesErrors}
             refreshPropertyValues={refreshPropertyValues}
-            onChange={onMemberPropertiesChange}
+            onChange={(values) =>
+              onMemberPropertiesChange(values.map(({ memberPropertyId, value }) => ({ id: memberPropertyId, value })))
+            }
             userId={currentUser.id}
             showCollectionOptions
           />

@@ -1,23 +1,24 @@
 import type { UserDetails } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
+import { useFormFields } from 'components/common/form/hooks/useFormFields';
 import type { EditableFields } from 'components/settings/profile/components/UserDetailsForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { DEFAULT_MEMBER_PROPERTIES, NON_DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
-import type { MemberPropertyValueType, Social, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
+import type { Social } from 'lib/members/interfaces';
 
 import { useMemberPropertyValues } from './useMemberPropertyValues';
 
-const requiredString = yup.string().required().ensure().trim();
+const requiredString = (msg: string) => yup.string().required(msg).ensure().trim();
 
 const nonRequiredString = yup.string().notRequired().trim();
 
@@ -28,7 +29,7 @@ const LINKEDIN_URL_REGEX =
 
 export function useRequiredMemberProperties({ userId }: { userId: string }) {
   const { user: currentUser } = useUser();
-  const { memberPropertyValues } = useMemberPropertyValues(userId);
+  const { memberPropertyValues, isLoading: isLoadingMemberProperties } = useMemberPropertyValues(userId);
   const { space: currentSpace } = useCurrentSpace();
   const { data: userDetails, isLoading: isLoadingUserDetails } = useSWRImmutable(`/current-user-details`, () =>
     charmClient.getUserDetails()
@@ -119,6 +120,7 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
 
   return {
     ...data,
+    isLoadingMemberProperties,
     isLoadingUserDetails,
     userDetails
   };
@@ -128,95 +130,39 @@ export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) 
   const { memberProperties = [] } = useRequiredMemberProperties({ userId });
   const { updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(userId);
   const { space } = useCurrentSpace();
+  const { mutateMembers } = useMembers();
 
-  const {
-    control,
-    formState: { isValid, errors, isDirty, isSubmitting },
-    reset,
-    getValues,
-    setValue,
-    handleSubmit
-  } = useForm({
-    mode: 'onChange',
-    resolver: yupResolver(
-      yup.object(
-        memberProperties.reduce((acc, property) => {
-          if (!NON_DEFAULT_MEMBER_PROPERTIES.includes(property.type)) {
-            return acc;
-          }
+  const nonDefaultMemberProperties = useMemo(() => {
+    return memberProperties
+      .filter((p) => NON_DEFAULT_MEMBER_PROPERTIES.includes(p.type))
+      .map((p) => ({
+        ...p,
+        id: p.memberPropertyId
+      }));
+  }, [memberProperties]);
 
-          const isRequired = property.required;
-
-          if (isRequired) {
-            if (property.type === 'multiselect') {
-              acc[property.memberPropertyId] = yup.array().of(yup.string()).required();
-              return acc;
-            }
-
-            acc[property.memberPropertyId] = property.type === 'number' ? yup.number().required() : requiredString;
-
-            return acc;
-          }
-
-          if (property.type === 'multiselect') {
-            acc[property.memberPropertyId] = yup.array().of(yup.string());
-            return acc;
-          }
-
-          acc[property.memberPropertyId] = property.type === 'number' ? yup.number() : nonRequiredString;
-
-          return acc;
-        }, {} as Record<string, any>)
-      )
-    )
+  const { getValues, control, errors, isDirty, isSubmitting, isValid, onFormChange, onSubmit } = useFormFields({
+    fields: nonDefaultMemberProperties,
+    onSubmit: async (values) => {
+      if (space) {
+        await updateSpaceValues(
+          space.id,
+          Object.entries(values).map(([memberPropertyId, value]) => ({ memberPropertyId, value }))
+        );
+        refreshPropertyValues();
+        mutateMembers();
+      }
+    }
   });
 
   const values = getValues();
 
-  useEffect(() => {
-    if (!memberProperties) {
-      return;
-    }
-    const defaultValues = memberProperties.reduce<Record<string, MemberPropertyValueType>>((acc, prop) => {
-      if (NON_DEFAULT_MEMBER_PROPERTIES.includes(prop.type)) {
-        acc[prop.memberPropertyId] = prop.value;
-      }
-      return acc;
-    }, {});
-
-    reset(defaultValues);
-  }, [memberProperties, reset]);
-
-  const onSubmit = () => {
-    if (isDirty && isValid && space) {
-      return handleSubmit(async () => {
-        await updateSpaceValues(
-          space.id,
-          Object.entries(getValues()).map(([memberPropertyId, value]) => ({ memberPropertyId, value }))
-        );
-        refreshPropertyValues();
-      })();
-    }
-  };
-
-  function onFormChange(fields: UpdateMemberPropertyValuePayload[]) {
-    fields.forEach((field) => {
-      setValue(field.memberPropertyId, field.value, {
-        shouldDirty: true,
-        shouldValidate: true,
-        shouldTouch: true
-      });
-    });
-  }
-
   return {
     values,
     control,
-    isValid: Object.keys(errors).length === 0,
+    isValid,
     errors,
     isDirty,
-    setValue,
-    getValues,
     isSubmitting,
     onSubmit,
     onFormChange
@@ -230,7 +176,6 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
     isLinkedinRequired,
     isTimezoneRequired,
     isTwitterRequired,
-    isLoadingUserDetails,
     userDetails: { id, ...userDetails } = {} as UserDetails
   } = useRequiredMemberProperties({ userId });
   const { showMessage } = useSnackbar();
@@ -244,48 +189,32 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
     reset
   } = useForm({
     mode: 'onChange',
-    defaultValues: userDetails,
+    defaultValues: {
+      ...userDetails,
+      social: userDetails.social ?? {
+        twitterURL: '',
+        githubURL: '',
+        linkedinURL: ''
+      }
+    },
     resolver: yupResolver(
       yup.object({
-        description: isBioRequired ? requiredString : nonRequiredString,
-        timezone: isTimezoneRequired ? requiredString : nonRequiredString,
+        description: isBioRequired ? requiredString('Bio is required') : nonRequiredString,
+        timezone: isTimezoneRequired ? requiredString('Timezone is required') : nonRequiredString,
         social: yup.object({
           twitterURL: isTwitterRequired
-            ? requiredString.matches(TWITTER_URL_REGEX, 'Invalid Twitter link')
+            ? requiredString('Twitter is required').matches(TWITTER_URL_REGEX, 'Invalid Twitter link')
             : nonRequiredString.matches(TWITTER_URL_REGEX, 'Invalid Twitter link'),
           githubURL: isGithubRequired
-            ? requiredString.matches(GITHUB_URL_REGEX, 'Invalid GitHub link')
+            ? requiredString('Github is required').matches(GITHUB_URL_REGEX, 'Invalid GitHub link')
             : nonRequiredString.matches(GITHUB_URL_REGEX, 'Invalid GitHub link'),
           linkedinURL: isLinkedinRequired
-            ? requiredString.matches(LINKEDIN_URL_REGEX, 'Invalid LinkedIn link')
-            : nonRequiredString.matches(LINKEDIN_URL_REGEX, 'Invalid LinkedIn link'),
-          discordUsername: nonRequiredString
+            ? requiredString('Linkedin is required').matches(LINKEDIN_URL_REGEX, 'Invalid LinkedIn link')
+            : nonRequiredString.matches(LINKEDIN_URL_REGEX, 'Invalid LinkedIn link')
         })
       })
     )
   });
-
-  useEffect(() => {
-    if (!isLoadingUserDetails) {
-      reset({
-        ...userDetails,
-        social:
-          userDetails.social === null
-            ? {
-                twitterURL: '',
-                githubURL: '',
-                linkedinURL: ''
-              }
-            : userDetails.social
-      });
-    }
-  }, [isLoadingUserDetails]);
-
-  const values = {
-    description: getValues('description'),
-    social: getValues('social'),
-    timezone: getValues('timezone')
-  };
 
   function onFormChange(fields: EditableFields) {
     Object.entries(fields).forEach(([key, value]) => {
@@ -297,12 +226,17 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
     });
   }
 
+  const values = getValues();
+
   function onSubmit() {
     if (isDirty && isValid) {
-      return handleSubmit(async () => {
+      return handleSubmit(async (_values) => {
         await charmClient.updateUserDetails(getValues());
-        await mutate('/current-user-details');
-        await mutateMembers();
+        await Promise.all([mutate('/current-user-details'), mutateMembers()]);
+        reset(_values, {
+          keepDirty: false,
+          keepDirtyValues: false
+        });
         showMessage('Profile updated', 'success');
       })();
     }

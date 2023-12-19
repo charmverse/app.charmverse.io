@@ -121,6 +121,17 @@ export function useNewProposal({ newProposal }: Props) {
     // get the first validation error from the evaluations
     disabledTooltip = formInputs.evaluations.map(getEvaluationFormError).filter(isTruthy)[0];
   }
+  if (formInputs.proposalType === 'structured' && (formInputs.formFields ?? [])?.length === 0) {
+    disabledTooltip = 'Form fields are required for structured proposals';
+  }
+
+  if (formInputs.proposalType === 'structured' && formInputs.formFields?.some((formField) => !formField.name)) {
+    disabledTooltip = 'Form fields must have a name';
+  }
+
+  if (formInputs.proposalType === 'free_form' && !formInputs.content) {
+    disabledTooltip = 'Content is required for free-form proposals';
+  }
 
   return {
     formInputs,
@@ -157,6 +168,7 @@ function emptyState({
   ...inputs
 }: Partial<ProposalPageAndPropertiesInput> & { userId?: string } = {}): ProposalPageAndPropertiesInput {
   return {
+    proposalType: 'free_form',
     categoryId: null,
     content: null,
     contentText: '',
