@@ -17,9 +17,9 @@ interface Props {
 type IDiscordConnectionContext = {
   isConnected: boolean;
   isLoading: boolean;
-  connect: VoidFunction;
+  connect: () => Promise<void> | void;
   error?: string;
-  popupLogin: (redirectUrl: string, type?: 'login' | 'connect') => void;
+  popupLogin: (redirectUrl: string, type: 'login' | 'connect') => void;
 };
 
 export const DiscordConnectionContext = createContext<Readonly<IDiscordConnectionContext>>({
@@ -74,7 +74,7 @@ export function DiscordProvider({ children }: Props) {
       });
   }
 
-  function popupLogin(redirectUrl: string, type: 'login' | 'connect' = 'login') {
+  function popupLogin(redirectUrl: string, type: 'login' | 'connect') {
     const discordLoginPath = getDiscordLoginPath({
       type,
       redirectUrl,

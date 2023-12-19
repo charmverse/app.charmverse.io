@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import type { KeyedMutator } from 'swr';
+import { useSWRConfig, type KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import { useGetRewards } from 'charmClient/hooks/rewards';
@@ -19,6 +19,7 @@ type RewardsContextType = {
   refreshReward: (rewardId: string) => Promise<RewardWithUsers>;
   creatingInlineReward: boolean;
   setCreatingInlineReward: (isCreating: boolean) => void;
+  getRewardById: (id: string) => RewardWithUsers | undefined;
 };
 
 export const RewardsContext = createContext<Readonly<RewardsContextType>>({
@@ -30,12 +31,14 @@ export const RewardsContext = createContext<Readonly<RewardsContextType>>({
   updateReward: () => Promise.resolve(),
   refreshReward: () => Promise.resolve() as any,
   creatingInlineReward: false,
-  setCreatingInlineReward: () => {}
+  setCreatingInlineReward: () => {},
+  getRewardById: () => undefined
 });
 
 export function RewardsProvider({ children }: { children: ReactNode }) {
   const { pages, loadingPages } = usePages();
   const { space } = useCurrentSpace();
+  const { mutate } = useSWRConfig();
 
   const { data, mutate: mutateRewards, isLoading } = useGetRewards({ spaceId: space?.id });
   const [creatingInlineReward, setCreatingInlineReward] = useState<boolean>(false);
@@ -76,9 +79,13 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
         },
         { revalidate: false }
       );
+
+      // update cache for single reward get
+      mutate(`/api/rewards/${rewardId}`, reward, false);
+
       return reward;
     },
-    [mutateRewards]
+    [mutate, mutateRewards]
   );
 
   useEffect(() => {
@@ -108,6 +115,13 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
     };
   }, [mutateRewards, subscribe]);
 
+  const getRewardById = useCallback(
+    (id: string) => {
+      return rewards?.find((reward) => reward.id === id);
+    },
+    [rewards]
+  );
+
   const value = useMemo(
     () => ({
       rewards,
@@ -117,7 +131,8 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
       refreshReward,
       setRewards: mutateRewards,
       setCreatingInlineReward,
-      creatingInlineReward
+      creatingInlineReward,
+      getRewardById
     }),
     [
       rewards,
@@ -127,7 +142,8 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
       updateReward,
       refreshReward,
       creatingInlineReward,
-      setCreatingInlineReward
+      setCreatingInlineReward,
+      getRewardById
     ]
   );
 

@@ -40,15 +40,15 @@ export function FormComposition() {
     <Paper sx={{ p: 4 }}>
       <Grid container direction='column' spacing={2} mt={1} maxWidth={700} mx='auto'>
         <Grid item>
-          <UserDescription currentDescription={description} save={saveDescription} />
+          <UserDescription description={description} onChange={saveDescription} />
         </Grid>
         <Grid item>
           <TimezoneAutocomplete
             userTimezone={newTimezone}
-            save={(timezone) => setNewTimezone(timezone || 'America/New_York')}
+            onChange={(timezone) => setNewTimezone(timezone || 'America/New_York')}
           />
         </Grid>
-        <SocialInputs social={text as Social} save={saveSocial} />
+        <SocialInputs social={text as Social} onChange={saveSocial} />
         <Box display='flex' justifyContent='flex-end' gap={2} mt={4}>
           <Button color='error'>Cancel</Button>
           <Button>Save</Button>

@@ -35,12 +35,27 @@ type Props = {
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
   onDeleteCard?: (cardId: string) => Promise<void>;
   readOnlyTitle?: boolean;
+  readOnlyRows?: boolean;
   disableAddingCards?: boolean;
   expandSubRowsOnLoad?: boolean;
+  rowExpansionLocalStoragePrefix?: string;
+  subRowsEmptyValueContent?: React.ReactElement | string;
 };
 
 function Table(props: Props): JSX.Element {
-  const { board, cardPages, activeView, visibleGroups, groupByProperty, views, expandSubRowsOnLoad } = props;
+  const {
+    board,
+    cardPages,
+    activeView,
+    visibleGroups,
+    groupByProperty,
+    views,
+    expandSubRowsOnLoad,
+    readOnly,
+    readOnlyRows,
+    rowExpansionLocalStoragePrefix,
+    subRowsEmptyValueContent
+  } = props;
   const isManualSort = activeView.fields.sortOptions?.length === 0;
   const dispatch = useAppDispatch();
 
@@ -255,6 +270,7 @@ function Table(props: Props): JSX.Element {
                   onDropToGroup={onDropToGroup}
                   readOnlyTitle={props.readOnlyTitle}
                   disableAddingCards={props.disableAddingCards}
+                  subRowsEmptyValueContent={subRowsEmptyValueContent}
                 />
               );
             })}
@@ -267,7 +283,7 @@ function Table(props: Props): JSX.Element {
               columnRefs={columnRefs}
               cardPages={cardPages}
               selectedCardIds={props.selectedCardIds}
-              readOnly={props.readOnly}
+              readOnly={readOnly || !!readOnlyRows}
               cardIdToFocusOnRender={props.cardIdToFocusOnRender}
               offset={offset}
               resizingColumn={resizingColumn}
@@ -278,6 +294,8 @@ function Table(props: Props): JSX.Element {
               onDeleteCard={props.onDeleteCard}
               readOnlyTitle={props.readOnlyTitle}
               expandSubRowsOnLoad={expandSubRowsOnLoad}
+              rowExpansionLocalStoragePrefix={rowExpansionLocalStoragePrefix}
+              subRowsEmptyValueContent={subRowsEmptyValueContent}
             />
           )}
         </div>

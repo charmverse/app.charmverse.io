@@ -1,24 +1,26 @@
-import type { Prisma, Space } from '@charmverse/core/prisma';
+import type { IdentityType, Prisma, Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
+import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import {
   Box,
-  Grid,
-  Stack,
-  Typography,
-  TextField,
   FormHelperText,
-  MenuItem,
-  ListItem,
+  Grid,
   List,
+  ListItem,
+  ListItemIcon,
   ListItemText,
-  ListItemIcon
+  MenuItem,
+  Select,
+  Stack,
+  TextField,
+  Typography
 } from '@mui/material';
 import isEqual from 'lodash/isEqual';
 import PopupState from 'material-ui-popup-state';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
@@ -26,12 +28,12 @@ import * as yup from 'yup';
 import charmClient from 'charmClient';
 import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
+import { DraggableListItem } from 'components/common/DraggableListItem';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import { PageIcon } from 'components/common/PageIcon';
-import DraggableListItem from 'components/common/PageLayout/components/DraggableListItem';
 import type { Feature } from 'components/common/PageLayout/components/Sidebar/constants';
 import Legend from 'components/settings/Legend';
 import { SetupCustomDomain } from 'components/settings/space/components/SetupCustomDomain';
@@ -46,6 +48,8 @@ import type { MemberProfileName } from 'lib/profile/memberProfiles';
 import { getSpaceUrl, getSubdomainPath } from 'lib/utilities/browser';
 import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFromHost';
 
+import { IdentityIcon } from '../profile/components/IdentityIcon';
+
 import Avatar from './components/LargeAvatar';
 import { NotificationTogglesInput } from './components/NotificationToggles';
 import { SettingsItem } from './components/SettingsItem';
@@ -53,13 +57,15 @@ import { SettingsItem } from './components/SettingsItem';
 export type FormValues = {
   name: string;
   spaceImage?: string | null;
+  spaceArtwork?: string | null;
   domain: string;
   notificationToggles: NotificationToggles;
 };
 
-const schema: yup.SchemaOf<FormValues> = yup.object({
+const schema: yup.Schema<FormValues> = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
-  spaceImage: yup.string().nullable(true),
+  spaceImage: yup.string().nullable(),
+  spaceArtwork: yup.string().nullable(),
   notificationToggles: yup.object(),
   domain: yup
     .string()
@@ -87,6 +93,7 @@ export function SpaceSettings({
   const unsavedChangesModalState = usePopupState({ variant: 'popover', popupId: 'unsaved-changes' });
   const memberProfilesPopupState = usePopupState({ variant: 'popover', popupId: 'member-profiles' });
   const [featuresInput, setFeatures] = useState(currentFeatures);
+  const [primaryMemberIdentity, setPrimaryMemberIdentity] = useState<IdentityType | null>(space.primaryMemberIdentity);
   const [memberProfileTypesInput, setMemberProfileProperties] = useState(currentMemberProfileTypes);
   const {
     register,
@@ -131,6 +138,7 @@ export function SpaceSettings({
 
   const watchName = watch('name');
   const watchSpaceImage = watch('spaceImage');
+  const watchSpaceArtwork = watch('spaceArtwork');
 
   async function onSubmit(values: FormValues) {
     if (!isAdmin || !values.domain) return;
@@ -152,7 +160,9 @@ export function SpaceSettings({
       memberProfiles: memberProfileTypesInput,
       name: values.name,
       domain: values.domain,
-      spaceImage: values.spaceImage
+      primaryMemberIdentity,
+      spaceImage: values.spaceImage,
+      spaceArtwork: values.spaceArtwork
     });
 
     if (newDomain) {
@@ -195,7 +205,10 @@ export function SpaceSettings({
   }
 
   const dataChanged =
-    !isEqual(currentFeatures, featuresInput) || !isEqual(currentMemberProfileTypes, memberProfileTypesInput) || isDirty;
+    !isEqual(currentFeatures, featuresInput) ||
+    !isEqual(currentMemberProfileTypes, memberProfileTypesInput) ||
+    isDirty ||
+    space.primaryMemberIdentity !== primaryMemberIdentity;
 
   useEffect(() => {
     setUnsavedChanges(dataChanged);
@@ -265,6 +278,52 @@ export function SpaceSettings({
               watch={watch}
               setValue={setValue}
             />
+          </Grid>
+          <Grid item>
+            <FieldLabel>Primary Identity</FieldLabel>
+            <Typography variant='caption' mb={1} component='p'>
+              Choose the primary identity for your space. This will be the required identity that your members will have
+              to provide when they first join and it will be used to display the member.
+            </Typography>
+            <Box display='flex' alignItems='center' gap={1}>
+              <Select
+                value={primaryMemberIdentity ?? 'none'}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setPrimaryMemberIdentity(value === 'none' ? null : (value as IdentityType));
+                }}
+                disabled={!isAdmin}
+              >
+                <MenuItem value='none'>
+                  <Stack flexDirection='row' alignItems='center' gap={1}>
+                    <PersonOutlinedIcon style={{ width: 18, height: 18 }} />
+                    <Typography variant='body2'>Member's choice</Typography>
+                  </Stack>
+                </MenuItem>
+                {(['Discord', 'Google', 'Telegram', 'Wallet'] as IdentityType[]).map((identity) => (
+                  <MenuItem key={identity} value={identity}>
+                    <Stack flexDirection='row' alignItems='center' gap={1}>
+                      <IdentityIcon size='xSmall' type={identity} />
+                      <Typography variant='body2'>{identity}</Typography>
+                    </Stack>
+                  </MenuItem>
+                ))}
+              </Select>
+            </Box>
+          </Grid>
+          <Grid item>
+            <FieldLabel>Custom Artwork</FieldLabel>
+            <Typography variant='caption' mb={2} component='p'>
+              Show your artwork for onboarding users.
+            </Typography>
+            <Avatar
+              name={watchName}
+              variant='rounded'
+              image={watchSpaceArtwork}
+              updateImage={(url: string) => setValue('spaceArtwork', url, { shouldDirty: true })}
+              editable={isAdmin}
+            />
+            <TextField {...register('spaceArtwork')} sx={{ visibility: 'hidden', width: '0px', height: '0px' }} />
           </Grid>
           <Grid item>
             <FieldLabel>Sidebar Options</FieldLabel>
@@ -417,6 +476,7 @@ export function SpaceSettings({
                 data-test='submit-space-update'
                 disabled={isMutating || !dataChanged}
                 type='submit'
+                loading={isMutating}
               >
                 Save
               </Button>
@@ -549,6 +609,7 @@ function _getFormValues(space: Space): FormValues {
   return {
     name: space.name,
     spaceImage: space.spaceImage,
+    spaceArtwork: space.spaceArtwork,
     domain: space.domain,
     notificationToggles
   };

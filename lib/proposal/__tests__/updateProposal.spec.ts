@@ -1,6 +1,5 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
 import { InvalidStateError } from 'lib/middleware';
 import { createProposalWithUsers, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
@@ -29,14 +28,12 @@ beforeAll(async () => {
 describe('Update proposal specific data', () => {
   it('Update the reviewers and authors list of a proposal', async () => {
     // Create a test proposal first
-    const pageWithProposal = await createProposalWithUsers({
+    const proposal = await createProposalWithUsers({
       spaceId: space.id,
       userId: author1.id,
       authors: [],
       reviewers: [reviewer2.id]
     });
-
-    const proposal = pageWithProposal.proposal as ProposalWithUsers;
 
     await updateProposal({
       proposalId: proposal.id,
@@ -50,36 +47,28 @@ describe('Update proposal specific data', () => {
     });
 
     const [proposalReviewer1, proposalReviewer2, proposalAuthor1, proposalAuthor2] = await Promise.all([
-      prisma.proposalReviewer.findUnique({
+      prisma.proposalReviewer.findFirst({
         where: {
-          userId_proposalId: {
-            proposalId: proposal.id,
-            userId: reviewer1.id
-          }
+          proposalId: proposal.id,
+          userId: reviewer1.id
         }
       }),
-      prisma.proposalReviewer.findUnique({
+      prisma.proposalReviewer.findFirst({
         where: {
-          userId_proposalId: {
-            proposalId: proposal.id,
-            userId: reviewer2.id
-          }
+          proposalId: proposal.id,
+          userId: reviewer2.id
         }
       }),
-      prisma.proposalAuthor.findUnique({
+      prisma.proposalAuthor.findFirst({
         where: {
-          proposalId_userId: {
-            proposalId: proposal.id,
-            userId: author1.id
-          }
+          proposalId: proposal.id,
+          userId: author1.id
         }
       }),
-      prisma.proposalAuthor.findUnique({
+      prisma.proposalAuthor.findFirst({
         where: {
-          proposalId_userId: {
-            proposalId: proposal.id,
-            userId: author2.id
-          }
+          proposalId: proposal.id,
+          userId: author2.id
         }
       })
     ]);
@@ -95,18 +84,16 @@ describe('Update proposal specific data', () => {
 
   it('Should throw error if at least one author is not selected for a proposal', async () => {
     // Create a test proposal first
-    const pageWithProposal = await createProposalWithUsers({
+    const result = await createProposalWithUsers({
       spaceId: space.id,
       userId: author1.id,
       authors: [],
       reviewers: [reviewer2.id]
     });
 
-    const proposal = pageWithProposal.proposal as ProposalWithUsers;
-
     await expect(
       updateProposal({
-        proposalId: proposal.id,
+        proposalId: result.id,
         authors: [],
         reviewers: [
           {

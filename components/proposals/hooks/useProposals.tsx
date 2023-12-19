@@ -1,11 +1,12 @@
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import type { ReactNode } from 'react';
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useMemo } from 'react';
 import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import { useGetProposalsBySpace } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { usePages } from 'hooks/usePages';
 import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
@@ -34,7 +35,13 @@ export function ProposalsProvider({ children }: { children: ReactNode }) {
   const { loadingPages } = usePages();
   const { space } = useCurrentSpace();
 
-  const { data: proposals, mutate: mutateProposals, isLoading } = useGetProposalsBySpace({ spaceId: space?.id });
+  const useProposalEvaluationPermissions = useIsCharmverseSpace();
+
+  const {
+    data: proposals,
+    mutate: mutateProposals,
+    isLoading
+  } = useGetProposalsBySpace({ spaceId: space?.id, useProposalEvaluationPermissions });
 
   const archiveProposal = useCallback(
     async (input: ArchiveProposalRequest) => {

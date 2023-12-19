@@ -10,6 +10,7 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
+import { usePages } from 'hooks/usePages';
 import { useRewardBlocks } from 'hooks/useRewardBlocks';
 import type { BlockTypes } from 'lib/focalboard/block';
 import type { Board } from 'lib/focalboard/board';
@@ -19,8 +20,9 @@ import { CardFilter } from 'lib/focalboard/cardFilter';
 import { Constants } from 'lib/focalboard/constants';
 import { viewTypeToBlockId } from 'lib/focalboard/customBlocks/constants';
 import type { Member } from 'lib/members/interfaces';
+import type { PagesMap } from 'lib/pages';
 import {
-  ASSIGNEES_BLOCK_ID,
+  REWARDS_APPLICANTS_BLOCK_ID,
   CREATED_AT_ID,
   DEFAULT_VIEW_BLOCK_ID,
   DUE_DATE_ID,
@@ -31,7 +33,9 @@ import {
   REWARD_AMOUNT,
   REWARD_CHAIN,
   REWARD_CUSTOM_VALUE,
-  REWARD_TOKEN
+  REWARD_TOKEN,
+  REWARD_APPLICANTS_COUNT,
+  REWARD_PROPOSAL_LINK
 } from 'lib/rewards/blocks/constants';
 import type { RewardFields, RewardFieldsProp, RewardPropertyValue } from 'lib/rewards/blocks/interfaces';
 import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmissionSlots';
@@ -46,6 +50,9 @@ export function useRewardsBoardAdapter() {
   const { rewards } = useRewards();
   const { rewardBoardBlock, rewardBlocks } = useRewardBlocks();
   const { getRewardPage } = useRewardPage();
+  const hasMilestoneRewards = useMemo(() => rewards?.some((r) => !!r.proposalId), [rewards]);
+  const { pages } = usePages();
+
   const {
     router: { query }
   } = useCharmRouter();
@@ -53,17 +60,40 @@ export function useRewardsBoardAdapter() {
 
   // board with all reward properties and default properties
   const board: Board = getDefaultBoard({
-    storedBoard: rewardBoardBlock
+    storedBoard: rewardBoardBlock,
+    hasMilestoneRewards
   });
 
-  const views = useMemo(
-    () => board.fields.viewIds.map((vId) => rewardBlocks?.find((b) => b.id === vId) as BoardView).filter(Boolean),
-    [board.fields.viewIds, rewardBlocks]
-  );
-  const queryViewType = viewTypeToBlockId[query?.viewId?.toString() as IViewType];
+  const views = useMemo(() => {
+    return board.fields.viewIds
+      .map((vId) => rewardBlocks?.find((b) => b.id === vId) as BoardView)
+      .filter(Boolean)
+      .map((v) => {
+        const view = { ...v };
+        if (v.fields.viewType === 'table' && v.fields?.visiblePropertyIds?.length) {
+          const visibleIds = [...v.fields.visiblePropertyIds];
+          if (hasMilestoneRewards) {
+            const proposalIndex = visibleIds.indexOf(REWARD_PROPOSAL_LINK);
+            if (proposalIndex === -1) {
+              const titleIndex = visibleIds.indexOf(Constants.titleColumnId);
+              visibleIds.splice(titleIndex === 0 ? titleIndex + 1 : 0, 0, REWARD_PROPOSAL_LINK);
+            }
+          } else {
+            visibleIds.filter((id) => id !== REWARD_PROPOSAL_LINK);
+          }
+
+          view.fields.visiblePropertyIds = Array.from(new Set(visibleIds));
+        }
+
+        return view;
+      });
+  }, [board.fields.viewIds, hasMilestoneRewards, rewardBlocks]);
+  const queryViewType =
+    viewTypeToBlockId[query?.viewId?.toString() as IViewType] || query?.viewId?.toString() || DEFAULT_VIEW_BLOCK_ID;
+
   const activeViewId = board.fields.viewIds?.find((vid) => vid === queryViewType)
     ? queryViewType
-    : board.fields.viewIds?.[0] || DEFAULT_VIEW_BLOCK_ID;
+    : board.fields.viewIds?.[0];
 
   const localViewSettings = useLocalDbViewSettings(`rewards-${space?.id}-${activeViewId}`);
 
@@ -90,7 +120,13 @@ export function useRewardsBoardAdapter() {
         ?.map((p) => {
           const page = getRewardPage(p.id);
 
-          return mapRewardToCardPage({ reward: p, rewardPage: page, spaceId: space?.id, members: membersRecord });
+          return mapRewardToCardPage({
+            reward: p,
+            rewardPage: page,
+            spaceId: space?.id,
+            members: membersRecord,
+            pages
+          });
         })
         .filter((cp): cp is CardPage => !!cp.card && !!cp.page) || [];
 
@@ -109,7 +145,17 @@ export function useRewardsBoardAdapter() {
       : [];
 
     return sortedCardPages;
-  }, [activeView, board, getRewardPage, localViewSettings, membersRecord, rewards, space?.id]);
+  }, [
+    activeView,
+    board,
+    getRewardPage,
+    localViewSettings?.localFilters,
+    localViewSettings?.localSort,
+    membersRecord,
+    pages,
+    rewards,
+    space?.id
+  ]);
 
   const boardCustomProperties: Board = getDefaultBoard({
     storedBoard: rewardBoardBlock,
@@ -121,7 +167,8 @@ export function useRewardsBoardAdapter() {
     reward: boardReward,
     rewardPage,
     spaceId: space?.id,
-    members: membersRecord
+    members: membersRecord,
+    pages
   }).card;
 
   // each reward with fields reflects a card
@@ -146,29 +193,43 @@ function mapRewardToCardPage({
   reward,
   rewardPage,
   spaceId,
-  members
+  members,
+  pages
 }: {
   reward: BoardReward | RewardWithUsers | null;
   rewardPage?: PageMeta;
   spaceId?: string;
   members: Record<string, Member>;
+  pages: PagesMap;
 }): Omit<CardPage<RewardPropertyValue>, 'page'> & Partial<Pick<CardPage, 'page'>> {
   const rewardFields = (reward?.fields || { properties: {} }) as RewardFields;
   const rewardSpaceId = reward?.spaceId || spaceId || '';
+  const validApplications =
+    reward && 'applications' in reward
+      ? reward.applications.filter((application) => members[application.createdBy])
+      : [];
 
+  const proposalPage = reward && 'proposalId' in reward && reward.proposalId ? pages[reward.proposalId] : null;
+  const proposalLinkValue = proposalPage ? [proposalPage.title, `/${proposalPage.path}`] : '';
+  const assignedSubmitters =
+    reward && 'assignedSubmitters' in reward && reward.assignedSubmitters ? reward.assignedSubmitters : null;
+  const isAssignedReward = !!assignedSubmitters && assignedSubmitters.length > 0;
+
+  rewardFields.isAssigned = isAssignedReward;
   rewardFields.properties = {
     ...rewardFields.properties,
     [Constants.titleColumnId]: rewardPage?.title || '',
     // add default field values on the fly
-    [REWARDS_AVAILABLE_BLOCK_ID]:
-      reward && 'maxSubmissions' in reward && typeof reward.maxSubmissions === 'number' && reward.maxSubmissions > 0
-        ? (
-            countRemainingSubmissionSlots({
-              applications: reward.applications ?? [],
-              limit: reward.maxSubmissions
-            }) as number
-          )?.toString()
-        : '-',
+    [REWARDS_AVAILABLE_BLOCK_ID]: isAssignedReward
+      ? 1
+      : reward && 'maxSubmissions' in reward && typeof reward.maxSubmissions === 'number' && reward.maxSubmissions > 0
+      ? (
+          countRemainingSubmissionSlots({
+            applications: validApplications,
+            limit: reward.maxSubmissions
+          }) as number
+        )?.toString()
+      : '-',
     [REWARD_STATUS_BLOCK_ID]: (reward && 'status' in reward && reward.status) || '',
     [REWARDER_BLOCK_ID]: (reward && 'createdBy' in reward && [reward.createdBy]) || '',
     // focalboard component expects a timestamp
@@ -176,11 +237,13 @@ function mapRewardToCardPage({
     [CREATED_AT_ID]:
       rewardPage && 'createdAt' in rewardPage && rewardPage.createdAt ? new Date(rewardPage.createdAt).getTime() : '',
     [REWARD_REVIEWERS_BLOCK_ID]: (reward && 'reviewers' in reward && reward.reviewers) || [],
-    [ASSIGNEES_BLOCK_ID]: (reward && 'applications' in reward && reward.applications.map((a) => a.createdBy)) || [],
+    [REWARDS_APPLICANTS_BLOCK_ID]: isAssignedReward ? assignedSubmitters : validApplications.map((a) => a.createdBy),
     [REWARD_AMOUNT]: (reward && 'rewardAmount' in reward && reward.rewardAmount) || '',
     [REWARD_CHAIN]: (reward && 'chainId' in reward && reward.chainId?.toString()) || '',
     [REWARD_CUSTOM_VALUE]: (reward && 'customReward' in reward && reward.customReward) || '',
-    [REWARD_TOKEN]: (reward && 'rewardToken' in reward && reward.rewardToken) || ''
+    [REWARD_TOKEN]: (reward && 'rewardToken' in reward && reward.rewardToken) || '',
+    [REWARD_APPLICANTS_COUNT]: isAssignedReward ? 1 : validApplications.length.toString(),
+    [REWARD_PROPOSAL_LINK]: proposalLinkValue
   };
 
   const card: Card<RewardPropertyValue> = {
@@ -206,15 +269,17 @@ function mapRewardToCardPage({
     page: rewardPage,
     subPages:
       rewardPage && reward && 'applications' in reward
-        ? reward.applications.map((application) =>
-            mapApplicationToCardPage({
-              application,
-              rewardPage,
-              spaceId,
-              reward,
-              members
-            })
-          )
+        ? reward.applications
+            .filter((application) => members[application.createdBy])
+            .map((application) =>
+              mapApplicationToCardPage({
+                application,
+                rewardPage,
+                spaceId,
+                reward,
+                members
+              })
+            )
         : undefined
   };
 }
@@ -240,11 +305,12 @@ function mapApplicationToCardPage({
     ...applicationFields.properties,
     // add default field values on the fly
     [REWARDS_AVAILABLE_BLOCK_ID]: null,
-    [ASSIGNEES_BLOCK_ID]: (application && 'createdBy' in application && application.createdBy) || '',
+    [REWARDS_APPLICANTS_BLOCK_ID]: (application && 'createdBy' in application && application.createdBy) || '',
     [REWARD_STATUS_BLOCK_ID]: (application && 'status' in application && application.status) || '',
     [REWARDER_BLOCK_ID]: (application && 'createdBy' in application && [application.createdBy]) || '',
     [DUE_DATE_ID]: null,
-    [REWARD_REVIEWERS_BLOCK_ID]: []
+    [REWARD_REVIEWERS_BLOCK_ID]: [],
+    [REWARD_APPLICANTS_COUNT]: null
   };
 
   const card: Card<RewardPropertyValue> = {

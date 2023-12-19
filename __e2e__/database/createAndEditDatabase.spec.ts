@@ -1,5 +1,4 @@
-import type { User } from '@charmverse/core/prisma';
-import type { Space } from '@charmverse/core/prisma-client';
+import type { User, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 import { test as base, expect } from '@playwright/test';
@@ -109,6 +108,8 @@ test.describe.serial('Edit database select properties', async () => {
 
     // Leave time for all creation processes to happen
     await page.waitForTimeout(500);
+
+    await databasePage.closeModal.click();
 
     const card = await prisma.page.findFirstOrThrow({ where: { parentId: databasePageId } });
 

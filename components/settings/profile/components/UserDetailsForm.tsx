@@ -7,19 +7,18 @@ import type { IconButtonProps } from '@mui/material/IconButton';
 import IconButton from '@mui/material/IconButton';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
-import { mutate } from 'swr';
-import useSWRImmutable from 'swr/immutable';
-import useSWRMutation from 'swr/mutation';
+import { useEffect } from 'react';
+import type { FieldErrors } from 'react-hook-form';
 
-import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
+import {
+  useRequiredMemberProperties,
+  useRequiredUserDetailsForm
+} from 'components/members/hooks/useRequiredMemberProperties';
 import { useIdentityTypes } from 'components/settings/account/hooks/useIdentityTypes';
 import Avatar from 'components/settings/space/components/LargeAvatar';
-import { useMembers } from 'hooks/useMembers';
 import { usePreventReload } from 'hooks/usePreventReload';
-import { useSnackbar } from 'hooks/useSnackbar';
 import type { Social } from 'lib/members/interfaces';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import { shortWalletAddress } from 'lib/utilities/blockchain';
@@ -40,6 +39,13 @@ export interface UserDetailsProps {
   user: LoggedInUser;
   sx?: SxProps<Theme>;
   onChange: (user: EditableFields) => void;
+  userDetails?: EditableFields;
+  errors?: FieldErrors<{
+    description: string | null;
+    social: FieldErrors<Record<keyof Social, string | null>>;
+    timezone: string | null;
+    locale: string | null;
+  }>;
 }
 
 const StyledStack = styled(Stack)`
@@ -61,11 +67,10 @@ function EditIconContainer({
   );
 }
 
-export function UserDetailsForm({ user, onChange, sx = {} }: UserDetailsProps) {
-  const { data: userDetails, isLoading } = useSWRImmutable(`/current-user-details`, () => charmClient.getUserDetails());
-
+export function UserDetailsForm({ errors, userDetails, user, onChange, sx = {} }: UserDetailsProps) {
   const identityTypes = useIdentityTypes();
-
+  const { isBioRequired, isTimezoneRequired, isLinkedinRequired, isGithubRequired, isTwitterRequired } =
+    useRequiredMemberProperties({ userId: user.id });
   const identityModalState = usePopupState({ variant: 'popover', popupId: 'identity-modal' });
 
   const { updateProfileAvatar, isSaving: isSavingAvatar } = useUpdateProfileAvatar();
@@ -82,8 +87,6 @@ export function UserDetailsForm({ user, onChange, sx = {} }: UserDetailsProps) {
   const setSocial = async (social: Social) => {
     onChange({ social });
   };
-
-  const disabled = isLoading;
 
   return (
     <>
@@ -109,12 +112,31 @@ export function UserDetailsForm({ user, onChange, sx = {} }: UserDetailsProps) {
           </EditIconContainer>
         </Grid>
         <Grid item>
-          <UserDescription currentDescription={userDetails?.description} save={setDescription} readOnly={disabled} />
+          <UserDescription
+            description={userDetails?.description || ''}
+            onChange={setDescription}
+            error={errors?.description}
+            required={isBioRequired}
+          />
         </Grid>
         <Grid item>
-          <TimezoneAutocomplete userTimezone={userDetails?.timezone} save={setTimezone} readOnly={disabled} />
+          <TimezoneAutocomplete
+            required={isTimezoneRequired}
+            userTimezone={userDetails?.timezone}
+            onChange={setTimezone}
+          />
         </Grid>
-        <SocialInputs social={userDetails?.social as Social} save={setSocial} readOnly={disabled} />
+        <SocialInputs
+          errors={errors?.social as FieldErrors<Record<keyof Social, string | null>>}
+          required={{
+            discordUsername: false,
+            githubURL: isGithubRequired,
+            linkedinURL: isLinkedinRequired,
+            twitterURL: isTwitterRequired
+          }}
+          social={userDetails?.social as Social}
+          onChange={setSocial}
+        />
       </Grid>
       <IdentityModal
         isOpen={identityModalState.isOpen}
@@ -133,42 +155,37 @@ export function UserDetailsFormWithSave({
   user,
   setUnsavedChanges
 }: Pick<UserDetailsProps, 'user'> & { setUnsavedChanges: (dataChanged: boolean) => void }) {
-  const [form, setForm] = useState<EditableFields>({});
-  const { mutateMembers } = useMembers();
-  const { showMessage } = useSnackbar();
-  const { trigger: updateUserDetails } = useSWRMutation(
-    '/api/profile/details',
-    (_url, { arg }: Readonly<{ arg: Partial<UserDetailsType> }>) => charmClient.updateUserDetails(arg)
-  );
-  const isFormClean = Object.keys(form).length === 0;
+  const { isDirty, isValid, onFormChange, values, errors, isSubmitting, onSubmit } = useRequiredUserDetailsForm({
+    userId: user.id
+  });
 
-  usePreventReload(!isFormClean);
-
-  function onFormChange(fields: EditableFields) {
-    setForm((_form) => ({ ..._form, ...fields }));
-  }
+  usePreventReload(isDirty);
 
   async function saveForm() {
-    await updateUserDetails(form);
-    await mutateMembers();
-    setForm({});
-    showMessage('Profile updated', 'success');
-    mutate('/current-user-details');
+    onSubmit();
+    setUnsavedChanges(false);
   }
 
   useEffect(() => {
-    setUnsavedChanges(!isFormClean);
+    setUnsavedChanges(isDirty);
 
     return () => {
       setUnsavedChanges(false);
     };
-  }, [isFormClean]);
+  }, [isDirty]);
 
   return (
     <>
-      <UserDetailsForm user={user} onChange={onFormChange} />
+      <UserDetailsForm userDetails={values} user={user} errors={errors} onChange={onFormChange} />
       <Box mt={2} display='flex' justifyContent='flex-end'>
-        <Button disableElevation size='large' disabled={isFormClean} onClick={saveForm}>
+        <Button
+          disableElevation
+          size='large'
+          disabled={!isDirty || !isValid}
+          disabledTooltip={!isDirty ? 'No changes to save' : 'Please fill out all required fields'}
+          onClick={saveForm}
+          loading={isSubmitting}
+        >
           Save
         </Button>
       </Box>

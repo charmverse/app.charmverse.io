@@ -1,3 +1,4 @@
+import { InvalidInputError } from '@charmverse/core/errors';
 import type { PageComment, PageCommentVote } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -7,6 +8,9 @@ import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
 import { defaultHandler, logApiRequest } from 'lib/public-api/handler';
+import type { UserProfile } from 'lib/public-api/interfaces';
+import type { UserInfo } from 'lib/public-api/searchUserProfile';
+import { getUserProfile, userProfileSelect } from 'lib/public-api/searchUserProfile';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = defaultHandler();
@@ -45,9 +49,11 @@ handler.post(
  *               type: string
  *               example: "## This is a comment."
  *         createdBy:
- *           type: string
- *           description: User ID of the user who created the comment
- *           example: "69a54a56-50d6-4f7b-b350-2d9c312f81f3"
+ *           oneOf:
+ *             - type: string
+ *               description: User ID of the user who created the comment
+ *               example: "69a54a56-50d6-4f7b-b350-2d9c312f81f3"
+ *             - $ref: '#/components/schemas/SearchUserResponseBody'
  *         createdAt:
  *           type: string
  *           description: ISO Timestamp of comment creation date
@@ -62,11 +68,10 @@ handler.post(
  *           type: array
  *           description: Child comments of this comment. By default, this array is empty unless you request comments as a tree
  *           example: []
- *
  */
 export type PublicApiProposalComment = {
   id: string;
-  createdBy: string;
+  createdBy: string | UserProfile;
   createdAt: string;
   parentId: string | null;
   content: {
@@ -82,8 +87,9 @@ async function mapReducePageComments({
   comments,
   reduceToTree
 }: {
-  comments: (Pick<PageComment, 'id' | 'parentId' | 'content' | 'contentText' | 'createdAt' | 'createdBy'> & {
+  comments: (Pick<PageComment, 'id' | 'parentId' | 'content' | 'contentText' | 'createdAt'> & {
     votes: Pick<PageCommentVote, 'upvoted'>[];
+    createdBy: string | UserProfile;
   })[];
   reduceToTree?: boolean;
 }): Promise<PublicApiProposalComment[]> {
@@ -148,6 +154,9 @@ async function mapReducePageComments({
 
   return rootComments;
 }
+
+const expandableFields = ['user'];
+
 /**
  * @swagger
  * /proposals/{proposalIdOrPath}/comments:
@@ -169,6 +178,15 @@ async function mapReducePageComments({
  *         description: Optional parameter to get the comments as a tree structure
  *         schema:
  *           type: boolean
+ *       - name: expand
+ *         in: query
+ *         required: false
+ *         description: An array of additional fields to expand
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: string
+ *             enum: [user]
  *     responses:
  *       200:
  *         description: List of proposal comments
@@ -200,6 +218,21 @@ async function getProposalComments(req: NextApiRequest, res: NextApiResponse<Pub
     }
   });
 
+  // If a single key=value pair is passed its converted into a string
+  const expand = Array.isArray(req.query.expand)
+    ? req.query.expand
+    : typeof req.query.expand === 'string'
+    ? [req.query.expand]
+    : [];
+
+  const hasUnsupportedExpandableFields = expand.some((expandField) => !expandableFields.includes(expandField));
+
+  if (hasUnsupportedExpandableFields) {
+    throw new InvalidInputError(
+      `Unsupported expand field: ${expand}. Please provide one of ${expandableFields.join(',')}`
+    );
+  }
+
   const proposalComments = await prisma.pageComment.findMany({
     where: {
       pageId: proposal.id
@@ -215,12 +248,26 @@ async function getProposalComments(req: NextApiRequest, res: NextApiResponse<Pub
         select: {
           upvoted: true
         }
-      }
+      },
+      ...(expand.includes('user')
+        ? {
+            user: {
+              select: userProfileSelect
+            }
+          }
+        : {})
     }
   });
 
   const mappedComments = await mapReducePageComments({
-    comments: proposalComments,
+    comments: proposalComments.map((proposalComment) => {
+      return {
+        ...proposalComment,
+        createdBy: proposalComment.user
+          ? getUserProfile(proposalComment.user as unknown as UserInfo)
+          : proposalComment.createdBy
+      };
+    }),
     reduceToTree: req.query.resultsAsTree === 'true'
   });
 

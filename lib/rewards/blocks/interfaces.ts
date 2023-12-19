@@ -1,5 +1,6 @@
 import type { RewardBlock } from '@charmverse/core/prisma-client';
 
+import type { Block } from 'lib/focalboard/block';
 import type { BoardFields } from 'lib/focalboard/board';
 import type { BoardViewFields } from 'lib/focalboard/boardView';
 import type { Card, CardPropertyValue } from 'lib/focalboard/card';
@@ -16,12 +17,12 @@ export type RewardPropertiesBlockFields = {
 };
 // Properties block with typed fields
 export type RewardPropertiesBlock = RewardBlock & {
-  fields: RewardPropertiesBlockFields;
+  fields: RewardPropertiesBlockFields | BoardFields;
   type: 'board' | 'view';
 };
 
 // TODO: Add other block types i.e. view.
-export type RewardBlockWithTypedFields = RewardPropertiesBlock;
+export type RewardBlockWithTypedFields = RewardPropertiesBlock | Block;
 
 export type RewardPropertyValue = CardPropertyValue | ApplicationMeta[] | TargetPermissionGroup<'user' | 'role'>[];
 
@@ -29,7 +30,7 @@ export type RewardPropertiesField = Record<string, RewardPropertyValue>;
 
 export type RewardPropertyValues = { properties: RewardPropertiesField };
 
-export type RewardFields = RewardPropertyValues;
+export type RewardFields = RewardPropertyValues & { isAssigned?: boolean };
 
 export type RewardFieldsProp = { fields: RewardFields };
 

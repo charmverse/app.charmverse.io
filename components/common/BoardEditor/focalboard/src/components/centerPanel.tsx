@@ -32,6 +32,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { webhookEndpoint } from 'config/constants';
 import { useApiPageKeys } from 'hooks/useApiPageKeys';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
 import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
@@ -101,6 +102,7 @@ function CenterPanel(props: Props) {
   const { space } = useCurrentSpace();
   const { pages, refreshPage } = usePages();
   const { membersRecord } = useMembers();
+  const localViewSettings = useLocalDbViewSettings(activeView?.id);
 
   const isEmbedded = !!props.embeddedBoardPath;
   const boardPageType = boardPage?.type;
@@ -124,7 +126,8 @@ function CenterPanel(props: Props) {
   const _cards = useAppSelector((state) =>
     selectViewCardsSortedFilteredAndGrouped(state, {
       boardId: activeBoard?.id || '',
-      viewId: activeView?.id || ''
+      viewId: activeView?.id || '',
+      localFilters: localViewSettings?.localFilters
     })
   );
   const isActiveView = !!(activeView && activeBoard);
@@ -143,16 +146,14 @@ function CenterPanel(props: Props) {
   // filter cards by whats accessible
   const cardPages: CardPage[] = useMemo(() => {
     const result = _cards
-      // TODO: dont recreate the card objects, this causes re-rendering on all cards when any card/page is updated
-      // we need to figure another way to grab the page titles probably down-stream
       .map((card) => ({
         card,
         page: pages[card.id]!
       }))
       .filter(({ page }) => !!page && !page.deletedAt);
 
-    return isActiveView ? sortCards(result, activeBoard, activeView, membersRecord) : [];
-  }, [isActiveView, _cards, pages]);
+    return isActiveView ? sortCards(result, activeBoard, activeView, membersRecord, localViewSettings?.localSort) : [];
+  }, [isActiveView, _cards, pages, localViewSettings?.localSort]);
 
   const cards = cardPages.map(({ card }) => card);
 
@@ -386,7 +387,8 @@ function CenterPanel(props: Props) {
   const kanbanAddCard = useCallback(
     (groupByOptionId?: string) => {
       addCard({
-        groupByOptionId
+        groupByOptionId,
+        show: true
       });
     },
     [addCard]

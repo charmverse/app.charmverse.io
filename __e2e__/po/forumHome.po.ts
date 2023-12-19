@@ -43,7 +43,7 @@ export class ForumHomePage {
     this.confirmNewCategoryButton = page.locator('data-test=confirm-new-category-button');
     this.sidebarForumLink = page.locator('data-test=sidebar-link-forum');
     this.categoryPermissionsDialog = page.locator('data-test=category-permissions-dialog');
-    this.spaceCategoryPermissionSelect = page.locator('data-test=category-space-permission >> input');
+    this.spaceCategoryPermissionSelect = page.locator('data-test=category-space-permission >> .MuiSelect-select');
     this.closeModalButton = page.locator('data-test=close-modal');
     this.postDialog = page.locator('data-test=dialog');
     this.postDialogCloseButton = page.locator('data-test=close-modal');

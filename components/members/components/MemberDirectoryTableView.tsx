@@ -50,7 +50,6 @@ function MemberDirectoryTableRow({
 }) {
   const twitterUrl = (member.profile?.social as Social)?.twitterURL ?? '';
   const twitterHandle = twitterUrl.split('/').at(-1);
-  const discordUsername = (member.profile?.social as Social)?.discordUsername;
   const { space: currentSpace } = useCurrentSpace();
   const { user } = useUser();
   const { showUserId } = useMemberDialog();
@@ -111,17 +110,6 @@ function MemberDirectoryTableRow({
                 </TableCell>
               );
             }
-            case 'discord': {
-              return (
-                <TableCell key={property.id}>
-                  {discordUsername ? (
-                    <DiscordSocialIcon showLogo={false} showUsername username={discordUsername} />
-                  ) : (
-                    '-'
-                  )}
-                </TableCell>
-              );
-            }
             case 'join_date': {
               return (
                 <TableCell>
@@ -161,19 +149,6 @@ function MemberDirectoryTableRow({
                 </TableCell>
               );
             }
-            case 'name': {
-              const content = (
-                <Typography fontWeight='bold'>{(memberProperty.value as string) ?? member.username}</Typography>
-              );
-
-              return (
-                <TableCell key={property.id}>
-                  <Box sx={{ cursor: 'pointer' }} onClick={() => showUserId(member.id)}>
-                    {content}
-                  </Box>
-                </TableCell>
-              );
-            }
             case 'bio': {
               return (
                 <TableCell key={property.id}>
@@ -191,6 +166,9 @@ function MemberDirectoryTableRow({
             case 'text':
             case 'phone':
             case 'email':
+            case 'google':
+            case 'telegram':
+            case 'discord':
             case 'number': {
               return (
                 <TableCell key={property.id}>

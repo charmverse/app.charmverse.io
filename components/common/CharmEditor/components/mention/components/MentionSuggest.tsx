@@ -53,12 +53,7 @@ function MentionSuggestMenu({ pluginKey }: { pluginKey: PluginKey }) {
   const filteredMembers = useMemo(
     () =>
       searchText.length !== 0
-        ? members.filter(
-            (member) =>
-              filterByUserCustomName(member, searchText) ||
-              filterByDiscordName(member, searchText) ||
-              filterByUsername(member, searchText)
-          )
+        ? members.filter((member) => filterByUsername(member, searchText) || filterByDiscordName(member, searchText))
         : members,
     [members, searchText, searchText]
   );
@@ -234,14 +229,6 @@ function ShowMoreMenuItem({ onClick, children }: { onClick: VoidFunction; childr
       <Typography color='secondary'>{children}</Typography>
     </MenuItem>
   );
-}
-
-function filterByUserCustomName(member: Member, searchText: string) {
-  return member.properties
-    .find((prop) => prop.type === 'name')
-    ?.value?.toString()
-    .toLowerCase()
-    .match(searchText);
 }
 
 function filterByDiscordName(member: Member, searchText: string) {

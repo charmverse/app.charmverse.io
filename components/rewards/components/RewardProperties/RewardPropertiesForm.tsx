@@ -8,18 +8,23 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { StyledFocalboardTextInput } from 'components/common/BoardEditor/components/properties/TextInput';
-import type { GroupedRole } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
+import type { RoleOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
+import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import Checkbox from 'components/common/BoardEditor/focalboard/src/widgets/checkbox';
+import { TemplateSelect } from 'components/proposals/ProposalPage/components/TemplateSelect';
+import { RewardApplicationType } from 'components/rewards/components/RewardProperties/components/RewardApplicationType';
 import { RewardPropertiesHeader } from 'components/rewards/components/RewardProperties/components/RewardPropertiesHeader';
 import type { RewardTokenDetails } from 'components/rewards/components/RewardProperties/components/RewardTokenProperty';
 import { RewardTokenProperty } from 'components/rewards/components/RewardProperties/components/RewardTokenProperty';
 import type { RewardType } from 'components/rewards/components/RewardProperties/components/RewardTypeSelect';
 import { RewardTypeSelect } from 'components/rewards/components/RewardProperties/components/RewardTypeSelect';
 import { CustomPropertiesAdapter } from 'components/rewards/components/RewardProperties/CustomPropertiesAdapter';
+import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import type { RewardFieldsProp, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
-import type { Reward, RewardWithUsers } from 'lib/rewards/interfaces';
+import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
+import type { Reward, RewardWithUsers, RewardReviewer } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -34,6 +39,24 @@ type Props = {
   isNewReward?: boolean;
   isTemplate?: boolean;
   expandedByDefault?: boolean;
+  addPageFromTemplate?: (templateId: string) => void;
+  selectedTemplate?: RewardTemplate | null;
+  resetTemplate?: VoidFunction;
+  forcedApplicationType?: RewardApplicationType;
+};
+
+const getApplicationType = (values: UpdateableRewardFields, forcedApplicationType?: RewardApplicationType) => {
+  if (forcedApplicationType) {
+    return forcedApplicationType;
+  }
+
+  let applicationType: RewardApplicationType = values?.approveSubmitters ? 'application_required' : 'direct_submission';
+
+  if (values?.assignedSubmitters?.length) {
+    applicationType = 'assigned';
+  }
+
+  return applicationType;
 };
 
 export function RewardPropertiesForm({
@@ -44,16 +67,43 @@ export function RewardPropertiesForm({
   isNewReward,
   isTemplate,
   pageId,
-  refreshPermissions,
-  expandedByDefault
+  expandedByDefault,
+  addPageFromTemplate,
+  selectedTemplate,
+  resetTemplate,
+  forcedApplicationType
 }: Props) {
+  const [rewardApplicationType, setRewardApplicationTypeRaw] = useState<RewardApplicationType>(() =>
+    getApplicationType(values, forcedApplicationType)
+  );
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(!!expandedByDefault);
   const [rewardType, setRewardType] = useState<RewardType>(values?.customReward ? 'Custom' : 'Token');
-  const allowedSubmittersValue: GroupedRole[] = (values?.allowedSubmitterRoles ?? []).map((id) => ({
+  const allowedSubmittersValue: RoleOption[] = (values?.allowedSubmitterRoles ?? []).map((id) => ({
     id,
     group: 'role'
   }));
+
+  const isAssignedReward = rewardApplicationType === 'assigned';
+  const { templates: rewardTemplates = [] } = useRewardTemplates();
+
+  const setRewardApplicationType = useCallback((updatedType: RewardApplicationType) => {
+    if (updatedType === 'direct_submission') {
+      applyUpdates({
+        approveSubmitters: false,
+        assignedSubmitters: null
+      });
+    }
+
+    if (updatedType === 'application_required') {
+      applyUpdates({
+        approveSubmitters: true,
+        assignedSubmitters: null
+      });
+    }
+
+    setRewardApplicationTypeRaw(updatedType);
+  }, []);
 
   useEffect(() => {
     if (isTruthy(values?.customReward)) {
@@ -101,6 +151,14 @@ export function RewardPropertiesForm({
     });
   }, []);
 
+  const updateAssignedSubmitters = useCallback((submitters: string[]) => {
+    applyUpdates({
+      assignedSubmitters: submitters,
+      approveSubmitters: false,
+      allowMultipleApplications: false
+    });
+  }, []);
+
   const updateRewardMaxSubmissions = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const updatedValue = Number(e.target.value);
 
@@ -145,6 +203,31 @@ export function RewardPropertiesForm({
 
         <Collapse in={isExpanded} timeout='auto' unmountOnExit>
           <>
+            {!isTemplate && isNewReward && (
+              <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
+                <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+                  <PropertyLabel readOnly highlighted>
+                    Template
+                  </PropertyLabel>
+                  <Box display='flex' flex={1}>
+                    <TemplateSelect
+                      options={rewardTemplates.map((rewardTemplate) => rewardTemplate.page)}
+                      value={selectedTemplate?.page ?? null}
+                      onChange={(templatePage) => {
+                        if (!templatePage) {
+                          resetTemplate?.();
+                        }
+                        const template = rewardTemplates.find((_template) => _template.page.id === templatePage?.id);
+                        if (template && addPageFromTemplate) {
+                          addPageFromTemplate(template.page.id);
+                        }
+                      }}
+                    />
+                  </Box>
+                </Box>
+              </Box>
+            )}
+
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
               <PropertyLabel readOnly highlighted required={isNewReward && !isTemplate}>
                 Reviewer
@@ -153,8 +236,11 @@ export function RewardPropertiesForm({
                 readOnly={readOnly}
                 value={values.reviewers ?? []}
                 onChange={async (options) => {
+                  const reviewerOptions = options.filter(
+                    (option) => option.group === 'role' || option.group === 'user'
+                  ) as RewardReviewer[];
                   await applyUpdates({
-                    reviewers: options.map((option) => ({ group: option.group, id: option.id }))
+                    reviewers: reviewerOptions.map((option) => ({ group: option.group, id: option.id }))
                   });
                 }}
               />
@@ -199,6 +285,17 @@ export function RewardPropertiesForm({
 
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
               <PropertyLabel readOnly highlighted>
+                Application Type
+              </PropertyLabel>
+              <RewardApplicationType
+                readOnly={readOnly || !!forcedApplicationType}
+                value={rewardApplicationType}
+                onChange={setRewardApplicationType}
+              />
+            </Box>
+
+            {/* <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+              <PropertyLabel readOnly highlighted>
                 Application required
               </PropertyLabel>
 
@@ -212,76 +309,95 @@ export function RewardPropertiesForm({
                 disabled={readOnly}
                 readOnly={readOnly}
               />
-            </Box>
+            </Box> */}
 
-            <Tooltip placement='left' title='Allow the same user to participate in this reward more than once'>
+            {!isAssignedReward && (
+              <>
+                <Tooltip placement='left' title='Allow the same user to participate in this reward more than once'>
+                  <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+                    <PropertyLabel readOnly highlighted>
+                      Allow multiple entries
+                    </PropertyLabel>
+
+                    <Checkbox
+                      isOn={Boolean(values?.allowMultipleApplications)}
+                      onChanged={(isOn) => {
+                        applyUpdates({
+                          allowMultipleApplications: !!isOn
+                        });
+                      }}
+                      disabled={readOnly}
+                      readOnly={readOnly}
+                    />
+                  </Box>
+                </Tooltip>
+
+                <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+                  <PropertyLabel readOnly highlighted>
+                    Applicant Roles
+                  </PropertyLabel>
+                  <UserAndRoleSelect
+                    type='role'
+                    readOnly={readOnly}
+                    value={allowedSubmittersValue}
+                    onChange={async (options) => {
+                      const roleIds = options.filter((option) => option.group === 'role').map((option) => option.id);
+
+                      await applyUpdates({
+                        allowedSubmitterRoles: roleIds
+                      });
+                    }}
+                  />
+                </Box>
+
+                <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+                  <PropertyLabel readOnly highlighted>
+                    # of Rewards Available
+                  </PropertyLabel>
+                  <StyledFocalboardTextInput
+                    onChange={updateRewardMaxSubmissions}
+                    required
+                    defaultValue={values?.maxSubmissions}
+                    type='number'
+                    size='small'
+                    inputProps={{
+                      step: 1,
+                      min: 1,
+                      style: { height: 'auto' },
+                      className: clsx('Editable octo-propertyvalue', { readonly: readOnly })
+                    }}
+                    sx={{
+                      width: '100%'
+                    }}
+                    disabled={readOnly}
+                    placeholder='Unlimited'
+                  />
+                </Box>
+              </>
+            )}
+
+            {/* Select authors */}
+            {isAssignedReward && (
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-                <PropertyLabel readOnly highlighted>
-                  Allow multiple entries
+                <PropertyLabel readOnly required={!isTemplate && !readOnly} highlighted>
+                  Assigned applicants
                 </PropertyLabel>
-
-                <Checkbox
-                  isOn={Boolean(values?.allowMultipleApplications)}
-                  onChanged={(isOn) => {
-                    applyUpdates({
-                      allowMultipleApplications: !!isOn
-                    });
-                  }}
-                  disabled={readOnly}
-                  readOnly={readOnly}
-                />
+                <Box display='flex' flex={1}>
+                  <UserSelect
+                    memberIds={values?.assignedSubmitters ?? []}
+                    readOnly={readOnly}
+                    onChange={updateAssignedSubmitters}
+                    wrapColumn
+                    showEmptyPlaceholder
+                    error={
+                      !isNewReward && !values?.assignedSubmitters?.length && !readOnly
+                        ? 'Assigned reward requires at least one assignee'
+                        : undefined
+                    }
+                  />
+                </Box>
               </Box>
-            </Tooltip>
-
-            <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-              <PropertyLabel readOnly highlighted>
-                Applicant Roles
-              </PropertyLabel>
-              <UserAndRoleSelect
-                type='role'
-                readOnly={readOnly}
-                value={allowedSubmittersValue}
-                onChange={async (options) => {
-                  const roleIds = options.filter((option) => option.group === 'role').map((option) => option.id);
-
-                  await applyUpdates({
-                    allowedSubmitterRoles: roleIds
-                  });
-                }}
-              />
-              {/* TODO @Mo - FIX later
-              {rewardPagePermissions && rewardPermissions && (
-                <MissingPagePermissions
-                  target='submitter'
-                  rewardPermissions={rewardPermissions}
-                  pagePermissions={rewardPagePermissions}
-                />
-              )} */}
-            </Box>
-
-            <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-              <PropertyLabel readOnly highlighted>
-                # of Rewards Available
-              </PropertyLabel>
-              <StyledFocalboardTextInput
-                onChange={updateRewardMaxSubmissions}
-                required
-                defaultValue={values?.maxSubmissions}
-                type='number'
-                size='small'
-                inputProps={{
-                  step: 1,
-                  min: 1,
-                  style: { height: 'auto' },
-                  className: clsx('Editable octo-propertyvalue', { readonly: readOnly })
-                }}
-                sx={{
-                  width: '100%'
-                }}
-                disabled={readOnly}
-                placeholder='Unlimited'
-              />
-            </Box>
+            )}
 
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
               <PropertyLabel readOnly highlighted>

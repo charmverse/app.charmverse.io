@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
-import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { apiHandler } from 'lib/public-api/handler';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -125,7 +125,7 @@ async function computeProposalPermissions(req: NextApiRequest, res: NextApiRespo
 
   const userId = req.query.userId as string | undefined;
 
-  const permissions = await premiumPermissionsApiClient.proposals.computeProposalPermissions({
+  const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
     resourceId: proposal.id,
     userId
   });

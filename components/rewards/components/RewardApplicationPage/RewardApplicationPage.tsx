@@ -5,8 +5,8 @@ import { Box, Grid, Divider, FormLabel } from '@mui/material';
 import { useState } from 'react';
 
 import { useGetReward, useGetRewardPermissions } from 'charmClient/hooks/rewards';
+import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
-import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import UserDisplay from 'components/common/UserDisplay';
@@ -33,7 +33,7 @@ type Props = {
   closeDialog?: VoidFunction;
 };
 
-const StyledContainer = styled(Container)`
+const StyledContainer = styled(PageEditorContainer)`
   margin-bottom: 180px;
 `;
 
@@ -120,7 +120,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
   const isApplicationLoaded = !!application || isNewApplication;
 
   return (
-    <Box height='100%' sx={{ overflowY: 'auto' }}>
+    <Box height='100%' sx={{ overflowY: 'auto' }} data-test='reward-application-page'>
       <Box mt={10}>
         <div className='document-print-container'>
           <Box display='flex' flexDirection='column'>
@@ -154,7 +154,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
               </div>
               {isApplicationLoaded && (
                 <>
-                  {application && application?.createdBy !== user?.id && (
+                  {application && (
                     <Box mb={2} display='flex' justifyContent='space-between' alignItems='center'>
                       <Grid item display='flex' alignItems='center' gap={2}>
                         <FormLabel sx={{ fontWeight: 'bold', cursor: 'pointer', lineHeight: '1.5' }}>

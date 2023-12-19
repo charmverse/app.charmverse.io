@@ -19,13 +19,15 @@ export function mapDbRewardToReward(
     });
 
   const allowedSubmitterRoles = reward.permissions.filter((p) => p.permissionLevel === 'submitter' && p.roleId);
+  const assignedSubmitters = reward.permissions.filter((p) => p.permissionLevel === 'submitter' && p.userId);
 
   const rewardWithUsers: RewardWithUsers = {
     ...reward,
     applications: reward.applications,
     reviewers,
     allowedSubmitterRoles:
-      allowedSubmitterRoles.length > 0 ? allowedSubmitterRoles.map((r) => r.roleId as string) : null
+      allowedSubmitterRoles.length > 0 ? allowedSubmitterRoles.map((r) => r.roleId as string) : null,
+    assignedSubmitters: assignedSubmitters.length > 0 ? assignedSubmitters.map((r) => r.userId as string) : null
   };
   return rewardWithUsers;
 }

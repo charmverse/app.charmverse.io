@@ -138,21 +138,21 @@ function getDocumentContent(n: DocumentNotification, actorUsername?: string): st
   });
 }
 
-function getBountyContent(n: BountyNotification, authorUsername?: string): string | ReactNode {
+function getRewardContent(n: BountyNotification, authorUsername?: string): string | ReactNode {
   const { createdBy, type } = n;
   const username = authorUsername ?? createdBy?.username;
   switch (type) {
     case 'application.created': {
       return (
         <span>
-          <strong>{username}</strong> applied for a bounty
+          <strong>{username}</strong> applied for a reward
         </span>
       );
     }
     case 'submission.created': {
       return (
         <span>
-          <strong>{username}</strong> applied for a bounty
+          <strong>{username}</strong> applied for a reward
         </span>
       );
     }
@@ -234,7 +234,7 @@ export function getNotificationMetadata(
     switch (notification.group) {
       case 'bounty': {
         return {
-          content: getBountyContent(notification as BountyNotification, actorUsername),
+          content: getRewardContent(notification as BountyNotification, actorUsername),
           href,
           pageTitle: notification.pageTitle
         };

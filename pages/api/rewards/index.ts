@@ -8,6 +8,7 @@ import { logUserFirstBountyEvents, logWorkspaceFirstBountyEvents } from 'lib/met
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { upsertDefaultRewardsBoard } from 'lib/rewards/blocks/upsertDefaultRewardsBoard';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import { createReward } from 'lib/rewards/createReward';
@@ -63,7 +64,7 @@ async function getRewards(req: NextApiRequest, res: NextApiResponse<RewardWithUs
     throw new ActionNotPermittedError(`You cannot access the rewards list`);
   }
 
-  const accessiblePageIds = await req.basePermissionsClient.pages.getAccessiblePageIds({
+  const accessiblePageIds = await permissionsApiClient.pages.getAccessiblePageIds({
     spaceId,
     userId
   });

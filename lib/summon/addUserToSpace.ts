@@ -7,7 +7,7 @@ import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 type Props = {
   spaceId: string;
   userId: string;
-  userXpsEngineId: string;
+  userXpsEngineId?: string;
 };
 
 export async function addUserToSpace({ spaceId, userId, userXpsEngineId }: Props): Promise<Space | null> {
@@ -46,14 +46,16 @@ export async function addUserToSpace({ spaceId, userId, userXpsEngineId }: Props
       }
     });
   }
-  await prisma.user.update({
-    where: {
-      id: userId
-    },
-    data: {
-      xpsEngineId: userXpsEngineId
-    }
-  });
+  if (userXpsEngineId) {
+    await prisma.user.update({
+      where: {
+        id: userId
+      },
+      data: {
+        xpsEngineId: userXpsEngineId
+      }
+    });
+  }
 
   return space;
 }

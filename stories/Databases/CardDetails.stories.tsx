@@ -1,19 +1,12 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import { Paper } from '@mui/material';
 import { rest } from 'msw';
-import type { ReactNode } from 'react';
-import { useRef } from 'react';
-import { Provider } from 'react-redux';
+import { GlobalContext } from 'stories/lib/GlobalContext';
 import { v4 as uuid } from 'uuid';
 
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
 import { CardPropertiesWrapper } from 'components/common/CharmEditor/CardPropertiesWrapper';
-import type { ICurrentSpaceContext } from 'hooks/useCurrentSpace';
-import { CurrentSpaceContext } from 'hooks/useCurrentSpace';
-import { MembersProvider } from 'hooks/useMembers';
-import { PagesProvider } from 'hooks/usePages';
-import { UserProvider } from 'hooks/useUser';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { createTableView } from 'lib/focalboard/tableView';
 import { createMockBoard, createMockCard } from 'testing/mocks/block';
@@ -106,35 +99,9 @@ const reduxStore = mockStateStore([], {
   }
 });
 
-function Context({ children }: { children: ReactNode }) {
-  // mock the current space since it usually relies on the URL
-  const spaceContext = useRef<ICurrentSpaceContext>({
-    isLoading: false,
-    refreshCurrentSpace: () => {},
-    space
-  });
-  return (
-    <UserProvider>
-      <CurrentSpaceContext.Provider value={spaceContext.current}>
-        <PagesProvider>
-          <MembersProvider>
-            <Provider store={reduxStore}>{children}</Provider>
-          </MembersProvider>
-        </PagesProvider>
-      </CurrentSpaceContext.Provider>
-    </UserProvider>
-  );
-}
-
 export function CardPropsView() {
-  // const dispatch = useAppDispatch();
-
-  // useEffect(() => {
-  //   dispatch(initialDatabaseLoad({ pageId: board.id }));
-  // }, []);
-
   return (
-    <Context>
+    <GlobalContext reduxStore={reduxStore}>
       <Paper>
         <CardPropertiesWrapper>
           <CardDetailProperties
@@ -149,7 +116,7 @@ export function CardPropsView() {
           />
         </CardPropertiesWrapper>
       </Paper>
-    </Context>
+    </GlobalContext>
   );
 }
 

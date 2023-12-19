@@ -134,7 +134,8 @@ describe('computeProposalPermissions - base', () => {
       archive: false,
       unarchive: false,
       // Proposal is always public
-      view: true
+      view: true,
+      move: false
     });
   });
 
@@ -153,7 +154,8 @@ describe('computeProposalPermissions - base', () => {
       delete: false,
       create_vote: true,
       archive: false,
-      unarchive: false
+      unarchive: false,
+      move: false
     });
   });
 
@@ -183,7 +185,8 @@ describe('computeProposalPermissions - base', () => {
       review: false,
       evaluate: false,
       archive: false,
-      unarchive: false
+      unarchive: false,
+      move: false
     });
   });
 
@@ -204,7 +207,8 @@ describe('computeProposalPermissions - base', () => {
       evaluate: true,
       make_public: false,
       archive: true,
-      unarchive: true
+      unarchive: true,
+      move: true
     });
   });
 
@@ -226,7 +230,8 @@ describe('computeProposalPermissions - base', () => {
       vote: false,
       archive: false,
       unarchive: false,
-      view: true
+      view: true,
+      move: false
     });
   });
 

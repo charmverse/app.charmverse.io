@@ -1,4 +1,3 @@
-import type { WorkspaceEvent } from '@charmverse/core/prisma';
 import { ProposalStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
@@ -13,6 +12,10 @@ import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 import { ProposalNotFoundError } from './errors';
 import type { ProposalWithUsersAndRubric } from './interface';
 
+/**
+ *
+ * @deprecated Use updateProposalStatusOnly instead
+ */
 export async function updateProposalStatus({
   proposalId,
   newStatus,
@@ -53,7 +56,7 @@ export async function updateProposalStatus({
       })
   );
 
-  if (!statusFlow[newStatus]) {
+  if (newStatus !== 'published' && !statusFlow[newStatus]) {
     throw new InvalidStateError(`Invalid transition to proposal status "${newStatus}"`);
   }
 
@@ -113,7 +116,11 @@ export async function updateProposalStatus({
         reviewers: true,
         category: true,
         rubricAnswers: true,
-        rubricCriteria: true
+        rubricCriteria: {
+          orderBy: {
+            index: 'asc'
+          }
+        }
       }
     });
 

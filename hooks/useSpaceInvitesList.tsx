@@ -1,4 +1,4 @@
-import type { PublicInviteLinkContext } from '@charmverse/core/prisma-client';
+import type { PublicInviteLinkContext } from '@charmverse/core/prisma';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';

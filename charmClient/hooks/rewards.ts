@@ -47,7 +47,7 @@ export function useGetRewardBlocks({ spaceId }: { spaceId?: string }) {
 // // Mutative requests
 
 export function useCreateReward() {
-  return usePOST<Omit<RewardCreationData, 'userId'>, RewardWithUsers>('/api/rewards');
+  return usePOST<Omit<RewardCreationData, 'userId'>>('/api/rewards');
 }
 
 // export function useUpsertRubricCriteria({ rewardId }: { rewardId: string }) {
@@ -81,5 +81,5 @@ export function useUpdateRewardBlocks(spaceId: string) {
 }
 
 export function useDeleteRewardBlocks(spaceId: string) {
-  return useDELETE<string[]>(`/api/spaces/${spaceId}/rewards/blocks`);
+  return useDELETE<{ blockIds: string[] }>(`/api/spaces/${spaceId}/rewards/blocks`);
 }

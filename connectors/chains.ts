@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
 // ref: https://wagmi.sh/core/chains
+import networks from '@unlock-protocol/networks';
 import type { Chain } from 'viem/chains';
 import {
   arbitrum,
@@ -40,6 +41,7 @@ export interface IChainDetails {
   rpcUrls: readonly string[];
   blockExplorerUrls: readonly string[];
   alchemyUrl?: string;
+  // See Safe docs for official URLs https://docs.safe.global/safe-core-api/supported-networks
   gnosisUrl?: string;
   iconUrl: string;
   testnet?: boolean;
@@ -98,12 +100,15 @@ const RPC: Record<string, IChainDetails> = {
     ...EVM_DEFAULT,
     chainId: sepolia.id,
     viem: sepolia,
+    alchemyUrl: 'https://eth-sepolia.g.alchemy.com',
+    gnosisUrl: 'https://safe-transaction-sepolia.safe.global',
     chainName: 'Ethereum - Sepolia',
     rpcUrls: ['https://ethereum-sepolia.blockpi.network/v1/rpc/public'],
     blockExplorerUrls: ['https://sepolia.etherscan.io/'],
     iconUrl: '/images/cryptoLogos/ethereum-eth-logo.svg',
     testnet: true,
-    shortName: 'sep'
+    shortName: 'sep',
+    litNetwork: 'sepolia'
   },
   OPTIMISM: {
     ...EVM_DEFAULT,
@@ -208,6 +213,43 @@ const RPC: Record<string, IChainDetails> = {
     shortName: 'arb1',
     litNetwork: 'arbitrum'
   },
+  MANTLE: {
+    chainId: mantle.id,
+    viem: mantle,
+    chainName: 'Mantle',
+    nativeCurrency: {
+      name: 'Mantle',
+      symbol: 'MNT',
+      decimals: 18,
+      address: '0x0000000000000000000000000000000000000000',
+      logoURI: 'https://cryptototem.com/wp-content/uploads/2023/01/Mantle-logo.jpg'
+    },
+    rpcUrls: ['https://rpc.mantle.xyz'],
+    blockExplorerUrls: ['https://explorer.mantle.xyz'],
+    iconUrl: '/images/cryptoLogos/mantle-logo.svg',
+    gnosisUrl: 'https://gateway.multisig.mantle.xyz',
+    shortName: 'mantle',
+    litNetwork: 'mantle'
+  },
+  MANTLE_TESTNET: {
+    chainId: mantleTestnet.id,
+    viem: mantleTestnet,
+    chainName: 'Mantle - Testnet',
+    nativeCurrency: {
+      name: 'Testnet Mantle',
+      symbol: 'MNT',
+      decimals: 18,
+      address: '0x0000000000000000000000000000000000000000',
+      logoURI: 'https://cryptototem.com/wp-content/uploads/2023/01/Mantle-logo.jpg'
+    },
+    rpcUrls: ['https://rpc.testnet.mantle.xyz'],
+    gnosisUrl: 'https://gateway.multisig.mantle.xyz',
+    blockExplorerUrls: ['https://explorer.testnet.mantle.xyz'],
+    iconUrl: '/images/cryptoLogos/mantle-logo.svg',
+    shortName: 'mantle-testnet',
+    testnet: true,
+    litNetwork: 'mantleTestnet'
+  },
   AVALANCHE: {
     chainId: avalanche.id,
     viem: avalanche,
@@ -290,6 +332,7 @@ const RPC: Record<string, IChainDetails> = {
       address: '0x0000000000000000000000000000000000000000',
       logoURI: 'https://assets.coingecko.com/coins/images/11090/small/icon-celo-CELO-color-500.png?1592293590'
     },
+    gnosisUrl: 'https://safe-transaction-celo.safe.global',
     rpcUrls: ['https://forno.celo.org'],
     blockExplorerUrls: ['https://explorer.celo.org'],
     iconUrl: '/images/cryptoLogos/celo-celo-logo.svg',
@@ -337,6 +380,7 @@ const RPC: Record<string, IChainDetails> = {
     chainName: 'zkSync Era',
     rpcUrls: ['https://mainnet.era.zksync.io'],
     blockExplorerUrls: ['https://explorer.zksync.io'],
+    gnosisUrl: 'https://safe-transaction-zksync.safe.global',
     iconUrl: '/images/cryptoLogos/zksync-era-logo.svg',
     shortName: 'zksync'
   },
@@ -349,43 +393,6 @@ const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: ['https://goerli.explorer.zksync.io'],
     iconUrl: '/images/cryptoLogos/zksync-era-logo.svg',
     shortName: 'zksync-goerli'
-  },
-  MANTLE: {
-    chainId: mantle.id,
-    viem: mantle,
-    chainName: 'Mantle',
-    nativeCurrency: {
-      name: 'Mantle',
-      symbol: 'MNT',
-      decimals: 18,
-      address: '0x0000000000000000000000000000000000000000',
-      logoURI: 'https://cryptototem.com/wp-content/uploads/2023/01/Mantle-logo.jpg'
-    },
-    rpcUrls: ['https://rpc.mantle.xyz'],
-    blockExplorerUrls: ['https://explorer.mantle.xyz'],
-    iconUrl: '/images/cryptoLogos/mantle-logo.svg',
-    gnosisUrl: 'https://gateway.multisig.mantle.xyz',
-    shortName: 'mantle',
-    litNetwork: 'mantle'
-  },
-  MANTLE_TESTNET: {
-    chainId: mantleTestnet.id,
-    viem: mantleTestnet,
-    chainName: 'Mantle - Testnet',
-    nativeCurrency: {
-      name: 'Testnet Mantle',
-      symbol: 'MNT',
-      decimals: 18,
-      address: '0x0000000000000000000000000000000000000000',
-      logoURI: 'https://cryptototem.com/wp-content/uploads/2023/01/Mantle-logo.jpg'
-    },
-    rpcUrls: ['https://rpc.testnet.mantle.xyz'],
-    gnosisUrl: 'https://gateway.multisig.mantle.xyz',
-    blockExplorerUrls: ['https://explorer.testnet.mantle.xyz'],
-    iconUrl: '/images/cryptoLogos/mantle-logo.svg',
-    shortName: 'mantle-testnet',
-    testnet: true,
-    litNetwork: 'mantleTestnet'
   }
 } as const;
 
@@ -453,4 +460,27 @@ export function getChainExplorerLink(
   }
   log.warn('Mising chain explorer link for network', { chainId, endpoint });
   return '';
+}
+
+export type IChainDetailsWithLit = IChainDetails & { litNetwork: NonNullable<IChainDetails['litNetwork']> };
+
+export const litChains: IChainDetailsWithLit[] = RPCList.filter(
+  (chain): chain is IChainDetailsWithLit => !!chain.litNetwork
+).sort(sortChainList);
+
+export const litDaoChains: IChainDetailsWithLit[] = litChains.filter((chain) =>
+  ['ethereum', 'arbitrum', 'optimism', 'polygon'].includes(chain.litNetwork)
+);
+
+const unlockNetworkIds = Object.values(networks).map((n: any) => n.id);
+export const unlockChains = RPCList.filter((chain) => unlockNetworkIds.includes(chain.chainId)).sort(sortChainList);
+
+function sortChainList<T extends IChainDetails>(a: T, b: T) {
+  const isMainnet = (chain: T) => !chain.testnet;
+  if (isMainnet(a) && !isMainnet(b)) {
+    return -1;
+  } else if (!isMainnet(a) && isMainnet(b)) {
+    return 1;
+  }
+  return 0;
 }

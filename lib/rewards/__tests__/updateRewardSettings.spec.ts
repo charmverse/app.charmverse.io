@@ -66,6 +66,72 @@ describe('updateRewardSettings', () => {
     expect(updatedReward).toMatchObject(updateContent);
   });
 
+  it('should updae fields to make reward assigned', async () => {
+    const submitterRole = await testUtilsMembers.generateRole({ spaceId: space.id, createdBy: user.id });
+    const reviewerRole = await testUtilsMembers.generateRole({ spaceId: space.id, createdBy: user.id });
+
+    const reviewers: TargetPermissionGroup<'role' | 'user'>[] = [
+      { group: 'role', id: reviewerRole.id },
+      { group: 'user', id: user.id }
+    ];
+
+    const updateContent: UpdateableRewardFields = {
+      rewardAmount: 1000,
+      rewardToken: 'TOKEN',
+      chainId: 12,
+      approveSubmitters: true,
+      dueDate: new Date(2025, 11, 31),
+      allowMultipleApplications: true,
+      maxSubmissions: 1000,
+      customReward: 'Custom Reward Description',
+      fields: ['Field1', 'Field2'],
+      reviewers,
+      allowedSubmitterRoles: [submitterRole.id],
+      assignedSubmitters: [user.id]
+    };
+
+    const updatedReward = await updateRewardSettings({ rewardId: reward.id, updateContent });
+
+    expect(updatedReward).toMatchObject({
+      rewardAmount: 1000,
+      rewardToken: 'TOKEN',
+      chainId: 12,
+      approveSubmitters: false,
+      dueDate: new Date(2025, 11, 31),
+      allowMultipleApplications: false,
+      maxSubmissions: 1,
+      customReward: 'Custom Reward Description',
+      fields: ['Field1', 'Field2'],
+      reviewers,
+      allowedSubmitterRoles: null,
+      assignedSubmitters: [user.id]
+    });
+  });
+
+  it('should make reward application required (from assigned)', async () => {
+    const newReward = await generateBounty({
+      createdBy: user.id,
+      spaceId: space.id,
+      approveSubmitters: false
+    });
+
+    const updateContent: UpdateableRewardFields = {
+      assignedSubmitters: [user.id]
+    };
+
+    const updatedReward = await updateRewardSettings({ rewardId: newReward.id, updateContent });
+
+    expect(updatedReward.assignedSubmitters).toMatchObject([user.id]);
+
+    const updatedReward2 = await updateRewardSettings({
+      rewardId: reward.id,
+      updateContent: { assignedSubmitters: null, approveSubmitters: true }
+    });
+
+    expect(updatedReward2.assignedSubmitters).toBe(null);
+    expect(updatedReward2.approveSubmitters).toBe(true);
+  });
+
   it('should set maxSubmissions without any prior submissions', async () => {
     const testReward = await generateBounty({
       createdBy: user.id,

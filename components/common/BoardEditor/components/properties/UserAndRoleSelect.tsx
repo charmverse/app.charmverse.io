@@ -17,19 +17,28 @@ import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import { EmptyPlaceholder } from './EmptyPlaceholder';
 import { SelectPreviewContainer } from './TagSelect/TagSelect';
 
-export type GroupedRole = TargetPermissionGroup<'role'>;
-type GroupedMember = TargetPermissionGroup<'user'>;
-type GroupedOption = GroupedRole | GroupedMember;
-type GroupedRolePopulated = ListSpaceRolesResponse & GroupedRole;
-type GroupedMemberPopulated = Member & GroupedMember;
-type GroupedOptionPopulated = GroupedRolePopulated | GroupedMemberPopulated;
+export type RoleOption = TargetPermissionGroup<'role'>;
+type MemberOption = TargetPermissionGroup<'user'>;
+type SystemRoleOption<T extends string = string> = { group: 'system_role'; id: T };
+export type SelectOption = RoleOption | MemberOption | SystemRoleOption;
+type RoleOptionPopulated = ListSpaceRolesResponse & RoleOption;
+type MemberOptionPopulated = Member & MemberOption;
+export type SystemRoleOptionPopulated<T extends string = string> = SystemRoleOption<T> & {
+  icon: JSX.Element;
+  label: string;
+};
+
+export type SelectOptionPopulated = RoleOptionPopulated | MemberOptionPopulated | SystemRoleOptionPopulated;
 
 type ContainerProps = {
   displayType?: PropertyValueDisplayType;
 };
 
-const StyledAutocomplete = styled(Autocomplete<GroupedOptionPopulated, true, boolean>)`
+const StyledAutocomplete = styled(Autocomplete<SelectOptionPopulated, true, boolean>)`
   min-width: 150px;
+  .MuiAutocomplete-inputRoot {
+    gap: 4px;
+  }
 `;
 
 export const StyledUserPropertyContainer = styled(Box, {
@@ -59,108 +68,126 @@ export const StyledUserPropertyContainer = styled(Box, {
 
 function SelectedOptions({
   value,
+  isRequiredValue = () => false,
   readOnly,
-  readOnlyMessage,
   onRemove,
   wrapColumn
 }: {
   wrapColumn?: boolean;
   readOnly: boolean;
-  readOnlyMessage?: string;
-  value: GroupedOptionPopulated[];
+  value: SelectOptionPopulated[];
+  isRequiredValue?: (option: SelectOptionPopulated) => boolean;
   onRemove: (reviewerId: string) => void;
 }) {
   return (
-    <Tooltip title={readOnlyMessage ?? null}>
-      <Stack
-        display='inline-flex'
-        width={wrapColumn ? '100%' : 'min-content'}
-        flexDirection='row'
-        gap={1}
-        rowGap={0.5}
-        flexWrap={wrapColumn ? 'wrap' : 'nowrap'}
-      >
-        {value.map((option) => {
-          return (
-            <Stack
-              alignItems='center'
-              flexDirection='row'
-              key={option.id}
-              gap={0.5}
-              data-test='selected-user-or-role-option'
-              sx={wrapColumn ? { justifyContent: 'space-between', overflowX: 'hidden' } : { overflowX: 'hidden' }}
-            >
-              {option.group === 'user' && (
-                <>
-                  <UserDisplay fontSize={14} avatarSize='xSmall' userId={option.id} wrapName={wrapColumn} />
-                  {!readOnly && (
-                    <IconButton size='small' onClick={() => onRemove(option.id)}>
-                      <CloseIcon
-                        sx={{
-                          fontSize: 14
-                        }}
-                        cursor='pointer'
-                        color='secondary'
-                      />
-                    </IconButton>
-                  )}
-                </>
-              )}
-              {option.group === 'role' && (
-                <Chip
-                  sx={{ px: 0.5, cursor: readOnly ? 'text' : 'pointer' }}
-                  label={option.name}
-                  // color={option.color}
-                  key={option.id}
-                  size='small'
-                  onDelete={readOnly ? undefined : () => onRemove(option.id)}
-                  deleteIcon={
+    <>
+      {value.map((option) => {
+        return (
+          <>
+            {option.group === 'user' && (
+              <Stack
+                alignItems='center'
+                flexDirection='row'
+                key={option.id}
+                gap={0.5}
+                data-test='selected-user-or-role-option'
+                sx={wrapColumn ? { justifyContent: 'space-between', overflowX: 'hidden' } : { overflowX: 'hidden' }}
+              >
+                <UserDisplay fontSize={14} avatarSize='xSmall' userId={option.id} wrapName={wrapColumn} />
+                {!readOnly && !isRequiredValue(option) && (
+                  <IconButton size='small' onClick={() => onRemove(option.id)}>
                     <CloseIcon
                       sx={{
                         fontSize: 14
                       }}
                       cursor='pointer'
+                      color='secondary'
                     />
-                  }
-                />
-              )}
-            </Stack>
-          );
-        })}
-      </Stack>
-    </Tooltip>
+                  </IconButton>
+                )}
+              </Stack>
+            )}
+            {option.group === 'role' && (
+              <Chip
+                data-test='selected-user-or-role-option'
+                sx={{ px: 0.5, cursor: readOnly || isRequiredValue(option) ? 'text' : 'pointer' }}
+                label={option.name}
+                // color={option.color}
+                key={option.id}
+                size='small'
+                onDelete={readOnly || isRequiredValue(option) ? undefined : () => onRemove(option.id)}
+                deleteIcon={
+                  <CloseIcon
+                    sx={{
+                      fontSize: 14
+                    }}
+                    cursor='pointer'
+                  />
+                }
+              />
+            )}
+            {option.group === 'system_role' && (
+              <Chip
+                data-test='selected-user-or-role-option'
+                sx={{ px: 0.5, cursor: readOnly || isRequiredValue(option) ? 'text' : 'pointer' }}
+                label={option.label}
+                key={option.id}
+                icon={option.icon}
+                variant='outlined'
+                size='small'
+                onDelete={readOnly || isRequiredValue(option) ? undefined : () => onRemove(option.id)}
+                deleteIcon={
+                  <CloseIcon
+                    sx={{
+                      fontSize: 14
+                    }}
+                    cursor='pointer'
+                  />
+                }
+              />
+            )}
+          </>
+        );
+      })}
+    </>
   );
 }
 
-type Props = {
+type Props<T> = {
   emptyPlaceholderContent?: string;
+  inputPlaceholder?: string; // placeholder for the editable input of outlined variant
   displayType?: PropertyValueDisplayType;
-  onChange: (value: GroupedOptionPopulated[]) => void;
+  onChange: (value: SelectOptionPopulated[]) => void;
   proposalCategoryId?: string | null;
   readOnly?: boolean;
   readOnlyMessage?: string;
   showEmptyPlaceholder?: boolean;
-  value: GroupedOption[];
+  systemRoles?: SystemRoleOptionPopulated[];
+  value: T[];
+  isRequiredValue?: (value: SelectOptionPopulated) => boolean;
   variant?: 'outlined' | 'standard';
   'data-test'?: string;
   wrapColumn?: boolean;
   type?: 'role' | 'roleAndUser';
 };
 
-export function UserAndRoleSelect({
+export function UserAndRoleSelect<T extends { id: string; group: string } = SelectOption>({
   displayType = 'details',
   onChange,
   proposalCategoryId,
   readOnly,
   readOnlyMessage,
+  inputPlaceholder,
   showEmptyPlaceholder = true,
   emptyPlaceholderContent = 'Empty',
+  systemRoles = [],
   variant = 'standard',
   value: inputValue,
+  isRequiredValue,
   'data-test': dataTest,
   wrapColumn,
   type = 'roleAndUser'
-}: Props): JSX.Element | null {
+}: Props<T>): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(false);
   const { roles } = useRoles();
   const { members } = useMembers();
@@ -173,8 +200,8 @@ export function UserAndRoleSelect({
     ? (inputValue as { id: string; group: 'user' | 'role' }[]).filter((elem) => elem.group === 'user')
     : (inputValue as { id: string; group: 'user' | 'role' }[]);
 
-  const mappedMembers: GroupedMemberPopulated[] = filteredMembers.map((member) => ({ ...member, group: 'user' }));
-  const mappedRoles: GroupedRolePopulated[] =
+  const mappedMembers: MemberOptionPopulated[] = filteredMembers.map((member) => ({ ...member, group: 'user' }));
+  const mappedRoles: RoleOptionPopulated[] =
     roles?.map((includedRole) => ({ ...includedRole, group: 'role' } as ListSpaceRolesResponse & { group: 'role' })) ??
     [];
 
@@ -187,32 +214,34 @@ export function UserAndRoleSelect({
   }, [reviewerPool]);
 
   const filteredOptions = useMemo(() => {
-    let _filteredOptions: GroupedOptionPopulated[] = [];
+    let _filteredOptions: SelectOptionPopulated[] = [];
     if (proposalCategoryId && isFreeSpace) {
       _filteredOptions = reviewerPool
         ? mappedMembers.filter((member) => !!mappedEligibleProposalReviewers[member.id])
         : [];
+      _filteredOptions = [..._filteredOptions, ...systemRoles];
     } else if (proposalCategoryId && !isFreeSpace) {
       _filteredOptions = [
         // For proposals we only want current space members and roles that are allowed to review proposals
         ...(reviewerPool ? mappedMembers.filter((member) => !!mappedEligibleProposalReviewers[member.id]) : []),
+        ...systemRoles,
         ...mappedRoles.filter((role) => reviewerPool?.roleIds.includes(role.id))
       ];
     } else if (isFreeSpace) {
       // In public space, don't include custom roles
-      _filteredOptions = type === 'role' ? [] : [...mappedMembers];
+      _filteredOptions = type === 'role' ? [] : [...mappedMembers, ...systemRoles];
     } else {
       // For bounties, allow any space member or role to be selected
       if (type === 'role') {
-        _filteredOptions = mappedRoles;
+        _filteredOptions = [...systemRoles, ...mappedRoles];
       }
 
       if (type === 'roleAndUser') {
-        _filteredOptions = [...mappedMembers, ...mappedRoles];
+        _filteredOptions = [...mappedMembers, ...systemRoles, ...mappedRoles];
       }
     }
     return _filteredOptions;
-  }, [reviewerPool, isFreeSpace, filteredMembers, roles, proposalCategoryId, type]);
+  }, [reviewerPool, systemRoles, isFreeSpace, filteredMembers, roles, proposalCategoryId, type]);
 
   // Will only happen in the case of proposals
   const noReviewersAvailable = Boolean(
@@ -221,9 +250,9 @@ export function UserAndRoleSelect({
 
   const allOptions = useMemo(() => {
     if (isFreeSpace) {
-      return [...mappedMembers];
+      return [...mappedMembers, ...systemRoles];
     } else {
-      return [...mappedMembers, ...mappedRoles];
+      return [...mappedMembers, ...mappedRoles, ...systemRoles];
     }
   }, [filteredMembers, roles]);
 
@@ -235,11 +264,14 @@ export function UserAndRoleSelect({
     }
   }, [readOnly]);
 
-  function removeReviewer(idToRemove: string) {
+  function removeOption(idToRemove: string) {
     onChange(populatedValue.filter(({ id }) => id !== idToRemove));
   }
 
   function getPlaceholderLabel() {
+    if (inputPlaceholder) {
+      return inputPlaceholder;
+    }
     if (isFreeSpace) {
       return 'Search for a person...';
     }
@@ -261,98 +293,116 @@ export function UserAndRoleSelect({
         readOnly={readOnly}
         onClick={onClickToEdit}
       >
-        <Stack gap={0.5}>
-          {applicableValues.length === 0 ? (
-            showEmptyPlaceholder && <EmptyPlaceholder>{emptyPlaceholderContent}</EmptyPlaceholder>
-          ) : (
-            <SelectedOptions
-              readOnlyMessage={readOnlyMessage}
-              wrapColumn={wrapColumn}
-              readOnly
-              value={populatedValue}
-              onRemove={removeReviewer}
-            />
-          )}
-        </Stack>
+        <Tooltip title={readOnlyMessage ?? null}>
+          <Box display='inline-flex' flexWrap='wrap' gap={0.5}>
+            {applicableValues.length === 0 ? (
+              showEmptyPlaceholder && <EmptyPlaceholder>{emptyPlaceholderContent}</EmptyPlaceholder>
+            ) : (
+              <SelectedOptions wrapColumn={wrapColumn} readOnly value={populatedValue} onRemove={removeOption} />
+            )}
+          </Box>
+        </Tooltip>
       </SelectPreviewContainer>
     );
   }
 
   return (
-    <StyledUserPropertyContainer displayType='details'>
-      <StyledAutocomplete
-        data-test={dataTest}
-        autoHighlight
-        // disabled={!roles || (proposalId && !reviewerPool) || !noReviewersAvailable}
-        disableClearable
-        disableCloseOnSelect
-        filterSelectedOptions
-        forcePopupIcon={false}
-        fullWidth
-        getOptionLabel={(option) => {
-          if (!option) {
-            return '';
-          }
-          if (option.group === 'user') {
-            return option.username;
-          }
-          return option.name;
-        }}
-        groupBy={(option) => `${option.group[0].toUpperCase() + option.group.slice(1)}s`}
-        isOptionEqualToValue={(option, val) => option.id === val.id}
-        loading={!roles || filteredMembers.length === 0 || (!!proposalCategoryId && !reviewerPool)}
-        multiple
-        noOptionsText='No more options available'
-        onChange={(e, value) => onChange(value)}
-        onClose={() => setIsOpen(false)}
-        openOnFocus
-        options={filteredOptions}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            autoFocus={variant === 'standard'}
-            size='small'
-            value={applicableValues}
-            placeholder={populatedValue.length === 0 ? getPlaceholderLabel() : ''}
-            InputProps={{
-              ...params.InputProps,
-              ...(variant === 'standard' && { disableUnderline: true })
-            }}
-            variant={variant}
-          />
-        )}
-        renderOption={(_props, option) => {
-          if (option.group === 'role') {
-            return (
-              <li data-test={`select-option-${option.id}`} {..._props}>
-                <Chip sx={{ px: 0.5, cursor: readOnly ? 'text' : 'pointer' }} label={option.name} size='small' />
-              </li>
-            );
-          }
-          return (
-            <UserDisplay
-              data-test={`select-option-${option.id}`}
-              {...(_props as any)}
-              userId={option.id}
-              avatarSize='small'
+    <Tooltip title={readOnlyMessage ?? null}>
+      <StyledUserPropertyContainer displayType='details'>
+        <StyledAutocomplete
+          data-test={dataTest}
+          autoHighlight
+          // disabled={!roles || (proposalId && !reviewerPool) || !noReviewersAvailable}
+          disableClearable
+          disableCloseOnSelect
+          filterSelectedOptions
+          forcePopupIcon={false}
+          fullWidth
+          getOptionLabel={(option) => {
+            if (!option) {
+              return '';
+            }
+            if (option.group === 'user') {
+              return option.username;
+            }
+            if (option.group === 'role') {
+              return option.name;
+            }
+            return option.label;
+          }}
+          groupBy={(option) => {
+            const group = option.group === 'system_role' ? 'role' : option.group;
+            return `${group[0].toUpperCase() + group.slice(1)}s`;
+          }}
+          isOptionEqualToValue={(option, val) => option.id === val.id}
+          loading={!roles || filteredMembers.length === 0 || (!!proposalCategoryId && !reviewerPool)}
+          multiple
+          noOptionsText='No more options available'
+          onChange={(e, value) => onChange(value)}
+          onClose={() => setIsOpen(false)}
+          openOnFocus
+          options={filteredOptions}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              autoFocus={variant === 'standard'}
+              size='small'
+              value={applicableValues}
+              placeholder={populatedValue.length === 0 ? getPlaceholderLabel() : ''}
+              InputProps={{
+                ...params.InputProps,
+                ...(variant === 'standard' && { disableUnderline: true })
+              }}
+              variant={variant}
             />
-          );
-        }}
-        renderTags={() => (
-          <SelectedOptions
-            wrapColumn={wrapColumn}
-            readOnly={!!readOnly}
-            value={populatedValue}
-            onRemove={removeReviewer}
-          />
+          )}
+          renderOption={(_props, option) => {
+            if (option.group === 'role') {
+              return (
+                <li data-test={`select-option-${option.id}`} {..._props}>
+                  <Chip sx={{ px: 0.5, cursor: readOnly ? 'text' : 'pointer' }} label={option.name} size='small' />
+                </li>
+              );
+            }
+            if (option.group === 'system_role') {
+              return (
+                <li data-test={`select-option-${option.id}`} {..._props}>
+                  <Chip
+                    sx={{ px: 0.5, cursor: readOnly ? 'text' : 'pointer' }}
+                    variant='outlined'
+                    icon={option.icon}
+                    label={option.label}
+                    size='small'
+                  />
+                </li>
+              );
+            }
+            return (
+              <UserDisplay
+                data-test={`select-option-${option.id}`}
+                {...(_props as any)}
+                userId={option.id}
+                avatarSize='small'
+              />
+            );
+          }}
+          renderTags={() => (
+            <SelectedOptions
+              wrapColumn={wrapColumn}
+              readOnly={!!readOnly}
+              value={populatedValue}
+              isRequiredValue={isRequiredValue}
+              onRemove={removeOption}
+            />
+          )}
+          value={populatedValue}
+        />
+        {noReviewersAvailable && (
+          <Alert severity='warning'>
+            No reviewers found: an admin must assign specific role(s) or all members as reviewers.
+          </Alert>
         )}
-        value={populatedValue}
-      />
-      {noReviewersAvailable && (
-        <Alert severity='warning'>
-          No reviewers found: an admin must assign specific role(s) or all members as reviewers.
-        </Alert>
-      )}
-    </StyledUserPropertyContainer>
+      </StyledUserPropertyContainer>
+    </Tooltip>
   );
 }

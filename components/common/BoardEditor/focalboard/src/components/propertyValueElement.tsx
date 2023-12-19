@@ -1,9 +1,11 @@
-import type { ApplicationStatus, ProposalStatus } from '@charmverse/core/prisma-client';
+import type { ApplicationStatus, ProposalStatus } from '@charmverse/core/prisma';
 import { stringUtils } from '@charmverse/core/utilities';
+import PersonIcon from '@mui/icons-material/Person';
+import { Box, Chip, Link, Stack, Typography } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import clsx from 'clsx';
 import { useRouter } from 'next/router';
-import type { ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import { memo, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 
@@ -29,11 +31,12 @@ import { PROPOSAL_REVIEWERS_BLOCK_ID, STATUS_BLOCK_ID } from 'lib/proposal/block
 import {
   REWARD_CHAIN,
   REWARD_TOKEN,
-  REWARD_CUSTOM_VALUE,
-  ASSIGNEES_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
+  REWARDS_APPLICANTS_BLOCK_ID,
   REWARD_REVIEWERS_BLOCK_ID,
-  REWARD_STATUS_BLOCK_ID
+  REWARD_STATUS_BLOCK_ID,
+  REWARD_APPLICANTS_COUNT,
+  REWARD_PROPOSAL_LINK
 } from 'lib/rewards/blocks/constants';
 import type { RewardStatus } from 'lib/rewards/interfaces';
 import { getAbsolutePath } from 'lib/utilities/browser';
@@ -68,6 +71,7 @@ type Props = {
   wrapColumn?: boolean;
   columnRef?: React.RefObject<HTMLDivElement>;
   mutator?: Mutator;
+  subRowsEmptyValueContent?: ReactElement | string;
 };
 
 /**
@@ -95,7 +99,8 @@ function PropertyValueElement(props: Props) {
     updatedBy,
     updatedAt,
     displayType,
-    mutator = defaultMutator
+    mutator = defaultMutator,
+    subRowsEmptyValueContent
   } = props;
 
   const { rubricProposalIdsWhereUserIsEvaluator, rubricProposalIdsWhereUserIsNotEvaluator } =
@@ -182,7 +187,30 @@ function PropertyValueElement(props: Props) {
         }
       />
     );
+  } else if (propertyTemplate.id === REWARD_PROPOSAL_LINK) {
+    if (!Array.isArray(propertyValue) || !propertyValue.length || !propertyValue[0]) {
+      return null;
+    }
+
+    return (
+      <Chip
+        label={propertyValue[0]}
+        sx={{
+          cursor: 'pointer'
+        }}
+        size='small'
+        component={Link}
+        href={getAbsolutePath(propertyValue[1] as string, domain)}
+      />
+    );
   } else if ([REWARD_REVIEWERS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID].includes(propertyTemplate.id)) {
+    if (Array.isArray(propertyValue) && propertyValue.length === 0 && subRowsEmptyValueContent) {
+      return typeof subRowsEmptyValueContent === 'string' ? (
+        <span>{subRowsEmptyValueContent}</span>
+      ) : (
+        subRowsEmptyValueContent ?? null
+      );
+    }
     return (
       <UserAndRoleSelect
         displayType={displayType}
@@ -222,15 +250,19 @@ function PropertyValueElement(props: Props) {
         displayType={displayType}
       />
     );
-    // do not show value in reward row
-  } else if (propertyTemplate.id === ASSIGNEES_BLOCK_ID && Array.isArray(propertyValue)) {
+    // Do not show  applicants in regular reward
+  } else if (
+    propertyTemplate.id === REWARDS_APPLICANTS_BLOCK_ID &&
+    Array.isArray(propertyValue) &&
+    !card.fields.isAssigned
+  ) {
     propertyValueElement = null;
   } else if (
     propertyTemplate.type === 'person' ||
     propertyTemplate.type === 'proposalEvaluatedBy' ||
     propertyTemplate.type === 'proposalAuthor' ||
     propertyTemplate.type === 'proposalReviewer' ||
-    propertyTemplate.id === ASSIGNEES_BLOCK_ID
+    propertyTemplate.id === REWARDS_APPLICANTS_BLOCK_ID
   ) {
     propertyValueElement = (
       <UserSelect
@@ -324,6 +356,18 @@ function PropertyValueElement(props: Props) {
     const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
     const chainId = card.fields.properties[REWARD_CHAIN] as string;
     propertyValueElement = <TokenChain chainId={chainId} symbolOrAddress={symbolOrAddress} />;
+  } else if (propertyTemplate.id === REWARD_APPLICANTS_COUNT) {
+    const totalApplicants = card.fields.properties[REWARD_APPLICANTS_COUNT];
+    if (totalApplicants) {
+      return (
+        <Stack flexDirection='row' gap={1} className='octo-propertyvalue readonly'>
+          <Box width={20} display='flex' alignItems='center'>
+            <PersonIcon fontSize='small' />
+          </Box>
+          {totalApplicants}
+        </Stack>
+      );
+    }
   }
 
   const commonProps = {
@@ -376,8 +420,13 @@ function PropertyValueElement(props: Props) {
   const hasArrayValue = Array.isArray(value) && value.length > 0;
   const hasStringValue = !Array.isArray(value) && !!value;
   const hasValue = hasCardValue || hasArrayValue || hasStringValue;
+
   if (!hasValue && props.readOnly && displayType !== 'details') {
-    return null;
+    return typeof subRowsEmptyValueContent === 'string' ? (
+      <span>{subRowsEmptyValueContent}</span>
+    ) : (
+      subRowsEmptyValueContent ?? null
+    );
   }
 
   // Explicitly hide the value for this proposal
@@ -387,9 +436,14 @@ function PropertyValueElement(props: Props) {
     } else if (syncWithPageId && (!!rubricProposalIdsWhereUserIsEvaluator[syncWithPageId] || isAdmin)) {
       return propertyValueElement;
     } else {
-      return null;
+      return typeof subRowsEmptyValueContent === 'string' ? (
+        <span>{subRowsEmptyValueContent}</span>
+      ) : (
+        subRowsEmptyValueContent ?? null
+      );
     }
   }
+
   if (props.showTooltip) {
     return (
       <Tooltip title={props.propertyTemplate.name}>
@@ -397,6 +451,7 @@ function PropertyValueElement(props: Props) {
       </Tooltip>
     );
   }
+
   return propertyValueElement;
 }
 

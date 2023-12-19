@@ -181,7 +181,13 @@ export function formatTime(dateInput: Date | string, locale?: string | null) {
 }
 
 export function sortByDate<T extends { createdAt: string | Date }>(a: T, b: T): number {
-  return a.createdAt > b.createdAt ? -1 : 1;
+  if (a.createdAt > b.createdAt) {
+    return -1;
+  } else if (a.createdAt < b.createdAt) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
 
 export function getCurrentDate() {

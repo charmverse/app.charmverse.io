@@ -36,7 +36,7 @@ import { SelectNewSpaceTemplate } from './SelectNewSpaceTemplate';
 
 const schema = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
-  spaceImage: yup.string().nullable(true),
+  spaceImage: yup.string().nullable(),
   spaceTemplateOption: yup.mixed<SpaceTemplateType>().oneOf(spaceTemplateIds).default('default')
 });
 type FormValues = yup.InferType<typeof schema>;
@@ -187,6 +187,8 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
     setStep('select_template');
   }
 
+  const errorText = typeof saveError === 'string' ? saveError : saveError?.message ?? 'Error creating space';
+
   if (step === 'join_space') {
     return (
       <Box>
@@ -285,7 +287,7 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
             </Grid>
             {saveError && (
               <Grid item>
-                <Alert severity='error'>{saveError}</Alert>
+                <Alert severity='error'>{errorText}</Alert>
               </Grid>
             )}
           </Grid>

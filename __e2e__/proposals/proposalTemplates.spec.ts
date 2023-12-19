@@ -7,7 +7,7 @@ import { generateProposal } from 'testing/setupDatabase';
 
 import { generateUserAndSpace, loginBrowserUser } from '../utils/mocks';
 
-test.describe.serial('Proposal templates', () => {
+test.describe('Proposal templates', () => {
   // create reusable pages we can reuse between tests
   let proposalListPage: ProposalsListPage;
   let proposalPage: ProposalPage;
@@ -59,7 +59,6 @@ test.describe.serial('Proposal templates', () => {
     await proposalListPage.proposalTemplateSelect.click();
     await proposalListPage.getTemplateOptionLocator(template.id).click();
 
-    await proposalPage.waitForDialog();
     await expect(proposalPage.saveDraftButton).toBeVisible();
   });
 });

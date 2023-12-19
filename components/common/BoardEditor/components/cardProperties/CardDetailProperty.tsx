@@ -84,6 +84,7 @@ export function CardDetailProperty({
         <Box>
           <PropertyNameContainer
             className='octo-propertyname'
+            {...bindTrigger(changePropertyPopupState)}
             sx={{
               opacity: isDragging ? 0.5 : 1,
               transition: `background-color 150ms ease-in-out`,
@@ -91,7 +92,7 @@ export function CardDetailProperty({
             }}
           >
             <DragIndicatorIcon className='icons' fontSize='small' color='secondary' />
-            <Button {...bindTrigger(changePropertyPopupState)}>{property.name}</Button>
+            <Button>{property.name}</Button>
           </PropertyNameContainer>
           <Menu {...bindMenu(changePropertyPopupState)}>
             <PropertyMenu

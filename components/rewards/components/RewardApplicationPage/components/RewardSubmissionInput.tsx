@@ -1,3 +1,4 @@
+import { isEmptyDocument } from '@bangle.dev/utils';
 import type { Application } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, FormLabel } from '@mui/material';
@@ -11,9 +12,11 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import { Button } from 'components/common/Button';
-import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
+import { CharmEditor } from 'components/common/CharmEditor';
 import { useUser } from 'hooks/useUser';
 import type { BountyPermissionFlags } from 'lib/permissions/bounties';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { WorkUpsertData } from 'lib/rewards/work';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import type { SystemError } from 'lib/utilities/errors';
@@ -23,10 +26,18 @@ import { RewardApplicationStatusChip, applicationStatuses } from '../../RewardAp
 const schema = (customReward?: boolean) => {
   return yup.object({
     submission: yup.string().required(),
-    submissionNodes: yup.mixed().required(),
+    submissionNodes: yup.mixed<string>().required(),
     walletAddress: customReward
       ? yup.string()
-      : yup.string().required().test('verifyContractFormat', 'Invalid wallet address', isValidChainAddress),
+      : yup
+          .string()
+          .required()
+          .test('verifyContractFormat', 'Invalid wallet address', (address) => {
+            if (address.endsWith('eth')) {
+              return true;
+            }
+            return isValidChainAddress(address);
+          }),
     rewardInfo: yup.string()
   });
 };
@@ -67,16 +78,19 @@ export function RewardSubmissionInput({
     register,
     handleSubmit,
     setValue,
+    getValues,
     formState: { errors, isValid }
   } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: {
       submission: submission?.submission as string,
-      submissionNodes: submission?.submissionNodes as any as JSON,
+      submissionNodes: submission?.submissionNodes as any as string,
       walletAddress: submission?.walletAddress ?? user?.wallets[0]?.address ?? ''
     },
     resolver: yupResolver(schema(hasCustomReward))
   });
+
+  const formValues = getValues();
 
   const [formError, setFormError] = useState<SystemError | null>(null);
 
@@ -106,13 +120,13 @@ export function RewardSubmissionInput({
       <form onSubmit={handleSubmit(onSubmit)} style={{ margin: 'auto', width: '100%' }}>
         <Grid container direction='column' spacing={2}>
           <Grid item>
-            <InlineCharmEditor
+            <CharmEditor
               content={submission?.submissionNodes ? JSON.parse(submission?.submissionNodes) : null}
               onContentChange={(content) => {
                 setValue('submission', content.rawText, {
                   shouldValidate: true
                 });
-                setValue('submissionNodes', content.doc, {
+                setValue('submissionNodes', content.doc as any as string, {
                   shouldValidate: true
                 });
                 setIsEditorTouched(true);
@@ -121,17 +135,21 @@ export function RewardSubmissionInput({
                 backgroundColor: 'var(--input-bg)',
                 border: '1px solid var(--input-border)',
                 borderRadius: 3,
-                minHeight: 130
+                minHeight: 130,
+                left: 0
               }}
               readOnly={readOnly || submission?.status === 'complete' || submission?.status === 'paid'}
               placeholderText={currentUserIsAuthor ? 'Enter your submission here' : 'No submission yet'}
               key={`${readOnly}.${submission?.status}`}
+              disableRowHandles
+              isContentControlled
+              disableNestedPages
             />
           </Grid>
 
           {(currentUserIsAuthor || permissions?.review) && !hasCustomReward && (
             <Grid item>
-              <InputLabel>Address to receive reward</InputLabel>
+              <InputLabel>Address/ENS to receive reward</InputLabel>
               <TextField
                 {...register('walletAddress')}
                 type='text'
@@ -162,7 +180,11 @@ export function RewardSubmissionInput({
           {!readOnly && (
             <Grid item display='flex' gap={1} justifyContent='flex-end'>
               <Button
-                disabled={(!isValid && submission?.status === 'inProgress') || !isEditorTouched}
+                disabled={
+                  (!isValid && submission?.status === 'inProgress') ||
+                  !isEditorTouched ||
+                  checkIsContentEmpty(formValues.submissionNodes as unknown as PageContent)
+                }
                 type='submit'
                 loading={isSaving}
               >

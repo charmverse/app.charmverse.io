@@ -21,7 +21,7 @@ export type UpdateableRewardFields = Partial<
     | 'customReward'
     | 'fields'
   >
-> & { reviewers?: RewardReviewer[]; allowedSubmitterRoles?: string[] | null };
+> & { reviewers?: RewardReviewer[]; allowedSubmitterRoles?: string[] | null; assignedSubmitters?: string[] | null };
 
 export type RewardUpdate = {
   rewardId: string;
@@ -58,6 +58,9 @@ export async function updateRewardSettings({ rewardId, updateContent }: RewardUp
   if (typeof remaining === 'number' && typeof updateContent.maxSubmissions === 'number' && remaining <= 0) {
     throw new InvalidInputError('New reward cap cannot be lower than total of active and valid submissions.');
   }
+
+  const isAssignedReward = !!updateContent.assignedSubmitters && !!updateContent.assignedSubmitters?.length;
+
   const updatedReward = await prisma.$transaction(async (tx) => {
     await tx.bounty.update({
       where: {
@@ -70,9 +73,9 @@ export async function updateRewardSettings({ rewardId, updateContent }: RewardUp
         chainId: updateContent.chainId,
         rewardAmount: updateContent.rewardAmount,
         rewardToken: updateContent.rewardToken,
-        approveSubmitters: updateContent.approveSubmitters,
-        allowMultipleApplications: updateContent.allowMultipleApplications,
-        maxSubmissions: updateContent.maxSubmissions,
+        allowMultipleApplications: isAssignedReward ? false : updateContent.allowMultipleApplications,
+        approveSubmitters: isAssignedReward ? false : updateContent.approveSubmitters,
+        maxSubmissions: isAssignedReward ? 1 : updateContent.maxSubmissions,
         fields: updateContent.fields as any
       },
       select: { id: true }
@@ -80,7 +83,11 @@ export async function updateRewardSettings({ rewardId, updateContent }: RewardUp
 
     const rewardAfterUpdate = await setRewardUsers({
       rewardId,
-      users: { allowedSubmitterRoles: updateContent.allowedSubmitterRoles, reviewers: updateContent.reviewers },
+      users: {
+        allowedSubmitterRoles: updateContent.allowedSubmitterRoles,
+        reviewers: updateContent.reviewers,
+        assignedSubmitters: updateContent.assignedSubmitters
+      },
       tx
     });
 

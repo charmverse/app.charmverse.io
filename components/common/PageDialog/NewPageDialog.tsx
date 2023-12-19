@@ -1,3 +1,4 @@
+import { Box } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
@@ -10,6 +11,7 @@ export function NewPageDialog({
   contentUpdated,
   onClose,
   onSave,
+  onCancel,
   isSaving,
   isOpen,
   disabledTooltip
@@ -17,6 +19,7 @@ export function NewPageDialog({
   children: React.ReactNode;
   contentUpdated: boolean;
   onClose?: VoidFunction;
+  onCancel?: VoidFunction;
   onSave: VoidFunction;
   isSaving?: boolean;
   disabledTooltip?: string;
@@ -55,15 +58,22 @@ export function NewPageDialog({
         }
       }}
       footerActions={
-        <Button
-          disabled={Boolean(disabledTooltip) || !contentUpdated || isSaving}
-          disabledTooltip={disabledTooltip}
-          onClick={onSave}
-          loading={isSaving}
-          data-test='save-new-page-button'
-        >
-          Save
-        </Button>
+        <Box display='flex' gap={1}>
+          {!!onCancel && (
+            <Button color='secondary' variant='outlined' onClick={onCancel} data-test='cancel-new-page-button'>
+              Cancel
+            </Button>
+          )}
+          <Button
+            disabled={Boolean(disabledTooltip) || !contentUpdated || isSaving}
+            disabledTooltip={disabledTooltip}
+            onClick={onSave}
+            loading={isSaving}
+            data-test='save-new-page-button'
+          >
+            Save
+          </Button>
+        </Box>
       }
     >
       {children}

@@ -3,7 +3,7 @@ import { Edit as EditIcon } from '@mui/icons-material';
 import { Box, Stack, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
-import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
+import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
 import { MemberActions } from 'components/settings/roles/components/MemberActions';
@@ -14,7 +14,7 @@ import type { Member } from 'lib/members/interfaces';
 import { ProfileTabs } from './components/ProfileTabs';
 import { UserDetailsReadonly } from './components/UserDetailsReadonly';
 
-const ContentContainer = styled(Container)`
+const ContentContainer = styled(PageEditorContainer)`
   width: 100%;
   margin-bottom: 100px;
 `;

@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import type { Space } from '@charmverse/core/prisma-client';
+import type { Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import CloseIcon from '@mui/icons-material/Close';
 import { Divider, Drawer, Grid, IconButton, InputLabel, Stack, TextField, Typography } from '@mui/material';
