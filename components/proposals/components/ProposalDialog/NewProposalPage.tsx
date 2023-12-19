@@ -12,6 +12,7 @@ import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
+import type { FormFieldInput } from 'components/common/form/interfaces';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -31,7 +32,8 @@ export type ProposalPageAndPropertiesInput = ProposalPropertiesInput & {
   headerImage: string | null;
   icon: string | null;
   type: PageType;
-  proposalType?: 'structured' | 'free-form';
+  proposalType: 'structured' | 'free-form';
+  formFields?: FormFieldInput[];
 };
 
 type Props = {
@@ -47,6 +49,7 @@ const StyledContainer = styled(Container)`
 // Note: this component is only used before a page is saved to the DB
 export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: Props) {
   const { space: currentSpace } = useCurrentSpace();
+  const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>([]);
   const [, { width: containerWidth }] = useElementSize();
   const { user } = useUser();
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
@@ -95,6 +98,15 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: P
       content: doc,
       contentText: rawText
     });
+  }
+
+  function toggleCollapse(fieldId: string) {
+    const isCollapsed = collapsedFieldIds.includes(fieldId);
+    if (isCollapsed) {
+      setCollapsedFieldIds(collapsedFieldIds.filter((id) => id !== fieldId));
+    } else {
+      setCollapsedFieldIds([...collapsedFieldIds, fieldId]);
+    }
   }
 
   const proposalPageContent = (
@@ -167,7 +179,17 @@ export function NewProposalPage({ setFormInputs, formInputs, contentUpdated }: P
             <Box minHeight={450}>
               {/* temporary? disable editing of page title when in suggestion mode */}
               {proposalPageContent}
-              <FormFieldsEditor />
+              <FormFieldsEditor
+                collapsedFieldIds={collapsedFieldIds}
+                toggleCollapse={toggleCollapse}
+                formFields={formInputs.formFields || []}
+                setFormFields={(formFields) => {
+                  setFormInputs({
+                    ...formInputs,
+                    formFields
+                  });
+                }}
+              />
             </Box>
           </StyledContainer>
         )}

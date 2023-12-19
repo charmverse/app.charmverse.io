@@ -1,4 +1,5 @@
 import { capitalize } from 'lodash';
+import { useState } from 'react';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 import { members } from 'stories/lib/mockData';
 import { v4 } from 'uuid';
@@ -7,26 +8,37 @@ import { formFieldTypes } from 'components/common/form/constants';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { FormFieldInputs as CustomFormFieldInputs } from 'components/common/form/FormFieldInputs';
 import { FormFieldsEditor as CustomFormFieldsEditor } from 'components/common/form/FormFieldsEditor';
-import type { TFormFieldInput } from 'components/common/form/interfaces';
+import type { FormFieldInput, TFormFieldInput } from 'components/common/form/interfaces';
 import { createDocumentWithText } from 'lib/prosemirror/constants';
 import { brandColorNames } from 'theme/colors';
 
 export function FormFieldsEditor() {
+  const field: FormFieldInput = {
+    description: 'This is a description',
+    index: 0,
+    name: 'Title',
+    options: [],
+    private: false,
+    required: true,
+    type: 'short_text',
+    id: v4()
+  };
+  const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>([field.id]);
+  const [formFields, setFormFields] = useState<FormFieldInput[]>([field]);
+
   return (
     <GlobalContext>
       <CustomFormFieldsEditor
-        formFields={[
-          {
-            description: 'This is a description',
-            index: 0,
-            name: 'Title',
-            options: [],
-            private: false,
-            required: true,
-            type: 'short_text',
-            id: v4()
+        formFields={formFields}
+        setFormFields={setFormFields}
+        collapsedFieldIds={collapsedFieldIds}
+        toggleCollapse={(fieldId) => {
+          if (collapsedFieldIds.includes(fieldId)) {
+            setCollapsedFieldIds(collapsedFieldIds.filter((id) => id !== fieldId));
+          } else {
+            setCollapsedFieldIds([...collapsedFieldIds, fieldId]);
           }
-        ]}
+        }}
       />
     </GlobalContext>
   );

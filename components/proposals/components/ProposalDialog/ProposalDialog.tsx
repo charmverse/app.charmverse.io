@@ -36,7 +36,6 @@ function ProposalDialogBase({ pageId, newProposal, closeDialog }: Props) {
   // This is needed so that the surrounding currentPage context provides the correct pageId
   const { setCurrentPageId } = useCurrentPage();
   const { editMode, resetPageProps, setPageProps } = useCharmEditor();
-
   const {
     formInputs,
     setFormInputs,
@@ -165,7 +164,7 @@ function ProposalDialogBase({ pageId, newProposal, closeDialog }: Props) {
       footerActions={
         isLoading || page || !newProposal ? null : (
           <Button
-            disabled={Boolean(disabledTooltip) || !contentUpdated || isCreatingProposal}
+            disabled={Boolean(disabledTooltip) || isCreatingProposal}
             disabledTooltip={disabledTooltip}
             onClick={saveForm}
             loading={isCreatingProposal}

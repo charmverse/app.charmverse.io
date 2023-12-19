@@ -1,6 +1,5 @@
 import AddIcon from '@mui/icons-material/Add';
 import { Stack } from '@mui/material';
-import { useState } from 'react';
 import { v4 } from 'uuid';
 
 import { Button } from '../Button';
@@ -9,13 +8,17 @@ import type { SelectOptionType } from './fields/Select/interfaces';
 import { FormField } from './FormField';
 import type { FormFieldInput } from './interfaces';
 
-export function FormFieldsEditor({ formFields: initialFormFields = [] }: { formFields?: FormFieldInput[] }) {
-  const [formFields, setFormFields] = useState<
-    (FormFieldInput & {
-      isOpen: boolean;
-    })[]
-  >(initialFormFields.map((formField) => ({ ...formField, isOpen: false })));
-
+export function FormFieldsEditor({
+  formFields,
+  setFormFields,
+  collapsedFieldIds,
+  toggleCollapse
+}: {
+  formFields: FormFieldInput[];
+  setFormFields: (newFormFields: FormFieldInput[]) => void;
+  collapsedFieldIds: string[];
+  toggleCollapse: (fieldId: string) => void;
+}) {
   function updateFormField(
     updatedFormField: Partial<
       FormFieldInput & {
@@ -25,119 +28,97 @@ export function FormFieldsEditor({ formFields: initialFormFields = [] }: { formF
       id: string;
     }
   ) {
-    setFormFields((prev) => {
-      const updatedFieldIndex = prev.findIndex((f) => f.id === updatedFormField.id);
-      const newFormFields = [...prev];
-      // If the index was changed, we need to move the form field to the new index
-      const newIndex = updatedFormField.index;
-      if (typeof newIndex === 'number') {
-        newFormFields.splice(newIndex, 0, newFormFields.splice(updatedFieldIndex, 1)[0]);
-        return newFormFields.map((formField, index) => {
-          if (index === newIndex) {
-            return {
-              ...formField,
-              ...updatedFormField
-            };
-          }
-
-          return {
-            ...formField,
-            index
-          };
-        });
-      } else {
-        newFormFields[updatedFieldIndex] = {
-          ...newFormFields[updatedFieldIndex],
-          ...updatedFormField
-        };
-        return newFormFields;
-      }
-    });
+    const updatedFieldIndex = formFields.findIndex((f) => f.id === updatedFormField.id);
+    const newFormFields = [...formFields];
+    // If the index was changed, we need to move the form field to the new index
+    const newIndex = updatedFormField.index;
+    if (typeof newIndex === 'number') {
+      newFormFields.splice(newIndex, 0, newFormFields.splice(updatedFieldIndex, 1)[0]);
+    }
+    setFormFields(
+      newFormFields.map((formField, index) => ({
+        ...formField,
+        ...(index === (newIndex ?? updatedFieldIndex) ? updatedFormField : {}),
+        index
+      }))
+    );
   }
 
   function addNewFormField() {
-    setFormFields((prev) => {
-      return [
-        ...prev,
-        {
-          type: 'short_text',
-          name: 'Title',
-          description: '',
-          index: prev.length,
-          options: [],
-          private: false,
-          required: true,
-          isOpen: true,
-          id: v4()
-        }
-      ];
-    });
+    const fieldId = v4();
+    setFormFields([
+      ...formFields,
+      {
+        type: 'short_text',
+        name: 'Title',
+        description: '',
+        index: formFields.length,
+        options: [],
+        private: false,
+        required: true,
+        id: fieldId
+      }
+    ]);
   }
 
   function duplicateFormField(fieldId: string) {
-    setFormFields((prev) => {
-      const index = prev.findIndex((f) => f.id === fieldId);
-      const newFormFields = [...prev];
-      newFormFields.splice(index, 0, {
-        ...newFormFields[index],
-        index: index + 1,
-        options: newFormFields[index].options?.map((option) => ({ ...option, id: v4() })) ?? []
-      });
+    const index = formFields.findIndex((f) => f.id === fieldId);
+    const newFormFields = [...formFields];
+    newFormFields.splice(index, 0, {
+      ...newFormFields[index],
+      index: index + 1,
+      options: newFormFields[index].options?.map((option) => ({ ...option, id: v4() })) ?? []
+    });
 
-      return newFormFields.map((formField, i) => ({
+    setFormFields(
+      newFormFields.map((formField, i) => ({
         ...formField,
         index: i
-      }));
-    });
+      }))
+    );
   }
 
   function deleteFormField(fieldId: string) {
-    setFormFields((prev) => {
-      const index = prev.findIndex((f) => f.id === fieldId);
-      const newFormFields = [...prev];
-      newFormFields.splice(index, 1);
-      return newFormFields.map((formField, i) => ({
+    const index = formFields.findIndex((f) => f.id === fieldId);
+    const newFormFields = [...formFields];
+    newFormFields.splice(index, 1);
+    setFormFields(
+      newFormFields.map((formField, i) => ({
         ...formField,
         index: i
-      }));
-    });
+      }))
+    );
   }
 
   function onCreateOption(fieldId: string, option: SelectOptionType) {
-    setFormFields((prev) => {
-      const index = prev.findIndex((f) => f.id === fieldId);
-      const newFormFields = [...prev];
-      const options = newFormFields[index].options ?? [];
-      options.push(option);
-      return newFormFields;
-    });
+    const index = formFields.findIndex((f) => f.id === fieldId);
+    const newFormFields = [...formFields];
+    const options = newFormFields[index].options ?? [];
+    options.push(option);
+    setFormFields(newFormFields);
   }
 
   function onDeleteOption(fieldId: string, option: SelectOptionType) {
-    setFormFields((prev) => {
-      const index = prev.findIndex((f) => f.id === fieldId);
-      const newFormFields = [...prev];
-      const options = newFormFields[index].options ?? [];
-      const newOptions = options.filter((o) => o.id !== option.id);
-      newFormFields[index].options = newOptions;
-      return newFormFields;
-    });
+    const index = formFields.findIndex((f) => f.id === fieldId);
+    const newFormFields = [...formFields];
+    const options = newFormFields[index].options ?? [];
+    const newOptions = options.filter((o) => o.id !== option.id);
+    newFormFields[index].options = newOptions;
+    setFormFields(newFormFields);
   }
 
   function onUpdateOption(fieldId: string, option: SelectOptionType) {
-    setFormFields((prev) => {
-      const index = prev.findIndex((f) => f.id === fieldId);
-      const newFormFields = [...prev];
-      const options = newFormFields[index].options ?? [];
-      const newOptions = options.map((o) => {
-        if (o.id === option.id) {
-          return option;
-        }
-        return o;
-      });
-      newFormFields[index].options = newOptions;
-      return newFormFields;
+    const index = formFields.findIndex((f) => f.id === fieldId);
+    const newFormFields = [...formFields];
+    const options = newFormFields[index].options ?? [];
+    const newOptions = options.map((o) => {
+      if (o.id === option.id) {
+        return option;
+      }
+      return o;
     });
+    newFormFields[index].options = newOptions;
+    setFormFields(newFormFields);
   }
 
   return (
@@ -145,9 +126,9 @@ export function FormFieldsEditor({ formFields: initialFormFields = [] }: { formF
       {formFields.map((formField) => (
         <FormField
           toggleOpen={() => {
-            updateFormField({ isOpen: !formField.isOpen, id: formField.id });
+            toggleCollapse(formField.id);
           }}
-          isOpen={formField.isOpen}
+          isOpen={!collapsedFieldIds.includes(formField.id)}
           formField={formField}
           updateFormField={(updatedFormField) => {
             updateFormField(updatedFormField);
