@@ -49,3 +49,9 @@ export type FormFieldInput = Pick<
 > & {
   options?: SelectOptionType[];
 };
+
+export type FieldAnswerInput = {
+  id?: string;
+  fieldId: string;
+  value: string | string[];
+};

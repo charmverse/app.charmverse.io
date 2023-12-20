@@ -50,6 +50,11 @@ async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWi
         include: {
           reviewers: true
         }
+      },
+      form: {
+        include: {
+          formFields: true
+        }
       }
     }
   });

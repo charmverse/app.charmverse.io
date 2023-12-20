@@ -48,6 +48,10 @@ export type VoteSettings = Pick<Vote, 'type' | 'threshold' | 'maxChoices'> & {
   options: string[];
 };
 
+export type ProposalFormData = {
+  formFields: FormField[] | null;
+};
+
 export type PopulatedEvaluation = ProposalRubricData &
   Omit<ProposalEvaluation, 'voteSettings'> & {
     permissions: ProposalEvaluationPermission[];
@@ -56,7 +60,8 @@ export type PopulatedEvaluation = ProposalRubricData &
   };
 
 export type ProposalWithUsersAndRubric = ProposalWithUsers &
-  ProposalRubricData & {
+  ProposalRubricData &
+  ProposalFormData & {
     evaluations: PopulatedEvaluation[];
     page?: { sourceTemplateId: string | null } | null;
     permissions: ProposalPermissionFlags;

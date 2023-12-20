@@ -5,6 +5,8 @@ import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse
 import request from 'supertest';
 import { v4 } from 'uuid';
 
+import type { FormFieldInput } from 'components/common/form/interfaces';
+import { createForm } from 'lib/form/createForm';
 import { addSpaceOperations } from 'lib/permissions/spaces/addSpaceOperations';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
@@ -64,6 +66,62 @@ describe('GET /api/proposals/[id] - Get proposal', () => {
             userId: reviewer.id
           })
         ]
+      })
+    );
+  });
+
+  it('should return the proposal with the form fields', async () => {
+    const generatedProposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: author.id,
+      authors: [author.id],
+      reviewers: [{ group: 'user', id: reviewer.id }],
+      proposalStatus: 'draft'
+    });
+
+    const fieldsInput: FormFieldInput[] = [
+      {
+        id: v4(),
+        type: 'short_text',
+        name: 'name',
+        description: 'description',
+        index: 0,
+        options: [],
+        private: false,
+        required: true
+      }
+    ];
+    const formId = await createForm(fieldsInput);
+    await prisma.proposal.update({
+      where: { id: generatedProposal.id },
+      data: { formId }
+    });
+
+    const proposal = (
+      await request(baseUrl).get(`/api/proposals/${generatedProposal.id}`).set('Cookie', authorCookie).expect(200)
+    ).body as ProposalWithUsers;
+
+    expect(proposal).toMatchObject(
+      expect.objectContaining({
+        id: expect.any(String),
+        spaceId: space.id,
+        createdBy: author.id,
+        status: 'draft',
+        authors: expect.arrayContaining([
+          expect.objectContaining({
+            proposalId: generatedProposal.id,
+            userId: author.id
+          })
+        ]),
+        reviewers: [
+          expect.objectContaining({
+            id: expect.any(String),
+            roleId: null,
+            proposalId: generatedProposal.id,
+            userId: reviewer.id
+          })
+        ],
+        formFields: expect.arrayContaining(fieldsInput.map((field) => expect.objectContaining({ ...field, formId })))
       })
     );
   });
