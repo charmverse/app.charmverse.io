@@ -1,5 +1,5 @@
 import type { ProposalEvaluationPermission } from '@charmverse/core/prisma';
-import type { PageType } from '@charmverse/core/prisma-client';
+import type { FormFieldAnswer, PageType } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
@@ -22,9 +22,10 @@ import { PropertyLabel } from 'components/common/BoardEditor/components/properti
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
-import { FormFieldInputs } from 'components/common/form/FormFieldInputs';
+import { ControlledFormFieldInputs } from 'components/common/form/FormFieldInputs';
 import { ControlledFormFieldsEditor } from 'components/common/form/FormFieldsEditor';
-import type { FormFieldInput } from 'components/common/form/interfaces';
+import { getInitialFormFieldValue, useFormFields } from 'components/common/form/hooks/useFormFields';
+import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useCharmRouter } from 'hooks/useCharmRouter';
@@ -56,6 +57,7 @@ export type ProposalPageAndPropertiesInput = ProposalPropertiesInput & {
   type: PageType;
   proposalType?: 'structured' | 'free_form';
   formFields?: FormFieldInput[];
+  formAnswers?: FieldAnswerInput[];
 };
 
 const StyledContainer = styled(PageEditorContainer)`
@@ -264,9 +266,18 @@ export function NewProposalPage({
     });
 
   const sourceTemplate = proposalTemplates?.find((template) => template.id === formInputs.proposalTemplateId);
-
   const isStructured = formInputs.proposalType === 'structured' || !!sourceTemplate?.formId;
   const proposalFormFields = formInputs.formFields ?? sourceTemplate?.formFields ?? [];
+
+  const {
+    control: proposalFormFieldControl,
+    isValid: isProposalFormFieldsValid,
+    errors: proposalFormFieldErrors,
+    values,
+    onFormChange
+  } = useFormFields({
+    fields: proposalFormFields
+  });
 
   const [, { width: containerWidth }] = useElementSize();
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
@@ -289,6 +300,17 @@ export function NewProposalPage({
       setReadOnlyEditor(!formInputs.proposalTemplateId);
     }
   }, [formInputs.proposalTemplateId, isTemplateRequired]);
+
+  useEffect(() => {
+    setFormInputs({
+      formAnswers: proposalFormFields
+        .filter((formField) => formField.type !== 'label')
+        .map((proposalFormField) => ({
+          fieldId: proposalFormField.id,
+          value: getInitialFormFieldValue(proposalFormField) as FieldAnswerInput['value']
+        }))
+    });
+  }, [proposalFormFields]);
 
   function updateProposalContent({ doc, rawText }: ICharmEditorOutput) {
     setFormInputs({
@@ -399,13 +421,28 @@ export function NewProposalPage({
                       formFields={proposalFormFields}
                       setFormFields={(formFields) => {
                         setFormInputs({
-                          ...formInputs,
                           formFields
                         });
                       }}
                     />
                   ) : (
-                    <FormFieldInputs formFields={proposalFormFields} />
+                    <ControlledFormFieldInputs
+                      control={proposalFormFieldControl}
+                      errors={proposalFormFieldErrors}
+                      onFormChange={(updatedFormFields) => {
+                        setFormInputs({
+                          formAnswers: formInputs.formAnswers?.map((formAnswer) => {
+                            const updatedFormField = updatedFormFields.find((f) => f.id === formAnswer.fieldId);
+                            return {
+                              ...formAnswer,
+                              value: updatedFormField?.value ?? formAnswer.value
+                            };
+                          })
+                        });
+                        onFormChange(updatedFormFields);
+                      }}
+                      formFields={proposalFormFields}
+                    />
                   )}
                 </>
               ) : (
@@ -440,8 +477,12 @@ export function NewProposalPage({
         </Box>
         <StickyFooterContainer>
           <Button
-            disabled={Boolean(disabledTooltip) || isCreatingProposal}
-            disabledTooltip={disabledTooltip}
+            disabled={Boolean(disabledTooltip) || isCreatingProposal || !isProposalFormFieldsValid}
+            disabledTooltip={
+              !isProposalFormFieldsValid
+                ? 'Please provide correct values for all proposal form fields'
+                : disabledTooltip
+            }
             onClick={saveForm}
             loading={isCreatingProposal}
             data-test='create-proposal-button'

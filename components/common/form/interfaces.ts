@@ -53,5 +53,5 @@ export type FormFieldInput = Pick<
 export type FieldAnswerInput = {
   id?: string;
   fieldId: string;
-  value: string | string[];
+  value: FormFieldValue;
 };

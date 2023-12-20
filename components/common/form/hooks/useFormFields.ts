@@ -11,7 +11,25 @@ import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isUUID, isUrl, isValidEmail } from 'lib/utilities/strings';
 
-import type { FieldType } from '../interfaces';
+import type { FieldType, FormFieldValue } from '../interfaces';
+
+export function getInitialFormFieldValue(prop: { type: FieldType; value?: FormFieldValue }) {
+  const value =
+    prop.type === 'multiselect' || prop.type === 'person'
+      ? // Convert to array if not already as yup expects array
+        Array.isArray(prop.value)
+        ? prop.value
+        : []
+      : prop.type === 'long_text'
+      ? // convert to content and contentText for prosemirror document
+        prop.value || {
+          content: emptyDocument,
+          contentText: ''
+        }
+      : prop.value || '';
+
+  return value;
+}
 
 export function useFormFields({
   fields,
@@ -37,20 +55,7 @@ export function useFormFields({
     defaultValues: fields
       .filter((field) => field.type !== 'label')
       .reduce<Record<string, Prisma.JsonValue>>((acc, prop) => {
-        const value =
-          prop.type === 'multiselect' || prop.type === 'person'
-            ? // Convert to array if not already as yup expects array
-              Array.isArray(prop.value)
-              ? prop.value
-              : []
-            : prop.type === 'long_text'
-            ? prop.value || {
-                content: emptyDocument,
-                contentText: ''
-              }
-            : prop.value || '';
-        acc[prop.id] = value;
-
+        acc[prop.id] = getInitialFormFieldValue(prop);
         return acc;
       }, {}),
     resolver: yupResolver(
