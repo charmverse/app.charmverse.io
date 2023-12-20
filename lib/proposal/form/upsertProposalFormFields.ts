@@ -49,9 +49,9 @@ export async function upsertProposalFormFields({
   const updatedFormFields = await prisma.$transaction(async (tx) => {
     // Delete fields that do not exist anymore in payload
     if (existingFields.length > 0) {
-      await tx.proposalRubricCriteria.deleteMany({
+      await tx.formField.deleteMany({
         where: {
-          proposalId,
+          formId,
           id: {
             in: existingFields.filter((f) => !formFields.some((uf) => uf.id === f.id)).map((c) => c.id)
           }
