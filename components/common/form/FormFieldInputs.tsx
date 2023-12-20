@@ -9,7 +9,7 @@ import { fieldTypePlaceholderRecord } from './constants';
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
 import type { SelectOptionType } from './fields/Select/interfaces';
 import { useFormFields } from './hooks/useFormFields';
-import type { TFormFieldInput } from './interfaces';
+import type { FormFieldValue } from './interfaces';
 
 const FormFieldInputsContainer = styled(Stack)`
   border: 1px solid ${(props) => props.theme.palette.divider};
@@ -24,7 +24,7 @@ export function FormFieldInputs({
   disabled
 }: {
   formFields: (Pick<FormField, 'type' | 'name' | 'required' | 'options' | 'id' | 'description' | 'private'> & {
-    value: TFormFieldInput['value'];
+    value: FormFieldValue;
     placeholder?: string;
   })[];
   disabled?: boolean;
@@ -43,7 +43,7 @@ export function FormFieldInputs({
           render={({ field }) => (
             <FieldTypeRenderer
               {...field}
-              value={(field.value ?? '') as TFormFieldInput['value']}
+              value={(field.value ?? '') as FormFieldValue}
               placeholder={formField.placeholder ?? fieldTypePlaceholderRecord[formField.type]}
               endAdornment={formField.private ? <Chip sx={{ ml: 1 }} label='Private' size='small' /> : undefined}
               description={formField.description as PageContent}
