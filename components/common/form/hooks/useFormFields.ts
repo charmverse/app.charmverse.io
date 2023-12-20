@@ -1,4 +1,3 @@
-import type { Prisma } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { isValidName } from 'ethers/lib/utils';
 import type { FieldValues } from 'react-hook-form';
@@ -54,7 +53,7 @@ export function useFormFields({
     mode: 'onChange',
     defaultValues: fields
       .filter((field) => field.type !== 'label')
-      .reduce<Record<string, Prisma.JsonValue>>((acc, prop) => {
+      .reduce<Record<string, FormFieldValue>>((acc, prop) => {
         acc[prop.id] = getInitialFormFieldValue(prop);
         return acc;
       }, {}),
@@ -99,10 +98,6 @@ export function useFormFields({
 
                 return value ? !Number.isNaN(value) : true;
               });
-              break;
-            }
-            case 'label': {
-              acc[property.id] = yup.string();
               break;
             }
             case 'select': {
@@ -179,9 +174,9 @@ export function useFormFields({
     )
   });
 
-  const values = getValues();
+  const values = getValues() as Record<string, FormFieldValue>;
 
-  function onFormChange(updatedFields: { id: string; value: Prisma.JsonValue }[]) {
+  function onFormChange(updatedFields: { id: string; value: FormFieldValue }[]) {
     updatedFields.forEach((updatedField) => {
       setValue(updatedField.id, updatedField.value, {
         shouldDirty: true,

@@ -23,6 +23,7 @@ import { FormFieldInputs } from 'components/common/form/FormFieldInputs';
 import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import { EvaluationStepper } from 'components/proposals/ProposalPage/components/EvaluationStepper/EvaluationStepper';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
+import { StructuredProposalFormFieldInputs } from 'components/proposals/ProposalPage/components/StructuredProposalFormFieldInputs';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmEditor } from 'hooks/useCharmEditor';
@@ -571,9 +572,9 @@ function DocumentPage({
                       formFields={proposal?.formFields ?? []}
                     />
                   ) : (
-                    <FormFieldInputs
+                    <StructuredProposalFormFieldInputs
+                      proposalId={proposal.id}
                       formFields={proposal?.formFields ?? []}
-                      disabled={proposal.createdBy !== user?.id}
                     />
                   )}
                 </Box>

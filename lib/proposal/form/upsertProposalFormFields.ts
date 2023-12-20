@@ -31,6 +31,10 @@ export async function upsertProposalFormFields({
     throw new InvalidInputError(`Proposal with id: ${proposalId} is not a template`);
   }
 
+  if (formFields.some((f) => f.type === 'label' && f.required)) {
+    throw new InvalidInputError(`Labels cannot be required`);
+  }
+
   const { formId } = proposal;
 
   if (!formId) {

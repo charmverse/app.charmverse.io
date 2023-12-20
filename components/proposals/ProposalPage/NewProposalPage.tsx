@@ -1,5 +1,5 @@
 import type { ProposalEvaluationPermission } from '@charmverse/core/prisma';
-import type { FormFieldAnswer, PageType } from '@charmverse/core/prisma-client';
+import type { PageType } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';

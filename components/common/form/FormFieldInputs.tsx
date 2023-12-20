@@ -1,10 +1,14 @@
-import type { FormField, Prisma } from '@charmverse/core/prisma-client';
+import type { FormField } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
-import { Chip, Stack } from '@mui/material';
+import { Box, Chip, Stack } from '@mui/material';
+import { useState } from 'react';
 import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+
+import { Button } from '../Button';
 
 import { fieldTypePlaceholderRecord } from './constants';
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
@@ -26,14 +30,16 @@ type FormFieldInputsProps = {
     options?: SelectOptionType[];
   })[];
   disabled?: boolean;
-  errors: FieldErrors<Record<string, Prisma.JsonValue>>;
-  control: Control<Record<string, Prisma.JsonValue>, any>;
+  errors: FieldErrors<Record<string, FormFieldValue>>;
+  control: Control<Record<string, FormFieldValue>, any>;
   onFormChange: (
     updatedFields: {
       id: string;
       value: FormFieldValue;
     }[]
   ) => void;
+  onSave?: (answers: { id: string; value: FormFieldValue }[]) => Promise<void>;
+  values?: Record<string, FormFieldValue>;
 };
 
 export function ControlledFormFieldInputs({
@@ -42,7 +48,7 @@ export function ControlledFormFieldInputs({
   control,
   errors,
   onFormChange
-}: FormFieldInputsProps) {
+}: Omit<FormFieldInputsProps, 'onSave'>) {
   return (
     <FormFieldInputsBase
       control={control}
@@ -56,9 +62,10 @@ export function ControlledFormFieldInputs({
 
 export function FormFieldInputs({
   formFields,
-  disabled
+  disabled,
+  onSave
 }: Omit<FormFieldInputsProps, 'control' | 'errors' | 'onFormChange'>) {
-  const { control, errors, onFormChange } = useFormFields({
+  const { control, errors, onFormChange, values } = useFormFields({
     fields: formFields
   });
 
@@ -69,43 +76,97 @@ export function FormFieldInputs({
       formFields={formFields}
       onFormChange={onFormChange}
       disabled={disabled}
+      onSave={onSave}
+      values={values}
     />
   );
 }
 
-function FormFieldInputsBase({ formFields, disabled, control, errors, onFormChange }: FormFieldInputsProps) {
+function FormFieldInputsBase({
+  onSave,
+  formFields,
+  values,
+  disabled,
+  control,
+  errors,
+  onFormChange
+}: FormFieldInputsProps) {
+  const [isUpdatingFormFieldAnswers, setIsUpdatingFormFieldAnswers] = useState(false);
+  const [isFormDirty, setIsFormDirty] = useState(false);
+  const { showMessage } = useSnackbar();
+
+  async function saveFormFieldAnswers() {
+    setIsUpdatingFormFieldAnswers(true);
+    try {
+      await onSave?.(Object.entries(values ?? {}).map(([id, value]) => ({ id, value })));
+      showMessage('Answers saved successfully');
+    } catch (_) {
+      //
+    } finally {
+      setIsFormDirty(false);
+      setIsUpdatingFormFieldAnswers(false);
+    }
+  }
+
+  const disabledTooltip =
+    Object.keys(errors).length !== 0
+      ? 'Please fix the errors before saving'
+      : !isFormDirty
+      ? 'No changes to save'
+      : undefined;
+
   return (
-    <FormFieldInputsContainer>
-      {formFields.map((formField) => (
-        <Controller
-          key={formField.id}
-          name={formField.id}
-          control={control}
-          render={({ field }) => (
-            <FieldTypeRenderer
-              {...field}
-              value={(field.value ?? '') as FormFieldValue}
-              placeholder={fieldTypePlaceholderRecord[formField.type]}
-              endAdornment={formField.private ? <Chip sx={{ ml: 1 }} label='Private' size='small' /> : undefined}
-              description={formField.description as PageContent}
-              disabled={disabled}
-              type={formField.type}
-              label={formField.name}
-              options={formField.options as SelectOptionType[]}
-              error={errors[formField.id] as any}
-              required={formField.required}
-              onChange={(e) => {
-                onFormChange([
-                  {
-                    id: formField.id,
-                    value: typeof e?.target?.value === 'string' ? e.target.value : e
-                  }
-                ]);
-              }}
-            />
-          )}
-        />
-      ))}
-    </FormFieldInputsContainer>
+    <Stack gap={1}>
+      <FormFieldInputsContainer>
+        {formFields.map((formField) => (
+          <Controller
+            key={formField.id}
+            name={formField.id}
+            control={control}
+            render={({ field }) => (
+              <FieldTypeRenderer
+                {...field}
+                value={(field.value ?? '') as FormFieldValue}
+                placeholder={fieldTypePlaceholderRecord[formField.type]}
+                endAdornment={formField.private ? <Chip sx={{ ml: 1 }} label='Private' size='small' /> : undefined}
+                description={formField.description as PageContent}
+                disabled={disabled}
+                type={formField.type}
+                label={formField.name}
+                options={formField.options as SelectOptionType[]}
+                error={errors[formField.id] as any}
+                required={formField.required}
+                onChange={(e) => {
+                  setIsFormDirty(true);
+                  onFormChange([
+                    {
+                      id: formField.id,
+                      value: typeof e?.target?.value === 'string' ? e.target.value : e
+                    }
+                  ]);
+                }}
+              />
+            )}
+          />
+        ))}
+      </FormFieldInputsContainer>
+      {onSave && (
+        <Box
+          sx={{
+            width: 'fit-content',
+            mb: 10
+          }}
+        >
+          <Button
+            onClick={saveFormFieldAnswers}
+            disabledTooltip={disabledTooltip}
+            loading={isUpdatingFormFieldAnswers}
+            disabled={!!disabledTooltip}
+          >
+            Save
+          </Button>
+        </Box>
+      )}
+    </Stack>
   );
 }
