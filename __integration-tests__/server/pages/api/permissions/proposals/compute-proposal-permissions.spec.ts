@@ -157,7 +157,7 @@ describe('GET /api/permissions/proposals/compute-proposal-permissions - Compute 
   let secondReviewerCookie: string;
 
   beforeAll(async () => {
-    ({ space, user } = await testUtilsUser.generateUserAndSpace({ isAdmin: false, spaceName: `cvt-${uuid()}` }));
+    ({ space, user } = await testUtilsUser.generateUserAndSpace({ isAdmin: false, domain: `cvt-${uuid()}` }));
     reviewer = await testUtilsUser.generateSpaceUser({
       spaceId: space.id
     });
@@ -166,53 +166,14 @@ describe('GET /api/permissions/proposals/compute-proposal-permissions - Compute 
     });
 
     userCookie = await loginUser(user.id);
-
     reviewerCookie = await loginUser(reviewer.id);
     secondReviewerCookie = await loginUser(secondReviewer.id);
   });
-  it('should use the new proposal permissions model if use flag is true', async () => {
+  it('should use the new proposal permissions model', async () => {
     const proposalCategoryWithoutPermissions = await testUtilsProposals.generateProposalCategory({
       spaceId: space.id,
       proposalCategoryPermissions: []
     });
-
-    const userDraftProposal = await testUtilsProposals.generateProposal({
-      spaceId: space.id,
-      userId: user.id,
-      categoryId: proposalCategoryWithoutPermissions.id,
-      proposalStatus: 'draft',
-      evaluationInputs: [{ evaluationType: 'rubric', permissions: [], reviewers: [{ group: 'user', id: reviewer.id }] }]
-    });
-
-    const userDraftPermissions = (
-      await request(baseUrl)
-        .post('/api/permissions/proposals/compute-proposal-permissions')
-        .set('Cookie', userCookie)
-        .send({
-          resourceId: userDraftProposal.id
-        } as PermissionCompute)
-        .expect(200)
-    ).body as ProposalPermissionFlags;
-
-    const reviewerDraftPermissions = (
-      await request(baseUrl)
-        .post('/api/permissions/proposals/compute-proposal-permissions')
-        .set('Cookie', reviewerCookie)
-        .send({
-          resourceId: userDraftProposal.id
-        } as PermissionCompute)
-        .expect(200)
-    ).body as ProposalPermissionFlags;
-
-    const secondReviewerDraftPermissions = (
-      await request(baseUrl)
-        .post('/api/permissions/proposals/compute-proposal-permissions')
-        .set('Cookie', secondReviewerCookie)
-        .send({
-          resourceId: userDraftProposal.id
-        } as PermissionCompute)
-        .expect(200)
-    ).body as ProposalPermissionFlags;
 
     const userInReviewProposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
@@ -220,8 +181,17 @@ describe('GET /api/permissions/proposals/compute-proposal-permissions - Compute 
       categoryId: proposalCategoryWithoutPermissions.id,
       proposalStatus: 'published',
       evaluationInputs: [
-        { evaluationType: 'rubric', permissions: [], reviewers: [{ group: 'user', id: reviewer.id }], result: 'pass' },
-        { evaluationType: 'rubric', permissions: [], reviewers: [{ group: 'user', id: secondReviewer.id }] }
+        {
+          evaluationType: 'rubric',
+          permissions: [],
+          reviewers: [{ group: 'user', id: reviewer.id }],
+          result: 'pass'
+        },
+        {
+          evaluationType: 'rubric',
+          permissions: [],
+          reviewers: [{ group: 'user', id: secondReviewer.id }]
+        }
       ]
     });
 
@@ -235,6 +205,8 @@ describe('GET /api/permissions/proposals/compute-proposal-permissions - Compute 
         .expect(200)
     ).body as ProposalPermissionFlags;
 
+    expect(userInReviewProposalPermissions.view).toEqual(true);
+
     const reviewerInReviewProposalPermissions = (
       await request(baseUrl)
         .post('/api/permissions/proposals/compute-proposal-permissions')
@@ -244,6 +216,8 @@ describe('GET /api/permissions/proposals/compute-proposal-permissions - Compute 
         } as PermissionCompute)
         .expect(200)
     ).body as ProposalPermissionFlags;
+
+    expect(reviewerInReviewProposalPermissions.view).toEqual(false);
 
     const secondReviewerInReviewProposalPermissions = (
       await request(baseUrl)
@@ -255,10 +229,6 @@ describe('GET /api/permissions/proposals/compute-proposal-permissions - Compute 
         .expect(200)
     ).body as ProposalPermissionFlags;
 
-    expect([
-      userInReviewProposalPermissions.view,
-      reviewerInReviewProposalPermissions.view,
-      secondReviewerInReviewProposalPermissions.view
-    ]).toEqual([true, false, true]);
+    expect(secondReviewerInReviewProposalPermissions.view).toEqual(true);
   });
 });

@@ -6,6 +6,7 @@ import request from 'supertest';
 import { v4 as uuid } from 'uuid';
 
 import { baseUrl, loginUser } from 'testing/mockApiCall';
+import { compareMissingExpectedPages } from 'testing/pages';
 
 describe('GET /api/spaces/[id]/pages - Get Pages in a space', () => {
   let space: Space;
@@ -165,14 +166,6 @@ describe('GET /api/spaces/[id]/pages - Get Pages in a space using new proposal e
       proposalCategoryPermissions: [{ assignee: { group: 'space', id: space.id }, permissionLevel: 'full_access' }]
     });
 
-    proposalVisibleInClassicModel = await testUtilsProposals.generateProposal({
-      spaceId: space.id,
-      userId: admin.id,
-      title: 'proposal visible in classic model',
-      proposalStatus: 'discussion',
-      categoryId: proposalCategoryWithSpacePermission.id
-    });
-
     proposalVisibleInProposalsEvaluationPermissionsModel = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: admin.id,
@@ -188,6 +181,15 @@ describe('GET /api/spaces/[id]/pages - Get Pages in a space using new proposal e
     const response = (
       await request(baseUrl).get(`/api/spaces/${space.id}/pages`).set('Cookie', reviewerUserCookie).expect(200)
     ).body as PageMeta[];
+
+    await compareMissingExpectedPages({
+      expected: arrayUtils.extractUuids([
+        pageWithSpacePermission,
+        publicPage,
+        proposalVisibleInProposalsEvaluationPermissionsModel
+      ]),
+      received: arrayUtils.extractUuids(response)
+    });
 
     const expectedPageIds = stringUtils.sortUuids(
       arrayUtils.extractUuids([
