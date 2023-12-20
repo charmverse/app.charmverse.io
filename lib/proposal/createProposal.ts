@@ -9,6 +9,7 @@ import { v4 as uuid } from 'uuid';
 
 import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
 import { createForm } from 'lib/form/createForm';
+import { upsertProposalFormAnswers } from 'lib/form/upsertProposalFormAnswers';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { createPage } from 'lib/pages/server/createPage';
 import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
@@ -229,6 +230,7 @@ export async function createProposal({
         rubricCriteria
       })
     : [];
+
   await Promise.all(
     evaluations.map(async (evaluation, index) => {
       if (evaluation.rubricCriteria.length > 0) {
@@ -244,6 +246,11 @@ export async function createProposal({
   const proposalFormFields = proposal.formId
     ? await prisma.formField.findMany({ where: { formId: proposal.formId } })
     : null;
+
+  const proposalFormAnswers =
+    formId && formAnswers?.length && page.type === 'proposal'
+      ? await upsertProposalFormAnswers({ formId, proposalId, answers: formAnswers })
+      : null;
 
   await publishProposalEvent({
     scope: WebhookEventNames.ProposalStatusChanged,
@@ -262,7 +269,8 @@ export async function createProposal({
       rubricCriteria: upsertedCriteria,
       draftRubricAnswers: [],
       rubricAnswers: [],
-      formFields: proposalFormFields
+      formFields: proposalFormFields,
+      formAnswers: proposalFormAnswers
     }
   };
 }
