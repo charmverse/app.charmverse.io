@@ -43,7 +43,7 @@ export function FormFieldsEditor({
   formFields: FormFieldInput[];
   formId: string;
 }) {
-  const [formFields, setFormFields] = useState(initialFormFields);
+  const [formFields, setFormFields] = useState([...initialFormFields]);
   const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>([]);
 
   const saveFormFields = () => {

@@ -551,7 +551,7 @@ function DocumentPage({
             top={pageTop}
             fullWidth={isSmallScreen || (page.fullWidth ?? false)}
           >
-            {proposal && proposal?.formId ? (
+            {proposal && proposal.formId ? (
               <>
                 <DocumentPageContent
                   editorState={editorState}
@@ -568,11 +568,11 @@ function DocumentPage({
                     <FormFieldsEditor
                       proposalId={proposal.id}
                       formId={proposal.formId}
-                      formFields={proposal.form?.formFields ?? []}
+                      formFields={proposal?.formFields ?? []}
                     />
                   ) : (
                     <FormFieldInputs
-                      formFields={proposal.form?.formFields ?? []}
+                      formFields={proposal?.formFields ?? []}
                       disabled={proposal.createdBy !== user?.id}
                     />
                   )}

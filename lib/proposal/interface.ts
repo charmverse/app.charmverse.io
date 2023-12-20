@@ -49,7 +49,11 @@ export type VoteSettings = Pick<Vote, 'type' | 'threshold' | 'maxChoices'> & {
 };
 
 export type ProposalFormData = {
-  formFields: FormField[] | null;
+  formFields:
+    | (Omit<FormField, 'options'> & {
+        options: SelectOptionType[];
+      })[]
+    | null;
 };
 
 export type PopulatedEvaluation = ProposalRubricData &
