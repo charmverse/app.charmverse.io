@@ -57,7 +57,7 @@ type SidebarProps = {
   proposalEvaluationId?: string | null;
   isNewProposal?: boolean;
   isProposalTemplate?: boolean;
-  readOnlyReviewers: boolean;
+  readOnlyReviewers?: boolean;
 };
 
 function PageSidebarComponent(props: SidebarProps) {
