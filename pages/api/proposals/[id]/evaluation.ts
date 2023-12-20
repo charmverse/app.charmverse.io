@@ -4,9 +4,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch } from 'lib/middleware';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
-import { updateProposalEvaluation } from 'lib/proposal/updateProposalEvaluation';
 import type { UpdateEvaluationRequest } from 'lib/proposal/updateProposalEvaluation';
+import { updateProposalEvaluation } from 'lib/proposal/updateProposalEvaluation';
 import { withSessionRoute } from 'lib/session/withSession';
 import { AdministratorOnlyError } from 'lib/users/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
@@ -57,7 +58,7 @@ async function updateEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
   }
 
   // A proposal can only be updated when its in draft or discussion status and only the proposal author can update it
-  const proposalPermissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
+  const proposalPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
     resourceId: proposal.id,
     useProposalEvaluationPermissions: proposal?.status === 'published',
     userId
