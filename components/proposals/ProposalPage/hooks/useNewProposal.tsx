@@ -156,14 +156,18 @@ function getEvaluationFormError(evaluation: ProposalEvaluationValues): string | 
       return false;
     case 'rubric':
       return evaluation.reviewers.length === 0
-        ? 'Reviewers are required'
+        ? `Reviewers are required for the "${evaluation.title}" step`
         : evaluation.rubricCriteria.length === 0
-        ? 'Rubric criteria are required'
+        ? `At least one rubric criteria is required for the "${evaluation.title}" step`
         : false;
     case 'pass_fail':
-      return evaluation.reviewers.length === 0 ? 'Reviewers are required' : false;
+      return evaluation.reviewers.length === 0 ? `Reviewers are required for the "${evaluation.title}" step` : false;
     case 'vote':
-      return !evaluation.voteSettings ? 'Vote details are required' : false;
+      return evaluation.reviewers.length === 0
+        ? `Voters are required for the "${evaluation.title}" step`
+        : !evaluation.voteSettings
+        ? `Vote details are required for the "${evaluation.title}" step`
+        : false;
     default:
       return false;
   }
