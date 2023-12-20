@@ -39,6 +39,7 @@ export function EvaluationSidebar({
     setActiveEvaluationId(evaluationIdFromContext);
   }, [evaluationIdFromContext]);
 
+  // show default evaluation if we are not on a specific evaluation
   useEffect(() => {
     if (evaluationIdFromContext) {
       return;

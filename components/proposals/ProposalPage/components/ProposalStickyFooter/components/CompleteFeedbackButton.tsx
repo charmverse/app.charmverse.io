@@ -6,8 +6,8 @@ import { useSnackbar } from 'hooks/useSnackbar';
 
 export type Props = {
   proposalId: string;
+  currentStep?: { id: string; title: string };
   hasMovePermission: boolean;
-  currentStep?: { id: string };
   nextStep?: { title: string };
   onSubmit?: VoidFunction;
 };
@@ -38,7 +38,7 @@ export function CompleteFeedbackButton({ proposalId, hasMovePermission, currentS
       disabled={!!disabledTooltip}
       disabledTooltip={disabledTooltip}
     >
-      Move to {nextStep?.title}
+      {nextStep ? `Move to ${nextStep.title}` : `Complete ${currentStep?.title}`}
     </Button>
   );
 }
