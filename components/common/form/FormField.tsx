@@ -198,9 +198,10 @@ function ExpandedFormField({
 export function FormField(
   props: FormFieldProps & {
     isOpen?: boolean;
+    readOnly?: boolean;
   }
 ) {
-  const { isOpen, formField, toggleOpen, updateFormField } = props;
+  const { readOnly, isOpen, formField, toggleOpen, updateFormField } = props;
 
   const [{ offset }, drag, dragPreview] = useDrag(() => ({
     type: 'item',
@@ -247,24 +248,28 @@ export function FormField(
   const isAdjacentActive = canDrop && isOverCurrent;
 
   return (
-    <Stack flexDirection='row' gap={0.5} alignItems='flex-start' ref={mergeRefs([dragPreview, drop])}>
-      <div ref={drag}>
-        <DragIndicatorIcon
-          fontSize='small'
-          color='secondary'
-          sx={{
-            cursor: 'pointer'
-          }}
-        />
-      </div>
+    <Stack flexDirection='row' gap={0.5} alignItems='flex-start' ref={readOnly ? null : mergeRefs([dragPreview, drop])}>
+      {!readOnly && (
+        <div ref={readOnly ? null : drag}>
+          <DragIndicatorIcon
+            fontSize='small'
+            color='secondary'
+            sx={{
+              cursor: 'pointer'
+            }}
+          />
+        </div>
+      )}
       <FormFieldContainer dragDirection={isAdjacentActive ? ((offset?.y ?? 0) < 0 ? 'top' : 'bottom') : undefined}>
-        {isOpen ? (
-          <ExpandMoreIcon onClick={toggleOpen} sx={{ cursor: 'pointer', mt: 1 }} />
-        ) : (
-          <ChevronRightIcon onClick={toggleOpen} sx={{ cursor: 'pointer' }} />
-        )}
-        <Stack gap={1} width='100%'>
-          {!isOpen ? (
+        {!readOnly ? (
+          isOpen ? (
+            <ExpandMoreIcon onClick={toggleOpen} sx={{ cursor: 'pointer', mt: 1 }} />
+          ) : (
+            <ChevronRightIcon onClick={toggleOpen} sx={{ cursor: 'pointer' }} />
+          )
+        ) : null}
+        <Stack gap={1} width='100%' ml={readOnly ? 1 : 0}>
+          {!isOpen || readOnly ? (
             <FieldTypeRenderer
               fieldWrapperSx={{
                 my: 0

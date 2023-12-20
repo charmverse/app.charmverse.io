@@ -565,7 +565,11 @@ function DocumentPage({
                 />
                 <Box mb={10}>
                   {page.type === 'proposal_template' ? (
-                    <FormFieldsEditor proposalId={proposal.id} formFields={proposal?.formFields ?? []} />
+                    <FormFieldsEditor
+                      readOnly={proposal.createdBy !== user?.id}
+                      proposalId={proposal.id}
+                      formFields={proposal?.formFields ?? []}
+                    />
                   ) : (
                     <FormFieldInputs
                       formFields={proposal?.formFields ?? []}

@@ -36,10 +36,12 @@ export function ControlledFormFieldsEditor({
 
 export function FormFieldsEditor({
   proposalId,
-  formFields: initialFormFields
+  formFields: initialFormFields,
+  readOnly
 }: {
   proposalId: string;
   formFields: FormFieldInput[];
+  readOnly?: boolean;
 }) {
   const [formFields, setFormFields] = useState([...initialFormFields]);
   const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>(formFields.map((field) => field.id));
@@ -61,6 +63,7 @@ export function FormFieldsEditor({
           setCollapsedFieldIds([...collapsedFieldIds, fieldId]);
         }
       }}
+      readOnly={readOnly}
     />
   );
 }
@@ -70,13 +73,15 @@ function FormFieldsEditorBase({
   setFormFields,
   collapsedFieldIds,
   toggleCollapse,
-  onSave
+  onSave,
+  readOnly
 }: {
   formFields: FormFieldInput[];
   setFormFields: (updatedFormFields: FormFieldInput[]) => void;
   collapsedFieldIds: string[];
   toggleCollapse: (fieldId: string) => void;
   onSave?: VoidFunction | (() => Promise<void>);
+  readOnly?: boolean;
 }) {
   const [isFormDirty, setIsFormDirty] = useState(false);
   const [isUpdatingFormFields, setIsUpdatingFormFields] = useState(false);
@@ -220,6 +225,7 @@ function FormFieldsEditorBase({
     <Stack gap={1}>
       {formFields.map((formField) => (
         <FormField
+          readOnly={readOnly}
           toggleOpen={() => {
             toggleCollapse(formField.id);
           }}
@@ -242,19 +248,21 @@ function FormFieldsEditorBase({
           }}
         />
       ))}
-      <Button
-        sx={{
-          width: 'fit-content'
-        }}
-        startIcon={<AddIcon fontSize='small' />}
-        variant='text'
-        size='small'
-        color='secondary'
-        onClick={addNewFormField}
-      >
-        Add an input
-      </Button>
-      {formFields.length !== 0 && onSave && (
+      {!readOnly && (
+        <Button
+          sx={{
+            width: 'fit-content'
+          }}
+          startIcon={<AddIcon fontSize='small' />}
+          variant='text'
+          size='small'
+          color='secondary'
+          onClick={addNewFormField}
+        >
+          Add an input
+        </Button>
+      )}
+      {formFields.length !== 0 && onSave && !readOnly && (
         <Box
           sx={{
             width: 'fit-content'
