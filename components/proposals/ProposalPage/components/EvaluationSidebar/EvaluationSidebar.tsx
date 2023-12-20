@@ -80,7 +80,7 @@ export function EvaluationSidebar({
       )}
       {evaluation?.type === 'rubric' && <RubricSidebar {...{ proposal, isCurrent, evaluation, refreshProposal }} />}
       {evaluation?.type === 'vote' && (
-        <VoteSidebar pageId={pageId} proposal={proposal} isCurrent={isCurrent} evaluation={evaluation} />
+        <VoteSidebar pageId={pageId!} proposal={proposal} isCurrent={isCurrent} evaluation={evaluation} />
       )}
     </>
   );

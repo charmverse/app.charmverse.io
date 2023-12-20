@@ -122,3 +122,7 @@ export function useDeleteProposalBlocks(spaceId: string) {
 export function useCreateProposalRewards(proposalId: string) {
   return usePOST<undefined, ProposalWithUsersAndRubric>(`/api/proposals/${proposalId}/rewards`);
 }
+
+export function useUpdateSnapshotProposal({ proposalId }: { proposalId: MaybeString }) {
+  return usePUT<{ snapshotProposalId: string | null; evaluationId: string }>(`/api/proposals/${proposalId}/snapshot`);
+}

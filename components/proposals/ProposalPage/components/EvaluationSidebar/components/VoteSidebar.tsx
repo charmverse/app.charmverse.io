@@ -13,7 +13,7 @@ import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/propos
 
 export type Props = {
   isCurrent: boolean;
-  pageId?: string;
+  pageId: string;
   proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'permissions'>;
   evaluation: PopulatedEvaluation;
 };
@@ -64,7 +64,9 @@ export function VoteSidebar({ pageId, isCurrent, proposal, evaluation }: Props) 
                 </Button>
               )}
               onPublish={onPublishToSnapshot}
-              pageId={proposal!.id}
+              pageId={pageId!}
+              evaluationId={evaluation.id}
+              proposalId={proposal!.id}
               snapshotProposalId={evaluation.snapshotId}
             />
           </span>

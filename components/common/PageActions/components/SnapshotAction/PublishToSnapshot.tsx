@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
+import { useUpdateSnapshotProposal } from 'charmClient/hooks/proposals';
 import Link from 'components/common/Link';
 import { LoadingIcon } from 'components/common/LoadingComponent';
 import { Modal } from 'components/common/Modal';
@@ -16,21 +17,41 @@ import { PublishingForm } from './PublishingForm';
 
 interface Props {
   pageId: string;
+  evaluationId: string;
+  proposalId: string;
   snapshotProposalId: string | null;
   renderContent: (props: { onClick?: () => void; label: string; icon: ReactNode }) => ReactNode;
   onPublish?: () => void;
 }
 
-export function PublishToSnapshot({ pageId, snapshotProposalId, renderContent, onPublish = () => null }: Props) {
+export function PublishToSnapshot({
+  pageId,
+  snapshotProposalId,
+  renderContent,
+  evaluationId,
+  proposalId,
+  onPublish = () => null
+}: Props) {
   const [checkingProposal, setCheckingProposal] = useState(!!snapshotProposalId);
   const [proposal, setProposal] = useState<SnapshotProposal | null>(null);
   const { space: currentSpace } = useCurrentSpace();
+  const { trigger: updateProposalEvaluation } = useUpdateSnapshotProposal({ proposalId });
 
   const { isOpen, open, close } = usePopupState({ variant: 'popover', popupId: 'publish-proposal' });
 
-  async function verifyProposal(proposalId: string) {
-    const snapshotProposal = await getSnapshotProposal(proposalId);
+  async function verifyProposal(snapshotId: string) {
+    const snapshotProposal = await getSnapshotProposal(snapshotId);
     if (!snapshotProposal) {
+      if (evaluationId) {
+        await updateProposalEvaluation({
+          evaluationId,
+          snapshotProposalId: null
+        });
+      } else {
+        await charmClient.updatePageSnapshotData(pageId, {
+          snapshotProposalId: null
+        });
+      }
       await charmClient.updatePageSnapshotData(pageId, { snapshotProposalId: null });
     }
     return snapshotProposal;
@@ -73,6 +94,8 @@ export function PublishToSnapshot({ pageId, snapshotProposalId, renderContent, o
             title={`Publish to Snapshot ${currentSpace?.snapshotDomain ? `(${currentSpace.snapshotDomain})` : ''}`}
           >
             <PublishingForm
+              evaluationId={evaluationId}
+              proposalId={proposalId}
               onSubmit={() => {
                 close();
                 onPublish();
