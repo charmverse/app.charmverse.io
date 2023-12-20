@@ -41,6 +41,8 @@ export function GoBackButton({
       if (!previousStep) {
         // handle draft, which does not have a evaluation step to go to
         await updateProposalStatusOnly({ newStatus: 'draft' });
+      } else {
+        await updateProposalEvaluation({ evaluationId: previousStep.id, result: null });
       }
     } catch (error) {
       showMessage((error as Error).message, 'error');
