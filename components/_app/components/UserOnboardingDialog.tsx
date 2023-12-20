@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 
 import { ConnectedAccounts } from 'components/_app/components/ConnectedAccounts';
 import { Button } from 'components/common/Button';
+import type { FormFieldValue } from 'components/common/form/interfaces';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { MemberPropertiesForm } from 'components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesForm';
 import { DialogContainer } from 'components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesFormDialog';
@@ -228,7 +229,9 @@ function UserOnboardingDialog({
             errors={memberPropertiesErrors}
             refreshPropertyValues={refreshPropertyValues}
             onChange={(values) =>
-              onMemberPropertiesChange(values.map(({ memberPropertyId, value }) => ({ id: memberPropertyId, value })))
+              onMemberPropertiesChange(
+                values.map(({ memberPropertyId, value }) => ({ id: memberPropertyId, value: value as FormFieldValue }))
+              )
             }
             userId={currentUser.id}
             showCollectionOptions
