@@ -114,6 +114,7 @@ function DocumentPage({
   const {
     proposal,
     permissions: proposalPermissions,
+    currentEvaluation,
     evaluationToShowInSidebar,
     refreshProposal,
     onChangeEvaluation
