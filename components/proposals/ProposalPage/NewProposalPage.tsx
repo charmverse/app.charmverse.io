@@ -113,9 +113,8 @@ export function NewProposalPage({
     }
   }, [formInputs.proposalTemplateId, isTemplateRequired]);
 
-  const readOnlyReviewers = !!proposalTemplates?.some(
-    (t) => t.id === formInputs?.proposalTemplateId && t.reviewers.length > 0
-  );
+  const readOnlyReviewers = !!proposalTemplates?.some((t) => t.id === formInputs?.proposalTemplateId);
+
   const templateOptions = (proposalTemplates || [])
     .filter((_proposal) => {
       if (!formInputs.categoryId) {
@@ -276,6 +275,7 @@ export function NewProposalPage({
             )}
             <ProposalPropertiesBase
               isFromTemplate={isFromTemplateSource}
+              readOnlyCategory={isFromTemplateSource}
               readOnlyRubricCriteria={readOnlyRubricCriteria}
               readOnlyReviewers={readOnlyReviewers}
               readOnlyProposalEvaluationType={isFromTemplateSource}
@@ -299,6 +299,7 @@ export function NewProposalPage({
         <PageSidebar
           isNewProposal
           readOnlyReviewers={readOnlyReviewers}
+          readOnlyRubricCriteria={readOnlyRubricCriteria}
           id='page-action-sidebar'
           spaceId={currentSpace.id}
           sidebarView={internalSidebarView || null}

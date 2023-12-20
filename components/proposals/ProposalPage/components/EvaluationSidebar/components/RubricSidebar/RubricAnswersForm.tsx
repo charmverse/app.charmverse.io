@@ -190,6 +190,7 @@ export function RubricAnswersForm({
         applyDraftValues();
       }
     }
+    // include evaluationId so that answers reset when navigating between evaluations
   }, [answers, draftAnswers]);
 
   return (

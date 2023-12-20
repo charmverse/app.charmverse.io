@@ -1,5 +1,5 @@
 import { Delete, Edit } from '@mui/icons-material';
-import { Box, Grid, IconButton, Stack, Typography } from '@mui/material';
+import { Box, Grid, Hidden, IconButton, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 
 import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
@@ -118,29 +118,25 @@ export function ProposalRewards({
                   flex={1}
                 >
                   <SelectPreviewContainer displayType='details' onClick={() => openReward(reward.id)}>
-                    <Stack direction='row'>
-                      <Grid container>
-                        <Grid item xs={6}>
-                          <Typography component='span' variant='subtitle1' fontWeight='normal'>
-                            {getRewardPage(reward.id)?.title || 'Untitled reward'}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Stack alignItems='center' direction='row' height='100%'>
-                            {reward.customReward ? (
-                              <Typography component='span' variant='subtitle1' fontWeight='normal'>
-                                {reward.customReward}
-                              </Typography>
-                            ) : (
-                              <RewardTokenInfo
-                                chainId={reward.chainId || null}
-                                symbolOrAddress={reward.rewardToken || null}
-                                rewardAmount={reward.rewardAmount || null}
-                              />
-                            )}
-                          </Stack>
-                        </Grid>
-                      </Grid>
+                    <Stack direction='row' justifyContent='space-between' alignItems='center'>
+                      <Typography component='span' variant='subtitle1' fontWeight='normal'>
+                        {getRewardPage(reward.id)?.title || 'Untitled reward'}
+                      </Typography>
+                      <Hidden mdDown>
+                        <Stack alignItems='center' direction='row' height='100%'>
+                          {reward.customReward ? (
+                            <Typography component='span' variant='subtitle1' fontWeight='normal'>
+                              {reward.customReward}
+                            </Typography>
+                          ) : (
+                            <RewardTokenInfo
+                              chainId={reward.chainId || null}
+                              symbolOrAddress={reward.rewardToken || null}
+                              rewardAmount={reward.rewardAmount || null}
+                            />
+                          )}
+                        </Stack>
+                      </Hidden>
                     </Stack>
                   </SelectPreviewContainer>
                 </Stack>
@@ -175,29 +171,25 @@ export function ProposalRewards({
                   flex={1}
                 >
                   <SelectPreviewContainer readOnly={readOnly} displayType='details'>
-                    <Stack direction='row'>
-                      <Grid container>
-                        <Grid item xs={6}>
-                          <Typography component='span' variant='subtitle1' fontWeight='normal'>
-                            {page?.title || 'Untitled reward'}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Stack alignItems='center' direction='row' height='100%'>
-                            {reward.customReward ? (
-                              <Typography component='span' variant='subtitle1' fontWeight='normal'>
-                                {reward.customReward}
-                              </Typography>
-                            ) : (
-                              <RewardTokenInfo
-                                chainId={reward.chainId || null}
-                                symbolOrAddress={reward.rewardToken || null}
-                                rewardAmount={reward.rewardAmount || null}
-                              />
-                            )}
-                          </Stack>
-                        </Grid>
-                      </Grid>
+                    <Stack direction='row' justifyContent='space-between' alignItems='center'>
+                      <Typography component='span' variant='subtitle1' fontWeight='normal'>
+                        {page?.title || 'Untitled reward'}
+                      </Typography>
+                      <Hidden lgDown>
+                        <Stack alignItems='center' direction='row' height='100%'>
+                          {reward.customReward ? (
+                            <Typography component='span' variant='subtitle1' fontWeight='normal'>
+                              {reward.customReward}
+                            </Typography>
+                          ) : (
+                            <RewardTokenInfo
+                              chainId={reward.chainId || null}
+                              symbolOrAddress={reward.rewardToken || null}
+                              rewardAmount={reward.rewardAmount || null}
+                            />
+                          )}
+                        </Stack>
+                      </Hidden>
 
                       <Stack className='icons' sx={{ opacity: 0, transition: 'all 0.2s ease' }} direction='row' gap={1}>
                         <IconButton size='small' onClick={() => editReward({ reward, page, draftId })}>

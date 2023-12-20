@@ -156,10 +156,6 @@ export function ProposalProperties({
     mutateProposals();
   }
 
-  async function changeEvaluationStep(evaluationId: string) {
-    // Call backend
-  }
-
   const onChangeRubricCriteriaDebounced = useCallback(debounce(onChangeRubricCriteria, 300), [proposal?.status]);
   const readOnlyCategory = !isAdmin && (!proposalPermissions?.edit || !!proposal?.page?.sourceTemplateId);
   const readOnlyReviewers = readOnlyProperties || (!isAdmin && !!sourceTemplate);
@@ -213,7 +209,6 @@ export function ProposalProperties({
           snapshotProposalId={snapshotProposalId}
           updateProposalStatus={updateProposalStatus}
           onChangeRubricCriteria={onChangeRubricCriteriaDebounced}
-          changeEvaluationStep={changeEvaluationStep}
           proposalFormInputs={proposalFormInputs}
           setProposalFormInputs={onChangeProperties}
           isPublishingToLens={isPublishingToLens}

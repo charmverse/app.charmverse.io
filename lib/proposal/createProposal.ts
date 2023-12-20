@@ -140,6 +140,11 @@ export async function createProposal({
       }))
     );
   }
+  for (const evaluation of evaluations) {
+    if (evaluation.reviewers.length === 0 && evaluation.type !== 'feedback') {
+      throw new Error('No reviewers defined for proposal evaluation step');
+    }
+  }
 
   // Using a transaction to ensure both the proposal and page gets created together
   const [proposal, , , page] = await prisma.$transaction([
