@@ -1,11 +1,11 @@
-import type { PagesRequest } from '@charmverse/core/dist/cjs/pages';
-import type { Space } from '@charmverse/core/dist/cjs/prisma-client';
+import type { PagesRequest } from '@charmverse/core/pages';
 import type {
   BulkPagePermissionCompute,
   PermissionCompute,
   ProposalPermissionsSwitch
 } from '@charmverse/core/permissions';
 import { PermissionsApiClient, getSpaceInfoViaResource } from '@charmverse/core/permissions';
+import type { Space } from '@charmverse/core/prisma-client';
 
 import { permissionsApiAuthKey, permissionsApiUrl } from 'config/constants';
 import { isCharmVerseSpace } from 'lib/featureFlag/isCharmVerseSpace';

@@ -1,10 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import type {
-  AssignedPostCategoryPermission,
-  AssignedProposalCategoryPermission
-} from '@charmverse/core/dist/cjs/permissions';
+import type { AssignedPostCategoryPermission, AssignedProposalCategoryPermission } from '@charmverse/core/permissions';
 import type {
   MemberProperty,
   MemberPropertyPermission,
