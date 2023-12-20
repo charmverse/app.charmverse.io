@@ -48,7 +48,7 @@ export function ProposalStickyFooter({
           proposalId={proposal.id}
           previousStep={previousStep}
           isDraft={proposal.status === 'draft'}
-          disabled={!proposal.permissions.move}
+          hasMovePermission={proposal.permissions.move}
           onSubmit={refreshProposal}
         />
         {evaluationTypeOrDraft === 'draft' && (
@@ -59,9 +59,7 @@ export function ProposalStickyFooter({
             currentStep={currentEvaluation}
             nextStep={nextStep}
             proposalId={proposal.id}
-            disabledTooltip={
-              !proposal.permissions.move ? 'You do not have permission to move this proposal' : undefined
-            }
+            hasMovePermission={proposal.permissions.move}
             onSubmit={refreshProposal}
           />
         )}

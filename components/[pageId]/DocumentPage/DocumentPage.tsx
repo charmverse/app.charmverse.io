@@ -114,6 +114,7 @@ function DocumentPage({
   const {
     proposal,
     permissions: proposalPermissions,
+    currentEvaluation,
     evaluationToShowInSidebar,
     refreshProposal,
     onChangeEvaluation
@@ -299,6 +300,9 @@ function DocumentPage({
       });
     }
   }, [printRef, _printRef]);
+
+  const currentSnapshotId = currentEvaluation?.snapshotId ?? page.snapshotProposalId;
+
   return (
     <>
       {!!page?.deletedAt && (

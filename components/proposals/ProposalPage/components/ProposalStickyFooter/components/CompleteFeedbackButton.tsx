@@ -6,15 +6,17 @@ import { useSnackbar } from 'hooks/useSnackbar';
 
 export type Props = {
   proposalId: string;
-  disabledTooltip?: string;
+  hasMovePermission: boolean;
   currentStep?: { id: string };
   nextStep?: { title: string };
   onSubmit?: VoidFunction;
 };
 
-export function CompleteFeedbackButton({ proposalId, disabledTooltip, currentStep, nextStep, onSubmit }: Props) {
+export function CompleteFeedbackButton({ proposalId, hasMovePermission, currentStep, nextStep, onSubmit }: Props) {
   const { showMessage } = useSnackbar();
   const { trigger: updateProposalEvaluation, isMutating } = useUpdateProposalEvaluation({ proposalId });
+
+  const disabledTooltip = !hasMovePermission ? 'You do not have permission to move this proposal' : undefined;
 
   async function onMoveForward() {
     try {

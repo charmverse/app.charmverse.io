@@ -10,13 +10,13 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import type { ProposalEvaluationValues } from '../../EvaluationSettingsSidebar/components/EvaluationSettings';
 
 export function GoBackButton({
-  disabled,
+  hasMovePermission,
   isDraft,
   proposalId,
   previousStep,
   onSubmit
 }: {
-  disabled?: boolean;
+  hasMovePermission: boolean;
   isDraft?: boolean;
   proposalId: string;
   previousStep?: Pick<ProposalEvaluationValues, 'id' | 'type' | 'title'>;
@@ -30,7 +30,7 @@ export function GoBackButton({
   const { trigger: updateProposalEvaluation, isMutating: isSavingEvaluation } = useUpdateProposalEvaluation({
     proposalId
   });
-  const disabledTooltip = disabled
+  const disabledTooltip = !hasMovePermission
     ? 'You do not have permission to move this proposal'
     : previousStep?.type === 'vote'
     ? 'You cannot go back to a vote'

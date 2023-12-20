@@ -1,3 +1,4 @@
+import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { useMemo } from 'react';
 
 import {
@@ -15,8 +16,7 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
 
   // const evaluationToShowInSidebar = proposal?.permissions.evaluate && proposal?.currentEvaluationId;
   let evaluationToShowInSidebar: string | undefined;
-
-  const currentEvaluation = proposal?.evaluations.find((evaluation) => evaluation.id === proposal?.currentEvaluationId);
+  const currentEvaluation = getCurrentEvaluation(proposal?.evaluations ?? []);
   if (currentEvaluation && evaluationTypesWithSidebar.includes(currentEvaluation.type)) {
     evaluationToShowInSidebar = currentEvaluation.id;
   }
@@ -27,6 +27,7 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
       proposal,
       permissions: proposal?.permissions,
       evaluationToShowInSidebar,
+      currentEvaluation,
       refreshProposal: () => refreshProposal(), // wrap it in a function so click handlers dont pass in the event
       async onChangeEvaluation(evaluationId: string, updatedEvaluation: Partial<ProposalEvaluationValues>) {
         if (updatedEvaluation.rubricCriteria) {
@@ -43,6 +44,13 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
         await refreshProposal();
       }
     }),
-    [proposal, refreshProposal, evaluationToShowInSidebar, updateProposalEvaluation, upsertRubricCriteria]
+    [
+      proposal,
+      refreshProposal,
+      evaluationToShowInSidebar,
+      currentEvaluation,
+      updateProposalEvaluation,
+      upsertRubricCriteria
+    ]
   );
 }
