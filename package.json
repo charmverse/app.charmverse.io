@@ -365,7 +365,7 @@
     "tsc-alias": "^1.8.6",
     "tsconfig-paths": "^4.2.0",
     "tslib": "^2.6.2",
-    "tsx": "^3.12.6",
+    "tsx": "^4.7.0",
     "typescript": "^5.2.2",
     "webpack": "^5.76.0"
   },

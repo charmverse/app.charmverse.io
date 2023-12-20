@@ -108,7 +108,7 @@ export type FormValues = yup.InferType<typeof schema>;
 const defaultValues: FormValues = {
   collectableOption: undefined,
   chain: '',
-  contract: undefined,
+  contract: '' as `0x${string}`,
   check: undefined,
   quantity: '',
   tokenId: '',
