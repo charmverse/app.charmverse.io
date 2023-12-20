@@ -34,7 +34,7 @@ export async function updateTokenGateLitDetails<T extends LitConditions>(
             });
 
             if (nft) {
-              const nftName = nft.title || nft.contractName;
+              const nftName = hasTokenId ? nft.title : nft.contractName || nft.title;
               return {
                 ...condition,
                 name: nftName,

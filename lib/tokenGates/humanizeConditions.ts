@@ -101,14 +101,14 @@ export function humanizeLitConditionsData(conditions: TokenGate<'lit'>['conditio
           };
         } else if (acc.standardContractType === 'ERC721' && acc.method === 'ownerOf') {
           // specific erc721
-          // Owner of ${tokenName} on ${chain}
+          // Owner of ${tokenName} NFT on ${chain}
           return {
             image,
             standardContractType: acc.standardContractType,
             content: [
               { type: 'text', content: 'Owner of' },
               { ...etherscanUrl, content: tokenName, props: { fontWeight: 'bold' } },
-              { type: 'text', content: 'on' },
+              { type: 'text', content: 'NFT on' },
               { type: 'text', content: chain }
             ]
           };
@@ -226,7 +226,7 @@ export function humanizeLitConditionsData(conditions: TokenGate<'lit'>['conditio
               { type: 'text', content: comparator },
               { type: 'text', content: value },
               { type: 'text', content: `of` },
-              { type: 'text', content: tokenName, props: { fontWeight: 'bold' } },
+              { ...etherscanUrl, content: tokenName, props: { fontWeight: 'bold' } },
               { type: 'text', content: `NFT on` },
               { type: 'text', content: chain }
             ]
