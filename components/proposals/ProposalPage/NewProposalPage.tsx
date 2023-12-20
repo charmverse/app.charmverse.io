@@ -360,8 +360,7 @@ export function NewProposalPage({
                     setFormFields={(formFields) => {
                       setFormInputs({
                         ...formInputs,
-                        formFields:
-                          typeof formFields === 'function' ? formFields(formInputs.formFields || []) : formFields
+                        formFields
                       });
                     }}
                   />

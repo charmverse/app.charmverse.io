@@ -1,6 +1,6 @@
 import AddIcon from '@mui/icons-material/Add';
 import { Stack } from '@mui/material';
-import type { Dispatch, SetStateAction } from 'react';
+import { useRef, useEffect } from 'react';
 import { v4 } from 'uuid';
 
 import { emptyDocument } from 'lib/prosemirror/constants';
@@ -18,10 +18,17 @@ export function FormFieldsEditor({
   toggleCollapse
 }: {
   formFields: FormFieldInput[];
-  setFormFields: Dispatch<SetStateAction<FormFieldInput[]>>;
+  setFormFields: (updatedFormFields: FormFieldInput[]) => void;
   collapsedFieldIds: string[];
   toggleCollapse: (fieldId: string) => void;
 }) {
+  // Using a ref to keep the formFields state updated, since it becomes stale inside the functions
+  const formFieldsRef = useRef(formFields);
+
+  useEffect(() => {
+    formFieldsRef.current = formFields;
+  }, [formFields]);
+
   function updateFormField(
     updatedFormField: Partial<
       FormFieldInput & {
@@ -31,21 +38,21 @@ export function FormFieldsEditor({
       id: string;
     }
   ) {
-    setFormFields((fields) => {
-      const newFormFields = [...fields];
-      const updatedFieldIndex = newFormFields.findIndex((f) => f.id === updatedFormField.id);
-      // If the index was changed, we need to move the form field to the new index
-      const newIndex = updatedFormField.index;
-      if (typeof newIndex === 'number') {
-        newFormFields.splice(newIndex, 0, newFormFields.splice(updatedFieldIndex, 1)[0]);
-      }
+    const newFormFields = [...formFieldsRef.current];
+    const updatedFieldIndex = newFormFields.findIndex((f) => f.id === updatedFormField.id);
+    // If the index was changed, we need to move the form field to the new index
+    const newIndex = updatedFormField.index;
+    if (typeof newIndex === 'number') {
+      newFormFields.splice(newIndex, 0, newFormFields.splice(updatedFieldIndex, 1)[0]);
+    }
 
-      return newFormFields.map((formField, index) => ({
+    setFormFields(
+      newFormFields.map((formField, index) => ({
         ...formField,
         ...(index === (newIndex ?? updatedFieldIndex) ? updatedFormField : {}),
         index
-      }));
-    });
+      }))
+    );
   }
 
   function addNewFormField() {

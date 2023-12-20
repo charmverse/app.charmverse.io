@@ -82,6 +82,7 @@ export function useNewProposal({ newProposal }: Props) {
           icon: formInputs.icon,
           type: formInputs.type
         },
+        formFields: formInputs.formFields,
         evaluations: formInputs.evaluations,
         evaluationType: formInputs.evaluationType,
         rubricCriteria: formInputs.rubricCriteria as RubricDataInput[],

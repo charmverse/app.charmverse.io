@@ -1,3 +1,4 @@
+import type { PageMeta } from '@charmverse/core/pages';
 import styled from '@emotion/styled';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
@@ -48,7 +49,15 @@ export function NewProposalButton() {
 
   const canCreateProposal = proposalCategoriesWithCreatePermission.length > 0;
   // grab page data from context so that title is always up-to-date
-  const proposalTemplatePages = proposalTemplates?.map((template) => pages[template.page.id]).filter(isTruthy);
+  const proposalTemplatePages = proposalTemplates
+    ?.map(
+      (template) =>
+        ({ ...pages[template.page.id], isStructuredProposal: !!template.formId } as PageMeta & {
+          isStructuredProposal: boolean;
+        })
+    )
+    .filter(isTruthy);
+
   function deleteProposalTemplate(pageId: string) {
     return charmClient.deletePage(pageId);
   }
