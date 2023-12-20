@@ -27,6 +27,7 @@ async function convertProposals() {
       reviewers: true
     }
   });
+  console.log('proposals to update', proposals.length);
   const proposalsToUpdate = proposals.filter((p) => p.evaluations.length === 0);
   await Promise.all(
     proposalsToUpdate.map(async (p) => {
@@ -36,7 +37,7 @@ async function convertProposals() {
         const completedAt = vote?.deadline;
         const voteFailed = vote?.status === 'Rejected';
         const result = votePassed ? 'pass' : voteFailed ? 'fail' : null;
-        const passFailEvaluationId = uuid();
+        const reviewEvaluationId = uuid();
         await prisma.$transaction(async (tx) => {
           if (isPublished(p)) {
             await tx.proposal.update({
@@ -54,24 +55,16 @@ async function convertProposals() {
               index: 0,
               proposalId: p.id,
               permissions: {
-                create: feedbackPermissions
+                createMany: {
+                  data: feedbackPermissions
+                }
               }
             }
           });
           await tx.proposalEvaluation.create({
             data: {
-              ...feedbackEvaluation,
-              index: 0,
-              proposalId: p.id,
-              permissions: {
-                create: getDefaultPermissions()
-              }
-            }
-          });
-          await tx.proposalEvaluation.create({
-            data: {
-              id: passFailEvaluationId,
-              title: 'Revew',
+              id: reviewEvaluationId,
+              title: 'Review',
               index: 1,
               result: p.reviewedAt ? 'pass' : null,
               completedAt: p.reviewedAt || null,
@@ -79,14 +72,18 @@ async function convertProposals() {
               type: 'pass_fail',
               proposalId: p.id,
               permissions: {
-                create: getDefaultPermissions()
-              },
-              reviewers: {
-                create: p.reviewers.map((reviewer) => ({
-                  ...reviewer,
-                  evaluationId: passFailEvaluationId
-                }))
+                createMany: {
+                  data: getDefaultPermissions()
+                }
               }
+            }
+          });
+          await tx.proposalReviewer.updateMany({
+            where: {
+              proposalId: p.id
+            },
+            data: {
+              evaluationId: reviewEvaluationId
             }
           });
           await tx.proposalEvaluation.create({
@@ -101,23 +98,28 @@ async function convertProposals() {
               snapshotId: p.page?.snapshotProposalId,
               snapshotExpiry: p.snapshotProposalExpiry,
               voteId: vote?.id,
-              reviewers: {
-                create: p.category?.proposalCategoryPermissions
-                  .filter((perm) => perm.permissionLevel === 'full_access')
-                  .map((perm) => ({
-                    proposalId: p.id,
-                    roleId: perm.roleId,
-                    systemRole: perm.spaceId ? 'space_member' : undefined
-                  }))
-              },
+              reviewers: p.category
+                ? {
+                    createMany: {
+                      data: p.category.proposalCategoryPermissions
+                        .filter((perm) => perm.permissionLevel === 'full_access')
+                        .map((perm) => ({
+                          proposalId: p.id,
+                          roleId: perm.roleId,
+                          systemRole: perm.spaceId ? 'space_member' : undefined
+                        }))
+                    }
+                  }
+                : undefined,
               permissions: {
-                create: getDefaultPermissions()
+                createMany: {
+                  data: getDefaultPermissions()
+                }
               }
             }
           });
         });
       } else if (p.evaluationType === 'rubric') {
-        const passFailEvaluationId = uuid();
         const rubricEvaluationId = uuid();
         await prisma.$transaction(async (tx) => {
           if (isPublished(p)) {
@@ -136,13 +138,14 @@ async function convertProposals() {
               index: 0,
               proposalId: p.id,
               permissions: {
-                create: feedbackPermissions
+                createMany: {
+                  data: feedbackPermissions
+                }
               }
             }
           });
           await tx.proposalEvaluation.create({
             data: {
-              id: passFailEvaluationId,
               title: 'Revew',
               index: 1,
               result: p.reviewedAt ? 'pass' : null,
@@ -151,13 +154,16 @@ async function convertProposals() {
               type: 'pass_fail',
               proposalId: p.id,
               permissions: {
-                create: getDefaultPermissions()
+                createMany: {
+                  data: getDefaultPermissions()
+                }
               },
               reviewers: {
-                create: p.reviewers.map((reviewer) => ({
-                  ...reviewer,
-                  evaluationId: passFailEvaluationId
-                }))
+                createMany: {
+                  data: p.reviewers.map(({ evaluationId, id, ...reviewer }) => ({
+                    ...reviewer
+                  }))
+                }
               }
             }
           });
@@ -169,7 +175,9 @@ async function convertProposals() {
               type: 'rubric',
               proposalId: p.id,
               permissions: {
-                create: getDefaultPermissions()
+                createMany: {
+                  data: getDefaultPermissions()
+                }
               }
             }
           });
@@ -232,3 +240,11 @@ async function convertSpaces() {
 function isPublished(proposal: Proposal) {
   return proposal.status !== 'draft';
 }
+
+convertProposals()
+  .then(() => {
+    console.log('Done!');
+  })
+  .catch((e) => {
+    console.error('Error!', e);
+  });
