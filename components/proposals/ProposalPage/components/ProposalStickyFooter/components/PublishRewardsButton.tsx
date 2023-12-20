@@ -1,8 +1,12 @@
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
+import { Typography } from '@mui/material';
+import { useState } from 'react';
 
 import { useCreateProposalRewards } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
+import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
 export type Props = {
   disabled: boolean;
@@ -11,8 +15,11 @@ export type Props = {
 };
 
 export function PublishRewardsButton({ proposalId, disabled, onSubmit }: Props) {
+  const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const { trigger, isMutating } = useCreateProposalRewards(proposalId);
   const { showMessage } = useSnackbar();
+  const { mappedFeatures } = useSpaceFeatures();
+  const rewardsTitle = mappedFeatures.rewards.title;
 
   const createRewards = async () => {
     try {
@@ -21,20 +28,30 @@ export function PublishRewardsButton({ proposalId, disabled, onSubmit }: Props) 
       onSubmit();
       // mutateRewards();
     } catch (e) {
-      showMessage('Error creating rewards', 'error');
+      showMessage(`Error creating ${rewardsTitle}`, 'error');
     }
   };
 
   return (
-    <Button
-      disabled={disabled}
-      disabledTooltip='Only reviewers can publish rewards'
-      color='success'
-      endIcon={<BountyIcon />}
-      loading={isMutating}
-      onClick={createRewards}
-    >
-      Publish Rewards
-    </Button>
+    <>
+      <Button
+        disabled={disabled}
+        disabledTooltip={`Only reviewers can publish ${rewardsTitle}`}
+        color='success'
+        endIcon={<BountyIcon />}
+        loading={isMutating}
+        onClick={() => setShowConfirmation(true)}
+      >
+        Publish {rewardsTitle}
+      </Button>
+      <ModalWithButtons
+        open={showConfirmation}
+        buttonText={`Publish ${rewardsTitle}?`}
+        onClose={() => setShowConfirmation(false)}
+        onConfirm={createRewards}
+      >
+        <Typography>This action cannot be done</Typography>
+      </ModalWithButtons>
+    </>
   );
 }
