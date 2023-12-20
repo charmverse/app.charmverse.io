@@ -57,7 +57,8 @@ type SidebarProps = {
   proposalEvaluationId?: string | null;
   isNewProposal?: boolean;
   isProposalTemplate?: boolean;
-  readOnlyReviewers?: boolean;
+  readOnlyReviewers: boolean;
+  readOnlyRubricCriteria: boolean;
 };
 
 function PageSidebarComponent(props: SidebarProps) {
@@ -192,7 +193,8 @@ function SidebarContents({
   refreshProposal,
   isProposalTemplate,
   isNewProposal,
-  readOnlyReviewers
+  readOnlyReviewers,
+  readOnlyRubricCriteria
 }: SidebarProps) {
   const isCharmVerse = useIsCharmverseSpace();
   return (
@@ -220,6 +222,7 @@ function SidebarContents({
           showHeader={!isNewProposal && !isProposalTemplate}
           onChangeEvaluation={onChangeEvaluation}
           readOnlyReviewers={!!readOnlyReviewers}
+          readOnlyRubricCriteria={!!readOnlyRubricCriteria}
           goToEvaluation={(evaluationId) => {
             openEvaluationSidebar?.(evaluationId);
           }}
