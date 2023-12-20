@@ -66,10 +66,12 @@ const StyledContainer = styled(PageEditorContainer)`
 // Note: this component is only used before a page is saved to the DB
 export function NewProposalPage({
   isTemplate,
-  templateId: templateIdFromUrl
+  templateId: templateIdFromUrl,
+  proposalType
 }: {
   isTemplate?: boolean;
   templateId?: string;
+  proposalType?: ProposalPageAndPropertiesInput['proposalType'];
 }) {
   const { navigateToSpacePath } = useCharmRouter();
   const { space: currentSpace } = useCurrentSpace();
@@ -81,17 +83,10 @@ export function NewProposalPage({
   const [, setPageTitle] = usePageTitle();
   const { data: workflowOptions } = useGetProposalWorkflows(currentSpace?.id);
   const [workflowId, setWorkflowId] = useState('');
-  const {
-    formInputs,
-    setFormInputs,
-    contentUpdated,
-    disabledTooltip,
-    isCreatingProposal,
-    clearFormInputs,
-    createProposal
-  } = useNewProposal({
-    newProposal: { type: isTemplate ? 'proposal_template' : 'proposal' }
-  });
+  const { formInputs, setFormInputs, contentUpdated, disabledTooltip, isCreatingProposal, createProposal } =
+    useNewProposal({
+      newProposal: { type: isTemplate ? 'proposal_template' : 'proposal', proposalType }
+    });
 
   const [, { width: containerWidth }] = useElementSize();
   const { user } = useUser();

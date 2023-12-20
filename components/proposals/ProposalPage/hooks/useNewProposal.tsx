@@ -125,15 +125,16 @@ export function useNewProposal({ newProposal }: Props) {
 
   if (formInputs.proposalType === 'structured') {
     if ((formInputs.formFields ?? []).length === 0) {
-      disabledTooltip = 'Form fields are required for structured proposals';
+      disabledTooltip = 'Atleast one form field is required for structured proposals';
     } else if (formInputs.formFields?.some((formField) => !formField.name)) {
-      disabledTooltip = 'Form fields must have a name';
+      disabledTooltip = 'All form fields must have a title';
     } else if (
       formInputs.formFields?.some(
-        (formField) => (formField.type === 'select' || formField.type === 'multiselect') && !formField.options
+        (formField) =>
+          (formField.type === 'select' || formField.type === 'multiselect') && (formField.options ?? []).length === 0
       )
     ) {
-      disabledTooltip = 'Select fields must have options';
+      disabledTooltip = 'Select fields must have atleast one option';
     }
   } else if (formInputs.proposalType === 'free_form' && !formInputs.content) {
     disabledTooltip = 'Content is required for free-form proposals';
