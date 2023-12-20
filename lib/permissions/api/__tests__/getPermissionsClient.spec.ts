@@ -43,10 +43,3 @@ describe('getPermissionsClient', () => {
     }
   });
 });
-describe('test', () => {
-  it('should do stuff', async () => {
-    const client = new PermissionsApiClientWithPermissionsSwitch();
-
-    await client.pages.computePagePermissions({ resourceId: '123', userId: '123' });
-  });
-});

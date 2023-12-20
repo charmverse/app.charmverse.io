@@ -4,7 +4,7 @@ import type {
   PermissionsEngine,
   PremiumPermissionsClient
 } from '@charmverse/core/permissions';
-import { PermissionsApiClient, getSpaceInfoViaResource } from '@charmverse/core/permissions';
+import { getSpaceInfoViaResource } from '@charmverse/core/permissions';
 
 import { PublicPermissionsClient } from './freeClient';
 import { PermissionsApiClientWithPermissionsSwitch } from './overridenPermissionsApiClient';
