@@ -7,8 +7,10 @@ import type { FormFieldValue } from 'components/common/form/interfaces';
 
 export function StructuredProposalFormFieldInputs({
   proposalId,
-  formFields
+  formFields,
+  readOnly
 }: {
+  readOnly?: boolean;
   proposalId: string;
   formFields: FormField[];
 }) {
@@ -32,7 +34,8 @@ export function StructuredProposalFormFieldInputs({
 
   return (
     <FormFieldInputs
-      onSave={onSave}
+      onSave={readOnly ? undefined : onSave}
+      disabled={readOnly}
       formFields={formFields
         .map((formField) => {
           const proposalFormFieldAnswer = proposalFormFieldAnswers.find(

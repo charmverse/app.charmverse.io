@@ -575,6 +575,7 @@ function DocumentPage({
                     <StructuredProposalFormFieldInputs
                       proposalId={proposal.id}
                       formFields={proposal?.formFields ?? []}
+                      readOnly={!!(proposal.createdBy !== user?.id)}
                     />
                   )}
                 </Box>
