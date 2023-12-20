@@ -150,6 +150,10 @@ export async function createProposal({
       })
     : [];
 
+  const proposalFormFields = proposal.formId
+    ? await prisma.formField.findMany({ where: { formId: proposal.formId } })
+    : null;
+
   await publishProposalEvent({
     scope: WebhookEventNames.ProposalStatusChanged,
     proposalId: proposal.id,
@@ -161,6 +165,12 @@ export async function createProposal({
 
   return {
     page: page as PageWithPermissions,
-    proposal: { ...proposal, rubricCriteria: upsertedCriteria, draftRubricAnswers: [], rubricAnswers: [] }
+    proposal: {
+      ...proposal,
+      rubricCriteria: upsertedCriteria,
+      draftRubricAnswers: [],
+      rubricAnswers: [],
+      formFields: proposalFormFields
+    }
   };
 }

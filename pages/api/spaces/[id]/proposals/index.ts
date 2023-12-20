@@ -43,7 +43,12 @@ async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWi
       authors: true,
       reviewers: true,
       category: true,
-      rewards: true
+      rewards: true,
+      form: {
+        include: {
+          formFields: true
+        }
+      }
     }
   });
 
