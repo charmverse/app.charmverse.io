@@ -1,13 +1,14 @@
 import { InvalidInputError } from '@charmverse/core/errors';
+import { isProposalAuthor } from '@charmverse/core/permissions';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import type { FieldAnswerInput } from 'components/common/form/interfaces';
+import { upsertProposalFormAnswers } from 'lib/form/upsertProposalFormAnswers';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
-import { getAnswersTable } from 'lib/proposal/rubric/getAnswersTable';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
-import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers';
-import { upsertRubricAnswers } from 'lib/proposal/rubric/upsertRubricAnswers';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -24,24 +25,25 @@ async function upsertProposalFormAnswersHandler(
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const permissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
-    resourceId: proposalId,
-    userId
-  });
+  const proposal = await prisma.proposal.findUnique({ where: { id: proposalId }, include: { authors: true } });
 
-  if (!permissions.evaluate) {
-    throw new ActionNotPermittedError(`You cannot update your answer for this proposal`);
+  if (!proposal) {
+    throw new InvalidInputError(`Proposal with id ${proposalId} does not exist`);
   }
 
-  const { answers, evaluationId, isDraft } = req.body as RubricAnswerUpsert;
+  if (!proposal.formId) {
+    throw new InvalidInputError(`Proposal ${proposalId} does not have a form`);
+  }
 
-  await upsertRubricAnswers({
-    isDraft,
-    evaluationId,
-    proposalId,
-    answers,
-    userId
-  });
+  const isAuthor = isProposalAuthor({ userId, proposal });
+
+  if (!isAuthor) {
+    throw new ActionNotPermittedError('Only authors can edit proposal form answers');
+  }
+
+  const { answers } = req.body as { answers: FieldAnswerInput[] };
+
+  await upsertProposalFormAnswers({ answers, formId: proposal.formId, proposalId });
 
   res.status(200).end();
 }
