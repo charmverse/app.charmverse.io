@@ -31,10 +31,6 @@ export async function upsertProposalFormFields({
     throw new InvalidInputError(`Proposal with id: ${proposalId} is not a template`);
   }
 
-  if (formFields.some((f) => f.type === 'label' && f.required)) {
-    throw new InvalidInputError(`Labels cannot be required`);
-  }
-
   const { formId } = proposal;
 
   if (!formId) {
@@ -81,7 +77,7 @@ export async function upsertProposalFormFields({
             index: field.index,
             options: field.options,
             private: field.private,
-            required: field.required
+            required: field.type === 'label' ? false : field.required
           },
           update: {
             type: field.type,
@@ -90,7 +86,7 @@ export async function upsertProposalFormFields({
             index: field.index,
             options: field.options,
             private: field.private,
-            required: field.required
+            required: field.type === 'label' ? false : field.required
           }
         });
       })

@@ -159,7 +159,7 @@ export function useFormFields({
                   return false;
                 }
 
-                return 'content' in value ? !checkIsContentEmpty(value.content as PageContent) : true;
+                return value && 'content' in value ? !checkIsContentEmpty(value.content as PageContent) : true;
               });
               break;
             }

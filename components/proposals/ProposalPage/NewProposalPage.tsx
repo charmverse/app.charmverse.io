@@ -4,7 +4,7 @@ import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { Box, Divider, useMediaQuery } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 import { v4 as uuid } from 'uuid';
 
@@ -274,7 +274,6 @@ export function NewProposalPage({
     control: proposalFormFieldControl,
     isValid: isProposalFormFieldsValid,
     errors: proposalFormFieldErrors,
-    values,
     onFormChange
   } = useFormFields({
     fields: proposalFormFields
@@ -391,6 +390,13 @@ export function NewProposalPage({
     }
   }, [templateIdFromUrl, isLoadingTemplates]);
 
+  // Keep the formAnswers in sync with the formFields using a ref as charmEditor fields uses the initial field value
+  const formAnswersRef = useRef(formInputs.formAnswers);
+
+  useEffect(() => {
+    formAnswersRef.current = formInputs.formAnswers;
+  }, [formInputs.formAnswers]);
+
   return (
     <Box flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
       <PrimaryColumn showPageActionSidebar={!!internalSidebarView}>
@@ -428,7 +434,7 @@ export function NewProposalPage({
                       errors={proposalFormFieldErrors}
                       onFormChange={(updatedFormFields) => {
                         setFormInputs({
-                          formAnswers: formInputs.formAnswers?.map((formAnswer) => {
+                          formAnswers: formAnswersRef.current?.map((formAnswer) => {
                             const updatedFormField = updatedFormFields.find((f) => f.id === formAnswer.fieldId);
                             return {
                               ...formAnswer,

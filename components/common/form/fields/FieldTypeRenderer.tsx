@@ -52,7 +52,7 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
       }
 
       case 'label': {
-        return <FieldWrapper {...fieldProps} />;
+        return <FieldWrapper {...fieldProps} sx={fieldProps?.fieldWrapperSx} />;
       }
 
       case 'select': {
