@@ -263,6 +263,11 @@ export function NewProposalPage({
       newProposal: { type: isTemplate ? 'proposal_template' : 'proposal', proposalType }
     });
 
+  const sourceTemplate = proposalTemplates?.find((template) => template.id === formInputs.proposalTemplateId);
+
+  const isStructured = formInputs.proposalType === 'structured' || !!sourceTemplate?.formId;
+  const proposalFormFields = formInputs.formFields ?? sourceTemplate?.formFields ?? [];
+
   const [, { width: containerWidth }] = useElementSize();
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const [readOnlyEditor, setReadOnlyEditor] = useState(false);
@@ -375,7 +380,7 @@ export function NewProposalPage({
           {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
           <StyledContainer data-test='page-charmeditor' top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
             <Box minHeight={450}>
-              {formInputs.proposalType === 'structured' ? (
+              {isStructured ? (
                 <>
                   <ProposalPageContent
                     applyTemplate={applyTemplate}
@@ -391,7 +396,7 @@ export function NewProposalPage({
                     <ControlledFormFieldsEditor
                       collapsedFieldIds={collapsedFieldIds}
                       toggleCollapse={toggleCollapse}
-                      formFields={formInputs.formFields || []}
+                      formFields={proposalFormFields}
                       setFormFields={(formFields) => {
                         setFormInputs({
                           ...formInputs,
@@ -400,7 +405,7 @@ export function NewProposalPage({
                       }}
                     />
                   ) : (
-                    <FormFieldInputs formFields={formInputs.formFields || []} />
+                    <FormFieldInputs formFields={proposalFormFields} />
                   )}
                 </>
               ) : (
