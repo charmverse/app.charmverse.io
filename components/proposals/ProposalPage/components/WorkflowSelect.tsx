@@ -4,7 +4,7 @@ import { TagSelect } from 'components/common/BoardEditor/components/properties/T
 
 type Props = {
   onChange: (value: ProposalWorkflowTyped) => void;
-  value: string;
+  value?: string | null;
   options?: ProposalWorkflowTyped[];
   readOnly: boolean;
 };
@@ -30,7 +30,7 @@ export function WorkflowSelect({ onChange, value, options, readOnly }: Props) {
       disableClearable
       wrapColumn
       options={propertyOptions}
-      propertyValue={value}
+      propertyValue={value || ''}
       onChange={onValueChange}
       readOnly={readOnly}
     />

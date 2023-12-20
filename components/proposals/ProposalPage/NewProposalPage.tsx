@@ -79,19 +79,11 @@ export function NewProposalPage({
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>(null);
   const [, setPageTitle] = usePageTitle();
   const { data: workflowOptions } = useGetProposalWorkflows(currentSpace?.id);
-  const [workflowId, setWorkflowId] = useState('');
   const isMdScreen = useMdScreen();
-  const {
-    formInputs,
-    setFormInputs,
-    contentUpdated,
-    disabledTooltip,
-    isCreatingProposal,
-    clearFormInputs,
-    createProposal
-  } = useNewProposal({
-    newProposal: { type: isTemplate ? 'proposal_template' : 'proposal' }
-  });
+  const { formInputs, setFormInputs, contentUpdated, disabledTooltip, isCreatingProposal, createProposal } =
+    useNewProposal({
+      newProposal: { type: isTemplate ? 'proposal_template' : 'proposal' }
+    });
 
   const [, { width: containerWidth }] = useElementSize();
   const { user } = useUser();
@@ -173,7 +165,6 @@ export function NewProposalPage({
         permissions: evaluation.permissions as ProposalEvaluationPermission[]
       }))
     });
-    setWorkflowId(workflow.id);
   }
 
   function clearTemplate() {
@@ -276,7 +267,7 @@ export function NewProposalPage({
                   Workflow
                 </PropertyLabel>
                 <WorkflowSelect
-                  value={workflowId}
+                  value={formInputs.workflowId}
                   onChange={selectEvaluationWorkflow}
                   options={workflowOptions}
                   readOnly={!!formInputs.proposalTemplateId}
@@ -337,7 +328,7 @@ export function NewProposalPage({
 
   // populate workflow if not set and template is not selected
   useEffect(() => {
-    if (isCharmVerse && workflowOptions?.length && !workflowId && !templateIdFromUrl) {
+    if (isCharmVerse && workflowOptions?.length && !formInputs.workflowId && !templateIdFromUrl) {
       selectEvaluationWorkflow(workflowOptions[0]);
     }
   }, [!!workflowOptions, isCharmVerse]);

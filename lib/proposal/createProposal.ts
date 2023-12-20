@@ -169,7 +169,14 @@ export async function createProposal({
             }))
           }
         },
-        fields
+        fields,
+        workflow: workflowId
+          ? {
+              connect: {
+                id: workflowId
+              }
+            }
+          : undefined
       },
       include: {
         authors: true,
