@@ -1,4 +1,4 @@
-import { humanizeConditions, humanizeLitConditionsData } from '../humanizeConditions';
+import { humanizeConditions, humanizeLitConditionsData, humanizeUnlockConditionsData } from '../humanizeConditions';
 
 describe('humanizeConditions', () => {
   const walletAddress = '0x1bd0d6edb387114b2fdf20d683366fa9f94a07f4';
@@ -254,7 +254,7 @@ describe('humanizeConditions', () => {
     expect(result).toBe('Is a member of the DAO at 0x3806…ddce');
   });
 
-  it('should return the owner of at least 1 nft from a specific collection condition', () => {
+  it('should return the owner of at least 1 NFT from a specific collection condition', () => {
     const conditions = {
       chains: ['optimism'],
       permanent: true,
@@ -278,7 +278,7 @@ describe('humanizeConditions', () => {
     };
     const data = humanizeLitConditionsData({ ...conditions, myWalletAddress: '' });
     const result = humanizeConditions(data);
-    expect(result).toBe('Owns at least 1 of Charmed & Optimistic nft on Optimism');
+    expect(result).toBe('Owns at least 1 of Charmed & Optimistic NFT on Optimism');
   });
 
   it('should return the owner of a specific nft condition', () => {
@@ -305,7 +305,7 @@ describe('humanizeConditions', () => {
     };
     const data = humanizeLitConditionsData({ ...conditions, myWalletAddress: '' });
     const result = humanizeConditions(data);
-    expect(result).toBe('Owner of Charmed & Optimistic 71 on Optimism');
+    expect(result).toBe('Owner of Charmed & Optimistic 71 NFT on Optimism');
   });
 
   it('should return the cask condition', () => {
@@ -358,5 +358,16 @@ describe('humanizeConditions', () => {
     const data = humanizeLitConditionsData({ ...conditions, myWalletAddress: '' });
     const result = humanizeConditions(data);
     expect(result).toBe('Owns at least 1 of Pepe tokens with token id 72 on Ethereum');
+  });
+
+  it('should return an unlock protocol condition', () => {
+    const conditions = {
+      contract: '0x1f98431c8ad98523631ae4a59f267346ea31f984',
+      chainId: 1,
+      name: 'The Cool One'
+    };
+    const data = humanizeUnlockConditionsData({ ...conditions });
+    const result = humanizeConditions(data);
+    expect(result).toBe('Unlock Protocol - The Cool One');
   });
 });
