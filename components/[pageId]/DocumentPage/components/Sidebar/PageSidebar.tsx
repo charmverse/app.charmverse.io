@@ -219,7 +219,7 @@ function SidebarContents({
           readOnly={!!readOnlyProposalPermissions}
           showHeader={!isNewProposal && !isProposalTemplate}
           onChangeEvaluation={onChangeEvaluation}
-          readOnlyReviewers={readOnlyReviewers}
+          readOnlyReviewers={!!readOnlyReviewers}
           goToEvaluation={(evaluationId) => {
             openEvaluationSidebar?.(evaluationId);
           }}
