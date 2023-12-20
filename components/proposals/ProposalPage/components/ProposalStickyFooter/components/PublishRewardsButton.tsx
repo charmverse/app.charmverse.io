@@ -1,9 +1,7 @@
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 
-import { useCreateProposalRewards, useGetProposalDetails } from 'charmClient/hooks/proposals';
+import { useCreateProposalRewards } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
-import { useProposals } from 'components/proposals/hooks/useProposals';
-import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useSnackbar } from 'hooks/useSnackbar';
 
 export type Props = {
@@ -28,7 +26,14 @@ export function PublishRewardsButton({ proposalId, disabled, onSubmit }: Props) 
   };
 
   return (
-    <Button disabled={disabled} color='success' endIcon={<BountyIcon />} loading={isMutating} onClick={createRewards}>
+    <Button
+      disabled={disabled}
+      disabledTooltip='Only reviewers can publish rewards'
+      color='success'
+      endIcon={<BountyIcon />}
+      loading={isMutating}
+      onClick={createRewards}
+    >
       Publish Rewards
     </Button>
   );
