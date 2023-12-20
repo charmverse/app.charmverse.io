@@ -175,5 +175,5 @@ async function convertSpaces() {
 }
 
 function isPublished(proposal: Proposal) {
-  return proposal.status !== 'draft' && proposal.status !== 'discussion';
+  return proposal.status !== 'draft';
 }
