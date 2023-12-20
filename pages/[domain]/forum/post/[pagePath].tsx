@@ -22,7 +22,7 @@ export default function ForumPostPage() {
 function WrapperPostPage({ post }: { post: PostWithVotes }) {
   const [formInputs, setFormInputs] = useState<FormInputs>(post);
   const [contentUpdated, setContentUpdated] = useState(false);
-  const [, setTitleState] = usePageTitle();
+  const [, setPageTitle] = usePageTitle();
 
   useTrackPageView({ postId: post.id, type: 'post' });
 
@@ -38,7 +38,7 @@ function WrapperPostPage({ post }: { post: PostWithVotes }) {
       post={post}
       spaceId={post.spaceId}
       onTitleChange={(newTitle) => {
-        setTitleState(newTitle);
+        setPageTitle(newTitle);
       }}
     />
   );

@@ -2,7 +2,6 @@ import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
 import { Alert, Autocomplete, Box, Chip, IconButton, Stack, TextField, Tooltip } from '@mui/material';
-import { NonNullablePickerChangeHandler } from '@mui/x-date-pickers/internals/hooks/useViews';
 import { useCallback, useMemo, useState } from 'react';
 
 import { useGetReviewerPool } from 'charmClient/hooks/proposals';
@@ -28,7 +27,8 @@ export type SystemRoleOptionPopulated<T extends string = string> = SystemRoleOpt
   icon: JSX.Element;
   label: string;
 };
-type SelectOptionPopulated = RoleOptionPopulated | MemberOptionPopulated | SystemRoleOptionPopulated;
+
+export type SelectOptionPopulated = RoleOptionPopulated | MemberOptionPopulated | SystemRoleOptionPopulated;
 
 type ContainerProps = {
   displayType?: PropertyValueDisplayType;
@@ -68,7 +68,7 @@ export const StyledUserPropertyContainer = styled(Box, {
 
 function SelectedOptions({
   value,
-  isRequiredValue = () => true,
+  isRequiredValue = () => false,
   readOnly,
   onRemove,
   wrapColumn

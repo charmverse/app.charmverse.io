@@ -1,5 +1,6 @@
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalStatus } from '@charmverse/core/prisma';
+import { Box } from '@mui/material';
 import { debounce } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -8,20 +9,21 @@ import {
   useGetIsReviewer,
   useGetProposalDetails,
   useGetProposalFlowFlags,
-  useUpsertRubricCriteria
+  useUpsertRubricCriteria,
+  useUpdateProposal
 } from 'charmClient/hooks/proposals';
 import { useNotifications } from 'components/nexus/hooks/useNotifications';
-import type { ProposalPropertiesInput } from 'components/proposals/components/ProposalProperties/ProposalPropertiesBase';
-import { ProposalPropertiesBase } from 'components/proposals/components/ProposalProperties/ProposalPropertiesBase';
-import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
+import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
+import { ProposalPropertiesBase } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { PageWithContent } from 'lib/pages';
 import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
+import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { CreateLensPublication } from './CreateLensPublication';
@@ -34,9 +36,12 @@ interface ProposalPropertiesProps {
   snapshotProposalId: string | null;
   pagePermissions?: PagePermissionFlags;
   refreshPagePermissions?: () => void;
-  openEvaluation?: () => void;
+  openEvaluation?: (evaluationId?: string) => void;
   isEvaluationSidebarOpen?: boolean;
   proposalPage: PageWithContent;
+  proposal?: ProposalWithUsersAndRubric;
+  refreshProposal: VoidFunction;
+  isCharmVerse: boolean;
 }
 
 export function ProposalProperties({
@@ -49,15 +54,15 @@ export function ProposalProperties({
   readOnly,
   isEvaluationSidebarOpen,
   openEvaluation,
-  proposalPage
+  proposalPage,
+  proposal,
+  refreshProposal,
+  isCharmVerse
 }: ProposalPropertiesProps) {
-  const { data: proposal, mutate: refreshProposal } = useGetProposalDetails(proposalId);
   const { mutate: mutateNotifications } = useNotifications();
+  const { trigger: updateProposal } = useUpdateProposal({ proposalId });
   const { user } = useUser();
   const [isPublishingToLens, setIsPublishingToLens] = useState(false);
-  const { permissions: proposalPermissions, refresh: refreshProposalPermissions } = useProposalPermissions({
-    proposalIdOrPath: proposalId
-  });
   const { setupLensProfile } = useLensProfile();
   const { mutateProposals } = useProposals();
   const { account } = useWeb3Account();
@@ -70,6 +75,7 @@ export function ProposalProperties({
   const isAdmin = useIsAdmin();
 
   // further restrict readOnly if user cannot update proposal properties specifically
+  const proposalPermissions = proposal?.permissions;
   const readOnlyProperties = readOnly || !(pagePermissions?.edit_content || isAdmin);
 
   const isFromTemplateSource = Boolean(proposal?.page?.sourceTemplateId);
@@ -98,6 +104,7 @@ export function ProposalProperties({
     categoryId: proposal?.categoryId,
     evaluationType: proposal?.evaluationType || 'vote',
     authors: proposal?.authors.map((author) => author.userId) ?? [],
+    evaluations: proposal?.evaluations ?? [],
     rubricCriteria: proposal?.rubricCriteria ?? [],
     publishToLens: proposal ? proposal.publishToLens ?? false : !!user?.publishToLensDefault,
     reviewers:
@@ -121,12 +128,7 @@ export function ProposalProperties({
         }
       }
       await charmClient.proposals.updateStatus(proposal.id, newStatus);
-      await Promise.all([
-        refreshProposal(),
-        refreshProposalFlowFlags(),
-        refreshPagePermissions(),
-        refreshProposalPermissions()
-      ]);
+      await Promise.all([refreshProposal(), refreshProposalFlowFlags(), refreshPagePermissions()]);
       mutateNotifications();
       mutateProposals();
     }
@@ -140,12 +142,11 @@ export function ProposalProperties({
 
   async function onChangeProperties(values: Partial<ProposalPropertiesInput>) {
     if (proposal) {
-      await charmClient.proposals.updateProposal({
-        proposalId,
+      await updateProposal({
         authors: proposal.authors.map(({ userId }) => userId),
         reviewers: proposal.reviewers.map((reviewer) => ({
-          id: reviewer.roleId ?? (reviewer.userId as string),
-          group: reviewer.roleId ? 'role' : 'user'
+          id: reviewer.roleId ?? reviewer.userId ?? (reviewer.systemRole as string),
+          group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role'
         })),
         ...values
       });
@@ -153,6 +154,10 @@ export function ProposalProperties({
     refreshProposal();
     refreshProposalFlowFlags(); // needs to run when reviewers change?
     mutateProposals();
+  }
+
+  async function changeEvaluationStep(evaluationId: string) {
+    // Call backend
   }
 
   const onChangeRubricCriteriaDebounced = useCallback(debounce(onChangeRubricCriteria, 300), [proposal?.status]);
@@ -172,58 +177,70 @@ export function ProposalProperties({
   }, [canSeeEvaluation]);
 
   return (
-    <>
-      <ProposalPropertiesBase
-        canSeeEvaluation={canSeeEvaluation}
-        proposalLensLink={proposal?.lensPostLink ?? undefined}
-        archived={!!proposal?.archived}
-        isFromTemplate={!!proposal?.page?.sourceTemplateId}
-        proposalFlowFlags={proposalFlowFlags}
-        proposalStatus={proposal?.status}
-        proposalId={proposal?.id}
-        pageId={pageId}
-        readOnlyAuthors={readOnlyProperties}
-        readOnlyCategory={readOnlyCategory}
-        isAdmin={isAdmin}
-        readOnlyRubricCriteria={readOnlyRubricCriteria}
-        readOnlyProposalEvaluationType={
-          readOnlyProperties ||
-          // dont let users change type after status moves to Feedback, and forward
-          (proposal?.status !== 'draft' && !isTemplate) ||
-          isFromTemplateSource
+    <Box
+      className='CardDetail content'
+      sx={{
+        '.octo-propertyname .Button': {
+          paddingLeft: 0
         }
-        readOnlyReviewers={readOnlyReviewers}
-        rubricAnswers={proposal?.rubricAnswers}
-        isTemplate={isTemplate}
-        rubricCriteria={proposal?.rubricCriteria}
-        snapshotProposalId={snapshotProposalId}
-        updateProposalStatus={updateProposalStatus}
-        onChangeRubricCriteria={onChangeRubricCriteriaDebounced}
-        proposalFormInputs={proposalFormInputs}
-        setProposalFormInputs={onChangeProperties}
-        isPublishingToLens={isPublishingToLens}
-        readOnlyCustomProperties={readOnlyCustomProperties}
-        isEvaluationSidebarOpen={isEvaluationSidebarOpen}
-        openEvaluation={openEvaluation}
-        isReviewer={isReviewer}
-        rewardIds={proposal?.rewardIds}
-      />
-      {isPublishingToLens && (
-        <CreateLensPublication
-          onError={() => {
-            setIsPublishingToLens(false);
-          }}
-          publicationType='post'
-          content={proposalPage.content as PageContent}
-          proposalId={proposalId}
-          proposalPath={proposalPage.path}
-          onSuccess={async () => {
-            await refreshProposal();
-            setIsPublishingToLens(false);
-          }}
-          proposalTitle={proposalPage.title}
+      }}
+      mt={2}
+    >
+      <div className='octo-propertylist'>
+        <ProposalPropertiesBase
+          canSeeEvaluation={canSeeEvaluation}
+          proposalLensLink={proposal?.lensPostLink ?? undefined}
+          archived={!!proposal?.archived}
+          isFromTemplate={!!proposal?.page?.sourceTemplateId}
+          proposalFlowFlags={proposalFlowFlags}
+          proposalStatus={proposal?.status}
+          proposalId={proposal?.id}
+          pageId={pageId}
+          readOnlyAuthors={readOnlyProperties}
+          readOnlyCategory={readOnlyCategory}
+          isAdmin={isAdmin}
+          readOnlyRubricCriteria={readOnlyRubricCriteria}
+          readOnlyProposalEvaluationType={
+            readOnlyProperties ||
+            // dont let users change type after status moves to Feedback, and forward
+            (proposal?.status !== 'draft' && !isTemplate) ||
+            isFromTemplateSource
+          }
+          readOnlyReviewers={readOnlyReviewers}
+          rubricAnswers={proposal?.rubricAnswers}
+          isTemplate={isTemplate}
+          rubricCriteria={proposal?.rubricCriteria}
+          snapshotProposalId={snapshotProposalId}
+          updateProposalStatus={updateProposalStatus}
+          onChangeRubricCriteria={onChangeRubricCriteriaDebounced}
+          changeEvaluationStep={changeEvaluationStep}
+          proposalFormInputs={proposalFormInputs}
+          setProposalFormInputs={onChangeProperties}
+          isPublishingToLens={isPublishingToLens}
+          readOnlyCustomProperties={readOnlyCustomProperties}
+          isEvaluationSidebarOpen={isEvaluationSidebarOpen}
+          openEvaluation={openEvaluation}
+          isReviewer={isReviewer}
+          rewardIds={proposal?.rewardIds}
+          isCharmVerse={isCharmVerse}
         />
-      )}
-    </>
+        {isPublishingToLens && (
+          <CreateLensPublication
+            onError={() => {
+              setIsPublishingToLens(false);
+            }}
+            publicationType='post'
+            content={proposalPage.content as PageContent}
+            proposalId={proposalId}
+            proposalPath={proposalPage.path}
+            onSuccess={async () => {
+              await refreshProposal();
+              setIsPublishingToLens(false);
+            }}
+            proposalTitle={proposalPage.title}
+          />
+        )}
+      </div>
+    </Box>
   );
 }

@@ -56,8 +56,8 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
   }
 
   async function saveForm() {
-    const newReward = await createReward(newPageValues);
-    if (newReward) {
+    const success = await createReward(newPageValues);
+    if (success) {
       closeDialog();
     }
   }

@@ -38,18 +38,16 @@ export function EvaluationRow({
 }: {
   key: string;
   evaluation: WorkflowEvaluationJson;
-  onChangeOrder: (selectedId: string, targetId: string) => void;
+  onChangeOrder: (selectedId: WorkflowEvaluationJson, targetId: WorkflowEvaluationJson) => void;
   readOnly: boolean;
 } & ContextMenuProps) {
-  const dragKey = `evaluationItem-${key}`;
-  const [, , draggableRef, draggableStyle] = useSortable('view', dragKey, !readOnly, onChangeOrder);
+  const [, , draggableRef, draggableStyle] = useSortable('evaluation_row', evaluation, !readOnly, onChangeOrder);
 
   return (
     <StyledCard style={draggableStyle} variant='outlined' ref={draggableRef} sx={{ mb: 1 }} readOnly={readOnly}>
       <Box p={1} display='flex' alignItems='center' gap={1} justifyContent='space-between'>
         {!readOnly && <DragIndicator className='show-on-hover' color='secondary' fontSize='small' />}
-
-        {evaluationIcons[evaluation.type]}
+        {evaluationIcons[evaluation.type]()}
         <Typography sx={{ flexGrow: 1 }}>{evaluation.title}</Typography>
         <EvaluationContextMenu
           evaluation={evaluation}

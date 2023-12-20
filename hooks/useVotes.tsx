@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { useGetVotesForPage } from 'charmClient/hooks/votes';
 import { useNotifications } from 'components/nexus/hooks/useNotifications';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { ExtendedVote, VoteDTO } from 'lib/votes/interfaces';
@@ -45,6 +46,7 @@ export function VotesProvider({ children }: { children: ReactNode }) {
   const { space: currentSpace } = useCurrentSpace();
   const [isLoading, setIsLoading] = useState(true);
   const { mutate: mutateNotifications } = useNotifications();
+  const { data } = useGetVotesForPage(parent || undefined);
 
   const { subscribe } = useWebSocketClient();
 
@@ -100,14 +102,6 @@ export function VotesProvider({ children }: { children: ReactNode }) {
       unsubscribeFromUpdatedVotes();
     };
   }, []);
-
-  const { data } = useSWR(
-    () => (parent ? `pages/${parent.pageId || parent.postId}/votes` : null),
-    async () => charmClient.votes.getVotesByPage(parent!),
-    {
-      revalidateOnFocus: false
-    }
-  );
 
   async function castVote(voteId: string, choices: string[]) {
     const userVote = await charmClient.votes.castVote(voteId, choices);

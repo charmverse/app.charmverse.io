@@ -1,4 +1,4 @@
-import type { Block } from '@prisma/client';
+import type { Block } from '@charmverse/core/prisma';
 import { useEffect } from 'react';
 import { Create } from 'sharp';
 

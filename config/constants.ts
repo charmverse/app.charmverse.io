@@ -5,7 +5,7 @@ export const isTestEnv = (env('APP_ENV') ?? process.env.REACT_APP_APP_ENV ?? pro
 export const isStagingEnv = (env('APP_ENV') ?? process.env.REACT_APP_APP_ENV) === 'staging';
 export const isProdEnv = process.env.NODE_ENV === 'production' && !isTestEnv && !isStagingEnv;
 export const isDevEnv =
-  (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') && !isProdEnv && !isStagingEnv;
+  (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') && !isProdEnv && !isStagingEnv && !isTestEnv;
 
 export const isNodeEnv = typeof window === 'undefined';
 export const appEnv = isProdEnv ? 'production' : isStagingEnv ? 'staging' : isTestEnv ? 'test' : 'development';

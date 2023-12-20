@@ -21,7 +21,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -73,7 +73,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -137,7 +137,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -201,7 +201,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -358,19 +358,19 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   >
                     <div
-                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-1v6zf4t-MuiChip-root"
+                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
                     >
                       <span
                         class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
@@ -387,15 +387,15 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   />
                 </div>
@@ -496,19 +496,19 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   >
                     <div
-                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-1v6zf4t-MuiChip-root"
+                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
                     >
                       <span
                         class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
@@ -525,15 +525,15 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   />
                 </div>
@@ -702,7 +702,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -754,7 +754,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -818,7 +818,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -882,7 +882,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -1036,19 +1036,19 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   >
                     <div
-                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-1v6zf4t-MuiChip-root"
+                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
                     >
                       <span
                         class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
@@ -1065,15 +1065,15 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   />
                 </div>
@@ -1168,19 +1168,19 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   >
                     <div
-                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-1v6zf4t-MuiChip-root"
+                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
                     >
                       <span
                         class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
@@ -1197,15 +1197,15 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   />
                 </div>
@@ -1368,7 +1368,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -1420,7 +1420,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -1484,7 +1484,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -1548,7 +1548,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -1705,19 +1705,19 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   >
                     <div
-                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-1v6zf4t-MuiChip-root"
+                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
                     >
                       <span
                         class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
@@ -1734,15 +1734,15 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   />
                 </div>
@@ -1843,19 +1843,19 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   >
                     <div
-                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-1v6zf4t-MuiChip-root"
+                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
                     >
                       <span
                         class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
@@ -1872,15 +1872,15 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   />
                 </div>
@@ -2049,7 +2049,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -2101,7 +2101,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -2165,7 +2165,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -2229,7 +2229,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -2383,19 +2383,19 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   >
                     <div
-                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-1v6zf4t-MuiChip-root"
+                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
                     >
                       <span
                         class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
@@ -2412,15 +2412,15 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   />
                 </div>
@@ -2515,19 +2515,19 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   >
                     <div
-                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-1v6zf4t-MuiChip-root"
+                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
                     >
                       <span
                         class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
@@ -2544,15 +2544,15 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   />
                 </div>
@@ -2715,7 +2715,7 @@ exports[`components/table/Table should match snapshot 1`] = `
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -2767,7 +2767,7 @@ exports[`components/table/Table should match snapshot 1`] = `
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -2831,7 +2831,7 @@ exports[`components/table/Table should match snapshot 1`] = `
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -3041,7 +3041,7 @@ exports[`components/table/Table should match snapshot with GroupBy 1`] = `
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -3093,7 +3093,7 @@ exports[`components/table/Table should match snapshot with GroupBy 1`] = `
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -3157,7 +3157,7 @@ exports[`components/table/Table should match snapshot with GroupBy 1`] = `
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -3425,7 +3425,7 @@ exports[`components/table/Table should match snapshot, read-only 1`] = `
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <span
                 class="Label empty "
@@ -3464,7 +3464,7 @@ exports[`components/table/Table should match snapshot, read-only 1`] = `
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <span
                 class="Label empty "
@@ -3503,7 +3503,7 @@ exports[`components/table/Table should match snapshot, read-only 1`] = `
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <span
                 class="Label empty "

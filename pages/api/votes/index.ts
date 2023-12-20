@@ -10,7 +10,7 @@ import { mapNotificationActor } from 'lib/notifications/mapNotificationActor';
 import { getPermissionsClient } from 'lib/permissions/api/routers';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
-import { createVote as createVoteService } from 'lib/votes';
+import { createVote as createVoteService } from 'lib/votes/createVote';
 import { getVotesByPage } from 'lib/votes/getVotesByPage';
 import type { ExtendedVote, VoteDTO, VoteTask } from 'lib/votes/interfaces';
 import { relay } from 'lib/websockets/relay';

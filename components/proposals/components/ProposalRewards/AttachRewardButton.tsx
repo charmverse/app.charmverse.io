@@ -9,6 +9,7 @@ import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
 import type { ProposalPendingReward } from 'lib/proposal/blocks/interfaces';
+import type { ProposalReviewerInput } from 'lib/proposal/interface';
 import type { RewardReviewer } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
@@ -20,15 +21,14 @@ export function AttachRewardButton({
   children
 }: {
   onSave: (reward: ProposalPendingReward) => void;
-  reviewers: RewardReviewer[];
+  reviewers: ProposalReviewerInput[];
   assignedSubmitters: string[];
   readOnly: boolean;
   children?: React.ReactNode;
 }) {
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
 
-  const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, createReward, isSavingReward } =
-    useNewReward();
+  const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, isSavingReward } = useNewReward();
 
   function closeDialog() {
     clearRewardValues();
@@ -37,7 +37,8 @@ export function AttachRewardButton({
 
   function createNewReward() {
     clearRewardValues();
-    setRewardValues({ reviewers, assignedSubmitters });
+    const rewardReviewers = reviewers.filter((reviewer) => reviewer.group !== 'system_role') as RewardReviewer[];
+    setRewardValues({ reviewers: rewardReviewers, assignedSubmitters });
 
     openNewPage({
       type: 'bounty'

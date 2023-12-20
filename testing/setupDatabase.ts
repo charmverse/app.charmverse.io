@@ -30,12 +30,11 @@ import type { IViewType } from 'lib/focalboard/boardView';
 import { generateDefaultPropertiesInput } from 'lib/members/generateDefaultPropertiesInput';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import type { NotificationToggles } from 'lib/notifications/notificationToggles';
-import type { PageWithProposal } from 'lib/pages/interfaces';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import type { BountyPermissions } from 'lib/permissions/bounties';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
-import type { ProposalReviewerInput } from 'lib/proposal/interface';
+import type { ProposalWithUsersAndRubric, ProposalReviewerInput } from 'lib/proposal/interface';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { getRewardOrThrow } from 'lib/rewards/getReward';
 import type { ApplicationMeta } from 'lib/rewards/interfaces';
@@ -789,7 +788,7 @@ export async function createProposalWithUsers({
   userId: string;
   proposalStatus?: ProposalStatus;
   proposalCategoryId?: string;
-} & Partial<Prisma.PageCreateInput>): Promise<PageWithProposal> {
+} & Partial<Prisma.PageCreateInput>): Promise<{ id: string; pageId: string }> {
   const proposalId = v4();
 
   const proposalCategoryIdToLink = !proposalCategoryId
@@ -804,7 +803,7 @@ export async function createProposalWithUsers({
       ).id
     : proposalCategoryId;
 
-  const proposalPage = await createPageDb<PageWithProposal>({
+  const proposalPage = await createPageDb({
     data: {
       ...pageCreateInput,
       id: proposalId,
@@ -853,21 +852,13 @@ export async function createProposalWithUsers({
           }
         }
       }
-    },
-    include: {
-      proposal: {
-        include: {
-          authors: true,
-          reviewers: true,
-          category: true,
-          rubricAnswers: true,
-          rubricCriteria: true
-        }
-      }
     }
   });
 
-  return proposalPage;
+  return {
+    id: proposalPage.proposalId!,
+    pageId: proposalPage.id
+  };
 }
 
 export async function generateCommentWithThreadAndPage({
@@ -965,6 +956,7 @@ export function createBlock(options: Partial<Block> & Pick<Block, 'createdBy' | 
   });
 }
 
+type PageWithProposal = Page & { proposal: ProposalWithUsersAndRubric };
 /**
  * Creates a proposal with the linked authors and reviewers
  */
@@ -1009,7 +1001,7 @@ export async function generateProposal({
       })
     ).id;
 
-  const result = await createPageDb<PageWithProposal>({
+  const result = await createPageDb({
     data: {
       id: proposalId,
       contentText: '',
@@ -1073,7 +1065,7 @@ export async function generateProposal({
     }
   });
 
-  return result;
+  return result as PageWithProposal;
 }
 
 /**
