@@ -1,3 +1,4 @@
+import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
@@ -40,5 +41,9 @@ describe('createForm', () => {
 
     expect(formWithFields).toBeDefined();
     expect(formWithFields?.formFields).toHaveLength(fieldsInput.length);
+  });
+
+  it('should throw an error if there are no fields for the form', async () => {
+    await expect(createForm([])).rejects.toBeInstanceOf(InvalidInputError);
   });
 });
