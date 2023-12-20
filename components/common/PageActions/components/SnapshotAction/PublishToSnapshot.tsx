@@ -17,8 +17,8 @@ import { PublishingForm } from './PublishingForm';
 
 interface Props {
   pageId: string;
-  evaluationId: string;
-  proposalId: string;
+  evaluationId?: string;
+  proposalId?: string;
   snapshotProposalId: string | null;
   renderContent: (props: { onClick?: () => void; label: string; icon: ReactNode }) => ReactNode;
   onPublish?: () => void;
