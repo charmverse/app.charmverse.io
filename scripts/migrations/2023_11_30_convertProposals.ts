@@ -36,6 +36,7 @@ async function convertProposals() {
         const completedAt = vote?.deadline;
         const voteFailed = vote?.status === 'Rejected';
         const result = votePassed ? 'pass' : voteFailed ? 'fail' : null;
+        const passFailEvaluationId = uuid();
         await prisma.$transaction(async (tx) => {
           if (isPublished(p)) {
             await tx.proposal.update({
@@ -59,6 +60,37 @@ async function convertProposals() {
           });
           await tx.proposalEvaluation.create({
             data: {
+              ...feedbackEvaluation,
+              index: 0,
+              proposalId: p.id,
+              permissions: {
+                create: getDefaultPermissions()
+              }
+            }
+          });
+          await tx.proposalEvaluation.create({
+            data: {
+              id: passFailEvaluationId,
+              title: 'Revew',
+              index: 1,
+              result: p.reviewedAt ? 'pass' : null,
+              completedAt: p.reviewedAt || null,
+              decidedBy: p.reviewedBy,
+              type: 'pass_fail',
+              proposalId: p.id,
+              permissions: {
+                create: getDefaultPermissions()
+              },
+              reviewers: {
+                create: p.reviewers.map((reviewer) => ({
+                  ...reviewer,
+                  evaluationId: passFailEvaluationId
+                }))
+              }
+            }
+          });
+          await tx.proposalEvaluation.create({
+            data: {
               id: uuid(),
               title: 'Vote',
               index: 1,
@@ -67,6 +99,7 @@ async function convertProposals() {
               completedAt: result ? completedAt || new Date() : null,
               proposalId: p.id,
               snapshotId: p.page?.snapshotProposalId,
+              snapshotExpiry: p.snapshotProposalExpiry,
               voteId: vote?.id,
               reviewers: {
                 create: p.category?.proposalCategoryPermissions
@@ -84,7 +117,8 @@ async function convertProposals() {
           });
         });
       } else if (p.evaluationType === 'rubric') {
-        const evaluationId = uuid();
+        const passFailEvaluationId = uuid();
+        const rubricEvaluationId = uuid();
         await prisma.$transaction(async (tx) => {
           if (isPublished(p)) {
             await tx.proposal.update({
@@ -108,9 +142,30 @@ async function convertProposals() {
           });
           await tx.proposalEvaluation.create({
             data: {
-              id: evaluationId,
-              title: 'Rubric evaluation',
+              id: passFailEvaluationId,
+              title: 'Revew',
               index: 1,
+              result: p.reviewedAt ? 'pass' : null,
+              completedAt: p.reviewedAt,
+              decidedBy: p.reviewedBy,
+              type: 'pass_fail',
+              proposalId: p.id,
+              permissions: {
+                create: getDefaultPermissions()
+              },
+              reviewers: {
+                create: p.reviewers.map((reviewer) => ({
+                  ...reviewer,
+                  evaluationId: passFailEvaluationId
+                }))
+              }
+            }
+          });
+          await tx.proposalEvaluation.create({
+            data: {
+              id: rubricEvaluationId,
+              title: 'Rubric evaluation',
+              index: 2,
               type: 'rubric',
               proposalId: p.id,
               permissions: {
@@ -123,7 +178,7 @@ async function convertProposals() {
               proposalId: p.id
             },
             data: {
-              evaluationId
+              evaluationId: rubricEvaluationId
             }
           });
           await tx.proposalRubricCriteria.updateMany({
@@ -131,7 +186,7 @@ async function convertProposals() {
               proposalId: p.id
             },
             data: {
-              evaluationId
+              evaluationId: rubricEvaluationId
             }
           });
           await tx.proposalRubricCriteriaAnswer.updateMany({
@@ -139,7 +194,7 @@ async function convertProposals() {
               proposalId: p.id
             },
             data: {
-              evaluationId
+              evaluationId: rubricEvaluationId
             }
           });
           await tx.draftProposalRubricCriteriaAnswer.updateMany({
@@ -147,7 +202,7 @@ async function convertProposals() {
               proposalId: p.id
             },
             data: {
-              evaluationId
+              evaluationId: rubricEvaluationId
             }
           });
         });

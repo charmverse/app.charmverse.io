@@ -11,7 +11,7 @@ const defaultDomains = ['charmverse'];
  */
 export function useIsCharmverseSpace(allowedDomains = defaultDomains) {
   const { space: currentSpace } = useCurrentSpace();
-
+  return false;
   // check for CharmVerse spaces
   if (allowedDomains.includes(currentSpace?.domain ?? '') || currentSpace?.domain.startsWith('cvt-')) {
     return true;
