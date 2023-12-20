@@ -43,6 +43,7 @@ export function EvaluationSettings({ evaluation, categoryId, onChange, readOnly,
       }))
     });
   }
+
   return (
     <Box ml={3}>
       <Box display='flex' alignItems='center' gap='5px' ml='-25px'>
@@ -56,22 +57,16 @@ export function EvaluationSettings({ evaluation, categoryId, onChange, readOnly,
         </Typography>
       </FormLabel>
       <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow' mb={2}>
-        {evaluation.type === 'vote' ? (
-          <Typography color='secondary' variant='caption'>
-            Vote permissions are specified by Categories
-          </Typography>
-        ) : (
-          <UserAndRoleSelect
-            data-test='proposal-reviewer-select'
-            emptyPlaceholderContent='Select user or role'
-            value={reviewerOptions}
-            readOnly={readOnly || readOnlyReviewers}
-            systemRoles={[allMembersSystemRole]}
-            variant='outlined'
-            proposalCategoryId={categoryId}
-            onChange={handleOnChangeReviewers}
-          />
-        )}
+        <UserAndRoleSelect
+          data-test='proposal-reviewer-select'
+          emptyPlaceholderContent='Select user or role'
+          value={reviewerOptions}
+          readOnly={readOnly || readOnlyReviewers}
+          systemRoles={[allMembersSystemRole]}
+          variant='outlined'
+          proposalCategoryId={categoryId}
+          onChange={handleOnChangeReviewers}
+        />
       </Box>
       {evaluation.type === 'rubric' && (
         <>
