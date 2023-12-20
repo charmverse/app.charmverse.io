@@ -8,29 +8,6 @@ import type { FormFieldInput } from 'components/common/form/interfaces';
 import { createForm } from 'lib/form/createForm';
 import { upsertProposalFormFields } from 'lib/proposal/form/upsertProposalFormFields';
 
-const fieldsInput: FormFieldInput[] = [
-  {
-    id: v4(),
-    type: 'short_text',
-    name: 'name',
-    description: 'description',
-    index: 0,
-    options: [],
-    private: false,
-    required: true
-  },
-  {
-    id: v4(),
-    type: 'long_text',
-    name: 'long name',
-    description: 'another description',
-    index: 1,
-    options: [],
-    private: true,
-    required: true
-  }
-];
-
 const numberFieldInput: FormFieldInput = {
   id: v4(),
   type: 'number',
@@ -60,6 +37,29 @@ describe('upsertProposalFormFields', () => {
       userId: user.id,
       categoryId: proposalCategory.id
     });
+
+    const fieldsInput: FormFieldInput[] = [
+      {
+        id: v4(),
+        type: 'short_text',
+        name: 'name',
+        description: 'description',
+        index: 0,
+        options: [],
+        private: false,
+        required: true
+      },
+      {
+        id: v4(),
+        type: 'long_text',
+        name: 'long name',
+        description: 'another description',
+        index: 1,
+        options: [],
+        private: true,
+        required: true
+      }
+    ];
 
     const formId = await createForm(fieldsInput);
     // add form to proposal
@@ -96,6 +96,29 @@ describe('upsertProposalFormFields', () => {
       categoryId: proposalCategory.id
     });
 
+    const fieldsInput: FormFieldInput[] = [
+      {
+        id: v4(),
+        type: 'short_text',
+        name: 'name',
+        description: 'description',
+        index: 0,
+        options: [],
+        private: false,
+        required: true
+      },
+      {
+        id: v4(),
+        type: 'long_text',
+        name: 'long name',
+        description: 'another description',
+        index: 1,
+        options: [],
+        private: true,
+        required: true
+      }
+    ];
+
     const formId = await createForm(fieldsInput);
     // add form to proposal
     await prisma.proposal.update({ where: { id: proposal.id }, data: { formId } });
@@ -116,7 +139,18 @@ describe('upsertProposalFormFields', () => {
     await expect(
       upsertProposalFormFields({
         proposalId: undefined as any,
-        formFields: fieldsInput
+        formFields: [
+          {
+            id: v4(),
+            type: 'long_text',
+            name: 'long name',
+            description: 'another description',
+            index: 1,
+            options: [],
+            private: true,
+            required: true
+          }
+        ]
       })
     ).rejects.toBeInstanceOf(InvalidInputError);
   });
