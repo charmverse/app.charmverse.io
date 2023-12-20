@@ -7,7 +7,7 @@ import type { ProposalWithUsers, WorkflowEvaluationJson, ProposalWorkflowTyped }
 import { arrayUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
-import type { FormFieldInput } from 'components/common/form/interfaces';
+import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
 import { createForm } from 'lib/form/createForm';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { createPage } from 'lib/pages/server/createPage';
@@ -51,6 +51,7 @@ export type CreateProposalInput = {
   fields?: ProposalFields;
   workflowId?: string;
   formFields?: FormFieldInput[];
+  formAnswers?: FieldAnswerInput[];
   formId?: string;
 };
 
@@ -71,9 +72,10 @@ export async function createProposal({
   rubricCriteria,
   publishToLens,
   fields,
-  formFields,
+  workflowId,
   formId,
-  workflowId
+  formFields,
+  formAnswers
 }: CreateProposalInput) {
   if (!categoryId) {
     throw new InvalidInputError('Proposal must be linked to a category');
