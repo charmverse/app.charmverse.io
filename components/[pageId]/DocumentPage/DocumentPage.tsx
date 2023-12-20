@@ -522,7 +522,19 @@ function DocumentPage({
             parentElementId: 'file-drop-container'
           })}
         >
-          <PageTemplateBanner parentId={page.parentId} pageType={page.type} />
+          <PageTemplateBanner
+            parentId={page.parentId}
+            pageType={page.type}
+            proposalType={
+              page.type === 'proposal_template'
+                ? proposal
+                  ? proposal.formId
+                    ? 'structured'
+                    : 'free_form'
+                  : undefined
+                : undefined
+            }
+          />
           {/* temporary? disable editing of page meta data when in suggestion mode */}
           {page.headerImage && (
             <PageBanner
