@@ -91,6 +91,26 @@ export async function updateProposalEvaluation({
           }
         }
       }
+    } else if (result === null) {
+      const evaluation = await tx.proposalEvaluation.findUnique({
+        where: {
+          id: evaluationId
+        }
+      });
+      if (evaluation?.type === 'vote') {
+        throw new Error('Cannot reset vote evaluation');
+      }
+      log.debug('Resetting proposal evaluation', { proposalId });
+      await tx.proposalEvaluation.update({
+        where: {
+          id: evaluationId
+        },
+        data: {
+          result: null,
+          decidedBy: null,
+          completedAt: null
+        }
+      });
     }
     if (voteSettings) {
       await tx.proposalEvaluation.update({

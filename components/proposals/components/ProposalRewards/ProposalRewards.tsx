@@ -124,7 +124,7 @@ export function ProposalRewards({
                       <Typography component='span' variant='subtitle1' fontWeight='normal'>
                         {getRewardPage(reward.id)?.title || 'Untitled reward'}
                       </Typography>
-                      <Hidden lgDown>
+                      <Hidden mdDown>
                         <Stack alignItems='center' direction='row' height='100%'>
                           {reward.customReward ? (
                             <Typography component='span' variant='subtitle1' fontWeight='normal'>

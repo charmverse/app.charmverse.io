@@ -154,6 +154,11 @@ export async function createProposal({
   if (!proposalFormId && formFields?.length && pageProps?.type === 'proposal_template') {
     proposalFormId = await createForm(formFields);
   }
+  for (const evaluation of evaluations) {
+    if (evaluation.reviewers.length === 0) {
+      throw new Error('No reviewers defined for proposal evaluation step');
+    }
+  }
 
   // Using a transaction to ensure both the proposal and page gets created together
   const [proposal, , , page] = await prisma.$transaction([
