@@ -18,12 +18,6 @@ export function useGetPaymentMethods(spaceId: MaybeString) {
   });
 }
 
-export function useGetSpaceProposalWorkflows(spaceId: MaybeString) {
-  return useGET<PaymentMethod[]>(spaceId ? `/api/payment-methods` : null, {
-    spaceId
-  });
-}
-
 export function useGetProposalWorkflows(spaceId: MaybeString) {
   return useGETImmutable<ProposalWorkflowTyped[]>(spaceId ? `/api/spaces/${spaceId}/proposals/workflows` : null);
 }

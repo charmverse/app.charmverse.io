@@ -3,7 +3,7 @@ import type { ProposalCategory, Space, User } from '@charmverse/core/prisma';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
 import { v4 as uuid } from 'uuid';
 
-import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposalCategory } from 'testing/utils/proposals';
 
 import { createProposal } from '../createProposal';
@@ -14,7 +14,7 @@ let space: Space;
 let proposalCategory: ProposalCategory;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken();
+  const generated = await generateUserAndSpace();
   user = generated.user;
   space = generated.space;
   proposalCategory = await generateProposalCategory({

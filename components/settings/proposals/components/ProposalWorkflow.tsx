@@ -19,6 +19,7 @@ import { useState } from 'react';
 
 import { Button } from 'components/common/Button';
 import MultiTabs from 'components/common/MultiTabs';
+import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { getDefaultEvaluation } from 'lib/proposal/workflows/defaultEvaluation';
 
@@ -37,7 +38,7 @@ export function ProposalWorkflowItem({
   onUpdate,
   onDuplicate,
   onDelete,
-  onCancel,
+  onCancelChanges,
   readOnly
 }: {
   isExpanded: boolean;
@@ -46,7 +47,7 @@ export function ProposalWorkflowItem({
   onUpdate: (workflow: WorkflowTemplateFormItem) => void;
   onSave: (workflow: ProposalWorkflowTyped) => void;
   onDelete: (id: string) => void;
-  onCancel: (id: string) => void;
+  onCancelChanges: (id: string) => void;
   onDuplicate: (workflow: ProposalWorkflowTyped) => void;
   readOnly: boolean;
 }) {
@@ -63,17 +64,20 @@ export function ProposalWorkflowItem({
     onDelete(workflow.id);
   }
 
-  function cancelNewWorkflow() {
-    onCancel(workflow.id);
+  function cancelChanges() {
+    setUnsavedChanges(false);
+    onCancelChanges(workflow.id);
   }
 
   function updateWorkflowTitle(title: string) {
-    workflow.title = title;
-    onUpdate(workflow);
+    onUpdate({ ...workflow, title });
     setUnsavedChanges(true);
   }
 
-  function changeEvaluationStepOrder(selectedId: string, targetId: string) {
+  function changeEvaluationStepOrder(
+    { id: selectedId }: WorkflowEvaluationJson,
+    { id: targetId }: WorkflowEvaluationJson
+  ) {
     const newOrder = [...workflow.evaluations];
     const propIndex = newOrder.findIndex((val) => val.id === selectedId); // find the property that was dragged
     const deletedElements = newOrder.splice(propIndex, 1); // remove the dragged property from the array
@@ -81,11 +85,11 @@ export function ProposalWorkflowItem({
     const newIndex = propIndex <= droppedOnIndex ? droppedOnIndex + 1 : droppedOnIndex; // if the dragged property was dropped on a space with a higher index, the new index needs to include 1 extra
     newOrder.splice(newIndex, 0, deletedElements[0]); // add the property to the new index
     workflow.evaluations = newOrder;
-    onUpdate(workflow);
+    onUpdate({ ...workflow, evaluations: newOrder });
     setUnsavedChanges(true);
   }
 
-  function addEvaluationStep(evaluation?: WorkflowEvaluationJson) {
+  function openNewEvaluationStepModal(evaluation?: WorkflowEvaluationJson) {
     const newEvaluation = getDefaultEvaluation(evaluation);
     setActiveEvaluation({
       ...newEvaluation,
@@ -94,25 +98,26 @@ export function ProposalWorkflowItem({
   }
 
   function deleteEvaluationStep(id: string) {
-    workflow.evaluations = workflow.evaluations.filter((evaluation) => evaluation.id !== id);
-    onUpdate(workflow);
+    const evaluations = workflow.evaluations.filter((evaluation) => evaluation.id !== id);
+    onUpdate({ ...workflow, evaluations });
     setUnsavedChanges(true);
   }
 
   // note: this only updates the workflow state, does not save to the db
   function updateEvaluationStep(updates: WorkflowEvaluationJson) {
     const index = workflow.evaluations.findIndex((e) => e.id === updates.id);
+    const evaluations = [...workflow.evaluations];
     if (index === -1) {
-      workflow.evaluations.push(updates);
+      evaluations.push(updates);
     } else {
-      workflow.evaluations[index] = { ...workflow.evaluations[index], ...updates };
+      evaluations[index] = { ...evaluations[index], ...updates };
     }
-    onUpdate(workflow);
+    onUpdate({ ...workflow, evaluations });
     setUnsavedChanges(true);
   }
 
   function duplicateEvaluationStep(evaluation: WorkflowEvaluationJson) {
-    addEvaluationStep(evaluation);
+    openNewEvaluationStepModal(evaluation);
   }
 
   function closeEvaluationStep() {
@@ -131,6 +136,8 @@ export function ProposalWorkflowItem({
       showMessage('Error saving workflow', 'error');
     }
   }
+
+  usePreventReload(hasUnsavedChanges);
 
   let disabledTooltip: string | undefined;
   if (!workflow.title) {
@@ -213,12 +220,12 @@ export function ProposalWorkflowItem({
                 ))}
 
               <Box display='flex' justifyContent='space-between' alignItems='center'>
-                <Button disabled={readOnly} variant='text' onClick={() => addEvaluationStep()} height='1px'>
+                <Button disabled={readOnly} variant='text' onClick={() => openNewEvaluationStepModal()} height='1px'>
                   + Add step
                 </Button>
                 <Stack flexDirection='row' gap={1}>
-                  {workflow.isNew && (
-                    <Button variant='outlined' color='secondary' onClick={cancelNewWorkflow}>
+                  {hasUnsavedChanges && (
+                    <Button variant='outlined' color='secondary' onClick={cancelChanges}>
                       Cancel
                     </Button>
                   )}

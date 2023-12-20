@@ -5,7 +5,7 @@ import { createForumPost } from 'lib/forums/posts/createForumPost';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { assignRole } from 'lib/roles';
-import { createVote } from 'lib/votes';
+import { createVote } from 'lib/votes/createVote';
 import { getSpaceEntity, getVoteEntity } from 'lib/webhookPublisher/entities';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { createPage, generateUserAndSpace } from 'testing/setupDatabase';

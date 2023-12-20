@@ -52,7 +52,7 @@ describe('updateProposalStatus', () => {
   });
 
   it('Move a reviewed proposal to discussion status and unassign proposal reviewer and reviewed at fields', async () => {
-    const pageWithProposal = await createProposalWithUsers({
+    const { id: proposalId } = await createProposalWithUsers({
       spaceId: space.id,
       userId: user.id,
       authors: [],
@@ -61,7 +61,7 @@ describe('updateProposalStatus', () => {
     });
 
     const proposal = await updateProposalStatus({
-      proposalId: pageWithProposal.proposal?.id as string,
+      proposalId,
       newStatus: 'discussion',
       userId: user.id
     });
@@ -71,7 +71,7 @@ describe('updateProposalStatus', () => {
   });
 
   it('Throw error when trying to move a reviewed proposal to review', async () => {
-    const pageWithProposal = await createProposalWithUsers({
+    const { id: proposalId } = await createProposalWithUsers({
       spaceId: space.id,
       userId: user.id,
       authors: [],
@@ -80,7 +80,7 @@ describe('updateProposalStatus', () => {
     });
     await expect(
       updateProposalStatus({
-        proposalId: pageWithProposal.proposal?.id as string,
+        proposalId,
         newStatus: 'review',
         userId: user.id
       })
@@ -88,7 +88,7 @@ describe('updateProposalStatus', () => {
   });
 
   it('Should allow reviewer to move reviewed proposal back to review', async () => {
-    const pageWithProposal = await createProposalWithUsers({
+    const { id: proposalId } = await createProposalWithUsers({
       spaceId: space.id,
       userId: user.id,
       authors: [],
@@ -97,7 +97,7 @@ describe('updateProposalStatus', () => {
     });
 
     const proposal = await updateProposalStatus({
-      proposalId: pageWithProposal.proposal?.id as string,
+      proposalId,
       newStatus: 'review',
       userId: user.id
     });
@@ -108,7 +108,7 @@ describe('updateProposalStatus', () => {
   });
 
   it('Should allow reviewer to move proposal from discussion to review', async () => {
-    const pageWithProposal = await createProposalWithUsers({
+    const { id: proposalId } = await createProposalWithUsers({
       spaceId: space.id,
       userId: user.id,
       authors: [],
@@ -117,7 +117,7 @@ describe('updateProposalStatus', () => {
     });
 
     const proposal = await updateProposalStatus({
-      proposalId: pageWithProposal.proposal?.id as string,
+      proposalId,
       newStatus: 'review',
       userId: user.id
     });
@@ -128,7 +128,7 @@ describe('updateProposalStatus', () => {
   });
 
   it('Should allow reviewer to move proposal from reviewed to vote_active', async () => {
-    const pageWithProposal = await createProposalWithUsers({
+    const { id: proposalId } = await createProposalWithUsers({
       spaceId: space.id,
       userId: user.id,
       authors: [],
@@ -137,7 +137,7 @@ describe('updateProposalStatus', () => {
     });
 
     const proposal = await updateProposalStatus({
-      proposalId: pageWithProposal.proposal?.id as string,
+      proposalId,
       newStatus: 'vote_active',
       userId: user.id
     });
@@ -146,7 +146,7 @@ describe('updateProposalStatus', () => {
   });
 
   it('Throw error when trying to move a discussion proposal to review without any reviewers attached', async () => {
-    const pageWithProposal = await createProposalWithUsers({
+    const { id: proposalId } = await createProposalWithUsers({
       spaceId: space.id,
       userId: user.id,
       authors: [],
@@ -155,7 +155,7 @@ describe('updateProposalStatus', () => {
     });
     await expect(
       updateProposalStatus({
-        proposalId: pageWithProposal.proposal?.id as string,
+        proposalId,
         newStatus: 'review',
         userId: user.id
       })
@@ -182,7 +182,7 @@ describe('updateProposalStatus', () => {
   });
 
   it('should save the snapshot expiry date when changing the status of the proposal to vote active if it was exported to snapshot', async () => {
-    const pageWithProposal = await createProposalWithUsers({
+    const { id: proposalId, pageId } = await createProposalWithUsers({
       spaceId: space.id,
       proposalStatus: 'reviewed',
       userId: user.id,
@@ -192,7 +192,7 @@ describe('updateProposalStatus', () => {
 
     await prisma.page.update({
       where: {
-        id: pageWithProposal.id
+        id: pageId
       },
       data: {
         // https://snapshot.org/#/olympusdao.eth/proposal/0x3236041d0857f7548c8da12f3890c6f590a016f02fd2f100230e1b8cbcfed078
@@ -201,7 +201,7 @@ describe('updateProposalStatus', () => {
     });
 
     const proposal = await updateProposalStatus({
-      proposalId: pageWithProposal.proposalId as string,
+      proposalId,
       newStatus: 'vote_active',
       userId: user.id
     });

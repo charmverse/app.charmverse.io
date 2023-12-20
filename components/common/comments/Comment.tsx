@@ -81,7 +81,7 @@ export function Comment({
     doc: comment.content as PageContent,
     rawText: comment.contentText
   });
-  const commentContainerRef = useRef<HTMLElement | null>(null);
+  const commentContainerRef = useRef<HTMLDivElement | null>(null);
   const [commentEditContent, setCommentEditContent] = useState<ICharmEditorOutput>(commentContent);
   const { showUserId } = useMemberDialog();
   const { commentId } = router.query as { commentId: string | null };

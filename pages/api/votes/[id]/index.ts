@@ -8,9 +8,10 @@ import { permissionsApiClient } from 'lib/permissions/api/client';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
-import { deleteVote as deleteVoteService, getVote as getVoteService, updateVote as updateVoteService } from 'lib/votes';
-import { getVote } from 'lib/votes/getVote';
+import { deleteVote as deleteVoteService } from 'lib/votes/deleteVote';
+import { getVote as getVoteService } from 'lib/votes/getVote';
 import type { ExtendedVote, UpdateVoteDTO } from 'lib/votes/interfaces';
+import { updateVote as updateVoteService } from 'lib/votes/updateVote';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -122,7 +123,7 @@ async function updateVote(req: NextApiRequest, res: NextApiResponse<Vote | { err
 
   await updateVoteService(voteId, userId, update);
 
-  const updatedVote = (await getVote(voteId, userId)) as ExtendedVote;
+  const updatedVote = (await getVoteService(voteId, userId)) as ExtendedVote;
 
   relay.broadcast(
     {

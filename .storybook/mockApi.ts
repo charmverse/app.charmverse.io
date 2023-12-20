@@ -86,22 +86,6 @@ const proposalHandlers = {
   }),
   reviewerIds: rest.get(`/api/proposals/:pageId/get-user-reviewerids`, (req, res, ctx) => {
     return res(ctx.json([]));
-  }),
-  proposalPermissions: rest.post(`/api/permissions/proposals/compute-proposal-permissions`, (req, res, ctx) => {
-    const permissions: ProposalPermissionFlags = {
-      edit: true,
-      view: true,
-      delete: true,
-      create_vote: true,
-      vote: true,
-      comment: true,
-      review: true,
-      evaluate: true,
-      make_public: true,
-      archive: true,
-      unarchive: true
-    };
-    return res(ctx.json(permissions));
   })
 };
 

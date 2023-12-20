@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { PageWithPermissions } from '@charmverse/core/pages';
-import type { Page } from '@charmverse/core/prisma';
-import type { Space, User } from '@charmverse/core/prisma-client';
+import type { Page, Space, User } from '@charmverse/core/prisma';
 import { testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 

@@ -14,14 +14,16 @@ type RubricAnswerData<T extends ProposalRubricCriteriaType = ProposalRubricCrite
   ProposalRubricCriteriaAnswerWithTypedResponse<T>,
   'rubricCriteriaId' | 'response'
 > & { comment?: string };
+
 export type RubricAnswerUpsert = {
   isDraft?: boolean;
   userId: string;
   proposalId: string;
+  evaluationId?: string | null;
   answers: RubricAnswerData[];
 };
 
-export async function upsertRubricAnswers({ answers, userId, proposalId, isDraft }: RubricAnswerUpsert) {
+export async function upsertRubricAnswers({ answers, userId, proposalId, evaluationId, isDraft }: RubricAnswerUpsert) {
   if (!stringUtils.isUUID(proposalId)) {
     throw new InvalidInputError(`Valid proposalId is required`);
   } else if (!stringUtils.isUUID(userId)) {
@@ -31,6 +33,7 @@ export async function upsertRubricAnswers({ answers, userId, proposalId, isDraft
   const criteria = (await prisma.proposalRubricCriteria.findMany({
     where: {
       proposalId,
+      evaluationId,
       id: {
         in: answers.map((a) => a.rubricCriteriaId)
       }
@@ -62,12 +65,14 @@ export async function upsertRubricAnswers({ answers, userId, proposalId, isDraft
     table.deleteMany({
       where: {
         proposalId,
+        evaluationId,
         userId
       }
     }),
     table.createMany({
       data: answers.map((a) => ({
         proposalId,
+        evaluationId,
         response: a.response,
         userId,
         comment: a.comment,

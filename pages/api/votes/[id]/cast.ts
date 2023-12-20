@@ -9,7 +9,7 @@ import { getPermissionsClient, permissionsApiClient } from 'lib/permissions/api/
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
-import { castVote as castVoteService } from 'lib/votes';
+import { castVote as castVoteService } from 'lib/votes/castVote';
 import type { UserVoteDTO } from 'lib/votes/interfaces';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

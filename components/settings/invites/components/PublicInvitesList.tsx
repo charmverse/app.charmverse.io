@@ -1,4 +1,4 @@
-import type { PublicInviteLinkContext } from '@charmverse/core/prisma-client';
+import type { PublicInviteLinkContext } from '@charmverse/core/prisma';
 import CloseIcon from '@mui/icons-material/Close';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import Box from '@mui/material/Box';

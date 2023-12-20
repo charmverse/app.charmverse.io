@@ -2,7 +2,7 @@ import type { ProposalCategory } from '@charmverse/core/prisma';
 
 import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
 import { mapMUIColorToProperty } from 'components/common/BoardEditor/utils/mapMUIColorToProperty';
-import { evaluationTypeOptions } from 'components/proposals/components/ProposalProperties/components/ProposalEvaluationTypeSelect';
+import { evaluationTypeOptions } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalEvaluationTypeSelect';
 import type { Block } from 'lib/focalboard/block';
 import { createBoard } from 'lib/focalboard/board';
 import { Constants } from 'lib/focalboard/constants';

@@ -13,7 +13,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
         class="top-head"
       >
         <div
-          class="css-1y52uev-MuiStack-root"
+          class="MuiStack-root css-1y52uev-MuiStack-root"
         >
           <div
             class="ViewHeader "
@@ -138,11 +138,11 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                 </button>
               </div>
               <div
-                class="MuiButtonGroup-root MuiButtonGroup-contained MuiButtonGroup-disableElevation css-76ejyv-MuiButtonGroup-root"
+                class="MuiButtonGroup-root MuiButtonGroup-contained MuiButtonGroup-disableElevation css-jgbgc3-MuiButtonGroup-root"
                 role="group"
               >
                 <button
-                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation css-1pjzawa-MuiButtonBase-root-MuiButton-root"
+                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation MuiButtonGroup-firstButton css-1pjzawa-MuiButtonBase-root-MuiButton-root"
                   tabindex="0"
                   type="button"
                 >
@@ -153,7 +153,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                   </div>
                 </button>
                 <button
-                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation css-1lvcm06-MuiButtonBase-root-MuiButton-root"
+                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation MuiButtonGroup-lastButton css-1lvcm06-MuiButtonBase-root-MuiButton-root"
                   tabindex="0"
                   type="button"
                 >
@@ -284,7 +284,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                     class="octo-board-column"
                   >
                     <a
-                      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1mu6lya-MuiTypography-root-MuiLink-root"
+                      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-uufjfw-MuiTypography-root-MuiLink-root"
                       draggable="false"
                       href="/test-space/1"
                     >
@@ -334,12 +334,12 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                           </div>
                         </div>
                         <div
-                          class="css-1qh2y1i-MuiStack-root"
+                          class="MuiStack-root css-1qh2y1i-MuiStack-root"
                         />
                       </div>
                     </a>
                     <a
-                      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1mu6lya-MuiTypography-root-MuiLink-root"
+                      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-uufjfw-MuiTypography-root-MuiLink-root"
                       draggable="false"
                       href="/test-space/2"
                     >
@@ -389,7 +389,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                           </div>
                         </div>
                         <div
-                          class="css-1qh2y1i-MuiStack-root"
+                          class="MuiStack-root css-1qh2y1i-MuiStack-root"
                         />
                       </div>
                     </a>
@@ -723,7 +723,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
         class="top-head"
       >
         <div
-          class="css-1y52uev-MuiStack-root"
+          class="MuiStack-root css-1y52uev-MuiStack-root"
         >
           <div
             class="ViewHeader "
@@ -848,11 +848,11 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                 </button>
               </div>
               <div
-                class="MuiButtonGroup-root MuiButtonGroup-contained MuiButtonGroup-disableElevation css-76ejyv-MuiButtonGroup-root"
+                class="MuiButtonGroup-root MuiButtonGroup-contained MuiButtonGroup-disableElevation css-jgbgc3-MuiButtonGroup-root"
                 role="group"
               >
                 <button
-                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation css-1pjzawa-MuiButtonBase-root-MuiButton-root"
+                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation MuiButtonGroup-firstButton css-1pjzawa-MuiButtonBase-root-MuiButton-root"
                   tabindex="0"
                   type="button"
                 >
@@ -863,7 +863,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                   </div>
                 </button>
                 <button
-                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation css-1lvcm06-MuiButtonBase-root-MuiButton-root"
+                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation MuiButtonGroup-lastButton css-1lvcm06-MuiButtonBase-root-MuiButton-root"
                   tabindex="0"
                   type="button"
                 >
@@ -1111,7 +1111,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
         class="top-head"
       >
         <div
-          class="css-1y52uev-MuiStack-root"
+          class="MuiStack-root css-1y52uev-MuiStack-root"
         >
           <div
             class="ViewHeader "
@@ -1236,11 +1236,11 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                 </button>
               </div>
               <div
-                class="MuiButtonGroup-root MuiButtonGroup-contained MuiButtonGroup-disableElevation css-76ejyv-MuiButtonGroup-root"
+                class="MuiButtonGroup-root MuiButtonGroup-contained MuiButtonGroup-disableElevation css-jgbgc3-MuiButtonGroup-root"
                 role="group"
               >
                 <button
-                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation css-1pjzawa-MuiButtonBase-root-MuiButton-root"
+                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation MuiButtonGroup-firstButton css-1pjzawa-MuiButtonBase-root-MuiButton-root"
                   tabindex="0"
                   type="button"
                 >
@@ -1251,7 +1251,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                   </div>
                 </button>
                 <button
-                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation css-1lvcm06-MuiButtonBase-root-MuiButton-root"
+                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation MuiButtonGroup-lastButton css-1lvcm06-MuiButtonBase-root-MuiButton-root"
                   tabindex="0"
                   type="button"
                 >
@@ -1711,7 +1711,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
         class="top-head"
       >
         <div
-          class="css-1y52uev-MuiStack-root"
+          class="MuiStack-root css-1y52uev-MuiStack-root"
         >
           <div
             class="ViewHeader "
@@ -1836,11 +1836,11 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                 </button>
               </div>
               <div
-                class="MuiButtonGroup-root MuiButtonGroup-contained MuiButtonGroup-disableElevation css-76ejyv-MuiButtonGroup-root"
+                class="MuiButtonGroup-root MuiButtonGroup-contained MuiButtonGroup-disableElevation css-jgbgc3-MuiButtonGroup-root"
                 role="group"
               >
                 <button
-                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation css-1pjzawa-MuiButtonBase-root-MuiButton-root"
+                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation MuiButtonGroup-firstButton css-1pjzawa-MuiButtonBase-root-MuiButton-root"
                   tabindex="0"
                   type="button"
                 >
@@ -1851,7 +1851,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                   </div>
                 </button>
                 <button
-                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation css-1lvcm06-MuiButtonBase-root-MuiButton-root"
+                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-disableElevation MuiButtonGroup-lastButton css-1lvcm06-MuiButtonBase-root-MuiButton-root"
                   tabindex="0"
                   type="button"
                 >
@@ -1897,7 +1897,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                     style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
                   >
                     <div
-                      class="css-19zgtxi-MuiStack-root"
+                      class="MuiStack-root css-19zgtxi-MuiStack-root"
                     >
                       <div>
                         <div>

@@ -11,9 +11,9 @@ export function PageTitleProvider({ children }: { children: ReactNode }) {
   return <TitleContext.Provider value={pageTitleValue}>{children}</TitleContext.Provider>;
 }
 
-export const setTitle = (title: string) => {
-  const [_, setTitleValue] = usePageTitle();
+export const useStaticPageTitle = (title: string) => {
+  const [, setPageTitle] = usePageTitle();
   useEffect(() => {
-    setTitleValue(title);
-  }, []);
+    setPageTitle(title);
+  }, [setPageTitle, title]);
 };

@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 import { getAddress } from 'viem';
 
 import charmClient from 'charmClient';
+import { useUpdateSnapshotProposal } from 'charmClient/hooks/proposals';
 import { OpenWalletSelectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/OpenWalletSelectorButton';
 import FieldLabel from 'components/common/form/FieldLabel';
 import InputEnumToOption from 'components/common/form/InputEnumToOptions';
@@ -39,6 +40,8 @@ import { InputVotingStrategies } from './InputVotingStrategies';
 interface Props {
   onSubmit: () => void;
   pageId: string;
+  proposalId?: string;
+  evaluationId?: string;
 }
 
 const MAX_SNAPSHOT_PROPOSAL_CHARACTERS = 20000;
@@ -50,8 +53,9 @@ const MIN_VOTING_OPTIONS = 2;
  * @abstract See this code for restrictions enforced by Snapshot when submitting proposals
  * https://github.com/snapshot-labs/snapshot-sequencer/blob/24fba742c89790c7d955c520b4d36c96e883a3e9/src/writer/proposal.ts#L83C29-L83C29
  */
-export function PublishingForm({ onSubmit, pageId }: Props) {
+export function PublishingForm({ onSubmit, pageId, proposalId, evaluationId }: Props) {
   const { account, provider: web3Provider } = useWeb3Account();
+  const { trigger: updateProposalEvaluation } = useUpdateSnapshotProposal({ proposalId });
 
   const { space } = useCurrentSpace();
   const { members } = useMembers();
@@ -253,11 +257,17 @@ export function PublishingForm({ onSubmit, pageId }: Props) {
         proposalParams
       )) as SnapshotReceipt;
 
-      const updatedPage = await charmClient.updatePageSnapshotData(pageId, {
-        snapshotProposalId: receipt.id
-      });
-
-      mutatePage(updatedPage);
+      if (evaluationId) {
+        updateProposalEvaluation({
+          evaluationId,
+          snapshotProposalId: receipt.id
+        });
+      } else {
+        const updatedPage = await charmClient.updatePageSnapshotData(pageId, {
+          snapshotProposalId: receipt.id
+        });
+        mutatePage(updatedPage);
+      }
       charmClient.track.trackAction('new_vote_created', {
         platform: 'snapshot',
         pageId,
