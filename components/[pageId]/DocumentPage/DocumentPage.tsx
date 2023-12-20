@@ -1,4 +1,5 @@
 import type { Page } from '@charmverse/core/prisma';
+import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { useMediaQuery, Divider, Box } from '@mui/material';
 import dynamic from 'next/dynamic';
@@ -19,7 +20,6 @@ import type { FrontendParticipant } from 'components/common/CharmEditor/componen
 import type { ConnectionEvent } from 'components/common/CharmEditor/components/fiduswriter/ws';
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
-import { FormFieldInputs } from 'components/common/form/FormFieldInputs';
 import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import { EvaluationStepper } from 'components/proposals/ProposalPage/components/EvaluationStepper/EvaluationStepper';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
@@ -28,7 +28,7 @@ import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmRouter } from 'hooks/useCharmRouter';
-import { useLgScreen } from 'hooks/useMediaScreens';
+import { useMdScreen } from 'hooks/useMediaScreens';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import { useVotes } from 'hooks/useVotes';
@@ -82,30 +82,35 @@ export interface DocumentPageProps {
   enableSidebar?: boolean;
 }
 
-function DocumentPageContent({
+function DocumentPage({
   insideModal = false,
   page,
   refreshPage,
   savePage,
-  close,
   readOnly = false,
-  enableSidebar,
-  editorState
-}: DocumentPageProps & {
-  editorState: EditorState | null;
-}) {
+  close,
+  enableSidebar
+}: DocumentPageProps) {
+  const { user } = useUser();
   const { castVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
   const { navigateToSpacePath, router } = useCharmRouter();
   const {
     activeView: sidebarView,
     activeEvaluationId,
+    persistedActiveView,
     persistActiveView,
     setActiveView,
     closeSidebar,
     openEvaluationSidebar
   } = usePageSidebar();
-  const { editMode, printRef: _printRef } = useCharmEditor();
+  const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
+  const [connectionError, setConnectionError] = useState<Error | null>(null);
+  const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
+  const dispatch = useAppDispatch();
+  const [containerRef, { width: containerWidth }] = useElementSize();
+  const [editorState, setEditorState] = useState<EditorState | null>(null);
   const { creatingInlineReward } = useRewards();
+  const isMdScreen = useMdScreen();
 
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
@@ -113,6 +118,9 @@ function DocumentPageContent({
   const {
     proposal,
     permissions: proposalPermissions,
+    readOnlyRubricCriteria,
+    readOnlyReviewers,
+    evaluationToShowInSidebar,
     refreshProposal,
     onChangeEvaluation
   } = useProposal({ proposalId });
@@ -155,19 +163,40 @@ function DocumentPageContent({
 
   const activeBoardView = boardViews[0];
 
-  const { threads } = useThreads();
+  const pageTop = getPageTop(page);
+
+  const { threads, isLoading: isLoadingThreads, currentPageId: threadsPageId } = useThreads();
   const isSharedPage = router.pathname.startsWith('/share');
   // Check if we are on the rewards page, as parent chip is only shown on rewards page
   const isRewardsPage = router.pathname === '/[domain]/rewards';
   const showParentChip = !!(page.type === 'card' && page.bountyId && card?.parentId && insideModal && isRewardsPage);
   const { data: reward } = useGetReward({ rewardId: page.bountyId });
+  const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
   const hideCardDetails = isRewardsPage && page.bountyId;
 
   const enableSuggestingMode = editMode === 'suggesting' && !readOnly && !!pagePermissions.comment;
   const isPageTemplate = page.type.includes('template');
   const enableComments = !isSharedPage && !enableSuggestingMode && !isPageTemplate && !!pagePermissions?.comment;
+  const showPageActionSidebar =
+    !!enableSidebar && sidebarView !== null && (sidebarView !== 'comments' || enableComments);
 
   const pageVote = Object.values(votes).find((v) => v.context === 'proposal');
+
+  // create a key that updates when edit mode changes - default to 'editing' so we dont close sockets immediately
+  const editorKey = page.id + (editMode || 'editing') + pagePermissions.edit_content;
+
+  function onParticipantUpdate(participants: FrontendParticipant[]) {
+    setPageProps({ participants });
+  }
+
+  function onConnectionEvent(event: ConnectionEvent) {
+    if (event.type === 'error') {
+      setConnectionError(event.error);
+    } else if (event.type === 'subscribed') {
+      // clear out error in case we re-subscribed
+      setConnectionError(null);
+    }
+  }
 
   const openEvaluation = useCallback(
     (evaluationId?: string) => {
@@ -193,7 +222,91 @@ function DocumentPageContent({
     [page.path, page.id, sidebarView, setActiveView, activeEvaluationId, enableSidebar]
   );
 
-  return (
+  useEffect(() => {
+    if (page?.type === 'card') {
+      // the two properties are the title and the id which are added to the card as soon as we get the corresponding page
+      const hasCardLoaded = card && Object.keys(card).length > 2;
+      if (!hasCardLoaded) {
+        dispatch(databaseViewsLoad({ pageId: page.parentId as string }));
+        dispatch(blockLoad({ blockId: page.id }));
+        dispatch(blockLoad({ blockId: page.parentId as string }));
+      }
+    }
+  }, [page.id]);
+
+  // reset error and sidebar state whenever page id changes
+  useEffect(() => {
+    setConnectionError(null);
+    // check page id has changed, otherwwise this runs on every refresh in dev
+    if (threadsPageId !== page.id) {
+      closeSidebar();
+    }
+  }, [page.id, threadsPageId]);
+
+  const threadIds = useMemo(
+    () =>
+      typeof page.type === 'string'
+        ? Object.values(threads)
+            .filter((thread) => !thread?.resolved)
+            .filter(isTruthy)
+            .map((thread) => thread.id)
+        : undefined,
+    [threads, page.type]
+  );
+
+  // show page sidebar by default if there are comments or votes
+  useEffect(() => {
+    if (!enableSidebar) {
+      return;
+    }
+    let highlightedCommentId = new URLSearchParams(window.location.search).get('commentId');
+    // hack to handle improperly-created URLs from notifications
+    if (highlightedCommentId === 'undefined') {
+      highlightedCommentId = null;
+    }
+    const unresolvedThreads = Object.values(threads)
+      .filter((thread) => !thread?.resolved)
+      .filter(isTruthy);
+    if (sidebarView && !highlightedCommentId) {
+      // dont redirect if sidebar is already open
+      return;
+    }
+    if (page.id !== threadsPageId) {
+      // threads result is from a different page, maybe during navigation
+      return;
+    }
+
+    if (!isLoadingThreads) {
+      if (highlightedCommentId || (isMdScreen && unresolvedThreads.length)) {
+        return setActiveView('comments');
+      }
+    }
+  }, [isLoadingThreads, page.id, enableSidebar, threadsPageId]);
+
+  useEffect(() => {
+    const defaultView = persistedActiveView?.[page.id];
+    if (enableSidebar && defaultView && isMdScreen) {
+      setActiveView(defaultView);
+    }
+  }, [!!persistedActiveView, enableSidebar, page.id]);
+
+  useEffect(() => {
+    if (enableSidebar && evaluationToShowInSidebar) {
+      openEvaluation(evaluationToShowInSidebar);
+    }
+  }, [evaluationToShowInSidebar, enableSidebar]);
+
+  // keep a ref in sync for printing
+  const printRef = useRef(null);
+  useEffect(() => {
+    if (printRef?.current !== _printRef?.current) {
+      setPageProps({
+        printRef
+      });
+    }
+  }, [printRef, _printRef]);
+
+  const documentPageContent = (
     <>
       {/* temporary? disable editing of page title when in suggestion mode */}
       <PageHeader
@@ -295,6 +408,8 @@ function DocumentPageContent({
             proposalId={proposalId}
             proposalEvaluationId={activeEvaluationId}
             readOnlyProposalPermissions={!proposal?.permissions.edit}
+            readOnlyRubricCriteria={readOnlyRubricCriteria}
+            readOnlyReviewers={readOnlyReviewers}
             pagePermissions={pagePermissions}
             editorState={editorState}
             sidebarView={sidebarView}
@@ -312,186 +427,6 @@ function DocumentPageContent({
       </CardPropertiesWrapper>
     </>
   );
-}
-
-function DocumentPage({
-  insideModal = false,
-  page,
-  refreshPage,
-  savePage,
-  readOnly = false,
-  close,
-  enableSidebar
-}: DocumentPageProps) {
-  const { user } = useUser();
-  const isLargeScreen = useLgScreen();
-  const { navigateToSpacePath, router } = useCharmRouter();
-  const {
-    activeView: sidebarView,
-    activeEvaluationId,
-    persistedActiveView,
-    persistActiveView,
-    setActiveView,
-    closeSidebar,
-    openEvaluationSidebar
-  } = usePageSidebar();
-  const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
-  const [connectionError, setConnectionError] = useState<Error | null>(null);
-  const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
-  const dispatch = useAppDispatch();
-  const [containerRef, { width: containerWidth }] = useElementSize();
-  const [editorState, setEditorState] = useState<EditorState | null>(null);
-
-  const pagePermissions = page.permissionFlags;
-  const proposalId = page.proposalId;
-
-  const { proposal, evaluationToShowInSidebar, refreshProposal } = useProposal({ proposalId });
-
-  // base the feature flag off the proposal instead of the space
-  const isCharmVerse = !!proposal?.evaluations.length;
-
-  const card = useAppSelector((state) => {
-    if (page?.type !== 'card' && page?.type !== 'card_template') {
-      return null;
-    }
-    return state.cards.cards[page.id] ?? state.cards.templates[page.id];
-  });
-
-  const pageTop = getPageTop(page);
-
-  const { threads, isLoading: isLoadingThreads, currentPageId: threadsPageId } = useThreads();
-  const isSharedPage = router.pathname.startsWith('/share');
-  const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
-
-  const enableSuggestingMode = editMode === 'suggesting' && !readOnly && !!pagePermissions.comment;
-  const isPageTemplate = page.type.includes('template');
-  const enableComments = !isSharedPage && !enableSuggestingMode && !isPageTemplate && !!pagePermissions?.comment;
-  const showPageActionSidebar =
-    !!enableSidebar && sidebarView !== null && (sidebarView !== 'comments' || enableComments);
-
-  // create a key that updates when edit mode changes - default to 'editing' so we dont close sockets immediately
-  const editorKey = page.id + (editMode || 'editing') + pagePermissions.edit_content;
-
-  function onParticipantUpdate(participants: FrontendParticipant[]) {
-    setPageProps({ participants });
-  }
-
-  function onConnectionEvent(event: ConnectionEvent) {
-    if (event.type === 'error') {
-      setConnectionError(event.error);
-    } else if (event.type === 'subscribed') {
-      // clear out error in case we re-subscribed
-      setConnectionError(null);
-    }
-  }
-
-  const openEvaluation = useCallback(
-    (evaluationId?: string) => {
-      if (evaluationId || !isCharmVerse) {
-        if (activeEvaluationId === evaluationId) {
-          // close the sidebar if u click on the active step
-          closeSidebar();
-          return;
-        }
-        if (enableSidebar) {
-          openEvaluationSidebar(evaluationId);
-        } else {
-          persistActiveView({
-            [page.id]: 'proposal_evaluation'
-          });
-          // go to full page view
-          navigateToSpacePath(`/${page.path}`);
-        }
-      } else {
-        closeSidebar();
-      }
-    },
-    [page.path, page.id, sidebarView, setActiveView, activeEvaluationId, enableSidebar]
-  );
-
-  useEffect(() => {
-    if (page?.type === 'card') {
-      // the two properties are the title and the id which are added to the card as soon as we get the corresponding page
-      const hasCardLoaded = card && Object.keys(card).length > 2;
-      if (!hasCardLoaded) {
-        dispatch(databaseViewsLoad({ pageId: page.parentId as string }));
-        dispatch(blockLoad({ blockId: page.id }));
-        dispatch(blockLoad({ blockId: page.parentId as string }));
-      }
-    }
-  }, [page.id]);
-
-  // reset error and sidebar state whenever page id changes
-  useEffect(() => {
-    setConnectionError(null);
-    // check page id has changed, otherwwise this runs on every refresh in dev
-    if (threadsPageId !== page.id) {
-      closeSidebar();
-    }
-  }, [page.id, threadsPageId]);
-
-  const threadIds = useMemo(
-    () =>
-      typeof page.type === 'string'
-        ? Object.values(threads)
-            .filter((thread) => !thread?.resolved)
-            .filter(isTruthy)
-            .map((thread) => thread.id)
-        : undefined,
-    [threads, page.type]
-  );
-
-  // show page sidebar by default if there are comments or votes
-  useEffect(() => {
-    if (!enableSidebar) {
-      return;
-    }
-    let highlightedCommentId = new URLSearchParams(window.location.search).get('commentId');
-    // hack to handle improperly-created URLs from notifications
-    if (highlightedCommentId === 'undefined') {
-      highlightedCommentId = null;
-    }
-    const unresolvedThreads = Object.values(threads)
-      .filter((thread) => !thread?.resolved)
-      .filter(isTruthy);
-    if (sidebarView && !highlightedCommentId) {
-      // dont redirect if sidebar is already open
-      return;
-    }
-    if (page.id !== threadsPageId) {
-      // threads result is from a different page, maybe during navigation
-      return;
-    }
-
-    if (!isLoadingThreads) {
-      if (highlightedCommentId || (isLargeScreen && unresolvedThreads.length)) {
-        return setActiveView('comments');
-      }
-    }
-  }, [isLoadingThreads, page.id, enableSidebar, threadsPageId]);
-
-  useEffect(() => {
-    const defaultView = persistedActiveView?.[page.id];
-    if (enableSidebar && defaultView) {
-      setActiveView(defaultView);
-    }
-  }, [!!persistedActiveView, enableSidebar, page.id]);
-
-  useEffect(() => {
-    if (enableSidebar && evaluationToShowInSidebar) {
-      openEvaluation(evaluationToShowInSidebar);
-    }
-  }, [evaluationToShowInSidebar, enableSidebar]);
-
-  // keep a ref in sync for printing
-  const printRef = useRef(null);
-  useEffect(() => {
-    if (printRef?.current !== _printRef?.current) {
-      setPageProps({
-        printRef
-      });
-    }
-  }, [printRef, _printRef]);
 
   return (
     <>
@@ -554,16 +489,7 @@ function DocumentPage({
           >
             {proposal && proposal.formId ? (
               <>
-                <DocumentPageContent
-                  editorState={editorState}
-                  page={page}
-                  refreshPage={refreshPage}
-                  savePage={savePage}
-                  close={close}
-                  enableSidebar={enableSidebar}
-                  insideModal={insideModal}
-                  readOnly={readOnly}
-                />
+                {documentPageContent}
                 <Box mb={10}>
                   {page.type === 'proposal_template' ? (
                     <FormFieldsEditor
@@ -613,16 +539,7 @@ function DocumentPage({
                 allowClickingFooter={true}
                 threadIds={threadIds}
               >
-                <DocumentPageContent
-                  editorState={editorState}
-                  page={page}
-                  refreshPage={refreshPage}
-                  savePage={savePage}
-                  close={close}
-                  enableSidebar={enableSidebar}
-                  insideModal={insideModal}
-                  readOnly={readOnly}
-                />
+                {documentPageContent}
               </CharmEditor>
             )}
 
@@ -640,6 +557,7 @@ function DocumentPage({
             refreshProposal={refreshProposal}
             isEvaluationSidebarOpen={sidebarView === 'proposal_evaluation'}
             openEvaluationSidebar={openEvaluationSidebar}
+            closeSidebar={closeSidebar}
           />
         )}
       </PrimaryColumn>

@@ -138,3 +138,7 @@ export function useUpdateProposalFormFieldAnswers({ proposalId }: { proposalId: 
     `/api/proposals/${proposalId}/form/answers`
   );
 }
+
+export function useUpdateSnapshotProposal({ proposalId }: { proposalId: MaybeString }) {
+  return usePUT<{ snapshotProposalId: string | null; evaluationId: string }>(`/api/proposals/${proposalId}/snapshot`);
+}

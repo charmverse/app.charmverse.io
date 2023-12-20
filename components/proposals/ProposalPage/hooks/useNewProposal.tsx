@@ -31,21 +31,18 @@ export function useNewProposal({ newProposal }: Props) {
     emptyState({ ...newProposal, userId: user?.id })
   );
 
-  const setFormInputs = useCallback((partialFormInputs: Partial<ProposalPageAndPropertiesInput>) => {
-    setContentUpdated(true);
-    setFormInputsRaw((existingFormInputs) => ({ ...existingFormInputs, ...partialFormInputs }));
-  }, []);
-
-  const clearFormInputs = useCallback(() => {
-    setFormInputs(emptyState());
-    setContentUpdated(false);
-  }, [setFormInputs]);
+  const setFormInputs = useCallback(
+    (partialFormInputs: Partial<ProposalPageAndPropertiesInput>) => {
+      setContentUpdated(true);
+      setFormInputsRaw((existingFormInputs) => ({ ...existingFormInputs, ...partialFormInputs }));
+    },
+    [setFormInputsRaw]
+  );
 
   useEffect(() => {
-    setFormInputsRaw((v) => ({
-      ...v,
+    setFormInputs({
       publishToLens: !!user?.publishToLensDefault
-    }));
+    });
   }, [setFormInputs, user?.publishToLensDefault]);
 
   async function createProposal() {
@@ -91,7 +88,8 @@ export function useNewProposal({ newProposal }: Props) {
         publishToLens: formInputs.publishToLens,
         fields: formInputs.fields,
         formId: formInputs.formId,
-        formAnswers: formInputs.formAnswers
+        formAnswers: formInputs.formAnswers,
+        workflowId: formInputs.workflowId || undefined
       }).catch((err: any) => {
         showMessage(err.message ?? 'Something went wrong', 'error');
         throw err;
@@ -129,7 +127,7 @@ export function useNewProposal({ newProposal }: Props) {
     if ((formInputs.formFields ?? []).length === 0) {
       disabledTooltip = 'Atleast one form field is required for structured proposals';
     } else if (formInputs.formFields?.some((formField) => !formField.name)) {
-      disabledTooltip = 'All form fields must have a title';
+      disabledTooltip = 'Form fields must have a name';
     } else if (
       formInputs.formFields?.some(
         (formField) =>
@@ -144,7 +142,6 @@ export function useNewProposal({ newProposal }: Props) {
 
   return {
     formInputs,
-    clearFormInputs,
     setFormInputs,
     createProposal,
     disabledTooltip,

@@ -1,15 +1,15 @@
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
-import { useState } from 'react';
 
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 
 type Props = {
   onChange: (value: ProposalWorkflowTyped) => void;
-  value: string;
+  value?: string | null;
   options?: ProposalWorkflowTyped[];
+  readOnly: boolean;
 };
 
-export function WorkflowSelect({ onChange, value, options }: Props) {
+export function WorkflowSelect({ onChange, value, options, readOnly }: Props) {
   const propertyOptions = (options || []).map((option) => ({
     id: option.id,
     value: option.title,
@@ -26,6 +26,13 @@ export function WorkflowSelect({ onChange, value, options }: Props) {
     }
   }
   return (
-    <TagSelect disableClearable wrapColumn options={propertyOptions} propertyValue={value} onChange={onValueChange} />
+    <TagSelect
+      disableClearable
+      wrapColumn
+      options={propertyOptions}
+      propertyValue={value || ''}
+      onChange={onValueChange}
+      readOnly={readOnly}
+    />
   );
 }

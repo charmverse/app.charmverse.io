@@ -32,6 +32,7 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
+import { useMdScreen } from 'hooks/useMediaScreens';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
@@ -65,44 +66,74 @@ const StyledContainer = styled(PageEditorContainer)`
   margin-bottom: 180px;
 `;
 
-export function ProposalPageContent({
-  formInputs,
-  setFormInputs,
+// Note: this component is only used before a page is saved to the DB
+export function NewProposalPage({
   isTemplate,
-  setSelectedProposalTemplateId,
-  internalSidebarView,
-  selectEvaluationWorkflow,
-  workflowId,
-  applyTemplate
+  templateId: templateIdFromUrl,
+  proposalType
 }: {
-  formInputs: ProposalPageAndPropertiesInput;
-  setFormInputs: (partialFormInputs: Partial<ProposalPageAndPropertiesInput>) => void;
   isTemplate?: boolean;
-  setSelectedProposalTemplateId: (templateId: string) => void;
-  internalSidebarView: PageSidebarView | null;
-  selectEvaluationWorkflow: (workflow: ProposalWorkflowTyped) => void;
-  workflowId: string;
-  applyTemplate: (templateId: string) => void;
+  templateId?: string;
+  proposalType?: ProposalPageAndPropertiesInput['proposalType'];
 }) {
+  const { navigateToSpacePath } = useCharmRouter();
   const { space: currentSpace } = useCurrentSpace();
+  const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>([]);
   const isCharmVerse = useIsCharmverseSpace();
-  const { setActiveView, closeSidebar } = usePageSidebar();
-  const { proposalTemplates } = useProposalTemplates();
+  const { activeView: sidebarView, setActiveView, closeSidebar } = usePageSidebar();
+  const { proposalTemplates, isLoadingTemplates } = useProposalTemplates();
+  const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>(null);
   const [, setPageTitle] = usePageTitle();
   const { data: workflowOptions } = useGetProposalWorkflows(currentSpace?.id);
+  const isMdScreen = useMdScreen();
+  const { formInputs, setFormInputs, contentUpdated, disabledTooltip, isCreatingProposal, createProposal } =
+    useNewProposal({
+      newProposal: { type: isTemplate ? 'proposal_template' : 'proposal', proposalType }
+    });
 
+  const [, { width: containerWidth }] = useElementSize();
   const { user } = useUser();
+  const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
+  const [readOnlyEditor, setReadOnlyEditor] = useState(false);
   const isAdmin = useIsAdmin();
   const isReviewer = formInputs.reviewers?.some((r) => r.id === user?.id);
+
+  const sourceTemplate = proposalTemplates?.find((template) => template.id === formInputs.proposalTemplateId);
+  const isStructured = formInputs.proposalType === 'structured' || !!sourceTemplate?.formId;
+  const proposalFormFields = formInputs.formFields ?? sourceTemplate?.formFields ?? [];
+
+  const {
+    control: proposalFormFieldControl,
+    isValid: isProposalFormFieldsValid,
+    errors: proposalFormFieldErrors,
+    onFormChange
+  } = useFormFields({
+    fields: proposalFormFields
+  });
+
+  function toggleCollapse(fieldId: string) {
+    if (collapsedFieldIds.includes(fieldId)) {
+      setCollapsedFieldIds(collapsedFieldIds.filter((id) => id !== fieldId));
+    } else {
+      setCollapsedFieldIds([...collapsedFieldIds, fieldId]);
+    }
+  }
+
+  usePreventReload(contentUpdated);
 
   const isFromTemplateSource = Boolean(formInputs.proposalTemplateId);
   const isTemplateRequired = Boolean(currentSpace?.requireProposalTemplate);
   // rubric criteria can always be updated by reviewers and admins
   const readOnlyRubricCriteria = isFromTemplateSource && !(isAdmin || isReviewer);
 
-  const readOnlyReviewers = !!proposalTemplates?.some(
-    (t) => t.id === formInputs?.proposalTemplateId && t.reviewers.length > 0
-  );
+  useEffect(() => {
+    if (isTemplateRequired) {
+      setReadOnlyEditor(!formInputs.proposalTemplateId);
+    }
+  }, [formInputs.proposalTemplateId, isTemplateRequired]);
+
+  const readOnlyReviewers = !!proposalTemplates?.some((t) => t.id === formInputs?.proposalTemplateId);
+
   const templateOptions = (proposalTemplates || [])
     .filter((_proposal) => {
       if (!formInputs.categoryId) {
@@ -113,9 +144,6 @@ export function ProposalPageContent({
     .map((template) => template.page);
   const { pages } = usePages();
 
-  const sourceTemplate = isFromTemplateSource
-    ? proposalTemplates?.find((template) => template.id === formInputs.proposalTemplateId)
-    : undefined;
   const proposalTemplatePage = formInputs.proposalTemplateId ? pages[formInputs.proposalTemplateId] : null;
 
   // properties with values from templates should be read only
@@ -131,13 +159,78 @@ export function ProposalPageContent({
         }, [] as string[])
       : [];
 
+  function updateProposalContent({ doc, rawText }: ICharmEditorOutput) {
+    setFormInputs({
+      content: doc,
+      contentText: rawText
+    });
+  }
+
+  function selectEvaluationWorkflow(workflow: ProposalWorkflowTyped) {
+    setFormInputs({
+      workflowId: workflow.id,
+      evaluations: workflow.evaluations.map((evaluation, index) => ({
+        id: uuid(),
+        index,
+        reviewers: [],
+        rubricCriteria: [] as ProposalRubricCriteriaWithTypedParams[],
+        title: evaluation.title,
+        type: evaluation.type,
+        result: null,
+        permissions: evaluation.permissions as ProposalEvaluationPermission[]
+      }))
+    });
+  }
+
   function clearTemplate() {
     setFormInputs({
       proposalTemplateId: null
     });
   }
 
-  return (
+  async function saveForm() {
+    await createProposal();
+    navigateToSpacePath(`/proposals`);
+  }
+
+  function applyTemplate(_templateId: string) {
+    const template = proposalTemplates?.find((t) => t.id === _templateId);
+    if (template) {
+      setFormInputs({
+        categoryId: template.categoryId,
+        content: template.page.content as PageContent,
+        contentText: template.page.contentText,
+        reviewers: template.reviewers.map((reviewer) => ({
+          group: reviewer.roleId ? 'role' : 'user',
+          id: reviewer.roleId ?? (reviewer.userId as string)
+        })),
+        proposalTemplateId: _templateId,
+        headerImage: template.page.headerImage,
+        icon: template.page.icon,
+        workflowId: template.workflowId,
+        evaluationType: template.evaluationType,
+        evaluations: template.evaluations,
+        rubricCriteria: template.rubricCriteria,
+        fields: (template.fields as ProposalFields) || {},
+        type: 'proposal',
+        formId: template.formId ?? undefined,
+        formAnswers: (template?.formFields ?? [])
+          .filter((formField) => formField.type !== 'label')
+          .map((proposalFormField) => ({
+            fieldId: proposalFormField.id,
+            value: getInitialFormFieldValue(proposalFormField) as FieldAnswerInput['value']
+          }))
+      });
+    }
+  }
+
+  // having `internalSidebarView` allows us to have the sidebar open by default, because usePageSidebar() does not allow us to do this currently
+  const [defaultSidebarView, setDefaultView] = useState<PageSidebarView | null>(
+    isCharmVerse && isMdScreen ? 'proposal_evaluation_settings' : null
+  );
+  const internalSidebarView = defaultSidebarView || sidebarView;
+
+  const proposalPageContent = (
     <>
       <PageHeader
         headerImage={formInputs.headerImage}
@@ -195,11 +288,17 @@ export function ProposalPageContent({
                 <PropertyLabel readOnly required highlighted>
                   Workflow
                 </PropertyLabel>
-                <WorkflowSelect value={workflowId} onChange={selectEvaluationWorkflow} options={workflowOptions} />
+                <WorkflowSelect
+                  value={formInputs.workflowId}
+                  onChange={selectEvaluationWorkflow}
+                  options={workflowOptions}
+                  readOnly={!!formInputs.proposalTemplateId}
+                />
               </Box>
             )}
             <ProposalPropertiesBase
               isFromTemplate={isFromTemplateSource}
+              readOnlyCategory={isFromTemplateSource}
               readOnlyRubricCriteria={readOnlyRubricCriteria}
               readOnlyReviewers={readOnlyReviewers}
               readOnlyProposalEvaluationType={isFromTemplateSource}
@@ -222,6 +321,8 @@ export function ProposalPageContent({
       {currentSpace && (
         <PageSidebar
           isNewProposal
+          readOnlyReviewers={readOnlyReviewers}
+          readOnlyRubricCriteria={readOnlyRubricCriteria}
           id='page-action-sidebar'
           spaceId={currentSpace.id}
           sidebarView={internalSidebarView || null}
@@ -239,138 +340,11 @@ export function ProposalPageContent({
       )}
     </>
   );
-}
-
-// Note: this component is only used before a page is saved to the DB
-export function NewProposalPage({
-  isTemplate,
-  templateId: templateIdFromUrl,
-  proposalType
-}: {
-  isTemplate?: boolean;
-  templateId?: string;
-  proposalType?: ProposalPageAndPropertiesInput['proposalType'];
-}) {
-  const { navigateToSpacePath } = useCharmRouter();
-  const { space: currentSpace } = useCurrentSpace();
-  const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>([]);
-  const isCharmVerse = useIsCharmverseSpace();
-  const { activeView: sidebarView, setActiveView } = usePageSidebar();
-  const { proposalTemplates, isLoadingTemplates } = useProposalTemplates();
-  const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>(null);
-  const [, setPageTitle] = usePageTitle();
-  const { data: workflowOptions } = useGetProposalWorkflows(currentSpace?.id);
-  const [workflowId, setWorkflowId] = useState('');
-  const { formInputs, setFormInputs, contentUpdated, disabledTooltip, isCreatingProposal, createProposal } =
-    useNewProposal({
-      newProposal: { type: isTemplate ? 'proposal_template' : 'proposal', proposalType }
-    });
-
-  const sourceTemplate = proposalTemplates?.find((template) => template.id === formInputs.proposalTemplateId);
-  const isStructured = formInputs.proposalType === 'structured' || !!sourceTemplate?.formId;
-  const proposalFormFields = formInputs.formFields ?? sourceTemplate?.formFields ?? [];
-
-  const {
-    control: proposalFormFieldControl,
-    isValid: isProposalFormFieldsValid,
-    errors: proposalFormFieldErrors,
-    onFormChange
-  } = useFormFields({
-    fields: proposalFormFields
-  });
-
-  const [, { width: containerWidth }] = useElementSize();
-  const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
-  const [readOnlyEditor, setReadOnlyEditor] = useState(false);
-
-  function toggleCollapse(fieldId: string) {
-    if (collapsedFieldIds.includes(fieldId)) {
-      setCollapsedFieldIds(collapsedFieldIds.filter((id) => id !== fieldId));
-    } else {
-      setCollapsedFieldIds([...collapsedFieldIds, fieldId]);
-    }
-  }
-
-  usePreventReload(contentUpdated);
-
-  const isTemplateRequired = Boolean(currentSpace?.requireProposalTemplate);
-
-  useEffect(() => {
-    if (isTemplateRequired) {
-      setReadOnlyEditor(!formInputs.proposalTemplateId);
-    }
-  }, [formInputs.proposalTemplateId, isTemplateRequired]);
-
-  function updateProposalContent({ doc, rawText }: ICharmEditorOutput) {
-    setFormInputs({
-      content: doc,
-      contentText: rawText
-    });
-  }
-
-  function selectEvaluationWorkflow(workflow: ProposalWorkflowTyped) {
-    setFormInputs({
-      workflowId: workflow.id,
-      evaluations: workflow.evaluations.map((evaluation, index) => ({
-        id: uuid(),
-        index,
-        reviewers: [],
-        rubricCriteria: [] as ProposalRubricCriteriaWithTypedParams[],
-        title: evaluation.title,
-        type: evaluation.type,
-        result: null,
-        permissions: evaluation.permissions as ProposalEvaluationPermission[]
-      }))
-    });
-    setWorkflowId(workflow.id);
-  }
-
-  async function saveForm() {
-    await createProposal();
-    navigateToSpacePath(`/proposals`);
-  }
-
-  function applyTemplate(_templateId: string) {
-    const template = proposalTemplates?.find((t) => t.id === _templateId);
-    if (template) {
-      setFormInputs({
-        categoryId: template.categoryId,
-        content: template.page.content as PageContent,
-        contentText: template.page.contentText,
-        reviewers: template.reviewers.map((reviewer) => ({
-          group: reviewer.roleId ? 'role' : 'user',
-          id: reviewer.roleId ?? (reviewer.userId as string)
-        })),
-        proposalTemplateId: _templateId,
-        headerImage: template.page.headerImage,
-        icon: template.page.icon,
-        workflowId: template.workflowId,
-        evaluationType: template.evaluationType,
-        evaluations: template.evaluations,
-        rubricCriteria: template.rubricCriteria,
-        fields: (template.fields as ProposalFields) || {},
-        type: 'proposal',
-        formId: template.formId ?? undefined,
-        formAnswers: (template?.formFields ?? [])
-          .filter((formField) => formField.type !== 'label')
-          .map((proposalFormField) => ({
-            fieldId: proposalFormField.id,
-            value: getInitialFormFieldValue(proposalFormField) as FieldAnswerInput['value']
-          }))
-      });
-    }
-  }
-
-  // having `internalSidebarView` allows us to have the sidebar open by default, because usePageSidebar() does not allow us to do this currently
-  const [defaultSidebarView, setDefaultView] = useState<PageSidebarView | null>(
-    isCharmVerse ? 'proposal_evaluation_settings' : null
-  );
-  const internalSidebarView = defaultSidebarView || sidebarView;
 
   useEffect(() => {
     // clear out page title on load
     setPageTitle('');
-    if (isCharmVerse) {
+    if (isCharmVerse && isMdScreen) {
       setActiveView('proposal_evaluation_settings');
       setDefaultView(null);
     }
@@ -378,7 +352,7 @@ export function NewProposalPage({
 
   // populate workflow if not set and template is not selected
   useEffect(() => {
-    if (isCharmVerse && workflowOptions?.length && !workflowId && !templateIdFromUrl) {
+    if (isCharmVerse && workflowOptions?.length && !formInputs.workflowId && !templateIdFromUrl) {
       selectEvaluationWorkflow(workflowOptions[0]);
     }
   }, [!!workflowOptions, isCharmVerse]);
@@ -401,22 +375,13 @@ export function NewProposalPage({
     <Box flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
       <PrimaryColumn showPageActionSidebar={!!internalSidebarView}>
         <Box className={`document-print-container ${fontClassName}`} display='flex' flexDirection='column'>
-          <PageTemplateBanner pageType={formInputs.type} isNewPage proposalType={formInputs.proposalType} />
+          <PageTemplateBanner pageType={formInputs.type} isNewPage />
           {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
           <StyledContainer data-test='page-charmeditor' top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
             <Box minHeight={450}>
               {isStructured ? (
                 <>
-                  <ProposalPageContent
-                    applyTemplate={applyTemplate}
-                    selectEvaluationWorkflow={selectEvaluationWorkflow}
-                    workflowId={workflowId}
-                    setSelectedProposalTemplateId={setSelectedProposalTemplateId}
-                    formInputs={formInputs}
-                    setFormInputs={setFormInputs}
-                    isTemplate={isTemplate}
-                    internalSidebarView={internalSidebarView}
-                  />
+                  {proposalPageContent}
                   {formInputs.type === 'proposal_template' ? (
                     <ControlledFormFieldsEditor
                       collapsedFieldIds={collapsedFieldIds}
@@ -463,22 +428,18 @@ export function NewProposalPage({
                   key={`${String(formInputs.proposalTemplateId)}.${readOnlyEditor}`}
                 >
                   {/* temporary? disable editing of page title when in suggestion mode */}
-                  <ProposalPageContent
-                    applyTemplate={applyTemplate}
-                    selectEvaluationWorkflow={selectEvaluationWorkflow}
-                    workflowId={workflowId}
-                    setSelectedProposalTemplateId={setSelectedProposalTemplateId}
-                    formInputs={formInputs}
-                    setFormInputs={setFormInputs}
-                    isTemplate={isTemplate}
-                    internalSidebarView={internalSidebarView}
-                  />
+                  {proposalPageContent}
                 </CharmEditor>
               )}
             </Box>
           </StyledContainer>
         </Box>
         <StickyFooterContainer>
+          {!isMdScreen && (
+            <Button variant='outlined' onClick={() => setActiveView('proposal_evaluation_settings')}>
+              Configure
+            </Button>
+          )}
           <Button
             disabled={Boolean(disabledTooltip) || isCreatingProposal || !isProposalFormFieldsValid}
             disabledTooltip={

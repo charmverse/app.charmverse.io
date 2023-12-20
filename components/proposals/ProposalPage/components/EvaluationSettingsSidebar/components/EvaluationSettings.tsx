@@ -21,9 +21,18 @@ type Props = {
   categoryId?: string | null;
   onChange: (criteria: Partial<ProposalEvaluationValues>) => void;
   readOnly: boolean;
+  readOnlyReviewers: boolean;
+  readOnlyRubricCriteria: boolean;
 };
 
-export function EvaluationSettings({ evaluation, categoryId, onChange, readOnly }: Props) {
+export function EvaluationSettings({
+  evaluation,
+  categoryId,
+  onChange,
+  readOnly,
+  readOnlyReviewers,
+  readOnlyRubricCriteria
+}: Props) {
   const reviewerOptions = evaluation.reviewers
     // .filter((reviewer) => reviewer.group === 'role' || reviewer.group === 'user')
     .map((reviewer) => ({
@@ -42,6 +51,7 @@ export function EvaluationSettings({ evaluation, categoryId, onChange, readOnly 
       }))
     });
   }
+
   return (
     <Box ml={3}>
       <Box display='flex' alignItems='center' gap='5px' ml='-25px'>
@@ -64,7 +74,7 @@ export function EvaluationSettings({ evaluation, categoryId, onChange, readOnly 
             data-test='proposal-reviewer-select'
             emptyPlaceholderContent='Select user or role'
             value={reviewerOptions}
-            readOnly={readOnly}
+            readOnly={readOnly || readOnlyReviewers}
             systemRoles={[allMembersSystemRole]}
             variant='outlined'
             proposalCategoryId={categoryId}
@@ -81,7 +91,7 @@ export function EvaluationSettings({ evaluation, categoryId, onChange, readOnly 
           </FormLabel>
           <Box display='flex' flex={1} flexDirection='column'>
             <RubricCriteria
-              readOnly={readOnly}
+              readOnly={readOnly || readOnlyRubricCriteria}
               value={evaluation.rubricCriteria as RangeProposalCriteria[]}
               onChange={(rubricCriteria) =>
                 onChange({
@@ -94,24 +104,15 @@ export function EvaluationSettings({ evaluation, categoryId, onChange, readOnly 
         </>
       )}
       {evaluation.type === 'vote' && (
-        <>
-          {/* <FormLabel required>
-            <Typography component='span' variant='subtitle1'>
-              Vote settings
-            </Typography>
-          </FormLabel> */}
-          {/* <Box display='flex' flex={1} flexDirection='column'> */}
-          <VoteSettings
-            readOnly={readOnly}
-            value={evaluation.voteSettings}
-            onChange={(voteSettings) =>
-              onChange({
-                voteSettings
-              })
-            }
-          />
-          {/* </Box> */}
-        </>
+        <VoteSettings
+          readOnly={readOnly || readOnlyReviewers}
+          value={evaluation.voteSettings}
+          onChange={(voteSettings) =>
+            onChange({
+              voteSettings
+            })
+          }
+        />
       )}
     </Box>
   );

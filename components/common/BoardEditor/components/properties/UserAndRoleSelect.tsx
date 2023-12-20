@@ -395,6 +395,7 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
               onRemove={removeOption}
             />
           )}
+          disabled={!!readOnly}
           value={populatedValue}
         />
         {noReviewersAvailable && (

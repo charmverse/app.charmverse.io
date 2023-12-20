@@ -1,16 +1,19 @@
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
+import { Tooltip, Typography } from '@mui/material';
 
 import charmClient from 'charmClient';
 import { useGetVotesForPage } from 'charmClient/hooks/votes';
 import { NoCommentsMessage } from 'components/[pageId]/DocumentPage/components/Sidebar/components/CommentsSidebar';
+import { Button } from 'components/common/Button';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { PublishToSnapshot } from 'components/common/PageActions/components/SnapshotAction/PublishToSnapshot';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposal/interface';
 
 export type Props = {
   isCurrent: boolean;
-  pageId?: string;
+  pageId: string;
   proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'permissions'>;
   evaluation: PopulatedEvaluation;
 };
@@ -38,12 +41,38 @@ export function VoteSidebar({ pageId, isCurrent, proposal, evaluation }: Props) 
     await refreshVotes();
   }
 
+  function onPublishToSnapshot() {}
+
   if (isLoading) {
     return <LoadingComponent minHeight={200} />;
   }
+
   const vote = votes?.find((v) => v.id === evaluation.voteId);
 
   if (!vote) {
+    if (evaluation.voteSettings?.publishToSnapshot) {
+      return (
+        <Tooltip
+          title={!isReviewer ? 'Only proposal authors and space admins can publish this proposal to snapshot' : ''}
+        >
+          <span>
+            <PublishToSnapshot
+              renderContent={({ label, onClick, icon }) => (
+                <Button disabled={!isReviewer} onClick={onClick}>
+                  {icon}
+                  <Typography>{label}</Typography>
+                </Button>
+              )}
+              onPublish={onPublishToSnapshot}
+              pageId={pageId!}
+              evaluationId={evaluation.id}
+              proposalId={proposal!.id}
+              snapshotProposalId={evaluation.snapshotId}
+            />
+          </span>
+        </Tooltip>
+      );
+    }
     return (
       <NoCommentsMessage
         icon={

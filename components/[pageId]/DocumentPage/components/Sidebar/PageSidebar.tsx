@@ -57,14 +57,15 @@ type SidebarProps = {
   proposalEvaluationId?: string | null;
   isNewProposal?: boolean;
   isProposalTemplate?: boolean;
+  readOnlyReviewers: boolean;
+  readOnlyRubricCriteria: boolean;
 };
 
 function PageSidebarComponent(props: SidebarProps) {
-  const { id, proposal, sidebarView, openSidebar, closeSidebar } = props;
+  const { id, proposal, sidebarView, openSidebar, closeSidebar, isNewProposal } = props;
   const isMdScreen = useMdScreen();
   const isCharmVerse = useIsCharmverseSpace();
   const isOpen = sidebarView !== null;
-  // const sidebarTitle = props.isNewProposal ? 'Evaluation settings' : sidebarView && SIDEBAR_VIEWS[sidebarView]?.title;
   const sidebarTitle = sidebarView && SIDEBAR_VIEWS[sidebarView]?.title;
   const showEvaluationSidebarIcon =
     (proposal?.evaluationType === 'rubric' &&
@@ -112,6 +113,7 @@ function PageSidebarComponent(props: SidebarProps) {
                 activeView={sidebarView}
                 showEvaluationSidebarIcon={showEvaluationSidebarIcon}
                 openSidebar={openSidebar}
+                isNewProposal={!!isNewProposal}
               />
             )}
           </Box>
@@ -130,10 +132,11 @@ function PageSidebarComponent(props: SidebarProps) {
             activeView={sidebarView}
             showEvaluationSidebarIcon={showEvaluationSidebarIcon}
             openSidebar={openSidebar}
+            isNewProposal={!!isNewProposal}
           />
         )
       }
-      contentSx={{ pr: 0, pb: 0, pl: 1 }}
+      contentSx={{ pb: 0, px: 1 }}
     >
       <Box display='flex' gap={1} flexDirection='column' flex={1} height='100%'>
         <SidebarContents {...props} />
@@ -145,11 +148,13 @@ function PageSidebarComponent(props: SidebarProps) {
 function SidebarNavigationIcons({
   showEvaluationSidebarIcon,
   openSidebar,
-  activeView
+  activeView,
+  isNewProposal
 }: {
   showEvaluationSidebarIcon: boolean;
   openSidebar: (view: PageSidebarView) => void;
   activeView?: PageSidebarView | null;
+  isNewProposal: boolean;
 }) {
   return (
     <Box display='flex' alignItems='center' pr={1} justifyContent='flex-end'>
@@ -160,8 +165,12 @@ function SidebarNavigationIcons({
           onClick={openSidebar}
         />
       )}
-      <SidebarViewIcon view='comments' isActive={activeView === 'comments'} onClick={openSidebar} />
-      <SidebarViewIcon view='suggestions' isActive={activeView === 'suggestions'} onClick={openSidebar} />
+      {!isNewProposal && (
+        <>
+          <SidebarViewIcon view='comments' isActive={activeView === 'comments'} onClick={openSidebar} />
+          <SidebarViewIcon view='suggestions' isActive={activeView === 'suggestions'} onClick={openSidebar} />
+        </>
+      )}
     </Box>
   );
 }
@@ -183,9 +192,11 @@ function SidebarContents({
   onChangeEvaluation,
   refreshProposal,
   isProposalTemplate,
-  isNewProposal
+  isNewProposal,
+  readOnlyReviewers,
+  readOnlyRubricCriteria
 }: SidebarProps) {
-  const isCharmVerse = !!proposal?.evaluations.length;
+  const isCharmVerse = useIsCharmverseSpace();
   return (
     <>
       {sidebarView === 'proposal_evaluation' &&
@@ -210,6 +221,8 @@ function SidebarContents({
           readOnly={!!readOnlyProposalPermissions}
           showHeader={!isNewProposal && !isProposalTemplate}
           onChangeEvaluation={onChangeEvaluation}
+          readOnlyReviewers={!!readOnlyReviewers}
+          readOnlyRubricCriteria={!!readOnlyRubricCriteria}
           goToEvaluation={(evaluationId) => {
             openEvaluationSidebar?.(evaluationId);
           }}
