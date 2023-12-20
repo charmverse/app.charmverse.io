@@ -7,6 +7,7 @@ import type {
 import type { ProposalStatus } from '@charmverse/core/prisma-client';
 import type { ProposalWithUsers, ListProposalsRequest } from '@charmverse/core/proposals';
 
+import type { FormFieldInput } from 'components/common/form/interfaces';
 import type {
   ProposalBlockInput,
   ProposalBlockUpdateInput,
@@ -121,4 +122,8 @@ export function useDeleteProposalBlocks(spaceId: string) {
 
 export function useCreateProposalRewards(proposalId: string) {
   return usePOST<undefined, ProposalWithUsersAndRubric>(`/api/proposals/${proposalId}/rewards`);
+}
+
+export function useUpdateProposalFormFields({ proposalId }: { proposalId: string }) {
+  return usePUT<{ formFields: FormFieldInput[] }, FormFieldInput[]>(`/api/proposals/${proposalId}/form`);
 }

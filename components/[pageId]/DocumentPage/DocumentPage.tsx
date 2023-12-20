@@ -565,11 +565,7 @@ function DocumentPage({
                 />
                 <Box mb={10}>
                   {page.type === 'proposal_template' ? (
-                    <FormFieldsEditor
-                      proposalId={proposal.id}
-                      formId={proposal.formId}
-                      formFields={proposal?.formFields ?? []}
-                    />
+                    <FormFieldsEditor proposalId={proposal.id} formFields={proposal?.formFields ?? []} />
                   ) : (
                     <FormFieldInputs
                       formFields={proposal?.formFields ?? []}

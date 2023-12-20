@@ -135,11 +135,11 @@ interface IInputSearchMemberMultipleProps
 export function InputSearchMemberMultiple({
   onChange,
   disableCloseOnSelect,
-  defaultValue,
+  defaultValue = [],
   ...props
 }: IInputSearchMemberMultipleProps) {
   const { members, membersRecord } = useMembers();
-  const defaultMembers = (defaultValue || []).map((userId) => membersRecord[userId]).filter(Boolean);
+  const defaultMembers = defaultValue.map((userId) => membersRecord[userId]).filter(Boolean);
   const [value, setValue] = useState<Member[]>(defaultMembers);
 
   function emitValue(users: Member[], reason: AutocompleteChangeReason) {

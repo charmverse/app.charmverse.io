@@ -3,7 +3,7 @@ import { Box, Stack } from '@mui/material';
 import { useRef, useEffect, useState } from 'react';
 import { v4 } from 'uuid';
 
-import charmClient from 'charmClient';
+import { useUpdateProposalFormFields } from 'charmClient/hooks/proposals';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { emptyDocument } from 'lib/prosemirror/constants';
 
@@ -36,22 +36,16 @@ export function ControlledFormFieldsEditor({
 
 export function FormFieldsEditor({
   proposalId,
-  formFields: initialFormFields,
-  formId
+  formFields: initialFormFields
 }: {
   proposalId: string;
   formFields: FormFieldInput[];
-  formId: string;
 }) {
   const [formFields, setFormFields] = useState([...initialFormFields]);
-  const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>([]);
-
-  const saveFormFields = () => {
-    charmClient.proposals.updateProposal({
-      proposalId,
-      formFields,
-      formId
-    });
+  const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>(formFields.map((field) => field.id));
+  const { trigger } = useUpdateProposalFormFields({ proposalId });
+  const saveFormFields = async () => {
+    await trigger({ formFields });
   };
 
   return (
@@ -269,7 +263,7 @@ function FormFieldsEditorBase({
           <Button
             onClick={saveFormFields}
             disabledTooltip={saveButtonDisabledTooltip}
-            isLoading={isUpdatingFormFields}
+            loading={isUpdatingFormFields}
             disabled={!!saveButtonDisabledTooltip}
           >
             Save

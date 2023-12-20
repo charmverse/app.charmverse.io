@@ -34,7 +34,7 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
         return <TextInputField {...fieldProps} ref={ref} />;
       }
       case 'long_text': {
-        return <CharmEditorInputField {...fieldProps} ref={ref} />;
+        return <CharmEditorInputField {...fieldProps} />;
       }
       case 'text_multiline': {
         return <TextInputField {...fieldProps} ref={ref} multiline rows={3} />;
