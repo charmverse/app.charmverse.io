@@ -23,6 +23,7 @@ import { PropertyLabel } from 'components/common/BoardEditor/components/properti
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
+import { FormFieldInputs } from 'components/common/form/FormFieldInputs';
 import { ControlledFormFieldsEditor, FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import type { FormFieldInput } from 'components/common/form/interfaces';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
@@ -353,17 +354,21 @@ export function NewProposalPage({
               {formInputs.proposalType === 'structured' ? (
                 <>
                   {proposalPageContent}
-                  <ControlledFormFieldsEditor
-                    collapsedFieldIds={collapsedFieldIds}
-                    toggleCollapse={toggleCollapse}
-                    formFields={formInputs.formFields || []}
-                    setFormFields={(formFields) => {
-                      setFormInputs({
-                        ...formInputs,
-                        formFields
-                      });
-                    }}
-                  />
+                  {formInputs.type === 'proposal_template' ? (
+                    <ControlledFormFieldsEditor
+                      collapsedFieldIds={collapsedFieldIds}
+                      toggleCollapse={toggleCollapse}
+                      formFields={formInputs.formFields || []}
+                      setFormFields={(formFields) => {
+                        setFormInputs({
+                          ...formInputs,
+                          formFields
+                        });
+                      }}
+                    />
+                  ) : (
+                    <FormFieldInputs formFields={formInputs.formFields || []} />
+                  )}
                 </>
               ) : (
                 <CharmEditor

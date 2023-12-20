@@ -113,7 +113,7 @@ export function useNewProposal({ newProposal }: Props) {
     disabledTooltip = 'Template is required';
   }
 
-  // old evalauation logic
+  // old evaluation logic
   if (!isCharmVerse) {
     if (formInputs.reviewers.length === 0) {
       disabledTooltip = 'Reviewers are required';
@@ -122,15 +122,20 @@ export function useNewProposal({ newProposal }: Props) {
     // get the first validation error from the evaluations
     disabledTooltip = formInputs.evaluations.map(getEvaluationFormError).filter(isTruthy)[0];
   }
-  if (formInputs.proposalType === 'structured' && (formInputs.formFields ?? [])?.length === 0) {
-    disabledTooltip = 'Form fields are required for structured proposals';
-  }
 
-  if (formInputs.proposalType === 'structured' && formInputs.formFields?.some((formField) => !formField.name)) {
-    disabledTooltip = 'Form fields must have a name';
-  }
-
-  if (formInputs.proposalType === 'free_form' && !formInputs.content) {
+  if (formInputs.proposalType === 'structured') {
+    if ((formInputs.formFields ?? []).length === 0) {
+      disabledTooltip = 'Form fields are required for structured proposals';
+    } else if (formInputs.formFields?.some((formField) => !formField.name)) {
+      disabledTooltip = 'Form fields must have a name';
+    } else if (
+      formInputs.formFields?.some(
+        (formField) => (formField.type === 'select' || formField.type === 'multiselect') && !formField.options
+      )
+    ) {
+      disabledTooltip = 'Select fields must have options';
+    }
+  } else if (formInputs.proposalType === 'free_form' && !formInputs.content) {
     disabledTooltip = 'Content is required for free-form proposals';
   }
 

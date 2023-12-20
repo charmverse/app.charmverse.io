@@ -23,9 +23,10 @@ export function FormFieldInputs({
   formFields,
   disabled
 }: {
-  formFields: (Pick<FormField, 'type' | 'name' | 'required' | 'options' | 'id' | 'description' | 'private'> & {
-    value: FormFieldValue;
+  formFields: (Pick<FormField, 'type' | 'name' | 'required' | 'id' | 'description' | 'private'> & {
+    value?: FormFieldValue;
     placeholder?: string;
+    options?: SelectOptionType[];
   })[];
   disabled?: boolean;
 }) {

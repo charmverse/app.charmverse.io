@@ -18,7 +18,7 @@ export function useFormFields({
   onSubmit
 }: {
   fields: {
-    value: any;
+    value?: any;
     id: string;
     required: boolean;
     type: FieldType;
