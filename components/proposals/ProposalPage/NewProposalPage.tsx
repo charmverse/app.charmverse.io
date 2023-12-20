@@ -29,7 +29,6 @@ import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemp
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
@@ -73,7 +72,6 @@ export function NewProposalPage({
   const { navigateToSpacePath } = useCharmRouter();
   const { space: currentSpace } = useCurrentSpace();
   const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>([]);
-  const isCharmVerse = useIsCharmverseSpace();
   const { activeView: sidebarView, setActiveView, closeSidebar } = usePageSidebar();
   const { proposalTemplates, isLoadingTemplates } = useProposalTemplates();
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>(null);
@@ -203,7 +201,7 @@ export function NewProposalPage({
 
   // having `internalSidebarView` allows us to have the sidebar open by default, because usePageSidebar() does not allow us to do this currently
   const [defaultSidebarView, setDefaultView] = useState<PageSidebarView | null>(
-    isCharmVerse && isMdScreen ? 'proposal_evaluation_settings' : null
+    isMdScreen ? 'proposal_evaluation_settings' : null
   );
   const internalSidebarView = defaultSidebarView || sidebarView;
 
@@ -224,14 +222,10 @@ export function NewProposalPage({
         }}
         placeholder='Title (required)'
       />
-      {isCharmVerse && (
-        <>
-          <Box my={2} mb={1}>
-            <EvaluationStepper evaluations={formInputs.evaluations} disabled isDraft={true} />
-          </Box>
-          <Divider />
-        </>
-      )}
+      <Box my={2} mb={1}>
+        <EvaluationStepper evaluations={formInputs.evaluations} disabled isDraft={true} />
+      </Box>
+      <Divider />
       <div className='focalboard-body font-family-default'>
         <div className='CardDetail content'>
           <div className='octo-propertylist'>
@@ -260,37 +254,24 @@ export function NewProposalPage({
                 </Box>
               </Box>
             )}
-            {isCharmVerse && (
-              <Box className='octo-propertyrow' mb='0 !important'>
-                <PropertyLabel readOnly required highlighted>
-                  Workflow
-                </PropertyLabel>
-                <WorkflowSelect
-                  value={formInputs.workflowId}
-                  onChange={selectEvaluationWorkflow}
-                  options={workflowOptions}
-                  readOnly={!!formInputs.proposalTemplateId}
-                />
-              </Box>
-            )}
+            <Box className='octo-propertyrow' mb='0 !important'>
+              <PropertyLabel readOnly required highlighted>
+                Workflow
+              </PropertyLabel>
+              <WorkflowSelect
+                value={formInputs.workflowId}
+                onChange={selectEvaluationWorkflow}
+                options={workflowOptions}
+                readOnly={!!formInputs.proposalTemplateId}
+              />
+            </Box>
             <ProposalPropertiesBase
               isFromTemplate={isFromTemplateSource}
               readOnlyCategory={isFromTemplateSource}
-              readOnlyRubricCriteria={readOnlyRubricCriteria}
-              readOnlyReviewers={readOnlyReviewers}
-              readOnlyProposalEvaluationType={isFromTemplateSource}
               proposalStatus='draft'
               proposalFormInputs={formInputs}
-              isTemplate={formInputs.type === 'proposal_template'}
               setProposalFormInputs={setFormInputs}
-              onChangeRubricCriteria={(rubricCriteria) => {
-                setFormInputs({
-                  ...formInputs,
-                  rubricCriteria
-                });
-              }}
               readOnlyCustomProperties={readOnlyCustomProperties}
-              isCharmVerse={isCharmVerse}
             />
           </div>
         </div>
@@ -321,7 +302,7 @@ export function NewProposalPage({
   useEffect(() => {
     // clear out page title on load
     setPageTitle('');
-    if (isCharmVerse && isMdScreen) {
+    if (isMdScreen) {
       setActiveView('proposal_evaluation_settings');
       setDefaultView(null);
     }
@@ -329,10 +310,10 @@ export function NewProposalPage({
 
   // populate workflow if not set and template is not selected
   useEffect(() => {
-    if (isCharmVerse && workflowOptions?.length && !formInputs.workflowId && !templateIdFromUrl) {
+    if (workflowOptions?.length && !formInputs.workflowId && !templateIdFromUrl) {
       selectEvaluationWorkflow(workflowOptions[0]);
     }
-  }, [!!workflowOptions, isCharmVerse]);
+  }, [!!workflowOptions]);
 
   // populate with template if selected
   useEffect(() => {

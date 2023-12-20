@@ -5,7 +5,6 @@ import { mutate } from 'swr';
 import { useCreateProposal } from 'charmClient/hooks/proposals';
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationSettings';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { RubricDataInput } from 'lib/proposal/rubric/upsertRubricCriteria';
@@ -20,7 +19,6 @@ type Props = {
 };
 
 export function useNewProposal({ newProposal }: Props) {
-  const isCharmVerse = useIsCharmverseSpace();
   const { user } = useUser();
   const { showMessage } = useSnackbar();
   const { space: currentSpace } = useCurrentSpace();
@@ -110,12 +108,7 @@ export function useNewProposal({ newProposal }: Props) {
     disabledTooltip = 'Template is required';
   }
 
-  // old evalauation logic
-  if (!isCharmVerse) {
-    if (formInputs.reviewers.length === 0) {
-      disabledTooltip = 'Reviewers are required';
-    }
-  } else if (!disabledTooltip) {
+  if (!disabledTooltip) {
     // get the first validation error from the evaluations
     disabledTooltip = formInputs.evaluations.map(getEvaluationFormError).filter(isTruthy)[0];
   }

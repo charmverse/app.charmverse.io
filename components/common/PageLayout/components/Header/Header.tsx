@@ -11,7 +11,6 @@ import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPag
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
 import { useNotifications } from 'components/nexus/hooks/useNotifications';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { usePage } from 'hooks/usePage';
 import { usePageIdFromPath } from 'hooks/usePageFromPath';
 
@@ -39,7 +38,6 @@ type HeaderProps = {
 };
 
 function HeaderComponent({ open, openSidebar }: HeaderProps) {
-  const isCharmVerse = useIsCharmverseSpace();
   const router = useRouter();
   const basePageId = usePageIdFromPath();
   const { space: currentSpace } = useCurrentSpace();
@@ -91,7 +89,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
           {isProposalsPage && <ProposalShareButton headerHeight={headerHeight} />}
 
           {basePage && <DocumentHeaderElements headerHeight={headerHeight} page={basePage} />}
-          {isNewProposalPage && isCharmVerse && <ToggleEvaluationButton />}
+          {isNewProposalPage && <ToggleEvaluationButton />}
 
           <FullPageActionsMenuButton page={basePage} post={forumPostInfo?.forumPost} />
         </Box>

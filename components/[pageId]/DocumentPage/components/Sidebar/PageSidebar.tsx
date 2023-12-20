@@ -9,8 +9,6 @@ import { EvaluationSettingsSidebar } from 'components/proposals/ProposalPage/com
 import type { Props as ProposalSettingsProps } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/EvaluationSettingsSidebar';
 import type { Props as EvaluationSidebarProps } from 'components/proposals/ProposalPage/components/EvaluationSidebar/EvaluationSidebar';
 import { EvaluationSidebar } from 'components/proposals/ProposalPage/components/EvaluationSidebar/EvaluationSidebar';
-import { OldProposalEvaluationSidebar } from 'components/proposals/ProposalPage/components/EvaluationSidebar/OldProposalEvaluationSidebar';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 
@@ -64,13 +62,12 @@ type SidebarProps = {
 function PageSidebarComponent(props: SidebarProps) {
   const { id, proposal, sidebarView, openSidebar, closeSidebar, isNewProposal } = props;
   const isMdScreen = useMdScreen();
-  const isCharmVerse = useIsCharmverseSpace();
   const isOpen = sidebarView !== null;
   const sidebarTitle = sidebarView && SIDEBAR_VIEWS[sidebarView]?.title;
   const showEvaluationSidebarIcon =
     (proposal?.evaluationType === 'rubric' &&
       (proposal.status === 'evaluation_active' || proposal?.status === 'evaluation_closed')) ||
-    (isCharmVerse && !!proposal);
+    !!proposal;
 
   function toggleSidebar() {
     if (sidebarView === null) {
@@ -196,25 +193,21 @@ function SidebarContents({
   readOnlyReviewers,
   readOnlyRubricCriteria
 }: SidebarProps) {
-  const isCharmVerse = useIsCharmverseSpace();
   return (
     <>
-      {sidebarView === 'proposal_evaluation' &&
-        (isCharmVerse ? (
-          <EvaluationSidebar
-            pageId={pageId}
-            proposal={proposal}
-            isTemplate={isProposalTemplate}
-            isNewProposal={isNewProposal}
-            evaluationId={proposalEvaluationId}
-            refreshProposal={refreshProposal}
-            goToSettings={() => {
-              openSidebar?.('proposal_evaluation_settings');
-            }}
-          />
-        ) : (
-          <OldProposalEvaluationSidebar pageId={pageId} proposalId={proposalId} />
-        ))}
+      {sidebarView === 'proposal_evaluation' && (
+        <EvaluationSidebar
+          pageId={pageId}
+          proposal={proposal}
+          isTemplate={isProposalTemplate}
+          isNewProposal={isNewProposal}
+          evaluationId={proposalEvaluationId}
+          refreshProposal={refreshProposal}
+          goToSettings={() => {
+            openSidebar?.('proposal_evaluation_settings');
+          }}
+        />
+      )}
       {sidebarView === 'proposal_evaluation_settings' && (
         <EvaluationSettingsSidebar
           proposal={proposalInput}
