@@ -1,5 +1,4 @@
 import type { Page } from '@charmverse/core/prisma';
-import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { useMediaQuery, Divider, Box } from '@mui/material';
 import dynamic from 'next/dynamic';
@@ -20,6 +19,7 @@ import type { FrontendParticipant } from 'components/common/CharmEditor/componen
 import type { ConnectionEvent } from 'components/common/CharmEditor/components/fiduswriter/ws';
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
+import { FormFieldInputs } from 'components/common/form/FormFieldInputs';
 import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import { EvaluationStepper } from 'components/proposals/ProposalPage/components/EvaluationStepper/EvaluationStepper';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
@@ -29,6 +29,7 @@ import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useLgScreen } from 'hooks/useMediaScreens';
 import { useThreads } from 'hooks/useThreads';
+import { useUser } from 'hooks/useUser';
 import { useVotes } from 'hooks/useVotes';
 import type { PageWithContent } from 'lib/pages/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -321,6 +322,7 @@ function DocumentPage({
   close,
   enableSidebar
 }: DocumentPageProps) {
+  const { user } = useUser();
   const isLargeScreen = useLgScreen();
   const { navigateToSpacePath, router } = useCharmRouter();
   const {
@@ -549,7 +551,7 @@ function DocumentPage({
             top={pageTop}
             fullWidth={isSmallScreen || (page.fullWidth ?? false)}
           >
-            {proposal?.formId ? (
+            {proposal && proposal?.formId ? (
               <>
                 <DocumentPageContent
                   editorState={editorState}
@@ -561,7 +563,20 @@ function DocumentPage({
                   insideModal={insideModal}
                   readOnly={readOnly}
                 />
-                <FormFieldsEditor formFields={proposal?.form?.formFields ?? []} />
+                <Box mb={10}>
+                  {page.type === 'proposal_template' ? (
+                    <FormFieldsEditor
+                      proposalId={proposal.id}
+                      formId={proposal.formId}
+                      formFields={proposal.form?.formFields ?? []}
+                    />
+                  ) : (
+                    <FormFieldInputs
+                      formFields={proposal.form?.formFields ?? []}
+                      disabled={proposal.createdBy !== user?.id}
+                    />
+                  )}
+                </Box>
               </>
             ) : (
               <CharmEditor

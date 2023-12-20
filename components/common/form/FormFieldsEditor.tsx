@@ -3,6 +3,8 @@ import { Box, Stack } from '@mui/material';
 import { useRef, useEffect, useState } from 'react';
 import { v4 } from 'uuid';
 
+import charmClient from 'charmClient';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { emptyDocument } from 'lib/prosemirror/constants';
 
 import { Button } from '../Button';
@@ -32,11 +34,25 @@ export function ControlledFormFieldsEditor({
   );
 }
 
-export function FormFieldsEditor({ formFields: initialFormFields }: { formFields: FormFieldInput[] }) {
+export function FormFieldsEditor({
+  proposalId,
+  formFields: initialFormFields,
+  formId
+}: {
+  proposalId: string;
+  formFields: FormFieldInput[];
+  formId: string;
+}) {
   const [formFields, setFormFields] = useState(initialFormFields);
   const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>([]);
 
-  const saveFormFields = () => {};
+  const saveFormFields = () => {
+    charmClient.proposals.updateProposal({
+      proposalId,
+      formFields,
+      formId
+    });
+  };
 
   return (
     <FormFieldsEditorBase
@@ -66,8 +82,11 @@ function FormFieldsEditorBase({
   setFormFields: (updatedFormFields: FormFieldInput[]) => void;
   collapsedFieldIds: string[];
   toggleCollapse: (fieldId: string) => void;
-  onSave?: VoidFunction;
+  onSave?: VoidFunction | (() => Promise<void>);
 }) {
+  const [isFormDirty, setIsFormDirty] = useState(false);
+  const [isUpdatingFormFields, setIsUpdatingFormFields] = useState(false);
+  const { showMessage } = useSnackbar();
   // Using a ref to keep the formFields state updated, since it becomes stale inside the functions
   const formFieldsRef = useRef(formFields);
 
@@ -86,8 +105,8 @@ function FormFieldsEditorBase({
   ) {
     const newFormFields = [...formFieldsRef.current];
     const updatedFieldIndex = newFormFields.findIndex((f) => f.id === updatedFormField.id);
-    // If the index was changed, we need to move the form field to the new index
     const newIndex = updatedFormField.index;
+    // If the index was changed, we need to move the form field to the new index
     if (typeof newIndex === 'number') {
       newFormFields.splice(newIndex, 0, newFormFields.splice(updatedFieldIndex, 1)[0]);
     }
@@ -99,6 +118,20 @@ function FormFieldsEditorBase({
         index
       }))
     );
+    setIsFormDirty(true);
+  }
+
+  async function saveFormFields() {
+    setIsUpdatingFormFields(true);
+    try {
+      await onSave?.();
+      showMessage('Form fields saved successfully');
+    } catch (_) {
+      //
+    } finally {
+      setIsFormDirty(false);
+      setIsUpdatingFormFields(false);
+    }
   }
 
   function addNewFormField() {
@@ -181,6 +214,14 @@ function FormFieldsEditorBase({
 
   const hasEmptyName = formFields.some((formField) => !formField.name);
 
+  const saveButtonDisabledTooltip = !isFormDirty
+    ? 'Please edit the form before saving'
+    : hasEmptyName
+    ? 'Please fill out all field names before saving'
+    : formFields.length === 0
+    ? 'Please add at least one field before saving'
+    : undefined;
+
   return (
     <Stack gap={1}>
       {formFields.map((formField) => (
@@ -226,13 +267,10 @@ function FormFieldsEditorBase({
           }}
         >
           <Button
-            onClick={onSave}
-            disabledTooltip={
-              hasEmptyName
-                ? 'Please fill out all field names before saving'
-                : 'Please add at least one field before saving'
-            }
-            disabled={formFields.length === 0 || hasEmptyName}
+            onClick={saveFormFields}
+            disabledTooltip={saveButtonDisabledTooltip}
+            isLoading={isUpdatingFormFields}
+            disabled={!!saveButtonDisabledTooltip}
           >
             Save
           </Button>
