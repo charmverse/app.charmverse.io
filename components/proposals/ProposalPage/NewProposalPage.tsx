@@ -1,4 +1,3 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import type { ProposalEvaluationPermission } from '@charmverse/core/prisma';
 import type { PageType } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
@@ -31,6 +30,7 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
+import { useMdScreen } from 'hooks/useMediaScreens';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
@@ -80,6 +80,7 @@ export function NewProposalPage({
   const [, setPageTitle] = usePageTitle();
   const { data: workflowOptions } = useGetProposalWorkflows(currentSpace?.id);
   const [workflowId, setWorkflowId] = useState('');
+  const isMdScreen = useMdScreen();
   const {
     formInputs,
     setFormInputs,
@@ -212,7 +213,7 @@ export function NewProposalPage({
 
   // having `internalSidebarView` allows us to have the sidebar open by default, because usePageSidebar() does not allow us to do this currently
   const [defaultSidebarView, setDefaultView] = useState<PageSidebarView | null>(
-    isCharmVerse ? 'proposal_evaluation_settings' : null
+    isCharmVerse && isMdScreen ? 'proposal_evaluation_settings' : null
   );
   const internalSidebarView = defaultSidebarView || sidebarView;
 
@@ -274,7 +275,12 @@ export function NewProposalPage({
                 <PropertyLabel readOnly required highlighted>
                   Workflow
                 </PropertyLabel>
-                <WorkflowSelect value={workflowId} onChange={selectEvaluationWorkflow} options={workflowOptions} />
+                <WorkflowSelect
+                  value={workflowId}
+                  onChange={selectEvaluationWorkflow}
+                  options={workflowOptions}
+                  readOnly={!!formInputs.proposalTemplateId}
+                />
               </Box>
             )}
             <ProposalPropertiesBase
@@ -301,6 +307,7 @@ export function NewProposalPage({
       {currentSpace && (
         <PageSidebar
           isNewProposal
+          readOnlyReviewers={readOnlyReviewers}
           id='page-action-sidebar'
           spaceId={currentSpace.id}
           sidebarView={internalSidebarView || null}
@@ -322,7 +329,7 @@ export function NewProposalPage({
   useEffect(() => {
     // clear out page title on load
     setPageTitle('');
-    if (isCharmVerse) {
+    if (isCharmVerse && isMdScreen) {
       setActiveView('proposal_evaluation_settings');
       setDefaultView(null);
     }
@@ -388,6 +395,11 @@ export function NewProposalPage({
           </StyledContainer>
         </Box>
         <StickyFooterContainer>
+          {!isMdScreen && (
+            <Button variant='outlined' onClick={() => setActiveView('proposal_evaluation_settings')}>
+              Configure
+            </Button>
+          )}
           <Button
             disabled={Boolean(disabledTooltip) || isCreatingProposal}
             disabledTooltip={disabledTooltip}

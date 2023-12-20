@@ -21,9 +21,10 @@ type Props = {
   categoryId?: string | null;
   onChange: (criteria: Partial<ProposalEvaluationValues>) => void;
   readOnly: boolean;
+  readOnlyReviewers: boolean;
 };
 
-export function EvaluationSettings({ evaluation, categoryId, onChange, readOnly }: Props) {
+export function EvaluationSettings({ evaluation, categoryId, onChange, readOnly, readOnlyReviewers }: Props) {
   const reviewerOptions = evaluation.reviewers
     // .filter((reviewer) => reviewer.group === 'role' || reviewer.group === 'user')
     .map((reviewer) => ({
@@ -64,7 +65,7 @@ export function EvaluationSettings({ evaluation, categoryId, onChange, readOnly 
             data-test='proposal-reviewer-select'
             emptyPlaceholderContent='Select user or role'
             value={reviewerOptions}
-            readOnly={readOnly}
+            readOnly={readOnly || readOnlyReviewers}
             systemRoles={[allMembersSystemRole]}
             variant='outlined'
             proposalCategoryId={categoryId}
