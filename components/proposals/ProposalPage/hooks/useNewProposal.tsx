@@ -129,10 +129,6 @@ export function useNewProposal({ newProposal }: Props) {
     disabledTooltip = 'Form fields must have a name';
   }
 
-  if (formInputs.proposalType === 'free_form' && !formInputs.content) {
-    disabledTooltip = 'Content is required for free-form proposals';
-  }
-
   return {
     formInputs,
     clearFormInputs,
