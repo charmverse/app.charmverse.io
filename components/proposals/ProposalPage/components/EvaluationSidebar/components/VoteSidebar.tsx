@@ -51,37 +51,24 @@ export function VoteSidebar({ pageId, isCurrent, proposal, evaluation }: Props) 
 
   if (!vote) {
     if (evaluation.voteSettings?.publishToSnapshot) {
-      <Tooltip
-        title={!isReviewer ? 'Only proposal authors and space admins can publish this proposal to snapshot' : ''}
-      >
-        <span>
-          <PublishToSnapshot
-            renderContent={({ label, onClick, icon }) => (
-              <Button disabled={!isReviewer} onClick={onClick}>
-                {icon}
-                <Typography>{label}</Typography>
-              </Button>
-            )}
-            onPublish={onPublishToSnapshot}
-            pageId={proposal!.id}
-            snapshotProposalId={evaluation.snapshotId}
-          />
-        </span>
-      </Tooltip>;
       return (
-        <NoCommentsMessage
-          icon={
-            <HowToVoteIcon
-              fontSize='large'
-              color='secondary'
-              sx={{
-                height: '2em',
-                width: '2em'
-              }}
+        <Tooltip
+          title={!isReviewer ? 'Only proposal authors and space admins can publish this proposal to snapshot' : ''}
+        >
+          <span>
+            <PublishToSnapshot
+              renderContent={({ label, onClick, icon }) => (
+                <Button disabled={!isReviewer} onClick={onClick}>
+                  {icon}
+                  <Typography>{label}</Typography>
+                </Button>
+              )}
+              onPublish={onPublishToSnapshot}
+              pageId={proposal!.id}
+              snapshotProposalId={evaluation.snapshotId}
             />
-          }
-          message='Vote has not been published to snapshot yet'
-        />
+          </span>
+        </Tooltip>
       );
     }
     return (
