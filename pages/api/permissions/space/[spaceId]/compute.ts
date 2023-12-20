@@ -2,8 +2,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
-import { permissionsApiClient } from 'lib/permissions/api/routers';
 import type { SpacePermissionFlags } from 'lib/permissions/spaces';
 import { withSessionRoute } from 'lib/session/withSession';
 

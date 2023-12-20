@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';
 import { archiveProposal } from 'lib/proposal/archiveProposal';
 import { withSessionRoute } from 'lib/session/withSession';

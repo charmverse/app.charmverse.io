@@ -6,7 +6,7 @@ import nc from 'next-connect';
 import { createCardsFromProposals } from 'lib/focalboard/createCardsFromProposals';
 import { updateCardsFromProposals } from 'lib/focalboard/updateCardsFromProposals';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

@@ -8,7 +8,7 @@ import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';
 import { createPage } from 'lib/pages/server/createPage';
 import { untitledPage } from 'lib/pages/untitledPage';
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 import { replaceS3Domain } from 'lib/utilities/url';
 

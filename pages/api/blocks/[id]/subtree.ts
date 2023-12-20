@@ -5,7 +5,7 @@ import nc from 'next-connect';
 
 import type { BoardViewFields } from 'lib/focalboard/boardView';
 import { onError, onNoMatch } from 'lib/middleware';
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 
 // TODO: frontend should tell us which space to use

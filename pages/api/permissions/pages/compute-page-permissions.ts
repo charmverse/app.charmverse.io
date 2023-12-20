@@ -6,7 +6,7 @@ import nc from 'next-connect';
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { PageNotFoundError } from 'lib/pages/server';
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isUUID } from 'lib/utilities/strings';

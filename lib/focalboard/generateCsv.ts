@@ -5,7 +5,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { Formatters, PropertyContext } from 'components/common/BoardEditor/focalboard/src/octoUtils';
 import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtils';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { formatDate, formatDateTime } from 'lib/utilities/dates';
 
 import type { Board, IPropertyTemplate, PropertyType } from './board';

@@ -8,7 +8,7 @@ import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProf
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 import { duplicatePage } from 'lib/pages/duplicatePage';
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { PageNotFoundError } from 'lib/public-api';
 import { withSessionRoute } from 'lib/session/withSession';
 import { relay } from 'lib/websockets/relay';

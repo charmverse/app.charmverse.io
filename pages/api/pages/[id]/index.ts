@@ -12,7 +12,7 @@ import type { ModifyChildPagesResponse, PageWithContent } from 'lib/pages';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { updatePage } from 'lib/pages/server/updatePage';
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { convertDoc } from 'lib/prosemirror/conversions/convertOldListNodes';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';

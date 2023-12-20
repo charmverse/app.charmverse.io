@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { getRewardOrThrow } from 'lib/rewards/getReward';
 import type { RewardWithUsers, RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
 import { rollupRewardStatus } from 'lib/rewards/rollupRewardStatus';

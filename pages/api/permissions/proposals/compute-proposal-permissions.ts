@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch } from 'lib/middleware';
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import type { PermissionCompute } from 'lib/permissions/interfaces';
 import { ProposalNotFoundError } from 'lib/proposal/errors';
 import { withSessionRoute } from 'lib/session/withSession';

@@ -6,7 +6,7 @@ import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser }
 import type { ModifyChildPagesResponse } from 'lib/pages';
 import { archivePages } from 'lib/pages/archivePages';
 import { PageNotFoundError } from 'lib/pages/server';
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 import { relay } from 'lib/websockets/relay';
 

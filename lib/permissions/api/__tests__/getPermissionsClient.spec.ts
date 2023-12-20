@@ -2,9 +2,9 @@ import { PermissionsApiClient } from '@charmverse/core/permissions';
 import type { SubscriptionTier } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 
-import { PublicPermissionsClient } from '../client';
+import { getPermissionsClient } from '../client';
+import { PublicPermissionsClient } from '../freeClient';
 import { PermissionsApiClientWithPermissionsSwitch } from '../overridenPermissionsApiClient';
-import { getPermissionsClient } from '../routers';
 
 describe('getPermissionsClient', () => {
   it('should return the free client for a free space', async () => {

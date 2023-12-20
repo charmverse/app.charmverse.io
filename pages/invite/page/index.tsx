@@ -8,7 +8,7 @@ import { getLayout as getBaseLayout } from 'components/common/BaseLayout/getLayo
 import { useMagicLink } from 'components/invite/page/hooks/useMagicLink';
 import type { MagicLinkResponseStatus } from 'components/invite/page/PageInviteLink';
 import { PageInviteLink } from 'components/invite/page/PageInviteLink';
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionSsr } from 'lib/session/withSession';
 import { getPagePath } from 'lib/utilities/domains/getPagePath';
 

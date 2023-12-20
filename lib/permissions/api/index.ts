@@ -1,1 +1,1 @@
-export { getPermissionsClient } from './routers';
+export { getPermissionsClient } from './client';

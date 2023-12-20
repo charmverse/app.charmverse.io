@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 
 import { createForumPost } from 'lib/forums/posts/createForumPost';
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { assignRole } from 'lib/roles';
 import { createVote } from 'lib/votes';

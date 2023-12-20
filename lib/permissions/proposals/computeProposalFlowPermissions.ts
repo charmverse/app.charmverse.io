@@ -5,7 +5,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { isProposalReviewer } from 'lib/proposal/isProposalReviewer';
 
-import { permissionsApiClient } from '../api/routers';
+import { permissionsApiClient } from '../api/client';
 
 import { countReviewers } from './countReviewers';
 

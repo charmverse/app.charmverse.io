@@ -4,7 +4,7 @@ import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse
 import request from 'supertest';
 import { v4 as uuid } from 'uuid';
 
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { upsertProposalCategoryPermission } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 

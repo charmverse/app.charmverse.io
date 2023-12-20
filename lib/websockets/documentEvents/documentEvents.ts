@@ -6,7 +6,7 @@ import { validate } from 'uuid';
 
 import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/constants';
 import { archivePages } from 'lib/pages/archivePages';
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { convertAndSavePage } from 'lib/prosemirror/conversions/convertOldListNodes';

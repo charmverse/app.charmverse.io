@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { NotFoundError, onError, onNoMatch } from 'lib/middleware';
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getVotesByPage } from 'lib/votes/getVotesByPage';
 import type { ExtendedVote } from 'lib/votes/interfaces';

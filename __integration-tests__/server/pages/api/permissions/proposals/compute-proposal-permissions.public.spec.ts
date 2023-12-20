@@ -2,7 +2,7 @@ import type { ProposalCategoryPermission, Space, User } from '@charmverse/core/p
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 let space: Space;
