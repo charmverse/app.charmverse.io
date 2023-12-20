@@ -14,7 +14,7 @@ import { PageActionsMenu } from 'components/common/PageActions/components/PageAc
 import { PageIcon } from 'components/common/PageIcon';
 import { RewardApplicationStatusIcon } from 'components/rewards/components/RewardApplicationStatusChip';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useLocalStorage } from 'hooks/useLocalStorage';
+import { useSmallScreen } from 'hooks/useMediaScreens';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
@@ -98,6 +98,7 @@ function TableRow(props: Props) {
     subRowsEmptyValueContent
   } = props;
   const { space } = useCurrentSpace();
+  const isMobile = useSmallScreen();
   const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
   const [title, setTitle] = useState('');
   const isManualSort = activeView.fields.sortOptions.length === 0;
@@ -237,7 +238,7 @@ function TableRow(props: Props) {
                       icon={pageIcon}
                     />
                   )}
-                  <TextInput {...commonProps} multiline={wrapColumn} />
+                  <TextInput {...commonProps} disablePopup={isMobile} multiline={wrapColumn} />
                 </div>
 
                 <div className='open-button' data-test={`database-open-button-${card.id}`}>

@@ -1,29 +1,29 @@
 import type { Space, User, Vote } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
-import type { PageWithProposal } from 'lib/pages';
 import { castProposalVote } from 'lib/public-api/castProposalVote';
 import { UserIsNotSpaceMemberError } from 'lib/users/errors';
 import { DataNotFoundError, UndesirableOperationError } from 'lib/utilities/errors';
-import { createProposalWithUsers, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createProposalWithUsers, createVote, generateUserAndSpace } from 'testing/setupDatabase';
 
 let user: User;
 let space: Space;
-let proposal: PageWithProposal;
+let proposalId: string;
 let vote: Vote;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken();
+  const generated = await generateUserAndSpace();
   user = generated.user;
   space = generated.space;
 
-  proposal = await createProposalWithUsers({
+  const proposal = await createProposalWithUsers({
     spaceId: space.id,
     userId: user.id,
     authors: [],
     reviewers: [user.id],
     proposalStatus: 'vote_active'
   });
+  proposalId = proposal.id;
 
   vote = await createVote({
     pageId: proposal.id,
@@ -36,7 +36,7 @@ beforeAll(async () => {
 describe('castProposalVote', () => {
   it('should cast a vote for proposal by proposalId', async () => {
     const choice = '1';
-    const userVote = await castProposalVote({ userId: user.id, proposalId: proposal.id, choice });
+    const userVote = await castProposalVote({ userId: user.id, proposalId, choice });
 
     expect(userVote).toMatchObject(
       expect.objectContaining({
@@ -77,7 +77,7 @@ describe('castProposalVote', () => {
   });
 
   it('should throw error if user does not have access to space', async () => {
-    await expect(castProposalVote({ choice: '4', proposalId: proposal.id, userId: v4() })).rejects.toBeInstanceOf(
+    await expect(castProposalVote({ choice: '4', proposalId, userId: v4() })).rejects.toBeInstanceOf(
       UserIsNotSpaceMemberError
     );
   });

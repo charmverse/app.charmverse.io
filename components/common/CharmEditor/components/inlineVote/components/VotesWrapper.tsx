@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 import FormControl from '@mui/material/FormControl';
 
 export const VotesWrapper = styled.div<{ detailed?: boolean }>`
+  position: relative;
   border: 1px solid var(--input-border);
   padding: ${({ theme }) => theme.spacing(2)};
 `;

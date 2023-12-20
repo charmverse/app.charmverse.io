@@ -25,7 +25,9 @@ export function DocumentHeaderElements({ headerHeight, isInsideDialog, page }: P
       {isBasePageDocument && <DocumentParticipants />}
       {isBasePageDocument && <EditingModeToggle />}
       {!deletedAt && <ShareButton headerHeight={headerHeight} pageId={id} />}
-      {type === 'proposal' && <ToggleEvaluationButton isInsideDialog={isInsideDialog} pageId={id} />}
+      {(type === 'proposal' || type === 'proposal_template') && (
+        <ToggleEvaluationButton isInsideDialog={isInsideDialog} pageId={id} />
+      )}
     </>
   );
 }

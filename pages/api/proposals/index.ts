@@ -3,7 +3,6 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import type { PageWithProposal } from 'lib/pages';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import type { CreateProposalInput } from 'lib/proposal/createProposal';
@@ -25,7 +24,7 @@ handler
   )
   .post(createProposalController);
 
-async function createProposalController(req: NextApiRequest, res: NextApiResponse<PageWithProposal>) {
+async function createProposalController(req: NextApiRequest, res: NextApiResponse<{ id: string }>) {
   const proposaCreateProps = req.body as CreateProposalInput;
 
   if (proposaCreateProps.pageProps?.type === 'proposal_template') {
@@ -63,10 +62,7 @@ async function createProposalController(req: NextApiRequest, res: NextApiRespons
     proposalPage.page.spaceId
   );
 
-  return res.status(201).json({
-    ...proposalPage.page,
-    proposal: proposalPage.proposal
-  });
+  return res.status(201).json({ id: proposalPage.proposal.id });
 }
 
 export default withSessionRoute(handler);

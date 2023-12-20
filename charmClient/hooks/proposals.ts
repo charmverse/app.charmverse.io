@@ -4,9 +4,9 @@ import type {
   ProposalPermissionsSwitch,
   ProposalReviewerPool
 } from '@charmverse/core/permissions';
+import type { ProposalStatus } from '@charmverse/core/prisma-client';
 import type { ProposalWithUsers, ListProposalsRequest } from '@charmverse/core/proposals';
 
-import type { PageWithProposal } from 'lib/pages';
 import type {
   ProposalBlockInput,
   ProposalBlockUpdateInput,
@@ -18,6 +18,8 @@ import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers';
 import type { RubricCriteriaUpsert } from 'lib/proposal/rubric/upsertRubricCriteria';
+import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
+import type { UpdateEvaluationRequest } from 'lib/proposal/updateProposalEvaluation';
 import type { UpdateProposalLensPropertiesRequest } from 'lib/proposal/updateProposalLensProperties';
 
 import type { MaybeString } from './helpers';
@@ -27,10 +29,6 @@ import { useGET, usePOST, usePUT, useDELETE } from './helpers';
 
 export function useGetProposalDetails(proposalId: MaybeString) {
   return useGET<ProposalWithUsersAndRubric>(proposalId ? `/api/proposals/${proposalId}` : null);
-}
-
-export function useGetAllReviewerUserIds(proposalId: MaybeString) {
-  return useGET<string[]>(proposalId ? `/api/proposals/${proposalId}/get-user-reviewerids` : null);
 }
 
 export function useGetIsReviewer(proposalId: MaybeString) {
@@ -73,23 +71,36 @@ export function useGetProposalBlocks(spaceId?: string) {
 // Mutative requests
 
 export function useCreateProposal() {
-  return usePOST<Omit<CreateProposalInput, 'userId'>, PageWithProposal>('/api/proposals');
+  return usePOST<Omit<CreateProposalInput, 'userId'>, { id: string }>('/api/proposals');
 }
 
-export function useUpsertRubricCriteria({ proposalId }: { proposalId: string }) {
-  return usePUT<Pick<RubricCriteriaUpsert, 'rubricCriteria'>>(`/api/proposals/${proposalId}/rubric-criteria`);
+export function useUpdateProposal({ proposalId }: { proposalId: MaybeString }) {
+  return usePUT<Omit<UpdateProposalRequest, 'proposalId'>>(`/api/proposals/${proposalId}`);
 }
 
+export function useUpdateProposalStatusOnly({ proposalId }: { proposalId: MaybeString }) {
+  return usePUT<{ newStatus: 'draft' | 'published' }>(`/api/proposals/${proposalId}/status-only`);
+}
+
+export function useUpdateProposalEvaluation({ proposalId }: { proposalId: MaybeString }) {
+  return usePUT<Partial<Omit<UpdateEvaluationRequest, 'proposalId'>>>(`/api/proposals/${proposalId}/evaluation`);
+}
+
+export function useUpsertRubricCriteria({ proposalId }: { proposalId: MaybeString }) {
+  return usePUT<Pick<RubricCriteriaUpsert, 'evaluationId' | 'rubricCriteria'>>(
+    `/api/proposals/${proposalId}/rubric-criteria`
+  );
+}
 export function useUpsertRubricCriteriaAnswers({ proposalId }: { proposalId: MaybeString }) {
-  return usePUT<Pick<RubricAnswerUpsert, 'answers'>>(`/api/proposals/${proposalId}/rubric-answers`);
+  return usePUT<Pick<RubricAnswerUpsert, 'evaluationId' | 'answers'>>(`/api/proposals/${proposalId}/rubric-answers`);
 }
 
 export function useUpsertDraftRubricCriteriaAnswers({ proposalId }: { proposalId: MaybeString }) {
-  return usePUT<Pick<RubricAnswerUpsert, 'answers'>>(`/api/proposals/${proposalId}/rubric-answers`);
+  return usePUT<Pick<RubricAnswerUpsert, 'evaluationId' | 'answers'>>(`/api/proposals/${proposalId}/rubric-answers`);
 }
 
 export function useDeleteRubricCriteriaAnswers({ proposalId }: { proposalId: MaybeString }) {
-  return useDELETE<{ isDraft: boolean }>(`/api/proposals/${proposalId}/rubric-answers`);
+  return useDELETE<{ isDraft: boolean; evaluationId?: string }>(`/api/proposals/${proposalId}/rubric-answers`);
 }
 
 export function useUpdateProposalLensProperties({ proposalId }: { proposalId: string }) {

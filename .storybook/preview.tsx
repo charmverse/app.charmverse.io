@@ -75,6 +75,7 @@ const preview: Preview = {
         { name: 'light', value: '#fff' }
       ]
     },
+    layout: 'fullscreen', // removes padding around the views
     actions: { argTypesRegex: '^on[A-Z].*' },
     controls: {
       matchers: {

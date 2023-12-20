@@ -60,8 +60,6 @@ export type PageDetails = {
   spaceId: string;
 };
 
-export type PageWithProposal = Page & { proposal: ProposalWithUsersAndRubric };
-
 export type PagesMap<P extends PageMeta | PageNode = PageMeta> = Record<string, P | undefined>;
 
 export type PageUpdates = Partial<Page> & { id: string };

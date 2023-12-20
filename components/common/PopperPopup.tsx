@@ -17,6 +17,7 @@ interface PopperPopupProps {
   paperSx?: SxProps<Theme>;
   style?: React.CSSProperties;
   popoverProps?: Partial<PopoverProps>;
+  disablePopup?: boolean;
 }
 
 export default function PopperPopup(props: PopperPopupProps) {
@@ -29,6 +30,7 @@ export default function PopperPopup(props: PopperPopupProps) {
     onClose,
     onOpen,
     open,
+    disablePopup,
     popoverProps: customPopoverProps = {}
   } = props;
 
@@ -57,8 +59,10 @@ export default function PopperPopup(props: PopperPopupProps) {
     ...popoverToggle,
     onClick: (e) => {
       e.stopPropagation();
-      onOpen?.();
-      popoverToggle.onClick(e);
+      if (!disablePopup) {
+        onOpen?.();
+        popoverToggle.onClick(e);
+      }
     }
   };
 

@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Comment, Space } from '@charmverse/core/prisma';
-import type { User } from '@charmverse/core/prisma-client';
+import type { Comment, Space, User } from '@charmverse/core/prisma';
 import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 

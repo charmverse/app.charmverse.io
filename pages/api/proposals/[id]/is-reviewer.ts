@@ -4,7 +4,6 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
-import { isProposalReviewer } from 'lib/proposal/isProposalReviewer';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -18,8 +17,15 @@ async function getReviewerIds(req: NextApiRequest, res: NextApiResponse<boolean>
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
+  const proposal = await prisma.proposal.findUniqueOrThrow({
+    where: {
+      id: proposalId
+    }
+  });
+
   const permissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
     resourceId: proposalId,
+    useProposalEvaluationPermissions: proposal.status === 'published',
     userId
   });
 
@@ -27,26 +33,7 @@ async function getReviewerIds(req: NextApiRequest, res: NextApiResponse<boolean>
     throw new ActionNotPermittedError(`You cannot view this proposal`);
   }
 
-  const proposal = await prisma.proposal.findUniqueOrThrow({
-    where: {
-      id: proposalId
-    },
-    select: {
-      id: true,
-      spaceId: true,
-      space: {
-        select: {
-          id: true,
-          paidTier: true
-        }
-      },
-      reviewers: true
-    }
-  });
-
-  const isReviewer = await isProposalReviewer({ proposal, userId, checkRoles: proposal.space.paidTier !== 'free' });
-
-  return res.status(200).send(isReviewer);
+  return res.status(200).send(permissions.review || permissions.evaluate);
 }
 
 export default withSessionRoute(handler);

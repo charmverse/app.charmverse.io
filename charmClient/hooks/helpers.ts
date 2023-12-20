@@ -6,9 +6,10 @@ import * as http from 'adapters/http';
 
 export type MaybeString = string | null | undefined;
 
-export function useGET<T = unknown>(path: string | undefined | null, query: any = {}) {
+// eslint-disable-next-line default-param-last
+export function useGET<T = unknown>(path: string | undefined | null, query: any = {}, swrOptions?: any) {
   const requestUrl = path ? path + getQueryString(query) : null;
-  return useSWR<T>(requestUrl, http.GET);
+  return useSWR<T>(requestUrl, http.GET, swrOptions);
 }
 
 export function useGETImmutable<T = unknown>(path: string | undefined | null, query: any = {}) {

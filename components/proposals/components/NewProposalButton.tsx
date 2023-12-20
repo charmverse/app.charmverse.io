@@ -10,17 +10,15 @@ import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { TemplatesMenu } from 'components/common/TemplatesMenu';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { usePages } from 'hooks/usePages';
-import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 
 import { useProposalCategories } from '../hooks/useProposalCategories';
 import { useProposalTemplates } from '../hooks/useProposalTemplates';
-
-import type { ProposalPageAndPropertiesInput } from './ProposalDialog/NewProposalPage';
+import type { ProposalPageAndPropertiesInput } from '../ProposalPage/NewProposalPage';
 
 const ProposalTemplateMenu = styled(Stack)`
   border: 1px solid ${({ theme }) => theme.palette.divider};
@@ -35,13 +33,9 @@ const ProposalTemplateMenu = styled(Stack)`
   gap: ${({ theme }) => theme.spacing(1)};
 `;
 
-export function NewProposalButton({
-  showProposal,
-  showNewProposal
-}: {
-  showProposal: (pageId: string) => void;
-  showNewProposal: (input?: Partial<ProposalPageAndPropertiesInput>) => void;
-}) {
+export function NewProposalButton() {
+  const { navigateToSpacePath } = useCharmRouter();
+
   const { proposalCategoriesWithCreatePermission } = useProposalCategories();
   const isAdmin = useIsAdmin();
   const { pages } = usePages();
@@ -55,44 +49,19 @@ export function NewProposalButton({
   const canCreateProposal = proposalCategoriesWithCreatePermission.length > 0;
   // grab page data from context so that title is always up-to-date
   const proposalTemplatePages = proposalTemplates?.map((template) => pages[template.page.id]).filter(isTruthy);
-
-  async function createProposalFromTemplate(templateId: string) {
-    const proposalTemplate = proposalTemplates?.find((proposal) => proposal.id === templateId);
-    if (proposalTemplate) {
-      showNewProposal({
-        contentText: proposalTemplate.page.contentText ?? '',
-        content: proposalTemplate.page.content as PageContent,
-        proposalTemplateId: templateId,
-        evaluationType: proposalTemplate.evaluationType,
-        headerImage: proposalTemplate.page.headerImage,
-        icon: proposalTemplate.page.icon,
-        categoryId: proposalTemplate.categoryId as string,
-        reviewers: proposalTemplate.reviewers.map((reviewer) => ({
-          group: reviewer.roleId ? 'role' : 'user',
-          id: (reviewer.roleId ?? reviewer.userId) as string
-        })),
-        rubricCriteria: proposalTemplate.rubricCriteria,
-        fields: (proposalTemplate.fields as ProposalFields) || {},
-        type: 'proposal'
-      });
-    }
-  }
-
   function deleteProposalTemplate(pageId: string) {
     return charmClient.deletePage(pageId);
   }
 
-  async function createProposalTemplate(proposalType: ProposalPageAndPropertiesInput['proposalType']) {
-    showNewProposal({
-      type: 'proposal_template',
-      proposalType
-    });
-    popupState.close();
-    proposalTemplateCreateModalState.close();
+  function editTemplate(pageId: string) {
+    navigateToSpacePath(`/${pageId}`);
+  }
+  function createTemplate(proposalType: ProposalPageAndPropertiesInput['proposalType']) {
+    navigateToSpacePath('/proposals/new', { type: 'proposal_template', proposalType });
   }
 
-  async function onClickCreate() {
-    showNewProposal();
+  function createFromTemplate(pageId: string) {
+    navigateToSpacePath(`/proposals/new`, { template: pageId });
   }
 
   return (
@@ -100,7 +69,7 @@ export function NewProposalButton({
       <Tooltip title={!canCreateProposal ? 'You do not have the permission to create a proposal.' : ''}>
         <Box>
           <ButtonGroup variant='contained' ref={buttonRef}>
-            <Button disabled={!canCreateProposal} onClick={onClickCreate} data-test='new-proposal-button'>
+            <Button disabled={!canCreateProposal} href='/proposals/new' data-test='new-proposal-button'>
               Create
             </Button>
             <Button
@@ -116,12 +85,12 @@ export function NewProposalButton({
       </Tooltip>
       <TemplatesMenu
         isLoading={isLoadingTemplates}
+        addPageFromTemplate={createFromTemplate}
+        editTemplate={editTemplate}
         pages={proposalTemplatePages}
-        addPageFromTemplate={createProposalFromTemplate}
         createTemplate={() =>
-          !isCharmverseSpace ? createProposalTemplate('free-form') : proposalTemplateCreateModalState.open()
+          !isCharmverseSpace ? createTemplate('free_form') : proposalTemplateCreateModalState.open()
         }
-        editTemplate={(pageId) => showProposal(pageId)}
         deleteTemplate={deleteProposalTemplate}
         anchorEl={buttonRef.current as Element}
         boardTitle='Proposals'
@@ -137,7 +106,7 @@ export function NewProposalButton({
         onClose={proposalTemplateCreateModalState.close}
       >
         <Stack spacing={2}>
-          <ProposalTemplateMenu onClick={() => createProposalTemplate('structured')}>
+          <ProposalTemplateMenu onClick={() => createTemplate('structured')}>
             <Stack flexDirection='row' gap={1} alignItems='center'>
               <WidgetsOutlinedIcon fontSize='large' />
               <Typography variant='h5'>Structured Form</Typography>
@@ -146,7 +115,7 @@ export function NewProposalButton({
               Create a template using Forms, creating a structured data format for each proposal to conform to.
             </Typography>
           </ProposalTemplateMenu>
-          <ProposalTemplateMenu onClick={() => createProposalTemplate('free-form')}>
+          <ProposalTemplateMenu onClick={() => createTemplate('free_form')}>
             <Stack flexDirection='row' gap={1} alignItems='center'>
               <DescriptionOutlinedIcon fontSize='large' />
               <Typography variant='h5'>Free Form</Typography>

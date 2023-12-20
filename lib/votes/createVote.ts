@@ -10,8 +10,20 @@ import type { ExtendedVote, VoteDTO } from './interfaces';
 import { DEFAULT_THRESHOLD, VOTE_STATUS } from './interfaces';
 
 export async function createVote(vote: VoteDTO & { spaceId: string }): Promise<ExtendedVote> {
-  const { spaceId, createdBy, pageId, postId, title, content, contentText, deadline, type, voteOptions, context } =
-    vote;
+  const {
+    spaceId,
+    createdBy,
+    evaluationId,
+    pageId,
+    postId,
+    title,
+    content,
+    contentText,
+    deadline,
+    type,
+    voteOptions,
+    context
+  } = vote;
 
   if (pageId) {
     const page = await prisma.page.findUnique({
@@ -55,6 +67,7 @@ export async function createVote(vote: VoteDTO & { spaceId: string }): Promise<E
       type: voteType,
       maxChoices,
       context,
+      evaluation: evaluationId ? { connect: { id: evaluationId } } : undefined,
       page: pageId
         ? {
             connect: {

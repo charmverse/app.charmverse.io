@@ -1,7 +1,14 @@
-import type { FormField, Page, PageComment, Proposal } from '@charmverse/core/prisma';
+import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
+import type {
+  FormField,
+  Page,
+  PageComment,
+  Proposal,
+  ProposalEvaluation,
+  ProposalEvaluationPermission,
+  Vote
+} from '@charmverse/core/prisma';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
-
-import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
 
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
@@ -9,8 +16,9 @@ import type {
 } from './rubric/interfaces';
 
 export interface ProposalReviewerInput {
-  group: Extract<AssignablePermissionGroups, 'role' | 'user'>;
+  group: 'system_role' | 'role' | 'user';
   id: string;
+  evaluationId?: string;
 }
 
 export interface NewProposalCategory {
@@ -33,14 +41,30 @@ export type ProposalRubricData = {
   draftRubricAnswers: ProposalRubricCriteriaAnswerWithTypedResponse[];
 };
 
+export type VoteSettings = Pick<Vote, 'type' | 'threshold' | 'maxChoices'> & {
+  durationDays: number;
+  options: string[];
+};
+
 export type ProposalFormData = {
   formFields: FormField[] | null;
 };
 
+export type PopulatedEvaluation = ProposalRubricData &
+  Omit<ProposalEvaluation, 'voteSettings'> & {
+    permissions: ProposalEvaluationPermission[];
+    reviewers: ProposalWithUsers['reviewers'];
+    voteSettings: VoteSettings | null;
+  };
+
 export type ProposalWithUsersAndRubric = ProposalWithUsers &
   ProposalRubricData &
-  ProposalFormData & { page?: { sourceTemplateId: string | null } | null };
-
+  ProposalFormData & {
+    evaluations: PopulatedEvaluation[];
+    page?: { sourceTemplateId: string | null } | null;
+    permissions: ProposalPermissionFlags;
+    currentEvaluationId?: string;
+  };
 export interface ProposalWithCommentsAndUsers extends ProposalWithUsers {
   page: Page & { comments: PageComment[] };
 }

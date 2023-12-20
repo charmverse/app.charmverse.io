@@ -24,7 +24,6 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalPendingReward } from 'lib/proposal/blocks/interfaces';
 import type { ProposalReviewerInput } from 'lib/proposal/interface';
-import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 
 type Props = {

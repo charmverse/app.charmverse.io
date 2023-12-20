@@ -5,7 +5,6 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
-import { getAllReviewerUserIds } from 'lib/proposal/getAllReviewerIds';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import { mapDbProposalToProposal } from 'lib/proposal/mapDbProposalToProposal';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
@@ -37,11 +36,24 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
           index: 'asc'
         }
       },
+      evaluations: {
+        orderBy: {
+          index: 'asc'
+        },
+        include: {
+          permissions: true,
+          reviewers: true,
+          rubricCriteria: true,
+          rubricAnswers: true,
+          draftRubricAnswers: true,
+          vote: true
+        }
+      },
       authors: true,
+      category: true,
+      page: { select: { id: true, sourceTemplateId: true } },
       reviewers: true,
       rewards: true,
-      category: true,
-      page: { select: { sourceTemplateId: true } },
       form: {
         include: {
           formFields: true
@@ -53,13 +65,23 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
   if (!proposal) {
     throw new NotFoundError();
   }
-  const computed = await req.basePermissionsClient.pages.computePagePermissions({
-    // Proposal id is the same as page
+  // TODO: use Mo's new core permissions client
+  const permissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
     resourceId: proposal?.id,
+    useProposalEvaluationPermissions: proposal?.status === 'published',
     userId
   });
-  if (computed.read !== true) {
-    throw new NotFoundError();
+
+  if (permissions.view !== true) {
+    const pagePermissions = proposal?.page?.id
+      ? await req.basePermissionsClient.pages.computePagePermissions({
+          resourceId: proposal.page.id,
+          userId
+        })
+      : null;
+    if (!pagePermissions?.read) {
+      throw new NotFoundError();
+    }
   }
 
   const { spaceRole } = await hasAccessToSpace({
@@ -67,21 +89,17 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
     userId
   });
 
-  const reviewerIds =
-    !spaceRole || spaceRole.isAdmin
-      ? []
-      : await getAllReviewerUserIds({
-          proposalId: proposal.id
-        });
-
-  const canSeeAnswers = spaceRole?.isAdmin || (userId && reviewerIds.includes(userId as string));
-
+  const canSeeAnswers = spaceRole?.isAdmin || permissions.evaluate || permissions.review;
   if (!canSeeAnswers) {
     proposal.draftRubricAnswers = [];
     proposal.rubricAnswers = [];
+    proposal.evaluations.forEach((evaluation) => {
+      evaluation.draftRubricAnswers = [];
+      evaluation.rubricAnswers = [];
+    });
   }
 
-  return res.status(200).json(mapDbProposalToProposal(proposal));
+  return res.status(200).json(mapDbProposalToProposal({ proposal, permissions }));
 }
 
 async function updateProposalController(req: NextApiRequest, res: NextApiResponse) {
@@ -95,10 +113,7 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
       id: proposalId
     },
     include: {
-      authors: true,
       reviewers: true,
-      rubricAnswers: true,
-      rubricCriteria: true,
       page: {
         select: {
           type: true
@@ -128,6 +143,7 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
   // A proposal can only be updated when its in draft or discussion status and only the proposal author can update it
   const proposalPermissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
     resourceId: proposal.id,
+    useProposalEvaluationPermissions: proposal?.status === 'published',
     userId
   });
 

@@ -1,4 +1,4 @@
-import { Chip, MenuItem, Stack, TextField } from '@mui/material';
+import { Chip, MenuItem, TextField, Typography, Stack } from '@mui/material';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import { forwardRef, useEffect, useRef, useState } from 'react';
 import { v4 } from 'uuid';
@@ -16,6 +16,7 @@ type SelectProps = {
   multiselect?: boolean;
   options?: SelectOptionType[];
   disabled?: boolean;
+  includeSelectedOptions?: boolean;
   canEditOptions?: boolean;
   noOptionsText?: string;
   onChange?: (option: string | string[]) => void;
@@ -52,6 +53,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
       onBlur,
       placeholder,
       className,
+      includeSelectedOptions = false,
       forcePopupIcon = 'auto',
       noOptionsText,
       helperText,
@@ -134,7 +136,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
           clearOnBlur
           handleHomeEndKeys
           multiple
-          filterSelectedOptions
+          filterSelectedOptions={!includeSelectedOptions}
           sx={{ minWidth: 150, width: '100%', zIndex: 1 }}
           options={options}
           autoHighlight
@@ -170,7 +172,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
               ))}
             </Stack>
           )}
-          noOptionsText={noOptionsText || 'No options available'}
+          noOptionsText={<Typography variant='caption'>{noOptionsText || 'No options available'}</Typography>}
           renderInput={(params) => (
             <TextField
               inputRef={inputRef}

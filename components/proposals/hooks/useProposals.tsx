@@ -1,6 +1,6 @@
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import type { ReactNode } from 'react';
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useMemo } from 'react';
 import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';

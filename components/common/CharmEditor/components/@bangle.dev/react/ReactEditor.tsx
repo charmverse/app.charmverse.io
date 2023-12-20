@@ -162,6 +162,8 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
         isLoadingRef.current = false;
         setEditorContent(_editor, initialContent);
       }
+    } else {
+      log.debug('[ws/ceditor] Subscribed to document');
     }
   }
 
@@ -247,7 +249,6 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
 
   useEffect(() => {
     const _editor = new CoreBangleEditor(renderRef.current!, editorViewPayloadRef.current);
-
     if (isContentControlled) {
       isLoadingRef.current = false;
     } else if (useSockets) {

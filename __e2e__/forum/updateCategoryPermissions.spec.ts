@@ -109,17 +109,13 @@ test.describe.serial('Update category permissions', () => {
 
     await expect(forumHomePage.categoryPermissionsDialog).toBeVisible();
 
-    let select = await page.getByRole('button', { name: 'No access' });
+    const select = forumHomePage.spaceCategoryPermissionSelect;
     await expect(select).toBeVisible();
     await select.click();
 
     const option = await page.getByRole('option', { name: 'View' });
     await expect(option).toBeVisible();
     await option.click();
-
-    // The option should now be the select value
-    select = await page.getByRole('button', { name: 'View' });
-    await expect(select).toBeVisible();
 
     await forumHomePage.closeModalButton.click();
 

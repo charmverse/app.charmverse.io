@@ -1,4 +1,4 @@
-import type { Space } from '@charmverse/core/prisma-client';
+import type { Space } from '@charmverse/core/prisma';
 import type { LensConfig } from '@lens-protocol/react-web';
 import { development, LensProvider } from '@lens-protocol/react-web';
 import { bindings } from '@lens-protocol/wagmi';
@@ -70,7 +70,7 @@ export function GlobalContext({
               <ReduxProvider store={reduxStore}>
                 <PagesProvider>
                   <LensProvider config={lensConfig}>
-                    <Paper>{children}</Paper>
+                    <Paper square>{children}</Paper>
                   </LensProvider>
                 </PagesProvider>
               </ReduxProvider>

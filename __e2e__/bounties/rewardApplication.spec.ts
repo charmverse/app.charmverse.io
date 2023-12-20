@@ -1,5 +1,5 @@
 // import type { Space, User } from '@charmverse/core/prisma';
-import type { Application, Bounty, Page, Space, User } from '@charmverse/core/prisma-client';
+import type { Application, Bounty, Page, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 import { login } from '__e2e__/utils/session';

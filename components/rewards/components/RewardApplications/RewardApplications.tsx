@@ -1,4 +1,4 @@
-import type { ApplicationStatus } from '@charmverse/core/prisma-client';
+import type { ApplicationStatus } from '@charmverse/core/prisma';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { Box, Divider, Grid, IconButton, Stack, Tooltip } from '@mui/material';
 import Typography from '@mui/material/Typography';

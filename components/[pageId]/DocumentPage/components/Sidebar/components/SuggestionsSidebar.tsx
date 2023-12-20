@@ -23,7 +23,7 @@ export function SuggestionsSidebar({
   spaceId
 }: {
   readOnly: boolean;
-  state: EditorState | null;
+  state?: EditorState | null;
   pageId: string;
   spaceId: string;
 }) {
