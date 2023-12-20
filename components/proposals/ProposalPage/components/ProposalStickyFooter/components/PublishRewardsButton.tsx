@@ -21,7 +21,7 @@ export function PublishRewardsButton({ proposalId, disabled, onSubmit }: Props) 
   const { mappedFeatures } = useSpaceFeatures();
   const rewardsTitle = mappedFeatures.rewards.title;
 
-  const createRewards = async () => {
+  async function createRewards() {
     try {
       await trigger();
       showMessage('Rewards created', 'success');
@@ -30,7 +30,7 @@ export function PublishRewardsButton({ proposalId, disabled, onSubmit }: Props) 
     } catch (e) {
       showMessage(`Error creating ${rewardsTitle}`, 'error');
     }
-  };
+  }
 
   return (
     <>
@@ -46,9 +46,11 @@ export function PublishRewardsButton({ proposalId, disabled, onSubmit }: Props) 
       </Button>
       <ModalWithButtons
         open={showConfirmation}
-        buttonText={`Publish ${rewardsTitle}?`}
+        title={`Publish ${rewardsTitle}?`}
+        buttonText='Publish'
         onClose={() => setShowConfirmation(false)}
-        onConfirm={createRewards}
+        // wrap the function so it does not return a promise to the confirmation modal
+        onConfirm={() => createRewards()}
       >
         <Typography>This action cannot be done</Typography>
       </ModalWithButtons>
