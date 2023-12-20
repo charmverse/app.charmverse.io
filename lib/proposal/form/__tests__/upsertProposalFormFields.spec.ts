@@ -115,7 +115,7 @@ describe('upsertProposalFormFields', () => {
         index: 1,
         options: [],
         private: true,
-        required: true
+        required: false
       }
     ];
 
@@ -123,7 +123,7 @@ describe('upsertProposalFormFields', () => {
     // add form to proposal
     await prisma.proposal.update({ where: { id: proposal.id }, data: { formId } });
 
-    const updatedFieldsInput = [fieldsInput[0], fieldsInput[1]];
+    const updatedFieldsInput = [fieldsInput[0]];
 
     const fields = await upsertProposalFormFields({
       proposalId: proposal.id,
