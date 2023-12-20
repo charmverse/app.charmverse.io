@@ -114,7 +114,8 @@ function DocumentPage({
   const {
     proposal,
     permissions: proposalPermissions,
-    currentEvaluation,
+    readOnlyRubricCriteria,
+    readOnlyReviewers,
     evaluationToShowInSidebar,
     refreshProposal,
     onChangeEvaluation
@@ -483,6 +484,8 @@ function DocumentPage({
                     proposalId={proposalId}
                     proposalEvaluationId={activeEvaluationId}
                     readOnlyProposalPermissions={!proposal?.permissions.edit}
+                    readOnlyRubricCriteria={readOnlyRubricCriteria}
+                    readOnlyReviewers={readOnlyReviewers}
                     pagePermissions={pagePermissions}
                     editorState={editorState}
                     sidebarView={sidebarView}
@@ -514,6 +517,7 @@ function DocumentPage({
             refreshProposal={refreshProposal}
             isEvaluationSidebarOpen={sidebarView === 'proposal_evaluation'}
             openEvaluationSidebar={openEvaluationSidebar}
+            closeSidebar={closeSidebar}
           />
         )}
       </PrimaryColumn>

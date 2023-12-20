@@ -20,6 +20,12 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
   if (currentEvaluation && evaluationTypesWithSidebar.includes(currentEvaluation.type)) {
     evaluationToShowInSidebar = currentEvaluation.id;
   }
+  const readOnlyProperties = !proposal?.permissions.edit;
+  const readOnlyReviewers = Boolean(readOnlyProperties || !!proposal?.page?.sourceTemplateId);
+  // rubric criteria can always be updated by reviewers and admins, but criteria from a template are only editable by admin
+  const readOnlyRubricCriteria = Boolean(
+    readOnlyProperties && (!proposal?.permissions.evaluate || proposal?.page?.sourceTemplateId)
+  );
 
   // console.log(proposal?.permissions);
   return useMemo(
@@ -28,6 +34,8 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
       permissions: proposal?.permissions,
       evaluationToShowInSidebar,
       currentEvaluation,
+      readOnlyReviewers,
+      readOnlyRubricCriteria,
       refreshProposal: () => refreshProposal(), // wrap it in a function so click handlers dont pass in the event
       async onChangeEvaluation(evaluationId: string, updatedEvaluation: Partial<ProposalEvaluationValues>) {
         if (updatedEvaluation.rubricCriteria) {
@@ -49,6 +57,8 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
       refreshProposal,
       evaluationToShowInSidebar,
       currentEvaluation,
+      readOnlyReviewers,
+      readOnlyRubricCriteria,
       updateProposalEvaluation,
       upsertRubricCriteria
     ]

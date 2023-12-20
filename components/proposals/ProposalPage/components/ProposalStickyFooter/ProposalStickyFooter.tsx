@@ -18,12 +18,14 @@ export function ProposalStickyFooter({
   proposal,
   refreshProposal,
   isEvaluationSidebarOpen,
-  openEvaluationSidebar
+  openEvaluationSidebar,
+  closeSidebar
 }: {
   proposal: ProposalWithUsersAndRubric;
   refreshProposal: VoidFunction;
   isEvaluationSidebarOpen: boolean;
   openEvaluationSidebar: (evaluationId?: string) => void;
+  closeSidebar: VoidFunction;
 }) {
   const currentEvaluation = proposal.evaluations.find((e) => e.id === proposal.currentEvaluationId);
   const currentEvaluationIndex = proposal?.evaluations.findIndex((e) => e.id === currentEvaluation?.id) ?? -1;
@@ -65,9 +67,9 @@ export function ProposalStickyFooter({
         )}
         {hasSidebarEvaluation && (
           <OpenEvaluationButton
-            disabled={!proposal.permissions.move || isEvaluationSidebarOpen}
-            isEvaluationSidebarOpen={false}
-            onClick={() => openEvaluationSidebar(currentEvaluation?.id)}
+            disabled={!proposal.permissions.move}
+            isEvaluationSidebarOpen={isEvaluationSidebarOpen}
+            onClick={() => (isEvaluationSidebarOpen ? closeSidebar() : openEvaluationSidebar(currentEvaluation?.id))}
           />
         )}
       </Box>
