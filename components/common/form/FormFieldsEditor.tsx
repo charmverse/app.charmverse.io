@@ -110,6 +110,11 @@ function FormFieldsEditorBase({
       newFormFields.splice(newIndex, 0, newFormFields.splice(updatedFieldIndex, 1)[0]);
     }
 
+    // Making sure that the label field is not required
+    if (updatedFormField.type === 'label') {
+      updatedFormField.required = false;
+    }
+
     setFormFields(
       newFormFields.map((formField, index) => ({
         ...formField,

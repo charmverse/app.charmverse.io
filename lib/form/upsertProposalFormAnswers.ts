@@ -40,7 +40,7 @@ export async function upsertProposalFormAnswers({ answers, formId, proposalId }:
   }
 
   const hasAllRequiredAnswers = form.formFields.every(
-    (f) => !f.required || answers.some((a) => a.fieldId === f.id && !!a.value)
+    (f) => f.type === 'label' || !f.required || answers.some((a) => a.fieldId === f.id && !!a.value)
   );
 
   if (!hasAllRequiredAnswers) {

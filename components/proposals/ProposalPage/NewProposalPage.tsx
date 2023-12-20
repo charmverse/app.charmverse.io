@@ -58,6 +58,7 @@ export type ProposalPageAndPropertiesInput = ProposalPropertiesInput & {
   proposalType?: 'structured' | 'free_form';
   formFields?: FormFieldInput[];
   formAnswers?: FieldAnswerInput[];
+  formId?: string;
 };
 
 const StyledContainer = styled(PageEditorContainer)`
@@ -301,17 +302,6 @@ export function NewProposalPage({
     }
   }, [formInputs.proposalTemplateId, isTemplateRequired]);
 
-  useEffect(() => {
-    setFormInputs({
-      formAnswers: proposalFormFields
-        .filter((formField) => formField.type !== 'label')
-        .map((proposalFormField) => ({
-          fieldId: proposalFormField.id,
-          value: getInitialFormFieldValue(proposalFormField) as FieldAnswerInput['value']
-        }))
-    });
-  }, [proposalFormFields]);
-
   function updateProposalContent({ doc, rawText }: ICharmEditorOutput) {
     setFormInputs({
       content: doc,
@@ -360,7 +350,14 @@ export function NewProposalPage({
         evaluations: template.evaluations,
         rubricCriteria: template.rubricCriteria,
         fields: (template.fields as ProposalFields) || {},
-        type: 'proposal'
+        type: 'proposal',
+        formId: template.formId ?? undefined,
+        formAnswers: (template?.formFields ?? [])
+          .filter((formField) => formField.type !== 'label')
+          .map((proposalFormField) => ({
+            fieldId: proposalFormField.id,
+            value: getInitialFormFieldValue(proposalFormField) as FieldAnswerInput['value']
+          }))
       });
     }
   }

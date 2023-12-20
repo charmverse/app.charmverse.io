@@ -90,6 +90,7 @@ export function useNewProposal({ newProposal }: Props) {
         spaceId: currentSpace.id,
         publishToLens: formInputs.publishToLens,
         fields: formInputs.fields,
+        formId: formInputs.formId,
         formAnswers: formInputs.formAnswers
       }).catch((err: any) => {
         showMessage(err.message ?? 'Something went wrong', 'error');
