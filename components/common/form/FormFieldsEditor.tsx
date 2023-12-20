@@ -1,6 +1,6 @@
 import AddIcon from '@mui/icons-material/Add';
-import { Stack } from '@mui/material';
-import { useRef, useEffect } from 'react';
+import { Box, Stack } from '@mui/material';
+import { useRef, useEffect, useState } from 'react';
 import { v4 } from 'uuid';
 
 import { emptyDocument } from 'lib/prosemirror/constants';
@@ -11,7 +11,7 @@ import type { SelectOptionType } from './fields/Select/interfaces';
 import { FormField } from './FormField';
 import type { FormFieldInput } from './interfaces';
 
-export function FormFieldsEditor({
+export function ControlledFormFieldsEditor({
   formFields,
   setFormFields,
   collapsedFieldIds,
@@ -21,6 +21,52 @@ export function FormFieldsEditor({
   setFormFields: (updatedFormFields: FormFieldInput[]) => void;
   collapsedFieldIds: string[];
   toggleCollapse: (fieldId: string) => void;
+}) {
+  return (
+    <FormFieldsEditorBase
+      collapsedFieldIds={collapsedFieldIds}
+      formFields={formFields}
+      setFormFields={setFormFields}
+      toggleCollapse={toggleCollapse}
+    />
+  );
+}
+
+export function FormFieldsEditor({ formFields: initialFormFields }: { formFields: FormFieldInput[] }) {
+  const [formFields, setFormFields] = useState(initialFormFields);
+  const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>([]);
+
+  const saveFormFields = () => {};
+
+  return (
+    <FormFieldsEditorBase
+      collapsedFieldIds={collapsedFieldIds}
+      formFields={formFields}
+      onSave={saveFormFields}
+      setFormFields={setFormFields}
+      toggleCollapse={(fieldId) => {
+        if (collapsedFieldIds.includes(fieldId)) {
+          setCollapsedFieldIds(collapsedFieldIds.filter((id) => id !== fieldId));
+        } else {
+          setCollapsedFieldIds([...collapsedFieldIds, fieldId]);
+        }
+      }}
+    />
+  );
+}
+
+function FormFieldsEditorBase({
+  formFields,
+  setFormFields,
+  collapsedFieldIds,
+  toggleCollapse,
+  onSave
+}: {
+  formFields: FormFieldInput[];
+  setFormFields: (updatedFormFields: FormFieldInput[]) => void;
+  collapsedFieldIds: string[];
+  toggleCollapse: (fieldId: string) => void;
+  onSave?: VoidFunction;
 }) {
   // Using a ref to keep the formFields state updated, since it becomes stale inside the functions
   const formFieldsRef = useRef(formFields);
@@ -133,6 +179,8 @@ export function FormFieldsEditor({
     setFormFields(newFormFields);
   }
 
+  const hasEmptyName = formFields.some((formField) => !formField.name);
+
   return (
     <Stack gap={1}>
       {formFields.map((formField) => (
@@ -171,6 +219,25 @@ export function FormFieldsEditor({
       >
         Add an input
       </Button>
+      {formFields.length !== 0 && onSave && (
+        <Box
+          sx={{
+            width: 'fit-content'
+          }}
+        >
+          <Button
+            onClick={onSave}
+            disabledTooltip={
+              hasEmptyName
+                ? 'Please fill out all field names before saving'
+                : 'Please add at least one field before saving'
+            }
+            disabled={formFields.length === 0 || hasEmptyName}
+          >
+            Save
+          </Button>
+        </Box>
+      )}
     </Stack>
   );
 }

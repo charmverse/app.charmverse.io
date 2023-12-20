@@ -23,7 +23,7 @@ import { PropertyLabel } from 'components/common/BoardEditor/components/properti
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
-import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
+import { ControlledFormFieldsEditor, FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import type { FormFieldInput } from 'components/common/form/interfaces';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
@@ -353,7 +353,7 @@ export function NewProposalPage({
               {formInputs.proposalType === 'structured' ? (
                 <>
                   {proposalPageContent}
-                  <FormFieldsEditor
+                  <ControlledFormFieldsEditor
                     collapsedFieldIds={collapsedFieldIds}
                     toggleCollapse={toggleCollapse}
                     formFields={formInputs.formFields || []}

@@ -65,6 +65,7 @@ export function NewProposalButton() {
   function editTemplate(pageId: string) {
     navigateToSpacePath(`/${pageId}`);
   }
+
   function createTemplate(proposalType: ProposalPageAndPropertiesInput['proposalType']) {
     navigateToSpacePath('/proposals/new', { type: 'proposal_template', proposalType });
   }

@@ -7,7 +7,7 @@ import { v4 } from 'uuid';
 import { formFieldTypes } from 'components/common/form/constants';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { FormFieldInputs as CustomFormFieldInputs } from 'components/common/form/FormFieldInputs';
-import { FormFieldsEditor as CustomFormFieldsEditor } from 'components/common/form/FormFieldsEditor';
+import { ControlledFormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import type { FormFieldInput, FormFieldValue } from 'components/common/form/interfaces';
 import { createDocumentWithText } from 'lib/prosemirror/constants';
 
@@ -45,7 +45,7 @@ export function FormFieldsEditor() {
 
   return (
     <GlobalContext>
-      <CustomFormFieldsEditor
+      <ControlledFormFieldsEditor
         formFields={formFields}
         setFormFields={setFormFields}
         collapsedFieldIds={collapsedFieldIds}
