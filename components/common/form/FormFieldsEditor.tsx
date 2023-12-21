@@ -217,6 +217,10 @@ function FormFieldsEditorBase({
   }
 
   const hasEmptyName = formFields.some((formField) => !formField.name);
+  const hasEmptySelectOptions = formFields.some(
+    (formField) =>
+      (formField.type === 'select' || formField.type === 'multiselect') && (formField.options ?? []).length === 0
+  );
 
   const saveButtonDisabledTooltip = !isFormDirty
     ? 'Please edit the form before saving'
@@ -224,6 +228,8 @@ function FormFieldsEditorBase({
     ? 'Please fill out all field names before saving'
     : formFields.length === 0
     ? 'Please add at least one field before saving'
+    : hasEmptySelectOptions
+    ? 'Please add at least one option to all select fields before saving'
     : undefined;
 
   return (

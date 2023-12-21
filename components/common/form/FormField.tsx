@@ -161,7 +161,6 @@ function ExpandedFormField({
         placeholder={fieldTypePlaceholderRecord[formField.type]}
         // Enable select and multiselect fields to be able to create options
         disabled={formField.type !== 'select' && formField.type !== 'multiselect'}
-        value={formField.type === 'date' ? new Date().toString() : ''}
         options={formField.options}
       />
       <Divider

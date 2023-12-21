@@ -27,6 +27,7 @@ export const DateInputField = forwardRef<HTMLDivElement, Props>(
     },
     ref
   ) => {
+    const dateValue = typeof value === 'string' ? DateTime.fromJSDate(new Date(value)) : undefined;
     return (
       <FieldWrapper
         endAdornment={endAdornment}
@@ -38,7 +39,7 @@ export const DateInputField = forwardRef<HTMLDivElement, Props>(
         sx={fieldWrapperSx}
       >
         <DateTimePicker
-          value={typeof value === 'string' ? DateTime.fromJSDate(new Date(value)) : undefined}
+          value={dateValue}
           onChange={(_value) => {
             onChange?.(_value?.toJSDate().getTime());
           }}
@@ -50,7 +51,8 @@ export const DateInputField = forwardRef<HTMLDivElement, Props>(
               inputProps={{
                 ...props.inputProps,
                 readOnly: true,
-                placeholder
+                placeholder,
+                value: dateValue?.toFormat('dd-MM-yyyy HH:mm a') ?? ''
               }}
               disabled={disabled}
               error={!!error}
