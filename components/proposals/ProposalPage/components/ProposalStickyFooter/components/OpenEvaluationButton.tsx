@@ -40,7 +40,7 @@ export function OpenEvaluationButton({
       endIcon={isEvaluationSidebarOpen ? <ChevronRightIcon /> : SIDEBAR_VIEWS.proposal_evaluation.icon}
       onClick={onClick}
     >
-      {isEvaluationSidebarOpen ? label.close : label.vote}
+      {isEvaluationSidebarOpen ? label.close : label.open}
     </Button>
   );
 }
