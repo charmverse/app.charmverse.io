@@ -4,7 +4,7 @@ import type { FormField, Proposal, ProposalEvaluation } from '@charmverse/core/p
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
-import { getProposalFormFields } from 'lib/proposal/form/getProposalFormFields';
+import { getProposalFormFields, getProposalFormFields } from 'lib/proposal/form/getProposalFormFields';
 
 import { getOldProposalStatus } from './getOldProposalStatus';
 import type { ProposalWithUsersAndRubric } from './interface';
