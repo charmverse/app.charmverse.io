@@ -14,6 +14,6 @@ export async function refreshBountyApplications() {
     count('cron.token-gate-verification.total-applications-to-refresh', totalCount);
     count('cron.token-gate-verification.total-udpated-payment-statuses', updatedApplicationsCount);
   } catch (error: any) {
-    log.error(`Error expiring proposals: ${error.stack || error.message || error}`, { error });
+    log.error(`Error refreshing bounty applications: ${error.stack || error.message || error}`, { error });
   }
 }
