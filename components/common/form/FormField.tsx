@@ -20,6 +20,7 @@ import {
   TextField,
   Typography
 } from '@mui/material';
+import { useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 import { emptyDocument } from 'lib/prosemirror/constants';
@@ -74,6 +75,14 @@ function ExpandedFormField({
   onUpdateOption
 }: Omit<FormFieldProps, 'isCollapsed'>) {
   const theme = useTheme();
+  const titleTextFieldRef = useRef<HTMLInputElement | null>(null);
+
+  // Auto focus on title text field when expanded
+  useEffect(() => {
+    if (titleTextFieldRef.current) {
+      titleTextFieldRef.current.querySelector('input')?.focus();
+    }
+  }, [titleTextFieldRef]);
 
   return (
     <>
@@ -131,6 +140,7 @@ function ExpandedFormField({
         onChange={(e) => updateFormField({ name: e.target.value, id: formField.id })}
         placeholder='Title (required)'
         error={!formField.name}
+        ref={titleTextFieldRef}
         data-test='form-field-name-input'
       />
       <CharmEditor
