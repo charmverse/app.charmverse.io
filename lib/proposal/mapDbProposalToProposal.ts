@@ -5,18 +5,22 @@ import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import type { ProposalEvaluation } from '@prisma/client';
 
+import { getProposalFormFields } from 'lib/proposal/form/getProposalFormFields';
+
 import { getOldProposalStatus } from './getOldProposalStatus';
 import type { ProposalWithUsersAndRubric } from './interface';
 
 type FormFieldsIncludeType = {
   form: {
+    id: string;
     formFields: FormField[] | null;
   } | null;
 };
 
 export function mapDbProposalToProposal({
   proposal,
-  permissions
+  permissions,
+  canAccessPrivateFormFields
 }: {
   proposal: Proposal &
     FormFieldsIncludeType & {
@@ -31,9 +35,12 @@ export function mapDbProposalToProposal({
       draftRubricAnswers: any[];
     };
   permissions?: ProposalPermissionFlags;
+  canAccessPrivateFormFields?: boolean;
 }): ProposalWithUsersAndRubric {
   const { rewards, form, ...rest } = proposal;
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
+  const formFields = getProposalFormFields(form?.formFields, !!canAccessPrivateFormFields);
+
   const proposalWithUsers = {
     ...rest,
     permissions,
@@ -45,7 +52,12 @@ export function mapDbProposalToProposal({
     draftRubricAnswers: currentEvaluation?.draftRubricAnswers || proposal.draftRubricAnswers,
     reviewers: currentEvaluation?.reviewers || proposal.reviewers,
     rewardIds: rewards.map((r) => r.id) || null,
-    formFields: form?.formFields || null
+    form: form
+      ? {
+          formFields: formFields || null,
+          id: form?.id || null
+        }
+      : null
   };
 
   return proposalWithUsers as ProposalWithUsersAndRubric;
