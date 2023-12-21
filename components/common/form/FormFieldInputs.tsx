@@ -1,7 +1,7 @@
 import type { FormField } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { Box, Chip, Stack } from '@mui/material';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
@@ -17,11 +17,8 @@ import { useFormFields } from './hooks/useFormFields';
 import type { FormFieldValue } from './interfaces';
 
 const FormFieldInputsContainer = styled(Stack)`
-  border: 1px solid ${(props) => props.theme.palette.divider};
-  padding: ${(props) => props.theme.spacing(2)};
   gap: ${(props) => props.theme.spacing(1)};
   flex-direction: column;
-  gap: ${(props) => props.theme.spacing(1)};
 `;
 
 type FormFieldInputsProps = {
@@ -117,7 +114,7 @@ function FormFieldInputsBase({
 
   return (
     <Stack gap={1}>
-      <FormFieldInputsContainer mb={10}>
+      <FormFieldInputsContainer>
         {formFields.map((formField) => (
           <Controller
             key={formField.id}
@@ -155,7 +152,7 @@ function FormFieldInputsBase({
         <Box
           sx={{
             width: 'fit-content',
-            mb: 4
+            mb: 5
           }}
         >
           <Button

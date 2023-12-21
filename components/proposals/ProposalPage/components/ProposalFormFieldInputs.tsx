@@ -38,18 +38,16 @@ export function ProposalFormFieldInputs({
     <FormFieldInputs
       onSave={readOnly ? undefined : onSave}
       disabled={readOnly || (proposalStatus !== 'discussion' && proposalStatus !== 'draft')}
-      formFields={formFields
-        .map((formField) => {
-          const proposalFormFieldAnswer = proposalFormFieldAnswers.find(
-            (_proposalFormFieldAnswer) => _proposalFormFieldAnswer.fieldId === formField.id
-          );
-          return {
-            ...formField,
-            value: proposalFormFieldAnswer?.value as FormFieldValue,
-            options: (formField.options ?? []) as SelectOptionType[]
-          };
-        })
-        .filter((f) => f.type !== 'label')}
+      formFields={formFields.map((formField) => {
+        const proposalFormFieldAnswer = proposalFormFieldAnswers.find(
+          (_proposalFormFieldAnswer) => _proposalFormFieldAnswer.fieldId === formField.id
+        );
+        return {
+          ...formField,
+          value: proposalFormFieldAnswer?.value as FormFieldValue,
+          options: (formField.options ?? []) as SelectOptionType[]
+        };
+      })}
     />
   );
 }

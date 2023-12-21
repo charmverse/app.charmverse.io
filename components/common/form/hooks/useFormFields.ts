@@ -116,8 +116,8 @@ export function useFormFields({
                 .array()
                 .of(yup.string().uuid())
                 .test('is-uuid', 'Invalid uuid', (value) => {
-                  if (isRequired && !value) {
-                    return false;
+                  if (isRequired) {
+                    return value ? value.length !== 0 && value.every((v) => (v ? isUUID(v) : false)) : false;
                   }
 
                   return value ? value.every((v) => (v ? isUUID(v) : false)) : true;

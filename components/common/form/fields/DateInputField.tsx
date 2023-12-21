@@ -55,7 +55,7 @@ export const DateInputField = forwardRef<HTMLDivElement, Props>(
                   ...props.inputProps,
                   readOnly: true,
                   placeholder,
-                  value: disabled ? undefined : props.inputProps?.value ?? ''
+                  value: dateValue ? props.inputProps?.value : undefined
                 }}
                 disabled={disabled}
                 error={!!error}
