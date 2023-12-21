@@ -9,6 +9,7 @@ import type { FieldAnswerInput } from 'components/common/form/interfaces';
 import { upsertProposalFormAnswers } from 'lib/form/upsertProposalFormAnswers';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { getProposalFormAnswers } from 'lib/proposal/form/getProposalFormAnswers';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -28,7 +29,6 @@ async function getProposalFormAnswersHandler(req: NextApiRequest, res: NextApiRe
     where: { id: proposalId },
     include: {
       authors: true,
-      formAnswers: true,
       page: { select: { id: true, sourceTemplateId: true } }
     }
   });
@@ -59,9 +59,9 @@ async function getProposalFormAnswersHandler(req: NextApiRequest, res: NextApiRe
     }
   }
 
-  // TODO: hide private fields
+  const answers = await getProposalFormAnswers({ proposalId, userId });
 
-  return res.status(200).json(proposal.formAnswers);
+  return res.status(200).json(answers);
 }
 
 async function upsertProposalFormAnswersHandler(

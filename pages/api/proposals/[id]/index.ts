@@ -5,6 +5,7 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { canAccessPrivateFields } from 'lib/proposal/form/canAccessPrivateFields';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import { mapDbProposalToProposal } from 'lib/proposal/mapDbProposalToProposal';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
@@ -99,7 +100,9 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
     });
   }
 
-  return res.status(200).json(mapDbProposalToProposal({ proposal, permissions }));
+  const canAccessPrivateFormFields = await canAccessPrivateFields({ proposal, userId, proposalId: proposal.id });
+
+  return res.status(200).json(mapDbProposalToProposal({ proposal, permissions, canAccessPrivateFormFields }));
 }
 
 async function updateProposalController(req: NextApiRequest, res: NextApiResponse) {
