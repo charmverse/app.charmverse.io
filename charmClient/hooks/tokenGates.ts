@@ -42,9 +42,7 @@ export function useEvaluateTokenGateEligibility() {
 }
 
 export function useVerifyTokenGate() {
-  return usePOST<Omit<TokenGateVerificationRequest, 'userId'>, { error?: string; success?: boolean }>(
-    '/api/token-gates/verify'
-  );
+  return usePOST<Omit<TokenGateVerificationRequest, 'userId'>, { success?: boolean }>('/api/token-gates/verify');
 }
 
 export function useReevaluateRoles() {
