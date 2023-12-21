@@ -87,6 +87,11 @@ export async function getProposalTemplates({ spaceId, userId }: SpaceResourcesRe
         orderBy: {
           index: 'asc'
         }
+      },
+      form: {
+        include: {
+          formFields: true
+        }
       }
     }
   });
