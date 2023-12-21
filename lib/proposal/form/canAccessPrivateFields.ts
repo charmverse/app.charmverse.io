@@ -2,7 +2,7 @@ import { hasAccessToSpace, isProposalAuthor } from '@charmverse/core/permissions
 import type { Proposal, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { getPermissionsClient } from 'lib/permissions/api';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 
 export async function canAccessPrivateFields({
   proposalId,
@@ -37,14 +37,10 @@ export async function canAccessPrivateFields({
     return true;
   }
 
-  const permissions = await getPermissionsClient({ resourceId: proposalId, resourceIdType: 'proposal' }).then(
-    ({ client }) =>
-      client.proposals.computeProposalPermissions({
-        resourceId: proposalId,
-        useProposalEvaluationPermissions: checkProposal.status === 'published',
-        userId
-      })
-  );
+  const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
+    resourceId: checkProposal.id,
+    userId
+  });
 
   // reviewers can view private fields
   return permissions.review || permissions.evaluate;

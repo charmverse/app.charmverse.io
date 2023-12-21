@@ -91,7 +91,11 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
     });
   }
 
-  return res.status(200).json(mapDbProposalToProposal({ proposal, permissions: proposalPermissions }));
+  const canAccessPrivateFormFields = await canAccessPrivateFields({ proposal, userId, proposalId: proposal.id });
+
+  return res
+    .status(200)
+    .json(mapDbProposalToProposal({ proposal, permissions: proposalPermissions, canAccessPrivateFormFields }));
 }
 
 async function updateProposalController(req: NextApiRequest, res: NextApiResponse) {
