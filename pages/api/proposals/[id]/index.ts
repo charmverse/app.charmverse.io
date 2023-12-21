@@ -57,7 +57,11 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
       rewards: true,
       form: {
         include: {
-          formFields: true
+          formFields: {
+            orderBy: {
+              index: 'asc'
+            }
+          }
         }
       }
     }
