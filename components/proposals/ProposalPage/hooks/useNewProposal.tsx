@@ -9,6 +9,7 @@ import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { RubricDataInput } from 'lib/proposal/rubric/upsertRubricCriteria';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { ProposalPageAndPropertiesInput } from '../NewProposalPage';
@@ -125,7 +126,7 @@ export function useNewProposal({ newProposal }: Props) {
 
   if (formInputs.proposalType === 'structured') {
     if ((formInputs.formFields ?? []).length === 0) {
-      disabledTooltip = 'Atleast one form field is required for structured proposals';
+      disabledTooltip = 'Form fields are required for structured proposals';
     } else if (formInputs.formFields?.some((formField) => !formField.name)) {
       disabledTooltip = 'Form fields must have a name';
     } else if (
@@ -136,10 +137,13 @@ export function useNewProposal({ newProposal }: Props) {
     ) {
       disabledTooltip = 'Select fields must have atleast one option';
     }
-  } else if (formInputs.proposalType === 'free_form' && !formInputs.content) {
+  } else if (
+    formInputs.proposalType === 'free_form' &&
+    formInputs.type === 'proposal_template' &&
+    checkIsContentEmpty(formInputs.content)
+  ) {
     disabledTooltip = 'Content is required for free-form proposals';
   }
-
   return {
     formInputs,
     setFormInputs,
