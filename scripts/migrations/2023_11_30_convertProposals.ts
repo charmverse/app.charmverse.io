@@ -122,6 +122,7 @@ async function convertProposals() {
           });
         });
       } else if (p.evaluationType === 'rubric') {
+        const reviewEvaluationId = uuid();
         const rubricEvaluationId = uuid();
         await prisma.$transaction(async (tx) => {
           if (isPublished(p)) {
@@ -150,7 +151,7 @@ async function convertProposals() {
           });
           await tx.proposalEvaluation.create({
             data: {
-              title: 'Revew',
+              title: 'Review',
               index: 1,
               result: p.reviewedAt ? 'pass' : null,
               completedAt: p.reviewedAt,
@@ -165,7 +166,8 @@ async function convertProposals() {
               reviewers: {
                 createMany: {
                   data: p.reviewers.map(({ evaluationId, id, ...reviewer }) => ({
-                    ...reviewer
+                    ...reviewer,
+                    evaluationId: reviewEvaluationId
                   }))
                 }
               }
@@ -187,7 +189,8 @@ async function convertProposals() {
           });
           await tx.proposalReviewer.updateMany({
             where: {
-              proposalId: p.id
+              proposalId: p.id,
+              evaluationId: null
             },
             data: {
               evaluationId: rubricEvaluationId
