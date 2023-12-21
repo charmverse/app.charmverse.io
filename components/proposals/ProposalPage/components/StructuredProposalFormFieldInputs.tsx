@@ -1,4 +1,4 @@
-import type { FormField } from '@charmverse/core/prisma-client';
+import type { FormField, ProposalStatus } from '@charmverse/core/prisma-client';
 
 import { useGetProposalFormFieldAnswers, useUpdateProposalFormFieldAnswers } from 'charmClient/hooks/proposals';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
@@ -8,11 +8,13 @@ import type { FormFieldValue } from 'components/common/form/interfaces';
 export function StructuredProposalFormFieldInputs({
   proposalId,
   formFields,
-  readOnly
+  readOnly,
+  proposalStatus
 }: {
   readOnly?: boolean;
   proposalId: string;
   formFields: FormField[];
+  proposalStatus: ProposalStatus;
 }) {
   const { data: proposalFormFieldAnswers = [], isLoading } = useGetProposalFormFieldAnswers({ proposalId });
   const { trigger } = useUpdateProposalFormFieldAnswers({ proposalId });
@@ -35,7 +37,7 @@ export function StructuredProposalFormFieldInputs({
   return (
     <FormFieldInputs
       onSave={readOnly ? undefined : onSave}
-      disabled={readOnly}
+      disabled={readOnly || (proposalStatus !== 'discussion' && proposalStatus !== 'draft')}
       formFields={formFields
         .map((formField) => {
           const proposalFormFieldAnswer = proposalFormFieldAnswers.find(

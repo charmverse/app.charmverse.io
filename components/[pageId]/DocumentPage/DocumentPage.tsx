@@ -1,5 +1,4 @@
 import type { Page } from '@charmverse/core/prisma';
-import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { useMediaQuery, Divider, Box } from '@mui/material';
 import dynamic from 'next/dynamic';
@@ -306,6 +305,8 @@ function DocumentPage({
     }
   }, [printRef, _printRef]);
 
+  const isStructuredProposal = proposal && proposal.formId;
+
   const documentPageContent = (
     <>
       {/* temporary? disable editing of page title when in suggestion mode */}
@@ -400,6 +401,7 @@ function DocumentPage({
           />
         )}
         {creatingInlineReward && !readOnly && <NewInlineReward pageId={page.id} />}
+        {/** Structured proposal isn't inside a CharmEditor context, thus useViewContext used in PageSidebar would throw error for undefined view */}
         {(enableComments || enableSuggestingMode || page.type === 'proposal' || page.type === 'proposal_template') && (
           <PageSidebar
             id='page-action-sidebar'
@@ -422,6 +424,7 @@ function DocumentPage({
             onChangeEvaluation={onChangeEvaluation}
             isProposalTemplate={page.type === 'proposal_template'}
             refreshProposal={refreshProposal}
+            disabledViews={isStructuredProposal ? ['suggestions', 'comments'] : []}
           />
         )}
       </CardPropertiesWrapper>
@@ -502,6 +505,7 @@ function DocumentPage({
                       proposalId={proposal.id}
                       formFields={proposal?.formFields ?? []}
                       readOnly={!!(proposal.createdBy !== user?.id)}
+                      proposalStatus={proposal.status}
                     />
                   )}
                 </Box>

@@ -144,7 +144,7 @@ function FormFieldsEditorBase({
       ...formFields,
       {
         type: 'short_text',
-        name: 'Title',
+        name: '',
         description: emptyDocument,
         index: formFields.length,
         options: [],

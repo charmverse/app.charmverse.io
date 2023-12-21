@@ -161,7 +161,7 @@ function FormFieldInputsBase({
             onClick={saveFormFieldAnswers}
             disabledTooltip={disabledTooltip}
             loading={isUpdatingFormFieldAnswers}
-            disabled={!!disabledTooltip}
+            disabled={!!disabledTooltip || disabled}
           >
             Save
           </Button>
