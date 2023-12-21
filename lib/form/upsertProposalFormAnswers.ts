@@ -4,6 +4,7 @@ import { stringUtils } from '@charmverse/core/utilities';
 import { v4 } from 'uuid';
 
 import type { FieldAnswerInput } from 'components/common/form/interfaces';
+import { isTruthy } from 'lib/utilities/types';
 
 export type RubricAnswerUpsert = {
   formId: string;
@@ -18,29 +19,33 @@ export async function upsertProposalFormAnswers({ answers, formId, proposalId }:
     throw new InvalidInputError(`Valid formId is required`);
   }
 
-  const form = await prisma.form.findUnique({ where: { id: formId }, include: { formFields: true } });
-
-  if (!form) {
-    throw new InvalidInputError(`Could not find form ${formId}`);
-  }
+  const form = await prisma.form.findUniqueOrThrow({ where: { id: formId }, include: { formFields: true } });
 
   const existingAnswers = await prisma.formFieldAnswer.findMany({ where: { proposalId } });
 
-  // validate answers input
-  for (const answer of answers) {
-    const field = form.formFields.find((f) => f.id === answer.fieldId);
+  const answersToSave = answers
+    .map((a) => {
+      const field = form.formFields.find((f) => f.id === a.fieldId);
 
-    if (!field) {
-      throw new InvalidInputError(`Could not find field ${answer.fieldId} for proposal ${proposalId}`);
-    }
+      if (!field) {
+        throw new InvalidInputError(`Could not find field ${a.fieldId} for proposal ${proposalId}`);
+      }
 
-    if (field.required && !answer.value) {
-      throw new InvalidInputError(`Value for field ${field.name} is required`);
-    }
-  }
+      // do not save answers for labels
+      if (field.type === 'label') {
+        return null;
+      }
+
+      if (field.required && !a.value) {
+        throw new InvalidInputError(`Value for field ${field.name} is required`);
+      }
+
+      return a;
+    })
+    .filter(isTruthy);
 
   const hasAllRequiredAnswers = form.formFields.every(
-    (f) => !f.required || answers.some((a) => a.fieldId === f.id && !!a.value)
+    (f) => !f.required || answersToSave.some((a) => a.fieldId === f.id && !!a.value)
   );
 
   if (!hasAllRequiredAnswers) {
@@ -48,7 +53,7 @@ export async function upsertProposalFormAnswers({ answers, formId, proposalId }:
   }
 
   const res = await prisma.$transaction([
-    ...answers.map((a) => {
+    ...answersToSave.map((a) => {
       const field = form.formFields.find((f) => f.id === a.fieldId);
       const existingAnswer = existingAnswers.find((e) => e.fieldId === a.fieldId);
       const answerId = existingAnswer?.id || v4();
