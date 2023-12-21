@@ -161,6 +161,11 @@ export async function createProposal({
     }
   }
 
+  let proposalFormId = formId;
+  if (!proposalFormId && formFields?.length && pageProps?.type === 'proposal_template') {
+    proposalFormId = await createForm(formFields);
+  }
+
   // Using a transaction to ensure both the proposal and page gets created together
   const [proposal, , , page] = await prisma.$transaction([
     prisma.proposal.create({

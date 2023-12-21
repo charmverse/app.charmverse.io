@@ -21,11 +21,7 @@ export async function upsertProposalFormFields({
     throw new InvalidInputError(`You need to specify at least one form field`);
   }
 
-  const proposal = await prisma.proposal.findUnique({ where: { id: proposalId }, include: { page: true } });
-
-  if (!proposal) {
-    throw new InvalidInputError(`No proposal found with id: ${proposalId}`);
-  }
+  const proposal = await prisma.proposal.findUniqueOrThrow({ where: { id: proposalId }, include: { page: true } });
 
   if (proposal.page?.type !== 'proposal_template') {
     throw new InvalidInputError(`Proposal with id: ${proposalId} is not a template`);
@@ -63,6 +59,7 @@ export async function upsertProposalFormFields({
     await Promise.all(
       formFields.map((field) => {
         const fieldId = field.id && isUUID(field.id) ? field.id : v4();
+        const required = field.type === 'label' ? false : field.required;
 
         return tx.formField.upsert({
           where: {
@@ -77,7 +74,7 @@ export async function upsertProposalFormFields({
             index: field.index,
             options: field.options,
             private: field.private,
-            required: field.type === 'label' ? false : field.required
+            required
           },
           update: {
             type: field.type,
@@ -86,7 +83,7 @@ export async function upsertProposalFormFields({
             index: field.index,
             options: field.options,
             private: field.private,
-            required: field.type === 'label' ? false : field.required
+            required
           }
         });
       })
