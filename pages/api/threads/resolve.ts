@@ -4,7 +4,7 @@ import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { MultipleThreadsInput } from 'lib/threads';
 
@@ -13,13 +13,6 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler
   .use(requireUser)
   .use(requireKeys<MultipleThreadsInput>(['threadIds', 'pageId'], 'body'))
-  .use(
-    providePermissionClients({
-      key: 'pageId',
-      location: 'body',
-      resourceIdType: 'page'
-    })
-  )
   .post(resolveThreads);
 
 async function resolveThreads(req: NextApiRequest, res: NextApiResponse) {
@@ -27,7 +20,7 @@ async function resolveThreads(req: NextApiRequest, res: NextApiResponse) {
 
   const userId = req.session.user.id;
 
-  const permissionSet = await req.basePermissionsClient.pages.computePagePermissions({
+  const permissionSet = await permissionsApiClient.pages.computePagePermissions({
     resourceId: pageId,
     userId
   });

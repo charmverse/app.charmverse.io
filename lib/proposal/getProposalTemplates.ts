@@ -5,11 +5,11 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { generateCategoryIdQuery } from '@charmverse/core/proposals';
 import { stringUtils } from '@charmverse/core/utilities';
 
-import { permissionsApiClient } from 'lib/permissions/api/routers';
-import { canAccessPrivateFields } from 'lib/proposal/form/canAccessPrivateFields';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { mapDbProposalToProposal } from 'lib/proposal/mapDbProposalToProposal';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
+import { canAccessPrivateFields } from './form/canAccessPrivateFields';
 import type { ProposalWithUsersAndRubric } from './interface';
 
 export type ProposalTemplate = ProposalWithUsersAndRubric & { page: Page };

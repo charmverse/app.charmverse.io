@@ -1,31 +1,20 @@
-import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(providePermissionClients({ key: 'id', location: 'query', resourceIdType: 'proposal' }))
-  .use(requireUser)
-  .get(getReviewerIds);
+handler.use(requireUser).get(getReviewerIds);
 
 async function getReviewerIds(req: NextApiRequest, res: NextApiResponse<boolean>) {
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const proposal = await prisma.proposal.findUniqueOrThrow({
-    where: {
-      id: proposalId
-    }
-  });
-
-  const permissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
+  const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
     resourceId: proposalId,
-    useProposalEvaluationPermissions: proposal.status === 'published',
     userId
   });
 

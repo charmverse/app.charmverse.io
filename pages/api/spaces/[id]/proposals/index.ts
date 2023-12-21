@@ -1,11 +1,10 @@
-import type { ProposalPermissionsSwitch } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWithUsers, ListProposalsRequest } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch } from 'lib/middleware';
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { mapDbProposalToProposalLite } from 'lib/proposal/mapDbProposalToProposal';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -18,14 +17,12 @@ async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWi
 
   const spaceId = req.query.id as string;
 
-  const { categoryIds, onlyAssigned, useProposalEvaluationPermissions } = req.query as any as ListProposalsRequest &
-    ProposalPermissionsSwitch;
+  const { categoryIds, onlyAssigned } = req.query as any as ListProposalsRequest;
   const proposalIds = await permissionsApiClient.proposals.getAccessibleProposalIds({
     categoryIds,
     onlyAssigned,
     userId,
-    spaceId,
-    useProposalEvaluationPermissions
+    spaceId
   });
 
   const proposals = await prisma.proposal.findMany({

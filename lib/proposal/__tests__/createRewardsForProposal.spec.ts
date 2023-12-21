@@ -1,5 +1,6 @@
 import type { ProposalCategory, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { v4 as uuid } from 'uuid';
 
 import { createRewardsForProposal } from 'lib/proposal/createRewardsForProposal';
 import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
@@ -42,13 +43,18 @@ describe('Creates rewards for proposal with pending rewards', () => {
       categoryId: proposalCategory.id,
       userId: user.id,
       spaceId: space.id,
-      authors: [user.id, extraUser.id],
-      reviewers: [
+      evaluations: [
         {
-          group: 'user',
-          id: reviewerUser.id
+          id: uuid(),
+          index: 0,
+          reviewers: [{ userId: reviewerUser.id }],
+          rubricCriteria: [],
+          title: 'Example step',
+          type: 'rubric',
+          permissions: []
         }
       ],
+      authors: [user.id, extraUser.id],
       fields: {
         pendingRewards: [
           {
@@ -67,6 +73,15 @@ describe('Creates rewards for proposal with pending rewards', () => {
           }
         ],
         properties: {}
+      }
+    });
+
+    await prisma.proposal.update({
+      where: {
+        id: proposal.id
+      },
+      data: {
+        status: 'published'
       }
     });
 

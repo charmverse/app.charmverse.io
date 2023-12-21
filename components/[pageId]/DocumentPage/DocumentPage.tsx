@@ -291,7 +291,7 @@ function DocumentPage({
   }, [!!persistedActiveView, enableSidebar, page.id]);
 
   useEffect(() => {
-    if (enableSidebar && evaluationToShowInSidebar) {
+    if (enableSidebar && evaluationToShowInSidebar && isMdScreen) {
       openEvaluation(evaluationToShowInSidebar);
     }
   }, [evaluationToShowInSidebar, enableSidebar]);
