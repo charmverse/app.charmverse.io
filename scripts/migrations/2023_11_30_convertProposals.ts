@@ -27,8 +27,8 @@ async function convertProposals() {
       reviewers: true
     }
   });
-  console.log('proposals to update', proposals.length);
   const proposalsToUpdate = proposals.filter((p) => p.evaluations.length === 0);
+  console.log('proposals to update', proposalsToUpdate.length);
   await Promise.all(
     proposalsToUpdate.map(async (p) => {
       if (p.evaluationType === 'vote') {
@@ -151,6 +151,7 @@ async function convertProposals() {
           });
           await tx.proposalEvaluation.create({
             data: {
+              id: reviewEvaluationId,
               title: 'Review',
               index: 1,
               result: p.reviewedAt ? 'pass' : null,
@@ -161,14 +162,6 @@ async function convertProposals() {
               permissions: {
                 createMany: {
                   data: getDefaultPermissions()
-                }
-              },
-              reviewers: {
-                createMany: {
-                  data: p.reviewers.map(({ evaluationId, id, ...reviewer }) => ({
-                    ...reviewer,
-                    evaluationId: reviewEvaluationId
-                  }))
                 }
               }
             }
@@ -189,12 +182,17 @@ async function convertProposals() {
           });
           await tx.proposalReviewer.updateMany({
             where: {
-              proposalId: p.id,
-              evaluationId: null
+              proposalId: p.id
             },
             data: {
               evaluationId: rubricEvaluationId
             }
+          });
+          await tx.proposalReviewer.createMany({
+            data: p.reviewers.map(({ evaluationId, id, ...reviewer }) => ({
+              ...reviewer,
+              evaluationId: reviewEvaluationId
+            }))
           });
           await tx.proposalRubricCriteria.updateMany({
             where: {
