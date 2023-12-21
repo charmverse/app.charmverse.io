@@ -59,7 +59,7 @@ async function castVote(req: NextApiRequest, res: NextApiResponse<UserVote | { e
       resourceId: pageData.proposalId,
       userId
     });
-    if (!permissions.vote) {
+    if (!permissions.evaluate) {
       throw new ActionNotPermittedError(`You do not have permission to cast a vote on this proposal.`);
     }
   } else if (vote.pageId) {
