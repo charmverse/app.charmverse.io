@@ -20,7 +20,7 @@ export const PersonInputField = forwardRef<HTMLDivElement, Props>(
           disabled={disabled}
           placeholder={placeholder}
           ref={ref}
-          defaultValue={value as unknown as string[]}
+          defaultValue={(value || []) as string[]}
         />
       </FieldWrapper>
     );
