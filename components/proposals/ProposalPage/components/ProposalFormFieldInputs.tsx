@@ -5,7 +5,7 @@ import type { SelectOptionType } from 'components/common/form/fields/Select/inte
 import { FormFieldInputs } from 'components/common/form/FormFieldInputs';
 import type { FormFieldValue } from 'components/common/form/interfaces';
 
-export function StructuredProposalFormFieldInputs({
+export function ProposalFormFieldInputs({
   proposalId,
   formFields,
   readOnly,

@@ -117,7 +117,7 @@ function FormFieldInputsBase({
 
   return (
     <Stack gap={1}>
-      <FormFieldInputsContainer>
+      <FormFieldInputsContainer mb={10}>
         {formFields.map((formField) => (
           <Controller
             key={formField.id}
@@ -154,8 +154,7 @@ function FormFieldInputsBase({
       {onSave && (
         <Box
           sx={{
-            width: 'fit-content',
-            mb: 10
+            width: 'fit-content'
           }}
         >
           <Button

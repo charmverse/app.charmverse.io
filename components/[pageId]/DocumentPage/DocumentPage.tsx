@@ -21,8 +21,8 @@ import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/in
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import { EvaluationStepper } from 'components/proposals/ProposalPage/components/EvaluationStepper/EvaluationStepper';
+import { ProposalFormFieldInputs } from 'components/proposals/ProposalPage/components/ProposalFormFieldInputs';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
-import { StructuredProposalFormFieldInputs } from 'components/proposals/ProposalPage/components/StructuredProposalFormFieldInputs';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmEditor } from 'hooks/useCharmEditor';
@@ -504,7 +504,7 @@ function DocumentPage({
                       formFields={proposal?.form.formFields ?? []}
                     />
                   ) : (
-                    <StructuredProposalFormFieldInputs
+                    <ProposalFormFieldInputs
                       proposalId={proposal.id}
                       formFields={proposal?.form.formFields ?? []}
                       readOnly={!user || !proposalAuthors.includes(user.id)}
