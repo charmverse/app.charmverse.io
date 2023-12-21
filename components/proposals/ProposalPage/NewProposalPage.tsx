@@ -100,7 +100,7 @@ export function NewProposalPage({
 
   const sourceTemplate = proposalTemplates?.find((template) => template.id === formInputs.proposalTemplateId);
   const isStructured = formInputs.proposalType === 'structured' || !!sourceTemplate?.formId;
-  const proposalFormFields = formInputs.formFields ?? sourceTemplate?.formFields ?? [];
+  const proposalFormFields = formInputs.formFields ?? sourceTemplate?.form?.formFields ?? [];
 
   const {
     control: proposalFormFieldControl,
@@ -214,7 +214,7 @@ export function NewProposalPage({
         fields: (template.fields as ProposalFields) || {},
         type: 'proposal',
         formId: template.formId ?? undefined,
-        formAnswers: (template?.formFields ?? [])
+        formAnswers: (template?.form?.formFields ?? [])
           .filter((formField) => formField.type !== 'label')
           .map((proposalFormField) => ({
             fieldId: proposalFormField.id,

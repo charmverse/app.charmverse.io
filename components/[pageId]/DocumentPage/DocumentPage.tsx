@@ -501,12 +501,12 @@ function DocumentPage({
                     <FormFieldsEditor
                       readOnly={!isAdmin && (!user || !proposalAuthors.includes(user.id))}
                       proposalId={proposal.id}
-                      formFields={proposal?.formFields ?? []}
+                      formFields={proposal?.form.formFields ?? []}
                     />
                   ) : (
                     <StructuredProposalFormFieldInputs
                       proposalId={proposal.id}
-                      formFields={proposal?.formFields ?? []}
+                      formFields={proposal?.form.formFields ?? []}
                       readOnly={!user || !proposalAuthors.includes(user.id)}
                       proposalStatus={proposal.status}
                     />
