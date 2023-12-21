@@ -187,6 +187,7 @@ function ExpandedFormField({
           size='small'
           checked={formField.private}
           onChange={(e) => updateFormField({ private: e.target.checked, id: formField.id })}
+          data-test='form-field-private-switch'
         />
         <Stack>
           <Typography>Private</Typography>

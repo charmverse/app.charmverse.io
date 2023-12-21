@@ -8,6 +8,7 @@ export class FormField extends DocumentPage {
     public addNewFormFieldButton = page.locator('data-test=add-new-form-field-button'),
     public formFieldNameInput = page.locator('data-test=form-field-name-input'),
     public formFieldRequiredSwitch = page.locator('data-test=form-field-required-switch'),
+    public formFieldPrivateSwitch = page.locator('data-test=form-field-private-switch'),
     public toggleFormFieldButton = page.locator('data-test=toggle-form-field-button'),
     public formFieldsSaveButton = page.locator('data-test=form-fields-save-button'),
     public formFieldsAnswersSaveButton = page.locator('data-test=form-fields-answers-save-button')

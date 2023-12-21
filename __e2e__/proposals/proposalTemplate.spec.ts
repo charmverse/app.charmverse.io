@@ -28,8 +28,7 @@ const test = base.extend<Fixtures>({
 
 let space: Space;
 let spaceAdmin: User;
-let proposalReviewer: User;
-let proposalAuthor: User;
+let spaceMember: User;
 let proposalCategory: ProposalCategory;
 
 test.beforeAll(async () => {
@@ -43,12 +42,7 @@ test.beforeAll(async () => {
   space = generated.space;
   spaceAdmin = generated.user;
 
-  proposalAuthor = await testUtilsUser.generateSpaceUser({
-    spaceId: space.id,
-    isAdmin: false
-  });
-
-  proposalReviewer = await testUtilsUser.generateSpaceUser({
+  spaceMember = await testUtilsUser.generateSpaceUser({
     spaceId: space.id,
     isAdmin: false
   });
@@ -57,7 +51,7 @@ test.beforeAll(async () => {
     where: {
       spaceUser: {
         spaceId: space.id,
-        userId: proposalAuthor.id
+        userId: spaceMember.id
       }
     },
     data: {
@@ -122,6 +116,8 @@ test.describe.serial('Structured proposal template', () => {
     await expect(proposalPage.saveDraftButton).toBeDisabled();
 
     await formField.formFieldRequiredSwitch.nth(1).click();
+
+    await formField.formFieldPrivateSwitch.nth(1).click();
 
     await proposalPage.categorySelect.click();
 
@@ -265,7 +261,7 @@ test.describe.serial('Structured proposal template', () => {
     await proposalListPage.waitForProposalsList();
   });
 
-  test('Visit structured proposal and edit field values', async ({
+  test('Visit structured proposal and edit form field answers as an author', async ({
     proposalPage,
     proposalListPage,
     documentPage,
@@ -320,11 +316,50 @@ test.describe.serial('Structured proposal template', () => {
 
     await formField.formFieldsAnswersSaveButton.click();
 
+    await proposalPage.nextStatusButton.click();
+    await proposalPage.confirmStatusButton.click();
+
     await proposalPage.page.waitForTimeout(500);
 
     await proposalPage.page.reload();
 
     // Reload the page to ensure the changes were saved
     await expect(formField.getFormFieldInput(formFieldIds[1])).toHaveValue('John Doe');
+  });
+
+  test('Visit structured proposal and view only public form fields as a space member', async ({
+    proposalListPage,
+    documentPage,
+    formField
+  }) => {
+    await loginBrowserUser({
+      browserPage: proposalListPage.page,
+      userId: spaceMember.id
+    });
+
+    const proposal = await prisma.proposal.findFirstOrThrow({
+      where: {
+        spaceId: space.id,
+        page: {
+          type: 'proposal'
+        }
+      },
+      select: {
+        page: {
+          select: {
+            path: true
+          }
+        }
+      }
+    });
+
+    await documentPage.goToPage({
+      domain: space.domain,
+      path: proposal.page!.path
+    });
+
+    await expect(formField.page.locator('data-test=field-label').filter({ hasText: 'Full name' })).toBeVisible();
+    await expect(formField.page.locator('data-test=field-label').filter({ hasText: 'Surname' })).toBeVisible();
+    await expect(formField.page.locator('data-test=field-label').filter({ hasText: 'Nickname' })).not.toBeVisible();
   });
 });

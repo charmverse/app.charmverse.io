@@ -154,7 +154,8 @@ function FormFieldInputsBase({
       {onSave && (
         <Box
           sx={{
-            width: 'fit-content'
+            width: 'fit-content',
+            mb: 4
           }}
         >
           <Button
