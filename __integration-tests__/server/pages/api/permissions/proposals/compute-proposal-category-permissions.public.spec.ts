@@ -2,7 +2,7 @@ import type { ProposalCategoryPermission } from '@charmverse/core/prisma';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
-import { publicPermissionsClient } from 'lib/permissions/api/client';
+import { publicPermissionsClient } from 'lib/permissions/api/freeClient';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 describe('POST /api/permissions/proposals/compute-proposal-category-permissions - Compute permissions for a proposal category', () => {

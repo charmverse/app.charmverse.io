@@ -33,11 +33,8 @@ export const ProposalsContext = createContext<Readonly<ProposalsContextType>>({
 export function ProposalsProvider({ children }: { children: ReactNode }) {
   const { loadingPages } = usePages();
   const { space } = useCurrentSpace();
-  const {
-    data: proposals,
-    mutate: mutateProposals,
-    isLoading
-  } = useGetProposalsBySpace({ spaceId: space?.id, useProposalEvaluationPermissions: true });
+
+  const { data: proposals, mutate: mutateProposals, isLoading } = useGetProposalsBySpace({ spaceId: space?.id });
 
   const archiveProposal = useCallback(
     async (input: ArchiveProposalRequest) => {

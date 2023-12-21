@@ -1,7 +1,6 @@
 import type {
   ProposalCategoryWithPermissions,
   ProposalFlowPermissionFlags,
-  ProposalPermissionsSwitch,
   ProposalReviewerPool
 } from '@charmverse/core/permissions';
 import type { ProposalWithUsers, ListProposalsRequest } from '@charmverse/core/proposals';
@@ -24,7 +23,7 @@ import type { UpdateEvaluationRequest } from 'lib/proposal/updateProposalEvaluat
 import type { UpdateProposalLensPropertiesRequest } from 'lib/proposal/updateProposalLensProperties';
 
 import type { MaybeString } from './helpers';
-import { useGET, usePOST, usePUT, useDELETE } from './helpers';
+import { useDELETE, useGET, usePOST, usePUT } from './helpers';
 
 // Getters
 
@@ -42,14 +41,9 @@ export function useGetReviewerPool(categoryId: MaybeString) {
 export function useGetProposalFlowFlags(proposalId: MaybeString) {
   return useGET<ProposalFlowPermissionFlags>(proposalId ? `/api/proposals/${proposalId}/compute-flow-flags` : null);
 }
-export function useGetProposalsBySpace({
-  spaceId,
-  categoryIds,
-  useProposalEvaluationPermissions
-}: Partial<ListProposalsRequest & ProposalPermissionsSwitch>) {
+export function useGetProposalsBySpace({ spaceId, categoryIds }: Partial<ListProposalsRequest>) {
   return useGET<ProposalWithUsers[]>(spaceId ? `/api/spaces/${spaceId}/proposals` : null, {
-    categoryIds,
-    useProposalEvaluationPermissions
+    categoryIds
   });
 }
 

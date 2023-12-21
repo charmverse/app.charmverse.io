@@ -2,7 +2,7 @@ import type { ProposalReviewerPool } from '@charmverse/core/permissions';
 import type { Proposal, Role, Space, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 
-import { publicPermissionsClient } from 'lib/permissions/api/client';
+import { publicPermissionsClient } from 'lib/permissions/api/freeClient';
 import { addSpaceOperations } from 'lib/permissions/spaces';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { randomETHWalletAddress } from 'testing/generateStubs';

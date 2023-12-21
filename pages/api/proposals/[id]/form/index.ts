@@ -4,6 +4,7 @@ import nc from 'next-connect';
 
 import type { FormFieldInput } from 'components/common/form/interfaces';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { upsertProposalFormFields } from 'lib/proposal/form/upsertProposalFormFields';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -19,7 +20,7 @@ async function upsertProposalFormController(req: NextApiRequest, res: NextApiRes
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const permissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
+  const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
     resourceId: proposalId,
     userId
   });

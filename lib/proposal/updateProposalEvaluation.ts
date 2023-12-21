@@ -33,7 +33,6 @@ export async function updateProposalEvaluation({
         }))
       });
     }
-
     if (voteSettings) {
       await tx.proposalEvaluation.update({
         where: {

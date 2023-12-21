@@ -8,17 +8,13 @@ import nc from 'next-connect';
 import type { FieldAnswerInput } from 'components/common/form/interfaces';
 import { upsertProposalFormAnswers } from 'lib/form/upsertProposalFormAnswers';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireUser)
-  .use(providePermissionClients({ key: 'id', location: 'query', resourceIdType: 'proposal' }))
-  .put(getProposalFormAnswersHandler)
-  .put(upsertProposalFormAnswersHandler);
+handler.use(requireUser).put(getProposalFormAnswersHandler).put(upsertProposalFormAnswersHandler);
 
 async function getProposalFormAnswersHandler(req: NextApiRequest, res: NextApiResponse<FormFieldAnswer[]>) {
   const proposalId = req.query.id as string;
@@ -41,15 +37,14 @@ async function getProposalFormAnswersHandler(req: NextApiRequest, res: NextApiRe
     throw new InvalidInputError(`Proposal ${proposalId} does not have a form`);
   }
 
-  const permissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
+  const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
     resourceId: proposal?.id,
-    useProposalEvaluationPermissions: proposal?.status === 'published',
     userId
   });
 
   if (permissions.view !== true) {
     const pagePermissions = proposal?.page?.id
-      ? await req.basePermissionsClient.pages.computePagePermissions({
+      ? await permissionsApiClient.pages.computePagePermissions({
           resourceId: proposal.page.id,
           userId
         })

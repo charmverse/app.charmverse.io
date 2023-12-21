@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { apiHandler } from 'lib/public-api/handler';
 import { withSessionRoute } from 'lib/session/withSession';
 

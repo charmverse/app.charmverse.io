@@ -8,7 +8,7 @@ import { getLayout as getBaseLayout } from 'components/common/BaseLayout/getLayo
 import { useMagicLink } from 'components/invite/page/hooks/useMagicLink';
 import type { MagicLinkResponseStatus } from 'components/invite/page/PageInviteLink';
 import { PageInviteLink } from 'components/invite/page/PageInviteLink';
-import { getPermissionsClient } from 'lib/permissions/api';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionSsr } from 'lib/session/withSession';
 import { getPagePath } from 'lib/utilities/domains/getPagePath';
 
@@ -42,8 +42,7 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr<Props>(asyn
 
   if (page) {
     // Page ID might be a path now, so first we fetch the page and if found, can pass the id from the found page to check if we should actually send it to the requester
-    const { client } = await getPermissionsClient({ resourceId: page.space.id, resourceIdType: 'space' });
-    const permissions = await client.pages.computePagePermissions({
+    const permissions = await permissionsApiClient.pages.computePagePermissions({
       resourceId: pageId,
       userId: sessionUserId
     });

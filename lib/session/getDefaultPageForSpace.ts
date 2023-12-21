@@ -6,7 +6,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import type { StaticPageType, PageEventMap } from 'lib/metrics/mixpanel/interfaces/PageEvent';
 import { filterVisiblePages } from 'lib/pages/filterVisiblePages';
-import { getPermissionsClient, permissionsApiClient } from 'lib/permissions/api/routers';
+import { getPermissionsClient, permissionsApiClient } from 'lib/permissions/api/client';
 import { getSubdomainPath, getSpaceUrl, fullyDecodeURI } from 'lib/utilities/browser';
 
 type ViewMeta = PageEventMap['page_view']['meta'];
