@@ -5,7 +5,7 @@ import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { getPermissionsClient } from 'lib/permissions/api';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { ThreadCreatePayload, ThreadWithComments } from 'lib/threads';
 import { createThread } from 'lib/threads';
@@ -30,9 +30,7 @@ async function startThread(req: NextApiRequest, res: NextApiResponse<ThreadWithC
     throw new PageNotFoundError(pageId);
   }
 
-  const permissions = await getPermissionsClient({ resourceId: pageId, resourceIdType: 'page' }).then(({ client }) =>
-    client.pages.computePagePermissions({ resourceId: pageId, userId })
-  );
+  const permissions = await permissionsApiClient.pages.computePagePermissions({ resourceId: pageId, userId });
 
   if (!permissions.comment) {
     throw new ActionNotPermittedError();

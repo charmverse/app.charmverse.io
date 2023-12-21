@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { createFormResponseCard } from 'lib/pages/createFormResponseCard';
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { apiHandler } from 'lib/public-api/handler';
 import type { AddFormResponseInput } from 'lib/zapier/interfaces';
 import { validateFormRequestInput } from 'lib/zapier/validateFormRequestInput';

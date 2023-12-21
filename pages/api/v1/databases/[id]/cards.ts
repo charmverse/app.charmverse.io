@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { createDatabaseCardPage, validateCreationData } from 'lib/public-api';
 import { apiHandler } from 'lib/public-api/handler';
 

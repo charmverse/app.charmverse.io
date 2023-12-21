@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { prisma } from '@charmverse/core/prisma-client';
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 
 /**
  * Publish or unpublish all cards in a board, and the board itself

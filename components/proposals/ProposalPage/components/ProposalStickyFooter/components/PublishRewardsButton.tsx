@@ -28,7 +28,7 @@ export function PublishRewardsButton({ proposalId, disabled, onSubmit }: Props) 
       onSubmit();
       // mutateRewards();
     } catch (e) {
-      showMessage(`Error creating ${rewardsTitle}`, 'error');
+      showMessage((e as any).message, 'error');
     }
   }
 

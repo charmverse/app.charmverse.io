@@ -1,7 +1,7 @@
 import type { NextApiResponse } from 'next';
 
 import type { NextApiRequestWithApiPageKey } from 'lib/middleware/requireApiPageKey';
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import type { PageProperty } from 'lib/public-api';
 import { createDatabaseCardPage } from 'lib/public-api';
 import { getDatabaseWithSchema } from 'lib/public-api/getDatabaseWithSchema';

@@ -1,10 +1,9 @@
-import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { ActionNotPermittedError, requireKeys, onError, onNoMatch } from 'lib/middleware';
+import { ActionNotPermittedError, onError, onNoMatch, requireKeys } from 'lib/middleware';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
-import { clearEvaluationResult } from 'lib/proposal/clearEvaluationResult';
 import type { ReviewEvaluationRequest } from 'lib/proposal/submitEvaluationResult';
 import { submitEvaluationResult } from 'lib/proposal/submitEvaluationResult';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -23,7 +22,7 @@ async function updateEvaluationResultndpoint(req: NextApiRequest, res: NextApiRe
 
   const { evaluationId, result } = req.body as ReviewEvaluationRequest;
   // A proposal can only be updated when its in draft or discussion status and only the proposal author can update it
-  const proposalPermissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
+  const proposalPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
     resourceId: proposalId,
     useProposalEvaluationPermissions: true,
     userId
