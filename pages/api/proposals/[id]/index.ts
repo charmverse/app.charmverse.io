@@ -52,7 +52,7 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
       },
       authors: true,
       category: true,
-      page: { select: { id: true, sourceTemplateId: true } },
+      page: { select: { id: true, sourceTemplateId: true, type: true } },
       reviewers: true,
       rewards: true,
       form: {
@@ -91,6 +91,7 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
     });
   }
 
+  // If we are viewing a proposal template, we can see all private fields since the user might be creating a proposal
   const canAccessPrivateFormFields = await canAccessPrivateFields({ proposal, userId, proposalId: proposal.id });
 
   return res
