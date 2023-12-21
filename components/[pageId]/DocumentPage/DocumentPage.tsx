@@ -27,6 +27,7 @@ import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
@@ -110,7 +111,7 @@ function DocumentPage({
   const [editorState, setEditorState] = useState<EditorState | null>(null);
   const { creatingInlineReward } = useRewards();
   const isMdScreen = useMdScreen();
-
+  const isAdmin = useIsAdmin();
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
 
@@ -431,6 +432,8 @@ function DocumentPage({
     </>
   );
 
+  const proposalAuthors = proposal ? [proposal.createdBy, ...proposal.authors.map((author) => author.userId)] : [];
+
   return (
     <>
       {!!page?.deletedAt && (
@@ -496,7 +499,7 @@ function DocumentPage({
                 <Box mb={10}>
                   {page.type === 'proposal_template' ? (
                     <FormFieldsEditor
-                      readOnly={proposal.createdBy !== user?.id}
+                      readOnly={!isAdmin && (!user || !proposalAuthors.includes(user.id))}
                       proposalId={proposal.id}
                       formFields={proposal?.formFields ?? []}
                     />
@@ -504,7 +507,7 @@ function DocumentPage({
                     <StructuredProposalFormFieldInputs
                       proposalId={proposal.id}
                       formFields={proposal?.formFields ?? []}
-                      readOnly={!!(proposal.createdBy !== user?.id)}
+                      readOnly={!user || !proposalAuthors.includes(user.id)}
                       proposalStatus={proposal.status}
                     />
                   )}
