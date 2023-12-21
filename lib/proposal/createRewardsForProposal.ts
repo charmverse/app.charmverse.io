@@ -89,7 +89,12 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
           index: 'asc'
         }
       },
-      rewards: true
+      rewards: true,
+      form: {
+        include: {
+          formFields: true
+        }
+      }
     }
   });
 
