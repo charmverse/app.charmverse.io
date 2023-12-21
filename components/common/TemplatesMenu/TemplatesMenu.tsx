@@ -120,6 +120,7 @@ export function TemplatesMenu({
           dense
           sx={{ color: `${theme.palette.primary.main} !important` }}
           onClick={createTemplate}
+          data-test='new-template-button'
         >
           <AddIcon />
           <ListItemText>New template</ListItemText>

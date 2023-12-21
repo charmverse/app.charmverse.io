@@ -262,6 +262,7 @@ function FormFieldsEditorBase({
           variant='text'
           size='small'
           color='secondary'
+          data-test='add-new-form-field-button'
           onClick={addNewFormField}
         >
           Add an input
@@ -274,6 +275,7 @@ function FormFieldsEditorBase({
           }}
         >
           <Button
+            data-test='form-fields-save-button'
             onClick={saveFormFields}
             disabledTooltip={saveButtonDisabledTooltip}
             loading={isUpdatingFormFields}

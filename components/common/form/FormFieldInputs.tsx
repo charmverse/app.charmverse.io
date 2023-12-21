@@ -136,6 +136,7 @@ function FormFieldInputsBase({
                 options={formField.options as SelectOptionType[]}
                 error={errors[formField.id] as any}
                 required={formField.required}
+                data-test={`form-field-input-${formField.id}`}
                 onChange={(e) => {
                   setIsFormDirty(true);
                   onFormChange([
@@ -158,6 +159,7 @@ function FormFieldInputsBase({
           }}
         >
           <Button
+            data-test='form-fields-answers-save-button'
             onClick={saveFormFieldAnswers}
             disabledTooltip={disabledTooltip}
             loading={isUpdatingFormFieldAnswers}

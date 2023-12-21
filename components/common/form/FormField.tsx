@@ -131,6 +131,7 @@ function ExpandedFormField({
         onChange={(e) => updateFormField({ name: e.target.value, id: formField.id })}
         placeholder='Title (required)'
         error={!formField.name}
+        data-test='form-field-name-input'
       />
       <CharmEditor
         isContentControlled
@@ -172,6 +173,7 @@ function ExpandedFormField({
       {formField.type !== 'label' && (
         <Stack gap={0.5} flexDirection='row' alignItems='center'>
           <Switch
+            data-test='form-field-required-switch'
             size='small'
             checked={formField.required}
             onChange={(e) => updateFormField({ required: e.target.checked, id: formField.id })}
@@ -262,11 +264,13 @@ export function FormField(
       )}
       <FormFieldContainer dragDirection={isAdjacentActive ? ((offset?.y ?? 0) < 0 ? 'top' : 'bottom') : undefined}>
         {!readOnly ? (
-          isOpen ? (
-            <ExpandMoreIcon onClick={toggleOpen} sx={{ cursor: 'pointer', mt: 1 }} />
-          ) : (
-            <ChevronRightIcon onClick={toggleOpen} sx={{ cursor: 'pointer' }} />
-          )
+          <span data-test='toggle-form-field-button'>
+            {isOpen ? (
+              <ExpandMoreIcon onClick={toggleOpen} sx={{ cursor: 'pointer', mt: 1 }} />
+            ) : (
+              <ChevronRightIcon onClick={toggleOpen} sx={{ cursor: 'pointer' }} />
+            )}
+          </span>
         ) : null}
         <Stack gap={1} width='100%' ml={readOnly ? 1 : 0}>
           {!isOpen || readOnly ? (
