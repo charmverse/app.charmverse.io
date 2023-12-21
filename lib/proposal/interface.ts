@@ -1,5 +1,6 @@
 import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
 import type {
+  FormField,
   Page,
   PageComment,
   Proposal,
@@ -46,6 +47,10 @@ export type VoteSettings = Pick<Vote, 'type' | 'threshold' | 'maxChoices'> & {
   publishToSnapshot: boolean;
 };
 
+export type ProposalFormData = {
+  formFields: FormField[] | null;
+};
+
 export type PopulatedEvaluation = ProposalRubricData &
   Omit<ProposalEvaluation, 'voteSettings'> & {
     permissions: ProposalEvaluationPermission[];
@@ -54,7 +59,8 @@ export type PopulatedEvaluation = ProposalRubricData &
   };
 
 export type ProposalWithUsersAndRubric = ProposalWithUsers &
-  ProposalRubricData & {
+  ProposalRubricData &
+  ProposalFormData & {
     evaluations: PopulatedEvaluation[];
     page?: { sourceTemplateId: string | null } | null;
     permissions: ProposalPermissionFlags;

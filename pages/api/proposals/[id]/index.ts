@@ -53,7 +53,12 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
       category: true,
       page: { select: { id: true, sourceTemplateId: true } },
       reviewers: true,
-      rewards: true
+      rewards: true,
+      form: {
+        include: {
+          formFields: true
+        }
+      }
     }
   });
 

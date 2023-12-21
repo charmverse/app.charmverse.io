@@ -8,6 +8,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { RubricDataInput } from 'lib/proposal/rubric/upsertRubricCriteria';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { ProposalPageAndPropertiesInput } from '../NewProposalPage';
@@ -114,12 +115,17 @@ export function useNewProposal({ newProposal }: Props) {
   }
   if (formInputs.proposalType === 'structured' && (formInputs.formFields ?? [])?.length === 0) {
     disabledTooltip = 'Form fields are required for structured proposals';
+  } else if (
+    formInputs.proposalType === 'free_form' &&
+    formInputs.type === 'proposal_template' &&
+    checkIsContentEmpty(formInputs.content)
+  ) {
+    disabledTooltip = 'Content is required for free-form proposal templates';
   }
 
   if (formInputs.proposalType === 'structured' && formInputs.formFields?.some((formField) => !formField.name)) {
     disabledTooltip = 'Form fields must have a name';
   }
-
   return {
     formInputs,
     setFormInputs,

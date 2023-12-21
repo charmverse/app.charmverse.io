@@ -21,7 +21,7 @@ async function updateEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const { evaluationId, result, reviewers } = req.body as UpdateEvaluationRequest;
+  const { evaluationId, reviewers } = req.body as UpdateEvaluationRequest;
 
   const proposal = await prisma.proposal.findUnique({
     where: {
@@ -59,7 +59,7 @@ async function updateEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
   // A proposal can only be updated when its in draft or discussion status and only the proposal author can update it
   const proposalPermissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
     resourceId: proposal.id,
-    useProposalEvaluationPermissions: proposal?.status === 'published',
+    useProposalEvaluationPermissions: true,
     userId
   });
 
@@ -112,8 +112,6 @@ async function updateEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
   await updateProposalEvaluation({
     proposalId: proposal.id,
     evaluationId,
-    result,
-    decidedBy: result ? userId : undefined,
     voteSettings: req.body.voteSettings,
     reviewers
   });
