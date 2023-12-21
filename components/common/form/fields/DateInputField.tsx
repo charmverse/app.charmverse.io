@@ -1,5 +1,3 @@
-import CloseIcon from '@mui/icons-material/CloseOutlined';
-import { IconButton, InputAdornment } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { DateTime } from 'luxon';
@@ -57,7 +55,7 @@ export const DateInputField = forwardRef<HTMLDivElement, Props>(
                   ...props.inputProps,
                   readOnly: true,
                   placeholder,
-                  value: props.inputProps?.value ?? ''
+                  value: disabled ? undefined : props.inputProps?.value ?? ''
                 }}
                 disabled={disabled}
                 error={!!error}

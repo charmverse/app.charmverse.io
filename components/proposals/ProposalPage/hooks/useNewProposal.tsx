@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { mutate } from 'swr';
 
 import { useCreateProposal } from 'charmClient/hooks/proposals';
+import { checkFormFieldErrors } from 'components/common/form/checkFormFieldErrors';
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationSettings';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
@@ -125,18 +126,7 @@ export function useNewProposal({ newProposal }: Props) {
   }
 
   if (formInputs.proposalType === 'structured') {
-    if ((formInputs.formFields ?? []).length === 0) {
-      disabledTooltip = 'Form fields are required for structured proposals';
-    } else if (formInputs.formFields?.some((formField) => !formField.name)) {
-      disabledTooltip = 'Form fields must have a name';
-    } else if (
-      formInputs.formFields?.some(
-        (formField) =>
-          (formField.type === 'select' || formField.type === 'multiselect') && (formField.options ?? []).length === 0
-      )
-    ) {
-      disabledTooltip = 'Select fields must have atleast one option';
-    }
+    disabledTooltip = checkFormFieldErrors(formInputs.formFields ?? []);
   } else if (
     formInputs.proposalType === 'free_form' &&
     formInputs.type === 'proposal_template' &&
