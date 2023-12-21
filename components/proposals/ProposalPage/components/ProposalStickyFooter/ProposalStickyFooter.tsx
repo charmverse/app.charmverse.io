@@ -2,6 +2,7 @@ import type { ProposalEvaluationType } from '@charmverse/core/prisma';
 import { Box } from '@mui/material';
 
 import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/components/StickyFooterContainer';
+import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 
 import { evaluationTypesWithSidebar } from '../EvaluationSidebar/components/ProposalSidebarHeader';
@@ -10,6 +11,7 @@ import { CompleteDraftButton } from './components/CompleteDraftButton';
 import { CompleteFeedbackButton } from './components/CompleteFeedbackButton';
 import { GoBackButton } from './components/GoBackButton';
 import { OpenEvaluationButton } from './components/OpenEvaluationButton';
+import { PublishRewardsButton } from './components/PublishRewardsButton';
 
 export type EvaluationTypeOrDraft = ProposalEvaluationType | 'draft';
 
@@ -18,12 +20,14 @@ export function ProposalStickyFooter({
   proposal,
   refreshProposal,
   isEvaluationSidebarOpen,
-  openEvaluationSidebar
+  openEvaluationSidebar,
+  closeSidebar
 }: {
   proposal: ProposalWithUsersAndRubric;
   refreshProposal: VoidFunction;
   isEvaluationSidebarOpen: boolean;
   openEvaluationSidebar: (evaluationId?: string) => void;
+  closeSidebar: VoidFunction;
 }) {
   const currentEvaluation = proposal.evaluations.find((e) => e.id === proposal.currentEvaluationId);
   const currentEvaluationIndex = proposal?.evaluations.findIndex((e) => e.id === currentEvaluation?.id) ?? -1;
@@ -40,6 +44,10 @@ export function ProposalStickyFooter({
   }
 
   const hasSidebarEvaluation = evaluationTypesWithSidebar.includes(evaluationTypeOrDraft as ProposalEvaluationType);
+  const showPublishRewards =
+    !!currentEvaluation?.result &&
+    !!(proposal.fields as ProposalFields)?.pendingRewards?.length &&
+    !proposal.rewardIds?.length;
 
   return (
     <StickyFooterContainer>
@@ -48,28 +56,33 @@ export function ProposalStickyFooter({
           proposalId={proposal.id}
           previousStep={previousStep}
           isDraft={proposal.status === 'draft'}
-          disabled={!proposal.permissions.move}
+          hasMovePermission={proposal.permissions.move}
           onSubmit={refreshProposal}
         />
-        {evaluationTypeOrDraft === 'draft' && (
+        {evaluationTypeOrDraft === 'draft' && !showPublishRewards && (
           <CompleteDraftButton proposalId={proposal.id} nextStep={nextStep} onSubmit={refreshProposal} />
         )}
-        {evaluationTypeOrDraft === 'feedback' && (
+        {evaluationTypeOrDraft === 'feedback' && !showPublishRewards && (
           <CompleteFeedbackButton
             currentStep={currentEvaluation}
             nextStep={nextStep}
             proposalId={proposal.id}
-            disabledTooltip={
-              !proposal.permissions.move ? 'You do not have permission to move this proposal' : undefined
-            }
+            hasMovePermission={proposal.permissions.move}
             onSubmit={refreshProposal}
           />
         )}
-        {hasSidebarEvaluation && (
+        {hasSidebarEvaluation && !showPublishRewards && (
           <OpenEvaluationButton
-            disabled={!proposal.permissions.move || isEvaluationSidebarOpen}
-            isEvaluationSidebarOpen={false}
-            onClick={() => openEvaluationSidebar(currentEvaluation?.id)}
+            disabled={!proposal.permissions.move}
+            isEvaluationSidebarOpen={isEvaluationSidebarOpen}
+            onClick={() => (isEvaluationSidebarOpen ? closeSidebar() : openEvaluationSidebar(currentEvaluation?.id))}
+          />
+        )}
+        {showPublishRewards && (
+          <PublishRewardsButton
+            disabled={!proposal.permissions.evaluate}
+            proposalId={proposal.id}
+            onSubmit={refreshProposal}
           />
         )}
       </Box>

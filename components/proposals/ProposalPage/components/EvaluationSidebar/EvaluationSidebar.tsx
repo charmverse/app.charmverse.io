@@ -39,6 +39,7 @@ export function EvaluationSidebar({
     setActiveEvaluationId(evaluationIdFromContext);
   }, [evaluationIdFromContext]);
 
+  // show default evaluation if we are not on a specific evaluation
   useEffect(() => {
     if (evaluationIdFromContext) {
       return;
@@ -76,10 +77,20 @@ export function EvaluationSidebar({
         goToSettings={goToSettings}
       />
       {evaluation?.type === 'pass_fail' && (
-        <PassFailSidebar {...{ proposal, isCurrent, evaluation, refreshProposal }} />
+        <PassFailSidebar key={evaluation.id} {...{ proposal, isCurrent, evaluation, refreshProposal }} />
       )}
-      {evaluation?.type === 'rubric' && <RubricSidebar {...{ proposal, isCurrent, evaluation, refreshProposal }} />}
-      {evaluation?.type === 'vote' && <VoteSidebar {...{ proposal, pageId, isCurrent, evaluation }} />}
+      {evaluation?.type === 'rubric' && (
+        <RubricSidebar key={evaluation.id} {...{ proposal, isCurrent, evaluation, refreshProposal }} />
+      )}
+      {evaluation?.type === 'vote' && (
+        <VoteSidebar
+          key={evaluation.id}
+          pageId={pageId!}
+          proposal={proposal}
+          isCurrent={isCurrent}
+          evaluation={evaluation}
+        />
+      )}
     </>
   );
 }

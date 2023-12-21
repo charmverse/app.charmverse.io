@@ -14,6 +14,8 @@ export type Props = {
   goToEvaluation: (evaluationId?: string) => void;
   readOnly: boolean;
   showHeader: boolean;
+  readOnlyReviewers: boolean;
+  readOnlyRubricCriteria: boolean;
 };
 
 export function EvaluationSettingsSidebar({
@@ -21,7 +23,9 @@ export function EvaluationSettingsSidebar({
   showHeader,
   goToEvaluation,
   onChangeEvaluation,
-  readOnly
+  readOnly,
+  readOnlyReviewers,
+  readOnlyRubricCriteria
 }: Props) {
   const evaluationsWithConfig = proposal?.evaluations.filter((e) => e.type !== 'feedback');
 
@@ -41,6 +45,8 @@ export function EvaluationSettingsSidebar({
               <EvaluationSettings
                 categoryId={proposal.categoryId}
                 readOnly={readOnly}
+                readOnlyReviewers={readOnlyReviewers}
+                readOnlyRubricCriteria={readOnlyRubricCriteria}
                 evaluation={evaluation}
                 onChange={(updated) => {
                   onChangeEvaluation?.(evaluation.id, updated);

@@ -8,6 +8,7 @@ import { Modal } from 'components/common/Modal';
 type Props = Pick<ModalProps, 'onClose' | 'open' | 'size'> & {
   children: ReactNode;
   buttonText?: string;
+  loading?: boolean;
   title?: string;
   onConfirm: () => Promise<void> | void;
   secondaryButtonText?: string;
@@ -23,6 +24,7 @@ export default function ModalWithButtons({
   buttonText = 'Update',
   title,
   onConfirm,
+  loading,
   size,
   secondaryButtonText = 'Cancel',
   disabled,
@@ -45,6 +47,7 @@ export default function ModalWithButtons({
         <Button
           data-test='modal-confirm-button'
           color='primary'
+          loading={loading}
           sx={{
             mr: 0.5,
             fontWeight: 'bold',

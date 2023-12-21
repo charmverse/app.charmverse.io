@@ -66,29 +66,51 @@ export async function updateProposalEvaluation({
         const nextEvaluation = await getCurrentEvaluation(evaluations);
         if (nextEvaluation.type === 'vote') {
           const settings = nextEvaluation.voteSettings as VoteSettings;
-          const page = await tx.page.findUniqueOrThrow({
-            where: { proposalId },
-            select: { id: true, spaceId: true }
-          });
-          const newVote: VoteDTO = {
-            evaluationId: nextEvaluation.id,
-            pageId: page.id,
-            spaceId: page.spaceId,
-            voteOptions: settings.options,
-            type: settings.type,
-            threshold: settings.threshold,
-            maxChoices: settings.maxChoices,
-            deadline: new Date(Date.now() + settings.durationDays * 24 * 60 * 60 * 1000),
-            createdBy: decidedBy,
-            title: '',
-            content: null,
-            contentText: '',
-            context: 'proposal'
-          };
-          await createVoteService(newVote);
-          log.info('Initiated vote for proposal', { proposalId, spaceId: page.spaceId, pageId: page.id });
+          if (!settings.publishToSnapshot) {
+            const page = await tx.page.findUniqueOrThrow({
+              where: { proposalId },
+              select: { id: true, spaceId: true }
+            });
+            const newVote: VoteDTO = {
+              evaluationId: nextEvaluation.id,
+              pageId: page.id,
+              spaceId: page.spaceId,
+              voteOptions: settings.options,
+              type: settings.type,
+              threshold: settings.threshold,
+              maxChoices: settings.maxChoices,
+              deadline: new Date(Date.now() + settings.durationDays * 24 * 60 * 60 * 1000),
+              createdBy: decidedBy,
+              title: '',
+              content: null,
+              contentText: '',
+              context: 'proposal'
+            };
+            await createVoteService(newVote);
+            log.info('Initiated vote for proposal', { proposalId, spaceId: page.spaceId, pageId: page.id });
+          }
         }
       }
+    } else if (result === null) {
+      const evaluation = await tx.proposalEvaluation.findUnique({
+        where: {
+          id: evaluationId
+        }
+      });
+      if (evaluation?.type === 'vote') {
+        throw new Error('Cannot reset vote evaluation');
+      }
+      log.debug('Resetting proposal evaluation', { proposalId });
+      await tx.proposalEvaluation.update({
+        where: {
+          id: evaluationId
+        },
+        data: {
+          result: null,
+          decidedBy: null,
+          completedAt: null
+        }
+      });
     }
     if (voteSettings) {
       await tx.proposalEvaluation.update({

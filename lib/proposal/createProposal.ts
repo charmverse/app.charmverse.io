@@ -149,6 +149,11 @@ export async function createProposal({
       }))
     );
   }
+  for (const evaluation of evaluations) {
+    if (evaluation.reviewers.length === 0 && evaluation.type !== 'feedback') {
+      throw new Error('No reviewers defined for proposal evaluation step');
+    }
+  }
 
   let proposalFormId = formId;
   if (!proposalFormId && formFields?.length && pageProps?.type === 'proposal_template') {
@@ -184,6 +189,13 @@ export async function createProposal({
           }
         },
         fields,
+        workflow: workflowId
+          ? {
+              connect: {
+                id: workflowId
+              }
+            }
+          : undefined,
         form: proposalFormId ? { connect: { id: proposalFormId } } : undefined
       },
       include: {
