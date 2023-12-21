@@ -1,3 +1,5 @@
+import CloseIcon from '@mui/icons-material/CloseOutlined';
+import { IconButton, InputAdornment } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { DateTime } from 'luxon';
@@ -27,7 +29,9 @@ export const DateInputField = forwardRef<HTMLDivElement, Props>(
     },
     ref
   ) => {
-    const dateValue = typeof value === 'string' ? DateTime.fromJSDate(new Date(value)) : undefined;
+    const dateValue =
+      typeof value === 'string' || typeof value === 'number' ? DateTime.fromJSDate(new Date(value)) : undefined;
+
     return (
       <FieldWrapper
         endAdornment={endAdornment}
@@ -44,22 +48,24 @@ export const DateInputField = forwardRef<HTMLDivElement, Props>(
             onChange?.(_value?.toJSDate().getTime());
           }}
           disabled={disabled}
-          renderInput={(props) => (
-            <TextField
-              {...props}
-              fullWidth
-              inputProps={{
-                ...props.inputProps,
-                readOnly: true,
-                placeholder,
-                value: dateValue?.toFormat('dd-MM-yyyy HH:mm a') ?? ''
-              }}
-              disabled={disabled}
-              error={!!error}
-              ref={ref}
-              helperText={helperText}
-            />
-          )}
+          renderInput={(props) => {
+            return (
+              <TextField
+                {...props}
+                fullWidth
+                inputProps={{
+                  ...props.inputProps,
+                  readOnly: true,
+                  placeholder,
+                  value: props.inputProps?.value ?? ''
+                }}
+                disabled={disabled}
+                error={!!error}
+                ref={ref}
+                helperText={helperText}
+              />
+            );
+          }}
         />
       </FieldWrapper>
     );
