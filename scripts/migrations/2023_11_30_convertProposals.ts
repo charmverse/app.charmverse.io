@@ -49,10 +49,12 @@ async function convertProposals() {
               }
             });
           }
+          const feedbackComplete = p.status !== 'draft' && p.status !== 'discussion';
           await tx.proposalEvaluation.create({
             data: {
               ...feedbackEvaluation,
               index: 0,
+              result: feedbackComplete ? 'pass' : null,
               proposalId: p.id,
               permissions: {
                 createMany: {
@@ -132,10 +134,12 @@ async function convertProposals() {
               }
             });
           }
+          const feedbackComplete = p.status !== 'draft' && p.status !== 'discussion';
           await tx.proposalEvaluation.create({
             data: {
               ...feedbackEvaluation,
               index: 0,
+              result: feedbackComplete ? 'pass' : null,
               proposalId: p.id,
               permissions: {
                 createMany: {

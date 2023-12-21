@@ -7,6 +7,9 @@ import type { ProposalWithUsers, WorkflowEvaluationJson, ProposalWorkflowTyped }
 import { arrayUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
+import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
+import { createForm } from 'lib/form/createForm';
+import { upsertProposalFormAnswers } from 'lib/form/upsertProposalFormAnswers';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { createPage } from 'lib/pages/server/createPage';
 import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
@@ -48,6 +51,9 @@ export type CreateProposalInput = {
   publishToLens?: boolean;
   fields?: ProposalFields;
   workflowId?: string;
+  formFields?: FormFieldInput[];
+  formAnswers?: FieldAnswerInput[];
+  formId?: string;
 };
 
 export type CreatedProposal = {
@@ -67,7 +73,10 @@ export async function createProposal({
   rubricCriteria,
   publishToLens,
   fields,
-  workflowId
+  workflowId,
+  formId,
+  formFields,
+  formAnswers
 }: CreateProposalInput) {
   if (!categoryId) {
     throw new InvalidInputError('Proposal must be linked to a category');
@@ -140,11 +149,15 @@ export async function createProposal({
       }))
     );
   }
-
   for (const evaluation of evaluations) {
-    if (evaluation.reviewers.length === 0) {
+    if (evaluation.reviewers.length === 0 && evaluation.type !== 'feedback') {
       throw new Error('No reviewers defined for proposal evaluation step');
     }
+  }
+
+  let proposalFormId = formId;
+  if (!proposalFormId && formFields?.length && pageProps?.type === 'proposal_template') {
+    proposalFormId = await createForm(formFields);
   }
 
   // Using a transaction to ensure both the proposal and page gets created together
@@ -182,7 +195,8 @@ export async function createProposal({
                 id: workflowId
               }
             }
-          : undefined
+          : undefined,
+        form: proposalFormId ? { connect: { id: proposalFormId } } : undefined
       },
       include: {
         authors: true,
@@ -241,6 +255,15 @@ export async function createProposal({
     })
   );
 
+  const proposalFormFields = proposal.formId
+    ? await prisma.formField.findMany({ where: { formId: proposal.formId } })
+    : null;
+
+  const proposalFormAnswers =
+    formId && formAnswers?.length && page.type === 'proposal'
+      ? await upsertProposalFormAnswers({ formId, proposalId, answers: formAnswers })
+      : null;
+
   await publishProposalEvent({
     scope: WebhookEventNames.ProposalStatusChanged,
     proposalId: proposal.id,
@@ -257,7 +280,9 @@ export async function createProposal({
       reviewers: createdReviewers,
       rubricCriteria: upsertedCriteria,
       draftRubricAnswers: [],
-      rubricAnswers: []
+      rubricAnswers: [],
+      formFields: proposalFormFields,
+      formAnswers: proposalFormAnswers
     }
   };
 }
