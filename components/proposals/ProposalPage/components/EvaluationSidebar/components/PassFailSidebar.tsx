@@ -1,10 +1,11 @@
 import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
 import { Box, Card, FormLabel, Stack, Typography } from '@mui/material';
 
-import { useUpdateProposalEvaluation } from 'charmClient/hooks/proposals';
+import { useSubmitEvaluationResult } from 'charmClient/hooks/proposals';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { Button } from 'components/common/Button';
 import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposal/interface';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 
@@ -16,12 +17,13 @@ export type Props = {
 };
 
 export function PassFailSidebar({ proposal, evaluation, isCurrent, refreshProposal }: Props) {
-  const { trigger: updateProposalEvaluation } = useUpdateProposalEvaluation({ proposalId: proposal?.id });
+  const { trigger } = useSubmitEvaluationResult({ proposalId: proposal?.id });
 
   const reviewerOptions = evaluation.reviewers.map((reviewer) => ({
     group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
     id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
   }));
+  const { showMessage } = useSnackbar();
 
   const isReviewer = proposal?.permissions.evaluate;
   const completedDate = evaluation.completedAt ? getRelativeTimeInThePast(new Date(evaluation.completedAt)) : null;
@@ -32,11 +34,15 @@ export function PassFailSidebar({ proposal, evaluation, isCurrent, refreshPropos
     : null;
 
   async function onSubmitReview(result: NonNullable<PopulatedEvaluation['result']>) {
-    await updateProposalEvaluation({
-      evaluationId: evaluation.id,
-      result
-    });
-    refreshProposal?.();
+    try {
+      await trigger({
+        evaluationId: evaluation.id,
+        result
+      });
+      refreshProposal?.();
+    } catch (error) {
+      showMessage((error as Error).message, 'error');
+    }
   }
 
   return (
