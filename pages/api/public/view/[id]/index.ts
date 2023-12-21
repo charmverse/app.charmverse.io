@@ -4,21 +4,13 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch } from 'lib/middleware';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(
-    providePermissionClients({
-      key: 'id',
-      location: 'query',
-      resourceIdType: 'page'
-    })
-  )
-  .get(getPageByBlockViewId);
+handler.get(getPageByBlockViewId);
 
 async function getPageByBlockViewId(req: NextApiRequest, res: NextApiResponse<Page>) {
   const { id } = req.query as { id: string };
@@ -34,7 +26,7 @@ async function getPageByBlockViewId(req: NextApiRequest, res: NextApiResponse<Pa
     return res.status(400).json({ error: 'No such view exists' } as any);
   }
 
-  const computed = await req.basePermissionsClient.pages.computePagePermissions({
+  const computed = await permissionsApiClient.pages.computePagePermissions({
     resourceId: id
   });
 

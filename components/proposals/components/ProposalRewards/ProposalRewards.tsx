@@ -1,5 +1,3 @@
-import type { ProposalReviewer } from '@charmverse/core/dist/cjs/prisma-client';
-import styled from '@emotion/styled';
 import { Delete, Edit } from '@mui/icons-material';
 import { Box, Grid, Hidden, IconButton, Stack, Typography } from '@mui/material';
 import { useState } from 'react';

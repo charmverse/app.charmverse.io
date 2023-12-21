@@ -5,7 +5,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { generateCategoryIdQuery } from '@charmverse/core/proposals';
 import { stringUtils } from '@charmverse/core/utilities';
 
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { canAccessPrivateFields } from 'lib/proposal/form/canAccessPrivateFields';
 import { mapDbProposalToProposal } from 'lib/proposal/mapDbProposalToProposal';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';

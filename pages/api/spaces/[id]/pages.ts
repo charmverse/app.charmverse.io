@@ -1,4 +1,3 @@
-import type { ProposalPermissionsSwitch } from '@charmverse/core/dist/cjs/permissions';
 import { log } from '@charmverse/core/log';
 import type { PageMeta, PagesRequest } from '@charmverse/core/pages';
 import type { Prisma } from '@charmverse/core/prisma';
@@ -9,7 +8,7 @@ import nc from 'next-connect';
 import { onError, onNoMatch } from 'lib/middleware';
 import { createPage } from 'lib/pages/server/createPage';
 import { untitledPage } from 'lib/pages/untitledPage';
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 import { replaceS3Domain } from 'lib/utilities/url';
 
@@ -21,16 +20,14 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
   const userId = req.session?.user?.id;
 
   const spaceId = req.query.id as string;
-  const { archived, limit, search, useProposalEvaluationPermissions } = req.query as any as PagesRequest &
-    ProposalPermissionsSwitch;
+  const { archived, limit, search } = req.query as any as PagesRequest;
 
   const accessiblePageIds = await permissionsApiClient.pages.getAccessiblePageIds({
     spaceId,
     userId,
     archived,
     limit,
-    search,
-    useProposalEvaluationPermissions
+    search
   });
 
   const pages: PageMeta[] = await prisma.page.findMany({

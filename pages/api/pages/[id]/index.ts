@@ -1,5 +1,4 @@
 import { log } from '@charmverse/core/log';
-import type { PageMeta } from '@charmverse/core/pages';
 import { resolvePageTree } from '@charmverse/core/pages';
 import type { Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
@@ -13,10 +12,8 @@ import type { ModifyChildPagesResponse, PageWithContent } from 'lib/pages';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { updatePage } from 'lib/pages/server/updatePage';
-import { getPermissionsClient } from 'lib/permissions/api';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { convertDoc } from 'lib/prosemirror/conversions/convertOldListNodes';
-import { checkPageContent } from 'lib/security/checkPageContent';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { UndesirableOperationError } from 'lib/utilities/errors';
@@ -29,13 +26,6 @@ handler
   .get(getPageRoute)
   // Only require user on update and delete
   .use(requireUser)
-  .use(
-    providePermissionClients({
-      key: 'id',
-      location: 'query',
-      resourceIdType: 'page'
-    })
-  )
   .put(updatePageHandler)
   .delete(deletePage);
 
@@ -55,14 +45,10 @@ async function getPageRoute(req: NextApiRequest, res: NextApiResponse<PageWithCo
   }
 
   // Page ID might be a path now, so first we fetch the page and if found, can pass the id from the found page to check if we should actually send it to the requester
-  const permissions = await getPermissionsClient({ resourceId: page.spaceId, resourceIdType: 'space' }).then(
-    ({ client }) =>
-      client.pages.computePagePermissions({
-        resourceId: page.id,
-        userId
-      })
-  );
-
+  const permissions = await permissionsApiClient.pages.computePagePermissions({
+    resourceId: page.id,
+    userId
+  });
   if (!permissions.read) {
     throw new ActionNotPermittedError('You do not have permissions to view this page');
   }
@@ -89,7 +75,7 @@ async function updatePageHandler(req: NextApiRequest, res: NextApiResponse) {
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
+  const permissions = await permissionsApiClient.pages.computePagePermissions({
     resourceId: pageId,
     userId
   });
@@ -182,7 +168,7 @@ async function updatePageHandler(req: NextApiRequest, res: NextApiResponse) {
   );
 
   if (hasNewParentPage) {
-    await req.premiumPermissionsClient.pages.setupPagePermissionsAfterEvent({
+    await permissionsApiClient.pages.setupPagePermissionsAfterEvent({
       event: 'repositioned',
       pageId
     });
@@ -206,7 +192,7 @@ async function deletePage(req: NextApiRequest, res: NextApiResponse<ModifyChildP
     }
   });
 
-  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
+  const permissions = await permissionsApiClient.pages.computePagePermissions({
     resourceId: pageId,
     userId
   });

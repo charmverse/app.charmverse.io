@@ -4,17 +4,14 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';
 import { archiveProposal } from 'lib/proposal/archiveProposal';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(providePermissionClients({ key: 'id', location: 'query', resourceIdType: 'proposal' }))
-  .use(requireUser)
-  .post(archiveProposalController);
+handler.use(requireUser).post(archiveProposalController);
 
 async function archiveProposalController(req: NextApiRequest, res: NextApiResponse<ProposalWithUsers>) {
   const proposalId = req.query.id as string;
@@ -22,7 +19,7 @@ async function archiveProposalController(req: NextApiRequest, res: NextApiRespon
 
   const { archived } = req.body as ArchiveProposalRequest;
 
-  const permissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
+  const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
     resourceId: proposalId,
     userId
   });

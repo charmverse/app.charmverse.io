@@ -9,7 +9,7 @@ import { stringUtils } from '@charmverse/core/utilities';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 
-import { getPermissionsClient, permissionsApiClient } from './routers';
+import { getPermissionsClient, permissionsApiClient } from './client';
 
 declare module 'http' {
   interface IncomingMessage {

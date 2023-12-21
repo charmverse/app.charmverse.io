@@ -1,9 +1,8 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { getAnswersTable } from 'lib/proposal/rubric/getAnswersTable';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers';
@@ -12,11 +11,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireUser)
-  .use(providePermissionClients({ key: 'id', location: 'query', resourceIdType: 'proposal' }))
-  .put(upsertProposalAnswersController)
-  .delete(deleteRubricAnswers);
+handler.use(requireUser).put(upsertProposalAnswersController).delete(deleteRubricAnswers);
 
 async function upsertProposalAnswersController(
   req: NextApiRequest,
@@ -25,7 +20,7 @@ async function upsertProposalAnswersController(
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const permissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
+  const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
     resourceId: proposalId,
     userId
   });
@@ -54,7 +49,7 @@ async function deleteRubricAnswers(req: NextApiRequest, res: NextApiResponse) {
 
   const userId = req.session.user.id;
 
-  const permissions = await req.basePermissionsClient.proposals.computeProposalPermissions({
+  const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
     resourceId: proposalId,
     userId
   });

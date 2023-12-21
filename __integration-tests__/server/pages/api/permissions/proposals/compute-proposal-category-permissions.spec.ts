@@ -2,7 +2,7 @@ import type { ProposalCategoryPermission } from '@charmverse/core/prisma';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { upsertProposalCategoryPermission } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
