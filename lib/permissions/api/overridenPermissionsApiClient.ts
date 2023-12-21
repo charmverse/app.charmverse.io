@@ -5,18 +5,12 @@ import type {
   ProposalPermissionsSwitch
 } from '@charmverse/core/permissions';
 import { PermissionsApiClient, getSpaceInfoViaResource } from '@charmverse/core/permissions';
-import type { Space } from '@charmverse/core/prisma-client';
 
 import { permissionsApiAuthKey, permissionsApiUrl } from 'config/constants';
-import { isCharmVerseSpace } from 'lib/featureFlag/isCharmVerseSpace';
 
 // Injected method for expanding args
-function withUseProposalPermissionsArgs<T>(
-  space: Pick<Space, 'domain'> | undefined,
-  args: T
-): Required<ProposalPermissionsSwitch> & T {
-  const useProposalEvaluationPermissions = isCharmVerseSpace({ space });
-  return { useProposalEvaluationPermissions, ...args };
+function withUseProposalPermissionsArgs<T>(args: T): Required<ProposalPermissionsSwitch> & T {
+  return { useProposalEvaluationPermissions: true, ...args };
 }
 
 export class PermissionsApiClientWithPermissionsSwitch extends PermissionsApiClient {
@@ -33,7 +27,7 @@ export class PermissionsApiClientWithPermissionsSwitch extends PermissionsApiCli
     pages.computePagePermissions = async function (args: PermissionCompute) {
       const space = await getSpaceInfoViaResource({ resourceId: args.resourceId, resourceIdType: 'page' });
 
-      const injectedArgs = withUseProposalPermissionsArgs(space, args);
+      const injectedArgs = withUseProposalPermissionsArgs(args);
 
       const permissions = await originalComputePagePermissions.apply(this, [injectedArgs]);
       return permissions;
@@ -44,7 +38,7 @@ export class PermissionsApiClientWithPermissionsSwitch extends PermissionsApiCli
     pages.bulkComputePagePermissions = async function (args: BulkPagePermissionCompute) {
       const space = await getSpaceInfoViaResource({ resourceId: args.pageIds[0], resourceIdType: 'page' });
 
-      const injectedArgs = withUseProposalPermissionsArgs(space, args);
+      const injectedArgs = withUseProposalPermissionsArgs(args);
 
       const permissions = await originalBulkComputePagePermissions.apply(this, [injectedArgs]);
       return permissions;
@@ -56,7 +50,7 @@ export class PermissionsApiClientWithPermissionsSwitch extends PermissionsApiCli
     pages.getAccessiblePageIds = async function (args: PagesRequest) {
       const space = await getSpaceInfoViaResource({ resourceId: args.spaceId, resourceIdType: 'space' });
 
-      const injectedArgs = withUseProposalPermissionsArgs(space, args);
+      const injectedArgs = withUseProposalPermissionsArgs(args);
 
       const pageIds = await originalGetAccessiblePageIds.apply(this, [injectedArgs]);
       return pageIds;
@@ -68,7 +62,7 @@ export class PermissionsApiClientWithPermissionsSwitch extends PermissionsApiCli
     proposals.computeProposalPermissions = async function (args: PermissionCompute) {
       const space = await getSpaceInfoViaResource({ resourceId: args.resourceId, resourceIdType: 'proposal' });
 
-      const injectedArgs = withUseProposalPermissionsArgs(space, args);
+      const injectedArgs = withUseProposalPermissionsArgs(args);
 
       const permissions = await originalComputeProposalPermissions.apply(this, [injectedArgs]);
       return permissions;
@@ -80,7 +74,7 @@ export class PermissionsApiClientWithPermissionsSwitch extends PermissionsApiCli
     proposals.getAccessibleProposalIds = async function (args: PagesRequest) {
       const space = await getSpaceInfoViaResource({ resourceId: args.spaceId, resourceIdType: 'space' });
 
-      const injectedArgs = withUseProposalPermissionsArgs(space, args);
+      const injectedArgs = withUseProposalPermissionsArgs(args);
 
       const pageIds = await originalGetAccessibleProposalIds.apply(this, [injectedArgs]);
       return pageIds;
