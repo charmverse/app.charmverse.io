@@ -3,19 +3,21 @@ import type {
   ProposalFlowPermissionFlags,
   ProposalReviewerPool
 } from '@charmverse/core/permissions';
-import type { ListProposalsRequest, ProposalWithUsers } from '@charmverse/core/proposals';
+import type { ProposalWithUsers, ListProposalsRequest } from '@charmverse/core/proposals';
 
 import type {
   ProposalBlockInput,
   ProposalBlockUpdateInput,
   ProposalBlockWithTypedFields
 } from 'lib/proposal/blocks/interfaces';
+import type { ClearEvaluationResultRequest } from 'lib/proposal/clearEvaluationResult';
 import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import type { RubricProposalsUserInfo } from 'lib/proposal/getProposalsEvaluatedByUser';
 import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers';
 import type { RubricCriteriaUpsert } from 'lib/proposal/rubric/upsertRubricCriteria';
+import type { ReviewEvaluationRequest } from 'lib/proposal/submitEvaluationResult';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import type { UpdateEvaluationRequest } from 'lib/proposal/updateProposalEvaluation';
 import type { UpdateProposalLensPropertiesRequest } from 'lib/proposal/updateProposalLensProperties';
@@ -77,6 +79,14 @@ export function useUpdateProposalStatusOnly({ proposalId }: { proposalId: MaybeS
 
 export function useUpdateProposalEvaluation({ proposalId }: { proposalId: MaybeString }) {
   return usePUT<Partial<Omit<UpdateEvaluationRequest, 'proposalId'>>>(`/api/proposals/${proposalId}/evaluation`);
+}
+
+export function useSubmitEvaluationResult({ proposalId }: { proposalId: MaybeString }) {
+  return usePUT<Partial<Omit<ReviewEvaluationRequest, 'proposalId'>>>(`/api/proposals/${proposalId}/submit-result`);
+}
+
+export function useClearEvaluationResult({ proposalId }: { proposalId: MaybeString }) {
+  return usePUT<Partial<Omit<ClearEvaluationResultRequest, 'proposalId'>>>(`/api/proposals/${proposalId}/clear-result`);
 }
 
 export function useUpsertRubricCriteria({ proposalId }: { proposalId: MaybeString }) {

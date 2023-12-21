@@ -74,6 +74,7 @@ export function ProposalStickyFooter({
         {hasSidebarEvaluation && !showPublishRewards && (
           <OpenEvaluationButton
             disabled={!proposal.permissions.move}
+            currentStep={currentEvaluation}
             isEvaluationSidebarOpen={isEvaluationSidebarOpen}
             onClick={() => (isEvaluationSidebarOpen ? closeSidebar() : openEvaluationSidebar(currentEvaluation?.id))}
           />
