@@ -41,7 +41,6 @@ export async function updateProposalStatusOnly({
 
   const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
     resourceId: proposalId,
-    useProposalEvaluationPermissions: true,
     userId
   });
 

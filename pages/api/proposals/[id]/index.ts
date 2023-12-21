@@ -68,7 +68,6 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
   const proposalPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
     // Proposal id is the same as page
     resourceId: proposal?.id,
-    useProposalEvaluationPermissions: proposal?.status === 'published',
     userId
   });
 
@@ -135,7 +134,6 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
   // A proposal can only be updated when its in draft or discussion status and only the proposal author can update it
   const proposalPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
     resourceId: proposal.id,
-    useProposalEvaluationPermissions: proposal?.status === 'published',
     userId
   });
 
