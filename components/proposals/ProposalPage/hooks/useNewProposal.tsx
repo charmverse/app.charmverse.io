@@ -9,6 +9,7 @@ import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { RubricDataInput } from 'lib/proposal/rubric/upsertRubricCriteria';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { ProposalPageAndPropertiesInput } from '../NewProposalPage';
@@ -31,21 +32,18 @@ export function useNewProposal({ newProposal }: Props) {
     emptyState({ ...newProposal, userId: user?.id })
   );
 
-  const setFormInputs = useCallback((partialFormInputs: Partial<ProposalPageAndPropertiesInput>) => {
-    setContentUpdated(true);
-    setFormInputsRaw((existingFormInputs) => ({ ...existingFormInputs, ...partialFormInputs }));
-  }, []);
-
-  const clearFormInputs = useCallback(() => {
-    setFormInputs(emptyState());
-    setContentUpdated(false);
-  }, [setFormInputs]);
+  const setFormInputs = useCallback(
+    (partialFormInputs: Partial<ProposalPageAndPropertiesInput>) => {
+      setContentUpdated(true);
+      setFormInputsRaw((existingFormInputs) => ({ ...existingFormInputs, ...partialFormInputs }));
+    },
+    [setFormInputsRaw]
+  );
 
   useEffect(() => {
-    setFormInputsRaw((v) => ({
-      ...v,
+    setFormInputs({
       publishToLens: !!user?.publishToLensDefault
-    }));
+    });
   }, [setFormInputs, user?.publishToLensDefault]);
 
   async function createProposal() {
@@ -88,7 +86,8 @@ export function useNewProposal({ newProposal }: Props) {
         reviewers: formInputs.reviewers,
         spaceId: currentSpace.id,
         publishToLens: formInputs.publishToLens,
-        fields: formInputs.fields
+        fields: formInputs.fields,
+        workflowId: formInputs.workflowId || undefined
       }).catch((err: any) => {
         showMessage(err.message ?? 'Something went wrong', 'error');
         throw err;
@@ -123,19 +122,19 @@ export function useNewProposal({ newProposal }: Props) {
   }
   if (formInputs.proposalType === 'structured' && (formInputs.formFields ?? [])?.length === 0) {
     disabledTooltip = 'Form fields are required for structured proposals';
+  } else if (
+    formInputs.proposalType === 'free_form' &&
+    formInputs.type === 'proposal_template' &&
+    checkIsContentEmpty(formInputs.content)
+  ) {
+    disabledTooltip = 'Content is required for free-form proposal templates';
   }
 
   if (formInputs.proposalType === 'structured' && formInputs.formFields?.some((formField) => !formField.name)) {
     disabledTooltip = 'Form fields must have a name';
   }
-
-  if (formInputs.proposalType === 'free_form' && !formInputs.content) {
-    disabledTooltip = 'Content is required for free-form proposals';
-  }
-
   return {
     formInputs,
-    clearFormInputs,
     setFormInputs,
     createProposal,
     disabledTooltip,

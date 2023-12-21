@@ -3,8 +3,11 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { getDefaultWorkflows } from 'lib/proposal/workflows/defaultWorkflows';
 import { v4 as uuid } from 'uuid';
 
+import { getDefaultFeedbackEvaluation, getDefaultPermissions } from 'lib/proposal/workflows/defaultEvaluation';
 // This script is a work in progress
 // It adds proposal steps to existing proposals
+
+const { permissions: feedbackPermissions, id, ...feedbackEvaluation } = getDefaultFeedbackEvaluation();
 
 async function convertProposals() {
   const proposals = await prisma.proposal.findMany({
@@ -15,7 +18,13 @@ async function convertProposals() {
           snapshotProposalId: true,
           votes: true
         }
-      }
+      },
+      category: {
+        include: {
+          proposalCategoryPermissions: true
+        }
+      },
+      reviewers: true
     }
   });
   const proposalsToUpdate = proposals.filter((p) => p.evaluations.length === 0);
@@ -40,9 +49,19 @@ async function convertProposals() {
           }
           await tx.proposalEvaluation.create({
             data: {
+              ...feedbackEvaluation,
+              index: 0,
+              proposalId: p.id,
+              permissions: {
+                create: feedbackPermissions
+              }
+            }
+          });
+          await tx.proposalEvaluation.create({
+            data: {
               id: uuid(),
               title: 'Vote',
-              index: 0,
+              index: 1,
               type: 'vote',
               result,
               completedAt: result ? completedAt || new Date() : null,
@@ -50,9 +69,16 @@ async function convertProposals() {
               snapshotId: p.page?.snapshotProposalId,
               voteId: vote?.id,
               reviewers: {
-                create: {
-                  proposalId: p.id
-                }
+                create: p.category?.proposalCategoryPermissions
+                  .filter((perm) => perm.permissionLevel === 'full_access')
+                  .map((perm) => ({
+                    proposalId: p.id,
+                    roleId: perm.roleId,
+                    systemRole: perm.spaceId ? 'space_member' : undefined
+                  }))
+              },
+              permissions: {
+                create: getDefaultPermissions()
               }
             }
           });
@@ -72,11 +98,24 @@ async function convertProposals() {
           }
           await tx.proposalEvaluation.create({
             data: {
+              ...feedbackEvaluation,
+              index: 0,
+              proposalId: p.id,
+              permissions: {
+                create: feedbackPermissions
+              }
+            }
+          });
+          await tx.proposalEvaluation.create({
+            data: {
               id: evaluationId,
               title: 'Rubric evaluation',
-              index: 0,
+              index: 1,
               type: 'rubric',
-              proposalId: p.id
+              proposalId: p.id,
+              permissions: {
+                create: getDefaultPermissions()
+              }
             }
           });
           await tx.proposalReviewer.updateMany({
@@ -136,5 +175,5 @@ async function convertSpaces() {
 }
 
 function isPublished(proposal: Proposal) {
-  return proposal.status !== 'draft' && proposal.status !== 'discussion';
+  return proposal.status !== 'draft';
 }

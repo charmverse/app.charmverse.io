@@ -66,7 +66,6 @@ type ProposalPropertiesProps = {
   isAdmin?: boolean;
   isFromTemplate?: boolean;
   onChangeRubricCriteria: (criteria: RangeProposalCriteria[]) => void;
-  changeEvaluationStep?: (evaluationId: string) => void;
   pageId?: string;
   proposalId?: string;
   proposalFlowFlags?: ProposalFlowPermissionFlags;
@@ -97,7 +96,6 @@ export function ProposalPropertiesBase({
   isAdmin = false,
   isFromTemplate,
   onChangeRubricCriteria,
-  changeEvaluationStep,
   proposalFormInputs,
   pageId,
   proposalId,

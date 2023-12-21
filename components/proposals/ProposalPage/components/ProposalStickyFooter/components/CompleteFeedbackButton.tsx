@@ -1,24 +1,26 @@
 import { ArrowForwardIos } from '@mui/icons-material';
 
-import { useUpdateProposalEvaluation } from 'charmClient/hooks/proposals';
+import { useSubmitEvaluationResult } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
 import { useSnackbar } from 'hooks/useSnackbar';
 
 export type Props = {
   proposalId: string;
-  disabledTooltip?: string;
-  currentStep?: { id: string };
+  currentStep?: { id: string; title: string };
+  hasMovePermission: boolean;
   nextStep?: { title: string };
   onSubmit?: VoidFunction;
 };
 
-export function CompleteFeedbackButton({ proposalId, disabledTooltip, currentStep, nextStep, onSubmit }: Props) {
+export function CompleteFeedbackButton({ proposalId, hasMovePermission, currentStep, nextStep, onSubmit }: Props) {
   const { showMessage } = useSnackbar();
-  const { trigger: updateProposalEvaluation, isMutating } = useUpdateProposalEvaluation({ proposalId });
+  const { trigger, isMutating } = useSubmitEvaluationResult({ proposalId });
+
+  const disabledTooltip = !hasMovePermission ? 'You do not have permission to move this proposal' : undefined;
 
   async function onMoveForward() {
     try {
-      await updateProposalEvaluation({
+      await trigger({
         evaluationId: currentStep?.id,
         result: 'pass'
       });
@@ -36,7 +38,7 @@ export function CompleteFeedbackButton({ proposalId, disabledTooltip, currentSte
       disabled={!!disabledTooltip}
       disabledTooltip={disabledTooltip}
     >
-      Move to {nextStep?.title}
+      {nextStep ? `Move to ${nextStep.title}` : `Complete ${currentStep?.title}`}
     </Button>
   );
 }

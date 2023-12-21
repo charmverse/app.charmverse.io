@@ -1,10 +1,11 @@
 import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
-import { Box, FormLabel, Stack, Typography } from '@mui/material';
+import { Box, Card, FormLabel, Stack, Typography } from '@mui/material';
 
-import { useUpdateProposalEvaluation } from 'charmClient/hooks/proposals';
+import { useSubmitEvaluationResult } from 'charmClient/hooks/proposals';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { Button } from 'components/common/Button';
 import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposal/interface';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 
@@ -16,12 +17,13 @@ export type Props = {
 };
 
 export function PassFailSidebar({ proposal, evaluation, isCurrent, refreshProposal }: Props) {
-  const { trigger: updateProposalEvaluation } = useUpdateProposalEvaluation({ proposalId: proposal?.id });
+  const { trigger } = useSubmitEvaluationResult({ proposalId: proposal?.id });
 
   const reviewerOptions = evaluation.reviewers.map((reviewer) => ({
     group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
     id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
   }));
+  const { showMessage } = useSnackbar();
 
   const isReviewer = proposal?.permissions.evaluate;
   const completedDate = evaluation.completedAt ? getRelativeTimeInThePast(new Date(evaluation.completedAt)) : null;
@@ -32,11 +34,15 @@ export function PassFailSidebar({ proposal, evaluation, isCurrent, refreshPropos
     : null;
 
   async function onSubmitReview(result: NonNullable<PopulatedEvaluation['result']>) {
-    await updateProposalEvaluation({
-      evaluationId: evaluation.id,
-      result
-    });
-    refreshProposal?.();
+    try {
+      await trigger({
+        evaluationId: evaluation.id,
+        result
+      });
+      refreshProposal?.();
+    } catch (error) {
+      showMessage((error as Error).message, 'error');
+    }
   }
 
   return (
@@ -54,49 +60,50 @@ export function PassFailSidebar({ proposal, evaluation, isCurrent, refreshPropos
           onChange={() => {}}
         />
       </Box>
-      {!evaluation.result && (
-        <Box display='flex' justifyContent='space-between' alignItems='center'>
-          <FormLabel>
-            <Typography component='span' variant='subtitle1'>
-              Submit review:
-            </Typography>
-          </FormLabel>
-          <Box display='flex' justifyContent='flex-end' gap={1}>
-            <Button
-              onClick={() => onSubmitReview('fail')}
-              disabled={!!disabledTooltip}
-              disabledTooltip={disabledTooltip}
-              color='error'
-            >
-              Decline
-            </Button>
-            <Button
-              onClick={() => onSubmitReview('pass')}
-              disabled={!!disabledTooltip}
-              disabledTooltip={disabledTooltip}
-              color='success'
-            >
-              Pass
-            </Button>
+      <FormLabel>
+        <Typography variant='subtitle1'>Result</Typography>
+      </FormLabel>
+      <Card variant='outlined'>
+        {!evaluation.result && (
+          <Box display='flex' justifyContent='space-between' alignItems='center' p={2}>
+            <FormLabel>
+              <Typography component='span' variant='subtitle1'>
+                Submit review:
+              </Typography>
+            </FormLabel>
+            <Box display='flex' justifyContent='flex-end' gap={1}>
+              <Button
+                onClick={() => onSubmitReview('fail')}
+                disabled={!!disabledTooltip}
+                disabledTooltip={disabledTooltip}
+                color='error'
+              >
+                Decline
+              </Button>
+              <Button
+                onClick={() => onSubmitReview('pass')}
+                disabled={!!disabledTooltip}
+                disabledTooltip={disabledTooltip}
+                color='success'
+              >
+                Pass
+              </Button>
+            </Box>
           </Box>
-        </Box>
-      )}
-      {evaluation.result === 'pass' && (
-        <Stack flexDirection='row' gap={2} alignItems='center'>
-          <ApprovedIcon color='success' fontSize='large' />
-          <Box>
+        )}
+        {evaluation.result === 'pass' && (
+          <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' p={2}>
+            <ApprovedIcon color='success' fontSize='large' />
             <Typography>Approved {completedDate}</Typography>
-          </Box>
-        </Stack>
-      )}
-      {evaluation.result === 'fail' && (
-        <Stack flexDirection='row' gap={2} alignItems='center'>
-          <RejectedIcon color='error' fontSize='large' />
-          <Box>
+          </Stack>
+        )}
+        {evaluation.result === 'fail' && (
+          <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' p={2}>
+            <RejectedIcon color='error' fontSize='large' />
             <Typography>Declined {completedDate}</Typography>
-          </Box>
-        </Stack>
-      )}
+          </Stack>
+        )}
+      </Card>
     </>
   );
 }

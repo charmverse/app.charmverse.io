@@ -26,7 +26,7 @@ import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmRouter } from 'hooks/useCharmRouter';
-import { useLgScreen } from 'hooks/useMediaScreens';
+import { useMdScreen } from 'hooks/useMediaScreens';
 import { useThreads } from 'hooks/useThreads';
 import { useVotes } from 'hooks/useVotes';
 import type { PageWithContent } from 'lib/pages/interfaces';
@@ -89,7 +89,6 @@ function DocumentPage({
   enableSidebar
 }: DocumentPageProps) {
   const { castVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
-  const isLargeScreen = useLgScreen();
   const { navigateToSpacePath, router } = useCharmRouter();
   const {
     activeView: sidebarView,
@@ -107,6 +106,7 @@ function DocumentPage({
   const [containerRef, { width: containerWidth }] = useElementSize();
   const [editorState, setEditorState] = useState<EditorState | null>(null);
   const { creatingInlineReward } = useRewards();
+  const isMdScreen = useMdScreen();
 
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
@@ -114,6 +114,8 @@ function DocumentPage({
   const {
     proposal,
     permissions: proposalPermissions,
+    readOnlyRubricCriteria,
+    readOnlyReviewers,
     evaluationToShowInSidebar,
     refreshProposal,
     onChangeEvaluation
@@ -271,7 +273,7 @@ function DocumentPage({
     }
 
     if (!isLoadingThreads) {
-      if (highlightedCommentId || (isLargeScreen && unresolvedThreads.length)) {
+      if (highlightedCommentId || (isMdScreen && unresolvedThreads.length)) {
         return setActiveView('comments');
       }
     }
@@ -279,7 +281,7 @@ function DocumentPage({
 
   useEffect(() => {
     const defaultView = persistedActiveView?.[page.id];
-    if (enableSidebar && defaultView) {
+    if (enableSidebar && defaultView && isMdScreen) {
       setActiveView(defaultView);
     }
   }, [!!persistedActiveView, enableSidebar, page.id]);
@@ -299,6 +301,7 @@ function DocumentPage({
       });
     }
   }, [printRef, _printRef]);
+
   return (
     <>
       {!!page?.deletedAt && (
@@ -481,6 +484,8 @@ function DocumentPage({
                     proposalId={proposalId}
                     proposalEvaluationId={activeEvaluationId}
                     readOnlyProposalPermissions={!proposal?.permissions.edit}
+                    readOnlyRubricCriteria={readOnlyRubricCriteria}
+                    readOnlyReviewers={readOnlyReviewers}
                     pagePermissions={pagePermissions}
                     editorState={editorState}
                     sidebarView={sidebarView}
@@ -512,6 +517,7 @@ function DocumentPage({
             refreshProposal={refreshProposal}
             isEvaluationSidebarOpen={sidebarView === 'proposal_evaluation'}
             openEvaluationSidebar={openEvaluationSidebar}
+            closeSidebar={closeSidebar}
           />
         )}
       </PrimaryColumn>
