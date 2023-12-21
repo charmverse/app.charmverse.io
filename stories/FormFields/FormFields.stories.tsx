@@ -7,10 +7,27 @@ import { v4 } from 'uuid';
 import { formFieldTypes } from 'components/common/form/constants';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { FormFieldInputs as CustomFormFieldInputs } from 'components/common/form/FormFieldInputs';
-import { FormFieldsEditor as CustomFormFieldsEditor } from 'components/common/form/FormFieldsEditor';
-import type { FormFieldInput, TFormFieldInput } from 'components/common/form/interfaces';
+import { ControlledFormFieldsEditor } from 'components/common/form/FormFieldsEditor';
+import type { FormFieldInput, FormFieldValue } from 'components/common/form/interfaces';
 import { createDocumentWithText } from 'lib/prosemirror/constants';
-import { brandColorNames } from 'theme/colors';
+
+const options: SelectOptionType[] = [
+  {
+    id: v4(),
+    name: 'Option 1',
+    color: 'blue'
+  },
+  {
+    id: v4(),
+    name: 'Option 2',
+    color: 'green'
+  },
+  {
+    id: v4(),
+    name: 'Option 3',
+    color: 'orange'
+  }
+];
 
 export function FormFieldsEditor() {
   const field: FormFieldInput = {
@@ -28,7 +45,7 @@ export function FormFieldsEditor() {
 
   return (
     <GlobalContext>
-      <CustomFormFieldsEditor
+      <ControlledFormFieldsEditor
         formFields={formFields}
         setFormFields={setFormFields}
         collapsedFieldIds={collapsedFieldIds}
@@ -49,23 +66,11 @@ export function FormFieldsInputs() {
     <GlobalContext>
       <CustomFormFieldInputs
         formFields={formFieldTypes.map((formFieldType, index) => {
-          const options: SelectOptionType[] = [];
-          if (formFieldType.match(/select|multiselect/)) {
-            // Random number between 3 and 5
-            const totalOptions = Math.floor(Math.random() * (5 - 3 + 1) + 3);
-            for (let i = 0; i < totalOptions; i++) {
-              options.push({
-                id: v4(),
-                name: `Option ${i + 1}`,
-                color: brandColorNames[Math.floor(Math.random() * brandColorNames.length)]
-              });
-            }
-          }
           const label = capitalize(formFieldType.replaceAll(/_/g, ' '));
           return {
             description: createDocumentWithText(`This is a description for ${label.toLocaleLowerCase()}`),
             name: `${label} title`,
-            options,
+            options: formFieldType.match(/select|multiselect/) ? options : [],
             private: index % 2 !== 0,
             required: index % 2 !== 0,
             type: formFieldType,
@@ -84,20 +89,8 @@ export function FormFieldsInputsDisplay() {
       <CustomFormFieldInputs
         disabled
         formFields={formFieldTypes.map((formFieldType, index) => {
-          const options: SelectOptionType[] = [];
-          if (formFieldType.match(/select|multiselect/)) {
-            // Random number between 3 and 5
-            const totalOptions = Math.floor(Math.random() * (5 - 3 + 1) + 3);
-            for (let i = 0; i < totalOptions; i++) {
-              options.push({
-                id: v4(),
-                name: `Option ${i + 1}`,
-                color: brandColorNames[Math.floor(Math.random() * brandColorNames.length)]
-              });
-            }
-          }
           const label = capitalize(formFieldType.replaceAll(/_/g, ' '));
-          let value: TFormFieldInput['value'] = '';
+          let value: FormFieldValue = '';
           switch (formFieldType) {
             case 'phone': {
               value = '+1 123 456 7890';
@@ -158,7 +151,7 @@ export function FormFieldsInputsDisplay() {
           return {
             description: createDocumentWithText(`This is a description for ${label.toLocaleLowerCase()}`),
             name: `${label} title`,
-            options,
+            options: formFieldType.match(/select|multiselect/) ? options : [],
             private: index % 2 !== 0,
             required: index % 2 === 0,
             type: formFieldType,

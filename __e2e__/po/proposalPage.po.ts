@@ -20,4 +20,8 @@ export class ProposalPage extends DocumentPage {
   getSelectOption(categoryId: string) {
     return this.page.locator(`data-test=select-option-${categoryId}`);
   }
+
+  async waitForNewProposalPage(domain: string) {
+    return this.page.waitForURL(`**/${domain}/proposals/new?**`);
+  }
 }

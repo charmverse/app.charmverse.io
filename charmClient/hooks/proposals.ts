@@ -4,9 +4,10 @@ import type {
   ProposalPermissionsSwitch,
   ProposalReviewerPool
 } from '@charmverse/core/permissions';
-import type { ProposalStatus } from '@charmverse/core/prisma-client';
+import type { FormFieldAnswer, ProposalStatus } from '@charmverse/core/prisma-client';
 import type { ProposalWithUsers, ListProposalsRequest } from '@charmverse/core/proposals';
 
+import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
 import type {
   ProposalBlockInput,
   ProposalBlockUpdateInput,
@@ -16,6 +17,7 @@ import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import type { RubricProposalsUserInfo } from 'lib/proposal/getProposalsEvaluatedByUser';
 import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers';
 import type { RubricCriteriaUpsert } from 'lib/proposal/rubric/upsertRubricCriteria';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
@@ -121,6 +123,20 @@ export function useDeleteProposalBlocks(spaceId: string) {
 
 export function useCreateProposalRewards(proposalId: string) {
   return usePOST<undefined, ProposalWithUsersAndRubric>(`/api/proposals/${proposalId}/rewards`);
+}
+
+export function useUpdateProposalFormFields({ proposalId }: { proposalId: string }) {
+  return usePUT<{ formFields: FormFieldInput[] }, FormFieldInput[]>(`/api/proposals/${proposalId}/form`);
+}
+
+export function useGetProposalFormFieldAnswers({ proposalId }: { proposalId: string }) {
+  return useGET<FormFieldAnswer[]>(`/api/proposals/${proposalId}/form/answers`);
+}
+
+export function useUpdateProposalFormFieldAnswers({ proposalId }: { proposalId: string }) {
+  return usePUT<{ answers: FieldAnswerInput[] }, ProposalRubricCriteriaAnswerWithTypedResponse[]>(
+    `/api/proposals/${proposalId}/form/answers`
+  );
 }
 
 export function useUpdateSnapshotProposal({ proposalId }: { proposalId: MaybeString }) {
