@@ -10,7 +10,6 @@ import { canAccessPrivateFields } from 'lib/proposal/form/canAccessPrivateFields
 import { mapDbProposalToProposal } from 'lib/proposal/mapDbProposalToProposal';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
-import { canAccessPrivateFields } from './form/canAccessPrivateFields';
 import type { ProposalWithUsersAndRubric } from './interface';
 
 export type ProposalTemplate = ProposalWithUsersAndRubric & { page: Page };
