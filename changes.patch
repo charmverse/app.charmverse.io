@@ -1,0 +1,2662 @@
+diff --git a/__e2e__/po/databasePage.po.ts b/__e2e__/po/databasePage.po.ts
+index ceb2315db..033581856 100644
+--- a/__e2e__/po/databasePage.po.ts
++++ b/__e2e__/po/databasePage.po.ts
+@@ -113,4 +113,16 @@ export class DatabasePage extends GlobalPage {
+   getLinkedPageOption({ pageId, boardId }: { pageId: string } & OptionalBoardId) {
+     return this.linkedDatabaseOptions({ boardId }).locator(`data-test=linked-database-option-${pageId}`);
+   }
++
++  getNewTemplateButton() {
++    return this.page.locator('data-test=new-template-button');
++  }
++
++  getTemplateMenu({ pageId }: { pageId: string }) {
++    return this.page.locator(`data-test=template-menu-${pageId}`);
++  }
++
++  getTemplateMenuEditOption({ pageId }: { pageId: string }) {
++    return this.page.locator(`data-test=template-menu-edit-${pageId}`);
++  }
+ }
+diff --git a/__e2e__/po/formField.po.ts b/__e2e__/po/formField.po.ts
+new file mode 100644
+index 000000000..eddaec95a
+--- /dev/null
++++ b/__e2e__/po/formField.po.ts
+@@ -0,0 +1,25 @@
++import type { Page } from '@playwright/test';
++
++import { DocumentPage } from './document.po';
++
++export class FormField extends DocumentPage {
++  constructor(
++    page: Page,
++    public addNewFormFieldButton = page.locator('data-test=add-new-form-field-button'),
++    public formFieldNameInput = page.locator('data-test=form-field-name-input'),
++    public formFieldRequiredSwitch = page.locator('data-test=form-field-required-switch'),
++    public toggleFormFieldButton = page.locator('data-test=toggle-form-field-button'),
++    public formFieldsSaveButton = page.locator('data-test=form-fields-save-button'),
++    public formFieldsAnswersSaveButton = page.locator('data-test=form-fields-answers-save-button')
++  ) {
++    super(page);
++  }
++
++  getFormFieldNameInput(index: number = 0) {
++    return this.formFieldNameInput.getByPlaceholder('Title (required)').nth(index);
++  }
++
++  getFormFieldInput(fieldId: string) {
++    return this.page.locator(`data-test=form-field-input-${fieldId} >> input`);
++  }
++}
+diff --git a/__e2e__/po/proposalPage.po.ts b/__e2e__/po/proposalPage.po.ts
+index 4d5b2588b..a0829608a 100644
+--- a/__e2e__/po/proposalPage.po.ts
++++ b/__e2e__/po/proposalPage.po.ts
+@@ -20,4 +20,8 @@ export class ProposalPage extends DocumentPage {
+   getSelectOption(categoryId: string) {
+     return this.page.locator(`data-test=select-option-${categoryId}`);
+   }
++
++  async waitForNewProposalPage(domain: string) {
++    return this.page.waitForURL(`**/${domain}/proposals/new?**`);
++  }
+ }
+diff --git a/__e2e__/po/proposalsList.po.ts b/__e2e__/po/proposalsList.po.ts
+index 2a3237fb4..64fe04650 100644
+--- a/__e2e__/po/proposalsList.po.ts
++++ b/__e2e__/po/proposalsList.po.ts
+@@ -9,7 +9,8 @@ export class ProposalsListPage extends GlobalPage {
+     page: Page,
+     public emptyState = page.locator('data-test=empty-state'),
+     public proposalTemplateSelect = page.locator('data-test=proposal-template-select'),
+-    public createProposalButton = page.locator('data-test=new-proposal-button')
++    public createProposalButton = page.locator('data-test=new-proposal-button'),
++    public structuredProposalTemplateMenu = page.locator('data-test=structured-proposal-template-menu')
+   ) {
+     super(page);
+   }
+diff --git a/__e2e__/proposals/proposalTemplate.spec.ts b/__e2e__/proposals/proposalTemplate.spec.ts
+new file mode 100644
+index 000000000..9810e6ecf
+--- /dev/null
++++ b/__e2e__/proposals/proposalTemplate.spec.ts
+@@ -0,0 +1,330 @@
++import type { ProposalCategory, Space, User } from '@charmverse/core/prisma';
++import { prisma } from '@charmverse/core/prisma-client';
++import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
++import { test as base, expect } from '@playwright/test';
++import { DatabasePage } from '__e2e__/po/databasePage.po';
++import { DocumentPage } from '__e2e__/po/document.po';
++import { FormField } from '__e2e__/po/formField.po';
++import { ProposalPage } from '__e2e__/po/proposalPage.po';
++import { ProposalsListPage } from '__e2e__/po/proposalsList.po';
++
++import { loginBrowserUser } from '../utils/mocks';
++
++type Fixtures = {
++  proposalListPage: ProposalsListPage;
++  documentPage: DocumentPage;
++  databasePage: DatabasePage;
++  proposalPage: ProposalPage;
++  formField: FormField;
++};
++
++const test = base.extend<Fixtures>({
++  proposalListPage: ({ page }, use) => use(new ProposalsListPage(page)),
++  documentPage: ({ page }, use) => use(new DocumentPage(page)),
++  databasePage: ({ page }, use) => use(new DatabasePage(page)),
++  proposalPage: ({ page }, use) => use(new ProposalPage(page)),
++  formField: ({ page }, use) => use(new FormField(page))
++});
++
++let space: Space;
++let spaceAdmin: User;
++let proposalReviewer: User;
++let proposalAuthor: User;
++let proposalCategory: ProposalCategory;
++
++test.beforeAll(async () => {
++  // Initial setup
++  const generated = await testUtilsUser.generateUserAndSpace({
++    isAdmin: true,
++    spaceName: 'space',
++    onboarded: true
++  });
++
++  space = generated.space;
++  spaceAdmin = generated.user;
++
++  proposalAuthor = await testUtilsUser.generateSpaceUser({
++    spaceId: space.id,
++    isAdmin: false
++  });
++
++  proposalReviewer = await testUtilsUser.generateSpaceUser({
++    spaceId: space.id,
++    isAdmin: false
++  });
++
++  await prisma.spaceRole.update({
++    where: {
++      spaceUser: {
++        spaceId: space.id,
++        userId: proposalAuthor.id
++      }
++    },
++    data: {
++      onboarded: true
++    }
++  });
++
++  proposalCategory = await testUtilsProposals.generateProposalCategory({
++    spaceId: space.id,
++    title: 'Proposals',
++    proposalCategoryPermissions: [
++      {
++        permissionLevel: 'full_access',
++        assignee: { group: 'space', id: space.id }
++      }
++    ]
++  });
++});
++
++test.describe.serial('Structured proposal template', () => {
++  test('User creates a structured proposal template with required and non-required fields', async ({
++    databasePage,
++    proposalPage,
++    proposalListPage,
++    documentPage,
++    formField
++  }) => {
++    await loginBrowserUser({
++      browserPage: proposalListPage.page,
++      userId: spaceAdmin.id
++    });
++    await proposalListPage.goToHomePage();
++
++    await proposalListPage.getSidebarLink('proposals').click();
++
++    await proposalListPage.waitForProposalsList();
++
++    await proposalListPage.proposalTemplateSelect.click();
++
++    await databasePage.getNewTemplateButton().click();
++
++    await proposalListPage.structuredProposalTemplateMenu.click();
++
++    await proposalPage.waitForNewProposalPage(space.domain);
++
++    await expect(documentPage.charmEditor).not.toBeVisible();
++
++    await expect(formField.addNewFormFieldButton).toBeVisible();
++
++    await formField.addNewFormFieldButton.click();
++
++    await expect(proposalPage.saveDraftButton).toBeDisabled();
++
++    await formField.getFormFieldNameInput().fill('Name');
++
++    await formField.addNewFormFieldButton.click();
++
++    await documentPage.documentTitle.getByPlaceholder('Title (required)').fill('Structured proposal template');
++
++    await formField.getFormFieldNameInput(1).fill('Nickname');
++
++    await expect(proposalPage.saveDraftButton).toBeDisabled();
++
++    await formField.formFieldRequiredSwitch.nth(1).click();
++
++    await proposalPage.categorySelect.click();
++
++    await proposalPage.getSelectOption(proposalCategory.id).click();
++
++    await proposalPage.reviewerSelect.click();
++
++    await proposalPage.getSelectOption(spaceAdmin.id).click();
++
++    await proposalPage.saveDraftButton.click();
++
++    await proposalListPage.waitForProposalsList();
++  });
++
++  test('Visit structured proposal template and edit/add fields', async ({
++    databasePage,
++    proposalPage,
++    proposalListPage,
++    documentPage,
++    formField
++  }) => {
++    await loginBrowserUser({
++      browserPage: proposalListPage.page,
++      userId: spaceAdmin.id
++    });
++
++    const proposalTemplate = await prisma.proposal.findFirstOrThrow({
++      where: {
++        spaceId: space.id
++      },
++      select: {
++        page: {
++          select: {
++            id: true,
++            path: true
++          }
++        }
++      }
++    });
++
++    await proposalListPage.goToProposals(space.domain);
++
++    await proposalListPage.waitForProposalsList();
++
++    await proposalListPage.proposalTemplateSelect.click();
++
++    await databasePage.getTemplateMenu({ pageId: proposalTemplate.page!.id }).click();
++
++    await databasePage.getTemplateMenuEditOption({ pageId: proposalTemplate.page!.id }).click();
++
++    await documentPage.waitForDocumentPage({
++      domain: space.domain,
++      path: proposalTemplate.page!.path
++    });
++
++    await expect(formField.addNewFormFieldButton).toBeVisible();
++
++    // Should be disabled as there are no changes
++    await expect(formField.formFieldsSaveButton).toBeDisabled();
++
++    await formField.toggleFormFieldButton.nth(0).click();
++
++    // Rename first field
++    await formField.getFormFieldNameInput().fill('Full name');
++
++    await expect(formField.formFieldsSaveButton).toBeEnabled();
++
++    await formField.addNewFormFieldButton.click();
++
++    await formField.getFormFieldNameInput(1).fill('Surname');
++
++    await formField.formFieldsSaveButton.click();
++
++    await proposalPage.page.waitForTimeout(500);
++
++    await proposalPage.page.reload();
++
++    // Reload the page to ensure the changes were saved
++    await expect(proposalPage.page.locator('data-test=field-label').filter({ hasText: /^Full name\*$/ })).toBeVisible();
++  });
++
++  test('Create proposal from structure template after providing required fields', async ({
++    proposalPage,
++    proposalListPage,
++    documentPage,
++    formField
++  }) => {
++    await loginBrowserUser({
++      browserPage: proposalListPage.page,
++      userId: spaceAdmin.id
++    });
++
++    const proposalTemplate = await prisma.proposal.findFirstOrThrow({
++      where: {
++        spaceId: space.id
++      },
++      select: {
++        page: {
++          select: {
++            id: true,
++            path: true
++          }
++        },
++        form: {
++          select: {
++            formFields: {
++              select: {
++                id: true
++              },
++              orderBy: {
++                index: 'asc'
++              }
++            }
++          }
++        }
++      }
++    });
++
++    const formFieldIds = proposalTemplate.form!.formFields.map((_formField) => _formField.id);
++
++    await proposalListPage.goToProposals(space.domain);
++
++    await proposalListPage.waitForProposalsList();
++
++    await proposalListPage.proposalTemplateSelect.click();
++
++    await proposalPage.getSelectOption(proposalTemplate.page!.id).click();
++
++    await proposalPage.waitForNewProposalPage(space.domain);
++
++    // Should be disabled as the required fields are not filled
++    await expect(proposalPage.saveDraftButton).toBeDisabled();
++
++    await documentPage.documentTitle.getByPlaceholder('Title (required)').fill('Proposal 1');
++
++    await formField.getFormFieldInput(formFieldIds[0]).fill('John');
++    await formField.getFormFieldInput(formFieldIds[2]).fill('Doe');
++
++    await proposalPage.saveDraftButton.click();
++
++    await proposalListPage.waitForProposalsList();
++  });
++
++  test('Visit structured proposal and edit field values', async ({
++    proposalPage,
++    proposalListPage,
++    documentPage,
++    formField
++  }) => {
++    await loginBrowserUser({
++      browserPage: proposalListPage.page,
++      userId: spaceAdmin.id
++    });
++
++    const proposal = await prisma.proposal.findFirstOrThrow({
++      where: {
++        spaceId: space.id,
++        page: {
++          type: 'proposal'
++        }
++      },
++      select: {
++        id: true,
++        page: {
++          select: {
++            id: true,
++            path: true
++          }
++        },
++        form: {
++          select: {
++            formFields: {
++              select: {
++                id: true
++              },
++              orderBy: {
++                index: 'asc'
++              }
++            }
++          }
++        }
++      }
++    });
++
++    const formFieldIds = proposal.form!.formFields.map((_formField) => _formField.id);
++
++    await documentPage.goToPage({
++      domain: space.domain,
++      path: proposal.page!.path
++    });
++
++    // Should be disabled as no changes were mage
++    await expect(formField.formFieldsAnswersSaveButton).toBeDisabled();
++
++    await formField.getFormFieldInput(formFieldIds[1]).fill('John Doe');
++
++    await formField.formFieldsAnswersSaveButton.click();
++
++    await proposalPage.page.waitForTimeout(500);
++
++    await proposalPage.page.reload();
++
++    // Reload the page to ensure the changes were saved
++    await expect(formField.getFormFieldInput(formFieldIds[1])).toHaveValue('John Doe');
++  });
++});
+diff --git a/charmClient/hooks/proposals.ts b/charmClient/hooks/proposals.ts
+index 5c66971ec..4dfc3934f 100644
+--- a/charmClient/hooks/proposals.ts
++++ b/charmClient/hooks/proposals.ts
+@@ -4,9 +4,10 @@ import type {
+   ProposalPermissionsSwitch,
+   ProposalReviewerPool
+ } from '@charmverse/core/permissions';
+-import type { ProposalStatus } from '@charmverse/core/prisma-client';
++import type { FormFieldAnswer, ProposalStatus } from '@charmverse/core/prisma-client';
+ import type { ProposalWithUsers, ListProposalsRequest } from '@charmverse/core/proposals';
+ 
++import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
+ import type {
+   ProposalBlockInput,
+   ProposalBlockUpdateInput,
+@@ -16,6 +17,7 @@ import type { CreateProposalInput } from 'lib/proposal/createProposal';
+ import type { RubricProposalsUserInfo } from 'lib/proposal/getProposalsEvaluatedByUser';
+ import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
+ import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
++import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
+ import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers';
+ import type { RubricCriteriaUpsert } from 'lib/proposal/rubric/upsertRubricCriteria';
+ import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
+@@ -123,6 +125,20 @@ export function useCreateProposalRewards(proposalId: string) {
+   return usePOST<undefined, ProposalWithUsersAndRubric>(`/api/proposals/${proposalId}/rewards`);
+ }
+ 
++export function useUpdateProposalFormFields({ proposalId }: { proposalId: string }) {
++  return usePUT<{ formFields: FormFieldInput[] }, FormFieldInput[]>(`/api/proposals/${proposalId}/form`);
++}
++
++export function useGetProposalFormFieldAnswers({ proposalId }: { proposalId: string }) {
++  return useGET<FormFieldAnswer[]>(`/api/proposals/${proposalId}/form/answers`);
++}
++
++export function useUpdateProposalFormFieldAnswers({ proposalId }: { proposalId: string }) {
++  return usePUT<{ answers: FieldAnswerInput[] }, ProposalRubricCriteriaAnswerWithTypedResponse[]>(
++    `/api/proposals/${proposalId}/form/answers`
++  );
++}
++
+ export function useUpdateSnapshotProposal({ proposalId }: { proposalId: MaybeString }) {
+   return usePUT<{ snapshotProposalId: string | null; evaluationId: string }>(`/api/proposals/${proposalId}/snapshot`);
+ }
+diff --git a/components/[pageId]/DocumentPage/DocumentPage.tsx b/components/[pageId]/DocumentPage/DocumentPage.tsx
+index 38f9b70ec..74ee6eacf 100644
+--- a/components/[pageId]/DocumentPage/DocumentPage.tsx
++++ b/components/[pageId]/DocumentPage/DocumentPage.tsx
+@@ -1,5 +1,4 @@
+ import type { Page } from '@charmverse/core/prisma';
+-import styled from '@emotion/styled';
+ import type { Theme } from '@mui/material';
+ import { useMediaQuery, Divider, Box } from '@mui/material';
+ import dynamic from 'next/dynamic';
+@@ -20,14 +19,18 @@ import type { FrontendParticipant } from 'components/common/CharmEditor/componen
+ import type { ConnectionEvent } from 'components/common/CharmEditor/components/fiduswriter/ws';
+ import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
+ import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
++import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
+ import { EvaluationStepper } from 'components/proposals/ProposalPage/components/EvaluationStepper/EvaluationStepper';
+ import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
++import { StructuredProposalFormFieldInputs } from 'components/proposals/ProposalPage/components/StructuredProposalFormFieldInputs';
+ import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
+ import { useRewards } from 'components/rewards/hooks/useRewards';
+ import { useCharmEditor } from 'hooks/useCharmEditor';
+ import { useCharmRouter } from 'hooks/useCharmRouter';
++import { useIsAdmin } from 'hooks/useIsAdmin';
+ import { useMdScreen } from 'hooks/useMediaScreens';
+ import { useThreads } from 'hooks/useThreads';
++import { useUser } from 'hooks/useUser';
+ import { useVotes } from 'hooks/useVotes';
+ import type { PageWithContent } from 'lib/pages/interfaces';
+ import type { PageContent } from 'lib/prosemirror/interfaces';
+@@ -88,6 +91,7 @@ function DocumentPage({
+   close,
+   enableSidebar
+ }: DocumentPageProps) {
++  const { user } = useUser();
+   const { castVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
+   const { navigateToSpacePath, router } = useCharmRouter();
+   const {
+@@ -107,7 +111,7 @@ function DocumentPage({
+   const [editorState, setEditorState] = useState<EditorState | null>(null);
+   const { creatingInlineReward } = useRewards();
+   const isMdScreen = useMdScreen();
+-
++  const isAdmin = useIsAdmin();
+   const pagePermissions = page.permissionFlags;
+   const proposalId = page.proposalId;
+ 
+@@ -302,6 +306,134 @@ function DocumentPage({
+     }
+   }, [printRef, _printRef]);
+ 
++  const isStructuredProposal = proposal && proposal.formId;
++
++  const documentPageContent = (
++    <>
++      {/* temporary? disable editing of page title when in suggestion mode */}
++      <PageHeader
++        headerImage={page.headerImage}
++        // Commented for now, as we need to preserve cursor position between re-renders caused by updating this
++        // key={page.title}
++        icon={page.icon}
++        title={page.title}
++        updatedAt={page.updatedAt.toString()}
++        readOnly={readOnly || !!enableSuggestingMode}
++        setPage={savePage}
++        readOnlyTitle={!!page.syncWithPageId}
++        parentId={showParentChip ? card.parentId : null}
++        insideModal={insideModal}
++        pageId={page.id}
++      />
++      {isCharmVerse && proposal && !isLoading && (
++        <>
++          <Box my={2} mb={1}>
++            <EvaluationStepper
++              evaluations={proposal.evaluations || []}
++              selected={activeEvaluationId}
++              isDraft={proposal.status === 'draft'}
++              onClick={openEvaluation}
++            />
++          </Box>
++          <Divider />
++        </>
++      )}
++      {!isCharmVerse && page.type === 'proposal' && !isLoading && page.snapshotProposalId && (
++        <Box my={2} className='font-family-default'>
++          <SnapshotVoteDetails snapshotProposalId={page.snapshotProposalId} />
++        </Box>
++      )}
++      {!isCharmVerse && page.type === 'proposal' && !isLoading && pageVote && (
++        <Box my={2} className='font-family-default'>
++          <VoteDetail
++            castVote={castVote}
++            updateDeadline={updateDeadline}
++            vote={pageVote}
++            detailed={false}
++            isProposal={true}
++            disableVote={!proposalPermissions?.vote}
++          />
++        </Box>
++      )}
++      <CardPropertiesWrapper>
++        {/* Property list */}
++        {card && board && !hideCardDetails && (
++          <>
++            <CardDetailProperties
++              syncWithPageId={page.syncWithPageId}
++              board={board}
++              card={card}
++              cards={cards}
++              activeView={activeBoardView}
++              views={boardViews}
++              readOnly={readOnly}
++              pageUpdatedAt={page.updatedAt.toString()}
++              pageUpdatedBy={page.updatedBy}
++            />
++            <AddBountyButton readOnly={readOnly} cardId={page.id} />
++          </>
++        )}
++        {proposalId && (
++          <ProposalProperties
++            enableSidebar={enableSidebar}
++            pageId={page.id}
++            proposalId={proposalId}
++            pagePermissions={pagePermissions}
++            snapshotProposalId={page.snapshotProposalId}
++            refreshPagePermissions={refreshPage}
++            readOnly={readonlyProposalProperties}
++            proposalPage={page}
++            isEvaluationSidebarOpen={sidebarView === 'proposal_evaluation'}
++            openEvaluation={openEvaluation}
++            proposal={proposal}
++            refreshProposal={refreshProposal}
++            isCharmVerse={isCharmVerse}
++          />
++        )}
++        {reward && (
++          <RewardProperties
++            reward={reward}
++            pageId={page.id}
++            pagePath={page.path}
++            readOnly={readOnly}
++            showApplications
++            expandedRewardProperties
++            isTemplate={page.type === 'bounty_template'}
++          />
++        )}
++        {creatingInlineReward && !readOnly && <NewInlineReward pageId={page.id} />}
++        {/** Structured proposal isn't inside a CharmEditor context, thus useViewContext used in PageSidebar would throw error for undefined view */}
++        {(enableComments || enableSuggestingMode || page.type === 'proposal' || page.type === 'proposal_template') && (
++          <PageSidebar
++            id='page-action-sidebar'
++            pageId={page.id}
++            spaceId={page.spaceId}
++            proposalId={proposalId}
++            proposalEvaluationId={activeEvaluationId}
++            readOnlyProposalPermissions={!proposal?.permissions.edit}
++            readOnlyRubricCriteria={readOnlyRubricCriteria}
++            readOnlyReviewers={readOnlyReviewers}
++            pagePermissions={pagePermissions}
++            editorState={editorState}
++            sidebarView={sidebarView}
++            closeSidebar={closeSidebar}
++            openSidebar={setActiveView}
++            openEvaluationSidebar={openEvaluationSidebar}
++            threads={threads}
++            proposal={proposal}
++            proposalInput={proposal}
++            onChangeEvaluation={onChangeEvaluation}
++            isProposalTemplate={page.type === 'proposal_template'}
++            refreshProposal={refreshProposal}
++            disabledViews={isStructuredProposal ? ['suggestions', 'comments'] : []}
++          />
++        )}
++      </CardPropertiesWrapper>
++    </>
++  );
++
++  const proposalAuthors = proposal ? [proposal.createdBy, ...proposal.authors.map((author) => author.userId)] : [];
++
+   return (
+     <>
+       {!!page?.deletedAt && (
+@@ -334,7 +466,19 @@ function DocumentPage({
+             parentElementId: 'file-drop-container'
+           })}
+         >
+-          <PageTemplateBanner parentId={page.parentId} pageType={page.type} />
++          <PageTemplateBanner
++            parentId={page.parentId}
++            pageType={page.type}
++            proposalType={
++              page.type === 'proposal_template'
++                ? proposal
++                  ? proposal.formId
++                    ? 'structured'
++                    : 'free_form'
++                  : undefined
++                : undefined
++            }
++          />
+           {/* temporary? disable editing of page meta data when in suggestion mode */}
+           {page.headerImage && (
+             <PageBanner
+@@ -349,159 +493,62 @@ function DocumentPage({
+             top={pageTop}
+             fullWidth={isSmallScreen || (page.fullWidth ?? false)}
+           >
+-            <CharmEditor
+-              placeholderText={
+-                page.type === 'bounty' || page.type === 'bounty_template'
+-                  ? `Describe the reward. Type '/' to see the list of available commands`
+-                  : undefined
+-              }
+-              key={editorKey}
+-              content={page.content as PageContent}
+-              readOnly={readOnly || !!page.syncWithPageId}
+-              autoFocus={false}
+-              sidebarView={sidebarView}
+-              setSidebarView={setActiveView}
+-              pageId={page.id}
+-              disablePageSpecificFeatures={isSharedPage}
+-              enableSuggestingMode={enableSuggestingMode}
+-              enableVoting={page.type !== 'proposal'}
+-              enableComments={enableComments}
+-              containerWidth={containerWidth}
+-              pageType={page.type}
+-              pagePermissions={pagePermissions ?? undefined}
+-              onConnectionEvent={onConnectionEvent}
+-              setEditorState={setEditorState}
+-              snapshotProposalId={page.snapshotProposalId}
+-              onParticipantUpdate={onParticipantUpdate}
+-              style={{
+-                // 5 lines
+-                minHeight: proposalId || page?.type.includes('card') ? '150px' : 'unset'
+-              }}
+-              disableNestedPages={page?.type === 'proposal' || page?.type === 'proposal_template'}
+-              allowClickingFooter={true}
+-              threadIds={threadIds}
+-            >
+-              {/* temporary? disable editing of page title when in suggestion mode */}
+-              <PageHeader
+-                headerImage={page.headerImage}
+-                // Commented for now, as we need to preserve cursor position between re-renders caused by updating this
+-                // key={page.title}
+-                icon={page.icon}
+-                title={page.title}
+-                updatedAt={page.updatedAt.toString()}
+-                readOnly={readOnly || !!enableSuggestingMode}
+-                setPage={savePage}
+-                readOnlyTitle={!!page.syncWithPageId}
+-                parentId={showParentChip ? card.parentId : null}
+-                insideModal={insideModal}
+-                pageId={page.id}
+-              />
+-              {isCharmVerse && proposal && !isLoading && (
+-                <>
+-                  <Box my={2} mb={1}>
+-                    <EvaluationStepper
+-                      evaluations={proposal.evaluations || []}
+-                      selected={activeEvaluationId}
+-                      isDraft={proposal.status === 'draft'}
+-                      onClick={openEvaluation}
++            {proposal && proposal.formId ? (
++              <>
++                {documentPageContent}
++                <Box mb={10}>
++                  {page.type === 'proposal_template' ? (
++                    <FormFieldsEditor
++                      readOnly={!isAdmin && (!user || !proposalAuthors.includes(user.id))}
++                      proposalId={proposal.id}
++                      formFields={proposal?.formFields ?? []}
+                     />
+-                  </Box>
+-                  <Divider />
+-                </>
+-              )}
+-              {!isCharmVerse && page.type === 'proposal' && !isLoading && page.snapshotProposalId && (
+-                <Box my={2} className='font-family-default'>
+-                  <SnapshotVoteDetails snapshotProposalId={page.snapshotProposalId} />
+-                </Box>
+-              )}
+-              {!isCharmVerse && page.type === 'proposal' && !isLoading && pageVote && (
+-                <Box my={2} className='font-family-default'>
+-                  <VoteDetail
+-                    castVote={castVote}
+-                    updateDeadline={updateDeadline}
+-                    vote={pageVote}
+-                    detailed={false}
+-                    isProposal={true}
+-                    disableVote={!proposalPermissions?.vote}
+-                  />
+-                </Box>
+-              )}
+-              <CardPropertiesWrapper>
+-                {/* Property list */}
+-                {card && board && !hideCardDetails && (
+-                  <>
+-                    <CardDetailProperties
+-                      syncWithPageId={page.syncWithPageId}
+-                      board={board}
+-                      card={card}
+-                      cards={cards}
+-                      activeView={activeBoardView}
+-                      views={boardViews}
+-                      readOnly={readOnly}
+-                      pageUpdatedAt={page.updatedAt.toString()}
+-                      pageUpdatedBy={page.updatedBy}
++                  ) : (
++                    <StructuredProposalFormFieldInputs
++                      proposalId={proposal.id}
++                      formFields={proposal?.formFields ?? []}
++                      readOnly={!user || !proposalAuthors.includes(user.id)}
++                      proposalStatus={proposal.status}
+                     />
+-                    <AddBountyButton readOnly={readOnly} cardId={page.id} />
+-                  </>
+-                )}
+-                {proposalId && (
+-                  <ProposalProperties
+-                    enableSidebar={enableSidebar}
+-                    pageId={page.id}
+-                    proposalId={proposalId}
+-                    pagePermissions={pagePermissions}
+-                    snapshotProposalId={page.snapshotProposalId}
+-                    refreshPagePermissions={refreshPage}
+-                    readOnly={readonlyProposalProperties}
+-                    proposalPage={page}
+-                    isEvaluationSidebarOpen={sidebarView === 'proposal_evaluation'}
+-                    openEvaluation={openEvaluation}
+-                    proposal={proposal}
+-                    refreshProposal={refreshProposal}
+-                    isCharmVerse={isCharmVerse}
+-                  />
+-                )}
+-                {reward && (
+-                  <RewardProperties
+-                    reward={reward}
+-                    pageId={page.id}
+-                    pagePath={page.path}
+-                    readOnly={readOnly}
+-                    showApplications
+-                    expandedRewardProperties
+-                    isTemplate={page.type === 'bounty_template'}
+-                  />
+-                )}
+-                {creatingInlineReward && !readOnly && <NewInlineReward pageId={page.id} />}
+-                {(enableComments ||
+-                  enableSuggestingMode ||
+-                  page.type === 'proposal' ||
+-                  page.type === 'proposal_template') && (
+-                  <PageSidebar
+-                    id='page-action-sidebar'
+-                    pageId={page.id}
+-                    spaceId={page.spaceId}
+-                    proposalId={proposalId}
+-                    proposalEvaluationId={activeEvaluationId}
+-                    readOnlyProposalPermissions={!proposal?.permissions.edit}
+-                    readOnlyRubricCriteria={readOnlyRubricCriteria}
+-                    readOnlyReviewers={readOnlyReviewers}
+-                    pagePermissions={pagePermissions}
+-                    editorState={editorState}
+-                    sidebarView={sidebarView}
+-                    closeSidebar={closeSidebar}
+-                    openSidebar={setActiveView}
+-                    openEvaluationSidebar={openEvaluationSidebar}
+-                    threads={threads}
+-                    proposal={proposal}
+-                    proposalInput={proposal}
+-                    onChangeEvaluation={onChangeEvaluation}
+-                    isProposalTemplate={page.type === 'proposal_template'}
+-                    refreshProposal={refreshProposal}
+-                  />
+-                )}
+-              </CardPropertiesWrapper>
+-            </CharmEditor>
++                  )}
++                </Box>
++              </>
++            ) : (
++              <CharmEditor
++                placeholderText={
++                  page.type === 'bounty' || page.type === 'bounty_template'
++                    ? `Describe the reward. Type '/' to see the list of available commands`
++                    : undefined
++                }
++                key={editorKey}
++                content={page.content as PageContent}
++                readOnly={readOnly || !!page.syncWithPageId}
++                autoFocus={false}
++                sidebarView={sidebarView}
++                setSidebarView={setActiveView}
++                pageId={page.id}
++                disablePageSpecificFeatures={isSharedPage}
++                enableSuggestingMode={enableSuggestingMode}
++                enableVoting={page.type !== 'proposal'}
++                enableComments={enableComments}
++                containerWidth={containerWidth}
++                pageType={page.type}
++                pagePermissions={pagePermissions ?? undefined}
++                onConnectionEvent={onConnectionEvent}
++                setEditorState={setEditorState}
++                snapshotProposalId={page.snapshotProposalId}
++                onParticipantUpdate={onParticipantUpdate}
++                style={{
++                  // 5 lines
++                  minHeight: proposalId || page?.type.includes('card') ? '150px' : 'unset'
++                }}
++                disableNestedPages={page?.type === 'proposal' || page?.type === 'proposal_template'}
++                allowClickingFooter={true}
++                threadIds={threadIds}
++              >
++                {documentPageContent}
++              </CharmEditor>
++            )}
+ 
+             {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') && (
+               <Box mt='-100px'>
+diff --git a/components/[pageId]/DocumentPage/components/PageTemplateBanner.tsx b/components/[pageId]/DocumentPage/components/PageTemplateBanner.tsx
+index 773ded977..53dbc8402 100644
+--- a/components/[pageId]/DocumentPage/components/PageTemplateBanner.tsx
++++ b/components/[pageId]/DocumentPage/components/PageTemplateBanner.tsx
+@@ -27,6 +27,7 @@ type Props = {
+   isNewPage?: boolean;
+   parentId?: string | null;
+   pageType?: PageMeta['type'];
++  proposalType?: 'free_form' | 'structured';
+ };
+ 
+ const templateTypes = {
+@@ -36,7 +37,7 @@ const templateTypes = {
+ 
+ type RewardTemplateType = keyof typeof templateTypes;
+ 
+-export function PageTemplateBanner({ isNewPage, pageType, parentId }: Props) {
++export function PageTemplateBanner({ proposalType, isNewPage, pageType, parentId }: Props) {
+   const { space } = useCurrentSpace();
+   const theme = useTheme();
+   const { pages } = usePages();
+@@ -64,7 +65,9 @@ export function PageTemplateBanner({ isNewPage, pageType, parentId }: Props) {
+         <Grid item xs={8} display='flex' justifyContent='center'>
+           {!isShowingCard ? (
+             <span>
+-              You're {isNewPage ? 'creating' : 'editing'} a {templateTypes[pageType as RewardTemplateType]} template
++              You're {isNewPage ? 'creating' : 'editing'} a{' '}
++              {proposalType ? `${proposalType === 'free_form' ? 'free-form' : 'structured'} ` : ''}
++              {templateTypes[pageType as RewardTemplateType]} template
+             </span>
+           ) : (
+             <>
+diff --git a/components/[pageId]/DocumentPage/components/Sidebar/PageSidebar.tsx b/components/[pageId]/DocumentPage/components/Sidebar/PageSidebar.tsx
+index 10e48e413..b891f2a30 100644
+--- a/components/[pageId]/DocumentPage/components/Sidebar/PageSidebar.tsx
++++ b/components/[pageId]/DocumentPage/components/Sidebar/PageSidebar.tsx
+@@ -59,10 +59,12 @@ type SidebarProps = {
+   isProposalTemplate?: boolean;
+   readOnlyReviewers: boolean;
+   readOnlyRubricCriteria: boolean;
++  // eslint-disable-next-line react/no-unused-prop-types
++  disabledViews?: PageSidebarView[];
+ };
+ 
+ function PageSidebarComponent(props: SidebarProps) {
+-  const { id, proposal, sidebarView, openSidebar, closeSidebar, isNewProposal } = props;
++  const { disabledViews = [], id, proposal, sidebarView, openSidebar, closeSidebar, isNewProposal } = props;
+   const isMdScreen = useMdScreen();
+   const isCharmVerse = useIsCharmverseSpace();
+   const isOpen = sidebarView !== null;
+@@ -80,6 +82,10 @@ function PageSidebarComponent(props: SidebarProps) {
+     }
+   }
+ 
++  if (sidebarView && disabledViews.includes(sidebarView)) {
++    return null;
++  }
++
+   return isMdScreen ? (
+     <Slide
+       appear={false}
+@@ -114,6 +120,7 @@ function PageSidebarComponent(props: SidebarProps) {
+                 showEvaluationSidebarIcon={showEvaluationSidebarIcon}
+                 openSidebar={openSidebar}
+                 isNewProposal={!!isNewProposal}
++                disabledViews={disabledViews}
+               />
+             )}
+           </Box>
+@@ -129,6 +136,7 @@ function PageSidebarComponent(props: SidebarProps) {
+       rightActions={
+         openSidebar && (
+           <SidebarNavigationIcons
++            disabledViews={disabledViews}
+             activeView={sidebarView}
+             showEvaluationSidebarIcon={showEvaluationSidebarIcon}
+             openSidebar={openSidebar}
+@@ -149,16 +157,18 @@ function SidebarNavigationIcons({
+   showEvaluationSidebarIcon,
+   openSidebar,
+   activeView,
+-  isNewProposal
++  isNewProposal,
++  disabledViews = []
+ }: {
+   showEvaluationSidebarIcon: boolean;
+   openSidebar: (view: PageSidebarView) => void;
+   activeView?: PageSidebarView | null;
+   isNewProposal: boolean;
++  disabledViews?: PageSidebarView[];
+ }) {
+   return (
+     <Box display='flex' alignItems='center' pr={1} justifyContent='flex-end'>
+-      {showEvaluationSidebarIcon && (
++      {showEvaluationSidebarIcon && !disabledViews.includes('proposal_evaluation') && (
+         <SidebarViewIcon
+           view='proposal_evaluation'
+           isActive={!!activeView?.includes('proposal')}
+@@ -167,8 +177,12 @@ function SidebarNavigationIcons({
+       )}
+       {!isNewProposal && (
+         <>
+-          <SidebarViewIcon view='comments' isActive={activeView === 'comments'} onClick={openSidebar} />
+-          <SidebarViewIcon view='suggestions' isActive={activeView === 'suggestions'} onClick={openSidebar} />
++          {!disabledViews.includes('comments') && (
++            <SidebarViewIcon view='comments' isActive={activeView === 'comments'} onClick={openSidebar} />
++          )}
++          {!disabledViews.includes('suggestions') && (
++            <SidebarViewIcon view='suggestions' isActive={activeView === 'suggestions'} onClick={openSidebar} />
++          )}
+         </>
+       )}
+     </Box>
+diff --git a/components/_app/components/UserOnboardingDialog.tsx b/components/_app/components/UserOnboardingDialog.tsx
+index 1dc4a6d6d..db4e8dc03 100644
+--- a/components/_app/components/UserOnboardingDialog.tsx
++++ b/components/_app/components/UserOnboardingDialog.tsx
+@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
+ 
+ import { ConnectedAccounts } from 'components/_app/components/ConnectedAccounts';
+ import { Button } from 'components/common/Button';
++import type { FormFieldValue } from 'components/common/form/interfaces';
+ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+ import { MemberPropertiesForm } from 'components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesForm';
+ import { DialogContainer } from 'components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesFormDialog';
+@@ -228,7 +229,9 @@ function UserOnboardingDialog({
+             errors={memberPropertiesErrors}
+             refreshPropertyValues={refreshPropertyValues}
+             onChange={(values) =>
+-              onMemberPropertiesChange(values.map(({ memberPropertyId, value }) => ({ id: memberPropertyId, value })))
++              onMemberPropertiesChange(
++                values.map(({ memberPropertyId, value }) => ({ id: memberPropertyId, value: value as FormFieldValue }))
++              )
+             }
+             userId={currentUser.id}
+             showCollectionOptions
+diff --git a/components/common/BoardEditor/focalboard/src/components/table/tableRow.tsx b/components/common/BoardEditor/focalboard/src/components/table/tableRow.tsx
+index fca529a2c..5e4968a56 100644
+--- a/components/common/BoardEditor/focalboard/src/components/table/tableRow.tsx
++++ b/components/common/BoardEditor/focalboard/src/components/table/tableRow.tsx
+@@ -36,6 +36,7 @@ export type CardPageWithCustomIcon = CardPage & {
+ 
+ type Props = {
+   hasContent?: boolean;
++  isStructuredProposal?: boolean;
+   board: Board;
+   activeView: BoardView;
+   card: Card;
+@@ -82,6 +83,7 @@ function TableRow(props: Props) {
+     cardPage,
+     hasContent,
+     board,
++    isStructuredProposal,
+     activeView,
+     columnRefs,
+     card,
+@@ -233,6 +235,7 @@ function TableRow(props: Props) {
+                   )}
+                   {card.customIconType !== 'applicationStatus' && card.customIconType !== 'reward' && (
+                     <PageIcon
++                      isStructuredProposal={isStructuredProposal}
+                       isEditorEmpty={!hasContent}
+                       pageType={card.customIconType === 'reward' ? 'bounty' : 'page'}
+                       icon={pageIcon}
+diff --git a/components/common/BoardEditor/focalboard/src/components/table/tableRows.tsx b/components/common/BoardEditor/focalboard/src/components/table/tableRows.tsx
+index 46a2c0fde..2800e5290 100644
+--- a/components/common/BoardEditor/focalboard/src/components/table/tableRows.tsx
++++ b/components/common/BoardEditor/focalboard/src/components/table/tableRows.tsx
+@@ -87,12 +87,13 @@ function TableRows(props: Props): JSX.Element {
+ 
+   return (
+     <>
+-      {cardPages.map(({ page, card, subPages }) => (
++      {cardPages.map(({ page, card, subPages, isStructuredProposal }) => (
+         <TableRow
+           key={card.id + card.updatedAt}
+           board={board}
+           activeView={activeView}
+           card={card}
++          isStructuredProposal={isStructuredProposal}
+           hasContent={page.hasContent}
+           isSelected={props.selectedCardIds.includes(card.id)}
+           focusOnMount={props.cardIdToFocusOnRender === card.id}
+diff --git a/components/common/PageIcon.tsx b/components/common/PageIcon.tsx
+index d5b73cba8..b1a0a1d5f 100644
+--- a/components/common/PageIcon.tsx
++++ b/components/common/PageIcon.tsx
+@@ -9,6 +9,7 @@ import BountyIcon from '@mui/icons-material/RequestPageOutlined';
+ import DatabaseIcon from '@mui/icons-material/TableChart';
+ import ProposalIcon from '@mui/icons-material/TaskOutlined';
+ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
++import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
+ import { Box } from '@mui/material';
+ import type { ComponentProps, ReactNode } from 'react';
+ 
+@@ -67,6 +68,7 @@ type PageIconProps = Omit<ComponentProps<typeof StyledPageIcon>, 'icon'> & {
+   pageType?: PagePathType;
+   isEditorEmpty?: boolean;
+   isLinkedPage?: boolean;
++  isStructuredProposal?: boolean;
+ };
+ 
+ export function NoAccessPageIcon() {
+@@ -81,7 +83,14 @@ export function NoAccessPageIcon() {
+   );
+ }
+ 
+-export function PageIcon({ icon, isEditorEmpty, isLinkedPage = false, pageType, ...props }: PageIconProps) {
++export function PageIcon({
++  isStructuredProposal = false,
++  icon,
++  isEditorEmpty,
++  isLinkedPage = false,
++  pageType,
++  ...props
++}: PageIconProps) {
+   let iconComponent: ReactNode = icon;
+   if (!icon) {
+     if (pageType === 'linked_board') {
+@@ -105,6 +114,8 @@ export function PageIcon({ icon, isEditorEmpty, isLinkedPage = false, pageType,
+       iconComponent = <MembersIcon />;
+     } else if (pageType === 'forum' || pageType === 'forum_category') {
+       iconComponent = <MessageOutlinedIcon />;
++    } else if (isStructuredProposal) {
++      iconComponent = <WidgetsOutlinedIcon />;
+     } else if (isEditorEmpty) {
+       iconComponent = <EmptyPageIcon />;
+     } else {
+diff --git a/components/common/TemplatesMenu/TemplatePageMenuActions.tsx b/components/common/TemplatesMenu/TemplatePageMenuActions.tsx
+index a6e32fd5d..a603d72ea 100644
+--- a/components/common/TemplatesMenu/TemplatePageMenuActions.tsx
++++ b/components/common/TemplatesMenu/TemplatePageMenuActions.tsx
+@@ -13,26 +13,20 @@ type Props = {
+   editTemplate: (showPage: string) => void;
+   pageId: string;
+   closeParentPopup: () => void;
+-  isDefaultTemplate?: boolean;
+ };
+ 
+-export function TemplatePageMenuActions({
+-  deleteTemplate,
+-  closeParentPopup,
+-  pageId,
+-  editTemplate,
+-  isDefaultTemplate
+-}: Props) {
++export function TemplatePageMenuActions({ deleteTemplate, closeParentPopup, pageId, editTemplate }: Props) {
+   const popupState = usePopupState({ variant: 'popover', popupId: `template-context-${pageId}` });
+ 
+   return (
+     <>
+-      <IconButton size='small' {...bindTrigger(popupState)}>
++      <IconButton size='small' {...bindTrigger(popupState)} data-test={`template-menu-${pageId}`}>
+         <MoreHorizIcon />
+       </IconButton>
+ 
+       <Menu {...bindMenu(popupState)} open={popupState.isOpen}>
+         <MenuItem
++          data-test={`template-menu-edit-${pageId}`}
+           onClick={(e) => {
+             e.stopPropagation();
+             popupState.close();
+diff --git a/components/common/TemplatesMenu/TemplatesMenu.tsx b/components/common/TemplatesMenu/TemplatesMenu.tsx
+index 0f89e8875..53e1ac250 100644
+--- a/components/common/TemplatesMenu/TemplatesMenu.tsx
++++ b/components/common/TemplatesMenu/TemplatesMenu.tsx
+@@ -1,6 +1,7 @@
+ import type { PageMeta } from '@charmverse/core/pages';
+ import { useTheme } from '@emotion/react';
+ import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
++import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
+ import { Box, Divider, ListItemIcon, ListItemText } from '@mui/material';
+ import Menu from '@mui/material/Menu';
+ import MenuItem from '@mui/material/MenuItem';
+@@ -18,7 +19,7 @@ import { TemplatePageMenuActions } from './TemplatePageMenuActions';
+  * @enableItemOptions Defaults to true. Adds an external condition to decide if we enable the menu item options.
+  */
+ interface Props {
+-  pages?: PageMeta[];
++  pages?: (PageMeta & { isStructuredProposal?: boolean })[];
+   createTemplate: () => void;
+   editTemplate: (pageId: string) => void;
+   deleteTemplate: (pageId: string) => void;
+@@ -94,7 +95,7 @@ export function TemplatesMenu({
+               }}
+             >
+               <ListItemIcon>
+-                <DescriptionOutlinedIcon />
++                {page.isStructuredProposal ? <WidgetsOutlinedIcon /> : <DescriptionOutlinedIcon />}
+               </ListItemIcon>
+               <ListItemText>{fancyTrim(page.title || 'Untitled', maxTitleLength)}</ListItemText>
+ 
+@@ -119,6 +120,7 @@ export function TemplatesMenu({
+           dense
+           sx={{ color: `${theme.palette.primary.main} !important` }}
+           onClick={createTemplate}
++          data-test='new-template-button'
+         >
+           <AddIcon />
+           <ListItemText>New template</ListItemText>
+diff --git a/components/common/form/FormField.tsx b/components/common/form/FormField.tsx
+index fa61f32fd..cab925994 100644
+--- a/components/common/form/FormField.tsx
++++ b/components/common/form/FormField.tsx
+@@ -131,6 +131,7 @@ function ExpandedFormField({
+         onChange={(e) => updateFormField({ name: e.target.value, id: formField.id })}
+         placeholder='Title (required)'
+         error={!formField.name}
++        data-test='form-field-name-input'
+       />
+       <CharmEditor
+         isContentControlled
+@@ -172,6 +173,7 @@ function ExpandedFormField({
+       {formField.type !== 'label' && (
+         <Stack gap={0.5} flexDirection='row' alignItems='center'>
+           <Switch
++            data-test='form-field-required-switch'
+             size='small'
+             checked={formField.required}
+             onChange={(e) => updateFormField({ required: e.target.checked, id: formField.id })}
+@@ -198,9 +200,10 @@ function ExpandedFormField({
+ export function FormField(
+   props: FormFieldProps & {
+     isOpen?: boolean;
++    readOnly?: boolean;
+   }
+ ) {
+-  const { isOpen, formField, toggleOpen, updateFormField } = props;
++  const { readOnly, isOpen, formField, toggleOpen, updateFormField } = props;
+ 
+   const [{ offset }, drag, dragPreview] = useDrag(() => ({
+     type: 'item',
+@@ -247,24 +250,30 @@ export function FormField(
+   const isAdjacentActive = canDrop && isOverCurrent;
+ 
+   return (
+-    <Stack flexDirection='row' gap={0.5} alignItems='flex-start' ref={mergeRefs([dragPreview, drop])}>
+-      <div ref={drag}>
+-        <DragIndicatorIcon
+-          fontSize='small'
+-          color='secondary'
+-          sx={{
+-            cursor: 'pointer'
+-          }}
+-        />
+-      </div>
++    <Stack flexDirection='row' gap={0.5} alignItems='flex-start' ref={readOnly ? null : mergeRefs([dragPreview, drop])}>
++      {!readOnly && (
++        <div ref={readOnly ? null : drag}>
++          <DragIndicatorIcon
++            fontSize='small'
++            color='secondary'
++            sx={{
++              cursor: 'pointer'
++            }}
++          />
++        </div>
++      )}
+       <FormFieldContainer dragDirection={isAdjacentActive ? ((offset?.y ?? 0) < 0 ? 'top' : 'bottom') : undefined}>
+-        {isOpen ? (
+-          <ExpandMoreIcon onClick={toggleOpen} sx={{ cursor: 'pointer', mt: 1 }} />
+-        ) : (
+-          <ChevronRightIcon onClick={toggleOpen} sx={{ cursor: 'pointer' }} />
+-        )}
+-        <Stack gap={1} width='100%'>
+-          {!isOpen ? (
++        {!readOnly ? (
++          <span data-test='toggle-form-field-button'>
++            {isOpen ? (
++              <ExpandMoreIcon onClick={toggleOpen} sx={{ cursor: 'pointer', mt: 1 }} />
++            ) : (
++              <ChevronRightIcon onClick={toggleOpen} sx={{ cursor: 'pointer' }} />
++            )}
++          </span>
++        ) : null}
++        <Stack gap={1} width='100%' ml={readOnly ? 1 : 0}>
++          {!isOpen || readOnly ? (
+             <FieldTypeRenderer
+               fieldWrapperSx={{
+                 my: 0
+diff --git a/components/common/form/FormFieldInputs.tsx b/components/common/form/FormFieldInputs.tsx
+index 0e20bf139..a532deab3 100644
+--- a/components/common/form/FormFieldInputs.tsx
++++ b/components/common/form/FormFieldInputs.tsx
+@@ -1,15 +1,20 @@
+ import type { FormField } from '@charmverse/core/prisma-client';
+ import styled from '@emotion/styled';
+-import { Chip, Stack } from '@mui/material';
++import { Box, Chip, Stack } from '@mui/material';
++import { useEffect, useRef, useState } from 'react';
++import type { Control, FieldErrors } from 'react-hook-form';
+ import { Controller } from 'react-hook-form';
+ 
++import { useSnackbar } from 'hooks/useSnackbar';
+ import type { PageContent } from 'lib/prosemirror/interfaces';
+ 
++import { Button } from '../Button';
++
+ import { fieldTypePlaceholderRecord } from './constants';
+ import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
+ import type { SelectOptionType } from './fields/Select/interfaces';
+ import { useFormFields } from './hooks/useFormFields';
+-import type { TFormFieldInput } from './interfaces';
++import type { FormFieldValue } from './interfaces';
+ 
+ const FormFieldInputsContainer = styled(Stack)`
+   border: 1px solid ${(props) => props.theme.palette.divider};
+@@ -19,52 +24,151 @@ const FormFieldInputsContainer = styled(Stack)`
+   gap: ${(props) => props.theme.spacing(1)};
+ `;
+ 
+-export function FormFieldInputs({
+-  formFields,
+-  disabled
+-}: {
+-  formFields: (Pick<FormField, 'type' | 'name' | 'required' | 'options' | 'id' | 'description' | 'private'> & {
+-    value: TFormFieldInput['value'];
+-    placeholder?: string;
++type FormFieldInputsProps = {
++  formFields: (Pick<FormField, 'type' | 'name' | 'required' | 'id' | 'description' | 'private'> & {
++    value?: FormFieldValue;
++    options?: SelectOptionType[];
+   })[];
+   disabled?: boolean;
+-}) {
+-  const { control, errors, onFormChange } = useFormFields({
++  errors: FieldErrors<Record<string, FormFieldValue>>;
++  control: Control<Record<string, FormFieldValue>, any>;
++  onFormChange: (
++    updatedFields: {
++      id: string;
++      value: FormFieldValue;
++    }[]
++  ) => void;
++  onSave?: (answers: { id: string; value: FormFieldValue }[]) => Promise<void>;
++  values?: Record<string, FormFieldValue>;
++};
++
++export function ControlledFormFieldInputs({
++  formFields,
++  disabled,
++  control,
++  errors,
++  onFormChange
++}: Omit<FormFieldInputsProps, 'onSave'>) {
++  return (
++    <FormFieldInputsBase
++      control={control}
++      errors={errors}
++      formFields={formFields}
++      onFormChange={onFormChange}
++      disabled={disabled}
++    />
++  );
++}
++
++export function FormFieldInputs({
++  formFields,
++  disabled,
++  onSave
++}: Omit<FormFieldInputsProps, 'control' | 'errors' | 'onFormChange'>) {
++  const { control, errors, onFormChange, values } = useFormFields({
+     fields: formFields
+   });
+ 
+   return (
+-    <FormFieldInputsContainer>
+-      {formFields.map((formField) => (
+-        <Controller
+-          key={formField.id}
+-          name={formField.id}
+-          control={control}
+-          render={({ field }) => (
+-            <FieldTypeRenderer
+-              {...field}
+-              value={(field.value ?? '') as TFormFieldInput['value']}
+-              placeholder={formField.placeholder ?? fieldTypePlaceholderRecord[formField.type]}
+-              endAdornment={formField.private ? <Chip sx={{ ml: 1 }} label='Private' size='small' /> : undefined}
+-              description={formField.description as PageContent}
+-              disabled={disabled}
+-              type={formField.type}
+-              label={formField.name}
+-              options={formField.options as SelectOptionType[]}
+-              error={errors[formField.id] as any}
+-              required={formField.required}
+-              onChange={(e) => {
+-                onFormChange([
+-                  {
+-                    id: formField.id,
+-                    value: typeof e?.target?.value === 'string' ? e.target.value : e
+-                  }
+-                ]);
+-              }}
+-            />
+-          )}
+-        />
+-      ))}
+-    </FormFieldInputsContainer>
++    <FormFieldInputsBase
++      control={control}
++      errors={errors}
++      formFields={formFields}
++      onFormChange={onFormChange}
++      disabled={disabled}
++      onSave={onSave}
++      values={values}
++    />
++  );
++}
++
++function FormFieldInputsBase({
++  onSave,
++  formFields,
++  values,
++  disabled,
++  control,
++  errors,
++  onFormChange
++}: FormFieldInputsProps) {
++  const [isUpdatingFormFieldAnswers, setIsUpdatingFormFieldAnswers] = useState(false);
++  const [isFormDirty, setIsFormDirty] = useState(false);
++  const { showMessage } = useSnackbar();
++
++  async function saveFormFieldAnswers() {
++    setIsUpdatingFormFieldAnswers(true);
++    try {
++      await onSave?.(Object.entries(values ?? {}).map(([id, value]) => ({ id, value })));
++      showMessage('Answers saved successfully');
++    } catch (_) {
++      //
++    } finally {
++      setIsFormDirty(false);
++      setIsUpdatingFormFieldAnswers(false);
++    }
++  }
++
++  const disabledTooltip =
++    Object.keys(errors).length !== 0
++      ? 'Please fix the errors before saving'
++      : !isFormDirty
++      ? 'No changes to save'
++      : undefined;
++
++  return (
++    <Stack gap={1}>
++      <FormFieldInputsContainer>
++        {formFields.map((formField) => (
++          <Controller
++            key={formField.id}
++            name={formField.id}
++            control={control}
++            render={({ field }) => (
++              <FieldTypeRenderer
++                {...field}
++                value={(field.value ?? '') as FormFieldValue}
++                placeholder={fieldTypePlaceholderRecord[formField.type]}
++                endAdornment={formField.private ? <Chip sx={{ ml: 1 }} label='Private' size='small' /> : undefined}
++                description={formField.description as PageContent}
++                disabled={disabled}
++                type={formField.type}
++                label={formField.name}
++                options={formField.options as SelectOptionType[]}
++                error={errors[formField.id] as any}
++                required={formField.required}
++                data-test={`form-field-input-${formField.id}`}
++                onChange={(e) => {
++                  setIsFormDirty(true);
++                  onFormChange([
++                    {
++                      id: formField.id,
++                      value: typeof e?.target?.value === 'string' ? e.target.value : e
++                    }
++                  ]);
++                }}
++              />
++            )}
++          />
++        ))}
++      </FormFieldInputsContainer>
++      {onSave && (
++        <Box
++          sx={{
++            width: 'fit-content',
++            mb: 10
++          }}
++        >
++          <Button
++            data-test='form-fields-answers-save-button'
++            onClick={saveFormFieldAnswers}
++            disabledTooltip={disabledTooltip}
++            loading={isUpdatingFormFieldAnswers}
++            disabled={!!disabledTooltip || disabled}
++          >
++            Save
++          </Button>
++        </Box>
++      )}
++    </Stack>
+   );
+ }
+diff --git a/components/common/form/FormFieldsEditor.tsx b/components/common/form/FormFieldsEditor.tsx
+index 3dc49869f..83829ecc2 100644
+--- a/components/common/form/FormFieldsEditor.tsx
++++ b/components/common/form/FormFieldsEditor.tsx
+@@ -1,8 +1,10 @@
+ import AddIcon from '@mui/icons-material/Add';
+-import { Stack } from '@mui/material';
+-import type { Dispatch, SetStateAction } from 'react';
++import { Box, Stack } from '@mui/material';
++import { useRef, useEffect, useState } from 'react';
+ import { v4 } from 'uuid';
+ 
++import { useUpdateProposalFormFields } from 'charmClient/hooks/proposals';
++import { useSnackbar } from 'hooks/useSnackbar';
+ import { emptyDocument } from 'lib/prosemirror/constants';
+ 
+ import { Button } from '../Button';
+@@ -11,17 +13,86 @@ import type { SelectOptionType } from './fields/Select/interfaces';
+ import { FormField } from './FormField';
+ import type { FormFieldInput } from './interfaces';
+ 
+-export function FormFieldsEditor({
++export function ControlledFormFieldsEditor({
+   formFields,
+   setFormFields,
+   collapsedFieldIds,
+   toggleCollapse
+ }: {
+   formFields: FormFieldInput[];
+-  setFormFields: Dispatch<SetStateAction<FormFieldInput[]>>;
++  setFormFields: (updatedFormFields: FormFieldInput[]) => void;
+   collapsedFieldIds: string[];
+   toggleCollapse: (fieldId: string) => void;
+ }) {
++  return (
++    <FormFieldsEditorBase
++      collapsedFieldIds={collapsedFieldIds}
++      formFields={formFields}
++      setFormFields={setFormFields}
++      toggleCollapse={toggleCollapse}
++    />
++  );
++}
++
++export function FormFieldsEditor({
++  proposalId,
++  formFields: initialFormFields,
++  readOnly
++}: {
++  proposalId: string;
++  formFields: FormFieldInput[];
++  readOnly?: boolean;
++}) {
++  const [formFields, setFormFields] = useState([...initialFormFields]);
++  const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>(formFields.map((field) => field.id));
++  const { trigger } = useUpdateProposalFormFields({ proposalId });
++  const saveFormFields = async () => {
++    await trigger({ formFields });
++  };
++
++  return (
++    <FormFieldsEditorBase
++      collapsedFieldIds={collapsedFieldIds}
++      formFields={formFields}
++      onSave={saveFormFields}
++      setFormFields={setFormFields}
++      toggleCollapse={(fieldId) => {
++        if (collapsedFieldIds.includes(fieldId)) {
++          setCollapsedFieldIds(collapsedFieldIds.filter((id) => id !== fieldId));
++        } else {
++          setCollapsedFieldIds([...collapsedFieldIds, fieldId]);
++        }
++      }}
++      readOnly={readOnly}
++    />
++  );
++}
++
++function FormFieldsEditorBase({
++  formFields,
++  setFormFields,
++  collapsedFieldIds,
++  toggleCollapse,
++  onSave,
++  readOnly
++}: {
++  formFields: FormFieldInput[];
++  setFormFields: (updatedFormFields: FormFieldInput[]) => void;
++  collapsedFieldIds: string[];
++  toggleCollapse: (fieldId: string) => void;
++  onSave?: VoidFunction | (() => Promise<void>);
++  readOnly?: boolean;
++}) {
++  const [isFormDirty, setIsFormDirty] = useState(false);
++  const [isUpdatingFormFields, setIsUpdatingFormFields] = useState(false);
++  const { showMessage } = useSnackbar();
++  // Using a ref to keep the formFields state updated, since it becomes stale inside the functions
++  const formFieldsRef = useRef(formFields);
++
++  useEffect(() => {
++    formFieldsRef.current = formFields;
++  }, [formFields]);
++
+   function updateFormField(
+     updatedFormField: Partial<
+       FormFieldInput & {
+@@ -31,21 +102,40 @@ export function FormFieldsEditor({
+       id: string;
+     }
+   ) {
+-    setFormFields((fields) => {
+-      const newFormFields = [...fields];
+-      const updatedFieldIndex = newFormFields.findIndex((f) => f.id === updatedFormField.id);
+-      // If the index was changed, we need to move the form field to the new index
+-      const newIndex = updatedFormField.index;
+-      if (typeof newIndex === 'number') {
+-        newFormFields.splice(newIndex, 0, newFormFields.splice(updatedFieldIndex, 1)[0]);
+-      }
++    const newFormFields = [...formFieldsRef.current];
++    const updatedFieldIndex = newFormFields.findIndex((f) => f.id === updatedFormField.id);
++    const newIndex = updatedFormField.index;
++    // If the index was changed, we need to move the form field to the new index
++    if (typeof newIndex === 'number') {
++      newFormFields.splice(newIndex, 0, newFormFields.splice(updatedFieldIndex, 1)[0]);
++    }
++
++    // Making sure that the label field is not required
++    if (updatedFormField.type === 'label') {
++      updatedFormField.required = false;
++    }
+ 
+-      return newFormFields.map((formField, index) => ({
++    setFormFields(
++      newFormFields.map((formField, index) => ({
+         ...formField,
+         ...(index === (newIndex ?? updatedFieldIndex) ? updatedFormField : {}),
+         index
+-      }));
+-    });
++      }))
++    );
++    setIsFormDirty(true);
++  }
++
++  async function saveFormFields() {
++    setIsUpdatingFormFields(true);
++    try {
++      await onSave?.();
++      showMessage('Form fields saved successfully');
++    } catch (_) {
++      //
++    } finally {
++      setIsFormDirty(false);
++      setIsUpdatingFormFields(false);
++    }
+   }
+ 
+   function addNewFormField() {
+@@ -54,7 +144,7 @@ export function FormFieldsEditor({
+       ...formFields,
+       {
+         type: 'short_text',
+-        name: 'Title',
++        name: '',
+         description: emptyDocument,
+         index: formFields.length,
+         options: [],
+@@ -126,10 +216,21 @@ export function FormFieldsEditor({
+     setFormFields(newFormFields);
+   }
+ 
++  const hasEmptyName = formFields.some((formField) => !formField.name);
++
++  const saveButtonDisabledTooltip = !isFormDirty
++    ? 'Please edit the form before saving'
++    : hasEmptyName
++    ? 'Please fill out all field names before saving'
++    : formFields.length === 0
++    ? 'Please add at least one field before saving'
++    : undefined;
++
+   return (
+     <Stack gap={1}>
+       {formFields.map((formField) => (
+         <FormField
++          readOnly={readOnly}
+           toggleOpen={() => {
+             toggleCollapse(formField.id);
+           }}
+@@ -152,18 +253,38 @@ export function FormFieldsEditor({
+           }}
+         />
+       ))}
+-      <Button
+-        sx={{
+-          width: 'fit-content'
+-        }}
+-        startIcon={<AddIcon fontSize='small' />}
+-        variant='text'
+-        size='small'
+-        color='secondary'
+-        onClick={addNewFormField}
+-      >
+-        Add an input
+-      </Button>
++      {!readOnly && (
++        <Button
++          sx={{
++            width: 'fit-content'
++          }}
++          startIcon={<AddIcon fontSize='small' />}
++          variant='text'
++          size='small'
++          color='secondary'
++          data-test='add-new-form-field-button'
++          onClick={addNewFormField}
++        >
++          Add an input
++        </Button>
++      )}
++      {formFields.length !== 0 && onSave && !readOnly && (
++        <Box
++          sx={{
++            width: 'fit-content'
++          }}
++        >
++          <Button
++            data-test='form-fields-save-button'
++            onClick={saveFormFields}
++            disabledTooltip={saveButtonDisabledTooltip}
++            loading={isUpdatingFormFields}
++            disabled={!!saveButtonDisabledTooltip}
++          >
++            Save
++          </Button>
++        </Box>
++      )}
+     </Stack>
+   );
+ }
+diff --git a/components/common/form/InputSearchMember.tsx b/components/common/form/InputSearchMember.tsx
+index f642f7cbf..3218d1b65 100644
+--- a/components/common/form/InputSearchMember.tsx
++++ b/components/common/form/InputSearchMember.tsx
+@@ -135,11 +135,11 @@ interface IInputSearchMemberMultipleProps
+ export function InputSearchMemberMultiple({
+   onChange,
+   disableCloseOnSelect,
+-  defaultValue,
++  defaultValue = [],
+   ...props
+ }: IInputSearchMemberMultipleProps) {
+   const { members, membersRecord } = useMembers();
+-  const defaultMembers = (defaultValue || []).map((userId) => membersRecord[userId]).filter(Boolean);
++  const defaultMembers = defaultValue.map((userId) => membersRecord[userId]).filter(Boolean);
+   const [value, setValue] = useState<Member[]>(defaultMembers);
+ 
+   function emitValue(users: Member[], reason: AutocompleteChangeReason) {
+diff --git a/components/common/form/fields/CharmEditorInputField.tsx b/components/common/form/fields/CharmEditorInputField.tsx
+index fcf66e40e..c5b1f611d 100644
+--- a/components/common/form/fields/CharmEditorInputField.tsx
++++ b/components/common/form/fields/CharmEditorInputField.tsx
+@@ -1,5 +1,4 @@
+ import { useTheme } from '@emotion/react';
+-import { forwardRef } from 'react';
+ 
+ import { CharmEditor } from 'components/common/CharmEditor';
+ import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
+@@ -8,33 +7,31 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
+ 
+ type Props = ControlFieldProps & FieldProps & { multiline?: boolean; rows?: number };
+ 
+-export const CharmEditorInputField = forwardRef<HTMLDivElement, Props>(
+-  ({ placeholder, fieldWrapperSx, error, ...inputProps }) => {
+-    const theme = useTheme();
++export function CharmEditorInputField({ placeholder, fieldWrapperSx, error, ...inputProps }: Props) {
++  const theme = useTheme();
+ 
+-    return (
+-      <FieldWrapper sx={fieldWrapperSx} {...inputProps}>
+-        <CharmEditor
+-          onContentChange={({ doc, rawText }) => {
+-            inputProps.onChange?.({ content: doc, contentText: rawText });
+-          }}
+-          readOnly={inputProps.disabled}
+-          content={(inputProps.value as { content: PageContent; contentText: string })?.content ?? undefined}
+-          placeholderText={placeholder}
+-          disableNestedPages
+-          disablePageSpecificFeatures
+-          isContentControlled
+-          disableRowHandles
+-          style={{
+-            left: 0,
+-            backgroundColor: 'var(--input-bg)',
+-            border: error ? `1px solid ${theme.palette.error.main}` : '1px solid var(--input-border)',
+-            minHeight: 150,
+-            color: inputProps.disabled ? theme.palette.text.disabled : '',
+-            borderRadius: theme.spacing(0.5)
+-          }}
+-        />
+-      </FieldWrapper>
+-    );
+-  }
+-);
++  return (
++    <FieldWrapper sx={fieldWrapperSx} {...inputProps}>
++      <CharmEditor
++        onContentChange={({ doc, rawText }) => {
++          inputProps.onChange?.({ content: doc, contentText: rawText });
++        }}
++        readOnly={inputProps.disabled}
++        content={(inputProps.value as { content: PageContent; contentText: string })?.content ?? undefined}
++        placeholderText={placeholder}
++        disableNestedPages
++        disablePageSpecificFeatures
++        isContentControlled
++        disableRowHandles
++        style={{
++          left: 0,
++          backgroundColor: 'var(--input-bg)',
++          border: error ? `1px solid ${theme.palette.error.main}` : '1px solid var(--input-border)',
++          minHeight: 150,
++          color: inputProps.disabled ? theme.palette.text.disabled : '',
++          borderRadius: theme.spacing(0.5)
++        }}
++      />
++    </FieldWrapper>
++  );
++}
+diff --git a/components/common/form/fields/FieldTypeRenderer.tsx b/components/common/form/fields/FieldTypeRenderer.tsx
+index 6ea9432f0..a67fb694a 100644
+--- a/components/common/form/fields/FieldTypeRenderer.tsx
++++ b/components/common/form/fields/FieldTypeRenderer.tsx
+@@ -34,7 +34,7 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
+         return <TextInputField {...fieldProps} ref={ref} />;
+       }
+       case 'long_text': {
+-        return <CharmEditorInputField {...fieldProps} ref={ref} />;
++        return <CharmEditorInputField {...fieldProps} />;
+       }
+       case 'text_multiline': {
+         return <TextInputField {...fieldProps} ref={ref} multiline rows={3} />;
+@@ -52,7 +52,7 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
+       }
+ 
+       case 'label': {
+-        return <FieldWrapper {...fieldProps} />;
++        return <FieldWrapper {...fieldProps} sx={fieldProps?.fieldWrapperSx} />;
+       }
+ 
+       case 'select': {
+diff --git a/components/common/form/fields/FieldWrapper.tsx b/components/common/form/fields/FieldWrapper.tsx
+index 28a59bdf6..1d7d0daf7 100644
+--- a/components/common/form/fields/FieldWrapper.tsx
++++ b/components/common/form/fields/FieldWrapper.tsx
+@@ -31,7 +31,7 @@ export function FieldWrapper({ sx, endAdornment, description, required, children
+         <Box alignItems='center' display='flex' gap={1}>
+           {iconLabel ?? null}
+           {label && (
+-            <FieldLabel noWrap>
++            <FieldLabel noWrap data-test='field-label'>
+               {label}
+               {required && (
+                 <Typography component='span' color='error'>
+diff --git a/components/common/form/fields/PersonInputField.tsx b/components/common/form/fields/PersonInputField.tsx
+index ca600634d..e6bf1d892 100644
+--- a/components/common/form/fields/PersonInputField.tsx
++++ b/components/common/form/fields/PersonInputField.tsx
+@@ -8,7 +8,7 @@ import { InputSearchMemberMultiple } from '../InputSearchMember';
+ type Props = ControlFieldProps & FieldProps;
+ 
+ export const PersonInputField = forwardRef<HTMLDivElement, Props>(
+-  ({ onChange, value, error, helperText, disabled, placeholder, fieldWrapperSx, ...inputProps }) => {
++  ({ onChange, value, error, helperText, disabled, placeholder, fieldWrapperSx, ...inputProps }, ref) => {
+     return (
+       <FieldWrapper sx={fieldWrapperSx} {...inputProps}>
+         <InputSearchMemberMultiple
+@@ -19,6 +19,7 @@ export const PersonInputField = forwardRef<HTMLDivElement, Props>(
+           error={!!error}
+           disabled={disabled}
+           placeholder={placeholder}
++          ref={ref}
+           defaultValue={value as unknown as string[]}
+         />
+       </FieldWrapper>
+diff --git a/components/common/form/hooks/useFormFields.ts b/components/common/form/hooks/useFormFields.ts
+index 04fd12fe8..49f1b211f 100644
+--- a/components/common/form/hooks/useFormFields.ts
++++ b/components/common/form/hooks/useFormFields.ts
+@@ -1,4 +1,3 @@
+-import type { Prisma } from '@charmverse/core/prisma-client';
+ import { yupResolver } from '@hookform/resolvers/yup';
+ import { isValidName } from 'ethers/lib/utils';
+ import type { FieldValues } from 'react-hook-form';
+@@ -11,14 +10,32 @@ import { emptyDocument } from 'lib/prosemirror/constants';
+ import type { PageContent } from 'lib/prosemirror/interfaces';
+ import { isUUID, isUrl, isValidEmail } from 'lib/utilities/strings';
+ 
+-import type { FieldType } from '../interfaces';
++import type { FieldType, FormFieldValue } from '../interfaces';
++
++export function getInitialFormFieldValue(prop: { type: FieldType; value?: FormFieldValue }) {
++  const value =
++    prop.type === 'multiselect' || prop.type === 'person'
++      ? // Convert to array if not already as yup expects array
++        Array.isArray(prop.value)
++        ? prop.value
++        : []
++      : prop.type === 'long_text'
++      ? // convert to content and contentText for prosemirror document
++        prop.value || {
++          content: emptyDocument,
++          contentText: ''
++        }
++      : prop.value || '';
++
++  return value;
++}
+ 
+ export function useFormFields({
+   fields,
+   onSubmit
+ }: {
+   fields: {
+-    value: any;
++    value?: any;
+     id: string;
+     required: boolean;
+     type: FieldType;
+@@ -36,21 +53,8 @@ export function useFormFields({
+     mode: 'onChange',
+     defaultValues: fields
+       .filter((field) => field.type !== 'label')
+-      .reduce<Record<string, Prisma.JsonValue>>((acc, prop) => {
+-        const value =
+-          prop.type === 'multiselect' || prop.type === 'person'
+-            ? // Convert to array if not already as yup expects array
+-              Array.isArray(prop.value)
+-              ? prop.value
+-              : []
+-            : prop.type === 'long_text'
+-            ? prop.value || {
+-                content: emptyDocument,
+-                contentText: ''
+-              }
+-            : prop.value || '';
+-        acc[prop.id] = value;
+-
++      .reduce<Record<string, FormFieldValue>>((acc, prop) => {
++        acc[prop.id] = getInitialFormFieldValue(prop);
+         return acc;
+       }, {}),
+     resolver: yupResolver(
+@@ -96,10 +100,6 @@ export function useFormFields({
+               });
+               break;
+             }
+-            case 'label': {
+-              acc[property.id] = yup.string();
+-              break;
+-            }
+             case 'select': {
+               acc[property.id] = yup.string().test('is-uuid', 'Invalid uuid', (value) => {
+                 if (isRequired && !value) {
+@@ -159,7 +159,7 @@ export function useFormFields({
+                   return false;
+                 }
+ 
+-                return 'content' in value ? !checkIsContentEmpty(value.content as PageContent) : true;
++                return value && 'content' in value ? !checkIsContentEmpty(value.content as PageContent) : true;
+               });
+               break;
+             }
+@@ -174,9 +174,9 @@ export function useFormFields({
+     )
+   });
+ 
+-  const values = getValues();
++  const values = getValues() as Record<string, FormFieldValue>;
+ 
+-  function onFormChange(updatedFields: { id: string; value: Prisma.JsonValue }[]) {
++  function onFormChange(updatedFields: { id: string; value: FormFieldValue }[]) {
+     updatedFields.forEach((updatedField) => {
+       setValue(updatedField.id, updatedField.value, {
+         shouldDirty: true,
+diff --git a/components/common/form/interfaces.ts b/components/common/form/interfaces.ts
+index 96fc8d4a9..253ca9858 100644
+--- a/components/common/form/interfaces.ts
++++ b/components/common/form/interfaces.ts
+@@ -8,20 +8,17 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
+ 
+ export type FieldType = MemberPropertyType | FormFieldType;
+ 
+-export interface TFormFieldInput {
+-  id: string;
+-  value:
+-    | string
+-    | string[]
+-    | {
+-        content: PageContent;
+-        contentText: string;
+-      };
+-}
++export type FormFieldValue =
++  | string
++  | string[]
++  | {
++      content: PageContent;
++      contentText: string;
++    };
+ 
+ export type ControlFieldProps = {
+   onChange?: (value: any) => void;
+-  value?: TFormFieldInput['value'];
++  value?: FormFieldValue;
+ };
+ 
+ export type SelectFieldProps = {
+@@ -56,5 +53,5 @@ export type FormFieldInput = Pick<
+ export type FieldAnswerInput = {
+   id?: string;
+   fieldId: string;
+-  value: string | string[];
++  value: FormFieldValue;
+ };
+diff --git a/components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesFormDialog.tsx b/components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesFormDialog.tsx
+index 552337037..a97c42d7f 100644
+--- a/components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesFormDialog.tsx
++++ b/components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesFormDialog.tsx
+@@ -6,6 +6,7 @@ import type { ReactNode } from 'react';
+ import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
+ import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
+ import { Button } from 'components/common/Button';
++import type { FormFieldValue } from 'components/common/form/interfaces';
+ import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
+ import { useRequiredMemberPropertiesForm } from 'components/members/hooks/useRequiredMemberProperties';
+ import Legend from 'components/settings/Legend';
+@@ -91,7 +92,7 @@ export function MemberPropertiesFormDialog({ userId, onClose }: Props) {
+   }
+ 
+   function onMemberDetailsChange(fields: UpdateMemberPropertyValuePayload[]) {
+-    onFormChange(fields.map((field) => ({ id: field.memberPropertyId, value: field.value })));
++    onFormChange(fields.map((field) => ({ id: field.memberPropertyId, value: field.value as FormFieldValue })));
+   }
+ 
+   return (
+diff --git a/components/proposals/ProposalPage/NewProposalPage.tsx b/components/proposals/ProposalPage/NewProposalPage.tsx
+index a5158f2ba..023d08150 100644
+--- a/components/proposals/ProposalPage/NewProposalPage.tsx
++++ b/components/proposals/ProposalPage/NewProposalPage.tsx
+@@ -4,7 +4,7 @@ import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
+ import styled from '@emotion/styled';
+ import type { Theme } from '@mui/material';
+ import { Box, Divider, useMediaQuery } from '@mui/material';
+-import { useEffect, useState } from 'react';
++import { useEffect, useRef, useState } from 'react';
+ import { useElementSize } from 'usehooks-ts';
+ import { v4 as uuid } from 'uuid';
+ 
+@@ -22,8 +22,10 @@ import { PropertyLabel } from 'components/common/BoardEditor/components/properti
+ import { Button } from 'components/common/Button';
+ import { CharmEditor } from 'components/common/CharmEditor';
+ import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
+-import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
+-import type { FormFieldInput } from 'components/common/form/interfaces';
++import { ControlledFormFieldInputs } from 'components/common/form/FormFieldInputs';
++import { ControlledFormFieldsEditor } from 'components/common/form/FormFieldsEditor';
++import { getInitialFormFieldValue, useFormFields } from 'components/common/form/hooks/useFormFields';
++import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
+ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+ import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
+ import { useCharmRouter } from 'hooks/useCharmRouter';
+@@ -56,6 +58,8 @@ export type ProposalPageAndPropertiesInput = ProposalPropertiesInput & {
+   type: PageType;
+   proposalType?: 'structured' | 'free_form';
+   formFields?: FormFieldInput[];
++  formAnswers?: FieldAnswerInput[];
++  formId?: string;
+ };
+ 
+ const StyledContainer = styled(PageEditorContainer)`
+@@ -65,10 +69,12 @@ const StyledContainer = styled(PageEditorContainer)`
+ // Note: this component is only used before a page is saved to the DB
+ export function NewProposalPage({
+   isTemplate,
+-  templateId: templateIdFromUrl
++  templateId: templateIdFromUrl,
++  proposalType
+ }: {
+   isTemplate?: boolean;
+   templateId?: string;
++  proposalType?: ProposalPageAndPropertiesInput['proposalType'];
+ }) {
+   const { navigateToSpacePath } = useCharmRouter();
+   const { space: currentSpace } = useCurrentSpace();
+@@ -82,7 +88,7 @@ export function NewProposalPage({
+   const isMdScreen = useMdScreen();
+   const { formInputs, setFormInputs, contentUpdated, disabledTooltip, isCreatingProposal, createProposal } =
+     useNewProposal({
+-      newProposal: { type: isTemplate ? 'proposal_template' : 'proposal' }
++      newProposal: { type: isTemplate ? 'proposal_template' : 'proposal', proposalType }
+     });
+ 
+   const [, { width: containerWidth }] = useElementSize();
+@@ -92,6 +98,19 @@ export function NewProposalPage({
+   const isAdmin = useIsAdmin();
+   const isReviewer = formInputs.reviewers?.some((r) => r.id === user?.id);
+ 
++  const sourceTemplate = proposalTemplates?.find((template) => template.id === formInputs.proposalTemplateId);
++  const isStructured = formInputs.proposalType === 'structured' || !!sourceTemplate?.formId;
++  const proposalFormFields = formInputs.formFields ?? sourceTemplate?.formFields ?? [];
++
++  const {
++    control: proposalFormFieldControl,
++    isValid: isProposalFormFieldsValid,
++    errors: proposalFormFieldErrors,
++    onFormChange
++  } = useFormFields({
++    fields: proposalFormFields
++  });
++
+   function toggleCollapse(fieldId: string) {
+     if (collapsedFieldIds.includes(fieldId)) {
+       setCollapsedFieldIds(collapsedFieldIds.filter((id) => id !== fieldId));
+@@ -125,9 +144,6 @@ export function NewProposalPage({
+     .map((template) => template.page);
+   const { pages } = usePages();
+ 
+-  const sourceTemplate = isFromTemplateSource
+-    ? proposalTemplates?.find((template) => template.id === formInputs.proposalTemplateId)
+-    : undefined;
+   const proposalTemplatePage = formInputs.proposalTemplateId ? pages[formInputs.proposalTemplateId] : null;
+ 
+   // properties with values from templates should be read only
+@@ -196,7 +212,14 @@ export function NewProposalPage({
+         evaluations: template.evaluations,
+         rubricCriteria: template.rubricCriteria,
+         fields: (template.fields as ProposalFields) || {},
+-        type: 'proposal'
++        type: 'proposal',
++        formId: template.formId ?? undefined,
++        formAnswers: (template?.formFields ?? [])
++          .filter((formField) => formField.type !== 'label')
++          .map((proposalFormField) => ({
++            fieldId: proposalFormField.id,
++            value: getInitialFormFieldValue(proposalFormField) as FieldAnswerInput['value']
++          }))
+       });
+     }
+   }
+@@ -341,29 +364,54 @@ export function NewProposalPage({
+     }
+   }, [templateIdFromUrl, isLoadingTemplates]);
+ 
++  // Keep the formAnswers in sync with the formFields using a ref as charmEditor fields uses the initial field value
++  const formAnswersRef = useRef(formInputs.formAnswers);
++
++  useEffect(() => {
++    formAnswersRef.current = formInputs.formAnswers;
++  }, [formInputs.formAnswers]);
++
+   return (
+     <Box flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
+       <PrimaryColumn showPageActionSidebar={!!internalSidebarView}>
+         <Box className={`document-print-container ${fontClassName}`} display='flex' flexDirection='column'>
+-          <PageTemplateBanner pageType={formInputs.type} isNewPage />
++          <PageTemplateBanner pageType={formInputs.type} isNewPage proposalType={formInputs.proposalType} />
+           {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
+           <StyledContainer data-test='page-charmeditor' top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
+             <Box minHeight={450}>
+-              {formInputs.proposalType === 'structured' ? (
++              {isStructured ? (
+                 <>
+                   {proposalPageContent}
+-                  <FormFieldsEditor
+-                    collapsedFieldIds={collapsedFieldIds}
+-                    toggleCollapse={toggleCollapse}
+-                    formFields={formInputs.formFields || []}
+-                    setFormFields={(formFields) => {
+-                      setFormInputs({
+-                        ...formInputs,
+-                        formFields:
+-                          typeof formFields === 'function' ? formFields(formInputs.formFields || []) : formFields
+-                      });
+-                    }}
+-                  />
++                  {formInputs.type === 'proposal_template' ? (
++                    <ControlledFormFieldsEditor
++                      collapsedFieldIds={collapsedFieldIds}
++                      toggleCollapse={toggleCollapse}
++                      formFields={proposalFormFields}
++                      setFormFields={(formFields) => {
++                        setFormInputs({
++                          formFields
++                        });
++                      }}
++                    />
++                  ) : (
++                    <ControlledFormFieldInputs
++                      control={proposalFormFieldControl}
++                      errors={proposalFormFieldErrors}
++                      onFormChange={(updatedFormFields) => {
++                        setFormInputs({
++                          formAnswers: formAnswersRef.current?.map((formAnswer) => {
++                            const updatedFormField = updatedFormFields.find((f) => f.id === formAnswer.fieldId);
++                            return {
++                              ...formAnswer,
++                              value: updatedFormField?.value ?? formAnswer.value
++                            };
++                          })
++                        });
++                        onFormChange(updatedFormFields);
++                      }}
++                      formFields={proposalFormFields}
++                    />
++                  )}
+                 </>
+               ) : (
+                 <CharmEditor
+@@ -393,8 +441,12 @@ export function NewProposalPage({
+             </Button>
+           )}
+           <Button
+-            disabled={Boolean(disabledTooltip) || isCreatingProposal}
+-            disabledTooltip={disabledTooltip}
++            disabled={Boolean(disabledTooltip) || isCreatingProposal || !isProposalFormFieldsValid}
++            disabledTooltip={
++              !isProposalFormFieldsValid
++                ? 'Please provide correct values for all proposal form fields'
++                : disabledTooltip
++            }
+             onClick={saveForm}
+             loading={isCreatingProposal}
+             data-test='create-proposal-button'
+diff --git a/components/proposals/ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter.ts b/components/proposals/ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter.ts
+index cfe147488..7621756a0 100644
+--- a/components/proposals/ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter.ts
++++ b/components/proposals/ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter.ts
+@@ -73,8 +73,11 @@ export function useProposalsBoardAdapter() {
+       proposals
+         ?.map((p) => {
+           const page = pages[p?.id];
+-
+-          return mapProposalToCardPage({ proposal: p, proposalPage: page, spaceId: space?.id });
++          const isStructuredProposal = !!p.formId;
++          return {
++            ...mapProposalToCardPage({ proposal: p, proposalPage: page, spaceId: space?.id }),
++            isStructuredProposal
++          } as CardPage;
+         })
+         .filter((cp): cp is CardPage => !!cp.card && !!cp.page) || [];
+ 
+diff --git a/components/proposals/ProposalPage/components/StructuredProposalFormFieldInputs.tsx b/components/proposals/ProposalPage/components/StructuredProposalFormFieldInputs.tsx
+new file mode 100644
+index 000000000..11ac90723
+--- /dev/null
++++ b/components/proposals/ProposalPage/components/StructuredProposalFormFieldInputs.tsx
+@@ -0,0 +1,55 @@
++import type { FormField, ProposalStatus } from '@charmverse/core/prisma-client';
++
++import { useGetProposalFormFieldAnswers, useUpdateProposalFormFieldAnswers } from 'charmClient/hooks/proposals';
++import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
++import { FormFieldInputs } from 'components/common/form/FormFieldInputs';
++import type { FormFieldValue } from 'components/common/form/interfaces';
++
++export function StructuredProposalFormFieldInputs({
++  proposalId,
++  formFields,
++  readOnly,
++  proposalStatus
++}: {
++  readOnly?: boolean;
++  proposalId: string;
++  formFields: FormField[];
++  proposalStatus: ProposalStatus;
++}) {
++  const { data: proposalFormFieldAnswers = [], isLoading } = useGetProposalFormFieldAnswers({ proposalId });
++  const { trigger } = useUpdateProposalFormFieldAnswers({ proposalId });
++  const onSave = async (answers: { id: string; value: FormFieldValue }[]) => {
++    await trigger({
++      answers: answers.map((answer) => {
++        return {
++          fieldId: answer.id,
++          value: answer.value,
++          id: proposalFormFieldAnswers.find((proposalFormFieldAnswer) => proposalFormFieldAnswer.id === answer.id)?.id
++        };
++      })
++    });
++  };
++
++  if (isLoading) {
++    return null;
++  }
++
++  return (
++    <FormFieldInputs
++      onSave={readOnly ? undefined : onSave}
++      disabled={readOnly || (proposalStatus !== 'discussion' && proposalStatus !== 'draft')}
++      formFields={formFields
++        .map((formField) => {
++          const proposalFormFieldAnswer = proposalFormFieldAnswers.find(
++            (_proposalFormFieldAnswer) => _proposalFormFieldAnswer.fieldId === formField.id
++          );
++          return {
++            ...formField,
++            value: proposalFormFieldAnswer?.value as FormFieldValue,
++            options: (formField.options ?? []) as SelectOptionType[]
++          };
++        })
++        .filter((f) => f.type !== 'label')}
++    />
++  );
++}
+diff --git a/components/proposals/ProposalPage/hooks/useNewProposal.tsx b/components/proposals/ProposalPage/hooks/useNewProposal.tsx
+index f0dd6b57e..21a122254 100644
+--- a/components/proposals/ProposalPage/hooks/useNewProposal.tsx
++++ b/components/proposals/ProposalPage/hooks/useNewProposal.tsx
+@@ -79,6 +79,7 @@ export function useNewProposal({ newProposal }: Props) {
+           icon: formInputs.icon,
+           type: formInputs.type
+         },
++        formFields: formInputs.formFields,
+         evaluations: formInputs.evaluations,
+         evaluationType: formInputs.evaluationType,
+         rubricCriteria: formInputs.rubricCriteria as RubricDataInput[],
+@@ -86,6 +87,8 @@ export function useNewProposal({ newProposal }: Props) {
+         spaceId: currentSpace.id,
+         publishToLens: formInputs.publishToLens,
+         fields: formInputs.fields,
++        formId: formInputs.formId,
++        formAnswers: formInputs.formAnswers,
+         workflowId: formInputs.workflowId || undefined
+       }).catch((err: any) => {
+         showMessage(err.message ?? 'Something went wrong', 'error');
+@@ -110,7 +113,7 @@ export function useNewProposal({ newProposal }: Props) {
+     disabledTooltip = 'Template is required';
+   }
+ 
+-  // old evalauation logic
++  // old evaluation logic
+   if (!isCharmVerse) {
+     if (formInputs.reviewers.length === 0) {
+       disabledTooltip = 'Reviewers are required';
+@@ -119,12 +122,22 @@ export function useNewProposal({ newProposal }: Props) {
+     // get the first validation error from the evaluations
+     disabledTooltip = formInputs.evaluations.map(getEvaluationFormError).filter(isTruthy)[0];
+   }
+-  if (formInputs.proposalType === 'structured' && (formInputs.formFields ?? [])?.length === 0) {
+-    disabledTooltip = 'Form fields are required for structured proposals';
+-  }
+ 
+-  if (formInputs.proposalType === 'structured' && formInputs.formFields?.some((formField) => !formField.name)) {
+-    disabledTooltip = 'Form fields must have a name';
++  if (formInputs.proposalType === 'structured') {
++    if ((formInputs.formFields ?? []).length === 0) {
++      disabledTooltip = 'Atleast one form field is required for structured proposals';
++    } else if (formInputs.formFields?.some((formField) => !formField.name)) {
++      disabledTooltip = 'Form fields must have a name';
++    } else if (
++      formInputs.formFields?.some(
++        (formField) =>
++          (formField.type === 'select' || formField.type === 'multiselect') && (formField.options ?? []).length === 0
++      )
++    ) {
++      disabledTooltip = 'Select fields must have atleast one option';
++    }
++  } else if (formInputs.proposalType === 'free_form' && !formInputs.content) {
++    disabledTooltip = 'Content is required for free-form proposals';
+   }
+ 
+   return {
+@@ -143,14 +156,18 @@ function getEvaluationFormError(evaluation: ProposalEvaluationValues): string |
+       return false;
+     case 'rubric':
+       return evaluation.reviewers.length === 0
+-        ? 'Reviewers are required'
++        ? `Reviewers are required for the "${evaluation.title}" step`
+         : evaluation.rubricCriteria.length === 0
+-        ? 'Rubric criteria are required'
++        ? `At least one rubric criteria is required for the "${evaluation.title}" step`
+         : false;
+     case 'pass_fail':
+-      return evaluation.reviewers.length === 0 ? 'Reviewers are required' : false;
++      return evaluation.reviewers.length === 0 ? `Reviewers are required for the "${evaluation.title}" step` : false;
+     case 'vote':
+-      return !evaluation.voteSettings ? 'Vote details are required' : false;
++      return evaluation.reviewers.length === 0
++        ? `Voters are required for the "${evaluation.title}" step`
++        : !evaluation.voteSettings
++        ? `Vote details are required for the "${evaluation.title}" step`
++        : false;
+     default:
+       return false;
+   }
+diff --git a/components/proposals/ProposalsPage.tsx b/components/proposals/ProposalsPage.tsx
+index 811b35e77..3508f15b9 100644
+--- a/components/proposals/ProposalsPage.tsx
++++ b/components/proposals/ProposalsPage.tsx
+@@ -47,7 +47,6 @@ export function ProposalsPage({ title }: { title: string }) {
+   const router = useRouter();
+   const [showSidebar, setShowSidebar] = useState(false);
+   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
+-
+   const groupByProperty = useMemo(() => {
+     let _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
+ 
+diff --git a/components/proposals/components/NewProposalButton.tsx b/components/proposals/components/NewProposalButton.tsx
+index 7a1ba530e..937e12c34 100644
+--- a/components/proposals/components/NewProposalButton.tsx
++++ b/components/proposals/components/NewProposalButton.tsx
+@@ -1,3 +1,4 @@
++import type { PageMeta } from '@charmverse/core/pages';
+ import styled from '@emotion/styled';
+ import { KeyboardArrowDown } from '@mui/icons-material';
+ import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+@@ -40,7 +41,6 @@ export function NewProposalButton() {
+   const isAdmin = useIsAdmin();
+   const { pages } = usePages();
+   const proposalTemplateCreateModalState = usePopupState({ variant: 'dialog' });
+-  const isCharmverseSpace = useIsCharmverseSpace();
+   // MUI Menu specific content
+   const buttonRef = useRef<HTMLDivElement>(null);
+   const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
+@@ -48,7 +48,15 @@ export function NewProposalButton() {
+ 
+   const canCreateProposal = proposalCategoriesWithCreatePermission.length > 0;
+   // grab page data from context so that title is always up-to-date
+-  const proposalTemplatePages = proposalTemplates?.map((template) => pages[template.page.id]).filter(isTruthy);
++  const proposalTemplatePages = proposalTemplates
++    ?.map(
++      (template) =>
++        ({ ...pages[template.page.id], isStructuredProposal: !!template.formId } as PageMeta & {
++          isStructuredProposal: boolean;
++        })
++    )
++    .filter(isTruthy);
++
+   function deleteProposalTemplate(pageId: string) {
+     return charmClient.deletePage(pageId);
+   }
+@@ -56,6 +64,7 @@ export function NewProposalButton() {
+   function editTemplate(pageId: string) {
+     navigateToSpacePath(`/${pageId}`);
+   }
++
+   function createTemplate(proposalType: ProposalPageAndPropertiesInput['proposalType']) {
+     navigateToSpacePath('/proposals/new', { type: 'proposal_template', proposalType });
+   }
+@@ -88,9 +97,7 @@ export function NewProposalButton() {
+         addPageFromTemplate={createFromTemplate}
+         editTemplate={editTemplate}
+         pages={proposalTemplatePages}
+-        createTemplate={() =>
+-          !isCharmverseSpace ? createTemplate('free_form') : proposalTemplateCreateModalState.open()
+-        }
++        createTemplate={proposalTemplateCreateModalState.open}
+         deleteTemplate={deleteProposalTemplate}
+         anchorEl={buttonRef.current as Element}
+         boardTitle='Proposals'
+@@ -106,7 +113,10 @@ export function NewProposalButton() {
+         onClose={proposalTemplateCreateModalState.close}
+       >
+         <Stack spacing={2}>
+-          <ProposalTemplateMenu onClick={() => createTemplate('structured')}>
++          <ProposalTemplateMenu
++            onClick={() => createTemplate('structured')}
++            data-test='structured-proposal-template-menu'
++          >
+             <Stack flexDirection='row' gap={1} alignItems='center'>
+               <WidgetsOutlinedIcon fontSize='large' />
+               <Typography variant='h5'>Structured Form</Typography>
+@@ -115,7 +125,10 @@ export function NewProposalButton() {
+               Create a template using Forms, creating a structured data format for each proposal to conform to.
+             </Typography>
+           </ProposalTemplateMenu>
+-          <ProposalTemplateMenu onClick={() => createTemplate('free_form')}>
++          <ProposalTemplateMenu
++            onClick={() => createTemplate('free_form')}
++            data-test='free_form-proposal-template-menu'
++          >
+             <Stack flexDirection='row' gap={1} alignItems='center'>
+               <DescriptionOutlinedIcon fontSize='large' />
+               <Typography variant='h5'>Free Form</Typography>
+diff --git a/lib/focalboard/card.ts b/lib/focalboard/card.ts
+index a75d9b3e9..9a7248293 100644
+--- a/lib/focalboard/card.ts
++++ b/lib/focalboard/card.ts
+@@ -21,6 +21,7 @@ export type CardPage<V = CardPropertyValue> = {
+   subPages?: CardPage<V>[];
+   card: Card<V>;
+   page: PageMeta;
++  isStructuredProposal?: boolean;
+ };
+ 
+ export function createCard(block?: Partial<Block>): Card {
+diff --git a/lib/proposal/createProposal.ts b/lib/proposal/createProposal.ts
+index a1a86cbb8..db293269e 100644
+--- a/lib/proposal/createProposal.ts
++++ b/lib/proposal/createProposal.ts
+@@ -149,6 +149,12 @@ export async function createProposal({
+       }))
+     );
+   }
++
++  let proposalFormId = formId;
++  if (!proposalFormId && formFields?.length && pageProps?.type === 'proposal_template') {
++    proposalFormId = await createForm(formFields);
++  }
++
+   for (const evaluation of evaluations) {
+     if (evaluation.reviewers.length === 0 && evaluation.type !== 'feedback') {
+       throw new Error('No reviewers defined for proposal evaluation step');
+diff --git a/lib/proposal/interface.ts b/lib/proposal/interface.ts
+index f8a001613..e4c1e709a 100644
+--- a/lib/proposal/interface.ts
++++ b/lib/proposal/interface.ts
+@@ -10,6 +10,8 @@ import type {
+ } from '@charmverse/core/prisma';
+ import type { ProposalWithUsers } from '@charmverse/core/proposals';
+ 
++import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
++
+ import type {
+   ProposalRubricCriteriaAnswerWithTypedResponse,
+   ProposalRubricCriteriaWithTypedParams
+@@ -48,7 +50,11 @@ export type VoteSettings = Pick<Vote, 'type' | 'threshold' | 'maxChoices'> & {
+ };
+ 
+ export type ProposalFormData = {
+-  formFields: FormField[] | null;
++  formFields:
++    | (Omit<FormField, 'options'> & {
++        options: SelectOptionType[];
++      })[]
++    | null;
+ };
+ 
+ export type PopulatedEvaluation = ProposalRubricData &
+@@ -65,6 +71,13 @@ export type ProposalWithUsersAndRubric = ProposalWithUsers &
+     page?: { sourceTemplateId: string | null } | null;
+     permissions: ProposalPermissionFlags;
+     currentEvaluationId?: string;
++    form?: {
++      formFields:
++        | (Omit<FormField, 'options'> & {
++            options: SelectOptionType[];
++          })[]
++        | null;
++    };
+   };
+ export interface ProposalWithCommentsAndUsers extends ProposalWithUsers {
+   page: Page & { comments: PageComment[] };
+diff --git a/pages/[domain]/proposals/new.tsx b/pages/[domain]/proposals/new.tsx
+index 62f3bd891..adee16b07 100644
+--- a/pages/[domain]/proposals/new.tsx
++++ b/pages/[domain]/proposals/new.tsx
+@@ -1,13 +1,15 @@
+ import { useRouter } from 'next/router';
+ 
+ import getPageLayout from 'components/common/PageLayout/getLayout';
++import type { ProposalPageAndPropertiesInput } from 'components/proposals/ProposalPage/NewProposalPage';
+ import { NewProposalPage } from 'components/proposals/ProposalPage/NewProposalPage';
+ 
+ export default function PageView() {
+   const router = useRouter();
+   const isTemplate = router.query.type === 'proposal_template';
+   const selectedTemplate = router.query.template as string;
+-  return <NewProposalPage templateId={selectedTemplate} isTemplate={isTemplate} />;
++  const proposalType = router.query.proposalType as ProposalPageAndPropertiesInput['proposalType'];
++  return <NewProposalPage proposalType={proposalType} templateId={selectedTemplate} isTemplate={isTemplate} />;
+ }
+ 
+ PageView.getLayout = getPageLayout;
+diff --git a/pages/api/proposals/[id]/form/answers.ts b/pages/api/proposals/[id]/form/answers.ts
+index 084123c17..f65b16cd7 100644
+--- a/pages/api/proposals/[id]/form/answers.ts
++++ b/pages/api/proposals/[id]/form/answers.ts
+@@ -17,7 +17,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
+ handler
+   .use(requireUser)
+   .use(providePermissionClients({ key: 'id', location: 'query', resourceIdType: 'proposal' }))
+-  .put(getProposalFormAnswersHandler)
++  .get(getProposalFormAnswersHandler)
+   .put(upsertProposalFormAnswersHandler);
+ 
+ async function getProposalFormAnswersHandler(req: NextApiRequest, res: NextApiResponse<FormFieldAnswer[]>) {
+diff --git a/stories/FormFields/FormFields.stories.tsx b/stories/FormFields/FormFields.stories.tsx
+index fc6bbfbe9..00a022e15 100644
+--- a/stories/FormFields/FormFields.stories.tsx
++++ b/stories/FormFields/FormFields.stories.tsx
+@@ -7,10 +7,27 @@ import { v4 } from 'uuid';
+ import { formFieldTypes } from 'components/common/form/constants';
+ import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+ import { FormFieldInputs as CustomFormFieldInputs } from 'components/common/form/FormFieldInputs';
+-import { FormFieldsEditor as CustomFormFieldsEditor } from 'components/common/form/FormFieldsEditor';
+-import type { FormFieldInput, TFormFieldInput } from 'components/common/form/interfaces';
++import { ControlledFormFieldsEditor } from 'components/common/form/FormFieldsEditor';
++import type { FormFieldInput, FormFieldValue } from 'components/common/form/interfaces';
+ import { createDocumentWithText } from 'lib/prosemirror/constants';
+-import { brandColorNames } from 'theme/colors';
++
++const options: SelectOptionType[] = [
++  {
++    id: v4(),
++    name: 'Option 1',
++    color: 'blue'
++  },
++  {
++    id: v4(),
++    name: 'Option 2',
++    color: 'green'
++  },
++  {
++    id: v4(),
++    name: 'Option 3',
++    color: 'orange'
++  }
++];
+ 
+ export function FormFieldsEditor() {
+   const field: FormFieldInput = {
+@@ -28,7 +45,7 @@ export function FormFieldsEditor() {
+ 
+   return (
+     <GlobalContext>
+-      <CustomFormFieldsEditor
++      <ControlledFormFieldsEditor
+         formFields={formFields}
+         setFormFields={setFormFields}
+         collapsedFieldIds={collapsedFieldIds}
+@@ -49,23 +66,11 @@ export function FormFieldsInputs() {
+     <GlobalContext>
+       <CustomFormFieldInputs
+         formFields={formFieldTypes.map((formFieldType, index) => {
+-          const options: SelectOptionType[] = [];
+-          if (formFieldType.match(/select|multiselect/)) {
+-            // Random number between 3 and 5
+-            const totalOptions = Math.floor(Math.random() * (5 - 3 + 1) + 3);
+-            for (let i = 0; i < totalOptions; i++) {
+-              options.push({
+-                id: v4(),
+-                name: `Option ${i + 1}`,
+-                color: brandColorNames[Math.floor(Math.random() * brandColorNames.length)]
+-              });
+-            }
+-          }
+           const label = capitalize(formFieldType.replaceAll(/_/g, ' '));
+           return {
+             description: createDocumentWithText(`This is a description for ${label.toLocaleLowerCase()}`),
+             name: `${label} title`,
+-            options,
++            options: formFieldType.match(/select|multiselect/) ? options : [],
+             private: index % 2 !== 0,
+             required: index % 2 !== 0,
+             type: formFieldType,
+@@ -84,20 +89,8 @@ export function FormFieldsInputsDisplay() {
+       <CustomFormFieldInputs
+         disabled
+         formFields={formFieldTypes.map((formFieldType, index) => {
+-          const options: SelectOptionType[] = [];
+-          if (formFieldType.match(/select|multiselect/)) {
+-            // Random number between 3 and 5
+-            const totalOptions = Math.floor(Math.random() * (5 - 3 + 1) + 3);
+-            for (let i = 0; i < totalOptions; i++) {
+-              options.push({
+-                id: v4(),
+-                name: `Option ${i + 1}`,
+-                color: brandColorNames[Math.floor(Math.random() * brandColorNames.length)]
+-              });
+-            }
+-          }
+           const label = capitalize(formFieldType.replaceAll(/_/g, ' '));
+-          let value: TFormFieldInput['value'] = '';
++          let value: FormFieldValue = '';
+           switch (formFieldType) {
+             case 'phone': {
+               value = '+1 123 456 7890';
+@@ -158,7 +151,7 @@ export function FormFieldsInputsDisplay() {
+           return {
+             description: createDocumentWithText(`This is a description for ${label.toLocaleLowerCase()}`),
+             name: `${label} title`,
+-            options,
++            options: formFieldType.match(/select|multiselect/) ? options : [],
+             private: index % 2 !== 0,
+             required: index % 2 === 0,
+             type: formFieldType,

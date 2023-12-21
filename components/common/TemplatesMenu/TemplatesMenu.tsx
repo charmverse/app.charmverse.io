@@ -1,6 +1,7 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import { useTheme } from '@emotion/react';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
 import { Box, Divider, ListItemIcon, ListItemText } from '@mui/material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -18,7 +19,7 @@ import { TemplatePageMenuActions } from './TemplatePageMenuActions';
  * @enableItemOptions Defaults to true. Adds an external condition to decide if we enable the menu item options.
  */
 interface Props {
-  pages?: PageMeta[];
+  pages?: (PageMeta & { isStructuredProposal?: boolean })[];
   createTemplate: () => void;
   editTemplate: (pageId: string) => void;
   deleteTemplate: (pageId: string) => void;
@@ -94,7 +95,7 @@ export function TemplatesMenu({
               }}
             >
               <ListItemIcon>
-                <DescriptionOutlinedIcon />
+                {page.isStructuredProposal ? <WidgetsOutlinedIcon /> : <DescriptionOutlinedIcon />}
               </ListItemIcon>
               <ListItemText>{fancyTrim(page.title || 'Untitled', maxTitleLength)}</ListItemText>
 
@@ -119,6 +120,7 @@ export function TemplatesMenu({
           dense
           sx={{ color: `${theme.palette.primary.main} !important` }}
           onClick={createTemplate}
+          data-test='new-template-button'
         >
           <AddIcon />
           <ListItemText>New template</ListItemText>

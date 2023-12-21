@@ -1,4 +1,3 @@
-import type { Prisma } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { isValidName } from 'ethers/lib/utils';
 import type { FieldValues } from 'react-hook-form';
@@ -11,14 +10,32 @@ import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isUUID, isUrl, isValidEmail } from 'lib/utilities/strings';
 
-import type { FieldType } from '../interfaces';
+import type { FieldType, FormFieldValue } from '../interfaces';
+
+export function getInitialFormFieldValue(prop: { type: FieldType; value?: FormFieldValue }) {
+  const value =
+    prop.type === 'multiselect' || prop.type === 'person'
+      ? // Convert to array if not already as yup expects array
+        Array.isArray(prop.value)
+        ? prop.value
+        : []
+      : prop.type === 'long_text'
+      ? // convert to content and contentText for prosemirror document
+        prop.value || {
+          content: emptyDocument,
+          contentText: ''
+        }
+      : prop.value || '';
+
+  return value;
+}
 
 export function useFormFields({
   fields,
   onSubmit
 }: {
   fields: {
-    value: any;
+    value?: any;
     id: string;
     required: boolean;
     type: FieldType;
@@ -36,21 +53,8 @@ export function useFormFields({
     mode: 'onChange',
     defaultValues: fields
       .filter((field) => field.type !== 'label')
-      .reduce<Record<string, Prisma.JsonValue>>((acc, prop) => {
-        const value =
-          prop.type === 'multiselect' || prop.type === 'person'
-            ? // Convert to array if not already as yup expects array
-              Array.isArray(prop.value)
-              ? prop.value
-              : []
-            : prop.type === 'long_text'
-            ? prop.value || {
-                content: emptyDocument,
-                contentText: ''
-              }
-            : prop.value || '';
-        acc[prop.id] = value;
-
+      .reduce<Record<string, FormFieldValue>>((acc, prop) => {
+        acc[prop.id] = getInitialFormFieldValue(prop);
         return acc;
       }, {}),
     resolver: yupResolver(
@@ -94,10 +98,6 @@ export function useFormFields({
 
                 return value ? !Number.isNaN(value) : true;
               });
-              break;
-            }
-            case 'label': {
-              acc[property.id] = yup.string();
               break;
             }
             case 'select': {
@@ -159,7 +159,7 @@ export function useFormFields({
                   return false;
                 }
 
-                return 'content' in value ? !checkIsContentEmpty(value.content as PageContent) : true;
+                return value && 'content' in value ? !checkIsContentEmpty(value.content as PageContent) : true;
               });
               break;
             }
@@ -174,9 +174,9 @@ export function useFormFields({
     )
   });
 
-  const values = getValues();
+  const values = getValues() as Record<string, FormFieldValue>;
 
-  function onFormChange(updatedFields: { id: string; value: Prisma.JsonValue }[]) {
+  function onFormChange(updatedFields: { id: string; value: FormFieldValue }[]) {
     updatedFields.forEach((updatedField) => {
       setValue(updatedField.id, updatedField.value, {
         shouldDirty: true,

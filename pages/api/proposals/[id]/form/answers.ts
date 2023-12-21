@@ -17,7 +17,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler
   .use(requireUser)
   .use(providePermissionClients({ key: 'id', location: 'query', resourceIdType: 'proposal' }))
-  .put(getProposalFormAnswersHandler)
+  .get(getProposalFormAnswersHandler)
   .put(upsertProposalFormAnswersHandler);
 
 async function getProposalFormAnswersHandler(req: NextApiRequest, res: NextApiResponse<FormFieldAnswer[]>) {

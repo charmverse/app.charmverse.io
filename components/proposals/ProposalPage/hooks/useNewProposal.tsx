@@ -79,6 +79,7 @@ export function useNewProposal({ newProposal }: Props) {
           icon: formInputs.icon,
           type: formInputs.type
         },
+        formFields: formInputs.formFields,
         evaluations: formInputs.evaluations,
         evaluationType: formInputs.evaluationType,
         rubricCriteria: formInputs.rubricCriteria as RubricDataInput[],
@@ -86,6 +87,8 @@ export function useNewProposal({ newProposal }: Props) {
         spaceId: currentSpace.id,
         publishToLens: formInputs.publishToLens,
         fields: formInputs.fields,
+        formId: formInputs.formId,
+        formAnswers: formInputs.formAnswers,
         workflowId: formInputs.workflowId || undefined
       }).catch((err: any) => {
         showMessage(err.message ?? 'Something went wrong', 'error');
@@ -110,7 +113,7 @@ export function useNewProposal({ newProposal }: Props) {
     disabledTooltip = 'Template is required';
   }
 
-  // old evalauation logic
+  // old evaluation logic
   if (!isCharmVerse) {
     if (formInputs.reviewers.length === 0) {
       disabledTooltip = 'Reviewers are required';
@@ -119,12 +122,22 @@ export function useNewProposal({ newProposal }: Props) {
     // get the first validation error from the evaluations
     disabledTooltip = formInputs.evaluations.map(getEvaluationFormError).filter(isTruthy)[0];
   }
-  if (formInputs.proposalType === 'structured' && (formInputs.formFields ?? [])?.length === 0) {
-    disabledTooltip = 'Form fields are required for structured proposals';
-  }
 
-  if (formInputs.proposalType === 'structured' && formInputs.formFields?.some((formField) => !formField.name)) {
-    disabledTooltip = 'Form fields must have a name';
+  if (formInputs.proposalType === 'structured') {
+    if ((formInputs.formFields ?? []).length === 0) {
+      disabledTooltip = 'Atleast one form field is required for structured proposals';
+    } else if (formInputs.formFields?.some((formField) => !formField.name)) {
+      disabledTooltip = 'Form fields must have a name';
+    } else if (
+      formInputs.formFields?.some(
+        (formField) =>
+          (formField.type === 'select' || formField.type === 'multiselect') && (formField.options ?? []).length === 0
+      )
+    ) {
+      disabledTooltip = 'Select fields must have atleast one option';
+    }
+  } else if (formInputs.proposalType === 'free_form' && !formInputs.content) {
+    disabledTooltip = 'Content is required for free-form proposals';
   }
 
   return {
@@ -143,14 +156,18 @@ function getEvaluationFormError(evaluation: ProposalEvaluationValues): string | 
       return false;
     case 'rubric':
       return evaluation.reviewers.length === 0
-        ? 'Reviewers are required'
+        ? `Reviewers are required for the "${evaluation.title}" step`
         : evaluation.rubricCriteria.length === 0
-        ? 'Rubric criteria are required'
+        ? `At least one rubric criteria is required for the "${evaluation.title}" step`
         : false;
     case 'pass_fail':
-      return evaluation.reviewers.length === 0 ? 'Reviewers are required' : false;
+      return evaluation.reviewers.length === 0 ? `Reviewers are required for the "${evaluation.title}" step` : false;
     case 'vote':
-      return !evaluation.voteSettings ? 'Vote details are required' : false;
+      return evaluation.reviewers.length === 0
+        ? `Voters are required for the "${evaluation.title}" step`
+        : !evaluation.voteSettings
+        ? `Vote details are required for the "${evaluation.title}" step`
+        : false;
     default:
       return false;
   }
