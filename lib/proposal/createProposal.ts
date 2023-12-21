@@ -190,14 +190,14 @@ export async function createProposal({
           }
         },
         fields,
-        form: proposalFormId ? { connect: { id: proposalFormId } } : undefined,
         workflow: workflowId
           ? {
               connect: {
                 id: workflowId
               }
             }
-          : undefined
+          : undefined,
+        form: proposalFormId ? { connect: { id: proposalFormId } } : undefined
       },
       include: {
         authors: true,
