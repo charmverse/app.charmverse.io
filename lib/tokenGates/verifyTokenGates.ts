@@ -7,9 +7,9 @@ import { isTruthy } from 'lib/utilities/types';
 import { getUnlockProtocolValidTokenGate } from './evaluateEligibility';
 import type { TokenGateWithRoles } from './interfaces';
 
-export type TokenGateJwtResult = { jwt?: string; id: string; verified: boolean; grantedRoles: string[] };
+type TokenGateJwtResult = { jwt?: string; id: string; verified: boolean; grantedRoles: string[] };
 
-type TokenGateResult = TokenGateWithRoles & TokenGateJwtResult;
+export type TokenGateResult = TokenGateWithRoles & TokenGateJwtResult;
 
 type Props = {
   userId: string;
