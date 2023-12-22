@@ -38,7 +38,7 @@ export async function submitEvaluationResult({ decidedBy, evaluationId, proposal
         }
       });
       const nextEvaluation = await getCurrentEvaluation(evaluations);
-      if (nextEvaluation.type === 'vote') {
+      if (nextEvaluation?.type === 'vote') {
         const settings = nextEvaluation.voteSettings as VoteSettings;
         if (!settings.publishToSnapshot) {
           const page = await tx.page.findUniqueOrThrow({

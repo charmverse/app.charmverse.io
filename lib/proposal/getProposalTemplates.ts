@@ -5,7 +5,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { generateCategoryIdQuery } from '@charmverse/core/proposals';
 import { stringUtils } from '@charmverse/core/utilities';
 
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
+import { canAccessPrivateFields } from 'lib/proposal/form/canAccessPrivateFields';
 import { mapDbProposalToProposal } from 'lib/proposal/mapDbProposalToProposal';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
@@ -95,5 +96,18 @@ export async function getProposalTemplates({ spaceId, userId }: SpaceResourcesRe
       }
     }
   });
-  return templates.map((proposal) => mapDbProposalToProposal({ proposal })) as ProposalTemplate[];
+
+  const promises = templates.map(async (proposal) => {
+    const canAccessPrivateFormFields = await canAccessPrivateFields({
+      proposalId: proposal.id,
+      userId: userId || '',
+      proposal
+    });
+
+    return mapDbProposalToProposal({ proposal, canAccessPrivateFormFields }) as ProposalTemplate;
+  });
+
+  const res = await Promise.all(promises);
+
+  return res;
 }

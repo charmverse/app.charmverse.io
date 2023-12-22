@@ -2,8 +2,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { InvalidStateError } from 'lib/middleware';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
+import { getPermissionsClient } from 'lib/permissions/api';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
-import { isProposalReviewer } from 'lib/proposal/isProposalReviewer';
 import { createReward } from 'lib/rewards/createReward';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
@@ -39,9 +40,12 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
     throw new InvalidStateError(`Rewards have already been created for this proposal`);
   }
 
-  const isReviewer = await isProposalReviewer({ proposal, userId, checkRoles: true });
+  const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
+    resourceId: proposalId,
+    userId
+  });
 
-  if (!isReviewer) {
+  if (!permissions.evaluate && !permissions.review) {
     throw new InvalidStateError('Only reviewers can create rewards for a proposal');
   }
 

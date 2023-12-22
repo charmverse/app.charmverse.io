@@ -13,6 +13,7 @@ import { sendPageInviteEmail } from 'lib/mailer';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPermissionsSubscription';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { addGuest } from 'lib/roles/addGuest';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';
@@ -52,7 +53,7 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
     permission: PagePermissionAssignmentByValues;
   };
 
-  const computedPermissions = await req.basePermissionsClient.pages.computePagePermissions({
+  const computedPermissions = await permissionsApiClient.pages.computePagePermissions({
     resourceId: pageId,
     userId: req.session.user.id
   });

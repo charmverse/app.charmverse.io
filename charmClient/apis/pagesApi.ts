@@ -1,4 +1,3 @@
-import type { ProposalPermissionsSwitch } from '@charmverse/core/dist/cjs/permissions';
 import type { PageMeta } from '@charmverse/core/pages';
 import type { Page, PageComment, ProfileItem } from '@charmverse/core/prisma';
 
@@ -13,10 +12,8 @@ export interface UpdateProfileItemRequest {
 }
 
 export class PagesApi {
-  getPages({ useProposalEvaluationPermissions, spaceId }: { spaceId: string } & ProposalPermissionsSwitch) {
-    return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`, {
-      useProposalEvaluationPermissions
-    });
+  getPages({ spaceId }: { spaceId: string }) {
+    return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`);
   }
 
   getArchivedPages(spaceId: string) {
