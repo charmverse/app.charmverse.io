@@ -36,6 +36,7 @@ export type CardPageWithCustomIcon = CardPage & {
 
 type Props = {
   hasContent?: boolean;
+  isStructuredProposal?: boolean;
   board: Board;
   activeView: BoardView;
   card: Card;
@@ -82,6 +83,7 @@ function TableRow(props: Props) {
     cardPage,
     hasContent,
     board,
+    isStructuredProposal,
     activeView,
     columnRefs,
     card,
@@ -233,6 +235,7 @@ function TableRow(props: Props) {
                   )}
                   {card.customIconType !== 'applicationStatus' && card.customIconType !== 'reward' && (
                     <PageIcon
+                      isStructuredProposal={isStructuredProposal}
                       isEditorEmpty={!hasContent}
                       pageType={card.customIconType === 'reward' ? 'bounty' : 'page'}
                       icon={pageIcon}

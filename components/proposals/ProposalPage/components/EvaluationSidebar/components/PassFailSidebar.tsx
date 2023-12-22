@@ -54,6 +54,7 @@ export function PassFailSidebar({ proposal, evaluation, isCurrent, refreshPropos
           </Typography>
         </FormLabel>
         <UserAndRoleSelect
+          data-test='evaluation-reviewer-select'
           systemRoles={[allMembersSystemRole]}
           readOnly={true}
           value={reviewerOptions}
