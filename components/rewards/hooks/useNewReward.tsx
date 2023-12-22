@@ -17,10 +17,15 @@ export function useNewReward() {
   const [rewardValues, setRewardValuesRaw] = useState<UpdateableRewardFields>(emptyState());
   const { trigger: createRewardTrigger } = useCreateReward();
 
-  const setRewardValues = useCallback((partialFormInputs: Partial<UpdateableRewardFields>) => {
-    setContentUpdated(true);
-    setRewardValuesRaw((existingFormInputs) => ({ ...existingFormInputs, ...partialFormInputs }));
-  }, []);
+  const setRewardValues = useCallback(
+    (partialFormInputs: Partial<UpdateableRewardFields>, { skipDirty }: { skipDirty?: boolean } = {}) => {
+      if (!skipDirty) {
+        setContentUpdated(true);
+      }
+      setRewardValuesRaw((existingFormInputs) => ({ ...existingFormInputs, ...partialFormInputs }));
+    },
+    []
+  );
 
   const clearRewardValues = useCallback(() => {
     setRewardValuesRaw(emptyState());
