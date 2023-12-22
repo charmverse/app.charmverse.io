@@ -36,7 +36,7 @@ export function ProposalFormFieldInputs({
 
   return (
     <FormFieldInputs
-      onSave={readOnly ? undefined : onSave}
+      onSave={onSave}
       disabled={readOnly || (proposalStatus !== 'discussion' && proposalStatus !== 'draft')}
       formFields={formFields.map((formField) => {
         const proposalFormFieldAnswer = proposalFormFieldAnswers.find(

@@ -7,6 +7,7 @@ import { DocumentPage } from '__e2e__/po/document.po';
 import { FormField } from '__e2e__/po/formField.po';
 import { ProposalPage } from '__e2e__/po/proposalPage.po';
 import { ProposalsListPage } from '__e2e__/po/proposalsList.po';
+import { v4 } from 'uuid';
 
 import { loginBrowserUser } from '../utils/mocks';
 
@@ -36,7 +37,8 @@ test.beforeAll(async () => {
   const generated = await testUtilsUser.generateUserAndSpace({
     isAdmin: true,
     spaceName: 'space',
-    onboarded: true
+    onboarded: true,
+    domain: `cvt-${v4()}`
   });
 
   space = generated.space;
@@ -120,10 +122,6 @@ test.describe.serial('Structured proposal template', () => {
     await proposalPage.categorySelect.click();
 
     await proposalPage.getSelectOption(proposalCategory.id).click();
-
-    await proposalPage.reviewerSelect.click();
-
-    await proposalPage.getSelectOption(spaceAdmin.id).click();
 
     await proposalPage.saveDraftButton.click();
 

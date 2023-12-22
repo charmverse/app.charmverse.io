@@ -27,6 +27,7 @@ export const DateInputField = forwardRef<HTMLDivElement, Props>(
     },
     ref
   ) => {
+    // Convert to luxon date
     const dateValue =
       typeof value === 'string' || typeof value === 'number' ? DateTime.fromJSDate(new Date(value)) : undefined;
 
@@ -43,6 +44,7 @@ export const DateInputField = forwardRef<HTMLDivElement, Props>(
         <DateTimePicker
           value={dateValue}
           onChange={(_value) => {
+            // Convert to unix timestamp
             onChange?.(_value?.toJSDate().getTime());
           }}
           disabled={disabled}
@@ -55,6 +57,7 @@ export const DateInputField = forwardRef<HTMLDivElement, Props>(
                   ...props.inputProps,
                   readOnly: true,
                   placeholder,
+                  // props.inputProps.value is always a date, either dateValue or current date
                   value: dateValue ? props.inputProps?.value : undefined
                 }}
                 disabled={disabled}

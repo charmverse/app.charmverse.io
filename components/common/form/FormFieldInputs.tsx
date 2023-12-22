@@ -113,7 +113,7 @@ function FormFieldInputsBase({
       : undefined;
 
   return (
-    <Stack gap={1}>
+    <Stack gap={1} mb={15}>
       <FormFieldInputsContainer>
         {formFields.map((formField) => (
           <Controller
@@ -148,11 +148,10 @@ function FormFieldInputsBase({
           />
         ))}
       </FormFieldInputsContainer>
-      {onSave && (
+      {onSave && !disabled && (
         <Box
           sx={{
-            width: 'fit-content',
-            mb: 5
+            width: 'fit-content'
           }}
         >
           <Button
@@ -160,7 +159,7 @@ function FormFieldInputsBase({
             onClick={saveFormFieldAnswers}
             disabledTooltip={disabledTooltip}
             loading={isUpdatingFormFieldAnswers}
-            disabled={!!disabledTooltip || disabled}
+            disabled={!!disabledTooltip}
           >
             Save
           </Button>
