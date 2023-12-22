@@ -1,3 +1,4 @@
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -28,7 +29,15 @@ async function updateEvaluationResultndpoint(req: NextApiRequest, res: NextApiRe
     userId
   });
 
-  if (!proposalPermissions.evaluate) {
+  const evaluation = await prisma.proposalEvaluation.findUniqueOrThrow({
+    where: {
+      id: evaluationId
+    }
+  });
+
+  if (evaluation.type === 'feedback' && !proposalPermissions.edit) {
+    throw new ActionNotPermittedError(`Only authors can move a proposal out of feedback.`);
+  } else if (!proposalPermissions.evaluate) {
     throw new ActionNotPermittedError(`You don't have permission to review this proposal.`);
   }
   if (!result) {
