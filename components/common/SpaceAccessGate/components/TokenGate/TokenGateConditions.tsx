@@ -1,9 +1,10 @@
 import styled from '@emotion/styled';
-import { Box, Typography } from '@mui/material';
-import Image from 'next/image';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 import { Fragment } from 'react';
 import { v4 as uuid } from 'uuid';
 
+import Avatar from 'components/common/Avatar';
 import { Button } from 'components/common/Button';
 import type { HumanizeConditionsContent, HumanizeCondition } from 'lib/tokenGates/humanizeConditions';
 import { isTruthy } from 'lib/utilities/types';
@@ -62,24 +63,24 @@ function Condition({ condition }: { condition: HumanizeCondition }) {
   const image = condition.image;
   const textConditions = condition.content;
   const isOperator = condition.content.some((c) => c.type === 'operator');
-  const isExternalImage = condition.image?.startsWith('http');
-  const imageFittingType = isExternalImage ? 'cover' : undefined;
-  const imageBorderRadius = isExternalImage ? '50%' : undefined;
+  const isExternalImage = !!condition.image?.startsWith('http');
+  const imageFittingType = isExternalImage ? 'cover' : 'contain!important';
+  const contractType = condition.standardContractType || '';
 
   return (
     <Box display='flex' alignItems='center' my={isOperator ? 2 : undefined}>
       {image && (
         <Box mr={2}>
-          <Image
-            src={image}
-            width={35}
-            height={35}
-            style={{
-              display: 'block',
-              borderRadius: imageBorderRadius,
-              objectFit: imageFittingType
+          <Avatar
+            size='large'
+            avatar={image}
+            sx={{
+              img: {
+                objectFit: imageFittingType
+              }
             }}
-            alt='Token Gate Condition'
+            name='Token Gate condition'
+            isNft={['POAP', 'ERC721', 'ERC1155'].includes(contractType) && isExternalImage}
           />
         </Box>
       )}

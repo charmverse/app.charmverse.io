@@ -40,7 +40,7 @@ async function verifyWallet(req: NextApiRequest, res: NextApiResponse) {
     logWorkspaceJoinedViaTokenGate(result.space.id);
   }
 
-  res.status(200).send(result);
+  res.status(200).send({ success: true });
 }
 
 export default withSessionRoute(handler);
