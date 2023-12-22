@@ -1,5 +1,5 @@
 import { MessageOutlined, RateReviewOutlined } from '@mui/icons-material';
-import { Box, IconButton, Slide, SvgIcon, Tooltip, Typography } from '@mui/material';
+import { SvgIcon } from '@mui/material';
 import { RiChatCheckLine } from 'react-icons/ri';
 
 export const SIDEBAR_VIEWS = {

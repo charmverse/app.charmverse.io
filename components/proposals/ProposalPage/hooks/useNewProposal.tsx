@@ -115,6 +115,16 @@ export function useNewProposal({ newProposal }: Props) {
     disabledTooltip = 'Template is required';
   }
 
+  if (formInputs.proposalType === 'structured') {
+    disabledTooltip = checkFormFieldErrors(formInputs.formFields ?? []);
+  } else if (
+    formInputs.proposalType === 'free_form' &&
+    formInputs.type === 'proposal_template' &&
+    checkIsContentEmpty(formInputs.content)
+  ) {
+    disabledTooltip = 'Content is required for free-form proposals';
+  }
+
   // old evaluation logic
   if (!isCharmVerse) {
     if (formInputs.reviewers.length === 0) {
@@ -125,15 +135,6 @@ export function useNewProposal({ newProposal }: Props) {
     disabledTooltip = formInputs.evaluations.map(getEvaluationFormError).filter(isTruthy)[0];
   }
 
-  if (formInputs.proposalType === 'structured') {
-    disabledTooltip = checkFormFieldErrors(formInputs.formFields ?? []);
-  } else if (
-    formInputs.proposalType === 'free_form' &&
-    formInputs.type === 'proposal_template' &&
-    checkIsContentEmpty(formInputs.content)
-  ) {
-    disabledTooltip = 'Content is required for free-form proposals';
-  }
   return {
     formInputs,
     setFormInputs,
