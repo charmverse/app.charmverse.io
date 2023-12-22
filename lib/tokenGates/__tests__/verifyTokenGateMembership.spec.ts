@@ -161,7 +161,7 @@ describe('verifyTokenGateMembership', () => {
       getKeyExpirationByLockForOwner: async () => new Date().setDate(new Date().getDate() + 1) / 1000
     } as any as InitialWeb3Service);
 
-    const x = await applyTokenGates({
+    await applyTokenGates({
       spaceId: space.id,
       userId: user.id,
       commit: true,
