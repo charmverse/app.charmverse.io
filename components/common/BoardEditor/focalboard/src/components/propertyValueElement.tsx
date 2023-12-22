@@ -15,6 +15,7 @@ import { TagSelect } from 'components/common/BoardEditor/components/properties/T
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
+import { BreadcrumbPageTitle } from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
 import { ProposalStatusChipTextOnly } from 'components/proposals/components/ProposalStatusBadge';
 import { useProposalsWhereUserIsEvaluator } from 'components/proposals/hooks/useProposalsWhereUserIsEvaluator';
 import {
@@ -193,15 +194,11 @@ function PropertyValueElement(props: Props) {
     }
 
     return (
-      <Chip
-        label={propertyValue[0]}
-        sx={{
-          cursor: 'pointer'
-        }}
-        size='small'
-        component={Link}
-        href={getAbsolutePath(propertyValue[1] as string, domain)}
-      />
+      <Box sx={{ a: { color: 'inherit' } }}>
+        <Link href={getAbsolutePath(propertyValue[1] as string, domain)}>
+          <BreadcrumbPageTitle sx={{ maxWidth: 160 }}>{propertyValue[0]}</BreadcrumbPageTitle>
+        </Link>
+      </Box>
     );
   } else if ([REWARD_REVIEWERS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID].includes(propertyTemplate.id)) {
     if (Array.isArray(propertyValue) && propertyValue.length === 0 && subRowsEmptyValueContent) {
