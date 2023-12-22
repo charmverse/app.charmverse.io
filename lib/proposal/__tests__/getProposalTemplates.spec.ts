@@ -20,7 +20,7 @@ describe('getProposalTemplates', () => {
       ]
     });
 
-    const usableProposalTemplate = await testUtilsProposals.generateProposalTemplate({
+    await testUtilsProposals.generateProposalTemplate({
       spaceId: space.id,
       userId: adminUser.id,
       categoryId: createableCategory.id
@@ -36,7 +36,7 @@ describe('getProposalTemplates', () => {
       ]
     });
 
-    const nonusableProposalTemplate = await testUtilsProposals.generateProposalTemplate({
+    await testUtilsProposals.generateProposalTemplate({
       spaceId: space.id,
       userId: adminUser.id,
       categoryId: readonlyCategory.id
@@ -46,7 +46,7 @@ describe('getProposalTemplates', () => {
       spaceId: space.id
     });
 
-    const nonusableProposalTemplate2 = await testUtilsProposals.generateProposalTemplate({
+    await testUtilsProposals.generateProposalTemplate({
       spaceId: space.id,
       userId: adminUser.id,
       categoryId: invisibleCategory.id
@@ -115,7 +115,7 @@ describe('getProposalTemplates - public space', () => {
       spaceId: space.id
     });
 
-    const firstCategoryTemplate = await testUtilsProposals.generateProposalTemplate({
+    await testUtilsProposals.generateProposalTemplate({
       spaceId: space.id,
       userId: adminUser.id,
       categoryId: firstCategory.id
@@ -125,7 +125,7 @@ describe('getProposalTemplates - public space', () => {
       spaceId: space.id
     });
 
-    const secondCategoryTemplate = await testUtilsProposals.generateProposalTemplate({
+    await testUtilsProposals.generateProposalTemplate({
       spaceId: space.id,
       userId: adminUser.id,
       categoryId: secondCategory.id
@@ -179,11 +179,12 @@ describe('getProposalTemplates - public space', () => {
       ]
     });
 
-    const usableProposalTemplate = await testUtilsProposals.generateProposalTemplate({
+    await testUtilsProposals.generateProposalTemplate({
       spaceId: space.id,
       userId: adminUser.id,
       categoryId: createableCategory.id
     });
+
     const templates = await getProposalTemplates({
       spaceId: space.id,
       userId: undefined

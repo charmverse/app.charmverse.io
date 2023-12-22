@@ -66,7 +66,7 @@ export function EvaluationSettings({
       </FormLabel>
       <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow' mb={2}>
         <UserAndRoleSelect
-          data-test='proposal-reviewer-select'
+          data-test={`proposal-${evaluation.type}-select`}
           emptyPlaceholderContent='Select user or role'
           value={reviewerOptions}
           readOnly={readOnly || readOnlyReviewers}

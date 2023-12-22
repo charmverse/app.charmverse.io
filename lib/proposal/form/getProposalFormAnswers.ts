@@ -9,7 +9,11 @@ export async function getProposalFormAnswers({ proposalId, userId }: { userId: s
     include: {
       form: {
         include: {
-          formFields: true
+          formFields: {
+            orderBy: {
+              index: 'asc'
+            }
+          }
         }
       },
       formAnswers: true,

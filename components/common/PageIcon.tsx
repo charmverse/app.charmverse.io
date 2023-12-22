@@ -9,6 +9,7 @@ import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import DatabaseIcon from '@mui/icons-material/TableChart';
 import ProposalIcon from '@mui/icons-material/TaskOutlined';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
 import { Box } from '@mui/material';
 import type { ComponentProps, ReactNode } from 'react';
 
@@ -67,6 +68,7 @@ type PageIconProps = Omit<ComponentProps<typeof StyledPageIcon>, 'icon'> & {
   pageType?: PagePathType;
   isEditorEmpty?: boolean;
   isLinkedPage?: boolean;
+  isStructuredProposal?: boolean;
 };
 
 export function NoAccessPageIcon() {
@@ -81,7 +83,14 @@ export function NoAccessPageIcon() {
   );
 }
 
-export function PageIcon({ icon, isEditorEmpty, isLinkedPage = false, pageType, ...props }: PageIconProps) {
+export function PageIcon({
+  isStructuredProposal = false,
+  icon,
+  isEditorEmpty,
+  isLinkedPage = false,
+  pageType,
+  ...props
+}: PageIconProps) {
   let iconComponent: ReactNode = icon;
   if (!icon) {
     if (pageType === 'linked_board') {
@@ -105,6 +114,8 @@ export function PageIcon({ icon, isEditorEmpty, isLinkedPage = false, pageType, 
       iconComponent = <MembersIcon />;
     } else if (pageType === 'forum' || pageType === 'forum_category') {
       iconComponent = <MessageOutlinedIcon />;
+    } else if (isStructuredProposal) {
+      iconComponent = <WidgetsOutlinedIcon />;
     } else if (isEditorEmpty) {
       iconComponent = <EmptyPageIcon />;
     } else {

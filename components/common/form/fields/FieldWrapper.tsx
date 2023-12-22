@@ -31,7 +31,7 @@ export function FieldWrapper({ sx, endAdornment, description, required, children
         <Box alignItems='center' display='flex' gap={1}>
           {iconLabel ?? null}
           {label && (
-            <FieldLabel>
+            <FieldLabel data-test='field-label'>
               {label}
               {required && (
                 <Typography component='span' color='error'>

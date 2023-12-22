@@ -1,4 +1,4 @@
-import type { Space, TokenGate as PrismaTokengate } from '@charmverse/core/prisma';
+import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -52,6 +52,7 @@ async function saveTokenGate(req: NextApiRequest, res: NextApiResponse<void>) {
     spaceId,
     accesType,
     chainType,
+    gateType: result.type,
     numberOfConditions
   });
 

@@ -25,6 +25,10 @@ export async function canAccessPrivateFields({
     return false;
   }
 
+  if (!checkProposal.formId) {
+    return false;
+  }
+
   // authors can view private fields
   const isAuthor = isProposalAuthor({ proposal: checkProposal, userId });
   if (isAuthor) {
