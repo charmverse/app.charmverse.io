@@ -327,6 +327,7 @@ export function ProposalPropertiesBase({
                 Reviewer
               </PropertyLabel>
               <UserAndRoleSelect
+                data-test='proposal-reviewer-select'
                 readOnlyMessage={isFromTemplate ? templateTooltip('reviewers', isAdmin) : undefined}
                 readOnly={readOnlyReviewers}
                 value={proposalReviewers}

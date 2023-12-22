@@ -8,6 +8,7 @@ export class ProposalPage extends DocumentPage {
     page: Page,
     public saveDraftButton = page.locator('data-test=create-proposal-button'),
     public categorySelect = page.locator('data-test=proposal-category-select'),
+    public reviewerSelect = page.locator('data-test=proposal-reviewer-select'),
     public nextStatusButton = page.locator('data-test=next-status-button'),
     public confirmStatusButton = page.locator('data-test=modal-confirm-button'),
     public createVoteButton = page.locator('data-test=create-vote-button'),
