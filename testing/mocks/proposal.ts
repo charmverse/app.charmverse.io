@@ -28,6 +28,10 @@ export function createMockProposal(
     spaceId: '',
     status: 'draft',
     fields: null,
+    form: {
+      id: '',
+      formFields: []
+    },
     permissions: {
       view: true,
       review: true,

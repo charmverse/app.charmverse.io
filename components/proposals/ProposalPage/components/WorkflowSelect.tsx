@@ -27,6 +27,7 @@ export function WorkflowSelect({ onChange, value, options, readOnly }: Props) {
   }
   return (
     <TagSelect
+      data-test='proposal-workflow-select'
       disableClearable
       wrapColumn
       options={propertyOptions}

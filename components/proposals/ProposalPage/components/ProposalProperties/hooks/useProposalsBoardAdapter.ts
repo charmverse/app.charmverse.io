@@ -73,8 +73,11 @@ export function useProposalsBoardAdapter() {
       proposals
         ?.map((p) => {
           const page = pages[p?.id];
-
-          return mapProposalToCardPage({ proposal: p, proposalPage: page, spaceId: space?.id });
+          const isStructuredProposal = !!p.formId;
+          return {
+            ...mapProposalToCardPage({ proposal: p, proposalPage: page, spaceId: space?.id }),
+            isStructuredProposal
+          } as CardPage;
         })
         .filter((cp): cp is CardPage => !!cp.card && !!cp.page) || [];
 

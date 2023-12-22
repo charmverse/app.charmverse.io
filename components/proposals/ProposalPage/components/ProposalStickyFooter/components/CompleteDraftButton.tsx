@@ -24,7 +24,7 @@ export function CompleteDraftButton({ proposalId, nextStep, onSubmit }: Props) {
   }
 
   return (
-    <Button endIcon={<ArrowForwardIos />} loading={isMutating} onClick={onClick}>
+    <Button data-test='complete-draft-button' endIcon={<ArrowForwardIos />} loading={isMutating} onClick={onClick}>
       Move to {nextStep?.title}
     </Button>
   );

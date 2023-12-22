@@ -10,6 +10,8 @@ import type {
 } from '@charmverse/core/prisma';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
+import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   ProposalRubricCriteriaWithTypedParams
@@ -50,8 +52,12 @@ export type VoteSettings = Pick<Vote, 'type' | 'threshold' | 'maxChoices'> & {
 export type ProposalFormData = {
   form: {
     id: string;
-    formFields: FormField[] | null;
-  } | null;
+    formFields:
+      | (Omit<FormField, 'options'> & {
+          options: SelectOptionType[];
+        })[]
+      | null;
+  };
 };
 
 export type PopulatedEvaluation = ProposalRubricData &
@@ -68,6 +74,13 @@ export type ProposalWithUsersAndRubric = ProposalWithUsers &
     page?: { sourceTemplateId: string | null } | null;
     permissions: ProposalPermissionFlags;
     currentEvaluationId?: string;
+    form?: {
+      formFields:
+        | (Omit<FormField, 'options'> & {
+            options: SelectOptionType[];
+          })[]
+        | null;
+    };
   };
 export interface ProposalWithCommentsAndUsers extends ProposalWithUsers {
   page: Page & { comments: PageComment[] };

@@ -6,6 +6,7 @@ import type { ReactNode } from 'react';
 import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
+import type { FormFieldValue } from 'components/common/form/interfaces';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { useRequiredMemberPropertiesForm } from 'components/members/hooks/useRequiredMemberProperties';
 import Legend from 'components/settings/Legend';
@@ -91,7 +92,7 @@ export function MemberPropertiesFormDialog({ userId, onClose }: Props) {
   }
 
   function onMemberDetailsChange(fields: UpdateMemberPropertyValuePayload[]) {
-    onFormChange(fields.map((field) => ({ id: field.memberPropertyId, value: field.value })));
+    onFormChange(fields.map((field) => ({ id: field.memberPropertyId, value: field.value as FormFieldValue })));
   }
 
   return (

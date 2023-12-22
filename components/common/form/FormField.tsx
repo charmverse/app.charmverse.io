@@ -20,6 +20,7 @@ import {
   TextField,
   Typography
 } from '@mui/material';
+import { useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 import { emptyDocument } from 'lib/prosemirror/constants';
@@ -74,6 +75,14 @@ function ExpandedFormField({
   onUpdateOption
 }: Omit<FormFieldProps, 'isCollapsed'>) {
   const theme = useTheme();
+  const titleTextFieldRef = useRef<HTMLInputElement | null>(null);
+
+  // Auto focus on title text field when expanded
+  useEffect(() => {
+    if (titleTextFieldRef.current) {
+      titleTextFieldRef.current.querySelector('input')?.focus();
+    }
+  }, [titleTextFieldRef]);
 
   return (
     <>
@@ -131,6 +140,8 @@ function ExpandedFormField({
         onChange={(e) => updateFormField({ name: e.target.value, id: formField.id })}
         placeholder='Title (required)'
         error={!formField.name}
+        ref={titleTextFieldRef}
+        data-test='form-field-name-input'
       />
       <CharmEditor
         isContentControlled
@@ -160,7 +171,6 @@ function ExpandedFormField({
         placeholder={fieldTypePlaceholderRecord[formField.type]}
         // Enable select and multiselect fields to be able to create options
         disabled={formField.type !== 'select' && formField.type !== 'multiselect'}
-        value={formField.type === 'date' ? new Date().toString() : ''}
         options={formField.options}
       />
       <Divider
@@ -172,6 +182,7 @@ function ExpandedFormField({
       {formField.type !== 'label' && (
         <Stack gap={0.5} flexDirection='row' alignItems='center'>
           <Switch
+            data-test='form-field-required-switch'
             size='small'
             checked={formField.required}
             onChange={(e) => updateFormField({ required: e.target.checked, id: formField.id })}
@@ -185,6 +196,7 @@ function ExpandedFormField({
           size='small'
           checked={formField.private}
           onChange={(e) => updateFormField({ private: e.target.checked, id: formField.id })}
+          data-test='form-field-private-switch'
         />
         <Stack>
           <Typography>Private</Typography>
@@ -198,9 +210,10 @@ function ExpandedFormField({
 export function FormField(
   props: FormFieldProps & {
     isOpen?: boolean;
+    readOnly?: boolean;
   }
 ) {
-  const { isOpen, formField, toggleOpen, updateFormField } = props;
+  const { readOnly, isOpen, formField, toggleOpen, updateFormField } = props;
 
   const [{ offset }, drag, dragPreview] = useDrag(() => ({
     type: 'item',
@@ -247,24 +260,30 @@ export function FormField(
   const isAdjacentActive = canDrop && isOverCurrent;
 
   return (
-    <Stack flexDirection='row' gap={0.5} alignItems='flex-start' ref={mergeRefs([dragPreview, drop])}>
-      <div ref={drag}>
-        <DragIndicatorIcon
-          fontSize='small'
-          color='secondary'
-          sx={{
-            cursor: 'pointer'
-          }}
-        />
-      </div>
+    <Stack flexDirection='row' gap={0.5} alignItems='flex-start' ref={readOnly ? null : mergeRefs([dragPreview, drop])}>
+      {!readOnly && (
+        <div ref={readOnly ? null : drag}>
+          <DragIndicatorIcon
+            fontSize='small'
+            color='secondary'
+            sx={{
+              cursor: 'pointer'
+            }}
+          />
+        </div>
+      )}
       <FormFieldContainer dragDirection={isAdjacentActive ? ((offset?.y ?? 0) < 0 ? 'top' : 'bottom') : undefined}>
-        {isOpen ? (
-          <ExpandMoreIcon onClick={toggleOpen} sx={{ cursor: 'pointer', mt: 1 }} />
-        ) : (
-          <ChevronRightIcon onClick={toggleOpen} sx={{ cursor: 'pointer' }} />
-        )}
-        <Stack gap={1} width='100%'>
-          {!isOpen ? (
+        {!readOnly ? (
+          <span data-test='toggle-form-field-button'>
+            {isOpen ? (
+              <ExpandMoreIcon onClick={toggleOpen} sx={{ cursor: 'pointer', mt: 1 }} />
+            ) : (
+              <ChevronRightIcon onClick={toggleOpen} sx={{ cursor: 'pointer' }} />
+            )}
+          </span>
+        ) : null}
+        <Stack gap={1} width='100%' ml={readOnly ? 1 : 0}>
+          {!isOpen || readOnly ? (
             <FieldTypeRenderer
               fieldWrapperSx={{
                 my: 0

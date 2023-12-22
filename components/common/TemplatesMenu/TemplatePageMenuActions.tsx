@@ -13,26 +13,20 @@ type Props = {
   editTemplate: (showPage: string) => void;
   pageId: string;
   closeParentPopup: () => void;
-  isDefaultTemplate?: boolean;
 };
 
-export function TemplatePageMenuActions({
-  deleteTemplate,
-  closeParentPopup,
-  pageId,
-  editTemplate,
-  isDefaultTemplate
-}: Props) {
+export function TemplatePageMenuActions({ deleteTemplate, closeParentPopup, pageId, editTemplate }: Props) {
   const popupState = usePopupState({ variant: 'popover', popupId: `template-context-${pageId}` });
 
   return (
     <>
-      <IconButton size='small' {...bindTrigger(popupState)}>
+      <IconButton size='small' {...bindTrigger(popupState)} data-test={`template-menu-${pageId}`}>
         <MoreHorizIcon />
       </IconButton>
 
       <Menu {...bindMenu(popupState)} open={popupState.isOpen}>
         <MenuItem
+          data-test={`template-menu-edit-${pageId}`}
           onClick={(e) => {
             e.stopPropagation();
             popupState.close();
