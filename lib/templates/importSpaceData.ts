@@ -24,8 +24,6 @@ export type SpaceDataImportResult = Omit<SpaceDataExport, 'pages'> & {
 };
 
 export async function importSpaceData(importParams: ImportParams): Promise<SpaceDataImportResult> {
-  const targetSpace = await getSpace(importParams.targetSpaceIdOrDomain);
-
   const { roles, oldNewRecordIdHashMap: oldNewRoleIdHashMap } = await importRoles(importParams);
 
   const { proposalCategories, oldNewIdMap: oldNewProposalCategoryIdMap } = await importProposalCategories(importParams);

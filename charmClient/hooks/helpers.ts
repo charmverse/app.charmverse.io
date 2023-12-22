@@ -6,9 +6,10 @@ import * as http from 'adapters/http';
 
 export type MaybeString = string | null | undefined;
 
-export function useGET<T = unknown>(path: string | undefined | null, query: any = {}) {
+// eslint-disable-next-line default-param-last
+export function useGET<T = unknown>(path: string | undefined | null, query: any = {}, swrOptions?: any) {
   const requestUrl = path ? path + getQueryString(query) : null;
-  return useSWR<T>(requestUrl, http.GET);
+  return useSWR<T>(requestUrl, http.GET, swrOptions);
 }
 
 export function useGETImmutable<T = unknown>(path: string | undefined | null, query: any = {}) {
@@ -31,6 +32,14 @@ export function usePOST<T, U = unknown>(path: string) {
 export function usePUT<T, U = unknown>(path: string) {
   return useSWRMutation<U, Error, string, T>(path, (url: string, { arg }: { arg: any }) => {
     return http.PUT<U>(url, arg);
+  });
+}
+
+// To be used when you need to trigger a get request on demand
+export function useGETtrigger<T, U = unknown>(path: string) {
+  return useSWRMutation<U, Error, string, T>(path, (url: string, { arg }: { arg: any }) => {
+    const requestUrl = url + getQueryString(arg);
+    return http.GET<U>(requestUrl);
   });
 }
 

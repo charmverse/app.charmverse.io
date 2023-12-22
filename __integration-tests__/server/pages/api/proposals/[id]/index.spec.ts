@@ -5,9 +5,9 @@ import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import type { PageWithProposal } from 'lib/pages';
+import type { FormFieldInput } from 'components/common/form/interfaces';
+import { createForm } from 'lib/form/createForm';
 import { addSpaceOperations } from 'lib/permissions/spaces/addSpaceOperations';
-import { getProposal } from 'lib/proposal/getProposal';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateRole } from 'testing/setupDatabase';
@@ -70,6 +70,65 @@ describe('GET /api/proposals/[id] - Get proposal', () => {
     );
   });
 
+  it('should return the proposal with the form fields', async () => {
+    const generatedProposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: author.id,
+      authors: [author.id],
+      reviewers: [{ group: 'user', id: reviewer.id }],
+      proposalStatus: 'draft'
+    });
+
+    const fieldsInput: FormFieldInput[] = [
+      {
+        id: v4(),
+        type: 'short_text',
+        name: 'name',
+        description: 'description',
+        index: 0,
+        options: [],
+        private: false,
+        required: true
+      }
+    ];
+    const formId = await createForm(fieldsInput);
+    await prisma.proposal.update({
+      where: { id: generatedProposal.id },
+      data: { formId }
+    });
+
+    const proposal = (
+      await request(baseUrl).get(`/api/proposals/${generatedProposal.id}`).set('Cookie', authorCookie).expect(200)
+    ).body as ProposalWithUsers;
+
+    expect(proposal).toMatchObject(
+      expect.objectContaining({
+        id: expect.any(String),
+        spaceId: space.id,
+        createdBy: author.id,
+        status: 'draft',
+        authors: expect.arrayContaining([
+          expect.objectContaining({
+            proposalId: generatedProposal.id,
+            userId: author.id
+          })
+        ]),
+        reviewers: [
+          expect.objectContaining({
+            id: expect.any(String),
+            roleId: null,
+            proposalId: generatedProposal.id,
+            userId: reviewer.id
+          })
+        ],
+        form: {
+          id: formId,
+          formFields: expect.arrayContaining(fieldsInput.map((field) => expect.objectContaining({ ...field, formId })))
+        }
+      })
+    );
+  });
+
   it("should throw error if proposal doesn't exist", async () => {
     await request(baseUrl).get(`/api/proposals/${v4()}`).set('Cookie', authorCookie).expect(404);
   });
@@ -123,10 +182,13 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       .expect(200);
 
     // Make sure update went through
-    const updated = await getProposal({ proposalId: page.proposalId! });
+    const proposal = await prisma.proposal.findUniqueOrThrow({
+      where: { id: page.proposalId! },
+      include: { reviewers: true }
+    });
 
-    expect(updated.proposal?.reviewers).toHaveLength(1);
-    expect(updated.proposal?.reviewers.some((r) => r.userId === adminUser.id)).toBe(true);
+    expect(proposal.reviewers).toHaveLength(1);
+    expect(proposal.reviewers.some((r) => r.userId === adminUser.id)).toBe(true);
   });
 
   it('should update a proposal templates settings if the user is a space admin', async () => {
@@ -166,10 +228,17 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       .expect(200);
 
     // Make sure update went through
-    const updated = await getProposal({ proposalId: proposalTemplate.id });
-    expect(updated.proposal?.reviewers).toHaveLength(2);
-    expect(updated.proposal?.reviewers.some((r) => r.roleId === role.id)).toBe(true);
-    expect(updated.proposal?.reviewers.some((r) => r.userId === adminUser.id)).toBe(true);
+    const proposal = await prisma.proposal.findUniqueOrThrow({
+      where: {
+        id: proposalTemplate.id
+      },
+      include: {
+        reviewers: true
+      }
+    });
+    expect(proposal.reviewers).toHaveLength(2);
+    expect(proposal.reviewers.some((r) => r.roleId === role.id)).toBe(true);
+    expect(proposal.reviewers.some((r) => r.userId === adminUser.id)).toBe(true);
   });
 
   it('should allow an admin to update any discussion stage proposal', async () => {

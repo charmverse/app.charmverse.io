@@ -1,9 +1,10 @@
 import { log } from '@charmverse/core/log';
 import type { SxProps, Theme } from '@mui/material';
+import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 
 import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/Web3ConnectionManager';
-import PrimaryButton from 'components/common/PrimaryButton';
+import { Button } from 'components/common/Button';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
@@ -13,30 +14,37 @@ import { lowerCaseEqual } from 'lib/utilities/strings';
 interface Props {
   signSuccess: (authSig: AuthSig) => void | Promise<any>;
   buttonStyle?: SxProps<Theme>;
-  ButtonComponent?: typeof PrimaryButton;
+  ButtonComponent?: typeof Button;
   buttonSize?: 'small' | 'medium' | 'large';
   buttonOutlined?: boolean;
   // Verify Wallet will trigger signature as soon as a wallet is detected
   enableAutosign?: boolean;
   loading?: boolean;
   onError?: (err: any) => void;
+  children?: ReactNode | ((options: { needsVerification: boolean; isLoading: boolean }) => ReactNode);
+  buttonColor?: 'primary' | 'secondary';
+  onClick?: VoidFunction;
 }
 
 export function WalletSign({
   signSuccess,
   buttonStyle,
   buttonSize,
-  ButtonComponent = PrimaryButton,
+  ButtonComponent = Button,
   buttonOutlined,
   enableAutosign,
+  buttonColor = 'primary',
   loading,
-  onError
+  onError,
+  onClick,
+  children
 }: Props) {
   const { isConnectingIdentity, connectWallet, isWalletSelectorModalOpen } = useWeb3ConnectionManager();
   const { account, requestSignature, isSigning, walletAuthSignature, verifiableWalletDetected } = useWeb3Account();
   const { showMessage } = useSnackbar();
   const [isVerifyingWallet, setIsVerifyingWallet] = useState(false);
   const showLoadingState = loading || isSigning || isVerifyingWallet;
+
   useEffect(() => {
     // Do not trigger signature if user is on a mobile device
     if (!isTouchScreen() && !isSigning && enableAutosign && verifiableWalletDetected && !isConnectingIdentity) {
@@ -45,6 +53,7 @@ export function WalletSign({
   }, [verifiableWalletDetected]);
 
   async function generateWalletAuth() {
+    onClick?.();
     setIsVerifyingWallet(true);
     if (account && walletAuthSignature && lowerCaseEqual(walletAuthSignature.address, account)) {
       await signSuccess(walletAuthSignature);
@@ -54,7 +63,7 @@ export function WalletSign({
         .then(signSuccess)
         .catch((error) => {
           log.error('Error requesting wallet signature in login page', { error });
-          showMessage('Wallet signature cancelled', 'info');
+          showMessage(error?.message || 'Wallet signature cancelled', 'info');
           onError?.(error);
         })
         .finally(() => {
@@ -71,11 +80,17 @@ export function WalletSign({
         size={buttonSize ?? 'large'}
         loading={isWalletSelectorModalOpen || isConnectingIdentity}
         onClick={() => {
+          onClick?.();
           connectWallet();
         }}
         variant={buttonOutlined ? 'outlined' : undefined}
+        color={buttonColor}
       >
-        Connect Wallet
+        {children
+          ? typeof children === 'function'
+            ? children({ needsVerification: false, isLoading: isWalletSelectorModalOpen || isConnectingIdentity })
+            : children
+          : 'Connect a wallet'}
       </ButtonComponent>
     );
   }
@@ -88,8 +103,13 @@ export function WalletSign({
       onClick={generateWalletAuth}
       loading={showLoadingState}
       variant={buttonOutlined ? 'outlined' : undefined}
+      color={buttonColor}
     >
-      Verify wallet
+      {children
+        ? typeof children === 'function'
+          ? children({ needsVerification: true, isLoading: showLoadingState })
+          : children
+        : 'Verify wallet'}
     </ButtonComponent>
   );
 }

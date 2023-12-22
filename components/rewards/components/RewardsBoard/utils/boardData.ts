@@ -22,10 +22,12 @@ export const tokenChainOptions: IPropertyTemplate['options'] = RPCList.map((rpc)
 
 export function getDefaultBoard({
   storedBoard,
-  customOnly = false
+  customOnly = false,
+  hasMilestoneRewards = false
 }: {
   storedBoard: RewardPropertiesBlock | undefined;
   customOnly?: boolean;
+  hasMilestoneRewards?: boolean;
 }) {
   const block: Partial<Block> = storedBoard
     ? blockToFBBlock(storedBoard)
@@ -39,7 +41,7 @@ export function getDefaultBoard({
         }
       });
 
-  const cardProperties = [...getDefaultRewardProperties(), ...(block.fields?.cardProperties || [])];
+  const cardProperties = [...getDefaultRewardProperties(hasMilestoneRewards), ...(block.fields?.cardProperties || [])];
 
   block.fields = {
     ...(block.fields || {}),

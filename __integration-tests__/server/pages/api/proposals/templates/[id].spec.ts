@@ -36,6 +36,7 @@ describe('DELETE /api/proposals/templates/{templateId} - Delete a proposal templ
     const adminCookie = await loginUser(adminUser.id);
 
     const proposalTemplate = await createProposal({
+      evaluations: [],
       spaceId: space.id,
       userId: adminUser.id,
       categoryId: proposalCategory.id,
@@ -54,6 +55,7 @@ describe('DELETE /api/proposals/templates/{templateId} - Delete a proposal templ
     const nonAdminCookie = await loginUser(nonAdminUser.id);
 
     const proposalTemplate = await createProposal({
+      evaluations: [],
       spaceId: space.id,
       userId: adminUser.id,
       categoryId: proposalCategory.id,

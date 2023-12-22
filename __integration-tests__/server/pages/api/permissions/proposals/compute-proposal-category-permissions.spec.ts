@@ -2,7 +2,7 @@ import type { ProposalCategoryPermission } from '@charmverse/core/prisma';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
-import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { upsertProposalCategoryPermission } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
@@ -27,7 +27,7 @@ describe('POST /api/permissions/proposals/compute-proposal-category-permissions 
 
     const userCookie = await loginUser(user.id);
 
-    const computed = await premiumPermissionsApiClient.proposals.computeProposalCategoryPermissions({
+    const computed = await permissionsApiClient.proposals.computeProposalCategoryPermissions({
       resourceId: proposalCategory.id,
       userId: user.id
     });
@@ -43,7 +43,7 @@ describe('POST /api/permissions/proposals/compute-proposal-category-permissions 
     expect(result).toMatchObject(expect.objectContaining(computed));
 
     // Non logged in user test case
-    const publicComputed = await premiumPermissionsApiClient.proposals.computeProposalCategoryPermissions({
+    const publicComputed = await permissionsApiClient.proposals.computeProposalCategoryPermissions({
       resourceId: proposalCategory.id,
       userId: undefined
     });

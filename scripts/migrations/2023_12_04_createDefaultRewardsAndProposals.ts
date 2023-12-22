@@ -10,11 +10,11 @@ export async function createDefaultRewardsAndProposals() {
       createdBy: true,
       proposalCategories: {
         where: {
-          title: "General"
+          title: 'General'
         },
         select: {
           id: true
-        },
+        }
       },
       bounties: {
         select: {
@@ -29,7 +29,7 @@ export async function createDefaultRewardsAndProposals() {
         take: 1
       }
     }
-  })
+  });
 
   const totalSpaces = spaces.length;
   let count = 0;
@@ -40,24 +40,24 @@ export async function createDefaultRewardsAndProposals() {
         await createDefaultReward({
           spaceId: space.id,
           userId: space.createdBy
-        })
-    
+        });
+
         await upsertDefaultRewardsBoard({ spaceId: space.id, userId: space.createdBy });
       }
-  
+
       if (space.proposals.length === 0) {
         await createDefaultProposal({
           spaceId: space.id,
           userId: space.createdBy,
           categoryId: space.proposalCategories[0]?.id
-        })
+        });
       }
     } catch (err) {
-      console.error(`Failed to create test rewards and proposals for space ${space.id}`)
+      console.error(`Failed to create test rewards and proposals for space ${space.id}`);
     }
 
-    count+=1;
-    console.log(`Created default rewards and proposals for space ${space.id} (${count}/${totalSpaces})`)
+    count += 1;
+    console.log(`Created default rewards and proposals for space ${space.id} (${count}/${totalSpaces})`);
   }
 }
 

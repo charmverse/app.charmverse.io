@@ -27,6 +27,17 @@ const updateVoteStatus = async () => {
     .map((v) => v.pageId)
     .filter(isTruthy);
 
+  const evaluationsToUpdate = await prisma.proposalEvaluation.findMany({
+    where: {
+      voteId: {
+        in: votesPassedDeadline.map((v) => v.id)
+      }
+    }
+  });
+
+  const passedEvaluations = evaluationsToUpdate.filter((e) => passedVotes.some((vote) => vote.id === e.voteId));
+  const failedEvaluations = evaluationsToUpdate.filter((e) => rejectedVotes.some((vote) => vote.id === e.voteId));
+
   await prisma.$transaction([
     // update passed votes
     prisma.vote.updateMany({
@@ -59,6 +70,28 @@ const updateVoteStatus = async () => {
       },
       data: {
         status: 'vote_closed'
+      }
+    }),
+    prisma.proposalEvaluation.updateMany({
+      where: {
+        id: {
+          in: passedEvaluations.map((e) => e.id)
+        }
+      },
+      data: {
+        result: 'pass',
+        completedAt: new Date()
+      }
+    }),
+    prisma.proposalEvaluation.updateMany({
+      where: {
+        id: {
+          in: failedEvaluations.map((e) => e.id)
+        }
+      },
+      data: {
+        result: 'fail',
+        completedAt: new Date()
       }
     })
   ]);

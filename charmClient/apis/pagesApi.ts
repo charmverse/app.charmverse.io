@@ -12,7 +12,7 @@ export interface UpdateProfileItemRequest {
 }
 
 export class PagesApi {
-  getPages(spaceId: string) {
+  getPages({ spaceId }: { spaceId: string }) {
     return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`);
   }
 

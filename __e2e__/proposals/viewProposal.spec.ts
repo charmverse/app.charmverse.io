@@ -36,7 +36,8 @@ let publicLink: string;
 test.beforeAll(async () => {
   // Initial setup
   const generated = await testUtilsUser.generateUserAndSpace({
-    isAdmin: true
+    isAdmin: true,
+    spaceName: 'space'
   });
 
   space = generated.space;
@@ -96,11 +97,18 @@ test.beforeAll(async () => {
     spaceId: space.id,
     userId: proposalAuthor.id,
     proposalStatus: 'discussion',
-    categoryId: visibleProposalCategory.id,
-    reviewers: [
-      { group: 'role', id: role.id },
-      { group: 'user', id: proposalReviewer.id }
-    ]
+    evaluationInputs: [
+      {
+        evaluationType: 'feedback',
+        reviewers: [
+          { group: 'user', id: proposalReviewer.id },
+          { group: 'role', id: role.id },
+          { group: 'space_member' }
+        ],
+        permissions: []
+      }
+    ],
+    categoryId: visibleProposalCategory.id
   });
 
   hiddenProposal = await testUtilsProposals.generateProposal({
@@ -173,12 +181,8 @@ test.describe.serial('View proposal', () => {
   });
 
   test('Space member can see proposals but not drafts', async ({ proposalListPage }) => {
-    const spaceMember = await generateUser();
+    const spaceMember = await generateUser({ space: { id: space.id } });
 
-    await generateSpaceRole({
-      spaceId: space.id,
-      userId: spaceMember.id
-    });
     await loginBrowserUser({
       browserPage: proposalListPage.page,
       userId: spaceMember.id
@@ -198,6 +202,7 @@ test.describe.serial('View proposal', () => {
     const feedbackRowStatusBadge = feedbackRow.locator('data-test=proposal-status-badge');
     await expect((await feedbackRowStatusBadge.allInnerTexts())[0]).toEqual('Feedback');
   });
+
   test('Proposal can be edited by the author and made public', async ({
     page,
     proposalListPage,

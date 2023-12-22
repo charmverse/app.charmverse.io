@@ -1,6 +1,5 @@
-import type { Block } from '@prisma/client';
+import type { Block } from '@charmverse/core/prisma';
 import { useEffect } from 'react';
-import { Create } from 'sharp';
 
 import type { BlockUpdater } from 'components/common/BoardEditor/charmClient.interface';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';

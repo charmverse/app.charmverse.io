@@ -1,9 +1,12 @@
 import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma-client';
+import { Alert } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 
+import { ConnectedAccounts } from 'components/_app/components/ConnectedAccounts';
 import { Button } from 'components/common/Button';
+import type { FormFieldValue } from 'components/common/form/interfaces';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { MemberPropertiesForm } from 'components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesForm';
 import { DialogContainer } from 'components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesFormDialog';
@@ -43,14 +46,19 @@ export function UserOnboardingDialogGlobal() {
 
 function LoggedInUserOnboardingDialog({ user, space }: { space: Space; user: LoggedInUser }) {
   const { onboardingStep, completeOnboarding } = useOnboarding({ user, spaceId: space.id });
+  const [isOnboardingModalOpen, setIsOnboardingModalOpen] = useState(false);
 
   useEffect(() => {
     log.info('[user-journey] Show onboarding flow');
   }, []);
 
-  const { nonEmptyRequiredProperties } = useRequiredMemberProperties({
+  const { hasEmptyRequiredProperties, isLoadingMemberProperties, isLoadingUserDetails } = useRequiredMemberProperties({
     userId: user.id
   });
+
+  if (isLoadingMemberProperties || isLoadingUserDetails) {
+    return null;
+  }
 
   if (onboardingStep) {
     return (
@@ -60,12 +68,22 @@ function LoggedInUserOnboardingDialog({ user, space }: { space: Space; user: Log
         initialStep={onboardingStep}
         currentUser={user}
         completeOnboarding={completeOnboarding}
+        hasEmptyRequiredProperties={hasEmptyRequiredProperties}
+        setIsOnboardingModalOpen={setIsOnboardingModalOpen}
       />
     );
   }
 
-  if (nonEmptyRequiredProperties) {
-    return <UserOnboardingDialog space={space} key={user.id} currentUser={user} />;
+  if (hasEmptyRequiredProperties || isOnboardingModalOpen) {
+    return (
+      <UserOnboardingDialog
+        space={space}
+        key={user.id}
+        currentUser={user}
+        hasEmptyRequiredProperties={hasEmptyRequiredProperties}
+        setIsOnboardingModalOpen={setIsOnboardingModalOpen}
+      />
+    );
   }
 
   return null;
@@ -78,21 +96,24 @@ function UserOnboardingDialog({
   currentUser,
   completeOnboarding,
   initialStep,
-  space
+  space,
+  hasEmptyRequiredProperties,
+  setIsOnboardingModalOpen
 }: {
   completeOnboarding?: () => Promise<void>;
   currentUser: LoggedInUser;
   initialStep?: OnboardingStep;
   space: Space;
+  hasEmptyRequiredProperties?: boolean;
+  setIsOnboardingModalOpen: (isOpen: boolean) => void;
 }) {
-  const { requiredProperties } = useRequiredMemberProperties({
+  const { requiredPropertiesWithoutValue } = useRequiredMemberProperties({
     userId: currentUser.id
   });
   const {
     control: memberPropertiesControl,
     errors: memberPropertiesErrors,
     isValid: isMemberPropertiesValid,
-    values: memberPropertiesValues,
     onFormChange: onMemberPropertiesChange,
     isDirty: isMemberPropertiesDirty,
     isSubmitting: isMemberPropertiesSubmitting,
@@ -137,7 +158,17 @@ function UserOnboardingDialog({
     setCurrentStep('profile_step');
   }
 
+  const hideCloseButton =
+    !isUserDetailsValid ||
+    !isMemberPropertiesValid ||
+    requiredPropertiesWithoutValue.some((requiredProperty) =>
+      ['discord', 'google', 'wallet', 'telegram'].includes(requiredProperty)
+    );
+
+  const isSaveButtonDisabled = !isFormDirty || hideCloseButton;
+
   const handleClose = () => {
+    setIsOnboardingModalOpen(false);
     if (isFormDirty) {
       confirmExitPopupState.open();
     } else {
@@ -160,7 +191,7 @@ function UserOnboardingDialog({
       fluidSize={currentStep === 'email_step'}
       title={title}
       onClose={currentStep !== 'email_step' ? handleClose : undefined}
-      hideCloseButton={currentStep === 'email_step' || requiredProperties.length !== 0}
+      hideCloseButton={currentStep === 'email_step' || hideCloseButton}
       footerActions={
         currentStep === 'profile_step' ? (
           <Button
@@ -168,7 +199,7 @@ function UserOnboardingDialog({
             size='large'
             onClick={saveForm}
             loading={isUserDetailsSubmitting || isMemberPropertiesSubmitting}
-            disabled={!isFormDirty || !isUserDetailsValid || !isMemberPropertiesValid}
+            disabled={isSaveButtonDisabled}
             disabledTooltip={!isFormDirty ? 'No changes to save' : 'Please fill out all required fields'}
           >
             Save
@@ -180,6 +211,7 @@ function UserOnboardingDialog({
         <OnboardingEmailForm onClick={goNextStep} spaceId={space.id} />
       ) : currentStep === 'profile_step' ? (
         <>
+          {hasEmptyRequiredProperties ? <Alert severity='info'>Please fill out all required fields</Alert> : null}
           <UserDetailsForm
             errors={userDetailsErrors}
             userDetails={userDetailsValues}
@@ -189,13 +221,18 @@ function UserOnboardingDialog({
             user={currentUser}
             onChange={onUserDetailsChange}
           />
+          <Legend mt={4}>Build Your Identity</Legend>
+          <ConnectedAccounts user={currentUser} setIsOnboardingModalOpen={setIsOnboardingModalOpen} />
           <Legend mt={4}>Member details</Legend>
           <MemberPropertiesForm
-            values={memberPropertiesValues}
             control={memberPropertiesControl}
             errors={memberPropertiesErrors}
             refreshPropertyValues={refreshPropertyValues}
-            onChange={onMemberPropertiesChange}
+            onChange={(values) =>
+              onMemberPropertiesChange(
+                values.map(({ memberPropertyId, value }) => ({ id: memberPropertyId, value: value as FormFieldValue }))
+              )
+            }
             userId={currentUser.id}
             showCollectionOptions
           />

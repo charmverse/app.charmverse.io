@@ -3,28 +3,19 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { restoreDocument } from 'lib/pages/restoreDocument';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireUser)
-  .use(
-    providePermissionClients({
-      key: 'id',
-      location: 'query',
-      resourceIdType: 'page'
-    })
-  )
-  .get(execScript);
+handler.use(requireUser).get(restorePageController);
 
-async function execScript(req: NextApiRequest, res: NextApiResponse) {
+async function restorePageController(req: NextApiRequest, res: NextApiResponse) {
   const version = parseInt(req.query.version as any);
 
   const pageId = req.query.id as string;
 
-  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
+  const permissions = await permissionsApiClient.pages.computePagePermissions({
     resourceId: pageId,
     userId: req.session.user?.id
   });

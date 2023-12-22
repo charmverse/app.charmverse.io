@@ -1,7 +1,8 @@
 export const collectableOptions = [
   { id: 'ERC721', name: 'ERC-721 NFT' },
   { id: 'ERC1155', name: 'ERC-1155 NFT' },
-  { id: 'POAP', name: 'POAPS' }
+  { id: 'POAP', name: 'POAPS' },
+  { id: 'UNLOCK', name: 'Unlock Protocol' }
 ] as const;
 
 export const poapTypes = [

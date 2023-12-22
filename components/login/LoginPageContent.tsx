@@ -63,7 +63,11 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn, children }: Pr
   }
 
   const image = spaceFromPath ? (
-    <WorkspaceAvatar image={spaceFromPath?.spaceImage || ''} name={spaceFromPath?.name || ''} size='3xLarge' />
+    <WorkspaceAvatar
+      image={spaceFromPath?.spaceArtwork || spaceFromPath?.spaceImage || ''}
+      name={spaceFromPath?.name || ''}
+      size='3xLarge'
+    />
   ) : customDomain === null ? (
     <Image src={splashImage} px={3} />
   ) : null;

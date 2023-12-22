@@ -305,7 +305,7 @@ describe('importSpaceData', () => {
       data: {
         createdBy: sourceSpaceUser.id,
         name: 'Test Member Property',
-        type: 'name',
+        type: 'text',
         updatedBy: sourceSpaceUser.id,
         space: { connect: { id: sourceSpace.id } },
         permissions: {

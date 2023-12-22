@@ -16,6 +16,7 @@ import { PageIcon } from 'components/common/PageIcon';
 import { RewardApplicationStatusIcon } from 'components/rewards/components/RewardApplicationStatusChip';
 import { SelectionContext, useSelected } from 'hooks/useAreaSelection';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useSmallScreen } from 'hooks/useMediaScreens';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
@@ -37,6 +38,7 @@ export type CardPageWithCustomIcon = CardPage & {
 
 type Props = {
   hasContent?: boolean;
+  isStructuredProposal?: boolean;
   board: Board;
   activeView: BoardView;
   card: Card;
@@ -99,6 +101,7 @@ function TableRow(props: Props) {
     cardPage,
     hasContent,
     board,
+    isStructuredProposal,
     activeView,
     columnRefs,
     card,
@@ -116,6 +119,10 @@ function TableRow(props: Props) {
     isChecked,
     setCheckedIds
   } = props;
+  const { space } = useCurrentSpace();
+  const isMobile = useSmallScreen();
+  const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
+  const [title, setTitle] = useState('');
   const isManualSort = activeView.fields.sortOptions.length === 0;
   const isGrouped = Boolean(activeView.fields.groupById);
   const [isDragging, isOver, cardHandlerRef] = useSortable(
@@ -126,10 +133,6 @@ function TableRow(props: Props) {
   );
   const { selection } = useContext(SelectionContext);
   const isSelected = useSelected(cardRef, selection);
-
-  const { space } = useCurrentSpace();
-  const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
-  const [title, setTitle] = useState('');
 
   const handleDeleteCard = async () => {
     if (!card) {
@@ -298,12 +301,13 @@ function TableRow(props: Props) {
                   )}
                   {card.customIconType !== 'applicationStatus' && card.customIconType !== 'reward' && (
                     <PageIcon
+                      isStructuredProposal={isStructuredProposal}
                       isEditorEmpty={!hasContent}
                       pageType={card.customIconType === 'reward' ? 'bounty' : 'page'}
                       icon={pageIcon}
                     />
                   )}
-                  <TextInput {...commonProps} multiline={wrapColumn} />
+                  <TextInput {...commonProps} disablePopup={isMobile} multiline={wrapColumn} />
                 </div>
 
                 <div className='open-button' data-test={`database-open-button-${card.id}`}>

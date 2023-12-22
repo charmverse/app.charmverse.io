@@ -1,18 +1,20 @@
 import { getLogger } from '@charmverse/core/log';
-import type { Role, SpaceRoleToRole, TokenGate, TokenGateToRole, UserTokenGate } from '@charmverse/core/prisma';
+import type { SpaceRoleToRole, TokenGate, TokenGateToRole, UserTokenGate } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+
+import { getUnlockProtocolValidTokenGate } from './evaluateEligibility';
+import type { TokenGateWithRoles } from './interfaces';
 
 const log = getLogger('tg-verification');
 
-type TokenGateWithRoles = {
+type InitialTokenGateWithRoles = {
   tokenGate:
     | (TokenGate & {
-        tokenGateToRoles: TokenGateToRole[];
+        tokenGateToRoles?: TokenGateToRole[];
       })
     | null;
 };
-
-type UserTokenGateProp = Pick<UserTokenGate, 'id' | 'jwt' | 'grantedRoles' | 'tokenGateId'> & TokenGateWithRoles;
+type UserTokenGateProp = UserTokenGate & InitialTokenGateWithRoles;
 
 type VerifyTokenGateMembershipProps = {
   userTokenGates: UserTokenGateProp[];
@@ -35,19 +37,43 @@ export async function verifyTokenGateMembership({
 
   // We want to update only invalid token gates
   const tokenGateVerificationPromises = userTokenGates.map(async (userTokenGate) => {
-    if (!userTokenGate.jwt || !userTokenGate.tokenGate) {
-      return { id: userTokenGate.id, isVerified: false, roleIds: userTokenGate.grantedRoles };
+    const { jwt, tokenGate: tokenGateWithRoles, id, grantedRoles } = userTokenGate;
+
+    if (!jwt || !tokenGateWithRoles) {
+      return { id, isVerified: false, roleIds: grantedRoles };
     }
 
-    const lit = await import('@lit-protocol/lit-node-client');
-    const result = lit.verifyJwt({ jwt: userTokenGate.jwt });
-    const isVerified = result.verified && (result.payload as any)?.orgId === spaceId;
+    const tokenGate = tokenGateWithRoles as any as TokenGateWithRoles;
 
-    return {
-      id: userTokenGate.tokenGateId,
-      isVerified,
-      roleIds: userTokenGate.tokenGate.tokenGateToRoles.map((r) => r.roleId)
-    };
+    if (tokenGate.type === 'unlock') {
+      const wallets = await prisma.userWallet.findMany({
+        where: {
+          userId
+        }
+      });
+      const values = await Promise.all(
+        wallets.map(async (w) => {
+          const valid = await getUnlockProtocolValidTokenGate(tokenGate, w.address);
+          return valid;
+        })
+      );
+
+      return {
+        id: tokenGate.id,
+        isVerified: values.some((v) => !!v?.tokenGateId),
+        roleIds: tokenGate.tokenGateToRoles.map((r) => r.role.id)
+      };
+    } else {
+      const lit = await import('@lit-protocol/lit-node-client');
+      const result = lit.verifyJwt({ jwt });
+      const isVerified = result.verified && (result.payload as any)?.orgId === spaceId;
+
+      return {
+        id: tokenGate.id,
+        isVerified,
+        roleIds: tokenGate.tokenGateToRoles.map((r) => r.role.id)
+      };
+    }
   });
 
   const tokenGateVerificationResults = await Promise.all(tokenGateVerificationPromises);

@@ -3,6 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import * as mailer from 'lib/mailer';
 import * as emails from 'lib/mailer/emails';
+import { getMemberUsernameBySpaceRole } from 'lib/members/getMemberUsername';
 import { getCardNotifications } from 'lib/notifications/cards/getCardNotifications';
 import { getDocumentNotifications } from 'lib/notifications/documents/getDocumentNotifications';
 import { getPostNotifications } from 'lib/notifications/forum/getForumNotifications';
@@ -179,50 +180,31 @@ async function sendEmail({
   user: Pick<User, 'id' | 'username' | 'id' | 'avatar' | 'email'>;
 }) {
   const notificationSpaceId = notification.spaceId;
-  const userId = notification.createdBy.id;
 
-  const memberProperty = await prisma.memberProperty.findFirst({
+  const notificationAuthorSpaceRole = await prisma.spaceRole.findFirstOrThrow({
     where: {
-      spaceId: notificationSpaceId,
-      type: 'name'
+      userId: notification.createdBy.id,
+      spaceId: notificationSpaceId
     },
     select: {
       id: true
     }
   });
 
-  if (memberProperty) {
-    const notificationAuthorNamePropertyValue = await prisma.memberPropertyValue.findFirst({
-      where: {
-        spaceId: notificationSpaceId,
-        userId,
-        memberPropertyId: memberProperty.id
-      },
-      select: {
-        value: true
-      }
-    });
-
-    if (notificationAuthorNamePropertyValue?.value) {
-      notification.createdBy.username = notificationAuthorNamePropertyValue.value as string;
+  const notificationTargetSpaceRole = await prisma.spaceRole.findFirstOrThrow({
+    where: {
+      userId: notification.createdBy.id,
+      spaceId: notificationSpaceId
+    },
+    select: {
+      id: true
     }
+  });
 
-    const notificationTargetNamePropertyValue = await prisma.memberPropertyValue.findFirst({
-      where: {
-        spaceId: notificationSpaceId,
-        userId: user.id,
-        memberPropertyId: memberProperty.id
-      },
-      select: {
-        value: true
-      }
-    });
-    if (notificationTargetNamePropertyValue?.value) {
-      user.username = notificationTargetNamePropertyValue.value as string;
-    }
-  }
+  notification.createdBy.username = await getMemberUsernameBySpaceRole({ spaceRoleId: notificationAuthorSpaceRole.id });
+  const primaryIdentity = await getMemberUsernameBySpaceRole({ spaceRoleId: notificationTargetSpaceRole.id });
 
-  const template = emails.getPendingNotificationEmail(notification, user);
+  const template = emails.getPendingNotificationEmail(notification, { ...user, username: primaryIdentity });
   const result = await mailer.sendEmail({
     to: {
       displayName: user.username,

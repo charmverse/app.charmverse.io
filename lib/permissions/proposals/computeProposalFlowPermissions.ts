@@ -5,11 +5,14 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { isProposalReviewer } from 'lib/proposal/isProposalReviewer';
 
-import { computeProposalPermissions } from './computeProposalPermissions';
+import { PermissionsApiClientWithPermissionsSwitch } from '../api/overridenPermissionsApiClient';
+
 import { countReviewers } from './countReviewers';
 
+const client = new PermissionsApiClientWithPermissionsSwitch();
+
 const filters = getProposalFlagFilters({
-  computeProposalPermissions,
+  computeProposalPermissions: client.proposals.computeProposalPermissions,
   // In public mode, only take into account user reviewers
   countReviewers,
   isProposalReviewer

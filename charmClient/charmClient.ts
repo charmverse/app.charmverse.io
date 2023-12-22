@@ -56,7 +56,6 @@ import { RolesApi } from './apis/rolesApi';
 import { SpacesApi } from './apis/spacesApi';
 import { SubscriptionApi } from './apis/subscriptionApi';
 import { SummonApi } from './apis/summonApi';
-import { TokenGatesApi } from './apis/tokenGates';
 import { TrackApi } from './apis/trackApi';
 import { UnstoppableDomainsApi } from './apis/unstoppableApi';
 import { VotesApi } from './apis/votesApi';
@@ -108,8 +107,6 @@ class CharmClient {
   unstoppableDomains = new UnstoppableDomainsApi();
 
   votes = new VotesApi();
-
-  tokenGates = new TokenGatesApi();
 
   subscription = new SubscriptionApi();
 

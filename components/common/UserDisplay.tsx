@@ -9,6 +9,7 @@ import { useMemberDialog } from 'components/members/hooks/useMemberDialog';
 import { useENSName } from 'hooks/useENSName';
 import { useMembers } from 'hooks/useMembers';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
+import type { LoggedInUser } from 'models';
 
 /**
  * @avatarIcon Pass this to override the user avatar with a custom icon
@@ -82,12 +83,13 @@ export const AnonUserDisplay = memo(AnonUserDisplayComponent);
 interface UserDisplayProps extends StyleProps {
   userId?: string;
   showMiniProfile?: boolean;
+  user?: LoggedInUser;
 }
 
-function UserDisplay({ showMiniProfile = false, userId, ...props }: UserDisplayProps) {
+function UserDisplay({ showMiniProfile = false, user, userId, ...props }: UserDisplayProps) {
   const { showUserId } = useMemberDialog();
   const { membersRecord } = useMembers();
-  const member = userId ? membersRecord[userId] : null;
+  const member = user ?? (userId ? membersRecord[userId] : null);
 
   if (!member) {
     // strip out invalid names

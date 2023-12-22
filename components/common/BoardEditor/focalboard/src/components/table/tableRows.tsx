@@ -91,12 +91,13 @@ function TableRows(props: Props): JSX.Element {
 
   return (
     <>
-      {cardPages.map(({ page, card, subPages }) => (
+      {cardPages.map(({ page, card, subPages, isStructuredProposal }) => (
         <TableRow
           key={card.id + card.updatedAt}
           board={board}
           activeView={activeView}
           card={card}
+          isStructuredProposal={isStructuredProposal}
           hasContent={page.hasContent}
           isSelected={props.selectedCardIds.includes(card.id)}
           focusOnMount={props.cardIdToFocusOnRender === card.id}

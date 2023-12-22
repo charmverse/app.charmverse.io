@@ -4,10 +4,6 @@ import * as http from 'adapters/http';
 import type { ExtendedVote, UpdateVoteDTO, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
 
 export class VotesApi {
-  getVotesByPage(query: { postId?: string; pageId?: string }) {
-    return http.GET<ExtendedVote[]>(`/api/votes`, query);
-  }
-
   createVote(votePayload: VoteDTO) {
     return http.POST<ExtendedVote>('/api/votes', votePayload);
   }

@@ -5,7 +5,7 @@ import type { Card } from 'lib/focalboard/card';
 
 type Props = {
   onDrop: (card: Card) => void;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 };
 
 const KanbanColumn = React.memo((props: Props) => {

@@ -1,11 +1,10 @@
 import { Box } from '@mui/material';
 import { rest } from 'msw';
-import { useState } from 'react';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 
 import DocumentPage from 'components/[pageId]/DocumentPage/DocumentPage';
-import type { ProposalPageAndPropertiesInput } from 'components/proposals/components/ProposalDialog/NewProposalPage';
-import { NewProposalPage as ProposalPageComponent } from 'components/proposals/components/ProposalDialog/NewProposalPage';
+import { HeaderSpacer } from 'components/common/PageLayout/components/Header/Header';
+import { NewProposalPage as ProposalPageComponent } from 'components/proposals/ProposalPage/NewProposalPage';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import { createMockPage } from 'testing/mocks/page';
 import { createMockProposal } from 'testing/mocks/proposal';
@@ -31,55 +30,10 @@ export function ProposalsPage() {
 ProposalsPage.parameters = ProposalsPageStory.parameters;
 
 export function NewProposal() {
-  const [contentUpdated, setContentUpdated] = useState(false);
-  const [formInputs, setFormInputs] = useState<ProposalPageAndPropertiesInput>({
-    authors: [],
-    categoryId: null,
-    content: null,
-    contentText: '',
-    evaluationType: 'rubric',
-    headerImage: null,
-    icon: null,
-    proposalTemplateId: null,
-    reviewers: [],
-    rubricCriteria: [
-      {
-        id: '1',
-        index: -1,
-        title: 'Spelling and grammar',
-        description: 'Has correct punctuation',
-        type: 'range',
-        parameters: {
-          min: 0,
-          max: 1
-        }
-      },
-      {
-        id: '2',
-        index: -1,
-        title: 'Five stars',
-        type: 'range',
-        parameters: {
-          min: 1,
-          max: 5
-        }
-      }
-    ],
-    title: 'A simple proposition',
-    fields: { properties: {} },
-    type: 'proposal'
-  });
-
   return (
     <GlobalContext>
-      <ProposalPageComponent
-        formInputs={formInputs}
-        setFormInputs={(_formInputs) => {
-          setContentUpdated(true);
-          setFormInputs((__formInputs) => ({ ...__formInputs, ..._formInputs }));
-        }}
-        contentUpdated={contentUpdated}
-      />
+      <HeaderSpacer />
+      <ProposalPageComponent />
     </GlobalContext>
   );
 }

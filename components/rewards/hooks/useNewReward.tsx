@@ -34,7 +34,7 @@ export function useNewReward() {
       if (currentSpace) {
         setIsSaving(true);
 
-        const createdReward = await createRewardTrigger({
+        return createRewardTrigger({
           pageProps: pageValues?.linkedPageId
             ? undefined
             : {
@@ -54,15 +54,14 @@ export function useNewReward() {
             showMessage(err.message ?? 'Something went wrong', 'error');
             throw err;
           })
-          .then((reward) => {
+          .then(() => {
             setContentUpdated(false);
-            return reward;
+            return true;
           })
           .finally(() => {
             setIsSaving(false);
+            return false;
           });
-
-        return createdReward;
       }
     },
     [createRewardTrigger, rewardValues, currentSpace, showMessage]

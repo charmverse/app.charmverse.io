@@ -2,7 +2,7 @@ import type { Prisma } from '@charmverse/core/prisma';
 
 import { getPagePath } from 'lib/pages';
 import { createPage } from 'lib/pages/server/createPage';
-import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 
 import type { CreatePageInput } from './types';
 
@@ -66,7 +66,7 @@ export async function createPrismaPage({
   // eslint-disable-next-line
   let page = await createPage({ data: pageCreateInput });
 
-  await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
+  await permissionsApiClient.pages.setupPagePermissionsAfterEvent({
     event: 'created',
     pageId: page.id
   });

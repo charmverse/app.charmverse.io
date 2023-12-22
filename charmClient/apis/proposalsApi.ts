@@ -10,10 +10,12 @@ import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import type { UpdateProposalLensPropertiesRequest } from 'lib/proposal/updateProposalLensProperties';
 
 export class ProposalsApi {
+  /** @deprecated - use hooks instead */
   updateProposal({ proposalId, ...rest }: UpdateProposalRequest) {
     return http.PUT(`/api/proposals/${proposalId}`, rest);
   }
 
+  /** @deprecated use hooks instead */
   getProposal(proposalId: string) {
     return http.GET<ProposalWithUsersAndRubric>(`/api/proposals/${proposalId}`);
   }

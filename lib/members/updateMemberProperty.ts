@@ -36,9 +36,18 @@ export async function updateMemberProperty({
     }
   });
 
-  const memberProperty = await prisma.memberProperty.findUnique({
+  const memberProperty = await prisma.memberProperty.findUniqueOrThrow({
     where: {
       id
+    },
+    select: {
+      type: true,
+      index: true,
+      space: {
+        select: {
+          primaryMemberIdentity: true
+        }
+      }
     }
   });
 
@@ -65,6 +74,10 @@ export async function updateMemberProperty({
 
   if (hasDuplicatedOptions) {
     throw new InvalidInputError('Duplicated option names are not allowed.');
+  }
+
+  if (!data.required && memberProperty.space.primaryMemberIdentity?.toLowerCase() === memberProperty.type) {
+    throw new InvalidInputError('Primary member identity cannot be optional.');
   }
 
   if (newIndex !== null && newIndex !== undefined) {

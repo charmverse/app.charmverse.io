@@ -6,18 +6,17 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
 import ImageIcon from '@mui/icons-material/Image';
 import type { ListItemButtonProps } from '@mui/material';
-import { Chip, ListItemButton, Menu } from '@mui/material';
+import { ListItemButton, Menu } from '@mui/material';
 import Box from '@mui/material/Box';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { memo, useCallback, useState } from 'react';
 
+import { PageParentChip } from 'components/[pageId]/DocumentPage/components/PageParentChip';
 import { BlockIcons } from 'components/common/BoardEditor/focalboard/src/blockIcons';
 import { randomEmojiList } from 'components/common/BoardEditor/focalboard/src/emojiList';
 import { CustomEmojiPicker } from 'components/common/CustomEmojiPicker';
 import EmojiIcon from 'components/common/Emoji';
-import Link from 'components/common/Link';
-import { usePages } from 'hooks/usePages';
 import { randomIntFromInterval } from 'lib/utilities/random';
 
 import { randomBannerImage } from './PageBanner';
@@ -76,6 +75,8 @@ type PageHeaderProps = {
   readOnlyTitle?: boolean;
   placeholder?: string;
   parentId?: string | null;
+  insideModal?: boolean;
+  pageId?: string;
 };
 
 function PageHeader({
@@ -87,11 +88,10 @@ function PageHeader({
   updatedAt,
   readOnlyTitle,
   placeholder,
-  parentId
+  parentId,
+  insideModal,
+  pageId
 }: PageHeaderProps) {
-  const { pages } = usePages();
-  const parentPage = parentId ? pages[parentId] : null;
-
   function updateTitle(page: { title: string; updatedAt: any }) {
     setPage(page);
   }
@@ -102,25 +102,14 @@ function PageHeader({
 
   return (
     <>
-      {parentPage ? (
-        <Chip
-          label={parentPage.title || 'Untitled'}
-          sx={{
-            cursor: 'pointer'
-          }}
-          size='small'
-          component={Link}
-          href={`/${parentPage.path}`}
-        />
-      ) : (
-        <PageHeaderControls
-          addPageHeader={addPageHeader}
-          headerImage={headerImage}
-          icon={icon}
-          readOnly={readOnly}
-          setPage={setPage}
-        />
-      )}
+      <PageHeaderControls
+        addPageHeader={addPageHeader}
+        headerImage={headerImage}
+        icon={icon}
+        readOnly={readOnly}
+        setPage={setPage}
+      />
+      <PageParentChip insideModal={insideModal} pageId={pageId} parentId={parentId} />
       <PageTitleInput
         readOnly={readOnly || readOnlyTitle}
         value={title}
@@ -151,6 +140,7 @@ function PageControls({
     const _icon = randomEmojiList[randomIntFromInterval(0, randomEmojiList.length - 1)];
     setPage({ icon: _icon });
   }
+
   return (
     <Controls className='page-controls'>
       {!readOnly && !icon && (

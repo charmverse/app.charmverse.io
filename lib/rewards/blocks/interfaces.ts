@@ -30,7 +30,7 @@ export type RewardPropertiesField = Record<string, RewardPropertyValue>;
 
 export type RewardPropertyValues = { properties: RewardPropertiesField };
 
-export type RewardFields = RewardPropertyValues;
+export type RewardFields = RewardPropertyValues & { isAssigned?: boolean };
 
 export type RewardFieldsProp = { fields: RewardFields };
 

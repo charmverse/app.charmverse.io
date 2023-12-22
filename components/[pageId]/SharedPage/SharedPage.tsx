@@ -25,7 +25,7 @@ export function SharedPage({ publicPage }: Props) {
   const dispatch = useAppDispatch();
   const { setCurrentPageId } = useCurrentPage();
   const { pages } = usePages();
-  const [, setTitleState] = usePageTitle();
+  const [, setPageTitle] = usePageTitle();
   const { space } = useCurrentSpace();
 
   const basePageId = publicPage?.page?.id || '';
@@ -49,7 +49,7 @@ export function SharedPage({ publicPage }: Props) {
       spaceDomain: space?.domain
     });
 
-    setTitleState(rootPage.title);
+    setPageTitle(rootPage.title);
     setCurrentPageId(rootPage.id);
 
     dispatch(setCurrent(rootPage.id));

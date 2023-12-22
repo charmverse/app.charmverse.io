@@ -21,6 +21,7 @@ export type CardPage<V = CardPropertyValue> = {
   subPages?: CardPage<V>[];
   card: Card<V>;
   page: PageMeta;
+  isStructuredProposal?: boolean;
 };
 
 export function createCard(block?: Partial<Block>): Card {

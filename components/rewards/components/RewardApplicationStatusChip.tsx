@@ -28,7 +28,7 @@ export const REWARD_APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string>
 };
 
 export const REWARD_APPLICATION_STATUS_COLORS: Record<ApplicationStatus, BrandColor> = {
-  applied: 'teal',
+  applied: 'pink',
   cancelled: 'gray',
   rejected: 'red',
   submission_rejected: 'red',

@@ -21,7 +21,18 @@ type SupportedOperation = Extract<ProposalOperation, 'view' | 'comment' | 'edit'
 
 export const proposalOperations: SupportedOperation[] = ['view', 'comment', 'edit', 'move'];
 
-const extraEvaluationRoles: SystemRoleOptionPopulated<ProposalSystemRole>[] = [
+export const allMembersSystemRole = {
+  group: 'system_role',
+  icon: (
+    <Tooltip title='All members of this space'>
+      <MembersIcon color='secondary' fontSize='small' />
+    </Tooltip>
+  ),
+  id: ProposalSystemRole.space_member,
+  label: 'All members'
+} as const;
+
+export const extraEvaluationRoles: SystemRoleOptionPopulated<ProposalSystemRole>[] = [
   {
     group: 'system_role',
     icon: (
@@ -52,16 +63,7 @@ const extraEvaluationRoles: SystemRoleOptionPopulated<ProposalSystemRole>[] = [
     id: ProposalSystemRole.all_reviewers,
     label: 'All Reviewers'
   },
-  {
-    group: 'system_role',
-    icon: (
-      <Tooltip title='All members of this space'>
-        <MembersIcon color='secondary' fontSize='small' />
-      </Tooltip>
-    ),
-    id: ProposalSystemRole.space_member,
-    label: 'Members'
-  }
+  allMembersSystemRole
 ];
 
 const permissionOperationPlaceholders = {
@@ -87,7 +89,7 @@ export function EvaluationPermissionsRow({
     <Card variant='outlined' key={evaluation.id} sx={{ mb: 1 }}>
       <Box px={2} py={1}>
         <Box display='flex' alignItems='center' gap={1} mb={1} justifyContent='space-between'>
-          {evaluationIcons[evaluation.type]}
+          {evaluationIcons[evaluation.type]()}
           <Typography variant='h6' sx={{ flexGrow: 1 }}>
             {evaluation.title}
           </Typography>

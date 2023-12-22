@@ -22,8 +22,8 @@ export function NewInlineReward({ pageId }: { pageId: string }) {
   }
 
   async function saveForm() {
-    const newReward = await createReward({ linkedPageId: pageId });
-    if (newReward) {
+    const success = await createReward({ linkedPageId: pageId });
+    if (success) {
       resetForm();
       setCreatingInlineReward(false);
       refreshPage(pageId);

@@ -1,22 +1,38 @@
-import type { ProposalCategoryPermission, Space, User } from '@charmverse/core/prisma';
+import type { PermissionCompute, ProposalPermissionFlags } from '@charmverse/core/permissions';
+import type { Space, User } from '@charmverse/core/prisma';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
+import { v4 as uuid } from 'uuid';
 
-import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { upsertProposalCategoryPermission } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
-let space: Space;
-let user: User;
-
-beforeAll(async () => {
-  const generated = await testUtilsUser.generateUserAndSpace({ isAdmin: false });
-
-  space = generated.space;
-  user = generated.user;
-});
-
 describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute permissions for a proposal', () => {
+  let space: Space;
+  let user: User;
+  let reviewer: User;
+  let secondReviewer: User;
+
+  let userCookie: string;
+  let reviewerCookie: string;
+  let secondReviewerCookie: string;
+
+  beforeAll(async () => {
+    ({ space, user } = await testUtilsUser.generateUserAndSpace({ isAdmin: false }));
+    reviewer = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id
+    });
+    secondReviewer = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id
+    });
+
+    userCookie = await loginUser(user.id);
+
+    reviewerCookie = await loginUser(reviewer.id);
+    secondReviewerCookie = await loginUser(secondReviewer.id);
+  });
+
   it('should return computed permissions for a user, and respond 200', async () => {
     const proposalCategory = await testUtilsProposals.generateProposalCategory({
       spaceId: space.id
@@ -42,9 +58,7 @@ describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute
       proposalCategoryId: proposalCategory.id
     });
 
-    const userCookie = await loginUser(user.id);
-
-    const computed = await premiumPermissionsApiClient.proposals.computeProposalPermissions({
+    const computed = await permissionsApiClient.proposals.computeProposalPermissions({
       resourceId: proposal.id,
       userId: user.id
     });
@@ -55,7 +69,7 @@ describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute
         .set('Cookie', userCookie)
         .send({ resourceId: proposal.id })
         .expect(200)
-    ).body as ProposalCategoryPermission;
+    ).body as ProposalPermissionFlags;
 
     expect(result).toMatchObject(expect.objectContaining(computed));
   });
@@ -83,9 +97,7 @@ describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute
       proposalCategoryId: proposalCategory.id
     });
 
-    const userCookie = await loginUser(user.id);
-
-    const computed = await premiumPermissionsApiClient.proposals.computeProposalPermissions({
+    const computed = await permissionsApiClient.proposals.computeProposalPermissions({
       resourceId: proposal.id,
       userId: user.id
     });
@@ -96,7 +108,7 @@ describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute
         .set('Cookie', userCookie)
         .send({ resourceId: `${space.domain}/${proposal.page.path}` })
         .expect(200)
-    ).body as ProposalCategoryPermission;
+    ).body as ProposalPermissionFlags;
 
     expect(result).toMatchObject(expect.objectContaining(computed));
   });
@@ -119,7 +131,7 @@ describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute
     });
 
     // Non logged in user test case
-    const publicComputed = await premiumPermissionsApiClient.proposals.computeProposalPermissions({
+    const publicComputed = await permissionsApiClient.proposals.computeProposalPermissions({
       resourceId: proposal.id,
       userId: undefined
     });
@@ -128,8 +140,95 @@ describe('POST /api/permissions/proposals/compute-proposal-permissions - Compute
         .post('/api/permissions/proposals/compute-proposal-permissions')
         .send({ resourceId: proposal.id })
         .expect(200)
-    ).body as ProposalCategoryPermission;
+    ).body as ProposalPermissionFlags;
 
     expect(publicResult).toMatchObject(expect.objectContaining(publicComputed));
+  });
+});
+
+describe('GET /api/permissions/proposals/compute-proposal-permissions - Compute permissions for a proposal in a space with the new model', () => {
+  let space: Space;
+  let user: User;
+  let reviewer: User;
+  let secondReviewer: User;
+
+  let userCookie: string;
+  let reviewerCookie: string;
+  let secondReviewerCookie: string;
+
+  beforeAll(async () => {
+    ({ space, user } = await testUtilsUser.generateUserAndSpace({ isAdmin: false, domain: `cvt-${uuid()}` }));
+    reviewer = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id
+    });
+    secondReviewer = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id
+    });
+
+    userCookie = await loginUser(user.id);
+    reviewerCookie = await loginUser(reviewer.id);
+    secondReviewerCookie = await loginUser(secondReviewer.id);
+  });
+  it('should use the new proposal permissions model', async () => {
+    const proposalCategoryWithoutPermissions = await testUtilsProposals.generateProposalCategory({
+      spaceId: space.id,
+      proposalCategoryPermissions: []
+    });
+
+    const userInReviewProposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: user.id,
+      categoryId: proposalCategoryWithoutPermissions.id,
+      proposalStatus: 'published',
+      evaluationInputs: [
+        {
+          evaluationType: 'rubric',
+          permissions: [],
+          reviewers: [{ group: 'user', id: reviewer.id }],
+          result: 'pass'
+        },
+        {
+          evaluationType: 'rubric',
+          permissions: [],
+          reviewers: [{ group: 'user', id: secondReviewer.id }]
+        }
+      ]
+    });
+
+    const userInReviewProposalPermissions = (
+      await request(baseUrl)
+        .post('/api/permissions/proposals/compute-proposal-permissions')
+        .set('Cookie', userCookie)
+        .send({
+          resourceId: userInReviewProposal.id
+        } as PermissionCompute)
+        .expect(200)
+    ).body as ProposalPermissionFlags;
+
+    expect(userInReviewProposalPermissions.view).toEqual(true);
+
+    const reviewerInReviewProposalPermissions = (
+      await request(baseUrl)
+        .post('/api/permissions/proposals/compute-proposal-permissions')
+        .set('Cookie', reviewerCookie)
+        .send({
+          resourceId: userInReviewProposal.id
+        } as PermissionCompute)
+        .expect(200)
+    ).body as ProposalPermissionFlags;
+
+    expect(reviewerInReviewProposalPermissions.view).toEqual(false);
+
+    const secondReviewerInReviewProposalPermissions = (
+      await request(baseUrl)
+        .post('/api/permissions/proposals/compute-proposal-permissions')
+        .set('Cookie', secondReviewerCookie)
+        .send({
+          resourceId: userInReviewProposal.id
+        } as PermissionCompute)
+        .expect(200)
+    ).body as ProposalPermissionFlags;
+
+    expect(secondReviewerInReviewProposalPermissions.view).toEqual(true);
   });
 });

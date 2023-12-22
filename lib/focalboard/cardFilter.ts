@@ -328,11 +328,6 @@ class CardFilter {
     filterClause: FilterClause,
     templates: readonly IPropertyTemplate[]
   ): { id: string; value?: string | string[] } {
-    const template = templates.find((o) => o.id === filterClause.propertyId);
-    if (!template) {
-      Utils.assertFailure(`propertyThatMeetsFilterClause. Cannot find template: ${filterClause.propertyId}`);
-      return { id: filterClause.propertyId };
-    }
     const filterProperty = templates.find((o) => o.id === filterClause.propertyId);
     if (filterProperty) {
       const filterPropertyDataType = propertyConfigs[filterProperty.type].datatype;
@@ -400,10 +395,16 @@ class CardFilter {
         switch (condition) {
           case 'contains':
           case 'is_not_empty': {
+            if (filterProperty.type === 'person') {
+              return {
+                id: filterClause.propertyId,
+                value: filterClause.values
+              };
+            }
             return {
               id: filterClause.propertyId,
               value: filterClause.values.filter((filterValue) =>
-                template.options.find((option) => option.id === filterValue)
+                filterProperty.options.find((option) => option.id === filterValue)
               )
             };
           }
@@ -423,7 +424,7 @@ class CardFilter {
           case 'is_not_empty': {
             return {
               id: filterClause.propertyId,
-              value: template.options.find((option) => option.id === filterClause.values[0])
+              value: filterProperty.options.find((option) => option.id === filterClause.values[0])
                 ? [filterClause.values[0]]
                 : []
             };
@@ -472,6 +473,9 @@ class CardFilter {
           }
         }
       }
+    } else {
+      Utils.assertFailure(`propertyThatMeetsFilterClause. Cannot find template: ${filterClause.propertyId}`);
+      return { id: filterClause.propertyId };
     }
 
     return { id: filterClause.propertyId };

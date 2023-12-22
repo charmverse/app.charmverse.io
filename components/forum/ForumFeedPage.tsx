@@ -34,7 +34,7 @@ export function ForumPage() {
   const sort = router.query.sort as PostSortOption | undefined;
   const { createPost, hidePost, showPost } = usePostDialog();
   const { categories, isLoading: isCategoriesLoading, getPostableCategories } = useForumCategories();
-  const [, setTitle] = usePageTitle();
+  const [, setPageTitle] = usePageTitle();
   const [currentCategory, setCurrentCategory] = useState<PostCategory | null>(null);
 
   const { permissions: currentCategoryPermissions } = usePostCategoryPermissions(currentCategory?.id ?? null);
@@ -102,7 +102,7 @@ export function ForumPage() {
 
   useEffect(() => {
     if (currentCategory?.name) {
-      setTitle(currentCategory.name);
+      setPageTitle(currentCategory.name);
     }
   }, [currentCategory?.name]);
 

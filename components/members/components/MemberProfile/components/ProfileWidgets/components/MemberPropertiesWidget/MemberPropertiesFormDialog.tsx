@@ -3,9 +3,10 @@ import styled from '@emotion/styled';
 import { Box, useMediaQuery } from '@mui/material';
 import type { ReactNode } from 'react';
 
-import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
+import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
+import type { FormFieldValue } from 'components/common/form/interfaces';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { useRequiredMemberPropertiesForm } from 'components/members/hooks/useRequiredMemberProperties';
 import Legend from 'components/settings/Legend';
@@ -20,7 +21,7 @@ type Props = {
   onClose: VoidFunction;
 };
 
-const ContentContainer = styled(Container)`
+const ContentContainer = styled(PageEditorContainer)`
   width: 100%;
   margin-bottom: 100px;
 `;
@@ -81,10 +82,9 @@ export function DialogContainer({
 export function MemberPropertiesFormDialog({ userId, onClose }: Props) {
   const { refreshPropertyValues } = useMemberPropertyValues(userId);
 
-  const { control, errors, isValid, setValue, isDirty, isSubmitting, values, onSubmit } =
-    useRequiredMemberPropertiesForm({
-      userId
-    });
+  const { control, errors, isValid, isDirty, isSubmitting, onSubmit, onFormChange } = useRequiredMemberPropertiesForm({
+    userId
+  });
 
   async function saveForm() {
     await onSubmit();
@@ -92,15 +92,12 @@ export function MemberPropertiesFormDialog({ userId, onClose }: Props) {
   }
 
   function onMemberDetailsChange(fields: UpdateMemberPropertyValuePayload[]) {
-    fields.forEach((field) => {
-      setValue(field.memberPropertyId, field.value);
-    });
+    onFormChange(fields.map((field) => ({ id: field.memberPropertyId, value: field.value as FormFieldValue })));
   }
 
   return (
     <DialogContainer title='Edit profile' onClose={onClose}>
       <MemberPropertiesForm
-        values={values}
         control={control}
         errors={errors}
         userId={userId}
@@ -111,7 +108,15 @@ export function MemberPropertiesFormDialog({ userId, onClose }: Props) {
         <Button disableElevation color='secondary' variant='outlined' onClick={onClose}>
           Cancel
         </Button>
-        <Button disableElevation disabled={!isDirty || !isValid} loading={isSubmitting} onClick={saveForm}>
+        <Button
+          disableElevation
+          disabledTooltip={
+            !isValid ? 'Please fill out all required fields' : !isDirty ? 'No changes to save' : undefined
+          }
+          disabled={!isDirty || !isValid}
+          loading={isSubmitting}
+          onClick={saveForm}
+        >
           Save
         </Button>
       </Box>
