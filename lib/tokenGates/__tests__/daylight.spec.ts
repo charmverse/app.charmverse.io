@@ -1,6 +1,6 @@
 import type { Chain } from '@lit-protocol/types';
 
-import { getDaylightRequirements } from '../daylight';
+import { getDaylightLitRequirements, getDaylightUnlockRequirements } from '../daylight';
 
 const walletCondition = {
   chain: 'ethereum' as Chain,
@@ -32,11 +32,17 @@ const nftCondition = {
   parameters: ['1337']
 };
 
+const unlockCondition = {
+  chainId: 1,
+  contract: '0x00003',
+  name: ''
+};
+
 describe('getDaylightRequirements', () => {
   it('should return address based requirement', () => {
-    const tokenGateConditions = [walletCondition];
+    const tokenGateConditions = { unifiedAccessControlConditions: [walletCondition] };
 
-    expect(getDaylightRequirements(tokenGateConditions)).toEqual({
+    expect(getDaylightLitRequirements(tokenGateConditions)).toEqual({
       operator: 'OR',
       requirements: [
         {
@@ -49,9 +55,9 @@ describe('getDaylightRequirements', () => {
   });
 
   it('should return token based requirement', () => {
-    const tokenGateConditions = [tokenCondition];
+    const tokenGateConditions = { unifiedAccessControlConditions: [tokenCondition] };
 
-    expect(getDaylightRequirements(tokenGateConditions)).toEqual({
+    expect(getDaylightLitRequirements(tokenGateConditions)).toEqual({
       operator: 'OR',
       requirements: [
         {
@@ -65,9 +71,9 @@ describe('getDaylightRequirements', () => {
   });
 
   it('should return nft based requirement', () => {
-    const tokenGateConditions = [nftCondition];
+    const tokenGateConditions = { unifiedAccessControlConditions: [nftCondition] };
 
-    expect(getDaylightRequirements(tokenGateConditions)).toEqual({
+    expect(getDaylightLitRequirements(tokenGateConditions)).toEqual({
       operator: 'OR',
       requirements: [
         {
@@ -81,9 +87,11 @@ describe('getDaylightRequirements', () => {
   });
 
   it('should return requirements based on multiple conditions with OR operator', () => {
-    const tokenGateConditions = [nftCondition, { operator: 'OR' as const }, tokenCondition];
+    const tokenGateConditions = {
+      unifiedAccessControlConditions: [nftCondition, { operator: 'OR' as const }, tokenCondition]
+    };
 
-    expect(getDaylightRequirements(tokenGateConditions)).toEqual({
+    expect(getDaylightLitRequirements(tokenGateConditions)).toEqual({
       operator: 'OR',
       requirements: [
         {
@@ -103,9 +111,11 @@ describe('getDaylightRequirements', () => {
   });
 
   it('should return requirements based on multiple conditions with AND operator', () => {
-    const tokenGateConditions = [nftCondition, { operator: 'AND' as const }, tokenCondition];
+    const tokenGateConditions = {
+      unifiedAccessControlConditions: [nftCondition, { operator: 'AND' as const }, tokenCondition]
+    };
 
-    expect(getDaylightRequirements(tokenGateConditions)).toEqual({
+    expect(getDaylightLitRequirements(tokenGateConditions)).toEqual({
       operator: 'AND',
       requirements: [
         {
@@ -125,9 +135,9 @@ describe('getDaylightRequirements', () => {
   });
 
   it('should return requirements with default OR operator', () => {
-    const tokenGateConditions = [nftCondition, tokenCondition, walletCondition];
+    const tokenGateConditions = { unifiedAccessControlConditions: [nftCondition, tokenCondition, walletCondition] };
 
-    expect(getDaylightRequirements(tokenGateConditions)).toEqual({
+    expect(getDaylightLitRequirements(tokenGateConditions)).toEqual({
       operator: 'OR',
       requirements: [
         {
@@ -152,28 +162,32 @@ describe('getDaylightRequirements', () => {
   });
 
   it('should not return conditions with mixed operators', () => {
-    const tokenGateConditions = [
-      nftCondition,
-      { operator: 'AND' as const },
-      tokenCondition,
-      { operator: 'OR' as const },
-      walletCondition
-    ];
+    const tokenGateConditions = {
+      unifiedAccessControlConditions: [
+        nftCondition,
+        { operator: 'AND' as const },
+        tokenCondition,
+        { operator: 'OR' as const },
+        walletCondition
+      ]
+    };
 
-    expect(getDaylightRequirements(tokenGateConditions)).toEqual({
+    expect(getDaylightLitRequirements(tokenGateConditions)).toEqual({
       operator: 'AND',
       requirements: []
     });
   });
 
   it('should return requirements for nested conditions', () => {
-    const tokenGateConditions = [
-      [nftCondition, { operator: 'OR' as const }, walletCondition],
-      { operator: 'OR' as const },
-      tokenCondition
-    ];
+    const tokenGateConditions = {
+      unifiedAccessControlConditions: [
+        ...[nftCondition, { operator: 'OR' as const }, walletCondition],
+        { operator: 'OR' as const },
+        tokenCondition
+      ]
+    };
 
-    expect(getDaylightRequirements(tokenGateConditions)).toEqual({
+    expect(getDaylightLitRequirements(tokenGateConditions)).toEqual({
       operator: 'OR',
       requirements: [
         {
@@ -192,6 +206,22 @@ describe('getDaylightRequirements', () => {
           type: 'hasTokenBalance',
           minAmount: 1337,
           chain: 'ethereum'
+        }
+      ]
+    });
+  });
+
+  it('should return unlock protocol based requirement', () => {
+    const tokenGateConditions = unlockCondition;
+
+    expect(getDaylightUnlockRequirements(tokenGateConditions)).toEqual({
+      operator: 'OR',
+      requirements: [
+        {
+          chain: 'ethereum',
+          type: 'hasTokenBalance',
+          address: '0x00003',
+          minAmount: 1
         }
       ]
     });

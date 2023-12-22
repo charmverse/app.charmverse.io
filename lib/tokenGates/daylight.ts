@@ -145,7 +145,7 @@ export function getDaylightRequirements(tokenGate: TokenGate) {
   }
 }
 
-function getDaylightUnlockRequirements(tkConditions: Lock) {
+export function getDaylightUnlockRequirements(tkConditions: Lock) {
   const operator = 'OR';
 
   if (tkConditions.chainId !== 1) {
@@ -168,7 +168,7 @@ function getDaylightUnlockRequirements(tkConditions: Lock) {
   };
 }
 
-function getDaylightLitRequirements(tkConditions: LitTokenGateConditions) {
+export function getDaylightLitRequirements(tkConditions: LitTokenGateConditions) {
   const conditionsData = tkConditions.unifiedAccessControlConditions || [];
   const conditionsFlatArr = flatten(conditionsData);
 
