@@ -1,4 +1,4 @@
-import type { Space, TokenGate as PrismaTokengate } from '@charmverse/core/prisma';
+import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -9,7 +9,7 @@ import { onError, onNoMatch, requireKeys, requireSpaceMembership } from 'lib/mid
 import requireValidation from 'lib/middleware/requireValidation';
 import { withSessionRoute } from 'lib/session/withSession';
 import { addDaylightAbility } from 'lib/tokenGates/daylight';
-import type { TokenGateWithRoles } from 'lib/tokenGates/interfaces';
+import type { TokenGate, TokenGateWithRoles } from 'lib/tokenGates/interfaces';
 import { processTokenGateConditions } from 'lib/tokenGates/processTokenGateConditions';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
@@ -38,13 +38,13 @@ async function saveTokenGate(req: NextApiRequest, res: NextApiResponse<void>) {
 
   const { accessTypes, numberOfConditions, chainType, accesType } = processTokenGateConditions(req.body);
 
-  const result = await prisma.tokenGate.create({
+  const result = (await prisma.tokenGate.create({
     data: {
       createdBy: req.session.user.id,
       ...req.body,
       accessTypes
     }
-  });
+  })) as TokenGate;
 
   addDaylightAbility(result);
   trackUserAction('add_a_gate', {

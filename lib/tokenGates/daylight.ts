@@ -1,11 +1,11 @@
 import { GET, PUT } from '@charmverse/core/http';
-import type { TokenGate } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { AccsDefaultParams } from '@lit-protocol/types';
+import type { AccsDefaultParams, AccsOperatorParams } from '@lit-protocol/types';
 import { flatten } from 'lodash';
 
 import { baseUrl } from 'config/constants';
 
+import type { LitTokenGateConditions, Lock, TokenGate } from './interfaces';
 import { getAccessType } from './utils';
 
 const DAYLIGHT_API_KEY = process.env.DAYLIGHT_API_KEY;
@@ -17,9 +17,6 @@ const HEADERS = {
 const SOURCE_PREFIX = 'charmverse-';
 
 type Operator = 'AND' | 'OR';
-type ConditionOperator = { operator: Operator };
-type Condition = AccsDefaultParams | ConditionOperator;
-type TokenGateAccessConditions = (Condition | Condition[])[];
 
 export async function addDaylightAbility(tokenGate: TokenGate) {
   const space = await prisma.space.findUnique({ where: { id: tokenGate.spaceId } });
@@ -27,9 +24,7 @@ export async function addDaylightAbility(tokenGate: TokenGate) {
     return;
   }
 
-  const requirementsData = getDaylightRequirements(
-    (tokenGate.conditions as any)?.unifiedAccessControlConditions as any
-  );
+  const requirementsData = getDaylightRequirements(tokenGate);
 
   // "AND" operator is not yet supported by daylight
   if (!requirementsData.requirements.length || !DAYLIGHT_API_KEY || requirementsData.operator !== 'OR') {
@@ -142,16 +137,48 @@ function getRequirement(condition: AccsDefaultParams) {
   }
 }
 
-export function getDaylightRequirements(conditionsData: TokenGateAccessConditions) {
+export function getDaylightRequirements(tokenGate: TokenGate) {
+  if (tokenGate.type === 'unlock') {
+    return getDaylightUnlockRequirements(tokenGate.conditions);
+  } else {
+    return getDaylightLitRequirements(tokenGate.conditions);
+  }
+}
+
+function getDaylightUnlockRequirements(tkConditions: Lock) {
+  const operator = 'OR';
+
+  if (tkConditions.chainId !== 1) {
+    return {
+      requirements: [],
+      operator
+    };
+  }
+
+  return {
+    requirements: [
+      {
+        chain: 'ethereum',
+        type: 'hasTokenBalance',
+        address: tkConditions.contract,
+        minAmount: 1
+      }
+    ],
+    operator
+  };
+}
+
+function getDaylightLitRequirements(tkConditions: LitTokenGateConditions) {
+  const conditionsData = tkConditions.unifiedAccessControlConditions || [];
   const conditionsFlatArr = flatten(conditionsData);
 
-  const operators = conditionsFlatArr.filter((condition) => {
+  const operators = conditionsFlatArr.filter((condition): condition is AccsOperatorParams => {
     return 'operator' in condition;
-  }) as ConditionOperator[];
+  });
 
-  const conditions = conditionsFlatArr.filter((condition) => {
+  const conditions = conditionsFlatArr.filter((condition): condition is AccsDefaultParams => {
     return 'chain' in condition;
-  }) as AccsDefaultParams[];
+  });
 
   const conditionsOperator: Operator = (operators[0]?.operator.toLocaleUpperCase() as Operator) || 'OR';
 
