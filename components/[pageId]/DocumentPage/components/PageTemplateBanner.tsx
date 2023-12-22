@@ -27,6 +27,7 @@ type Props = {
   isNewPage?: boolean;
   parentId?: string | null;
   pageType?: PageMeta['type'];
+  customTitle?: string;
 };
 
 const templateTypes = {
@@ -36,7 +37,7 @@ const templateTypes = {
 
 type RewardTemplateType = keyof typeof templateTypes;
 
-export function PageTemplateBanner({ isNewPage, pageType, parentId }: Props) {
+export function PageTemplateBanner({ isNewPage, pageType, parentId, customTitle }: Props) {
   const { space } = useCurrentSpace();
   const theme = useTheme();
   const { pages } = usePages();
@@ -46,6 +47,16 @@ export function PageTemplateBanner({ isNewPage, pageType, parentId }: Props) {
   const board = isShowingCard ? parentPage : undefined;
 
   const boardPath = board ? `/${space?.domain}/${board?.path}` : undefined;
+
+  if (customTitle) {
+    return (
+      <StyledPageTemplateBanner card={isShowingCard}>
+        <Grid item xs={8} display='flex' justifyContent='center'>
+          <span>{customTitle}</span>
+        </Grid>
+      </StyledPageTemplateBanner>
+    );
+  }
 
   if (!pageType?.match('template')) {
     return null;
