@@ -130,7 +130,7 @@ export function TokenGateModalProvider({
 
       const litSuccess = await saveSigningCondition({
         unifiedAccessControlConditions: conditions.unifiedAccessControlConditions,
-        chain: authSigTypes[0], // etherum or solana
+        chain: authSigTypes[0], // ethereum or solana
         authSig,
         resourceId
       });

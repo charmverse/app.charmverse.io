@@ -107,7 +107,7 @@ describe('humanizeConditions', () => {
     expect(result).toBe('Owns at least 12 BNB on Bsc');
   });
 
-  it('should return owned eth on etherum condition', () => {
+  it('should return owned eth on ethereum condition', () => {
     const conditions = {
       chains: ['ethereum'],
       permanent: true,
@@ -133,7 +133,7 @@ describe('humanizeConditions', () => {
     expect(result).toBe('Owns at least 0.0000001 ETH on Ethereum');
   });
 
-  it('should return owned custom token on etherum condition', () => {
+  it('should return owned custom token on ethereum condition', () => {
     const conditions = {
       chains: ['ethereum'],
       permanent: true,
