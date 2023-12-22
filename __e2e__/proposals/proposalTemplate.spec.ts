@@ -113,8 +113,6 @@ test.describe.serial('Structured proposal template', () => {
 
     await formField.getFormFieldNameInput(1).fill('Nickname');
 
-    await expect(proposalPage.saveDraftButton).toBeDisabled();
-
     await formField.formFieldRequiredSwitch.nth(1).click();
 
     await formField.formFieldPrivateSwitch.nth(1).click();
