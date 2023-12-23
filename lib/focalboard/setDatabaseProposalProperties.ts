@@ -149,50 +149,54 @@ export function getBoardProperties({
   }
 
   formFields.forEach((formField) => {
-    let boardPropertyType: IPropertyTemplate['type'] | null = null;
-    let boardPropertyOptions: IPropertyTemplate['options'] = [];
+    const existingPropIndex = boardProperties.findIndex((p) => p.formFieldId === formField.id);
 
-    switch (formField.type) {
-      case 'short_text':
-      case 'wallet':
-      case 'long_text': {
-        boardPropertyType = 'text';
-        break;
-      }
-      case 'multiselect': {
-        boardPropertyType = 'multiSelect';
-        boardPropertyOptions = ((formField.options ?? []) as SelectOptionType[]).map((option) => ({
-          color: option.color,
-          id: option.id,
-          value: option.name
-        }));
-        break;
-      }
-      case 'select': {
-        boardPropertyType = 'select';
-        boardPropertyOptions = ((formField.options ?? []) as SelectOptionType[]).map((option) => ({
-          color: option.color,
-          id: option.id,
-          value: option.name
-        }));
-        break;
-      }
-      default: {
-        if (formField.type !== 'label') {
-          boardPropertyType = formField.type as IPropertyTemplate['type'];
+    if (existingPropIndex === -1) {
+      let boardPropertyType: IPropertyTemplate['type'] | null = null;
+      let boardPropertyOptions: IPropertyTemplate['options'] = [];
+
+      switch (formField.type) {
+        case 'short_text':
+        case 'wallet':
+        case 'long_text': {
+          boardPropertyType = 'text';
+          break;
+        }
+        case 'multiselect': {
+          boardPropertyType = 'multiSelect';
+          boardPropertyOptions = ((formField.options ?? []) as SelectOptionType[]).map((option) => ({
+            color: option.color,
+            id: option.id,
+            value: option.name
+          }));
+          break;
+        }
+        case 'select': {
+          boardPropertyType = 'select';
+          boardPropertyOptions = ((formField.options ?? []) as SelectOptionType[]).map((option) => ({
+            color: option.color,
+            id: option.id,
+            value: option.name
+          }));
+          break;
+        }
+        default: {
+          if (formField.type !== 'label') {
+            boardPropertyType = formField.type as IPropertyTemplate['type'];
+          }
         }
       }
-    }
 
-    if (boardPropertyType) {
-      boardProperties.push({
-        id: v4(),
-        name: formField.name,
-        options: boardPropertyOptions,
-        description: (formField.description as { content: PageContent; contentText: string })?.contentText,
-        type: boardPropertyType,
-        formFieldId: formField.id
-      });
+      if (boardPropertyType) {
+        boardProperties.push({
+          id: v4(),
+          name: formField.name,
+          options: boardPropertyOptions,
+          description: (formField.description as { content: PageContent; contentText: string })?.contentText,
+          type: boardPropertyType,
+          formFieldId: formField.id
+        });
+      }
     }
   });
 
