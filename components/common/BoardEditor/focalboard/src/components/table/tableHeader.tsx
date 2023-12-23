@@ -87,7 +87,8 @@ function TableHeader(props: Props): JSX.Element {
   const disableRename =
     proposalPropertyTypesList.includes(type as any) ||
     DEFAULT_BLOCK_IDS.includes(templateId) ||
-    defaultRewardPropertyIds.includes(templateId);
+    defaultRewardPropertyIds.includes(templateId) ||
+    !!template.formFieldId;
 
   const [tempName, setTempName] = useState(props.name || '');
 
@@ -257,7 +258,11 @@ function TableHeader(props: Props): JSX.Element {
           </MenuItem>,
           <MenuItem
             key='duplicate'
-            disabled={proposalPropertyTypesList.includes(type as any) || defaultRewardPropertyIds.includes(templateId)}
+            disabled={
+              proposalPropertyTypesList.includes(type as any) ||
+              defaultRewardPropertyIds.includes(templateId) ||
+              !!template.formFieldId
+            }
             onClick={() => {
               mutator.duplicatePropertyTemplate(board, activeView, templateId);
             }}
@@ -269,7 +274,11 @@ function TableHeader(props: Props): JSX.Element {
           </MenuItem>,
           <MenuItem
             key='delete'
-            disabled={proposalPropertyTypesList.includes(type as any) || defaultRewardPropertyIds.includes(templateId)}
+            disabled={
+              proposalPropertyTypesList.includes(type as any) ||
+              defaultRewardPropertyIds.includes(templateId) ||
+              !!template.formFieldId
+            }
             onClick={() => {
               mutator.deleteProperty(board, views, cards, templateId);
             }}
