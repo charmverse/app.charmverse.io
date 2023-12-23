@@ -6,6 +6,7 @@ import { stringUtils } from '@charmverse/core/utilities';
 
 import type { FormFieldValue } from 'components/common/form/interfaces';
 import { prismaToBlock } from 'lib/focalboard/block';
+import { canAccessPrivateFields } from 'lib/proposal/form/canAccessPrivateFields';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   ProposalRubricCriteriaWithTypedParams
@@ -65,12 +66,18 @@ export async function createCardsFromProposals({
           categoryId: true,
           status: true,
           evaluationType: true,
+          id: true,
+          spaceId: true,
+          authors: true,
+          formId: true,
+          createdBy: true,
           form: {
             select: {
               formFields: {
                 select: {
                   id: true,
                   type: true,
+                  private: true,
                   answers: {
                     select: {
                       proposalId: true,
@@ -173,6 +180,11 @@ export async function createCardsFromProposals({
   });
 
   for (const pageProposal of pageProposals) {
+    const accessPrivateFields = await canAccessPrivateFields({
+      userId,
+      proposal: pageProposal.proposal ?? undefined,
+      proposalId: pageProposal.proposal!.id
+    });
     const createdAt = pageProposal.createdAt;
 
     let properties: Record<string, BoardPropertyValue> = {};
@@ -193,7 +205,9 @@ export async function createCardsFromProposals({
     const formFields = pageProposal.proposal?.form?.formFields ?? [];
     const boardBlockCardProperties = boardBlock.fields.cardProperties ?? [];
 
-    for (const formField of formFields) {
+    const filteredFormFields = accessPrivateFields ? formFields : formFields.filter((formField) => !formField.private);
+
+    for (const formField of filteredFormFields) {
       const cardProperty = boardBlockCardProperties.find((p) => p.formFieldId === formField.id);
       const answerValue = formField.answers.find((ans) => ans.proposalId === pageProposal.id)?.value as FormFieldValue;
       if (formField.type === 'label' || !cardProperty) {

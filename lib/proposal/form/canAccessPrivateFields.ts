@@ -1,3 +1,4 @@
+import type { ProposalActors } from '@charmverse/core/permissions';
 import { hasAccessToSpace, isProposalAuthor } from '@charmverse/core/permissions';
 import type { Proposal, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
@@ -11,12 +12,7 @@ export async function canAccessPrivateFields({
 }: {
   proposalId: string;
   userId: string;
-  proposal?: Proposal & {
-    authors: {
-      proposalId: string;
-      userId: string;
-    }[];
-  };
+  proposal?: Pick<Proposal, 'createdBy' | 'formId' | 'spaceId' | 'id'> & Pick<ProposalActors, 'authors'>;
 }) {
   const checkProposal =
     proposal || (await prisma.proposal.findUnique({ where: { id: proposalId }, include: { authors: true } }));
