@@ -1,12 +1,14 @@
-import type { ProposalCategory } from '@charmverse/core/prisma';
+import type { FormField, ProposalCategory } from '@charmverse/core/prisma';
 import { ProposalStatus, prisma } from '@charmverse/core/prisma-client';
 import { objectUtils } from '@charmverse/core/utilities';
-import { v4 as uuid } from 'uuid';
+import { v4 as uuid, v4 } from 'uuid';
 
+import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import { getBoardColorFromColor } from 'lib/focalboard/constants';
 import { proposalDbProperties, proposalStatusBoardColors } from 'lib/focalboard/proposalDbProperties';
 import { InvalidStateError } from 'lib/middleware/errors';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 type ProposalCategoryFields = Pick<ProposalCategory, 'title' | 'id' | 'color'>;
 
@@ -37,8 +39,27 @@ export async function setDatabaseProposalProperties({ boardId }: { boardId: stri
     }
   });
 
+  const forms = await prisma.form.findMany({
+    where: {
+      proposal: {
+        some: {
+          page: {
+            type: 'proposal'
+          },
+          spaceId: boardBlock.spaceId
+        }
+      }
+    },
+    select: {
+      id: true,
+      formFields: true
+    }
+  });
+
+  const formFields = forms.flatMap((p) => p.formFields);
+
   const spaceUsesRubrics = rubricProposals > 0;
-  const boardProperties = getBoardProperties({ boardBlock, proposalCategories, spaceUsesRubrics });
+  const boardProperties = getBoardProperties({ formFields, boardBlock, proposalCategories, spaceUsesRubrics });
 
   return prisma.block.update({
     where: {
@@ -56,11 +77,13 @@ export async function setDatabaseProposalProperties({ boardId }: { boardId: stri
 export function getBoardProperties({
   boardBlock,
   proposalCategories,
-  spaceUsesRubrics
+  spaceUsesRubrics,
+  formFields = []
 }: {
   boardBlock: Board;
   proposalCategories: ProposalCategoryFields[];
   spaceUsesRubrics: boolean;
+  formFields?: FormField[];
 }) {
   const boardProperties = boardBlock.fields.cardProperties ?? [];
 
@@ -124,6 +147,55 @@ export function getBoardProperties({
       boardProperties.push(evaluationAverageProp);
     }
   }
+
+  formFields.forEach((formField) => {
+    let boardPropertyType: IPropertyTemplate['type'] | null = null;
+    let boardPropertyOptions: IPropertyTemplate['options'] = [];
+
+    switch (formField.type) {
+      case 'short_text':
+      case 'wallet':
+      case 'long_text': {
+        boardPropertyType = 'text';
+        break;
+      }
+      case 'multiselect': {
+        boardPropertyType = 'multiSelect';
+        boardPropertyOptions = ((formField.options ?? []) as SelectOptionType[]).map((option) => ({
+          color: option.color,
+          id: option.id,
+          value: option.name
+        }));
+        break;
+      }
+      case 'select': {
+        boardPropertyType = 'select';
+        boardPropertyOptions = ((formField.options ?? []) as SelectOptionType[]).map((option) => ({
+          color: option.color,
+          id: option.id,
+          value: option.name
+        }));
+        break;
+      }
+      default: {
+        if (formField.type !== 'label') {
+          boardPropertyType = formField.type as IPropertyTemplate['type'];
+        }
+      }
+    }
+
+    if (boardPropertyType) {
+      boardProperties.push({
+        id: v4(),
+        name: formField.name,
+        options: boardPropertyOptions,
+        description: (formField.description as { content: PageContent; contentText: string })?.contentText,
+        type: boardPropertyType,
+        formFieldId: formField.id
+      });
+    }
+  });
+
   return boardProperties;
 }
 

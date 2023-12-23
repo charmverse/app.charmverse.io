@@ -4,11 +4,13 @@ import type { Block, Page, ProposalRubricCriteria, ProposalRubricCriteriaAnswer 
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
+import type { FormFieldValue } from 'components/common/form/interfaces';
 import { prismaToBlock } from 'lib/focalboard/block';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   ProposalRubricCriteriaWithTypedParams
 } from 'lib/proposal/rubric/interfaces';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { BoardPropertyValue } from 'lib/public-api';
 import { relay } from 'lib/websockets/relay';
 
@@ -62,7 +64,23 @@ export async function createCardsFromProposals({
         select: {
           categoryId: true,
           status: true,
-          evaluationType: true
+          evaluationType: true,
+          form: {
+            select: {
+              formFields: {
+                select: {
+                  id: true,
+                  type: true,
+                  answers: {
+                    select: {
+                      proposalId: true,
+                      value: true
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -170,6 +188,28 @@ export async function createCardsFromProposals({
     if (proposalProps.proposalStatus) {
       properties[proposalProps.proposalStatus.id] =
         proposalProps.proposalStatus.options.find((opt) => opt.value === pageProposal.proposal?.status)?.id ?? '';
+    }
+
+    const formFields = pageProposal.proposal?.form?.formFields ?? [];
+    const boardBlockCardProperties = boardBlock.fields.cardProperties ?? [];
+
+    for (const formField of formFields) {
+      const cardProperty = boardBlockCardProperties.find((p) => p.formFieldId === formField.id);
+      const answerValue = formField.answers.find((ans) => ans.proposalId === pageProposal.id)?.value as FormFieldValue;
+      if (formField.type === 'label' || !cardProperty) {
+        // eslint-disable-next-line no-continue
+        continue;
+      } else if (formField.type === 'long_text') {
+        properties[cardProperty.id] =
+          (
+            answerValue as {
+              content: PageContent;
+              contentText: string;
+            }
+          )?.contentText ?? '';
+      } else {
+        properties[cardProperty.id] = answerValue ?? '';
+      }
     }
 
     if (pageProposal?.proposal?.evaluationType === 'rubric') {

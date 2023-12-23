@@ -1,5 +1,3 @@
-import type { Block } from '@charmverse/core/prisma';
-
 import type { BoardFields, DatabaseProposalPropertyType, IPropertyTemplate } from 'lib/focalboard/board';
 
 export type ExtractedDatabaseProposalProperties = Partial<Record<DatabaseProposalPropertyType, IPropertyTemplate>>;
