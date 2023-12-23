@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useMemo, useRef, useState } from 'react';
 
+import { useGetProposalDetails } from 'charmClient/hooks/proposals';
 import { undoEventName } from 'components/common/CharmEditor/utils';
 import { DatabasePageActionList } from 'components/common/PageActions/components/DatabasePageActionList';
 import type { PageActionMeta } from 'components/common/PageActions/components/DocumentPageActionList';
@@ -41,6 +42,7 @@ export function FullPageActionsMenuButton({ isInsideDialog, pageId, page: pagePr
     postIdOrPath: post?.id,
     isNewPost: !post
   });
+  const { data: proposalDetails } = useGetProposalDetails(pageFromId?.proposalId);
   const currentPageOrPostId = pageId ?? pageProp?.id ?? post?.id;
 
   const page = pageFromId || pageProp;
@@ -81,6 +83,7 @@ export function FullPageActionsMenuButton({ isInsideDialog, pageId, page: pagePr
         onComplete={closeMenu}
         onDelete={onDelete}
         undoEditorChanges={undoEditorChanges}
+        isStructuredProposal={!!proposalDetails?.formId}
       />
     );
   } else if (isBasePageDatabase && page) {
