@@ -94,7 +94,6 @@ function PropertyValueElement(props: Props) {
     card,
     syncWithPageId,
     propertyTemplate,
-    readOnly,
     showEmptyPlaceholder,
     board,
     updatedBy,
@@ -116,6 +115,10 @@ function PropertyValueElement(props: Props) {
 
   const intl = useIntl();
   const propertyValue = card.fields.properties[propertyTemplate.id];
+  const cardProperties = board.fields.cardProperties;
+  const readOnly =
+    props.readOnly || !!cardProperties.find((cardProperty) => cardProperty.id === propertyTemplate.id)?.formFieldId;
+
   const displayValue = OctoUtils.propertyDisplayValue({
     block: card,
     propertyValue,
