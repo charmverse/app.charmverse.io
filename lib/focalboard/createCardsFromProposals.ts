@@ -4,14 +4,12 @@ import type { Block, Page, ProposalRubricCriteria, ProposalRubricCriteriaAnswer 
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
-import type { FormFieldValue } from 'components/common/form/interfaces';
 import { prismaToBlock } from 'lib/focalboard/block';
 import { canAccessPrivateFields } from 'lib/proposal/form/canAccessPrivateFields';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   ProposalRubricCriteriaWithTypedParams
 } from 'lib/proposal/rubric/interfaces';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { BoardPropertyValue } from 'lib/public-api';
 import { relay } from 'lib/websockets/relay';
 
@@ -22,6 +20,7 @@ import type { BoardViewFields } from './boardView';
 import { extractDatabaseProposalProperties } from './extractDatabaseProposalProperties';
 import { generateResyncedProposalEvaluationForCard } from './generateResyncedProposalEvaluationForCard';
 import { setDatabaseProposalProperties } from './setDatabaseProposalProperties';
+import { updateCardFormFieldPropertiesValue } from './updateCardFormFieldPropertiesValue';
 
 export async function createCardsFromProposals({
   boardId,
@@ -180,11 +179,6 @@ export async function createCardsFromProposals({
   });
 
   for (const pageProposal of pageProposals) {
-    const accessPrivateFields = await canAccessPrivateFields({
-      userId,
-      proposal: pageProposal.proposal ?? undefined,
-      proposalId: pageProposal.proposal!.id
-    });
     const createdAt = pageProposal.createdAt;
 
     let properties: Record<string, BoardPropertyValue> = {};
@@ -205,26 +199,18 @@ export async function createCardsFromProposals({
     const formFields = pageProposal.proposal?.form?.formFields ?? [];
     const boardBlockCardProperties = boardBlock.fields.cardProperties ?? [];
 
-    const filteredFormFields = accessPrivateFields ? formFields : formFields.filter((formField) => !formField.private);
+    const accessPrivateFields = await canAccessPrivateFields({
+      userId,
+      proposal: pageProposal.proposal ?? undefined,
+      proposalId: pageProposal.proposal!.id
+    });
 
-    for (const formField of filteredFormFields) {
-      const cardProperty = boardBlockCardProperties.find((p) => p.formFieldId === formField.id);
-      const answerValue = formField.answers.find((ans) => ans.proposalId === pageProposal.id)?.value as FormFieldValue;
-      if (formField.type === 'label' || !cardProperty) {
-        // eslint-disable-next-line no-continue
-        continue;
-      } else if (formField.type === 'long_text') {
-        properties[cardProperty.id] =
-          (
-            answerValue as {
-              content: PageContent;
-              contentText: string;
-            }
-          )?.contentText ?? '';
-      } else {
-        properties[cardProperty.id] = answerValue ?? '';
-      }
-    }
+    const formFieldProperties = await updateCardFormFieldPropertiesValue({
+      accessPrivateFields,
+      cardProperties: boardBlockCardProperties,
+      formFields,
+      proposalId: pageProposal.proposal!.id
+    });
 
     if (pageProposal?.proposal?.evaluationType === 'rubric') {
       const criteria = mappedRubricCriteriaByProposal[pageProposal.id] ?? [];
@@ -247,7 +233,10 @@ export async function createCardsFromProposals({
       spaceId: pageProposal.spaceId,
       createdAt,
       createdBy: userId,
-      properties: properties as any,
+      properties: {
+        ...properties,
+        ...formFieldProperties
+      },
       hasContent: pageProposal.hasContent,
       content: pageProposal.content,
       contentText: pageProposal.contentText,
