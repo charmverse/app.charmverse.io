@@ -156,7 +156,7 @@ function SelectPropertyTemplateMenu({
   return (
     <PropertyMenu cards={cards} propertyTemplate={propertyTemplate}>
       {({ isPropertyOpen }) =>
-        isPropertyOpen ? <TagSelect opened {...tagSelectProps} /> : <TagSelect {...tagSelectProps} />
+        isPropertyOpen ? <TagSelect defaultOpened {...tagSelectProps} /> : <TagSelect {...tagSelectProps} />
       }
     </PropertyMenu>
   );
@@ -210,7 +210,7 @@ function PersonPropertyTemplateMenu({
   return (
     <PropertyMenu cards={cards} propertyTemplate={propertyTemplate}>
       {({ isPropertyOpen }) =>
-        isPropertyOpen ? <UserSelect opened {...userSelectProps} /> : <UserSelect {...userSelectProps} />
+        isPropertyOpen ? <UserSelect defaultOpened {...userSelectProps} /> : <UserSelect {...userSelectProps} />
       }
     </PropertyMenu>
   );

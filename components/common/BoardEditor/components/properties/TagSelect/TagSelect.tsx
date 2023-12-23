@@ -93,7 +93,7 @@ const StyledSelect = styled(SelectField)<ContainerProps>`
 `;
 
 export type TagSelectProps = {
-  opened?: boolean;
+  defaultOpened?: boolean;
   readOnly?: boolean;
   readOnlyMessage?: string;
   canEditOptions?: boolean; // TODO: allow editing options
@@ -128,10 +128,10 @@ export function TagSelect({
   noOptionsText,
   wrapColumn,
   'data-test': dataTest,
-  opened = false,
+  defaultOpened = false,
   disableClearable = false
 }: TagSelectProps) {
-  const [isOpened, setIsOpened] = useState(opened);
+  const [isOpened, setIsOpened] = useState(defaultOpened);
 
   const onEdit = useCallback(() => {
     if (!readOnly) {

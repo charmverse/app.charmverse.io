@@ -21,7 +21,7 @@ export type UserSelectProps = {
   displayType?: PropertyValueDisplayType;
   wrapColumn?: boolean;
   'data-test'?: string;
-  opened?: boolean;
+  defaultOpened?: boolean;
   error?: string;
 };
 
@@ -113,11 +113,11 @@ export function UserSelect({
   readOnly,
   showEmptyPlaceholder,
   wrapColumn,
-  opened,
+  defaultOpened,
   'data-test': dataTest,
   error
 }: UserSelectProps): JSX.Element | null {
-  const [isOpen, setIsOpen] = useState(opened);
+  const [isOpen, setIsOpen] = useState(defaultOpened);
 
   const _onChange = useCallback(
     (newMemberIds: string[]) => {
