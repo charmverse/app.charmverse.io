@@ -1,9 +1,9 @@
-import type { Proposal } from '@charmverse/core/prisma-client';
+import type { FormField, Proposal } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import _sum from 'lodash/sum';
 
 import type { IPropertyTemplate } from 'lib/focalboard/board';
-import type { Card, CardFields } from 'lib/focalboard/card';
+import type { CardFields } from 'lib/focalboard/card';
 import { paginatedPrismaTask } from 'lib/utilities/paginatedPrismaTask';
 
 import type { BlocksCountQuery, GenericBlocksCount } from './interfaces';
@@ -15,6 +15,7 @@ export type DetailedProposalBlocksCount = {
   proposalCategories: number;
   proposalRubrics: number;
   proposalRubricAnswers: number;
+  proposalFormFields: number;
 };
 
 export type ProposalBlocksCount = GenericBlocksCount<DetailedProposalBlocksCount>;
@@ -28,7 +29,8 @@ export async function countProposalBlocks({ spaceId, batchSize }: BlocksCountQue
       proposalPropertyValues: 0,
       proposalCategories: 0,
       proposalRubrics: 0,
-      proposalRubricAnswers: 0
+      proposalRubricAnswers: 0,
+      proposalFormFields: 0
     }
   };
 
@@ -91,6 +93,41 @@ export async function countProposalBlocks({ spaceId, batchSize }: BlocksCountQue
       }
     }
   });
+
+  const proposalsWithFormData = await prisma.proposal.findMany({
+    where: {
+      spaceId,
+      page: {
+        deletedAt: null
+      }
+    },
+    select: {
+      formAnswers: {
+        select: {
+          value: true
+        }
+      },
+      form: {
+        select: {
+          formFields: {
+            select: {
+              id: true
+            }
+          }
+        }
+      }
+    }
+  });
+
+  const totalFormFieldsCount = proposalsWithFormData.reduce<number>((acc, proposal) => {
+    const formFieldsCount = (proposal.form?.formFields ?? []).length;
+    const formFieldAnswersCount = proposal.formAnswers.filter(
+      (answer) => answer.value !== undefined && answer.value !== null
+    ).length;
+    return acc + formFieldsCount + formFieldAnswersCount;
+  }, 0);
+
+  detailedCount.details.proposalFormFields = totalFormFieldsCount;
 
   // 4 - Count proposal property values
   const proposalPropertyValues = await paginatedPrismaTask({
