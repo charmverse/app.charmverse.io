@@ -84,7 +84,7 @@ function Table(props: Props): JSX.Element {
   const dispatch = useAppDispatch();
   const selectContainerRef = useRef<HTMLDivElement | null>(null);
   const areaSelection = useAreaSelection({ readOnly, container: selectContainerRef });
-  const { resetState, setSelection, setDrawArea } = areaSelection;
+  const { resetState } = areaSelection;
 
   useKeydownPress(
     () => {
@@ -259,11 +259,7 @@ function Table(props: Props): JSX.Element {
     (srcCard: Card, dstCard: Card) => {
       Utils.log(`onDropToCard: ${dstCard.title}`);
       onDropToGroup(srcCard, dstCard.fields.properties[activeView.fields.groupById!] as string, dstCard.id);
-      setSelection(null);
-      setDrawArea({
-        end: undefined,
-        start: undefined
-      });
+      resetState();
     },
     [activeView]
   );
