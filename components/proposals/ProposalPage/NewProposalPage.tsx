@@ -6,7 +6,7 @@ import type { Theme } from '@mui/material';
 import { Box, Divider, useMediaQuery } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
-import { v4 as uuid } from 'uuid';
+import { v4 as uuid, v4 } from 'uuid';
 
 import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
 import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
@@ -39,6 +39,7 @@ import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
 import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
 import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposal/rubric/interfaces';
+import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
@@ -100,7 +101,19 @@ export function NewProposalPage({
 
   const sourceTemplate = proposalTemplates?.find((template) => template.id === formInputs.proposalTemplateId);
   const isStructured = formInputs.proposalType === 'structured' || !!sourceTemplate?.formId;
-  const proposalFormFields = formInputs.formFields ?? sourceTemplate?.form?.formFields ?? [];
+  const proposalFormFields = formInputs.formFields ??
+    sourceTemplate?.form?.formFields ?? [
+      {
+        type: 'short_text',
+        name: '',
+        description: emptyDocument,
+        index: 0,
+        options: [],
+        private: false,
+        required: true,
+        id: v4()
+      } as FormFieldInput
+    ];
 
   const {
     control: proposalFormFieldControl,
