@@ -1,7 +1,7 @@
 import type { FormField, ProposalCategory } from '@charmverse/core/prisma';
 import { ProposalStatus, prisma } from '@charmverse/core/prisma-client';
 import { objectUtils } from '@charmverse/core/utilities';
-import { v4 as uuid, v4 } from 'uuid';
+import { v4 as uuid } from 'uuid';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
@@ -196,7 +196,7 @@ export function getBoardProperties({
 
       if (existingPropIndex === -1) {
         boardProperties.push({
-          id: v4(),
+          id: uuid(),
           ...boardProperty
         });
       } else {

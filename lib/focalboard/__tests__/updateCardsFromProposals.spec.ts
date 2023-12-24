@@ -1,12 +1,16 @@
-import type { Page, Space, User } from '@charmverse/core/prisma-client';
+import type { FormField, Page, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
-import type { BoardView } from 'lib/focalboard/boardView';
 import { InvalidStateError } from 'lib/middleware';
-import { generateBoard } from 'testing/setupDatabase';
+import { randomETHWalletAddress } from 'lib/utilities/blockchain';
+import { generateBoard, generateProposal, generateUserAndSpace } from 'testing/setupDatabase';
+import { addUserToSpace } from 'testing/utils/spaces';
+import { generateUser } from 'testing/utils/users';
 
+import type { BoardFields, IPropertyTemplate } from '../board';
+import type { CardFields } from '../card';
 import { createCardsFromProposals } from '../createCardsFromProposals';
 import { extractCardProposalProperties } from '../extractCardProposalProperties';
 import { extractDatabaseProposalProperties } from '../extractDatabaseProposalProperties';
@@ -435,6 +439,209 @@ describe('updateCardsFromProposals()', () => {
     expect(updatedCardBlockAfterUnArchiveProposalProps.cardProposalStatus?.value).toBe('discussion');
     expect(updatedCardBlockAfterUnArchiveProposalProps.cardProposalStatus?.optionId).toBe(discussionValueId);
     expect(updatedCardBlockAfterUnArchiveProposalProps.cardProposalStatus?.propertyId).toBe(proposalStatus?.id);
+  });
+
+  it('should update the card properties values based on proposal form field answers, add new properties to board and new cards', async () => {
+    const { user: proposalAuthor, space: testSpace } = await generateUserAndSpace();
+    const spaceMember = await generateUser();
+    await addUserToSpace({
+      spaceId: testSpace.id,
+      userId: spaceMember.id
+    });
+
+    const proposal = await generateProposal({
+      authors: [proposalAuthor.id],
+      proposalStatus: 'discussion',
+      reviewers: [
+        {
+          group: 'user',
+          id: proposalAuthor.id
+        }
+      ],
+      spaceId: testSpace.id,
+      userId: proposalAuthor.id
+    });
+
+    const form = await prisma.form.create({
+      data: {
+        formFields: {
+          createMany: {
+            data: [
+              {
+                name: 'Short text',
+                type: 'short_text'
+              }
+            ]
+          }
+        },
+        proposal: {
+          connect: {
+            id: proposal.id
+          }
+        }
+      },
+      include: {
+        formFields: true
+      }
+    });
+
+    const formFields = form.formFields;
+    const shortTextField = formFields.find((field) => field.type === 'short_text') as FormField;
+
+    await prisma.formFieldAnswer.createMany({
+      data: [
+        {
+          fieldId: shortTextField.id,
+          proposalId: proposal.id,
+          type: shortTextField.type,
+          value: 'Short Text'
+        }
+      ]
+    });
+
+    const database = await generateBoard({
+      createdBy: proposalAuthor.id,
+      spaceId: testSpace.id,
+      views: 1,
+      viewDataSource: 'proposals'
+    });
+
+    await createCardsFromProposals({
+      boardId: database.id,
+      spaceId: testSpace.id,
+      userId: proposalAuthor.id
+    });
+
+    const proposal2 = await generateProposal({
+      authors: [proposalAuthor.id],
+      proposalStatus: 'discussion',
+      reviewers: [
+        {
+          group: 'user',
+          id: proposalAuthor.id
+        }
+      ],
+      spaceId: testSpace.id,
+      userId: proposalAuthor.id
+    });
+
+    await prisma.form.update({
+      where: {
+        id: form.id
+      },
+      data: {
+        proposal: {
+          connect: {
+            id: proposal2.id
+          }
+        }
+      }
+    });
+
+    const emailFormFieldId = v4();
+    const walletFormFieldId = v4();
+
+    await prisma.formField.createMany({
+      data: [
+        {
+          id: emailFormFieldId,
+          name: 'Email',
+          type: 'email',
+          formId: form.id
+        },
+        {
+          id: walletFormFieldId,
+          name: 'Wallet',
+          type: 'wallet',
+          formId: form.id,
+          private: true
+        }
+      ]
+    });
+
+    const walletAddress = randomETHWalletAddress();
+
+    await prisma.formFieldAnswer.createMany({
+      data: [
+        {
+          type: shortTextField.type,
+          value: 'Short text2',
+          fieldId: shortTextField.id,
+          proposalId: proposal2.id
+        },
+        {
+          type: 'email',
+          value: 'john.doe@gmail.com',
+          fieldId: emailFormFieldId,
+          proposalId: proposal2.id
+        },
+        {
+          type: 'wallet',
+          value: walletAddress,
+          fieldId: walletFormFieldId,
+          proposalId: proposal2.id
+        }
+      ]
+    });
+
+    // Space member visits the board and triggers the update
+    // Even though the member doesn't have access to the private wallet field, since the database was created by the proposal author, the wallet field should be added to the board
+    await updateCardsFromProposals({
+      boardId: database.id,
+      spaceId: testSpace.id,
+      userId: spaceMember.id
+    });
+
+    const databaseAfterUpdate = await prisma.block.findUniqueOrThrow({
+      where: {
+        id: database.id
+      }
+    });
+
+    const boardProperties = (databaseAfterUpdate.fields as unknown as BoardFields).cardProperties;
+    const emailProp = boardProperties.find((prop) => prop.formFieldId === emailFormFieldId) as IPropertyTemplate;
+    const walletProp = boardProperties.find((prop) => prop.formFieldId === walletFormFieldId) as IPropertyTemplate;
+    const shortTextProp = boardProperties.find((prop) => prop.formFieldId === shortTextField.id) as IPropertyTemplate;
+
+    // New card property was added since new form field was added
+    expect(emailProp).toMatchObject(
+      expect.objectContaining({
+        name: 'Email',
+        type: 'email'
+      })
+    );
+
+    expect(walletProp).toMatchObject(
+      expect.objectContaining({
+        name: 'Wallet',
+        type: 'text'
+      })
+    );
+
+    const cardBlocks = await prisma.block.findMany({
+      where: {
+        parentId: database.id,
+        type: 'card',
+        spaceId: testSpace.id,
+        page: {
+          syncWithPageId: {
+            not: null
+          }
+        }
+      }
+    });
+
+    const card1Properties = (cardBlocks[0].fields as unknown as CardFields).properties;
+    const card2Properties = (cardBlocks[1].fields as unknown as CardFields).properties;
+
+    expect(card1Properties[shortTextProp.id]).toBe('Short Text');
+    expect(card1Properties[emailProp.id]).toBeUndefined();
+    expect(card1Properties[walletProp.id]).toBeUndefined();
+
+    //
+    expect(card2Properties[shortTextProp.id]).toBe('Short text2');
+    expect(card2Properties[emailProp.id]).toBe('john.doe@gmail.com');
+    expect(card2Properties[walletProp.id]).toBe(walletAddress);
   });
 
   it('should delete cards from proposals', async () => {
