@@ -32,6 +32,8 @@ const ProposalTemplateMenu = styled(Stack)`
     transition: background-color 0.2s ease-in-out;
   }
   gap: ${({ theme }) => theme.spacing(1)};
+  flex-direction: row;
+  align-items: center;
 `;
 
 export function NewProposalButton() {
@@ -108,7 +110,6 @@ export function NewProposalButton() {
       />
 
       <Modal
-        size='fluid'
         title='Select a template type'
         open={proposalTemplateCreateModalState.isOpen}
         onClose={proposalTemplateCreateModalState.close}
@@ -118,23 +119,15 @@ export function NewProposalButton() {
             onClick={() => createTemplate('structured')}
             data-test='structured-proposal-template-menu'
           >
-            <Stack flexDirection='row' gap={1} alignItems='center'>
-              <WidgetsOutlinedIcon fontSize='large' />
-              <Typography variant='h5'>Structured Form</Typography>
-            </Stack>
-            <Typography variant='body2'>
-              Create a template using Forms, creating a structured data format for each proposal to conform to.
-            </Typography>
+            <WidgetsOutlinedIcon fontSize='large' />
+            <Typography variant='h6'>Form</Typography>
           </ProposalTemplateMenu>
           <ProposalTemplateMenu
             onClick={() => createTemplate('free_form')}
             data-test='free_form-proposal-template-menu'
           >
-            <Stack flexDirection='row' gap={1} alignItems='center'>
-              <DescriptionOutlinedIcon fontSize='large' />
-              <Typography variant='h5'>Free Form</Typography>
-            </Stack>
-            <Typography variant='body2'>Create a template using an open editor.</Typography>
+            <DescriptionOutlinedIcon fontSize='large' />
+            <Typography variant='h6'>Document</Typography>
           </ProposalTemplateMenu>
         </Stack>
       </Modal>
