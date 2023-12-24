@@ -469,6 +469,13 @@ function CenterPanel(props: Props) {
     }
   }, [activeView?.id]);
 
+  useEffect(() => {
+    const viewType = activeView?.fields.viewType;
+    if (viewType !== 'table') {
+      setCheckedIds([]);
+    }
+  }, [activeView?.fields.viewType]);
+
   // refresh google forms data whenever source changes
   useEffect(() => {
     if (activeView) {
