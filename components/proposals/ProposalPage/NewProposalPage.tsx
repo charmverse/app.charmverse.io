@@ -101,19 +101,21 @@ export function NewProposalPage({
 
   const sourceTemplate = proposalTemplates?.find((template) => template.id === formInputs.proposalTemplateId);
   const isStructured = formInputs.proposalType === 'structured' || !!sourceTemplate?.formId;
-  const proposalFormFields = formInputs.formFields ??
-    sourceTemplate?.form?.formFields ?? [
-      {
-        type: 'short_text',
-        name: '',
-        description: emptyDocument,
-        index: 0,
-        options: [],
-        private: false,
-        required: true,
-        id: v4()
-      } as FormFieldInput
-    ];
+  const proposalFormFields = isStructured
+    ? formInputs.formFields ??
+      sourceTemplate?.form?.formFields ?? [
+        {
+          type: 'short_text',
+          name: '',
+          description: emptyDocument,
+          index: 0,
+          options: [],
+          private: false,
+          required: true,
+          id: v4()
+        } as FormFieldInput
+      ]
+    : [];
 
   const {
     control: proposalFormFieldControl,
