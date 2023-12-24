@@ -16,6 +16,7 @@ import { PageIcon } from 'components/common/PageIcon';
 import { RewardApplicationStatusIcon } from 'components/rewards/components/RewardApplicationStatusChip';
 import { SelectionContext, useSelected } from 'hooks/useAreaSelection';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useDragDrop } from 'hooks/useDragDrop';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
@@ -23,9 +24,9 @@ import type { Card, CardPage } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
 import { REWARD_STATUS_BLOCK_ID } from 'lib/rewards/blocks/constants';
 import { isTouchScreen } from 'lib/utilities/browser';
+import { mergeRefs } from 'lib/utilities/react';
 
 import { TextInput } from '../../../../components/properties/TextInput';
-import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
@@ -125,12 +126,16 @@ function TableRow(props: Props) {
   const [title, setTitle] = useState('');
   const isManualSort = activeView.fields.sortOptions.length === 0;
   const isGrouped = Boolean(activeView.fields.groupById);
-  const [isDragging, isOver, cardHandlerRef] = useSortable(
-    'card',
-    card,
-    !isTouchScreen() && !props.readOnly && (isManualSort || isGrouped),
-    props.onDrop
-  );
+
+  const enabled = !isTouchScreen() && !props.readOnly && (isManualSort || isGrouped);
+
+  const { drag, drop, preview, style } = useDragDrop({
+    item: card,
+    itemType: 'card',
+    onDrop: props.onDrop,
+    enabled
+  });
+
   const { selection } = useContext(SelectionContext);
   const isSelected = useSelected(cardRef, selection);
 
@@ -183,9 +188,7 @@ function TableRow(props: Props) {
   }, [board.fields.cardProperties, activeView.fields.visiblePropertyIds]);
 
   let className = props.isSelected ? 'TableRow octo-table-row selected' : 'TableRow octo-table-row';
-  if (isOver) {
-    className += ' dragover';
-  }
+
   if (isGrouped) {
     const groupID = activeView.fields.groupById || '';
     const groupValue = (card.fields.properties[groupID] as string) || 'undefined';
@@ -210,23 +213,23 @@ function TableRow(props: Props) {
       data-test={`database-row-${card.id}`}
       className={className}
       onClick={(e) => props.onClick?.(e, card)}
-      ref={cardRef}
+      ref={mergeRefs([cardRef, preview, drop])}
       style={{
-        opacity: isDragging ? 0.5 : 1,
         backgroundColor: isNested ? 'var(--input-bg)' : 'transparent',
         ...(isChecked && {
           background: 'rgba(35, 131, 226, 0.14)',
           zIndex: 85
-        })
+        }),
+        ...style
       }}
     >
       {!props.readOnly && (
         <>
-          <Box className='icons row-actions' onClick={handleClick} ref={cardHandlerRef}>
+          <div className='icons row-actions' onClick={handleClick} ref={drag}>
             <Box className='charm-drag-handle disable-drag-selection'>
               <DragIndicatorIcon color='secondary' />
             </Box>
-          </Box>
+          </div>
           {setCheckedIds && (
             <StyledCheckbox
               className='table-row-checkbox disable-drag-selection'

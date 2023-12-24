@@ -49,7 +49,16 @@ type Props = {
 
 const TableRowsContainer = forwardRef<HTMLDivElement, { children: ReactNode }>(({ children }, ref) => {
   return (
-    <div ref={ref as LegacyRef<HTMLDivElement>} className='table-row-container'>
+    <div
+      ref={ref as LegacyRef<HTMLDivElement>}
+      className='table-row-container'
+      style={{
+        // Adding 2px margin top to show the drag and drop outline, otherwise the table header blocks it,
+        // it can also be achieved via position: relative, zIndex: 1
+        // but it changes the position from sticky which might have unknown side-effects
+        marginTop: 2
+      }}
+    >
       {children}
     </div>
   );
