@@ -82,6 +82,17 @@ export function useAreaSelection({ container = { current: document.body }, readO
     setSelection(null);
   }, []);
 
+  const resetState = () => {
+    setDrawArea({
+      start: undefined,
+      end: undefined
+    });
+    setSelection(null);
+    if (boxElement.current) {
+      container.current?.removeChild(boxElement.current);
+    }
+  };
+
   useEffect(() => {
     const containerElement = container.current;
     if (containerElement && !readOnly) {
@@ -123,7 +134,8 @@ export function useAreaSelection({ container = { current: document.body }, readO
     selection,
     setSelection,
     boxElement,
-    setDrawArea
+    setDrawArea,
+    resetState
   };
 }
 

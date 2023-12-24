@@ -75,11 +75,12 @@ function Table(props: Props): JSX.Element {
   const dispatch = useAppDispatch();
   const selectContainerRef = useRef<HTMLDivElement | null>(null);
   const areaSelection = useAreaSelection({ readOnly, container: selectContainerRef });
-  const { setSelection, setDrawArea } = areaSelection;
+  const { resetState, setSelection, setDrawArea } = areaSelection;
 
   useKeydownPress(
     () => {
       setCheckedIds?.([]);
+      resetState();
     },
     {
       ctrl: false,
