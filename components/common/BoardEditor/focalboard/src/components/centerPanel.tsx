@@ -463,6 +463,7 @@ function CenterPanel(props: Props) {
 
   // close settings once a view has been added
   useEffect(() => {
+    setCheckedIds([]);
     if (activeView) {
       closeSettings();
     }
