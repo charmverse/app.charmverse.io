@@ -277,14 +277,15 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
         </div>
         <div
           class="table-row-container"
+          style="margin-top: 2px;"
         >
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-1"
-            style="opacity: 1; background-color: transparent;"
+            style="background-color: transparent; opacity: 1; cursor: default;"
           >
             <div
-              class="icons row-actions MuiBox-root css-0"
+              class="icons row-actions"
               draggable="true"
             >
               <div
@@ -419,10 +420,10 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-2"
-            style="opacity: 1; background-color: transparent;"
+            style="background-color: transparent; opacity: 1; cursor: default;"
           >
             <div
-              class="icons row-actions MuiBox-root css-0"
+              class="icons row-actions"
               draggable="true"
             >
               <div
@@ -956,14 +957,15 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
         </div>
         <div
           class="table-row-container"
+          style="margin-top: 2px;"
         >
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-1"
-            style="opacity: 1; background-color: transparent;"
+            style="background-color: transparent; opacity: 1; cursor: default;"
           >
             <div
-              class="icons row-actions MuiBox-root css-0"
+              class="icons row-actions"
               draggable="true"
             >
               <div
@@ -1092,10 +1094,10 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-2"
-            style="opacity: 1; background-color: transparent;"
+            style="background-color: transparent; opacity: 1; cursor: default;"
           >
             <div
-              class="icons row-actions MuiBox-root css-0"
+              class="icons row-actions"
               draggable="true"
             >
               <div
@@ -1626,14 +1628,15 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
         </div>
         <div
           class="table-row-container"
+          style="margin-top: 2px;"
         >
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-1"
-            style="opacity: 1; background-color: transparent;"
+            style="background-color: transparent; opacity: 1; cursor: default;"
           >
             <div
-              class="icons row-actions MuiBox-root css-0"
+              class="icons row-actions"
               draggable="true"
             >
               <div
@@ -1768,10 +1771,10 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-2"
-            style="opacity: 1; background-color: transparent;"
+            style="background-color: transparent; opacity: 1; cursor: default;"
           >
             <div
-              class="icons row-actions MuiBox-root css-0"
+              class="icons row-actions"
               draggable="true"
             >
               <div
@@ -2305,14 +2308,15 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
         </div>
         <div
           class="table-row-container"
+          style="margin-top: 2px;"
         >
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-1"
-            style="opacity: 1; background-color: transparent;"
+            style="background-color: transparent; opacity: 1; cursor: default;"
           >
             <div
-              class="icons row-actions MuiBox-root css-0"
+              class="icons row-actions"
               draggable="true"
             >
               <div
@@ -2441,10 +2445,10 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-2"
-            style="opacity: 1; background-color: transparent;"
+            style="background-color: transparent; opacity: 1; cursor: default;"
           >
             <div
-              class="icons row-actions MuiBox-root css-0"
+              class="icons row-actions"
               draggable="true"
             >
               <div
@@ -2920,6 +2924,7 @@ exports[`components/table/Table should match snapshot 1`] = `
         </div>
         <div
           class="table-row-container"
+          style="margin-top: 2px;"
         />
         <div
           class="octo-table-footer"
@@ -3247,6 +3252,7 @@ exports[`components/table/Table should match snapshot with GroupBy 1`] = `
         </div>
         <div
           class="table-row-container"
+          style="margin-top: 2px;"
         >
           <div
             class="octo-table-group"
@@ -3549,6 +3555,7 @@ exports[`components/table/Table should match snapshot, read-only 1`] = `
         </div>
         <div
           class="table-row-container"
+          style="margin-top: 2px;"
         />
         <div
           class="octo-table-footer"

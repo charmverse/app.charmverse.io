@@ -1969,6 +1969,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                 </div>
                 <div
                   class="table-row-container"
+                  style="margin-top: 2px;"
                 >
                   <div
                     class="octo-table-group"
