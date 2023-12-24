@@ -88,8 +88,8 @@ export function useAreaSelection({ container = { current: document.body }, readO
       end: undefined
     });
     setSelection(null);
-    if (boxElement.current) {
-      container.current?.removeChild(boxElement.current);
+    if (boxElement.current && container.current?.contains(boxElement.current)) {
+      container.current.removeChild(boxElement.current);
     }
   };
 
