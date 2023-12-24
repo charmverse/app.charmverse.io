@@ -123,7 +123,8 @@ export function NewProposalPage({
     errors: proposalFormFieldErrors,
     onFormChange
   } = useFormFields({
-    fields: proposalFormFields
+    // Only set the initial state with fields when we are creating a structured proposal
+    fields: isStructured && formInputs.type === 'proposal' ? proposalFormFields : []
   });
 
   function toggleCollapse(fieldId: string) {

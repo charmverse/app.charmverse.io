@@ -1,4 +1,4 @@
-import type { FormField, Proposal } from '@charmverse/core/prisma-client';
+import type { Proposal } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import _sum from 'lodash/sum';
 
