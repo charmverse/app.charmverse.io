@@ -12,7 +12,6 @@ export type DetailedProposalBlocksCount = {
   proposalViews: number;
   proposalProperties: number;
   proposalPropertyValues: number;
-  proposalCategories: number;
   proposalRubrics: number;
   proposalRubricAnswers: number;
 };
@@ -26,7 +25,6 @@ export async function countProposalBlocks({ spaceId, batchSize }: BlocksCountQue
       proposalViews: 0,
       proposalProperties: 0,
       proposalPropertyValues: 0,
-      proposalCategories: 0,
       proposalRubrics: 0,
       proposalRubricAnswers: 0
     }

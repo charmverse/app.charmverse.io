@@ -900,7 +900,6 @@
         "archived": false,
         "reviewedBy": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
         "reviewedAt": "2022-09-08T11:46:55.784Z",
-        "categoryId": "49c9fc30-0e3d-4bfa-8708-d2efea9b8891",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
@@ -2836,7 +2835,6 @@
         "archived": false,
         "reviewedBy": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
         "reviewedAt": "2022-09-19T18:22:07.761Z",
-        "categoryId": "49c9fc30-0e3d-4bfa-8708-d2efea9b8891",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
@@ -2916,7 +2914,6 @@
         "archived": false,
         "reviewedBy": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
         "reviewedAt": "2022-10-28T15:30:53.157Z",
-        "categoryId": "f5527a96-4f10-4986-b5c5-7b4292d8c222",
         "snapshotProposalExpiry": "2023-10-05T14:48:47.000Z",
         "publishToLens": null,
         "lensPostLink": null,
@@ -3024,7 +3021,6 @@
         "archived": false,
         "reviewedBy": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
         "reviewedAt": "2022-09-08T13:44:05.265Z",
-        "categoryId": "49c9fc30-0e3d-4bfa-8708-d2efea9b8891",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
@@ -3355,7 +3351,6 @@
         "archived": false,
         "reviewedBy": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
         "reviewedAt": "2022-11-08T19:38:40.135Z",
-        "categoryId": "f52208b1-2d4e-44b9-aad1-7fcab7d9036c",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
@@ -4207,7 +4202,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "4532b730-f8fa-4925-a056-4d1b175d0d67",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
@@ -4641,7 +4635,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "4532b730-f8fa-4925-a056-4d1b175d0d67",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
@@ -5294,7 +5287,6 @@
         "archived": false,
         "reviewedBy": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
         "reviewedAt": "2022-09-08T11:41:37.559Z",
-        "categoryId": "49c9fc30-0e3d-4bfa-8708-d2efea9b8891",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
@@ -5918,7 +5910,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "f5527a96-4f10-4986-b5c5-7b4292d8c222",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
@@ -6622,7 +6613,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "fc1c1130-1f02-414a-86fb-505bc5061bb5",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
@@ -10001,7 +9991,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "4b869f0f-259a-4fec-8c8e-f3d9a4992c35",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
@@ -17361,7 +17350,6 @@
         "archived": false,
         "reviewedBy": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
         "reviewedAt": "2023-08-31T15:32:05.631Z",
-        "categoryId": "4532b730-f8fa-4925-a056-4d1b175d0d67",
         "snapshotProposalExpiry": "2023-09-03T16:33:44.000Z",
         "publishToLens": true,
         "lensPostLink": "0x01c83b-0x02-DA-7666e5ec",
@@ -17564,7 +17552,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "4b869f0f-259a-4fec-8c8e-f3d9a4992c35",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
@@ -20849,7 +20836,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "4b869f0f-259a-4fec-8c8e-f3d9a4992c35",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
@@ -21228,7 +21214,6 @@
         "archived": false,
         "reviewedBy": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
         "reviewedAt": "2023-11-02T07:25:09.430Z",
-        "categoryId": "4532b730-f8fa-4925-a056-4d1b175d0d67",
         "snapshotProposalExpiry": "2023-11-05T08:25:31.000Z",
         "publishToLens": false,
         "lensPostLink": null,
@@ -25947,50 +25932,6 @@
       }
     ]
   },
-  "proposalCategories": [
-    {
-      "id": "fc1c1130-1f02-414a-86fb-505bc5061bb5",
-      "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-      "title": "Metagoverance",
-      "color": "pink"
-    },
-    {
-      "id": "4532b730-f8fa-4925-a056-4d1b175d0d67",
-      "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-      "title": "Treasury",
-      "color": "gray"
-    },
-    {
-      "id": "f5527a96-4f10-4986-b5c5-7b4292d8c222",
-      "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-      "title": "Protocol",
-      "color": "pink"
-    },
-    {
-      "id": "f52208b1-2d4e-44b9-aad1-7fcab7d9036c",
-      "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-      "title": "Hackathon",
-      "color": "orange"
-    },
-    {
-      "id": "99a92118-af0b-45db-9e7f-be81f4b3b8fc",
-      "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-      "title": "Governance",
-      "color": "purple"
-    },
-    {
-      "id": "49c9fc30-0e3d-4bfa-8708-d2efea9b8891",
-      "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-      "title": "General",
-      "color": "teal"
-    },
-    {
-      "id": "4b869f0f-259a-4fec-8c8e-f3d9a4992c35",
-      "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-      "title": "Season 11",
-      "color": "turquoise"
-    }
-  ],
   "postCategories": [
     {
       "id": "7d386386-673b-46ea-87e4-b5e5048b6e65",

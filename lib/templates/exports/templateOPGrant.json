@@ -471,7 +471,6 @@
         "status": "draft",
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "8478fcad-3d1f-43d2-9080-76acedffea84",
         "snapshotProposalExpiry": null,
         "category": {
           "id": "8478fcad-3d1f-43d2-9080-76acedffea84",
@@ -1611,7 +1610,6 @@
         "status": "draft",
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "8478fcad-3d1f-43d2-9080-76acedffea84",
         "snapshotProposalExpiry": null,
         "category": {
           "id": "8478fcad-3d1f-43d2-9080-76acedffea84",
@@ -2031,7 +2029,6 @@
         "status": "draft",
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "8478fcad-3d1f-43d2-9080-76acedffea84",
         "snapshotProposalExpiry": null,
         "category": {
           "id": "8478fcad-3d1f-43d2-9080-76acedffea84",
@@ -2379,7 +2376,6 @@
         "status": "draft",
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "fbece9d6-ea51-4626-a459-6b572556c302",
         "snapshotProposalExpiry": null,
         "category": {
           "id": "fbece9d6-ea51-4626-a459-6b572556c302",
@@ -3069,7 +3065,6 @@
         "status": "draft",
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "7ae5cdce-882c-4b4a-854c-e4bc5b2a99f7",
         "snapshotProposalExpiry": null,
         "category": {
           "id": "7ae5cdce-882c-4b4a-854c-e4bc5b2a99f7",
@@ -3757,7 +3752,6 @@
         "status": "draft",
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "7ae5cdce-882c-4b4a-854c-e4bc5b2a99f7",
         "snapshotProposalExpiry": null,
         "category": {
           "id": "7ae5cdce-882c-4b4a-854c-e4bc5b2a99f7",
@@ -4238,7 +4232,6 @@
         "status": "draft",
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "8478fcad-3d1f-43d2-9080-76acedffea84",
         "snapshotProposalExpiry": null,
         "category": {
           "id": "8478fcad-3d1f-43d2-9080-76acedffea84",
@@ -4928,7 +4921,6 @@
         "status": "draft",
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "7ae5cdce-882c-4b4a-854c-e4bc5b2a99f7",
         "snapshotProposalExpiry": null,
         "category": {
           "id": "7ae5cdce-882c-4b4a-854c-e4bc5b2a99f7",
@@ -6068,7 +6060,6 @@
         "status": "draft",
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "8478fcad-3d1f-43d2-9080-76acedffea84",
         "snapshotProposalExpiry": null,
         "category": {
           "id": "8478fcad-3d1f-43d2-9080-76acedffea84",
@@ -6488,7 +6479,6 @@
         "status": "draft",
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "8478fcad-3d1f-43d2-9080-76acedffea84",
         "snapshotProposalExpiry": null,
         "category": {
           "id": "8478fcad-3d1f-43d2-9080-76acedffea84",
@@ -6836,7 +6826,6 @@
         "status": "draft",
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "fbece9d6-ea51-4626-a459-6b572556c302",
         "snapshotProposalExpiry": null,
         "category": {
           "id": "fbece9d6-ea51-4626-a459-6b572556c302",
@@ -7524,7 +7513,6 @@
         "status": "draft",
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "7ae5cdce-882c-4b4a-854c-e4bc5b2a99f7",
         "snapshotProposalExpiry": null,
         "category": {
           "id": "7ae5cdce-882c-4b4a-854c-e4bc5b2a99f7",

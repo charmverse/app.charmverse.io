@@ -16858,7 +16858,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "99054d92-aabe-4bd9-97eb-ea9ba7223ab1",
         "snapshotProposalExpiry": null,
         "publishToLens": false,
         "lensPostLink": null,
@@ -18594,7 +18593,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "4cf7654d-3df7-4915-8755-e3028bbf4211",
         "snapshotProposalExpiry": null,
         "publishToLens": false,
         "lensPostLink": null,
@@ -20330,7 +20328,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "a1e3fa83-b7f2-44fd-8c22-7fa303fe1c66",
         "snapshotProposalExpiry": null,
         "publishToLens": false,
         "lensPostLink": null,
@@ -22066,7 +22063,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "542bfc53-b7dd-4557-b77f-feec43c052c6",
         "snapshotProposalExpiry": null,
         "publishToLens": false,
         "lensPostLink": null,
@@ -25656,32 +25652,6 @@
       }
     ]
   },
-  "proposalCategories": [
-    {
-      "id": "99054d92-aabe-4bd9-97eb-ea9ba7223ab1",
-      "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
-      "title": "Integrations",
-      "color": "orange"
-    },
-    {
-      "id": "4cf7654d-3df7-4915-8755-e3028bbf4211",
-      "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
-      "title": "Dev Tooling",
-      "color": "red"
-    },
-    {
-      "id": "a1e3fa83-b7f2-44fd-8c22-7fa303fe1c66",
-      "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
-      "title": "Dapps",
-      "color": "green"
-    },
-    {
-      "id": "542bfc53-b7dd-4557-b77f-feec43c052c6",
-      "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
-      "title": "Gaming",
-      "color": "turquoise"
-    }
-  ],
   "postCategories": [
     {
       "id": "b76fa50d-e0d3-4ab1-8062-3ef899a00c66",

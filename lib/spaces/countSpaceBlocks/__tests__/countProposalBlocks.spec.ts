@@ -132,7 +132,6 @@ describe('countProposalBlocks', () => {
         proposalViews: 1,
         proposalProperties: 7,
         proposalPropertyValues: 4,
-        proposalCategories: 2,
         proposalRubricAnswers: 4,
         proposalRubrics: 2
       }
@@ -240,7 +239,6 @@ describe('countProposalBlocks', () => {
         proposalViews: 1,
         proposalProperties: 7,
         proposalPropertyValues: 4,
-        proposalCategories: 2,
         proposalRubricAnswers: 0,
         proposalRubrics: 0
       }
@@ -258,7 +256,6 @@ describe('countProposalBlocks', () => {
         proposalViews: 0,
         proposalProperties: 0,
         proposalPropertyValues: 0,
-        proposalCategories: 0,
         proposalRubricAnswers: 0,
         proposalRubrics: 0
       }

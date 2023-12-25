@@ -655,7 +655,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "67f004c9-ff0f-459a-a9d0-d02fd563158c",
         "snapshotProposalExpiry": null,
         "publishToLens": false,
         "lensPostLink": null,
@@ -1455,7 +1454,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "e826b6ff-ea89-47aa-9bda-83234bff9491",
         "snapshotProposalExpiry": null,
         "publishToLens": false,
         "lensPostLink": null,
@@ -2233,7 +2231,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "037cac71-c4c7-4355-83dc-577a4cc30a08",
         "snapshotProposalExpiry": null,
         "publishToLens": false,
         "lensPostLink": null,
@@ -2746,7 +2743,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "9d39b289-e4a9-4817-bfe6-4ea83f9094c9",
         "snapshotProposalExpiry": null,
         "publishToLens": false,
         "lensPostLink": null,
@@ -3457,7 +3453,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "3b721d2f-d5af-4119-a11f-a43419266146",
         "snapshotProposalExpiry": null,
         "publishToLens": false,
         "lensPostLink": null,
@@ -4365,7 +4360,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "f7a37418-ffb8-483c-a260-c6162ae88155",
         "snapshotProposalExpiry": null,
         "publishToLens": false,
         "lensPostLink": null,
@@ -5009,7 +5003,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "53726def-5070-4911-a095-681c85aeacaa",
         "snapshotProposalExpiry": null,
         "publishToLens": false,
         "lensPostLink": null,
@@ -5787,7 +5780,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "8e80fb13-ce4b-45e9-abcf-fe01aea62ddd",
         "snapshotProposalExpiry": null,
         "publishToLens": false,
         "lensPostLink": null,
@@ -16875,56 +16867,6 @@
       }
     ]
   },
-  "proposalCategories": [
-    {
-      "id": "67f004c9-ff0f-459a-a9d0-d02fd563158c",
-      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-      "title": "Grants",
-      "color": "pink"
-    },
-    {
-      "id": "8e80fb13-ce4b-45e9-abcf-fe01aea62ddd",
-      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-      "title": "Tech",
-      "color": "yellow"
-    },
-    {
-      "id": "037cac71-c4c7-4355-83dc-577a4cc30a08",
-      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-      "title": "Partnerships",
-      "color": "blue"
-    },
-    {
-      "id": "9d39b289-e4a9-4817-bfe6-4ea83f9094c9",
-      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-      "title": "Education",
-      "color": "orange"
-    },
-    {
-      "id": "53726def-5070-4911-a095-681c85aeacaa",
-      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-      "title": "Tokenomics",
-      "color": "turquoise"
-    },
-    {
-      "id": "f7a37418-ffb8-483c-a260-c6162ae88155",
-      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-      "title": "Community",
-      "color": "green"
-    },
-    {
-      "id": "3b721d2f-d5af-4119-a11f-a43419266146",
-      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-      "title": "Art Direction",
-      "color": "purple"
-    },
-    {
-      "id": "e826b6ff-ea89-47aa-9bda-83234bff9491",
-      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-      "title": "Governance",
-      "color": "red"
-    }
-  ],
   "postCategories": [
     {
       "id": "ae5f885b-7958-4379-9521-6eb175d2f16a",

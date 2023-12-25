@@ -481,7 +481,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "506bd977-75a1-47e6-8936-74b18ce3be49",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
@@ -915,7 +914,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "506bd977-75a1-47e6-8936-74b18ce3be49",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
@@ -1275,7 +1273,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "598ae8e5-7fc5-42b3-95cd-380a84c666fb",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
@@ -1979,7 +1976,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "11a463b0-859d-49e2-894e-bd9c5e5574b0",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
@@ -2683,7 +2679,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "11a463b0-859d-49e2-894e-bd9c5e5574b0",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
@@ -46729,7 +46724,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "506bd977-75a1-47e6-8936-74b18ce3be49",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
@@ -49493,62 +49487,6 @@
       }
     ]
   },
-  "proposalCategories": [
-    {
-      "id": "c004d136-fea9-4381-bf0d-5c93f514dd8a",
-      "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-      "title": "General",
-      "color": "pink"
-    },
-    {
-      "id": "68b88fa3-5db1-44d6-914f-ed10247d8fee",
-      "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-      "title": "Operational Budget",
-      "color": "teal"
-    },
-    {
-      "id": "6a4d83dc-f3f1-4325-96e5-830e64724ab9",
-      "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-      "title": "Grants",
-      "color": "yellow"
-    },
-    {
-      "id": "56532016-471f-42d9-a8bd-78877b78d00a",
-      "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-      "title": "Investment",
-      "color": "purple"
-    },
-    {
-      "id": "a2996f2f-af07-470a-b22d-a56c921950e6",
-      "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-      "title": "Elections",
-      "color": "purple"
-    },
-    {
-      "id": "9821c563-96de-4956-b027-170b904c6018",
-      "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-      "title": "Governance",
-      "color": "purple"
-    },
-    {
-      "id": "506bd977-75a1-47e6-8936-74b18ce3be49",
-      "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-      "title": "Treasury",
-      "color": "gray"
-    },
-    {
-      "id": "598ae8e5-7fc5-42b3-95cd-380a84c666fb",
-      "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-      "title": "Protocol",
-      "color": "pink"
-    },
-    {
-      "id": "11a463b0-859d-49e2-894e-bd9c5e5574b0",
-      "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-      "title": "Metagoverance",
-      "color": "pink"
-    }
-  ],
   "postCategories": [
     {
       "id": "ca5ad096-0c24-4a44-bcb8-59951d4877a6",

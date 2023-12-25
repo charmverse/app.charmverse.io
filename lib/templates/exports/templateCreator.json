@@ -655,7 +655,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "03c19185-9b4e-4e8f-9740-98d7b7c18cdb",
         "snapshotProposalExpiry": null,
         "publishToLens": false,
         "lensPostLink": null,
@@ -6092,50 +6091,6 @@
       }
     ]
   },
-  "proposalCategories": [
-    {
-      "id": "03c19185-9b4e-4e8f-9740-98d7b7c18cdb",
-      "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
-      "title": "Grants",
-      "color": "orange"
-    },
-    {
-      "id": "511a1415-4d5c-4abc-8606-241801fe966d",
-      "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
-      "title": "Governance",
-      "color": "purple"
-    },
-    {
-      "id": "4a41fe9c-79d2-473a-86ca-7bb24c655f34",
-      "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
-      "title": "Community",
-      "color": "pink"
-    },
-    {
-      "id": "2920d4a9-2b64-4b45-8fad-6df67a499a34",
-      "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
-      "title": "Content Creation",
-      "color": "purple"
-    },
-    {
-      "id": "57ea8438-9a19-4c93-924f-063ba3d71ce8",
-      "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
-      "title": "Tech",
-      "color": "yellow"
-    },
-    {
-      "id": "c480284c-ddba-4589-aa99-01a1e8640f6c",
-      "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
-      "title": "Partnerships",
-      "color": "orange"
-    },
-    {
-      "id": "6537d78e-e2c5-41ea-8f37-9022d172949f",
-      "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
-      "title": "Outreach",
-      "color": "orange"
-    }
-  ],
   "postCategories": [
     {
       "id": "bd535b45-3aa2-4691-8096-512431442fcf",

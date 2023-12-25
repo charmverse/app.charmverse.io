@@ -222,7 +222,6 @@ let record: OverallBlocksCount =  {
         "proposalViews": 0,
         "proposalProperties": 0,
         "proposalPropertyValues": 0,
-        "proposalCategories": 0,
         "proposalRubrics": 0,
         "proposalRubricAnswers": 0
       }

@@ -42,13 +42,7 @@ export async function loadAndGenerateCsv({
       id: targetPage.spaceId
     },
     select: {
-      domain: true,
-      proposalCategories: {
-        select: {
-          id: true,
-          title: true
-        }
-      }
+      domain: true
     }
   });
 

@@ -149,10 +149,7 @@ export async function generateImportWorkspacePages({
   const isUuid = validate(targetSpaceIdOrDomain);
 
   const space = await prisma.space.findUniqueOrThrow({
-    where: isUuid ? { id: targetSpaceIdOrDomain } : { domain: targetSpaceIdOrDomain },
-    include: {
-      proposalCategories: true
-    }
+    where: isUuid ? { id: targetSpaceIdOrDomain } : { domain: targetSpaceIdOrDomain }
   });
 
   const dataToImport = await getImportData({ exportData, exportName });
@@ -449,9 +446,9 @@ export async function generateImportWorkspacePages({
       const { category, ...proposal } = node.proposal;
       let categoryId: string | undefined;
       if (category) {
-        categoryId =
-          space.proposalCategories.find((cat) => cat.title === category.title)?.id ||
-          proposalCategoryArgs.find((proposalCategoryArg) => proposalCategoryArg.title === category.title)?.id;
+        categoryId = proposalCategoryArgs.find(
+          (proposalCategoryArg) => proposalCategoryArg.title === category.title
+        )?.id;
         if (!categoryId) {
           categoryId = uuid();
           proposalCategoryArgs.push({
