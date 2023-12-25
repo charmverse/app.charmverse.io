@@ -4,21 +4,16 @@ import { v4 as uuid } from 'uuid';
 
 import { createRewardsForProposal } from 'lib/proposal/createRewardsForProposal';
 import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
-import { generateProposalCategory } from 'testing/utils/proposals';
 
 import { createProposal } from '../createProposal';
 
 let user: User;
 let space: Space;
-let proposalCategory: ProposalCategory;
 
 beforeAll(async () => {
   const generated = await generateUserAndSpace();
   user = generated.user;
   space = generated.space;
-  proposalCategory = await generateProposalCategory({
-    spaceId: space.id
-  });
 });
 
 describe('Creates rewards for proposal with pending rewards', () => {
@@ -40,7 +35,6 @@ describe('Creates rewards for proposal with pending rewards', () => {
         contentText: '',
         title: pageTitle
       },
-      categoryId: proposalCategory.id,
       userId: user.id,
       spaceId: space.id,
       evaluations: [
@@ -109,7 +103,6 @@ describe('Creates rewards for proposal with pending rewards', () => {
         contentText: '',
         title: 'proposal 2'
       },
-      categoryId: proposalCategory.id,
       userId: user.id,
       spaceId: space.id,
       authors: [user.id, extraUser.id],

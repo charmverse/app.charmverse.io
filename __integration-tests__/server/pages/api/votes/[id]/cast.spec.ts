@@ -2,10 +2,9 @@ import type { Page, Space, User, Vote } from '@charmverse/core/prisma';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import { upsertProposalCategoryPermission } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { createPage, createVote, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
-import { generateProposal, generateProposalCategory } from 'testing/utils/proposals';
+import { generateProposal } from 'testing/utils/proposals';
 
 let page: Page;
 
@@ -139,22 +138,7 @@ describe('POST /api/votes/[id]/cast - Cast a vote on a page poll', () => {
 });
 describe('POST /api/votes/[id]/cast - Cast a vote on a proposal', () => {
   it('Should allow voting if the proposal is in vote_active stage and user has permission', async () => {
-    // Setup proposal content
-    const proposalCategory = await generateProposalCategory({
-      spaceId: space1.id
-    });
-
-    await upsertProposalCategoryPermission({
-      assignee: {
-        group: 'space',
-        id: space1.id
-      },
-      permissionLevel: 'full_access',
-      proposalCategoryId: proposalCategory.id
-    });
-
     const proposal = await generateProposal({
-      categoryId: proposalCategory.id,
       spaceId: space1.id,
       userId: proposalAuthor.id as string,
       proposalStatus: 'vote_active'
@@ -181,22 +165,7 @@ describe('POST /api/votes/[id]/cast - Cast a vote on a proposal', () => {
   });
 
   it('Should not allow voting if the proposal is not in vote_active stage', async () => {
-    // Setup proposal content
-    const proposalCategory = await generateProposalCategory({
-      spaceId: space1.id
-    });
-
-    await upsertProposalCategoryPermission({
-      assignee: {
-        group: 'space',
-        id: space1.id
-      },
-      permissionLevel: 'full_access',
-      proposalCategoryId: proposalCategory.id
-    });
-
     const proposal = await generateProposal({
-      categoryId: proposalCategory.id,
       spaceId: space1.id,
       userId: proposalAuthor.id as string,
       proposalStatus: 'reviewed'
@@ -221,13 +190,7 @@ describe('POST /api/votes/[id]/cast - Cast a vote on a proposal', () => {
   });
 
   it('Should not allow voting if the user does not have permission to vote in this category', async () => {
-    // Setup proposal category with no permissions
-    const proposalCategory = await generateProposalCategory({
-      spaceId: space1.id
-    });
-
     const proposal = await generateProposal({
-      categoryId: proposalCategory.id,
       spaceId: space1.id,
       userId: proposalAuthor.id as string,
       proposalStatus: 'reviewed'

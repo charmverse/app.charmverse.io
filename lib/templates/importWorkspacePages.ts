@@ -566,8 +566,6 @@ export async function importWorkspacePages({
     voteArgs,
     voteOptionsArgs,
     proposalArgs,
-    proposalCategoryArgs,
-    proposalCategoryPermissionArgs,
     bountyPermissionArgs,
     oldNewRecordIdHashMap
   } = await generateImportWorkspacePages({
@@ -591,8 +589,6 @@ export async function importWorkspacePages({
     prisma.block.createMany(blockArgs),
     prisma.bounty.createMany(bountyArgs),
     prisma.bountyPermission.createMany(bountyPermissionArgs),
-    prisma.proposalCategory.createMany(proposalCategoryArgs),
-    prisma.proposalCategoryPermission.createMany(proposalCategoryPermissionArgs),
     prisma.proposal.createMany(proposalArgs),
     ...pageArgs.map((p) => {
       totalCreatedPages += 1;

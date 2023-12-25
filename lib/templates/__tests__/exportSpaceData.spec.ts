@@ -477,15 +477,9 @@ describe('exportSpaceData', () => {
       roles: expect.arrayContaining([proposalReviewerRole, secondProposalReviewerRole]),
       permissions: {
         postCategoryPermissions: expect.arrayContaining(postCategoryPermissions),
-        proposalCategoryPermissions: expect.arrayContaining(proposalCategoryPermissions),
         spacePermissions: expect.arrayContaining(spacePermissions)
       },
       pages: expect.arrayContaining([proposalInCategory1, proposalInCategory2, proposalInCategory3]),
-      proposalCategories: expect.arrayContaining([
-        proposalCategory1WithoutPermissions,
-        proposalCategory2WithSpacePermissions,
-        proposalCategory3WithRolePermissions
-      ]),
       postCategories: expect.arrayContaining([postCategoryWithPermissions]),
       posts: expect.arrayContaining(posts)
     });
@@ -513,16 +507,10 @@ describe('exportSpaceData', () => {
       },
       roles: expect.arrayContaining([proposalReviewerRole, secondProposalReviewerRole]),
       permissions: {
-        proposalCategoryPermissions: expect.arrayContaining(proposalCategoryPermissions),
         spacePermissions: expect.arrayContaining(spacePermissions),
         postCategoryPermissions: expect.arrayContaining(postCategoryPermissions)
       },
       pages: expect.arrayContaining([proposalInCategory1, proposalInCategory2, proposalInCategory3]),
-      proposalCategories: expect.arrayContaining([
-        proposalCategory1WithoutPermissions,
-        proposalCategory2WithSpacePermissions,
-        proposalCategory3WithRolePermissions
-      ]),
       postCategories: expect.arrayContaining([postCategoryWithPermissions]),
       posts: expect.arrayContaining(posts)
     });
@@ -587,7 +575,6 @@ describe('exportSpaceData', () => {
       ]),
       permissions: {
         postCategoryPermissions: expect.arrayContaining(postCategoryPermissions),
-        proposalCategoryPermissions: expect.arrayContaining(proposalCategoryPermissions),
         spacePermissions: expect.arrayContaining(spacePermissions)
       },
       pages: expect.arrayContaining(
@@ -597,11 +584,6 @@ describe('exportSpaceData', () => {
           updatedAt: p.updatedAt.toISOString()
         }))
       ),
-      proposalCategories: expect.arrayContaining([
-        proposalCategory1WithoutPermissions,
-        proposalCategory2WithSpacePermissions,
-        proposalCategory3WithRolePermissions
-      ]),
       postCategories: expect.arrayContaining([postCategoryWithPermissions]),
       posts: expect.arrayContaining(
         posts.map((p) => ({ ...p, createdAt: p.createdAt.toISOString(), updatedAt: p.updatedAt.toISOString() }))

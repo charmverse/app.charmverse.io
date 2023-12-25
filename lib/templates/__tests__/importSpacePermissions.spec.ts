@@ -173,17 +173,6 @@ describe('importSpacePermissions', () => {
     });
 
     expect(importResult).toMatchObject<ImportedPermissions>({
-      proposalCategoryPermissions: expect.arrayContaining(
-        proposalCategoryPermissions.map((p) => ({
-          permissionLevel: p.permissionLevel,
-          id: expect.any(String),
-          proposalCategoryId: expect.any(String),
-          assignee: {
-            group: p.assignee.group,
-            id: p.assignee.group === 'space' ? targetSpace.id : expect.any(String)
-          } as TargetPermissionGroup<'role' | 'space'>
-        }))
-      ),
       postCategoryPermissions: expect.arrayContaining(
         postCategoryPermissions.map((p) => ({
           permissionLevel: p.permissionLevel,
@@ -229,11 +218,7 @@ describe('importSpacePermissions', () => {
       })
       .then((_roles) => _roles.map((r) => r.id));
 
-    const allPermissions = [
-      ...importResult.spacePermissions,
-      ...importResult.proposalCategoryPermissions,
-      ...importResult.postCategoryPermissions
-    ];
+    const allPermissions = [...importResult.spacePermissions, ...importResult.postCategoryPermissions];
 
     allPermissions.forEach((permission) => {
       if (permission.assignee.group === 'space') {
@@ -265,8 +250,7 @@ describe('importSpacePermissions', () => {
     // Idempotency check - assuming no duplicate entries are created
     expect(reimportedPermissions).toMatchObject({
       ...reimportedPermissions,
-      postCategoryPermissions: expect.arrayContaining(importedPermissions.postCategoryPermissions),
-      proposalCategoryPermissions: expect.arrayContaining(importedPermissions.proposalCategoryPermissions)
+      postCategoryPermissions: expect.arrayContaining(importedPermissions.postCategoryPermissions)
     });
   });
 
@@ -293,7 +277,6 @@ describe('importSpacePermissions', () => {
       })
     ).resolves.toMatchObject<ImportedPermissions>({
       postCategoryPermissions: [],
-      proposalCategoryPermissions: [],
       roles: [],
       spacePermissions: []
     });

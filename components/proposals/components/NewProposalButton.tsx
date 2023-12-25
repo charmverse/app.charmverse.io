@@ -17,7 +17,6 @@ import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { usePages } from 'hooks/usePages';
 import { isTruthy } from 'lib/utilities/types';
 
-import { useProposalCategories } from '../hooks/useProposalCategories';
 import { useProposalTemplates } from '../hooks/useProposalTemplates';
 import type { ProposalPageAndPropertiesInput } from '../ProposalPage/NewProposalPage';
 
@@ -37,7 +36,6 @@ const ProposalTemplateMenu = styled(Stack)`
 export function NewProposalButton() {
   const { navigateToSpacePath } = useCharmRouter();
 
-  const { proposalCategoriesWithCreatePermission } = useProposalCategories();
   const isAdmin = useIsAdmin();
   const { pages } = usePages();
   const isCharmverseSpace = useIsCharmverseSpace();
@@ -47,7 +45,8 @@ export function NewProposalButton() {
   const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
   const { proposalTemplates, isLoadingTemplates } = useProposalTemplates();
 
-  const canCreateProposal = proposalCategoriesWithCreatePermission.length > 0;
+  // TODO: Remove this once we have a permission system for proposals
+  const canCreateProposal = true;
   // grab page data from context so that title is always up-to-date
   const proposalTemplatePages = proposalTemplates
     ?.map(

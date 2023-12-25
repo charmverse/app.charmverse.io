@@ -7,12 +7,6 @@ import type { ProposalStatusWithArchived } from 'lib/proposal/proposalStatusTran
 export const proposalDbProperties: {
   [key in DatabaseProposalPropertyType]: (id?: string, name?: string) => IPropertyTemplate;
 } = {
-  proposalCategory: (id?: string, name?: string) => ({
-    id: id || uuid(),
-    name: name || 'Proposal Category',
-    options: [],
-    type: 'proposalCategory'
-  }),
   proposalStatus: (id?: string, name?: string) => ({
     id: id || uuid(),
     name: name || 'Proposal Status',

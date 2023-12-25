@@ -32,13 +32,11 @@ import {
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-import { useProposalCategories } from '../../../hooks/useProposalCategories';
 import type { ProposalEvaluationValues } from '../EvaluationSettingsSidebar/components/EvaluationSettings';
 
 import type { RangeProposalCriteria } from './components/OldProposalRubricCriteriaInput';
 import { ProposalRubricCriteriaInput } from './components/OldProposalRubricCriteriaInput';
 import { OldProposalStepper } from './components/OldProposalStepper/ProposalStepper';
-import { ProposalCategorySelect } from './components/ProposalCategorySelect';
 import { ProposalEvaluationTypeSelect } from './components/ProposalEvaluationTypeSelect';
 import { ProposalStepSummary } from './components/ProposalStepSummary';
 
@@ -121,7 +119,6 @@ export function ProposalPropertiesBase({
   rewardIds
 }: ProposalPropertiesProps) {
   const { user } = useUser();
-  const { proposalCategoriesWithCreatePermission, categories } = useProposalCategories();
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
   const prevStatusRef = useRef(proposalStatus || '');
@@ -167,7 +164,6 @@ export function ProposalPropertiesBase({
 
   const isAuthor = proposalFormInputs.authors.includes(user?.id ?? '');
   const proposalCategoryId = proposalFormInputs.categoryId;
-  const proposalCategory = categories?.find((category) => category.id === proposalCategoryId);
   const proposalAuthorIds = proposalFormInputs.authors;
   const proposalReviewers = proposalFormInputs.reviewers;
   const isNewProposal = !pageId;
@@ -272,24 +268,6 @@ export function ProposalPropertiesBase({
             />
           </Box>
         )}
-
-        {/* Select a category */}
-        <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
-          <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-            <PropertyLabel readOnly required={isNewProposal} highlighted>
-              Category
-            </PropertyLabel>
-            <Box display='flex' flex={1}>
-              <ProposalCategorySelect
-                readOnly={readOnlyCategory}
-                readOnlyMessage={isFromTemplate ? templateTooltip('category', isAdmin) : undefined}
-                options={(readOnlyCategory ? categories : proposalCategoriesWithCreatePermission) || []}
-                value={proposalCategory ?? null}
-                onChange={onChangeCategory}
-              />
-            </Box>
-          </Box>
-        </Box>
 
         {/* Select authors */}
         <Box justifyContent='space-between' gap={2} alignItems='center'>

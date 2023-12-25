@@ -73,8 +73,7 @@ describe('POST /api/forums/posts/[postId]/convert-to-proposal - Convert post to 
 
     await convertPostToProposal({
       post,
-      userId: nonAdminUser1.id,
-      categoryId: proposalCategory.id
+      userId: nonAdminUser1.id
     });
 
     await request(baseUrl)

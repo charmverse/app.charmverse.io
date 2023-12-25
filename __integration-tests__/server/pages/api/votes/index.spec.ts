@@ -10,7 +10,7 @@ import type { VoteDTO } from 'lib/votes/interfaces';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { createPage, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generateProposal, generateProposalCategory } from 'testing/utils/proposals';
+import { generateProposal } from 'testing/utils/proposals';
 
 let page: Page;
 let space: Space;
@@ -36,9 +36,6 @@ beforeAll(async () => {
   });
 
   userCookie = await loginUser(user.id);
-  proposalCategory = await generateProposalCategory({
-    spaceId: space.id
-  });
 });
 
 describe('GET /api/votes?id={id} - Get an individual vote', () => {
@@ -169,8 +166,7 @@ describe('POST /api/votes - Create a proposal vote', () => {
     const proposal = await generateProposal({
       userId: author.id,
       spaceId: authorSpace.id,
-      proposalStatus: 'reviewed',
-      categoryId: proposalCategory.id
+      proposalStatus: 'reviewed'
     });
 
     const newVote: VoteDTO = {
@@ -199,8 +195,7 @@ describe('POST /api/votes - Create a proposal vote', () => {
     const proposal = await generateProposal({
       userId: author.id,
       spaceId: authorSpace.id,
-      proposalStatus: 'reviewed',
-      categoryId: proposalCategory.id
+      proposalStatus: 'reviewed'
     });
     const newVote: VoteDTO = {
       context: 'proposal',
@@ -232,8 +227,7 @@ describe('POST /api/votes - Create a proposal vote', () => {
 
     const { page: resultPage } = await createProposal({
       userId: author.id,
-      spaceId: authorSpace.id,
-      categoryId: proposalCategory.id
+      spaceId: authorSpace.id
     });
     const newVote: VoteDTO = {
       deadline: new Date(),

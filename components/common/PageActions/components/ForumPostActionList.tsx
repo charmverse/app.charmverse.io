@@ -6,7 +6,6 @@ import Tooltip from '@mui/material/Tooltip';
 
 import charmClient from 'charmClient';
 import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
-import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -38,9 +37,8 @@ export function ForumPostActionList({
 
   const { navigateToSpacePath } = useCharmRouter();
 
-  const { proposalCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
-
-  const canCreateProposal = proposalCategoriesWithCreatePermission.length > 0;
+  // TODO: Remove this once we have a permission system for proposals
+  const canCreateProposal = true;
 
   const postCreator = getMemberById(post?.createdBy);
 
@@ -72,8 +70,7 @@ export function ForumPostActionList({
   async function convertToProposal(pageId: string) {
     onComplete();
     const { path } = await charmClient.forum.convertToProposal({
-      postId: pageId,
-      categoryId: getDefaultCreateCategory()?.id
+      postId: pageId
     });
     navigateToSpacePath(`/${path}`);
   }

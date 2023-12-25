@@ -15,7 +15,6 @@ import Typography from '@mui/material/Typography';
 import charmClient from 'charmClient';
 import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { Button } from 'components/common/Button';
-import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useMembers } from 'hooks/useMembers';
@@ -122,9 +121,9 @@ export function DocumentPageActionList({
   const { setActiveView } = usePageSidebar();
   const pageType = page.type;
   const isExportablePage = documentTypes.includes(pageType as PageType);
-  const { proposalCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
 
-  const canCreateProposal = proposalCategoriesWithCreatePermission.length > 0;
+  // TODO: Remove this once we have a permission system for proposals
+  const canCreateProposal = true;
   const basePageBounty = rewards?.find((r) => r.id === pageId);
   function setPageProperty(prop: Partial<PageUpdates>) {
     updatePage({
@@ -174,7 +173,6 @@ export function DocumentPageActionList({
 
   async function convertToProposal() {
     const convertedProposal = await charmClient.pages.convertToProposal({
-      categoryId: getDefaultCreateCategory().id,
       pageId
     });
     onComplete();

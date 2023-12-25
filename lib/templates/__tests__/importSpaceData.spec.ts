@@ -568,13 +568,6 @@ describe('importSpaceData', () => {
       postCategories: expect.arrayContaining([
         { ...firstSourcePostCategory, spaceId: targetSpace.id, id: expect.any(String) }
       ]),
-      proposalCategories: expect.arrayContaining(
-        [firstSourceProposalCategory, secondSourceProposalCategory].map((c) => ({
-          ...c,
-          spaceId: targetSpace.id,
-          id: expect.any(String)
-        }))
-      ),
       roles: expect.arrayContaining([
         {
           ...firstSourceRole,
@@ -592,17 +585,6 @@ describe('importSpaceData', () => {
         }
       ]),
       permissions: {
-        proposalCategoryPermissions: expect.arrayContaining(
-          proposalCategoryPermissions.map((p) => ({
-            permissionLevel: p.permissionLevel,
-            id: expect.any(String),
-            proposalCategoryId: expect.any(String),
-            assignee: {
-              group: p.assignee.group,
-              id: p.assignee.group === 'space' ? targetSpace.id : expect.any(String)
-            } as TargetPermissionGroup<'role' | 'space'>
-          }))
-        ),
         postCategoryPermissions: expect.arrayContaining(
           postCategoryPermissions.map((p) => ({
             permissionLevel: p.permissionLevel,
@@ -646,10 +628,6 @@ describe('importSpaceData', () => {
         },
         postCategories: {
           [firstSourcePostCategory.id]: expect.any(String)
-        },
-        proposalCategories: {
-          [firstSourceProposalCategory.id]: expect.any(String),
-          [secondSourceProposalCategory.id]: expect.any(String)
         },
         roles: {
           [firstSourceRole.id]: expect.any(String),
@@ -771,13 +749,6 @@ describe('importSpaceData', () => {
       postCategories: expect.arrayContaining([
         { ...firstSourcePostCategory, spaceId: targetSpace.id, id: expect.any(String) }
       ]),
-      proposalCategories: expect.arrayContaining(
-        [firstSourceProposalCategory, secondSourceProposalCategory].map((c) => ({
-          ...c,
-          spaceId: targetSpace.id,
-          id: expect.any(String)
-        }))
-      ),
       roles: expect.arrayContaining([
         {
           ...firstSourceRole,
@@ -795,17 +766,6 @@ describe('importSpaceData', () => {
         }
       ]),
       permissions: {
-        proposalCategoryPermissions: expect.arrayContaining(
-          proposalCategoryPermissions.map((p) => ({
-            permissionLevel: p.permissionLevel,
-            id: expect.any(String),
-            proposalCategoryId: expect.any(String),
-            assignee: {
-              group: p.assignee.group,
-              id: p.assignee.group === 'space' ? targetSpace.id : expect.any(String)
-            } as TargetPermissionGroup<'role' | 'space'>
-          }))
-        ),
         postCategoryPermissions: expect.arrayContaining(
           postCategoryPermissions.map((p) => ({
             permissionLevel: p.permissionLevel,
@@ -850,10 +810,6 @@ describe('importSpaceData', () => {
         postCategories: {
           [firstSourcePostCategory.id]: expect.any(String)
         },
-        proposalCategories: {
-          [firstSourceProposalCategory.id]: expect.any(String),
-          [secondSourceProposalCategory.id]: expect.any(String)
-        },
         roles: {
           [firstSourceRole.id]: expect.any(String),
           [secondSourceRole.id]: expect.any(String)
@@ -890,7 +846,6 @@ describe('importSpaceData', () => {
       })
     ).resolves.toMatchObject<ImportedPermissions>({
       postCategoryPermissions: [],
-      proposalCategoryPermissions: [],
       roles: [],
       spacePermissions: []
     });

@@ -5,7 +5,7 @@ import { createMockPage } from 'testing/mocks/page';
 import { createMockProposal } from 'testing/mocks/proposal';
 import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 
-import { members, proposalCategories, userProfile } from '../lib/mockData';
+import { members, userProfile } from '../lib/mockData';
 
 export function ProposalsPageStory() {
   return <ProposalsPageWithProviders title='Proposals' />;
@@ -20,7 +20,6 @@ export const proposals = [
       { evaluationId: null, id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null },
       { evaluationId: null, id: '2', proposalId: '', roleId: null, userId: members[0].id, systemRole: null }
     ],
-    categoryId: proposalCategories[0].id,
     evaluationType: 'vote',
     status: 'draft'
   }),
@@ -29,7 +28,6 @@ export const proposals = [
     reviewers: [
       { evaluationId: null, id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null }
     ],
-    categoryId: proposalCategories[1].id,
     evaluationType: 'vote',
     status: 'discussion'
   }),
@@ -38,7 +36,6 @@ export const proposals = [
     reviewers: [
       { evaluationId: null, id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null }
     ],
-    categoryId: proposalCategories[2].id,
     evaluationType: 'rubric',
     status: 'review'
   })

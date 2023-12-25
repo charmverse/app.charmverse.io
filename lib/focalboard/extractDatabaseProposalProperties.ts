@@ -13,9 +13,6 @@ export function extractDatabaseProposalProperties({
   boardBlock: { fields: any };
 }): Partial<ExtractedDatabaseProposalProperties> {
   return {
-    proposalCategory: (boardBlock.fields as BoardFields).cardProperties.find(
-      (prop: IPropertyTemplate) => prop.type === 'proposalCategory'
-    ),
     proposalUrl: (boardBlock.fields as BoardFields).cardProperties.find(
       (prop: IPropertyTemplate) => prop.type === 'proposalUrl'
     ),

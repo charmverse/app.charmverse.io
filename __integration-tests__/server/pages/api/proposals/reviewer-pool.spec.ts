@@ -8,7 +8,7 @@ import { createUserFromWallet } from 'lib/users/createUser';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpace } from 'testing/setupDatabase';
-import { generateProposal, generateProposalCategory } from 'testing/utils/proposals';
+import { generateProposal } from 'testing/utils/proposals';
 
 let space: Space;
 let user: User;
@@ -19,11 +19,7 @@ beforeAll(async () => {
   const generated = await generateUserAndSpace({ isAdmin: false });
   space = generated.space;
   user = generated.user;
-  const proposalCategory = await generateProposalCategory({
-    spaceId: space.id
-  });
   proposal = await generateProposal({
-    categoryId: proposalCategory.id,
     spaceId: space.id,
     userId: user.id
   });

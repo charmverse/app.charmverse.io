@@ -5,7 +5,6 @@ import { v4 as uuid } from 'uuid';
 import { MissingDataError } from 'lib/utilities/errors';
 import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
-import { generateProposalCategory } from 'testing/utils/proposals';
 
 import { AvailableSpacePermissions } from '../availableSpacePermissions';
 import { saveRoleAndSpacePermissions } from '../saveRoleAndSpacePermissions';
@@ -14,10 +13,6 @@ describe('saveRoleAndSpacePermissions', () => {
   it('should replace the existing permissions assigned to a space or role for the SpacePermission, ProposalCategoryPermission and PostCategoryPermission entities without affecting public permissions', async () => {
     const { space, user } = await generateUserAndSpace({});
     const role = await generateRole({ spaceId: space.id, createdBy: user.id, assigneeUserIds: [user.id] });
-
-    const proposalCategory = await generateProposalCategory({
-      spaceId: space.id
-    });
 
     const postCategory = await generatePostCategory({
       spaceId: space.id
@@ -36,13 +31,6 @@ describe('saveRoleAndSpacePermissions', () => {
           forSpaceId: space.id,
           spaceId: space.id,
           operations: ['createPage']
-        }
-      }),
-      prisma.proposalCategoryPermission.create({
-        data: {
-          proposalCategoryId: proposalCategory.id,
-          permissionLevel: 'full_access',
-          spaceId: space.id
         }
       }),
       prisma.postCategoryPermission.create({
@@ -82,7 +70,6 @@ describe('saveRoleAndSpacePermissions', () => {
           }
         }
       ],
-      proposalCategories: [],
       forumCategories: [
         {
           id: uuid(),
@@ -114,42 +101,31 @@ describe('saveRoleAndSpacePermissions', () => {
       ]
     });
 
-    const [
-      spacePermissions,
-      proposalCategoryPermissions,
-      postCategoryPermissions,
-      secondPostCategoryPermissions,
-      thirdPostCategoryPermissions
-    ] = await Promise.all([
-      prisma.spacePermission.findMany({
-        where: {
-          forSpaceId: space.id
-        }
-      }),
-      prisma.proposalCategoryPermission.findMany({
-        where: {
-          proposalCategoryId: proposalCategory.id
-        }
-      }),
-      prisma.postCategoryPermission.findMany({
-        where: {
-          postCategoryId: postCategory.id
-        }
-      }),
-      prisma.postCategoryPermission.findMany({
-        where: {
-          postCategoryId: secondPostCategory.id
-        }
-      }),
-      prisma.postCategoryPermission.findMany({
-        where: {
-          postCategoryId: thirdPostCategory.id
-        }
-      })
-    ]);
+    const [spacePermissions, postCategoryPermissions, secondPostCategoryPermissions, thirdPostCategoryPermissions] =
+      await Promise.all([
+        prisma.spacePermission.findMany({
+          where: {
+            forSpaceId: space.id
+          }
+        }),
+        prisma.postCategoryPermission.findMany({
+          where: {
+            postCategoryId: postCategory.id
+          }
+        }),
+        prisma.postCategoryPermission.findMany({
+          where: {
+            postCategoryId: secondPostCategory.id
+          }
+        }),
+        prisma.postCategoryPermission.findMany({
+          where: {
+            postCategoryId: thirdPostCategory.id
+          }
+        })
+      ]);
 
     expect(spacePermissions).toHaveLength(1);
-    expect(proposalCategoryPermissions).toHaveLength(0);
     // We expect the old space permission to have been dropped since it was not included in the new permission set
     expect(postCategoryPermissions).toHaveLength(2);
     expect(postCategoryPermissions).toEqual(
@@ -185,8 +161,7 @@ describe('saveRoleAndSpacePermissions', () => {
     await expect(
       saveRoleAndSpacePermissions(space.id, {
         space: [],
-        forumCategories: [],
-        proposalCategories: []
+        forumCategories: []
       })
     ).rejects.toBeInstanceOf(MissingDataError);
   });

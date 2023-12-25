@@ -37,11 +37,6 @@ export async function countProposalBlocks({ spaceId, batchSize }: BlocksCountQue
     where: { spaceId, type: 'view' }
   });
 
-  // 2 - Count categories
-  detailedCount.details.proposalCategories = await prisma.proposalCategory.count({
-    where: { spaceId } // assuming proposalCategory has a spaceId field
-  });
-
   // Retrieve the single proposal board block for the space
   const proposalBlockRecord = await prisma.proposalBlock.findFirst({
     where: {

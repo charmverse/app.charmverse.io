@@ -98,7 +98,7 @@ export async function createProposalNotifications(webhookData: {
         }
       });
 
-      const spacePermissionsClient = await getPermissionsClient({
+      const permissionsClient = await getPermissionsClient({
         resourceId: spaceId,
         resourceIdType: 'space'
       });
@@ -109,24 +109,11 @@ export async function createProposalNotifications(webhookData: {
         }
         // We should not send role-based notifications for free spaces
         const roleIds = space.paidTier === 'free' ? [] : spaceRole.spaceRoleToRole.map(({ role }) => role.id);
-        const accessibleProposalCategories =
-          await spacePermissionsClient.client.proposals.getAccessibleProposalCategories({
-            spaceId,
-            userId
-          });
-        const accessibleProposalCategoryIds = accessibleProposalCategories.map(({ id }) => id);
 
         const isAuthor = proposalAuthorIds.includes(spaceRole.userId);
         const isReviewer =
           proposalReviewerIds.includes(spaceRole.userId) ||
           proposalReviewerRoleIds.some((roleId) => roleIds.includes(roleId));
-        const isProposalCategoryAccessible = proposal.categoryId
-          ? accessibleProposalCategoryIds.includes(proposal.categoryId)
-          : true;
-
-        if (!isProposalCategoryAccessible) {
-          continue;
-        }
 
         const action = getProposalAction({
           currentStatus: proposal.status,
@@ -144,15 +131,13 @@ export async function createProposalNotifications(webhookData: {
           continue;
         }
 
-        const categoryPermission = accessibleProposalCategories.find(({ id }) => id === proposal.categoryId);
-
-        if (
-          categoryPermission &&
-          ((action === 'start_discussion' && !categoryPermission.permissions.comment_proposals) ||
-            (action === 'vote' && !categoryPermission.permissions.vote_proposals))
-        ) {
-          continue;
-        }
+        // TODO: Uncomment this once we have proposals permissions
+        // if (
+        //   ((action === 'start_discussion' && !proposalFlowPermissions.discussion) ||
+        //     (action === 'vote' && !categoryPermission.permissions.vote_proposals))
+        // ) {
+        //   continue;
+        // }
 
         const { id } = await saveProposalNotification({
           createdAt: webhookData.createdAt,

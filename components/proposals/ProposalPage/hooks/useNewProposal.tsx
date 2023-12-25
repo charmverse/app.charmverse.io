@@ -71,7 +71,6 @@ export function useNewProposal({ newProposal }: Props) {
       }
       await createProposalTrigger({
         authors: formInputs.authors,
-        categoryId: formInputs.categoryId,
         pageProps: {
           content: formInputs.content,
           contentText: formInputs.contentText ?? '',

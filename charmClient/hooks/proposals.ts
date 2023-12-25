@@ -44,10 +44,8 @@ export function useGetReviewerPool(categoryId: MaybeString) {
 export function useGetProposalFlowFlags(proposalId: MaybeString) {
   return useGET<ProposalFlowPermissionFlags>(proposalId ? `/api/proposals/${proposalId}/compute-flow-flags` : null);
 }
-export function useGetProposalsBySpace({ spaceId, categoryIds }: Partial<ListProposalsRequest>) {
-  return useGET<ProposalWithUsers[]>(spaceId ? `/api/spaces/${spaceId}/proposals` : null, {
-    categoryIds
-  });
+export function useGetProposalsBySpace({ spaceId }: Partial<ListProposalsRequest>) {
+  return useGET<ProposalWithUsers[]>(spaceId ? `/api/spaces/${spaceId}/proposals` : null);
 }
 
 export function useGetProposalTemplatesBySpace(spaceId: MaybeString) {

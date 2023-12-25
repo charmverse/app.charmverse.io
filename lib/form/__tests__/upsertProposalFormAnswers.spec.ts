@@ -7,7 +7,7 @@ import type { FormFieldInput } from 'components/common/form/interfaces';
 import { createForm } from 'lib/form/createForm';
 import { upsertProposalFormAnswers } from 'lib/form/upsertProposalFormAnswers';
 import { generateUserAndSpace } from 'testing/setupDatabase';
-import { generateProposalCategory, generateProposal } from 'testing/utils/proposals';
+import { generateProposal } from 'testing/utils/proposals';
 
 describe('upsertFormAnswers', () => {
   let proposal: ProposalWithUsers;
@@ -23,12 +23,7 @@ describe('upsertFormAnswers', () => {
     space = generated.space;
     user = generated.user;
 
-    proposalCategory = await generateProposalCategory({
-      spaceId: space.id
-    });
-
     proposal = await generateProposal({
-      categoryId: proposalCategory.id,
       proposalStatus: 'draft',
       spaceId: space.id,
       userId: user.id

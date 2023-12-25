@@ -59,21 +59,21 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageM
     throw new ActionNotPermittedError('You do not have permission to update this page');
   }
 
-  const categoryId = req.body.categoryId;
+  // TODO: Uncomment this once we have proposals permissions
+  // const categoryId = req.body.categoryId;
 
-  const proposalPermissions = await req.basePermissionsClient.proposals.computeProposalCategoryPermissions({
-    resourceId: categoryId,
-    userId
-  });
+  // const proposalPermissions = await req.basePermissionsClient.proposals.computeProposalCategoryPermissions({
+  //   resourceId: categoryId,
+  //   userId
+  // });
 
-  if (!proposalPermissions.create_proposal) {
-    throw new UnauthorisedActionError('You do not have permission to create a proposal in this category');
-  }
+  // if (!proposalPermissions.create_proposal) {
+  //   throw new UnauthorisedActionError('You do not have permission to create a proposal in this category');
+  // }
 
   const proposalPage = await convertPageToProposal({
     page,
-    userId,
-    categoryId
+    userId
   });
 
   // Launch this job in the background

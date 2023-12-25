@@ -2,16 +2,11 @@ import { useEffect } from 'react';
 
 import { useGetProposalTemplatesBySpace } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
-import { useProposalCategories } from './useProposalCategories';
-
 export function useProposalTemplates({ load } = { load: true }) {
-  const { proposalCategoriesWithCreatePermission } = useProposalCategories();
   const { space } = useCurrentSpace();
-  const isAdmin = useIsAdmin();
   const { subscribe } = useWebSocketClient();
   const {
     data: proposalTemplates,
@@ -19,11 +14,8 @@ export function useProposalTemplates({ load } = { load: true }) {
     isLoading: isLoadingTemplates
   } = useGetProposalTemplatesBySpace(load ? space?.id : null);
 
-  const usableTemplates = isAdmin
-    ? proposalTemplates
-    : proposalTemplates?.filter((template) =>
-        proposalCategoriesWithCreatePermission.some((c) => c.id === template.categoryId)
-      );
+  // TODO: Remove this once we have a permission system for proposals
+  const usableTemplates = proposalTemplates;
 
   useEffect(() => {
     function handleDeleteEvent(value: WebSocketPayload<'pages_deleted'>) {

@@ -40,7 +40,6 @@ export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'id' | 'index' | 
 export type CreateProposalInput = {
   pageId?: string;
   pageProps?: PageProps;
-  categoryId: string;
   reviewers?: ProposalReviewerInput[];
   authors?: string[];
   userId: string;
@@ -64,7 +63,6 @@ export type CreatedProposal = {
 export async function createProposal({
   userId,
   spaceId,
-  categoryId,
   pageProps,
   authors,
   reviewers,
@@ -78,10 +76,6 @@ export async function createProposal({
   formFields,
   formAnswers
 }: CreateProposalInput) {
-  if (!categoryId) {
-    throw new InvalidInputError('Proposal must be linked to a category');
-  }
-
   const proposalId = uuid();
   const proposalStatus: ProposalStatus = 'draft';
 
@@ -170,7 +164,6 @@ export async function createProposal({
         id: proposalId,
         space: { connect: { id: spaceId } },
         status: proposalStatus,
-        category: { connect: { id: categoryId } },
         evaluationType,
         publishToLens,
         authors: {

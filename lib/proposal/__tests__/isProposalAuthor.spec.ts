@@ -3,7 +3,7 @@ import type { ProposalCategory, Space, User, Role } from '@charmverse/core/prism
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
 import { generateUserAndSpace, generateSpaceUser, generateRole } from 'testing/setupDatabase';
-import { generateProposalCategory, generateProposal } from 'testing/utils/proposals';
+import { generateProposal } from 'testing/utils/proposals';
 
 let proposal: ProposalWithUsers;
 let proposalCategory: ProposalCategory;
@@ -23,17 +23,12 @@ beforeAll(async () => {
   secondProposalAuthor = await generateSpaceUser({ isAdmin: false, spaceId: space.id });
   proposalReviewer = await generateSpaceUser({ isAdmin: false, spaceId: space.id });
 
-  proposalCategory = await generateProposalCategory({
-    spaceId: space.id
-  });
-
   role = await generateRole({
     createdBy: generated.user.id,
     spaceId: space.id
   });
 
   proposal = await generateProposal({
-    categoryId: proposalCategory.id,
     // Don't explicitly add the proposal author as an author
     authors: [secondProposalAuthor.id],
     proposalStatus: 'draft',

@@ -217,7 +217,7 @@ describe('updateCardsFromProposals()', () => {
       }
     });
 
-    const { proposalCategory, proposalStatus, proposalUrl } = extractDatabaseProposalProperties({
+    const { proposalStatus, proposalUrl } = extractDatabaseProposalProperties({
       boardBlock: databaseAfterUpdate as any
     });
 
@@ -243,7 +243,6 @@ describe('updateCardsFromProposals()', () => {
     const cardBlockProposalProps = extractCardProposalProperties({
       card: cardBlock as any,
       databaseProperties: {
-        proposalCategory,
         proposalStatus,
         proposalUrl
       }
@@ -255,7 +254,6 @@ describe('updateCardsFromProposals()', () => {
     expect(cardBlockProposalProps.cardProposalCategory).toBeDefined();
     expect(cardBlockProposalProps.cardProposalCategory?.optionId).toBe(pageProposal.categoryId);
     expect(cardBlockProposalProps.cardProposalCategory?.value).toBe(pageProposal.category?.title);
-    expect(cardBlockProposalProps.cardProposalCategory?.propertyId).toBe(proposalCategory?.id);
 
     const updatedProposal = await prisma.proposal.update({
       where: {
@@ -305,7 +303,6 @@ describe('updateCardsFromProposals()', () => {
     expect(updatedCardBlockProposalProps.cardProposalCategory).toBeDefined();
     expect(updatedCardBlockProposalProps.cardProposalCategory?.optionId).toBe(updatedProposal.categoryId);
     expect(updatedCardBlockProposalProps.cardProposalCategory?.value).toBe(updatedProposal.category?.title);
-    expect(updatedCardBlockProposalProps.cardProposalCategory?.propertyId).toBe(proposalCategory?.id);
   });
 
   it('should update the card proposalStatus to archived, or revert it to its status if unarchived', async () => {
@@ -331,7 +328,7 @@ describe('updateCardsFromProposals()', () => {
       }
     });
 
-    const { proposalCategory, proposalStatus, proposalUrl } = extractDatabaseProposalProperties({
+    const { proposalStatus, proposalUrl } = extractDatabaseProposalProperties({
       boardBlock: databaseAfterUpdate as any
     });
 
@@ -357,7 +354,6 @@ describe('updateCardsFromProposals()', () => {
     const cardBlockProposalProps = extractCardProposalProperties({
       card: cardBlock as any,
       databaseProperties: {
-        proposalCategory,
         proposalStatus,
         proposalUrl
       }

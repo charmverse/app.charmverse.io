@@ -4,7 +4,6 @@ import { objectUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
-import { getBoardColorFromColor } from 'lib/focalboard/constants';
 import { proposalDbProperties, proposalStatusBoardColors } from 'lib/focalboard/proposalDbProperties';
 import { InvalidStateError } from 'lib/middleware/errors';
 
@@ -19,16 +18,6 @@ export async function setDatabaseProposalProperties({ boardId }: { boardId: stri
   if (boardBlock.fields.sourceType !== 'proposals') {
     throw new InvalidStateError(`Cannot add proposal cards to a database which does not have proposals as its source`);
   }
-  const proposalCategories = await prisma.proposalCategory.findMany({
-    where: {
-      spaceId: boardBlock.spaceId
-    },
-    select: {
-      id: true,
-      color: true,
-      title: true
-    }
-  });
 
   const rubricProposals = await prisma.proposal.count({
     where: {
@@ -38,7 +27,7 @@ export async function setDatabaseProposalProperties({ boardId }: { boardId: stri
   });
 
   const spaceUsesRubrics = rubricProposals > 0;
-  const boardProperties = getBoardProperties({ boardBlock, proposalCategories, spaceUsesRubrics });
+  const boardProperties = getBoardProperties({ boardBlock, spaceUsesRubrics });
 
   return prisma.block.update({
     where: {
@@ -53,31 +42,11 @@ export async function setDatabaseProposalProperties({ boardId }: { boardId: stri
   }) as any as Board;
 }
 
-export function getBoardProperties({
-  boardBlock,
-  proposalCategories,
-  spaceUsesRubrics
-}: {
-  boardBlock: Board;
-  proposalCategories: ProposalCategoryFields[];
-  spaceUsesRubrics: boolean;
-}) {
+export function getBoardProperties({ boardBlock, spaceUsesRubrics }: { boardBlock: Board; spaceUsesRubrics: boolean }) {
   const boardProperties = boardBlock.fields.cardProperties ?? [];
 
-  const categoryProp = generateUpdatedProposalCategoryProperty({
-    boardProperties,
-    proposalCategories
-  });
   const statusProp = generateUpdatedProposalStatusProperty({ boardProperties });
   const proposalUrlProp = generateUpdatedProposalUrlProperty({ boardProperties });
-
-  const existingCategoryPropIndex = boardProperties.findIndex((p) => p.type === 'proposalCategory');
-
-  if (existingCategoryPropIndex > -1) {
-    boardProperties[existingCategoryPropIndex] = categoryProp;
-  } else {
-    boardProperties.push(categoryProp);
-  }
 
   const existingStatusPropIndex = boardProperties.findIndex((p) => p.type === 'proposalStatus');
 
@@ -125,38 +94,6 @@ export function getBoardProperties({
     }
   }
   return boardProperties;
-}
-
-function generateUpdatedProposalCategoryProperty({
-  boardProperties,
-  proposalCategories
-}: {
-  boardProperties: IPropertyTemplate[];
-  proposalCategories: ProposalCategoryFields[];
-}) {
-  // We will mutate and return this property
-  const proposalCategoryProp = {
-    ...(boardProperties.find((p) => p.type === 'proposalCategory') ?? {
-      ...proposalDbProperties.proposalCategory(),
-      id: uuid()
-    })
-  };
-
-  proposalCategories.forEach((c) => {
-    const existingPropertyValue = proposalCategoryProp.options.find((opt) => opt.id === c.id);
-
-    if (!existingPropertyValue) {
-      proposalCategoryProp.options.push({
-        id: c.id,
-        value: c.title,
-        color: getBoardColorFromColor(c.color)
-      });
-    } else {
-      existingPropertyValue.value = c.title;
-    }
-  });
-
-  return proposalCategoryProp;
 }
 
 function generateUpdatedProposalStatusProperty({ boardProperties }: { boardProperties: IPropertyTemplate[] }) {

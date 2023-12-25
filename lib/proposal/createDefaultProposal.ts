@@ -16,29 +16,8 @@ import {
 } from './blocks/constants';
 import { createProposal } from './createProposal';
 
-async function createOldDefaultProposal({
-  categoryId,
-  spaceId,
-  userId
-}: {
-  categoryId?: string;
-  spaceId: string;
-  userId: string;
-}) {
-  if (!categoryId) {
-    const category = await prisma.proposalCategory.findFirstOrThrow({
-      where: {
-        spaceId
-      },
-      select: {
-        id: true
-      }
-    });
-    categoryId = category.id;
-  }
-
+async function createOldDefaultProposal({ spaceId, userId }: { spaceId: string; userId: string }) {
   await createProposal({
-    categoryId,
     spaceId,
     userId,
     authors: [userId],
@@ -71,7 +50,6 @@ async function createOldDefaultProposal({
     fields: {
       properties: {
         [AUTHORS_BLOCK_ID]: [userId],
-        [CATEGORY_BLOCK_ID]: categoryId,
         [CREATED_AT_ID]: '',
         [EVALUATION_TYPE_BLOCK_ID]: 'vote',
         [PROPOSAL_REVIEWERS_BLOCK_ID]: [
@@ -94,21 +72,18 @@ async function createOldDefaultProposal({
 }
 // replace the old method with this one once we have moved to new flow
 export async function createDefaultProposal({
-  categoryId,
   isCharmVerse,
   spaceId,
   userId
 }: {
-  categoryId: string;
   isCharmVerse?: boolean;
   spaceId: string;
   userId: string;
 }) {
   if (!isCharmVerse) {
-    return createOldDefaultProposal({ categoryId, spaceId, userId });
+    return createOldDefaultProposal({ spaceId, userId });
   }
   await createProposal({
-    categoryId,
     spaceId,
     userId,
     authors: [userId],
@@ -158,7 +133,6 @@ export async function createDefaultProposal({
     fields: {
       properties: {
         [AUTHORS_BLOCK_ID]: [userId],
-        [CATEGORY_BLOCK_ID]: categoryId,
         [CREATED_AT_ID]: '',
         [EVALUATION_TYPE_BLOCK_ID]: 'vote',
         [PROPOSAL_REVIEWERS_BLOCK_ID]: [

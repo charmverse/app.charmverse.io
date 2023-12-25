@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page, Space, User } from '@charmverse/core/prisma';
-import { testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
 import { getPage } from 'lib/pages/server';
@@ -99,14 +99,9 @@ describe('PUT /api/pages/{id} - update page', () => {
   });
 
   it('should update proposal template page content if the user is an admin and respond 200', async () => {
-    const proposalCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id
-    });
-
     const template = await createProposal({
       spaceId: space.id,
       userId: adminUser.id,
-      categoryId: proposalCategory.id,
       pageProps: {
         type: 'proposal_template'
       }
@@ -124,14 +119,9 @@ describe('PUT /api/pages/{id} - update page', () => {
   });
 
   it('should to fail update proposal template page content if the user is not a space admin and respond 401', async () => {
-    const proposalCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id
-    });
-
     const template = await createProposal({
       spaceId: space.id,
       userId: adminUser.id,
-      categoryId: proposalCategory.id,
       pageProps: {
         type: 'proposal_template'
       }

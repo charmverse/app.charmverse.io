@@ -10,7 +10,6 @@ import { v4 as uuid } from 'uuid';
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { PostCategoryRolePermissionRow } from 'components/forum/components/PostCategoryPermissions/components/PostCategoryPermissionRow';
-import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
@@ -19,7 +18,6 @@ import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
-import type { ProposalCategoryPermissionInput } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 import type { SpacePermissions } from 'lib/permissions/spaces/listPermissions';
 
 import { PermissionToggle } from './components/PermissionToggle';
@@ -44,14 +42,6 @@ type FormAction =
       permissionValue: boolean;
     }
   | {
-      type: 'delete_proposal_category_permission';
-      id: string;
-    }
-  | {
-      type: 'set_proposal_category_permission';
-      permission: Omit<SpacePermissions['proposalCategories'][number], 'id'> & { id?: string };
-    }
-  | {
       type: 'delete_forum_category_permission';
       id: string;
     }
@@ -70,8 +60,7 @@ function reducerWithContext({ id }: { id: string }) {
         }
         return {
           space: state.space.filter((perm) => perm.assignee.id !== id),
-          forumCategories: state.forumCategories.filter((perm) => (perm.assignee as { id: string }).id !== id),
-          proposalCategories: state.proposalCategories.filter((perm) => (perm.assignee as { id: string }).id !== id)
+          forumCategories: state.forumCategories.filter((perm) => (perm.assignee as { id: string }).id !== id)
         };
       }
       case 'set_space_permission': {
@@ -114,25 +103,6 @@ function reducerWithContext({ id }: { id: string }) {
           forumCategories: [...state.forumCategories]
         };
       }
-      case 'delete_proposal_category_permission': {
-        return {
-          ...state,
-          proposalCategories: state.proposalCategories.filter((perm) => perm.id !== action.id)
-        };
-      }
-      case 'set_proposal_category_permission': {
-        const perm = action.permission;
-        const category = perm.id && state.proposalCategories.find((p) => p.id === perm.id);
-        if (category) {
-          Object.assign(category, perm);
-        } else {
-          state.proposalCategories.push({ ...perm, id: uuid() });
-        }
-        return {
-          ...state,
-          proposalCategories: [...state.proposalCategories]
-        };
-      }
       default:
         throw Error(`Unknown action`);
     }
@@ -142,7 +112,6 @@ function reducerWithContext({ id }: { id: string }) {
 export function RolePermissions({ targetGroup, id, callback = () => null }: Props) {
   const { space } = useCurrentSpace();
   const { isFreeSpace } = useIsFreeSpace();
-  const { categories: proposalCategories = [], isLoading: proposalCategoriesLoading } = useProposalCategories();
   const { categories: forumCategories = [], isLoading: forumCategoriesLoading } = useForumCategories();
   const isAdmin = useIsAdmin();
   const { showMessage } = useSnackbar();
@@ -151,24 +120,15 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
   const [touched, setTouched] = useState<boolean>(false);
   const [formState, dispatch] = useReducer(reducerWithContext({ id }), {
     space: [],
-    forumCategories: [],
-    proposalCategories: []
+    forumCategories: []
   });
 
   const currentSpaceId = space?.id;
 
-  const categoryIds = [...proposalCategories.map((c) => c.id), ...forumCategories.map((c) => c.id)];
-
   const { data: originalPermissions, mutate: refreshPermissions } = useSWR(
-    currentSpaceId && !forumCategoriesLoading && !proposalCategoriesLoading
-      ? `/proposals/list-permissions-${currentSpaceId}-${categoryIds}`
-      : null,
+    currentSpaceId && !forumCategoriesLoading ? `/proposals/list-permissions-${currentSpaceId}` : null,
     () => charmClient.permissions.spaces.listSpacePermissions(currentSpaceId as string)
   );
-
-  const defaultProposalCategoryPermissions = formState.proposalCategories.filter((permission) => {
-    return permission.assignee.group === 'space' && permission.assignee.id === currentSpaceId;
-  });
 
   const defaultForumCategoryPermissions = formState.forumCategories?.filter((permission) => {
     return permission.assignee.group === 'space' && permission.assignee.id === currentSpaceId;
@@ -204,16 +164,6 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
         showMessage('There was an error saving permissions', 'error');
       }
     }
-  }
-
-  async function deleteProposalCategoryPermission(permissionId: string) {
-    dispatch({ type: 'delete_proposal_category_permission', id: permissionId });
-    setTouched(true);
-  }
-
-  async function updateProposalCategoryPermission(permission: ProposalCategoryPermissionInput) {
-    dispatch({ type: 'set_proposal_category_permission', permission });
-    setTouched(true);
   }
 
   async function deletePostCategoryPermission(permissionId: string) {

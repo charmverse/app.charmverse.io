@@ -24,8 +24,7 @@ const formatters: Formatters = {
 
 const emptyContext: PropertyContext = {
   spaceDomain: 'test-space',
-  users: {},
-  proposalCategories: {}
+  users: {}
 };
 
 describe('CsvExporter', () => {
@@ -175,7 +174,6 @@ describe('getCSVColumns()', () => {
     board.fields.cardProperties = [];
     const boardProperties = getBoardProperties({
       boardBlock: board,
-      proposalCategories: [{ id: 'category_id', title: 'MockCategory', color: 'red' }],
       spaceUsesRubrics: true
     });
 
@@ -186,7 +184,6 @@ describe('getCSVColumns()', () => {
       boardBlock: board
     });
     const properties = {
-      [databaseProperties.proposalCategory!.id]: 'category_id',
       [databaseProperties.proposalUrl!.id]: 'path-123',
       [databaseProperties.proposalStatus!.id]: reviewStatusOptionId,
       [databaseProperties.proposalEvaluatedBy!.id]: 'user_1'
@@ -207,7 +204,6 @@ describe('getCSVColumns()', () => {
 
     const context: PropertyContext = {
       users: { user_1: { username: 'Mo' } },
-      proposalCategories: { category_id: 'General' },
       spaceDomain: 'test-space'
     };
     const rowColumns = getCSVColumns({

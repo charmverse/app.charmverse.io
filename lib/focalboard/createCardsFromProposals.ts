@@ -159,10 +159,6 @@ export async function createCardsFromProposals({
 
     let properties: Record<string, BoardPropertyValue> = {};
 
-    if (proposalProps.proposalCategory) {
-      properties[proposalProps.proposalCategory.id] = pageProposal.proposal?.categoryId ?? '';
-    }
-
     if (proposalProps.proposalUrl) {
       properties[proposalProps.proposalUrl.id] = pageProposal.path;
     }

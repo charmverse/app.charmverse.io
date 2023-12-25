@@ -13,7 +13,6 @@ import { getSpace } from 'lib/spaces/getSpace';
 import { exportRoles } from './exportRoles';
 
 export type ExportedPermissions = {
-  proposalCategoryPermissions: AssignedProposalCategoryPermission<'role' | 'space'>[];
   postCategoryPermissions: AssignedPostCategoryPermission<'role' | 'space'>[];
   spacePermissions: AssignedSpacePermission[];
 };
@@ -31,26 +30,7 @@ export async function exportSpacePermissions({
 
   const { roles } = await exportRoles({ spaceIdOrDomain });
 
-  const [proposalCategoryPermissions, postCategoryPermissions, spacePermissions] = await Promise.all([
-    prisma.proposalCategoryPermission.findMany({
-      where: {
-        proposalCategory: {
-          spaceId: space.id
-        },
-        OR: [
-          {
-            spaceId: {
-              not: null
-            }
-          },
-          {
-            roleId: {
-              not: null
-            }
-          }
-        ]
-      }
-    }),
+  const [postCategoryPermissions, spacePermissions] = await Promise.all([
     prisma.postCategoryPermission.findMany({
       where: {
         postCategory: {
@@ -90,9 +70,6 @@ export async function exportSpacePermissions({
   ]);
 
   const permissions: ExportedPermissions = {
-    proposalCategoryPermissions: proposalCategoryPermissions.map(
-      mapProposalCategoryPermissionToAssignee
-    ) as AssignedProposalCategoryPermission<'role' | 'space'>[],
     postCategoryPermissions: postCategoryPermissions.map(
       mapPostCategoryPermissionToAssignee
     ) as AssignedPostCategoryPermission<'role' | 'space'>[],

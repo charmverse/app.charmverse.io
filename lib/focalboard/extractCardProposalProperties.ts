@@ -22,17 +22,6 @@ export function extractCardProposalProperties({
 
   const extractedPropertyValues: Partial<ExtractedCardProposalProperties> = {};
 
-  const proposalCategoryPropertyId = databaseProperties.proposalCategory?.id;
-  const proposalCategoryValueId = proposalCategoryPropertyId ? cardValues[proposalCategoryPropertyId] : undefined;
-
-  if (proposalCategoryPropertyId && proposalCategoryValueId) {
-    extractedPropertyValues.cardProposalCategory = {
-      propertyId: proposalCategoryPropertyId,
-      optionId: proposalCategoryValueId as string,
-      value: databaseProperties.proposalCategory?.options.find((opt) => opt.id === proposalCategoryValueId)?.value ?? ''
-    };
-  }
-
   const proposalStatusPropertyId = databaseProperties.proposalStatus?.id;
   const proposalStatusValueId = proposalStatusPropertyId ? cardValues[proposalStatusPropertyId] : undefined;
 

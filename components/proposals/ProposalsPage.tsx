@@ -51,10 +51,7 @@ export function ProposalsPage({ title }: { title: string }) {
     let _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
 
     if (
-      (!_groupByProperty ||
-        (_groupByProperty?.type !== 'select' &&
-          _groupByProperty?.type !== 'proposalCategory' &&
-          _groupByProperty?.type !== 'proposalStatus')) &&
+      (!_groupByProperty || (_groupByProperty?.type !== 'select' && _groupByProperty?.type !== 'proposalStatus')) &&
       activeView?.fields.viewType === 'board'
     ) {
       _groupByProperty = activeBoard?.fields.cardProperties.find((o: any) => o.type === 'select');

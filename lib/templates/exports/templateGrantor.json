@@ -14984,7 +14984,7 @@
                       {
                         "id": "a521348a-c110-47a3-858a-eaae316cb077",
                         "name": "Proposal Category",
-                        "type": "proposalCategory",
+                        "type": "Category",
                         "options": [
                           {
                             "id": "99054d92-aabe-4bd9-97eb-ea9ba7223ab1",

@@ -29,7 +29,6 @@ describe('POST /api/permissions/space/{spaceId}/settings - Saving space permissi
           }
         }
       ],
-      proposalCategories: [],
       forumCategories: []
     };
 

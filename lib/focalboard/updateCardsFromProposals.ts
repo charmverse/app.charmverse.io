@@ -247,10 +247,6 @@ export async function updateCardsFromProposals({
     } else if (!card && !pageWithProposal.proposal?.archived) {
       let properties: Record<string, BoardPropertyValue> = {};
 
-      if (databaseProposalProps.proposalCategory) {
-        properties[databaseProposalProps.proposalCategory.id] = pageWithProposal.proposal?.categoryId ?? '';
-      }
-
       if (databaseProposalProps.proposalUrl) {
         properties[databaseProposalProps.proposalUrl.id] = pageWithProposal.path;
       }

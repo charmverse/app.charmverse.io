@@ -8,7 +8,6 @@ import {
   spaces,
   members,
   spaceRoles,
-  proposalCategories,
   proposalTemplates,
   userProfile,
   userMemberProfile
@@ -65,9 +64,6 @@ const pageHandlers = {
 };
 
 const proposalHandlers = {
-  proposalCategories: rest.get(`/api/spaces/:spaceId/proposal-categories`, (req, res, ctx) => {
-    return res(ctx.json(proposalCategories));
-  }),
   proposalTemplates: rest.get(`/api/spaces/:spaceId/proposal-templates`, (req, res, ctx) => {
     return res(ctx.json(proposalTemplates));
   }),

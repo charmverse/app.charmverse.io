@@ -5,7 +5,6 @@ import { v4 as uuid, v4 } from 'uuid';
 
 import type { FormFieldInput } from 'components/common/form/interfaces';
 import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
-import { generateProposalCategory } from 'testing/utils/proposals';
 
 import { createProposal } from '../createProposal';
 import type { ProposalWithUsersAndRubric } from '../interface';
@@ -18,9 +17,6 @@ beforeAll(async () => {
   const generated = await generateUserAndSpace();
   user = generated.user;
   space = generated.space;
-  proposalCategory = await generateProposalCategory({
-    spaceId: space.id
-  });
 });
 
 describe('Creates a page and proposal with relevant configuration', () => {
@@ -44,7 +40,6 @@ describe('Creates a page and proposal with relevant configuration', () => {
         title: pageTitle,
         sourceTemplateId: templateId
       },
-      categoryId: proposalCategory.id,
       userId: user.id,
       spaceId: space.id,
       authors: [user.id, extraUser.id],
@@ -130,7 +125,6 @@ describe('Creates a page and proposal with relevant configuration', () => {
         title: pageTitle,
         type: 'proposal_template'
       },
-      categoryId: proposalCategory.id,
       userId: user.id,
       spaceId: space.id,
       authors: [user.id, extraUser.id],
@@ -167,7 +161,6 @@ describe('Creates a page and proposal with relevant configuration', () => {
           contentText: '',
           title: 'page-title'
         },
-        categoryId: proposalCategory.id,
         userId: user.id,
         spaceId: space.id,
         authors: [user.id, outsideUser.id],
@@ -182,7 +175,6 @@ describe('Creates a page and proposal with relevant configuration', () => {
           contentText: '',
           title: 'page-title'
         },
-        categoryId: proposalCategory.id,
         userId: user.id,
         spaceId: space.id,
         authors: [user.id],
@@ -202,7 +194,6 @@ describe('Creates a page and proposal with relevant configuration', () => {
           contentText: '',
           title: 'page-title'
         },
-        categoryId: proposalCategory.id,
         userId: user.id,
         spaceId: space.id,
         authors: [user.id, outsideUser.id],
@@ -223,7 +214,6 @@ describe('Creates a page and proposal with relevant configuration', () => {
           contentText: '',
           title: 'page-title'
         },
-        categoryId: null as any,
         userId: user.id,
         spaceId: space.id
       })
