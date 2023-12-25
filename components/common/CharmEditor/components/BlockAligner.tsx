@@ -40,7 +40,7 @@ const Controls = styled.div`
   transition: opacity 250ms ease-in-out;
 `;
 
-const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props, ref) => {
+const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props) => {
   const { children, onDelete, onEdit, readOnly, onDragStart } = props;
   const theme = useTheme();
 

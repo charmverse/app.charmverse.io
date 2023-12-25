@@ -621,6 +621,36 @@ export class Mutator {
     }
   }
 
+  changePropertyValues(
+    cards: Card[],
+    propertyId: string,
+    value?: string | string[] | number,
+    description = 'change property'
+  ) {
+    const oldBlocks: Block[] = [];
+    const newBlocks: Block[] = [];
+
+    cards
+      .filter((card) => {
+        const oldValue = card.fields.properties[propertyId];
+        return oldValue !== value && (oldValue || value);
+      })
+      .forEach((card) => {
+        const newCard = createCard(card);
+        if (value) {
+          newCard.fields.properties[propertyId] = value;
+        } else {
+          delete newCard.fields.properties[propertyId];
+        }
+
+        newBlocks.push(newCard);
+        oldBlocks.push(card);
+      });
+
+    // dont save anything if property value was not changed.
+    return this.updateBlocks(newBlocks, oldBlocks, description);
+  }
+
   async changePropertyTypeAndName(
     board: Board,
     cards: Card[],
