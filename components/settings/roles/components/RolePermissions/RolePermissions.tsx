@@ -1,4 +1,4 @@
-import type { PostCategoryPermissionAssignment, TargetPermissionGroup } from '@charmverse/core/permissions';
+import type { PostCategoryPermissionAssignment } from '@charmverse/core/permissions';
 import { AvailableSpacePermissions } from '@charmverse/core/permissions/flags';
 import type { SpaceOperation } from '@charmverse/core/prisma';
 import { Box, Divider, Grid, Typography } from '@mui/material';
@@ -10,7 +10,6 @@ import { v4 as uuid } from 'uuid';
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { PostCategoryRolePermissionRow } from 'components/forum/components/PostCategoryPermissions/components/PostCategoryPermissionRow';
-import { ProposalCategoryRolePermissionRow } from 'components/proposals/components/ProposalViewOptions/components/ProposalCategoryPermissionsDialog/components/ProposalCategoryPermissionRow';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -332,44 +331,6 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                 upgradeContext='proposal_permissions'
               />
             )}
-            <Typography sx={{ my: 1 }}>Access to categories</Typography>
-            <Box display='flex' gap={3} mb={2}>
-              <Divider orientation='vertical' flexItem />
-              <Box flexGrow={1}>
-                {proposalCategories.map((category) => {
-                  const permission = formState.proposalCategories.find(
-                    (p) =>
-                      p.proposalCategoryId === category.id &&
-                      (p.assignee as TargetPermissionGroup<'space' | 'role'>).id === id
-                  );
-
-                  const defaultSpaceProposalPermission =
-                    targetGroup === 'space'
-                      ? undefined
-                      : defaultProposalCategoryPermissions.find((p) => p.proposalCategoryId === category.id);
-                  return (
-                    <ProposalCategoryRolePermissionRow
-                      key={category.id}
-                      canEdit={category.permissions.manage_permissions && !isFreeSpace}
-                      label={category.title}
-                      deletePermission={deleteProposalCategoryPermission}
-                      updatePermission={updateProposalCategoryPermission}
-                      proposalCategoryId={category.id}
-                      existingPermissionId={permission?.id}
-                      permissionLevel={isFreeSpace ? 'full_access' : permission?.permissionLevel}
-                      defaultPermissionLevel={
-                        isFreeSpace
-                          ? undefined
-                          : targetGroup === 'space'
-                          ? undefined
-                          : defaultSpaceProposalPermission?.permissionLevel
-                      }
-                      assignee={{ group: targetGroup, id }}
-                    />
-                  );
-                })}
-              </Box>
-            </Box>
             <Divider sx={{ mt: 1, mb: 2 }} />
             <Typography variant='body2' fontWeight='bold' gap={1} display='flex' alignItems='center'>
               Forums
