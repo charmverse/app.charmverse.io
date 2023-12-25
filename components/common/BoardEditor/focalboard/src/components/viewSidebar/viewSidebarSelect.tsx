@@ -16,7 +16,7 @@ import type { BoardView } from 'lib/focalboard/boardView';
 
 import { DatabaseSidebarHeader } from './databaseSidebarHeader';
 
-export type SidebarView = 'view-options' | 'layout' | 'card-properties' | 'group-by' | 'source' | 'proposalCategories';
+export type SidebarView = 'view-options' | 'layout' | 'card-properties' | 'group-by' | 'source';
 
 function MenuRow({
   icon,
@@ -159,14 +159,6 @@ export function ViewSidebarSelect({
           icon={<SourceIcon sourceType={sourceIconType} />}
           title='Source'
           value={sourceTitle}
-        />
-      )}
-
-      {withProposalCategories && (
-        <MenuRow
-          onClick={() => setSidebarView('proposalCategories')}
-          icon={<Apps color='secondary' />}
-          title='Categories'
         />
       )}
     </>
