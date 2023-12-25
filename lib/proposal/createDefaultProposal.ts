@@ -8,7 +8,6 @@ import { getDefaultFeedbackEvaluation, getDefaultPermissions } from 'lib/proposa
 
 import {
   AUTHORS_BLOCK_ID,
-  CATEGORY_BLOCK_ID,
   CREATED_AT_ID,
   EVALUATION_TYPE_BLOCK_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID,

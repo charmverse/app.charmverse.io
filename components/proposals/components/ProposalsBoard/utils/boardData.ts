@@ -9,7 +9,6 @@ import { proposalDbProperties, proposalStatusBoardColors } from 'lib/focalboard/
 import { createTableView } from 'lib/focalboard/tableView';
 import {
   AUTHORS_BLOCK_ID,
-  CATEGORY_BLOCK_ID,
   CREATED_AT_ID,
   DEFAULT_BOARD_BLOCK_ID,
   DEFAULT_VIEW_BLOCK_ID,
@@ -93,7 +92,6 @@ export function getDefaultTableView({ storedBoard }: { storedBoard: ProposalBoar
   view.id = DEFAULT_VIEW_BLOCK_ID;
   view.fields.columnWidths = {
     [Constants.titleColumnId]: 400,
-    [CATEGORY_BLOCK_ID]: 200,
     [STATUS_BLOCK_ID]: 150,
     [AUTHORS_BLOCK_ID]: 150,
     [PROPOSAL_REVIEWERS_BLOCK_ID]: 150

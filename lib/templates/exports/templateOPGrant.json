@@ -471,13 +471,7 @@
         "status": "draft",
         "reviewedBy": null,
         "reviewedAt": null,
-        "snapshotProposalExpiry": null,
-        "category": {
-          "id": "8478fcad-3d1f-43d2-9080-76acedffea84",
-          "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-          "title": "Treasury",
-          "color": "gray"
-        }
+        "snapshotProposalExpiry": null
       }
     },
     {
@@ -1610,13 +1604,7 @@
         "status": "draft",
         "reviewedBy": null,
         "reviewedAt": null,
-        "snapshotProposalExpiry": null,
-        "category": {
-          "id": "8478fcad-3d1f-43d2-9080-76acedffea84",
-          "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-          "title": "Treasury",
-          "color": "gray"
-        }
+        "snapshotProposalExpiry": null
       }
     },
     {
@@ -2029,13 +2017,7 @@
         "status": "draft",
         "reviewedBy": null,
         "reviewedAt": null,
-        "snapshotProposalExpiry": null,
-        "category": {
-          "id": "8478fcad-3d1f-43d2-9080-76acedffea84",
-          "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-          "title": "Treasury",
-          "color": "gray"
-        }
+        "snapshotProposalExpiry": null
       }
     },
     {
@@ -2376,13 +2358,7 @@
         "status": "draft",
         "reviewedBy": null,
         "reviewedAt": null,
-        "snapshotProposalExpiry": null,
-        "category": {
-          "id": "fbece9d6-ea51-4626-a459-6b572556c302",
-          "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-          "title": "Protocol",
-          "color": "pink"
-        }
+        "snapshotProposalExpiry": null
       }
     },
     {
@@ -3065,13 +3041,7 @@
         "status": "draft",
         "reviewedBy": null,
         "reviewedAt": null,
-        "snapshotProposalExpiry": null,
-        "category": {
-          "id": "7ae5cdce-882c-4b4a-854c-e4bc5b2a99f7",
-          "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-          "title": "Metagoverance",
-          "color": "pink"
-        }
+        "snapshotProposalExpiry": null
       }
     },
     {
@@ -3752,13 +3722,7 @@
         "status": "draft",
         "reviewedBy": null,
         "reviewedAt": null,
-        "snapshotProposalExpiry": null,
-        "category": {
-          "id": "7ae5cdce-882c-4b4a-854c-e4bc5b2a99f7",
-          "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-          "title": "Metagoverance",
-          "color": "pink"
-        }
+        "snapshotProposalExpiry": null
       }
     },
     {
@@ -4232,13 +4196,7 @@
         "status": "draft",
         "reviewedBy": null,
         "reviewedAt": null,
-        "snapshotProposalExpiry": null,
-        "category": {
-          "id": "8478fcad-3d1f-43d2-9080-76acedffea84",
-          "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-          "title": "Treasury",
-          "color": "gray"
-        }
+        "snapshotProposalExpiry": null
       }
     },
     {
@@ -4921,13 +4879,7 @@
         "status": "draft",
         "reviewedBy": null,
         "reviewedAt": null,
-        "snapshotProposalExpiry": null,
-        "category": {
-          "id": "7ae5cdce-882c-4b4a-854c-e4bc5b2a99f7",
-          "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-          "title": "Metagoverance",
-          "color": "pink"
-        }
+        "snapshotProposalExpiry": null
       }
     },
     {
@@ -6060,13 +6012,7 @@
         "status": "draft",
         "reviewedBy": null,
         "reviewedAt": null,
-        "snapshotProposalExpiry": null,
-        "category": {
-          "id": "8478fcad-3d1f-43d2-9080-76acedffea84",
-          "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-          "title": "Treasury",
-          "color": "gray"
-        }
+        "snapshotProposalExpiry": null
       }
     },
     {
@@ -6479,13 +6425,7 @@
         "status": "draft",
         "reviewedBy": null,
         "reviewedAt": null,
-        "snapshotProposalExpiry": null,
-        "category": {
-          "id": "8478fcad-3d1f-43d2-9080-76acedffea84",
-          "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-          "title": "Treasury",
-          "color": "gray"
-        }
+        "snapshotProposalExpiry": null
       }
     },
     {
@@ -6826,13 +6766,7 @@
         "status": "draft",
         "reviewedBy": null,
         "reviewedAt": null,
-        "snapshotProposalExpiry": null,
-        "category": {
-          "id": "fbece9d6-ea51-4626-a459-6b572556c302",
-          "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-          "title": "Protocol",
-          "color": "pink"
-        }
+        "snapshotProposalExpiry": null
       }
     },
     {
@@ -7513,13 +7447,7 @@
         "status": "draft",
         "reviewedBy": null,
         "reviewedAt": null,
-        "snapshotProposalExpiry": null,
-        "category": {
-          "id": "7ae5cdce-882c-4b4a-854c-e4bc5b2a99f7",
-          "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-          "title": "Metagoverance",
-          "color": "pink"
-        }
+        "snapshotProposalExpiry": null
       }
     },
     {
