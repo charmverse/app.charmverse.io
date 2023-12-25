@@ -39,35 +39,20 @@ async function getProposalFormAnswersHandler(req: NextApiRequest, res: NextApiRe
     throw new InvalidInputError(`Proposal ${proposalId} does not have a form`);
   }
 
-  if (userId) {
-    const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
-      resourceId: proposalId,
-      userId
-    });
+  const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
+    resourceId: proposalId,
+    userId
+  });
 
-    if (permissions.view !== true) {
-      const pagePermissions = proposal?.page?.id
-        ? await permissionsApiClient.pages.computePagePermissions({
-            resourceId: proposal.page.id,
-            userId
-          })
-        : null;
-      if (!pagePermissions?.read) {
-        throw new NotFoundError();
-      }
-    }
-  } else {
-    const space = await prisma.space.findUniqueOrThrow({
-      where: {
-        id: proposal.spaceId
-      },
-      select: {
-        publicProposals: true
-      }
-    });
+  if (permissions.view !== true) {
+    const pagePermissions = proposal?.page?.id
+      ? await permissionsApiClient.pages.computePagePermissions({
+          resourceId: proposal.page.id,
+          userId
+        })
+      : null;
 
-    const isProposalsPublic = space.publicProposals === true;
-    if (!isProposalsPublic) {
+    if (!pagePermissions?.read) {
       throw new NotFoundError();
     }
   }
