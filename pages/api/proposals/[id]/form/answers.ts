@@ -17,44 +17,57 @@ import { withSessionRoute } from 'lib/session/withSession';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
+  .get(getProposalFormAnswersHandler)
   .use(requireUser)
   .use(providePermissionClients({ key: 'id', location: 'query', resourceIdType: 'proposal' }))
-  .get(getProposalFormAnswersHandler)
   .put(upsertProposalFormAnswersHandler);
 
 async function getProposalFormAnswersHandler(req: NextApiRequest, res: NextApiResponse<FormFieldAnswer[]>) {
   const proposalId = req.query.id as string;
-  const userId = req.session.user.id;
+  const userId = req.session.user?.id;
 
-  const proposal = await prisma.proposal.findUnique({
+  const proposal = await prisma.proposal.findUniqueOrThrow({
     where: { id: proposalId },
-    include: {
-      authors: true,
+    select: {
+      formId: true,
+      spaceId: true,
       page: { select: { id: true, sourceTemplateId: true } }
     }
   });
-
-  if (!proposal) {
-    throw new NotFoundError();
-  }
 
   if (!proposal.formId) {
     throw new InvalidInputError(`Proposal ${proposalId} does not have a form`);
   }
 
-  const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
-    resourceId: proposal?.id,
-    userId
-  });
+  if (userId) {
+    const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
+      resourceId: proposalId,
+      userId
+    });
 
-  if (permissions.view !== true) {
-    const pagePermissions = proposal?.page?.id
-      ? await permissionsApiClient.pages.computePagePermissions({
-          resourceId: proposal.page.id,
-          userId
-        })
-      : null;
-    if (!pagePermissions?.read) {
+    if (permissions.view !== true) {
+      const pagePermissions = proposal?.page?.id
+        ? await permissionsApiClient.pages.computePagePermissions({
+            resourceId: proposal.page.id,
+            userId
+          })
+        : null;
+      if (!pagePermissions?.read) {
+        throw new NotFoundError();
+      }
+    }
+  } else {
+    const space = await prisma.space.findUniqueOrThrow({
+      where: {
+        id: proposal.spaceId
+      },
+      select: {
+        publicProposals: true
+      }
+    });
+
+    const isProposalsPublic = space.publicProposals === true;
+    if (!isProposalsPublic) {
       throw new NotFoundError();
     }
   }

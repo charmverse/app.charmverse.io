@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { canAccessPrivateFields } from 'lib/proposal/form/canAccessPrivateFields';
 import { getProposalFormFields } from 'lib/proposal/form/getProposalFormFields';
 
-export async function getProposalFormAnswers({ proposalId, userId }: { userId: string; proposalId: string }) {
+export async function getProposalFormAnswers({ proposalId, userId }: { userId?: string; proposalId: string }) {
   const proposal = await prisma.proposal.findUniqueOrThrow({
     where: { id: proposalId },
     include: {
@@ -27,7 +27,9 @@ export async function getProposalFormAnswers({ proposalId, userId }: { userId: s
     return [];
   }
 
-  const canViewPrivateFields = await canAccessPrivateFields({ proposalId: proposal.id, userId, proposal });
+  const canViewPrivateFields = userId
+    ? await canAccessPrivateFields({ proposalId: proposal.id, userId, proposal })
+    : false;
   const accessibleFields = getProposalFormFields(proposal.form?.formFields, canViewPrivateFields);
   const accessibleFieldIds = accessibleFields?.map((field) => field.id);
 
