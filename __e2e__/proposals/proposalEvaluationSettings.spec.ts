@@ -1,7 +1,14 @@
-import type { ProposalCategory, ProposalWorkflow, Space, User } from '@charmverse/core/prisma-client';
+import type {
+  ProposalCategory,
+  ProposalSystemRole,
+  ProposalWorkflow,
+  Role,
+  Space,
+  User
+} from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
-import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { expect } from '@playwright/test';
 import { ProposalPage } from '__e2e__/po/proposalPage.po';
 import { ProposalsListPage } from '__e2e__/po/proposalsList.po';
@@ -16,6 +23,7 @@ test.describe.serial('Proposal Evaluation', () => {
   let space: Space;
   let admin: User;
   let proposalCategory: ProposalCategory;
+  let role: Role;
 
   const proposalEvaluationPermissions: WorkflowEvaluationJson[] = [
     {
@@ -77,6 +85,10 @@ test.describe.serial('Proposal Evaluation', () => {
         evaluations: proposalEvaluationPermissions
       }
     });
+    role = await testUtilsMembers.generateRole({
+      createdBy: admin.id,
+      spaceId: space.id
+    });
   });
   test('An admin can create a template that uses a workflow', async ({
     proposalListPage,
@@ -108,13 +120,30 @@ test.describe.serial('Proposal Evaluation', () => {
 
     await proposalPage.selectCategory(proposalCategory.id);
 
+    // Workflow auto-selected when loading the proposal
     const workflowSelectTextContent = await proposalPage.workflowSelect.textContent();
     expect(workflowSelectTextContent).toBe(workflow.title);
 
     // Move into configuring the actual evaluation
     await expect(proposalPage.evaluationSettingsSidebar).toBeVisible();
 
-    // const rubricStep = proposalPage.selectEvaluationReviewer('rubric', );
+    // Configure rubric
+    await proposalPage.selectEvaluationReviewer('rubric', 'space_member' as ProposalSystemRole);
+
+    await proposalPage.addRubricCriteriaButton.click();
+
+    await proposalPage.editRubricCriteriaLabel.fill('Rubric criteria label');
+    await proposalPage.editRubricCriteriaDescription.fill('Rubric criteria description');
+    await proposalPage.editRubricCriteriaMinScore.fill('1');
+    await proposalPage.editRubricCriteriaMaxScore.fill('10');
+
+    // Configure review
+    await proposalPage.selectEvaluationReviewer('pass_fail', role.id);
+
+    // Configure vote
+    await proposalPage.selectEvaluationReviewer('vote', 'space_member');
+
+    await proposalPage.page.pause();
   });
 
   // test('A proposal author can move draft proposal to feedback', async () => {
