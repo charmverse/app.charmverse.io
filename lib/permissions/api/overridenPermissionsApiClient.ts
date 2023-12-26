@@ -50,6 +50,30 @@ export class PermissionsApiClientWithPermissionsSwitch extends PermissionsApiCli
       return permissions;
     };
 
+    // Override computeProposalCategoryPermissions method
+    const originalComputeProposalCategoryPermissions = proposals.computeProposalCategoryPermissions;
+
+    proposals.computeProposalCategoryPermissions = async function (args: PermissionCompute) {
+      const space = await getSpaceInfoViaResource({ resourceId: args.resourceId, resourceIdType: 'proposalCategory' });
+
+      const injectedArgs = withUseProposalPermissionsArgs(space, args);
+
+      const permissions = await originalComputeProposalCategoryPermissions.apply(this, [injectedArgs]);
+      return permissions;
+    };
+
+    // Override getAccessibleProposalCategories method
+    const originalGetAccessibleCategories = proposals.getAccessibleProposalCategories;
+
+    proposals.getAccessibleProposalCategories = async function (args: PagesRequest) {
+      const space = await getSpaceInfoViaResource({ resourceId: args.spaceId, resourceIdType: 'space' });
+
+      const injectedArgs = withUseProposalPermissionsArgs(space, args);
+
+      const pageIds = await originalGetAccessibleCategories.apply(this, [injectedArgs]);
+      return pageIds;
+    };
+
     // Override getAccessiblePageIds method
     const originalGetAccessiblePageIds = pages.getAccessiblePageIds;
 
