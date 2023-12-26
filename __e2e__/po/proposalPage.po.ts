@@ -25,7 +25,15 @@ export class ProposalPage extends DocumentPage {
       .locator('data-test=edit-rubric-criteria-description >> textarea')
       .first(),
     public editRubricCriteriaMinScore = page.locator('data-test=edit-rubric-criteria-min-score >> input'),
-    public editRubricCriteriaMaxScore = page.locator('data-test=edit-rubric-criteria-max-score >> input')
+    public editRubricCriteriaMaxScore = page.locator('data-test=edit-rubric-criteria-max-score >> input'),
+    public evaluationVoteDurationInput = page
+      .locator('data-test=evaluation-vote-settings')
+      .locator('data-test=vote-duration')
+      .locator('data-test=numeric-field >> input'),
+    public evaluationVotePassThresholdInput = page
+      .locator('data-test=evaluation-vote-settings')
+      .locator('data-test=vote-pass-threshold')
+      .locator('data-test=numeric-field >> input')
   ) {
     super(page);
   }
