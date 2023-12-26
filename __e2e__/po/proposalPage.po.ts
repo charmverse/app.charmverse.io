@@ -16,7 +16,8 @@ export class ProposalPage extends DocumentPage {
     public currentStatus = page.locator('data-test=current-proposal-status'),
     public workflowSelect = page.locator('data-test=proposal-workflow-select'),
     public voterSelect = page.locator('data-test=proposal-vote-select'),
-    public completeDraftButton = page.locator('data-test=complete-draft-button')
+    public completeDraftButton = page.locator('data-test=complete-draft-button'),
+    public newProposalEvaluationSettings = page.locator('data-test=new-proposal-evaluation-settings')
   ) {
     super(page);
   }
