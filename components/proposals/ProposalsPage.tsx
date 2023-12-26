@@ -197,7 +197,7 @@ export function ProposalsPage({ title }: { title: string }) {
               view={activeView}
               isOpen={!!showSidebar}
               closeSidebar={() => setShowSidebar(false)}
-              hideLayoutSelectOptions
+              hideLayoutOptions
               hideSourceOptions
               hideGroupOptions
               hidePropertiesRow={!isAdmin}
