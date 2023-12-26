@@ -108,14 +108,13 @@ test.describe.serial('Proposal Evaluation', () => {
 
     await proposalPage.selectCategory(proposalCategory.id);
 
-    // await proposalPage.selectWorkflow(workflow.id);
+    const workflowSelectTextContent = await proposalPage.workflowSelect.textContent();
+    expect(workflowSelectTextContent).toBe(workflow.title);
 
     // Move into configuring the actual evaluation
-    await expect(proposalPage.newProposalEvaluationSettings).toBeVisible();
+    await expect(proposalPage.evaluationSettingsSidebar).toBeVisible();
 
     // const rubricStep = proposalPage.selectEvaluationReviewer('rubric', );
-
-    await proposalListPage.page.pause();
   });
 
   // test('A proposal author can move draft proposal to feedback', async () => {
