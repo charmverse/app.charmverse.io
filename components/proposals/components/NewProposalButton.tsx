@@ -42,7 +42,6 @@ export function NewProposalButton() {
   const { proposalCategoriesWithCreatePermission } = useProposalCategories();
   const isAdmin = useIsAdmin();
   const { pages } = usePages();
-  const isCharmverseSpace = useIsCharmverseSpace();
   const proposalTemplateCreateModalState = usePopupState({ variant: 'dialog' });
   // MUI Menu specific content
   const buttonRef = useRef<HTMLDivElement>(null);
@@ -100,7 +99,7 @@ export function NewProposalButton() {
         addPageFromTemplate={createFromTemplate}
         editTemplate={editTemplate}
         pages={proposalTemplatePages}
-        createTemplate={!isCharmverseSpace ? () => createTemplate('free_form') : proposalTemplateCreateModalState.open}
+        createTemplate={proposalTemplateCreateModalState.open}
         deleteTemplate={deleteProposalTemplate}
         anchorEl={buttonRef.current as Element}
         boardTitle='Proposals'
