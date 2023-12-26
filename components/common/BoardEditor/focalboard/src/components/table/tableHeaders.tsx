@@ -1,7 +1,11 @@
 import { useTheme } from '@emotion/react';
 import AddIcon from '@mui/icons-material/Add';
+import CheckBoxOutlineBlankOutlinedIcon from '@mui/icons-material/CheckBoxOutlineBlankOutlined';
+import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
+import IndeterminateCheckBoxOutlinedIcon from '@mui/icons-material/IndeterminateCheckBoxOutlined';
 import { Box, Menu } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import type { Dispatch, SetStateAction } from 'react';
 import React, { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 
@@ -24,6 +28,7 @@ import { PropertyTypes } from '../../widgets/propertyTypes';
 import { typeDisplayName } from '../../widgets/typeDisplayName';
 
 import TableHeader from './tableHeader';
+import { StyledCheckbox } from './tableRow';
 
 type Props = {
   board: Board;
@@ -34,10 +39,23 @@ type Props = {
   resizingColumn: string;
   offset: number;
   columnRefs: Map<string, React.RefObject<HTMLDivElement>>;
+  checkedIds?: string[];
+  setCheckedIds?: Dispatch<SetStateAction<string[]>>;
 };
 
 function TableHeaders(props: Props): JSX.Element {
-  const { board, cards, activeView, resizingColumn, views, offset, columnRefs } = props;
+  const {
+    board,
+    cards,
+    activeView,
+    resizingColumn,
+    views,
+    offset,
+    columnRefs,
+    setCheckedIds,
+    readOnly,
+    checkedIds = []
+  } = props;
   const intl = useIntl();
   const { formatDateTime, formatDate } = useDateFormatter();
   const addPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-property' });
@@ -182,6 +200,33 @@ function TableHeaders(props: Props): JSX.Element {
 
   return (
     <div className='octo-table-header TableHeaders' id='mainBoardHeader'>
+      {setCheckedIds && !readOnly && cards.length !== 0 && (
+        <StyledCheckbox
+          checked={checkedIds.length === cards.length}
+          onChange={() => {
+            if (checkedIds.length === cards.length) {
+              setCheckedIds([]);
+            } else {
+              setCheckedIds(cards.map((card) => card.id));
+            }
+          }}
+          icon={
+            checkedIds.length === cards.length ? (
+              <CheckBoxOutlinedIcon fontSize='small' />
+            ) : checkedIds.length === 0 ? (
+              <CheckBoxOutlineBlankOutlinedIcon fontSize='small' />
+            ) : (
+              <IndeterminateCheckBoxOutlinedIcon fontSize='small' />
+            )
+          }
+          show={checkedIds.length !== 0}
+          size='small'
+          disableFocusRipple
+          disableRipple
+          disableTouchRipple
+        />
+      )}
+
       {visiblePropertyTemplates.map((template) => {
         let sorted: 'up' | 'down' | 'none' = 'none';
         const sortOption = sortOptions.find((o: ISortOption) => o.propertyId === template.id);

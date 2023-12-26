@@ -7,7 +7,7 @@ export function getCollectablesUnifiedAccessControlConditions(
   values: FormValues
 ): UnifiedAccessControlConditions | undefined {
   const { collectableOption, chain, contract, tokenId, quantity, poapType, poapId, poapName, poapNameMatch } = values;
-  const chainName = getChainById(Number(chain))?.litNetwork || 'etherum';
+  const chainName = getChainById(Number(chain))?.litNetwork || 'ethereum';
 
   if (collectableOption === 'ERC721' && chain && contract) {
     if (tokenId) {

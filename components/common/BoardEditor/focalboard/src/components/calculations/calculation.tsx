@@ -1,4 +1,4 @@
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import type { CSSProperties } from 'react';
 import React from 'react';
 import { useIntl } from 'react-intl';
@@ -60,7 +60,7 @@ function Calculation(props: Props): JSX.Element {
 
       <span className='calculationLabel'>{optionDisplayNameString(valueOption!, intl)}</span>
 
-      {value === Options.none.value && <ExpandLessIcon fontSize='small' />}
+      {value === Options.none.value && <ExpandMoreIcon fontSize='small' />}
 
       {value !== Options.none.value && (
         <span className='calculationValue'>

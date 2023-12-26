@@ -1,6 +1,8 @@
-import { Chip, Link } from '@mui/material';
+import { Box } from '@mui/material';
 import { useMemo } from 'react';
 
+import Link from 'components/common/Link';
+import { BreadcrumbPageTitle } from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { usePages } from 'hooks/usePages';
@@ -26,7 +28,8 @@ export function PageParentChip({ pageId, parentId, insideModal }: Props) {
   const parentProposal = parentProposalId ? pages[parentProposalId] : undefined;
 
   const title = parentPage?.title || parentProposal?.title || 'Untitled';
-  const href = parentPage?.path || parentProposal?.path || '/';
+  const path = parentPage?.path || parentProposal?.path || '/';
+  const href = path ? `/${path}` : '/';
 
   const backLinkModalType = useMemo(() => {
     if (!page?.type || !query.id) {
@@ -47,19 +50,17 @@ export function PageParentChip({ pageId, parentId, insideModal }: Props) {
   // full page redirect
   if (!insideModal || !backLinkModalType) {
     return (
-      <Chip
-        label={title}
-        sx={{
-          cursor: 'pointer'
-        }}
-        size='small'
-        component={Link}
-        href={href}
-      />
+      <Box sx={{ a: { color: 'inherit' } }}>
+        <Link href={href}>
+          <BreadcrumbPageTitle sx={{ maxWidth: 160 }}>{title}</BreadcrumbPageTitle>
+        </Link>
+      </Box>
     );
   }
 
-  const goBack = () => {
+  const goBack = (e: React.MouseEvent<Element, MouseEvent>) => {
+    e.preventDefault();
+
     switch (backLinkModalType) {
       case 'rewardToProposal':
         updateURLQuery({ rewardId: null });
@@ -71,14 +72,10 @@ export function PageParentChip({ pageId, parentId, insideModal }: Props) {
 
   // close modal
   return (
-    <Chip
-      label={parentProposal?.title || 'Untitled'}
-      sx={{
-        cursor: 'pointer'
-      }}
-      size='small'
-      component={Link}
-      onClick={goBack}
-    />
+    <Box sx={{ a: { color: 'inherit' } }}>
+      <Link href={href} onClick={goBack}>
+        <BreadcrumbPageTitle sx={{ maxWidth: 160 }}>{parentProposal?.title || 'Untitled'}</BreadcrumbPageTitle>
+      </Link>
+    </Box>
   );
 }

@@ -27,7 +27,6 @@ export function AttachRewardButton({
   children?: React.ReactNode;
 }) {
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
-
   const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, isSavingReward } = useNewReward();
 
   function closeDialog() {
@@ -38,7 +37,7 @@ export function AttachRewardButton({
   function createNewReward() {
     clearRewardValues();
     const rewardReviewers = reviewers.filter((reviewer) => reviewer.group !== 'system_role') as RewardReviewer[];
-    setRewardValues({ reviewers: rewardReviewers, assignedSubmitters });
+    setRewardValues({ reviewers: rewardReviewers, assignedSubmitters }, { skipDirty: true });
 
     openNewPage({
       type: 'bounty'
@@ -77,6 +76,7 @@ export function AttachRewardButton({
           titlePlaceholder='Reward title (required)'
           values={newPageValues}
           onChange={updateNewPageValues}
+          headerBannerTitle="You're creating a milestone reward"
         >
           <RewardPropertiesForm
             onChange={setRewardValues}

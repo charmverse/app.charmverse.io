@@ -1,6 +1,5 @@
 import { log } from '@charmverse/core/log';
 // ref: https://wagmi.sh/core/chains
-import networks from '@unlock-protocol/networks';
 import type { Chain } from 'viem/chains';
 import {
   arbitrum,
@@ -47,6 +46,7 @@ export interface IChainDetails {
   testnet?: boolean;
   shortName: string;
   litNetwork?: string;
+  unlockNetwork?: boolean;
   viem: Chain;
 }
 
@@ -80,7 +80,8 @@ const RPC: Record<string, IChainDetails> = {
     iconUrl: '/images/cryptoLogos/ethereum-eth-logo.svg',
     rpcUrls: ['https://eth.llamarpc.com'],
     shortName: 'eth',
-    litNetwork: 'ethereum'
+    litNetwork: 'ethereum',
+    unlockNetwork: true
   },
   GOERLI: {
     ...EVM_DEFAULT,
@@ -108,7 +109,8 @@ const RPC: Record<string, IChainDetails> = {
     iconUrl: '/images/cryptoLogos/ethereum-eth-logo.svg',
     testnet: true,
     shortName: 'sep',
-    litNetwork: 'sepolia'
+    litNetwork: 'sepolia',
+    unlockNetwork: true
   },
   OPTIMISM: {
     ...EVM_DEFAULT,
@@ -121,7 +123,8 @@ const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: ['https://optimistic.etherscan.io/'],
     iconUrl: '/images/cryptoLogos/optimism.svg',
     shortName: 'oeth',
-    litNetwork: 'optimism'
+    litNetwork: 'optimism',
+    unlockNetwork: true
   },
   // https://docs.base.org/network-information/
   BASE: {
@@ -135,7 +138,8 @@ const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: ['https://basescan.org'],
     iconUrl: '/images/cryptoLogos/base-logo.svg',
     shortName: 'base',
-    litNetwork: 'base'
+    litNetwork: 'base',
+    unlockNetwork: true
   },
   BASE_TESTNET: {
     ...EVM_DEFAULT,
@@ -148,7 +152,8 @@ const RPC: Record<string, IChainDetails> = {
     iconUrl: '/images/cryptoLogos/base-logo.svg',
     shortName: 'base-testnet',
     testnet: true,
-    litNetwork: 'baseGoerli'
+    litNetwork: 'baseGoerli',
+    unlockNetwork: true
   },
   // https://docs.zora.co/docs/zora-network/network
   ZORA: {
@@ -179,7 +184,8 @@ const RPC: Record<string, IChainDetails> = {
     gnosisUrl: 'https://safe-transaction-polygon.safe.global',
     iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
     litNetwork: 'polygon',
-    shortName: 'matic'
+    shortName: 'matic',
+    unlockNetwork: true
   },
   MUMBAI: {
     chainId: polygonMumbai.id,
@@ -198,7 +204,8 @@ const RPC: Record<string, IChainDetails> = {
     iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
     testnet: true,
     shortName: 'maticmum',
-    litNetwork: 'mumbai'
+    litNetwork: 'mumbai',
+    unlockNetwork: true
   },
   ARBITRUM: {
     ...EVM_DEFAULT,
@@ -211,7 +218,8 @@ const RPC: Record<string, IChainDetails> = {
     gnosisUrl: 'https://safe-transaction-arbitrum.safe.global',
     iconUrl: '/images/cryptoLogos/arbitrum.svg',
     shortName: 'arb1',
-    litNetwork: 'arbitrum'
+    litNetwork: 'arbitrum',
+    unlockNetwork: true
   },
   MANTLE: {
     chainId: mantle.id,
@@ -266,7 +274,8 @@ const RPC: Record<string, IChainDetails> = {
     gnosisUrl: 'https://safe-transaction-avalanche.safe.global',
     iconUrl: '/images/cryptoLogos/avalanche-avax-logo.svg',
     shortName: 'avax',
-    litNetwork: 'avalanche'
+    litNetwork: 'avalanche',
+    unlockNetwork: true
   },
   BSC: {
     chainId: bsc.id,
@@ -284,7 +293,8 @@ const RPC: Record<string, IChainDetails> = {
     gnosisUrl: 'https://safe-transaction-bsc.safe.global',
     iconUrl: '/images/cryptoLogos/binance-coin-bnb-logo.svg',
     shortName: 'bnb',
-    litNetwork: 'bsc'
+    litNetwork: 'bsc',
+    unlockNetwork: true
   },
   XDAI: {
     chainId: gnosis.id,
@@ -337,7 +347,8 @@ const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: ['https://explorer.celo.org'],
     iconUrl: '/images/cryptoLogos/celo-celo-logo.svg',
     shortName: 'celo',
-    litNetwork: 'celo'
+    litNetwork: 'celo',
+    unlockNetwork: true
   },
   HARMONY: {
     chainId: harmonyOne.id,
@@ -472,8 +483,7 @@ export const litDaoChains: IChainDetailsWithLit[] = litChains.filter((chain) =>
   ['ethereum', 'arbitrum', 'optimism', 'polygon'].includes(chain.litNetwork)
 );
 
-const unlockNetworkIds = Object.values(networks).map((n: any) => n.id);
-export const unlockChains = RPCList.filter((chain) => unlockNetworkIds.includes(chain.chainId)).sort(sortChainList);
+export const unlockChains = RPCList.filter((chain) => !!chain.unlockNetwork).sort(sortChainList);
 
 function sortChainList<T extends IChainDetails>(a: T, b: T) {
   const isMainnet = (chain: T) => !chain.testnet;
