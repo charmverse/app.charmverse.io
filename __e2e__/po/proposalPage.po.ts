@@ -1,4 +1,4 @@
-import type { ProposalEvaluationType } from '@charmverse/core/prisma-client';
+import type { ProposalEvaluationType, ProposalSystemRole } from '@charmverse/core/prisma-client';
 import type { Page } from '@playwright/test';
 
 import { DocumentPage } from './document.po';
@@ -22,8 +22,8 @@ export class ProposalPage extends DocumentPage {
     super(page);
   }
 
-  getSelectOption(categoryId: string) {
-    return this.page.locator(`data-test=select-option-${categoryId}`);
+  getSelectOption(optionId: string) {
+    return this.page.locator(`data-test=select-option-${optionId}`);
   }
 
   async waitForNewProposalPage(domain: string) {
@@ -40,8 +40,15 @@ export class ProposalPage extends DocumentPage {
     await this.getSelectOption(workflowId).click();
   }
 
-  async selectEvaluationOption(evaluationType: ProposalEvaluationType, option: string) {
-    await this.page.locator(`data-test=proposal-${evaluationType}-select`).click();
-    await this.getSelectOption(option).click();
+  getEvaluationToConfigure(evaluationType: ProposalEvaluationType) {
+    return this.page.locator(`data-test=proposal-${evaluationType}-select`);
+  }
+
+  /**
+   * @param assignee Either a system role, or a user or role id
+   */
+  async selectEvaluationReviewer(evaluationType: ProposalEvaluationType, assignee: ProposalSystemRole | string) {
+    await this.getEvaluationToConfigure(evaluationType).click();
+    await this.getSelectOption(assignee).click();
   }
 }

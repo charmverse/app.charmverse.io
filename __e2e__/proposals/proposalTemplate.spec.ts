@@ -129,8 +129,8 @@ test.describe.serial('Structured proposal template', () => {
     await formField.formFieldPrivateSwitch.nth(1).click();
 
     await proposalPage.selectCategory(proposalCategory.id);
-    await proposalPage.selectEvaluationOption('pass_fail', spaceAdmin.id);
-    await proposalPage.selectEvaluationOption('vote', 'space_member');
+    await proposalPage.selectEvaluationReviewer('pass_fail', spaceAdmin.id);
+    await proposalPage.selectEvaluationReviewer('vote', 'space_member');
 
     await proposalPage.saveDraftButton.click();
 

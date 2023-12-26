@@ -108,12 +108,12 @@ test.describe.serial('Proposal Evaluation', () => {
 
     await proposalPage.selectCategory(proposalCategory.id);
 
-    await proposalPage.selectWorkflow(workflow.id);
+    // await proposalPage.selectWorkflow(workflow.id);
 
     // Move into configuring the actual evaluation
     await expect(proposalPage.newProposalEvaluationSettings).toBeVisible();
 
-    // const rubricStep = proposalPage.get
+    // const rubricStep = proposalPage.selectEvaluationReviewer('rubric', );
 
     await proposalListPage.page.pause();
   });
