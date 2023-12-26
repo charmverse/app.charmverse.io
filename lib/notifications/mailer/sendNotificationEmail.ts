@@ -1,6 +1,7 @@
 import type { User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import type { FeatureJson } from 'lib/features/constants';
 import * as mailer from 'lib/mailer';
 import * as emails from 'lib/mailer/emails';
 import { getMemberUsernameBySpaceRole } from 'lib/members/getMemberUsername';
@@ -180,7 +181,15 @@ async function sendEmail({
   user: Pick<User, 'id' | 'username' | 'id' | 'avatar' | 'email'>;
 }) {
   const notificationSpaceId = notification.spaceId;
-
+  const space = await prisma.space.findUniqueOrThrow({
+    where: {
+      id: notificationSpaceId
+    },
+    select: {
+      features: true
+    }
+  });
+  const spaceFeatures = (space.features ?? []) as FeatureJson[];
   const notificationAuthorSpaceRole = await prisma.spaceRole.findFirstOrThrow({
     where: {
       userId: notification.createdBy.id,
@@ -204,7 +213,11 @@ async function sendEmail({
   notification.createdBy.username = await getMemberUsernameBySpaceRole({ spaceRoleId: notificationAuthorSpaceRole.id });
   const primaryIdentity = await getMemberUsernameBySpaceRole({ spaceRoleId: notificationTargetSpaceRole.id });
 
-  const template = emails.getPendingNotificationEmail(notification, { ...user, username: primaryIdentity });
+  const template = emails.getPendingNotificationEmail({
+    notification,
+    user: { ...user, username: primaryIdentity },
+    spaceFeatures
+  });
   const result = await mailer.sendEmail({
     to: {
       displayName: user.username,

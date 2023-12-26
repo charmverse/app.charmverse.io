@@ -6,7 +6,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { unsealData } from 'iron-session';
 import type { Socket } from 'socket.io';
 
-import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/constants';
+import { STATIC_PAGES } from 'lib/features/constants';
 import { ActionNotPermittedError } from 'lib/middleware';
 import { archivePages } from 'lib/pages/archivePages';
 import { createPage } from 'lib/pages/server/createPage';

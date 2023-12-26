@@ -14,7 +14,7 @@ export const rewardTypeOptions: IPropertyOption[] = [
   },
   {
     id: 'assigned' as const,
-    value: 'Assigned reward',
+    value: 'Assigned',
     color: 'green'
   }
 ];

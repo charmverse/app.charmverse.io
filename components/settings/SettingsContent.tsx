@@ -1,4 +1,3 @@
-import type { Feature } from '@charmverse/core/prisma';
 import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -20,6 +19,7 @@ import { useSmallScreen } from 'hooks/useMediaScreens';
 import type { SettingsPath } from 'hooks/useSettingsDialog';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useSpaces } from 'hooks/useSpaces';
+import type { Feature } from 'lib/features/constants';
 import { getSpaceUrl } from 'lib/utilities/browser';
 
 import { AccountSettings } from './account/AccountSettings';

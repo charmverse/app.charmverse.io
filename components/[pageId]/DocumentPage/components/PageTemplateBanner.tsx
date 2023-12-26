@@ -9,6 +9,7 @@ import { DocumentPageIcon } from 'components/common/Icons/DocumentPageIcon';
 import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
 const StyledPageTemplateBanner = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'card'
@@ -31,14 +32,9 @@ type Props = {
   proposalType?: 'free_form' | 'structured';
 };
 
-const templateTypes = {
-  proposal_template: 'proposal',
-  bounty_template: 'reward'
-};
-
-type RewardTemplateType = keyof typeof templateTypes;
 export function PageTemplateBanner({ proposalType, isNewPage, pageType, parentId, customTitle }: Props) {
   const { space } = useCurrentSpace();
+  const { getFeatureTitle } = useSpaceFeatures();
   const theme = useTheme();
   const { pages } = usePages();
   const parentPage = parentId ? pages[parentId] : undefined;
@@ -77,7 +73,10 @@ export function PageTemplateBanner({ proposalType, isNewPage, pageType, parentId
             <span>
               You're {isNewPage ? 'creating' : 'editing'} a{' '}
               {proposalType ? `${proposalType === 'free_form' ? 'free-form' : 'structured'} ` : ''}
-              {templateTypes[pageType as RewardTemplateType]} template
+              {getFeatureTitle({
+                feature: pageType === 'bounty_template' ? 'rewards' : 'proposals'
+              })}{' '}
+              template
             </span>
           ) : (
             <>

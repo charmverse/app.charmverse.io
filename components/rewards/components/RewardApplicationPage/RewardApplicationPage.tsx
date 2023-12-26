@@ -133,7 +133,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
                   variant='text'
                   startIcon={<ArrowBack fontSize='small' />}
                 >
-                  <span>Back to reward</span>
+                  <span>Back</span>
                 </Button>
               )}
 

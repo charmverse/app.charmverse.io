@@ -3,7 +3,7 @@ import path from 'node:path';
 import type { Prisma, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/constants';
+import { STATIC_PAGES } from 'lib/features/constants';
 import { generateDefaultPostCategories } from 'lib/forums/categories/generateDefaultPostCategories';
 import { setDefaultPostCategory } from 'lib/forums/categories/setDefaultPostCategory';
 import { generateDefaultPropertiesInput } from 'lib/members/generateDefaultPropertiesInput';
