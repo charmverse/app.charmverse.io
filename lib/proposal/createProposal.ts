@@ -103,11 +103,13 @@ export async function createProposal({
       })
     : null;
 
-  const workflow = (await prisma.proposalWorkflow.findUnique({
-    where: {
-      id: workflowId
-    }
-  })) as ProposalWorkflowTyped | null;
+  const workflow = workflowId
+    ? ((await prisma.proposalWorkflow.findUnique({
+        where: {
+          id: workflowId
+        }
+      })) as ProposalWorkflowTyped | null)
+    : null;
 
   const validation = await validateProposalAuthorsAndReviewers({
     authors: authorsList,

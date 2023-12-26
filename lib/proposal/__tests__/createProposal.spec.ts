@@ -1,3 +1,4 @@
+import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/dist/cjs/proposals';
 import { InsecureOperationError, InvalidInputError } from '@charmverse/core/errors';
 import type { Prisma, ProposalCategory, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
@@ -8,6 +9,7 @@ import type { FormFieldInput } from 'components/common/form/interfaces';
 import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposalCategory } from 'testing/utils/proposals';
 
+import type { ProposalEvaluationInput } from '../createProposal';
 import { createProposal } from '../createProposal';
 import type { ProposalWithUsersAndRubric } from '../interface';
 
@@ -232,9 +234,7 @@ describe('Creates a page and proposal with relevant configuration', () => {
   });
 
   it('should create a proposal from a workflow and copy over its permissions', async () => {
-    const evaluationTemplate: (Pick<Prisma.ProposalEvaluationCreateManyInput, 'id' | 'type' | 'title'> & {
-      permissions: Pick<Prisma.ProposalEvaluationPermissionCreateManyInput, 'operation' | 'systemRole'>[];
-    })[] = [
+    const evaluationTemplate: WorkflowEvaluationJson[] = [
       {
         title: 'Feedback',
         id: uuid(),
@@ -382,7 +382,16 @@ describe('Creates a page and proposal with relevant configuration', () => {
       categoryId: proposalCategory.id,
       spaceId: space.id,
       userId: user.id,
-      workflowId: proposalWorkflow.id
+      workflowId: proposalWorkflow.id,
+      evaluations: evaluationTemplate.map((item, index) => ({
+        id: item.id,
+        rubricCriteria: [],
+        title: item.title,
+        type: item.type,
+        index,
+        permissions: undefined,
+        reviewers: [{ systemRole: 'space_member' }]
+      })) as ProposalEvaluationInput[]
     });
 
     const proposalInDb = await prisma.proposal.findUniqueOrThrow({
@@ -391,7 +400,13 @@ describe('Creates a page and proposal with relevant configuration', () => {
       },
       select: {
         evaluations: {
+          orderBy: {
+            index: 'asc'
+          },
           select: {
+            id: true,
+            title: true,
+            type: true,
             permissions: true
           }
         }
@@ -401,9 +416,10 @@ describe('Creates a page and proposal with relevant configuration', () => {
     expect(proposalInDb.evaluations).toMatchObject(
       expect.arrayContaining(
         evaluationTemplate.map((item) => ({
-          ...item,
+          title: item.title,
+          type: item.type,
           id: expect.any(String),
-          permissions: expect.arrayContaining(item.permissions)
+          permissions: expect.arrayContaining(item.permissions.map((p) => expect.objectContaining(p)))
         }))
       )
     );
