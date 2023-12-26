@@ -5,10 +5,9 @@ import useSWRMutation from 'swr/mutation';
 
 import type { TokenGateVerificationRequest } from 'lib/tokenGates/applyTokenGates';
 import type { TokenGateEvaluationAttempt, TokenGateEvaluationResult } from 'lib/tokenGates/evaluateEligibility';
-import type { Lock, TokenGate, LitTokenGateConditions, TokenGateWithRoles } from 'lib/tokenGates/interfaces';
-import type { GetLockPayload } from 'lib/tokenGates/unlock/getLockDetails';
+import type { TokenGate, TokenGateWithRoles, TokenGateConditions } from 'lib/tokenGates/interfaces';
 
-import { useDELETE, useGET, useGETtrigger, usePOST, usePUT } from './helpers';
+import { useDELETE, useGET, usePOST, usePUT } from './helpers';
 
 export function useGetTokenGates(spaceId: string) {
   return useGET<TokenGateWithRoles[]>(spaceId ? '/api/token-gates' : null, { spaceId });
@@ -29,9 +28,7 @@ export function useUpdateTokenGateRoles(tokenGateId?: string) {
 }
 
 export function useReviewTokenGate() {
-  return usePOST<{ conditions: LitTokenGateConditions }, { conditions: LitTokenGateConditions }[]>(
-    '/api/token-gates/review'
-  );
+  return usePOST<TokenGateConditions, TokenGateConditions[]>('/api/token-gates/review');
 }
 
 export function useSaveSigningCondition(litClient: LitNodeClient | null) {
@@ -40,18 +37,12 @@ export function useSaveSigningCondition(litClient: LitNodeClient | null) {
   );
 }
 
-export function useReviewLock() {
-  return useGETtrigger<GetLockPayload, Lock>('/api/token-gates/unlock-protocol');
-}
-
 export function useEvaluateTokenGateEligibility() {
   return usePOST<Omit<TokenGateEvaluationAttempt, 'userId'>, TokenGateEvaluationResult>('/api/token-gates/evaluate');
 }
 
 export function useVerifyTokenGate() {
-  return usePOST<Omit<TokenGateVerificationRequest, 'userId'>, { error?: string; success?: boolean }>(
-    '/api/token-gates/verify'
-  );
+  return usePOST<Omit<TokenGateVerificationRequest, 'userId'>, { success?: boolean }>('/api/token-gates/verify');
 }
 
 export function useReevaluateRoles() {

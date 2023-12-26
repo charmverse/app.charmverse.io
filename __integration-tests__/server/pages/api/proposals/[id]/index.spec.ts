@@ -121,7 +121,10 @@ describe('GET /api/proposals/[id] - Get proposal', () => {
             userId: reviewer.id
           })
         ],
-        formFields: expect.arrayContaining(fieldsInput.map((field) => expect.objectContaining({ ...field, formId })))
+        form: {
+          id: formId,
+          formFields: expect.arrayContaining(fieldsInput.map((field) => expect.objectContaining({ ...field, formId })))
+        }
       })
     );
   });

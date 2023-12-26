@@ -2,7 +2,6 @@ import type { Space } from '@charmverse/core/prisma';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 
 import { useGetTokenGates } from 'charmClient/hooks/tokenGates';
-import Modal from 'components/common/Modal';
 import { TokenGateModalProvider } from 'components/common/TokenGateModal/hooks/useTokenGateModalContext';
 import TokenGateModal from 'components/common/TokenGateModal/TokenGateModal';
 
@@ -16,23 +15,21 @@ interface TokenGatesProps {
 
 export function TokenGates({ isAdmin, space, popupState }: TokenGatesProps) {
   const spaceId = space.id;
-  const { data = [], mutate } = useGetTokenGates(spaceId);
-  const { isOpen: isOpenTokenGateModal, close: closeTokenGateModal } = popupState;
+  const { data = [], mutate, isLoading } = useGetTokenGates(spaceId);
 
   return (
     <>
       <TokenGatesTable
         isAdmin={isAdmin}
         tokenGates={data}
+        isLoading={isLoading}
         refreshTokenGates={async () => {
           await mutate();
         }}
       />
-      <Modal open={isOpenTokenGateModal} onClose={closeTokenGateModal} size='large'>
-        <TokenGateModalProvider onClose={closeTokenGateModal} refreshTokenGates={() => mutate()}>
-          <TokenGateModal />
-        </TokenGateModalProvider>
-      </Modal>
+      <TokenGateModalProvider popupState={popupState} refreshTokenGates={() => mutate()}>
+        <TokenGateModal />
+      </TokenGateModalProvider>
     </>
   );
 }

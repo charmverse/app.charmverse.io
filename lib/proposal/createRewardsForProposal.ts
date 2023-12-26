@@ -96,7 +96,11 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
       rewards: true,
       form: {
         include: {
-          formFields: true
+          formFields: {
+            orderBy: {
+              index: 'asc'
+            }
+          }
         }
       }
     }

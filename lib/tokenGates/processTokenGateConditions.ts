@@ -40,7 +40,7 @@ export function processTokenGateConditions(tokenGate: TokenGate): {
       return {
         accessTypes: ['group_token_or_nft'],
         numberOfConditions: 1,
-        chainType: chain || 'etherum',
+        chainType: chain || 'ethereum',
         accesType: accessTypeDict.group_token_or_nft
       };
     } else {

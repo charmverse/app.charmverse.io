@@ -50,7 +50,11 @@ async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWi
       },
       form: {
         include: {
-          formFields: true
+          formFields: {
+            orderBy: {
+              index: 'asc'
+            }
+          }
         }
       }
     }

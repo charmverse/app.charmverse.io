@@ -28,6 +28,7 @@ async function convertProposals() {
     }
   });
   const proposalsToUpdate = proposals.filter((p) => p.evaluations.length === 0);
+  console.log('proposals to update', proposalsToUpdate.length);
   await Promise.all(
     proposalsToUpdate.map(async (p) => {
       if (p.evaluationType === 'vote') {
@@ -36,6 +37,7 @@ async function convertProposals() {
         const completedAt = vote?.deadline;
         const voteFailed = vote?.status === 'Rejected';
         const result = votePassed ? 'pass' : voteFailed ? 'fail' : null;
+        const reviewEvaluationId = uuid();
         await prisma.$transaction(async (tx) => {
           if (isPublished(p)) {
             await tx.proposal.update({
@@ -47,14 +49,43 @@ async function convertProposals() {
               }
             });
           }
+          const feedbackComplete = p.status !== 'draft' && p.status !== 'discussion';
           await tx.proposalEvaluation.create({
             data: {
               ...feedbackEvaluation,
               index: 0,
+              result: feedbackComplete ? 'pass' : null,
               proposalId: p.id,
               permissions: {
-                create: feedbackPermissions
+                createMany: {
+                  data: feedbackPermissions
+                }
               }
+            }
+          });
+          await tx.proposalEvaluation.create({
+            data: {
+              id: reviewEvaluationId,
+              title: 'Review',
+              index: 1,
+              result: p.reviewedAt ? 'pass' : null,
+              completedAt: p.reviewedAt || null,
+              decidedBy: p.reviewedBy,
+              type: 'pass_fail',
+              proposalId: p.id,
+              permissions: {
+                createMany: {
+                  data: getDefaultPermissions()
+                }
+              }
+            }
+          });
+          await tx.proposalReviewer.updateMany({
+            where: {
+              proposalId: p.id
+            },
+            data: {
+              evaluationId: reviewEvaluationId
             }
           });
           await tx.proposalEvaluation.create({
@@ -67,24 +98,32 @@ async function convertProposals() {
               completedAt: result ? completedAt || new Date() : null,
               proposalId: p.id,
               snapshotId: p.page?.snapshotProposalId,
+              snapshotExpiry: p.snapshotProposalExpiry,
               voteId: vote?.id,
-              reviewers: {
-                create: p.category?.proposalCategoryPermissions
-                  .filter((perm) => perm.permissionLevel === 'full_access')
-                  .map((perm) => ({
-                    proposalId: p.id,
-                    roleId: perm.roleId,
-                    systemRole: perm.spaceId ? 'space_member' : undefined
-                  }))
-              },
+              reviewers: p.category
+                ? {
+                    createMany: {
+                      data: p.category.proposalCategoryPermissions
+                        .filter((perm) => perm.permissionLevel === 'full_access')
+                        .map((perm) => ({
+                          proposalId: p.id,
+                          roleId: perm.roleId,
+                          systemRole: perm.spaceId ? 'space_member' : undefined
+                        }))
+                    }
+                  }
+                : undefined,
               permissions: {
-                create: getDefaultPermissions()
+                createMany: {
+                  data: getDefaultPermissions()
+                }
               }
             }
           });
         });
       } else if (p.evaluationType === 'rubric') {
-        const evaluationId = uuid();
+        const reviewEvaluationId = uuid();
+        const rubricEvaluationId = uuid();
         await prisma.$transaction(async (tx) => {
           if (isPublished(p)) {
             await tx.proposal.update({
@@ -96,25 +135,48 @@ async function convertProposals() {
               }
             });
           }
+          const feedbackComplete = p.status !== 'draft' && p.status !== 'discussion';
           await tx.proposalEvaluation.create({
             data: {
               ...feedbackEvaluation,
               index: 0,
+              result: feedbackComplete ? 'pass' : null,
               proposalId: p.id,
               permissions: {
-                create: feedbackPermissions
+                createMany: {
+                  data: feedbackPermissions
+                }
               }
             }
           });
           await tx.proposalEvaluation.create({
             data: {
-              id: evaluationId,
-              title: 'Rubric evaluation',
+              id: reviewEvaluationId,
+              title: 'Review',
               index: 1,
+              result: p.reviewedAt ? 'pass' : null,
+              completedAt: p.reviewedAt,
+              decidedBy: p.reviewedBy,
+              type: 'pass_fail',
+              proposalId: p.id,
+              permissions: {
+                createMany: {
+                  data: getDefaultPermissions()
+                }
+              }
+            }
+          });
+          await tx.proposalEvaluation.create({
+            data: {
+              id: rubricEvaluationId,
+              title: 'Rubric evaluation',
+              index: 2,
               type: 'rubric',
               proposalId: p.id,
               permissions: {
-                create: getDefaultPermissions()
+                createMany: {
+                  data: getDefaultPermissions()
+                }
               }
             }
           });
@@ -123,15 +185,21 @@ async function convertProposals() {
               proposalId: p.id
             },
             data: {
-              evaluationId
+              evaluationId: rubricEvaluationId
             }
+          });
+          await tx.proposalReviewer.createMany({
+            data: p.reviewers.map(({ evaluationId, id, ...reviewer }) => ({
+              ...reviewer,
+              evaluationId: reviewEvaluationId
+            }))
           });
           await tx.proposalRubricCriteria.updateMany({
             where: {
               proposalId: p.id
             },
             data: {
-              evaluationId
+              evaluationId: rubricEvaluationId
             }
           });
           await tx.proposalRubricCriteriaAnswer.updateMany({
@@ -139,7 +207,7 @@ async function convertProposals() {
               proposalId: p.id
             },
             data: {
-              evaluationId
+              evaluationId: rubricEvaluationId
             }
           });
           await tx.draftProposalRubricCriteriaAnswer.updateMany({
@@ -147,7 +215,7 @@ async function convertProposals() {
               proposalId: p.id
             },
             data: {
-              evaluationId
+              evaluationId: rubricEvaluationId
             }
           });
         });
@@ -190,11 +258,10 @@ function isPublished(proposal: Proposal) {
   return proposal.status !== 'draft';
 }
 
-convertSpaces()
-  .then((r) => {
-    console.log('Done!');
-  })
-  .catch((e) => {
-    console.error('error', e);
-    process.exit(1);
-  });
+// convertProposals()
+//   .then(() => {
+//     console.log('Done!');
+//   })
+//   .catch((e) => {
+//     console.error('Error!', e);
+//   });

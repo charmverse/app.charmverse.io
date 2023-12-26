@@ -202,9 +202,9 @@ async function sendEmail({
   });
 
   notification.createdBy.username = await getMemberUsernameBySpaceRole({ spaceRoleId: notificationAuthorSpaceRole.id });
-  user.username = await getMemberUsernameBySpaceRole({ spaceRoleId: notificationTargetSpaceRole.id });
+  const primaryIdentity = await getMemberUsernameBySpaceRole({ spaceRoleId: notificationTargetSpaceRole.id });
 
-  const template = emails.getPendingNotificationEmail(notification, user);
+  const template = emails.getPendingNotificationEmail(notification, { ...user, username: primaryIdentity });
   const result = await mailer.sendEmail({
     to: {
       displayName: user.username,

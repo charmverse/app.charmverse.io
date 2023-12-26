@@ -1,8 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { TokenGateJwtResult } from 'lib/tokenGates/verifyTokenGates';
+import type { TokenGateResult } from 'lib/tokenGates/verifyTokenGates';
 
-type UpdateUserTokenGatesProps = { tokenGates: TokenGateJwtResult[]; spaceId: string; userId: string };
+type UpdateUserTokenGatesProps = { tokenGates: TokenGateResult[]; spaceId: string; userId: string };
+
 type UpsertTokenGateProps = {
   tokenGateId: string;
   jwt: string;
@@ -13,7 +14,7 @@ type UpsertTokenGateProps = {
 type DeleteTokenGateProps = { tokenGateId: string; spaceId: string; userId: string } | { id: string };
 
 export async function updateUserTokenGates({ tokenGates, spaceId, userId }: UpdateUserTokenGatesProps) {
-  const verified = tokenGates.filter((tg) => tg.verified && tg.jwt);
+  const verified = tokenGates.filter((tg) => (tg.verified && tg.type === 'lit' ? !!tg.jwt : true));
   const nonVerified = tokenGates.filter((tg) => !tg.verified);
 
   return prisma.$transaction([

@@ -57,10 +57,12 @@ type SidebarProps = {
   isProposalTemplate?: boolean;
   readOnlyReviewers: boolean;
   readOnlyRubricCriteria: boolean;
+  // eslint-disable-next-line react/no-unused-prop-types
+  disabledViews?: PageSidebarView[];
 };
 
 function PageSidebarComponent(props: SidebarProps) {
-  const { id, proposal, sidebarView, openSidebar, closeSidebar, isNewProposal } = props;
+  const { disabledViews = [], id, proposal, sidebarView, openSidebar, closeSidebar, isNewProposal } = props;
   const isMdScreen = useMdScreen();
   const isOpen = sidebarView !== null;
   const sidebarTitle = sidebarView && SIDEBAR_VIEWS[sidebarView]?.title;
@@ -75,6 +77,10 @@ function PageSidebarComponent(props: SidebarProps) {
     } else {
       closeSidebar();
     }
+  }
+
+  if (sidebarView && disabledViews.includes(sidebarView)) {
+    return null;
   }
 
   return isMdScreen ? (
@@ -111,6 +117,7 @@ function PageSidebarComponent(props: SidebarProps) {
                 showEvaluationSidebarIcon={showEvaluationSidebarIcon}
                 openSidebar={openSidebar}
                 isNewProposal={!!isNewProposal}
+                disabledViews={disabledViews}
               />
             )}
           </Box>
@@ -126,6 +133,7 @@ function PageSidebarComponent(props: SidebarProps) {
       rightActions={
         openSidebar && (
           <SidebarNavigationIcons
+            disabledViews={disabledViews}
             activeView={sidebarView}
             showEvaluationSidebarIcon={showEvaluationSidebarIcon}
             openSidebar={openSidebar}
@@ -146,16 +154,18 @@ function SidebarNavigationIcons({
   showEvaluationSidebarIcon,
   openSidebar,
   activeView,
-  isNewProposal
+  isNewProposal,
+  disabledViews = []
 }: {
   showEvaluationSidebarIcon: boolean;
   openSidebar: (view: PageSidebarView) => void;
   activeView?: PageSidebarView | null;
   isNewProposal: boolean;
+  disabledViews?: PageSidebarView[];
 }) {
   return (
     <Box display='flex' alignItems='center' pr={1} justifyContent='flex-end'>
-      {showEvaluationSidebarIcon && (
+      {showEvaluationSidebarIcon && !disabledViews.includes('proposal_evaluation') && (
         <SidebarViewIcon
           view='proposal_evaluation'
           isActive={!!activeView?.includes('proposal')}
@@ -164,8 +174,12 @@ function SidebarNavigationIcons({
       )}
       {!isNewProposal && (
         <>
-          <SidebarViewIcon view='comments' isActive={activeView === 'comments'} onClick={openSidebar} />
-          <SidebarViewIcon view='suggestions' isActive={activeView === 'suggestions'} onClick={openSidebar} />
+          {!disabledViews.includes('comments') && (
+            <SidebarViewIcon view='comments' isActive={activeView === 'comments'} onClick={openSidebar} />
+          )}
+          {!disabledViews.includes('suggestions') && (
+            <SidebarViewIcon view='suggestions' isActive={activeView === 'suggestions'} onClick={openSidebar} />
+          )}
         </>
       )}
     </Box>

@@ -90,10 +90,19 @@ export async function getProposalTemplates({ spaceId, userId }: SpaceResourcesRe
       },
       form: {
         include: {
-          formFields: true
+          formFields: {
+            orderBy: {
+              index: 'asc'
+            }
+          }
         }
       }
     }
   });
-  return templates.map((proposal) => mapDbProposalToProposal({ proposal })) as ProposalTemplate[];
+
+  const res = templates.map(
+    (proposal) => mapDbProposalToProposal({ proposal, canAccessPrivateFormFields: true }) as ProposalTemplate
+  );
+
+  return res;
 }

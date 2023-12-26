@@ -1,5 +1,6 @@
 import Box from '@mui/material/Box';
 
+import Modal from 'components/common/Modal';
 import Legend from 'components/settings/Legend';
 
 import { TokenGateContent } from './components/TokenGateContent';
@@ -7,13 +8,19 @@ import { useTokenGateModal } from './hooks/useTokenGateModalContext';
 import { getTitle } from './utils/helpers';
 
 function TokenGateModal() {
-  const { displayedPage } = useTokenGateModal();
+  const { displayedPage, popupState, resetModal } = useTokenGateModal();
+
+  const handleClose = () => {
+    popupState.close();
+    resetModal();
+  };
 
   return (
-    <Box display='flex' gap={2} flexDirection='column'>
-      <Legend>{getTitle(displayedPage)}</Legend>
-      <TokenGateContent />
-    </Box>
+    <Modal open={popupState.isOpen} onClose={handleClose} size='large' title={getTitle(displayedPage)}>
+      <Box display='flex' gap={2} flexDirection='column'>
+        <TokenGateContent />
+      </Box>
+    </Modal>
   );
 }
 

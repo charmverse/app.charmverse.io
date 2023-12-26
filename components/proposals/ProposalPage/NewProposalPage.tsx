@@ -4,7 +4,7 @@ import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { Box, Divider, useMediaQuery } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 import { v4 as uuid } from 'uuid';
 
@@ -22,8 +22,10 @@ import { PropertyLabel } from 'components/common/BoardEditor/components/properti
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
-import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
-import type { FormFieldInput } from 'components/common/form/interfaces';
+import { ControlledFormFieldInputs } from 'components/common/form/FormFieldInputs';
+import { ControlledFormFieldsEditor } from 'components/common/form/FormFieldsEditor';
+import { getInitialFormFieldValue, useFormFields } from 'components/common/form/hooks/useFormFields';
+import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useCharmRouter } from 'hooks/useCharmRouter';
@@ -55,6 +57,8 @@ export type ProposalPageAndPropertiesInput = ProposalPropertiesInput & {
   type: PageType;
   proposalType?: 'structured' | 'free_form';
   formFields?: FormFieldInput[];
+  formAnswers?: FieldAnswerInput[];
+  formId?: string;
 };
 
 const StyledContainer = styled(PageEditorContainer)`
@@ -64,10 +68,12 @@ const StyledContainer = styled(PageEditorContainer)`
 // Note: this component is only used before a page is saved to the DB
 export function NewProposalPage({
   isTemplate,
-  templateId: templateIdFromUrl
+  templateId: templateIdFromUrl,
+  proposalType
 }: {
   isTemplate?: boolean;
   templateId?: string;
+  proposalType?: ProposalPageAndPropertiesInput['proposalType'];
 }) {
   const { navigateToSpacePath } = useCharmRouter();
   const { space: currentSpace } = useCurrentSpace();
@@ -80,7 +86,7 @@ export function NewProposalPage({
   const isMdScreen = useMdScreen();
   const { formInputs, setFormInputs, contentUpdated, disabledTooltip, isCreatingProposal, createProposal } =
     useNewProposal({
-      newProposal: { type: isTemplate ? 'proposal_template' : 'proposal' }
+      newProposal: { type: isTemplate ? 'proposal_template' : 'proposal', proposalType }
     });
 
   const [, { width: containerWidth }] = useElementSize();
@@ -89,6 +95,19 @@ export function NewProposalPage({
   const [readOnlyEditor, setReadOnlyEditor] = useState(false);
   const isAdmin = useIsAdmin();
   const isReviewer = formInputs.reviewers?.some((r) => r.id === user?.id);
+
+  const sourceTemplate = proposalTemplates?.find((template) => template.id === formInputs.proposalTemplateId);
+  const isStructured = formInputs.proposalType === 'structured' || !!sourceTemplate?.formId;
+  const proposalFormFields = formInputs.formFields ?? sourceTemplate?.form?.formFields ?? [];
+
+  const {
+    control: proposalFormFieldControl,
+    isValid: isProposalFormFieldsValid,
+    errors: proposalFormFieldErrors,
+    onFormChange
+  } = useFormFields({
+    fields: proposalFormFields
+  });
 
   function toggleCollapse(fieldId: string) {
     if (collapsedFieldIds.includes(fieldId)) {
@@ -123,9 +142,6 @@ export function NewProposalPage({
     .map((template) => template.page);
   const { pages } = usePages();
 
-  const sourceTemplate = isFromTemplateSource
-    ? proposalTemplates?.find((template) => template.id === formInputs.proposalTemplateId)
-    : undefined;
   const proposalTemplatePage = formInputs.proposalTemplateId ? pages[formInputs.proposalTemplateId] : null;
 
   // properties with values from templates should be read only
@@ -194,7 +210,14 @@ export function NewProposalPage({
         evaluations: template.evaluations,
         rubricCriteria: template.rubricCriteria,
         fields: (template.fields as ProposalFields) || {},
-        type: 'proposal'
+        type: 'proposal',
+        formId: template.formId ?? undefined,
+        formAnswers: (template?.form?.formFields ?? [])
+          .filter((formField) => formField.type !== 'label')
+          .map((proposalFormField) => ({
+            fieldId: proposalFormField.id,
+            value: getInitialFormFieldValue(proposalFormField) as FieldAnswerInput['value']
+          }))
       });
     }
   }
@@ -322,29 +345,54 @@ export function NewProposalPage({
     }
   }, [templateIdFromUrl, isLoadingTemplates]);
 
+  // Keep the formAnswers in sync with the formFields using a ref as charmEditor fields uses the initial field value
+  const formAnswersRef = useRef(formInputs.formAnswers);
+
+  useEffect(() => {
+    formAnswersRef.current = formInputs.formAnswers;
+  }, [formInputs.formAnswers]);
+
   return (
     <Box flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
       <PrimaryColumn showPageActionSidebar={!!internalSidebarView}>
         <Box className={`document-print-container ${fontClassName}`} display='flex' flexDirection='column'>
-          <PageTemplateBanner pageType={formInputs.type} isNewPage />
+          <PageTemplateBanner pageType={formInputs.type} isNewPage proposalType={formInputs.proposalType} />
           {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
           <StyledContainer data-test='page-charmeditor' top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
             <Box minHeight={450}>
-              {formInputs.proposalType === 'structured' ? (
+              {isStructured ? (
                 <>
                   {proposalPageContent}
-                  <FormFieldsEditor
-                    collapsedFieldIds={collapsedFieldIds}
-                    toggleCollapse={toggleCollapse}
-                    formFields={formInputs.formFields || []}
-                    setFormFields={(formFields) => {
-                      setFormInputs({
-                        ...formInputs,
-                        formFields:
-                          typeof formFields === 'function' ? formFields(formInputs.formFields || []) : formFields
-                      });
-                    }}
-                  />
+                  {formInputs.type === 'proposal_template' ? (
+                    <ControlledFormFieldsEditor
+                      collapsedFieldIds={collapsedFieldIds}
+                      toggleCollapse={toggleCollapse}
+                      formFields={proposalFormFields}
+                      setFormFields={(formFields) => {
+                        setFormInputs({
+                          formFields
+                        });
+                      }}
+                    />
+                  ) : (
+                    <ControlledFormFieldInputs
+                      control={proposalFormFieldControl}
+                      errors={proposalFormFieldErrors}
+                      onFormChange={(updatedFormFields) => {
+                        setFormInputs({
+                          formAnswers: formAnswersRef.current?.map((formAnswer) => {
+                            const updatedFormField = updatedFormFields.find((f) => f.id === formAnswer.fieldId);
+                            return {
+                              ...formAnswer,
+                              value: updatedFormField?.value ?? formAnswer.value
+                            };
+                          })
+                        });
+                        onFormChange(updatedFormFields);
+                      }}
+                      formFields={proposalFormFields}
+                    />
+                  )}
                 </>
               ) : (
                 <CharmEditor
@@ -374,8 +422,12 @@ export function NewProposalPage({
             </Button>
           )}
           <Button
-            disabled={Boolean(disabledTooltip) || isCreatingProposal}
-            disabledTooltip={disabledTooltip}
+            disabled={Boolean(disabledTooltip) || isCreatingProposal || !isProposalFormFieldsValid}
+            disabledTooltip={
+              !isProposalFormFieldsValid
+                ? 'Please provide correct values for all proposal form fields'
+                : disabledTooltip
+            }
             onClick={saveForm}
             loading={isCreatingProposal}
             data-test='create-proposal-button'

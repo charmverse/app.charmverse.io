@@ -1,3 +1,4 @@
+import type { PageMeta } from '@charmverse/core/pages';
 import styled from '@emotion/styled';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
@@ -39,8 +40,8 @@ export function NewProposalButton() {
   const { proposalCategoriesWithCreatePermission } = useProposalCategories();
   const isAdmin = useIsAdmin();
   const { pages } = usePages();
-  const proposalTemplateCreateModalState = usePopupState({ variant: 'dialog' });
   const isCharmverseSpace = useIsCharmverseSpace();
+  const proposalTemplateCreateModalState = usePopupState({ variant: 'dialog' });
   // MUI Menu specific content
   const buttonRef = useRef<HTMLDivElement>(null);
   const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
@@ -48,7 +49,15 @@ export function NewProposalButton() {
 
   const canCreateProposal = proposalCategoriesWithCreatePermission.length > 0;
   // grab page data from context so that title is always up-to-date
-  const proposalTemplatePages = proposalTemplates?.map((template) => pages[template.page.id]).filter(isTruthy);
+  const proposalTemplatePages = proposalTemplates
+    ?.map(
+      (template) =>
+        ({ ...pages[template.page.id], isStructuredProposal: !!template.formId } as PageMeta & {
+          isStructuredProposal: boolean;
+        })
+    )
+    .filter(isTruthy);
+
   function deleteProposalTemplate(pageId: string) {
     return charmClient.deletePage(pageId);
   }
@@ -56,6 +65,7 @@ export function NewProposalButton() {
   function editTemplate(pageId: string) {
     navigateToSpacePath(`/${pageId}`);
   }
+
   function createTemplate(proposalType: ProposalPageAndPropertiesInput['proposalType']) {
     navigateToSpacePath('/proposals/new', { type: 'proposal_template', proposalType });
   }
@@ -88,9 +98,7 @@ export function NewProposalButton() {
         addPageFromTemplate={createFromTemplate}
         editTemplate={editTemplate}
         pages={proposalTemplatePages}
-        createTemplate={() =>
-          !isCharmverseSpace ? createTemplate('free_form') : proposalTemplateCreateModalState.open()
-        }
+        createTemplate={!isCharmverseSpace ? () => createTemplate('free_form') : proposalTemplateCreateModalState.open}
         deleteTemplate={deleteProposalTemplate}
         anchorEl={buttonRef.current as Element}
         boardTitle='Proposals'
@@ -106,7 +114,10 @@ export function NewProposalButton() {
         onClose={proposalTemplateCreateModalState.close}
       >
         <Stack spacing={2}>
-          <ProposalTemplateMenu onClick={() => createTemplate('structured')}>
+          <ProposalTemplateMenu
+            onClick={() => createTemplate('structured')}
+            data-test='structured-proposal-template-menu'
+          >
             <Stack flexDirection='row' gap={1} alignItems='center'>
               <WidgetsOutlinedIcon fontSize='large' />
               <Typography variant='h5'>Structured Form</Typography>
@@ -115,7 +126,10 @@ export function NewProposalButton() {
               Create a template using Forms, creating a structured data format for each proposal to conform to.
             </Typography>
           </ProposalTemplateMenu>
-          <ProposalTemplateMenu onClick={() => createTemplate('free_form')}>
+          <ProposalTemplateMenu
+            onClick={() => createTemplate('free_form')}
+            data-test='free_form-proposal-template-menu'
+          >
             <Stack flexDirection='row' gap={1} alignItems='center'>
               <DescriptionOutlinedIcon fontSize='large' />
               <Typography variant='h5'>Free Form</Typography>

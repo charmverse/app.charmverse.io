@@ -9,7 +9,8 @@ export class ProposalsListPage extends GlobalPage {
     page: Page,
     public emptyState = page.locator('data-test=empty-state'),
     public proposalTemplateSelect = page.locator('data-test=proposal-template-select'),
-    public createProposalButton = page.locator('data-test=new-proposal-button')
+    public createProposalButton = page.locator('data-test=new-proposal-button'),
+    public structuredProposalTemplateMenu = page.locator('data-test=structured-proposal-template-menu')
   ) {
     super(page);
   }

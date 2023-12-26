@@ -19,13 +19,17 @@ export function TokenGateUnlockProtocol() {
         error={!!errors.chain?.message}
         helperMessage={errors.chain?.message}
         chains={unlockChains}
-        {...register('chain')}
+        {...register('chain', {
+          deps: ['contract']
+        })}
       />
       <TextInputField
         label='Lock Contract Address'
         error={errors.contract?.message}
         helperText={errors.contract?.message}
-        {...register('contract')}
+        {...register('contract', {
+          deps: ['chain']
+        })}
       />
     </>
   );

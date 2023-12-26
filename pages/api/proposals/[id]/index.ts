@@ -6,6 +6,7 @@ import nc from 'next-connect';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { canAccessPrivateFields } from 'lib/proposal/form/canAccessPrivateFields';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import { mapDbProposalToProposal } from 'lib/proposal/mapDbProposalToProposal';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
@@ -51,12 +52,16 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
       },
       authors: true,
       category: true,
-      page: { select: { id: true, sourceTemplateId: true } },
+      page: { select: { id: true, sourceTemplateId: true, type: true } },
       reviewers: true,
       rewards: true,
       form: {
         include: {
-          formFields: true
+          formFields: {
+            orderBy: {
+              index: 'asc'
+            }
+          }
         }
       }
     }
@@ -90,7 +95,12 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
     });
   }
 
-  return res.status(200).json(mapDbProposalToProposal({ proposal, permissions: proposalPermissions }));
+  // If we are viewing a proposal template, we can see all private fields since the user might be creating a proposal
+  const canAccessPrivateFormFields = await canAccessPrivateFields({ proposal, userId, proposalId: proposal.id });
+
+  return res
+    .status(200)
+    .json(mapDbProposalToProposal({ proposal, permissions: proposalPermissions, canAccessPrivateFormFields }));
 }
 
 async function updateProposalController(req: NextApiRequest, res: NextApiResponse) {

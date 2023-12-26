@@ -8,20 +8,17 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 
 export type FieldType = MemberPropertyType | FormFieldType;
 
-export interface TFormFieldInput {
-  id: string;
-  value:
-    | string
-    | string[]
-    | {
-        content: PageContent;
-        contentText: string;
-      };
-}
+export type FormFieldValue =
+  | string
+  | string[]
+  | {
+      content: PageContent;
+      contentText: string;
+    };
 
 export type ControlFieldProps = {
   onChange?: (value: any) => void;
-  value?: TFormFieldInput['value'];
+  value?: FormFieldValue;
 };
 
 export type SelectFieldProps = {
@@ -56,5 +53,5 @@ export type FormFieldInput = Pick<
 export type FieldAnswerInput = {
   id?: string;
   fieldId: string;
-  value: string | string[];
+  value: FormFieldValue;
 };

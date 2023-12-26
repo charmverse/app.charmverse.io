@@ -10,7 +10,7 @@ import TokenLogo from 'components/common/TokenLogo';
 export function TokenGateBlockchainSelect(
   props: SelectProps<string> & { helperMessage?: ReactNode; chains?: IChainDetails[] }
 ) {
-  const { helperMessage, children, chains = litChains } = props;
+  const { helperMessage, children, chains = litChains, ...restProps } = props;
 
   return (
     <FieldWrapper label='Blockchain'>
@@ -18,7 +18,7 @@ export function TokenGateBlockchainSelect(
         fullWidth
         displayEmpty
         renderValue={(selected) => getChainById(Number(selected))?.chainName || 'Select a Chain'}
-        {...props}
+        {...restProps}
       >
         {children ||
           chains.map((_chain, _index, _arr) => {

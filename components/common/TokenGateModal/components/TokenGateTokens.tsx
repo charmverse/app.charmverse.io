@@ -1,5 +1,6 @@
-import Box from '@mui/material/Box';
 import { FormProvider } from 'react-hook-form';
+
+import type { TokenGateConditions } from 'lib/tokenGates/interfaces';
 
 import { useTokenGateModal } from '../hooks/useTokenGateModalContext';
 import { useTokensForm } from '../hooks/useTokensForm';
@@ -9,7 +10,7 @@ import { TokenGateFooter } from './TokenGateFooter';
 import { TokenGateTokenFields } from './TokenGateTokensFields';
 
 export function TokenGateTokens() {
-  const { setDisplayedPage, handleUnifiedAccessControlConditions } = useTokenGateModal();
+  const { setDisplayedPage, handleTokenGate } = useTokenGateModal();
   const methods = useTokensForm();
   const {
     getValues,
@@ -20,7 +21,8 @@ export function TokenGateTokens() {
   const onSubmit = async () => {
     const values = getValues();
     const valueProps = getTokensUnifiedAccessControlConditions(values) || [];
-    handleUnifiedAccessControlConditions(valueProps);
+    const tokenGate: TokenGateConditions = { type: 'lit', conditions: { unifiedAccessControlConditions: valueProps } };
+    handleTokenGate(tokenGate);
     setDisplayedPage('review');
   };
 
