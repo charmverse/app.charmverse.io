@@ -2,7 +2,8 @@ import type { PagesRequest } from '@charmverse/core/pages';
 import type {
   BulkPagePermissionCompute,
   PermissionCompute,
-  ProposalPermissionsSwitch
+  ProposalPermissionsSwitch,
+  Resource
 } from '@charmverse/core/permissions';
 import { PermissionsApiClient, getSpaceInfoViaResource } from '@charmverse/core/permissions';
 import type { Space } from '@charmverse/core/prisma-client';
@@ -48,6 +49,18 @@ export class PermissionsApiClientWithPermissionsSwitch extends PermissionsApiCli
 
       const permissions = await originalBulkComputePagePermissions.apply(this, [injectedArgs]);
       return permissions;
+    };
+
+    // Override getReviewerPool method
+    const originalGetProposalReviewerPool = proposals.getProposalReviewerPool;
+
+    proposals.getProposalReviewerPool = async function (args: Resource) {
+      const space = await getSpaceInfoViaResource({ resourceId: args.resourceId, resourceIdType: 'proposalCategory' });
+
+      const injectedArgs = withUseProposalPermissionsArgs(space, args);
+
+      const reviewerPool = await originalGetProposalReviewerPool.apply(this, [injectedArgs]);
+      return reviewerPool;
     };
 
     // Override computeProposalCategoryPermissions method
