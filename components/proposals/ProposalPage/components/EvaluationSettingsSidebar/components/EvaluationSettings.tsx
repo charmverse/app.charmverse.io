@@ -53,7 +53,7 @@ export function EvaluationSettings({
   }
 
   return (
-    <Box ml={3}>
+    <Box ml={3} data-test='new-proposal-evaluation-settings'>
       <Box display='flex' alignItems='center' gap='5px' ml='-25px'>
         {evaluationIcons[evaluation.type]()}
         <Typography variant='h6'>{evaluation.title}</Typography>

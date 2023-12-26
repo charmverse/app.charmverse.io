@@ -42,6 +42,8 @@ import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposal/rubric/
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
+import { useProposals } from '../hooks/useProposals';
+
 import { EvaluationStepper } from './components/EvaluationStepper/EvaluationStepper';
 import type { ProposalPropertiesInput } from './components/ProposalProperties/ProposalPropertiesBase';
 import { ProposalPropertiesBase } from './components/ProposalProperties/ProposalPropertiesBase';
@@ -82,7 +84,8 @@ export function NewProposalPage({
   const isCharmVerse = useIsCharmverseSpace();
   const { activeView: sidebarView, setActiveView, closeSidebar } = usePageSidebar();
   const { proposalTemplates, isLoadingTemplates } = useProposalTemplates();
-  const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>(null);
+  const { mutateProposals: refreshProposals } = useProposals();
+  const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>();
   const [, setPageTitle] = usePageTitle();
   const { data: workflowOptions } = useGetProposalWorkflows(currentSpace?.id);
   const isMdScreen = useMdScreen();
@@ -118,7 +121,6 @@ export function NewProposalPage({
       setCollapsedFieldIds([...collapsedFieldIds, fieldId]);
     }
   }
-
   usePreventReload(contentUpdated);
 
   const isFromTemplateSource = Boolean(formInputs.proposalTemplateId);
@@ -170,7 +172,7 @@ export function NewProposalPage({
     setFormInputs({
       workflowId: workflow.id,
       evaluations: workflow.evaluations.map((evaluation, index) => ({
-        id: uuid(),
+        id: evaluation.id,
         index,
         reviewers: [],
         rubricCriteria: [] as ProposalRubricCriteriaWithTypedParams[],
@@ -190,6 +192,7 @@ export function NewProposalPage({
 
   async function saveForm() {
     await createProposal();
+    refreshProposals();
     navigateToSpacePath(`/proposals`);
   }
 

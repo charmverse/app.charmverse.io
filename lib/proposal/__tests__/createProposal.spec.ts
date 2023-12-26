@@ -1,12 +1,15 @@
+import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/dist/cjs/proposals';
 import { InsecureOperationError, InvalidInputError } from '@charmverse/core/errors';
-import type { ProposalCategory, Space, User } from '@charmverse/core/prisma';
+import type { Prisma, ProposalCategory, Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
-import { v4 as uuid, v4 } from 'uuid';
+import { v4 as uuid } from 'uuid';
 
 import type { FormFieldInput } from 'components/common/form/interfaces';
 import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposalCategory } from 'testing/utils/proposals';
 
+import type { ProposalEvaluationInput } from '../createProposal';
 import { createProposal } from '../createProposal';
 import type { ProposalWithUsersAndRubric } from '../interface';
 
@@ -103,7 +106,7 @@ describe('Creates a page and proposal with relevant configuration', () => {
 
     const formFields: FormFieldInput[] = [
       {
-        id: v4(),
+        id: uuid(),
         type: 'short_text',
         name: 'name',
         description: 'description',
@@ -113,7 +116,7 @@ describe('Creates a page and proposal with relevant configuration', () => {
         required: true
       },
       {
-        id: v4(),
+        id: uuid(),
         type: 'long_text',
         name: 'long name',
         description: 'another description',
@@ -228,5 +231,197 @@ describe('Creates a page and proposal with relevant configuration', () => {
         spaceId: space.id
       })
     ).rejects.toBeInstanceOf(InvalidInputError);
+  });
+
+  it('should create a proposal from a workflow and copy over its permissions', async () => {
+    const evaluationTemplate: WorkflowEvaluationJson[] = [
+      {
+        title: 'Feedback',
+        id: uuid(),
+        type: 'feedback',
+        permissions: [
+          {
+            operation: 'view',
+            systemRole: 'author'
+          },
+          {
+            operation: 'edit',
+            systemRole: 'author'
+          },
+          {
+            operation: 'comment',
+            systemRole: 'author'
+          },
+          {
+            operation: 'move',
+            systemRole: 'author'
+          },
+          {
+            operation: 'view',
+            systemRole: 'space_member'
+          },
+          {
+            operation: 'comment',
+            systemRole: 'space_member'
+          }
+        ]
+      },
+      {
+        id: uuid(),
+        type: 'pass_fail',
+        title: 'Review',
+        permissions: [
+          {
+            operation: 'view',
+            systemRole: 'author'
+          },
+          {
+            operation: 'edit',
+            systemRole: 'author'
+          },
+          {
+            operation: 'comment',
+            systemRole: 'author'
+          },
+          {
+            operation: 'move',
+            systemRole: 'author'
+          },
+          {
+            operation: 'view',
+            systemRole: 'current_reviewer'
+          },
+          {
+            operation: 'comment',
+            systemRole: 'current_reviewer'
+          },
+          {
+            operation: 'move',
+            systemRole: 'current_reviewer'
+          },
+          {
+            operation: 'view',
+            systemRole: 'all_reviewers'
+          },
+          {
+            operation: 'comment',
+            systemRole: 'all_reviewers'
+          },
+          {
+            operation: 'view',
+            systemRole: 'space_member'
+          },
+          {
+            operation: 'comment',
+            systemRole: 'space_member'
+          }
+        ]
+      },
+      {
+        id: '577b1c43-46da-4a00-a3f3-15549610b83e',
+        type: 'vote',
+        title: 'Community vote',
+        permissions: [
+          {
+            operation: 'view',
+            systemRole: 'author'
+          },
+          {
+            operation: 'edit',
+            systemRole: 'author'
+          },
+          {
+            operation: 'comment',
+            systemRole: 'author'
+          },
+          {
+            operation: 'move',
+            systemRole: 'author'
+          },
+          {
+            operation: 'view',
+            systemRole: 'current_reviewer'
+          },
+          {
+            operation: 'comment',
+            systemRole: 'current_reviewer'
+          },
+          {
+            operation: 'move',
+            systemRole: 'current_reviewer'
+          },
+          {
+            operation: 'view',
+            systemRole: 'all_reviewers'
+          },
+          {
+            operation: 'comment',
+            systemRole: 'all_reviewers'
+          },
+          {
+            operation: 'view',
+            systemRole: 'space_member'
+          },
+          {
+            operation: 'comment',
+            systemRole: 'space_member'
+          }
+        ]
+      }
+    ];
+    const proposalWorkflow = await prisma.proposalWorkflow.create({
+      data: {
+        index: 0,
+        space: { connect: { id: space.id } },
+        title: 'Example flow',
+        evaluations: evaluationTemplate
+      }
+    });
+
+    const { proposal } = await createProposal({
+      categoryId: proposalCategory.id,
+      spaceId: space.id,
+      userId: user.id,
+      workflowId: proposalWorkflow.id,
+      evaluations: evaluationTemplate.map((item, index) => ({
+        id: item.id,
+        rubricCriteria: [],
+        title: item.title,
+        type: item.type,
+        index,
+        permissions: undefined,
+        reviewers: [{ systemRole: 'space_member' }]
+      })) as ProposalEvaluationInput[]
+    });
+
+    const proposalInDb = await prisma.proposal.findUniqueOrThrow({
+      where: {
+        id: proposal.id
+      },
+      select: {
+        evaluations: {
+          orderBy: {
+            index: 'asc'
+          },
+          select: {
+            id: true,
+            title: true,
+            type: true,
+            permissions: true
+          }
+        }
+      }
+    });
+
+    expect(proposalInDb.evaluations).toMatchObject(
+      expect.arrayContaining(
+        evaluationTemplate.map((item) => ({
+          title: item.title,
+          type: item.type,
+          id: expect.any(String),
+          permissions: expect.arrayContaining(item.permissions.map((p) => expect.objectContaining(p)))
+        }))
+      )
+    );
   });
 });

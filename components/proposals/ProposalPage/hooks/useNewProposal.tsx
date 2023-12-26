@@ -70,6 +70,7 @@ export function useNewProposal({ newProposal }: Props) {
         return;
       }
       await createProposalTrigger({
+        proposalTemplateId: formInputs.proposalTemplateId,
         authors: formInputs.authors,
         categoryId: formInputs.categoryId,
         pageProps: {
