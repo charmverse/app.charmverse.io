@@ -6,7 +6,7 @@ import type { Theme } from '@mui/material';
 import { Box, Divider, useMediaQuery } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
-import { v4 as uuid, v4 } from 'uuid';
+import { v4 as uuid } from 'uuid';
 
 import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
 import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
@@ -42,8 +42,6 @@ import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposal/rubric/
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
-
-import { useProposals } from '../hooks/useProposals';
 
 import { EvaluationStepper } from './components/EvaluationStepper/EvaluationStepper';
 import type { ProposalPropertiesInput } from './components/ProposalProperties/ProposalPropertiesBase';
@@ -85,7 +83,6 @@ export function NewProposalPage({
   const isCharmVerse = useIsCharmverseSpace();
   const { activeView: sidebarView, setActiveView, closeSidebar } = usePageSidebar();
   const { proposalTemplates, isLoadingTemplates } = useProposalTemplates();
-  const { mutateProposals: refreshProposals } = useProposals();
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>();
   const [, setPageTitle] = usePageTitle();
   const { data: workflowOptions } = useGetProposalWorkflows(currentSpace?.id);
@@ -115,7 +112,7 @@ export function NewProposalPage({
           options: [],
           private: false,
           required: true,
-          id: v4()
+          id: uuid()
         } as FormFieldInput
       ]
     : [];
@@ -207,9 +204,10 @@ export function NewProposalPage({
   }
 
   async function saveForm() {
-    await createProposal();
-    refreshProposals();
-    navigateToSpacePath(`/proposals`);
+    const result = await createProposal();
+    if (result) {
+      navigateToSpacePath(`/${result.id}`);
+    }
   }
 
   function applyTemplate(_templateId: string) {

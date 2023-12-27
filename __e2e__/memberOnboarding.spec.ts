@@ -6,7 +6,7 @@ import { generateSpaceForUser } from 'testing/utils/spaces';
 import { generateUserAndSpace } from './utils/mocks';
 import { login } from './utils/session';
 
-test.describe.serial('Create two spaces and visit to check cv and space onboarding modal', async () => {
+test.describe('Create two spaces and visit to check cv and space onboarding modal', async () => {
   test('Fill the form and create a new space', async ({ page, loggedInPage }) => {
     const { space, user } = await generateUserAndSpace({
       skipOnboarding: false,

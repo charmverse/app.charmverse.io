@@ -131,8 +131,7 @@ test.describe.serial('Structured proposal template', () => {
     await proposalPage.selectEvaluationReviewer('vote', 'space_member');
 
     await proposalPage.saveDraftButton.click();
-
-    await proposalListPage.waitForProposalsList();
+    await proposalPage.page.waitForResponse(/\/api\/proposals/);
   });
 
   test('Visit structured proposal template and edit/add fields', async ({
@@ -261,7 +260,7 @@ test.describe.serial('Structured proposal template', () => {
 
     await proposalPage.saveDraftButton.click();
 
-    await proposalListPage.waitForProposalsList();
+    await proposalPage.page.waitForResponse(/\/api\/proposals/);
   });
 
   test('Visit structured proposal and edit form field answers as an author', async ({
