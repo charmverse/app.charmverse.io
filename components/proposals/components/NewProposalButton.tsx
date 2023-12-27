@@ -1,3 +1,4 @@
+import type { PageMeta } from '@charmverse/core/pages';
 import styled from '@emotion/styled';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
@@ -31,6 +32,8 @@ const ProposalTemplateMenu = styled(Stack)`
     transition: background-color 0.2s ease-in-out;
   }
   gap: ${({ theme }) => theme.spacing(1)};
+  flex-direction: row;
+  align-items: center;
 `;
 
 export function NewProposalButton() {
@@ -40,7 +43,6 @@ export function NewProposalButton() {
   const isAdmin = useIsAdmin();
   const { pages } = usePages();
   const proposalTemplateCreateModalState = usePopupState({ variant: 'dialog' });
-  const isCharmverseSpace = useIsCharmverseSpace();
   // MUI Menu specific content
   const buttonRef = useRef<HTMLDivElement>(null);
   const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
@@ -48,7 +50,15 @@ export function NewProposalButton() {
 
   const canCreateProposal = proposalCategoriesWithCreatePermission.length > 0;
   // grab page data from context so that title is always up-to-date
-  const proposalTemplatePages = proposalTemplates?.map((template) => pages[template.page.id]).filter(isTruthy);
+  const proposalTemplatePages = proposalTemplates
+    ?.map(
+      (template) =>
+        ({ ...pages[template.page.id], isStructuredProposal: !!template.formId } as PageMeta & {
+          isStructuredProposal: boolean;
+        })
+    )
+    .filter(isTruthy);
+
   function deleteProposalTemplate(pageId: string) {
     return charmClient.deletePage(pageId);
   }
@@ -56,6 +66,7 @@ export function NewProposalButton() {
   function editTemplate(pageId: string) {
     navigateToSpacePath(`/${pageId}`);
   }
+
   function createTemplate(proposalType: ProposalPageAndPropertiesInput['proposalType']) {
     navigateToSpacePath('/proposals/new', { type: 'proposal_template', proposalType });
   }
@@ -88,9 +99,7 @@ export function NewProposalButton() {
         addPageFromTemplate={createFromTemplate}
         editTemplate={editTemplate}
         pages={proposalTemplatePages}
-        createTemplate={() =>
-          !isCharmverseSpace ? createTemplate('free_form') : proposalTemplateCreateModalState.open()
-        }
+        createTemplate={proposalTemplateCreateModalState.open}
         deleteTemplate={deleteProposalTemplate}
         anchorEl={buttonRef.current as Element}
         boardTitle='Proposals'
@@ -100,27 +109,24 @@ export function NewProposalButton() {
       />
 
       <Modal
-        size='fluid'
         title='Select a template type'
         open={proposalTemplateCreateModalState.isOpen}
         onClose={proposalTemplateCreateModalState.close}
       >
         <Stack spacing={2}>
-          <ProposalTemplateMenu onClick={() => createTemplate('structured')}>
-            <Stack flexDirection='row' gap={1} alignItems='center'>
-              <WidgetsOutlinedIcon fontSize='large' />
-              <Typography variant='h5'>Structured Form</Typography>
-            </Stack>
-            <Typography variant='body2'>
-              Create a template using Forms, creating a structured data format for each proposal to conform to.
-            </Typography>
+          <ProposalTemplateMenu
+            onClick={() => createTemplate('structured')}
+            data-test='structured-proposal-template-menu'
+          >
+            <WidgetsOutlinedIcon fontSize='large' />
+            <Typography variant='h6'>Form</Typography>
           </ProposalTemplateMenu>
-          <ProposalTemplateMenu onClick={() => createTemplate('free_form')}>
-            <Stack flexDirection='row' gap={1} alignItems='center'>
-              <DescriptionOutlinedIcon fontSize='large' />
-              <Typography variant='h5'>Free Form</Typography>
-            </Stack>
-            <Typography variant='body2'>Create a template using an open editor.</Typography>
+          <ProposalTemplateMenu
+            onClick={() => createTemplate('free_form')}
+            data-test='free_form-proposal-template-menu'
+          >
+            <DescriptionOutlinedIcon fontSize='large' />
+            <Typography variant='h6'>Document</Typography>
           </ProposalTemplateMenu>
         </Stack>
       </Modal>

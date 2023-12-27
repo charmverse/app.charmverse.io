@@ -10,7 +10,7 @@ export async function canAccessPrivateFields({
   proposal
 }: {
   proposalId: string;
-  userId: string;
+  userId?: string;
   proposal?: Proposal & {
     authors: {
       proposalId: string;
@@ -18,10 +18,18 @@ export async function canAccessPrivateFields({
     }[];
   };
 }) {
+  if (!userId) {
+    return false;
+  }
+
   const checkProposal =
     proposal || (await prisma.proposal.findUnique({ where: { id: proposalId }, include: { authors: true } }));
 
   if (!checkProposal) {
+    return false;
+  }
+
+  if (!checkProposal.formId) {
     return false;
   }
 

@@ -92,7 +92,8 @@ const StyledSelect = styled(SelectField)<ContainerProps>`
   ${({ disableClearable }) => (disableClearable ? '.MuiSvgIcon-root { display: none; }' : '')}
 `;
 
-type Props = {
+export type TagSelectProps = {
+  defaultOpened?: boolean;
   readOnly?: boolean;
   readOnlyMessage?: string;
   canEditOptions?: boolean; // TODO: allow editing options
@@ -126,10 +127,11 @@ export function TagSelect({
   displayType = 'details',
   noOptionsText,
   wrapColumn,
-  disableClearable = false,
-  'data-test': dataTest
-}: Props) {
-  const [isOpened, setIsOpened] = useState(false);
+  'data-test': dataTest,
+  defaultOpened = false,
+  disableClearable = false
+}: TagSelectProps) {
+  const [isOpened, setIsOpened] = useState(defaultOpened);
 
   const onEdit = useCallback(() => {
     if (!readOnly) {

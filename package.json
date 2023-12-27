@@ -159,7 +159,8 @@
     "@stripe/stripe-js": "^1.54.1",
     "@typeform/api-client": "^1.7.0",
     "@uauth/js": "^2.4.0",
-    "@unlock-protocol/networks": "^0.0.18",
+    "@unlock-protocol/contracts": "^0.0.22",
+    "@unlock-protocol/networks": "^0.0.19",
     "@unlock-protocol/unlock-js": "^0.40.3",
     "@wagmi/core": "^1.4.5-cjs",
     "@zoralabs/zdk": "^2.4.0",
@@ -364,7 +365,7 @@
     "tsc-alias": "^1.8.6",
     "tsconfig-paths": "^4.2.0",
     "tslib": "^2.6.2",
-    "tsx": "^3.12.6",
+    "tsx": "^4.7.0",
     "typescript": "^5.2.2",
     "webpack": "^5.76.0"
   },

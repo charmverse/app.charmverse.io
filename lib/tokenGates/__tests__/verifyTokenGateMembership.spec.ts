@@ -1,16 +1,24 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { Web3Service as InitialWeb3Service } from '@unlock-protocol/unlock-js';
 
 import { applyTokenGates } from 'lib/tokenGates/applyTokenGates';
 import { verifyTokenGateMembership } from 'lib/tokenGates/verifyTokenGateMembership';
 import type { UserToVerifyMembership } from 'lib/tokenGates/verifyTokenGateMemberships';
-import type { LoggedInUser } from 'models';
 import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
 import { verifiedJWTResponse } from 'testing/utils/litProtocol';
-import { addRoleToTokenGate, deleteTokenGate, generateTokenGate } from 'testing/utils/tokenGates';
+import {
+  addRoleToTokenGate,
+  deleteTokenGate,
+  generateTokenGate,
+  generateUnlockTokenGate
+} from 'testing/utils/tokenGates';
 
 // @ts-ignore
 let mockedLitSDK: jest.Mocked;
+
+jest.mock('@unlock-protocol/unlock-js');
+const mockWeb3Service = jest.mocked(InitialWeb3Service);
 
 describe('verifyTokenGateMembership', () => {
   let user: User;
@@ -54,6 +62,8 @@ describe('verifyTokenGateMembership', () => {
   beforeEach(async () => {
     jest.mock('@lit-protocol/lit-node-client');
     mockedLitSDK = await import('@lit-protocol/lit-node-client');
+    mockWeb3Service.mockClear();
+
     const { user: u, space: s } = await generateUserAndSpace(undefined);
     user = u;
     space = s;
@@ -121,6 +131,8 @@ describe('verifyTokenGateMembership', () => {
   it('should not verify and remove user with all token gates being not verified', async () => {
     const tokenGate1 = await generateTokenGate({ userId: user.id, spaceId: space.id });
     const tokenGate2 = await generateTokenGate({ userId: user.id, spaceId: space.id });
+    const tokenGate3 = await generateUnlockTokenGate({ userId: user.id, spaceId: space.id });
+
     mockedLitSDK.verifyJwt
       // verify to apply token gate
       .mockReturnValueOnce(
@@ -143,13 +155,20 @@ describe('verifyTokenGateMembership', () => {
         })
       );
 
+    mockWeb3Service.mockReturnValueOnce({
+      getLock: async () => ({}),
+      balanceOf: async () => 1,
+      getKeyExpirationByLockForOwner: async () => new Date().setDate(new Date().getDate() + 1) / 1000
+    } as any as InitialWeb3Service);
+
     await applyTokenGates({
       spaceId: space.id,
       userId: user.id,
       commit: true,
       tokens: [
         { tokenGateId: tokenGate1.id, signedToken: 'jwt1' },
-        { tokenGateId: tokenGate2.id, signedToken: 'jwt2' }
+        { tokenGateId: tokenGate2.id, signedToken: 'jwt2' },
+        { tokenGateId: tokenGate3.id, signedToken: '' }
       ],
       walletAddress: '0x123'
     });
@@ -167,7 +186,7 @@ describe('verifyTokenGateMembership', () => {
     });
 
     const spaceUser = await getSpaceUser();
-    expect(verifyUser.user.userTokenGates.length).toBe(2);
+    expect(verifyUser.user.userTokenGates.length).toBe(3);
     expect(res).toEqual({ removedRoles: 0, verified: false });
     expect(spaceUser).toBeNull();
   });

@@ -1,3 +1,5 @@
+import type { TokenGateType } from '@charmverse/core/prisma-client';
+
 import type { BaseEvent } from './BaseEvent';
 
 export type AddInviteLink = BaseEvent & {
@@ -9,6 +11,7 @@ export type AddAGate = BaseEvent & {
   numberOfConditions: number;
   chainType: string | string[];
   accesType: string | string[];
+  gateType: TokenGateType;
 };
 
 type AddRoleEvent = BaseEvent & {

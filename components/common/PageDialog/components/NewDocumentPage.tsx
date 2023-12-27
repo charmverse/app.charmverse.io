@@ -24,10 +24,18 @@ type Props = {
   titlePlaceholder?: string;
   values: NewPageValues | null;
   onChange: (values: Partial<NewPageValues | null>) => void;
+  headerBannerTitle?: string;
 };
 
 // Note: this component is only used before a page is saved to the DB
-export function NewDocumentPage({ children, placeholder, titlePlaceholder, values: newPageValues, onChange }: Props) {
+export function NewDocumentPage({
+  children,
+  placeholder,
+  titlePlaceholder,
+  values: newPageValues,
+  onChange,
+  headerBannerTitle
+}: Props) {
   newPageValues ||= EMPTY_PAGE_VALUES;
   const [, { width: containerWidth }] = useElementSize();
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
@@ -35,7 +43,7 @@ export function NewDocumentPage({ children, placeholder, titlePlaceholder, value
   return (
     <div className={`document-print-container ${fontClassName}`}>
       <Box display='flex' flexDirection='column'>
-        <PageTemplateBanner pageType={newPageValues.type} isNewPage />
+        <PageTemplateBanner pageType={newPageValues.type} isNewPage customTitle={headerBannerTitle} />
         {newPageValues.headerImage && <PageBanner headerImage={newPageValues.headerImage} setPage={onChange} />}
         <StyledContainer data-test='page-charmeditor' top={getPageTop(newPageValues)} fullWidth={isSmallScreen}>
           <Box minHeight={450}>

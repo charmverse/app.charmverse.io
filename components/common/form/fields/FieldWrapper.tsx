@@ -1,6 +1,6 @@
 import type { SxProps } from '@mui/material';
-import { Typography } from '@mui/material';
 import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 import type { ReactNode } from 'react';
 
 import { CharmEditor } from 'components/common/CharmEditor';
@@ -31,7 +31,7 @@ export function FieldWrapper({ sx, endAdornment, description, required, children
         <Box alignItems='center' display='flex' gap={1}>
           {iconLabel ?? null}
           {label && (
-            <FieldLabel noWrap>
+            <FieldLabel data-test='field-label'>
               {label}
               {required && (
                 <Typography component='span' color='error'>

@@ -9,7 +9,7 @@ exports[`components/viewHeader/viewHeader return viewHeader 1`] = `
       class="MuiStack-root css-1y52uev-MuiStack-root"
     >
       <div
-        class="ViewHeader "
+        class="ViewHeader  "
       >
         <div
           class="MuiTabs-root css-5t1ahk-MuiTabs-root"
@@ -179,7 +179,7 @@ exports[`components/viewHeader/viewHeader return viewHeader readonly 1`] = `
       class="MuiStack-root css-1y52uev-MuiStack-root"
     >
       <div
-        class="ViewHeader "
+        class="ViewHeader  "
       >
         <div
           class="MuiTabs-root css-5t1ahk-MuiTabs-root"

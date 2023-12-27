@@ -1,10 +1,9 @@
 import type { Page } from '@charmverse/core/prisma';
-import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
-import { useMediaQuery, Divider, Box } from '@mui/material';
+import { Box, Divider, useMediaQuery } from '@mui/material';
 import dynamic from 'next/dynamic';
 import type { EditorState } from 'prosemirror-state';
-import { memo, useCallback, useEffect, useRef, useState, useMemo } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
 import { useGetReward } from 'charmClient/hooks/rewards';
@@ -20,14 +19,19 @@ import type { FrontendParticipant } from 'components/common/CharmEditor/componen
 import type { ConnectionEvent } from 'components/common/CharmEditor/components/fiduswriter/ws';
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
+import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import { EvaluationStepper } from 'components/proposals/ProposalPage/components/EvaluationStepper/EvaluationStepper';
+import { ProposalFormFieldInputs } from 'components/proposals/ProposalPage/components/ProposalFormFieldInputs';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMdScreen } from 'hooks/useMediaScreens';
+import { ProposalBlocksProvider } from 'hooks/useProposalBlocks';
 import { useThreads } from 'hooks/useThreads';
+import { useUser } from 'hooks/useUser';
 import { useVotes } from 'hooks/useVotes';
 import type { PageWithContent } from 'lib/pages/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -88,6 +92,7 @@ function DocumentPage({
   close,
   enableSidebar
 }: DocumentPageProps) {
+  const { user } = useUser();
   const { castVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
   const { navigateToSpacePath, router } = useCharmRouter();
   const {
@@ -107,7 +112,7 @@ function DocumentPage({
   const [editorState, setEditorState] = useState<EditorState | null>(null);
   const { creatingInlineReward } = useRewards();
   const isMdScreen = useMdScreen();
-
+  const isAdmin = useIsAdmin();
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
 
@@ -302,8 +307,136 @@ function DocumentPage({
     }
   }, [printRef, _printRef]);
 
-  return (
+  const isStructuredProposal = proposal && proposal.formId;
+
+  const documentPageContent = (
     <>
+      {/* temporary? disable editing of page title when in suggestion mode */}
+      <PageHeader
+        headerImage={page.headerImage}
+        // Commented for now, as we need to preserve cursor position between re-renders caused by updating this
+        // key={page.title}
+        icon={page.icon}
+        title={page.title}
+        updatedAt={page.updatedAt.toString()}
+        readOnly={readOnly || !!enableSuggestingMode}
+        setPage={savePage}
+        readOnlyTitle={!!page.syncWithPageId}
+        parentId={showParentChip ? card.parentId : null}
+        insideModal={insideModal}
+        pageId={page.id}
+      />
+      {isCharmVerse && proposal && !isLoading && (
+        <>
+          <Box my={2} mb={1}>
+            <EvaluationStepper
+              evaluations={proposal.evaluations || []}
+              selected={activeEvaluationId}
+              isDraft={proposal.status === 'draft'}
+              onClick={openEvaluation}
+            />
+          </Box>
+          <Divider />
+        </>
+      )}
+      {!isCharmVerse && page.type === 'proposal' && !isLoading && page.snapshotProposalId && (
+        <Box my={2} className='font-family-default'>
+          <SnapshotVoteDetails snapshotProposalId={page.snapshotProposalId} />
+        </Box>
+      )}
+      {!isCharmVerse && page.type === 'proposal' && !isLoading && pageVote && (
+        <Box my={2} className='font-family-default'>
+          <VoteDetail
+            castVote={castVote}
+            updateDeadline={updateDeadline}
+            vote={pageVote}
+            detailed={false}
+            isProposal={true}
+            disableVote={!proposalPermissions?.vote}
+          />
+        </Box>
+      )}
+      <CardPropertiesWrapper>
+        {/* Property list */}
+        {card && board && !hideCardDetails && (
+          <>
+            <CardDetailProperties
+              syncWithPageId={page.syncWithPageId}
+              board={board}
+              card={card}
+              cards={cards}
+              activeView={activeBoardView}
+              views={boardViews}
+              readOnly={readOnly}
+              pageUpdatedAt={page.updatedAt.toString()}
+              pageUpdatedBy={page.updatedBy}
+            />
+            <AddBountyButton readOnly={readOnly} cardId={page.id} />
+          </>
+        )}
+        {proposalId && (
+          <ProposalProperties
+            enableSidebar={enableSidebar}
+            pageId={page.id}
+            proposalId={proposalId}
+            pagePermissions={pagePermissions}
+            snapshotProposalId={page.snapshotProposalId}
+            refreshPagePermissions={refreshPage}
+            readOnly={readonlyProposalProperties}
+            proposalPage={page}
+            isEvaluationSidebarOpen={sidebarView === 'proposal_evaluation'}
+            openEvaluation={openEvaluation}
+            proposal={proposal}
+            refreshProposal={refreshProposal}
+            isCharmVerse={isCharmVerse}
+          />
+        )}
+        {reward && (
+          <RewardProperties
+            reward={reward}
+            pageId={page.id}
+            pagePath={page.path}
+            readOnly={readOnly}
+            showApplications
+            expandedRewardProperties
+            isTemplate={page.type === 'bounty_template'}
+          />
+        )}
+        {creatingInlineReward && !readOnly && <NewInlineReward pageId={page.id} />}
+        {/** Structured proposal isn't inside a CharmEditor context, thus useViewContext used in PageSidebar would throw error for undefined view */}
+        {(enableComments || enableSuggestingMode || page.type === 'proposal' || page.type === 'proposal_template') && (
+          <PageSidebar
+            id='page-action-sidebar'
+            pageId={page.id}
+            spaceId={page.spaceId}
+            proposalId={proposalId}
+            proposalEvaluationId={activeEvaluationId}
+            readOnlyProposalPermissions={!proposal?.permissions.edit}
+            readOnlyRubricCriteria={readOnlyRubricCriteria}
+            readOnlyReviewers={readOnlyReviewers}
+            pagePermissions={pagePermissions}
+            editorState={editorState}
+            sidebarView={sidebarView}
+            closeSidebar={closeSidebar}
+            openSidebar={setActiveView}
+            openEvaluationSidebar={openEvaluationSidebar}
+            threads={threads}
+            proposal={proposal}
+            proposalInput={proposal}
+            onChangeEvaluation={onChangeEvaluation}
+            isProposalTemplate={page.type === 'proposal_template'}
+            refreshProposal={refreshProposal}
+            disabledViews={isStructuredProposal ? ['suggestions', 'comments'] : []}
+          />
+        )}
+      </CardPropertiesWrapper>
+    </>
+  );
+
+  const proposalAuthors = proposal ? [proposal.createdBy, ...proposal.authors.map((author) => author.userId)] : [];
+
+  return (
+    <ProposalBlocksProvider>
       {!!page?.deletedAt && (
         <AlertContainer showPageActionSidebar={showPageActionSidebar}>
           <PageDeleteBanner pageType={page.type} pageId={page.id} />
@@ -334,7 +467,19 @@ function DocumentPage({
             parentElementId: 'file-drop-container'
           })}
         >
-          <PageTemplateBanner parentId={page.parentId} pageType={page.type} />
+          <PageTemplateBanner
+            parentId={page.parentId}
+            pageType={page.type}
+            proposalType={
+              page.type === 'proposal_template'
+                ? proposal
+                  ? proposal.formId
+                    ? 'structured'
+                    : 'free_form'
+                  : undefined
+                : undefined
+            }
+          />
           {/* temporary? disable editing of page meta data when in suggestion mode */}
           {page.headerImage && (
             <PageBanner
@@ -349,159 +494,62 @@ function DocumentPage({
             top={pageTop}
             fullWidth={isSmallScreen || (page.fullWidth ?? false)}
           >
-            <CharmEditor
-              placeholderText={
-                page.type === 'bounty' || page.type === 'bounty_template'
-                  ? `Describe the reward. Type '/' to see the list of available commands`
-                  : undefined
-              }
-              key={editorKey}
-              content={page.content as PageContent}
-              readOnly={readOnly || !!page.syncWithPageId}
-              autoFocus={false}
-              sidebarView={sidebarView}
-              setSidebarView={setActiveView}
-              pageId={page.id}
-              disablePageSpecificFeatures={isSharedPage}
-              enableSuggestingMode={enableSuggestingMode}
-              enableVoting={page.type !== 'proposal'}
-              enableComments={enableComments}
-              containerWidth={containerWidth}
-              pageType={page.type}
-              pagePermissions={pagePermissions ?? undefined}
-              onConnectionEvent={onConnectionEvent}
-              setEditorState={setEditorState}
-              snapshotProposalId={page.snapshotProposalId}
-              onParticipantUpdate={onParticipantUpdate}
-              style={{
-                // 5 lines
-                minHeight: proposalId || page?.type.includes('card') ? '150px' : 'unset'
-              }}
-              disableNestedPages={page?.type === 'proposal' || page?.type === 'proposal_template'}
-              allowClickingFooter={true}
-              threadIds={threadIds}
-            >
-              {/* temporary? disable editing of page title when in suggestion mode */}
-              <PageHeader
-                headerImage={page.headerImage}
-                // Commented for now, as we need to preserve cursor position between re-renders caused by updating this
-                // key={page.title}
-                icon={page.icon}
-                title={page.title}
-                updatedAt={page.updatedAt.toString()}
-                readOnly={readOnly || !!enableSuggestingMode}
-                setPage={savePage}
-                readOnlyTitle={!!page.syncWithPageId}
-                parentId={showParentChip ? card.parentId : null}
-                insideModal={insideModal}
+            {proposal && proposal.formId ? (
+              <>
+                {documentPageContent}
+                <Box mb={10}>
+                  {page.type === 'proposal_template' ? (
+                    <FormFieldsEditor
+                      readOnly={!isAdmin && (!user || !proposalAuthors.includes(user.id))}
+                      proposalId={proposal.id}
+                      formFields={proposal?.form.formFields ?? []}
+                    />
+                  ) : (
+                    <ProposalFormFieldInputs
+                      proposalId={proposal.id}
+                      formFields={proposal?.form.formFields ?? []}
+                      readOnly={!user || !proposalAuthors.includes(user.id)}
+                      proposalStatus={proposal.status}
+                    />
+                  )}
+                </Box>
+              </>
+            ) : (
+              <CharmEditor
+                placeholderText={
+                  page.type === 'bounty' || page.type === 'bounty_template'
+                    ? `Describe the reward. Type '/' to see the list of available commands`
+                    : undefined
+                }
+                key={editorKey}
+                content={page.content as PageContent}
+                readOnly={readOnly || !!page.syncWithPageId}
+                autoFocus={false}
+                sidebarView={sidebarView}
+                setSidebarView={setActiveView}
                 pageId={page.id}
-              />
-              {isCharmVerse && proposal && !isLoading && (
-                <>
-                  <Box my={2} mb={1}>
-                    <EvaluationStepper
-                      evaluations={proposal.evaluations || []}
-                      selected={activeEvaluationId}
-                      isDraft={proposal.status === 'draft'}
-                      onClick={openEvaluation}
-                    />
-                  </Box>
-                  <Divider />
-                </>
-              )}
-              {!isCharmVerse && page.type === 'proposal' && !isLoading && page.snapshotProposalId && (
-                <Box my={2} className='font-family-default'>
-                  <SnapshotVoteDetails snapshotProposalId={page.snapshotProposalId} />
-                </Box>
-              )}
-              {!isCharmVerse && page.type === 'proposal' && !isLoading && pageVote && (
-                <Box my={2} className='font-family-default'>
-                  <VoteDetail
-                    castVote={castVote}
-                    updateDeadline={updateDeadline}
-                    vote={pageVote}
-                    detailed={false}
-                    isProposal={true}
-                    disableVote={!proposalPermissions?.vote}
-                  />
-                </Box>
-              )}
-              <CardPropertiesWrapper>
-                {/* Property list */}
-                {card && board && !hideCardDetails && (
-                  <>
-                    <CardDetailProperties
-                      syncWithPageId={page.syncWithPageId}
-                      board={board}
-                      card={card}
-                      cards={cards}
-                      activeView={activeBoardView}
-                      views={boardViews}
-                      readOnly={readOnly}
-                      pageUpdatedAt={page.updatedAt.toString()}
-                      pageUpdatedBy={page.updatedBy}
-                    />
-                    <AddBountyButton readOnly={readOnly} cardId={page.id} />
-                  </>
-                )}
-                {proposalId && (
-                  <ProposalProperties
-                    enableSidebar={enableSidebar}
-                    pageId={page.id}
-                    proposalId={proposalId}
-                    pagePermissions={pagePermissions}
-                    snapshotProposalId={page.snapshotProposalId}
-                    refreshPagePermissions={refreshPage}
-                    readOnly={readonlyProposalProperties}
-                    proposalPage={page}
-                    isEvaluationSidebarOpen={sidebarView === 'proposal_evaluation'}
-                    openEvaluation={openEvaluation}
-                    proposal={proposal}
-                    refreshProposal={refreshProposal}
-                    isCharmVerse={isCharmVerse}
-                  />
-                )}
-                {reward && (
-                  <RewardProperties
-                    reward={reward}
-                    pageId={page.id}
-                    pagePath={page.path}
-                    readOnly={readOnly}
-                    showApplications
-                    expandedRewardProperties
-                    isTemplate={page.type === 'bounty_template'}
-                  />
-                )}
-                {creatingInlineReward && !readOnly && <NewInlineReward pageId={page.id} />}
-                {(enableComments ||
-                  enableSuggestingMode ||
-                  page.type === 'proposal' ||
-                  page.type === 'proposal_template') && (
-                  <PageSidebar
-                    id='page-action-sidebar'
-                    pageId={page.id}
-                    spaceId={page.spaceId}
-                    proposalId={proposalId}
-                    proposalEvaluationId={activeEvaluationId}
-                    readOnlyProposalPermissions={!proposal?.permissions.edit}
-                    readOnlyRubricCriteria={readOnlyRubricCriteria}
-                    readOnlyReviewers={readOnlyReviewers}
-                    pagePermissions={pagePermissions}
-                    editorState={editorState}
-                    sidebarView={sidebarView}
-                    closeSidebar={closeSidebar}
-                    openSidebar={setActiveView}
-                    openEvaluationSidebar={openEvaluationSidebar}
-                    threads={threads}
-                    proposal={proposal}
-                    proposalInput={proposal}
-                    onChangeEvaluation={onChangeEvaluation}
-                    isProposalTemplate={page.type === 'proposal_template'}
-                    refreshProposal={refreshProposal}
-                  />
-                )}
-              </CardPropertiesWrapper>
-            </CharmEditor>
+                disablePageSpecificFeatures={isSharedPage}
+                enableSuggestingMode={enableSuggestingMode}
+                enableVoting={page.type !== 'proposal'}
+                enableComments={enableComments}
+                containerWidth={containerWidth}
+                pageType={page.type}
+                pagePermissions={pagePermissions ?? undefined}
+                onConnectionEvent={onConnectionEvent}
+                setEditorState={setEditorState}
+                snapshotProposalId={page.snapshotProposalId}
+                onParticipantUpdate={onParticipantUpdate}
+                style={{
+                  // 5 lines
+                  minHeight: proposalId || page?.type.includes('card') ? '150px' : 'unset'
+                }}
+                disableNestedPages={page?.type === 'proposal' || page?.type === 'proposal_template'}
+                allowClickingFooter={true}
+                threadIds={threadIds}
+              >
+                {documentPageContent}
+              </CharmEditor>
+            )}
 
             {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') && (
               <Box mt='-100px'>
@@ -521,7 +569,7 @@ function DocumentPage({
           />
         )}
       </PrimaryColumn>
-    </>
+    </ProposalBlocksProvider>
   );
 }
 

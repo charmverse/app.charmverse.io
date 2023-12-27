@@ -15,6 +15,7 @@ import { TagSelect } from 'components/common/BoardEditor/components/properties/T
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
+import { BreadcrumbPageTitle } from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
 import { ProposalStatusChipTextOnly } from 'components/proposals/components/ProposalStatusBadge';
 import { useProposalsWhereUserIsEvaluator } from 'components/proposals/hooks/useProposalsWhereUserIsEvaluator';
 import {
@@ -72,6 +73,34 @@ type Props = {
   columnRef?: React.RefObject<HTMLDivElement>;
   mutator?: Mutator;
   subRowsEmptyValueContent?: ReactElement | string;
+};
+
+export const validatePropertyValue = (propType: string, val: string): boolean => {
+  if (val === '') {
+    return true;
+  }
+  switch (propType) {
+    case 'number':
+      return !Number.isNaN(parseInt(val, 10));
+    case 'email': {
+      const emailRegexp =
+        // eslint-disable-next-line max-len
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{"mixer na 8 chainach1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return emailRegexp.test(val);
+    }
+    case 'url': {
+      const urlRegexp =
+        // eslint-disable-next-line max-len
+        /(((.+:(?:\/\/)?)?(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www\.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w\-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[.!/\\\w]*))?)/;
+      return urlRegexp.test(val);
+    }
+    case 'text':
+      return true;
+    case 'phone':
+      return true;
+    default:
+      return false;
+  }
 };
 
 /**
@@ -140,34 +169,6 @@ function PropertyValueElement(props: Props) {
     setServerValue(props.card.fields.properties[props.propertyTemplate.id] || '');
   }, [value, props.card.fields.properties[props.propertyTemplate.id]]);
 
-  const validateProp = (propType: string, val: string): boolean => {
-    if (val === '') {
-      return true;
-    }
-    switch (propType) {
-      case 'number':
-        return !Number.isNaN(parseInt(val, 10));
-      case 'email': {
-        const emailRegexp =
-          // eslint-disable-next-line max-len
-          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{"mixer na 8 chainach1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        return emailRegexp.test(val);
-      }
-      case 'url': {
-        const urlRegexp =
-          // eslint-disable-next-line max-len
-          /(((.+:(?:\/\/)?)?(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www\.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w\-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[.!/\\\w]*))?)/;
-        return urlRegexp.test(val);
-      }
-      case 'text':
-        return true;
-      case 'phone':
-        return true;
-      default:
-        return false;
-    }
-  };
-
   let propertyValueElement: ReactNode = null;
 
   if (propertyTemplate.id === REWARD_STATUS_BLOCK_ID) {
@@ -193,15 +194,11 @@ function PropertyValueElement(props: Props) {
     }
 
     return (
-      <Chip
-        label={propertyValue[0]}
-        sx={{
-          cursor: 'pointer'
-        }}
-        size='small'
-        component={Link}
-        href={getAbsolutePath(propertyValue[1] as string, domain)}
-      />
+      <Box sx={{ a: { color: 'inherit' } }}>
+        <Link href={getAbsolutePath(propertyValue[1] as string, domain)}>
+          <BreadcrumbPageTitle sx={{ maxWidth: 160 }}>{propertyValue[0]}</BreadcrumbPageTitle>
+        </Link>
+      </Box>
     );
   } else if ([REWARD_REVIEWERS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID].includes(propertyTemplate.id)) {
     if (Array.isArray(propertyValue) && propertyValue.length === 0 && subRowsEmptyValueContent) {
@@ -283,17 +280,19 @@ function PropertyValueElement(props: Props) {
           const newUserIds = newValue.filter((id) => !previousValue.includes(id));
           Promise.all(
             newUserIds.map((userId) =>
-              charmClient.createEvent({
+              charmClient.createEvents({
                 spaceId: board.spaceId,
-                payload: {
-                  cardId: card.id,
-                  cardProperty: {
-                    id: propertyTemplate.id,
-                    name: propertyTemplate.name,
-                    value: userId
-                  },
-                  scope: WebhookEventNames.CardPersonPropertyAssigned
-                }
+                payload: [
+                  {
+                    cardId: card.id,
+                    cardProperty: {
+                      id: propertyTemplate.id,
+                      name: propertyTemplate.name,
+                      value: userId
+                    },
+                    scope: WebhookEventNames.CardPersonPropertyAssigned
+                  }
+                ]
               })
             )
           );
@@ -383,7 +382,7 @@ function PropertyValueElement(props: Props) {
       mutator.changePropertyValue(card, propertyTemplate.id, value);
     },
     onCancel: () => setValue(propertyValue || ''),
-    validator: (newValue: string) => validateProp(propertyTemplate.type, newValue),
+    validator: (newValue: string) => validatePropertyValue(propertyTemplate.type, newValue),
     spellCheck: propertyTemplate.type === 'text',
     wrapColumn: props.wrapColumn ?? false,
     columnRef: props.columnRef

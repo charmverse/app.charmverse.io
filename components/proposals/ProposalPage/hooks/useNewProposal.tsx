@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { mutate } from 'swr';
 
 import { useCreateProposal } from 'charmClient/hooks/proposals';
+import { checkFormFieldErrors } from 'components/common/form/checkFormFieldErrors';
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationSettings';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
@@ -68,7 +69,8 @@ export function useNewProposal({ newProposal }: Props) {
         showMessage((error as Error).message, 'error');
         return;
       }
-      await createProposalTrigger({
+      const result = await createProposalTrigger({
+        proposalTemplateId: formInputs.proposalTemplateId,
         authors: formInputs.authors,
         categoryId: formInputs.categoryId,
         pageProps: {
@@ -80,6 +82,7 @@ export function useNewProposal({ newProposal }: Props) {
           icon: formInputs.icon,
           type: formInputs.type
         },
+        formFields: formInputs.formFields,
         evaluations: formInputs.evaluations,
         evaluationType: formInputs.evaluationType,
         rubricCriteria: formInputs.rubricCriteria as RubricDataInput[],
@@ -87,14 +90,15 @@ export function useNewProposal({ newProposal }: Props) {
         spaceId: currentSpace.id,
         publishToLens: formInputs.publishToLens,
         fields: formInputs.fields,
+        formId: formInputs.formId,
+        formAnswers: formInputs.formAnswers,
         workflowId: formInputs.workflowId || undefined
       }).catch((err: any) => {
         showMessage(err.message ?? 'Something went wrong', 'error');
         throw err;
       });
-
-      mutate(`/api/spaces/${currentSpace.id}/proposals`);
       setContentUpdated(false);
+      return result;
     }
   }
 
@@ -111,7 +115,17 @@ export function useNewProposal({ newProposal }: Props) {
     disabledTooltip = 'Template is required';
   }
 
-  // old evalauation logic
+  if (formInputs.proposalType === 'structured') {
+    disabledTooltip = checkFormFieldErrors(formInputs.formFields ?? []);
+  } else if (
+    formInputs.proposalType === 'free_form' &&
+    formInputs.type === 'proposal_template' &&
+    checkIsContentEmpty(formInputs.content)
+  ) {
+    disabledTooltip = 'Content is required for free-form proposals';
+  }
+
+  // old evaluation logic
   if (!isCharmVerse) {
     if (formInputs.reviewers.length === 0) {
       disabledTooltip = 'Reviewers are required';
@@ -120,19 +134,7 @@ export function useNewProposal({ newProposal }: Props) {
     // get the first validation error from the evaluations
     disabledTooltip = formInputs.evaluations.map(getEvaluationFormError).filter(isTruthy)[0];
   }
-  if (formInputs.proposalType === 'structured' && (formInputs.formFields ?? [])?.length === 0) {
-    disabledTooltip = 'Form fields are required for structured proposals';
-  } else if (
-    formInputs.proposalType === 'free_form' &&
-    formInputs.type === 'proposal_template' &&
-    checkIsContentEmpty(formInputs.content)
-  ) {
-    disabledTooltip = 'Content is required for free-form proposal templates';
-  }
 
-  if (formInputs.proposalType === 'structured' && formInputs.formFields?.some((formField) => !formField.name)) {
-    disabledTooltip = 'Form fields must have a name';
-  }
   return {
     formInputs,
     setFormInputs,
@@ -149,14 +151,18 @@ function getEvaluationFormError(evaluation: ProposalEvaluationValues): string | 
       return false;
     case 'rubric':
       return evaluation.reviewers.length === 0
-        ? 'Reviewers are required'
+        ? `Reviewers are required for the "${evaluation.title}" step`
         : evaluation.rubricCriteria.length === 0
-        ? 'Rubric criteria are required'
+        ? `At least one rubric criteria is required for the "${evaluation.title}" step`
         : false;
     case 'pass_fail':
-      return evaluation.reviewers.length === 0 ? 'Reviewers are required' : false;
+      return evaluation.reviewers.length === 0 ? `Reviewers are required for the "${evaluation.title}" step` : false;
     case 'vote':
-      return !evaluation.voteSettings ? 'Vote details are required' : false;
+      return evaluation.reviewers.length === 0
+        ? `Voters are required for the "${evaluation.title}" step`
+        : !evaluation.voteSettings
+        ? `Vote details are required for the "${evaluation.title}" step`
+        : false;
     default:
       return false;
   }

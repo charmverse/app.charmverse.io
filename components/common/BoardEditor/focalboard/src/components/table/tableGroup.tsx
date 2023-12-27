@@ -1,5 +1,5 @@
 /* eslint-disable max-lines */
-import type { ReactElement } from 'react';
+import type { Dispatch, ReactElement, SetStateAction } from 'react';
 import React from 'react';
 import { useDrop } from 'react-dnd';
 
@@ -30,6 +30,8 @@ type Props = {
   disableAddingCards?: boolean;
   readOnlyTitle?: boolean;
   subRowsEmptyValueContent?: ReactElement | string;
+  checkedIds?: string[];
+  setCheckedIds?: Dispatch<SetStateAction<string[]>>;
 };
 
 const TableGroup = React.memo((props: Props): JSX.Element => {
@@ -89,6 +91,8 @@ const TableGroup = React.memo((props: Props): JSX.Element => {
           onDrop={props.onDropToCard}
           readOnlyTitle={props.readOnlyTitle}
           subRowsEmptyValueContent={props.subRowsEmptyValueContent}
+          checkedIds={props.checkedIds}
+          setCheckedIds={props.setCheckedIds}
         />
       )}
     </div>

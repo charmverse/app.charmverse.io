@@ -17,7 +17,7 @@ import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 
 import { PageIcon } from '../../../../PageIcon';
 
-const BreadCrumb = styled.span`
+export const BreadCrumb = styled.span`
   display: none;
 
   ${({ theme }) => theme.breakpoints.up('md')} {
@@ -51,7 +51,7 @@ const StyledPageTitle = styled(Typography)`
   max-width: 500px;
 ` as typeof Typography;
 
-function PageTitle({ children, sx = {} }: { children: ReactNode; sx?: object }) {
+export function BreadcrumbPageTitle({ children, sx = {} }: { children: ReactNode; sx?: object }) {
   return (
     <StyledPageTitle noWrap component='div' sx={sx}>
       {children}
@@ -97,21 +97,21 @@ function DocumentPageTitle({ basePath, pageId }: { basePath: string; pageId?: st
         <BreadCrumb key={crumb.path}>
           {crumb.path ? (
             <Link href={`${basePath}/${crumb.path}`}>
-              <PageTitle sx={{ maxWidth: 160 }}>
+              <BreadcrumbPageTitle sx={{ maxWidth: 160 }}>
                 {crumb.icon && <StyledPageIcon icon={crumb.icon} />}
                 {crumb.title || 'Untitled'}
-              </PageTitle>
+              </BreadcrumbPageTitle>
             </Link>
           ) : (
-            <PageTitle>{crumb.title}</PageTitle>
+            <BreadcrumbPageTitle>{crumb.title}</BreadcrumbPageTitle>
           )}
         </BreadCrumb>
       ))}
       {currentPage && (
-        <PageTitle sx={{ maxWidth: 240 }}>
+        <BreadcrumbPageTitle sx={{ maxWidth: 240 }}>
           {currentPage.icon && <StyledPageIcon icon={currentPage.icon} />}
           {currentPage.title || 'Untitled'}
-        </PageTitle>
+        </BreadcrumbPageTitle>
       )}
       {isSaving && (
         <Box display='inline-flex' alignItems='center' gap={1} ml={2}>
@@ -126,12 +126,12 @@ function DocumentPageTitle({ basePath, pageId }: { basePath: string; pageId?: st
 function ProposalPageTitle({ basePath, sectionName }: { basePath: string; sectionName: string }) {
   const [pageTitle] = usePageTitle();
   return (
-    <PageTitle>
+    <BreadcrumbPageTitle>
       <BreadCrumb>
         <Link href={`${basePath}/proposals`}>{sectionName}</Link>
       </BreadCrumb>
       {pageTitle || 'Untitled'}
-    </PageTitle>
+    </BreadcrumbPageTitle>
   );
 }
 
@@ -154,7 +154,7 @@ function ForumPostTitle({
   const { getForumCategoryById } = useForumCategories();
   const category = getForumCategoryById(forumPostInfo.forumPost?.categoryId);
   return (
-    <PageTitle>
+    <BreadcrumbPageTitle>
       <BreadCrumb>
         <Link href={`${basePath}/forum`}>{sectionName}</Link>
       </BreadCrumb>
@@ -164,7 +164,7 @@ function ForumPostTitle({
         </BreadCrumb>
       )}
       {title ?? 'Untitled'}
-    </PageTitle>
+    </BreadcrumbPageTitle>
   );
 }
 
@@ -182,7 +182,7 @@ function RewardsPageTitle({
   const { data: rewardWithPageMeta } = useGetReward({ rewardId: application?.bountyId });
 
   return (
-    <PageTitle>
+    <BreadcrumbPageTitle>
       <BreadCrumb>
         <Link href={`${basePath}/rewards`}>{sectionName}</Link>
       </BreadCrumb>
@@ -195,26 +195,26 @@ function RewardsPageTitle({
           {applicationId && 'Application'}
         </>
       )}
-    </PageTitle>
+    </BreadcrumbPageTitle>
   );
 }
 function PublicBountyPageTitle() {
   const { space } = useCurrentSpace();
   return (
-    <PageTitle>
+    <BreadcrumbPageTitle>
       {space && (
         <>
           <BreadCrumb>{`${space.name}`}</BreadCrumb>
           Rewards
         </>
       )}
-    </PageTitle>
+    </BreadcrumbPageTitle>
   );
 }
 
 function DefaultPageTitle() {
   const [pageTitle] = usePageTitle();
-  return <PageTitle>{pageTitle}</PageTitle>;
+  return <BreadcrumbPageTitle>{pageTitle}</BreadcrumbPageTitle>;
 }
 
 export default function PageTitleWithBreadcrumbs({

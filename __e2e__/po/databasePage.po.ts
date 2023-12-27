@@ -113,4 +113,16 @@ export class DatabasePage extends GlobalPage {
   getLinkedPageOption({ pageId, boardId }: { pageId: string } & OptionalBoardId) {
     return this.linkedDatabaseOptions({ boardId }).locator(`data-test=linked-database-option-${pageId}`);
   }
+
+  getNewTemplateButton() {
+    return this.page.locator('data-test=new-template-button');
+  }
+
+  getTemplateMenu({ pageId }: { pageId: string }) {
+    return this.page.locator(`data-test=template-menu-${pageId}`);
+  }
+
+  getTemplateMenuEditOption({ pageId }: { pageId: string }) {
+    return this.page.locator(`data-test=template-menu-edit-${pageId}`);
+  }
 }

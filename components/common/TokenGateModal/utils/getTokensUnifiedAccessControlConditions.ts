@@ -8,7 +8,7 @@ export function getTokensUnifiedAccessControlConditions(
   values: FormValues
 ): UnifiedAccessControlConditions | undefined {
   const { chain, contract, quantity, check } = values;
-  const chainName = getChainById(Number(chain))?.litNetwork || 'etherum';
+  const chainName = getChainById(Number(chain))?.litNetwork || 'ethereum';
   const amount = parseEther(quantity).toString();
 
   if (check === 'customToken') {

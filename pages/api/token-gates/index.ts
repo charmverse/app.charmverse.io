@@ -52,6 +52,7 @@ async function saveTokenGate(req: NextApiRequest, res: NextApiResponse<void>) {
     spaceId,
     accesType,
     chainType,
+    gateType: result.type,
     numberOfConditions
   });
 

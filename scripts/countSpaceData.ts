@@ -231,7 +231,8 @@ let record: OverallBlocksCount =  {
         "proposalPropertyValues": 0,
         "proposalCategories": 0,
         "proposalRubrics": 0,
-        "proposalRubricAnswers": 0
+        "proposalRubricAnswers": 0,
+        "proposalFormFields": 0
       }
     }
   },

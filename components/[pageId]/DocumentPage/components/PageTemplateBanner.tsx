@@ -27,6 +27,8 @@ type Props = {
   isNewPage?: boolean;
   parentId?: string | null;
   pageType?: PageMeta['type'];
+  customTitle?: string;
+  proposalType?: 'free_form' | 'structured';
 };
 
 const templateTypes = {
@@ -35,8 +37,7 @@ const templateTypes = {
 };
 
 type RewardTemplateType = keyof typeof templateTypes;
-
-export function PageTemplateBanner({ isNewPage, pageType, parentId }: Props) {
+export function PageTemplateBanner({ proposalType, isNewPage, pageType, parentId, customTitle }: Props) {
   const { space } = useCurrentSpace();
   const theme = useTheme();
   const { pages } = usePages();
@@ -46,6 +47,16 @@ export function PageTemplateBanner({ isNewPage, pageType, parentId }: Props) {
   const board = isShowingCard ? parentPage : undefined;
 
   const boardPath = board ? `/${space?.domain}/${board?.path}` : undefined;
+
+  if (customTitle) {
+    return (
+      <StyledPageTemplateBanner card={isShowingCard}>
+        <Grid item xs={8} display='flex' justifyContent='center'>
+          <span>{customTitle}</span>
+        </Grid>
+      </StyledPageTemplateBanner>
+    );
+  }
 
   if (!pageType?.match('template')) {
     return null;
@@ -64,7 +75,9 @@ export function PageTemplateBanner({ isNewPage, pageType, parentId }: Props) {
         <Grid item xs={8} display='flex' justifyContent='center'>
           {!isShowingCard ? (
             <span>
-              You're {isNewPage ? 'creating' : 'editing'} a {templateTypes[pageType as RewardTemplateType]} template
+              You're {isNewPage ? 'creating' : 'editing'} a{' '}
+              {proposalType ? `${proposalType === 'free_form' ? 'free-form' : 'structured'} ` : ''}
+              {templateTypes[pageType as RewardTemplateType]} template
             </span>
           ) : (
             <>

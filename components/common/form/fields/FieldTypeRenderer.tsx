@@ -34,7 +34,7 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
         return <TextInputField {...fieldProps} ref={ref} />;
       }
       case 'long_text': {
-        return <CharmEditorInputField {...fieldProps} ref={ref} />;
+        return <CharmEditorInputField {...fieldProps} />;
       }
       case 'text_multiline': {
         return <TextInputField {...fieldProps} ref={ref} multiline rows={3} />;
@@ -52,30 +52,19 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
       }
 
       case 'label': {
-        return <FieldWrapper {...fieldProps} />;
+        return <FieldWrapper {...fieldProps} sx={fieldProps?.fieldWrapperSx} />;
       }
 
+      case 'multiselect':
       case 'select': {
         return (
           <SelectField
             {...(fieldProps as SelectProps)}
-            value={fieldProps.value as string}
+            error={fieldProps.error || (options ?? []).length === 0 ? 'Atleast one option is required' : undefined}
             ref={ref}
-            options={options}
-            onCreateOption={onCreateOption}
-            onDeleteOption={onDeleteOption}
-            onUpdateOption={onUpdateOption}
-          />
-        );
-      }
-
-      case 'multiselect': {
-        return (
-          <SelectField
-            {...(fieldProps as SelectProps)}
-            ref={ref}
+            placeholder={(options ?? []).length === 0 ? 'Create an option' : fieldProps.placeholder}
             value={fieldProps.value as string[]}
-            multiselect
+            multiselect={type === 'multiselect'}
             options={options}
             onCreateOption={onCreateOption}
             onDeleteOption={onDeleteOption}

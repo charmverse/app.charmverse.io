@@ -286,7 +286,7 @@ class CharmClient {
   }
 
   async deleteBlocks(blockIds: string[], updater: BlockUpdater): Promise<void> {
-    const rootBlocks = await http.DELETE<Block[]>(`/api/blocks`, blockIds);
+    const rootBlocks = await http.DELETE<Block[]>(`/api/blocks`, { blockIds });
     const fbBlocks = rootBlocks.map((rootBlock) => ({
       ...blockToFBBlock(rootBlock),
       deletedAt: new Date().getTime()
@@ -350,25 +350,6 @@ class CharmClient {
     return http.DELETE('/api/aws/s3-delete', { src });
   }
 
-  // evaluate ({ , jwt }: { id: string, jwt: string }): Promise<{ error?: string, success?: boolean }> {
-
-  //   return http.POST(`/api/token-gates/${id}/verify`, { jwt });
-  // }
-
-  unlockTokenGate({
-    id,
-    jwt
-  }: {
-    id: string;
-    jwt: string;
-  }): Promise<{ error?: string; success?: boolean; space: Space }> {
-    return http.POST(`/api/token-gates/${id}/verify`, { commit: true, jwt });
-  }
-
-  updateTokenGateRoles(tokenGateId: string, spaceId: string, roleIds: string[]) {
-    return http.PUT<TokenGateToRole[]>(`/api/token-gates/${tokenGateId}/roles`, { spaceId, roleIds });
-  }
-
   getTokenMetaData({ chainId, contractAddress }: ITokenMetadataRequest): Promise<ITokenMetadata> {
     return http.GET('/api/tokens/metadata', { chainId, contractAddress });
   }
@@ -424,7 +405,7 @@ class CharmClient {
     });
   }
 
-  createEvent({ payload, spaceId }: { spaceId: string; payload: CreateEventPayload }) {
+  createEvents({ payload, spaceId }: { spaceId: string; payload: CreateEventPayload[] }) {
     return http.POST<void>(`/api/spaces/${spaceId}/event`, payload);
   }
 

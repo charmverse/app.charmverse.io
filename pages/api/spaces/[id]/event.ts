@@ -14,19 +14,21 @@ handler.use(requireUser).post(createEvent);
 async function createEvent(req: NextApiRequest, res: NextApiResponse) {
   const userId = req.session.user.id;
   const { id: spaceId } = req.query as { id: string };
-  const payload = req.body as CreateEventPayload;
+  const events = req.body as CreateEventPayload[];
 
-  switch (payload.scope) {
-    case WebhookEventNames.CardPersonPropertyAssigned: {
-      await publishCardEvent({
-        ...payload,
-        spaceId,
-        userId
-      });
-      break;
-    }
-    default: {
-      break;
+  for (const event of events) {
+    switch (event.scope) {
+      case WebhookEventNames.CardPersonPropertyAssigned: {
+        await publishCardEvent({
+          ...event,
+          spaceId,
+          userId
+        });
+        break;
+      }
+      default: {
+        break;
+      }
     }
   }
 
