@@ -126,6 +126,7 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
           onCancelChanges={handleCancelWorkflowChanges}
           onDuplicate={duplicateWorkflow}
           readOnly={!isAdmin}
+          preventDelete={workflows.length === 1}
         />
       ))}
     </>
