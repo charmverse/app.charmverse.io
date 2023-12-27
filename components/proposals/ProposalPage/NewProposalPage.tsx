@@ -47,7 +47,6 @@ import { EvaluationStepper } from './components/EvaluationStepper/EvaluationStep
 import type { ProposalPropertiesInput } from './components/ProposalProperties/ProposalPropertiesBase';
 import { ProposalPropertiesBase } from './components/ProposalProperties/ProposalPropertiesBase';
 import { TemplateSelect } from './components/TemplateSelect';
-import { WorkflowSelect } from './components/WorkflowSelect';
 import { useNewProposal } from './hooks/useNewProposal';
 
 export type ProposalPageAndPropertiesInput = ProposalPropertiesInput & {
@@ -264,54 +263,37 @@ export function NewProposalPage({
         }}
         placeholder='Title (required)'
       />
-      {isCharmVerse && (
-        <>
-          <Box my={2} mb={1}>
-            <EvaluationStepper evaluations={formInputs.evaluations} disabled isDraft={true} />
-          </Box>
-          <Divider />
-        </>
-      )}
       <div className='focalboard-body font-family-default'>
         <div className='CardDetail content'>
           <div className='octo-propertylist'>
             {/* Select a template for new proposals */}
             {!isTemplate && (
-              <Box className='octo-propertyrow' mb='0 !important'>
-                <PropertyLabel readOnly highlighted required={isTemplateRequired}>
-                  Template
-                </PropertyLabel>
-                <Box display='flex' flex={1}>
-                  <TemplateSelect
-                    options={templateOptions}
-                    value={proposalTemplatePage ?? null}
-                    onChange={(template) => {
-                      if (template === null) {
-                        clearTemplate();
-                        // if user has not updated the content, then just overwrite everything
-                      } else if (formInputs.contentText?.length === 0) {
-                        applyTemplate(template.id);
-                      } else {
-                        // set value to trigger a prompt
-                        setSelectedProposalTemplateId(template?.id ?? null);
-                      }
-                    }}
-                  />
+              <>
+                <Box className='octo-propertyrow'>
+                  <PropertyLabel readOnly highlighted required={isTemplateRequired}>
+                    Template
+                  </PropertyLabel>
+                  <Box display='flex' flex={1}>
+                    <TemplateSelect
+                      options={templateOptions}
+                      value={proposalTemplatePage ?? null}
+                      onChange={(template) => {
+                        if (template === null) {
+                          clearTemplate();
+                          // if user has not updated the content, then just overwrite everything
+                        } else if (formInputs.contentText?.length === 0) {
+                          applyTemplate(template.id);
+                        } else {
+                          // set value to trigger a prompt
+                          setSelectedProposalTemplateId(template?.id ?? null);
+                        }
+                      }}
+                    />
+                  </Box>
                 </Box>
-              </Box>
-            )}
-            {isCharmVerse && (
-              <Box className='octo-propertyrow' mb='0 !important'>
-                <PropertyLabel readOnly required highlighted>
-                  Workflow
-                </PropertyLabel>
-                <WorkflowSelect
-                  value={formInputs.workflowId}
-                  onChange={selectEvaluationWorkflow}
-                  options={workflowOptions}
-                  readOnly={!!formInputs.proposalTemplateId}
-                />
-              </Box>
+
+                <Divider />
+              </>
             )}
             <ProposalPropertiesBase
               isFromTemplate={isFromTemplateSource}

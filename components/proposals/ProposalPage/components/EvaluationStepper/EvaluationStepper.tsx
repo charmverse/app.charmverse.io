@@ -4,8 +4,6 @@ import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 
-import { evaluationTypesWithSidebar } from '../EvaluationSidebar/components/ProposalSidebarHeader';
-
 import type { Step } from './components/Stepper';
 import { Stepper } from './components/Stepper';
 
@@ -55,7 +53,7 @@ export function EvaluationStepper({
       return {
         label: evaluation.title,
         result: evaluation.result,
-        disabled: !!disabled || !evaluationTypesWithSidebar.includes(evaluation.type),
+        disabled: !!disabled,
         description,
         value: evaluation.id
       };

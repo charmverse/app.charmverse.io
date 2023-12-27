@@ -1,10 +1,13 @@
+import type { ProposalEvaluationType } from '@charmverse/core/prisma';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
+import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { useEffect, useState } from 'react';
 
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 
+import { WorkflowSelect } from '../WorkflowSelect';
+
 import { PassFailSidebar } from './components/PassFailSidebar';
-import { evaluationTypesWithSidebar, ProposalSidebarHeader } from './components/ProposalSidebarHeader';
 import { RubricSidebar } from './components/RubricSidebar/RubricSidebar';
 import { VoteSidebar } from './components/VoteSidebar';
 
@@ -14,68 +17,52 @@ export type Props = {
   isNewProposal?: boolean;
   proposal?: Pick<
     ProposalWithUsersAndRubric,
-    'id' | 'authors' | 'evaluations' | 'permissions' | 'status' | 'evaluationType'
+    | 'id'
+    | 'authors'
+    | 'evaluations'
+    | 'permissions'
+    | 'status'
+    | 'evaluationType'
+    | 'workflowId'
+    | 'currentEvaluationId'
   >;
-  evaluationId?: string | null;
   refreshProposal?: VoidFunction;
-  goToSettings: VoidFunction;
+  workflowOptions?: ProposalWorkflowTyped[];
 };
+
+const expandableEvaluationTypes: ProposalEvaluationType[] = ['pass_fail', 'rubric', 'vote'];
 
 export function EvaluationSidebar({
   pageId,
   isTemplate,
   isNewProposal,
   proposal,
-  evaluationId: evaluationIdFromContext = null,
   refreshProposal,
-  goToSettings
+  workflowOptions
 }: Props) {
-  const [activeEvaluationId, setActiveEvaluationId] = useState<string | null | undefined>(evaluationIdFromContext);
+  const [activeEvaluationId, setActiveEvaluationId] = useState<string | undefined>(proposal?.currentEvaluationId);
   const currentEvaluation = getCurrentEvaluation(proposal?.evaluations || []);
+  // const evaluationToShowInSidebar = proposal?.permissions.evaluate && proposal?.currentEvaluationId;
+  // let evaluationToShowInSidebar: string | undefined;
+  // const currentEvaluation = getCurrentEvaluation(proposal?.evaluations ?? []);
+  // if (currentEvaluation && evaluationTypesWithSidebar.includes(currentEvaluation.type)) {
+  //   evaluationToShowInSidebar = currentEvaluation.id;
+  // }
 
   const evaluation = proposal?.evaluations.find((e) => e.id === activeEvaluationId);
 
   useEffect(() => {
-    setActiveEvaluationId(evaluationIdFromContext);
-  }, [evaluationIdFromContext]);
-
-  // show default evaluation if we are not on a specific evaluation
-  useEffect(() => {
-    if (evaluationIdFromContext) {
-      return;
+    // open current evaluation by default
+    if (proposal?.currentEvaluationId) {
+      setActiveEvaluationId(proposal.currentEvaluationId);
     }
-    // if we were not provided a specific evaluation, go to the default view
-    if (isTemplate || isNewProposal) {
-      goToSettings();
-    }
-    // check for activeEvaluationId in case the user has navigated between steps (and evaluationIdFromContext was not updated)
-    else if (proposal && !activeEvaluationId) {
-      const sidebarEvaluations = proposal.evaluations.filter((e) => evaluationTypesWithSidebar.includes(e.type));
-      // open current evaluation by default
-      if (currentEvaluation && sidebarEvaluations.some((e) => e.id === currentEvaluation.id)) {
-        setActiveEvaluationId(currentEvaluation.id);
-      }
-      // go to the first evaluation
-      else if (sidebarEvaluations.length > 0) {
-        setActiveEvaluationId(sidebarEvaluations[0].id);
-      }
-      // in this case, there are no evaluations that appear in the sidebar, so go to settings
-      else {
-        goToSettings();
-      }
-    }
-  }, [!!proposal, !!evaluationIdFromContext, !!activeEvaluationId]);
+  }, [proposal?.currentEvaluationId, setActiveEvaluationId]);
 
   const isCurrent = currentEvaluation?.id === evaluation?.id;
 
   return (
     <>
-      <ProposalSidebarHeader
-        activeEvaluationId={activeEvaluationId}
-        evaluations={proposal?.evaluations || []}
-        goToEvaluation={setActiveEvaluationId}
-        goToSettings={goToSettings}
-      />
+      <WorkflowSelect value={proposal?.workflowId} readOnly />
       {evaluation?.type === 'pass_fail' && (
         <PassFailSidebar
           key={evaluation.id}

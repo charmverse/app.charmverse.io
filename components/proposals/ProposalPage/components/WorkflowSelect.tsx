@@ -1,16 +1,23 @@
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
+import { Box } from '@mui/material';
 
+import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
+import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 type Props = {
-  onChange: (value: ProposalWorkflowTyped) => void;
+  onChange?: (value: ProposalWorkflowTyped) => void;
   value?: string | null;
-  options?: ProposalWorkflowTyped[];
-  readOnly: boolean;
+  readOnly?: boolean;
+  required?: boolean;
 };
 
-export function WorkflowSelect({ onChange, value, options, readOnly }: Props) {
-  const propertyOptions = (options || []).map((option) => ({
+export function WorkflowSelect({ onChange, value, readOnly, required }: Props) {
+  const { space: currentSpace } = useCurrentSpace();
+  const { data: workflowOptions } = useGetProposalWorkflows(currentSpace?.id);
+
+  const propertyOptions = (workflowOptions || []).map((option) => ({
     id: option.id,
     value: option.title,
     color: 'grey'
@@ -19,21 +26,28 @@ export function WorkflowSelect({ onChange, value, options, readOnly }: Props) {
   function onValueChange(values: string | string[]) {
     const newValue = Array.isArray(values) ? values[0] : values;
     if (newValue) {
-      const option = options?.find(({ id }) => id === newValue);
-      if (option) {
+      const option = workflowOptions?.find(({ id }) => id === newValue);
+      if (option && onChange) {
         onChange(option);
       }
     }
   }
   return (
-    <TagSelect
-      data-test='proposal-workflow-select'
-      disableClearable
-      wrapColumn
-      options={propertyOptions}
-      propertyValue={value || ''}
-      onChange={onValueChange}
-      readOnly={readOnly}
-    />
+    <div className='CardDetail'>
+      <Box className='octo-propertyrow' mb='0 !important'>
+        <PropertyLabel readOnly required={required} highlighted>
+          Workflow
+        </PropertyLabel>
+        <TagSelect
+          data-test='proposal-workflow-select'
+          disableClearable
+          wrapColumn
+          options={propertyOptions}
+          propertyValue={value || ''}
+          onChange={onValueChange}
+          readOnly={readOnly}
+        />
+      </Box>
+    </div>
   );
 }

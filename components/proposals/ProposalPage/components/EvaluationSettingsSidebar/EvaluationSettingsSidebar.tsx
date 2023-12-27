@@ -1,43 +1,42 @@
+import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { Box, Divider, Typography } from '@mui/material';
 
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationSettings';
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
-import { useIsAdmin } from 'hooks/useIsAdmin';
 
-import { ProposalSidebarHeader } from '../EvaluationSidebar/components/ProposalSidebarHeader';
+import { WorkflowSelect } from '../WorkflowSelect';
 
 import { EvaluationSettings } from './components/EvaluationSettings';
 
 export type Props = {
-  proposal?: Pick<ProposalPropertiesInput, 'categoryId' | 'evaluations'>;
+  proposal?: Pick<ProposalPropertiesInput, 'categoryId' | 'evaluations' | 'workflowId'>;
   onChangeEvaluation?: (evaluationId: string, updated: Partial<ProposalEvaluationValues>) => void;
-  goToEvaluation: (evaluationId?: string) => void;
   readOnly: boolean;
-  showHeader: boolean;
   readOnlyReviewers: boolean;
   readOnlyRubricCriteria: boolean;
+  selectEvaluationWorkflow?: (workflow: ProposalWorkflowTyped) => void;
+  readOnlyWorkflowSelect?: boolean;
 };
 
 export function EvaluationSettingsSidebar({
   proposal,
-  showHeader,
-  goToEvaluation,
   onChangeEvaluation,
   readOnly,
   readOnlyReviewers,
-  readOnlyRubricCriteria
+  readOnlyRubricCriteria,
+  selectEvaluationWorkflow,
+  readOnlyWorkflowSelect
 }: Props) {
   const evaluationsWithConfig = proposal?.evaluations.filter((e) => e.type !== 'feedback');
 
   return (
     <>
-      {showHeader && (
-        <ProposalSidebarHeader
-          evaluations={proposal?.evaluations || []}
-          goToEvaluation={goToEvaluation}
-          goToSettings={() => undefined}
-        />
-      )}
+      <WorkflowSelect
+        value={proposal?.workflowId}
+        onChange={selectEvaluationWorkflow}
+        readOnly={readOnlyWorkflowSelect}
+        required
+      />
       <Box display='flex' flex={1} flexDirection='column' data-test='evaluation-settings-sidebar'>
         <Divider />
         {proposal &&

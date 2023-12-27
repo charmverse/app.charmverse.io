@@ -5,12 +5,9 @@ import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/componen
 import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 
-import { evaluationTypesWithSidebar } from '../EvaluationSidebar/components/ProposalSidebarHeader';
-
 import { CompleteDraftButton } from './components/CompleteDraftButton';
 import { CompleteFeedbackButton } from './components/CompleteFeedbackButton';
 import { GoBackButton } from './components/GoBackButton';
-import { OpenEvaluationButton } from './components/OpenEvaluationButton';
 import { PublishRewardsButton } from './components/PublishRewardsButton';
 
 export type EvaluationTypeOrDraft = ProposalEvaluationType | 'draft';
@@ -18,16 +15,10 @@ export type EvaluationTypeOrDraft = ProposalEvaluationType | 'draft';
 // Currently this is just used for proposals but there's no reason not to add logic for other page types here
 export function ProposalStickyFooter({
   proposal,
-  refreshProposal,
-  isEvaluationSidebarOpen,
-  openEvaluationSidebar,
-  closeSidebar
+  refreshProposal
 }: {
   proposal: ProposalWithUsersAndRubric;
   refreshProposal: VoidFunction;
-  isEvaluationSidebarOpen: boolean;
-  openEvaluationSidebar: (evaluationId?: string) => void;
-  closeSidebar: VoidFunction;
 }) {
   const currentEvaluation = proposal.evaluations.find((e) => e.id === proposal.currentEvaluationId);
   const currentEvaluationIndex = proposal?.evaluations.findIndex((e) => e.id === currentEvaluation?.id) ?? -1;
@@ -43,7 +34,6 @@ export function ProposalStickyFooter({
     evaluationTypeOrDraft = 'draft';
   }
 
-  const hasSidebarEvaluation = evaluationTypesWithSidebar.includes(evaluationTypeOrDraft as ProposalEvaluationType);
   const showPublishRewards =
     !!currentEvaluation?.result &&
     !!(proposal.fields as ProposalFields)?.pendingRewards?.length &&
@@ -69,14 +59,6 @@ export function ProposalStickyFooter({
             proposalId={proposal.id}
             hasMovePermission={proposal.permissions.move}
             onSubmit={refreshProposal}
-          />
-        )}
-        {hasSidebarEvaluation && !showPublishRewards && (
-          <OpenEvaluationButton
-            disabled={!proposal.permissions.move}
-            currentStep={currentEvaluation}
-            isEvaluationSidebarOpen={isEvaluationSidebarOpen}
-            onClick={() => (isEvaluationSidebarOpen ? closeSidebar() : openEvaluationSidebar(currentEvaluation?.id))}
           />
         )}
         {showPublishRewards && (

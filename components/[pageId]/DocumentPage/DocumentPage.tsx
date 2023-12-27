@@ -20,7 +20,6 @@ import type { ConnectionEvent } from 'components/common/CharmEditor/components/f
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
-import { EvaluationStepper } from 'components/proposals/ProposalPage/components/EvaluationStepper/EvaluationStepper';
 import { ProposalFormFieldInputs } from 'components/proposals/ProposalPage/components/ProposalFormFieldInputs';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
@@ -95,15 +94,7 @@ function DocumentPage({
   const { user } = useUser();
   const { castVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
   const { navigateToSpacePath, router } = useCharmRouter();
-  const {
-    activeView: sidebarView,
-    activeEvaluationId,
-    persistedActiveView,
-    persistActiveView,
-    setActiveView,
-    closeSidebar,
-    openEvaluationSidebar
-  } = usePageSidebar();
+  const { activeView: sidebarView, setActiveView, closeSidebar } = usePageSidebar();
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
   const [connectionError, setConnectionError] = useState<Error | null>(null);
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
@@ -121,7 +112,6 @@ function DocumentPage({
     permissions: proposalPermissions,
     readOnlyRubricCriteria,
     readOnlyReviewers,
-    evaluationToShowInSidebar,
     refreshProposal,
     onChangeEvaluation
   } = useProposal({ proposalId });
@@ -199,29 +189,9 @@ function DocumentPage({
     }
   }
 
-  const openEvaluation = useCallback(
-    (evaluationId?: string) => {
-      if (evaluationId || !isCharmVerse) {
-        if (activeEvaluationId === evaluationId) {
-          // close the sidebar if u click on the active step
-          closeSidebar();
-          return;
-        }
-        if (enableSidebar) {
-          openEvaluationSidebar(evaluationId);
-        } else {
-          persistActiveView({
-            [page.id]: 'proposal_evaluation'
-          });
-          // go to full page view
-          navigateToSpacePath(`/${page.path}`);
-        }
-      } else {
-        closeSidebar();
-      }
-    },
-    [page.path, page.id, sidebarView, setActiveView, activeEvaluationId, enableSidebar]
-  );
+  const openEvaluation = useCallback(() => {
+    setActiveView('proposal_evaluation');
+  }, [setActiveView]);
 
   useEffect(() => {
     if (page?.type === 'card') {
@@ -285,17 +255,10 @@ function DocumentPage({
   }, [isLoadingThreads, page.id, enableSidebar, threadsPageId]);
 
   useEffect(() => {
-    const defaultView = persistedActiveView?.[page.id];
-    if (enableSidebar && defaultView && isMdScreen) {
-      setActiveView(defaultView);
+    if (enableSidebar && isMdScreen) {
+      setActiveView('proposal_evaluation');
     }
-  }, [!!persistedActiveView, enableSidebar, page.id]);
-
-  useEffect(() => {
-    if (enableSidebar && evaluationToShowInSidebar && isMdScreen) {
-      openEvaluation(evaluationToShowInSidebar);
-    }
-  }, [evaluationToShowInSidebar, enableSidebar]);
+  }, [proposalId, enableSidebar]);
 
   // keep a ref in sync for printing
   const printRef = useRef(null);
@@ -326,19 +289,6 @@ function DocumentPage({
         insideModal={insideModal}
         pageId={page.id}
       />
-      {isCharmVerse && proposal && !isLoading && (
-        <>
-          <Box my={2} mb={1}>
-            <EvaluationStepper
-              evaluations={proposal.evaluations || []}
-              selected={activeEvaluationId}
-              isDraft={proposal.status === 'draft'}
-              onClick={openEvaluation}
-            />
-          </Box>
-          <Divider />
-        </>
-      )}
       {!isCharmVerse && page.type === 'proposal' && !isLoading && page.snapshotProposalId && (
         <Box my={2} className='font-family-default'>
           <SnapshotVoteDetails snapshotProposalId={page.snapshotProposalId} />
@@ -410,7 +360,6 @@ function DocumentPage({
             pageId={page.id}
             spaceId={page.spaceId}
             proposalId={proposalId}
-            proposalEvaluationId={activeEvaluationId}
             readOnlyProposalPermissions={!proposal?.permissions.edit}
             readOnlyRubricCriteria={readOnlyRubricCriteria}
             readOnlyReviewers={readOnlyReviewers}
@@ -419,7 +368,6 @@ function DocumentPage({
             sidebarView={sidebarView}
             closeSidebar={closeSidebar}
             openSidebar={setActiveView}
-            openEvaluationSidebar={openEvaluationSidebar}
             threads={threads}
             proposal={proposal}
             proposalInput={proposal}
@@ -559,7 +507,7 @@ function DocumentPage({
             )}
           </PageEditorContainer>
         </Box>
-        {isCharmVerse && proposal && page.type === 'proposal' && (
+        {/* {isCharmVerse && proposal && page.type === 'proposal' && (
           <ProposalStickyFooter
             proposal={proposal}
             refreshProposal={refreshProposal}
@@ -567,7 +515,7 @@ function DocumentPage({
             openEvaluationSidebar={openEvaluationSidebar}
             closeSidebar={closeSidebar}
           />
-        )}
+        )} */}
       </PrimaryColumn>
     </ProposalBlocksProvider>
   );

@@ -19,7 +19,6 @@ import { DocumentHeaderElements } from './components/DocumentHeaderElements';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
 import ProposalShareButton from './components/ProposalsShareButton/ProposalsShareButton';
 import RewardsShareButton from './components/RewardsShareButton/RewardsShareButton';
-import { ToggleEvaluationButton } from './components/ToggleEvaluationButton';
 
 export const headerHeight = 56;
 
@@ -39,7 +38,6 @@ type HeaderProps = {
 };
 
 function HeaderComponent({ open, openSidebar }: HeaderProps) {
-  const isCharmVerse = useIsCharmverseSpace();
   const router = useRouter();
   const basePageId = usePageIdFromPath();
   const { space: currentSpace } = useCurrentSpace();
@@ -89,9 +87,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1} gap={0.5}>
           {isRewardsList && <RewardsShareButton headerHeight={headerHeight} />}
           {isProposalsPage && <ProposalShareButton headerHeight={headerHeight} />}
-
           {basePage && <DocumentHeaderElements headerHeight={headerHeight} page={basePage} />}
-          {isNewProposalPage && isCharmVerse && <ToggleEvaluationButton />}
 
           <FullPageActionsMenuButton page={basePage} post={forumPostInfo?.forumPost} />
         </Box>
