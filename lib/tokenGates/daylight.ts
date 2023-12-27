@@ -156,13 +156,6 @@ export function getDaylightUnlockRequirements(tkConditions: Lock) {
     };
   }
 
-  if (tkConditions.chainId !== 1) {
-    return {
-      requirements: [],
-      operator
-    };
-  }
-
   return {
     requirements: [
       {
