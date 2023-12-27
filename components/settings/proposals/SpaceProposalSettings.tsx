@@ -14,7 +14,6 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import { getDefaultFeedbackEvaluation } from 'lib/proposal/workflows/defaultEvaluation';
 
 import Legend from '../Legend';
 
@@ -40,7 +39,7 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
       createdAt: new Date(),
       title: '',
       spaceId: space.id,
-      evaluations: [getDefaultFeedbackEvaluation()],
+      evaluations: [],
       ...workflow,
       isNew: true,
       id: uuid(),
