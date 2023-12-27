@@ -4,11 +4,7 @@ import nc from 'next-connect';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { deleteBlocks } from 'lib/proposal/blocks/deleteBlocks';
 import { getBlocks } from 'lib/proposal/blocks/getBlocks';
-import type {
-  ProposalBlockInput,
-  ProposalBlockUpdateInput,
-  ProposalBlockWithTypedFields
-} from 'lib/proposal/blocks/interfaces';
+import type { ProposalBlockUpdateInput, ProposalBlockWithTypedFields } from 'lib/proposal/blocks/interfaces';
 import { upsertBlocks } from 'lib/proposal/blocks/upsertBlocks';
 import { withSessionRoute } from 'lib/session/withSession';
 
