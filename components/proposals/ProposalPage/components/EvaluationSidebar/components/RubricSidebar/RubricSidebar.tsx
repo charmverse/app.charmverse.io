@@ -53,7 +53,7 @@ export function RubricSidebar({ proposal, isCurrent, evaluation, refreshProposal
    *  Results: visible to anyone when evaluation is active or closed, disabled if you are not a reviewer
    *
    * */
-  const evaluationTabs = canViewRubricAnswers ? ['Your evaluation', 'Results', 'Decision'] : ['Your evaluation'];
+  const evaluationTabs = canViewRubricAnswers ? ['Your evaluation', 'Results'] : ['Your evaluation'];
 
   return (
     <>
@@ -77,7 +77,7 @@ export function RubricSidebar({ proposal, isCurrent, evaluation, refreshProposal
                     draftAnswers={myDraftRubricAnswers}
                     criteriaList={rubricCriteria!}
                     onSubmit={onSubmitEvaluation}
-                    disabled={!canAnswerRubric}
+                    disabled={!canAnswerRubric || !isCurrent}
                   />
                 )}
                 {value === 'Results' && (
@@ -85,14 +85,10 @@ export function RubricSidebar({ proposal, isCurrent, evaluation, refreshProposal
                     key='results'
                     answers={evaluation?.rubricAnswers}
                     criteriaList={rubricCriteria || []}
-                  />
-                )}
-                {value === 'Decision' && (
-                  <PassFailSidebar
                     isCurrent={!!isCurrent}
-                    key='results'
                     evaluation={evaluation}
-                    proposal={proposal}
+                    isReviewer={proposal?.permissions.evaluate}
+                    proposalId={proposal?.id}
                     refreshProposal={refreshProposal}
                   />
                 )}
