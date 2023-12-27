@@ -1,9 +1,9 @@
 import type { Page } from '@charmverse/core/prisma';
 import type { Theme } from '@mui/material';
-import { useMediaQuery, Divider, Box } from '@mui/material';
+import { Box, Divider, useMediaQuery } from '@mui/material';
 import dynamic from 'next/dynamic';
 import type { EditorState } from 'prosemirror-state';
-import { memo, useCallback, useEffect, useRef, useState, useMemo } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
 import { useGetReward } from 'charmClient/hooks/rewards';
@@ -29,6 +29,7 @@ import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMdScreen } from 'hooks/useMediaScreens';
+import { ProposalBlocksProvider } from 'hooks/useProposalBlocks';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import { useVotes } from 'hooks/useVotes';
@@ -435,7 +436,7 @@ function DocumentPage({
   const proposalAuthors = proposal ? [proposal.createdBy, ...proposal.authors.map((author) => author.userId)] : [];
 
   return (
-    <>
+    <ProposalBlocksProvider>
       {!!page?.deletedAt && (
         <AlertContainer showPageActionSidebar={showPageActionSidebar}>
           <PageDeleteBanner pageType={page.type} pageId={page.id} />
@@ -568,7 +569,7 @@ function DocumentPage({
           />
         )}
       </PrimaryColumn>
-    </>
+    </ProposalBlocksProvider>
   );
 }
 
