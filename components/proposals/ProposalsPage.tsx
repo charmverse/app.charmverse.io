@@ -67,12 +67,7 @@ export function ProposalsPage({ title }: { title: string }) {
 
   function openPage(pageId: string | null) {
     if (!pageId) return;
-    const openPageIn = activeView?.fields.openPageIn ?? 'center_peek';
-    if (openPageIn === 'center_peek') {
-      updateURLQuery({ id: pageId });
-    } else if (openPageIn === 'full_page') {
-      navigateToSpacePath(`/${pageId}`);
-    }
+    navigateToSpacePath(`/${pageId}`);
   }
 
   function closeDialog() {
