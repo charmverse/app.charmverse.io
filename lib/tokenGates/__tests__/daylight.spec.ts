@@ -34,8 +34,7 @@ const nftCondition = {
 
 const unlockCondition = {
   chainId: 1,
-  contract: '0x00003',
-  name: ''
+  contract: '0x00003'
 };
 
 describe('getDaylightRequirements', () => {
