@@ -7,11 +7,11 @@ import type { NodeViewProps } from 'components/common/CharmEditor/components/@ba
 import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import Link from 'components/common/Link';
 import { NoAccessPageIcon, PageIcon } from 'components/common/PageIcon';
-import type { FeatureJson, StaticPage } from 'components/common/PageLayout/components/Sidebar/constants';
-import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { usePages } from 'hooks/usePages';
+import type { FeatureJson, StaticPage } from 'lib/features/constants';
+import { STATIC_PAGES } from 'lib/features/constants';
 
 import { enableDragAndDrop } from '../../../utils';
 import { pageNodeDropPluginKey } from '../../prosemirror/prosemirror-dropcursor/dropcursor';

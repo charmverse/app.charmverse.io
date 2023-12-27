@@ -19,6 +19,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
 import type { ProposalCategoryPermissionInput } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 import type { SpacePermissions } from 'lib/permissions/spaces/listPermissions';
@@ -150,6 +151,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
   // const [assignedPermissions, setAssignedPermissions] = useState<SpacePermissionFlags | null>(null);
   // custom onChange is used for switches so isDirty from useForm doesn't change its value
   const [touched, setTouched] = useState<boolean>(false);
+  const { getFeatureTitle } = useSpaceFeatures();
   const [formState, dispatch] = useReducer(reducerWithContext({ id }), {
     space: [],
     forumCategories: [],
@@ -274,12 +276,12 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
             )}
             <Divider sx={{ mt: 1, mb: 2 }} />
             <Typography variant='body2' fontWeight='bold' gap={1} display='flex' alignItems='center'>
-              Rewards
+              {getFeatureTitle('Rewards')}
               <UpgradeChip upgradeContext='forum_permissions' />
             </Typography>
             <PermissionToggle
               data-test='space-operation-createBounty'
-              label='Create new rewards'
+              label={`Create new ${getFeatureTitle('rewards')}`}
               defaultChecked={isFreeSpace ? true : assignedPermissions?.createBounty}
               disabled={disableModifications}
               memberChecked={targetGroup !== 'space' ? defaultPermissions?.createBounty : undefined}

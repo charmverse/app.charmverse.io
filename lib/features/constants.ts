@@ -15,3 +15,13 @@ export type FeatureJson = {
   isHidden: boolean;
   title?: string;
 };
+
+export type MappedFeatures = Record<
+  Feature,
+  {
+    id: Feature;
+    isHidden: boolean;
+    title: string;
+    path: StaticPageType;
+  }
+>;

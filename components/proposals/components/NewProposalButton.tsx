@@ -15,6 +15,7 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { usePages } from 'hooks/usePages';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { isTruthy } from 'lib/utilities/types';
 
 import { useProposalCategories } from '../hooks/useProposalCategories';
@@ -38,7 +39,7 @@ const ProposalTemplateMenu = styled(Stack)`
 
 export function NewProposalButton() {
   const { navigateToSpacePath } = useCharmRouter();
-
+  const { getFeatureTitle } = useSpaceFeatures();
   const { proposalCategoriesWithCreatePermission } = useProposalCategories();
   const isAdmin = useIsAdmin();
   const { pages } = usePages();
@@ -102,7 +103,7 @@ export function NewProposalButton() {
         createTemplate={proposalTemplateCreateModalState.open}
         deleteTemplate={deleteProposalTemplate}
         anchorEl={buttonRef.current as Element}
-        boardTitle='Proposals'
+        boardTitle={getFeatureTitle('Proposals')}
         popupState={popupState}
         enableItemOptions={isAdmin}
         enableNewTemplates={isAdmin}
