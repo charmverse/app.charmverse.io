@@ -74,7 +74,6 @@ test.describe.serial('Proposal Flow', () => {
     // Add reviewer user as reviewer
     await authorBrowserProposalPage.getSelectOption(proposalReviewer.id).click();
 
-    await authorBrowserProposalPage.page.pause();
     // save draft
     await expect(authorBrowserProposalPage.saveDraftButton).toBeEnabled();
     await authorBrowserProposalPage.saveDraftButton.click();
