@@ -27,9 +27,7 @@ export async function getProposalFormAnswers({ proposalId, userId }: { userId?: 
     return [];
   }
 
-  const canViewPrivateFields = userId
-    ? await canAccessPrivateFields({ proposalId: proposal.id, userId, proposal })
-    : false;
+  const canViewPrivateFields = await canAccessPrivateFields({ proposalId: proposal.id, userId, proposal });
   const accessibleFields = getProposalFormFields(proposal.form?.formFields, canViewPrivateFields);
   const accessibleFieldIds = accessibleFields?.map((field) => field.id);
 
