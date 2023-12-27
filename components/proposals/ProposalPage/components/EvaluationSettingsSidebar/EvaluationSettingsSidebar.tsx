@@ -14,7 +14,7 @@ export type Props = {
   readOnly: boolean;
   readOnlyReviewers: boolean;
   readOnlyRubricCriteria: boolean;
-  selectEvaluationWorkflow?: (workflow: ProposalWorkflowTyped) => void;
+  onChangeWorkflow: (workflow: ProposalWorkflowTyped) => void;
   readOnlyWorkflowSelect?: boolean;
 };
 
@@ -24,7 +24,7 @@ export function EvaluationSettingsSidebar({
   readOnly,
   readOnlyReviewers,
   readOnlyRubricCriteria,
-  selectEvaluationWorkflow,
+  onChangeWorkflow,
   readOnlyWorkflowSelect
 }: Props) {
   const evaluationsWithConfig = proposal?.evaluations.filter((e) => e.type !== 'feedback');
@@ -33,7 +33,7 @@ export function EvaluationSettingsSidebar({
     <>
       <WorkflowSelect
         value={proposal?.workflowId}
-        onChange={selectEvaluationWorkflow}
+        onChange={onChangeWorkflow}
         readOnly={readOnlyWorkflowSelect}
         required
       />

@@ -335,6 +335,7 @@ export function NewProposalPage({
               evaluations
             });
           }}
+          onChangeWorkflow={selectEvaluationWorkflow}
         />
       )}
     </>

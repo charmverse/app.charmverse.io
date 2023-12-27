@@ -51,7 +51,8 @@ type SidebarProps = {
   proposalId?: string | null;
   proposal?: EvaluationSidebarProps['proposal'];
   proposalInput?: ProposalSettingsProps['proposal'];
-  onChangeEvaluation?: ProposalSettingsProps['onChangeEvaluation'];
+  onChangeEvaluation: ProposalSettingsProps['onChangeEvaluation'];
+  onChangeWorkflow: ProposalSettingsProps['onChangeWorkflow'];
   refreshProposal?: VoidFunction;
   isNewProposal?: boolean;
   isProposalTemplate?: boolean;
@@ -203,6 +204,7 @@ function SidebarContents({
   proposal,
   proposalInput,
   onChangeEvaluation,
+  onChangeWorkflow,
   refreshProposal,
   isProposalTemplate,
   isNewProposal,
@@ -230,6 +232,7 @@ function SidebarContents({
           readOnly={!!readOnlyProposalPermissions}
           readOnlyWorkflowSelect={isProposalTemplate}
           onChangeEvaluation={onChangeEvaluation}
+          onChangeWorkflow={onChangeWorkflow}
           readOnlyReviewers={!!readOnlyReviewers}
           readOnlyRubricCriteria={!!readOnlyRubricCriteria}
         />
