@@ -1,9 +1,9 @@
 import { InsecureOperationError, InvalidInputError } from '@charmverse/core/errors';
 import type { PageWithPermissions } from '@charmverse/core/pages';
-import type { Page, ProposalStatus, ProposalReviewer, Vote } from '@charmverse/core/prisma';
+import type { Page, ProposalReviewer, ProposalStatus } from '@charmverse/core/prisma';
 import type { Prisma, ProposalEvaluation, ProposalEvaluationType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWithUsers, WorkflowEvaluationJson, ProposalWorkflowTyped } from '@charmverse/core/proposals';
+import type { ProposalWithUsers, ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { arrayUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
@@ -40,6 +40,7 @@ export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'id' | 'index' | 
 export type CreateProposalInput = {
   pageId?: string;
   pageProps?: PageProps;
+  proposalTemplateId?: string | null;
   categoryId: string;
   reviewers?: ProposalReviewerInput[];
   authors?: string[];
@@ -73,6 +74,7 @@ export async function createProposal({
   rubricCriteria,
   publishToLens,
   fields,
+  proposalTemplateId,
   workflowId,
   formId,
   formFields,
@@ -86,6 +88,20 @@ export async function createProposal({
   const proposalStatus: ProposalStatus = 'draft';
 
   const authorsList = arrayUtils.uniqueValues(authors ? [...authors, userId] : [userId]);
+
+  const sourceTemplate = proposalTemplateId
+    ? await prisma.proposal.findUniqueOrThrow({
+        where: { id: proposalTemplateId },
+        select: {
+          evaluations: {
+            orderBy: { index: 'asc' },
+            include: {
+              reviewers: true
+            }
+          }
+        }
+      })
+    : null;
 
   const workflow = workflowId
     ? ((await prisma.proposalWorkflow.findUnique({
@@ -123,7 +139,7 @@ export async function createProposal({
   // retrieve permissions and apply evaluation ids to reviewers
   if (evaluations.length > 0) {
     evaluations.forEach(({ id: evaluationId, permissions: permissionsInput }, index) => {
-      const configuredEvaluation = workflow?.evaluations.find((e) => e.id === evaluationId);
+      const configuredEvaluation = workflow?.evaluations[index];
       const permissions = configuredEvaluation?.permissions ?? permissionsInput;
       if (!permissions) {
         throw new Error(
@@ -139,7 +155,7 @@ export async function createProposal({
       );
     });
 
-    reviewersInput = evaluations.flatMap((evaluation, index) =>
+    reviewersInput = (sourceTemplate ? sourceTemplate.evaluations : evaluations).flatMap((evaluation, index) =>
       evaluation.reviewers.map((reviewer) => ({
         roleId: reviewer.roleId,
         systemRole: reviewer.systemRole,

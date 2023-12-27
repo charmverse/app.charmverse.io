@@ -38,7 +38,7 @@ export function EvaluationSettingsSidebar({
           goToSettings={() => undefined}
         />
       )}
-      <Box display='flex' flex={1} flexDirection='column'>
+      <Box display='flex' flex={1} flexDirection='column' data-test='evaluation-settings-sidebar'>
         {proposal &&
           evaluationsWithConfig?.map((evaluation) => (
             <Card key={evaluation.id} variant='outlined' sx={{ p: 1, mb: 2 }}>

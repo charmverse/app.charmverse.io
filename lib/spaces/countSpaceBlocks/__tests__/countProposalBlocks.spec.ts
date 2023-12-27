@@ -27,7 +27,7 @@ describe('countProposalBlocks', () => {
     urlSchema
   ];
 
-  it('should count each rubric criteria, rubric criteria answer, proposal view, proposal categories, proposal properties, proposal property values as 1 block', async () => {
+  it('should count each rubric criteria, rubric criteria answer, proposal view, proposal categories, proposal properties, proposal form field with answers, proposal property values as 1 block', async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace({
       customProposalProperties: propertyTemplates
     });
@@ -48,6 +48,7 @@ describe('countProposalBlocks', () => {
         [selectSchema.id]: selectSchema.options[0].id
       }
     });
+
     const proposal2 = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: user.id,
@@ -57,6 +58,80 @@ describe('countProposalBlocks', () => {
         [numberSchema.id]: 8,
         [urlSchema.id]: 'www.example.com'
       }
+    });
+
+    const proposal3 = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: user.id,
+      evaluationType: 'feedback',
+      categoryId: proposalCategory2.id
+    });
+
+    const form = await prisma.form.create({
+      data: {
+        formFields: {
+          createMany: {
+            data: [
+              {
+                name: 'Short Text',
+                type: 'short_text'
+              },
+              {
+                name: 'Email',
+                type: 'email'
+              }
+            ]
+          }
+        }
+      },
+      include: {
+        formFields: true
+      }
+    });
+
+    await Promise.all(
+      [proposal1.id, proposal2.id].map((proposalId) =>
+        prisma.form.update({
+          where: {
+            id: form.id
+          },
+          data: {
+            proposal: {
+              connect: {
+                id: proposalId
+              }
+            }
+          }
+        })
+      )
+    );
+
+    await prisma.formFieldAnswer.createMany({
+      data: [
+        {
+          fieldId: form.formFields[0].id,
+          proposalId: proposal1.id,
+          type: 'short_text',
+          value: 'Short Text Answer'
+        },
+        {
+          fieldId: form.formFields[1].id,
+          proposalId: proposal1.id,
+          type: 'email',
+          value: 'john.doe@gmail.com'
+        }
+      ]
+    });
+
+    await prisma.formFieldAnswer.createMany({
+      data: [
+        {
+          fieldId: form.formFields[0].id,
+          proposalId: proposal2.id,
+          type: 'short_text',
+          value: 'Short Text Answer 2'
+        }
+      ]
     });
 
     const rubricCriteria = await Promise.all([
@@ -127,14 +202,15 @@ describe('countProposalBlocks', () => {
     });
     const count = await countProposalBlocks({ spaceId: space.id });
     expect(count).toMatchObject<ProposalBlocksCount>({
-      total: 20,
+      total: 27,
       details: {
         proposalViews: 1,
         proposalProperties: 7,
         proposalPropertyValues: 4,
         proposalCategories: 2,
         proposalRubricAnswers: 4,
-        proposalRubrics: 2
+        proposalRubrics: 2,
+        proposalFormFields: 7
       }
     });
   });
@@ -242,7 +318,8 @@ describe('countProposalBlocks', () => {
         proposalPropertyValues: 4,
         proposalCategories: 2,
         proposalRubricAnswers: 0,
-        proposalRubrics: 0
+        proposalRubrics: 0,
+        proposalFormFields: 0
       }
     });
   });
@@ -260,7 +337,8 @@ describe('countProposalBlocks', () => {
         proposalPropertyValues: 0,
         proposalCategories: 0,
         proposalRubricAnswers: 0,
-        proposalRubrics: 0
+        proposalRubrics: 0,
+        proposalFormFields: 0
       }
     });
   });

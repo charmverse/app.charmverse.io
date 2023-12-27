@@ -83,19 +83,10 @@ test.describe.serial('Proposal Flow', () => {
     const page = await prisma.page.findFirstOrThrow({ where: { proposalId }, select: { path: true } });
     pagePath = page.path;
 
-    // Glitch where created proposal didn't show. This fixed it
-    await authorBrowserProposalListPage.page.reload();
-
-    // verify that the page list was updated
-    await expect(authorBrowserProposalListPage.emptyState).not.toBeVisible();
-    const proposalRow = authorBrowserProposalListPage.getProposalRowLocator(proposalId);
-    await expect(proposalRow).toBeVisible();
+    await authorBrowserProposalPage.waitForDocumentPage({ domain: space.domain, path: pagePath });
   });
 
   test('A proposal author can move draft proposal to feedback', async () => {
-    await authorBrowserProposalListPage.openProposalCard(proposalId);
-
-    await authorBrowserProposalPage.waitForDocumentPage({ domain: space.domain, path: pagePath });
     await expect(authorBrowserProposalPage.nextStatusButton).toHaveText(PROPOSAL_STATUS_LABELS.discussion);
 
     await authorBrowserProposalPage.nextStatusButton.click();

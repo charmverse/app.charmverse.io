@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
 import { IconButton, Box, Stack } from '@mui/material';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { ErrorWrapper } from 'components/common/BoardEditor/components/properties/ErrorWrapper';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
@@ -13,7 +13,7 @@ import { isTruthy } from 'lib/utilities/types';
 import { EmptyPlaceholder } from './EmptyPlaceholder';
 import { SelectPreviewContainer } from './TagSelect/TagSelect';
 
-type Props = {
+export type UserSelectProps = {
   memberIds: string[];
   readOnly?: boolean;
   onChange: (memberIds: string[]) => void;
@@ -21,6 +21,7 @@ type Props = {
   displayType?: PropertyValueDisplayType;
   wrapColumn?: boolean;
   'data-test'?: string;
+  defaultOpened?: boolean;
   error?: string;
 };
 
@@ -112,10 +113,11 @@ export function UserSelect({
   readOnly,
   showEmptyPlaceholder,
   wrapColumn,
+  defaultOpened,
   'data-test': dataTest,
   error
-}: Props): JSX.Element | null {
-  const [isOpen, setIsOpen] = useState(false);
+}: UserSelectProps): JSX.Element | null {
+  const [isOpen, setIsOpen] = useState(defaultOpened);
 
   const _onChange = useCallback(
     (newMemberIds: string[]) => {

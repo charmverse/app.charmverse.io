@@ -69,7 +69,8 @@ export function useNewProposal({ newProposal }: Props) {
         showMessage((error as Error).message, 'error');
         return;
       }
-      await createProposalTrigger({
+      const result = await createProposalTrigger({
+        proposalTemplateId: formInputs.proposalTemplateId,
         authors: formInputs.authors,
         categoryId: formInputs.categoryId,
         pageProps: {
@@ -96,9 +97,8 @@ export function useNewProposal({ newProposal }: Props) {
         showMessage(err.message ?? 'Something went wrong', 'error');
         throw err;
       });
-
-      mutate(`/api/spaces/${currentSpace.id}/proposals`);
       setContentUpdated(false);
+      return result;
     }
   }
 

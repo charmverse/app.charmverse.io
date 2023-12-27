@@ -39,6 +39,7 @@ import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
 import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
 import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposal/rubric/interfaces';
+import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
@@ -82,7 +83,7 @@ export function NewProposalPage({
   const isCharmVerse = useIsCharmverseSpace();
   const { activeView: sidebarView, setActiveView, closeSidebar } = usePageSidebar();
   const { proposalTemplates, isLoadingTemplates } = useProposalTemplates();
-  const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>(null);
+  const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>();
   const [, setPageTitle] = usePageTitle();
   const { data: workflowOptions } = useGetProposalWorkflows(currentSpace?.id);
   const isMdScreen = useMdScreen();
@@ -100,7 +101,21 @@ export function NewProposalPage({
 
   const sourceTemplate = proposalTemplates?.find((template) => template.id === formInputs.proposalTemplateId);
   const isStructured = formInputs.proposalType === 'structured' || !!sourceTemplate?.formId;
-  const proposalFormFields = formInputs.formFields ?? sourceTemplate?.form?.formFields ?? [];
+  const proposalFormFields = isStructured
+    ? formInputs.formFields ??
+      sourceTemplate?.form?.formFields ?? [
+        {
+          type: 'short_text',
+          name: '',
+          description: emptyDocument,
+          index: 0,
+          options: [],
+          private: false,
+          required: true,
+          id: uuid()
+        } as FormFieldInput
+      ]
+    : [];
 
   const {
     control: proposalFormFieldControl,
@@ -108,7 +123,8 @@ export function NewProposalPage({
     errors: proposalFormFieldErrors,
     onFormChange
   } = useFormFields({
-    fields: proposalFormFields
+    // Only set the initial state with fields when we are creating a structured proposal
+    fields: isStructured && formInputs.type === 'proposal' ? proposalFormFields : []
   });
 
   function toggleCollapse(fieldId: string) {
@@ -118,7 +134,6 @@ export function NewProposalPage({
       setCollapsedFieldIds([...collapsedFieldIds, fieldId]);
     }
   }
-
   usePreventReload(contentUpdated);
 
   const isFromTemplateSource = Boolean(formInputs.proposalTemplateId);
@@ -170,7 +185,7 @@ export function NewProposalPage({
     setFormInputs({
       workflowId: workflow.id,
       evaluations: workflow.evaluations.map((evaluation, index) => ({
-        id: uuid(),
+        id: evaluation.id,
         index,
         reviewers: [],
         rubricCriteria: [] as ProposalRubricCriteriaWithTypedParams[],
@@ -189,8 +204,10 @@ export function NewProposalPage({
   }
 
   async function saveForm() {
-    await createProposal();
-    navigateToSpacePath(`/proposals`);
+    const result = await createProposal();
+    if (result) {
+      navigateToSpacePath(`/${result.id}`);
+    }
   }
 
   function applyTemplate(_templateId: string) {

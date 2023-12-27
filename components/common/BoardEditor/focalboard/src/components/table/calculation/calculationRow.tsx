@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { filterPropertyTemplates } from 'components/common/BoardEditor/utils/updateVisibilePropertyIds';
-import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import type { Board } from 'lib/focalboard/board';
 import { createBoard } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
@@ -47,6 +47,10 @@ function CalculationRow(props: Props): JSX.Element {
       className='CalculationRow octo-table-row'
       onMouseEnter={() => setHovered(!props.readOnly)}
       onMouseLeave={() => setHovered(false)}
+      style={{
+        // Checkbox is shown when its not in read only mode. Without margin left there will be misalignment
+        marginLeft: props.readOnly ? 0 : 25
+      }}
     >
       {templates.map((template) => {
         const style = {

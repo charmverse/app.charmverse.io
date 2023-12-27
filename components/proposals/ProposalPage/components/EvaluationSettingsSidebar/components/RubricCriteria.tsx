@@ -163,6 +163,7 @@ export function RubricCriteria({ readOnly, readOnlyMessage, value, onChange, pro
               </div>
             )}
             <TextField
+              data-test='edit-rubric-criteria-label'
               inputProps={{ autoFocus: true }}
               multiline
               fullWidth
@@ -175,6 +176,7 @@ export function RubricCriteria({ readOnly, readOnlyMessage, value, onChange, pro
               // displayType='details'
               multiline
               fullWidth
+              data-test='edit-rubric-criteria-description'
               onChange={(e) => setCriteriaProperty(criteria.id, { description: e.target.value })}
               placeholder='Add a description...'
               disabled={readOnly}
@@ -186,6 +188,7 @@ export function RubricCriteria({ readOnly, readOnlyMessage, value, onChange, pro
                 <div>
                   <TextField
                     inputProps={{ type: 'number' }}
+                    data-test='edit-rubric-criteria-min-score'
                     onChange={(e) => {
                       setCriteriaProperty(criteria.id, {
                         parameters: { ...criteria.parameters, min: getNumberFromString(e.target.value) }
@@ -212,6 +215,7 @@ export function RubricCriteria({ readOnly, readOnlyMessage, value, onChange, pro
                       type: 'number',
                       min: typeof criteria.parameters.min === 'number' ? criteria.parameters.min + 1 : undefined
                     }}
+                    data-test='edit-rubric-criteria-max-score'
                     onChange={(e) => {
                       setCriteriaProperty(criteria.id, {
                         parameters: { ...criteria.parameters, max: getNumberFromString(e.target.value) }
@@ -261,7 +265,11 @@ export function RubricCriteria({ readOnly, readOnlyMessage, value, onChange, pro
         />
       )}
       {!readOnly && (
-        <AddAPropertyButton style={{ flex: 'none', margin: 0 }} onClick={addCriteria}>
+        <AddAPropertyButton
+          dataTest='add-rubric-criteria-button'
+          style={{ flex: 'none', margin: 0 }}
+          onClick={addCriteria}
+        >
           + Add a criteria
         </AddAPropertyButton>
       )}

@@ -191,17 +191,14 @@ function ExpandedFormField({
         </Stack>
       )}
 
-      <Stack flexDirection='row' gap={0.5} alignItems='center'>
+      <Stack gap={0.5} flexDirection='row' alignItems='center'>
         <Switch
+          data-test='form-field-private-switch'
           size='small'
           checked={formField.private}
           onChange={(e) => updateFormField({ private: e.target.checked, id: formField.id })}
-          data-test='form-field-private-switch'
         />
-        <Stack>
-          <Typography>Private</Typography>
-          <Typography variant='caption'>Only Authors, Reviewers and Admins can see the input</Typography>
-        </Stack>
+        <Typography>Private (Authors & Reviewers can view)</Typography>
       </Stack>
     </>
   );

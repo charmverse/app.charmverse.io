@@ -345,7 +345,7 @@ function TableHeader(props: Props): JSX.Element {
         width: columnWidth(props.template.id),
         opacity: isDragging ? 0.5 : 1,
         transition: `background-color 150ms ease-in-out`,
-        backgroundColor: isOver ? 'var(--charmeditor-active)' : 'initial'
+        backgroundColor: isOver ? 'var(--charmeditor-active)' : ''
       }}
       ref={columnRef}
     >
