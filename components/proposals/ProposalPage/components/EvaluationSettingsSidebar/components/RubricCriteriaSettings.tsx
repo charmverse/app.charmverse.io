@@ -77,6 +77,7 @@ export function RubricCriteria({ readOnly, readOnlyMessage, value, onChange, pro
   const [criteriaList, setCriteriaList] = useState<RangeProposalCriteria[]>([]);
 
   const [rubricCriteriaIdToDelete, setRubricCriteriaIdToDelete] = useState<string | null>(null);
+
   function addCriteria() {
     if (readOnly) {
       return;
@@ -93,7 +94,6 @@ export function RubricCriteria({ readOnly, readOnlyMessage, value, onChange, pro
     };
     const updatedList = [...criteriaList, newCriteria];
     setCriteriaList(updatedList);
-    // onChange(criteriaList); - no need to update the backend immediately something is entered?
   }
 
   function deleteCriteria(id: string) {
@@ -162,15 +162,26 @@ export function RubricCriteria({ readOnly, readOnlyMessage, value, onChange, pro
                 <DragIndicator color='secondary' fontSize='small' />
               </div>
             )}
-            <TextField
-              inputProps={{ autoFocus: true }}
-              multiline
-              fullWidth
-              onChange={(e) => setCriteriaProperty(criteria.id, { title: e.target.value })}
-              placeholder='Add a label...'
-              disabled={readOnly}
-              defaultValue={criteria.title}
-            />
+            <Box display='flex' alignItems='center' width='100%'>
+              <TextField
+                sx={{ flexGrow: 1 }}
+                multiline
+                fullWidth
+                onChange={(e) => setCriteriaProperty(criteria.id, { title: e.target.value })}
+                placeholder='Add a label...'
+                disabled={readOnly}
+                defaultValue={criteria.title}
+              />
+              {!readOnly && (
+                <Box pl={0.5}>
+                  <Tooltip title='Delete criteria'>
+                    <IconButton onClick={() => handleClickDelete(criteria.id)} size='small'>
+                      <DeleteIcon color='secondary' fontSize='small' />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              )}
+            </Box>
             <TextField
               // displayType='details'
               multiline
@@ -232,19 +243,6 @@ export function RubricCriteria({ readOnly, readOnlyMessage, value, onChange, pro
                 </div>
               </Grid>
             </Grid>
-            {!readOnly && (
-              <Box display='flex' width='100%' justifyContent='flex-end'>
-                <Button
-                  variant='outlined'
-                  color='secondary'
-                  startIcon={<DeleteIcon color='secondary' />}
-                  size='small'
-                  onClick={() => handleClickDelete(criteria.id)}
-                >
-                  Delete
-                </Button>
-              </Box>
-            )}
           </CriteriaRow>
         </DraggableListItem>
       ))}

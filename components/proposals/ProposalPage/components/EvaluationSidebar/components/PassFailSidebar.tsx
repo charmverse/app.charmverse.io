@@ -6,18 +6,27 @@ import { UserAndRoleSelect } from 'components/common/BoardEditor/components/prop
 import { Button } from 'components/common/Button';
 import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposal/interface';
+import type { PopulatedEvaluation } from 'lib/proposal/interface';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 
 export type Props = {
-  proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'permissions'>;
-  evaluation: PopulatedEvaluation;
+  hideReviewer?: boolean;
+  proposalId?: string;
+  isReviewer?: boolean;
+  evaluation: Pick<PopulatedEvaluation, 'id' | 'completedAt' | 'reviewers' | 'result'>;
   refreshProposal?: VoidFunction;
   isCurrent: boolean;
 };
 
-export function PassFailSidebar({ proposal, evaluation, isCurrent, refreshProposal }: Props) {
-  const { trigger } = useSubmitEvaluationResult({ proposalId: proposal?.id });
+export function PassFailSidebar({
+  proposalId,
+  hideReviewer,
+  isReviewer,
+  evaluation,
+  isCurrent,
+  refreshProposal
+}: Props) {
+  const { trigger } = useSubmitEvaluationResult({ proposalId });
 
   const reviewerOptions = evaluation.reviewers.map((reviewer) => ({
     group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
@@ -25,7 +34,6 @@ export function PassFailSidebar({ proposal, evaluation, isCurrent, refreshPropos
   }));
   const { showMessage } = useSnackbar();
 
-  const isReviewer = proposal?.permissions.evaluate;
   const completedDate = evaluation.completedAt ? getRelativeTimeInThePast(new Date(evaluation.completedAt)) : null;
   const disabledTooltip = !isCurrent
     ? 'This evaluation step is not active'
@@ -47,23 +55,27 @@ export function PassFailSidebar({ proposal, evaluation, isCurrent, refreshPropos
 
   return (
     <>
-      <Box mb={2}>
-        <FormLabel>
-          <Typography sx={{ mb: 1 }} variant='subtitle1'>
-            Reviewer
-          </Typography>
-        </FormLabel>
-        <UserAndRoleSelect
-          data-test='evaluation-reviewer-select'
-          systemRoles={[allMembersSystemRole]}
-          readOnly={true}
-          value={reviewerOptions}
-          onChange={() => {}}
-        />
-      </Box>
-      <FormLabel>
-        <Typography variant='subtitle1'>Result</Typography>
-      </FormLabel>
+      {!hideReviewer && (
+        <>
+          <Box mb={2}>
+            <FormLabel>
+              <Typography sx={{ mb: 1 }} variant='subtitle1'>
+                Reviewer
+              </Typography>
+            </FormLabel>
+            <UserAndRoleSelect
+              data-test='evaluation-reviewer-select'
+              systemRoles={[allMembersSystemRole]}
+              readOnly={true}
+              value={reviewerOptions}
+              onChange={() => {}}
+            />
+          </Box>
+          <FormLabel>
+            <Typography variant='subtitle1'>Result</Typography>
+          </FormLabel>
+        </>
+      )}
       <Card variant='outlined'>
         {!evaluation.result && (
           <Box display='flex' justifyContent='space-between' alignItems='center' p={2}>

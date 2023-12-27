@@ -1,10 +1,11 @@
-import type { ProposalRubricCriteria } from '@charmverse/core/prisma-client';
+import type { ProposalRubricCriteria } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { ArrowForwardIosSharp, Check } from '@mui/icons-material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import type { AccordionProps, AccordionSummaryProps } from '@mui/material';
 import {
   Box,
+  Divider,
   ListItemIcon,
   Menu,
   MenuItem,
@@ -18,12 +19,20 @@ import { useEffect, useState } from 'react';
 
 import { Button } from 'components/common/Button';
 import UserDisplay from 'components/common/UserDisplay';
+import type { PopulatedEvaluation } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import { isNumber } from 'lib/utilities/numbers';
+
+import { PassFailSidebar } from '../PassFailSidebar';
 
 type Props = {
   answers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
   criteriaList: ProposalRubricCriteria[];
+  isCurrent: boolean;
+  isReviewer?: boolean;
+  proposalId?: string;
+  evaluation: PopulatedEvaluation;
+  refreshProposal?: VoidFunction;
 };
 
 type CriteriaSummaryType = 'sum' | 'average';
@@ -51,7 +60,15 @@ const AccordionSummary = styled((props: AccordionSummaryProps) => (
   }
 }));
 
-export function RubricResults({ criteriaList = [], answers: allAnswers = [] }: Props) {
+export function RubricResults({
+  criteriaList = [],
+  answers: allAnswers = [],
+  evaluation,
+  refreshProposal,
+  isCurrent,
+  isReviewer,
+  proposalId
+}: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [criteriaSummaryType, setCriteriaSummaryType] = useState<CriteriaSummaryType>('average');
 
@@ -95,7 +112,7 @@ export function RubricResults({ criteriaList = [], answers: allAnswers = [] }: P
     };
   });
 
-  const allCriteriaScores = populatedCriteria.map((criteria) => criteria.totalResult);
+  const allCriteriaScores = populatedCriteria.filter((c) => c.answers.length).map((criteria) => criteria.totalResult);
   const allCriteriaAverage = roundNumber(mean(allCriteriaScores));
   const allCriteriaTotal = sum(allCriteriaScores);
   const allCriteriaTotalDenominator = sum(populatedCriteria.map((criteria) => criteria.totalDenominator));
@@ -115,6 +132,9 @@ export function RubricResults({ criteriaList = [], answers: allAnswers = [] }: P
 
   return (
     <>
+      <Typography variant='subtitle1' sx={{ mt: 1, ml: 2 }}>
+        Questions
+      </Typography>
       {populatedCriteria.map((criteria) => (
         <Accordion key={criteria.id} expanded={expandedCriteria === criteria.id} onChange={expandCriteria(criteria.id)}>
           <AccordionSummary>
@@ -167,7 +187,7 @@ export function RubricResults({ criteriaList = [], answers: allAnswers = [] }: P
             setAnchorEl(event.currentTarget);
           }}
           variant='text'
-          color='inherit'
+          color='secondary'
         >
           {summaryTypeLabel}
         </Button>
@@ -200,6 +220,22 @@ export function RubricResults({ criteriaList = [], answers: allAnswers = [] }: P
         ) : (
           <Typography color='secondary'>N/A</Typography>
         )}
+      </Box>
+      <Divider sx={{ my: 1 }} />
+      <Box mx={2}>
+        <Typography variant='subtitle1' sx={{ mb: 1 }}>
+          Decision
+        </Typography>
+
+        <PassFailSidebar
+          isCurrent={isCurrent}
+          hideReviewer
+          key='results'
+          isReviewer={isReviewer}
+          evaluation={evaluation}
+          proposalId={proposalId}
+          refreshProposal={refreshProposal}
+        />
       </Box>
     </>
   );
