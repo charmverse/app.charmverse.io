@@ -31,7 +31,7 @@ type Props = {
   isCurrent: boolean;
   isReviewer?: boolean;
   proposalId?: string;
-  evaluation: PopulatedEvaluation;
+  evaluation?: PopulatedEvaluation;
   refreshProposal?: VoidFunction;
 };
 
@@ -221,22 +221,26 @@ export function RubricResults({
           <Typography color='secondary'>N/A</Typography>
         )}
       </Box>
-      <Divider sx={{ my: 1 }} />
-      <Box mx={2}>
-        <Typography variant='subtitle1' sx={{ mb: 1 }}>
-          Decision
-        </Typography>
+      {evaluation && (
+        <>
+          <Divider sx={{ my: 1 }} />
+          <Box mx={2}>
+            <Typography variant='subtitle1' sx={{ mb: 1 }}>
+              Decision
+            </Typography>
 
-        <PassFailSidebar
-          isCurrent={isCurrent}
-          hideReviewer
-          key='results'
-          isReviewer={isReviewer}
-          evaluation={evaluation}
-          proposalId={proposalId}
-          refreshProposal={refreshProposal}
-        />
-      </Box>
+            <PassFailSidebar
+              isCurrent={isCurrent}
+              hideReviewer
+              key='results'
+              isReviewer={isReviewer}
+              evaluation={evaluation}
+              proposalId={proposalId}
+              refreshProposal={refreshProposal}
+            />
+          </Box>
+        </>
+      )}
     </>
   );
 }
