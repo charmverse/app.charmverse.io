@@ -148,6 +148,14 @@ export function getDaylightRequirements(tokenGate: TokenGate) {
 export function getDaylightUnlockRequirements(tkConditions: Lock) {
   const operator = 'OR';
 
+  // Daylight currently supports only ethereum
+  if (tkConditions.chainId !== 1) {
+    return {
+      requirements: [],
+      operator
+    };
+  }
+
   if (tkConditions.chainId !== 1) {
     return {
       requirements: [],
