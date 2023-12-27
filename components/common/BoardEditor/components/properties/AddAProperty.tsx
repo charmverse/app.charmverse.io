@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 
+import type { NestedDataTest } from 'testing/e2eType';
+
 import Button from '../../focalboard/src/widgets/buttons/button';
 
 type Props = {
@@ -8,10 +10,12 @@ type Props = {
   style?: any;
 };
 
-export function AddAPropertyButton({ children, style, onClick }: Props) {
+export function AddAPropertyButton({ children, style, onClick, dataTest = 'add-property' }: Props & NestedDataTest) {
   return (
     <div className='octo-propertyname add-property' style={style}>
-      <Button onClick={onClick}>{children}</Button>
+      <Button dataTest={dataTest} onClick={onClick}>
+        {children}
+      </Button>
     </div>
   );
 }

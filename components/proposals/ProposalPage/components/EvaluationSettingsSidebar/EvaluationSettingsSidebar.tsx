@@ -38,7 +38,7 @@ export function EvaluationSettingsSidebar({
           goToSettings={() => undefined}
         />
       )}
-      <Box display='flex' flex={1} flexDirection='column'>
+      <Box display='flex' flex={1} flexDirection='column' data-test='evaluation-settings-sidebar'>
         <Divider />
         {proposal &&
           evaluationsWithConfig?.map((evaluation) => (

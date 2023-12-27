@@ -75,8 +75,15 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
   }, [voteType, options, maxChoices, durationDays, passThreshold, publishToSnapshot]);
 
   return (
-    <StyledVoteSettings>
-      <Stack direction='row' alignItems='center' gap={2} justifyContent='space-between' mb={1}>
+    <StyledVoteSettings data-test='evaluation-vote-settings'>
+      <Stack
+        data-test='vote-duration'
+        direction='row'
+        alignItems='center'
+        gap={2}
+        justifyContent='space-between'
+        mb={1}
+      >
         <FormLabel>
           <Typography component='span' variant='subtitle1'>
             Duration (days)
@@ -134,7 +141,14 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
       )}
 
       {maxChoices === 1 && (
-        <Stack direction='row' alignItems='center' gap={2} justifyContent='space-between' mb={2}>
+        <Stack
+          data-test='vote-pass-threshold'
+          direction='row'
+          alignItems='center'
+          gap={2}
+          justifyContent='space-between'
+          mb={2}
+        >
           <FormLabel>
             <Typography component='span' variant='subtitle1'>
               Pass Threshold (%)

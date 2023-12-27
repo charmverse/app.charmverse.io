@@ -3,7 +3,7 @@ import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { Wallet } from '@ethersproject/wallet';
 import type { Page as BrowserPage } from '@playwright/test';
-import { v4 } from 'uuid';
+import { v4 as uuid } from 'uuid';
 
 import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/constants';
 import { baseUrl } from 'config/constants';
@@ -183,8 +183,8 @@ export async function generateUser({
   const user = await prisma.user.create({
     data: {
       identityType: 'Wallet',
-      username: v4(),
-      path: v4(),
+      username: uuid(),
+      path: uuid(),
       wallets: {
         create: {
           address: walletAddress
@@ -250,12 +250,12 @@ export async function generateDiscordUser() {
   const user = await prisma.user.create({
     data: {
       identityType: 'Wallet',
-      username: v4(),
-      path: v4(),
+      username: uuid(),
+      path: uuid(),
       discordUser: {
         create: {
           account: {},
-          discordId: v4()
+          discordId: uuid()
         }
       }
     }
@@ -290,6 +290,7 @@ type UserAndSpaceInput = {
   isAdmin?: boolean;
   onboarded?: boolean;
   spaceName?: string;
+  spaceDomain?: string;
   publicBountyBoard?: boolean;
   skipOnboarding?: boolean;
   email?: string;
@@ -298,9 +299,10 @@ type UserAndSpaceInput = {
 export async function generateUserAndSpace({
   isAdmin,
   spaceName = 'Example Space',
+  spaceDomain = `domain-${uuid()}`,
   publicBountyBoard,
   skipOnboarding = true,
-  email = `${v4()}@gmail.com`
+  email = `${uuid()}@gmail.com`
 }: UserAndSpaceInput = {}) {
   const wallet = Wallet.createRandom();
   const address = wallet.address;
@@ -310,7 +312,7 @@ export async function generateUserAndSpace({
   const existingSpaceId = user.spaceRoles?.[0]?.spaceId;
 
   let space: Space;
-  const spaceId = v4();
+  const spaceId = uuid();
 
   if (existingSpaceId) {
     space = await prisma.space.findUniqueOrThrow({
@@ -323,7 +325,7 @@ export async function generateUserAndSpace({
         id: spaceId,
         name: spaceName,
         // Adding prefix avoids this being evaluated as uuid
-        domain: `domain-${v4()}`,
+        domain: spaceDomain,
         author: {
           connect: {
             id: user.id
