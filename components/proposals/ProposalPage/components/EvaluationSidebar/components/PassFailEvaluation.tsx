@@ -106,14 +106,14 @@ export function PassFailEvaluation({
         )}
         {evaluation.result === 'pass' && (
           <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' p={2}>
-            <ApprovedIcon color='success' fontSize='large' />
-            <Typography>Approved {completedDate}</Typography>
+            <ApprovedIcon color='success' />
+            <Typography variant='body2'>Approved {completedDate}</Typography>
           </Stack>
         )}
         {evaluation.result === 'fail' && (
           <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' p={2}>
-            <RejectedIcon color='error' fontSize='large' />
-            <Typography>Declined {completedDate}</Typography>
+            <RejectedIcon color='error' />
+            <Typography variant='body2'>Declined {completedDate}</Typography>
           </Stack>
         )}
       </Card>

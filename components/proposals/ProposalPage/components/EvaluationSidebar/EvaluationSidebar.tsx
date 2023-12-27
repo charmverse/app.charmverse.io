@@ -21,6 +21,7 @@ import { WorkflowSelect } from '../WorkflowSelect';
 import { FeedbackEvaluation } from './components/FeedbackEvaluation';
 import { PassFailEvaluation } from './components/PassFailEvaluation';
 import { RubricEvaluation } from './components/RubricEvaluation/RubricEvaluation';
+import { StepperIcon } from './components/StepperIcon';
 import { VoteEvaluation } from './components/VoteEvaluation';
 
 export type Props = {
@@ -44,7 +45,7 @@ export type Props = {
 const Accordion = styled((props: AccordionProps) => <MuiAccordion disableGutters elevation={0} square {...props} />)(
   ({ theme }) => ({
     border: 0,
-    borderBottom: `1px solid ${theme.palette.divider}`,
+    borderTop: `1px solid ${theme.palette.divider}`,
     '&:before': {
       display: 'none'
     }
@@ -81,14 +82,21 @@ export function EvaluationSidebar({ pageId, isTemplate, proposal, refreshProposa
   }, [proposal?.currentEvaluationId, setActiveEvaluationId]);
 
   return (
-    <>
-      <WorkflowSelect value={proposal?.workflowId} readOnly />
+    <div>
+      <Box mb={1}>
+        <WorkflowSelect value={proposal?.workflowId} readOnly />
+      </Box>
       <Accordion
         expanded={activeEvaluationId === 'draft'}
         onChange={(e, expand) => setActiveEvaluationId(expand ? 'draft' : undefined)}
       >
         <AccordionSummary>
-          <Box display='flex' alignItems='center' gap='5px'>
+          <Box display='flex' alignItems='center' gap={1}>
+            <StepperIcon
+              result={proposal?.currentEvaluationId ? 'pass' : null}
+              isCurrent={!proposal?.currentEvaluationId}
+              position={1}
+            />
             <Typography variant='h6'>Draft</Typography>
           </Box>
         </AccordionSummary>
@@ -101,8 +109,13 @@ export function EvaluationSidebar({ pageId, isTemplate, proposal, refreshProposa
           onChange={(e, expand) => setActiveEvaluationId(expand ? evaluation.id : undefined)}
         >
           <AccordionSummary>
-            <Box display='flex' alignItems='center' gap='5px'>
-              {evaluationIcons[evaluation.type]()}
+            <Box display='flex' alignItems='center' gap={1}>
+              <StepperIcon
+                result={evaluation.result}
+                isCurrent={evaluation.id === proposal?.currentEvaluationId}
+                position={index + 2}
+              />
+              {/* {evaluationIcons[evaluation.type]()} */}
               <Typography variant='h6'>{evaluation.title}</Typography>
             </Box>
           </AccordionSummary>
@@ -149,6 +162,6 @@ export function EvaluationSidebar({ pageId, isTemplate, proposal, refreshProposa
           </AccordionDetails>
         </Accordion>
       ))}
-    </>
+    </div>
   );
 }

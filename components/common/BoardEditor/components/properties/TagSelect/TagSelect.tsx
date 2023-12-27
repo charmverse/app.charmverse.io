@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import type { SxProps } from '@mui/material';
 import { Stack } from '@mui/material';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -18,13 +19,15 @@ type ContainerProps = {
   disableClearable?: boolean;
   isHidden?: boolean;
   readOnly?: boolean;
+  fluidWidth?: boolean;
 };
 export const SelectPreviewContainer = styled(Stack, {
-  shouldForwardProp: (prop: string) => prop !== 'displayType' && prop !== 'isHidden' && prop !== 'readOnly'
+  shouldForwardProp: (prop: string) =>
+    prop !== 'displayType' && prop !== 'isHidden' && prop !== 'readOnly' && prop !== 'fluidWidth'
 })<ContainerProps>`
   border-radius: ${({ theme }) => theme.spacing(0.5)};
   display: ${({ isHidden }) => (isHidden ? 'none' : 'initial')};
-  width: 100%;
+  // width: 100%;
   height: 100%;
   justify-content: center;
   padding: ${({ theme }) => theme.spacing(0.25, 0)};
@@ -58,7 +61,7 @@ export const SelectPreviewContainer = styled(Stack, {
 `;
 
 const StyledSelect = styled(SelectField)<ContainerProps>`
-  flex-grow: 1;
+  ${({ fluidWidth }) => (!fluidWidth ? 'flex-grow: 1;' : '')}
   .MuiInputBase-root {
     background-color: ${({ theme }) => theme.palette.background.paper};
 
@@ -110,6 +113,7 @@ export type TagSelectProps = {
   onDeleteOption?: (option: IPropertyOption) => void;
   wrapColumn?: boolean;
   'data-test'?: string;
+  fluidWidth?: boolean;
 };
 
 export function TagSelect({
@@ -129,7 +133,8 @@ export function TagSelect({
   wrapColumn,
   'data-test': dataTest,
   defaultOpened = false,
-  disableClearable = false
+  disableClearable = false,
+  fluidWidth
 }: TagSelectProps) {
   const [isOpened, setIsOpened] = useState(defaultOpened);
 
@@ -180,7 +185,13 @@ export function TagSelect({
   }
   if (!isOpened) {
     return (
-      <SelectPreviewContainer data-test={dataTest} onClick={onEdit} displayType={displayType} readOnly={readOnly}>
+      <SelectPreviewContainer
+        data-test={dataTest}
+        onClick={onEdit}
+        displayType={displayType}
+        readOnly={readOnly}
+        fluidWidth={fluidWidth}
+      >
         <SelectPreview
           readOnly={readOnly}
           readOnlyMessage={readOnlyMessage}
@@ -215,6 +226,7 @@ export function TagSelect({
       onBlur={() => setIsOpened(false)}
       forcePopupIcon={false}
       displayType={displayType}
+      fluidWidth={fluidWidth}
     />
   );
 }

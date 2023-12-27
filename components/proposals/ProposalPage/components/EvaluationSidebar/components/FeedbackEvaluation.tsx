@@ -1,4 +1,4 @@
-import { Box, Card, Stack } from '@mui/material';
+import { Box, Card, Stack, Typography } from '@mui/material';
 
 import { useSubmitEvaluationResult } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
@@ -63,7 +63,7 @@ export function FeedbackEvaluation({
       {evaluation.result && (
         <Card variant='outlined'>
           <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' p={2}>
-            Completed {completedDate}
+            <Typography variant='body2'>Completed {completedDate}</Typography>
           </Stack>
         </Card>
       )}

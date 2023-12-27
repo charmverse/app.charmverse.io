@@ -30,7 +30,7 @@ export function EvaluationSettingsSidebar({
   const evaluationsWithConfig = proposal?.evaluations.filter((e) => e.type !== 'feedback');
 
   return (
-    <>
+    <div>
       <WorkflowSelect
         value={proposal?.workflowId}
         onChange={onChangeWorkflow}
@@ -38,10 +38,10 @@ export function EvaluationSettingsSidebar({
         required
       />
       <Box display='flex' flex={1} flexDirection='column' data-test='evaluation-settings-sidebar'>
-        <Divider />
         {proposal &&
           evaluationsWithConfig?.map((evaluation) => (
-            <Box key={evaluation.id} my={1}>
+            <Box key={evaluation.id}>
+              <Divider sx={{ my: 1 }} />
               <EvaluationStepSettings
                 categoryId={proposal.categoryId}
                 readOnly={readOnly}
@@ -52,7 +52,6 @@ export function EvaluationSettingsSidebar({
                   onChangeEvaluation?.(evaluation.id, updated);
                 }}
               />
-              <Divider sx={{ my: 1 }} />
             </Box>
           ))}
         {proposal && evaluationsWithConfig?.length === 0 && (
@@ -61,6 +60,6 @@ export function EvaluationSettingsSidebar({
           </Typography>
         )}
       </Box>
-    </>
+    </div>
   );
 }

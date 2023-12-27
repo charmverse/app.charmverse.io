@@ -53,12 +53,11 @@ export function EvaluationStepSettings({
   }
 
   return (
-    <Box ml={3} data-test='new-proposal-evaluation-settings'>
-      <Box display='flex' alignItems='center' gap='5px' ml='-25px'>
+    <Box data-test='new-proposal-evaluation-settings' px={2}>
+      <Box display='flex' alignItems='center' gap={1} mb={1}>
         {evaluationIcons[evaluation.type]()}
         <Typography variant='h6'>{evaluation.title}</Typography>
       </Box>
-      <Divider sx={{ my: 1 }} />
       <FormLabel required={evaluation.type !== 'vote'}>
         <Typography component='span' variant='subtitle1'>
           {evaluation.type === 'vote' ? 'Voter' : 'Reviewer'}
