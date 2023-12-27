@@ -73,10 +73,7 @@ export function PageTemplateBanner({ proposalType, isNewPage, pageType, parentId
             <span>
               You're {isNewPage ? 'creating' : 'editing'} a{' '}
               {proposalType ? `${proposalType === 'free_form' ? 'free-form' : 'structured'} ` : ''}
-              {getFeatureTitle({
-                feature: pageType === 'bounty_template' ? 'rewards' : 'proposals'
-              })}{' '}
-              template
+              {getFeatureTitle(pageType === 'bounty_template' ? 'reward' : 'proposal')} template
             </span>
           ) : (
             <>

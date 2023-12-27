@@ -424,11 +424,7 @@ export function RewardPropertiesForm({
             {rewardType === 'Custom' && (
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
                 <PropertyLabel readOnly highlighted required={isNewReward && !isTemplate}>
-                  Custom{' '}
-                  {getFeatureTitle({
-                    feature: 'rewards',
-                    capitalize: true
-                  })}
+                  Custom {getFeatureTitle('Reward')}
                 </PropertyLabel>
 
                 <StyledFocalboardTextInput

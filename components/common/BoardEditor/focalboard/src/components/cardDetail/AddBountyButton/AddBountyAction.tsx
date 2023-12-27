@@ -43,12 +43,7 @@ export default function AddBountyAction({ readOnly, cardId }: Props) {
 
   return canAddBounty ? (
     <AddAPropertyButton onClick={() => setCreatingInlineReward(true)}>
-      <FormattedMessage
-        id='CardDetail.add-bounty'
-        defaultMessage={`+ Add a ${getFeatureTitle({
-          feature: 'rewards'
-        })}`}
-      />
+      <FormattedMessage id='CardDetail.add-bounty' defaultMessage={`+ Add a ${getFeatureTitle('reward')}`} />
     </AddAPropertyButton>
   ) : null;
 }

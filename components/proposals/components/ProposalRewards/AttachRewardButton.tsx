@@ -61,12 +61,7 @@ export function AttachRewardButton({
           {children}
         </Stack>
       ) : (
-        <AddAPropertyButton onClick={createNewReward}>
-          + Add a{' '}
-          {getFeatureTitle({
-            feature: 'rewards'
-          })}
-        </AddAPropertyButton>
+        <AddAPropertyButton onClick={createNewReward}>+ Add a {getFeatureTitle('reward')}</AddAPropertyButton>
       )}
 
       <NewPageDialog

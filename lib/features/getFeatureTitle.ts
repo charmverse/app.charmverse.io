@@ -1,27 +1,52 @@
 import type { Feature, MappedFeatures } from './constants';
-import { STATIC_PAGES, pluralizedSingularizedFeatureTitlesRecord } from './constants';
+import { STATIC_PAGES } from './constants';
+
+export type FeatureTitleVariation =
+  | 'reward'
+  | 'proposal'
+  | 'rewards'
+  | 'proposals'
+  | 'Rewards'
+  | 'Proposals'
+  | 'Reward'
+  | 'Proposal'
+  | 'member_directory'
+  | 'Member_Directory'
+  | 'Forum'
+  | 'forum';
+
+const featureTitleRecord: Record<FeatureTitleVariation, Feature> = {
+  Proposal: 'proposals',
+  proposal: 'proposals',
+  Proposals: 'proposals',
+  proposals: 'proposals',
+  Reward: 'rewards',
+  reward: 'rewards',
+  Rewards: 'rewards',
+  rewards: 'rewards',
+  Forum: 'forum',
+  forum: 'forum',
+  Member_Directory: 'member_directory',
+  member_directory: 'member_directory'
+};
 
 export const getFeatureTitle = ({
-  feature,
-  capitalize,
-  pluralize,
+  featureTitle,
   mappedFeatures
 }: {
-  feature: Feature;
-  pluralize?: boolean;
-  capitalize?: boolean;
+  featureTitle: FeatureTitleVariation;
   mappedFeatures: MappedFeatures;
 }) => {
-  let featureTitle = mappedFeatures[feature].title;
+  const isCapitalized = featureTitle.charAt(0) === featureTitle.charAt(0).toUpperCase();
+  const feature = featureTitleRecord[featureTitle];
+  const featureCurrentTitle = mappedFeatures[feature].title;
   const staticPageFeature = STATIC_PAGES.find((page) => page.feature === feature)!;
   // Keep the current title without any modifications if its has been changed
-  if (featureTitle !== staticPageFeature.title) {
-    return capitalize ? featureTitle.charAt(0).toUpperCase() + featureTitle.slice(1) : featureTitle.toLowerCase();
+  if (featureCurrentTitle !== staticPageFeature.title) {
+    return isCapitalized
+      ? featureCurrentTitle.charAt(0).toUpperCase() + featureCurrentTitle.slice(1)
+      : featureCurrentTitle.toLowerCase();
   }
 
-  featureTitle = pluralize
-    ? pluralizedSingularizedFeatureTitlesRecord[feature].pluralized
-    : pluralizedSingularizedFeatureTitlesRecord[feature].singularized;
-  featureTitle = capitalize ? featureTitle.charAt(0).toUpperCase() + featureTitle.slice(1) : featureTitle.toLowerCase();
   return featureTitle;
 };

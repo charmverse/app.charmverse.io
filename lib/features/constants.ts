@@ -25,28 +25,3 @@ export type MappedFeatures = Record<
     path: StaticPageType;
   }
 >;
-
-export const pluralizedSingularizedFeatureTitlesRecord: Record<
-  Feature,
-  {
-    pluralized: string;
-    singularized: string;
-  }
-> = {
-  forum: {
-    pluralized: 'forums',
-    singularized: 'forum'
-  },
-  member_directory: {
-    pluralized: 'member_directories',
-    singularized: 'member_directory'
-  },
-  proposals: {
-    pluralized: 'proposals',
-    singularized: 'proposal'
-  },
-  rewards: {
-    pluralized: 'rewards',
-    singularized: 'reward'
-  }
-};

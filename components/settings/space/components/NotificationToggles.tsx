@@ -77,11 +77,7 @@ export function NotificationTogglesInput({
             control={control}
             disabled={!isAdmin}
             enabled={formValues.notificationToggles?.rewards}
-            title={getFeatureTitle({
-              feature: 'rewards',
-              capitalize: true,
-              pluralize: true
-            })}
+            title={getFeatureTitle('Rewards')}
             types={notifications.rewards.types}
           />
         }
@@ -96,11 +92,7 @@ export function NotificationTogglesInput({
             control={control}
             disabled={!isAdmin}
             enabled={formValues.notificationToggles?.proposals}
-            title={getFeatureTitle({
-              feature: 'proposals',
-              capitalize: true,
-              pluralize: true
-            })}
+            title={getFeatureTitle('Proposals')}
             types={notifications.proposals.types}
           />
         }

@@ -276,19 +276,12 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
             )}
             <Divider sx={{ mt: 1, mb: 2 }} />
             <Typography variant='body2' fontWeight='bold' gap={1} display='flex' alignItems='center'>
-              {getFeatureTitle({
-                feature: 'rewards',
-                pluralize: true,
-                capitalize: true
-              })}
+              {getFeatureTitle('Rewards')}
               <UpgradeChip upgradeContext='forum_permissions' />
             </Typography>
             <PermissionToggle
               data-test='space-operation-createBounty'
-              label={`Create new ${getFeatureTitle({
-                feature: 'rewards',
-                pluralize: true
-              })}`}
+              label={`Create new ${getFeatureTitle('rewards')}`}
               defaultChecked={isFreeSpace ? true : assignedPermissions?.createBounty}
               disabled={disableModifications}
               memberChecked={targetGroup !== 'space' ? defaultPermissions?.createBounty : undefined}

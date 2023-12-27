@@ -135,11 +135,7 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
         editTemplate={(pageId) => showPage(pageId)}
         deleteTemplate={deleteTemplate}
         anchorEl={buttonRef.current as Element}
-        boardTitle={getFeatureTitle({
-          feature: 'rewards',
-          capitalize: true,
-          pluralize: true
-        })}
+        boardTitle={getFeatureTitle('Rewards')}
         popupState={popupState}
         enableItemOptions={isAdmin}
         enableNewTemplates={isAdmin}

@@ -102,11 +102,7 @@ export function NewProposalButton() {
         createTemplate={!isCharmverseSpace ? () => createTemplate('free_form') : proposalTemplateCreateModalState.open}
         deleteTemplate={deleteProposalTemplate}
         anchorEl={buttonRef.current as Element}
-        boardTitle={getFeatureTitle({
-          feature: 'proposals',
-          capitalize: true,
-          pluralize: true
-        })}
+        boardTitle={getFeatureTitle('Proposals')}
         popupState={popupState}
         enableItemOptions={isAdmin}
         enableNewTemplates={isAdmin}

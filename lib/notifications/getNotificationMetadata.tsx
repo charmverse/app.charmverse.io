@@ -247,7 +247,7 @@ export function getNotificationMetadata({
             notification: notification as BountyNotification,
             authorUsername: actorUsername,
             rewardTitle: getFeatureTitle({
-              feature: 'rewards',
+              featureTitle: 'reward',
               mappedFeatures
             })
           }),
