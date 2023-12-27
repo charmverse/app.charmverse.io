@@ -305,7 +305,7 @@ describe('humanizeConditions', () => {
     };
     const data = humanizeLitConditionsData({ ...conditions, myWalletAddress: '' });
     const result = humanizeConditions(data);
-    expect(result).toBe('Owner of Charmed & Optimistic 71 NFT on Optimism');
+    expect(result).toBe('Owner of Charmed & Optimistic 71 NFT with token id 71 on Optimism');
   });
 
   it('should return the cask condition', () => {
