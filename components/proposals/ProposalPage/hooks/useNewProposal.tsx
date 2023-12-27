@@ -47,7 +47,7 @@ export function useNewProposal({ newProposal }: Props) {
     });
   }, [setFormInputs, user?.publishToLensDefault]);
 
-  async function createProposal() {
+  async function createProposal({ isDraft }: { isDraft?: boolean }) {
     log.info('[user-journey] Create a proposal');
     if (formInputs.categoryId && currentSpace) {
       // TODO: put validation inside the properties form component
@@ -92,7 +92,8 @@ export function useNewProposal({ newProposal }: Props) {
         fields: formInputs.fields,
         formId: formInputs.formId,
         formAnswers: formInputs.formAnswers,
-        workflowId: formInputs.workflowId || undefined
+        workflowId: formInputs.workflowId || undefined,
+        isDraft
       }).catch((err: any) => {
         showMessage(err.message ?? 'Something went wrong', 'error');
         throw err;

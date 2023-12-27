@@ -202,8 +202,8 @@ export function NewProposalPage({
     });
   }
 
-  async function saveForm() {
-    const result = await createProposal();
+  async function saveForm({ isDraft }: { isDraft?: boolean } = {}) {
+    const result = await createProposal({ isDraft });
     if (result) {
       navigateToSpacePath(`/${result.id}`);
     }
@@ -447,10 +447,10 @@ export function NewProposalPage({
                 ? 'Please provide correct values for all proposal form fields'
                 : disabledTooltip
             }
-            onClick={saveForm}
             loading={isCreatingProposal}
             data-test='create-proposal-button'
             variant='outlined'
+            onClick={() => saveForm({ isDraft: true })}
           >
             Save draft
           </Button>
@@ -461,7 +461,7 @@ export function NewProposalPage({
                 ? 'Please provide correct values for all proposal form fields'
                 : disabledTooltip
             }
-            onClick={saveForm}
+            onClick={() => saveForm()}
             loading={isCreatingProposal}
           >
             Publish

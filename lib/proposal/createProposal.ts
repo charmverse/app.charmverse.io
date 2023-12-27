@@ -55,6 +55,7 @@ export type CreateProposalInput = {
   formFields?: FormFieldInput[];
   formAnswers?: FieldAnswerInput[];
   formId?: string;
+  isDraft?: boolean;
 };
 
 export type CreatedProposal = {
@@ -78,14 +79,15 @@ export async function createProposal({
   workflowId,
   formId,
   formFields,
-  formAnswers
+  formAnswers,
+  isDraft
 }: CreateProposalInput) {
   if (!categoryId) {
     throw new InvalidInputError('Proposal must be linked to a category');
   }
 
   const proposalId = uuid();
-  const proposalStatus: ProposalStatus = 'draft';
+  const proposalStatus: ProposalStatus = isDraft ? 'draft' : 'published';
 
   const authorsList = arrayUtils.uniqueValues(authors ? [...authors, userId] : [userId]);
 
