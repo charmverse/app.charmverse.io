@@ -93,7 +93,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
           {basePage && <DocumentHeaderElements headerHeight={headerHeight} page={basePage} />}
           {isNewProposalPage && isCharmVerse && <ToggleEvaluationButton />}
 
-          <FullPageActionsMenuButton pageId={basePage?.id} page={basePage} post={forumPostInfo?.forumPost} />
+          <FullPageActionsMenuButton page={basePage} post={forumPostInfo?.forumPost} />
         </Box>
       </Box>
     </StyledToolbar>

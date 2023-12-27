@@ -26,19 +26,18 @@ export async function updateCardFormFieldPropertiesValue({
   for (const formField of filteredFormFields) {
     const cardProperty = cardProperties.find((p) => p.formFieldId === formField.id);
     const answerValue = formField.answers.find((ans) => ans.proposalId === proposalId)?.value as FormFieldValue;
-    if (formField.type === 'label' || !cardProperty) {
-      // eslint-disable-next-line no-continue
-      continue;
-    } else if (formField.type === 'long_text') {
-      properties[cardProperty.id] =
-        (
-          answerValue as {
-            content: PageContent;
-            contentText: string;
-          }
-        )?.contentText ?? '';
-    } else {
-      properties[cardProperty.id] = answerValue ?? '';
+    if (formField.type !== 'label' && cardProperty) {
+      if (formField.type === 'long_text') {
+        properties[cardProperty.id] =
+          (
+            answerValue as {
+              content: PageContent;
+              contentText: string;
+            }
+          )?.contentText ?? '';
+      } else {
+        properties[cardProperty.id] = answerValue ?? '';
+      }
     }
   }
 

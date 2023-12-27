@@ -26,7 +26,13 @@ type Props = {
   isInsideDialog?: boolean;
 };
 
-export function FullPageActionsMenuButton({ isInsideDialog, pageId, page: pageProp, post, onDelete }: Props) {
+export function FullPageActionsMenuButton({
+  isInsideDialog,
+  page: pageProp,
+  pageId = pageProp?.id,
+  post,
+  onDelete
+}: Props) {
   let pageOptionsList: ReactNode = null;
   const router = useRouter();
   const { page: pageFromId } = usePage({ pageIdOrPath: pageId });
@@ -42,7 +48,7 @@ export function FullPageActionsMenuButton({ isInsideDialog, pageId, page: pagePr
     postIdOrPath: post?.id,
     isNewPost: !post
   });
-  const { data: proposalDetails } = useGetProposalDetails(pageFromId?.proposalId);
+  const { data: proposalDetails } = useGetProposalDetails(pageMenuAnchorElement ? pageFromId?.proposalId : undefined);
   const currentPageOrPostId = pageId ?? pageProp?.id ?? post?.id;
 
   const page = pageFromId || pageProp;
