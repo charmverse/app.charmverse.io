@@ -103,6 +103,7 @@ type Props = {
   undoEditorChanges?: VoidFunction;
   onDelete?: VoidFunction;
   isInsideDialog?: boolean;
+  isStructuredProposal?: boolean;
 };
 
 export function DocumentPageActionList({
@@ -111,7 +112,8 @@ export function DocumentPageActionList({
   onComplete,
   onDelete,
   pagePermissions,
-  undoEditorChanges
+  undoEditorChanges,
+  isStructuredProposal
 }: Props) {
   const pageId = page.id;
   const { navigateToSpacePath } = useCharmRouter();
@@ -242,7 +244,7 @@ export function DocumentPageActionList({
           label={<Typography variant='body2'>Full width</Typography>}
         />
       </ListItemButton>
-      {!isInsideDialog && (
+      {!isInsideDialog && !isStructuredProposal && (
         <>
           <Divider />
           <ListItemButton

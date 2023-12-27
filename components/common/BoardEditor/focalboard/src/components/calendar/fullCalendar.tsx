@@ -156,12 +156,12 @@ function CalendarFullView(props: Props): JSX.Element | null {
                 board={board}
                 syncWithPageId={page?.syncWithPageId}
                 key={template.id}
-                readOnly={true}
+                readOnly
                 card={card}
                 updatedAt={page?.updatedAt.toString() ?? ''}
                 updatedBy={page?.updatedBy ?? ''}
                 propertyTemplate={template}
-                showEmptyPlaceholder={true}
+                showEmptyPlaceholder
                 showTooltip
                 displayType='calendar'
               />
