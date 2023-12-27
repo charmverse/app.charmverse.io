@@ -4,7 +4,7 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import { createProposal } from 'lib/proposal/createProposal';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -13,26 +13,17 @@ import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireUser)
-  .use(
-    providePermissionClients({
-      key: 'categoryId',
-      resourceIdType: 'proposalCategory',
-      location: 'body'
-    })
-  )
-  .post(createProposalController);
+handler.use(requireUser).post(createProposalController);
 
 async function createProposalController(req: NextApiRequest, res: NextApiResponse<{ id: string }>) {
-  const proposaCreateProps = req.body as CreateProposalInput;
+  const proposalCreateProps = req.body as CreateProposalInput;
 
-  if (proposaCreateProps.pageProps?.type === 'proposal_template') {
+  if (proposalCreateProps.pageProps?.type === 'proposal_template') {
     const adminRole = await prisma.spaceRole.findFirst({
       where: {
         isAdmin: true,
         userId: req.session.user.id,
-        spaceId: proposaCreateProps.spaceId
+        spaceId: proposalCreateProps.spaceId
       }
     });
 
@@ -40,12 +31,12 @@ async function createProposalController(req: NextApiRequest, res: NextApiRespons
       throw new AdministratorOnlyError();
     }
   } else {
-    const permissions = await req.basePermissionsClient.proposals.computeProposalCategoryPermissions({
-      resourceId: proposaCreateProps.categoryId,
+    const permissions = await permissionsApiClient.spaces.computeSpacePermissions({
+      resourceId: proposalCreateProps.spaceId,
       userId: req.session.user.id
     });
 
-    if (!permissions.create_proposal) {
+    if (!permissions.createProposals) {
       throw new ActionNotPermittedError('You cannot create new proposals');
     }
   }

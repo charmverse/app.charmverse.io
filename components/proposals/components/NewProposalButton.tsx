@@ -12,8 +12,8 @@ import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { TemplatesMenu } from 'components/common/TemplatesMenu';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { usePages } from 'hooks/usePages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { isTruthy } from 'lib/utilities/types';
@@ -40,7 +40,7 @@ const ProposalTemplateMenu = styled(Stack)`
 export function NewProposalButton() {
   const { navigateToSpacePath } = useCharmRouter();
   const { getFeatureTitle } = useSpaceFeatures();
-  const { proposalCategoriesWithCreatePermission } = useProposalCategories();
+  const [spacePermissions] = useCurrentSpacePermissions();
   const isAdmin = useIsAdmin();
   const { pages } = usePages();
   const proposalTemplateCreateModalState = usePopupState({ variant: 'dialog' });
@@ -49,7 +49,7 @@ export function NewProposalButton() {
   const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
   const { proposalTemplates, isLoadingTemplates } = useProposalTemplates();
 
-  const canCreateProposal = proposalCategoriesWithCreatePermission.length > 0;
+  const canCreateProposal = spacePermissions?.createProposals;
   // grab page data from context so that title is always up-to-date
   const proposalTemplatePages = proposalTemplates
     ?.map(

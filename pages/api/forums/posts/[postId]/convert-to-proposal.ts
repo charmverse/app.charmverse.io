@@ -5,8 +5,8 @@ import nc from 'next-connect';
 
 import { convertPostToProposal } from 'lib/forums/posts/convertPostToProposal';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
-import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 import { relay } from 'lib/websockets/relay';
@@ -15,7 +15,6 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .use(providePermissionClients({ key: 'categoryId', location: 'body', resourceIdType: 'proposalCategory' }))
   .use(requireKeys(['categoryId'], 'body'))
   .post(convertToProposal);
 
@@ -23,7 +22,7 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageM
   const postId = req.query.postId as string;
   const userId = req.session.user.id;
 
-  const post = await prisma.post.findUnique({
+  const post = await prisma.post.findUniqueOrThrow({
     where: {
       id: postId
     },
@@ -38,10 +37,6 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageM
     }
   });
 
-  if (!post) {
-    throw new NotFoundError();
-  }
-
   if (post.proposalId) {
     throw new ActionNotPermittedError("Post converted to proposal can't be edited");
   }
@@ -52,12 +47,12 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageM
 
   const categoryId = req.body.categoryId;
 
-  const permissions = await req.basePermissionsClient.proposals.computeProposalCategoryPermissions({
-    resourceId: categoryId,
+  const permissions = await permissionsApiClient.spaces.computeSpacePermissions({
+    resourceId: post.spaceId,
     userId
   });
 
-  if (!permissions.create_proposal) {
+  if (!permissions.createProposals) {
     throw new UnauthorisedActionError('You do not have permission to create a page in this space');
   }
 
