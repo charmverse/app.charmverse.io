@@ -242,7 +242,7 @@ export function NewProposalPage({
 
   // having `internalSidebarView` allows us to have the sidebar open by default, because usePageSidebar() does not allow us to do this currently
   const [defaultSidebarView, setDefaultView] = useState<PageSidebarView | null>(
-    isCharmVerse && isMdScreen ? 'proposal_evaluation_settings' : null
+    isCharmVerse && isMdScreen ? 'proposal_evaluation' : null
   );
   const internalSidebarView = defaultSidebarView || sidebarView;
 
@@ -319,7 +319,7 @@ export function NewProposalPage({
       </div>
       {currentSpace && (
         <PageSidebar
-          isNewProposal
+          isUnpublishedProposal
           readOnlyReviewers={readOnlyReviewers}
           readOnlyRubricCriteria={readOnlyRubricCriteria}
           id='page-action-sidebar'
@@ -345,7 +345,7 @@ export function NewProposalPage({
     // clear out page title on load
     setPageTitle('');
     if (isCharmVerse && isMdScreen) {
-      setActiveView('proposal_evaluation_settings');
+      setActiveView('proposal_evaluation');
       setDefaultView(null);
     }
   }, []);
@@ -436,7 +436,7 @@ export function NewProposalPage({
         </Box>
         <StickyFooterContainer>
           {!isMdScreen && (
-            <Button variant='outlined' onClick={() => setActiveView('proposal_evaluation_settings')}>
+            <Button variant='outlined' onClick={() => setActiveView('proposal_evaluation')}>
               Configure
             </Button>
           )}
@@ -450,8 +450,21 @@ export function NewProposalPage({
             onClick={saveForm}
             loading={isCreatingProposal}
             data-test='create-proposal-button'
+            variant='outlined'
           >
-            Save
+            Save draft
+          </Button>
+          <Button
+            disabled={Boolean(disabledTooltip) || isCreatingProposal || !isProposalFormFieldsValid}
+            disabledTooltip={
+              !isProposalFormFieldsValid
+                ? 'Please provide correct values for all proposal form fields'
+                : disabledTooltip
+            }
+            onClick={saveForm}
+            loading={isCreatingProposal}
+          >
+            Publish
           </Button>
         </StickyFooterContainer>
         <ConfirmDeleteModal

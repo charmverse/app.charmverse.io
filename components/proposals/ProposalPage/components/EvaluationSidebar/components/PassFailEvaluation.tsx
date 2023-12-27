@@ -18,7 +18,7 @@ export type Props = {
   isCurrent: boolean;
 };
 
-export function PassFailSidebar({
+export function PassFailEvaluation({
   proposalId,
   hideReviewer,
   isReviewer,

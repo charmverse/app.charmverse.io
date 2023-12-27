@@ -1,20 +1,31 @@
 import type { ProposalEvaluationType } from '@charmverse/core/prisma';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
+import styled from '@emotion/styled';
+import { ArrowForwardIosSharp, ExpandMore } from '@mui/icons-material';
+import {
+  Accordion as MuiAccordion,
+  AccordionDetails,
+  AccordionSummary as MuiAccordionSummary,
+  Box,
+  Typography
+} from '@mui/material';
+import type { AccordionProps, AccordionSummaryProps } from '@mui/material';
 import { useEffect, useState } from 'react';
 
+import { evaluationIcons } from 'components/settings/proposals/constants';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 
 import { WorkflowSelect } from '../WorkflowSelect';
 
-import { PassFailSidebar } from './components/PassFailSidebar';
-import { RubricSidebar } from './components/RubricSidebar/RubricSidebar';
-import { VoteSidebar } from './components/VoteSidebar';
+import { FeedbackEvaluation } from './components/FeedbackEvaluation';
+import { PassFailEvaluation } from './components/PassFailEvaluation';
+import { RubricEvaluation } from './components/RubricEvaluation/RubricEvaluation';
+import { VoteEvaluation } from './components/VoteEvaluation';
 
 export type Props = {
   pageId?: string;
   isTemplate?: boolean;
-  isNewProposal?: boolean;
   proposal?: Pick<
     ProposalWithUsersAndRubric,
     | 'id'
@@ -27,19 +38,33 @@ export type Props = {
     | 'currentEvaluationId'
   >;
   refreshProposal?: VoidFunction;
-  workflowOptions?: ProposalWorkflowTyped[];
+  // workflowOptions?: ProposalWorkflowTyped[];
 };
 
+const Accordion = styled((props: AccordionProps) => <MuiAccordion disableGutters elevation={0} square {...props} />)(
+  ({ theme }) => ({
+    border: 0,
+    borderBottom: `1px solid ${theme.palette.divider}`,
+    '&:before': {
+      display: 'none'
+    }
+  })
+);
+const AccordionSummary = styled((props: AccordionSummaryProps) => (
+  <MuiAccordionSummary expandIcon={<ExpandMore />} {...props} />
+))(({ theme }) => ({
+  // backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, .05)' : 'rgba(0, 0, 0, .03)',
+  // flexDirection: 'row-reverse',
+  // '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
+  //   transform: 'rotate(90deg)'
+  // },
+  // '& .MuiAccordionSummary-content': {
+  //   marginLeft: theme.spacing(1)
+  // }
+}));
 const expandableEvaluationTypes: ProposalEvaluationType[] = ['pass_fail', 'rubric', 'vote'];
 
-export function EvaluationSidebar({
-  pageId,
-  isTemplate,
-  isNewProposal,
-  proposal,
-  refreshProposal,
-  workflowOptions
-}: Props) {
+export function EvaluationSidebar({ pageId, isTemplate, proposal, refreshProposal }: Props) {
   const [activeEvaluationId, setActiveEvaluationId] = useState<string | undefined>(proposal?.currentEvaluationId);
   const currentEvaluation = getCurrentEvaluation(proposal?.evaluations || []);
   // const evaluationToShowInSidebar = proposal?.permissions.evaluate && proposal?.currentEvaluationId;
@@ -48,9 +73,6 @@ export function EvaluationSidebar({
   // if (currentEvaluation && evaluationTypesWithSidebar.includes(currentEvaluation.type)) {
   //   evaluationToShowInSidebar = currentEvaluation.id;
   // }
-
-  const evaluation = proposal?.evaluations.find((e) => e.id === activeEvaluationId);
-
   useEffect(() => {
     // open current evaluation by default
     if (proposal?.currentEvaluationId) {
@@ -58,33 +80,75 @@ export function EvaluationSidebar({
     }
   }, [proposal?.currentEvaluationId, setActiveEvaluationId]);
 
-  const isCurrent = currentEvaluation?.id === evaluation?.id;
-
   return (
     <>
       <WorkflowSelect value={proposal?.workflowId} readOnly />
-      {evaluation?.type === 'pass_fail' && (
-        <PassFailSidebar
+      <Accordion
+        expanded={activeEvaluationId === 'draft'}
+        onChange={(e, expand) => setActiveEvaluationId(expand ? 'draft' : undefined)}
+      >
+        <AccordionSummary>
+          <Box display='flex' alignItems='center' gap='5px'>
+            <Typography variant='h6'>Draft</Typography>
+          </Box>
+        </AccordionSummary>
+        <AccordionDetails></AccordionDetails>
+      </Accordion>
+      {proposal?.evaluations.map((evaluation, index) => (
+        <Accordion
           key={evaluation.id}
-          evaluation={evaluation}
-          proposalId={proposal?.id}
-          isCurrent={isCurrent}
-          isReviewer={proposal?.permissions.evaluate}
-          refreshProposal={refreshProposal}
-        />
-      )}
-      {evaluation?.type === 'rubric' && (
-        <RubricSidebar key={evaluation.id} {...{ proposal, isCurrent, evaluation, refreshProposal }} />
-      )}
-      {evaluation?.type === 'vote' && (
-        <VoteSidebar
-          key={evaluation.id}
-          pageId={pageId!}
-          proposal={proposal}
-          isCurrent={isCurrent}
-          evaluation={evaluation}
-        />
-      )}
+          expanded={evaluation.id === activeEvaluationId}
+          onChange={(e, expand) => setActiveEvaluationId(expand ? evaluation.id : undefined)}
+        >
+          <AccordionSummary>
+            <Box display='flex' alignItems='center' gap='5px'>
+              {evaluationIcons[evaluation.type]()}
+              <Typography variant='h6'>{evaluation.title}</Typography>
+            </Box>
+          </AccordionSummary>
+          <AccordionDetails>
+            {evaluation?.type === 'feedback' && (
+              <FeedbackEvaluation
+                key={evaluation.id}
+                evaluation={evaluation}
+                proposalId={proposal?.id}
+                isCurrent={activeEvaluationId === evaluation.id}
+                nextStep={proposal.evaluations[index + 1]}
+                hasMovePermission={proposal.permissions.move}
+                onSubmit={refreshProposal}
+              />
+            )}
+            {evaluation?.type === 'pass_fail' && (
+              <PassFailEvaluation
+                key={evaluation.id}
+                evaluation={evaluation}
+                proposalId={proposal?.id}
+                isCurrent={activeEvaluationId === evaluation.id}
+                isReviewer={proposal?.permissions.evaluate}
+                refreshProposal={refreshProposal}
+              />
+            )}
+            {evaluation?.type === 'rubric' && (
+              <RubricEvaluation
+                key={evaluation.id}
+                proposal={proposal}
+                isCurrent={activeEvaluationId === evaluation.id}
+                evaluation={evaluation}
+                refreshProposal={refreshProposal}
+              />
+            )}
+            {evaluation?.type === 'vote' && (
+              <VoteEvaluation
+                key={evaluation.id}
+                pageId={pageId!}
+                proposal={proposal}
+                isCurrent={activeEvaluationId === evaluation.id}
+                evaluation={evaluation}
+              />
+            )}
+          </AccordionDetails>
+        </Accordion>
+      ))}
     </>
   );
 }

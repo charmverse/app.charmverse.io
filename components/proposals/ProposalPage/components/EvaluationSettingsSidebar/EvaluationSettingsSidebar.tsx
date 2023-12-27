@@ -1,12 +1,12 @@
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { Box, Divider, Typography } from '@mui/material';
 
-import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationSettings';
+import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationStepSettings';
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 
 import { WorkflowSelect } from '../WorkflowSelect';
 
-import { EvaluationSettings } from './components/EvaluationSettings';
+import { EvaluationStepSettings } from './components/EvaluationStepSettings';
 
 export type Props = {
   proposal?: Pick<ProposalPropertiesInput, 'categoryId' | 'evaluations' | 'workflowId'>;
@@ -42,7 +42,7 @@ export function EvaluationSettingsSidebar({
         {proposal &&
           evaluationsWithConfig?.map((evaluation) => (
             <Box key={evaluation.id} my={1}>
-              <EvaluationSettings
+              <EvaluationStepSettings
                 categoryId={proposal.categoryId}
                 readOnly={readOnly}
                 readOnlyReviewers={readOnlyReviewers}

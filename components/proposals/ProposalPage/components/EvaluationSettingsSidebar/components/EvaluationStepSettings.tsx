@@ -25,7 +25,7 @@ type Props = {
   readOnlyRubricCriteria: boolean;
 };
 
-export function EvaluationSettings({
+export function EvaluationStepSettings({
   evaluation,
   categoryId,
   onChange,

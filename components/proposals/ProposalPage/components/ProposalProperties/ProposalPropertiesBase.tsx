@@ -33,7 +33,7 @@ import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { useProposalCategories } from '../../../hooks/useProposalCategories';
-import type { ProposalEvaluationValues } from '../EvaluationSettingsSidebar/components/EvaluationSettings';
+import type { ProposalEvaluationValues } from '../EvaluationSettingsSidebar/components/EvaluationStepSettings';
 
 import type { RangeProposalCriteria } from './components/OldProposalRubricCriteriaInput';
 import { ProposalRubricCriteriaInput } from './components/OldProposalRubricCriteriaInput';

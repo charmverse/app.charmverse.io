@@ -4,7 +4,7 @@ import { mutate } from 'swr';
 
 import { useCreateProposal } from 'charmClient/hooks/proposals';
 import { checkFormFieldErrors } from 'components/common/form/checkFormFieldErrors';
-import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationSettings';
+import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationStepSettings';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useSnackbar } from 'hooks/useSnackbar';

@@ -3,7 +3,7 @@ import { createContext, useContext, useMemo, useState } from 'react';
 
 import { useCurrentPage } from 'hooks/useCurrentPage';
 
-export type PageSidebarView = 'comments' | 'suggestions' | 'proposal_evaluation' | 'proposal_evaluation_settings';
+export type PageSidebarView = 'comments' | 'suggestions' | 'proposal_evaluation';
 
 export type IPageSidebarContext = {
   activeView: PageSidebarView | null;

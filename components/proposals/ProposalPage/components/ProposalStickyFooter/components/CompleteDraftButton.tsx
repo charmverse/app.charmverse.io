@@ -22,10 +22,11 @@ export function CompleteDraftButton({ proposalId, nextStep, onSubmit }: Props) {
     }
     onSubmit?.();
   }
-
+  // endIcon={<ArrowForwardIos />}
   return (
-    <Button data-test='complete-draft-button' endIcon={<ArrowForwardIos />} loading={isMutating} onClick={onClick}>
-      Move to {nextStep?.title}
+    <Button data-test='complete-draft-button' loading={isMutating} onClick={onClick}>
+      {/* Move to {nextStep?.title} */}
+      Publish
     </Button>
   );
 }

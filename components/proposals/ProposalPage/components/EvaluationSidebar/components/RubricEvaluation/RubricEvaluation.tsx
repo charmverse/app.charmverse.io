@@ -9,8 +9,6 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposal/interface';
 
-import { PassFailSidebar } from '../PassFailSidebar';
-
 import { RubricAnswersForm } from './RubricAnswersForm';
 import { RubricResults } from './RubricResults';
 
@@ -21,7 +19,7 @@ export type Props = {
   refreshProposal?: VoidFunction;
 };
 
-export function RubricSidebar({ proposal, isCurrent, evaluation, refreshProposal }: Props) {
+export function RubricEvaluation({ proposal, isCurrent, evaluation, refreshProposal }: Props) {
   const [rubricView, setRubricView] = useState<number>(0);
   const isAdmin = useIsAdmin();
   const { user } = useUser();

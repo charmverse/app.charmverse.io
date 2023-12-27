@@ -7,7 +7,7 @@ import { Button } from 'components/common/Button';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import { useSnackbar } from 'hooks/useSnackbar';
 
-import type { ProposalEvaluationValues } from '../../EvaluationSettingsSidebar/components/EvaluationSettings';
+import type { ProposalEvaluationValues } from '../../EvaluationSettingsSidebar/components/EvaluationStepSettings';
 
 export function GoBackButton({
   hasMovePermission,

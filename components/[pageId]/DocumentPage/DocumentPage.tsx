@@ -255,7 +255,7 @@ function DocumentPage({
   }, [isLoadingThreads, page.id, enableSidebar, threadsPageId]);
 
   useEffect(() => {
-    if (enableSidebar && isMdScreen) {
+    if (proposalId && enableSidebar && isMdScreen) {
       setActiveView('proposal_evaluation');
     }
   }, [proposalId, enableSidebar]);
@@ -360,6 +360,7 @@ function DocumentPage({
             pageId={page.id}
             spaceId={page.spaceId}
             proposalId={proposalId}
+            isUnpublishedProposal={proposal?.status === 'draft' || page.type === 'proposal_template'}
             readOnlyProposalPermissions={!proposal?.permissions.edit}
             readOnlyRubricCriteria={readOnlyRubricCriteria}
             readOnlyReviewers={readOnlyReviewers}
@@ -507,15 +508,9 @@ function DocumentPage({
             )}
           </PageEditorContainer>
         </Box>
-        {/* {isCharmVerse && proposal && page.type === 'proposal' && (
-          <ProposalStickyFooter
-            proposal={proposal}
-            refreshProposal={refreshProposal}
-            isEvaluationSidebarOpen={sidebarView === 'proposal_evaluation'}
-            openEvaluationSidebar={openEvaluationSidebar}
-            closeSidebar={closeSidebar}
-          />
-        )} */}
+        {isCharmVerse && proposal.status === 'draft' && (
+          <ProposalStickyFooter proposal={proposal} refreshProposal={refreshProposal} />
+        )}
       </PrimaryColumn>
     </ProposalBlocksProvider>
   );

@@ -41,33 +41,17 @@ export function ProposalStickyFooter({
 
   return (
     <StickyFooterContainer>
-      <Box display='flex' justifyContent='space-between' alignItems='center' width='100%'>
-        <GoBackButton
-          proposalId={proposal.id}
-          previousStep={previousStep}
-          isDraft={proposal.status === 'draft'}
-          hasMovePermission={proposal.permissions.move}
-          onSubmit={refreshProposal}
-        />
+      <Box display='flex' justifyContent='flex-end' alignItems='center' width='100%'>
         {evaluationTypeOrDraft === 'draft' && !showPublishRewards && (
           <CompleteDraftButton proposalId={proposal.id} nextStep={nextStep} onSubmit={refreshProposal} />
         )}
-        {evaluationTypeOrDraft === 'feedback' && !showPublishRewards && (
-          <CompleteFeedbackButton
-            currentStep={currentEvaluation}
-            nextStep={nextStep}
-            proposalId={proposal.id}
-            hasMovePermission={proposal.permissions.move}
-            onSubmit={refreshProposal}
-          />
-        )}
-        {showPublishRewards && (
+        {/* {showPublishRewards && (
           <PublishRewardsButton
             disabled={!proposal.permissions.evaluate}
             proposalId={proposal.id}
             onSubmit={refreshProposal}
           />
-        )}
+        )} */}
       </Box>
     </StickyFooterContainer>
   );
