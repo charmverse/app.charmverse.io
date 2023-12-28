@@ -14,7 +14,7 @@ import type {
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
-import { testUtilsMembers, testUtilsProposals } from '@charmverse/core/test';
+import { testUtilsMembers, testUtilsProposals, testUtilsSpaces } from '@charmverse/core/test';
 import { expect, test } from '__e2e__/utils/test';
 import { v4 as uuid } from 'uuid';
 
@@ -103,6 +103,11 @@ test.describe.serial('Proposal Evaluation', () => {
       skipOnboarding: true,
       spaceDomain: `cvt-${uuid()}`
     }));
+    await testUtilsSpaces.addSpaceOperations({
+      forSpaceId: space.id,
+      spaceId: space.id,
+      operations: ['createProposals']
+    });
     member = await generateUser({ space: { id: space.id, isAdmin: false } });
     proposalCategory = await testUtilsProposals.generateProposalCategory({
       title: 'General',
