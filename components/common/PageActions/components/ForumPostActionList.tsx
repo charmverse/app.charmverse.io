@@ -8,6 +8,7 @@ import charmClient from 'charmClient';
 import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
@@ -35,12 +36,12 @@ export function ForumPostActionList({
 }) {
   const { showMessage } = useSnackbar();
   const { getMemberById, members } = useMembers();
-
+  const [spacePermissions] = useCurrentSpacePermissions();
   const { navigateToSpacePath } = useCharmRouter();
 
-  const { proposalCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
+  const { getDefaultCreateCategory } = useProposalCategories();
 
-  const canCreateProposal = proposalCategoriesWithCreatePermission.length > 0;
+  const canCreateProposal = spacePermissions?.createProposals;
 
   const postCreator = getMemberById(post?.createdBy);
 
