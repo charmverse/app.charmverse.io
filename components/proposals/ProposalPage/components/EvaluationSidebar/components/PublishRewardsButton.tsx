@@ -6,23 +6,30 @@ import { useCreateProposalRewards } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import { RewardTokenInfo } from 'components/rewards/components/RewardProperties/components/RewardTokenInfo';
+import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
+import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalPendingReward } from 'lib/proposal/blocks/interfaces';
+import { isTruthy } from 'lib/utilities/types';
 
 export type Props = {
   disabled: boolean;
   proposalId?: string;
   pendingRewards: ProposalPendingReward[] | undefined;
+  rewardIds?: string[] | null;
   onSubmit?: VoidFunction;
 };
 
-export function PublishRewardsButton({ proposalId, pendingRewards, disabled, onSubmit }: Props) {
+export function PublishRewardsButton({ proposalId, pendingRewards, rewardIds, disabled, onSubmit }: Props) {
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const { trigger, isMutating } = useCreateProposalRewards(proposalId);
   const { showMessage } = useSnackbar();
   const { mappedFeatures } = useSpaceFeatures();
+  const { rewards: allRewards } = useRewards();
+  const { getRewardPage } = useRewardPage();
   const rewardsTitle = mappedFeatures.rewards.title;
+  const rewards = rewardIds?.map((rId) => allRewards?.find((r) => r.id === rId)).filter(isTruthy) || [];
 
   async function createRewards() {
     try {
@@ -35,9 +42,17 @@ export function PublishRewardsButton({ proposalId, pendingRewards, disabled, onS
     }
   }
 
+  const mappedRewards =
+    pendingRewards ||
+    rewards?.map((reward) => ({
+      reward,
+      page: getRewardPage(reward.id),
+      draftId: reward.id
+    }));
+
   return (
     <>
-      {pendingRewards?.map(({ reward, page, draftId }) => (
+      {mappedRewards?.map(({ reward, page, draftId }) => (
         <Box display='flex' alignItems='center' gap={1} key={draftId} mb={2}>
           <Typography component='span' variant='subtitle1' fontWeight='normal'>
             {page?.title || 'Untitled'}

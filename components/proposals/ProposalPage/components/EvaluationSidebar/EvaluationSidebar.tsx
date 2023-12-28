@@ -180,6 +180,7 @@ export function EvaluationSidebar({ pageId, isTemplate, proposal, refreshProposa
               disabled={!(proposal?.permissions.evaluate && isRewardsActive && !isRewardsComplete)}
               proposalId={proposal?.id}
               pendingRewards={pendingRewards}
+              rewardIds={proposal?.rewardIds}
               onSubmit={refreshProposal}
             />
           </AccordionDetails>

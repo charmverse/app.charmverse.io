@@ -120,7 +120,7 @@ export function ProposalRewards({
                   <SelectPreviewContainer displayType='details' onClick={() => openReward(reward.id)}>
                     <Stack direction='row' justifyContent='space-between' alignItems='center'>
                       <Typography component='span' variant='subtitle1' fontWeight='normal'>
-                        {getRewardPage(reward.id)?.title || 'Untitled reward'}
+                        {getRewardPage(reward.id)?.title || 'Untitled'}
                       </Typography>
                       <Hidden mdDown>
                         <Stack alignItems='center' direction='row' height='100%'>
