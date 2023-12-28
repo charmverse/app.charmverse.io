@@ -18,7 +18,7 @@ export type Lock = {
 };
 
 // TODO: Verify chains is being used by Lit, even tho its not on lit's types
-type LitTokenGateConditions = HumanizedAccsProps & { chains?: string[] };
+export type LitTokenGateConditions = HumanizedAccsProps & { chains?: string[] };
 
 export type LockConditions = { conditions: Lock; type: 'unlock' };
 
