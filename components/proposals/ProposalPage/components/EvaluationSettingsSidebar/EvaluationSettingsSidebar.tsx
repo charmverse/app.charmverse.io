@@ -3,7 +3,6 @@ import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationStepSettings';
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { ProposalFields } from 'lib/proposal/interface';
 
 import { EvaluationStepRow } from '../EvaluationSidebar/components/EvaluationStepRow';
 import { WorkflowSelect } from '../WorkflowSelect';
@@ -45,19 +44,21 @@ export function EvaluationSettingsSidebar({
           {proposal?.evaluations?.map((evaluation, index) => (
             <EvaluationStepRow key={evaluation.id} expanded result={null} index={index + 1} title={evaluation.title}>
               {/* <Divider sx={{ my: 1 }} /> */}
-              <EvaluationStepSettings
-                categoryId={proposal.categoryId}
-                readOnly={readOnly}
-                readOnlyReviewers={readOnlyReviewers}
-                readOnlyRubricCriteria={readOnlyRubricCriteria}
-                evaluation={evaluation}
-                onChange={(updated) => {
-                  onChangeEvaluation?.(evaluation.id, updated);
-                }}
-              />
+              {evaluation.type !== 'feedback' && (
+                <EvaluationStepSettings
+                  categoryId={proposal.categoryId}
+                  readOnly={readOnly}
+                  readOnlyReviewers={readOnlyReviewers}
+                  readOnlyRubricCriteria={readOnlyRubricCriteria}
+                  evaluation={evaluation}
+                  onChange={(updated) => {
+                    onChangeEvaluation?.(evaluation.id, updated);
+                  }}
+                />
+              )}
             </EvaluationStepRow>
           ))}
-          {pendingRewards?.length && (
+          {!!pendingRewards?.length && (
             <EvaluationStepRow
               index={proposal ? proposal.evaluations.length + 1 : 0}
               result={null}

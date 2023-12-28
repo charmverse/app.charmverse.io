@@ -42,7 +42,9 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
             evaluationId,
             rubricCriteria: updatedEvaluation.rubricCriteria
           });
-        } else {
+        }
+        const otherFields = Object.keys(updatedEvaluation).filter((key) => key !== 'rubricCriteria');
+        if (otherFields.length > 0) {
           await updateProposalEvaluation({
             evaluationId,
             ...updatedEvaluation

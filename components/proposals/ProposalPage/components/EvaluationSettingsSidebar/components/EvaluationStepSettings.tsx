@@ -53,6 +53,11 @@ export function EvaluationStepSettings({
 
   return (
     <>
+      <FormLabel required>
+        <Typography component='span' variant='subtitle1'>
+          {evaluation.type === 'vote' ? 'Voters' : 'Reviewers'}
+        </Typography>
+      </FormLabel>
       <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow' mb={2}>
         <UserAndRoleSelect
           data-test={`proposal-${evaluation.type}-select`}

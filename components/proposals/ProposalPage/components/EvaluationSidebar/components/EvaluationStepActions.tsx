@@ -1,8 +1,6 @@
 import { Edit as EditIcon } from '@mui/icons-material';
 import { Box, IconButton, Tooltip } from '@mui/material';
 
-import { Button } from 'components/common/Button';
-
 import type { ProposalEvaluationValues } from '../../EvaluationSettingsSidebar/components/EvaluationStepSettings';
 
 import { GoBackButton } from './GoBackButton';
@@ -13,11 +11,19 @@ type Props = {
   evaluation?: ProposalEvaluationValues;
   isPreviousStep: boolean;
   refreshProposal?: VoidFunction;
+  openSettings: (evaluation: ProposalEvaluationValues) => void;
 };
 
 const preventAccordionToggle = (e: any) => e.stopPropagation();
 
-export function EvaluationStepActions({ proposalId, permissions, evaluation, isPreviousStep, refreshProposal }: Props) {
+export function EvaluationStepActions({
+  proposalId,
+  permissions,
+  evaluation,
+  isPreviousStep,
+  openSettings,
+  refreshProposal
+}: Props) {
   return (
     <Box display='flex' gap={1} onClick={preventAccordionToggle}>
       {isPreviousStep && refreshProposal && proposalId && (
@@ -28,9 +34,21 @@ export function EvaluationStepActions({ proposalId, permissions, evaluation, isP
           onSubmit={refreshProposal}
         />
       )}
-      <Tooltip title={!permissions.edit ? 'You do not have permission to edit this evaluation' : 'Edit'}>
-        <span className='show-on-hover'>
-          <IconButton color='secondary' disabled={!permissions.edit} size='small'>
+
+      <Tooltip
+        disableInteractive
+        title={!permissions.edit ? 'You do not have permission to edit this evaluation' : 'Edit'}
+      >
+        <span
+          className='show-on-hover'
+          style={{ opacity: !evaluation || evaluation.type === 'feedback' ? 0 : undefined }}
+        >
+          <IconButton
+            color='secondary'
+            disabled={!permissions.edit}
+            size='small'
+            onClick={() => evaluation && openSettings(evaluation)}
+          >
             <EditIcon fontSize='small' />
           </IconButton>
         </span>

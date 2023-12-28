@@ -1,9 +1,13 @@
 import { Box } from '@mui/material';
 import { useEffect, useState } from 'react';
 
+import { Button } from 'components/common/Button';
+import Modal from 'components/common/Modal';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { ProposalFields, ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 
+import type { ProposalEvaluationValues } from '../EvaluationSettingsSidebar/components/EvaluationStepSettings';
+import { EvaluationStepSettings } from '../EvaluationSettingsSidebar/components/EvaluationStepSettings';
 import { WorkflowSelect } from '../WorkflowSelect';
 
 import { EvaluationStepActions } from './components/EvaluationStepActions';
@@ -28,19 +32,23 @@ export type Props = {
     | 'rewardIds'
     | 'workflowId'
     | 'currentEvaluationId'
+    | 'page'
   >;
+  onChangeEvaluation?: (evaluationId: string, updated: Partial<ProposalEvaluationValues>) => void;
   refreshProposal?: VoidFunction;
 };
 
-export function EvaluationSidebar({ pageId, proposal, refreshProposal }: Props) {
+export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refreshProposal }: Props) {
   const [activeEvaluationId, setActiveEvaluationId] = useState<string | undefined>(proposal?.currentEvaluationId);
   const { mappedFeatures } = useSpaceFeatures();
+  const [evaluationInput, setEvaluationInput] = useState<ProposalEvaluationValues | null>(null);
   const rewardsTitle = mappedFeatures.rewards.title;
   const currentEvaluation = proposal?.evaluations.find((e) => e.id === proposal?.currentEvaluationId);
   const pendingRewards = proposal?.fields?.pendingRewards;
   const isRewardsComplete = !!proposal?.rewardIds?.length;
-  const hasRewardsStep = !!pendingRewards?.length || isRewardsComplete;
+  const hasRewardsStep = Boolean(pendingRewards?.length || isRewardsComplete);
   const isRewardsActive = currentEvaluation?.result === 'pass';
+  const isFromTemplate = !!proposal?.page?.sourceTemplateId;
   // To find the previous step index. we have to calculate the position including Draft and Rewards steps
   let adjustedCurrentEvaluationIndex = 0; // "draft" step
   if (proposal && currentEvaluation) {
@@ -51,6 +59,19 @@ export function EvaluationSidebar({ pageId, proposal, refreshProposal }: Props) 
   }
 
   const previousStepIndex = adjustedCurrentEvaluationIndex > 0 ? adjustedCurrentEvaluationIndex - 1 : null;
+
+  function closeSettings() {
+    setEvaluationInput(null);
+  }
+
+  function updateEvaluation(updated: Partial<ProposalEvaluationValues>) {
+    setEvaluationInput((input) => ({ ...(input as ProposalEvaluationValues), ...updated }));
+  }
+
+  async function saveEvaluation(newEvaluation: ProposalEvaluationValues) {
+    await onChangeEvaluation?.(newEvaluation.id, newEvaluation);
+    closeSettings();
+  }
 
   useEffect(() => {
     // expand the current evaluation
@@ -77,6 +98,7 @@ export function EvaluationSidebar({ pageId, proposal, refreshProposal }: Props) 
             permissions={proposal?.permissions}
             proposalId={proposal?.id}
             refreshProposal={refreshProposal}
+            openSettings={setEvaluationInput}
           />
         }
       />
@@ -96,6 +118,7 @@ export function EvaluationSidebar({ pageId, proposal, refreshProposal }: Props) 
               proposalId={proposal?.id}
               refreshProposal={refreshProposal}
               evaluation={evaluation}
+              openSettings={(e) => setEvaluationInput({ ...e })}
             />
           }
         >
@@ -157,6 +180,25 @@ export function EvaluationSidebar({ pageId, proposal, refreshProposal }: Props) 
             onSubmit={refreshProposal}
           />
         </EvaluationStepRow>
+      )}
+      {evaluationInput && (
+        <Modal open onClose={closeSettings} title={`Edit ${evaluationInput?.title}`}>
+          <Box mb={1}>
+            <EvaluationStepSettings
+              readOnly={false}
+              readOnlyReviewers={isFromTemplate}
+              readOnlyRubricCriteria={isFromTemplate}
+              evaluation={evaluationInput}
+              onChange={updateEvaluation}
+            />
+          </Box>
+          <Box display='flex' justifyContent='flex-end' gap={1}>
+            <Button color='secondary' variant='outlined' onClick={closeSettings}>
+              Cancel
+            </Button>
+            <Button onClick={() => saveEvaluation(evaluationInput)}>Save</Button>
+          </Box>
+        </Modal>
       )}
     </div>
   );
