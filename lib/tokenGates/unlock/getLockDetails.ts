@@ -4,9 +4,9 @@ import { getAddress } from 'viem';
 
 import { isNumber } from 'lib/utilities/numbers';
 
+import { getPublicClient } from '../../blockchain/publicClient';
 import type { Lock } from '../interfaces';
 
-import { getPublicClient } from './client';
 import { getLockMetadata } from './getLockMetadata';
 
 type GetLockPayload = {

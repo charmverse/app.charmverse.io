@@ -13,7 +13,7 @@ import {
   generateUnlockTokenGate
 } from 'testing/utils/tokenGates';
 
-import { getPublicClient } from '../unlock/client';
+import { getPublicClient } from '../../blockchain/publicClient';
 
 // @ts-ignore
 let mockedLitSDK: jest.Mocked;
