@@ -18,13 +18,25 @@ type Props = {
 };
 
 const Accordion = styled((props: AccordionProps) => <MuiAccordion disableGutters elevation={0} square {...props} />)(
-  ({ theme }) => ({
-    border: 0,
-    borderTop: `1px solid ${theme.palette.divider}`,
-    '&:before': {
-      display: 'none'
+  ({ theme }) => `
+    border: 0;
+    border-top: 1px solid ${theme.palette.divider};
+    &:before {
+      display: none;
     }
-  })
+    ${theme.breakpoints.up('sm')} {
+      .show-on-hover {
+        opacity: 0;
+        transition: opacity 0.2s ease-in-out;
+      }
+      &:hover {
+        .show-on-hover {
+          opacity: 1;
+        }
+      }
+    }
+
+  `
 );
 
 export function EvaluationStepRow({ expanded, onChange, isCurrent, result, index, title, children, actions }: Props) {
