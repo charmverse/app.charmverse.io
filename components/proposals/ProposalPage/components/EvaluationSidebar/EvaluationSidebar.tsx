@@ -55,9 +55,7 @@ export function EvaluationSidebar({ pageId, proposal, refreshProposal }: Props) 
 
   return (
     <div>
-      <Box mb={1}>
-        <WorkflowSelect value={proposal?.workflowId} readOnly />
-      </Box>
+      <WorkflowSelect value={proposal?.workflowId} readOnly />
       <EvaluationStepRow
         isCurrent={!proposal?.currentEvaluationId}
         position={1}

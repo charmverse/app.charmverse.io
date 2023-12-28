@@ -33,7 +33,7 @@ export function WorkflowSelect({ onChange, value, readOnly, required }: Props) {
     }
   }
   return (
-    <div className='CardDetail'>
+    <Box className='CardDetail' mb={1}>
       <Box className='octo-propertyrow' mb='0 !important' display='flex' justifyContent='space-between'>
         <PropertyLabel readOnly required={required} highlighted>
           Workflow
@@ -49,6 +49,6 @@ export function WorkflowSelect({ onChange, value, readOnly, required }: Props) {
           fluidWidth
         />
       </Box>
-    </div>
+    </Box>
   );
 }
