@@ -2,7 +2,7 @@ import type { TokenGateWithRoles } from 'lib/tokenGates/interfaces';
 import { sortByDate } from 'lib/utilities/dates';
 
 import { updateTokenGateLitDetails } from './updateLitDetails';
-import { updateLocksDetails } from './updateLocksDetails';
+import { updateTokenGateLockDetails } from './updateLocksDetails';
 
 export async function updateTokenGatesDetails(tokenGates: TokenGateWithRoles[]): Promise<TokenGateWithRoles[]> {
   const { lit, unlock } = tokenGates.reduce<{
@@ -21,7 +21,7 @@ export async function updateTokenGatesDetails(tokenGates: TokenGateWithRoles[]):
   );
   // Add identifiable names to token gates
   const [updatedUnlockProtocolGates, updatedTokenGates] = await Promise.all([
-    updateLocksDetails(unlock),
+    updateTokenGateLockDetails(unlock, true),
     updateTokenGateLitDetails(lit)
   ]);
 

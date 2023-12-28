@@ -1,16 +1,18 @@
 import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
+import { PublicLockV13 } from '@unlock-protocol/contracts';
 import { networks } from '@unlock-protocol/networks';
-import { Web3Service } from '@unlock-protocol/unlock-js';
 import { unlockChains } from 'connectors/chains';
+import { getAddress } from 'viem';
 
 import { getAlchemyBaseUrl } from 'lib/blockchain/provider/alchemy/client';
 import { isNumber } from 'lib/utilities/numbers';
 
 import type { Lock } from '../interfaces';
 
+import { getPublicClient } from './client';
 import { getLockMetadata } from './getLockMetadata';
 
-export type GetLockPayload = {
+type GetLockPayload = {
   chainId: number;
   contract: string;
   walletAddress?: string;
@@ -42,41 +44,49 @@ const unlockNetworksSetup = unlockChains.reduce<Record<number, { unlockAddress: 
   {}
 );
 
-export function getUnlockService() {
-  const web3Service = new Web3Service(unlockNetworksSetup);
-  return web3Service;
-}
-
-export async function getLockDetails(values: GetLockPayload, withMetadata?: boolean): Promise<Lock> {
+export async function getLockDetails(
+  values: GetLockPayload,
+  withMetadata?: boolean
+): Promise<Lock & { validKey?: boolean }> {
   const { chainId: initialChain, contract, walletAddress } = values;
 
   if (!isNumber(Number(initialChain))) {
     throw new InvalidInputError('Chain must be a number');
   }
 
+  // Validate address and throw an error if it's not
+  const address = getAddress(contract);
+
   const chainId = Number(initialChain);
 
   try {
-    const web3Service = getUnlockService();
-    const lock = await web3Service.getLock(contract, chainId);
+    const publicClient = getPublicClient(chainId);
+    const name = (await publicClient.readContract({
+      address,
+      abi: PublicLockV13.abi,
+      functionName: 'name'
+    })) as string;
+
     const locksmithData = withMetadata ? await getLockMetadata({ contract, chainId }) : undefined;
 
     const lockMetadata: Lock = {
-      name: lock?.name,
+      name,
       contract,
       chainId,
-      image: locksmithData?.image,
-      description: locksmithData?.description
+      image: locksmithData?.image
     };
 
     if (walletAddress) {
-      const balanceOf = await web3Service.balanceOf(contract, walletAddress, chainId);
-      const expirationTimestamp = await web3Service.getKeyExpirationByLockForOwner(contract, walletAddress, chainId);
+      const validKey = (await publicClient.readContract({
+        address,
+        abi: PublicLockV13.abi,
+        functionName: 'getHasValidKey',
+        args: [walletAddress]
+      })) as boolean;
 
       return {
         ...lockMetadata,
-        balanceOf,
-        expirationTimestamp: expirationTimestamp * 1000
+        validKey
       };
     }
 
@@ -85,3 +95,11 @@ export async function getLockDetails(values: GetLockPayload, withMetadata?: bool
     throw new DataNotFoundError('Error fetching lock details. Check the contract address and chain.');
   }
 }
+
+getLockDetails(
+  {
+    chainId: 137,
+    contract: '0x739380a14c589929f4b66c4f1f132019c62f86c1'
+  },
+  true
+);
