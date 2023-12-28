@@ -37,7 +37,7 @@ import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
-import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
+import type { ProposalFields } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposal/rubric/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -163,7 +163,7 @@ export function NewProposalPage({
   // properties with values from templates should be read only
   const readOnlyCustomProperties =
     !isAdmin && sourceTemplate?.fields
-      ? Object.entries((sourceTemplate?.fields as ProposalFields).properties)?.reduce((acc, [key, value]) => {
+      ? Object.entries(sourceTemplate?.fields?.properties || {})?.reduce((acc, [key, value]) => {
           if (!value) {
             return acc;
           }
@@ -228,7 +228,7 @@ export function NewProposalPage({
         evaluationType: template.evaluationType,
         evaluations: template.evaluations,
         rubricCriteria: template.rubricCriteria,
-        fields: (template.fields as ProposalFields) || {},
+        fields: template.fields || {},
         type: 'proposal',
         formId: template.formId ?? undefined,
         formAnswers: (template?.form?.formFields ?? [])

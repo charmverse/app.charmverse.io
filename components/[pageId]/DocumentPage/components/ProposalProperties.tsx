@@ -22,8 +22,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { PageWithContent } from 'lib/pages';
-import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { ProposalFields, ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { CreateLensPublication } from './CreateLensPublication';
@@ -87,17 +86,14 @@ export function ProposalProperties({
   // properties with values from templates should be read only
   const readOnlyCustomProperties =
     !isAdmin && sourceTemplate?.fields
-      ? Object.entries((sourceTemplate?.fields as unknown as ProposalFields).properties)?.reduce(
-          (acc, [key, value]) => {
-            if (!value) {
-              return acc;
-            }
-
-            acc.push(key);
+      ? Object.entries(sourceTemplate?.fields?.properties || {})?.reduce((acc, [key, value]) => {
+          if (!value) {
             return acc;
-          },
-          [] as string[]
-        )
+          }
+
+          acc.push(key);
+          return acc;
+        }, [] as string[])
       : [];
 
   const proposalFormInputs: ProposalPropertiesInput = {
@@ -113,10 +109,7 @@ export function ProposalProperties({
         id: reviewer.roleId ?? (reviewer.userId as string)
       })) ?? [],
     type: proposalPage.type,
-    fields:
-      typeof proposal?.fields === 'object' && !!proposal?.fields
-        ? (proposal.fields as ProposalFields)
-        : { properties: {} }
+    fields: typeof proposal?.fields === 'object' && !!proposal?.fields ? proposal.fields : { properties: {} }
   };
 
   async function updateProposalStatus(newStatus: ProposalStatus) {

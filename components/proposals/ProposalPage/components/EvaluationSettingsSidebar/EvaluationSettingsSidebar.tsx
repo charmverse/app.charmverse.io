@@ -3,7 +3,7 @@ import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationStepSettings';
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
+import type { ProposalFields } from 'lib/proposal/interface';
 
 import { EvaluationStepRow } from '../EvaluationSidebar/components/EvaluationStepRow';
 import { WorkflowSelect } from '../WorkflowSelect';
@@ -29,7 +29,7 @@ export function EvaluationSettingsSidebar({
   onChangeWorkflow,
   readOnlyWorkflowSelect
 }: Props) {
-  const pendingRewards = (proposal?.fields as ProposalFields)?.pendingRewards;
+  const pendingRewards = proposal?.fields?.pendingRewards;
   const { mappedFeatures } = useSpaceFeatures();
   return (
     <div>
@@ -39,11 +39,11 @@ export function EvaluationSettingsSidebar({
         readOnly={readOnlyWorkflowSelect}
         required
       />
-      <EvaluationStepRow position={1} result={null} title='Draft' />
+      <EvaluationStepRow index={0} result={null} title='Draft' />
       {proposal && (
         <>
           {proposal?.evaluations?.map((evaluation, index) => (
-            <EvaluationStepRow key={evaluation.id} expanded result={null} position={index + 2} title={evaluation.title}>
+            <EvaluationStepRow key={evaluation.id} expanded result={null} index={index + 1} title={evaluation.title}>
               {/* <Divider sx={{ my: 1 }} /> */}
               <EvaluationStepSettings
                 categoryId={proposal.categoryId}
@@ -59,7 +59,7 @@ export function EvaluationSettingsSidebar({
           ))}
           {pendingRewards?.length && (
             <EvaluationStepRow
-              position={proposal ? proposal.evaluations.length + 2 : 0}
+              index={proposal ? proposal.evaluations.length + 1 : 0}
               result={null}
               title={mappedFeatures.rewards.title}
             />

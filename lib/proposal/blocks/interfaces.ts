@@ -30,10 +30,6 @@ export type ProposalPropertyValues = { properties: ProposalPropertiesField };
 
 export type ProposalPendingReward = { reward: UpdateableRewardFields; page: NewPageValues | null; draftId: string };
 
-export type ProposalFields = ProposalPropertyValues & { pendingRewards?: ProposalPendingReward[] };
-
-export type ProposalFieldsProp = { fields: ProposalFields };
-
 export type ProposalBlockInput = {
   id?: string;
   type: string;

@@ -22,8 +22,7 @@ import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { isProdEnv } from 'config/constants';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { ProposalFields, ProposalPropertiesField } from 'lib/proposal/blocks/interfaces';
-import type { ProposalReviewerInput, ProposalCategory } from 'lib/proposal/interface';
+import type { ProposalFields, ProposalReviewerInput, ProposalCategory } from 'lib/proposal/interface';
 import {
   getProposalStatuses,
   nextProposalStatusUpdateMessage,
@@ -54,7 +53,7 @@ export type ProposalPropertiesInput = {
   evaluations: ProposalEvaluationValues[];
   rubricCriteria: RangeProposalCriteria[];
   publishToLens?: boolean;
-  fields: ProposalFields;
+  fields: ProposalFields | null;
   type: PageType;
 };
 
@@ -502,7 +501,7 @@ export function ProposalPropertiesBase({
           readOnly={readOnlyAuthors}
           readOnlyProperties={readOnlyCustomProperties}
           proposal={proposalFormInputs}
-          onChange={(properties: ProposalPropertiesField) => {
+          onChange={(properties: ProposalFields['properties']) => {
             setProposalFormInputs({
               fields: { ...proposalFormInputs.fields, properties: properties ? { ...properties } : {} }
             });

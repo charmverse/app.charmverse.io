@@ -4,7 +4,7 @@ import type {
   ProposalReviewerPool
 } from '@charmverse/core/permissions';
 import type { FormFieldAnswer } from '@charmverse/core/prisma-client';
-import type { ProposalWithUsers, ListProposalsRequest } from '@charmverse/core/proposals';
+import type { ListProposalsRequest } from '@charmverse/core/proposals';
 
 import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
 import type {
@@ -16,7 +16,7 @@ import type { ClearEvaluationResultRequest } from 'lib/proposal/clearEvaluationR
 import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import type { RubricProposalsUserInfo } from 'lib/proposal/getProposalsEvaluatedByUser';
 import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { ProposalWithUsers, ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers';
 import type { RubricCriteriaUpsert } from 'lib/proposal/rubric/upsertRubricCriteria';

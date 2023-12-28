@@ -9,10 +9,11 @@ import { StepperIcon } from './StepperIcon';
 type Props = {
   title: string;
   result: ProposalEvaluation['result'];
-  position: number;
+  index: number;
   isCurrent?: boolean;
   expanded?: boolean;
   onChange?: (e: any, expanded: boolean) => void;
+  actions?: ReactNode;
   children?: ReactNode;
 };
 
@@ -26,13 +27,14 @@ const Accordion = styled((props: AccordionProps) => <MuiAccordion disableGutters
   })
 );
 
-export function EvaluationStepRow({ expanded, onChange, isCurrent, result, position, title, children }: Props) {
+export function EvaluationStepRow({ expanded, onChange, isCurrent, result, index, title, children, actions }: Props) {
   return (
     <Accordion expanded={expanded} onChange={onChange}>
       <AccordionSummary sx={{ px: 1 }}>
         <Box display='flex' alignItems='center' gap={1}>
-          <StepperIcon result={result} isCurrent={isCurrent} position={position} />
+          <StepperIcon result={result} isCurrent={isCurrent} position={index + 1} />
           <Typography variant='h6'>{title}</Typography>
+          {actions}
         </Box>
       </AccordionSummary>
       {children && <AccordionDetails sx={{ px: 1 }}>{children}</AccordionDetails>}

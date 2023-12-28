@@ -11,13 +11,11 @@ import type { ProposalEvaluationValues } from '../../EvaluationSettingsSidebar/c
 
 export function GoBackButton({
   hasMovePermission,
-  isDraft,
   proposalId,
   previousStep,
   onSubmit
 }: {
   hasMovePermission: boolean;
-  isDraft?: boolean;
   proposalId: string;
   previousStep?: Pick<ProposalEvaluationValues, 'id' | 'type' | 'title'>;
   onSubmit: () => void;
@@ -63,10 +61,6 @@ export function GoBackButton({
     setShowConfirmation(false);
   }
 
-  // draft is the first step
-  if (isDraft) {
-    return <div />;
-  }
   return (
     <>
       <Button

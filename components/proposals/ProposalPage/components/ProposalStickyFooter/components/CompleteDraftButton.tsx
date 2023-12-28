@@ -6,11 +6,10 @@ import { useSnackbar } from 'hooks/useSnackbar';
 
 export type Props = {
   proposalId: string;
-  nextStep?: { title: string };
   onSubmit?: VoidFunction;
 };
 
-export function CompleteDraftButton({ proposalId, nextStep, onSubmit }: Props) {
+export function CompleteDraftButton({ proposalId, onSubmit }: Props) {
   const { showMessage } = useSnackbar();
   const { trigger: updateProposalStatus, isMutating } = useUpdateProposalStatusOnly({ proposalId });
 
@@ -25,7 +24,6 @@ export function CompleteDraftButton({ proposalId, nextStep, onSubmit }: Props) {
   // endIcon={<ArrowForwardIos />}
   return (
     <Button data-test='complete-draft-button' loading={isMutating} onClick={onClick}>
-      {/* Move to {nextStep?.title} */}
       Publish
     </Button>
   );

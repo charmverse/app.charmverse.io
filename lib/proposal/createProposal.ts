@@ -12,7 +12,7 @@ import { createForm } from 'lib/form/createForm';
 import { upsertProposalFormAnswers } from 'lib/form/upsertProposalFormAnswers';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { createPage } from 'lib/pages/server/createPage';
-import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
+import type { ProposalFields } from 'lib/proposal/interface';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
@@ -50,7 +50,7 @@ export type CreateProposalInput = {
   rubricCriteria?: RubricDataInput[];
   evaluations?: ProposalEvaluationInput[];
   publishToLens?: boolean;
-  fields?: ProposalFields;
+  fields?: ProposalFields | null;
   workflowId?: string;
   formFields?: FormFieldInput[];
   formAnswers?: FieldAnswerInput[];
@@ -207,7 +207,7 @@ export async function createProposal({
             }))
           }
         },
-        fields,
+        fields: fields as any,
         workflow: workflowId
           ? {
               connect: {

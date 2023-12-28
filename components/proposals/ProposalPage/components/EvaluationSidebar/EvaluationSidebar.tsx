@@ -2,11 +2,11 @@ import { Box } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { ProposalFields, ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 
 import { WorkflowSelect } from '../WorkflowSelect';
 
+import { EvaluationStepActions } from './components/EvaluationStepActions';
 import { EvaluationStepRow } from './components/EvaluationStepRow';
 import { FeedbackEvaluation } from './components/FeedbackEvaluation';
 import { PassFailEvaluation } from './components/PassFailEvaluation';
@@ -37,10 +37,21 @@ export function EvaluationSidebar({ pageId, proposal, refreshProposal }: Props) 
   const { mappedFeatures } = useSpaceFeatures();
   const rewardsTitle = mappedFeatures.rewards.title;
   const currentEvaluation = proposal?.evaluations.find((e) => e.id === proposal?.currentEvaluationId);
-  const pendingRewards = (proposal?.fields as ProposalFields)?.pendingRewards;
+  const pendingRewards = proposal?.fields?.pendingRewards;
   const isRewardsComplete = !!proposal?.rewardIds?.length;
   const hasRewardsStep = !!pendingRewards?.length || isRewardsComplete;
   const isRewardsActive = currentEvaluation?.result === 'pass';
+
+  // To find the previous step index. we have to calculate the position including Draft and Rewards steps
+  let adjustedCurrentEvaluationIndex = 0; // "draft" step
+  if (proposal && currentEvaluation) {
+    adjustedCurrentEvaluationIndex = proposal.evaluations.findIndex((e) => e.id === currentEvaluation?.id);
+    if (hasRewardsStep && isRewardsActive) {
+      adjustedCurrentEvaluationIndex += 1;
+    }
+  }
+
+  const previousStepIndex = adjustedCurrentEvaluationIndex > 0 ? adjustedCurrentEvaluationIndex - 1 : null;
 
   useEffect(() => {
     // expand the current evaluation
@@ -58,9 +69,17 @@ export function EvaluationSidebar({ pageId, proposal, refreshProposal }: Props) 
       <WorkflowSelect value={proposal?.workflowId} readOnly />
       <EvaluationStepRow
         isCurrent={!proposal?.currentEvaluationId}
-        position={1}
+        index={0}
         result={proposal?.currentEvaluationId ? 'pass' : null}
         title='Draft'
+        actions={
+          <EvaluationStepActions
+            isPreviousStep={previousStepIndex === 0}
+            permissions={proposal?.permissions}
+            proposalId={proposal?.id}
+            refreshProposal={refreshProposal}
+          />
+        }
       />
       {proposal?.evaluations.map((evaluation, index) => (
         <EvaluationStepRow
@@ -68,9 +87,17 @@ export function EvaluationSidebar({ pageId, proposal, refreshProposal }: Props) 
           expanded={evaluation.id === activeEvaluationId}
           isCurrent={evaluation.id === proposal?.currentEvaluationId && !isRewardsActive}
           onChange={(e, expand) => setActiveEvaluationId(expand ? evaluation.id : undefined)}
-          position={index + 2}
+          index={index + 1}
           result={evaluation.result}
           title={evaluation.title}
+          actions={
+            <EvaluationStepActions
+              isPreviousStep={previousStepIndex === index + 1}
+              permissions={proposal?.permissions}
+              proposalId={proposal?.id}
+              refreshProposal={refreshProposal}
+            />
+          }
         >
           {evaluation.type === 'feedback' && (
             <FeedbackEvaluation
@@ -118,7 +145,7 @@ export function EvaluationSidebar({ pageId, proposal, refreshProposal }: Props) 
           expanded={activeEvaluationId === 'rewards'}
           isCurrent={isRewardsActive}
           onChange={(e, expand) => setActiveEvaluationId(expand ? 'rewards' : undefined)}
-          position={proposal ? proposal.evaluations.length + 2 : 0}
+          index={proposal ? proposal.evaluations.length + 1 : 0}
           result={isRewardsComplete ? 'pass' : null}
           title={rewardsTitle}
         >
