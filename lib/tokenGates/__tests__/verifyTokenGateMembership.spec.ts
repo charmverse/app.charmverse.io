@@ -13,11 +13,13 @@ import {
   generateUnlockTokenGate
 } from 'testing/utils/tokenGates';
 
+import { getPublicClient } from '../unlock/client';
+
 // @ts-ignore
 let mockedLitSDK: jest.Mocked;
 
-// jest.mock('@unlock-protocol/unlock-js');
-// const mockWeb3Service = jest.mocked(InitialWeb3Service);
+jest.mock('../unlock/client');
+const mockGetPublicClient = jest.mocked(getPublicClient);
 
 describe('verifyTokenGateMembership', () => {
   let user: User;
@@ -61,7 +63,7 @@ describe('verifyTokenGateMembership', () => {
   beforeEach(async () => {
     jest.mock('@lit-protocol/lit-node-client');
     mockedLitSDK = await import('@lit-protocol/lit-node-client');
-    // mockWeb3Service.mockClear();
+    mockGetPublicClient.mockClear();
 
     const { user: u, space: s } = await generateUserAndSpace(undefined);
     user = u;
@@ -154,10 +156,9 @@ describe('verifyTokenGateMembership', () => {
         })
       );
 
-    // mockWeb3Service.mockReturnValueOnce({
-    //   getLock: async () => ({}),
-    //   getHasValidKey: async () => true
-    // } as any as InitialWeb3Service);
+    mockGetPublicClient.mockReturnValueOnce({
+      readContract: jest.fn().mockReturnValueOnce('My New Lock').mockReturnValueOnce(true)
+    } as any);
 
     await applyTokenGates({
       spaceId: space.id,
