@@ -77,7 +77,14 @@ export function EvaluationSidebar({
         goToSettings={goToSettings}
       />
       {evaluation?.type === 'pass_fail' && (
-        <PassFailSidebar key={evaluation.id} {...{ proposal, isCurrent, evaluation, refreshProposal }} />
+        <PassFailSidebar
+          key={evaluation.id}
+          evaluation={evaluation}
+          proposalId={proposal?.id}
+          isCurrent={isCurrent}
+          isReviewer={proposal?.permissions.evaluate}
+          refreshProposal={refreshProposal}
+        />
       )}
       {evaluation?.type === 'rubric' && (
         <RubricSidebar key={evaluation.id} {...{ proposal, isCurrent, evaluation, refreshProposal }} />

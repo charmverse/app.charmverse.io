@@ -30,13 +30,13 @@ async function upsertProposalCriteriaController(
 
   const { rubricCriteria, evaluationId } = req.body as RubricCriteriaUpsert;
 
-  const updatedCriteria = await upsertRubricCriteria({
+  await upsertRubricCriteria({
     proposalId,
     evaluationId,
     rubricCriteria
   });
 
-  res.status(200).send(updatedCriteria);
+  res.status(200).end();
 }
 
 export default withSessionRoute(handler);
