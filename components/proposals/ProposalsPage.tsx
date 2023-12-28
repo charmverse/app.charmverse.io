@@ -31,6 +31,7 @@ import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import { isTruthy } from 'lib/utilities/types';
 
 import { useProposalDialog } from './components/ProposalDialog/hooks/useProposalDialog';
@@ -94,6 +95,37 @@ export function ProposalsPage({ title }: { title: string }) {
     }
   }, [router.query.id]);
 
+  async function deleteProposals(pageIds: string[]) {
+    for (const pageId of pageIds) {
+      const proposalId = pages[pageId]?.proposalId;
+      if (proposalId) {
+        try {
+          await charmClient.deletePage(proposalId);
+        } catch (err) {
+          //
+        }
+      }
+    }
+    await mutateProposals();
+  }
+
+  async function updateProposalsAuthor(pageIds: string[], authorIds: string[]) {
+    for (const pageId of pageIds) {
+      const proposalId = pages[pageId]?.proposalId;
+      if (proposalId) {
+        try {
+          await charmClient.proposals.updateProposal({
+            authors: authorIds,
+            proposalId
+          });
+        } catch (err) {
+          //
+        }
+      }
+    }
+    await mutateProposals();
+  }
+
   if (isLoadingAccess) {
     return null;
   }
@@ -155,19 +187,8 @@ export function ProposalsPage({ title }: { title: string }) {
                 onChange={() => {
                   mutateProposals();
                 }}
-                onDelete={async (pageIds) => {
-                  for (const pageId of pageIds) {
-                    const proposalId = pages[pageId]?.proposalId;
-                    if (proposalId) {
-                      try {
-                        await charmClient.deletePage(proposalId);
-                      } catch (err) {
-                        //
-                      }
-                    }
-                  }
-                  await mutateProposals();
-                }}
+                onDelete={deleteProposals}
+                onProposalAuthorSelect={updateProposalsAuthor}
               />
             )}
             <div className='octo-spacer' />

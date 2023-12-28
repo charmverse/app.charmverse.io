@@ -11,6 +11,7 @@ import { TagSelect } from 'components/common/BoardEditor/components/properties/T
 import { TextInput } from 'components/common/BoardEditor/components/properties/TextInput';
 import type { UserSelectProps } from 'components/common/BoardEditor/components/properties/UserSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
@@ -168,44 +169,51 @@ function PersonPropertyTemplateMenu({
   board,
   cards,
   propertyTemplate,
-  onChange
+  onChange,
+  onProposalAuthorSelect
 }: {
   board: Board;
   cards: Card[];
   propertyTemplate: IPropertyTemplate<PropertyType>;
   onChange?: VoidFunction;
+  onProposalAuthorSelect?: (userIds: string[]) => void;
 }) {
   const propertyValue = cards[0].fields.properties[propertyTemplate.id];
 
   const userSelectProps: UserSelectProps = {
     memberIds: typeof propertyValue === 'string' ? [propertyValue] : (propertyValue as string[]) ?? [],
     onChange: async (newValue) => {
-      await mutator.changePropertyValues(cards, propertyTemplate.id, newValue);
-      const previousValue = propertyValue
-        ? typeof propertyValue === 'string'
-          ? [propertyValue]
-          : (propertyValue as string[])
-        : [];
-      const newUserIds = newValue.filter((id) => !previousValue.includes(id));
-      charmClient.createEvents({
-        spaceId: board.spaceId,
-        payload: newUserIds
-          .map((userId) =>
-            cards.map(
-              (card) =>
-                ({
-                  cardId: card.id,
-                  cardProperty: {
-                    id: propertyTemplate.id,
-                    name: propertyTemplate.name,
-                    value: userId
-                  },
-                  scope: WebhookEventNames.CardPersonPropertyAssigned
-                } as CreateEventPayload)
+      if (onProposalAuthorSelect) {
+        onProposalAuthorSelect(newValue);
+      } else {
+        await mutator.changePropertyValues(cards, propertyTemplate.id, newValue);
+
+        const previousValue = propertyValue
+          ? typeof propertyValue === 'string'
+            ? [propertyValue]
+            : (propertyValue as string[])
+          : [];
+        const newUserIds = newValue.filter((id) => !previousValue.includes(id));
+        charmClient.createEvents({
+          spaceId: board.spaceId,
+          payload: newUserIds
+            .map((userId) =>
+              cards.map(
+                (card) =>
+                  ({
+                    cardId: card.id,
+                    cardProperty: {
+                      id: propertyTemplate.id,
+                      name: propertyTemplate.name,
+                      value: userId
+                    },
+                    scope: WebhookEventNames.CardPersonPropertyAssigned
+                  } as CreateEventPayload)
+              )
             )
-          )
-          .flat()
-      });
+            .flat()
+        });
+      }
       onChange?.();
     },
     displayType: 'table',
@@ -294,13 +302,17 @@ function PropertyTemplateMenu({
   cards,
   checkedIds,
   board,
-  onChange
+  onChange,
+  isAdmin,
+  onProposalAuthorSelect
 }: {
   board: Board;
   checkedIds: string[];
   cards: Card[];
   propertyTemplate: IPropertyTemplate<PropertyType>;
   onChange?: VoidFunction;
+  isAdmin: boolean;
+  onProposalAuthorSelect?: (pageIds: string[], userIds: string[]) => void;
 }) {
   const isValidType = [
     'checkbox',
@@ -312,7 +324,8 @@ function PropertyTemplateMenu({
     'url',
     'email',
     'phone',
-    'person'
+    'person',
+    'proposalAuthor'
   ].includes(propertyTemplate.type);
 
   if (!isValidType || propertyTemplate.id === Constants.titleColumnId) {
@@ -367,6 +380,23 @@ function PropertyTemplateMenu({
       );
     }
 
+    case 'proposalAuthor': {
+      if (!isAdmin) {
+        return null;
+      }
+      return (
+        <PersonPropertyTemplateMenu
+          onChange={onChange}
+          board={board}
+          cards={checkedCards}
+          propertyTemplate={propertyTemplate}
+          onProposalAuthorSelect={(userIds) => {
+            onProposalAuthorSelect?.(checkedIds, userIds);
+          }}
+        />
+      );
+    }
+
     case 'date': {
       return <DatePropertyTemplateMenu onChange={onChange} cards={checkedCards} propertyTemplate={propertyTemplate} />;
     }
@@ -384,7 +414,8 @@ export function ViewHeaderRowsMenu({
   board,
   propertyTemplates,
   onChange,
-  onDelete
+  onDelete,
+  onProposalAuthorSelect
 }: {
   board: Board;
   cards: Card[];
@@ -393,9 +424,10 @@ export function ViewHeaderRowsMenu({
   propertyTemplates: IPropertyTemplate<PropertyType>[];
   onChange?: VoidFunction;
   onDelete?: (pageIds: string[]) => Promise<void>;
+  onProposalAuthorSelect?: (pageIds: string[], userIds: string[]) => void;
 }) {
+  const isAdmin = useIsAdmin();
   const [isDeleting, setIsDeleting] = useState(false);
-
   async function deleteCheckedCards() {
     setIsDeleting(true);
     try {
@@ -422,12 +454,14 @@ export function ViewHeaderRowsMenu({
       {cards.length !== 0
         ? propertyTemplates.map((propertyTemplate) => (
             <PropertyTemplateMenu
+              isAdmin={isAdmin}
               board={board}
               checkedIds={checkedIds}
               cards={cards}
               propertyTemplate={propertyTemplate}
               key={propertyTemplate.id}
               onChange={onChange}
+              onProposalAuthorSelect={onProposalAuthorSelect}
             />
           ))
         : null}
