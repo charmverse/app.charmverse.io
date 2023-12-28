@@ -227,12 +227,7 @@ function SidebarContents({
               readOnlyRubricCriteria={!!readOnlyRubricCriteria}
             />
           ) : (
-            <EvaluationSidebar
-              pageId={pageId}
-              proposal={proposal}
-              isTemplate={isProposalTemplate}
-              refreshProposal={refreshProposal}
-            />
+            <EvaluationSidebar pageId={pageId} proposal={proposal} refreshProposal={refreshProposal} />
           )
         ) : (
           <OldProposalEvaluationSidebar pageId={pageId} proposalId={proposalId} />

@@ -1,15 +1,17 @@
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
-import { Box, Divider, Typography } from '@mui/material';
 
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationStepSettings';
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
+import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
 
+import { EvaluationStepRow } from '../EvaluationSidebar/components/EvaluationStepRow';
 import { WorkflowSelect } from '../WorkflowSelect';
 
 import { EvaluationStepSettings } from './components/EvaluationStepSettings';
 
 export type Props = {
-  proposal?: Pick<ProposalPropertiesInput, 'categoryId' | 'evaluations' | 'workflowId'>;
+  proposal?: Pick<ProposalPropertiesInput, 'categoryId' | 'fields' | 'evaluations' | 'workflowId'>;
   onChangeEvaluation?: (evaluationId: string, updated: Partial<ProposalEvaluationValues>) => void;
   readOnly: boolean;
   readOnlyReviewers: boolean;
@@ -27,8 +29,8 @@ export function EvaluationSettingsSidebar({
   onChangeWorkflow,
   readOnlyWorkflowSelect
 }: Props) {
-  const evaluationsWithConfig = proposal?.evaluations.filter((e) => e.type !== 'feedback');
-
+  const pendingRewards = (proposal?.fields as ProposalFields)?.pendingRewards;
+  const { mappedFeatures } = useSpaceFeatures();
   return (
     <div>
       <WorkflowSelect
@@ -37,11 +39,12 @@ export function EvaluationSettingsSidebar({
         readOnly={readOnlyWorkflowSelect}
         required
       />
-      <Box display='flex' flex={1} flexDirection='column' data-test='evaluation-settings-sidebar'>
-        {proposal &&
-          evaluationsWithConfig?.map((evaluation) => (
-            <Box key={evaluation.id}>
-              <Divider sx={{ my: 1 }} />
+      <EvaluationStepRow position={1} result={null} title='Draft' />
+      {proposal && (
+        <>
+          {proposal?.evaluations?.map((evaluation, index) => (
+            <EvaluationStepRow key={evaluation.id} expanded result={null} position={index + 2} title={evaluation.title}>
+              {/* <Divider sx={{ my: 1 }} /> */}
               <EvaluationStepSettings
                 categoryId={proposal.categoryId}
                 readOnly={readOnly}
@@ -52,14 +55,17 @@ export function EvaluationSettingsSidebar({
                   onChangeEvaluation?.(evaluation.id, updated);
                 }}
               />
-            </Box>
+            </EvaluationStepRow>
           ))}
-        {proposal && evaluationsWithConfig?.length === 0 && (
-          <Typography variant='body2' color='secondary'>
-            No evaluations configured
-          </Typography>
-        )}
-      </Box>
+          {pendingRewards?.length && (
+            <EvaluationStepRow
+              position={proposal ? proposal.evaluations.length + 2 : 0}
+              result={null}
+              title={mappedFeatures.rewards.title}
+            />
+          )}
+        </>
+      )}
     </div>
   );
 }

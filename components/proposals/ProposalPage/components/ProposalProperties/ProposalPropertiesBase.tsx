@@ -324,7 +324,7 @@ export function ProposalPropertiesBase({
           <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
               <PropertyLabel readOnly required={isNewProposal} highlighted>
-                Reviewer
+                Reviewers
               </PropertyLabel>
               <UserAndRoleSelect
                 data-test='proposal-reviewer-select'

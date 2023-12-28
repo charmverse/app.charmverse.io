@@ -1,10 +1,9 @@
 import type { ProposalEvaluation, ProposalSystemRole } from '@charmverse/core/prisma';
-import { Box, Divider, Typography, FormLabel } from '@mui/material';
+import { Box, Typography, FormLabel } from '@mui/material';
 
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
-import { evaluationIcons } from 'components/settings/proposals/constants';
 import type { ProposalEvaluationInput } from 'lib/proposal/createProposal';
 
 import { RubricCriteria } from './RubricCriteriaSettings';
@@ -53,16 +52,7 @@ export function EvaluationStepSettings({
   }
 
   return (
-    <Box px={1}>
-      <Box display='flex' alignItems='center' gap={1} mb={1}>
-        {evaluationIcons[evaluation.type]()}
-        <Typography variant='h6'>{evaluation.title}</Typography>
-      </Box>
-      <FormLabel required={evaluation.type !== 'vote'}>
-        <Typography component='span' variant='subtitle1'>
-          {evaluation.type === 'vote' ? 'Voter' : 'Reviewer'}
-        </Typography>
-      </FormLabel>
+    <>
       <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow' mb={2}>
         <UserAndRoleSelect
           data-test={`proposal-${evaluation.type}-select`}
@@ -107,6 +97,6 @@ export function EvaluationStepSettings({
           }
         />
       )}
-    </Box>
+    </>
   );
 }

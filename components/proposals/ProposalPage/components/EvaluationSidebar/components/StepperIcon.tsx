@@ -6,7 +6,7 @@ import { Stack, Typography } from '@mui/material';
 const stepperSize = 25;
 
 const StyledIconContainer = styled.div<{
-  isCurrent: boolean;
+  isCurrent?: boolean;
   result: ProposalEvaluationResult | null;
 }>(({ theme, result, isCurrent }) => {
   const currentColor = isCurrent
@@ -39,7 +39,7 @@ export function StepperIcon({
   isCurrent,
   position
 }: {
-  isCurrent: boolean;
+  isCurrent?: boolean;
   result: ProposalEvaluationResult | null;
   position: number;
 }) {
