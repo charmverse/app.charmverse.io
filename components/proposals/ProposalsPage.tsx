@@ -9,6 +9,7 @@ import { ViewSettingsRow } from 'components/common/BoardEditor/components/ViewSe
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
 import ViewHeaderActionsMenu from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderActionsMenu';
+import { ViewHeaderRowsMenu } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderRowsMenu';
 import ViewSidebar from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import ErrorPage from 'components/common/errors/ErrorPage';
@@ -28,6 +29,7 @@ import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useUser } from 'hooks/useUser';
+import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 
 import { useProposalDialog } from './components/ProposalDialog/hooks/useProposalDialog';
 import { useProposals } from './hooks/useProposals';
@@ -47,6 +49,8 @@ export function ProposalsPage({ title }: { title: string }) {
   const router = useRouter();
   const [showSidebar, setShowSidebar] = useState(false);
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
+  const [checkedIds, setCheckedIds] = useState<string[]>([]);
+
   const groupByProperty = useMemo(() => {
     let _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
 
@@ -96,6 +100,23 @@ export function ProposalsPage({ title }: { title: string }) {
     return <ErrorPage message='You cannot access proposals for this space' />;
   }
 
+  const showViewHeaderRowsMenu = checkedIds.length !== 0 && activeBoard;
+
+  const propertyTemplates: IPropertyTemplate<PropertyType>[] = [];
+
+  if (activeView?.fields?.visiblePropertyIds.length) {
+    activeView.fields.visiblePropertyIds.forEach((propertyId) => {
+      const property = activeBoard?.fields.cardProperties.find((p) => p.id === propertyId);
+      if (property) {
+        propertyTemplates.push(property);
+      }
+    });
+  } else {
+    activeBoard?.fields.cardProperties.forEach((property) => {
+      propertyTemplates.push(property);
+    });
+  }
+
   return (
     <DatabaseContainer>
       <DatabaseStickyHeader>
@@ -120,31 +141,39 @@ export function ProposalsPage({ title }: { title: string }) {
             </Box>
           </Box>
         </DatabaseTitle>
-        <>
-          <Stack direction='row' alignItems='center' justifyContent='flex-end' mb={1} gap={1}>
-            <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
-
-            <ViewSortControl
-              activeBoard={activeBoard}
-              activeView={activeView}
-              cards={cards}
-              viewSortPopup={viewSortPopup}
-            />
-
-            {user && (
-              <ViewHeaderActionsMenu
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setShowSidebar(!showSidebar);
-                }}
+        <Stack gap={0.75}>
+          <div className={`ViewHeader ${showViewHeaderRowsMenu ? 'view-header-rows-menu-visible' : ''}`}>
+            {showViewHeaderRowsMenu && (
+              <ViewHeaderRowsMenu
+                board={activeBoard}
+                cards={cards}
+                checkedIds={checkedIds}
+                setCheckedIds={setCheckedIds}
+                propertyTemplates={propertyTemplates}
               />
             )}
-          </Stack>
-          <Divider />
-
+            <div className='octo-spacer' />
+            <Box className='view-actions'>
+              <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
+              <ViewSortControl
+                activeBoard={activeBoard}
+                activeView={activeView}
+                cards={cards}
+                viewSortPopup={viewSortPopup}
+              />
+              {user && (
+                <ViewHeaderActionsMenu
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setShowSidebar(!showSidebar);
+                  }}
+                />
+              )}
+            </Box>
+          </div>
           <ViewSettingsRow activeView={activeView} canSaveGlobally={isAdmin} />
-        </>
+        </Stack>
       </DatabaseStickyHeader>
 
       {loadingData ? (
@@ -168,11 +197,12 @@ export function ProposalsPage({ title }: { title: string }) {
                   disableAddingCards
                   showCard={openPage}
                   readOnlyTitle
-                  readOnlyRows
                   cardIdToFocusOnRender=''
                   addCard={async () => {}}
                   onCardClicked={() => {}}
                   onDeleteCard={onDelete}
+                  setCheckedIds={setCheckedIds}
+                  checkedIds={checkedIds}
                 />
               </Box>
             ) : (

@@ -26,7 +26,6 @@ const StyledStack = styled(Stack)`
   flex-direction: row;
   align-items: center;
   z-index: 1;
-  margin-bottom: 4px;
   overflow: auto;
   width: 100%;
   margin-right: 8px;
