@@ -123,7 +123,6 @@ export function ProposalPropertiesBase({
   const { proposalCategoriesWithCreatePermission, categories } = useProposalCategories();
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
-  const prevStatusRef = useRef(proposalStatus || '');
   const { lensProfile } = useLensProfile();
   const isMobile = useMediaQuery<Theme>((theme) => theme.breakpoints.down('sm'));
   const { account } = useWeb3Account();
@@ -193,12 +192,8 @@ export function ProposalPropertiesBase({
   }
 
   useEffect(() => {
-    if (!prevStatusRef.current && proposalStatus === 'draft') {
-      setDetailsExpanded(true);
-    }
-
-    prevStatusRef.current = proposalStatus || '';
-  }, [detailsExpanded, proposalStatus]);
+    setDetailsExpanded(proposalStatus === 'draft');
+  }, [setDetailsExpanded, proposalStatus]);
 
   let lensProposalPropertyState: 'hide' | 'show_link' | 'show_toggle' = 'hide';
   if (proposalLensLink) {

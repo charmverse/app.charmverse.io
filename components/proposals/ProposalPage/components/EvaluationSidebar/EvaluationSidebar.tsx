@@ -1,18 +1,15 @@
-import { Box } from '@mui/material';
 import { useEffect, useState } from 'react';
 
-import { Button } from 'components/common/Button';
-import Modal from 'components/common/Modal';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 
-import { getEvaluationFormError } from '../../hooks/useNewProposal';
 import type { ProposalEvaluationValues } from '../EvaluationSettingsSidebar/components/EvaluationStepSettings';
-import { EvaluationStepSettings } from '../EvaluationSettingsSidebar/components/EvaluationStepSettings';
 import { WorkflowSelect } from '../WorkflowSelect';
 
 import { EvaluationStepActions } from './components/EvaluationStepActions';
 import { EvaluationStepRow } from './components/EvaluationStepRow';
+import { EvaluationStepSettingsModal } from './components/EvaluationStepSettingsModal';
 import { FeedbackEvaluation } from './components/FeedbackEvaluation';
 import { PassFailEvaluation } from './components/PassFailEvaluation';
 import { PublishRewardsButton } from './components/PublishRewardsButton';
@@ -42,6 +39,7 @@ export type Props = {
 export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refreshProposal }: Props) {
   const [activeEvaluationId, setActiveEvaluationId] = useState<string | undefined>(proposal?.currentEvaluationId);
   const { mappedFeatures } = useSpaceFeatures();
+  const { showMessage } = useSnackbar();
   const [evaluationInput, setEvaluationInput] = useState<ProposalEvaluationValues | null>(null);
   const rewardsTitle = mappedFeatures.rewards.title;
   const currentEvaluation = proposal?.evaluations.find((e) => e.id === proposal?.currentEvaluationId);
@@ -50,7 +48,6 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
   const hasRewardsStep = Boolean(pendingRewards?.length || isRewardsComplete);
   const isRewardsActive = currentEvaluation?.result === 'pass';
   const isFromTemplate = !!proposal?.page?.sourceTemplateId;
-  const evaluationInputError = evaluationInput && getEvaluationFormError(evaluationInput);
   // To find the previous step index. we have to calculate the position including Draft and Rewards steps
   let adjustedCurrentEvaluationIndex = 0; // "draft" step
   if (proposal && currentEvaluation) {
@@ -71,8 +68,12 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
   }
 
   async function saveEvaluation(newEvaluation: ProposalEvaluationValues) {
-    await onChangeEvaluation?.(newEvaluation.id, newEvaluation);
-    closeSettings();
+    try {
+      await onChangeEvaluation?.(newEvaluation.id, newEvaluation);
+      closeSettings();
+    } catch (error) {
+      showMessage((error as Error).message ?? 'Something went wrong', 'error');
+    }
   }
 
   useEffect(() => {
@@ -184,29 +185,13 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
         </EvaluationStepRow>
       )}
       {evaluationInput && (
-        <Modal open onClose={closeSettings} title={`Edit ${evaluationInput?.title}`}>
-          <Box mb={1}>
-            <EvaluationStepSettings
-              readOnly={false}
-              readOnlyReviewers={isFromTemplate}
-              readOnlyRubricCriteria={isFromTemplate}
-              evaluation={evaluationInput}
-              onChange={updateEvaluation}
-            />
-          </Box>
-          <Box display='flex' justifyContent='flex-end' gap={1}>
-            <Button color='secondary' variant='outlined' onClick={closeSettings}>
-              Cancel
-            </Button>
-            <Button
-              disabled={evaluationInputError}
-              disabledTooltip={evaluationInputError}
-              onClick={() => saveEvaluation(evaluationInput)}
-            >
-              Save
-            </Button>
-          </Box>
-        </Modal>
+        <EvaluationStepSettingsModal
+          close={closeSettings}
+          evaluationInput={evaluationInput}
+          isFromTemplate={isFromTemplate}
+          saveEvaluation={saveEvaluation}
+          updateEvaluation={updateEvaluation}
+        />
       )}
     </div>
   );
