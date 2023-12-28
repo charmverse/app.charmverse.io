@@ -1,4 +1,4 @@
-import { Box, Divider, Grid, Stack, Typography } from '@mui/material';
+import { Box, Grid, Stack, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -37,7 +37,7 @@ import { useProposals } from './hooks/useProposals';
 export function ProposalsPage({ title }: { title: string }) {
   const { space: currentSpace } = useCurrentSpace();
   const { isFreeSpace } = useIsFreeSpace();
-  const { proposals } = useProposals();
+  const { proposals, mutateProposals } = useProposals();
   const loadingData = !proposals;
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
   const canSeeProposals = hasAccess || isFreeSpace || currentSpace?.publicProposals === true;
@@ -150,6 +150,9 @@ export function ProposalsPage({ title }: { title: string }) {
                 checkedIds={checkedIds}
                 setCheckedIds={setCheckedIds}
                 propertyTemplates={propertyTemplates}
+                onChange={() => {
+                  mutateProposals();
+                }}
               />
             )}
             <div className='octo-spacer' />

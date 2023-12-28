@@ -124,11 +124,13 @@ function PropertyMenu({
 function SelectPropertyTemplateMenu({
   board,
   cards,
-  propertyTemplate
+  propertyTemplate,
+  onChange
 }: {
   board: Board;
   cards: Card[];
   propertyTemplate: IPropertyTemplate<PropertyType>;
+  onChange?: VoidFunction;
 }) {
   const propertyValue = cards[0].fields.properties[propertyTemplate.id];
 
@@ -137,8 +139,9 @@ function SelectPropertyTemplateMenu({
     multiselect: propertyTemplate.type === 'multiSelect',
     propertyValue: propertyValue as string,
     options: propertyTemplate.options,
-    onChange: (newValue) => {
-      mutator.changePropertyValues(cards, propertyTemplate.id, newValue);
+    onChange: async (newValue) => {
+      await mutator.changePropertyValues(cards, propertyTemplate.id, newValue);
+      onChange?.();
     },
     onUpdateOption: (option) => {
       mutator.changePropertyOption(board, propertyTemplate, option);
@@ -164,18 +167,20 @@ function SelectPropertyTemplateMenu({
 function PersonPropertyTemplateMenu({
   board,
   cards,
-  propertyTemplate
+  propertyTemplate,
+  onChange
 }: {
   board: Board;
   cards: Card[];
   propertyTemplate: IPropertyTemplate<PropertyType>;
+  onChange?: VoidFunction;
 }) {
   const propertyValue = cards[0].fields.properties[propertyTemplate.id];
 
   const userSelectProps: UserSelectProps = {
     memberIds: typeof propertyValue === 'string' ? [propertyValue] : (propertyValue as string[]) ?? [],
-    onChange: (newValue) => {
-      mutator.changePropertyValues(cards, propertyTemplate.id, newValue);
+    onChange: async (newValue) => {
+      await mutator.changePropertyValues(cards, propertyTemplate.id, newValue);
       const previousValue = propertyValue
         ? typeof propertyValue === 'string'
           ? [propertyValue]
@@ -201,6 +206,7 @@ function PersonPropertyTemplateMenu({
           )
           .flat()
       });
+      onChange?.();
     },
     displayType: 'table',
     showEmptyPlaceholder: true
@@ -217,10 +223,12 @@ function PersonPropertyTemplateMenu({
 
 function TextPropertyTemplateMenu({
   cards,
-  propertyTemplate
+  propertyTemplate,
+  onChange
 }: {
   cards: Card[];
   propertyTemplate: IPropertyTemplate<PropertyType>;
+  onChange?: VoidFunction;
 }) {
   const propertyValue = cards[0].fields.properties[propertyTemplate.id] || '';
   const [value, setValue] = useState(propertyValue);
@@ -238,6 +246,7 @@ function TextPropertyTemplateMenu({
             displayType='details'
             onSave={async () => {
               await mutator.changePropertyValues(cards, propertyTemplate.id, value);
+              onChange?.();
               closeMenu();
             }}
             onCancel={() => setValue(propertyValue || '')}
@@ -252,10 +261,12 @@ function TextPropertyTemplateMenu({
 
 function DatePropertyTemplateMenu({
   cards,
-  propertyTemplate
+  propertyTemplate,
+  onChange
 }: {
   cards: Card[];
   propertyTemplate: IPropertyTemplate<PropertyType>;
+  onChange?: VoidFunction;
 }) {
   const propertyValue = cards[0].fields.properties[propertyTemplate.id] || '';
 
@@ -267,8 +278,9 @@ function DatePropertyTemplateMenu({
             wrapColumn
             value={propertyValue?.toString()}
             showEmptyPlaceholder
-            onChange={(newValue) => {
-              mutator.changePropertyValues(cards, propertyTemplate.id, newValue);
+            onChange={async (newValue) => {
+              await mutator.changePropertyValues(cards, propertyTemplate.id, newValue);
+              onChange?.();
             }}
           />
         );
@@ -281,12 +293,14 @@ function PropertyTemplateMenu({
   propertyTemplate,
   cards,
   checkedIds,
-  board
+  board,
+  onChange
 }: {
   board: Board;
   checkedIds: string[];
   cards: Card[];
   propertyTemplate: IPropertyTemplate<PropertyType>;
+  onChange?: VoidFunction;
 }) {
   const isValidType = [
     'checkbox',
@@ -317,9 +331,14 @@ function PropertyTemplateMenu({
     case 'checkbox': {
       return (
         <StyledMenuItem
-          onClick={() =>
-            mutator.changePropertyValues(checkedCards, propertyTemplate.id, (!(propertyValue === 'true')).toString())
-          }
+          onClick={async () => {
+            await mutator.changePropertyValues(
+              checkedCards,
+              propertyTemplate.id,
+              (!(propertyValue === 'true')).toString()
+            );
+            onChange?.();
+          }}
         >
           {propertyTemplate.name}
         </StyledMenuItem>
@@ -327,19 +346,33 @@ function PropertyTemplateMenu({
     }
     case 'select':
     case 'multiSelect': {
-      return <SelectPropertyTemplateMenu board={board} cards={checkedCards} propertyTemplate={propertyTemplate} />;
+      return (
+        <SelectPropertyTemplateMenu
+          onChange={onChange}
+          board={board}
+          cards={checkedCards}
+          propertyTemplate={propertyTemplate}
+        />
+      );
     }
 
     case 'person': {
-      return <PersonPropertyTemplateMenu board={board} cards={checkedCards} propertyTemplate={propertyTemplate} />;
+      return (
+        <PersonPropertyTemplateMenu
+          onChange={onChange}
+          board={board}
+          cards={checkedCards}
+          propertyTemplate={propertyTemplate}
+        />
+      );
     }
 
     case 'date': {
-      return <DatePropertyTemplateMenu cards={checkedCards} propertyTemplate={propertyTemplate} />;
+      return <DatePropertyTemplateMenu onChange={onChange} cards={checkedCards} propertyTemplate={propertyTemplate} />;
     }
 
     default: {
-      return <TextPropertyTemplateMenu cards={checkedCards} propertyTemplate={propertyTemplate} />;
+      return <TextPropertyTemplateMenu onChange={onChange} cards={checkedCards} propertyTemplate={propertyTemplate} />;
     }
   }
 }
@@ -349,13 +382,15 @@ export function ViewHeaderRowsMenu({
   checkedIds,
   setCheckedIds,
   board,
-  propertyTemplates
+  propertyTemplates,
+  onChange
 }: {
   board: Board;
   cards: Card[];
   setCheckedIds: Dispatch<SetStateAction<string[]>>;
   checkedIds: string[];
   propertyTemplates: IPropertyTemplate<PropertyType>[];
+  onChange?: VoidFunction;
 }) {
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -386,6 +421,7 @@ export function ViewHeaderRowsMenu({
               cards={cards}
               propertyTemplate={propertyTemplate}
               key={propertyTemplate.id}
+              onChange={onChange}
             />
           ))
         : null}
