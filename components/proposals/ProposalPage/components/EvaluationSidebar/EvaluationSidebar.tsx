@@ -6,6 +6,7 @@ import Modal from 'components/common/Modal';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 
+import { getEvaluationFormError } from '../../hooks/useNewProposal';
 import type { ProposalEvaluationValues } from '../EvaluationSettingsSidebar/components/EvaluationStepSettings';
 import { EvaluationStepSettings } from '../EvaluationSettingsSidebar/components/EvaluationStepSettings';
 import { WorkflowSelect } from '../WorkflowSelect';
@@ -49,6 +50,7 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
   const hasRewardsStep = Boolean(pendingRewards?.length || isRewardsComplete);
   const isRewardsActive = currentEvaluation?.result === 'pass';
   const isFromTemplate = !!proposal?.page?.sourceTemplateId;
+  const evaluationInputError = evaluationInput && getEvaluationFormError(evaluationInput);
   // To find the previous step index. we have to calculate the position including Draft and Rewards steps
   let adjustedCurrentEvaluationIndex = 0; // "draft" step
   if (proposal && currentEvaluation) {
@@ -196,7 +198,13 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
             <Button color='secondary' variant='outlined' onClick={closeSettings}>
               Cancel
             </Button>
-            <Button onClick={() => saveEvaluation(evaluationInput)}>Save</Button>
+            <Button
+              disabled={evaluationInputError}
+              disabledTooltip={evaluationInputError}
+              onClick={() => saveEvaluation(evaluationInput)}
+            >
+              Save
+            </Button>
           </Box>
         </Modal>
       )}

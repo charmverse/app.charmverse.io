@@ -146,7 +146,7 @@ export function useNewProposal({ newProposal }: Props) {
   };
 }
 
-function getEvaluationFormError(evaluation: ProposalEvaluationValues): string | false {
+export function getEvaluationFormError(evaluation: ProposalEvaluationValues): string | false {
   switch (evaluation.type) {
     case 'feedback':
       return false;
