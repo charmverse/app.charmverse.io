@@ -341,6 +341,7 @@ function TableRow(props: Props) {
               readOnly={props.readOnly}
               syncWithPageId={cardPage?.syncWithPageId}
               card={card}
+              proposalId={cardPage.proposalId}
               board={board}
               showEmptyPlaceholder={false}
               propertyTemplate={template}

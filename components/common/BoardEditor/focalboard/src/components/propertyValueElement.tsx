@@ -8,6 +8,7 @@ import { useRouter } from 'next/router';
 import type { ReactElement, ReactNode } from 'react';
 import { memo, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
+import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
@@ -73,6 +74,7 @@ type Props = {
   columnRef?: React.RefObject<HTMLDivElement>;
   mutator?: Mutator;
   subRowsEmptyValueContent?: ReactElement | string;
+  proposalId?: string | null;
 };
 
 export const validatePropertyValue = (propType: string, val: string): boolean => {
@@ -128,7 +130,8 @@ function PropertyValueElement(props: Props) {
     updatedAt,
     displayType,
     mutator = defaultMutator,
-    subRowsEmptyValueContent
+    subRowsEmptyValueContent,
+    proposalId
   } = props;
 
   const { rubricProposalIdsWhereUserIsEvaluator, rubricProposalIdsWhereUserIsNotEvaluator } =
@@ -260,7 +263,6 @@ function PropertyValueElement(props: Props) {
   } else if (
     propertyTemplate.type === 'person' ||
     propertyTemplate.type === 'proposalEvaluatedBy' ||
-    propertyTemplate.type === 'proposalAuthor' ||
     propertyTemplate.type === 'proposalReviewer' ||
     propertyTemplate.id === REWARDS_APPLICANTS_BLOCK_ID
   ) {
@@ -299,6 +301,25 @@ function PropertyValueElement(props: Props) {
               })
             )
           );
+        }}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
+        showEmptyPlaceholder={showEmptyPlaceholder}
+      />
+    );
+  } else if (propertyTemplate.type === 'proposalAuthor') {
+    propertyValueElement = (
+      <UserSelect
+        displayType={displayType}
+        memberIds={typeof propertyValue === 'string' ? [propertyValue] : (propertyValue as string[]) ?? []}
+        readOnly={readOnly || (displayType !== 'details' && displayType !== 'table')}
+        onChange={async (newValue) => {
+          if (proposalId) {
+            await charmClient.proposals.updateProposal({
+              proposalId,
+              authors: newValue
+            });
+            await mutate(`/api/spaces/${board.spaceId}/proposals`);
+          }
         }}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
         showEmptyPlaceholder={showEmptyPlaceholder}
