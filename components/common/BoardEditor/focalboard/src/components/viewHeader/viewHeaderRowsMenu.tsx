@@ -383,7 +383,8 @@ export function ViewHeaderRowsMenu({
   setCheckedIds,
   board,
   propertyTemplates,
-  onChange
+  onChange,
+  onDelete
 }: {
   board: Board;
   cards: Card[];
@@ -391,13 +392,18 @@ export function ViewHeaderRowsMenu({
   checkedIds: string[];
   propertyTemplates: IPropertyTemplate<PropertyType>[];
   onChange?: VoidFunction;
+  onDelete?: (pageIds: string[]) => Promise<void>;
 }) {
   const [isDeleting, setIsDeleting] = useState(false);
 
   async function deleteCheckedCards() {
     setIsDeleting(true);
     try {
-      await mutator.deleteBlocks(checkedIds, 'delete cards');
+      if (onDelete) {
+        await onDelete(checkedIds);
+      } else {
+        await mutator.deleteBlocks(checkedIds, 'delete cards');
+      }
     } catch (_) {
       //
     } finally {

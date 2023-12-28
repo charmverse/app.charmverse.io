@@ -28,8 +28,10 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
+import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import { isTruthy } from 'lib/utilities/types';
 
 import { useProposalDialog } from './components/ProposalDialog/hooks/useProposalDialog';
 import { useProposals } from './hooks/useProposals';
@@ -50,7 +52,7 @@ export function ProposalsPage({ title }: { title: string }) {
   const [showSidebar, setShowSidebar] = useState(false);
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
-
+  const { pages } = usePages();
   const groupByProperty = useMemo(() => {
     let _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
 
@@ -152,6 +154,19 @@ export function ProposalsPage({ title }: { title: string }) {
                 propertyTemplates={propertyTemplates}
                 onChange={() => {
                   mutateProposals();
+                }}
+                onDelete={async (pageIds) => {
+                  for (const pageId of pageIds) {
+                    const proposalId = pages[pageId]?.proposalId;
+                    if (proposalId) {
+                      try {
+                        await charmClient.deletePage(proposalId);
+                      } catch (err) {
+                        //
+                      }
+                    }
+                  }
+                  await mutateProposals();
                 }}
               />
             )}
