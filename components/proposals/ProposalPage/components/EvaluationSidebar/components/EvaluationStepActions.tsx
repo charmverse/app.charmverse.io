@@ -1,13 +1,15 @@
 import { Edit as EditIcon } from '@mui/icons-material';
 import { Box, IconButton, Tooltip } from '@mui/material';
 
+import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+
 import type { ProposalEvaluationValues } from '../../EvaluationSettingsSidebar/components/EvaluationStepSettings';
 
 import { GoBackButton } from './GoBackButton';
 
 type Props = {
   proposalId?: string;
-  permissions?: any;
+  permissions?: ProposalWithUsersAndRubric['permissions'];
   evaluation?: ProposalEvaluationValues;
   isPreviousStep: boolean;
   refreshProposal?: VoidFunction;
@@ -30,14 +32,14 @@ export function EvaluationStepActions({
         <GoBackButton
           proposalId={proposalId}
           previousStep={evaluation}
-          hasMovePermission={permissions.move}
+          hasMovePermission={!!permissions?.move}
           onSubmit={refreshProposal}
         />
       )}
 
       <Tooltip
         disableInteractive
-        title={!permissions.edit ? 'You do not have permission to edit this evaluation' : 'Edit'}
+        title={!permissions?.edit ? 'You do not have permission to edit this evaluation' : 'Edit'}
       >
         <span
           className='show-on-hover'
@@ -45,7 +47,7 @@ export function EvaluationStepActions({
         >
           <IconButton
             color='secondary'
-            disabled={!permissions.edit}
+            disabled={!permissions?.edit}
             size='small'
             onClick={() => evaluation && openSettings(evaluation)}
           >
