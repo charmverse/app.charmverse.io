@@ -9,7 +9,7 @@ import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { ProposalPendingReward } from 'lib/proposal/blocks/interfaces';
+import type { ProposalPendingReward } from 'lib/proposal/interface';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 import { isTruthy } from 'lib/utilities/types';
 

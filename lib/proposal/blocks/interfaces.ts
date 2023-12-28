@@ -28,8 +28,6 @@ export type ProposalPropertiesField = Record<string, ProposalPropertyValue>;
 
 export type ProposalPropertyValues = { properties: ProposalPropertiesField };
 
-export type ProposalPendingReward = { reward: UpdateableRewardFields; page: NewPageValues | null; draftId: string };
-
 export type ProposalBlockInput = {
   id?: string;
   type: string;

@@ -454,6 +454,17 @@ export function ProposalPropertiesBase({
           </Box>
         )}
 
+        <CustomPropertiesAdapter
+          readOnly={readOnlyAuthors}
+          readOnlyProperties={readOnlyCustomProperties}
+          proposal={proposalFormInputs}
+          onChange={(properties: ProposalFields['properties']) => {
+            setProposalFormInputs({
+              fields: { ...proposalFormInputs.fields, properties: properties ? { ...properties } : {} }
+            });
+          }}
+        />
+
         <ProposalRewards
           pendingRewards={pendingRewards}
           reviewers={proposalReviewers}
@@ -493,17 +504,6 @@ export function ProposalPropertiesBase({
                   (draft) => draft.draftId !== draftId
                 )
               }
-            });
-          }}
-        />
-
-        <CustomPropertiesAdapter
-          readOnly={readOnlyAuthors}
-          readOnlyProperties={readOnlyCustomProperties}
-          proposal={proposalFormInputs}
-          onChange={(properties: ProposalFields['properties']) => {
-            setProposalFormInputs({
-              fields: { ...proposalFormInputs.fields, properties: properties ? { ...properties } : {} }
             });
           }}
         />

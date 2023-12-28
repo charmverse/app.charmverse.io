@@ -7,6 +7,7 @@ export type ClearEvaluationResultRequest = {
   evaluationId: string;
 };
 
+// clear the result of a proposal evaluation and all evaluations after it
 export async function clearEvaluationResult({ evaluationId, proposalId }: ClearEvaluationResultRequest) {
   const proposal = await prisma.proposal.findUniqueOrThrow({
     where: {
@@ -17,15 +18,23 @@ export async function clearEvaluationResult({ evaluationId, proposalId }: ClearE
         orderBy: {
           index: 'asc'
         }
-      }
+      },
+      rewards: true
     }
   });
   const evaluationIndex = proposal.evaluations.findIndex((e) => e.id === evaluationId);
+
   if (evaluationIndex < 0) {
     throw new Error('Evaluation not found');
   }
+
+  if (proposal.rewards.length > 0) {
+    throw new InvalidInputError('Cannot clear the results of a proposal with rewards');
+  }
+
   // Also reset all evaluations after this one
-  const evaluationsToReset = proposal.evaluations.slice(evaluationIndex);
+  const evaluationsToReset = proposal.evaluations.slice(evaluationIndex).filter((e) => e.result !== null);
+
   if (evaluationsToReset.some((evaluation) => evaluation.type === 'vote')) {
     throw new InvalidInputError('Cannot clear the results of a vote');
   }

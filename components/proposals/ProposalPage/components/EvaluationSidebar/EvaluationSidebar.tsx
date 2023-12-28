@@ -41,11 +41,10 @@ export function EvaluationSidebar({ pageId, proposal, refreshProposal }: Props) 
   const isRewardsComplete = !!proposal?.rewardIds?.length;
   const hasRewardsStep = !!pendingRewards?.length || isRewardsComplete;
   const isRewardsActive = currentEvaluation?.result === 'pass';
-
   // To find the previous step index. we have to calculate the position including Draft and Rewards steps
   let adjustedCurrentEvaluationIndex = 0; // "draft" step
   if (proposal && currentEvaluation) {
-    adjustedCurrentEvaluationIndex = proposal.evaluations.findIndex((e) => e.id === currentEvaluation?.id);
+    adjustedCurrentEvaluationIndex = proposal.evaluations.findIndex((e) => e.id === currentEvaluation?.id) + 1;
     if (hasRewardsStep && isRewardsActive) {
       adjustedCurrentEvaluationIndex += 1;
     }
@@ -96,6 +95,7 @@ export function EvaluationSidebar({ pageId, proposal, refreshProposal }: Props) 
               permissions={proposal?.permissions}
               proposalId={proposal?.id}
               refreshProposal={refreshProposal}
+              evaluation={evaluation}
             />
           }
         >

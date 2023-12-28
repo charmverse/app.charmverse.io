@@ -1,5 +1,4 @@
-import { ArrowBackIos } from '@mui/icons-material';
-import { Typography } from '@mui/material';
+import { Tooltip, Typography } from '@mui/material';
 import { useState } from 'react';
 
 import { useClearEvaluationResult, useUpdateProposalStatusOnly } from 'charmClient/hooks/proposals';
@@ -63,17 +62,19 @@ export function GoBackButton({
 
   return (
     <>
-      <Button
-        color='secondary'
-        loading={isSavingProposal || isSavingEvaluation}
-        startIcon={<ArrowBackIos />}
-        variant='text'
-        disabled={!!disabledTooltip}
-        disabledTooltip={disabledTooltip}
-        onClick={onClick}
-      >
-        Back to {previousStep?.title || 'Draft'}
-      </Button>
+      <Tooltip title={`Move back to ${previousStep?.title || 'Draft'}`}>
+        <Button
+          color='secondary'
+          loading={isSavingProposal || isSavingEvaluation}
+          size='small'
+          variant='outlined'
+          disabled={!!disabledTooltip}
+          disabledTooltip={disabledTooltip}
+          onClick={onClick}
+        >
+          Back
+        </Button>
+      </Tooltip>
       <ModalWithButtons open={showConfirmation} buttonText='Continue' onClose={onCancel} onConfirm={goToPreviousStep}>
         <Typography>
           Moving back will clear the result of the current and previous steps and cannot be undone.

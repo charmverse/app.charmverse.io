@@ -31,9 +31,11 @@ export function EvaluationStepRow({ expanded, onChange, isCurrent, result, index
   return (
     <Accordion expanded={expanded} onChange={onChange}>
       <AccordionSummary sx={{ px: 1 }}>
-        <Box display='flex' alignItems='center' gap={1}>
+        <Box display='flex' alignItems='center' gap={1} width='100%'>
           <StepperIcon result={result} isCurrent={isCurrent} position={index + 1} />
-          <Typography variant='h6'>{title}</Typography>
+          <Typography variant='h6' sx={{ flexGrow: 1 }}>
+            {title}
+          </Typography>
           {actions}
         </Box>
       </AccordionSummary>

@@ -2,6 +2,7 @@ import { Delete, Edit } from '@mui/icons-material';
 import { Box, Grid, Hidden, IconButton, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 
+import { AddAPropertyButton } from 'components/common/BoardEditor/components/properties/AddAProperty';
 import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { SelectPreviewContainer } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
@@ -20,8 +21,7 @@ import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { ProposalPendingReward } from 'lib/proposal/blocks/interfaces';
-import type { ProposalReviewerInput } from 'lib/proposal/interface';
+import type { ProposalPendingReward, ProposalReviewerInput } from 'lib/proposal/interface';
 import { isTruthy } from 'lib/utilities/types';
 
 type Props = {
@@ -145,6 +145,17 @@ export function ProposalRewards({
           </Stack>
         </Stack>
       </Stack>
+    );
+  }
+
+  if (!pendingRewards?.length) {
+    return (
+      <AttachRewardButton
+        readOnly={false}
+        onSave={onSave}
+        reviewers={reviewers}
+        assignedSubmitters={assignedSubmitters}
+      />
     );
   }
 

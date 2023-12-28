@@ -23,9 +23,9 @@ export function EvaluationStepActions({ proposalId, permissions, evaluation, isP
           onSubmit={refreshProposal}
         />
       )}
-      <Button size='small' variant='outlined' color='secondary'>
+      {/* <Button size='small' variant='outlined' color='secondary'>
         Go Back
-      </Button>
+      </Button> */}
     </>
   );
 }
