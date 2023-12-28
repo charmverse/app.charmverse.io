@@ -1,5 +1,4 @@
-import BountyIcon from '@mui/icons-material/RequestPageOutlined';
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Card, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 
 import { useCreateProposalRewards } from 'charmClient/hooks/proposals';
@@ -11,6 +10,7 @@ import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalPendingReward } from 'lib/proposal/blocks/interfaces';
+import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 import { isTruthy } from 'lib/utilities/types';
 
 export type Props = {
@@ -42,13 +42,14 @@ export function PublishRewardsButton({ proposalId, pendingRewards, rewardIds, di
     }
   }
 
-  const mappedRewards =
-    pendingRewards ||
-    rewards?.map((reward) => ({
-      reward,
-      page: getRewardPage(reward.id),
-      draftId: reward.id
-    }));
+  const publishDate = rewards.length ? getRelativeTimeInThePast(new Date(rewards[0].createdAt)) : null;
+  const mappedRewards = pendingRewards?.length
+    ? pendingRewards
+    : rewards.map((reward) => ({
+        reward,
+        page: getRewardPage(reward.id),
+        draftId: reward.id
+      }));
 
   return (
     <>
@@ -72,26 +73,35 @@ export function PublishRewardsButton({ proposalId, pendingRewards, rewardIds, di
           </Stack>
         </Box>
       ))}
-      <Box display='flex' justifyContent='flex-end'>
-        <Button
-          disabled={disabled}
-          disabledTooltip={`Only reviewers can publish ${rewardsTitle}`}
-          loading={isMutating}
-          onClick={() => setShowConfirmation(true)}
-        >
-          Publish {rewardsTitle}
-        </Button>
-        <ModalWithButtons
-          open={showConfirmation}
-          title={`Publish ${rewardsTitle}?`}
-          buttonText='Publish'
-          onClose={() => setShowConfirmation(false)}
-          // wrap the function so it does not return a promise to the confirmation modal
-          onConfirm={() => createRewards()}
-        >
-          <Typography>This action cannot be done</Typography>
-        </ModalWithButtons>
-      </Box>
+
+      {rewards.length ? (
+        <Card variant='outlined'>
+          <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' p={2}>
+            <Typography variant='body2'>Published {publishDate}</Typography>
+          </Stack>
+        </Card>
+      ) : (
+        <Box display='flex' justifyContent='flex-end'>
+          <Button
+            disabled={disabled}
+            disabledTooltip={`Only reviewers can publish ${rewardsTitle}`}
+            loading={isMutating}
+            onClick={() => setShowConfirmation(true)}
+          >
+            Publish {rewardsTitle}
+          </Button>
+          <ModalWithButtons
+            open={showConfirmation}
+            title={`Publish ${rewardsTitle}?`}
+            buttonText='Publish'
+            onClose={() => setShowConfirmation(false)}
+            // wrap the function so it does not return a promise to the confirmation modal
+            onConfirm={() => createRewards()}
+          >
+            <Typography>This action cannot be done</Typography>
+          </ModalWithButtons>
+        </Box>
+      )}
     </>
   );
 }
