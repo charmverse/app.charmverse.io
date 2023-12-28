@@ -61,6 +61,7 @@ export async function getLockDetails(
 
   try {
     const publicClient = getPublicClient(chainId);
+
     const name = (await publicClient.readContract({
       address,
       abi: PublicLockV13.abi,
@@ -95,11 +96,3 @@ export async function getLockDetails(
     throw new DataNotFoundError('Error fetching lock details. Check the contract address and chain.');
   }
 }
-
-getLockDetails(
-  {
-    chainId: 137,
-    contract: '0x739380a14c589929f4b66c4f1f132019c62f86c1'
-  },
-  true
-);
