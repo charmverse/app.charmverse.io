@@ -68,7 +68,7 @@ export function EvaluationSidebar({ pageId, isTemplate, proposal, refreshProposa
   const rewardsTitle = mappedFeatures.rewards.title;
   const currentEvaluation = proposal?.evaluations.find((e) => e.id === proposal?.currentEvaluationId);
   const pendingRewards = (proposal?.fields as ProposalFields)?.pendingRewards;
-  const isRewardsComplete = proposal?.rewardIds?.length;
+  const isRewardsComplete = !!proposal?.rewardIds?.length;
   const hasRewardsStep = !!pendingRewards?.length || isRewardsComplete;
   const isRewardsActive = currentEvaluation?.result === 'pass';
 
