@@ -17,7 +17,6 @@ export class ProposalPage extends DocumentPage {
     public workflowSelect = page.locator('data-test=proposal-workflow-select'),
     public voterSelect = page.locator('data-test=proposal-vote-select'),
     public completeDraftButton = page.locator('data-test=complete-draft-button'),
-    public newProposalEvaluationSettings = page.locator('data-test=new-proposal-evaluation-settings'),
     public evaluationSettingsSidebar = page.locator('data-test=evaluation-settings-sidebar'),
     public addRubricCriteriaButton = page.locator('data-test=add-rubric-criteria-button'),
     public editRubricCriteriaLabel = page.locator('data-test=edit-rubric-criteria-label >> textarea').first(),

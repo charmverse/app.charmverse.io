@@ -11,8 +11,8 @@ import { v4 as uuid } from 'uuid';
 import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
 import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
 import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
-import PageHeader, { getPageTop } from 'components/[pageId]/DocumentPage/components/PageHeader';
 import { PageTemplateBanner } from 'components/[pageId]/DocumentPage/components/PageTemplateBanner';
+import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
 import { PrimaryColumn } from 'components/[pageId]/DocumentPage/components/PrimaryColumn';
 import { PageSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/PageSidebar';
 import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/components/StickyFooterContainer';
@@ -43,7 +43,6 @@ import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
-import { EvaluationStepper } from './components/EvaluationStepper/EvaluationStepper';
 import type { ProposalPropertiesInput } from './components/ProposalProperties/ProposalPropertiesBase';
 import { ProposalPropertiesBase } from './components/ProposalProperties/ProposalPropertiesBase';
 import { TemplateSelect } from './components/TemplateSelect';
@@ -90,6 +89,7 @@ export function NewProposalPage({
     useNewProposal({
       newProposal: { type: isTemplate ? 'proposal_template' : 'proposal', proposalType }
     });
+  const [submittedDraft, setSubmittedDraft] = useState<boolean>(false);
 
   const [, { width: containerWidth }] = useElementSize();
   const { user } = useUser();
@@ -203,6 +203,7 @@ export function NewProposalPage({
   }
 
   async function saveForm({ isDraft }: { isDraft?: boolean } = {}) {
+    setSubmittedDraft(!!isDraft);
     const result = await createProposal({ isDraft });
     if (result) {
       navigateToSpacePath(`/${result.id}`);
@@ -248,14 +249,11 @@ export function NewProposalPage({
 
   const proposalPageContent = (
     <>
-      <PageHeader
-        headerImage={formInputs.headerImage}
-        icon={formInputs.icon}
+      <PageTitleInput
         readOnly={false}
         updatedAt={new Date().toString()}
-        title={formInputs.title || ''}
-        // readOnly={readOnly || !!enableSuggestingMode}
-        setPage={(updatedPage) => {
+        value={formInputs.title || ''}
+        onChange={(updatedPage) => {
           setFormInputs(updatedPage);
           if ('title' in updatedPage) {
             setPageTitle(updatedPage.title || '');
@@ -377,7 +375,7 @@ export function NewProposalPage({
         <Box className={`document-print-container ${fontClassName}`} display='flex' flexDirection='column'>
           <PageTemplateBanner pageType={formInputs.type} isNewPage proposalType={formInputs.proposalType} />
           {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
-          <StyledContainer data-test='page-charmeditor' top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
+          <StyledContainer data-test='page-charmeditor' top={0} fullWidth={isSmallScreen}>
             <Box minHeight={450}>
               {isStructured ? (
                 <>
@@ -447,7 +445,7 @@ export function NewProposalPage({
                 ? 'Please provide correct values for all proposal form fields'
                 : disabledTooltip
             }
-            loading={isCreatingProposal}
+            loading={isCreatingProposal && submittedDraft}
             data-test='create-proposal-button'
             variant='outlined'
             onClick={() => saveForm({ isDraft: true })}
@@ -462,7 +460,7 @@ export function NewProposalPage({
                 : disabledTooltip
             }
             onClick={() => saveForm()}
-            loading={isCreatingProposal}
+            loading={isCreatingProposal && !submittedDraft}
           >
             Publish
           </Button>

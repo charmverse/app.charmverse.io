@@ -53,7 +53,7 @@ export function EvaluationStepSettings({
   }
 
   return (
-    <Box data-test='new-proposal-evaluation-settings' px={2}>
+    <Box px={1}>
       <Box display='flex' alignItems='center' gap={1} mb={1}>
         {evaluationIcons[evaluation.type]()}
         <Typography variant='h6'>{evaluation.title}</Typography>

@@ -125,7 +125,7 @@ export function useDeleteProposalBlocks(spaceId: string) {
   return useDELETE<string[]>(`/api/spaces/${spaceId}/proposals/blocks`);
 }
 
-export function useCreateProposalRewards(proposalId: string) {
+export function useCreateProposalRewards(proposalId: MaybeString) {
   return usePOST<undefined, ProposalWithUsersAndRubric>(`/api/proposals/${proposalId}/rewards`);
 }
 

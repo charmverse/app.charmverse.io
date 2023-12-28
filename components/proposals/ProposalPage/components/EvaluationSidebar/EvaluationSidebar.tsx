@@ -14,12 +14,15 @@ import type { AccordionProps, AccordionSummaryProps } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import { evaluationIcons } from 'components/settings/proposals/constants';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
+import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 
 import { WorkflowSelect } from '../WorkflowSelect';
 
 import { FeedbackEvaluation } from './components/FeedbackEvaluation';
 import { PassFailEvaluation } from './components/PassFailEvaluation';
+import { PublishRewardsButton } from './components/PublishRewardsButton';
 import { RubricEvaluation } from './components/RubricEvaluation/RubricEvaluation';
 import { StepperIcon } from './components/StepperIcon';
 import { VoteEvaluation } from './components/VoteEvaluation';
@@ -35,6 +38,8 @@ export type Props = {
     | 'permissions'
     | 'status'
     | 'evaluationType'
+    | 'fields'
+    | 'rewardIds'
     | 'workflowId'
     | 'currentEvaluationId'
   >;
@@ -51,46 +56,40 @@ const Accordion = styled((props: AccordionProps) => <MuiAccordion disableGutters
     }
   })
 );
-const AccordionSummary = styled((props: AccordionSummaryProps) => (
-  <MuiAccordionSummary expandIcon={<ExpandMore />} {...props} />
-))(({ theme }) => ({
-  // backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, .05)' : 'rgba(0, 0, 0, .03)',
-  // flexDirection: 'row-reverse',
-  // '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
-  //   transform: 'rotate(90deg)'
-  // },
-  // '& .MuiAccordionSummary-content': {
-  //   marginLeft: theme.spacing(1)
-  // }
-}));
-const expandableEvaluationTypes: ProposalEvaluationType[] = ['pass_fail', 'rubric', 'vote'];
+
+const AccordionSummary = styled(({ hideExpand, ...props }: AccordionSummaryProps & { hideExpand?: boolean }) => (
+  <MuiAccordionSummary expandIcon={hideExpand ? null : <ExpandMore />} {...props} />
+))();
 
 export function EvaluationSidebar({ pageId, isTemplate, proposal, refreshProposal }: Props) {
   const [activeEvaluationId, setActiveEvaluationId] = useState<string | undefined>(proposal?.currentEvaluationId);
-  const currentEvaluation = getCurrentEvaluation(proposal?.evaluations || []);
-  // const evaluationToShowInSidebar = proposal?.permissions.evaluate && proposal?.currentEvaluationId;
-  // let evaluationToShowInSidebar: string | undefined;
-  // const currentEvaluation = getCurrentEvaluation(proposal?.evaluations ?? []);
-  // if (currentEvaluation && evaluationTypesWithSidebar.includes(currentEvaluation.type)) {
-  //   evaluationToShowInSidebar = currentEvaluation.id;
-  // }
+
+  const { mappedFeatures } = useSpaceFeatures();
+  const rewardsTitle = mappedFeatures.rewards.title;
+  const currentEvaluation = proposal?.evaluations.find((e) => e.id === proposal?.currentEvaluationId);
+  const pendingRewards = (proposal?.fields as ProposalFields)?.pendingRewards;
+  const isRewardsComplete = proposal?.rewardIds?.length;
+  const hasRewardsStep = !!pendingRewards?.length || isRewardsComplete;
+  const isRewardsActive = currentEvaluation?.result === 'pass';
+
   useEffect(() => {
-    // open current evaluation by default
+    // expand the current evaluation
     if (proposal?.currentEvaluationId) {
-      setActiveEvaluationId(proposal.currentEvaluationId);
+      if (isRewardsActive) {
+        setActiveEvaluationId('rewards');
+      } else {
+        setActiveEvaluationId(proposal.currentEvaluationId);
+      }
     }
-  }, [proposal?.currentEvaluationId, setActiveEvaluationId]);
+  }, [proposal?.currentEvaluationId, isRewardsActive, setActiveEvaluationId]);
 
   return (
     <div>
       <Box mb={1}>
         <WorkflowSelect value={proposal?.workflowId} readOnly />
       </Box>
-      <Accordion
-        expanded={activeEvaluationId === 'draft'}
-        onChange={(e, expand) => setActiveEvaluationId(expand ? 'draft' : undefined)}
-      >
-        <AccordionSummary>
+      <Accordion>
+        <AccordionSummary sx={{ px: 1 }} hideExpand>
           <Box display='flex' alignItems='center' gap={1}>
             <StepperIcon
               result={proposal?.currentEvaluationId ? 'pass' : null}
@@ -100,7 +99,7 @@ export function EvaluationSidebar({ pageId, isTemplate, proposal, refreshProposa
             <Typography variant='h6'>Draft</Typography>
           </Box>
         </AccordionSummary>
-        <AccordionDetails></AccordionDetails>
+        {/* <AccordionDetails sx={{ px: 1 }}></AccordionDetails> */}
       </Accordion>
       {proposal?.evaluations.map((evaluation, index) => (
         <Accordion
@@ -108,24 +107,23 @@ export function EvaluationSidebar({ pageId, isTemplate, proposal, refreshProposa
           expanded={evaluation.id === activeEvaluationId}
           onChange={(e, expand) => setActiveEvaluationId(expand ? evaluation.id : undefined)}
         >
-          <AccordionSummary>
+          <AccordionSummary sx={{ px: 1 }}>
             <Box display='flex' alignItems='center' gap={1}>
               <StepperIcon
                 result={evaluation.result}
-                isCurrent={evaluation.id === proposal?.currentEvaluationId}
+                isCurrent={evaluation.id === proposal?.currentEvaluationId && !isRewardsActive}
                 position={index + 2}
               />
-              {/* {evaluationIcons[evaluation.type]()} */}
               <Typography variant='h6'>{evaluation.title}</Typography>
             </Box>
           </AccordionSummary>
-          <AccordionDetails>
+          <AccordionDetails sx={{ px: 1 }}>
             {evaluation?.type === 'feedback' && (
               <FeedbackEvaluation
                 key={evaluation.id}
                 evaluation={evaluation}
                 proposalId={proposal?.id}
-                isCurrent={activeEvaluationId === evaluation.id}
+                isCurrent={currentEvaluation?.id === evaluation.id && !isRewardsActive}
                 nextStep={proposal.evaluations[index + 1]}
                 hasMovePermission={proposal.permissions.move}
                 onSubmit={refreshProposal}
@@ -136,7 +134,7 @@ export function EvaluationSidebar({ pageId, isTemplate, proposal, refreshProposa
                 key={evaluation.id}
                 evaluation={evaluation}
                 proposalId={proposal?.id}
-                isCurrent={activeEvaluationId === evaluation.id}
+                isCurrent={currentEvaluation?.id === evaluation.id && !isRewardsActive}
                 isReviewer={proposal?.permissions.evaluate}
                 refreshProposal={refreshProposal}
               />
@@ -145,7 +143,7 @@ export function EvaluationSidebar({ pageId, isTemplate, proposal, refreshProposa
               <RubricEvaluation
                 key={evaluation.id}
                 proposal={proposal}
-                isCurrent={activeEvaluationId === evaluation.id}
+                isCurrent={currentEvaluation?.id === evaluation.id && !isRewardsActive}
                 evaluation={evaluation}
                 refreshProposal={refreshProposal}
               />
@@ -155,13 +153,38 @@ export function EvaluationSidebar({ pageId, isTemplate, proposal, refreshProposa
                 key={evaluation.id}
                 pageId={pageId!}
                 proposal={proposal}
-                isCurrent={activeEvaluationId === evaluation.id}
+                isCurrent={currentEvaluation?.id === evaluation.id && !isRewardsActive}
                 evaluation={evaluation}
               />
             )}
           </AccordionDetails>
         </Accordion>
       ))}
+      {hasRewardsStep && (
+        <Accordion
+          expanded={activeEvaluationId === 'rewards'}
+          onChange={(e, expand) => setActiveEvaluationId(expand ? 'rewards' : undefined)}
+        >
+          <AccordionSummary sx={{ px: 1 }}>
+            <Box display='flex' alignItems='center' gap={1}>
+              <StepperIcon
+                result={isRewardsComplete ? 'pass' : null}
+                isCurrent={isRewardsActive}
+                position={proposal ? proposal.evaluations.length + 2 : 0}
+              />
+              <Typography variant='h6'>{rewardsTitle}</Typography>
+            </Box>
+          </AccordionSummary>
+          <AccordionDetails sx={{ px: 1 }}>
+            <PublishRewardsButton
+              disabled={!(proposal?.permissions.evaluate && isRewardsActive && !isRewardsComplete)}
+              proposalId={proposal?.id}
+              pendingRewards={pendingRewards}
+              onSubmit={refreshProposal}
+            />
+          </AccordionDetails>
+        </Accordion>
+      )}
     </div>
   );
 }

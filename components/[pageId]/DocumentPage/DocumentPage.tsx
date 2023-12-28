@@ -8,6 +8,7 @@ import { useElementSize } from 'usehooks-ts';
 
 import { useGetReward } from 'charmClient/hooks/rewards';
 import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
+import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import { blockLoad, databaseViewsLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
@@ -93,7 +94,7 @@ function DocumentPage({
 }: DocumentPageProps) {
   const { user } = useUser();
   const { castVote, updateDeadline, votes, isLoading } = useVotes({ pageId: page.id });
-  const { navigateToSpacePath, router } = useCharmRouter();
+  const { router } = useCharmRouter();
   const { activeView: sidebarView, setActiveView, closeSidebar } = usePageSidebar();
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
   const [connectionError, setConnectionError] = useState<Error | null>(null);
@@ -154,7 +155,8 @@ function DocumentPage({
 
   const activeBoardView = boardViews[0];
 
-  const pageTop = getPageTop(page);
+  const showPageBanner = page.type !== 'proposal' && page.type !== 'proposal_template';
+  const pageTop = showPageBanner ? getPageTop(page) : 0;
 
   const { threads, isLoading: isLoadingThreads, currentPageId: threadsPageId } = useThreads();
   const isSharedPage = router.pathname.startsWith('/share');
@@ -172,6 +174,7 @@ function DocumentPage({
     !!enableSidebar && sidebarView !== null && (sidebarView !== 'comments' || enableComments);
 
   const pageVote = Object.values(votes).find((v) => v.context === 'proposal');
+  const isStructuredProposal = proposal && proposal.formId;
 
   // create a key that updates when edit mode changes - default to 'editing' so we dont close sockets immediately
   const editorKey = page.id + (editMode || 'editing') + pagePermissions.edit_content;
@@ -270,25 +273,34 @@ function DocumentPage({
     }
   }, [printRef, _printRef]);
 
-  const isStructuredProposal = proposal && proposal.formId;
-
   const documentPageContent = (
     <>
       {/* temporary? disable editing of page title when in suggestion mode */}
-      <PageHeader
-        headerImage={page.headerImage}
-        // Commented for now, as we need to preserve cursor position between re-renders caused by updating this
-        // key={page.title}
-        icon={page.icon}
-        title={page.title}
-        updatedAt={page.updatedAt.toString()}
-        readOnly={readOnly || !!enableSuggestingMode}
-        setPage={savePage}
-        readOnlyTitle={!!page.syncWithPageId}
-        parentId={showParentChip ? card.parentId : null}
-        insideModal={insideModal}
-        pageId={page.id}
-      />
+      {showPageBanner ? (
+        <PageHeader
+          headerImage={page.headerImage}
+          // Commented for now, as we need to preserve cursor position between re-renders caused by updating this
+          // key={page.title}
+          icon={page.icon}
+          title={page.title}
+          updatedAt={page.updatedAt.toString()}
+          readOnly={readOnly || !!enableSuggestingMode}
+          setPage={savePage}
+          readOnlyTitle={!!page.syncWithPageId}
+          parentId={showParentChip ? card.parentId : null}
+          insideModal={insideModal}
+          pageId={page.id}
+        />
+      ) : (
+        <PageTitleInput
+          // Commented for now, as we need to preserve cursor position between re-renders caused by updating this
+          // key={page.title}
+          value={page.title}
+          updatedAt={page.updatedAt.toString()}
+          onChange={(updates) => savePage(updates as { title: string; updatedAt: any })}
+          readOnly={readOnly || !!enableSuggestingMode || !!page.syncWithPageId}
+        />
+      )}
       {!isCharmVerse && page.type === 'proposal' && !isLoading && page.snapshotProposalId && (
         <Box my={2} className='font-family-default'>
           <SnapshotVoteDetails snapshotProposalId={page.snapshotProposalId} />

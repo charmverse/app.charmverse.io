@@ -5,10 +5,11 @@ import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/componen
 import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 
+import { PublishRewardsButton } from '../EvaluationSidebar/components/PublishRewardsButton';
+
 import { CompleteDraftButton } from './components/CompleteDraftButton';
 import { CompleteFeedbackButton } from './components/CompleteFeedbackButton';
 import { GoBackButton } from './components/GoBackButton';
-import { PublishRewardsButton } from './components/PublishRewardsButton';
 
 export type EvaluationTypeOrDraft = ProposalEvaluationType | 'draft';
 

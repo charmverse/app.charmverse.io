@@ -171,9 +171,9 @@ export function ProposalRewards({
                   flex={1}
                 >
                   <SelectPreviewContainer readOnly={readOnly} displayType='details'>
-                    <Stack direction='row' justifyContent='space-between' alignItems='center'>
+                    <Stack direction='row' justifyContent='space-between' alignItems='center' gap={1}>
                       <Typography component='span' variant='subtitle1' fontWeight='normal'>
-                        {page?.title || 'Untitled reward'}
+                        {page?.title || 'Untitled'}
                       </Typography>
                       <Hidden lgDown>
                         <Stack alignItems='center' direction='row' height='100%'>
@@ -191,7 +191,7 @@ export function ProposalRewards({
                         </Stack>
                       </Hidden>
 
-                      <Stack className='icons' sx={{ opacity: 0, transition: 'all 0.2s ease' }} direction='row' gap={1}>
+                      <Stack className='icons' sx={{ opacity: 0, transition: 'opacity 0.2s ease' }} direction='row'>
                         <IconButton size='small' onClick={() => editReward({ reward, page, draftId })}>
                           <Edit color='secondary' fontSize='small' />
                         </IconButton>
