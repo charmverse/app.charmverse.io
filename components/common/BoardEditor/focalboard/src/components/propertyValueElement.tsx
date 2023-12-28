@@ -203,7 +203,7 @@ function PropertyValueElement(props: Props) {
         </Link>
       </Box>
     );
-  } else if ([REWARD_REVIEWERS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID].includes(propertyTemplate.id)) {
+  } else if (propertyTemplate.id === REWARD_REVIEWERS_BLOCK_ID && propertyTemplate.type !== 'proposalReviewer') {
     if (Array.isArray(propertyValue) && propertyValue.length === 0 && subRowsEmptyValueContent) {
       return typeof subRowsEmptyValueContent === 'string' ? (
         <span>{subRowsEmptyValueContent}</span>
