@@ -1,6 +1,6 @@
 import type { Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsProposals, testUtilsSpaces, testUtilsUser } from '@charmverse/core/test';
 import { expect } from '@playwright/test';
 import { ProposalPage } from '__e2e__/po/proposalPage.po';
 import { ProposalsListPage } from '__e2e__/po/proposalsList.po';
@@ -27,6 +27,13 @@ test.describe.serial('Proposal Flow', () => {
     const page = await browser.newPage();
 
     ({ space, user: proposalAuthor } = await generateUserAndSpace({}));
+
+    await testUtilsSpaces.addSpaceOperations({
+      forSpaceId: space.id,
+      spaceId: space.id,
+      operations: ['createProposals']
+    });
+
     proposalReviewer = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
     await prisma.spaceRole.update({
       where: { spaceUser: { userId: proposalReviewer.id, spaceId: space.id } },
@@ -43,9 +50,6 @@ test.describe.serial('Proposal Flow', () => {
       browserPage: authorBrowserProposalListPage.page,
       userId: proposalAuthor.id
     });
-
-    await authorBrowserProposalListPage.goToProposals(space.domain);
-
     const category = await testUtilsProposals.generateProposalCategory({
       spaceId: space.id,
       title: 'General',
@@ -60,6 +64,7 @@ test.describe.serial('Proposal Flow', () => {
     await authorBrowserProposalListPage.goToProposals(space.domain);
     await authorBrowserProposalListPage.waitForProposalsList();
     await expect(authorBrowserProposalListPage.emptyState).toBeVisible();
+
     await authorBrowserProposalListPage.createProposalButton.click();
 
     await expect(authorBrowserProposalPage.saveDraftButton).toBeDisabled();

@@ -1,4 +1,4 @@
-import { testUtilsProposals } from '@charmverse/core/test';
+import { testUtilsProposals, testUtilsSpaces } from '@charmverse/core/test';
 import { test, expect } from '@playwright/test';
 import { ProposalPage } from '__e2e__/po/proposalPage.po';
 import { ProposalsListPage } from '__e2e__/po/proposalsList.po';
@@ -23,7 +23,11 @@ test.describe('Proposal templates', () => {
   test('A user can create a proposal from a template', async () => {
     // Initial setup
     const { space, user } = await generateUserAndSpace();
-
+    await testUtilsSpaces.addSpaceOperations({
+      forSpaceId: space.id,
+      spaceId: space.id,
+      operations: ['createProposals']
+    });
     userId = user.id;
 
     await loginBrowserUser({
