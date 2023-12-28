@@ -1,4 +1,4 @@
-import { Box, Card, Typography } from '@mui/material';
+import { Box, Divider, Typography } from '@mui/material';
 
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationSettings';
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
@@ -39,9 +39,10 @@ export function EvaluationSettingsSidebar({
         />
       )}
       <Box display='flex' flex={1} flexDirection='column' data-test='evaluation-settings-sidebar'>
+        <Divider />
         {proposal &&
           evaluationsWithConfig?.map((evaluation) => (
-            <Card key={evaluation.id} variant='outlined' sx={{ p: 1, mb: 2 }}>
+            <Box key={evaluation.id} my={1}>
               <EvaluationSettings
                 categoryId={proposal.categoryId}
                 readOnly={readOnly}
@@ -52,7 +53,8 @@ export function EvaluationSettingsSidebar({
                   onChangeEvaluation?.(evaluation.id, updated);
                 }}
               />
-            </Card>
+              <Divider sx={{ my: 1 }} />
+            </Box>
           ))}
         {proposal && evaluationsWithConfig?.length === 0 && (
           <Typography variant='body2' color='secondary'>

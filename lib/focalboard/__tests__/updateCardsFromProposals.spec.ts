@@ -628,6 +628,9 @@ describe('updateCardsFromProposals()', () => {
             not: null
           }
         }
+      },
+      orderBy: {
+        createdAt: 'asc'
       }
     });
 

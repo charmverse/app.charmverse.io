@@ -27,7 +27,6 @@ export const getDefaultWorkflows: (spaceId: string) => ProposalWorkflowTyped[] =
     createdAt: new Date(),
     title: 'Decision Matrix',
     evaluations: [
-      getDefaultFeedbackEvaluation(),
       getDefaultEvaluation({
         title: 'Review',
         type: 'pass_fail'
@@ -45,7 +44,6 @@ export const getDefaultWorkflows: (spaceId: string) => ProposalWorkflowTyped[] =
     createdAt: new Date(),
     title: 'Grant Applications',
     evaluations: [
-      getDefaultFeedbackEvaluation(),
       getDefaultEvaluation({
         title: 'Rubric evaluation',
         type: 'rubric'

@@ -7,8 +7,8 @@ import { allMembersSystemRole } from 'components/settings/proposals/components/E
 import { evaluationIcons } from 'components/settings/proposals/constants';
 import type { ProposalEvaluationInput } from 'lib/proposal/createProposal';
 
-import { RubricCriteria } from './RubricCriteria';
-import type { RangeProposalCriteria } from './RubricCriteria';
+import { RubricCriteria } from './RubricCriteriaSettings';
+import type { RangeProposalCriteria } from './RubricCriteriaSettings';
 import { VoteSettings } from './VoteSettings';
 
 // result and id are not used for creating evaluations, so add them here

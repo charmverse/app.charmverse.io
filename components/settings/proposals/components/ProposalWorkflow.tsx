@@ -1,5 +1,5 @@
 import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
-import { ExpandMore, MoreHoriz } from '@mui/icons-material';
+import { ContentCopyOutlined, DeleteOutlined, ExpandMore, MoreHoriz } from '@mui/icons-material';
 import {
   Accordion,
   AccordionDetails,
@@ -7,11 +7,13 @@ import {
   Box,
   Chip,
   IconButton,
+  ListItemIcon,
   ListItemText,
   Menu,
   MenuItem,
   Stack,
   TextField,
+  Tooltip,
   Typography
 } from '@mui/material';
 import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
@@ -39,7 +41,8 @@ export function ProposalWorkflowItem({
   onDuplicate,
   onDelete,
   onCancelChanges,
-  readOnly
+  readOnly,
+  preventDelete
 }: {
   isExpanded: boolean;
   toggleRow: (id: string | false) => void;
@@ -50,6 +53,7 @@ export function ProposalWorkflowItem({
   onCancelChanges: (id: string) => void;
   onDuplicate: (workflow: ProposalWorkflowTyped) => void;
   readOnly: boolean;
+  preventDelete: boolean;
 }) {
   const [activeEvaluation, setActiveEvaluation] = useState<EvaluationTemplateFormItem | null>(null);
   const [hasUnsavedChanges, setUnsavedChanges] = useState(!!workflow.isNew);
@@ -172,11 +176,21 @@ export function ProposalWorkflowItem({
             <span onClick={(e) => e.stopPropagation()}>
               <Menu {...bindMenu(popupState)} onClick={popupState.close}>
                 <MenuItem onClick={duplicateWorkflow}>
+                  <ListItemIcon>
+                    <ContentCopyOutlined fontSize='small' />
+                  </ListItemIcon>
                   <ListItemText>Duplicate</ListItemText>
                 </MenuItem>
-                <MenuItem onClick={deleteWorkflow}>
-                  <ListItemText>Delete</ListItemText>
-                </MenuItem>
+                <Tooltip title={preventDelete ? 'There must be at least one workflow' : ''}>
+                  <span>
+                    <MenuItem onClick={deleteWorkflow} disabled={preventDelete}>
+                      <ListItemIcon>
+                        <DeleteOutlined fontSize='small' />
+                      </ListItemIcon>
+                      <ListItemText>Delete</ListItemText>
+                    </MenuItem>
+                  </span>
+                </Tooltip>
               </Menu>
               <Box display='flex' gap={2} alignItems='center'>
                 {!isExpanded && hasUnsavedChanges && (
