@@ -1,10 +1,7 @@
 import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
 import { PublicLockV13 } from '@unlock-protocol/contracts';
-import { networks } from '@unlock-protocol/networks';
-import { unlockChains } from 'connectors/chains';
 import { getAddress } from 'viem';
 
-import { getAlchemyBaseUrl } from 'lib/blockchain/provider/alchemy/client';
 import { isNumber } from 'lib/utilities/numbers';
 
 import type { Lock } from '../interfaces';
@@ -17,32 +14,6 @@ type GetLockPayload = {
   contract: string;
   walletAddress?: string;
 };
-
-const unlockNetworks = Object.values(networks);
-
-const unlockNetworksSetup = unlockChains.reduce<Record<number, { unlockAddress: string; provider: string }>>(
-  (acc, chain) => {
-    try {
-      return {
-        ...acc,
-        [chain.chainId]: {
-          unlockAddress: unlockNetworks.find((n: any): n is any => n.id === chain.chainId)?.unlockAddress || '',
-          provider: chain.alchemyUrl ? getAlchemyBaseUrl(chain.chainId) : chain.rpcUrls[0]
-        }
-      };
-    } catch (err) {
-      // This is more for the tests to pass
-      return {
-        ...acc,
-        [chain.chainId]: {
-          unlockAddress: unlockNetworks.find((n: any): n is any => n.id === chain.chainId)?.unlockAddress || '',
-          provider: chain.rpcUrls[0]
-        }
-      };
-    }
-  },
-  {}
-);
 
 export async function getLockDetails(
   values: GetLockPayload,
