@@ -1,5 +1,7 @@
 import styled from '@emotion/styled';
+import CancelIcon from '@mui/icons-material/Cancel';
 import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import { Fragment } from 'react';
 import { v4 as uuid } from 'uuid';
@@ -59,7 +61,15 @@ function generateComponent(condition: HumanizeConditionsContent) {
   }
 }
 
-function Condition({ condition }: { condition: HumanizeCondition }) {
+function Condition({
+  condition,
+  isLoading,
+  onDelete
+}: {
+  condition: HumanizeCondition;
+  isLoading?: boolean;
+  onDelete?: VoidFunction;
+}) {
   const image = condition.image;
   const textConditions = condition.content;
   const isOperator = condition.content.some((c) => c.type === 'operator');
@@ -85,15 +95,35 @@ function Condition({ condition }: { condition: HumanizeCondition }) {
         </Box>
       )}
       <Box width='100%'>{textConditions.map(generateComponent).filter(isTruthy)}</Box>
+      {onDelete && condition.content.some((c) => c.type !== 'operator') && (
+        <Box>
+          <IconButton onClick={onDelete} disabled={isLoading}>
+            <CancelIcon />
+          </IconButton>
+        </Box>
+      )}
     </Box>
   );
 }
 
-export function ConditionsGroup({ conditions }: { conditions: HumanizeCondition[] }) {
+export function ConditionsGroup({
+  conditions,
+  isLoading,
+  onDelete
+}: {
+  conditions: HumanizeCondition[];
+  isLoading?: boolean;
+  onDelete?: (index: number) => void;
+}) {
   return (
     <Box>
-      {conditions.map((condition) => (
-        <Condition key={uuid()} condition={condition} />
+      {conditions.map((condition, i) => (
+        <Condition
+          key={uuid()}
+          condition={condition}
+          onDelete={onDelete ? () => onDelete?.(i) : undefined}
+          isLoading={isLoading}
+        />
       ))}
     </Box>
   );

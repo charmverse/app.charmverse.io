@@ -29,6 +29,7 @@ type IContext = {
   popupState: PopupState;
   setFlow: (flow: Flow) => void;
   onSubmit: () => Promise<void>;
+  onDelete: (index: number) => void;
   resetModal: () => void;
   handleTokenGate: (tokenGate: TokenGateConditions) => void;
   setDisplayedPage: (page: DisplayedPage) => void;
@@ -39,6 +40,7 @@ type IContext = {
 export const TokenGateModalContext = createContext<Readonly<IContext>>({
   handleTokenGate: () => undefined,
   onSubmit: async () => undefined,
+  onDelete: () => undefined,
   popupState: {} as PopupState,
   flow: 'single',
   setFlow: () => undefined,
@@ -182,9 +184,37 @@ export function TokenGateModalProvider({
     }
   };
 
+  const onDelete = (index: number) => {
+    setTokenGate((prevState) => {
+      if (prevState?.type === 'lit') {
+        const unifiedAccessControlConditions = prevState.conditions?.unifiedAccessControlConditions || [];
+        const conditionExists = !!unifiedAccessControlConditions.find((_, i) => i === index);
+
+        if (conditionExists) {
+          // This is necessary because we need to delete the condition and the operator
+          if (index === 0) {
+            unifiedAccessControlConditions.splice(index, 2);
+          } else {
+            unifiedAccessControlConditions.splice(index - 1, 2);
+          }
+
+          return {
+            type: prevState.type,
+            conditions: {
+              unifiedAccessControlConditions: [...unifiedAccessControlConditions].filter(isTruthy)
+            }
+          };
+        }
+      }
+
+      return prevState;
+    });
+  };
+
   const value: IContext = useMemo(
     () => ({
       onSubmit,
+      onDelete,
       resetModal,
       setDisplayedPage,
       handleTokenGate,
@@ -206,6 +236,7 @@ export function TokenGateModalProvider({
       tokenError?.message,
       litError?.message,
       resetModal,
+      onDelete,
       handleTokenGate
     ]
   );
