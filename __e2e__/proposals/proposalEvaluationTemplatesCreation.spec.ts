@@ -334,7 +334,7 @@ test.describe.serial('Proposal Evaluation', () => {
 
     await documentPage.charmEditor.fill('This is a test proposal');
 
-    await proposalPage.saveDraftButton.click();
+    proposalPage.saveDraftButton.click();
 
     await proposalPage.page.waitForResponse('**/api/proposals');
 
