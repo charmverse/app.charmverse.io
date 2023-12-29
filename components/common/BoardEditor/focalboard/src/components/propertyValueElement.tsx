@@ -206,7 +206,7 @@ function PropertyValueElement(props: Props) {
         </Link>
       </Box>
     );
-  } else if (propertyTemplate.id === REWARD_REVIEWERS_BLOCK_ID && propertyTemplate.type !== 'proposalReviewer') {
+  } else if (propertyTemplate.id === REWARD_REVIEWERS_BLOCK_ID) {
     if (Array.isArray(propertyValue) && propertyValue.length === 0 && subRowsEmptyValueContent) {
       return typeof subRowsEmptyValueContent === 'string' ? (
         <span>{subRowsEmptyValueContent}</span>
@@ -218,7 +218,7 @@ function PropertyValueElement(props: Props) {
       <UserAndRoleSelect
         displayType={displayType}
         data-test='selected-reviewers'
-        readOnly={readOnly}
+        readOnly={readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any)}
         onChange={() => null}
         value={propertyValue as any}
       />
