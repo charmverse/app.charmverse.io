@@ -339,6 +339,7 @@ function PropertyValueElement(props: Props) {
           wrapColumn={props.wrapColumn}
           className='octo-propertyvalue'
           value={value.toString()}
+          key={value.toString()}
           showEmptyPlaceholder={showEmptyPlaceholder}
           onChange={(newValue) => {
             mutator.changePropertyValue(card, propertyTemplate.id, newValue);

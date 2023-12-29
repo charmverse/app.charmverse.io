@@ -169,8 +169,10 @@ function PersonPropertyTemplateMenu({
   cards,
   propertyTemplate,
   onChange,
-  onProposalAuthorSelect
+  onProposalAuthorSelect,
+  disallowEmpty
 }: {
+  disallowEmpty?: boolean;
   board: Board;
   cards: Card[];
   propertyTemplate: IPropertyTemplate<PropertyType>;
@@ -216,7 +218,8 @@ function PersonPropertyTemplateMenu({
       onChange?.();
     },
     displayType: 'table',
-    showEmptyPlaceholder: true
+    showEmptyPlaceholder: true,
+    disallowEmpty
   };
 
   return (
@@ -276,13 +279,13 @@ function DatePropertyTemplateMenu({
   onChange?: VoidFunction;
 }) {
   const propertyValue = cards[0].fields.properties[propertyTemplate.id] || '';
-
   return (
     <PropertyMenu cards={cards} propertyTemplate={propertyTemplate}>
       {() => {
         return (
           <DateRange
             wrapColumn
+            key={propertyValue?.toString()}
             value={propertyValue?.toString()}
             showEmptyPlaceholder
             onChange={async (newValue) => {
@@ -388,6 +391,7 @@ function PropertyTemplateMenu({
           onChange={onChange}
           board={board}
           cards={checkedCards}
+          disallowEmpty
           propertyTemplate={propertyTemplate}
           onProposalAuthorSelect={(userIds) => {
             onProposalAuthorSelect?.(checkedIds, userIds);
