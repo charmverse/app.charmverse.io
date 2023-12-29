@@ -68,6 +68,7 @@ export function EvaluationStepSettings({
           variant='outlined'
           proposalCategoryId={categoryId}
           onChange={handleOnChangeReviewers}
+          required
         />
       </Box>
       {evaluation.type === 'rubric' && (

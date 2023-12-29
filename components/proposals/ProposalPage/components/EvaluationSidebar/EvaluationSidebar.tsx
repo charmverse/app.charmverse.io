@@ -46,13 +46,13 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
   const pendingRewards = proposal?.fields?.pendingRewards;
   const isRewardsComplete = !!proposal?.rewardIds?.length;
   const hasRewardsStep = Boolean(pendingRewards?.length || isRewardsComplete);
-  const isRewardsActive = currentEvaluation?.result === 'pass';
+  const isRewardsActive = hasRewardsStep && currentEvaluation?.result === 'pass';
   const isFromTemplate = !!proposal?.page?.sourceTemplateId;
   // To find the previous step index. we have to calculate the position including Draft and Rewards steps
   let adjustedCurrentEvaluationIndex = 0; // "draft" step
   if (proposal && currentEvaluation) {
     adjustedCurrentEvaluationIndex = proposal.evaluations.findIndex((e) => e.id === currentEvaluation?.id) + 1;
-    if (hasRewardsStep && isRewardsActive) {
+    if (isRewardsActive) {
       adjustedCurrentEvaluationIndex += 1;
     }
   }
@@ -105,67 +105,72 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
           />
         }
       />
-      {proposal?.evaluations.map((evaluation, index) => (
-        <EvaluationStepRow
-          key={evaluation.id}
-          expanded={evaluation.id === activeEvaluationId}
-          isCurrent={evaluation.id === proposal?.currentEvaluationId && !isRewardsActive}
-          onChange={(e, expand) => setActiveEvaluationId(expand ? evaluation.id : undefined)}
-          index={index + 1}
-          result={evaluation.result}
-          title={evaluation.title}
-          actions={
-            <EvaluationStepActions
-              isPreviousStep={previousStepIndex === index + 1}
-              permissions={proposal?.permissions}
-              proposalId={proposal?.id}
-              refreshProposal={refreshProposal}
-              evaluation={evaluation}
-              openSettings={(e) => setEvaluationInput({ ...e })}
-            />
-          }
-        >
-          {evaluation.type === 'feedback' && (
-            <FeedbackEvaluation
-              key={evaluation.id}
-              evaluation={evaluation}
-              proposalId={proposal?.id}
-              isCurrent={currentEvaluation?.id === evaluation.id && !isRewardsActive}
-              nextStep={proposal.evaluations[index + 1]}
-              hasMovePermission={proposal.permissions.move}
-              onSubmit={refreshProposal}
-            />
-          )}
-          {evaluation.type === 'pass_fail' && (
-            <PassFailEvaluation
-              key={evaluation.id}
-              evaluation={evaluation}
-              proposalId={proposal?.id}
-              isCurrent={currentEvaluation?.id === evaluation.id && !isRewardsActive}
-              isReviewer={proposal?.permissions.evaluate}
-              refreshProposal={refreshProposal}
-            />
-          )}
-          {evaluation.type === 'rubric' && (
-            <RubricEvaluation
-              key={evaluation.id}
-              proposal={proposal}
-              isCurrent={currentEvaluation?.id === evaluation.id && !isRewardsActive}
-              evaluation={evaluation}
-              refreshProposal={refreshProposal}
-            />
-          )}
-          {evaluation.type === 'vote' && (
-            <VoteEvaluation
-              key={evaluation.id}
-              pageId={pageId!}
-              proposal={proposal}
-              isCurrent={currentEvaluation?.id === evaluation.id && !isRewardsActive}
-              evaluation={evaluation}
-            />
-          )}
-        </EvaluationStepRow>
-      ))}
+      {proposal?.evaluations.map((evaluation, index) => {
+        const isCurrentEval = currentEvaluation?.id === evaluation.id;
+        const isCurrent = isCurrentEval && !isRewardsActive;
+        return (
+          <EvaluationStepRow
+            key={evaluation.id}
+            expanded={evaluation.id === activeEvaluationId}
+            isCurrent={isCurrent}
+            onChange={(e, expand) => setActiveEvaluationId(expand ? evaluation.id : undefined)}
+            index={index + 1}
+            result={evaluation.result}
+            title={evaluation.title}
+            actions={
+              <EvaluationStepActions
+                isPreviousStep={previousStepIndex === index + 1}
+                permissions={proposal?.permissions}
+                proposalId={proposal?.id}
+                refreshProposal={refreshProposal}
+                evaluation={evaluation}
+                openSettings={(e) => setEvaluationInput({ ...e })}
+              />
+            }
+          >
+            {evaluation.type === 'feedback' && (
+              <FeedbackEvaluation
+                key={evaluation.id}
+                evaluation={evaluation}
+                proposalId={proposal?.id}
+                isCurrent={isCurrent}
+                nextStep={proposal.evaluations[index + 1]}
+                hasMovePermission={proposal.permissions.move}
+                onSubmit={refreshProposal}
+              />
+            )}
+            {evaluation.type === 'pass_fail' && (
+              <PassFailEvaluation
+                key={evaluation.id}
+                evaluation={evaluation}
+                proposalId={proposal?.id}
+                isCurrent={isCurrent}
+                isReviewer={proposal?.permissions.evaluate}
+                refreshProposal={refreshProposal}
+              />
+            )}
+            {evaluation.type === 'rubric' && (
+              <RubricEvaluation
+                key={evaluation.id}
+                proposal={proposal}
+                permissions={isCurrentEval ? proposal?.permissions : undefined}
+                isCurrent={isCurrent}
+                evaluation={evaluation}
+                refreshProposal={refreshProposal}
+              />
+            )}
+            {evaluation.type === 'vote' && (
+              <VoteEvaluation
+                key={evaluation.id}
+                pageId={pageId!}
+                proposal={proposal}
+                isCurrent={isCurrent}
+                evaluation={evaluation}
+              />
+            )}
+          </EvaluationStepRow>
+        );
+      })}
       {hasRewardsStep && (
         <EvaluationStepRow
           expanded={activeEvaluationId === 'rewards'}
