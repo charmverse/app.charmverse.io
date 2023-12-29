@@ -71,6 +71,7 @@ describe(`Test proposal events and notifications`, () => {
     });
 
     const { proposal } = await createProposal({
+      isDraft: true,
       categoryId: proposalCategory.id,
       spaceId: space.id,
       userId: author1.id,
@@ -445,6 +446,7 @@ async function createDiscussionNotifications(input: Parameters<typeof generateUs
     spaceId: space.id,
     userId: author1.id,
     authors: [author1.id],
+    isDraft: true,
     reviewers: [
       {
         group: 'user',
