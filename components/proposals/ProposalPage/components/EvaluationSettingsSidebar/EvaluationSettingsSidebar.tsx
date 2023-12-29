@@ -31,7 +31,7 @@ export function EvaluationSettingsSidebar({
   const pendingRewards = proposal?.fields?.pendingRewards;
   const { mappedFeatures } = useSpaceFeatures();
   return (
-    <div>
+    <div data-test='evaluation-settings-sidebar'>
       <WorkflowSelect
         value={proposal?.workflowId}
         onChange={onChangeWorkflow}
