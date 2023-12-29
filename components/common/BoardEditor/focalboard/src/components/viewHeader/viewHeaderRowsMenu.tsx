@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import { Box, Menu, MenuItem, Stack, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import type { ReactNode, Dispatch, SetStateAction } from 'react';
 
 import charmClient from 'charmClient';
@@ -169,8 +169,10 @@ function PersonPropertyTemplateMenu({
   cards,
   propertyTemplate,
   onChange,
-  onProposalAuthorSelect
+  onProposalAuthorSelect,
+  disallowEmpty
 }: {
+  disallowEmpty?: boolean;
   board: Board;
   cards: Card[];
   propertyTemplate: IPropertyTemplate<PropertyType>;
@@ -216,7 +218,8 @@ function PersonPropertyTemplateMenu({
       onChange?.();
     },
     displayType: 'table',
-    showEmptyPlaceholder: true
+    showEmptyPlaceholder: true,
+    disallowEmpty
   };
 
   return (
@@ -276,13 +279,13 @@ function DatePropertyTemplateMenu({
   onChange?: VoidFunction;
 }) {
   const propertyValue = cards[0].fields.properties[propertyTemplate.id] || '';
-
   return (
     <PropertyMenu cards={cards} propertyTemplate={propertyTemplate}>
       {() => {
         return (
           <DateRange
             wrapColumn
+            key={propertyValue?.toString()}
             value={propertyValue?.toString()}
             showEmptyPlaceholder
             onChange={async (newValue) => {
@@ -388,6 +391,7 @@ function PropertyTemplateMenu({
           onChange={onChange}
           board={board}
           cards={checkedCards}
+          disallowEmpty
           propertyTemplate={propertyTemplate}
           onProposalAuthorSelect={(userIds) => {
             onProposalAuthorSelect?.(checkedIds, userIds);
@@ -443,6 +447,10 @@ export function ViewHeaderRowsMenu({
     }
   }
 
+  const filteredPropertyTemplates = useMemo(() => {
+    return propertyTemplates.filter((propertyTemplate) => !propertyTemplate.formFieldId);
+  }, [propertyTemplates]);
+
   return (
     <StyledStack>
       <StyledMenuItem>
@@ -451,7 +459,7 @@ export function ViewHeaderRowsMenu({
         </Typography>
       </StyledMenuItem>
       {cards.length !== 0
-        ? propertyTemplates.map((propertyTemplate) => (
+        ? filteredPropertyTemplates.map((propertyTemplate) => (
             <PropertyTemplateMenu
               isAdmin={isAdmin}
               board={board}

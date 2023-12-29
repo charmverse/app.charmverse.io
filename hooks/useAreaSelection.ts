@@ -1,3 +1,4 @@
+import { useTheme } from '@emotion/react';
 import type { RefObject } from 'react';
 import { createContext, useCallback, useEffect, useRef, useState } from 'react';
 
@@ -14,20 +15,25 @@ interface UseAreaSelectionProps {
   readOnly?: boolean;
 }
 
-function createBoxNode() {
+function createBoxNode(theme: 'dark' | 'light') {
   if (typeof document === 'undefined') return null;
   const boxNode = document.createElement('div');
   boxNode.style.position = 'fixed';
   boxNode.style.background = 'hsl(206deg 100% 50% / 5%)';
+  if (theme === 'dark') {
+    boxNode.style.mixBlendMode = 'unset';
+  } else {
+    boxNode.style.mixBlendMode = 'multiply';
+  }
   boxNode.style.pointerEvents = 'none';
-  boxNode.style.mixBlendMode = 'multiply';
   boxNode.style.zIndex = '10';
 
   return boxNode;
 }
 
 export function useAreaSelection({ container = { current: document.body }, readOnly = false }: UseAreaSelectionProps) {
-  const boxElement = useRef<HTMLDivElement | null>(createBoxNode());
+  const theme = useTheme();
+  const boxElement = useRef<HTMLDivElement | null>(createBoxNode(theme.palette.mode));
   const [mouseDown, setMouseDown] = useState<boolean>(false);
   const [selection, setSelection] = useState<DOMRect | null>(null);
   const [drawArea, setDrawArea] = useState<DrawnArea>({
