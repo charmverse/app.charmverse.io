@@ -30,7 +30,7 @@ export function GoBackButton({
   const disabledTooltip = !hasMovePermission
     ? 'You do not have permission to move this proposal'
     : previousStep?.type === 'vote'
-    ? 'You cannot go back to a vote'
+    ? 'You cannot revert the results of a vote'
     : '';
 
   async function goToPreviousStep() {
