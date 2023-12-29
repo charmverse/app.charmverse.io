@@ -228,33 +228,45 @@ async function convertProposals() {
     })
   );
 }
-
-async function convertSpaces() {
+const perBatch = 100;
+async function convertSpaces({ offset = 0 }: { offset?: number } = {}) {
   const spaces = await prisma.space.findMany({
     include: {
       proposalWorkflows: true
-    }
+    },
+    orderBy: {
+      id: 'asc'
+    },
+    skip: offset,
+    take: perBatch
   });
-  await Promise.all(
-    spaces.map(async (space) => {
-      if (space.proposalWorkflows.length === 0) {
+  const withoutWorkflows = spaces.filter((s) => s.proposalWorkflows.length === 0);
+  if (withoutWorkflows.length > 0) {
+    console.log('adding workflows for', withoutWorkflows.length, 'spaces');
+    await Promise.all(
+      withoutWorkflows.map(async (space) => {
         const defaultWorkflows = getDefaultWorkflows(space.id);
         await prisma.proposalWorkflow.createMany({
           data: defaultWorkflows
         });
-      }
-    })
-  );
+      })
+    );
+  }
+
+  if (spaces.length > 0) {
+    console.log('checking', offset + perBatch, 'spaces. last id: ' + spaces[spaces.length - 1]?.id);
+    return convertSpaces({ offset: offset + perBatch });
+  }
 }
 
 function isPublished(proposal: Proposal) {
   return proposal.status !== 'draft';
 }
 
-convertProposals()
-  .then(() => {
-    console.log('Done!');
-  })
-  .catch((e) => {
-    console.error('Error!', e);
-  });
+// convertProposals()
+//   .then(() => {
+//     console.log('Done!');
+//   })
+//   .catch((e) => {
+//     console.error('Error!', e);
+//   });
