@@ -61,12 +61,12 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageM
 
   const categoryId = req.body.categoryId;
 
-  const proposalPermissions = await req.basePermissionsClient.proposals.computeProposalCategoryPermissions({
-    resourceId: categoryId,
+  const proposalPermissions = await permissionsApiClient.spaces.computeSpacePermissions({
+    resourceId: page.spaceId,
     userId
   });
 
-  if (!proposalPermissions.create_proposal) {
+  if (!proposalPermissions.createProposals) {
     throw new UnauthorisedActionError('You do not have permission to create a proposal in this category');
   }
 

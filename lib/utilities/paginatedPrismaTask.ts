@@ -5,7 +5,7 @@ import { InvalidInputError } from './errors';
 
 type PrismaModel = Extract<
   Uncapitalize<Prisma.ModelName>,
-  'block' | 'page' | 'post' | 'proposal' | 'memberPropertyValue'
+  'block' | 'page' | 'post' | 'proposal' | 'memberPropertyValue' | 'space'
 >;
 
 type PrismaArgs<M extends PrismaModel> = Pick<
@@ -19,6 +19,8 @@ type PrismaArgs<M extends PrismaModel> = Pick<
     ? Prisma.ProposalFindManyArgs
     : M extends 'memberPropertyValue'
     ? Prisma.MemberPropertyValueFindManyArgs
+    : M extends 'space'
+    ? Prisma.SpaceFindManyArgs
     : never,
   'select' | 'where' | 'include'
 >;
