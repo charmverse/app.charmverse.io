@@ -264,7 +264,7 @@ function DocumentPage({
     if (proposalId && enableSidebar && isCharmVerse) {
       setActiveView(isMdScreen ? 'proposal_evaluation' : null);
     }
-  }, [proposalId, enableSidebar, isMdScreen]);
+  }, [proposalId, enableSidebar, isCharmVerse, isMdScreen]);
 
   // keep a ref in sync for printing
   const printRef = useRef<HTMLDivElement>(null);
