@@ -74,7 +74,13 @@ describe('GET /api/spaces/[id]/pages - Get Pages in a space', () => {
     const response = (
       await request(baseUrl).get(`/api/spaces/${space.id}/pages`).set('Cookie', normalMemberCookie).expect(200)
     ).body as PageMeta[];
-    const expectedPageIds = stringUtils.sortUuids(arrayUtils.extractUuids([pageWithSpacePermission, publicPage]));
+    const expectedPageIds = stringUtils.sortUuids(
+      arrayUtils.extractUuids([
+        pageWithSpacePermission,
+        proposalVisibleInProposalsEvaluationPermissionsModel,
+        publicPage
+      ])
+    );
     expect(stringUtils.sortUuids(arrayUtils.extractUuids(response))).toEqual(expectedPageIds);
   });
 
