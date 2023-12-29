@@ -104,9 +104,7 @@ export async function getUnlockProtocolValidTokenGate<T extends TokenGate<'unloc
     chainId: tokenGate.conditions.chainId
   });
 
-  const now = new Date().getTime();
-
-  if (result.balanceOf === 1 && result.expirationTimestamp && result.expirationTimestamp > now) {
+  if (result.validKey) {
     return {
       signedToken: '',
       tokenGateId: tokenGate.id

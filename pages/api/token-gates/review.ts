@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { updateTokenGateLitDetails } from 'lib/blockchain/updateLitDetails';
-import { updateLocksDetails } from 'lib/blockchain/updateLocksDetails';
+import { updateTokenGateLockDetails } from 'lib/blockchain/updateLocksDetails';
 import { onError, onNoMatch } from 'lib/middleware';
 import requireValidation from 'lib/middleware/requireValidation';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -20,7 +20,7 @@ async function reviewTokenGate(req: NextApiRequest, res: NextApiResponse) {
   if (body.type === 'lit') {
     updatedResult = await updateTokenGateLitDetails([body]);
   } else if (body.type === 'unlock') {
-    updatedResult = await updateLocksDetails([body]);
+    updatedResult = await updateTokenGateLockDetails([body]);
   } else {
     throw new InvalidInputError('Invalid token gate type');
   }

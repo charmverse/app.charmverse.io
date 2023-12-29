@@ -1,82 +1,64 @@
 import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
-import { networks } from '@unlock-protocol/networks';
-import { Web3Service } from '@unlock-protocol/unlock-js';
-import { unlockChains } from 'connectors/chains';
+import { PublicLockV13 } from '@unlock-protocol/contracts';
+import { getAddress } from 'viem';
 
-import { getAlchemyBaseUrl } from 'lib/blockchain/provider/alchemy/client';
 import { isNumber } from 'lib/utilities/numbers';
 
+import { getPublicClient } from '../../blockchain/publicClient';
 import type { Lock } from '../interfaces';
 
 import { getLockMetadata } from './getLockMetadata';
 
-export type GetLockPayload = {
+type GetLockPayload = {
   chainId: number;
   contract: string;
   walletAddress?: string;
 };
 
-const unlockNetworks = Object.values(networks);
-
-const unlockNetworksSetup = unlockChains.reduce<Record<number, { unlockAddress: string; provider: string }>>(
-  (acc, chain) => {
-    try {
-      return {
-        ...acc,
-        [chain.chainId]: {
-          unlockAddress: unlockNetworks.find((n: any): n is any => n.id === chain.chainId)?.unlockAddress || '',
-          provider: chain.alchemyUrl ? getAlchemyBaseUrl(chain.chainId) : chain.rpcUrls[0]
-        }
-      };
-    } catch (err) {
-      // This is more for the tests to pass
-      return {
-        ...acc,
-        [chain.chainId]: {
-          unlockAddress: unlockNetworks.find((n: any): n is any => n.id === chain.chainId)?.unlockAddress || '',
-          provider: chain.rpcUrls[0]
-        }
-      };
-    }
-  },
-  {}
-);
-
-export function getUnlockService() {
-  const web3Service = new Web3Service(unlockNetworksSetup);
-  return web3Service;
-}
-
-export async function getLockDetails(values: GetLockPayload, withMetadata?: boolean): Promise<Lock> {
+export async function getLockDetails(
+  values: GetLockPayload,
+  withMetadata?: boolean
+): Promise<Lock & { validKey?: boolean }> {
   const { chainId: initialChain, contract, walletAddress } = values;
 
   if (!isNumber(Number(initialChain))) {
     throw new InvalidInputError('Chain must be a number');
   }
 
+  // Validate address and throw an error if it's not
+  const address = getAddress(contract);
+
   const chainId = Number(initialChain);
 
   try {
-    const web3Service = getUnlockService();
-    const lock = await web3Service.getLock(contract, chainId);
+    const publicClient = getPublicClient(chainId);
+
+    const name = (await publicClient.readContract({
+      address,
+      abi: PublicLockV13.abi,
+      functionName: 'name'
+    })) as string;
+
     const locksmithData = withMetadata ? await getLockMetadata({ contract, chainId }) : undefined;
 
     const lockMetadata: Lock = {
-      name: lock?.name,
+      name,
       contract,
       chainId,
-      image: locksmithData?.image,
-      description: locksmithData?.description
+      image: locksmithData?.image
     };
 
     if (walletAddress) {
-      const balanceOf = await web3Service.balanceOf(contract, walletAddress, chainId);
-      const expirationTimestamp = await web3Service.getKeyExpirationByLockForOwner(contract, walletAddress, chainId);
+      const validKey = (await publicClient.readContract({
+        address,
+        abi: PublicLockV13.abi,
+        functionName: 'getHasValidKey',
+        args: [walletAddress]
+      })) as boolean;
 
       return {
         ...lockMetadata,
-        balanceOf,
-        expirationTimestamp: expirationTimestamp * 1000
+        validKey
       };
     }
 
