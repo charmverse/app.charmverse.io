@@ -123,13 +123,15 @@ function ViewHeader(props: Props) {
         }`}
       >
         {showViewHeaderRowsMenu ? (
-          <ViewHeaderRowsMenu
-            board={activeBoard}
-            cards={cards}
-            checkedIds={checkedIds}
-            setCheckedIds={setCheckedIds}
-            propertyTemplates={propertyTemplates}
-          />
+          <div style={{ marginBottom: 4 }}>
+            <ViewHeaderRowsMenu
+              board={activeBoard}
+              cards={cards}
+              checkedIds={checkedIds}
+              setCheckedIds={setCheckedIds}
+              propertyTemplates={propertyTemplates}
+            />
+          </div>
         ) : (
           <>
             <ViewTabs

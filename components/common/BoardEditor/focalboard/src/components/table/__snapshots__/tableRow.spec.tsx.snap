@@ -11,23 +11,28 @@ exports[`components/table/TableRow should match snapshot 1`] = `
       style="background-color: transparent; opacity: 1; cursor: move;"
     >
       <div
-        class="icons row-actions"
-        draggable="true"
+        class="MuiStack-root css-1v111ru-MuiStack-root"
       >
         <div
-          class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
+          class="icons row-actions"
+          draggable="true"
+          style="padding: 0px;"
         >
-          <svg
-            aria-hidden="true"
-            class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
-            data-testid="DragIndicatorIcon"
-            focusable="false"
-            viewBox="0 0 24 24"
+          <div
+            class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
           >
-            <path
-              d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
-            />
-          </svg>
+            <svg
+              aria-hidden="true"
+              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+              data-testid="DragIndicatorIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+              />
+            </svg>
+          </div>
         </div>
       </div>
       <div
@@ -108,23 +113,28 @@ exports[`components/table/TableRow should match snapshot, collapsed tree 1`] = `
       style="background-color: transparent; opacity: 1; cursor: move;"
     >
       <div
-        class="icons row-actions"
-        draggable="true"
+        class="MuiStack-root css-1v111ru-MuiStack-root"
       >
         <div
-          class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
+          class="icons row-actions"
+          draggable="true"
+          style="padding: 0px;"
         >
-          <svg
-            aria-hidden="true"
-            class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
-            data-testid="DragIndicatorIcon"
-            focusable="false"
-            viewBox="0 0 24 24"
+          <div
+            class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
           >
-            <path
-              d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
-            />
-          </svg>
+            <svg
+              aria-hidden="true"
+              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+              data-testid="DragIndicatorIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+              />
+            </svg>
+          </div>
         </div>
       </div>
       <div
@@ -205,23 +215,28 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
       style="background-color: transparent; opacity: 1; cursor: move;"
     >
       <div
-        class="icons row-actions"
-        draggable="true"
+        class="MuiStack-root css-1v111ru-MuiStack-root"
       >
         <div
-          class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
+          class="icons row-actions"
+          draggable="true"
+          style="padding: 0px;"
         >
-          <svg
-            aria-hidden="true"
-            class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
-            data-testid="DragIndicatorIcon"
-            focusable="false"
-            viewBox="0 0 24 24"
+          <div
+            class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
           >
-            <path
-              d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
-            />
-          </svg>
+            <svg
+              aria-hidden="true"
+              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+              data-testid="DragIndicatorIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+              />
+            </svg>
+          </div>
         </div>
       </div>
       <div
@@ -350,23 +365,28 @@ exports[`components/table/TableRow should match snapshot, isSelected 1`] = `
       style="background-color: transparent; opacity: 1; cursor: move;"
     >
       <div
-        class="icons row-actions"
-        draggable="true"
+        class="MuiStack-root css-1v111ru-MuiStack-root"
       >
         <div
-          class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
+          class="icons row-actions"
+          draggable="true"
+          style="padding: 0px;"
         >
-          <svg
-            aria-hidden="true"
-            class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
-            data-testid="DragIndicatorIcon"
-            focusable="false"
-            viewBox="0 0 24 24"
+          <div
+            class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
           >
-            <path
-              d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
-            />
-          </svg>
+            <svg
+              aria-hidden="true"
+              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+              data-testid="DragIndicatorIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+              />
+            </svg>
+          </div>
         </div>
       </div>
       <div
@@ -525,23 +545,28 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
       style="background-color: transparent; opacity: 1; cursor: move;"
     >
       <div
-        class="icons row-actions"
-        draggable="true"
+        class="MuiStack-root css-1v111ru-MuiStack-root"
       >
         <div
-          class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
+          class="icons row-actions"
+          draggable="true"
+          style="padding: 0px;"
         >
-          <svg
-            aria-hidden="true"
-            class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
-            data-testid="DragIndicatorIcon"
-            focusable="false"
-            viewBox="0 0 24 24"
+          <div
+            class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
           >
-            <path
-              d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
-            />
-          </svg>
+            <svg
+              aria-hidden="true"
+              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+              data-testid="DragIndicatorIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+              />
+            </svg>
+          </div>
         </div>
       </div>
       <div

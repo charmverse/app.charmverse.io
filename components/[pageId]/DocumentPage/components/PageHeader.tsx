@@ -77,6 +77,7 @@ type PageHeaderProps = {
   parentId?: string | null;
   insideModal?: boolean;
   pageId?: string;
+  focusDocumentEditor: VoidFunction;
 };
 
 function PageHeader({
@@ -90,7 +91,8 @@ function PageHeader({
   placeholder,
   parentId,
   insideModal,
-  pageId
+  pageId,
+  focusDocumentEditor
 }: PageHeaderProps) {
   function updateTitle(page: { title: string; updatedAt: any }) {
     setPage(page);
@@ -116,6 +118,7 @@ function PageHeader({
         onChange={updateTitle}
         updatedAt={updatedAt}
         placeholder={placeholder}
+        focusDocumentEditor={focusDocumentEditor}
       />
     </>
   );

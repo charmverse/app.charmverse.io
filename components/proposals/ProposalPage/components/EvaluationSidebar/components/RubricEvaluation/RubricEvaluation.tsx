@@ -9,8 +9,6 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposal/interface';
 
-import { PassFailSidebar } from '../PassFailSidebar';
-
 import { RubricAnswersForm } from './RubricAnswersForm';
 import { RubricResults } from './RubricResults';
 
@@ -21,7 +19,7 @@ export type Props = {
   refreshProposal?: VoidFunction;
 };
 
-export function RubricSidebar({ proposal, isCurrent, evaluation, refreshProposal }: Props) {
+export function RubricEvaluation({ proposal, isCurrent, evaluation, refreshProposal }: Props) {
   const [rubricView, setRubricView] = useState<number>(0);
   const isAdmin = useIsAdmin();
   const { user } = useUser();
@@ -53,7 +51,7 @@ export function RubricSidebar({ proposal, isCurrent, evaluation, refreshProposal
    *  Results: visible to anyone when evaluation is active or closed, disabled if you are not a reviewer
    *
    * */
-  const evaluationTabs = canViewRubricAnswers ? ['Your evaluation', 'Results', 'Decision'] : ['Your evaluation'];
+  const evaluationTabs = canViewRubricAnswers ? ['Your evaluation', 'Results'] : ['Your evaluation'];
 
   return (
     <>
@@ -77,7 +75,7 @@ export function RubricSidebar({ proposal, isCurrent, evaluation, refreshProposal
                     draftAnswers={myDraftRubricAnswers}
                     criteriaList={rubricCriteria!}
                     onSubmit={onSubmitEvaluation}
-                    disabled={!canAnswerRubric}
+                    disabled={!canAnswerRubric || !isCurrent}
                   />
                 )}
                 {value === 'Results' && (
@@ -85,14 +83,10 @@ export function RubricSidebar({ proposal, isCurrent, evaluation, refreshProposal
                     key='results'
                     answers={evaluation?.rubricAnswers}
                     criteriaList={rubricCriteria || []}
-                  />
-                )}
-                {value === 'Decision' && (
-                  <PassFailSidebar
                     isCurrent={!!isCurrent}
-                    key='results'
                     evaluation={evaluation}
-                    proposal={proposal}
+                    isReviewer={proposal?.permissions.evaluate}
+                    proposalId={proposal?.id}
                     refreshProposal={refreshProposal}
                   />
                 )}

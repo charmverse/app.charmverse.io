@@ -8,10 +8,13 @@ import type {
   ProposalEvaluationPermission,
   Vote
 } from '@charmverse/core/prisma';
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
+import type { ProposalWithUsers as CoreProposalWithUsers } from '@charmverse/core/proposals';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import type { NewPageValues } from 'components/common/PageDialog/hooks/useNewPage';
+import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
+import type { ProposalPropertiesField } from './blocks/interfaces';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   ProposalRubricCriteriaWithTypedParams
@@ -49,6 +52,8 @@ export type VoteSettings = Pick<Vote, 'type' | 'threshold' | 'maxChoices'> & {
   publishToSnapshot: boolean;
 };
 
+export type ProposalPendingReward = { reward: UpdateableRewardFields; page: NewPageValues | null; draftId: string };
+export type ProposalFields = { properties?: ProposalPropertiesField; pendingRewards?: ProposalPendingReward[] };
 export type ProposalFormData = {
   form: {
     id: string;
@@ -58,6 +63,10 @@ export type ProposalFormData = {
         })[]
       | null;
   };
+};
+
+export type ProposalWithUsers = Omit<CoreProposalWithUsers, 'fields'> & {
+  fields: ProposalFields | null;
 };
 
 export type PopulatedEvaluation = ProposalRubricData &
@@ -71,6 +80,7 @@ export type ProposalWithUsersAndRubric = ProposalWithUsers &
   ProposalRubricData &
   ProposalFormData & {
     evaluations: PopulatedEvaluation[];
+    fields: ProposalFields | null;
     page?: { sourceTemplateId: string | null } | null;
     permissions: ProposalPermissionFlags;
     currentEvaluationId?: string;
@@ -82,6 +92,7 @@ export type ProposalWithUsersAndRubric = ProposalWithUsers &
         | null;
     };
   };
+
 export interface ProposalWithCommentsAndUsers extends ProposalWithUsers {
   page: Page & { comments: PageComment[] };
 }

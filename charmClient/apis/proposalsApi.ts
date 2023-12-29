@@ -1,11 +1,10 @@
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { ProposalCategoryWithPermissions } from '@charmverse/core/permissions';
 import type { ProposalStatus } from '@charmverse/core/prisma';
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
 import * as http from 'adapters/http';
 import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';
-import type { ProposalCategory, ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { ProposalWithUsers, ProposalCategory, ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import type { UpdateProposalLensPropertiesRequest } from 'lib/proposal/updateProposalLensProperties';
 

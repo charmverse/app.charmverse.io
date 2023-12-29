@@ -1,9 +1,9 @@
 import { InsecureOperationError, InvalidInputError } from '@charmverse/core/errors';
 import type { PageWithPermissions } from '@charmverse/core/pages';
-import type { Page, ProposalStatus, ProposalReviewer, Vote } from '@charmverse/core/prisma';
+import type { Page, ProposalReviewer, ProposalStatus } from '@charmverse/core/prisma';
 import type { Prisma, ProposalEvaluation, ProposalEvaluationType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWithUsers, WorkflowEvaluationJson, ProposalWorkflowTyped } from '@charmverse/core/proposals';
+import type { ProposalWithUsers, ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { arrayUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
@@ -12,7 +12,7 @@ import { createForm } from 'lib/form/createForm';
 import { upsertProposalFormAnswers } from 'lib/form/upsertProposalFormAnswers';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { createPage } from 'lib/pages/server/createPage';
-import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
+import type { ProposalFields } from 'lib/proposal/interface';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
@@ -40,6 +40,7 @@ export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'id' | 'index' | 
 export type CreateProposalInput = {
   pageId?: string;
   pageProps?: PageProps;
+  proposalTemplateId?: string | null;
   categoryId: string;
   reviewers?: ProposalReviewerInput[];
   authors?: string[];
@@ -49,11 +50,12 @@ export type CreateProposalInput = {
   rubricCriteria?: RubricDataInput[];
   evaluations?: ProposalEvaluationInput[];
   publishToLens?: boolean;
-  fields?: ProposalFields;
+  fields?: ProposalFields | null;
   workflowId?: string;
   formFields?: FormFieldInput[];
   formAnswers?: FieldAnswerInput[];
   formId?: string;
+  isDraft?: boolean;
 };
 
 export type CreatedProposal = {
@@ -73,19 +75,35 @@ export async function createProposal({
   rubricCriteria,
   publishToLens,
   fields,
+  proposalTemplateId,
   workflowId,
   formId,
   formFields,
-  formAnswers
+  formAnswers,
+  isDraft
 }: CreateProposalInput) {
   if (!categoryId) {
     throw new InvalidInputError('Proposal must be linked to a category');
   }
 
   const proposalId = uuid();
-  const proposalStatus: ProposalStatus = 'draft';
+  const proposalStatus: ProposalStatus = isDraft ? 'draft' : 'published';
 
   const authorsList = arrayUtils.uniqueValues(authors ? [...authors, userId] : [userId]);
+
+  const sourceTemplate = proposalTemplateId
+    ? await prisma.proposal.findUniqueOrThrow({
+        where: { id: proposalTemplateId },
+        select: {
+          evaluations: {
+            orderBy: { index: 'asc' },
+            include: {
+              reviewers: true
+            }
+          }
+        }
+      })
+    : null;
 
   const workflow = workflowId
     ? ((await prisma.proposalWorkflow.findUnique({
@@ -123,7 +141,7 @@ export async function createProposal({
   // retrieve permissions and apply evaluation ids to reviewers
   if (evaluations.length > 0) {
     evaluations.forEach(({ id: evaluationId, permissions: permissionsInput }, index) => {
-      const configuredEvaluation = workflow?.evaluations.find((e) => e.id === evaluationId);
+      const configuredEvaluation = workflow?.evaluations[index];
       const permissions = configuredEvaluation?.permissions ?? permissionsInput;
       if (!permissions) {
         throw new Error(
@@ -139,7 +157,7 @@ export async function createProposal({
       );
     });
 
-    reviewersInput = evaluations.flatMap((evaluation, index) =>
+    reviewersInput = (sourceTemplate ? sourceTemplate.evaluations : evaluations).flatMap((evaluation, index) =>
       evaluation.reviewers.map((reviewer) => ({
         roleId: reviewer.roleId,
         systemRole: reviewer.systemRole,
@@ -189,7 +207,7 @@ export async function createProposal({
             }))
           }
         },
-        fields,
+        fields: fields as any,
         workflow: workflowId
           ? {
               connect: {

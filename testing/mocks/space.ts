@@ -1,7 +1,7 @@
 import type { Space } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
-import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/constants';
+import { STATIC_PAGES } from 'lib/features/constants';
 import { memberProfileNames } from 'lib/profile/memberProfiles';
 
 export const createMockSpace = (space?: Partial<Space>): Space => {

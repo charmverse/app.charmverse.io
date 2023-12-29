@@ -50,6 +50,13 @@ export function PendingNotificationTemplate() {
         id: v4(),
         username: 'Doe John'
       }}
+      spaceFeatures={[
+        {
+          id: 'rewards',
+          isHidden: false,
+          title: 'Rewards'
+        }
+      ]}
     />
   );
 }

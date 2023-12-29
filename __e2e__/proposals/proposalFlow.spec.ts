@@ -1,6 +1,6 @@
 import type { Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsProposals, testUtilsSpaces, testUtilsUser } from '@charmverse/core/test';
 import { expect } from '@playwright/test';
 import { ProposalPage } from '__e2e__/po/proposalPage.po';
 import { ProposalsListPage } from '__e2e__/po/proposalsList.po';
@@ -27,6 +27,13 @@ test.describe.skip('Proposal Flow', () => {
     const page = await browser.newPage();
 
     ({ space, user: proposalAuthor } = await generateUserAndSpace({}));
+
+    await testUtilsSpaces.addSpaceOperations({
+      forSpaceId: space.id,
+      spaceId: space.id,
+      operations: ['createProposals']
+    });
+
     proposalReviewer = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
     await prisma.spaceRole.update({
       where: { spaceUser: { userId: proposalReviewer.id, spaceId: space.id } },
@@ -43,9 +50,6 @@ test.describe.skip('Proposal Flow', () => {
       browserPage: authorBrowserProposalListPage.page,
       userId: proposalAuthor.id
     });
-
-    await authorBrowserProposalListPage.goToProposals(space.domain);
-
     const category = await testUtilsProposals.generateProposalCategory({
       spaceId: space.id,
       title: 'General',
@@ -60,6 +64,7 @@ test.describe.skip('Proposal Flow', () => {
     await authorBrowserProposalListPage.goToProposals(space.domain);
     await authorBrowserProposalListPage.waitForProposalsList();
     await expect(authorBrowserProposalListPage.emptyState).toBeVisible();
+
     await authorBrowserProposalListPage.createProposalButton.click();
 
     await expect(authorBrowserProposalPage.saveDraftButton).toBeDisabled();
@@ -83,19 +88,10 @@ test.describe.skip('Proposal Flow', () => {
     const page = await prisma.page.findFirstOrThrow({ where: { proposalId }, select: { path: true } });
     pagePath = page.path;
 
-    // Glitch where created proposal didn't show. This fixed it
-    await authorBrowserProposalListPage.page.reload();
-
-    // verify that the page list was updated
-    await expect(authorBrowserProposalListPage.emptyState).not.toBeVisible();
-    const proposalRow = authorBrowserProposalListPage.getProposalRowLocator(proposalId);
-    await expect(proposalRow).toBeVisible();
+    await authorBrowserProposalPage.waitForDocumentPage({ domain: space.domain, path: pagePath });
   });
 
   test('A proposal author can move draft proposal to feedback', async () => {
-    await authorBrowserProposalListPage.openProposalCard(proposalId);
-
-    await authorBrowserProposalPage.waitForDocumentPage({ domain: space.domain, path: pagePath });
     await expect(authorBrowserProposalPage.nextStatusButton).toHaveText(PROPOSAL_STATUS_LABELS.discussion);
 
     await authorBrowserProposalPage.nextStatusButton.click();

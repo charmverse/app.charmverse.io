@@ -8,6 +8,7 @@ import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components
 import PageHeader, { getPageTop } from 'components/[pageId]/DocumentPage/components/PageHeader';
 import { PageTemplateBanner } from 'components/[pageId]/DocumentPage/components/PageTemplateBanner';
 import { CharmEditor } from 'components/common/CharmEditor';
+import { focusEventName } from 'components/common/CharmEditor/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
@@ -40,6 +41,12 @@ export function NewDocumentPage({
   const [, { width: containerWidth }] = useElementSize();
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
 
+  function focusDocumentEditor() {
+    const focusEvent = new CustomEvent(focusEventName);
+    // TODO: use a ref passed down instead
+    document.querySelector(`.bangle-editor-core`)?.dispatchEvent(focusEvent);
+  }
+
   return (
     <div className={`document-print-container ${fontClassName}`}>
       <Box display='flex' flexDirection='column'>
@@ -68,6 +75,7 @@ export function NewDocumentPage({
                 readOnly={false}
                 setPage={onChange}
                 placeholder={titlePlaceholder}
+                focusDocumentEditor={focusDocumentEditor}
               />
               <div className='focalboard-body font-family-default'>
                 <div className='CardDetail content'>{children}</div>

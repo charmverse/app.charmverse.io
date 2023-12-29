@@ -1,22 +1,21 @@
+import { UserIsNotSpaceMemberError } from '@charmverse/core/errors';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
+import { NotFoundError, onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { deleteBlocks } from 'lib/proposal/blocks/deleteBlocks';
 import { getBlocks } from 'lib/proposal/blocks/getBlocks';
-import type {
-  ProposalBlockInput,
-  ProposalBlockUpdateInput,
-  ProposalBlockWithTypedFields
-} from 'lib/proposal/blocks/interfaces';
+import type { ProposalBlockUpdateInput, ProposalBlockWithTypedFields } from 'lib/proposal/blocks/interfaces';
 import { upsertBlocks } from 'lib/proposal/blocks/upsertBlocks';
 import { withSessionRoute } from 'lib/session/withSession';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
-  .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' }))
   .get(getProposalBlocksHandler)
+  .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' }))
   .put(updateProposalBlocksHandler)
   .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
   .delete(deleteProposalBlocksHandler);
@@ -24,6 +23,30 @@ handler
 async function getProposalBlocksHandler(req: NextApiRequest, res: NextApiResponse<ProposalBlockWithTypedFields[]>) {
   const spaceId = req.query.id as string;
   const blockId = req.query.blockId as string;
+  const userId = req.session.user?.id;
+
+  if (userId) {
+    const { error } = await hasAccessToSpace({
+      spaceId,
+      userId
+    });
+    if (error) {
+      throw new UserIsNotSpaceMemberError();
+    }
+  } else {
+    const space = await prisma.space.findUniqueOrThrow({
+      where: {
+        id: spaceId
+      },
+      select: {
+        publicProposals: true
+      }
+    });
+
+    if (!space.publicProposals) {
+      throw new NotFoundError();
+    }
+  }
 
   const proposalBlocks = await getBlocks({
     spaceId,

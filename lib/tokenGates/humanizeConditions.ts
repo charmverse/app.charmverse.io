@@ -108,7 +108,10 @@ export function humanizeLitConditionsData(conditions: TokenGate<'lit'>['conditio
             content: [
               { type: 'text', content: 'Owner of' },
               { ...etherscanUrl, content: tokenName, props: { fontWeight: 'bold' } },
-              { type: 'text', content: 'NFT on' },
+              { type: 'text', content: 'NFT' },
+              { type: 'text', content: 'with token id' },
+              { type: 'text', content: acc.parameters[0] },
+              { type: 'text', content: 'on' },
               { type: 'text', content: chain }
             ]
           };

@@ -112,8 +112,6 @@ test.describe.serial('Structured proposal template', () => {
 
     await expect(formField.addNewFormFieldButton).toBeVisible();
 
-    await formField.addNewFormFieldButton.click();
-
     await expect(proposalPage.saveDraftButton).toBeDisabled();
 
     await formField.getFormFieldNameInput().fill('Name');
@@ -129,12 +127,11 @@ test.describe.serial('Structured proposal template', () => {
     await formField.formFieldPrivateSwitch.nth(1).click();
 
     await proposalPage.selectCategory(proposalCategory.id);
-    await proposalPage.selectEvaluationOption('pass_fail', spaceAdmin.id);
-    await proposalPage.selectEvaluationOption('vote', 'space_member');
+    await proposalPage.selectEvaluationReviewer('pass_fail', spaceAdmin.id);
+    await proposalPage.selectEvaluationReviewer('vote', 'space_member');
 
     await proposalPage.saveDraftButton.click();
-
-    await proposalListPage.waitForProposalsList();
+    await proposalPage.page.waitForResponse(/\/api\/proposals/);
   });
 
   test('Visit structured proposal template and edit/add fields', async ({
@@ -263,7 +260,7 @@ test.describe.serial('Structured proposal template', () => {
 
     await proposalPage.saveDraftButton.click();
 
-    await proposalListPage.waitForProposalsList();
+    await proposalPage.page.waitForResponse(/\/api\/proposals/);
   });
 
   test('Visit structured proposal and edit form field answers as an author', async ({

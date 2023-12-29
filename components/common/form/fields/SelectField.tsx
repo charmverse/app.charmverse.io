@@ -29,6 +29,7 @@ type SelectProps = {
   className?: string;
   forcePopupIcon?: boolean | 'auto';
   required?: boolean;
+  fluidWidth?: boolean;
 };
 
 type Props = Omit<ControlFieldProps, 'value'> & FieldProps & SelectProps;
@@ -58,6 +59,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
       noOptionsText,
       helperText,
       fieldWrapperSx,
+      fluidWidth,
       ...inputProps
     },
     ref
@@ -137,7 +139,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
           handleHomeEndKeys
           multiple
           filterSelectedOptions={!includeSelectedOptions}
-          sx={{ minWidth: 150, width: '100%', zIndex: 1 }}
+          sx={!fluidWidth ? { minWidth: 150, width: '100%', zIndex: 1 } : { zIndex: 1 }}
           options={options}
           autoHighlight
           clearIcon={null}

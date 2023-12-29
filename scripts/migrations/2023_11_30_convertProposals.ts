@@ -24,7 +24,12 @@ async function convertProposals() {
           proposalCategoryPermissions: true
         }
       },
-      reviewers: true
+      reviewers: true,
+      space: {
+        include: {
+          proposalWorkflows: true
+        }
+      }
     }
   });
   const proposalsToUpdate = proposals.filter((p) => p.evaluations.length === 0);
@@ -32,6 +37,7 @@ async function convertProposals() {
   await Promise.all(
     proposalsToUpdate.map(async (p) => {
       if (p.evaluationType === 'vote') {
+        const workflow = p.space.proposalWorkflows.find((w) => w.title === 'Community Proposals');
         const vote = p.page?.votes.find((v) => v.context === 'proposal');
         const votePassed = vote?.status === 'Passed';
         const completedAt = vote?.deadline;
@@ -39,16 +45,15 @@ async function convertProposals() {
         const result = votePassed ? 'pass' : voteFailed ? 'fail' : null;
         const reviewEvaluationId = uuid();
         await prisma.$transaction(async (tx) => {
-          if (isPublished(p)) {
-            await tx.proposal.update({
-              where: {
-                id: p.id
-              },
-              data: {
-                status: 'published'
-              }
-            });
-          }
+          await tx.proposal.update({
+            where: {
+              id: p.id
+            },
+            data: {
+              status: isPublished(p) ? 'published' : undefined,
+              workflowId: workflow?.id
+            }
+          });
           const feedbackComplete = p.status !== 'draft' && p.status !== 'discussion';
           await tx.proposalEvaluation.create({
             data: {
@@ -125,16 +130,16 @@ async function convertProposals() {
         const reviewEvaluationId = uuid();
         const rubricEvaluationId = uuid();
         await prisma.$transaction(async (tx) => {
-          if (isPublished(p)) {
-            await tx.proposal.update({
-              where: {
-                id: p.id
-              },
-              data: {
-                status: 'published'
-              }
-            });
-          }
+          const workflow = p.space.proposalWorkflows.find((w) => w.title === 'Decision Matrix');
+          await tx.proposal.update({
+            where: {
+              id: p.id
+            },
+            data: {
+              status: isPublished(p) ? 'published' : undefined,
+              workflowId: workflow?.id
+            }
+          });
           const feedbackComplete = p.status !== 'draft' && p.status !== 'discussion';
           await tx.proposalEvaluation.create({
             data: {

@@ -155,7 +155,7 @@ const KanbanCard = React.memo((props: Props) => {
               <PropertyValueElement
                 key={template.id}
                 board={board}
-                readOnly={true}
+                readOnly
                 card={card}
                 syncWithPageId={cardPage?.syncWithPageId}
                 updatedAt={cardPage?.updatedAt.toString() || ''}

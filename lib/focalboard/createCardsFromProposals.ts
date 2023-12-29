@@ -5,6 +5,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
 import { prismaToBlock } from 'lib/focalboard/block';
+import { canAccessPrivateFields } from 'lib/proposal/form/canAccessPrivateFields';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   ProposalRubricCriteriaWithTypedParams
@@ -19,6 +20,7 @@ import type { BoardViewFields } from './boardView';
 import { extractDatabaseProposalProperties } from './extractDatabaseProposalProperties';
 import { generateResyncedProposalEvaluationForCard } from './generateResyncedProposalEvaluationForCard';
 import { setDatabaseProposalProperties } from './setDatabaseProposalProperties';
+import { updateCardFormFieldPropertiesValue } from './updateCardFormFieldPropertiesValue';
 
 export async function createCardsFromProposals({
   boardId,
@@ -62,7 +64,29 @@ export async function createCardsFromProposals({
         select: {
           categoryId: true,
           status: true,
-          evaluationType: true
+          evaluationType: true,
+          id: true,
+          spaceId: true,
+          authors: true,
+          formId: true,
+          createdBy: true,
+          form: {
+            select: {
+              formFields: {
+                select: {
+                  id: true,
+                  type: true,
+                  private: true,
+                  answers: {
+                    select: {
+                      proposalId: true,
+                      value: true
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -172,6 +196,22 @@ export async function createCardsFromProposals({
         proposalProps.proposalStatus.options.find((opt) => opt.value === pageProposal.proposal?.status)?.id ?? '';
     }
 
+    const formFields = pageProposal.proposal?.form?.formFields ?? [];
+    const boardBlockCardProperties = boardBlock.fields.cardProperties ?? [];
+
+    const accessPrivateFields = await canAccessPrivateFields({
+      userId,
+      proposal: pageProposal.proposal ?? undefined,
+      proposalId: pageProposal.proposal!.id
+    });
+
+    const formFieldProperties = await updateCardFormFieldPropertiesValue({
+      accessPrivateFields,
+      cardProperties: boardBlockCardProperties,
+      formFields,
+      proposalId: pageProposal.proposal!.id
+    });
+
     if (pageProposal?.proposal?.evaluationType === 'rubric') {
       const criteria = mappedRubricCriteriaByProposal[pageProposal.id] ?? [];
       const answers = mappedRubricAnswersByProposal[pageProposal.id] ?? [];
@@ -193,7 +233,10 @@ export async function createCardsFromProposals({
       spaceId: pageProposal.spaceId,
       createdAt,
       createdBy: userId,
-      properties: properties as any,
+      properties: {
+        ...properties,
+        ...formFieldProperties
+      },
       hasContent: pageProposal.hasContent,
       content: pageProposal.content,
       contentText: pageProposal.contentText,

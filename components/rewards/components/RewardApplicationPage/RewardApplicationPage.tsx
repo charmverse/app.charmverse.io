@@ -125,7 +125,12 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
         <div className='document-print-container'>
           <Box display='flex' flexDirection='column'>
             <StyledContainer top={0}>
-              <PageTitleInput value={reward.page.title} readOnly onChange={() => null} />
+              <PageTitleInput
+                value={reward.page.title}
+                readOnly
+                onChange={() => null}
+                focusDocumentEditor={() => null}
+              />
               {!!query.id && (
                 <Button
                   onClick={goToReward}
@@ -133,7 +138,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
                   variant='text'
                   startIcon={<ArrowBack fontSize='small' />}
                 >
-                  <span>Back to reward</span>
+                  <span>Back</span>
                 </Button>
               )}
 

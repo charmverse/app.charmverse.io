@@ -21,6 +21,7 @@ import type { RewardType } from 'components/rewards/components/RewardProperties/
 import { RewardTypeSelect } from 'components/rewards/components/RewardProperties/components/RewardTypeSelect';
 import { CustomPropertiesAdapter } from 'components/rewards/components/RewardProperties/CustomPropertiesAdapter';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { RewardFieldsProp, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
@@ -76,6 +77,7 @@ export function RewardPropertiesForm({
   const [rewardApplicationType, setRewardApplicationTypeRaw] = useState<RewardApplicationType>(() =>
     getApplicationType(values, forcedApplicationType)
   );
+  const { getFeatureTitle } = useSpaceFeatures();
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(!!expandedByDefault);
   const [rewardType, setRewardType] = useState<RewardType>(values?.customReward ? 'Custom' : 'Token');
@@ -230,7 +232,7 @@ export function RewardPropertiesForm({
 
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
               <PropertyLabel readOnly highlighted required={isNewReward && !isTemplate}>
-                Reviewer
+                Reviewers
               </PropertyLabel>
               <UserAndRoleSelect
                 readOnly={readOnly}
@@ -352,7 +354,7 @@ export function RewardPropertiesForm({
 
                 <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
                   <PropertyLabel readOnly highlighted>
-                    # of Rewards Available
+                    # Available
                   </PropertyLabel>
                   <StyledFocalboardTextInput
                     onChange={updateRewardMaxSubmissions}
@@ -391,7 +393,7 @@ export function RewardPropertiesForm({
                     showEmptyPlaceholder
                     error={
                       !isNewReward && !values?.assignedSubmitters?.length && !readOnly
-                        ? 'Assigned reward requires at least one assignee'
+                        ? 'Requires at least one assignee'
                         : undefined
                     }
                   />
@@ -401,7 +403,7 @@ export function RewardPropertiesForm({
 
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
               <PropertyLabel readOnly highlighted>
-                Reward Type
+                Type
               </PropertyLabel>
               <RewardTypeSelect readOnly={readOnly} value={rewardType} onChange={setRewardType} />
             </Box>
@@ -409,7 +411,7 @@ export function RewardPropertiesForm({
             {rewardType === 'Token' && (
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
                 <PropertyLabel readOnly highlighted required={isNewReward && !isTemplate}>
-                  Reward Token
+                  Token
                 </PropertyLabel>
                 <RewardTokenProperty
                   onChange={onRewardTokenUpdate}
@@ -422,7 +424,7 @@ export function RewardPropertiesForm({
             {rewardType === 'Custom' && (
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
                 <PropertyLabel readOnly highlighted required={isNewReward && !isTemplate}>
-                  Custom Reward
+                  Custom {getFeatureTitle('Reward')}
                 </PropertyLabel>
 
                 <StyledFocalboardTextInput

@@ -1,11 +1,11 @@
 import type { Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import type { Browser } from '@playwright/test';
 import { chromium, expect, test } from '@playwright/test';
 import { v4 } from 'uuid';
 
 import { baseUrl } from 'config/constants';
+import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { generateProposal, generateRole } from 'testing/setupDatabase';
 
 import { generateUserAndSpace } from './utils/mocks';

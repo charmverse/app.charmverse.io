@@ -63,7 +63,7 @@ export function ApplicationInput({
     resolver: yupResolver(schema)
   });
 
-  const applicationExample = 'Explain why you are the right person or team to work on this bounty.';
+  const applicationExample = 'Explain why you are the right person or team to work on this';
 
   const currentApplicationMessage = watch('message');
 

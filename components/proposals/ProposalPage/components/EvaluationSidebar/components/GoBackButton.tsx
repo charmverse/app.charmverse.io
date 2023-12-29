@@ -1,5 +1,4 @@
-import { ArrowBackIos } from '@mui/icons-material';
-import { Typography } from '@mui/material';
+import { Tooltip, Typography } from '@mui/material';
 import { useState } from 'react';
 
 import { useClearEvaluationResult, useUpdateProposalStatusOnly } from 'charmClient/hooks/proposals';
@@ -7,17 +6,15 @@ import { Button } from 'components/common/Button';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import { useSnackbar } from 'hooks/useSnackbar';
 
-import type { ProposalEvaluationValues } from '../../EvaluationSettingsSidebar/components/EvaluationSettings';
+import type { ProposalEvaluationValues } from '../../EvaluationSettingsSidebar/components/EvaluationStepSettings';
 
 export function GoBackButton({
   hasMovePermission,
-  isDraft,
   proposalId,
   previousStep,
   onSubmit
 }: {
   hasMovePermission: boolean;
-  isDraft?: boolean;
   proposalId: string;
   previousStep?: Pick<ProposalEvaluationValues, 'id' | 'type' | 'title'>;
   onSubmit: () => void;
@@ -33,7 +30,7 @@ export function GoBackButton({
   const disabledTooltip = !hasMovePermission
     ? 'You do not have permission to move this proposal'
     : previousStep?.type === 'vote'
-    ? 'You cannot go back to a vote'
+    ? 'You cannot revert the results of a vote'
     : '';
 
   async function goToPreviousStep() {
@@ -63,23 +60,21 @@ export function GoBackButton({
     setShowConfirmation(false);
   }
 
-  // draft is the first step
-  if (isDraft) {
-    return <div />;
-  }
   return (
     <>
-      <Button
-        color='secondary'
-        loading={isSavingProposal || isSavingEvaluation}
-        startIcon={<ArrowBackIos />}
-        variant='text'
-        disabled={!!disabledTooltip}
-        disabledTooltip={disabledTooltip}
-        onClick={onClick}
-      >
-        Back to {previousStep?.title || 'Draft'}
-      </Button>
+      <Tooltip title={`Move back to ${previousStep?.title || 'Draft'}`}>
+        <Button
+          color='secondary'
+          loading={isSavingProposal || isSavingEvaluation}
+          size='small'
+          variant='outlined'
+          disabled={!!disabledTooltip}
+          disabledTooltip={disabledTooltip}
+          onClick={onClick}
+        >
+          Back
+        </Button>
+      </Tooltip>
       <ModalWithButtons open={showConfirmation} buttonText='Continue' onClose={onCancel} onConfirm={goToPreviousStep}>
         <Typography>
           Moving back will clear the result of the current and previous steps and cannot be undone.

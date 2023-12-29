@@ -18,6 +18,7 @@ import { Button } from 'components/common/Button';
 import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -103,6 +104,7 @@ type Props = {
   undoEditorChanges?: VoidFunction;
   onDelete?: VoidFunction;
   isInsideDialog?: boolean;
+  isStructuredProposal?: boolean;
 };
 
 export function DocumentPageActionList({
@@ -111,7 +113,8 @@ export function DocumentPageActionList({
   onComplete,
   onDelete,
   pagePermissions,
-  undoEditorChanges
+  undoEditorChanges,
+  isStructuredProposal
 }: Props) {
   const pageId = page.id;
   const { navigateToSpacePath } = useCharmRouter();
@@ -122,9 +125,9 @@ export function DocumentPageActionList({
   const { setActiveView } = usePageSidebar();
   const pageType = page.type;
   const isExportablePage = documentTypes.includes(pageType as PageType);
-  const { proposalCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
-
-  const canCreateProposal = proposalCategoriesWithCreatePermission.length > 0;
+  const { getDefaultCreateCategory } = useProposalCategories();
+  const [spacePermissions] = useCurrentSpacePermissions();
+  const canCreateProposal = spacePermissions?.createProposals;
   const basePageBounty = rewards?.find((r) => r.id === pageId);
   function setPageProperty(prop: Partial<PageUpdates>) {
     updatePage({
@@ -242,7 +245,7 @@ export function DocumentPageActionList({
           label={<Typography variant='body2'>Full width</Typography>}
         />
       </ListItemButton>
-      {!isInsideDialog && (
+      {!isInsideDialog && !isStructuredProposal && (
         <>
           <Divider />
           <ListItemButton

@@ -4,6 +4,7 @@ import { htmlToText } from 'html-to-text';
 import type { ReactElement } from 'react';
 import ReactDOMServer from 'react-dom/server';
 
+import type { FeatureJson } from 'lib/features/constants';
 import { getNotificationMetadata } from 'lib/notifications/getNotificationMetadata';
 import type { Notification } from 'lib/notifications/interfaces';
 
@@ -11,12 +12,17 @@ import { PendingNotification } from './templates/NotificationTemplate';
 import type { PageInviteEmailProps } from './templates/PageInviteEmail';
 import { emailSubject, PageInviteEmail } from './templates/PageInviteEmail';
 
-export function getPendingNotificationEmail(
-  notification: Notification,
-  user: Pick<User, 'id' | 'username' | 'id' | 'avatar'>
-) {
-  const html = render(PendingNotification({ notification, user }));
-  const content = getNotificationMetadata(notification).content;
+export function getPendingNotificationEmail({
+  notification,
+  spaceFeatures,
+  user
+}: {
+  notification: Notification;
+  user: Pick<User, 'id' | 'username' | 'id' | 'avatar'>;
+  spaceFeatures: FeatureJson[];
+}) {
+  const html = render(PendingNotification({ notification, user, spaceFeatures }));
+  const content = getNotificationMetadata({ notification, spaceFeatures }).content;
   const subject =
     typeof content === 'string' ? content : htmlToText(ReactDOMServer.renderToString(content as ReactElement));
 

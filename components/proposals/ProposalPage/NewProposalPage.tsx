@@ -11,8 +11,8 @@ import { v4 as uuid } from 'uuid';
 import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
 import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
 import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
-import PageHeader, { getPageTop } from 'components/[pageId]/DocumentPage/components/PageHeader';
 import { PageTemplateBanner } from 'components/[pageId]/DocumentPage/components/PageTemplateBanner';
+import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
 import { PrimaryColumn } from 'components/[pageId]/DocumentPage/components/PrimaryColumn';
 import { PageSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/PageSidebar';
 import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/components/StickyFooterContainer';
@@ -22,6 +22,7 @@ import { PropertyLabel } from 'components/common/BoardEditor/components/properti
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
+import { focusEventName } from 'components/common/CharmEditor/constants';
 import { ControlledFormFieldInputs } from 'components/common/form/FormFieldInputs';
 import { ControlledFormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import { getInitialFormFieldValue, useFormFields } from 'components/common/form/hooks/useFormFields';
@@ -36,16 +37,15 @@ import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
-import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
+import type { ProposalFields } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposal/rubric/interfaces';
+import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
-import { EvaluationStepper } from './components/EvaluationStepper/EvaluationStepper';
 import type { ProposalPropertiesInput } from './components/ProposalProperties/ProposalPropertiesBase';
 import { ProposalPropertiesBase } from './components/ProposalProperties/ProposalPropertiesBase';
 import { TemplateSelect } from './components/TemplateSelect';
-import { WorkflowSelect } from './components/WorkflowSelect';
 import { useNewProposal } from './hooks/useNewProposal';
 
 export type ProposalPageAndPropertiesInput = ProposalPropertiesInput & {
@@ -80,7 +80,7 @@ export function NewProposalPage({
   const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>([]);
   const { activeView: sidebarView, setActiveView, closeSidebar } = usePageSidebar();
   const { proposalTemplates, isLoadingTemplates } = useProposalTemplates();
-  const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>(null);
+  const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>();
   const [, setPageTitle] = usePageTitle();
   const { data: workflowOptions } = useGetProposalWorkflows(currentSpace?.id);
   const isMdScreen = useMdScreen();
@@ -88,6 +88,7 @@ export function NewProposalPage({
     useNewProposal({
       newProposal: { type: isTemplate ? 'proposal_template' : 'proposal', proposalType }
     });
+  const [submittedDraft, setSubmittedDraft] = useState<boolean>(false);
 
   const [, { width: containerWidth }] = useElementSize();
   const { user } = useUser();
@@ -98,7 +99,21 @@ export function NewProposalPage({
 
   const sourceTemplate = proposalTemplates?.find((template) => template.id === formInputs.proposalTemplateId);
   const isStructured = formInputs.proposalType === 'structured' || !!sourceTemplate?.formId;
-  const proposalFormFields = formInputs.formFields ?? sourceTemplate?.form?.formFields ?? [];
+  const proposalFormFields = isStructured
+    ? formInputs.formFields ??
+      sourceTemplate?.form?.formFields ?? [
+        {
+          type: 'short_text',
+          name: '',
+          description: emptyDocument,
+          index: 0,
+          options: [],
+          private: false,
+          required: true,
+          id: uuid()
+        } as FormFieldInput
+      ]
+    : [];
 
   const {
     control: proposalFormFieldControl,
@@ -106,7 +121,8 @@ export function NewProposalPage({
     errors: proposalFormFieldErrors,
     onFormChange
   } = useFormFields({
-    fields: proposalFormFields
+    // Only set the initial state with fields when we are creating a structured proposal
+    fields: isStructured && formInputs.type === 'proposal' ? proposalFormFields : []
   });
 
   function toggleCollapse(fieldId: string) {
@@ -116,7 +132,6 @@ export function NewProposalPage({
       setCollapsedFieldIds([...collapsedFieldIds, fieldId]);
     }
   }
-
   usePreventReload(contentUpdated);
 
   const isFromTemplateSource = Boolean(formInputs.proposalTemplateId);
@@ -147,7 +162,7 @@ export function NewProposalPage({
   // properties with values from templates should be read only
   const readOnlyCustomProperties =
     !isAdmin && sourceTemplate?.fields
-      ? Object.entries((sourceTemplate?.fields as ProposalFields).properties)?.reduce((acc, [key, value]) => {
+      ? Object.entries(sourceTemplate?.fields?.properties || {})?.reduce((acc, [key, value]) => {
           if (!value) {
             return acc;
           }
@@ -168,7 +183,7 @@ export function NewProposalPage({
     setFormInputs({
       workflowId: workflow.id,
       evaluations: workflow.evaluations.map((evaluation, index) => ({
-        id: uuid(),
+        id: evaluation.id,
         index,
         reviewers: [],
         rubricCriteria: [] as ProposalRubricCriteriaWithTypedParams[],
@@ -186,9 +201,18 @@ export function NewProposalPage({
     });
   }
 
-  async function saveForm() {
-    await createProposal();
-    navigateToSpacePath(`/proposals`);
+  async function saveForm({ isDraft }: { isDraft?: boolean } = {}) {
+    setSubmittedDraft(!!isDraft);
+    const result = await createProposal({ isDraft });
+    if (result) {
+      navigateToSpacePath(`/${result.id}`);
+    }
+  }
+
+  function focusDocumentEditor() {
+    const focusEvent = new CustomEvent(focusEventName);
+    // TODO: use a ref passed down instead
+    document.querySelector(`.bangle-editor-core`)?.dispatchEvent(focusEvent);
   }
 
   function applyTemplate(_templateId: string) {
@@ -209,7 +233,7 @@ export function NewProposalPage({
         evaluationType: template.evaluationType,
         evaluations: template.evaluations,
         rubricCriteria: template.rubricCriteria,
-        fields: (template.fields as ProposalFields) || {},
+        fields: template.fields || {},
         type: 'proposal',
         formId: template.formId ?? undefined,
         formAnswers: (template?.form?.formFields ?? [])
@@ -224,70 +248,57 @@ export function NewProposalPage({
 
   // having `internalSidebarView` allows us to have the sidebar open by default, because usePageSidebar() does not allow us to do this currently
   const [defaultSidebarView, setDefaultView] = useState<PageSidebarView | null>(
-    isMdScreen ? 'proposal_evaluation_settings' : null
+    isMdScreen ? 'proposal_evaluation' : null
   );
   const internalSidebarView = defaultSidebarView || sidebarView;
 
   const proposalPageContent = (
     <>
-      <PageHeader
-        headerImage={formInputs.headerImage}
-        icon={formInputs.icon}
+      <PageTitleInput
         readOnly={false}
         updatedAt={new Date().toString()}
-        title={formInputs.title || ''}
-        // readOnly={readOnly || !!enableSuggestingMode}
-        setPage={(updatedPage) => {
+        value={formInputs.title || ''}
+        onChange={(updatedPage) => {
           setFormInputs(updatedPage);
           if ('title' in updatedPage) {
             setPageTitle(updatedPage.title || '');
           }
         }}
+        focusDocumentEditor={focusDocumentEditor}
         placeholder='Title (required)'
       />
-      <Box my={2} mb={1}>
-        <EvaluationStepper evaluations={formInputs.evaluations} disabled isDraft={true} />
-      </Box>
-      <Divider />
       <div className='focalboard-body font-family-default'>
         <div className='CardDetail content'>
           <div className='octo-propertylist'>
             {/* Select a template for new proposals */}
             {!isTemplate && (
-              <Box className='octo-propertyrow' mb='0 !important'>
-                <PropertyLabel readOnly highlighted required={isTemplateRequired}>
-                  Template
-                </PropertyLabel>
-                <Box display='flex' flex={1}>
-                  <TemplateSelect
-                    options={templateOptions}
-                    value={proposalTemplatePage ?? null}
-                    onChange={(template) => {
-                      if (template === null) {
-                        clearTemplate();
-                        // if user has not updated the content, then just overwrite everything
-                      } else if (formInputs.contentText?.length === 0) {
-                        applyTemplate(template.id);
-                      } else {
-                        // set value to trigger a prompt
-                        setSelectedProposalTemplateId(template?.id ?? null);
-                      }
-                    }}
-                  />
+              <>
+                <Box className='octo-propertyrow'>
+                  <PropertyLabel readOnly highlighted required={isTemplateRequired}>
+                    Template
+                  </PropertyLabel>
+                  <Box display='flex' flex={1}>
+                    <TemplateSelect
+                      options={templateOptions}
+                      value={proposalTemplatePage ?? null}
+                      onChange={(template) => {
+                        if (template === null) {
+                          clearTemplate();
+                          // if user has not updated the content, then just overwrite everything
+                        } else if (formInputs.contentText?.length === 0) {
+                          applyTemplate(template.id);
+                        } else {
+                          // set value to trigger a prompt
+                          setSelectedProposalTemplateId(template?.id ?? null);
+                        }
+                      }}
+                    />
+                  </Box>
                 </Box>
-              </Box>
+
+                <Divider />
+              </>
             )}
-            <Box className='octo-propertyrow' mb='0 !important'>
-              <PropertyLabel readOnly required highlighted>
-                Workflow
-              </PropertyLabel>
-              <WorkflowSelect
-                value={formInputs.workflowId}
-                onChange={selectEvaluationWorkflow}
-                options={workflowOptions}
-                readOnly={!!formInputs.proposalTemplateId}
-              />
-            </Box>
             <ProposalPropertiesBase
               isFromTemplate={isFromTemplateSource}
               readOnlyCategory={isFromTemplateSource}
@@ -301,7 +312,7 @@ export function NewProposalPage({
       </div>
       {currentSpace && (
         <PageSidebar
-          isNewProposal
+          isUnpublishedProposal
           readOnlyReviewers={readOnlyReviewers}
           readOnlyRubricCriteria={readOnlyRubricCriteria}
           id='page-action-sidebar'
@@ -317,6 +328,7 @@ export function NewProposalPage({
               evaluations
             });
           }}
+          onChangeWorkflow={selectEvaluationWorkflow}
         />
       )}
     </>
@@ -326,7 +338,7 @@ export function NewProposalPage({
     // clear out page title on load
     setPageTitle('');
     if (isMdScreen) {
-      setActiveView('proposal_evaluation_settings');
+      setActiveView('proposal_evaluation');
       setDefaultView(null);
     }
   }, []);
@@ -358,7 +370,7 @@ export function NewProposalPage({
         <Box className={`document-print-container ${fontClassName}`} display='flex' flexDirection='column'>
           <PageTemplateBanner pageType={formInputs.type} isNewPage proposalType={formInputs.proposalType} />
           {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
-          <StyledContainer data-test='page-charmeditor' top={getPageTop(formInputs)} fullWidth={isSmallScreen}>
+          <StyledContainer data-test='page-charmeditor' top={0} fullWidth={isSmallScreen}>
             <Box minHeight={450}>
               {isStructured ? (
                 <>
@@ -417,7 +429,7 @@ export function NewProposalPage({
         </Box>
         <StickyFooterContainer>
           {!isMdScreen && (
-            <Button variant='outlined' onClick={() => setActiveView('proposal_evaluation_settings')}>
+            <Button variant='outlined' onClick={() => setActiveView('proposal_evaluation')}>
               Configure
             </Button>
           )}
@@ -428,11 +440,24 @@ export function NewProposalPage({
                 ? 'Please provide correct values for all proposal form fields'
                 : disabledTooltip
             }
-            onClick={saveForm}
-            loading={isCreatingProposal}
+            loading={isCreatingProposal && submittedDraft}
             data-test='create-proposal-button'
+            variant='outlined'
+            onClick={() => saveForm({ isDraft: true })}
           >
-            Save
+            Save draft
+          </Button>
+          <Button
+            disabled={Boolean(disabledTooltip) || isCreatingProposal || !isProposalFormFieldsValid}
+            disabledTooltip={
+              !isProposalFormFieldsValid
+                ? 'Please provide correct values for all proposal form fields'
+                : disabledTooltip
+            }
+            onClick={() => saveForm()}
+            loading={isCreatingProposal && !submittedDraft}
+          >
+            Publish
           </Button>
         </StickyFooterContainer>
         <ConfirmDeleteModal

@@ -1,6 +1,5 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { Web3Service as InitialWeb3Service } from '@unlock-protocol/unlock-js';
 
 import { applyTokenGates } from 'lib/tokenGates/applyTokenGates';
 import { verifyTokenGateMembership } from 'lib/tokenGates/verifyTokenGateMembership';
@@ -14,11 +13,13 @@ import {
   generateUnlockTokenGate
 } from 'testing/utils/tokenGates';
 
+import { getPublicClient } from '../../blockchain/publicClient';
+
 // @ts-ignore
 let mockedLitSDK: jest.Mocked;
 
-jest.mock('@unlock-protocol/unlock-js');
-const mockWeb3Service = jest.mocked(InitialWeb3Service);
+jest.mock('../../blockchain/publicClient');
+const mockGetPublicClient = jest.mocked(getPublicClient);
 
 describe('verifyTokenGateMembership', () => {
   let user: User;
@@ -62,7 +63,7 @@ describe('verifyTokenGateMembership', () => {
   beforeEach(async () => {
     jest.mock('@lit-protocol/lit-node-client');
     mockedLitSDK = await import('@lit-protocol/lit-node-client');
-    mockWeb3Service.mockClear();
+    mockGetPublicClient.mockClear();
 
     const { user: u, space: s } = await generateUserAndSpace(undefined);
     user = u;
@@ -155,11 +156,9 @@ describe('verifyTokenGateMembership', () => {
         })
       );
 
-    mockWeb3Service.mockReturnValueOnce({
-      getLock: async () => ({}),
-      balanceOf: async () => 1,
-      getKeyExpirationByLockForOwner: async () => new Date().setDate(new Date().getDate() + 1) / 1000
-    } as any as InitialWeb3Service);
+    mockGetPublicClient.mockReturnValueOnce({
+      readContract: jest.fn().mockReturnValueOnce('My New Lock').mockReturnValueOnce(true)
+    } as any);
 
     await applyTokenGates({
       spaceId: space.id,

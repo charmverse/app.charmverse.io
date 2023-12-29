@@ -14,6 +14,7 @@ import { RewardPropertiesForm } from 'components/rewards/components/RewardProper
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 
@@ -30,6 +31,7 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
   const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
   const { templates, isLoading } = useRewardTemplates();
   const [currentSpacePermissions] = useCurrentSpacePermissions();
+  const { getFeatureTitle } = useSpaceFeatures();
 
   function deleteTemplate(pageId: string) {
     return charmClient.deletePage(pageId);
@@ -133,7 +135,7 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
         editTemplate={(pageId) => showPage(pageId)}
         deleteTemplate={deleteTemplate}
         anchorEl={buttonRef.current as Element}
-        boardTitle='Rewards'
+        boardTitle={getFeatureTitle('Rewards')}
         popupState={popupState}
         enableItemOptions={isAdmin}
         enableNewTemplates={isAdmin}

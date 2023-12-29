@@ -13,7 +13,7 @@ import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
 import { Box } from '@mui/material';
 import type { ComponentProps, ReactNode } from 'react';
 
-import type { StaticPageType } from 'components/common/PageLayout/components/Sidebar/constants';
+import type { StaticPageType } from 'lib/features/constants';
 import { greyColor2 } from 'theme/colors';
 
 import EmojiIcon from './Emoji';

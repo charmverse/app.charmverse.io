@@ -12,9 +12,10 @@ import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { TemplatesMenu } from 'components/common/TemplatesMenu';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { usePages } from 'hooks/usePages';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { isTruthy } from 'lib/utilities/types';
 
 import { useProposalCategories } from '../hooks/useProposalCategories';
@@ -32,22 +33,23 @@ const ProposalTemplateMenu = styled(Stack)`
     transition: background-color 0.2s ease-in-out;
   }
   gap: ${({ theme }) => theme.spacing(1)};
+  flex-direction: row;
+  align-items: center;
 `;
 
 export function NewProposalButton() {
   const { navigateToSpacePath } = useCharmRouter();
-
-  const { proposalCategoriesWithCreatePermission } = useProposalCategories();
+  const { getFeatureTitle } = useSpaceFeatures();
+  const [spacePermissions] = useCurrentSpacePermissions();
   const isAdmin = useIsAdmin();
   const { pages } = usePages();
-  const isCharmverseSpace = useIsCharmverseSpace();
   const proposalTemplateCreateModalState = usePopupState({ variant: 'dialog' });
   // MUI Menu specific content
   const buttonRef = useRef<HTMLDivElement>(null);
   const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
   const { proposalTemplates, isLoadingTemplates } = useProposalTemplates();
 
-  const canCreateProposal = proposalCategoriesWithCreatePermission.length > 0;
+  const canCreateProposal = spacePermissions?.createProposals;
   // grab page data from context so that title is always up-to-date
   const proposalTemplatePages = proposalTemplates
     ?.map(
@@ -98,17 +100,16 @@ export function NewProposalButton() {
         addPageFromTemplate={createFromTemplate}
         editTemplate={editTemplate}
         pages={proposalTemplatePages}
-        createTemplate={!isCharmverseSpace ? () => createTemplate('free_form') : proposalTemplateCreateModalState.open}
+        createTemplate={proposalTemplateCreateModalState.open}
         deleteTemplate={deleteProposalTemplate}
         anchorEl={buttonRef.current as Element}
-        boardTitle='Proposals'
+        boardTitle={getFeatureTitle('Proposals')}
         popupState={popupState}
         enableItemOptions={isAdmin}
         enableNewTemplates={isAdmin}
       />
 
       <Modal
-        size='fluid'
         title='Select a template type'
         open={proposalTemplateCreateModalState.isOpen}
         onClose={proposalTemplateCreateModalState.close}
@@ -118,23 +119,15 @@ export function NewProposalButton() {
             onClick={() => createTemplate('structured')}
             data-test='structured-proposal-template-menu'
           >
-            <Stack flexDirection='row' gap={1} alignItems='center'>
-              <WidgetsOutlinedIcon fontSize='large' />
-              <Typography variant='h5'>Structured Form</Typography>
-            </Stack>
-            <Typography variant='body2'>
-              Create a template using Forms, creating a structured data format for each proposal to conform to.
-            </Typography>
+            <WidgetsOutlinedIcon fontSize='large' />
+            <Typography variant='h6'>Form</Typography>
           </ProposalTemplateMenu>
           <ProposalTemplateMenu
             onClick={() => createTemplate('free_form')}
             data-test='free_form-proposal-template-menu'
           >
-            <Stack flexDirection='row' gap={1} alignItems='center'>
-              <DescriptionOutlinedIcon fontSize='large' />
-              <Typography variant='h5'>Free Form</Typography>
-            </Stack>
-            <Typography variant='body2'>Create a template using an open editor.</Typography>
+            <DescriptionOutlinedIcon fontSize='large' />
+            <Typography variant='h6'>Document</Typography>
           </ProposalTemplateMenu>
         </Stack>
       </Modal>

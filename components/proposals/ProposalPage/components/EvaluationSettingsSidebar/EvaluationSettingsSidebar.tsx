@@ -1,65 +1,72 @@
-import { Box, Card, Typography } from '@mui/material';
+import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 
-import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationSettings';
+import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationStepSettings';
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
-import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
-import { ProposalSidebarHeader } from '../EvaluationSidebar/components/ProposalSidebarHeader';
+import { EvaluationStepRow } from '../EvaluationSidebar/components/EvaluationStepRow';
+import { WorkflowSelect } from '../WorkflowSelect';
 
-import { EvaluationSettings } from './components/EvaluationSettings';
+import { EvaluationStepSettings } from './components/EvaluationStepSettings';
 
 export type Props = {
-  proposal?: Pick<ProposalPropertiesInput, 'categoryId' | 'evaluations'>;
+  proposal?: Pick<ProposalPropertiesInput, 'categoryId' | 'fields' | 'evaluations' | 'workflowId'>;
   onChangeEvaluation?: (evaluationId: string, updated: Partial<ProposalEvaluationValues>) => void;
-  goToEvaluation: (evaluationId?: string) => void;
   readOnly: boolean;
-  showHeader: boolean;
   readOnlyReviewers: boolean;
   readOnlyRubricCriteria: boolean;
+  onChangeWorkflow: (workflow: ProposalWorkflowTyped) => void;
+  readOnlyWorkflowSelect?: boolean;
 };
 
 export function EvaluationSettingsSidebar({
   proposal,
-  showHeader,
-  goToEvaluation,
   onChangeEvaluation,
   readOnly,
   readOnlyReviewers,
-  readOnlyRubricCriteria
+  readOnlyRubricCriteria,
+  onChangeWorkflow,
+  readOnlyWorkflowSelect
 }: Props) {
-  const evaluationsWithConfig = proposal?.evaluations.filter((e) => e.type !== 'feedback');
-
+  const pendingRewards = proposal?.fields?.pendingRewards;
+  const { mappedFeatures } = useSpaceFeatures();
   return (
-    <>
-      {showHeader && (
-        <ProposalSidebarHeader
-          evaluations={proposal?.evaluations || []}
-          goToEvaluation={goToEvaluation}
-          goToSettings={() => undefined}
-        />
-      )}
-      <Box display='flex' flex={1} flexDirection='column'>
-        {proposal &&
-          evaluationsWithConfig?.map((evaluation) => (
-            <Card key={evaluation.id} variant='outlined' sx={{ p: 1, mb: 2 }}>
-              <EvaluationSettings
-                categoryId={proposal.categoryId}
-                readOnly={readOnly}
-                readOnlyReviewers={readOnlyReviewers}
-                readOnlyRubricCriteria={readOnlyRubricCriteria}
-                evaluation={evaluation}
-                onChange={(updated) => {
-                  onChangeEvaluation?.(evaluation.id, updated);
-                }}
-              />
-            </Card>
+    <div data-test='evaluation-settings-sidebar'>
+      <WorkflowSelect
+        value={proposal?.workflowId}
+        onChange={onChangeWorkflow}
+        readOnly={readOnlyWorkflowSelect}
+        required
+      />
+      <EvaluationStepRow index={0} result={null} title='Draft' />
+      {proposal && (
+        <>
+          {proposal?.evaluations?.map((evaluation, index) => (
+            <EvaluationStepRow key={evaluation.id} expanded result={null} index={index + 1} title={evaluation.title}>
+              {/* <Divider sx={{ my: 1 }} /> */}
+              {evaluation.type !== 'feedback' && (
+                <EvaluationStepSettings
+                  categoryId={proposal.categoryId}
+                  readOnly={readOnly}
+                  readOnlyReviewers={readOnlyReviewers}
+                  readOnlyRubricCriteria={readOnlyRubricCriteria}
+                  evaluation={evaluation}
+                  onChange={(updated) => {
+                    onChangeEvaluation?.(evaluation.id, updated);
+                  }}
+                />
+              )}
+            </EvaluationStepRow>
           ))}
-        {proposal && evaluationsWithConfig?.length === 0 && (
-          <Typography variant='body2' color='secondary'>
-            No evaluations configured
-          </Typography>
-        )}
-      </Box>
-    </>
+          {!!pendingRewards?.length && (
+            <EvaluationStepRow
+              index={proposal ? proposal.evaluations.length + 1 : 0}
+              result={null}
+              title={mappedFeatures.rewards.title}
+            />
+          )}
+        </>
+      )}
+    </div>
   );
 }

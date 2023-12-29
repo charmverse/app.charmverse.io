@@ -87,7 +87,8 @@ function TableHeader(props: Props): JSX.Element {
   const disableRename =
     proposalPropertyTypesList.includes(type as any) ||
     DEFAULT_BLOCK_IDS.includes(templateId) ||
-    defaultRewardPropertyIds.includes(templateId);
+    defaultRewardPropertyIds.includes(templateId) ||
+    !!template.formFieldId;
 
   const [tempName, setTempName] = useState(props.name || '');
 
@@ -168,6 +169,11 @@ function TableHeader(props: Props): JSX.Element {
     const columnWrappedIds = activeView.fields.columnWrappedIds ?? [];
     await mutator.toggleColumnWrap(activeView.id, templateId, columnWrappedIds);
   }
+
+  const isDisabled =
+    proposalPropertyTypesList.includes(type as any) ||
+    defaultRewardPropertyIds.includes(templateId) ||
+    !!template.formFieldId;
 
   const popupContent = (
     <Stack>
@@ -257,7 +263,7 @@ function TableHeader(props: Props): JSX.Element {
           </MenuItem>,
           <MenuItem
             key='duplicate'
-            disabled={proposalPropertyTypesList.includes(type as any) || defaultRewardPropertyIds.includes(templateId)}
+            disabled={isDisabled}
             onClick={() => {
               mutator.duplicatePropertyTemplate(board, activeView, templateId);
             }}
@@ -269,7 +275,7 @@ function TableHeader(props: Props): JSX.Element {
           </MenuItem>,
           <MenuItem
             key='delete'
-            disabled={proposalPropertyTypesList.includes(type as any) || defaultRewardPropertyIds.includes(templateId)}
+            disabled={isDisabled}
             onClick={() => {
               mutator.deleteProperty(board, views, cards, templateId);
             }}

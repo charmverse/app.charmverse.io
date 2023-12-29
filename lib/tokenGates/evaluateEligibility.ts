@@ -94,16 +94,17 @@ async function getTokenGateResults(tokenGate: TokenGateWithRoles, authSig: AuthS
   }
 }
 
-export async function getUnlockProtocolValidTokenGate(tokenGate: TokenGateWithRoles<'unlock'>, walletAddress: string) {
+export async function getUnlockProtocolValidTokenGate<T extends TokenGate<'unlock'>>(
+  tokenGate: T,
+  walletAddress: string
+) {
   const result = await getLockDetails({
     walletAddress,
     contract: tokenGate.conditions.contract,
     chainId: tokenGate.conditions.chainId
   });
 
-  const now = new Date().getTime();
-
-  if (result.balanceOf === 1 && result.expirationTimestamp && result.expirationTimestamp > now) {
+  if (result.validKey) {
     return {
       signedToken: '',
       tokenGateId: tokenGate.id

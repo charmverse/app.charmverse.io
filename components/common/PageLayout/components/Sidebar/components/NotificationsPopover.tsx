@@ -26,6 +26,7 @@ import { useNotifications } from 'components/nexus/hooks/useNotifications';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useMembers } from 'hooks/useMembers';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useUser } from 'hooks/useUser';
 import type { Member } from 'lib/members/interfaces';
 import { getNotificationMetadata } from 'lib/notifications/getNotificationMetadata';
@@ -434,10 +435,15 @@ export function NotificationContent({
   onClose: VoidFunction;
   user?: Member;
 }) {
+  const { features } = useSpaceFeatures();
   const read = notification.read;
   const archived = notification.archived;
   const { spaceName, createdBy, id, createdAt, spaceDomain } = notification;
-  const { href, content, pageTitle } = getNotificationMetadata(notification, actorUsername);
+  const { href, content, pageTitle } = getNotificationMetadata({
+    notification,
+    actorUsername,
+    spaceFeatures: features
+  });
   const notificationContent = notification.group === 'document' ? notification.content : null;
   const { formatDate, formatTime } = useDateFormatter();
   const date = new Date(createdAt);

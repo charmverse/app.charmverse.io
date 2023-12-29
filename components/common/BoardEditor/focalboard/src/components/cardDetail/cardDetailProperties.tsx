@@ -9,10 +9,11 @@ import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import { proposalPropertyTypesList, type Board, type IPropertyTemplate, type PropertyType } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
+import { defaultRewardPropertyIds } from 'lib/rewards/blocks/constants';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { Mutator } from '../../mutator';
@@ -253,11 +254,17 @@ function CardDetailProperties(props: Props) {
   return (
     <div className='octo-propertylist' data-test='card-detail-properties'>
       {board.fields?.cardProperties.map((propertyTemplate) => {
+        const readOnly = props.readOnly || props.readOnlyProperties?.includes(propertyTemplate.id) || false;
+        const isReadonlyTemplateProperty =
+          readOnly ||
+          proposalPropertyTypesList.includes(propertyTemplate.type as any) ||
+          defaultRewardPropertyIds.includes(propertyTemplate.id) ||
+          !!(board.fields?.cardProperties ?? []).find((cardProperty) => cardProperty.id === propertyTemplate.id)
+            ?.formFieldId;
+
         if (propertyTemplate.id === Constants.titleColumnId) {
           return null;
         }
-
-        const readOnly = props.readOnly || props.readOnlyProperties?.includes(propertyTemplate.id) || false;
 
         return (
           <CardDetailProperty
@@ -274,7 +281,7 @@ function CardDetailProperties(props: Props) {
             pageUpdatedAt={pageUpdatedAt}
             pageUpdatedBy={pageUpdatedBy}
             property={propertyTemplate}
-            readOnly={readOnly}
+            readOnly={isReadonlyTemplateProperty}
             mutator={mutator}
             disableEditPropertyOption={disableEditPropertyOption}
           />

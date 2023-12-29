@@ -1,5 +1,7 @@
 import React from 'react';
 
+import type { NestedDataTest } from 'testing/e2eType';
+
 import { Utils } from '../../utils';
 
 type Props = {
@@ -13,7 +15,7 @@ type Props = {
   rightIcon?: boolean;
 };
 
-function Button({ size = 'small', ...props }: Props): JSX.Element {
+function Button({ size = 'small', ...props }: Props & NestedDataTest): JSX.Element {
   const classNames: Record<string, boolean> = {
     Button: true
   };
@@ -22,6 +24,7 @@ function Button({ size = 'small', ...props }: Props): JSX.Element {
 
   return (
     <button
+      data-test={props.dataTest}
       type='button'
       onClick={props.onClick}
       className={Utils.generateClassName(classNames)}

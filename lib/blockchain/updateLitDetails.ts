@@ -1,3 +1,4 @@
+import type { AccsDefaultParams } from '@lit-protocol/types';
 import { getChainById } from 'connectors/chains';
 
 import type { LitConditions } from 'lib/tokenGates/interfaces';
@@ -19,12 +20,15 @@ export async function updateTokenGateLitDetails<T extends LitConditions>(
 
       const unifiedConditions = await Promise.all(
         unifiedAccessControlConditions.map(async (condition) => {
-          const isNft = 'standardContractType' in condition && condition.standardContractType === 'ERC721';
+          const isNft =
+            'standardContractType' in condition &&
+            (condition.standardContractType === 'ERC721' || condition.standardContractType === 'ERC1155');
+
           const isCustomToken = 'standardContractType' in condition && condition.standardContractType === 'ERC20';
 
           if (isNft) {
-            const hasTokenId = !!condition.parameters[0] && Number(condition.parameters[0]) >= 0;
-            const tokenId = hasTokenId ? String(condition.parameters[0]) : '1';
+            const tokenId = getTokenId(condition);
+
             const chainDetails = getChainById(LIT_CHAINS[condition.chain].chainId);
 
             const nft = await getNFT({
@@ -34,7 +38,7 @@ export async function updateTokenGateLitDetails<T extends LitConditions>(
             });
 
             if (nft) {
-              const nftName = hasTokenId ? nft.title : nft.contractName || nft.title;
+              const nftName = nft.contractName || nft.title;
               return {
                 ...condition,
                 name: nftName,
@@ -67,4 +71,25 @@ export async function updateTokenGateLitDetails<T extends LitConditions>(
   );
 
   return updatedTokenGates;
+}
+
+function getTokenId(conditions: AccsDefaultParams) {
+  switch (conditions.standardContractType) {
+    case 'ERC721': {
+      const parameter = conditions.parameters[0];
+      const hasTokenId = !!parameter && Number(parameter) >= 0;
+
+      return hasTokenId ? parameter : '1';
+    }
+
+    case 'ERC1155': {
+      const parameter: string = conditions.parameters[1];
+      const hasTokenId = !!parameter && Number(parameter) >= 0;
+
+      return hasTokenId ? parameter : '1';
+    }
+
+    default:
+      return '1';
+  }
 }

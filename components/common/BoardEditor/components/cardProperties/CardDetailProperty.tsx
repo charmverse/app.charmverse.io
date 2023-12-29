@@ -115,7 +115,7 @@ export function CardDetailProperty({
         updatedAt={pageUpdatedAt}
         updatedBy={pageUpdatedBy}
         propertyTemplate={property}
-        showEmptyPlaceholder={true}
+        showEmptyPlaceholder
         displayType='details'
         mutator={mutator}
       />

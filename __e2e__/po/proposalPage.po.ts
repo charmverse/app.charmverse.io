@@ -1,4 +1,4 @@
-import type { ProposalEvaluationType } from '@charmverse/core/prisma-client';
+import type { ProposalEvaluationType, ProposalSystemRole } from '@charmverse/core/prisma-client';
 import type { Page } from '@playwright/test';
 
 import { DocumentPage } from './document.po';
@@ -16,13 +16,29 @@ export class ProposalPage extends DocumentPage {
     public currentStatus = page.locator('data-test=current-proposal-status'),
     public workflowSelect = page.locator('data-test=proposal-workflow-select'),
     public voterSelect = page.locator('data-test=proposal-vote-select'),
-    public completeDraftButton = page.locator('data-test=complete-draft-button')
+    public completeDraftButton = page.locator('data-test=complete-draft-button'),
+    public evaluationSettingsSidebar = page.locator('data-test=evaluation-settings-sidebar'),
+    public addRubricCriteriaButton = page.locator('data-test=add-rubric-criteria-button'),
+    public editRubricCriteriaLabel = page.locator('data-test=edit-rubric-criteria-label >> textarea').first(),
+    public editRubricCriteriaDescription = page
+      .locator('data-test=edit-rubric-criteria-description >> textarea')
+      .first(),
+    public editRubricCriteriaMinScore = page.locator('data-test=edit-rubric-criteria-min-score >> input'),
+    public editRubricCriteriaMaxScore = page.locator('data-test=edit-rubric-criteria-max-score >> input'),
+    public evaluationVoteDurationInput = page
+      .locator('data-test=evaluation-vote-settings')
+      .locator('data-test=vote-duration')
+      .locator('data-test=numeric-field >> input'),
+    public evaluationVotePassThresholdInput = page
+      .locator('data-test=evaluation-vote-settings')
+      .locator('data-test=vote-pass-threshold')
+      .locator('data-test=numeric-field >> input')
   ) {
     super(page);
   }
 
-  getSelectOption(categoryId: string) {
-    return this.page.locator(`data-test=select-option-${categoryId}`);
+  getSelectOption(optionId: string) {
+    return this.page.locator(`data-test=select-option-${optionId}`);
   }
 
   async waitForNewProposalPage(domain: string) {
@@ -39,8 +55,17 @@ export class ProposalPage extends DocumentPage {
     await this.getSelectOption(workflowId).click();
   }
 
-  async selectEvaluationOption(evaluationType: ProposalEvaluationType, option: string) {
-    await this.page.locator(`data-test=proposal-${evaluationType}-select`).click();
-    await this.getSelectOption(option).click();
+  getEvaluationReviewerSelect(evaluationType: ProposalEvaluationType) {
+    return this.page.locator(`data-test=proposal-${evaluationType}-select`);
+  }
+
+  /**
+   * @param assignee Either a system role, or a user or role id
+   */
+  async selectEvaluationReviewer(evaluationType: ProposalEvaluationType, assignee: ProposalSystemRole | string) {
+    await this.getEvaluationReviewerSelect(evaluationType).click();
+    await this.getSelectOption(assignee).click();
+    // Close the menu afterwards
+    await this.getEvaluationReviewerSelect(evaluationType).click();
   }
 }

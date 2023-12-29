@@ -53,14 +53,14 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
     }
   }, [voteType]);
 
-  // useEffect on the values to call onChange() doesnt seem ideal, but it works for now
+  // useEffect on the values to call onChange() doesnt seem ideal and triggers on the first load, but it works for now. TODO: use react-hook-form?
   useEffect(() => {
     if (onChange) {
       const hasError =
         passThreshold > 100 ||
         (voteType === VoteType.SingleChoice && options.some((option) => option.length === 0)) ||
         new Set(options).size !== options.length;
-      // console.log({ hasError, passThreshold, voteType, options, maxChoices, durationDays });
+
       if (!hasError) {
         onChange({
           threshold: passThreshold,
@@ -75,8 +75,15 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
   }, [voteType, options, maxChoices, durationDays, passThreshold, publishToSnapshot]);
 
   return (
-    <StyledVoteSettings>
-      <Stack direction='row' alignItems='center' gap={2} justifyContent='space-between' mb={1}>
+    <StyledVoteSettings data-test='evaluation-vote-settings'>
+      <Stack
+        data-test='vote-duration'
+        direction='row'
+        alignItems='center'
+        gap={2}
+        justifyContent='space-between'
+        mb={1}
+      >
         <FormLabel>
           <Typography component='span' variant='subtitle1'>
             Duration (days)
@@ -134,7 +141,14 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
       )}
 
       {maxChoices === 1 && (
-        <Stack direction='row' alignItems='center' gap={2} justifyContent='space-between' mb={2}>
+        <Stack
+          data-test='vote-pass-threshold'
+          direction='row'
+          alignItems='center'
+          gap={2}
+          justifyContent='space-between'
+          mb={2}
+        >
           <FormLabel>
             <Typography component='span' variant='subtitle1'>
               Pass Threshold (%)
