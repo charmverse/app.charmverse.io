@@ -30,7 +30,6 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { useProposalCategories } from '../../../hooks/useProposalCategories';
 import type { ProposalEvaluationValues } from '../EvaluationSettingsSidebar/components/EvaluationStepSettings';
 
-import type { RangeProposalCriteria } from './components/OldProposalRubricCriteriaInput';
 import { ProposalCategorySelect } from './components/ProposalCategorySelect';
 
 export type ProposalPropertiesInput = {
@@ -43,7 +42,6 @@ export type ProposalPropertiesInput = {
   proposalTemplateId?: string | null;
   evaluationType: ProposalEvaluationType;
   evaluations: ProposalEvaluationValues[];
-  rubricCriteria: RangeProposalCriteria[];
   publishToLens?: boolean;
   fields: ProposalFields | null;
   type: PageType;

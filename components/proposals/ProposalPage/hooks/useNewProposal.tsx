@@ -1,6 +1,5 @@
 import { log } from '@charmverse/core/log';
 import { useCallback, useEffect, useState } from 'react';
-import { mutate } from 'swr';
 
 import { useCreateProposal } from 'charmClient/hooks/proposals';
 import { checkFormFieldErrors } from 'components/common/form/checkFormFieldErrors';
@@ -8,7 +7,6 @@ import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { RubricDataInput } from 'lib/proposal/rubric/upsertRubricCriteria';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -48,25 +46,6 @@ export function useNewProposal({ newProposal }: Props) {
   async function createProposal({ isDraft }: { isDraft?: boolean }) {
     log.info('[user-journey] Create a proposal');
     if (formInputs.categoryId && currentSpace) {
-      // TODO: put validation inside the properties form component
-      try {
-        formInputs.rubricCriteria.forEach((criteria) => {
-          if (criteria.type === 'range') {
-            if (
-              (!criteria.parameters.min && criteria.parameters.min !== 0) ||
-              (!criteria.parameters.max && criteria.parameters.max !== 0)
-            ) {
-              throw new Error('Range values are invalid');
-            }
-            if (criteria.parameters.min >= criteria.parameters.max) {
-              throw new Error('Minimum must be less than Maximum');
-            }
-          }
-        });
-      } catch (error) {
-        showMessage((error as Error).message, 'error');
-        return;
-      }
       const result = await createProposalTrigger({
         proposalTemplateId: formInputs.proposalTemplateId,
         authors: formInputs.authors,
@@ -83,7 +62,6 @@ export function useNewProposal({ newProposal }: Props) {
         formFields: formInputs.formFields,
         evaluations: formInputs.evaluations,
         evaluationType: formInputs.evaluationType,
-        rubricCriteria: formInputs.rubricCriteria as RubricDataInput[],
         reviewers: formInputs.reviewers,
         spaceId: currentSpace.id,
         publishToLens: formInputs.publishToLens,
@@ -175,7 +153,6 @@ function emptyState({
     proposalTemplateId: null,
     reviewers: [],
     evaluations: [],
-    rubricCriteria: [],
     title: '',
     type: 'proposal',
     publishToLens: false,

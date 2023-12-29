@@ -243,7 +243,6 @@ export function NewProposalPage({
         workflowId: template.workflowId,
         evaluationType: template.evaluationType,
         evaluations: template.evaluations,
-        rubricCriteria: template.rubricCriteria,
         fields: template.fields || {},
         type: 'proposal',
         formId: template.formId ?? undefined,
