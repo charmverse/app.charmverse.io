@@ -22,6 +22,7 @@ import { PropertyLabel } from 'components/common/BoardEditor/components/properti
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
+import { focusEventName } from 'components/common/CharmEditor/constants';
 import { ControlledFormFieldInputs } from 'components/common/form/FormFieldInputs';
 import { ControlledFormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import { getInitialFormFieldValue, useFormFields } from 'components/common/form/hooks/useFormFields';
@@ -210,6 +211,12 @@ export function NewProposalPage({
     }
   }
 
+  function focusDocumentEditor() {
+    const focusEvent = new CustomEvent(focusEventName);
+    // TODO: use a ref passed down instead
+    document.querySelector(`.bangle-editor-core`)?.dispatchEvent(focusEvent);
+  }
+
   function applyTemplate(_templateId: string) {
     const template = proposalTemplates?.find((t) => t.id === _templateId);
     if (template) {
@@ -259,6 +266,7 @@ export function NewProposalPage({
             setPageTitle(updatedPage.title || '');
           }
         }}
+        focusDocumentEditor={focusDocumentEditor}
         placeholder='Title (required)'
       />
       <div className='focalboard-body font-family-default'>

@@ -21,7 +21,7 @@ export function CompleteDraftButton({ proposalId, onSubmit }: Props) {
     }
     onSubmit?.();
   }
-  // endIcon={<ArrowForwardIos />}
+
   return (
     <Button data-test='complete-draft-button' loading={isMutating} onClick={onClick}>
       Publish
