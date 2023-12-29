@@ -1,6 +1,6 @@
 import type { Page } from '@charmverse/core/prisma';
 import type { Theme } from '@mui/material';
-import { Box, Divider, useMediaQuery } from '@mui/material';
+import { Box, Tab, Tabs, useMediaQuery } from '@mui/material';
 import dynamic from 'next/dynamic';
 import type { EditorState } from 'prosemirror-state';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -20,7 +20,9 @@ import type { FrontendParticipant } from 'components/common/CharmEditor/componen
 import type { ConnectionEvent } from 'components/common/CharmEditor/components/fiduswriter/ws';
 import { SnapshotVoteDetails } from 'components/common/CharmEditor/components/inlineVote/components/SnapshotVoteDetails';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
+import { focusEventName } from 'components/common/CharmEditor/constants';
 import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
+import { EvaluationSidebar } from 'components/proposals/ProposalPage/components/EvaluationSidebar/EvaluationSidebar';
 import { ProposalFormFieldInputs } from 'components/proposals/ProposalPage/components/ProposalFormFieldInputs';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
@@ -100,6 +102,7 @@ function DocumentPage({
   const [connectionError, setConnectionError] = useState<Error | null>(null);
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const dispatch = useAppDispatch();
+  const [currentTab, setCurrentTab] = useState<number>(0);
   const [containerRef, { width: containerWidth }] = useElementSize();
   const [editorState, setEditorState] = useState<EditorState | null>(null);
   const { creatingInlineReward } = useRewards();
@@ -258,13 +261,13 @@ function DocumentPage({
   }, [isLoadingThreads, page.id, enableSidebar, threadsPageId]);
 
   useEffect(() => {
-    if (proposalId && enableSidebar && isMdScreen) {
-      setActiveView('proposal_evaluation');
+    if (proposalId && enableSidebar) {
+      setActiveView(isMdScreen ? 'proposal_evaluation' : null);
     }
-  }, [proposalId, enableSidebar]);
+  }, [proposalId, enableSidebar, isMdScreen]);
 
   // keep a ref in sync for printing
-  const printRef = useRef(null);
+  const printRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (printRef?.current !== _printRef?.current) {
       setPageProps({
@@ -273,34 +276,14 @@ function DocumentPage({
     }
   }, [printRef, _printRef]);
 
+  function focusDocumentEditor() {
+    const focusEvent = new CustomEvent(focusEventName);
+    // TODO: use a ref passed down instead
+    document.querySelector(`.bangle-editor-core[data-page-id="${page.id}"]`)?.dispatchEvent(focusEvent);
+  }
+
   const documentPageContent = (
     <>
-      {/* temporary? disable editing of page title when in suggestion mode */}
-      {showPageBanner ? (
-        <PageHeader
-          headerImage={page.headerImage}
-          // Commented for now, as we need to preserve cursor position between re-renders caused by updating this
-          // key={page.title}
-          icon={page.icon}
-          title={page.title}
-          updatedAt={page.updatedAt.toString()}
-          readOnly={readOnly || !!enableSuggestingMode}
-          setPage={savePage}
-          readOnlyTitle={!!page.syncWithPageId}
-          parentId={showParentChip ? card.parentId : null}
-          insideModal={insideModal}
-          pageId={page.id}
-        />
-      ) : (
-        <PageTitleInput
-          // Commented for now, as we need to preserve cursor position between re-renders caused by updating this
-          // key={page.title}
-          value={page.title}
-          updatedAt={page.updatedAt.toString()}
-          onChange={(updates) => savePage(updates as { title: string; updatedAt: any })}
-          readOnly={readOnly || !!enableSuggestingMode || !!page.syncWithPageId}
-        />
-      )}
       {!isCharmVerse && page.type === 'proposal' && !isLoading && page.snapshotProposalId && (
         <Box my={2} className='font-family-default'>
           <SnapshotVoteDetails snapshotProposalId={page.snapshotProposalId} />
@@ -388,6 +371,7 @@ function DocumentPage({
             isProposalTemplate={page.type === 'proposal_template'}
             refreshProposal={refreshProposal}
             disabledViews={isStructuredProposal ? ['suggestions', 'comments'] : []}
+            onChangeWorkflow={() => alert('FIX ME')}
           />
         )}
       </CardPropertiesWrapper>
@@ -455,68 +439,133 @@ function DocumentPage({
             top={pageTop}
             fullWidth={isSmallScreen || (page.fullWidth ?? false)}
           >
-            {proposal && proposal.formId ? (
-              <>
-                {documentPageContent}
-                <Box mb={10}>
-                  {page.type === 'proposal_template' ? (
-                    <FormFieldsEditor
-                      readOnly={!isAdmin && (!user || !proposalAuthors.includes(user.id))}
-                      proposalId={proposal.id}
-                      formFields={proposal?.form.formFields ?? []}
-                    />
-                  ) : (
-                    <ProposalFormFieldInputs
-                      proposalId={proposal.id}
-                      formFields={proposal?.form.formFields ?? []}
-                      readOnly={!user || !proposalAuthors.includes(user.id)}
-                      proposalStatus={proposal.status}
-                    />
-                  )}
-                </Box>
-              </>
-            ) : (
-              <CharmEditor
-                placeholderText={
-                  page.type === 'bounty' || page.type === 'bounty_template'
-                    ? `Describe the reward. Type '/' to see the list of available commands`
-                    : undefined
-                }
-                key={editorKey}
-                content={page.content as PageContent}
-                readOnly={readOnly || !!page.syncWithPageId}
-                autoFocus={false}
-                sidebarView={sidebarView}
-                setSidebarView={setActiveView}
+            {/* temporary? disable editing of page title when in suggestion mode */}
+            {showPageBanner ? (
+              <PageHeader
+                headerImage={page.headerImage}
+                // Commented for now, as we need to preserve cursor position between re-renders caused by updating this
+                // key={page.title}
+                icon={page.icon}
+                title={page.title}
+                updatedAt={page.updatedAt.toString()}
+                readOnly={readOnly || !!enableSuggestingMode}
+                setPage={savePage}
+                readOnlyTitle={!!page.syncWithPageId}
+                parentId={showParentChip ? card.parentId : null}
+                insideModal={insideModal}
                 pageId={page.id}
-                disablePageSpecificFeatures={isSharedPage}
-                enableSuggestingMode={enableSuggestingMode}
-                enableVoting={page.type !== 'proposal'}
-                enableComments={enableComments}
-                containerWidth={containerWidth}
-                pageType={page.type}
-                pagePermissions={pagePermissions ?? undefined}
-                onConnectionEvent={onConnectionEvent}
-                setEditorState={setEditorState}
-                snapshotProposalId={page.snapshotProposalId}
-                onParticipantUpdate={onParticipantUpdate}
-                style={{
-                  // 5 lines
-                  minHeight: proposalId || page?.type.includes('card') ? '150px' : 'unset'
+                focusDocumentEditor={focusDocumentEditor}
+              />
+            ) : (
+              <PageTitleInput
+                // Commented for now, as we need to preserve cursor position between re-renders caused by updating this
+                // key={page.title}
+                value={page.title}
+                focusDocumentEditor={focusDocumentEditor}
+                updatedAt={page.updatedAt.toString()}
+                onChange={(updates) => savePage(updates as { title: string; updatedAt: any })}
+                readOnly={readOnly || !!enableSuggestingMode || !!page.syncWithPageId}
+              />
+            )}
+            {isCharmVerse && proposalId && !isMdScreen && (
+              <Tabs
+                sx={{
+                  mb: 1
                 }}
-                disableNestedPages={page?.type === 'proposal' || page?.type === 'proposal_template'}
-                allowClickingFooter={true}
-                threadIds={threadIds}
+                indicatorColor='primary'
+                value={currentTab}
               >
-                {documentPageContent}
-              </CharmEditor>
+                <Tab label='Document' value={0} onClick={() => setCurrentTab(0)} />
+                <Tab
+                  sx={{
+                    px: 1.5,
+                    fontSize: 14,
+                    minHeight: 0
+                    // '&.MuiTab-root': {
+                    //   color: 'palette.secondary.main'
+                    // }
+                  }}
+                  label='Evaluation'
+                  value={1}
+                  onClick={() => setCurrentTab(1)}
+                />
+              </Tabs>
+            )}
+            {currentTab === 1 && (
+              <EvaluationSidebar
+                pageId={page.id}
+                proposal={proposal}
+                onChangeEvaluation={onChangeEvaluation}
+                refreshProposal={refreshProposal}
+              />
             )}
 
-            {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') && (
-              <Box mt='-100px'>
-                {/* add negative margin to offset height of .charm-empty-footer */}
-                <PageComments page={page} canCreateComments={pagePermissions.comment} />
-              </Box>
+            {currentTab === 0 && (
+              <>
+                {proposal && proposal.formId ? (
+                  <>
+                    {documentPageContent}
+                    <Box mb={10}>
+                      {page.type === 'proposal_template' ? (
+                        <FormFieldsEditor
+                          readOnly={!isAdmin && (!user || !proposalAuthors.includes(user.id))}
+                          proposalId={proposal.id}
+                          formFields={proposal?.form.formFields ?? []}
+                        />
+                      ) : (
+                        <ProposalFormFieldInputs
+                          proposalId={proposal.id}
+                          formFields={proposal?.form.formFields ?? []}
+                          readOnly={!user || !proposalAuthors.includes(user.id)}
+                          proposalStatus={proposal.status}
+                        />
+                      )}
+                    </Box>
+                  </>
+                ) : (
+                  <CharmEditor
+                    placeholderText={
+                      page.type === 'bounty' || page.type === 'bounty_template'
+                        ? `Describe the reward. Type '/' to see the list of available commands`
+                        : undefined
+                    }
+                    key={editorKey}
+                    content={page.content as PageContent}
+                    readOnly={readOnly || !!page.syncWithPageId}
+                    autoFocus={false}
+                    sidebarView={sidebarView}
+                    setSidebarView={setActiveView}
+                    pageId={page.id}
+                    disablePageSpecificFeatures={isSharedPage}
+                    enableSuggestingMode={enableSuggestingMode}
+                    enableVoting={page.type !== 'proposal'}
+                    enableComments={enableComments}
+                    containerWidth={containerWidth}
+                    pageType={page.type}
+                    pagePermissions={pagePermissions ?? undefined}
+                    onConnectionEvent={onConnectionEvent}
+                    setEditorState={setEditorState}
+                    snapshotProposalId={page.snapshotProposalId}
+                    onParticipantUpdate={onParticipantUpdate}
+                    style={{
+                      // 5 lines
+                      minHeight: proposalId || page?.type.includes('card') ? '150px' : 'unset'
+                    }}
+                    disableNestedPages={page?.type === 'proposal' || page?.type === 'proposal_template'}
+                    allowClickingFooter={true}
+                    threadIds={threadIds}
+                  >
+                    {documentPageContent}
+                  </CharmEditor>
+                )}
+
+                {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') && (
+                  <Box mt='-100px'>
+                    {/* add negative margin to offset height of .charm-empty-footer */}
+                    <PageComments page={page} canCreateComments={pagePermissions.comment} />
+                  </Box>
+                )}
+              </>
             )}
           </PageEditorContainer>
         </Box>

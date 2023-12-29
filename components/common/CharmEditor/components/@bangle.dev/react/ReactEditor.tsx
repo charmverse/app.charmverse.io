@@ -16,12 +16,13 @@ import useSWRImmutable from 'swr/immutable';
 import charmClient from 'charmClient';
 import type { BangleEditorProps as CoreBangleEditorProps } from 'components/common/CharmEditor/components/@bangle.dev/core/bangle-editor';
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
-import { undoEventName } from 'components/common/CharmEditor/utils';
+import { undoEventName, focusEventName } from 'components/common/CharmEditor/constants';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { getThreadsKey } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
+import { insertAndFocusFirstLine } from 'lib/prosemirror/insertAndFocusFirstLine';
 import { insertAndFocusLineAtEndofDoc } from 'lib/prosemirror/insertAndFocusLineAtEndofDoc';
 import { isTouchScreen } from 'lib/utilities/browser';
 
@@ -176,12 +177,17 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   }
 
   useEffect(() => {
-    function editorUndoListener(event: Event) {
+    function handleUndo(event: Event) {
       if (editor) {
         const detail = (event as CustomEvent).detail as { pageId: string } | null;
         if (detail && detail.pageId === pageId) {
           undo()(editor.view.state, editor.view.dispatch);
         }
+      }
+    }
+    function handleFocus() {
+      if (editor) {
+        insertAndFocusFirstLine(editor.view);
       }
     }
 
@@ -219,12 +225,15 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
       (pageId || postId) &&
       pageType?.match(/(page|card|post|proposal|bounty)/)
     ) {
-      editorRef.current.addEventListener(undoEventName, editorUndoListener);
-      editorRef.current.addEventListener(imageFileDropEventName, handleImageFileDrop);
+      const element = editorRef.current;
+      element.addEventListener(undoEventName, handleUndo);
+      element.addEventListener(imageFileDropEventName, handleImageFileDrop);
+      element.addEventListener(focusEventName, handleFocus);
 
       return () => {
-        editorRef.current?.removeEventListener(undoEventName, editorUndoListener);
-        editorRef.current?.removeEventListener(imageFileDropEventName, handleImageFileDrop);
+        element.removeEventListener(undoEventName, handleUndo);
+        element.removeEventListener(imageFileDropEventName, handleImageFileDrop);
+        element.removeEventListener(focusEventName, handleFocus);
       };
     }
   }, [editorRef, editor, readOnly, inline, pageType, postId, pageId]);
