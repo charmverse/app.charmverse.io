@@ -440,9 +440,10 @@ export function NewProposalPage({
         <StickyFooterContainer>
           {isTemplate ? (
             <Button
+              data-test='create-proposal-button'
               disabled={Boolean(disabledTooltip) || isCreatingProposal}
               disabledTooltip={disabledTooltip}
-              onClick={() => saveForm()}
+              onClick={() => saveForm({ isDraft: true })}
               loading={isCreatingProposal && !submittedDraft}
             >
               Save
