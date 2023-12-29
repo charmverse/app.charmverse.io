@@ -371,7 +371,7 @@ function DocumentPage({
             isProposalTemplate={page.type === 'proposal_template'}
             refreshProposal={refreshProposal}
             disabledViews={isStructuredProposal ? ['suggestions', 'comments'] : []}
-            onChangeWorkflow={() => alert('FIX ME')}
+            onChangeWorkflow={() => {}}
           />
         )}
       </CardPropertiesWrapper>

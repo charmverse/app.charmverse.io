@@ -359,7 +359,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-12h9q2s-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
@@ -388,7 +388,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-12h9q2s-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
@@ -497,7 +497,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-12h9q2s-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
@@ -526,7 +526,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-12h9q2s-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
@@ -1039,7 +1039,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-12h9q2s-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
@@ -1068,7 +1068,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-12h9q2s-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
@@ -1171,7 +1171,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-12h9q2s-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
@@ -1200,7 +1200,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-12h9q2s-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
@@ -1710,7 +1710,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-12h9q2s-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
@@ -1739,7 +1739,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-12h9q2s-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
@@ -1848,7 +1848,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-12h9q2s-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
@@ -1877,7 +1877,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-12h9q2s-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
@@ -2390,7 +2390,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-12h9q2s-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
@@ -2419,7 +2419,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-12h9q2s-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
@@ -2522,7 +2522,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-12h9q2s-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
@@ -2551,7 +2551,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-12h9q2s-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
