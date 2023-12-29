@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import { Box, Menu, MenuItem, Stack, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import type { ReactNode, Dispatch, SetStateAction } from 'react';
 
 import charmClient from 'charmClient';
@@ -447,6 +447,10 @@ export function ViewHeaderRowsMenu({
     }
   }
 
+  const filteredPropertyTemplates = useMemo(() => {
+    return propertyTemplates.filter((propertyTemplate) => !propertyTemplate.formFieldId);
+  }, [propertyTemplates]);
+
   return (
     <StyledStack>
       <StyledMenuItem>
@@ -455,7 +459,7 @@ export function ViewHeaderRowsMenu({
         </Typography>
       </StyledMenuItem>
       {cards.length !== 0
-        ? propertyTemplates.map((propertyTemplate) => (
+        ? filteredPropertyTemplates.map((propertyTemplate) => (
             <PropertyTemplateMenu
               isAdmin={isAdmin}
               board={board}
