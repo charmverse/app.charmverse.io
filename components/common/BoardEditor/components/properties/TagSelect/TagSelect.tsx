@@ -27,7 +27,7 @@ export const SelectPreviewContainer = styled(Stack, {
 })<ContainerProps>`
   border-radius: ${({ theme }) => theme.spacing(0.5)};
   display: ${({ isHidden }) => (isHidden ? 'none' : 'initial')};
-  // width: 100%;
+  ${({ fluidWidth }) => (!fluidWidth ? 'width: 100%;' : '')}
   height: 100%;
   justify-content: center;
   padding: ${({ theme }) => theme.spacing(0.25, 0)};
