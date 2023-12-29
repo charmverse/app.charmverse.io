@@ -261,7 +261,7 @@ function DocumentPage({
   }, [isLoadingThreads, page.id, enableSidebar, threadsPageId]);
 
   useEffect(() => {
-    if (proposalId && enableSidebar) {
+    if (proposalId && enableSidebar && isCharmVerse) {
       setActiveView(isMdScreen ? 'proposal_evaluation' : null);
     }
   }, [proposalId, enableSidebar, isMdScreen]);
