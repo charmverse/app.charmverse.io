@@ -23,7 +23,6 @@ import DateRange from '../properties/dateRange/dateRange';
 import { validatePropertyValue } from '../propertyValueElement';
 
 const StyledStack = styled(Stack)`
-  background: ${({ theme }) => theme.palette.background.paper};
   flex-direction: row;
   align-items: center;
   z-index: 1;
