@@ -23,6 +23,7 @@ export type UserSelectProps = {
   'data-test'?: string;
   defaultOpened?: boolean;
   error?: string;
+  disallowEmpty?: boolean;
 };
 
 type ContainerProps = {
@@ -58,8 +59,10 @@ function MembersDisplay({
   memberIds,
   readOnly,
   setMemberIds,
-  wrapColumn
+  wrapColumn,
+  disallowEmpty
 }: {
+  disallowEmpty?: boolean;
   wrapColumn: boolean;
   readOnly: boolean;
   memberIds: string[];
@@ -74,6 +77,7 @@ function MembersDisplay({
   }
 
   const members = memberIds.map((memberId) => membersRecord[memberId]).filter(isTruthy);
+  const showDeleteIcon = (disallowEmpty && memberIds.length !== 1) || !disallowEmpty;
 
   return memberIds.length === 0 ? null : (
     <Stack flexDirection='row' gap={1} rowGap={0.5} flexWrap={wrapColumn ? 'wrap' : 'nowrap'}>
@@ -87,7 +91,7 @@ function MembersDisplay({
             sx={wrapColumn ? { justifyContent: 'space-between', overflowX: 'hidden' } : { overflowX: 'hidden' }}
           >
             <UserDisplay fontSize={14} avatarSize='xSmall' userId={user.id} wrapName={wrapColumn} />
-            {!readOnly && (
+            {!readOnly && showDeleteIcon && (
               <IconButton size='small' onClick={() => removeMember(user.id)}>
                 <CloseIcon
                   sx={{
@@ -115,17 +119,18 @@ export function UserSelect({
   wrapColumn,
   defaultOpened,
   'data-test': dataTest,
-  error
+  error,
+  disallowEmpty = false
 }: UserSelectProps): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(defaultOpened);
 
   const _onChange = useCallback(
     (newMemberIds: string[]) => {
-      if (!readOnly) {
+      if (!readOnly && ((disallowEmpty && newMemberIds.length !== 0) || !disallowEmpty)) {
         onChange(newMemberIds);
       }
     },
-    [readOnly, onChange]
+    [readOnly, onChange, disallowEmpty]
   );
 
   const onClickToEdit = useCallback(() => {
@@ -180,7 +185,13 @@ export function UserSelect({
           inputVariant='standard'
           forcePopupIcon={false}
           renderTags={() => (
-            <MembersDisplay wrapColumn={true} readOnly={!!readOnly} memberIds={memberIds} setMemberIds={_onChange} />
+            <MembersDisplay
+              disallowEmpty={disallowEmpty}
+              wrapColumn={true}
+              readOnly={!!readOnly}
+              memberIds={memberIds}
+              setMemberIds={_onChange}
+            />
           )}
         />
       </StyledUserPropertyContainer>

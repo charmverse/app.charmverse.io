@@ -4,7 +4,7 @@ import styled from '@emotion/styled';
 import CollapseIcon from '@mui/icons-material/ArrowDropDown';
 import ExpandIcon from '@mui/icons-material/ArrowRight';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import { Box, Checkbox } from '@mui/material';
+import { Box, Checkbox, Stack } from '@mui/material';
 import React, { memo, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { Dispatch, MouseEvent, ReactElement, ReactNode, SetStateAction } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -81,6 +81,7 @@ export const StyledCheckbox = styled(Checkbox)<{ show?: boolean }>`
   }
 
   padding: 0;
+  height: fit-content;
   margin-left: ${({ theme }) => theme.spacing(0.5)};
 `;
 
@@ -224,8 +225,15 @@ function TableRow(props: Props) {
       }}
     >
       {!props.readOnly && (
-        <>
-          <div className='icons row-actions' onClick={handleClick} ref={drag}>
+        <Stack flexDirection='row' gap={1} alignItems='center'>
+          <div
+            className='icons row-actions'
+            onClick={handleClick}
+            ref={drag}
+            style={{
+              padding: 0
+            }}
+          >
             <Box className='charm-drag-handle disable-drag-selection'>
               <DragIndicatorIcon color='secondary' />
             </Box>
@@ -250,7 +258,7 @@ function TableRow(props: Props) {
               disableTouchRipple
             />
           )}
-        </>
+        </Stack>
       )}
 
       {/* Columns, one per property */}
@@ -341,6 +349,7 @@ function TableRow(props: Props) {
               readOnly={props.readOnly}
               syncWithPageId={cardPage?.syncWithPageId}
               card={card}
+              proposalId={cardPage.proposalId}
               board={board}
               showEmptyPlaceholder={false}
               propertyTemplate={template}

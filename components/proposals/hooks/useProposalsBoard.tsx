@@ -1,6 +1,6 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import type { ReactNode } from 'react';
-import { createContext, useContext, useMemo } from 'react';
+import { createContext, useContext } from 'react';
 
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
