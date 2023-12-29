@@ -80,16 +80,22 @@ export function NewProposalPage({
   const { space: currentSpace } = useCurrentSpace();
   const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>([]);
   const isCharmVerse = useIsCharmverseSpace();
-  const { activeView: sidebarView, setActiveView, closeSidebar } = usePageSidebar();
+  const { activeView: sidebarView, setActiveView } = usePageSidebar();
   const { proposalTemplates, isLoadingTemplates } = useProposalTemplates();
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>();
   const [, setPageTitle] = usePageTitle();
   const { data: workflowOptions } = useGetProposalWorkflows(currentSpace?.id);
   const isMdScreen = useMdScreen();
-  const { formInputs, setFormInputs, contentUpdated, disabledTooltip, isCreatingProposal, createProposal } =
-    useNewProposal({
-      newProposal: { type: isTemplate ? 'proposal_template' : 'proposal', proposalType }
-    });
+  const {
+    formInputs,
+    setFormInputs,
+    contentUpdated,
+    disabledTooltip: _disabledTooltip,
+    isCreatingProposal,
+    createProposal
+  } = useNewProposal({
+    newProposal: { type: isTemplate ? 'proposal_template' : 'proposal', proposalType }
+  });
   const [submittedDraft, setSubmittedDraft] = useState<boolean>(false);
 
   const [, { width: containerWidth }] = useElementSize();
@@ -126,6 +132,11 @@ export function NewProposalPage({
     // Only set the initial state with fields when we are creating a structured proposal
     fields: isStructured && formInputs.type === 'proposal' ? proposalFormFields : []
   });
+
+  let disabledTooltip = _disabledTooltip;
+  if (!disabledTooltip && !isProposalFormFieldsValid) {
+    disabledTooltip = 'Please provide correct values for all proposal form fields';
+  }
 
   function toggleCollapse(fieldId: string) {
     if (collapsedFieldIds.includes(fieldId)) {
@@ -331,7 +342,7 @@ export function NewProposalPage({
           id='page-action-sidebar'
           spaceId={currentSpace.id}
           sidebarView={internalSidebarView || null}
-          closeSidebar={closeSidebar}
+          closeSidebar={() => {}}
           openSidebar={setActiveView}
           proposalInput={formInputs}
           onChangeEvaluation={(evaluationId, updates) => {
@@ -441,37 +452,37 @@ export function NewProposalPage({
           </StyledContainer>
         </Box>
         <StickyFooterContainer>
-          {!isMdScreen && (
-            <Button variant='outlined' onClick={() => setActiveView('proposal_evaluation')}>
-              Configure
+          {isTemplate ? (
+            <Button
+              disabled={Boolean(disabledTooltip) || isCreatingProposal}
+              disabledTooltip={disabledTooltip}
+              onClick={() => saveForm()}
+              loading={isCreatingProposal && !submittedDraft}
+            >
+              Save
             </Button>
+          ) : (
+            <>
+              <Button
+                disabled={Boolean(disabledTooltip) || isCreatingProposal}
+                disabledTooltip={disabledTooltip}
+                loading={isCreatingProposal && submittedDraft}
+                data-test='create-proposal-button'
+                variant='outlined'
+                onClick={() => saveForm({ isDraft: true })}
+              >
+                Save draft
+              </Button>
+              <Button
+                disabled={Boolean(disabledTooltip) || isCreatingProposal}
+                disabledTooltip={disabledTooltip}
+                onClick={() => saveForm()}
+                loading={isCreatingProposal && !submittedDraft}
+              >
+                Publish
+              </Button>
+            </>
           )}
-          <Button
-            disabled={Boolean(disabledTooltip) || isCreatingProposal || !isProposalFormFieldsValid}
-            disabledTooltip={
-              !isProposalFormFieldsValid
-                ? 'Please provide correct values for all proposal form fields'
-                : disabledTooltip
-            }
-            loading={isCreatingProposal && submittedDraft}
-            data-test='create-proposal-button'
-            variant='outlined'
-            onClick={() => saveForm({ isDraft: true })}
-          >
-            Save draft
-          </Button>
-          <Button
-            disabled={Boolean(disabledTooltip) || isCreatingProposal || !isProposalFormFieldsValid}
-            disabledTooltip={
-              !isProposalFormFieldsValid
-                ? 'Please provide correct values for all proposal form fields'
-                : disabledTooltip
-            }
-            onClick={() => saveForm()}
-            loading={isCreatingProposal && !submittedDraft}
-          >
-            Publish
-          </Button>
         </StickyFooterContainer>
         <ConfirmDeleteModal
           onClose={() => {

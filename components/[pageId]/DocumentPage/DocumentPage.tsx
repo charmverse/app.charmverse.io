@@ -59,22 +59,6 @@ const RewardProperties = dynamic(
   { ssr: false }
 );
 
-// export const Container = styled(({ fullWidth, top, ...props }: any) => <Box {...props} />)<{
-//   top: number;
-//   fullWidth?: boolean;
-// }>`
-//   width: ${({ fullWidth }) => (fullWidth ? '100%' : '860px')};
-//   max-width: 100%;
-//   margin: 0 auto ${({ top }) => top || 0}px;
-//   position: relative;
-//   top: ${({ top }) => top || 0}px;
-//   padding: 0 40px 0 30px;
-
-//   ${({ theme }) => theme.breakpoints.up('md')} {
-//     padding: 0 80px;
-//   }
-// `;
-
 export interface DocumentPageProps {
   page: PageWithContent;
   refreshPage: () => Promise<any>;
@@ -362,7 +346,8 @@ function DocumentPage({
             pagePermissions={pagePermissions}
             editorState={editorState}
             sidebarView={sidebarView}
-            closeSidebar={closeSidebar}
+            // dont let users collapse sidebar when looking at a proposal
+            closeSidebar={proposalId ? () => {} : closeSidebar}
             openSidebar={setActiveView}
             threads={threads}
             proposal={proposal}

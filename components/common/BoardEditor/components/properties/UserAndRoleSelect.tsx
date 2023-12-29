@@ -169,6 +169,7 @@ type Props<T> = {
   'data-test'?: string;
   wrapColumn?: boolean;
   type?: 'role' | 'roleAndUser';
+  required?: boolean;
 };
 
 export function UserAndRoleSelect<T extends { id: string; group: string } = SelectOption>({
@@ -186,7 +187,8 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
   isRequiredValue,
   'data-test': dataTest,
   wrapColumn,
-  type = 'roleAndUser'
+  type = 'roleAndUser',
+  required
 }: Props<T>): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(false);
   const { roles } = useRoles();
@@ -349,6 +351,8 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
               size='small'
               value={applicableValues}
               placeholder={populatedValue.length === 0 ? getPlaceholderLabel() : ''}
+              // kind of hacky but useful for proposal forms where its hard to see all required fields
+              error={required && populatedValue.length === 0}
               InputProps={{
                 ...params.InputProps,
                 ...(variant === 'standard' && { disableUnderline: true })
