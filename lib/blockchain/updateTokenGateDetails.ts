@@ -21,7 +21,7 @@ export async function updateTokenGatesDetails(tokenGates: TokenGateWithRoles[]):
   );
   // Add identifiable names to token gates
   const [updatedUnlockProtocolGates, updatedTokenGates] = await Promise.all([
-    updateTokenGateLockDetails(unlock, true),
+    updateTokenGateLockDetails(unlock),
     updateTokenGateLitDetails(lit)
   ]);
 

@@ -20,7 +20,7 @@ async function reviewTokenGate(req: NextApiRequest, res: NextApiResponse) {
   if (body.type === 'lit') {
     updatedResult = await updateTokenGateLitDetails([body]);
   } else if (body.type === 'unlock') {
-    updatedResult = await updateTokenGateLockDetails([body], true);
+    updatedResult = await updateTokenGateLockDetails([body]);
   } else {
     throw new InvalidInputError('Invalid token gate type');
   }
