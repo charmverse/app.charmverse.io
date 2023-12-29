@@ -18,7 +18,7 @@ import { getPublicClient } from '../../blockchain/publicClient';
 // @ts-ignore
 let mockedLitSDK: jest.Mocked;
 
-jest.mock('../unlock/client');
+jest.mock('../../blockchain/publicClient');
 const mockGetPublicClient = jest.mocked(getPublicClient);
 
 describe('verifyTokenGateMembership', () => {
