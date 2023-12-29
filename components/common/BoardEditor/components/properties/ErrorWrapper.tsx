@@ -1,10 +1,16 @@
-import { Box, Stack, Typography } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 
 export function ErrorWrapper({ error, children }: { error?: string; children: React.ReactNode }) {
   return (
-    <Stack flex={1}>
+    <Stack
+      flex={1}
+      sx={{
+        height: '100%'
+      }}
+    >
       <Stack
         sx={{
+          height: '100%',
           boxShadow: error ? '0 0 0 1px var(--danger-text)' : 'none',
           borderRadius: ({ spacing }) => spacing(0.5)
         }}
