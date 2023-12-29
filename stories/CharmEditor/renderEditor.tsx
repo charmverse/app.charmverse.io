@@ -33,6 +33,7 @@ export function renderEditorWithContent({ content, title }: { content?: PageCont
         readOnly={false}
         setPage={() => {}}
         readOnlyTitle={false}
+        focusDocumentEditor={() => null}
       />
     </CharmEditorComponent>
   );

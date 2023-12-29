@@ -23,7 +23,7 @@ import type { PopulatedEvaluation } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import { isNumber } from 'lib/utilities/numbers';
 
-import { PassFailSidebar } from '../PassFailSidebar';
+import { PassFailEvaluation } from '../PassFailEvaluation';
 
 type Props = {
   answers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
@@ -229,7 +229,7 @@ export function RubricResults({
               Decision
             </Typography>
 
-            <PassFailSidebar
+            <PassFailEvaluation
               isCurrent={isCurrent}
               hideReviewer
               key='results'

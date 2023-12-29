@@ -45,17 +45,16 @@ type SidebarProps = {
   pagePermissions?: PagePermissionFlags | null;
   sidebarView: PageSidebarView | null;
   openSidebar?: (view: PageSidebarView) => void; // leave undefined to hide navigation
-  openEvaluationSidebar?: (evaluationId?: string) => void;
   readOnlyProposalPermissions?: boolean;
   // eslint-disable-next-line react/no-unused-prop-types
   closeSidebar: () => void;
   proposalId?: string | null;
   proposal?: EvaluationSidebarProps['proposal'];
   proposalInput?: ProposalSettingsProps['proposal'];
-  onChangeEvaluation?: ProposalSettingsProps['onChangeEvaluation'];
+  onChangeEvaluation: ProposalSettingsProps['onChangeEvaluation'];
+  onChangeWorkflow: ProposalSettingsProps['onChangeWorkflow'];
   refreshProposal?: VoidFunction;
-  proposalEvaluationId?: string | null;
-  isNewProposal?: boolean;
+  isUnpublishedProposal?: boolean;
   isProposalTemplate?: boolean;
   readOnlyReviewers: boolean;
   readOnlyRubricCriteria: boolean;
@@ -64,11 +63,12 @@ type SidebarProps = {
 };
 
 function PageSidebarComponent(props: SidebarProps) {
-  const { disabledViews = [], id, proposal, sidebarView, openSidebar, closeSidebar, isNewProposal } = props;
+  const { disabledViews = [], id, proposal, sidebarView, openSidebar, closeSidebar, isUnpublishedProposal } = props;
   const isMdScreen = useMdScreen();
   const isCharmVerse = useIsCharmverseSpace();
   const isOpen = sidebarView !== null;
   const sidebarTitle = sidebarView && SIDEBAR_VIEWS[sidebarView]?.title;
+  const canHideSidebar = isMdScreen && !props.proposalId; // dont allow closing the sidebar when viewing a proposal
   const showEvaluationSidebarIcon =
     (proposal?.evaluationType === 'rubric' &&
       (proposal.status === 'evaluation_active' || proposal?.status === 'evaluation_closed')) ||
@@ -109,21 +109,23 @@ function PageSidebarComponent(props: SidebarProps) {
             flexDirection: 'column'
           }}
         >
-          <Box display='flex' gap={1} alignItems='center'>
-            <PageSidebarViewToggle onClick={toggleSidebar} />
-            <Typography flexGrow={1} fontWeight={600} fontSize={20}>
-              {sidebarTitle}
-            </Typography>
-            {openSidebar && (
-              <SidebarNavigationIcons
-                activeView={sidebarView}
-                showEvaluationSidebarIcon={showEvaluationSidebarIcon}
-                openSidebar={openSidebar}
-                isNewProposal={!!isNewProposal}
-                disabledViews={disabledViews}
-              />
-            )}
-          </Box>
+          {!isUnpublishedProposal && (
+            <Box display='flex' gap={1} alignItems='center'>
+              {canHideSidebar ? <PageSidebarViewToggle onClick={toggleSidebar} /> : <div />}
+              <Typography flexGrow={1} fontWeight={600} fontSize={20}>
+                {sidebarTitle}
+              </Typography>
+              {openSidebar && (
+                <SidebarNavigationIcons
+                  activeView={sidebarView}
+                  showEvaluationSidebarIcon={showEvaluationSidebarIcon}
+                  openSidebar={openSidebar}
+                  isUnpublishedProposal={!!isUnpublishedProposal}
+                  disabledViews={disabledViews}
+                />
+              )}
+            </Box>
+          )}
           <SidebarContents {...props} />
         </Box>
       </DesktopContainer>
@@ -140,7 +142,7 @@ function PageSidebarComponent(props: SidebarProps) {
             activeView={sidebarView}
             showEvaluationSidebarIcon={showEvaluationSidebarIcon}
             openSidebar={openSidebar}
-            isNewProposal={!!isNewProposal}
+            isUnpublishedProposal={!!isUnpublishedProposal}
           />
         )
       }
@@ -157,13 +159,13 @@ function SidebarNavigationIcons({
   showEvaluationSidebarIcon,
   openSidebar,
   activeView,
-  isNewProposal,
+  isUnpublishedProposal,
   disabledViews = []
 }: {
   showEvaluationSidebarIcon: boolean;
   openSidebar: (view: PageSidebarView) => void;
   activeView?: PageSidebarView | null;
-  isNewProposal: boolean;
+  isUnpublishedProposal: boolean;
   disabledViews?: PageSidebarView[];
 }) {
   return (
@@ -175,7 +177,7 @@ function SidebarNavigationIcons({
           onClick={openSidebar}
         />
       )}
-      {!isNewProposal && (
+      {!isUnpublishedProposal && (
         <>
           {!disabledViews.includes('comments') && (
             <SidebarViewIcon view='comments' isActive={activeView === 'comments'} onClick={openSidebar} />
@@ -198,15 +200,14 @@ function SidebarContents({
   editorState,
   threads,
   openSidebar,
-  openEvaluationSidebar,
   proposalId,
-  proposalEvaluationId,
   proposal,
   proposalInput,
   onChangeEvaluation,
+  onChangeWorkflow,
   refreshProposal,
   isProposalTemplate,
-  isNewProposal,
+  isUnpublishedProposal,
   readOnlyReviewers,
   readOnlyRubricCriteria
 }: SidebarProps) {
@@ -215,33 +216,27 @@ function SidebarContents({
     <>
       {sidebarView === 'proposal_evaluation' &&
         (isCharmVerse ? (
-          <EvaluationSidebar
-            pageId={pageId}
-            proposal={proposal}
-            isTemplate={isProposalTemplate}
-            isNewProposal={isNewProposal}
-            evaluationId={proposalEvaluationId}
-            refreshProposal={refreshProposal}
-            goToSettings={() => {
-              openSidebar?.('proposal_evaluation_settings');
-            }}
-          />
+          isUnpublishedProposal ? (
+            <EvaluationSettingsSidebar
+              proposal={proposalInput}
+              readOnly={!!readOnlyProposalPermissions}
+              readOnlyWorkflowSelect={isProposalTemplate}
+              onChangeEvaluation={onChangeEvaluation}
+              onChangeWorkflow={onChangeWorkflow}
+              readOnlyReviewers={!!readOnlyReviewers}
+              readOnlyRubricCriteria={!!readOnlyRubricCriteria}
+            />
+          ) : (
+            <EvaluationSidebar
+              pageId={pageId}
+              proposal={proposal}
+              onChangeEvaluation={onChangeEvaluation}
+              refreshProposal={refreshProposal}
+            />
+          )
         ) : (
           <OldProposalEvaluationSidebar pageId={pageId} proposalId={proposalId} />
         ))}
-      {sidebarView === 'proposal_evaluation_settings' && (
-        <EvaluationSettingsSidebar
-          proposal={proposalInput}
-          readOnly={!!readOnlyProposalPermissions}
-          showHeader={!isNewProposal && !isProposalTemplate}
-          onChangeEvaluation={onChangeEvaluation}
-          readOnlyReviewers={!!readOnlyReviewers}
-          readOnlyRubricCriteria={!!readOnlyRubricCriteria}
-          goToEvaluation={(evaluationId) => {
-            openEvaluationSidebar?.(evaluationId);
-          }}
-        />
-      )}
       {sidebarView === 'suggestions' && (
         <SuggestionsSidebar
           pageId={pageId!}

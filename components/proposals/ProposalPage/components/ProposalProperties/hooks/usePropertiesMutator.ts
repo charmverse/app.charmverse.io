@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 
 import { ProposalsMutator } from 'components/proposals/ProposalPage/components/ProposalProperties/proposalsMutator';
 import { useProposalBlocks } from 'hooks/useProposalBlocks';
-import type { ProposalFieldsProp, ProposalPropertiesField } from 'lib/proposal/blocks/interfaces';
+import type { ProposalPropertiesField } from 'lib/proposal/blocks/interfaces';
+import type { ProposalFields } from 'lib/proposal/interface';
 
 type Props = {
-  proposal: { spaceId?: string; id?: string } & ProposalFieldsProp;
+  proposal: { spaceId?: string; id?: string; fields: ProposalFields | null };
   onChange?: (values: ProposalPropertiesField) => void;
 };
 

@@ -1,15 +1,16 @@
 import { useEffect } from 'react';
 
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
-import { usePropertiesMutator } from 'components/proposals/ProposalPage/components/ProposalProperties/hooks/usePropertiesMutator';
-import { useProposalsBoardAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
-import type { ProposalFieldsProp, ProposalPropertiesField } from 'lib/proposal/blocks/interfaces';
+import type { ProposalFields } from 'lib/proposal/interface';
+
+import { usePropertiesMutator } from './hooks/usePropertiesMutator';
+import { useProposalsBoardAdapter } from './hooks/useProposalsBoardAdapter';
 
 type Props = {
-  proposal: { spaceId?: string; id?: string } & ProposalFieldsProp;
-  onChange?: (properties: ProposalPropertiesField) => void;
+  proposal: { spaceId?: string; id?: string; fields: ProposalFields | null };
+  onChange?: (properties: ProposalFields['properties']) => void;
   readOnly?: boolean;
   readOnlyProperties?: string[];
 };

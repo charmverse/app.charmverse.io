@@ -4,7 +4,7 @@ import { mutate } from 'swr';
 
 import { useCreateProposal } from 'charmClient/hooks/proposals';
 import { checkFormFieldErrors } from 'components/common/form/checkFormFieldErrors';
-import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationSettings';
+import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationStepSettings';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -47,7 +47,7 @@ export function useNewProposal({ newProposal }: Props) {
     });
   }, [setFormInputs, user?.publishToLensDefault]);
 
-  async function createProposal() {
+  async function createProposal({ isDraft }: { isDraft?: boolean }) {
     log.info('[user-journey] Create a proposal');
     if (formInputs.categoryId && currentSpace) {
       // TODO: put validation inside the properties form component
@@ -92,7 +92,8 @@ export function useNewProposal({ newProposal }: Props) {
         fields: formInputs.fields,
         formId: formInputs.formId,
         formAnswers: formInputs.formAnswers,
-        workflowId: formInputs.workflowId || undefined
+        workflowId: formInputs.workflowId || undefined,
+        isDraft
       }).catch((err: any) => {
         showMessage(err.message ?? 'Something went wrong', 'error');
         throw err;
@@ -145,7 +146,7 @@ export function useNewProposal({ newProposal }: Props) {
   };
 }
 
-function getEvaluationFormError(evaluation: ProposalEvaluationValues): string | false {
+export function getEvaluationFormError(evaluation: ProposalEvaluationValues): string | false {
   switch (evaluation.type) {
     case 'feedback':
       return false;

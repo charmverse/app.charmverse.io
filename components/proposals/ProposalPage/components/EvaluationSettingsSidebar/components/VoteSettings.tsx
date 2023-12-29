@@ -53,14 +53,14 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
     }
   }, [voteType]);
 
-  // useEffect on the values to call onChange() doesnt seem ideal, but it works for now
+  // useEffect on the values to call onChange() doesnt seem ideal and triggers on the first load, but it works for now. TODO: use react-hook-form?
   useEffect(() => {
     if (onChange) {
       const hasError =
         passThreshold > 100 ||
         (voteType === VoteType.SingleChoice && options.some((option) => option.length === 0)) ||
         new Set(options).size !== options.length;
-      // console.log({ hasError, passThreshold, voteType, options, maxChoices, durationDays });
+
       if (!hasError) {
         onChange({
           threshold: passThreshold,

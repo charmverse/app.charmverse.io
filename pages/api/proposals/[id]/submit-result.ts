@@ -35,8 +35,10 @@ async function updateEvaluationResultndpoint(req: NextApiRequest, res: NextApiRe
     }
   });
 
-  if (evaluation.type === 'feedback' && !proposalPermissions.edit) {
-    throw new ActionNotPermittedError(`Only authors can move a proposal out of feedback.`);
+  if (evaluation.type === 'feedback') {
+    if (!proposalPermissions.move) {
+      throw new ActionNotPermittedError(`You don't have permission to move this proposal.`);
+    }
   } else if (!proposalPermissions.evaluate) {
     throw new ActionNotPermittedError(`You don't have permission to review this proposal.`);
   }

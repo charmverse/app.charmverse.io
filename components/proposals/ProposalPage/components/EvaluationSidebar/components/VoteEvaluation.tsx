@@ -1,5 +1,6 @@
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import { Tooltip, Typography } from '@mui/material';
+import { useEffect } from 'react';
 
 import charmClient from 'charmClient';
 import { useGetVotesForPage } from 'charmClient/hooks/votes';
@@ -18,10 +19,12 @@ export type Props = {
   evaluation: PopulatedEvaluation;
 };
 
-export function VoteSidebar({ pageId, isCurrent, proposal, evaluation }: Props) {
+export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation }: Props) {
   const { data: votes, mutate: refreshVotes, isLoading } = useGetVotesForPage(pageId ? { pageId } : undefined);
   const { showMessage } = useSnackbar();
   const isReviewer = isCurrent && proposal?.permissions.evaluate;
+  const vote = votes?.find((v) => v.id === evaluation.voteId);
+  const hasVote = !!vote;
 
   async function castVote(voteId: string, choices: string[]) {
     try {
@@ -43,11 +46,16 @@ export function VoteSidebar({ pageId, isCurrent, proposal, evaluation }: Props) 
 
   function onPublishToSnapshot() {}
 
+  useEffect(() => {
+    if (!hasVote && isCurrent) {
+      // retrieve vote if this status becomes active
+      refreshVotes();
+    }
+  }, [hasVote, isCurrent, refreshVotes]);
+
   if (isLoading) {
     return <LoadingComponent minHeight={200} />;
   }
-
-  const vote = votes?.find((v) => v.id === evaluation.voteId);
 
   if (!vote) {
     if (evaluation.voteSettings?.publishToSnapshot) {

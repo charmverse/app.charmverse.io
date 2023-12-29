@@ -2,9 +2,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { InvalidStateError } from 'lib/middleware';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
-import { getPermissionsClient } from 'lib/permissions/api';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
+import type { ProposalFields } from 'lib/proposal/interface';
 import { createReward } from 'lib/rewards/createReward';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
@@ -50,7 +49,7 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
   }
 
   const fields = proposal.fields as ProposalFields;
-  const pendingRewards = fields.pendingRewards;
+  const pendingRewards = fields?.pendingRewards;
 
   if (!pendingRewards || !pendingRewards.length) {
     throw new InvalidStateError('There are no pending rewards for this proposal');

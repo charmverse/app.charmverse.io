@@ -232,7 +232,7 @@ export function RewardPropertiesForm({
 
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
               <PropertyLabel readOnly highlighted required={isNewReward && !isTemplate}>
-                Reviewer
+                Reviewers
               </PropertyLabel>
               <UserAndRoleSelect
                 readOnly={readOnly}

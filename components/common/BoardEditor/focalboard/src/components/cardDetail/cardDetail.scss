@@ -103,43 +103,6 @@
     }
   }
 
-  .octo-propertyname {
-    font-weight: 600;
-
-    span {
-      text-overflow: ellipsis;
-      overflow: hidden;
-      white-space: nowrap;
-    }
-
-    &.octo-propertyname--readonly {
-      font-size: 12px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-    }
-
-    &.octo-propertyname--readonly .Button:hover {
-      background: transparent;
-      cursor: text;
-    }
-
-    width: 150px;
-    margin-right: 5px;
-    color: rgba(var(--center-channel-color-rgb), 0.6);
-
-    .Button {
-      width: 100%;
-      padding: 4px 8px;
-      text-align: left;
-      justify-content: unset;
-    }
-
-    &.add-property {
-      margin: 8px 0 0;
-      color: rgba(var(--center-channel-color-rgb), 0.4);
-    }
-  }
 
   &.content-blocks {
 
@@ -160,5 +123,43 @@
         color: rgba(var(--center-channel-color-rgb), 0.6);
       }
     }
+  }
+}
+
+.octo-propertyname {
+  font-weight: 600;
+
+  span {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  &.octo-propertyname--readonly {
+    font-size: 12px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+  }
+
+  &.octo-propertyname--readonly .Button:hover {
+    background: transparent;
+    cursor: text;
+  }
+
+  width: 150px;
+  margin-right: 5px;
+  color: rgba(var(--center-channel-color-rgb), 0.6);
+
+  .Button {
+    width: 100%;
+    padding: 4px 8px;
+    text-align: left;
+    justify-content: unset;
+  }
+
+  &.add-property {
+    margin: 8px 0 0;
+    color: rgba(var(--center-channel-color-rgb), 0.4);
   }
 }

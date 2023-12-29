@@ -22,8 +22,7 @@ import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { isProdEnv } from 'config/constants';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { ProposalFields, ProposalPropertiesField } from 'lib/proposal/blocks/interfaces';
-import type { ProposalReviewerInput, ProposalCategory } from 'lib/proposal/interface';
+import type { ProposalFields, ProposalReviewerInput, ProposalCategory } from 'lib/proposal/interface';
 import {
   getProposalStatuses,
   nextProposalStatusUpdateMessage,
@@ -33,7 +32,7 @@ import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { useProposalCategories } from '../../../hooks/useProposalCategories';
-import type { ProposalEvaluationValues } from '../EvaluationSettingsSidebar/components/EvaluationSettings';
+import type { ProposalEvaluationValues } from '../EvaluationSettingsSidebar/components/EvaluationStepSettings';
 
 import type { RangeProposalCriteria } from './components/OldProposalRubricCriteriaInput';
 import { ProposalRubricCriteriaInput } from './components/OldProposalRubricCriteriaInput';
@@ -54,7 +53,7 @@ export type ProposalPropertiesInput = {
   evaluations: ProposalEvaluationValues[];
   rubricCriteria: RangeProposalCriteria[];
   publishToLens?: boolean;
-  fields: ProposalFields;
+  fields: ProposalFields | null;
   type: PageType;
 };
 
@@ -124,7 +123,6 @@ export function ProposalPropertiesBase({
   const { proposalCategoriesWithCreatePermission, categories } = useProposalCategories();
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
-  const prevStatusRef = useRef(proposalStatus || '');
   const { lensProfile } = useLensProfile();
   const isMobile = useMediaQuery<Theme>((theme) => theme.breakpoints.down('sm'));
   const { account } = useWeb3Account();
@@ -194,12 +192,8 @@ export function ProposalPropertiesBase({
   }
 
   useEffect(() => {
-    if (!prevStatusRef.current && proposalStatus === 'draft') {
-      setDetailsExpanded(true);
-    }
-
-    prevStatusRef.current = proposalStatus || '';
-  }, [detailsExpanded, proposalStatus]);
+    setDetailsExpanded(proposalStatus === 'draft');
+  }, [setDetailsExpanded, proposalStatus]);
 
   let lensProposalPropertyState: 'hide' | 'show_link' | 'show_toggle' = 'hide';
   if (proposalLensLink) {
@@ -324,7 +318,7 @@ export function ProposalPropertiesBase({
           <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
               <PropertyLabel readOnly required={isNewProposal} highlighted>
-                Reviewer
+                Reviewers
               </PropertyLabel>
               <UserAndRoleSelect
                 data-test='proposal-reviewer-select'
@@ -455,6 +449,17 @@ export function ProposalPropertiesBase({
           </Box>
         )}
 
+        <CustomPropertiesAdapter
+          readOnly={readOnlyAuthors}
+          readOnlyProperties={readOnlyCustomProperties}
+          proposal={proposalFormInputs}
+          onChange={(properties: ProposalFields['properties']) => {
+            setProposalFormInputs({
+              fields: { ...proposalFormInputs.fields, properties: properties ? { ...properties } : {} }
+            });
+          }}
+        />
+
         <ProposalRewards
           pendingRewards={pendingRewards}
           reviewers={proposalReviewers}
@@ -494,17 +499,6 @@ export function ProposalPropertiesBase({
                   (draft) => draft.draftId !== draftId
                 )
               }
-            });
-          }}
-        />
-
-        <CustomPropertiesAdapter
-          readOnly={readOnlyAuthors}
-          readOnlyProperties={readOnlyCustomProperties}
-          proposal={proposalFormInputs}
-          onChange={(properties: ProposalPropertiesField) => {
-            setProposalFormInputs({
-              fields: { ...proposalFormInputs.fields, properties: properties ? { ...properties } : {} }
             });
           }}
         />

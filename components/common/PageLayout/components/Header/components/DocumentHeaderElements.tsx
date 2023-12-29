@@ -5,7 +5,6 @@ import { documentTypes } from 'components/common/PageActions/components/Document
 import { DocumentParticipants } from './DocumentParticipants';
 import EditingModeToggle from './EditingModeToggle';
 import { ShareButton } from './ShareButton/ShareButton';
-import { ToggleEvaluationButton } from './ToggleEvaluationButton';
 
 type Props = {
   headerHeight: number;
@@ -25,9 +24,6 @@ export function DocumentHeaderElements({ headerHeight, isInsideDialog, page }: P
       {isBasePageDocument && <DocumentParticipants />}
       {isBasePageDocument && <EditingModeToggle />}
       {!deletedAt && <ShareButton headerHeight={headerHeight} pageId={id} />}
-      {(type === 'proposal' || type === 'proposal_template') && (
-        <ToggleEvaluationButton isInsideDialog={isInsideDialog} pageId={id} />
-      )}
     </>
   );
 }

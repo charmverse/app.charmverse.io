@@ -1,4 +1,3 @@
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useMemo } from 'react';
 import type { KeyedMutator } from 'swr';
@@ -8,6 +7,7 @@ import { useGetProposalsBySpace } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';
+import type { ProposalWithUsers } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 
 type ProposalsContextType = {
