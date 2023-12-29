@@ -1,7 +1,7 @@
 import type { NextApiResponse } from 'next';
 
 import type { NextApiRequestWithApiPageKey } from 'lib/middleware/requireApiPageKey';
-import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import type { PageProperty } from 'lib/public-api';
 import { createDatabaseCardPage } from 'lib/public-api';
 import { getDatabaseWithSchema } from 'lib/public-api/getDatabaseWithSchema';
@@ -104,7 +104,7 @@ export async function createFormResponse(req: NextApiRequestWithApiPageKey, res:
     createdBy: apiPageKey.createdBy
   });
 
-  await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
+  await permissionsApiClient.pages.setupPagePermissionsAfterEvent({
     event: 'created',
     pageId: card.id
   });

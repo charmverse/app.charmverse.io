@@ -12,17 +12,11 @@ import { useUser } from 'hooks/useUser';
 const emailSchema = yup.string().email().ensure().trim();
 
 export const schema = yup.object({
-  email: emailSchema
-    .when('emailNewsletter', {
-      is: true,
-      then: () => emailSchema.required('Unselect email options to proceed without email'),
-      otherwise: () => emailSchema
-    })
-    .when('emailNotifications', {
-      is: true,
-      then: () => emailSchema.required('Unselect email options to proceed without email'),
-      otherwise: () => emailSchema
-    }),
+  email: emailSchema.when(['emailNewsletter', 'emailNotifications'], {
+    is: (emailNewsletter: boolean, emailNotifications: boolean) => emailNewsletter || emailNotifications,
+    then: () => emailSchema.required('Unselect email options to proceed without email'),
+    otherwise: () => emailSchema
+  }),
   emailNotifications: yup.boolean(),
   emailNewsletter: yup.boolean(),
   agreeTermsConditions: yup.boolean().oneOf([true], 'You must agree to the terms and privacy policy to continue')
@@ -45,7 +39,6 @@ export function OnboardingEmailForm({ onClick, spaceId }: { onClick: VoidFunctio
     defaultValues: {
       email: user?.email || '',
       emailNotifications: true,
-      emailNewsletter: !!user?.emailNewsletter,
       agreeTermsConditions: false
     },
     // mode: 'onChange',

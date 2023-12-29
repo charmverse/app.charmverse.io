@@ -18,7 +18,6 @@ export function RewardProperties(props: {
   pageId: string;
   pagePath: string;
   rewardChanged?: () => void;
-  onClose?: () => void;
   showApplications?: boolean;
   isTemplate?: boolean;
   expandedRewardProperties?: boolean;
@@ -28,7 +27,6 @@ export function RewardProperties(props: {
     pageId,
     readOnly: parentReadOnly = false,
     rewardChanged,
-    onClose,
     showApplications,
     isTemplate,
     expandedRewardProperties
@@ -92,8 +90,11 @@ export function RewardProperties(props: {
           {!!currentReward?.id && showApplications && (
             <>
               <Divider sx={{ my: 1 }} />
-              <Stack mb={1}>
-                <RewardApplications rewardId={currentReward.id} onShowApplication={onClose} />
+              <Stack>
+                <RewardApplications
+                  applicationRequired={currentReward.approveSubmitters ?? false}
+                  rewardId={currentReward.id}
+                />
               </Stack>
             </>
           )}

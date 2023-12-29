@@ -6,6 +6,7 @@ import { Row } from '@react-email/row';
 import { Section } from '@react-email/section';
 
 import { baseUrl } from 'config/constants';
+import type { FeatureJson } from 'lib/features/constants';
 import { getNotificationMetadata } from 'lib/notifications/getNotificationMetadata';
 import type { Notification } from 'lib/notifications/interfaces';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
@@ -18,14 +19,16 @@ const MAX_CHAR = 60;
 
 export function PendingNotification({
   notification,
-  user
+  user,
+  spaceFeatures
 }: {
   user: Pick<User, 'id' | 'username' | 'id' | 'avatar'>;
   notification: Notification;
+  spaceFeatures: FeatureJson[];
 }) {
   return (
     <EmailWrapper title='Your open notifications' preview='Your open notifications'>
-      <NotificationSection user={user} notification={notification} />
+      <NotificationSection spaceFeatures={spaceFeatures} user={user} notification={notification} />
       <Hr />
       <Feedback />
     </EmailWrapper>
@@ -34,13 +37,15 @@ export function PendingNotification({
 
 function NotificationSection({
   notification,
-  user
+  user,
+  spaceFeatures
 }: {
+  spaceFeatures: FeatureJson[];
   user: Pick<User, 'id' | 'username' | 'id' | 'avatar'>;
   notification: Notification;
 }) {
   const { spaceName, spaceDomain, createdAt, createdBy, id } = notification;
-  const { href, content, pageTitle } = getNotificationMetadata(notification);
+  const { href, content, pageTitle } = getNotificationMetadata({ notification, spaceFeatures });
   const notificationContent = notification.group === 'document' ? notification.content : null;
   const dateTime = getFormattedDateTime(new Date(createdAt), {
     dateStyle: 'medium',

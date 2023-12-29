@@ -28,7 +28,7 @@ export async function reevaluateRoles({
 
     const userRoles = spaceMembership?.spaceRoleToRole.map((r) => r.roleId) ?? [];
 
-    const { gateTokens } = await evaluateTokenGateEligibility({
+    const { eligibleGates } = await evaluateTokenGateEligibility({
       spaceIdOrDomain: spaceId,
       authSig
     });
@@ -39,11 +39,8 @@ export async function reevaluateRoles({
       commit: true,
       joinType: 'token_gate',
       reevaluate: true,
-      tokens:
-        gateTokens.map((tk) => ({
-          signedToken: tk.signedToken,
-          tokenGateId: tk.tokenGate.id
-        })) ?? []
+      tokens: eligibleGates ?? [],
+      walletAddress: authSig.address
     });
 
     const updatedSpaceMembership = await getSpaceMembershipWithRoles({ spaceId, userId });

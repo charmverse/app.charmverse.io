@@ -1,4 +1,6 @@
-import { Card, CardContent, Typography } from '@mui/material';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
 import { useEffect } from 'react';
 
 import { useReviewTokenGate } from 'charmClient/hooks/tokenGates';
@@ -18,32 +20,19 @@ import { TokenGateFooter } from './TokenGateFooter';
 export function TokenGateReview() {
   const { account } = useWeb3Account();
   const { showMessage } = useSnackbar();
-  const {
-    unifiedAccessControlConditions,
-    resetModal,
-    createUnifiedAccessControlConditions,
-    loadingToken,
-    error,
-    flow,
-    onClose,
-    setFlow,
-    setDisplayedPage
-  } = useTokenGateModal();
-  const { trigger, data, isMutating } = useReviewTokenGate();
+  const { resetModal, onSubmit, loadingToken, error, flow, setFlow, setDisplayedPage, tokenGate } = useTokenGateModal();
+  const { trigger: reviewTokenGate, data: initialData, isMutating } = useReviewTokenGate();
+  const data = initialData?.[0];
 
-  const enrichedUnifiedAccessControlConditions = data?.[0]?.conditions?.unifiedAccessControlConditions;
-  const conditionsData = humanizeConditionsData({
-    myWalletAddress: account || '',
-    unifiedAccessControlConditions: enrichedUnifiedAccessControlConditions
-  });
+  const conditionsData = data ? humanizeConditionsData(data, account || '') : null;
 
   useEffect(() => {
-    if (unifiedAccessControlConditions.length > 0) {
-      trigger({
-        conditions: { unifiedAccessControlConditions }
+    if (tokenGate?.conditions) {
+      reviewTokenGate(tokenGate, {
+        onError: () => showMessage('Something went wrong. Please review your conditions.', 'error')
       });
     }
-  }, [trigger, unifiedAccessControlConditions]);
+  }, [tokenGate, reviewTokenGate, showMessage]);
 
   useEffect(() => {
     if (error) {
@@ -51,10 +40,9 @@ export function TokenGateReview() {
     }
   }, [error, showMessage]);
 
-  const onSubmit = async () => {
-    await createUnifiedAccessControlConditions();
+  const onSubmitCondition = async () => {
+    await onSubmit();
     showMessage('Token gate created successfully', 'success');
-    onClose();
   };
 
   const handleMultipleConditions = (_flow: Flow) => {
@@ -62,25 +50,26 @@ export function TokenGateReview() {
     setDisplayedPage('home');
   };
 
+  const goToHome = () => setDisplayedPage('home');
+
   return (
     <>
       <Typography>Review your conditions and confirm</Typography>
-      {!data || isMutating ? (
-        <LoadingComponent isLoading={isMutating} />
-      ) : (
+      <LoadingComponent isLoading={isMutating} />
+      {conditionsData && (
         <Card variant='outlined' color='default'>
           <CardContent>
             <ConditionsGroup conditions={conditionsData} />
           </CardContent>
         </Card>
       )}
-      {data && flow === 'single' && <TokenGateAddMultipleButton onClick={handleMultipleConditions} />}
-      {data && flow !== 'single' && (
-        <Button variant='outlined' onClick={() => setDisplayedPage('home')}>
+      {data?.type === 'lit' && flow === 'single' && <TokenGateAddMultipleButton onClick={handleMultipleConditions} />}
+      {data?.type === 'lit' && flow !== 'single' && (
+        <Button variant='outlined' onClick={goToHome}>
           Add a condition
         </Button>
       )}
-      <TokenGateFooter onSubmit={onSubmit} onCancel={resetModal} isValid={!loadingToken} />
+      <TokenGateFooter onSubmit={onSubmitCondition} onCancel={resetModal} loading={loadingToken} />
     </>
   );
 }

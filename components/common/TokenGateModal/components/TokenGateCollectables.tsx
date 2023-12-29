@@ -14,7 +14,8 @@ import { TokenGateCollectableFields } from './TokenGateCollectableFields';
 import { TokenGateFooter } from './TokenGateFooter';
 
 export function TokenGateCollectables() {
-  const { setDisplayedPage, handleUnifiedAccessControlConditions } = useTokenGateModal();
+  const { setDisplayedPage, flow, handleTokenGate } = useTokenGateModal();
+
   const methods = useCollectablesForm();
   const {
     register,
@@ -25,14 +26,26 @@ export function TokenGateCollectables() {
 
   const onSubmit = async () => {
     const values = getValues();
-    const valueProps = getCollectablesUnifiedAccessControlConditions(values) || [];
-    handleUnifiedAccessControlConditions(valueProps);
-    setDisplayedPage('review');
+
+    if (values.collectableOption === 'UNLOCK' && values.chain && values.contract) {
+      handleTokenGate({
+        type: 'unlock',
+        conditions: { chainId: Number(values.chain), contract: values.contract }
+      });
+      setDisplayedPage('review');
+    } else {
+      const valueProps = getCollectablesUnifiedAccessControlConditions(values) || [];
+
+      if (valueProps.length > 0) {
+        handleTokenGate({ type: 'lit', conditions: { unifiedAccessControlConditions: valueProps } });
+        setDisplayedPage('review');
+      }
+    }
   };
 
   const onCancel = () => {
-    setDisplayedPage('home');
     reset();
+    setDisplayedPage('home');
   };
 
   return (
@@ -41,14 +54,18 @@ export function TokenGateCollectables() {
         <Select<FormValues['collectableOption']>
           displayEmpty
           fullWidth
-          renderValue={(selected) => selected || 'Select a collectible type'}
+          renderValue={(selected) =>
+            collectableOptions.find((op) => op.id === selected)?.name || selected || 'Select a collectible type'
+          }
           {...register('collectableOption')}
         >
-          {collectableOptions.map((type) => (
-            <MenuItem key={type.id} value={type.id}>
-              {type.name}
-            </MenuItem>
-          ))}
+          {collectableOptions
+            .filter((col) => !(col.id === 'UNLOCK' && flow !== 'single'))
+            .map((type) => (
+              <MenuItem key={type.id} value={type.id}>
+                {type.name}
+              </MenuItem>
+            ))}
         </Select>
       </FieldWrapper>
       <TokenGateCollectableFields />

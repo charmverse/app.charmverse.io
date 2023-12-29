@@ -1,6 +1,7 @@
 import { Img } from '@react-email/img';
 
 import { stringToColor } from 'lib/utilities/strings';
+import { replaceS3Domain } from 'lib/utilities/url';
 
 import Text from './Text';
 
@@ -43,7 +44,7 @@ export default function Avatar({
         borderRadius: '50%',
         ...sizeStyleMap[size]
       }}
-      src={avatar}
+      src={replaceS3Domain(avatar)}
     />
   ) : (
     <Text

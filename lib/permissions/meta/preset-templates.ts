@@ -11,7 +11,8 @@ const readOnly: SpacePermissionTemplate = {
     reviewProposals: false,
     deleteAnyBounty: false,
     deleteAnyPage: false,
-    deleteAnyProposal: false
+    deleteAnyProposal: false,
+    createProposals: false
   },
   pagePermissionDefaults: {
     defaultPagePermissionGroup: 'view',
@@ -29,7 +30,8 @@ const collaborative: SpacePermissionTemplate = {
     reviewProposals: true,
     deleteAnyBounty: false,
     deleteAnyPage: false,
-    deleteAnyProposal: false
+    deleteAnyProposal: false,
+    createProposals: true
   },
   pagePermissionDefaults: {
     defaultPagePermissionGroup: 'full_access',
@@ -47,7 +49,8 @@ const open: SpacePermissionTemplate = {
     reviewProposals: true,
     deleteAnyBounty: false,
     deleteAnyPage: false,
-    deleteAnyProposal: false
+    deleteAnyProposal: false,
+    createProposals: true
   },
   pagePermissionDefaults: {
     defaultPagePermissionGroup: 'full_access',

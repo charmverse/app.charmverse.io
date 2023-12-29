@@ -100,12 +100,11 @@ describe('GET /api/spaces/[id]/proposals - Get proposals in a space', () => {
             }
           ],
           reviewers: [
-            {
+            expect.objectContaining({
               id: expect.any(String),
               proposalId: visibleCategoryFeedbackProposalReviewedByAdmin.id,
-              roleId: null,
               userId: adminUser.id
-            }
+            })
           ]
         })
       ])

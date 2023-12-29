@@ -63,7 +63,7 @@ function InputSearchRoleBase({
   }
 
   return (
-    <Autocomplete<ReducedRole>
+    <Autocomplete
       value={defaultRole as any}
       loading={!roles}
       sx={{ minWidth: 150 }}

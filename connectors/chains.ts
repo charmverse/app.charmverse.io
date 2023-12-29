@@ -40,11 +40,13 @@ export interface IChainDetails {
   rpcUrls: readonly string[];
   blockExplorerUrls: readonly string[];
   alchemyUrl?: string;
+  // See Safe docs for official URLs https://docs.safe.global/safe-core-api/supported-networks
   gnosisUrl?: string;
   iconUrl: string;
   testnet?: boolean;
   shortName: string;
   litNetwork?: string;
+  unlockNetwork?: boolean;
   viem: Chain;
 }
 
@@ -78,7 +80,8 @@ const RPC: Record<string, IChainDetails> = {
     iconUrl: '/images/cryptoLogos/ethereum-eth-logo.svg',
     rpcUrls: ['https://eth.llamarpc.com'],
     shortName: 'eth',
-    litNetwork: 'ethereum'
+    litNetwork: 'ethereum',
+    unlockNetwork: true
   },
   GOERLI: {
     ...EVM_DEFAULT,
@@ -98,6 +101,7 @@ const RPC: Record<string, IChainDetails> = {
     ...EVM_DEFAULT,
     chainId: sepolia.id,
     viem: sepolia,
+    alchemyUrl: 'https://eth-sepolia.g.alchemy.com',
     gnosisUrl: 'https://safe-transaction-sepolia.safe.global',
     chainName: 'Ethereum - Sepolia',
     rpcUrls: ['https://ethereum-sepolia.blockpi.network/v1/rpc/public'],
@@ -105,7 +109,8 @@ const RPC: Record<string, IChainDetails> = {
     iconUrl: '/images/cryptoLogos/ethereum-eth-logo.svg',
     testnet: true,
     shortName: 'sep',
-    litNetwork: 'sepolia'
+    litNetwork: 'sepolia',
+    unlockNetwork: true
   },
   OPTIMISM: {
     ...EVM_DEFAULT,
@@ -118,7 +123,8 @@ const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: ['https://optimistic.etherscan.io/'],
     iconUrl: '/images/cryptoLogos/optimism.svg',
     shortName: 'oeth',
-    litNetwork: 'optimism'
+    litNetwork: 'optimism',
+    unlockNetwork: true
   },
   // https://docs.base.org/network-information/
   BASE: {
@@ -132,7 +138,8 @@ const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: ['https://basescan.org'],
     iconUrl: '/images/cryptoLogos/base-logo.svg',
     shortName: 'base',
-    litNetwork: 'base'
+    litNetwork: 'base',
+    unlockNetwork: true
   },
   BASE_TESTNET: {
     ...EVM_DEFAULT,
@@ -145,7 +152,8 @@ const RPC: Record<string, IChainDetails> = {
     iconUrl: '/images/cryptoLogos/base-logo.svg',
     shortName: 'base-testnet',
     testnet: true,
-    litNetwork: 'baseGoerli'
+    litNetwork: 'baseGoerli',
+    unlockNetwork: true
   },
   // https://docs.zora.co/docs/zora-network/network
   ZORA: {
@@ -176,7 +184,8 @@ const RPC: Record<string, IChainDetails> = {
     gnosisUrl: 'https://safe-transaction-polygon.safe.global',
     iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
     litNetwork: 'polygon',
-    shortName: 'matic'
+    shortName: 'matic',
+    unlockNetwork: true
   },
   MUMBAI: {
     chainId: polygonMumbai.id,
@@ -195,7 +204,8 @@ const RPC: Record<string, IChainDetails> = {
     iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
     testnet: true,
     shortName: 'maticmum',
-    litNetwork: 'mumbai'
+    litNetwork: 'mumbai',
+    unlockNetwork: true
   },
   ARBITRUM: {
     ...EVM_DEFAULT,
@@ -208,7 +218,8 @@ const RPC: Record<string, IChainDetails> = {
     gnosisUrl: 'https://safe-transaction-arbitrum.safe.global',
     iconUrl: '/images/cryptoLogos/arbitrum.svg',
     shortName: 'arb1',
-    litNetwork: 'arbitrum'
+    litNetwork: 'arbitrum',
+    unlockNetwork: true
   },
   MANTLE: {
     chainId: mantle.id,
@@ -263,7 +274,8 @@ const RPC: Record<string, IChainDetails> = {
     gnosisUrl: 'https://safe-transaction-avalanche.safe.global',
     iconUrl: '/images/cryptoLogos/avalanche-avax-logo.svg',
     shortName: 'avax',
-    litNetwork: 'avalanche'
+    litNetwork: 'avalanche',
+    unlockNetwork: true
   },
   BSC: {
     chainId: bsc.id,
@@ -281,7 +293,8 @@ const RPC: Record<string, IChainDetails> = {
     gnosisUrl: 'https://safe-transaction-bsc.safe.global',
     iconUrl: '/images/cryptoLogos/binance-coin-bnb-logo.svg',
     shortName: 'bnb',
-    litNetwork: 'bsc'
+    litNetwork: 'bsc',
+    unlockNetwork: true
   },
   XDAI: {
     chainId: gnosis.id,
@@ -329,11 +342,13 @@ const RPC: Record<string, IChainDetails> = {
       address: '0x0000000000000000000000000000000000000000',
       logoURI: 'https://assets.coingecko.com/coins/images/11090/small/icon-celo-CELO-color-500.png?1592293590'
     },
+    gnosisUrl: 'https://safe-transaction-celo.safe.global',
     rpcUrls: ['https://forno.celo.org'],
     blockExplorerUrls: ['https://explorer.celo.org'],
     iconUrl: '/images/cryptoLogos/celo-celo-logo.svg',
     shortName: 'celo',
-    litNetwork: 'celo'
+    litNetwork: 'celo',
+    unlockNetwork: true
   },
   HARMONY: {
     chainId: harmonyOne.id,
@@ -376,6 +391,7 @@ const RPC: Record<string, IChainDetails> = {
     chainName: 'zkSync Era',
     rpcUrls: ['https://mainnet.era.zksync.io'],
     blockExplorerUrls: ['https://explorer.zksync.io'],
+    gnosisUrl: 'https://safe-transaction-zksync.safe.global',
     iconUrl: '/images/cryptoLogos/zksync-era-logo.svg',
     shortName: 'zksync'
   },
@@ -461,21 +477,20 @@ export type IChainDetailsWithLit = IChainDetails & { litNetwork: NonNullable<ICh
 
 export const litChains: IChainDetailsWithLit[] = RPCList.filter(
   (chain): chain is IChainDetailsWithLit => !!chain.litNetwork
-).sort((a, b) => {
-  // Createa function that will return mainnets first, then testnets
-  const isMainnet = (chain: IChainDetailsWithLit) => !chain.testnet;
+).sort(sortChainList);
+
+export const litDaoChains: IChainDetailsWithLit[] = litChains.filter((chain) =>
+  ['ethereum', 'arbitrum', 'optimism', 'polygon'].includes(chain.litNetwork)
+);
+
+export const unlockChains = RPCList.filter((chain) => !!chain.unlockNetwork).sort(sortChainList);
+
+function sortChainList<T extends IChainDetails>(a: T, b: T) {
+  const isMainnet = (chain: T) => !chain.testnet;
   if (isMainnet(a) && !isMainnet(b)) {
     return -1;
   } else if (!isMainnet(a) && isMainnet(b)) {
     return 1;
   }
   return 0;
-});
-
-export const litDaoChains: IChainDetailsWithLit[] = litChains.filter((chain) =>
-  ['ethereum', 'arbitrum', 'optimism', 'polygon'].includes(chain.litNetwork)
-);
-
-export const getChainDetailsFromLitNetwork = (network?: string) => {
-  return litChains.find((chain) => chain.litNetwork === network);
-};
+}

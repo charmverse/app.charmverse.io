@@ -3,6 +3,7 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { getPermissionsClient } from 'lib/permissions/api';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
 import { extractMentions } from 'lib/prosemirror/extractMentions';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -141,7 +142,7 @@ export async function createDocumentNotifications(webhookData: {
       for (const targetUserId of targetUserIds) {
         let hasReadPermission = false;
         if (pageId) {
-          const pagePermission = await permissionsClient.client.pages.computePagePermissions({
+          const pagePermission = await permissionsApiClient.pages.computePagePermissions({
             resourceId: pageId,
             userId: targetUserId
           });
@@ -265,7 +266,7 @@ export async function createDocumentNotifications(webhookData: {
           continue;
         }
 
-        const pagePermission = await permissionsClient.client.pages.computePagePermissions({
+        const pagePermission = await permissionsApiClient.pages.computePagePermissions({
           resourceId: pageId,
           userId
         });
@@ -304,7 +305,7 @@ export async function createDocumentNotifications(webhookData: {
             continue;
           }
 
-          const pagePermission = await permissionsClient.client.pages.computePagePermissions({
+          const pagePermission = await permissionsApiClient.pages.computePagePermissions({
             resourceId: pageId,
             userId: targetUserId
           });
@@ -449,7 +450,7 @@ export async function createDocumentNotifications(webhookData: {
 
           let hasReadPermission = false;
           if (documentId) {
-            const pagePermission = await permissionsClient.client.pages.computePagePermissions({
+            const pagePermission = await permissionsApiClient.pages.computePagePermissions({
               resourceId: documentId,
               userId: targetUserId
             });
@@ -613,7 +614,7 @@ export async function createDocumentNotifications(webhookData: {
             continue;
           }
 
-          const pagePermission = await permissionsClient.client.pages.computePagePermissions({
+          const pagePermission = await permissionsApiClient.pages.computePagePermissions({
             resourceId: documentId,
             userId: targetUserId
           });

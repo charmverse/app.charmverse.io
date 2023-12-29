@@ -1,7 +1,6 @@
-import type { Space } from '@charmverse/core/prisma';
 import { useEffect, useState } from 'react';
 
-import charmClient from 'charmClient';
+import { useEvaluateTokenGateEligibility, useVerifyTokenGate } from 'charmClient/hooks/tokenGates';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
@@ -23,11 +22,11 @@ type Props = {
 export type TokenGateState = {
   isEnabled: boolean;
   tokenGates: TokenGateWithRoles[] | null;
-  tokenGateResult: TokenGateEvaluationResult | null;
+  tokenGateResult?: TokenGateEvaluationResult;
   isVerified: boolean;
   isVerifying: boolean;
-  evaluateEligibility: (sig: AuthSig) => void;
-  joinSpace: (onError: (error: any) => void) => void;
+  evaluateEligibility: (sig: AuthSig) => Promise<void>;
+  joinSpace: (onError: (error: any) => void) => Promise<void>;
   joiningSpace: boolean;
 };
 
@@ -42,12 +41,15 @@ export function useTokenGates({
   const { spaces, setSpaces } = useSpaces();
   const { getStoredSignature } = useWeb3Account();
   const { refreshUser, user } = useUser();
+  const { trigger: verifyTokenGateAndJoin } = useVerifyTokenGate();
 
-  const [isVerifying, setIsVerifying] = useState(false);
   const [joiningSpace, setJoiningSpace] = useState(false);
   const tokenGates = space.tokenGates;
-  const [tokenGateResult, setTokenGateResult] = useState<TokenGateEvaluationResult | null>(null);
-  // Token gates with those that succeedeed first
+  const {
+    data: tokenGateResult,
+    trigger: evaluateSpaceTokenGates,
+    isMutating: isVerifying
+  } = useEvaluateTokenGateEligibility();
 
   useEffect(() => {
     if (autoVerify && account) {
@@ -57,53 +59,45 @@ export function useTokenGates({
         evaluateEligibility(signature);
       }
     }
-  }, [user, account]);
+  }, [user, account, autoVerify]);
 
   async function evaluateEligibility(authSig: AuthSig) {
-    // Reset the current state
-    setTokenGateResult(null);
-    setIsVerifying(true);
-
-    charmClient.tokenGates
-      .evaluateTokenGateEligibility({
+    await evaluateSpaceTokenGates(
+      {
         authSig,
         spaceIdOrDomain: space.id
-      })
-      .then((verifyResult) => {
-        setTokenGateResult(verifyResult);
-      })
-      .catch((err: any) => {
-        showMessage(err?.message ?? 'An unknown error occurred', err?.severity ?? 'error');
-      })
-      .finally(() => setIsVerifying(false));
+      },
+      {
+        onError: (err: any) => {
+          showMessage(err?.message ?? 'An unknown error occurred', err?.severity ?? 'error');
+        }
+      }
+    );
   }
 
   async function joinSpace(onError: (error: any) => void) {
     setJoiningSpace(true);
 
     try {
-      await charmClient.tokenGates.verifyTokenGate({
-        commit: true,
-        spaceId: tokenGateResult?.space.id as string,
-        tokens:
-          tokenGateResult?.gateTokens.map((tk) => {
-            return {
-              signedToken: tk.signedToken,
-              tokenGateId: tk.tokenGate.id
-            };
-          }) ?? [],
-        joinType
-      });
+      if (account) {
+        await verifyTokenGateAndJoin({
+          commit: true,
+          spaceId: space.id,
+          tokens: tokenGateResult?.eligibleGates ?? [],
+          joinType,
+          walletAddress: account
+        });
+      }
 
-      showMessage(`You have joined the ${tokenGateResult?.space.name} space.`, 'success');
+      showMessage(`You have joined the ${space.name} space.`, 'success');
 
       await refreshUser();
 
-      const spaceExists = spaces.some((s) => s.id === tokenGateResult?.space.id);
+      const spaceExists = spaces.some((s) => s.id === space.id);
 
       // Refresh spaces as otherwise the redirect will not work
       if (!spaceExists) {
-        setSpaces([...spaces, tokenGateResult?.space as Space]);
+        setSpaces([...spaces, space]);
       }
       onSuccess?.();
     } catch (err: any) {

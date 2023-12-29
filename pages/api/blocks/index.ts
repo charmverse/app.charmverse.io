@@ -18,7 +18,7 @@ import {
 import { createPage } from 'lib/pages/server/createPage';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { getPagePath } from 'lib/pages/utils';
-import { getPermissionsClient } from 'lib/permissions/api/routers';
+import { getPermissionsClient, permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
@@ -294,8 +294,8 @@ async function updateBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) 
 }
 
 async function deleteBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) {
-  // TODO: remove use of req.body after browsers update - 06/2023
-  const blockIds: string[] = (req.query.blockIds || req.body) ?? [];
+  const queryBlockIds = (req.query.blockIds ?? []) as string[];
+  const blockIds = typeof queryBlockIds === 'string' ? [queryBlockIds] : queryBlockIds;
   const userId = req.session.user.id as string | undefined;
 
   const blocks = await prisma.block.findMany({
@@ -314,12 +314,10 @@ async function deleteBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) 
   }
 
   for (const blockId of blockIds) {
-    const permissions = await getPermissionsClient({ resourceId: blockId, resourceIdType: 'page' }).then(({ client }) =>
-      client.pages.computePagePermissions({
-        resourceId: blockId,
-        userId
-      })
-    );
+    const permissions = await permissionsApiClient.pages.computePagePermissions({
+      resourceId: blockId,
+      userId
+    });
 
     if (permissions.delete !== true) {
       throw new ActionNotPermittedError('You are not allowed to delete this block.');

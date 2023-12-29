@@ -5,14 +5,14 @@ import type { FormValues } from '../hooks/useWalletForm';
 export function getWalletUnifiedAccessControlConditions(
   values: FormValues
 ): UnifiedAccessControlConditions | undefined {
-  const { chain, contract } = values;
+  const { contract } = values;
 
   return [
     {
       conditionType: 'evmBasic',
       contractAddress: '',
       standardContractType: '',
-      chain,
+      chain: 'ethereum',
       method: '',
       parameters: [':userAddress'],
       returnValueTest: {

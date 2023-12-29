@@ -1,7 +1,7 @@
 /* eslint-disable no-continue */
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { getPermissionsClient } from 'lib/permissions/api/routers';
+import { getPermissionsClient, permissionsApiClient } from 'lib/permissions/api/client';
 import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
@@ -41,15 +41,9 @@ export async function createPollNotifications(webhookData: {
       });
 
       const spaceUserIds = spaceRoles.map(({ userId }) => userId).filter((userId) => userId !== vote.createdBy);
-
-      const permissionClient = await getPermissionsClient({
-        resourceId: spaceId,
-        resourceIdType: 'space'
-      });
-
       if (vote.pageId) {
         for (const spaceUserId of spaceUserIds) {
-          const pagePermission = await permissionClient.client.pages.computePagePermissions({
+          const pagePermission = await permissionsApiClient.pages.computePagePermissions({
             resourceId: vote.pageId,
             userId: spaceUserId
           });
@@ -67,6 +61,11 @@ export async function createPollNotifications(webhookData: {
         }
       } else if (vote.postId) {
         for (const spaceUserId of spaceUserIds) {
+          const permissionClient = await getPermissionsClient({
+            resourceId: spaceId,
+            resourceIdType: 'space'
+          });
+
           const postPermission = await permissionClient.client.forum.computePostPermissions({
             resourceId: vote.postId,
             userId: spaceUserId

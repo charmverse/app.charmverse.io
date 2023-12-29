@@ -50,7 +50,6 @@ function UserMenu() {
   const { user, logoutUser } = useUser();
   const router = useRouter();
   const menuPopupState = usePopupState({ variant: 'popover', popupId: 'menu-dropdown' });
-
   const isLoginPage = router.pathname === '/';
 
   async function logout() {
@@ -68,7 +67,7 @@ function UserMenu() {
         {user && (
           <Button variant='outlined' color='secondary' {...bindTrigger(menuPopupState)}>
             {' '}
-            <UserDisplay avatarSize='small' userId={user.id} sx={{ cursor: 'pointer' }} />
+            <UserDisplay avatarSize='small' user={user} sx={{ cursor: 'pointer' }} />
           </Button>
         )}
       </div>

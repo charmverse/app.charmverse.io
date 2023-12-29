@@ -13,12 +13,12 @@ import {
   REWARD_CHAIN,
   REWARD_CUSTOM_VALUE,
   REWARD_TOKEN,
-  REWARD_APPLICANTS_COUNT
+  REWARD_APPLICANTS_COUNT,
+  REWARD_PROPOSAL_LINK
 } from 'lib/rewards/blocks/constants';
 
 const rewardStatusOptions: { id: BountyStatus; value: string; color: keyof (typeof Constants)['menuColors'] }[] = [
   { id: 'open', value: 'Open', color: 'propColorTeal' },
-  { id: 'inProgress', value: 'In Progress', color: 'propColorYellow' },
   { id: 'complete', value: 'Approved', color: 'propColorBlue' },
   { id: 'paid', value: 'Paid', color: 'propColorGreen' }
 ];
@@ -89,11 +89,17 @@ const rewardDbProperties = {
     name: 'No. of Applicants',
     options: [],
     type: 'number'
+  }),
+  rewardProposalLink: (): IPropertyTemplate => ({
+    id: REWARD_PROPOSAL_LINK,
+    name: 'Proposal',
+    options: [],
+    type: 'proposalUrl'
   })
 };
 
-export function getDefaultRewardProperties(): IPropertyTemplate[] {
-  return [
+export function getDefaultRewardProperties(hasMilestoneRewards?: boolean): IPropertyTemplate[] {
+  const properties = [
     rewardDbProperties.rewardCreatedAt(),
     rewardDbProperties.rewardDueDate(),
     rewardDbProperties.rewardApplicants(),
@@ -105,4 +111,10 @@ export function getDefaultRewardProperties(): IPropertyTemplate[] {
     rewardDbProperties.rewardCustomValue(),
     rewardDbProperties.rewardApplicantsNumber()
   ];
+
+  if (hasMilestoneRewards) {
+    properties.unshift(rewardDbProperties.rewardProposalLink());
+  }
+
+  return properties;
 }

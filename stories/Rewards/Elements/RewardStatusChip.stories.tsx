@@ -16,7 +16,6 @@ export function RewardStatus() {
           <Box display='inline-flex' gap={4}>
             <RewardStatusChip status={undefined} />
             <RewardStatusChip status='open' />
-            <RewardStatusChip status='inProgress' />
             <RewardStatusChip status='complete' />
             <RewardStatusChip status='paid' />
           </Box>
@@ -25,7 +24,6 @@ export function RewardStatus() {
           <h2>With icon</h2>
           <Box display='inline-flex' gap={4}>
             <RewardStatusChip status='open' />
-            <RewardStatusChip status='inProgress' />
             <RewardStatusChip status='complete' />
             <RewardStatusChip status='paid' />
           </Box>

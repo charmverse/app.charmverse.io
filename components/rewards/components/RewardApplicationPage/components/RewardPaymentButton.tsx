@@ -1,4 +1,4 @@
-import type { SystemError } from '@charmverse/core/dist/cjs/errors';
+import type { SystemError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { Application, UserGnosisSafe } from '@charmverse/core/prisma';
 import { BigNumber } from '@ethersproject/bignumber';
@@ -8,6 +8,7 @@ import { Divider, Menu, MenuItem, Tooltip } from '@mui/material';
 import type { AlertColor } from '@mui/material/Alert';
 import ERC20ABI from 'abis/ERC20.json';
 import { getChainById } from 'connectors/chains';
+import { ethers } from 'ethers';
 import type { MouseEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
@@ -16,6 +17,7 @@ import { getAddress, parseEther, parseUnits } from 'viem';
 import charmClient from 'charmClient';
 import { OpenWalletSelectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/OpenWalletSelectorButton';
 import { Button } from 'components/common/Button';
+import TokenLogo from 'components/common/TokenLogo';
 import type { GnosisProposeTransactionResult } from 'hooks/useGnosisPayment';
 import { getPaymentErrorMessage, useGnosisPayment } from 'hooks/useGnosisPayment';
 import { useMultiRewardPayment } from 'hooks/useMultiRewardPayment';
@@ -76,6 +78,7 @@ function SafeMenuItem({
       safeTxHash: result.txHash,
       chainId: safeInfo.chainId.toString()
     });
+    showMessage('Transaction added to your Safe', 'success');
 
     refreshSubmission();
   }
@@ -87,7 +90,6 @@ function SafeMenuItem({
         onClick();
         try {
           await makePayment();
-          showMessage('Transaction added to your Safe', 'success');
         } catch (error) {
           const typedError = error as SystemError;
           onError(typedError.message, typedError.severity);
@@ -206,6 +208,18 @@ export function RewardPaymentButton({
         await switchActiveNetwork(chainIdToUse);
       }
 
+      let receiverAddress = receiver;
+
+      if (receiver.endsWith('.eth') && ethers.utils.isValidName(receiver)) {
+        const resolvedWalletAddress = await charmClient.resolveEnsName(receiver);
+        if (resolvedWalletAddress === null) {
+          onError(`Could not resolve ENS name ${receiver}`);
+          return;
+        }
+
+        receiverAddress = resolvedWalletAddress;
+      }
+
       if (isValidChainAddress(tokenSymbolOrAddress)) {
         const tokenContract = new Contract(tokenSymbolOrAddress, ERC20ABI, signer);
 
@@ -232,19 +246,19 @@ export function RewardPaymentButton({
         const parsedTokenAmount = parseUnits(amount, tokenDecimals);
 
         // get allowance
-        const allowance = await tokenContract.allowance(account, receiver);
+        const allowance = await tokenContract.allowance(account, receiverAddress);
 
         if (BigNumber.from(allowance).lt(parsedTokenAmount)) {
           // approve if the allowance is small
-          await tokenContract.approve(receiver, parsedTokenAmount);
+          await tokenContract.approve(receiverAddress, parsedTokenAmount);
         }
 
         // transfer token
-        const tx = await tokenContract.transfer(receiver, parsedTokenAmount);
+        const tx = await tokenContract.transfer(receiverAddress, parsedTokenAmount);
         onSuccess(tx.hash, chainToUse!.chainId);
       } else {
         const tx = await signer.sendTransaction({
-          to: receiver,
+          to: receiverAddress,
           value: parseEther(amount)
         });
 
@@ -270,6 +284,8 @@ export function RewardPaymentButton({
       </div>
     );
   }
+
+  const chainInfo = getChainById(reward.chainId as number);
 
   return (
     <>
@@ -303,8 +319,9 @@ export function RewardPaymentButton({
             {shortenHex(account ?? '')}
           </MenuItem>
           <Divider />
-          <MenuItem dense sx={{ pointerEvents: 'none', color: 'secondary.main' }}>
-            Gnosis wallets
+          <MenuItem dense sx={{ pointerEvents: 'none', color: 'secondary.main', gap: 1 }}>
+            <span style={{ margin: 'auto' }}>Gnosis wallet</span>
+            <TokenLogo height={16} src={chainInfo?.iconUrl as string} sx={{ margin: 'auto' }} />
           </MenuItem>
           {existingSafesData
             ?.filter((s) => !s.isHidden && chainIdToUse === s.chainId)

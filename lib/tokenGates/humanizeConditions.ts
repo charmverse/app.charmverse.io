@@ -1,11 +1,11 @@
 import { log } from '@charmverse/core/log';
-import type { HumanizedAccsProps } from '@lit-protocol/types';
 import type { TypographyProps } from '@mui/material/Typography';
 import { formatEther, isAddress } from 'viem';
 
 import { shortWalletAddress } from 'lib/utilities/blockchain';
 import { isTruthy } from 'lib/utilities/types';
 
+import type { TokenGate, TokenGateConditions } from './interfaces';
 import { ALL_LIT_CHAINS } from './utils';
 
 const humanizeComparator = (comparator: string) => {
@@ -38,10 +38,23 @@ export type HumanizeConditionsContent = {
 
 export type HumanizeCondition = {
   image?: string;
+  standardContractType?: string;
   content: HumanizeConditionsContent[];
 };
 
-export function humanizeConditionsData(conditions: HumanizedAccsProps) {
+export function humanizeUnlockConditionsData(conditions: TokenGate<'unlock'>['conditions']): HumanizeCondition[] {
+  return [
+    {
+      image: conditions.image,
+      content: [
+        { type: 'text', content: 'Unlock Protocol -' },
+        { type: 'text', content: conditions.name || 'Lock' }
+      ]
+    }
+  ];
+}
+
+export function humanizeLitConditionsData(conditions: TokenGate<'lit'>['conditions']): HumanizeCondition[] {
   const myWalletAddress = conditions.myWalletAddress;
   const humanReadableConditions = conditions.unifiedAccessControlConditions
     ?.map<HumanizeCondition | undefined>((acc) => {
@@ -88,12 +101,16 @@ export function humanizeConditionsData(conditions: HumanizedAccsProps) {
           };
         } else if (acc.standardContractType === 'ERC721' && acc.method === 'ownerOf') {
           // specific erc721
-          // Owner of ${tokenName} on ${chain}
+          // Owner of ${tokenName} NFT on ${chain}
           return {
             image,
+            standardContractType: acc.standardContractType,
             content: [
               { type: 'text', content: 'Owner of' },
               { ...etherscanUrl, content: tokenName, props: { fontWeight: 'bold' } },
+              { type: 'text', content: 'NFT' },
+              { type: 'text', content: 'with token id' },
+              { type: 'text', content: acc.parameters[0] },
               { type: 'text', content: 'on' },
               { type: 'text', content: chain }
             ]
@@ -109,6 +126,7 @@ export function humanizeConditionsData(conditions: HumanizedAccsProps) {
           // Owns any POAP
           return {
             image,
+            standardContractType: acc.standardContractType,
             content: [{ type: 'text', content: `Owns any POAP` }]
           };
         } else if (acc.standardContractType === 'POAP' && acc.method === 'tokenURI') {
@@ -116,6 +134,7 @@ export function humanizeConditionsData(conditions: HumanizedAccsProps) {
           // Owner of a ${value} POAP on ${chain}
           return {
             image,
+            standardContractType: acc.standardContractType,
             content: [
               { type: 'text', content: 'Owner of a' },
               {
@@ -132,6 +151,7 @@ export function humanizeConditionsData(conditions: HumanizedAccsProps) {
           // Owner of a POAP from event ID ${value} on ${chain}
           return {
             image,
+            standardContractType: acc.standardContractType,
             content: [
               { type: 'text', content: 'Owner of a POAP from event ID' },
               { type: 'text', content: value, props: { fontWeight: 'bold' } },
@@ -200,16 +220,17 @@ export function humanizeConditionsData(conditions: HumanizedAccsProps) {
           };
         } else if (acc.standardContractType === 'ERC721' && acc.method === 'balanceOf') {
           // any erc721 in collection
-          // Owns ${comparator} ${value} of ${tokenName} nft on ${chain}
+          // Owns ${comparator} ${value} of ${tokenName} NFT on ${chain}
           return {
             image,
+            standardContractType: acc.standardContractType,
             content: [
               { type: 'text', content: `Owns` },
               { type: 'text', content: comparator },
               { type: 'text', content: value },
               { type: 'text', content: `of` },
-              { type: 'text', content: tokenName, props: { fontWeight: 'bold' } },
-              { type: 'text', content: `nft on` },
+              { ...etherscanUrl, content: tokenName, props: { fontWeight: 'bold' } },
+              { type: 'text', content: `NFT on` },
               { type: 'text', content: chain }
             ]
           };
@@ -279,6 +300,19 @@ export function humanizeConditionsData(conditions: HumanizedAccsProps) {
     .filter(isTruthy);
 
   return humanReadableConditions || [];
+}
+
+export function humanizeConditionsData<T extends TokenGateConditions>(tokenGate: T, walletAddress: string) {
+  const { type, conditions } = tokenGate;
+
+  switch (type) {
+    case 'lit':
+      return humanizeLitConditionsData({ ...conditions, myWalletAddress: walletAddress });
+    case 'unlock':
+      return humanizeUnlockConditionsData(conditions);
+    default:
+      return [];
+  }
 }
 
 export function humanizeConditions(conditions: HumanizeCondition[]) {

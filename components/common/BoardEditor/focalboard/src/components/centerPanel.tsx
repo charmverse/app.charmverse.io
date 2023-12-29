@@ -42,7 +42,6 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
-import { Constants } from 'lib/focalboard/constants';
 
 import mutator from '../mutator';
 import { addCard as _addCard, addTemplate } from '../store/cards';
@@ -89,6 +88,7 @@ type State = {
 
 function CenterPanel(props: Props) {
   const { activeView, board, currentRootPageId, pageIcon, showView, views, page: boardPage } = props;
+  const [checkedIds, setCheckedIds] = useState<string[]>([]);
 
   const [state, setState] = useState<State>({
     cardIdToFocusOnRender: '',
@@ -144,7 +144,7 @@ function CenterPanel(props: Props) {
   }, [activeView?.id, views.length, isActiveView]);
 
   // filter cards by whats accessible
-  const cardPages: CardPage[] = useMemo(() => {
+  const { cardPages, cardPageIds } = useMemo(() => {
     const result = _cards
       .map((card) => ({
         card,
@@ -152,10 +152,25 @@ function CenterPanel(props: Props) {
       }))
       .filter(({ page }) => !!page && !page.deletedAt);
 
-    return isActiveView ? sortCards(result, activeBoard, activeView, membersRecord, localViewSettings?.localSort) : [];
+    const _cardPages = isActiveView
+      ? sortCards(result, activeBoard, activeView, membersRecord, localViewSettings?.localSort)
+      : [];
+
+    const _cardPageIds = new Set<string>();
+    _cardPages.forEach((cardPage) => _cardPageIds.add(cardPage.card.id));
+
+    return {
+      cardPages: _cardPages,
+      cardPageIds: _cardPageIds
+    };
   }, [isActiveView, _cards, pages, localViewSettings?.localSort]);
 
   const cards = cardPages.map(({ card }) => card);
+
+  // Make sure the checkedIds are still cards that exist
+  useEffect(() => {
+    setCheckedIds((checkedIds) => checkedIds.filter((id) => cardPageIds.has(id)));
+  }, [cardPageIds.size]);
 
   let groupByProperty = _groupByProperty;
   if (
@@ -448,10 +463,18 @@ function CenterPanel(props: Props) {
 
   // close settings once a view has been added
   useEffect(() => {
+    setCheckedIds([]);
     if (activeView) {
       closeSettings();
     }
   }, [activeView?.id]);
+
+  useEffect(() => {
+    const viewType = activeView?.fields.viewType;
+    if (viewType !== 'table') {
+      setCheckedIds([]);
+    }
+  }, [activeView?.fields.viewType]);
 
   // refresh google forms data whenever source changes
   useEffect(() => {
@@ -556,6 +579,8 @@ function CenterPanel(props: Props) {
               editCardTemplate={editCardTemplate}
               readOnly={props.readOnly}
               embeddedBoardPath={props.embeddedBoardPath}
+              checkedIds={checkedIds}
+              setCheckedIds={setCheckedIds}
             />
           )}
         </div>
@@ -644,6 +669,8 @@ function CenterPanel(props: Props) {
                     onCardClicked={cardClicked}
                     disableAddingCards={disableAddingNewCards}
                     readOnlyTitle={readOnlyTitle}
+                    checkedIds={checkedIds}
+                    setCheckedIds={setCheckedIds}
                   />
                 )}
                 {activeBoard && activeView?.fields.viewType === 'calendar' && (

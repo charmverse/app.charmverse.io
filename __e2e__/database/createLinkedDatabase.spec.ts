@@ -1,5 +1,4 @@
-import type { Space, User, Block } from '@charmverse/core/prisma';
-import type { Page } from '@charmverse/core/prisma-client';
+import type { Space, User, Block, Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 import { test as base, expect } from '@playwright/test';

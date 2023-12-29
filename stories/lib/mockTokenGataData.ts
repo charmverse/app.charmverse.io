@@ -235,18 +235,17 @@ export const mockTokenGates: TokenGateWithRoles[] = [
 ];
 
 export const mockTokenGateResult: TokenGateEvaluationResult = {
-  space: _spaces[0],
   walletAddress: '0x1234',
   canJoinSpace: true,
-  gateTokens: mockTokenGates.map((tokenGate) => ({
+  eligibleGates: mockTokenGates.map((tokenGate) => ({
     signedToken: '123',
-    tokenGate
-  })),
-  roles: spaceRoles
+    tokenGateId: tokenGate.id
+  }))
 };
 
 function mockTokenGate(gate: UnifiedAccessControlConditions) {
   return createMockTokenGate({
+    type: 'lit',
     conditions: {
       unifiedAccessControlConditions: gate
     },

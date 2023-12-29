@@ -1,4 +1,4 @@
-import type { PageType } from '@charmverse/core/prisma-client';
+import type { PageType } from '@charmverse/core/prisma';
 import { Box, Button, Tooltip } from '@mui/material';
 import { useState } from 'react';
 import { mutate } from 'swr';

@@ -1,4 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import { PublicLockV13 } from '@unlock-protocol/contracts';
+import { readContract } from '@wagmi/core';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -20,18 +22,35 @@ const schema = yup.object({
     .oneOf(collectableOptionIds, 'Invalid collectable option')
     .test('empty-collectable-option-check', 'Selection is required', (option) => !!option),
   chain: yup.string().when('collectableOption', {
-    is: (val: CollectableOptionsId) => val === 'ERC721' || val === 'ERC1155',
+    is: (val: CollectableOptionsId) => val === 'ERC721' || val === 'ERC1155' || val === 'UNLOCK',
     then: () => yup.string().required('Chain is required'),
     otherwise: () => yup.string()
   }),
-  contract: yup.string().when('collectableOption', {
-    is: (val: CollectableOptionsId) => val === 'ERC721' || val === 'ERC1155',
+  contract: yup.string<`0x${string}`>().when('collectableOption', {
+    is: (val: CollectableOptionsId) => val === 'ERC721' || val === 'ERC1155' || val === 'UNLOCK',
     then: () =>
       yup
-        .string()
+        .string<`0x${string}`>()
         .required('Contract is required')
-        .test('isAddress', 'Invalid address', (value) => isValidChainAddress(value)),
-    otherwise: () => yup.string()
+        .test('isAddress', 'Invalid address', (value) => isValidChainAddress(value))
+        .test('isUnlockContract', 'Invalid Unlock contract or chain', async (value, context) => {
+          if (context.parent.chain && context.parent.collectableOption === 'UNLOCK') {
+            try {
+              await readContract({
+                address: value,
+                chainId: Number(context.parent.chain),
+                abi: PublicLockV13.abi,
+                functionName: 'publicLockVersion'
+              });
+              return true;
+            } catch (err) {
+              return false;
+            }
+          } else {
+            return true;
+          }
+        }),
+    otherwise: () => yup.string<`0x${string}`>()
   }),
   check: yup
     .string()
@@ -89,7 +108,7 @@ export type FormValues = yup.InferType<typeof schema>;
 const defaultValues: FormValues = {
   collectableOption: undefined,
   chain: '',
-  contract: '',
+  contract: '' as `0x${string}`,
   check: undefined,
   quantity: '',
   tokenId: '',

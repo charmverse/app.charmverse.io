@@ -2,15 +2,14 @@ import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { Box, useMediaQuery } from '@mui/material';
 import type { ReactNode } from 'react';
-import { useState } from 'react';
 
-import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
+import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
+import type { FormFieldValue } from 'components/common/form/interfaces';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { useRequiredMemberPropertiesForm } from 'components/members/hooks/useRequiredMemberProperties';
 import Legend from 'components/settings/Legend';
-import { useMembers } from 'hooks/useMembers';
 import type { UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 
 import { useMemberPropertyValues } from '../../../../../../hooks/useMemberPropertyValues';
@@ -18,12 +17,11 @@ import { useMemberPropertyValues } from '../../../../../../hooks/useMemberProper
 import { MemberPropertiesForm } from './MemberPropertiesForm';
 
 type Props = {
-  spaceId: string;
   userId: string;
   onClose: VoidFunction;
 };
 
-const ContentContainer = styled(Container)`
+const ContentContainer = styled(PageEditorContainer)`
   width: 100%;
   margin-bottom: 100px;
 `;
@@ -81,36 +79,27 @@ export function DialogContainer({
   );
 }
 
-export function MemberPropertiesFormDialog({ spaceId, userId, onClose }: Props) {
-  const { updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(userId);
-  const [memberDetails, setMemberDetails] = useState<UpdateMemberPropertyValuePayload[]>([]);
-  const { mutateMembers } = useMembers();
+export function MemberPropertiesFormDialog({ userId, onClose }: Props) {
+  const { refreshPropertyValues } = useMemberPropertyValues(userId);
 
-  const { control, errors, isValid, memberProperties, values } = useRequiredMemberPropertiesForm({ userId });
+  const { control, errors, isValid, isDirty, isSubmitting, onSubmit, onFormChange } = useRequiredMemberPropertiesForm({
+    userId
+  });
 
   async function saveForm() {
-    await updateSpaceValues(spaceId, memberDetails);
+    await onSubmit();
     onClose();
   }
 
   function onMemberDetailsChange(fields: UpdateMemberPropertyValuePayload[]) {
-    setMemberDetails(fields);
+    onFormChange(fields.map((field) => ({ id: field.memberPropertyId, value: field.value as FormFieldValue })));
   }
 
-  function onClickClose() {
-    // refresh members only after all the editing is finished
-    onClose();
-    mutateMembers();
-  }
-
-  const isFormClean = memberDetails.length === 0;
   return (
-    <DialogContainer title='Edit profile' onClose={onClickClose}>
+    <DialogContainer title='Edit profile' onClose={onClose}>
       <MemberPropertiesForm
-        values={values}
         control={control}
         errors={errors}
-        properties={memberProperties}
         userId={userId}
         refreshPropertyValues={refreshPropertyValues}
         onChange={onMemberDetailsChange}
@@ -119,7 +108,15 @@ export function MemberPropertiesFormDialog({ spaceId, userId, onClose }: Props) 
         <Button disableElevation color='secondary' variant='outlined' onClick={onClose}>
           Cancel
         </Button>
-        <Button disableElevation disabled={isFormClean || !isValid} onClick={saveForm}>
+        <Button
+          disableElevation
+          disabledTooltip={
+            !isValid ? 'Please fill out all required fields' : !isDirty ? 'No changes to save' : undefined
+          }
+          disabled={!isDirty || !isValid}
+          loading={isSubmitting}
+          onClick={saveForm}
+        >
           Save
         </Button>
       </Box>

@@ -1,13 +1,14 @@
-import type { ApplicationStatus, ProposalStatus } from '@charmverse/core/prisma-client';
+import type { ApplicationStatus, ProposalStatus } from '@charmverse/core/prisma';
 import { stringUtils } from '@charmverse/core/utilities';
 import PersonIcon from '@mui/icons-material/Person';
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Chip, Link, Stack, Typography } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import clsx from 'clsx';
 import { useRouter } from 'next/router';
 import type { ReactElement, ReactNode } from 'react';
 import { memo, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
+import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
@@ -15,6 +16,7 @@ import { TagSelect } from 'components/common/BoardEditor/components/properties/T
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
+import { BreadcrumbPageTitle } from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
 import { ProposalStatusChipTextOnly } from 'components/proposals/components/ProposalStatusBadge';
 import { useProposalsWhereUserIsEvaluator } from 'components/proposals/hooks/useProposalsWhereUserIsEvaluator';
 import {
@@ -35,7 +37,8 @@ import {
   REWARDS_APPLICANTS_BLOCK_ID,
   REWARD_REVIEWERS_BLOCK_ID,
   REWARD_STATUS_BLOCK_ID,
-  REWARD_APPLICANTS_COUNT
+  REWARD_APPLICANTS_COUNT,
+  REWARD_PROPOSAL_LINK
 } from 'lib/rewards/blocks/constants';
 import type { RewardStatus } from 'lib/rewards/interfaces';
 import { getAbsolutePath } from 'lib/utilities/browser';
@@ -71,6 +74,35 @@ type Props = {
   columnRef?: React.RefObject<HTMLDivElement>;
   mutator?: Mutator;
   subRowsEmptyValueContent?: ReactElement | string;
+  proposalId?: string | null;
+};
+
+export const validatePropertyValue = (propType: string, val: string): boolean => {
+  if (val === '') {
+    return true;
+  }
+  switch (propType) {
+    case 'number':
+      return !Number.isNaN(parseInt(val, 10));
+    case 'email': {
+      const emailRegexp =
+        // eslint-disable-next-line max-len
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{"mixer na 8 chainach1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return emailRegexp.test(val);
+    }
+    case 'url': {
+      const urlRegexp =
+        // eslint-disable-next-line max-len
+        /(((.+:(?:\/\/)?)?(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www\.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w\-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[.!/\\\w]*))?)/;
+      return urlRegexp.test(val);
+    }
+    case 'text':
+      return true;
+    case 'phone':
+      return true;
+    default:
+      return false;
+  }
 };
 
 /**
@@ -92,14 +124,14 @@ function PropertyValueElement(props: Props) {
     card,
     syncWithPageId,
     propertyTemplate,
-    readOnly,
     showEmptyPlaceholder,
     board,
     updatedBy,
     updatedAt,
     displayType,
     mutator = defaultMutator,
-    subRowsEmptyValueContent
+    subRowsEmptyValueContent,
+    proposalId
   } = props;
 
   const { rubricProposalIdsWhereUserIsEvaluator, rubricProposalIdsWhereUserIsNotEvaluator } =
@@ -114,6 +146,10 @@ function PropertyValueElement(props: Props) {
 
   const intl = useIntl();
   const propertyValue = card.fields.properties[propertyTemplate.id];
+  const cardProperties = board.fields.cardProperties;
+  const readOnly =
+    props.readOnly || !!cardProperties.find((cardProperty) => cardProperty.id === propertyTemplate.id)?.formFieldId;
+
   const displayValue = OctoUtils.propertyDisplayValue({
     block: card,
     propertyValue,
@@ -139,34 +175,6 @@ function PropertyValueElement(props: Props) {
     setServerValue(props.card.fields.properties[props.propertyTemplate.id] || '');
   }, [value, props.card.fields.properties[props.propertyTemplate.id]]);
 
-  const validateProp = (propType: string, val: string): boolean => {
-    if (val === '') {
-      return true;
-    }
-    switch (propType) {
-      case 'number':
-        return !Number.isNaN(parseInt(val, 10));
-      case 'email': {
-        const emailRegexp =
-          // eslint-disable-next-line max-len
-          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{"mixer na 8 chainach1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        return emailRegexp.test(val);
-      }
-      case 'url': {
-        const urlRegexp =
-          // eslint-disable-next-line max-len
-          /(((.+:(?:\/\/)?)?(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www\.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w\-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[.!/\\\w]*))?)/;
-        return urlRegexp.test(val);
-      }
-      case 'text':
-        return true;
-      case 'phone':
-        return true;
-      default:
-        return false;
-    }
-  };
-
   let propertyValueElement: ReactNode = null;
 
   if (propertyTemplate.id === REWARD_STATUS_BLOCK_ID) {
@@ -186,7 +194,19 @@ function PropertyValueElement(props: Props) {
         }
       />
     );
-  } else if ([REWARD_REVIEWERS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID].includes(propertyTemplate.id)) {
+  } else if (propertyTemplate.id === REWARD_PROPOSAL_LINK) {
+    if (!Array.isArray(propertyValue) || !propertyValue.length || !propertyValue[0]) {
+      return null;
+    }
+
+    return (
+      <Box sx={{ a: { color: 'inherit' } }}>
+        <Link href={getAbsolutePath(propertyValue[1] as string, domain)}>
+          <BreadcrumbPageTitle sx={{ maxWidth: 160 }}>{propertyValue[0]}</BreadcrumbPageTitle>
+        </Link>
+      </Box>
+    );
+  } else if (propertyTemplate.id === REWARD_REVIEWERS_BLOCK_ID) {
     if (Array.isArray(propertyValue) && propertyValue.length === 0 && subRowsEmptyValueContent) {
       return typeof subRowsEmptyValueContent === 'string' ? (
         <span>{subRowsEmptyValueContent}</span>
@@ -198,7 +218,7 @@ function PropertyValueElement(props: Props) {
       <UserAndRoleSelect
         displayType={displayType}
         data-test='selected-reviewers'
-        readOnly={readOnly}
+        readOnly={readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any)}
         onChange={() => null}
         value={propertyValue as any}
       />
@@ -233,13 +253,16 @@ function PropertyValueElement(props: Props) {
         displayType={displayType}
       />
     );
-    // do not show value in reward row
-  } else if (propertyTemplate.id === REWARDS_APPLICANTS_BLOCK_ID && Array.isArray(propertyValue)) {
+    // Do not show  applicants in regular reward
+  } else if (
+    propertyTemplate.id === REWARDS_APPLICANTS_BLOCK_ID &&
+    Array.isArray(propertyValue) &&
+    !card.fields.isAssigned
+  ) {
     propertyValueElement = null;
   } else if (
     propertyTemplate.type === 'person' ||
     propertyTemplate.type === 'proposalEvaluatedBy' ||
-    propertyTemplate.type === 'proposalAuthor' ||
     propertyTemplate.type === 'proposalReviewer' ||
     propertyTemplate.id === REWARDS_APPLICANTS_BLOCK_ID
   ) {
@@ -262,21 +285,43 @@ function PropertyValueElement(props: Props) {
           const newUserIds = newValue.filter((id) => !previousValue.includes(id));
           Promise.all(
             newUserIds.map((userId) =>
-              charmClient.createEvent({
+              charmClient.createEvents({
                 spaceId: board.spaceId,
-                payload: {
-                  cardId: card.id,
-                  cardProperty: {
-                    id: propertyTemplate.id,
-                    name: propertyTemplate.name,
-                    value: userId
-                  },
-                  scope: WebhookEventNames.CardPersonPropertyAssigned
-                }
+                payload: [
+                  {
+                    cardId: card.id,
+                    cardProperty: {
+                      id: propertyTemplate.id,
+                      name: propertyTemplate.name,
+                      value: userId
+                    },
+                    scope: WebhookEventNames.CardPersonPropertyAssigned
+                  }
+                ]
               })
             )
           );
         }}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
+        showEmptyPlaceholder={showEmptyPlaceholder}
+      />
+    );
+  } else if (propertyTemplate.type === 'proposalAuthor') {
+    propertyValueElement = (
+      <UserSelect
+        displayType={displayType}
+        memberIds={typeof propertyValue === 'string' ? [propertyValue] : (propertyValue as string[]) ?? []}
+        readOnly={readOnly || (displayType !== 'details' && displayType !== 'table')}
+        onChange={async (newValue) => {
+          if (proposalId) {
+            await charmClient.proposals.updateProposal({
+              proposalId,
+              authors: newValue
+            });
+            await mutate(`/api/spaces/${board.spaceId}/proposals`);
+          }
+        }}
+        disallowEmpty
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
         showEmptyPlaceholder={showEmptyPlaceholder}
       />
@@ -362,7 +407,7 @@ function PropertyValueElement(props: Props) {
       mutator.changePropertyValue(card, propertyTemplate.id, value);
     },
     onCancel: () => setValue(propertyValue || ''),
-    validator: (newValue: string) => validateProp(propertyTemplate.type, newValue),
+    validator: (newValue: string) => validatePropertyValue(propertyTemplate.type, newValue),
     spellCheck: propertyTemplate.type === 'text',
     wrapColumn: props.wrapColumn ?? false,
     columnRef: props.columnRef

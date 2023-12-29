@@ -11,6 +11,7 @@ export interface VoteDTO extends Omit<Vote, 'id' | 'status' | 'createdAt' | 'pos
   postId?: string | null;
   voteOptions: string[];
   spaceId: string;
+  evaluationId?: string;
 }
 
 export type UpdateVoteDTO = Pick<Vote, 'status' | 'deadline'>;

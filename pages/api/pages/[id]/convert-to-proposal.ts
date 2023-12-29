@@ -5,6 +5,7 @@ import nc from 'next-connect';
 
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { convertPageToProposal } from 'lib/proposal/convertPageToProposal';
 import { disconnectProposalChildren } from 'lib/proposal/disconnectProposalChildren';
@@ -49,7 +50,7 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageM
     throw new NotFoundError();
   }
 
-  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
+  const permissions = await permissionsApiClient.pages.computePagePermissions({
     resourceId: pageId,
     userId
   });
@@ -60,12 +61,12 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageM
 
   const categoryId = req.body.categoryId;
 
-  const proposalPermissions = await req.basePermissionsClient.proposals.computeProposalCategoryPermissions({
-    resourceId: categoryId,
+  const proposalPermissions = await permissionsApiClient.spaces.computeSpacePermissions({
+    resourceId: page.spaceId,
     userId
   });
 
-  if (!proposalPermissions.create_proposal) {
+  if (!proposalPermissions.createProposals) {
     throw new UnauthorisedActionError('You do not have permission to create a proposal in this category');
   }
 

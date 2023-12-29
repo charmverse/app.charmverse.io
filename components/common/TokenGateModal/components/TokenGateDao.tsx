@@ -1,11 +1,10 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { ListItemIcon, ListItemText, MenuItem } from '@mui/material';
 import { litDaoChains } from 'connectors/chains';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import { TextInputField } from 'components/common/form/fields/TextInputField';
-import TokenLogo from 'components/common/TokenLogo';
+import type { TokenGateConditions } from 'lib/tokenGates/interfaces';
 import { isValidChainAddress } from 'lib/tokens/validation';
 
 import { useTokenGateModal } from '../hooks/useTokenGateModalContext';
@@ -36,12 +35,13 @@ export function TokenGateDao() {
     defaultValues: { contract: '', chain: '' }
   });
 
-  const { setDisplayedPage, handleUnifiedAccessControlConditions } = useTokenGateModal();
+  const { setDisplayedPage, handleTokenGate } = useTokenGateModal();
 
   const onSubmit = async () => {
     const values = getValues();
     const valueProps = getDaoUnifiedAccessControlConditions(values) || [];
-    handleUnifiedAccessControlConditions(valueProps);
+    const _tokenGate: TokenGateConditions = { type: 'lit', conditions: { unifiedAccessControlConditions: valueProps } };
+    handleTokenGate(_tokenGate);
     setDisplayedPage('review');
   };
 
@@ -55,17 +55,9 @@ export function TokenGateDao() {
       <TokenGateBlockchainSelect
         error={!!errors.chain?.message}
         helperMessage={errors.chain?.message}
+        chains={litDaoChains}
         {...register('chain')}
-      >
-        {litDaoChains.map((_chain) => (
-          <MenuItem key={_chain.litNetwork} value={_chain.chainName}>
-            <ListItemIcon>
-              <TokenLogo height={20} src={_chain.iconUrl} />
-            </ListItemIcon>
-            <ListItemText>{_chain.chainName}</ListItemText>
-          </MenuItem>
-        ))}
-      </TokenGateBlockchainSelect>
+      />
       <TextInputField
         label='DAO Contract Address'
         error={errors.contract?.message}

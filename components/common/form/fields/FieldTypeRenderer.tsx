@@ -5,12 +5,18 @@ import { SelectField } from 'components/common/form/fields/SelectField';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 import type { ControlFieldProps, FieldProps, FieldType } from 'components/common/form/interfaces';
 
+import { CharmEditorInputField } from './CharmEditorInputField';
+import { DateInputField } from './DateInputField';
+import { FieldWrapper } from './FieldWrapper';
+import { PersonInputField } from './PersonInputField';
+
 type TextProps = {
   type: Exclude<FieldType, 'select' | 'multiselect'>;
 } & FieldProps &
   ControlFieldProps;
+
 type SelectProps = {
-  type: Extract<FieldType, 'select' | 'multiselect'>;
+  type: 'select' | 'multiselect';
 } & FieldProps &
   Required<ControlFieldProps>;
 
@@ -20,11 +26,15 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
   ({ type, options, onCreateOption, onDeleteOption, onUpdateOption, ...fieldProps }: Props, ref) => {
     switch (type) {
       case 'text':
-      case 'phone':
+      case 'email':
       case 'url':
-      case 'name':
-      case 'email': {
+      case 'phone':
+      case 'short_text':
+      case 'wallet': {
         return <TextInputField {...fieldProps} ref={ref} />;
+      }
+      case 'long_text': {
+        return <CharmEditorInputField {...fieldProps} />;
       }
       case 'text_multiline': {
         return <TextInputField {...fieldProps} ref={ref} multiline rows={3} />;
@@ -33,25 +43,28 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
         return <NumberInputField {...fieldProps} ref={ref} />;
       }
 
+      case 'date': {
+        return <DateInputField {...fieldProps} ref={ref} />;
+      }
+
+      case 'person': {
+        return <PersonInputField {...fieldProps} ref={ref} />;
+      }
+
+      case 'label': {
+        return <FieldWrapper {...fieldProps} sx={fieldProps?.fieldWrapperSx} />;
+      }
+
+      case 'multiselect':
       case 'select': {
         return (
           <SelectField
             {...(fieldProps as SelectProps)}
+            error={fieldProps.error || (options ?? []).length === 0 ? 'Atleast one option is required' : undefined}
             ref={ref}
-            options={options}
-            onCreateOption={onCreateOption}
-            onDeleteOption={onDeleteOption}
-            onUpdateOption={onUpdateOption}
-          />
-        );
-      }
-
-      case 'multiselect': {
-        return (
-          <SelectField
-            {...(fieldProps as SelectProps)}
-            ref={ref}
-            multiselect
+            placeholder={(options ?? []).length === 0 ? 'Create an option' : fieldProps.placeholder}
+            value={fieldProps.value as string[]}
+            multiselect={type === 'multiselect'}
             options={options}
             onCreateOption={onCreateOption}
             onDeleteOption={onDeleteOption}

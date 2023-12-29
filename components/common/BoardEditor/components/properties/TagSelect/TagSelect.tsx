@@ -15,6 +15,7 @@ import type { IPropertyOption } from 'lib/focalboard/board';
 
 type ContainerProps = {
   displayType?: PropertyValueDisplayType;
+  disableClearable?: boolean;
   isHidden?: boolean;
   readOnly?: boolean;
 };
@@ -86,17 +87,23 @@ const StyledSelect = styled(SelectField)<ContainerProps>`
   .MuiOutlinedInput-notchedOutline {
     border: 0 none !important;
   }
+
+  /* Hide the clear icons on each tag - useful for requried selects */
+  ${({ disableClearable }) => (disableClearable ? '.MuiSvgIcon-root { display: none; }' : '')}
 `;
 
-type Props = {
+export type TagSelectProps = {
+  defaultOpened?: boolean;
   readOnly?: boolean;
   readOnlyMessage?: string;
   canEditOptions?: boolean; // TODO: allow editing options
   multiselect?: boolean;
+  includeSelectedOptions?: boolean;
   noOptionsText?: string;
   options: IPropertyOption[];
   propertyValue: string | string[];
   displayType?: PropertyValueDisplayType;
+  disableClearable?: boolean;
   onChange: (option: string | string[]) => void;
   onCreateOption?: (option: IPropertyOption) => void;
   onUpdateOption?: (option: IPropertyOption) => void;
@@ -109,6 +116,7 @@ export function TagSelect({
   readOnly,
   readOnlyMessage,
   canEditOptions = false,
+  includeSelectedOptions,
   options,
   propertyValue,
   multiselect = false,
@@ -119,9 +127,11 @@ export function TagSelect({
   displayType = 'details',
   noOptionsText,
   wrapColumn,
-  'data-test': dataTest
-}: Props) {
-  const [isOpened, setIsOpened] = useState(false);
+  'data-test': dataTest,
+  defaultOpened = false,
+  disableClearable = false
+}: TagSelectProps) {
+  const [isOpened, setIsOpened] = useState(defaultOpened);
 
   const onEdit = useCallback(() => {
     if (!readOnly) {
@@ -189,11 +199,13 @@ export function TagSelect({
     <StyledSelect
       data-test={dataTest}
       canEditOptions={canEditOptions}
+      includeSelectedOptions={includeSelectedOptions}
       placeholder='Search for an option...'
       noOptionsText={noOptionsText}
       autoOpen
       multiselect={multiselect}
       disabled={readOnly}
+      disableClearable={disableClearable}
       value={selectValue}
       options={selectOptions}
       onChange={onChange}

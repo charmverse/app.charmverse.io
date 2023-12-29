@@ -48,34 +48,11 @@ describe('POST /api/v1/spaces/{spaceId}/members', () => {
     expect(response.statusCode).toBe(401);
   });
 
-  it('should respond 404 when no summon user with the email or wallet address exist', async () => {
-    const wallet = randomETHWalletAddress();
-
-    const response = await request(baseUrl)
-      .post(`/api/v1/spaces/${space.id}/members`)
-      .set('Authorization', superApiKey.token)
-      .send({
-        wallet
-      });
-
-    expect(response.statusCode).toBe(404);
-    expect(response.body.message).toBe('Summon profile not found');
-  });
-
   it('should respond 200 with user profile and create user if no charmverse user with the provided email or wallet address exist', async () => {
     const wallet = randomETHWalletAddress().toLowerCase();
     const xpsEngineId = v4();
     const tenantId = v4();
     const { listen, router } = createServer();
-
-    // Mock discord auth endpoints
-    router.get('/scan/identity', (ctx) => {
-      ctx.body = {
-        data: {
-          userId: xpsEngineId
-        }
-      };
-    });
 
     router.get('/scan/inventory/:xpsEngineId', (ctx) => {
       ctx.body = {
@@ -96,6 +73,7 @@ describe('POST /api/v1/spaces/{spaceId}/members', () => {
       .query({ summonApiUrl: `http://localhost:${(server.address() as AddressInfo).port}` })
       .set('Authorization', superApiKey.token)
       .send({
+        summonUserId: xpsEngineId,
         wallet
       });
 

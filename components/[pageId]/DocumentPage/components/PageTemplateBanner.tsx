@@ -9,6 +9,7 @@ import { DocumentPageIcon } from 'components/common/Icons/DocumentPageIcon';
 import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
 const StyledPageTemplateBanner = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'card'
@@ -27,17 +28,13 @@ type Props = {
   isNewPage?: boolean;
   parentId?: string | null;
   pageType?: PageMeta['type'];
+  customTitle?: string;
+  proposalType?: 'free_form' | 'structured';
 };
 
-const templateTypes = {
-  proposal_template: 'proposal',
-  bounty_template: 'reward'
-};
-
-type RewardTemplateType = keyof typeof templateTypes;
-
-export function PageTemplateBanner({ isNewPage, pageType, parentId }: Props) {
+export function PageTemplateBanner({ proposalType, isNewPage, pageType, parentId, customTitle }: Props) {
   const { space } = useCurrentSpace();
+  const { getFeatureTitle } = useSpaceFeatures();
   const theme = useTheme();
   const { pages } = usePages();
   const parentPage = parentId ? pages[parentId] : undefined;
@@ -46,6 +43,16 @@ export function PageTemplateBanner({ isNewPage, pageType, parentId }: Props) {
   const board = isShowingCard ? parentPage : undefined;
 
   const boardPath = board ? `/${space?.domain}/${board?.path}` : undefined;
+
+  if (customTitle) {
+    return (
+      <StyledPageTemplateBanner card={isShowingCard}>
+        <Grid item xs={8} display='flex' justifyContent='center'>
+          <span>{customTitle}</span>
+        </Grid>
+      </StyledPageTemplateBanner>
+    );
+  }
 
   if (!pageType?.match('template')) {
     return null;
@@ -64,7 +71,9 @@ export function PageTemplateBanner({ isNewPage, pageType, parentId }: Props) {
         <Grid item xs={8} display='flex' justifyContent='center'>
           {!isShowingCard ? (
             <span>
-              You're {isNewPage ? 'creating' : 'editing'} a {templateTypes[pageType as RewardTemplateType]} template
+              You're {isNewPage ? 'creating' : 'editing'} a{' '}
+              {proposalType ? `${proposalType === 'free_form' ? 'free-form' : 'structured'} ` : ''}
+              {getFeatureTitle(pageType === 'bounty_template' ? 'reward' : 'proposal')} template
             </span>
           ) : (
             <>

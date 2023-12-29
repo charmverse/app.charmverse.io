@@ -4,7 +4,7 @@ import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog'
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { isUUID } from 'lib/utilities/strings';
 
-export function useRewardsNavigation() {
+export function useRewardsNavigation(idKey = 'id') {
   const { showPage, hidePage } = usePageDialog();
   const {
     router: { query },
@@ -12,14 +12,14 @@ export function useRewardsNavigation() {
   } = useCharmRouter();
 
   const onClose = () => {
-    updateURLQuery({ applicationId: null, isNewApplication: null, id: null });
+    updateURLQuery({ applicationId: null, isNewApplication: null, [idKey]: null });
   };
 
   useEffect(() => {
     const applicationId =
       query.applicationId && isUUID(query.applicationId as string) ? (query.applicationId as string) : undefined;
     const isNewApplication = query.applicationId === 'new';
-    const pageId = query.id && isUUID(query.id as string) ? (query.id as string) : undefined;
+    const pageId = query[idKey] && isUUID(query[idKey] as string) ? (query[idKey] as string) : undefined;
 
     if (!applicationId && !isNewApplication && !pageId) {
       hidePage();
@@ -33,5 +33,5 @@ export function useRewardsNavigation() {
       pageId,
       onClose
     });
-  }, [query]);
+  }, [idKey, query]);
 }

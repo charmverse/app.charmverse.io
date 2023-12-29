@@ -1,3 +1,4 @@
+import type { Block } from '@charmverse/core/prisma';
 import { useEffect } from 'react';
 
 import type { BlockUpdater } from 'components/common/BoardEditor/charmClient.interface';
@@ -8,10 +9,18 @@ import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
 import { useRewardBlocks } from 'hooks/useRewardBlocks';
 import type { BlockPatch, Block as FBBlock } from 'lib/focalboard/block';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
-import type { RewardBlockWithTypedFields, RewardPropertyValues } from 'lib/rewards/blocks/interfaces';
+import type { RewardBlockInput, RewardBlockUpdateInput } from 'lib/rewards/blocks/interfaces';
 
 export function useRewardsBoardMutator() {
-  const { updateBlock, createBlock, getBlock, updateBlocks } = useRewardBlocks();
+  const {
+    updateBlock,
+    createBlock,
+    getBlock,
+    updateBlocks,
+    createBlocks,
+    deleteBlocks: deleteRewardBlocks,
+    deleteBlock: deleteRewardBlock
+  } = useRewardBlocks();
   const { activeView } = useRewardsBoard();
   const { rewards, updateReward } = useRewards();
 
@@ -35,13 +44,13 @@ export function useRewardsBoardMutator() {
     if (!currentBlock) {
       // if updating default view for the first time - create it in db
       if (blockId === '__defaultView') {
-        currentBlock = await createBlock(fbBlockToBlock(activeView) as unknown as RewardBlockWithTypedFields);
+        currentBlock = await createBlock(fbBlockToBlock(activeView) as unknown as RewardBlockInput);
       }
     }
 
     if (!currentBlock) return;
 
-    const currentFBBlock = blockToFBBlock(currentBlock);
+    const currentFBBlock = blockToFBBlock(currentBlock as Block);
     const fbBlockInput = Object.assign(currentFBBlock, updates, {
       fields: { ...(currentFBBlock.fields as object), ...updatedFields }
     });
@@ -54,10 +63,10 @@ export function useRewardsBoardMutator() {
     deletedFields.forEach((field) => delete fbBlockInput.fields[field]);
     const blockInput = fbBlockToBlock(fbBlockInput);
 
-    const updatedBlock = await updateBlock(blockInput as RewardBlockWithTypedFields);
+    const updatedBlock = await updateBlock(blockInput as unknown as RewardBlockUpdateInput);
     if (!updatedBlock) return;
 
-    const fbBlock = blockToFBBlock(updatedBlock);
+    const fbBlock = blockToFBBlock(updatedBlock as Block);
     updater([fbBlock]);
   };
 
@@ -76,16 +85,52 @@ export function useRewardsBoardMutator() {
       deletedFields.forEach((field) => delete fbBlockInput.fields[field]);
       return fbBlockToBlock(fbBlockInput);
     });
-    const updatedBlocks = await updateBlocks(updatedBlockInput as RewardBlockWithTypedFields[]);
+    const updatedBlocks = await updateBlocks(updatedBlockInput as unknown as RewardBlockUpdateInput[]);
     if (!updatedBlocks) return;
 
-    const fbBlocks = updatedBlocks.map(blockToFBBlock) || [];
+    const fbBlocks = (updatedBlocks as Block[]).map(blockToFBBlock) || [];
     updater(fbBlocks);
+  };
+
+  const insertBlocks = async (fbBlocks: FBBlock[], updater: BlockUpdater): Promise<FBBlock[]> => {
+    const blocksInput = fbBlocks.map(fbBlockToBlock);
+    const newBlocks = await createBlocks(blocksInput as unknown as RewardBlockInput[]);
+
+    if (!newBlocks) return [];
+
+    const newFBBlocks = (newBlocks as Block[]).map(blockToFBBlock);
+    updater(newFBBlocks);
+
+    return newFBBlocks;
+  };
+
+  const deleteBlocks = async (blockIds: string[], updater: BlockUpdater): Promise<void> => {
+    const rootBlocks = await deleteRewardBlocks(blockIds);
+    if (!rootBlocks) return;
+
+    const fbBlocks = rootBlocks.map((rootBlock) => ({
+      ...blockToFBBlock(rootBlock as Block),
+      deletedAt: new Date().getTime()
+    }));
+    updater(fbBlocks);
+  };
+
+  const insertBlock = async (fbBlock: FBBlock, updater: BlockUpdater): Promise<FBBlock[]> => {
+    return insertBlocks([fbBlock], updater);
+  };
+
+  const deleteBlock = async (blockId: string, updater: BlockUpdater): Promise<void> => {
+    const rootBlock = await deleteRewardBlock(blockId);
+    if (!rootBlock) return;
+
+    const fbBlock = blockToFBBlock(rootBlock as Block);
+    fbBlock.deletedAt = new Date().getTime();
+    updater([fbBlock]);
   };
 
   useEffect(() => {
     // override default mutator updaters
-    mutator.setCustomMutatorUpdaters({ patchBlock, patchBlocks });
+    mutator.setCustomMutatorUpdaters({ patchBlock, patchBlocks, insertBlock, insertBlocks, deleteBlocks, deleteBlock });
 
     // restore default mutator updaters on unmount
     return () => mutator.setCustomMutatorUpdaters(null);

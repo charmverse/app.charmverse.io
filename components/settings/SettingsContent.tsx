@@ -1,4 +1,3 @@
-import type { Feature } from '@charmverse/core/prisma';
 import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -20,6 +19,7 @@ import { useSmallScreen } from 'hooks/useMediaScreens';
 import type { SettingsPath } from 'hooks/useSettingsDialog';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useSpaces } from 'hooks/useSpaces';
+import type { Feature } from 'lib/features/constants';
 import { getSpaceUrl } from 'lib/utilities/browser';
 
 import { AccountSettings } from './account/AccountSettings';
@@ -29,7 +29,7 @@ import { ACCOUNT_TABS, SPACE_SETTINGS_TABS } from './config';
 import { ImportSettings } from './import/ImportSettings';
 import { Invites } from './invites/Invites';
 import ProfileSettings from './profile/ProfileSettings';
-import { ProposalSettings } from './proposals/ProposalSettings';
+import { SpaceProposalSettings } from './proposals/SpaceProposalSettings';
 import { RoleSettings } from './roles/RoleSettings';
 import { SpaceSettings } from './space/SpaceSettings';
 import { useSpaceSubscription } from './subscription/hooks/useSpaceSubscription';
@@ -54,7 +54,7 @@ const spaceTabs: Record<SpaceSettingsTab['path'], typeof SpaceSettings> = {
   roles: RoleSettings,
   subscription: SubscriptionSettings,
   space: SpaceSettings,
-  proposals: ProposalSettings
+  proposals: SpaceProposalSettings
 };
 
 function TabPanel(props: TabPanelProps) {
@@ -92,7 +92,7 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
   const { subscriptionEnded, hasPassedBlockQuota } = useSpaceSubscription();
   const switchSpaceMenu = usePopupState({ variant: 'popover', popupId: 'switch-space' });
   return (
-    <Box data-test-active-path={activePath} display='flex' flexDirection='row' flex='1' overflow='hidden'>
+    <Box data-test-active-path={activePath} display='flex' flexDirection='row' flex='1' overflow='hidden' height='100%'>
       <Box
         component='aside'
         width={{ xs: '100%', md: 300 }}

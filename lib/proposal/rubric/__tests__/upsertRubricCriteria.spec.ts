@@ -30,7 +30,7 @@ describe('upsertRubricCriteria', () => {
     });
 
     expect(rubrics).toEqual<ProposalRubricCriteriaWithTypedParams<'range'>[]>([
-      {
+      expect.objectContaining({
         id: expect.any(String),
         index: 0,
         description: null,
@@ -41,7 +41,7 @@ describe('upsertRubricCriteria', () => {
         proposalId: proposal.id,
         title: 'Score',
         type: 'range'
-      }
+      })
     ]);
 
     const newRubrics = await upsertRubricCriteria({
@@ -51,7 +51,7 @@ describe('upsertRubricCriteria', () => {
 
     expect(newRubrics).toEqual<ProposalRubricCriteriaWithTypedParams<'range'>[]>([
       rubrics[0],
-      {
+      expect.objectContaining({
         id: expect.any(String),
         index: 1,
         description: null,
@@ -62,7 +62,7 @@ describe('upsertRubricCriteria', () => {
         proposalId: proposal.id,
         title: 'Second score',
         type: 'range'
-      }
+      })
     ]);
   });
   it('should update existing criteria', async () => {
@@ -74,6 +74,7 @@ describe('upsertRubricCriteria', () => {
 
     const rubrics = await upsertRubricCriteria({
       proposalId: proposal.id,
+      evaluationId: null,
       rubricCriteria: [{ type: 'range', title: 'Score', parameters: { max: 5, min: 1 } }]
     });
 

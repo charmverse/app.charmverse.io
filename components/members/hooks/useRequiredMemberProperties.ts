@@ -1,127 +1,254 @@
+import type { UserDetails } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
+import { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
+import { useFormFields } from 'components/common/form/hooks/useFormFields';
+import type { EditableFields } from 'components/settings/profile/components/UserDetailsForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { MemberPropertyValueType } from 'lib/members/interfaces';
+import { useMembers } from 'hooks/useMembers';
+import { useSnackbar } from 'hooks/useSnackbar';
+import { useUser } from 'hooks/useUser';
+import { DEFAULT_MEMBER_PROPERTIES, NON_DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
+import type { Social } from 'lib/members/interfaces';
 
 import { useMemberPropertyValues } from './useMemberPropertyValues';
 
+const requiredString = (msg: string) => yup.string().required(msg).ensure().trim();
+
+const nonRequiredString = yup.string().notRequired().trim();
+
+const TWITTER_URL_REGEX = /^$|^http(?:s)?:\/\/(?:www\.)?(?:mobile\.)?twitter\.com\/([a-zA-Z0-9_]+)/i;
+const GITHUB_URL_REGEX = /^$|^http(?:s)?:\/\/(?:www\.)?github\.([a-z])+\/([^\s\\]{1,})+\/?$/i;
+const LINKEDIN_URL_REGEX =
+  /^$|^http(?:s)?:\/\/((www|\w\w)\.)?linkedin.com\/((in\/[^/]+\/?)|(company\/[^/]+\/?)|(pub\/[^/]+\/((\w|\d)+\/?){3}))$/i;
+
 export function useRequiredMemberProperties({ userId }: { userId: string }) {
-  const { memberPropertyValues } = useMemberPropertyValues(userId);
+  const { user: currentUser } = useUser();
+  const { memberPropertyValues, isLoading: isLoadingMemberProperties } = useMemberPropertyValues(userId);
   const { space: currentSpace } = useCurrentSpace();
-  const { data: userDetails } = useSWRImmutable(`/current-user-details`, () => charmClient.getUserDetails());
+  const { data: userDetails, isLoading: isLoadingUserDetails } = useSWRImmutable(`/current-user-details`, () =>
+    charmClient.getUserDetails()
+  );
 
-  const { memberProperties, isBioRequired, isTimezoneRequired, requiredProperties, nonEmptyRequiredProperties } =
-    useMemo(() => {
-      const _memberProperties = memberPropertyValues
-        ?.filter((mpv) => mpv.spaceId === currentSpace?.id)
-        .map((mpv) => mpv.properties)
-        .flat();
+  const data = useMemo(() => {
+    const _memberProperties = memberPropertyValues
+      ?.filter((mpv) => mpv.spaceId === currentSpace?.id)
+      .map((mpv) => mpv.properties)
+      .flat();
 
-      // Role and join date are non editable properties
-      const _requiredProperties =
-        _memberProperties?.filter((p) => p.required && !['role', 'join_date'].includes(p.type)) ?? [];
-      const _isTimezoneRequired = _requiredProperties.find((p) => p.type === 'timezone');
-      const _isBioRequired = _requiredProperties.find((p) => p.type === 'bio');
-      const propertiesWithoutValue = _requiredProperties
-        .filter(
-          (rp) =>
-            !_memberProperties?.find((mp) => mp.memberPropertyId === rp.memberPropertyId)?.value &&
-            !['bio', 'timezone'].includes(rp.type)
-        )
-        .map((p) => p.memberPropertyId);
+    // Role and join date are non editable properties
+    const _requiredProperties =
+      _memberProperties?.filter((p) => p.required && !['role', 'join_date', 'profile_pic'].includes(p.type)) ?? [];
 
-      if (userDetails && _isTimezoneRequired && !userDetails.timezone) {
-        propertiesWithoutValue.push('timezone');
-      }
+    const _isTimezoneRequired = _requiredProperties.find((p) => p.type === 'timezone');
+    const _isBioRequired = _requiredProperties.find((p) => p.type === 'bio');
+    const _isTwitterRequired = _requiredProperties.find((p) => p.type === 'twitter');
+    const _isLinkedinRequired = _requiredProperties.find((p) => p.type === 'linked_in');
+    const _isGithubRequired = _requiredProperties.find((p) => p.type === 'github');
+    const _isGoogleRequired = _requiredProperties.find((p) => p.type === 'google');
+    const _isDiscordRequired = _requiredProperties.find((p) => p.type === 'discord');
+    const _isWalletRequired = _requiredProperties.find((p) => p.type === 'wallet');
+    const _isTelegramRequired = _requiredProperties.find((p) => p.type === 'telegram');
 
-      if (userDetails && _isBioRequired && !userDetails.description) {
-        propertiesWithoutValue.push('bio');
-      }
+    const userDetailsSocial = userDetails?.social as Social;
 
-      return {
-        memberProperties: _memberProperties,
-        requiredProperties: _requiredProperties,
-        isTimezoneRequired: !!_isTimezoneRequired,
-        isBioRequired: !!_isBioRequired,
-        nonEmptyRequiredProperties: propertiesWithoutValue.length !== 0
-      };
-    }, [userDetails, memberPropertyValues, currentSpace?.id]);
+    const requiredPropertiesWithoutValue = _requiredProperties
+      .filter(
+        (rp) =>
+          !_memberProperties?.find((mp) => mp.memberPropertyId === rp.memberPropertyId)?.value &&
+          !DEFAULT_MEMBER_PROPERTIES.includes(rp.type)
+      )
+      .map((p) => p.memberPropertyId);
+
+    if (userDetails && _isTimezoneRequired && !userDetails.timezone) {
+      requiredPropertiesWithoutValue.push('timezone');
+    }
+
+    if (userDetails && _isBioRequired && !userDetails.description) {
+      requiredPropertiesWithoutValue.push('bio');
+    }
+
+    if (_isTwitterRequired && !userDetailsSocial?.twitterURL) {
+      requiredPropertiesWithoutValue.push('twitter');
+    }
+
+    if (_isLinkedinRequired && !userDetailsSocial?.linkedinURL) {
+      requiredPropertiesWithoutValue.push('linked_in');
+    }
+
+    if (_isGithubRequired && !userDetailsSocial?.githubURL) {
+      requiredPropertiesWithoutValue.push('github');
+    }
+
+    if (currentUser && _isWalletRequired && (currentUser.wallets ?? []).length === 0) {
+      requiredPropertiesWithoutValue.push('wallet');
+    }
+
+    if (currentUser && _isGoogleRequired && (currentUser.googleAccounts ?? []).length === 0) {
+      requiredPropertiesWithoutValue.push('google');
+    }
+
+    if (currentUser && _isDiscordRequired && !currentUser.discordUser) {
+      requiredPropertiesWithoutValue.push('discord');
+    }
+
+    if (currentUser && _isTelegramRequired && !currentUser.telegramUser) {
+      requiredPropertiesWithoutValue.push('telegram');
+    }
+
+    return {
+      memberProperties: _memberProperties,
+      requiredProperties: _requiredProperties,
+      isTimezoneRequired: !!_isTimezoneRequired,
+      isBioRequired: !!_isBioRequired,
+      requiredPropertiesWithoutValue,
+      hasEmptyRequiredProperties: requiredPropertiesWithoutValue.length !== 0,
+      isTwitterRequired: !!_isTwitterRequired,
+      isLinkedinRequired: !!_isLinkedinRequired,
+      isGithubRequired: !!_isGithubRequired,
+      isGoogleRequired: !!_isGoogleRequired,
+      isDiscordRequired: !!_isDiscordRequired,
+      isWalletRequired: !!_isWalletRequired,
+      isTelegramRequired: !!_isTelegramRequired
+    };
+  }, [userDetails, memberPropertyValues, currentSpace?.id, currentUser]);
 
   return {
-    memberProperties,
-    requiredProperties,
-    isTimezoneRequired,
-    isBioRequired,
-    nonEmptyRequiredProperties,
+    ...data,
+    isLoadingMemberProperties,
+    isLoadingUserDetails,
     userDetails
   };
 }
 
 export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) {
-  const { memberProperties, requiredProperties, ...rest } = useRequiredMemberProperties({ userId });
+  const { memberProperties = [] } = useRequiredMemberProperties({ userId });
+  const { updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(userId);
+  const { space } = useCurrentSpace();
+  const { mutateMembers } = useMembers();
 
-  const editableRequiredProperties = requiredProperties.filter(
-    (p) =>
-      ![
-        // Handled by oauth
-        'linked_in',
-        'github',
-        'discord',
-        'twitter',
-        'profile_pic',
-        // Handled separately from space member properties
-        'bio',
-        'timezone'
-      ].includes(p.type)
-  );
+  const nonDefaultMemberProperties = useMemo(() => {
+    return memberProperties
+      .filter((p) => NON_DEFAULT_MEMBER_PROPERTIES.includes(p.type))
+      .map((p) => ({
+        ...p,
+        id: p.memberPropertyId
+      }));
+  }, [memberProperties]);
 
-  const {
-    control,
-    formState: { isValid, errors },
-    reset,
-    getValues
-  } = useForm({
-    mode: 'onChange',
-    resolver: yupResolver(
-      yup.object(
-        Object.values(editableRequiredProperties).reduce((acc, prop) => {
-          if (prop.type === 'multiselect') {
-            acc[prop.memberPropertyId] = yup.array().of(yup.string()).required();
-            return acc;
-          }
-          acc[prop.memberPropertyId] = prop.type === 'number' ? yup.number().required() : yup.string().required();
-          return acc;
-        }, {} as Record<string, any>)
-      )
-    )
+  const { getValues, control, errors, isDirty, isSubmitting, isValid, onFormChange, onSubmit } = useFormFields({
+    fields: nonDefaultMemberProperties,
+    onSubmit: async (values) => {
+      if (space) {
+        await updateSpaceValues(
+          space.id,
+          Object.entries(values).map(([memberPropertyId, value]) => ({ memberPropertyId, value }))
+        );
+        refreshPropertyValues();
+        mutateMembers();
+      }
+    }
   });
 
   const values = getValues();
-
-  useEffect(() => {
-    if (!memberProperties) {
-      return;
-    }
-    const defaultValues = memberProperties.reduce<Record<string, MemberPropertyValueType>>((acc, prop) => {
-      acc[prop.memberPropertyId] = prop.value;
-      return acc;
-    }, {});
-
-    reset(defaultValues);
-  }, [memberProperties, reset]);
 
   return {
     values,
     control,
     isValid,
     errors,
-    memberProperties,
-    requiredProperties,
-    ...rest
+    isDirty,
+    isSubmitting,
+    onSubmit,
+    onFormChange
+  };
+}
+
+export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
+  const {
+    isBioRequired,
+    isGithubRequired,
+    isLinkedinRequired,
+    isTimezoneRequired,
+    isTwitterRequired,
+    userDetails: { id, ...userDetails } = {} as UserDetails
+  } = useRequiredMemberProperties({ userId });
+  const { showMessage } = useSnackbar();
+  const { mutateMembers } = useMembers();
+
+  const {
+    formState: { errors, isValid, isDirty, isSubmitting },
+    setValue,
+    handleSubmit,
+    getValues,
+    reset
+  } = useForm({
+    mode: 'onChange',
+    defaultValues: {
+      ...userDetails,
+      social: userDetails.social ?? {
+        twitterURL: '',
+        githubURL: '',
+        linkedinURL: ''
+      }
+    },
+    resolver: yupResolver(
+      yup.object({
+        description: isBioRequired ? requiredString('Bio is required') : nonRequiredString,
+        timezone: isTimezoneRequired ? requiredString('Timezone is required') : nonRequiredString,
+        social: yup.object({
+          twitterURL: isTwitterRequired
+            ? requiredString('Twitter is required').matches(TWITTER_URL_REGEX, 'Invalid Twitter link')
+            : nonRequiredString.matches(TWITTER_URL_REGEX, 'Invalid Twitter link'),
+          githubURL: isGithubRequired
+            ? requiredString('Github is required').matches(GITHUB_URL_REGEX, 'Invalid GitHub link')
+            : nonRequiredString.matches(GITHUB_URL_REGEX, 'Invalid GitHub link'),
+          linkedinURL: isLinkedinRequired
+            ? requiredString('Linkedin is required').matches(LINKEDIN_URL_REGEX, 'Invalid LinkedIn link')
+            : nonRequiredString.matches(LINKEDIN_URL_REGEX, 'Invalid LinkedIn link')
+        })
+      })
+    )
+  });
+
+  function onFormChange(fields: EditableFields) {
+    Object.entries(fields).forEach(([key, value]) => {
+      setValue(key as keyof EditableFields, value, {
+        shouldDirty: true,
+        shouldValidate: true,
+        shouldTouch: true
+      });
+    });
+  }
+
+  const values = getValues();
+
+  function onSubmit() {
+    if (isDirty && isValid) {
+      return handleSubmit(async (_values) => {
+        await charmClient.updateUserDetails(getValues());
+        await Promise.all([mutate('/current-user-details'), mutateMembers()]);
+        reset(_values, {
+          keepDirty: false,
+          keepDirtyValues: false
+        });
+        showMessage('Profile updated', 'success');
+      })();
+    }
+  }
+
+  return {
+    values,
+    isValid,
+    isDirty,
+    errors,
+    onFormChange,
+    isSubmitting,
+    onSubmit
   };
 }

@@ -56,9 +56,7 @@ export function MemberPropertiesWidget({
       (property) =>
         (Array.isArray(property.value) ? property.value.length !== 0 : !!property.value) &&
         // These are not shown in member properties, so even if their value exist we don't want to show them
-        !(['bio', 'discord', 'twitter', 'linked_in', 'github', 'timezone'] as MemberPropertyType[]).includes(
-          property.type
-        )
+        !(['bio', 'discord', 'timezone'] as MemberPropertyType[]).includes(property.type)
     );
 
   function openPropertiesForm() {
@@ -88,7 +86,7 @@ export function MemberPropertiesWidget({
         <MemberProperties properties={currentSpacePropertyNonEmptyValues} />
       </ProfileWidget>
       {showPropertiesForm && space && user && (
-        <MemberPropertiesFormDialog spaceId={space.id} userId={userId} onClose={hidePropertiesForm} />
+        <MemberPropertiesFormDialog userId={userId} onClose={hidePropertiesForm} />
       )}
     </>
   );

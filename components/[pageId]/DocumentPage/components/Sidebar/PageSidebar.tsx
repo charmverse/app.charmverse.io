@@ -1,23 +1,25 @@
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
-import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { MessageOutlined, RateReviewOutlined } from '@mui/icons-material';
-import { Box, IconButton, Slide, SvgIcon, Tooltip, Typography } from '@mui/material';
+import { Box, IconButton, Slide, Tooltip, Typography } from '@mui/material';
 import type { EditorState } from 'prosemirror-state';
 import { memo } from 'react';
-import { RiChatCheckLine } from 'react-icons/ri';
 
-import { useGetAllReviewerUserIds, useGetProposalDetails } from 'charmClient/hooks/proposals';
-import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
+import { EvaluationSettingsSidebar } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/EvaluationSettingsSidebar';
+import type { Props as ProposalSettingsProps } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/EvaluationSettingsSidebar';
+import type { Props as EvaluationSidebarProps } from 'components/proposals/ProposalPage/components/EvaluationSidebar/EvaluationSidebar';
+import { EvaluationSidebar } from 'components/proposals/ProposalPage/components/EvaluationSidebar/EvaluationSidebar';
+import { OldProposalEvaluationSidebar } from 'components/proposals/ProposalPage/components/EvaluationSidebar/OldProposalEvaluationSidebar';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useMdScreen } from 'hooks/useMediaScreens';
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
+
+import type { PageSidebarView } from '../../hooks/usePageSidebar';
 
 import { CommentsSidebar } from './components/CommentsSidebar';
 import { PageSidebarViewToggle } from './components/PageSidebarViewToggle';
-import { ProposalSidebar } from './components/ProposalSidebar/ProposalSidebar';
 import { SuggestionsSidebar } from './components/SuggestionsSidebar';
+import { SIDEBAR_VIEWS } from './constants';
 
 const DesktopContainer = styled.div`
   position: fixed;
@@ -33,56 +35,55 @@ const DesktopContainer = styled.div`
   border-left: 1px solid var(--input-border);
 `;
 
-export const SIDEBAR_VIEWS = {
-  proposal_evaluation: {
-    icon: <SvgIcon component={RiChatCheckLine} fontSize='small' sx={{ mb: '1px' }} />,
-    tooltip: 'View evaluation',
-    title: 'Evaluation'
-  },
-  comments: {
-    icon: <MessageOutlined fontSize='small' />,
-    tooltip: 'View all comments',
-    title: 'Comments'
-  },
-  suggestions: {
-    icon: <RateReviewOutlined fontSize='small' />,
-    tooltip: 'View all suggestions',
-    title: 'Suggestions'
-  }
-} as const;
-
 type SidebarProps = {
   // eslint-disable-next-line react/no-unused-prop-types
   id: string;
-  pageId: string;
+  pageId?: string;
   spaceId: string;
-  threads: Record<string, ThreadWithComments | undefined>;
-  editorState: EditorState | null;
-  pagePermissions: PagePermissionFlags | null;
+  threads?: Record<string, ThreadWithComments | undefined>;
+  editorState?: EditorState | null;
+  pagePermissions?: PagePermissionFlags | null;
   sidebarView: PageSidebarView | null;
-  openSidebar: (view: PageSidebarView) => void;
+  openSidebar?: (view: PageSidebarView) => void; // leave undefined to hide navigation
+  openEvaluationSidebar?: (evaluationId?: string) => void;
+  readOnlyProposalPermissions?: boolean;
   // eslint-disable-next-line react/no-unused-prop-types
   closeSidebar: () => void;
-  proposalId: string | null;
+  proposalId?: string | null;
+  proposal?: EvaluationSidebarProps['proposal'];
+  proposalInput?: ProposalSettingsProps['proposal'];
+  onChangeEvaluation?: ProposalSettingsProps['onChangeEvaluation'];
+  refreshProposal?: VoidFunction;
+  proposalEvaluationId?: string | null;
+  isNewProposal?: boolean;
+  isProposalTemplate?: boolean;
+  readOnlyReviewers: boolean;
+  readOnlyRubricCriteria: boolean;
+  // eslint-disable-next-line react/no-unused-prop-types
+  disabledViews?: PageSidebarView[];
 };
 
 function PageSidebarComponent(props: SidebarProps) {
-  const { id, proposalId, sidebarView, openSidebar, closeSidebar } = props;
+  const { disabledViews = [], id, proposal, sidebarView, openSidebar, closeSidebar, isNewProposal } = props;
   const isMdScreen = useMdScreen();
+  const isCharmVerse = useIsCharmverseSpace();
   const isOpen = sidebarView !== null;
   const sidebarTitle = sidebarView && SIDEBAR_VIEWS[sidebarView]?.title;
-  const { data: proposal, mutate: refreshProposal } = useGetProposalDetails(proposalId);
-
-  const showEvaluationSidebar =
-    proposal?.evaluationType === 'rubric' &&
-    (proposal.status === 'evaluation_active' || proposal?.status === 'evaluation_closed');
+  const showEvaluationSidebarIcon =
+    (proposal?.evaluationType === 'rubric' &&
+      (proposal.status === 'evaluation_active' || proposal?.status === 'evaluation_closed')) ||
+    (isCharmVerse && !!proposal);
 
   function toggleSidebar() {
     if (sidebarView === null) {
-      openSidebar('comments');
+      openSidebar?.('comments');
     } else {
       closeSidebar();
     }
+  }
+
+  if (sidebarView && disabledViews.includes(sidebarView)) {
+    return null;
   }
 
   return isMdScreen ? (
@@ -113,15 +114,17 @@ function PageSidebarComponent(props: SidebarProps) {
             <Typography flexGrow={1} fontWeight={600} fontSize={20}>
               {sidebarTitle}
             </Typography>
-            <Box display='flex' alignItems='center' pr={1} justifyContent='flex-end'>
-              {showEvaluationSidebar && (
-                <SidebarViewIcon view='proposal_evaluation' activeView={sidebarView} onClick={openSidebar} />
-              )}
-              <SidebarViewIcon view='comments' activeView={sidebarView} onClick={openSidebar} />
-              <SidebarViewIcon view='suggestions' activeView={sidebarView} onClick={openSidebar} />
-            </Box>
+            {openSidebar && (
+              <SidebarNavigationIcons
+                activeView={sidebarView}
+                showEvaluationSidebarIcon={showEvaluationSidebarIcon}
+                openSidebar={openSidebar}
+                isNewProposal={!!isNewProposal}
+                disabledViews={disabledViews}
+              />
+            )}
           </Box>
-          <SidebarContents {...props} proposal={proposal} refreshProposal={refreshProposal} />
+          <SidebarContents {...props} />
         </Box>
       </DesktopContainer>
     </Slide>
@@ -131,20 +134,58 @@ function PageSidebarComponent(props: SidebarProps) {
       open={isOpen}
       onClose={closeSidebar}
       rightActions={
-        <Box display='flex' alignItems='center' pr={1} justifyContent='flex-end'>
-          {showEvaluationSidebar && (
-            <SidebarViewIcon view='proposal_evaluation' size='medium' activeView={sidebarView} onClick={openSidebar} />
-          )}
-          <SidebarViewIcon view='comments' size='medium' activeView={sidebarView} onClick={openSidebar} />
-          <SidebarViewIcon view='suggestions' size='medium' activeView={sidebarView} onClick={openSidebar} />
-        </Box>
+        openSidebar && (
+          <SidebarNavigationIcons
+            disabledViews={disabledViews}
+            activeView={sidebarView}
+            showEvaluationSidebarIcon={showEvaluationSidebarIcon}
+            openSidebar={openSidebar}
+            isNewProposal={!!isNewProposal}
+          />
+        )
       }
-      contentSx={{ pr: 0, pb: 0, pl: 1 }}
+      contentSx={{ pb: 0, px: 1 }}
     >
       <Box display='flex' gap={1} flexDirection='column' flex={1} height='100%'>
-        <SidebarContents {...props} proposal={proposal} refreshProposal={refreshProposal} />
+        <SidebarContents {...props} />
       </Box>
     </MobileDialog>
+  );
+}
+
+function SidebarNavigationIcons({
+  showEvaluationSidebarIcon,
+  openSidebar,
+  activeView,
+  isNewProposal,
+  disabledViews = []
+}: {
+  showEvaluationSidebarIcon: boolean;
+  openSidebar: (view: PageSidebarView) => void;
+  activeView?: PageSidebarView | null;
+  isNewProposal: boolean;
+  disabledViews?: PageSidebarView[];
+}) {
+  return (
+    <Box display='flex' alignItems='center' pr={1} justifyContent='flex-end'>
+      {showEvaluationSidebarIcon && !disabledViews.includes('proposal_evaluation') && (
+        <SidebarViewIcon
+          view='proposal_evaluation'
+          isActive={!!activeView?.includes('proposal')}
+          onClick={openSidebar}
+        />
+      )}
+      {!isNewProposal && (
+        <>
+          {!disabledViews.includes('comments') && (
+            <SidebarViewIcon view='comments' isActive={activeView === 'comments'} onClick={openSidebar} />
+          )}
+          {!disabledViews.includes('suggestions') && (
+            <SidebarViewIcon view='suggestions' isActive={activeView === 'suggestions'} onClick={openSidebar} />
+          )}
+        </>
+      )}
+    </Box>
   );
 }
 
@@ -153,33 +194,68 @@ function SidebarContents({
   pageId,
   spaceId,
   pagePermissions,
+  readOnlyProposalPermissions,
   editorState,
   threads,
   openSidebar,
+  openEvaluationSidebar,
   proposalId,
+  proposalEvaluationId,
   proposal,
-  refreshProposal
-}: SidebarProps & { proposal?: ProposalWithUsersAndRubric; refreshProposal: VoidFunction }) {
+  proposalInput,
+  onChangeEvaluation,
+  refreshProposal,
+  isProposalTemplate,
+  isNewProposal,
+  readOnlyReviewers,
+  readOnlyRubricCriteria
+}: SidebarProps) {
+  const isCharmVerse = useIsCharmverseSpace();
   return (
     <>
-      {sidebarView === 'proposal_evaluation' && (
-        <ProposalSidebar
-          pageId={pageId}
-          proposal={proposal}
-          proposalId={proposalId}
-          refreshProposal={refreshProposal}
+      {sidebarView === 'proposal_evaluation' &&
+        (isCharmVerse ? (
+          <EvaluationSidebar
+            pageId={pageId}
+            proposal={proposal}
+            isTemplate={isProposalTemplate}
+            isNewProposal={isNewProposal}
+            evaluationId={proposalEvaluationId}
+            refreshProposal={refreshProposal}
+            goToSettings={() => {
+              openSidebar?.('proposal_evaluation_settings');
+            }}
+          />
+        ) : (
+          <OldProposalEvaluationSidebar pageId={pageId} proposalId={proposalId} />
+        ))}
+      {sidebarView === 'proposal_evaluation_settings' && (
+        <EvaluationSettingsSidebar
+          proposal={proposalInput}
+          readOnly={!!readOnlyProposalPermissions}
+          showHeader={!isNewProposal && !isProposalTemplate}
+          onChangeEvaluation={onChangeEvaluation}
+          readOnlyReviewers={!!readOnlyReviewers}
+          readOnlyRubricCriteria={!!readOnlyRubricCriteria}
+          goToEvaluation={(evaluationId) => {
+            openEvaluationSidebar?.(evaluationId);
+          }}
         />
       )}
       {sidebarView === 'suggestions' && (
         <SuggestionsSidebar
-          pageId={pageId}
+          pageId={pageId!}
           spaceId={spaceId}
           readOnly={!pagePermissions?.edit_content}
           state={editorState}
         />
       )}
       {sidebarView === 'comments' && (
-        <CommentsSidebar openSidebar={openSidebar} threads={threads} canCreateComments={!!pagePermissions?.comment} />
+        <CommentsSidebar
+          openSidebar={openSidebar!}
+          threads={threads || {}}
+          canCreateComments={!!pagePermissions?.comment}
+        />
       )}
     </>
   );
@@ -187,18 +263,18 @@ function SidebarContents({
 
 function SidebarViewIcon({
   view,
-  activeView,
+  isActive,
   size = 'small',
   onClick
 }: {
-  activeView: PageSidebarView | null;
+  isActive: boolean;
   view: PageSidebarView;
   size?: 'small' | 'medium';
   onClick: (view: PageSidebarView) => void;
 }) {
   return (
     <Tooltip title={SIDEBAR_VIEWS[view].tooltip}>
-      <IconButton color={activeView === view ? 'inherit' : 'secondary'} size={size} onClick={() => onClick(view)}>
+      <IconButton color={isActive ? 'inherit' : 'secondary'} size={size} onClick={() => onClick(view)}>
         {SIDEBAR_VIEWS[view].icon}
       </IconButton>
     </Tooltip>

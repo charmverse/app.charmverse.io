@@ -17,6 +17,7 @@ import SubjectIcon from '@mui/icons-material/Subject';
 import TextIcon from '@mui/icons-material/TextFields';
 import { ListItemIcon, ListItemText } from '@mui/material';
 import type { ReactNode } from 'react';
+import { FaGoogle, FaTelegramPlane, FaWallet } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
 
 import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
@@ -39,9 +40,11 @@ export const MemberPropertyIcons: Record<MemberPropertyType, ReactNode> = {
   twitter: <FaXTwitter width={18.5} height={18.5} />,
   linked_in: <LinkedInIcon width={18.5} height={18.5} />,
   github: <GithubIcon fontSize='small' />,
-  name: <DriveFileRenameOutlineIcon fontSize='small' />,
   bio: <PersonIcon fontSize='small' />,
-  join_date: <CalendarMonthIcon fontSize='small' />
+  join_date: <CalendarMonthIcon fontSize='small' />,
+  google: <FaGoogle fontSize='small' />,
+  telegram: <FaTelegramPlane fontSize='small' />,
+  wallet: <FaWallet fontSize='small' />
 };
 
 type Props = {

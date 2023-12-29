@@ -5,6 +5,7 @@ import { AppThemeProvider } from '../theme/AppThemeProvider';
 import { initialize, mswLoader } from 'msw-storybook-addon';
 import { IntlProvider } from 'react-intl';
 import ReactDndProvider from '../components/common/ReactDndProvider';
+import { LocalizationProvider } from '../components/_app/LocalizationProvider';
 
 import '@bangle.dev/tooltip/style.css';
 import 'prosemirror-menu/style/menu.css';
@@ -74,6 +75,7 @@ const preview: Preview = {
         { name: 'light', value: '#fff' }
       ]
     },
+    layout: 'fullscreen', // removes padding around the views
     actions: { argTypesRegex: '^on[A-Z].*' },
     controls: {
       matchers: {
@@ -124,7 +126,9 @@ export const globalProviders = (Story, context) => {
     <WagmiConfig config={wagmiConfig}>
       <IntlProvider locale='en'>
         <ReactDndProvider>
-          <Story />
+          <LocalizationProvider>
+            <Story />
+          </LocalizationProvider>
         </ReactDndProvider>
       </IntlProvider>
     </WagmiConfig>

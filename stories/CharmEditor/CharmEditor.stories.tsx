@@ -2,7 +2,7 @@ import { Divider, Paper } from '@mui/material';
 import { useState } from 'react';
 import { Provider } from 'react-redux';
 
-import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
+import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import CharmEditorComponent from 'components/common/CharmEditor/CharmEditor';
@@ -26,9 +26,9 @@ export default {
     (Story: any) => (
       <Provider store={store}>
         <Paper sx={{ p: 4 }}>
-          <Container>
+          <PageEditorContainer>
             <Story />
-          </Container>
+          </PageEditorContainer>
         </Paper>
       </Provider>
     )

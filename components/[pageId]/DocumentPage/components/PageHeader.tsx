@@ -12,6 +12,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { memo, useCallback, useState } from 'react';
 
+import { PageParentChip } from 'components/[pageId]/DocumentPage/components/PageParentChip';
 import { BlockIcons } from 'components/common/BoardEditor/focalboard/src/blockIcons';
 import { randomEmojiList } from 'components/common/BoardEditor/focalboard/src/emojiList';
 import { CustomEmojiPicker } from 'components/common/CustomEmojiPicker';
@@ -73,6 +74,9 @@ type PageHeaderProps = {
   updatedAt: string;
   readOnlyTitle?: boolean;
   placeholder?: string;
+  parentId?: string | null;
+  insideModal?: boolean;
+  pageId?: string;
 };
 
 function PageHeader({
@@ -83,7 +87,10 @@ function PageHeader({
   title,
   updatedAt,
   readOnlyTitle,
-  placeholder
+  placeholder,
+  parentId,
+  insideModal,
+  pageId
 }: PageHeaderProps) {
   function updateTitle(page: { title: string; updatedAt: any }) {
     setPage(page);
@@ -102,6 +109,7 @@ function PageHeader({
         readOnly={readOnly}
         setPage={setPage}
       />
+      <PageParentChip insideModal={insideModal} pageId={pageId} parentId={parentId} />
       <PageTitleInput
         readOnly={readOnly || readOnlyTitle}
         value={title}
@@ -132,6 +140,7 @@ function PageControls({
     const _icon = randomEmojiList[randomIntFromInterval(0, randomEmojiList.length - 1)];
     setPage({ icon: _icon });
   }
+
   return (
     <Controls className='page-controls'>
       {!readOnly && !icon && (

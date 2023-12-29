@@ -68,15 +68,15 @@ async function updateRewardBlocksHandler(req: NextApiRequest, res: NextApiRespon
 
 async function deleteRewardBlocksHandler(req: NextApiRequest, res: NextApiResponse<string[]>) {
   const userId = req.session.user.id;
-  const data = req.body as string[];
+  const blockIds = typeof req.query.blockIds === 'string' ? [req.query.blockIds] : req.query.blockIds;
 
   await deleteBlocks({
-    blocksData: data,
+    blocksData: blockIds || [],
     userId,
     spaceId: req.query.id as string
   });
 
-  return res.status(200).json(data);
+  return res.status(200).json(blockIds || []);
 }
 
 export default withSessionRoute(handler);

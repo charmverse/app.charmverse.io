@@ -3,13 +3,13 @@ import type { PluginKey } from 'prosemirror-state';
 import { useCallback, memo, useEffect, useMemo } from 'react';
 
 import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
-import type { FeatureJson } from 'components/common/PageLayout/components/Sidebar/constants';
-import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/constants';
 import type { PageListItem } from 'components/common/PagesList';
 import { PagesList } from 'components/common/PagesList';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { usePages } from 'hooks/usePages';
+import type { FeatureJson } from 'lib/features/constants';
+import { STATIC_PAGES } from 'lib/features/constants';
 import { insertLinkedPage } from 'lib/prosemirror/insertLinkedPage';
 import { safeScrollIntoViewIfNeeded } from 'lib/utilities/browser';
 import { stringSimilarity } from 'lib/utilities/strings';

@@ -92,7 +92,7 @@ const GalleryCard = React.memo((props: Props) => {
               updatedBy={cardPage?.updatedBy || ''}
               syncWithPageId={cardPage.syncWithPageId}
               board={board}
-              readOnly={true}
+              readOnly
               card={card}
               propertyTemplate={template}
               showEmptyPlaceholder={false}

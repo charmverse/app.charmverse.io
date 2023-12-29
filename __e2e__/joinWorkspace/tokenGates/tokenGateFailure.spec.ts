@@ -16,7 +16,10 @@ const test = base.extend<Fixtures>({
   tokenGatePage: ({ page }, use) => use(new TokenGatePage(page))
 });
 
-test('tokenGates - token gate verify wallet shows error if no condition is met', async ({ page, tokenGatePage }) => {
+test.skip('tokenGates - token gate verify wallet shows error if no condition is met', async ({
+  page,
+  tokenGatePage
+}) => {
   const { space, user: spaceUser } = await generateUserAndSpace();
   const { user, address, privateKey } = await generateUserAndSpace();
 

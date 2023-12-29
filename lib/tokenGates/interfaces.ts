@@ -1,21 +1,39 @@
-import type { TokenGate as PrismaTokenGate } from '@charmverse/core/prisma';
+import type { TokenGate as PrismaTokenGate, Role } from '@charmverse/core/prisma';
 import type { HumanizedAccsProps } from '@lit-protocol/types';
 
 export type TokenGateJoinType = 'public_bounty_token_gate' | 'token_gate';
 
-type TokenGateFields = Pick<PrismaTokenGate, 'createdAt' | 'id'>;
-
-// TODO: Verify chains is being used by Lit, even tho its not on lit's types
-export type TokenGateConditions = HumanizedAccsProps & { chains?: string[] };
-
-export type TokenGate = TokenGateFields & {
-  conditions: TokenGateConditions;
+export type TokenGateFields = Pick<PrismaTokenGate, 'createdAt' | 'id' | 'spaceId'> & {
   resourceId: any;
 };
-export type TokenGateWithRoles = TokenGate & {
-  tokenGateToRoles: { role: { id: string; name: string } }[];
+
+export type Lock = {
+  name?: string; // lock name
+  contract: string; // lock contract address
+  chainId: number; // lock chain id
+  image?: string; // lock image
 };
 
+// TODO: Verify chains is being used by Lit, even tho its not on lit's types
+export type LitTokenGateConditions = HumanizedAccsProps & { chains?: string[] };
+
+export type LockConditions = { conditions: Lock; type: 'unlock' };
+
+export type LitConditions = { conditions: LitTokenGateConditions; type: 'lit' };
+
+export type TokenGateConditions = LitConditions | LockConditions;
+
+type TokenGateOptions = TokenGateConditions & TokenGateFields;
+
+export type TokenGate<T extends TokenGateOptions['type'] | undefined = undefined> = T extends undefined
+  ? TokenGateOptions
+  : Extract<TokenGateOptions, { type: T }>;
+
+type WithRoles = {
+  tokenGateToRoles: { role: Pick<Role, 'id' | 'name'> }[];
+};
+
+export type TokenGateWithRoles<T extends TokenGateOptions['type'] | undefined = undefined> = TokenGate<T> & WithRoles;
 export type TokenGateAccessType =
   | 'individual_wallet'
   | 'individual_nft'

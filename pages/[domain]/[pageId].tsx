@@ -17,36 +17,39 @@ import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { getCustomDomainFromHost } from 'lib/utilities/domains/getCustomDomainFromHost';
 import { getPagePath } from 'lib/utilities/domains/getPagePath';
+import { isUUID } from 'lib/utilities/strings';
 import type { GlobalPageProps } from 'pages/_app';
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { domain, pageId: pagePath } = ctx.params ?? {};
 
-  if (domain && pagePath) {
+  if (typeof domain === 'string' && typeof pagePath === 'string') {
     const page = await prisma.page.findFirst({
-      where: {
-        OR: [
-          {
-            path: pagePath as string
+      where: isUUID(pagePath)
+        ? { id: pagePath }
+        : {
+            OR: [
+              {
+                path: pagePath
+              },
+              {
+                additionalPaths: {
+                  has: pagePath
+                }
+              }
+            ],
+            space: {
+              OR: [
+                {
+                  domain
+                },
+                {
+                  customDomain: domain,
+                  isCustomDomainVerified: true
+                }
+              ]
+            }
           },
-          {
-            additionalPaths: {
-              has: pagePath as string
-            }
-          }
-        ],
-        space: {
-          OR: [
-            {
-              domain: domain as string
-            },
-            {
-              customDomain: domain as string,
-              isCustomDomainVerified: true
-            }
-          ]
-        }
-      },
       select: {
         title: true,
         path: true,
@@ -67,14 +70,18 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       }
     });
 
-    if (page && typeof domain === 'string') {
+    if (page) {
       if (page.path !== pagePath) {
+        const sanitizedQuery = { ...ctx.query };
+        // strip out parameters from the path
+        delete sanitizedQuery.domain;
+        delete sanitizedQuery.pageId;
         return {
           redirect: {
             destination: getPagePath({
               hostName: ctx.req.headers.host,
               path: page.path,
-              query: ctx.query,
+              query: sanitizedQuery,
               spaceDomain: domain
             }),
             permanent: false

@@ -9,21 +9,20 @@ import PrimaryButton from 'components/common/PrimaryButton';
 import { EmailAddressForm } from 'components/login/components/EmailAddressForm';
 import { WalletSign } from 'components/login/components/WalletSign';
 import { AddWalletStep } from 'components/settings/account/components/AddWalletStep';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCustomDomain } from 'hooks/useCustomDomain';
 import { useDiscordConnection } from 'hooks/useDiscordConnection';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useGoogleLogin } from 'hooks/useGoogleLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useTelegramConnect } from 'hooks/useTelegramConnect';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import { lowerCaseEqual } from 'lib/utilities/strings';
-import type { LoggedInUser } from 'models';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import IdentityProviderItem from './IdentityProviderItem';
-import { loginWithTelegram, TELEGRAM_BOT_ID } from './TelegramLoginIframe';
+import { TELEGRAM_BOT_ID } from './TelegramLoginIframe';
 
 type Props = {
   isOpen: boolean;
@@ -40,8 +39,7 @@ const modalTitles: Record<IdentityStepToAdd, string> = {
 export function NewIdentityModal({ isOpen, onClose }: Props) {
   const { isConnectingIdentity } = useWeb3ConnectionManager();
   const { account, isSigning, setAccountUpdatePaused } = useWeb3Account();
-  const { user, setUser, updateUser } = useUser();
-  const { space } = useCurrentSpace();
+  const { user, updateUser } = useUser();
   const { showMessage } = useSnackbar();
   const { requestMagicLinkViaFirebase } = useFirebaseAuth();
   const sendingMagicLink = useRef(false);
@@ -63,28 +61,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
 
   const isConnectingWallet = isConnectingIdentity || isVerifyingWallet || isSigning;
 
-  const { trigger: connectToTelegram, isMutating: isConnectingToTelegram } = useSWRMutation(
-    '/telegram/connect',
-    (_url, { arg }: Readonly<{ arg: TelegramAccount }>) => charmClient.connectTelegram(arg),
-    {
-      onSuccess(data) {
-        setUser((_user: LoggedInUser) => ({ ..._user, telegramUser: data }));
-      },
-      onError(err) {
-        showMessage((err as any).message ?? 'Something went wrong', 'error');
-      }
-    }
-  );
-
-  async function connectTelegram() {
-    loginWithTelegram(async (_telegramAccount: TelegramAccount) => {
-      if (_telegramAccount) {
-        await connectToTelegram(_telegramAccount);
-      } else {
-        showMessage('Something went wrong. Please try again', 'warning');
-      }
-    });
-  }
+  const { connectTelegram, isConnectingToTelegram } = useTelegramConnect();
 
   const { connect, isConnected, isLoading: isDiscordLoading, popupLogin } = useDiscordConnection();
 
@@ -141,16 +118,12 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
               <WalletSign
                 buttonSize='small'
                 signSuccess={onSignSuccess}
-                loading={isVerifyingWallet || isSigning || isConnectingIdentity}
+                loading={isConnectingWallet}
                 enableAutosign={false}
               />
             </IdentityProviderItem>
           ) : (
-            <IdentityProviderItem
-              type='Wallet'
-              loading={isConnectingIdentity || isVerifyingWallet || isSigning}
-              text='Add wallet address'
-            >
+            <IdentityProviderItem type='Wallet' loading={isConnectingWallet} text='Add wallet address'>
               <PrimaryButton size='small' onClick={() => setIdentityToAdd('wallet')} disabled={isConnectingWallet}>
                 Connect
               </PrimaryButton>
@@ -195,7 +168,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
             <IdentityProviderItem type='Google'>
               <PrimaryButton
                 size='small'
-                onClick={async () => {
+                onClick={() => {
                   loginWithGooglePopup({ type: 'connect' });
                   onClose();
                 }}

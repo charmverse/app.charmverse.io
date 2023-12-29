@@ -1,13 +1,14 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import type { ReactNode } from 'react';
-import { createContext, useContext, useMemo } from 'react';
+import { createContext, useContext } from 'react';
 
-import type { BoardProposal } from 'components/proposals/components/ProposalProperties/hooks/useProposalsBoardAdapter';
-import { useProposalsBoardAdapter } from 'components/proposals/components/ProposalProperties/hooks/useProposalsBoardAdapter';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import type { ProposalPropertyValue } from 'lib/proposal/blocks/interfaces';
+
+import { useProposalsBoardAdapter } from '../ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter';
+import type { BoardProposal } from '../ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter';
 
 type ProposalsBoardContextType = {
   board: Board;

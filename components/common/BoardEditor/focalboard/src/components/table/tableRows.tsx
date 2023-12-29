@@ -1,6 +1,6 @@
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { Box, Typography } from '@mui/material';
-import type { ReactElement } from 'react';
+import type { Dispatch, ReactElement, SetStateAction } from 'react';
 import React, { useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -33,6 +33,8 @@ type Props = {
   expandSubRowsOnLoad?: boolean;
   rowExpansionLocalStoragePrefix?: string;
   subRowsEmptyValueContent?: ReactElement | string;
+  checkedIds?: string[];
+  setCheckedIds?: Dispatch<SetStateAction<string[]>>;
 };
 
 function TableRows(props: Props): JSX.Element {
@@ -42,7 +44,9 @@ function TableRows(props: Props): JSX.Element {
     activeView,
     onDeleteCard,
     expandSubRowsOnLoad,
-    subRowsEmptyValueContent
+    subRowsEmptyValueContent,
+    setCheckedIds,
+    checkedIds = []
   } = props;
 
   const hasSubPages = allCardPages.some((cardPage) => cardPage.subPages?.length);
@@ -87,12 +91,13 @@ function TableRows(props: Props): JSX.Element {
 
   return (
     <>
-      {cardPages.map(({ page, card, subPages }) => (
+      {cardPages.map(({ page, card, subPages, isStructuredProposal }) => (
         <TableRow
           key={card.id + card.updatedAt}
           board={board}
           activeView={activeView}
           card={card}
+          isStructuredProposal={isStructuredProposal}
           hasContent={page.hasContent}
           isSelected={props.selectedCardIds.includes(card.id)}
           focusOnMount={props.cardIdToFocusOnRender === card.id}
@@ -114,6 +119,8 @@ function TableRows(props: Props): JSX.Element {
           subPages={subPages}
           expandSubRowsOnLoad={expandSubRowsOnLoad}
           setIsExpanded={setIsExpanded}
+          setCheckedIds={setCheckedIds}
+          isChecked={checkedIds.includes(page.id)}
           emptySubPagesPlaceholder={
             page.bountyId ? (
               <Box

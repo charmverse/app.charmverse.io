@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { prisma } from '@charmverse/core/prisma-client';
-import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 
 /**
  * Publish or unpublish all cards in a board, and the board itself
@@ -32,7 +32,7 @@ async function toggleBoardPublishedState(boardId: string, publish: boolean): Pro
   }
 
   // Publish the board
-  await premiumPermissionsApiClient.pages.upsertPagePermission({
+  await permissionsApiClient.pages.upsertPagePermission({
     pageId: boardId,
     permission: {
       assignee: {
@@ -56,7 +56,7 @@ async function toggleBoardPublishedState(boardId: string, publish: boolean): Pro
   let processed = 0;
 
   for (const card of cardsInBoard) {
-    await premiumPermissionsApiClient.pages.upsertPagePermission({
+    await permissionsApiClient.pages.upsertPagePermission({
       pageId: card.id, permission: {
       assignee: {group: 'public'},
       permissionLevel: 'view'

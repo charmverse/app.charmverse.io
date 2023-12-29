@@ -2,6 +2,9 @@ import { log } from '@charmverse/core/log';
 import type { PageType } from '@charmverse/core/prisma-client';
 import type { ReactNode } from 'react';
 
+import type { FeatureJson } from 'lib/features/constants';
+import { constructFeaturesRecord } from 'lib/features/constructFeaturesRecord';
+import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import type {
   ApplicationCommentNotificationType,
   BountyNotification,
@@ -138,47 +141,46 @@ function getDocumentContent(n: DocumentNotification, actorUsername?: string): st
   });
 }
 
-function getBountyContent(n: BountyNotification, authorUsername?: string): string | ReactNode {
-  const { createdBy, type } = n;
+function getRewardContent({
+  notification,
+  rewardTitle,
+  authorUsername
+}: {
+  notification: BountyNotification;
+  authorUsername?: string;
+  rewardTitle: string;
+}): string | ReactNode {
+  const { createdBy, type } = notification;
   const username = authorUsername ?? createdBy?.username;
   switch (type) {
     case 'application.created': {
       return (
         <span>
-          <strong>{username}</strong> applied for a bounty
+          <strong>{username}</strong> applied for a {rewardTitle}
         </span>
       );
     }
     case 'submission.created': {
       return (
         <span>
-          <strong>{username}</strong> applied for a bounty
+          <strong>{username}</strong> applied for a {rewardTitle}
         </span>
       );
     }
     case 'application.approved': {
-      return `Your application for a reward was accepted`;
+      return `Your application for a ${rewardTitle} was accepted`;
     }
     case 'application.rejected': {
-      return `Your application for a reward has been rejected`;
+      return `Your application for a ${rewardTitle} has been rejected`;
     }
     case 'submission.approved': {
-      return `Your application for a reward was approved`;
+      return `Your application for a ${rewardTitle} was approved`;
     }
     case 'application.payment_pending': {
-      return `Payment required for a reward`;
+      return `Payment required for a ${rewardTitle}`;
     }
     case 'application.payment_completed': {
-      return `You have been paid for a reward`;
-    }
-    case 'suggestion.created': {
-      return username ? (
-        <span>
-          <strong>{username}</strong> suggested a new reward
-        </span>
-      ) : (
-        `New reward suggestion`
-      );
+      return `You have been paid for a ${rewardTitle}`;
     }
     default: {
       return '';
@@ -221,20 +223,34 @@ function getProposalContent(n: ProposalNotification, actorUsername?: string): st
   }
 }
 
-export function getNotificationMetadata(
-  notification: Notification,
-  actorUsername?: string
-): {
+export function getNotificationMetadata({
+  notification,
+  actorUsername,
+  spaceFeatures = []
+}: {
+  notification: Notification;
+  actorUsername?: string;
+  spaceFeatures: FeatureJson[];
+}): {
   href: string;
   content: ReactNode;
   pageTitle: string;
 } {
   const href = getNotificationUrl(notification);
+  const { mappedFeatures } = constructFeaturesRecord(spaceFeatures);
+
   try {
     switch (notification.group) {
       case 'bounty': {
         return {
-          content: getBountyContent(notification as BountyNotification, actorUsername),
+          content: getRewardContent({
+            notification: notification as BountyNotification,
+            authorUsername: actorUsername,
+            rewardTitle: getFeatureTitle({
+              featureTitle: 'reward',
+              mappedFeatures
+            })
+          }),
           href,
           pageTitle: notification.pageTitle
         };
@@ -249,12 +265,6 @@ export function getNotificationMetadata(
       }
 
       case 'document': {
-        const basePath =
-          notification.pageType === 'post'
-            ? `/forum/post/${notification.pagePath}`
-            : notification.pageType === 'bounty' && notification.applicationId
-            ? `/rewards/applications/${notification.applicationId}`
-            : `/${notification.pagePath}`;
         return {
           content: getDocumentContent(notification as DocumentNotification, actorUsername),
           href,

@@ -1,4 +1,5 @@
 import type { UnifiedAccessControlConditions } from '@lit-protocol/types';
+import { getChainById } from 'connectors/chains';
 import { parseEther } from 'viem';
 
 import type { FormValues } from '../hooks/useTokensForm';
@@ -7,12 +8,13 @@ export function getTokensUnifiedAccessControlConditions(
   values: FormValues
 ): UnifiedAccessControlConditions | undefined {
   const { chain, contract, quantity, check } = values;
+  const chainName = getChainById(Number(chain))?.litNetwork || 'ethereum';
   const amount = parseEther(quantity).toString();
 
   if (check === 'customToken') {
     return [
       {
-        chain,
+        chain: chainName,
         conditionType: 'evmBasic',
         contractAddress: contract,
         method: 'balanceOf',
@@ -29,7 +31,7 @@ export function getTokensUnifiedAccessControlConditions(
   if (check === 'token') {
     return [
       {
-        chain,
+        chain: chainName,
         conditionType: 'evmBasic',
         contractAddress: '',
         standardContractType: '',

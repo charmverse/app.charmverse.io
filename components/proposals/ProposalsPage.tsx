@@ -1,4 +1,4 @@
-import { Box, Divider, Grid, Stack, Typography } from '@mui/material';
+import { Box, Grid, Stack, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -9,6 +9,7 @@ import { ViewSettingsRow } from 'components/common/BoardEditor/components/ViewSe
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
 import ViewHeaderActionsMenu from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderActionsMenu';
+import { ViewHeaderRowsMenu } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderRowsMenu';
 import ViewSidebar from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import ErrorPage from 'components/common/errors/ErrorPage';
@@ -27,17 +28,19 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
+import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
+import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import { UpdateProposalRequest } from 'lib/proposal/updateProposal';
+import { isTruthy } from 'lib/utilities/types';
 
 import { useProposalDialog } from './components/ProposalDialog/hooks/useProposalDialog';
-import type { ProposalPageAndPropertiesInput } from './components/ProposalDialog/NewProposalPage';
 import { useProposals } from './hooks/useProposals';
 
 export function ProposalsPage({ title }: { title: string }) {
   const { space: currentSpace } = useCurrentSpace();
   const { isFreeSpace } = useIsFreeSpace();
-  const { proposals } = useProposals();
-  const [newProposal, setNewProposal] = useState<Partial<ProposalPageAndPropertiesInput> | null>(null);
+  const { proposals, mutateProposals } = useProposals();
   const loadingData = !proposals;
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
   const canSeeProposals = hasAccess || isFreeSpace || currentSpace?.publicProposals === true;
@@ -49,7 +52,8 @@ export function ProposalsPage({ title }: { title: string }) {
   const router = useRouter();
   const [showSidebar, setShowSidebar] = useState(false);
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
-
+  const [checkedIds, setCheckedIds] = useState<string[]>([]);
+  const { pages } = usePages();
   const groupByProperty = useMemo(() => {
     let _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
 
@@ -70,21 +74,11 @@ export function ProposalsPage({ title }: { title: string }) {
 
   function openPage(pageId: string | null) {
     if (!pageId) return;
-    const openPageIn = activeView?.fields.openPageIn ?? 'center_peek';
-    if (openPageIn === 'center_peek') {
-      updateURLQuery({ id: pageId });
-    } else if (openPageIn === 'full_page') {
-      navigateToSpacePath(`/${pageId}`);
-    }
+    navigateToSpacePath(`/${pageId}`);
   }
 
   function closeDialog() {
     updateURLQuery({ id: null });
-    setNewProposal(null);
-  }
-
-  function showNewProposal(input: Partial<ProposalPageAndPropertiesInput> = {}) {
-    setNewProposal(input);
   }
 
   const onDelete = useCallback(async (proposalId: string) => {
@@ -101,12 +95,60 @@ export function ProposalsPage({ title }: { title: string }) {
     }
   }, [router.query.id]);
 
+  async function deleteProposals(pageIds: string[]) {
+    for (const pageId of pageIds) {
+      const proposalId = pages[pageId]?.proposalId;
+      if (proposalId) {
+        try {
+          await charmClient.deletePage(proposalId);
+        } catch (err) {
+          //
+        }
+      }
+    }
+    await mutateProposals();
+  }
+
+  async function updateProposalsAuthor(pageIds: string[], authorIds: string[]) {
+    for (const pageId of pageIds) {
+      const proposalId = pages[pageId]?.proposalId;
+      if (proposalId) {
+        try {
+          await charmClient.proposals.updateProposal({
+            authors: authorIds,
+            proposalId
+          });
+        } catch (err) {
+          //
+        }
+      }
+    }
+    await mutateProposals();
+  }
+
   if (isLoadingAccess) {
     return null;
   }
 
   if (!canSeeProposals) {
     return <ErrorPage message='You cannot access proposals for this space' />;
+  }
+
+  const showViewHeaderRowsMenu = checkedIds.length !== 0 && activeBoard;
+
+  const propertyTemplates: IPropertyTemplate<PropertyType>[] = [];
+
+  if (activeView?.fields?.visiblePropertyIds.length) {
+    activeView.fields.visiblePropertyIds.forEach((propertyId) => {
+      const property = activeBoard?.fields.cardProperties.find((p) => p.id === propertyId);
+      if (property) {
+        propertyTemplates.push(property);
+      }
+    });
+  } else {
+    activeBoard?.fields.cardProperties.forEach((property) => {
+      propertyTemplates.push(property);
+    });
   }
 
   return (
@@ -128,36 +170,49 @@ export function ProposalsPage({ title }: { title: string }) {
                   flexDirection: 'row-reverse'
                 }}
               >
-                <NewProposalButton showProposal={openPage} showNewProposal={showNewProposal} />
+                <NewProposalButton />
               </Box>
             </Box>
           </Box>
         </DatabaseTitle>
-        <>
-          <Stack direction='row' alignItems='center' justifyContent='flex-end' mb={1} gap={1}>
-            <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
-
-            <ViewSortControl
-              activeBoard={activeBoard}
-              activeView={activeView}
-              cards={cards}
-              viewSortPopup={viewSortPopup}
-            />
-
-            {user && (
-              <ViewHeaderActionsMenu
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setShowSidebar(!showSidebar);
+        <Stack gap={0.75}>
+          <div className={`ViewHeader ${showViewHeaderRowsMenu ? 'view-header-rows-menu-visible' : ''}`}>
+            {showViewHeaderRowsMenu && (
+              <ViewHeaderRowsMenu
+                board={activeBoard}
+                cards={cards}
+                checkedIds={checkedIds}
+                setCheckedIds={setCheckedIds}
+                propertyTemplates={propertyTemplates}
+                onChange={() => {
+                  mutateProposals();
                 }}
+                onDelete={deleteProposals}
+                onProposalAuthorSelect={updateProposalsAuthor}
               />
             )}
-          </Stack>
-          <Divider />
-
+            <div className='octo-spacer' />
+            <Box className='view-actions'>
+              <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
+              <ViewSortControl
+                activeBoard={activeBoard}
+                activeView={activeView}
+                cards={cards}
+                viewSortPopup={viewSortPopup}
+              />
+              {user && (
+                <ViewHeaderActionsMenu
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setShowSidebar(!showSidebar);
+                  }}
+                />
+              )}
+            </Box>
+          </div>
           <ViewSettingsRow activeView={activeView} canSaveGlobally={isAdmin} />
-        </>
+        </Stack>
       </DatabaseStickyHeader>
 
       {loadingData ? (
@@ -180,12 +235,13 @@ export function ProposalsPage({ title }: { title: string }) {
                   readOnly={!isAdmin}
                   disableAddingCards
                   showCard={openPage}
-                  readOnlyTitle
-                  readOnlyRows
+                  readOnlyTitle={!isAdmin}
                   cardIdToFocusOnRender=''
                   addCard={async () => {}}
                   onCardClicked={() => {}}
                   onDeleteCard={onDelete}
+                  setCheckedIds={setCheckedIds}
+                  checkedIds={checkedIds}
                 />
               </Box>
             ) : (
@@ -205,7 +261,7 @@ export function ProposalsPage({ title }: { title: string }) {
               view={activeView}
               isOpen={!!showSidebar}
               closeSidebar={() => setShowSidebar(false)}
-              hideLayoutSelectOptions
+              hideLayoutOptions
               hideSourceOptions
               hideGroupOptions
               hidePropertiesRow={!isAdmin}
@@ -218,9 +274,7 @@ export function ProposalsPage({ title }: { title: string }) {
           </Stack>
         </Box>
       )}
-      {(props.pageId || newProposal) && (
-        <ProposalDialog pageId={props.pageId} newProposal={newProposal} closeDialog={closeDialog} />
-      )}
+      {props.pageId && <ProposalDialog pageId={props.pageId} closeDialog={closeDialog} />}
     </DatabaseContainer>
   );
 }

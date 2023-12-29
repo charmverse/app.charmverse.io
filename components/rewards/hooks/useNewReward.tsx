@@ -17,10 +17,15 @@ export function useNewReward() {
   const [rewardValues, setRewardValuesRaw] = useState<UpdateableRewardFields>(emptyState());
   const { trigger: createRewardTrigger } = useCreateReward();
 
-  const setRewardValues = useCallback((partialFormInputs: Partial<UpdateableRewardFields>) => {
-    setContentUpdated(true);
-    setRewardValuesRaw((existingFormInputs) => ({ ...existingFormInputs, ...partialFormInputs }));
-  }, []);
+  const setRewardValues = useCallback(
+    (partialFormInputs: Partial<UpdateableRewardFields>, { skipDirty }: { skipDirty?: boolean } = {}) => {
+      if (!skipDirty) {
+        setContentUpdated(true);
+      }
+      setRewardValuesRaw((existingFormInputs) => ({ ...existingFormInputs, ...partialFormInputs }));
+    },
+    []
+  );
 
   const clearRewardValues = useCallback(() => {
     setRewardValuesRaw(emptyState());
@@ -34,7 +39,7 @@ export function useNewReward() {
       if (currentSpace) {
         setIsSaving(true);
 
-        const createdReward = await createRewardTrigger({
+        return createRewardTrigger({
           pageProps: pageValues?.linkedPageId
             ? undefined
             : {
@@ -54,15 +59,14 @@ export function useNewReward() {
             showMessage(err.message ?? 'Something went wrong', 'error');
             throw err;
           })
-          .then((reward) => {
+          .then(() => {
             setContentUpdated(false);
-            return reward;
+            return true;
           })
           .finally(() => {
             setIsSaving(false);
+            return false;
           });
-
-        return createdReward;
       }
     },
     [createRewardTrigger, rewardValues, currentSpace, showMessage]

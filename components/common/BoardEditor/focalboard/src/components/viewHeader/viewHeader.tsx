@@ -3,6 +3,7 @@ import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box, Stack, Tooltip } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
+import type { Dispatch, SetStateAction } from 'react';
 import React from 'react';
 import { mutate } from 'swr';
 
@@ -11,7 +12,7 @@ import { ViewSettingsRow } from 'components/common/BoardEditor/components/ViewSe
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
 import Link from 'components/common/Link';
 import { usePages } from 'hooks/usePages';
-import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 
@@ -24,6 +25,7 @@ import AddViewMenu from '../addViewMenu';
 import NewCardButton from './newCardButton';
 import ViewHeaderActionsMenu from './viewHeaderActionsMenu';
 import ViewHeaderDisplayByMenu from './viewHeaderDisplayByMenu';
+import { ViewHeaderRowsMenu } from './viewHeaderRowsMenu';
 import ViewTabs from './viewTabs';
 
 type Props = {
@@ -47,6 +49,8 @@ type Props = {
   showView: (viewId: string) => void;
   embeddedBoardPath?: string;
   toggleViewOptions: (open?: boolean) => void;
+  checkedIds?: string[];
+  setCheckedIds?: Dispatch<SetStateAction<string[]>>;
 };
 
 function ViewHeader(props: Props) {
@@ -66,7 +70,9 @@ function ViewHeader(props: Props) {
     onClickNewView,
     activeView,
     cards,
-    dateDisplayProperty
+    dateDisplayProperty,
+    checkedIds = [],
+    setCheckedIds
   } = props;
 
   const withDisplayBy = activeView?.fields.viewType === 'calendar';
@@ -91,36 +97,71 @@ function ViewHeader(props: Props) {
     }
   }
 
+  const propertyTemplates: IPropertyTemplate<PropertyType>[] = [];
+
+  if (activeView?.fields?.visiblePropertyIds.length) {
+    activeView.fields.visiblePropertyIds.forEach((propertyId) => {
+      const property = activeBoard?.fields.cardProperties.find((p) => p.id === propertyId);
+      if (property) {
+        propertyTemplates.push(property);
+      }
+    });
+  } else {
+    activeBoard?.fields.cardProperties.forEach((property) => {
+      propertyTemplates.push(property);
+    });
+  }
+
+  const showViewHeaderRowsMenu = checkedIds.length !== 0 && setCheckedIds && activeBoard;
+
   return (
     <Stack gap={0.75}>
-      <div key={viewsBoard.id} className={`ViewHeader ${props.showActionsOnHover ? 'hide-actions' : ''}`}>
-        <ViewTabs
-          onDeleteView={props.onDeleteView}
-          onClickNewView={onClickNewView}
-          board={viewsBoard}
-          views={views}
-          readOnly={props.readOnly}
-          showView={showView}
-          activeView={activeView}
-          disableUpdatingUrl={props.disableUpdatingUrl}
-          maxTabsShown={maxTabsShown}
-          openViewOptions={() => toggleViewOptions(true)}
-        />
-
-        {/* add a view */}
-
-        {!props.readOnly && views.length <= maxTabsShown && (
-          <Box className='view-actions' pt='4px'>
-            <AddViewMenu
-              board={viewsBoard}
-              activeView={activeView}
-              views={views}
-              showView={showView}
-              onClick={onClickNewView}
+      <div
+        key={viewsBoard.id}
+        className={`ViewHeader ${showViewHeaderRowsMenu ? 'view-header-rows-menu-visible' : ''} ${
+          props.showActionsOnHover ? 'hide-actions' : ''
+        }`}
+      >
+        {showViewHeaderRowsMenu ? (
+          <div style={{ marginBottom: 4 }}>
+            <ViewHeaderRowsMenu
+              board={activeBoard}
+              cards={cards}
+              checkedIds={checkedIds}
+              setCheckedIds={setCheckedIds}
+              propertyTemplates={propertyTemplates}
             />
-          </Box>
-        )}
+          </div>
+        ) : (
+          <>
+            <ViewTabs
+              onDeleteView={props.onDeleteView}
+              onClickNewView={onClickNewView}
+              board={viewsBoard}
+              views={views}
+              readOnly={props.readOnly}
+              showView={showView}
+              activeView={activeView}
+              disableUpdatingUrl={props.disableUpdatingUrl}
+              maxTabsShown={maxTabsShown}
+              openViewOptions={() => toggleViewOptions(true)}
+            />
 
+            {/* add a view */}
+
+            {!props.readOnly && views.length <= maxTabsShown && (
+              <Box className='view-actions' pt='4px'>
+                <AddViewMenu
+                  board={viewsBoard}
+                  activeView={activeView}
+                  views={views}
+                  showView={showView}
+                  onClick={onClickNewView}
+                />
+              </Box>
+            )}
+          </>
+        )}
         <div className='octo-spacer' />
 
         <Box className='view-actions'>

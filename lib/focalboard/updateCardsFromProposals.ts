@@ -5,6 +5,7 @@ import { prismaToBlock } from 'lib/focalboard/block';
 import { extractCardProposalProperties } from 'lib/focalboard/extractCardProposalProperties';
 import { extractDatabaseProposalProperties } from 'lib/focalboard/extractDatabaseProposalProperties';
 import { InvalidStateError } from 'lib/middleware';
+import { canAccessPrivateFields } from 'lib/proposal/form/canAccessPrivateFields';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   ProposalRubricCriteriaWithTypedParams
@@ -17,6 +18,7 @@ import { createCardPage } from '../pages/createCardPage';
 import type { BoardFields } from './board';
 import { generateResyncedProposalEvaluationForCard } from './generateResyncedProposalEvaluationForCard';
 import { setDatabaseProposalProperties } from './setDatabaseProposalProperties';
+import { updateCardFormFieldPropertiesValue } from './updateCardFormFieldPropertiesValue';
 
 export async function updateCardsFromProposals({
   boardId,
@@ -60,7 +62,29 @@ export async function updateCardsFromProposals({
           evaluationType: true,
           status: true,
           categoryId: true,
-          archived: true
+          archived: true,
+          createdBy: true,
+          formId: true,
+          authors: true,
+          spaceId: true,
+          id: true,
+          form: {
+            select: {
+              formFields: {
+                select: {
+                  id: true,
+                  type: true,
+                  private: true,
+                  answers: {
+                    select: {
+                      proposalId: true,
+                      value: true
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -154,6 +178,13 @@ export async function updateCardsFromProposals({
 
   for (const pageWithProposal of pageProposals) {
     const card = existingSyncedCardsWithBlocks[pageWithProposal.id];
+
+    const accessPrivateFields = await canAccessPrivateFields({
+      // Use the board creator to check if private fields are accessible
+      userId: boardBlock.createdBy,
+      proposal: pageWithProposal.proposal ?? undefined,
+      proposalId: pageWithProposal.proposal!.id
+    });
 
     if (card) {
       const { cardProposalCategory, cardProposalStatus, cardProposalUrl } = extractCardProposalProperties({
@@ -276,13 +307,26 @@ export async function updateCardsFromProposals({
         properties = updatedCardShape.fields;
       }
 
+      const formFields = pageWithProposal.proposal?.form?.formFields ?? [];
+      const boardBlockCardProperties = boardBlock.fields.cardProperties ?? [];
+
+      const formFieldProperties = await updateCardFormFieldPropertiesValue({
+        accessPrivateFields,
+        cardProperties: boardBlockCardProperties,
+        formFields,
+        proposalId: pageWithProposal.proposal!.id
+      });
+
       const _card = await createCardPage({
         title: pageWithProposal.title,
         boardId,
         spaceId: pageWithProposal.spaceId,
         createdAt,
         createdBy: userId,
-        properties,
+        properties: {
+          ...properties,
+          ...formFieldProperties
+        },
         hasContent: pageWithProposal.hasContent,
         content: pageWithProposal.content,
         contentText: pageWithProposal.contentText,

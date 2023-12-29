@@ -1,7 +1,5 @@
 import { log } from '@charmverse/core/log';
 
-import { isUUID } from 'lib/utilities/strings';
-
 import type { MixpanelEventMap, MixpanelEventName, MixpanelTrackBase } from './interfaces';
 import { mixpanel } from './mixpanel';
 import { eventNameToHumanFormat, paramsToHumanFormat, validateMixPanelEvent } from './utils';

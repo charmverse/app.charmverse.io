@@ -1,17 +1,16 @@
 import { UndesirableOperationError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { resolvePageTree } from '@charmverse/core/pages';
-import type { PermissionsClient } from '@charmverse/core/permissions';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { unsealData } from 'iron-session';
 import type { Socket } from 'socket.io';
 
-import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/constants';
+import { STATIC_PAGES } from 'lib/features/constants';
 import { ActionNotPermittedError } from 'lib/middleware';
 import { archivePages } from 'lib/pages/archivePages';
 import { createPage } from 'lib/pages/server/createPage';
-import { getPermissionsClient, premiumPermissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
@@ -34,8 +33,6 @@ export class SpaceEventHandler {
   spaceId: string | null = null;
 
   private relay: AbstractWebsocketBroadcaster;
-
-  private permissionsClient?: PermissionsClient;
 
   constructor(
     relay: AbstractWebsocketBroadcaster,
@@ -242,7 +239,7 @@ export class SpaceEventHandler {
           createdPage.spaceId
         );
 
-        await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
+        await permissionsApiClient.pages.setupPagePermissionsAfterEvent({
           event: 'created',
           pageId: createdPage.id
         });
@@ -356,7 +353,7 @@ export class SpaceEventHandler {
           }
         }
 
-        await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
+        await permissionsApiClient.pages.setupPagePermissionsAfterEvent({
           event: 'repositioned',
           pageId
         });
@@ -427,42 +424,40 @@ export class SpaceEventHandler {
         const { documentNode, documentRoom, participant, position, content } = pageDetails;
         const lastValidPos = dropPos ?? documentNode.content.size;
 
-        if (position !== null) {
-          return;
-        }
-
-        if (documentRoom && participant) {
-          await participant.handleDiff(
-            {
-              type: 'diff',
-              ds: SpaceEventHandler.generateInsertNestedPageDiffs({
+        if (position === null) {
+          if (documentRoom && participant) {
+            await participant.handleDiff(
+              {
+                type: 'diff',
+                ds: SpaceEventHandler.generateInsertNestedPageDiffs({
+                  pageId,
+                  pos: lastValidPos,
+                  path: pagePath,
+                  type: pageType
+                }),
+                doc: documentRoom.doc.content,
+                c: participant.messages.client,
+                s: participant.messages.server,
+                v: documentRoom.doc.version,
+                rid: 0,
+                cid: -1
+              },
+              {
+                socketEvent: 'page_reordered'
+              }
+            );
+          } else {
+            await this.applyDiffAndSaveDocument({
+              content,
+              pageId: newParentId,
+              diffs: SpaceEventHandler.generateInsertNestedPageDiffs({
                 pageId,
                 pos: lastValidPos,
                 path: pagePath,
                 type: pageType
-              }),
-              doc: documentRoom.doc.content,
-              c: participant.messages.client,
-              s: participant.messages.server,
-              v: documentRoom.doc.version,
-              rid: 0,
-              cid: -1
-            },
-            {
-              socketEvent: 'page_reordered'
-            }
-          );
-        } else {
-          await this.applyDiffAndSaveDocument({
-            content,
-            pageId: newParentId,
-            diffs: SpaceEventHandler.generateInsertNestedPageDiffs({
-              pageId,
-              pos: lastValidPos,
-              path: pagePath,
-              type: pageType
-            })
-          });
+              })
+            });
+          }
         }
 
         // Since this was not dropped in sidebar the auto update and broadcast won't be triggered from the frontend
@@ -482,7 +477,7 @@ export class SpaceEventHandler {
           },
           this.spaceId
         );
-        await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
+        await permissionsApiClient.pages.setupPagePermissionsAfterEvent({
           event: 'repositioned',
           pageId
         });
@@ -558,44 +553,42 @@ export class SpaceEventHandler {
         const { documentNode, documentRoom, participant, position, content } = pageDetails;
         const lastValidPos = documentNode.content.size;
 
-        if (position !== null) {
-          return;
-        }
-
-        if (documentRoom && participant) {
-          await participant.handleDiff(
-            {
-              type: 'diff',
-              ds: SpaceEventHandler.generateInsertNestedPageDiffs({
+        if (position === null) {
+          if (documentRoom && participant) {
+            await participant.handleDiff(
+              {
+                type: 'diff',
+                ds: SpaceEventHandler.generateInsertNestedPageDiffs({
+                  pageId,
+                  pos: lastValidPos,
+                  isLinkedPage,
+                  path: pagePath,
+                  type: pageType
+                }),
+                doc: documentRoom.doc.content,
+                c: participant.messages.client,
+                s: participant.messages.server,
+                v: documentRoom.doc.version,
+                rid: 0,
+                cid: -1
+              },
+              {
+                socketEvent: 'page_reordered'
+              }
+            );
+          } else {
+            await this.applyDiffAndSaveDocument({
+              content,
+              pageId: newParentId,
+              diffs: SpaceEventHandler.generateInsertNestedPageDiffs({
                 pageId,
                 pos: lastValidPos,
                 isLinkedPage,
                 path: pagePath,
                 type: pageType
-              }),
-              doc: documentRoom.doc.content,
-              c: participant.messages.client,
-              s: participant.messages.server,
-              v: documentRoom.doc.version,
-              rid: 0,
-              cid: -1
-            },
-            {
-              socketEvent: 'page_reordered'
-            }
-          );
-        } else {
-          await this.applyDiffAndSaveDocument({
-            content,
-            pageId: newParentId,
-            diffs: SpaceEventHandler.generateInsertNestedPageDiffs({
-              pageId,
-              pos: lastValidPos,
-              isLinkedPage,
-              path: pagePath,
-              type: pageType
-            })
-          });
+              })
+            });
+          }
         }
 
         if (!isLinkedPage && !isStaticPage && !isForumCategory) {
@@ -615,7 +608,7 @@ export class SpaceEventHandler {
             },
             this.spaceId
           );
-          await premiumPermissionsApiClient.pages.setupPagePermissionsAfterEvent({
+          await permissionsApiClient.pages.setupPagePermissionsAfterEvent({
             event: 'repositioned',
             pageId
           });
@@ -711,11 +704,8 @@ export class SpaceEventHandler {
 
       const { documentRoom, participant, content, position: _nodePos } = pageDetails;
       const position = nodePos ?? _nodePos;
-      if (position === null) {
-        return;
-      }
 
-      if (documentRoom && participant) {
+      if (documentRoom && participant && position !== null) {
         await participant.handleDiff(
           {
             type: 'diff',
@@ -736,17 +726,19 @@ export class SpaceEventHandler {
           { socketEvent: event }
         );
       } else {
-        await this.applyDiffAndSaveDocument({
-          content,
-          pageId,
-          diffs: [
-            {
-              from: position,
-              to: position + 1,
-              stepType: 'replace'
-            }
-          ]
-        });
+        if (position !== null) {
+          await this.applyDiffAndSaveDocument({
+            content,
+            pageId,
+            diffs: [
+              {
+                from: position,
+                to: position + 1,
+                stepType: 'replace'
+              }
+            ]
+          });
+        }
 
         // If the user is not in the document or the position of the page node is not found (present in sidebar)
         if (event === 'page_deleted') {
@@ -771,20 +763,7 @@ export class SpaceEventHandler {
   }
 
   async checkUserCanDeletePage({ pageId, parentId }: { pageId: string; parentId?: string | null }): Promise<void> {
-    const permissionsClient =
-      this.permissionsClient ??
-      (
-        await getPermissionsClient({
-          resourceId: pageId,
-          resourceIdType: 'page'
-        })
-      ).client;
-
-    if (!this.permissionsClient) {
-      this.permissionsClient = permissionsClient;
-    }
-
-    const childPagePermissions = await permissionsClient.pages.computePagePermissions({
+    const childPagePermissions = await permissionsApiClient.pages.computePagePermissions({
       resourceId: pageId,
       userId: this.userId as string
     });
@@ -792,7 +771,7 @@ export class SpaceEventHandler {
     let canDelete = childPagePermissions.edit_content || childPagePermissions.delete;
 
     if (!canDelete && parentId) {
-      const parentPagePermissions = await permissionsClient.pages.computePagePermissions({
+      const parentPagePermissions = await permissionsApiClient.pages.computePagePermissions({
         resourceId: parentId,
         userId: this.userId as string
       });

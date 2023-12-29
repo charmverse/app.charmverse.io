@@ -1,11 +1,12 @@
 import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma-client';
+import { Alert } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
-import { mutate } from 'swr';
 
-import charmClient from 'charmClient';
+import { ConnectedAccounts } from 'components/_app/components/ConnectedAccounts';
 import { Button } from 'components/common/Button';
+import type { FormFieldValue } from 'components/common/form/interfaces';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { MemberPropertiesForm } from 'components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesForm';
 import { DialogContainer } from 'components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesFormDialog';
@@ -13,17 +14,15 @@ import { ProfileWidgets } from 'components/members/components/MemberProfile/comp
 import { useMemberPropertyValues } from 'components/members/hooks/useMemberPropertyValues';
 import {
   useRequiredMemberProperties,
-  useRequiredMemberPropertiesForm
+  useRequiredMemberPropertiesForm,
+  useRequiredUserDetailsForm
 } from 'components/members/hooks/useRequiredMemberProperties';
 import Legend from 'components/settings/Legend';
-import type { EditableFields } from 'components/settings/profile/components/UserDetailsForm';
 import { UserDetailsForm } from 'components/settings/profile/components/UserDetailsForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePreventReload } from 'hooks/usePreventReload';
-import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 import type { LoggedInUser } from 'models';
 
 import type { OnboardingStep } from '../hooks/useOnboarding';
@@ -47,14 +46,19 @@ export function UserOnboardingDialogGlobal() {
 
 function LoggedInUserOnboardingDialog({ user, space }: { space: Space; user: LoggedInUser }) {
   const { onboardingStep, completeOnboarding } = useOnboarding({ user, spaceId: space.id });
+  const [isOnboardingModalOpen, setIsOnboardingModalOpen] = useState(false);
 
   useEffect(() => {
     log.info('[user-journey] Show onboarding flow');
   }, []);
 
-  const { nonEmptyRequiredProperties } = useRequiredMemberProperties({
+  const { hasEmptyRequiredProperties, isLoadingMemberProperties, isLoadingUserDetails } = useRequiredMemberProperties({
     userId: user.id
   });
+
+  if (isLoadingMemberProperties || isLoadingUserDetails) {
+    return null;
+  }
 
   if (onboardingStep) {
     return (
@@ -64,12 +68,22 @@ function LoggedInUserOnboardingDialog({ user, space }: { space: Space; user: Log
         initialStep={onboardingStep}
         currentUser={user}
         completeOnboarding={completeOnboarding}
+        hasEmptyRequiredProperties={hasEmptyRequiredProperties}
+        setIsOnboardingModalOpen={setIsOnboardingModalOpen}
       />
     );
   }
 
-  if (nonEmptyRequiredProperties) {
-    return <UserOnboardingDialog space={space} key={user.id} currentUser={user} />;
+  if (hasEmptyRequiredProperties || isOnboardingModalOpen) {
+    return (
+      <UserOnboardingDialog
+        space={space}
+        key={user.id}
+        currentUser={user}
+        hasEmptyRequiredProperties={hasEmptyRequiredProperties}
+        setIsOnboardingModalOpen={setIsOnboardingModalOpen}
+      />
+    );
   }
 
   return null;
@@ -82,81 +96,60 @@ function UserOnboardingDialog({
   currentUser,
   completeOnboarding,
   initialStep,
-  space
+  space,
+  hasEmptyRequiredProperties,
+  setIsOnboardingModalOpen
 }: {
   completeOnboarding?: () => Promise<void>;
   currentUser: LoggedInUser;
   initialStep?: OnboardingStep;
   space: Space;
+  hasEmptyRequiredProperties?: boolean;
+  setIsOnboardingModalOpen: (isOpen: boolean) => void;
 }) {
-  const [isLoading, setIsLoading] = useState(false);
-  const { showMessage } = useSnackbar();
+  const { requiredPropertiesWithoutValue } = useRequiredMemberProperties({
+    userId: currentUser.id
+  });
   const {
-    control,
-    isTimezoneRequired,
-    userDetails: defaultUserDetails,
-    isBioRequired,
-    errors,
-    isValid,
-    memberProperties,
-    nonEmptyRequiredProperties,
-    values,
-    requiredProperties
+    control: memberPropertiesControl,
+    errors: memberPropertiesErrors,
+    isValid: isMemberPropertiesValid,
+    onFormChange: onMemberPropertiesChange,
+    isDirty: isMemberPropertiesDirty,
+    isSubmitting: isMemberPropertiesSubmitting,
+    onSubmit: onSubmitMemberProperties
   } = useRequiredMemberPropertiesForm({
     userId: currentUser.id
   });
-  const { updateSpaceValues, refreshPropertyValues } = useMemberPropertyValues(currentUser.id);
+
+  const {
+    errors: userDetailsErrors,
+    isValid: isUserDetailsValid,
+    values: userDetailsValues,
+    onFormChange: onUserDetailsChange,
+    isDirty: isUserDetailsDirty,
+    isSubmitting: isUserDetailsSubmitting,
+    onSubmit: onSubmitUserDetails
+  } = useRequiredUserDetailsForm({
+    userId: currentUser.id
+  });
+
+  const { refreshPropertyValues } = useMemberPropertyValues(currentUser.id);
   const confirmExitPopupState = usePopupState({ variant: 'popover', popupId: 'confirm-exit' });
-  const [userDetails, setUserDetails] = useState<EditableFields>({});
-  const [memberDetails, setMemberDetails] = useState<UpdateMemberPropertyValuePayload[]>([]);
-  const { mutateMembers } = useMembers();
-  const [isFormClean, setIsFormClean] = useState(true);
-  const isInputValid =
-    requiredProperties.length === 0 ||
-    (isValid && (!isTimezoneRequired || !!userDetails.timezone) && (!isBioRequired || !!userDetails.description));
 
-  useEffect(() => {
-    log.info('[user-journey] Show onboarding flow');
-  }, []);
+  const isFormDirty = isMemberPropertiesDirty || isUserDetailsDirty;
 
-  useEffect(() => {
-    setUserDetails({
-      description: defaultUserDetails?.description ?? '',
-      timezone: defaultUserDetails?.timezone ?? ''
-    });
-  }, [defaultUserDetails]);
-
-  function onUserDetailsChange(fields: EditableFields) {
-    setIsFormClean(false);
-    setUserDetails((_form) => ({ ..._form, ...fields }));
-  }
-
-  function onMemberDetailsChange(fields: UpdateMemberPropertyValuePayload[]) {
-    setIsFormClean(false);
-    setMemberDetails(fields);
-  }
-
-  usePreventReload(!isFormClean);
+  usePreventReload(isFormDirty);
 
   async function saveForm() {
-    setIsLoading(true);
-    if (isFormClean) {
-      await completeOnboarding?.();
-      setIsFormClean(true);
-      setIsLoading(false);
+    if (!isFormDirty) {
+      completeOnboarding?.();
       return;
     }
-    await charmClient.updateUserDetails(userDetails);
-    await updateSpaceValues(space.id, memberDetails);
-    await Promise.all([
-      mutateMembers(),
-      refreshPropertyValues(),
-      completeOnboarding?.(),
-      mutate('/current-user-details')
-    ]);
-    setIsFormClean(true);
-    showMessage('Profile updated', 'success');
-    setIsLoading(false);
+
+    await onSubmitMemberProperties();
+    await onSubmitUserDetails();
+    completeOnboarding?.();
   }
 
   const [currentStep, setCurrentStep] = useState<OnboardingStep>(initialStep || 'profile_step');
@@ -165,13 +158,18 @@ function UserOnboardingDialog({
     setCurrentStep('profile_step');
   }
 
-  const handleClose = () => {
-    // If there are required properties that must be filled, don't open the discard changes modal
-    if (nonEmptyRequiredProperties) {
-      return;
-    }
+  const hideCloseButton =
+    !isUserDetailsValid ||
+    !isMemberPropertiesValid ||
+    requiredPropertiesWithoutValue.some((requiredProperty) =>
+      ['discord', 'google', 'wallet', 'telegram'].includes(requiredProperty)
+    );
 
-    if (!isFormClean) {
+  const isSaveButtonDisabled = !isFormDirty || hideCloseButton;
+
+  const handleClose = () => {
+    setIsOnboardingModalOpen(false);
+    if (isFormDirty) {
       confirmExitPopupState.open();
     } else {
       completeOnboarding?.();
@@ -193,16 +191,16 @@ function UserOnboardingDialog({
       fluidSize={currentStep === 'email_step'}
       title={title}
       onClose={currentStep !== 'email_step' ? handleClose : undefined}
-      hideCloseButton={currentStep === 'email_step' || requiredProperties.length !== 0}
+      hideCloseButton={currentStep === 'email_step' || hideCloseButton}
       footerActions={
         currentStep === 'profile_step' ? (
           <Button
             disableElevation
             size='large'
             onClick={saveForm}
-            disabled={isFormClean || !isInputValid}
-            loading={isLoading}
-            disabledTooltip={isFormClean ? 'No changes to save' : 'Please fill out all required fields'}
+            loading={isUserDetailsSubmitting || isMemberPropertiesSubmitting}
+            disabled={isSaveButtonDisabled}
+            disabledTooltip={!isFormDirty ? 'No changes to save' : 'Please fill out all required fields'}
           >
             Save
           </Button>
@@ -213,22 +211,28 @@ function UserOnboardingDialog({
         <OnboardingEmailForm onClick={goNextStep} spaceId={space.id} />
       ) : currentStep === 'profile_step' ? (
         <>
+          {hasEmptyRequiredProperties ? <Alert severity='info'>Please fill out all required fields</Alert> : null}
           <UserDetailsForm
+            errors={userDetailsErrors}
+            userDetails={userDetailsValues}
             sx={{
               mt: 0
             }}
             user={currentUser}
             onChange={onUserDetailsChange}
-            memberProperties={memberProperties ?? []}
           />
+          <Legend mt={4}>Build Your Identity</Legend>
+          <ConnectedAccounts user={currentUser} setIsOnboardingModalOpen={setIsOnboardingModalOpen} />
           <Legend mt={4}>Member details</Legend>
           <MemberPropertiesForm
-            values={values}
-            control={control}
-            errors={errors}
-            properties={memberProperties}
+            control={memberPropertiesControl}
+            errors={memberPropertiesErrors}
             refreshPropertyValues={refreshPropertyValues}
-            onChange={onMemberDetailsChange}
+            onChange={(values) =>
+              onMemberPropertiesChange(
+                values.map(({ memberPropertyId, value }) => ({ id: memberPropertyId, value: value as FormFieldValue }))
+              )
+            }
             userId={currentUser.id}
             showCollectionOptions
           />

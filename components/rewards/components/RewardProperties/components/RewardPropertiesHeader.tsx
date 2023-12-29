@@ -53,7 +53,7 @@ export function RewardPropertiesHeader({ readOnly = false, reward, isExpanded, p
       {/* Reward price and status  */}
       <Grid container mb={1}>
         <Grid item xs={6}>
-          <ExpandableSectionTitle title='Reward details' isExpanded={isExpanded} toggleExpanded={toggleExpanded} />
+          <ExpandableSectionTitle title='Details' isExpanded={isExpanded} toggleExpanded={toggleExpanded} />
         </Grid>
         <Grid item xs={6}>
           <Box
