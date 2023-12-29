@@ -97,7 +97,7 @@ function Condition({
       <Box width='100%'>{textConditions.map(generateComponent).filter(isTruthy)}</Box>
       {onDelete && condition.content.some((c) => c.type !== 'operator') && (
         <Box>
-          <IconButton onClick={onDelete} disabled={isLoading}>
+          <IconButton onClick={onDelete} disabled={isLoading} color='default'>
             <CancelIcon />
           </IconButton>
         </Box>
