@@ -107,23 +107,6 @@ export function ProposalsPage({ title }: { title: string }) {
     await mutateProposals();
   }
 
-  async function updateProposalsAuthor(pageIds: string[], authorIds: string[]) {
-    for (const pageId of pageIds) {
-      const proposalId = pages[pageId]?.proposalId;
-      if (proposalId) {
-        try {
-          await charmClient.proposals.updateProposal({
-            authors: authorIds,
-            proposalId
-          });
-        } catch (err) {
-          //
-        }
-      }
-    }
-    await mutateProposals();
-  }
-
   if (isLoadingAccess) {
     return null;
   }
@@ -186,7 +169,6 @@ export function ProposalsPage({ title }: { title: string }) {
                   mutateProposals();
                 }}
                 onDelete={deleteProposals}
-                onProposalAuthorSelect={updateProposalsAuthor}
               />
             )}
             <div className='octo-spacer' />
