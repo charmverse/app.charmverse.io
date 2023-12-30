@@ -1,6 +1,6 @@
 import { rest } from 'msw';
 
-import { ProposalsPageWithProviders } from 'components/proposals/ProposalsPageWithProviders';
+import { ProposalsPageWithProviders } from 'components/proposals/ProposalsPageProviders';
 import { createMockPage } from 'testing/mocks/page';
 import { createMockProposal } from 'testing/mocks/proposal';
 import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
