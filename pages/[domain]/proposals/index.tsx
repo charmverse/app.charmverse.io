@@ -1,6 +1,7 @@
 import { useTrackPageView } from 'charmClient/hooks/track';
 import getPageLayout from 'components/common/PageLayout/getLayout';
-import { ProposalsPageWithProviders } from 'components/proposals/ProposalsPageWithProviders';
+import { ProposalsPage } from 'components/proposals/ProposalsPage';
+import { ProposalsPageProviders } from 'components/proposals/ProposalsPageProviders';
 import { useStaticPageTitle } from 'hooks/usePageTitle';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
@@ -11,7 +12,11 @@ export default function ProposalsPageComponent() {
 
   useStaticPageTitle(proposalTitle);
 
-  return <ProposalsPageWithProviders title={proposalTitle} />;
+  return (
+    <ProposalsPageProviders>
+      <ProposalsPage title={proposalTitle} />
+    </ProposalsPageProviders>
+  );
 }
 
 ProposalsPageComponent.getLayout = getPageLayout;
