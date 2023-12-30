@@ -170,9 +170,10 @@ function mapProposalToCardPage({
       proposal && 'reviewers' in proposal
         ? proposal.reviewers.map(
             (r) =>
-              ({ group: r.userId ? 'user' : 'role', id: r.userId ?? r.roleId } as TargetPermissionGroup<
-                'user' | 'role'
-              >)
+              ({
+                group: r.userId ? 'user' : r.roleId ? 'role' : 'system_role',
+                id: r.userId ?? r.roleId ?? r.systemRole
+              } as TargetPermissionGroup<'user' | 'role'>)
           )
         : []
   };
