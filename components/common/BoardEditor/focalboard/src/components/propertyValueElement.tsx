@@ -333,6 +333,7 @@ function PropertyValueElement(props: Props) {
         }}
         value={propertyValue as any}
         showEmptyPlaceholder={showEmptyPlaceholder}
+        disallowEmpty
       />
     );
   } else if (propertyTemplate.type === 'proposalAuthor') {
