@@ -347,7 +347,7 @@ function DocumentPage({
             editorState={editorState}
             sidebarView={sidebarView}
             // dont let users collapse sidebar when looking at a proposal
-            closeSidebar={proposalId ? () => {} : closeSidebar}
+            closeSidebar={closeSidebar}
             openSidebar={setActiveView}
             threads={threads}
             proposal={proposal}
