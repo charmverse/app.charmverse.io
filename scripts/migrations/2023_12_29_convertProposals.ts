@@ -263,10 +263,10 @@ function isPublished(proposal: Proposal) {
   return proposal.status !== 'draft';
 }
 
-// convertProposals()
-//   .then(() => {
-//     console.log('Done!');
-//   })
-//   .catch((e) => {
-//     console.error('Error!', e);
-//   });
+createWorkflows()
+  .then(() => {
+    console.log('Done!');
+  })
+  .catch((e) => {
+    console.error('Error!', e);
+  });
