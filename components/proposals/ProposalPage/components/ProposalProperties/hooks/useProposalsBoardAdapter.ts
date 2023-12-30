@@ -36,11 +36,12 @@ export function useProposalsBoardAdapter() {
   const [boardProposal, setBoardProposal] = useState<BoardProposal | null>(null);
   const { space } = useCurrentSpace();
   const { membersRecord } = useMembers();
-  const { proposals } = useProposals();
+  const { proposals = [] } = useProposals();
   const { categories } = useProposalCategories();
   const { pages } = usePages();
   const { proposalBoardBlock, proposalBlocks } = useProposalBlocks();
   const proposalPage = pages[boardProposal?.id || ''];
+  const proposal = proposals.find((p) => p.id === boardProposal?.id) ?? null;
 
   const localViewSettings = useLocalDbViewSettings(`proposals-${space?.id}-${DEFAULT_VIEW_BLOCK_ID}`);
 
@@ -76,7 +77,8 @@ export function useProposalsBoardAdapter() {
           const isStructuredProposal = !!p.formId;
           return {
             ...mapProposalToCardPage({ proposal: p, proposalPage: page, spaceId: space?.id }),
-            isStructuredProposal
+            isStructuredProposal,
+            proposal: p
           } as CardPage;
         })
         .filter((cp): cp is CardPage => !!cp.card && !!cp.page) || [];
@@ -116,7 +118,7 @@ export function useProposalsBoardAdapter() {
 
   // card from current proposal
   const card: Card<ProposalPropertyValue> = mapProposalToCardPage({
-    proposal: boardProposal,
+    proposal,
     proposalPage,
     spaceId: space?.id
   }).card;
@@ -146,13 +148,12 @@ function mapProposalToCardPage({
   proposalPage,
   spaceId
 }: {
-  proposal: BoardProposal | ProposalWithUsers | null;
+  proposal: ProposalWithUsers | null;
   proposalPage?: PageMeta;
   spaceId?: string;
 }) {
   const proposalFields: ProposalFields = proposal?.fields || { properties: {} };
   const proposalSpaceId = proposal?.spaceId || spaceId || '';
-
   proposalFields.properties = {
     ...proposalFields.properties,
     [Constants.titleColumnId]: proposalPage?.title || '',

@@ -6,6 +6,7 @@ import * as http from 'adapters/http';
 import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';
 import type { ProposalWithUsers, ProposalCategory, ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
+import type { UpdateEvaluationRequest } from 'lib/proposal/updateProposalEvaluation';
 import type { UpdateProposalLensPropertiesRequest } from 'lib/proposal/updateProposalLensProperties';
 
 export class ProposalsApi {
@@ -47,5 +48,9 @@ export class ProposalsApi {
 
   deleteProposalCategory(spaceId: string, categoryId: string) {
     return http.DELETE<{ ok: true }>(`/api/spaces/${spaceId}/proposal-categories/${categoryId}`);
+  }
+
+  updateProposalEvaluation({ proposalId, ...payload }: UpdateEvaluationRequest) {
+    return http.PUT(`/api/proposals/${proposalId}/evaluation`, payload);
   }
 }

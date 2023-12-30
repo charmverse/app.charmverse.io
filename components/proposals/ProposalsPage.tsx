@@ -31,8 +31,6 @@ import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
-import { UpdateProposalRequest } from 'lib/proposal/updateProposal';
-import { isTruthy } from 'lib/utilities/types';
 
 import { useProposalDialog } from './components/ProposalDialog/hooks/useProposalDialog';
 import { useProposals } from './hooks/useProposals';

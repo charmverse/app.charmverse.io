@@ -22,6 +22,7 @@ import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
+import type { ProposalWithUsers } from 'lib/proposal/interface';
 import { REWARD_STATUS_BLOCK_ID } from 'lib/rewards/blocks/constants';
 import { isTouchScreen } from 'lib/utilities/browser';
 import { mergeRefs } from 'lib/utilities/react';
@@ -69,6 +70,7 @@ type Props = {
   emptySubPagesPlaceholder?: ReactNode;
   isChecked?: boolean;
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
+  proposal?: ProposalWithUsers;
 };
 
 export const StyledCheckbox = styled(Checkbox)<{ show?: boolean }>`
@@ -119,7 +121,8 @@ function TableRow(props: Props) {
     isNested,
     subRowsEmptyValueContent,
     isChecked,
-    setCheckedIds
+    setCheckedIds,
+    proposal
   } = props;
   const { space } = useCurrentSpace();
   const isMobile = useSmallScreen();
@@ -349,7 +352,7 @@ function TableRow(props: Props) {
               readOnly={props.readOnly}
               syncWithPageId={cardPage?.syncWithPageId}
               card={card}
-              proposalId={cardPage.proposalId}
+              proposal={proposal}
               board={board}
               showEmptyPlaceholder={false}
               propertyTemplate={template}
