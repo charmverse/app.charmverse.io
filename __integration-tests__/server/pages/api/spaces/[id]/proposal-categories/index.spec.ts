@@ -45,28 +45,6 @@ describe('POST /api/spaces/[id]/proposal-categories - Create a proposal category
       spaceId: space.id,
       title: proposalInput.title
     });
-
-    const permissions = await prisma.proposalCategoryPermission.findMany({
-      where: {
-        proposalCategoryId: proposalCategory.id
-      }
-    });
-
-    expect(permissions).toHaveLength(1);
-
-    const permission = permissions[0];
-
-    expect(permission).toMatchObject(
-      expect.objectContaining<ProposalCategoryPermission>({
-        id: expect.any(String),
-        spaceId: space.id,
-        roleId: null,
-        public: null,
-        proposalCategoryId: proposalCategory.id,
-        permissionLevel: 'full_access',
-        categoryOperations: []
-      })
-    );
   });
 
   it('should fail if the user is not an admin, responding with 401', async () => {

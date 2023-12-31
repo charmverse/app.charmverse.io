@@ -33,7 +33,6 @@ async function createCategory(req: NextApiRequest, res: NextApiResponse<Proposal
   const spaceId = req.query.id as string;
   const categoryData = req.body as Omit<ProposalCategory, 'id' | 'spaceId'>;
   const category = await createProposalCategory({ data: { ...categoryData, spaceId } });
-
   return res.status(201).json({ ...category, permissions: new AvailableProposalCategoryPermissions().full });
 }
 
