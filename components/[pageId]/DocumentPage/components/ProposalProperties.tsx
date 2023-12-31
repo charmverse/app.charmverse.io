@@ -12,6 +12,7 @@ import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/
 import { ProposalPropertiesBase } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useMdScreen } from 'hooks/useMediaScreens';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { PageWithContent } from 'lib/pages';
@@ -59,6 +60,7 @@ export function ProposalProperties({
   const { mutateProposals } = useProposals();
   const { account } = useWeb3Account();
 
+  const isMdScreen = useMdScreen();
   const { proposalTemplates } = useProposalTemplates({ load: !!proposal?.page?.sourceTemplateId });
 
   const { data: isReviewer } = useGetIsReviewer(pageId || undefined);
@@ -140,7 +142,7 @@ export function ProposalProperties({
 
   // open the rubric sidebar by default
   useEffect(() => {
-    if (enableSidebar && canSeeEvaluation) {
+    if (enableSidebar && canSeeEvaluation && !isMdScreen) {
       openEvaluation?.();
     }
   }, [canSeeEvaluation]);

@@ -14,39 +14,9 @@ import { prisma } from '@charmverse/core/prisma-client';
  */
 
 async function search() {
+  const acc = await prisma.proposalWorkflow.deleteMany({});
 
-  const acc = await prisma.proposal.findFirstOrThrow({
-    where: {
-      page: {
-        path: 'page-054678415655162294'
-      }
-    },
-    select: {
-      page: {
-        select: {
-          title: true,
-          path: true
-        }
-      },
-      evaluations: {
-        orderBy: {
-          index: 'asc'
-        },
-        select: {
-          type: true,
-          id: true,
-          index: true,
-          result: true,
-          reviewers: true,
-          permissions: true
-        }
-      }
-    }
-  });
-
-  console.log(JSON.stringify({acc}, null, 2))
-
-  console.log(getCurrentEvaluation(acc.evaluations))
+  console.log(acc);
 }
 
 search().then(() => console.log('Done'));

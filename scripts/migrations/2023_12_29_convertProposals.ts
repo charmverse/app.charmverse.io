@@ -229,7 +229,7 @@ async function convertProposals() {
   );
 }
 const perBatch = 100;
-async function convertSpaces({ offset = 0 }: { offset?: number } = {}) {
+async function createWorkflows({ offset = 0 }: { offset?: number } = {}) {
   const spaces = await prisma.space.findMany({
     include: {
       proposalWorkflows: true
@@ -255,7 +255,7 @@ async function convertSpaces({ offset = 0 }: { offset?: number } = {}) {
 
   if (spaces.length > 0) {
     console.log('checking', offset + perBatch, 'spaces. last id: ' + spaces[spaces.length - 1]?.id);
-    return convertSpaces({ offset: offset + perBatch });
+    return createWorkflows({ offset: offset + perBatch });
   }
 }
 
@@ -263,10 +263,10 @@ function isPublished(proposal: Proposal) {
   return proposal.status !== 'draft';
 }
 
-// convertProposals()
-//   .then(() => {
-//     console.log('Done!');
-//   })
-//   .catch((e) => {
-//     console.error('Error!', e);
-//   });
+createWorkflows()
+  .then(() => {
+    console.log('Done!');
+  })
+  .catch((e) => {
+    console.error('Error!', e);
+  });

@@ -31,7 +31,6 @@ import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMdScreen } from 'hooks/useMediaScreens';
-import { ProposalBlocksProvider } from 'hooks/useProposalBlocks';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import { useVotes } from 'hooks/useVotes';
@@ -347,7 +346,7 @@ function DocumentPage({
             editorState={editorState}
             sidebarView={sidebarView}
             // dont let users collapse sidebar when looking at a proposal
-            closeSidebar={proposalId ? () => {} : closeSidebar}
+            closeSidebar={closeSidebar}
             openSidebar={setActiveView}
             threads={threads}
             proposal={proposal}
@@ -366,7 +365,7 @@ function DocumentPage({
   const proposalAuthors = proposal ? [proposal.createdBy, ...proposal.authors.map((author) => author.userId)] : [];
 
   return (
-    <ProposalBlocksProvider>
+    <>
       {!!page?.deletedAt && (
         <AlertContainer showPageActionSidebar={showPageActionSidebar}>
           <PageDeleteBanner pageType={page.type} pageId={page.id} />
@@ -558,7 +557,7 @@ function DocumentPage({
           <ProposalStickyFooter proposal={proposal} refreshProposal={refreshProposal} />
         )}
       </PrimaryColumn>
-    </ProposalBlocksProvider>
+    </>
   );
 }
 
