@@ -1,17 +1,14 @@
 import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
-import type { PageType, ProposalEvaluationType, ProposalRubricCriteria, ProposalStatus } from '@charmverse/core/prisma';
+import type { PageType, ProposalEvaluationType, ProposalStatus } from '@charmverse/core/prisma';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import type { Theme } from '@mui/material';
-import { Box, Collapse, Divider, Grid, IconButton, Stack, Switch, Typography } from '@mui/material';
+import { Box, Collapse, Divider, IconButton, Stack, Switch, Typography } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useRef, useState } from 'react';
 
-import { SIDEBAR_VIEWS } from 'components/[pageId]/DocumentPage/components/Sidebar/constants';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
-import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
-import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
 import { LoadingIcon } from 'components/common/LoadingComponent';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
@@ -28,18 +25,12 @@ import {
   nextProposalStatusUpdateMessage,
   previousProposalStatusUpdateMessage
 } from 'lib/proposal/proposalStatusTransition';
-import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { useProposalCategories } from '../../../hooks/useProposalCategories';
 import type { ProposalEvaluationValues } from '../EvaluationSettingsSidebar/components/EvaluationStepSettings';
 
-import type { RangeProposalCriteria } from './components/OldProposalRubricCriteriaInput';
-import { ProposalRubricCriteriaInput } from './components/OldProposalRubricCriteriaInput';
-import { OldProposalStepper } from './components/OldProposalStepper/ProposalStepper';
 import { ProposalCategorySelect } from './components/ProposalCategorySelect';
-import { ProposalEvaluationTypeSelect } from './components/ProposalEvaluationTypeSelect';
-import { ProposalStepSummary } from './components/ProposalStepSummary';
 
 export type ProposalPropertiesInput = {
   content?: PageContent | null;
@@ -51,7 +42,6 @@ export type ProposalPropertiesInput = {
   proposalTemplateId?: string | null;
   evaluationType: ProposalEvaluationType;
   evaluations: ProposalEvaluationValues[];
-  rubricCriteria: RangeProposalCriteria[];
   publishToLens?: boolean;
   fields: ProposalFields | null;
   type: PageType;
@@ -60,41 +50,27 @@ export type ProposalPropertiesInput = {
 type ProposalPropertiesProps = {
   isPublishingToLens?: boolean;
   proposalLensLink?: string;
-  archived?: boolean;
   readOnlyCategory?: boolean;
   isAdmin?: boolean;
   isFromTemplate?: boolean;
-  onChangeRubricCriteria: (criteria: RangeProposalCriteria[]) => void;
   pageId?: string;
   proposalId?: string;
   proposalFlowFlags?: ProposalFlowPermissionFlags;
   proposalFormInputs: ProposalPropertiesInput;
   proposalStatus?: ProposalStatus;
   readOnlyAuthors?: boolean;
-  readOnlyReviewers?: boolean;
-  readOnlyProposalEvaluationType?: boolean;
-  readOnlyRubricCriteria?: boolean;
-  rubricAnswers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
-  rubricCriteria?: ProposalRubricCriteria[];
   setProposalFormInputs: (values: Partial<ProposalPropertiesInput>) => Promise<void> | void;
-  isTemplate: boolean;
   snapshotProposalId?: string | null;
   updateProposalStatus?: (newStatus: ProposalStatus) => Promise<void>;
   readOnlyCustomProperties?: string[];
-  openEvaluation?: (evaluationId?: string) => void;
-  isEvaluationSidebarOpen?: boolean;
-  canSeeEvaluation?: boolean;
   isReviewer?: boolean;
-  isCharmVerse: boolean;
   rewardIds?: string[] | null;
 };
 
 export function ProposalPropertiesBase({
   proposalLensLink,
-  archived,
   isAdmin = false,
   isFromTemplate,
-  onChangeRubricCriteria,
   proposalFormInputs,
   pageId,
   proposalId,
@@ -102,21 +78,12 @@ export function ProposalPropertiesBase({
   proposalStatus,
   readOnlyAuthors,
   readOnlyCategory,
-  readOnlyProposalEvaluationType,
-  readOnlyReviewers,
-  readOnlyRubricCriteria,
-  rubricAnswers = [],
   setProposalFormInputs,
-  isTemplate,
   snapshotProposalId,
   updateProposalStatus,
   isPublishingToLens,
-  openEvaluation,
-  isEvaluationSidebarOpen,
-  canSeeEvaluation,
   readOnlyCustomProperties,
   isReviewer,
-  isCharmVerse,
   rewardIds
 }: ProposalPropertiesProps) {
   const { user } = useUser();
@@ -169,7 +136,6 @@ export function ProposalPropertiesBase({
   const proposalAuthorIds = proposalFormInputs.authors;
   const proposalReviewers = proposalFormInputs.reviewers;
   const isNewProposal = !pageId;
-  const showStatusStepper = !isTemplate && !isCharmVerse;
   const voteProposal = proposalId && proposalStatus ? { id: proposalId, status: proposalStatus } : undefined;
   const pendingRewards = proposalFormInputs.fields?.pendingRewards || [];
 
@@ -204,41 +170,7 @@ export function ProposalPropertiesBase({
 
   return (
     <>
-      {showStatusStepper && (
-        <>
-          <Grid container mb={2}>
-            {!isNewProposal && (
-              <ProposalStepSummary
-                archived={archived}
-                proposalFlowFlags={proposalFlowFlags}
-                proposalStatus={proposalStatus}
-                handleProposalStatusUpdate={handleProposalStatusUpdate}
-                evaluationType={proposalFormInputs.evaluationType}
-                proposalId={proposalId}
-                canCreateRewards={isReviewer && !!pendingRewards.length}
-              />
-            )}
-          </Grid>
-
-          <Stack
-            direction='row'
-            gap={1}
-            alignItems='center'
-            sx={{ cursor: 'pointer' }}
-            onClick={() => setDetailsExpanded((v) => !v)}
-          >
-            <Typography fontWeight='bold'>Details</Typography>
-            <IconButton size='small'>
-              <KeyboardArrowDown
-                fontSize='small'
-                sx={{ transform: `rotate(${detailsExpanded ? 180 : 0}deg)`, transition: 'all 0.2s ease' }}
-              />
-            </IconButton>
-          </Stack>
-        </>
-      )}
-
-      {isCharmVerse && !isNewProposal && (
+      {!isNewProposal && (
         <Stack
           direction='row'
           gap={1}
@@ -256,17 +188,6 @@ export function ProposalPropertiesBase({
         </Stack>
       )}
       <Collapse in={detailsExpanded} timeout='auto' unmountOnExit>
-        {showStatusStepper && (
-          <Box mt={2} mb={2}>
-            <OldProposalStepper
-              proposalFlowPermissions={proposalFlowFlags}
-              proposalStatus={proposalStatus}
-              handleProposalStatusUpdate={handleProposalStatusUpdate}
-              evaluationType={proposalFormInputs.evaluationType}
-            />
-          </Box>
-        )}
-
         {/* Select a category */}
         <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
           <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
@@ -313,31 +234,6 @@ export function ProposalPropertiesBase({
             </Box>
           </div>
         </Box>
-        {/* Select reviewers */}
-        {!isCharmVerse && (
-          <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
-            <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-              <PropertyLabel readOnly required={isNewProposal} highlighted>
-                Reviewers
-              </PropertyLabel>
-              <UserAndRoleSelect
-                data-test='proposal-reviewer-select'
-                readOnlyMessage={isFromTemplate ? templateTooltip('reviewers', isAdmin) : undefined}
-                readOnly={readOnlyReviewers}
-                value={proposalReviewers}
-                proposalCategoryId={proposalFormInputs.categoryId}
-                onChange={async (options) => {
-                  const reviewerOptions = options.filter(
-                    (option) => option.group === 'role' || option.group === 'user'
-                  ) as ProposalReviewerInput[];
-                  await setProposalFormInputs({
-                    reviewers: reviewerOptions.map((option) => ({ group: option.group, id: option.id }))
-                  });
-                }}
-              />
-            </Box>
-          </Box>
-        )}
 
         {lensProposalPropertyState !== 'hide' && (
           <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
@@ -394,61 +290,6 @@ export function ProposalPropertiesBase({
             </Box>
           </Box>
         )}
-
-        {/* Select valuation type */}
-        {!isCharmVerse && (
-          <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
-            <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-              <PropertyLabel readOnly highlighted>
-                Type
-              </PropertyLabel>
-              <ProposalEvaluationTypeSelect
-                readOnly={readOnlyProposalEvaluationType}
-                readOnlyMessage={isFromTemplate ? templateTooltip('evaluation type', isAdmin) : undefined}
-                value={proposalFormInputs.evaluationType}
-                onChange={(evaluationType) => {
-                  setProposalFormInputs({
-                    evaluationType
-                  });
-                }}
-              />
-            </Box>
-          </Box>
-        )}
-
-        {/* Select rubric criteria */}
-
-        {proposalFormInputs.evaluationType === 'rubric' && !isCharmVerse && (
-          <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
-            <Box
-              display='flex'
-              height='fit-content'
-              flex={1}
-              className='octo-propertyrow'
-              flexDirection={{ xs: 'column', sm: 'row' }}
-              alignItems={{ xs: 'stretch!important', sm: 'flex-start' }}
-            >
-              {isMobile ? (
-                <Typography variant='caption' component='div' color='secondary' fontWeight='600' p='4px 8px' mb={1}>
-                  Rubric criteria
-                </Typography>
-              ) : (
-                <PropertyLabel />
-              )}
-              <Box display='flex' flex={1} flexDirection='column'>
-                <ProposalRubricCriteriaInput
-                  readOnly={readOnlyRubricCriteria}
-                  readOnlyMessage={isFromTemplate ? templateTooltip('rubric criteria', isAdmin) : undefined}
-                  value={proposalFormInputs.rubricCriteria}
-                  onChange={onChangeRubricCriteria}
-                  proposalStatus={proposalStatus}
-                  answers={rubricAnswers ?? []}
-                />
-              </Box>
-            </Box>
-          </Box>
-        )}
-
         <CustomPropertiesAdapter
           readOnly={readOnlyAuthors}
           readOnlyProperties={readOnlyCustomProperties}
@@ -459,7 +300,6 @@ export function ProposalPropertiesBase({
             });
           }}
         />
-
         <ProposalRewards
           pendingRewards={pendingRewards}
           reviewers={proposalReviewers}
@@ -508,18 +348,6 @@ export function ProposalPropertiesBase({
           my: 2
         }}
       />
-
-      {!isCharmVerse && canSeeEvaluation && (
-        <Box display='flex' justifyContent='center' py={2}>
-          <Button
-            disabled={isEvaluationSidebarOpen}
-            startIcon={SIDEBAR_VIEWS.proposal_evaluation.icon}
-            onClick={() => openEvaluation?.()}
-          >
-            Open evaluation
-          </Button>
-        </Box>
-      )}
       <CreateVoteModal
         proposalFlowFlags={proposalFlowFlags}
         proposal={voteProposal}

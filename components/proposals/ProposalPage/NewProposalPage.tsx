@@ -32,7 +32,6 @@ import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemp
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
@@ -79,7 +78,6 @@ export function NewProposalPage({
   const { navigateToSpacePath } = useCharmRouter();
   const { space: currentSpace } = useCurrentSpace();
   const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>([]);
-  const isCharmVerse = useIsCharmverseSpace();
   const { activeView: sidebarView, setActiveView } = usePageSidebar();
   const { proposalTemplates, isLoadingTemplates } = useProposalTemplates();
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>();
@@ -245,7 +243,6 @@ export function NewProposalPage({
         workflowId: template.workflowId,
         evaluationType: template.evaluationType,
         evaluations: template.evaluations,
-        rubricCriteria: template.rubricCriteria,
         fields: template.fields || {},
         type: 'proposal',
         formId: template.formId ?? undefined,
@@ -261,7 +258,7 @@ export function NewProposalPage({
 
   // having `internalSidebarView` allows us to have the sidebar open by default, because usePageSidebar() does not allow us to do this currently
   const [defaultSidebarView, setDefaultView] = useState<PageSidebarView | null>(
-    isCharmVerse && isMdScreen ? 'proposal_evaluation' : null
+    isMdScreen ? 'proposal_evaluation' : null
   );
   const internalSidebarView = defaultSidebarView || sidebarView;
 
@@ -315,21 +312,10 @@ export function NewProposalPage({
             <ProposalPropertiesBase
               isFromTemplate={isFromTemplateSource}
               readOnlyCategory={isFromTemplateSource}
-              readOnlyRubricCriteria={readOnlyRubricCriteria}
-              readOnlyReviewers={readOnlyReviewers}
-              readOnlyProposalEvaluationType={isFromTemplateSource}
               proposalStatus='draft'
               proposalFormInputs={formInputs}
-              isTemplate={formInputs.type === 'proposal_template'}
               setProposalFormInputs={setFormInputs}
-              onChangeRubricCriteria={(rubricCriteria) => {
-                setFormInputs({
-                  ...formInputs,
-                  rubricCriteria
-                });
-              }}
               readOnlyCustomProperties={readOnlyCustomProperties}
-              isCharmVerse={isCharmVerse}
             />
           </div>
         </div>
@@ -361,7 +347,7 @@ export function NewProposalPage({
   useEffect(() => {
     // clear out page title on load
     setPageTitle('');
-    if (isCharmVerse && isMdScreen) {
+    if (isMdScreen) {
       setActiveView('proposal_evaluation');
       setDefaultView(null);
     }
@@ -369,10 +355,10 @@ export function NewProposalPage({
 
   // populate workflow if not set and template is not selected
   useEffect(() => {
-    if (isCharmVerse && workflowOptions?.length && !formInputs.workflowId && !templateIdFromUrl) {
+    if (workflowOptions?.length && !formInputs.workflowId && !templateIdFromUrl) {
       selectEvaluationWorkflow(workflowOptions[0]);
     }
-  }, [!!workflowOptions, isCharmVerse]);
+  }, [!!workflowOptions]);
 
   // populate with template if selected
   useEffect(() => {

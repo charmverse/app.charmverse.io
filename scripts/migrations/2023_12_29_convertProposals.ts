@@ -3,20 +3,40 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { getDefaultWorkflows } from 'lib/proposal/workflows/defaultWorkflows';
 import { v4 as uuid } from 'uuid';
 
+import type { ProposalEvaluationInput } from 'lib/proposal/createProposal';
 import { getDefaultFeedbackEvaluation, getDefaultPermissions } from 'lib/proposal/workflows/defaultEvaluation';
 // This script is a work in progress
 // It adds proposal steps to existing proposals
 
 const { permissions: feedbackPermissions, id, ...feedbackEvaluation } = getDefaultFeedbackEvaluation();
 
-async function convertProposals() {
+const perBatch = 50;
+async function convertProposals({ offset = 0 }: { offset?: number } = {}) {
+  const count = await prisma.proposal.count({
+    where: {
+      status: {
+        not: 'published'
+      }
+    }
+  });
+  console.log('count remaining', count);
+
   const proposals = await prisma.proposal.findMany({
+    where: {
+      status: {
+        not: 'published'
+      }
+    },
     include: {
       evaluations: true,
       page: {
         select: {
           snapshotProposalId: true,
-          votes: true
+          votes: {
+            include: {
+              voteOptions: true
+            }
+          }
         }
       },
       category: {
@@ -30,7 +50,12 @@ async function convertProposals() {
           proposalWorkflows: true
         }
       }
-    }
+    },
+    orderBy: {
+      id: 'asc'
+    },
+    skip: offset,
+    take: perBatch
   });
   const proposalsToUpdate = proposals.filter((p) => p.evaluations.length === 0);
   console.log('proposals to update', proposalsToUpdate.length);
@@ -42,6 +67,14 @@ async function convertProposals() {
         const votePassed = vote?.status === 'Passed';
         const completedAt = vote?.deadline;
         const voteFailed = vote?.status === 'Rejected';
+        const voteSettings: ProposalEvaluationInput['voteSettings'] = {
+          threshold: vote?.threshold || 50,
+          type: vote?.type || 'Approval',
+          options: vote?.voteOptions.map((o) => o.name) || ['Yes', 'No', 'Abstain'],
+          maxChoices: vote?.maxChoices || 1,
+          publishToSnapshot: !!p.snapshotProposalExpiry || !!p.page?.snapshotProposalId,
+          durationDays: vote ? Math.ceil((vote.deadline.getTime() - vote.createdAt.getTime()) / 1000 / 60 / 60 / 24) : 5
+        };
         const result = votePassed ? 'pass' : voteFailed ? 'fail' : null;
         const reviewEvaluationId = uuid();
         await prisma.$transaction(async (tx) => {
@@ -50,7 +83,7 @@ async function convertProposals() {
               id: p.id
             },
             data: {
-              status: isPublished(p) ? 'published' : undefined,
+              status: isPublished(p) ? 'published' : 'draft',
               workflowId: workflow?.id
             }
           });
@@ -105,6 +138,7 @@ async function convertProposals() {
               snapshotId: p.page?.snapshotProposalId,
               snapshotExpiry: p.snapshotProposalExpiry,
               voteId: vote?.id,
+              voteSettings,
               reviewers: p.category
                 ? {
                     createMany: {
@@ -127,7 +161,6 @@ async function convertProposals() {
           });
         });
       } else if (p.evaluationType === 'rubric') {
-        const reviewEvaluationId = uuid();
         const rubricEvaluationId = uuid();
         await prisma.$transaction(async (tx) => {
           const workflow = p.space.proposalWorkflows.find((w) => w.title === 'Decision Matrix');
@@ -136,7 +169,7 @@ async function convertProposals() {
               id: p.id
             },
             data: {
-              status: isPublished(p) ? 'published' : undefined,
+              status: isPublished(p) ? 'published' : 'draft',
               workflowId: workflow?.id
             }
           });
@@ -156,26 +189,9 @@ async function convertProposals() {
           });
           await tx.proposalEvaluation.create({
             data: {
-              id: reviewEvaluationId,
-              title: 'Review',
-              index: 1,
-              result: p.reviewedAt ? 'pass' : null,
-              completedAt: p.reviewedAt,
-              decidedBy: p.reviewedBy,
-              type: 'pass_fail',
-              proposalId: p.id,
-              permissions: {
-                createMany: {
-                  data: getDefaultPermissions()
-                }
-              }
-            }
-          });
-          await tx.proposalEvaluation.create({
-            data: {
               id: rubricEvaluationId,
               title: 'Rubric evaluation',
-              index: 2,
+              index: 1,
               type: 'rubric',
               proposalId: p.id,
               permissions: {
@@ -192,12 +208,6 @@ async function convertProposals() {
             data: {
               evaluationId: rubricEvaluationId
             }
-          });
-          await tx.proposalReviewer.createMany({
-            data: p.reviewers.map(({ evaluationId, id, ...reviewer }) => ({
-              ...reviewer,
-              evaluationId: reviewEvaluationId
-            }))
           });
           await tx.proposalRubricCriteria.updateMany({
             where: {
@@ -227,8 +237,12 @@ async function convertProposals() {
       }
     })
   );
+
+  if (proposals.length > 0) {
+    console.log('checking', offset + perBatch, 'proposals. last id: ' + proposals[proposals.length - 1]?.id);
+    return convertProposals({ offset: offset + perBatch });
+  }
 }
-const perBatch = 100;
 async function createWorkflows({ offset = 0 }: { offset?: number } = {}) {
   const spaces = await prisma.space.findMany({
     include: {
@@ -263,7 +277,7 @@ function isPublished(proposal: Proposal) {
   return proposal.status !== 'draft';
 }
 
-createWorkflows()
+convertProposals()
   .then(() => {
     console.log('Done!');
   })

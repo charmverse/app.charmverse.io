@@ -11,7 +11,6 @@ import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPag
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
 import { useNotifications } from 'components/nexus/hooks/useNotifications';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { usePage } from 'hooks/usePage';
 import { usePageIdFromPath } from 'hooks/usePageFromPath';
 

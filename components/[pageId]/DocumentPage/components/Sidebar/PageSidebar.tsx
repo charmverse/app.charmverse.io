@@ -9,8 +9,6 @@ import { EvaluationSettingsSidebar } from 'components/proposals/ProposalPage/com
 import type { Props as ProposalSettingsProps } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/EvaluationSettingsSidebar';
 import type { Props as EvaluationSidebarProps } from 'components/proposals/ProposalPage/components/EvaluationSidebar/EvaluationSidebar';
 import { EvaluationSidebar } from 'components/proposals/ProposalPage/components/EvaluationSidebar/EvaluationSidebar';
-import { OldProposalEvaluationSidebar } from 'components/proposals/ProposalPage/components/EvaluationSidebar/OldProposalEvaluationSidebar';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 
@@ -65,14 +63,13 @@ type SidebarProps = {
 function PageSidebarComponent(props: SidebarProps) {
   const { disabledViews = [], id, proposal, sidebarView, openSidebar, closeSidebar, isUnpublishedProposal } = props;
   const isMdScreen = useMdScreen();
-  const isCharmVerse = useIsCharmverseSpace();
   const isOpen = sidebarView !== null;
   const sidebarTitle = sidebarView && SIDEBAR_VIEWS[sidebarView]?.title;
   const canHideSidebar = isMdScreen && !props.proposalId; // dont allow closing the sidebar when viewing a proposal
   const showEvaluationSidebarIcon =
     (proposal?.evaluationType === 'rubric' &&
       (proposal.status === 'evaluation_active' || proposal?.status === 'evaluation_closed')) ||
-    (isCharmVerse && !!proposal);
+    !!proposal;
 
   function toggleSidebar() {
     if (sidebarView === null) {
@@ -211,31 +208,26 @@ function SidebarContents({
   readOnlyReviewers,
   readOnlyRubricCriteria
 }: SidebarProps) {
-  const isCharmVerse = useIsCharmverseSpace();
   return (
     <>
       {sidebarView === 'proposal_evaluation' &&
-        (isCharmVerse ? (
-          isUnpublishedProposal ? (
-            <EvaluationSettingsSidebar
-              proposal={proposalInput}
-              readOnly={!!readOnlyProposalPermissions}
-              readOnlyWorkflowSelect={isProposalTemplate}
-              onChangeEvaluation={onChangeEvaluation}
-              onChangeWorkflow={onChangeWorkflow}
-              readOnlyReviewers={!!readOnlyReviewers}
-              readOnlyRubricCriteria={!!readOnlyRubricCriteria}
-            />
-          ) : (
-            <EvaluationSidebar
-              pageId={pageId}
-              proposal={proposal}
-              onChangeEvaluation={onChangeEvaluation}
-              refreshProposal={refreshProposal}
-            />
-          )
+        (isUnpublishedProposal ? (
+          <EvaluationSettingsSidebar
+            proposal={proposalInput}
+            readOnly={!!readOnlyProposalPermissions}
+            readOnlyWorkflowSelect={isProposalTemplate}
+            onChangeEvaluation={onChangeEvaluation}
+            onChangeWorkflow={onChangeWorkflow}
+            readOnlyReviewers={!!readOnlyReviewers}
+            readOnlyRubricCriteria={!!readOnlyRubricCriteria}
+          />
         ) : (
-          <OldProposalEvaluationSidebar pageId={pageId} proposalId={proposalId} />
+          <EvaluationSidebar
+            pageId={pageId}
+            proposal={proposal}
+            onChangeEvaluation={onChangeEvaluation}
+            refreshProposal={refreshProposal}
+          />
         ))}
       {sidebarView === 'suggestions' && (
         <SuggestionsSidebar

@@ -23,7 +23,6 @@ describe('GET /api/spaces/[id]/pages - Get Pages in a space', () => {
   let pageWithSpacePermission: Page;
   let publicPage: Page;
 
-  let proposalVisibleInClassicModel: Proposal;
   let proposalVisibleInProposalsEvaluationPermissionsModel: Proposal;
 
   beforeAll(async () => {
@@ -59,14 +58,6 @@ describe('GET /api/spaces/[id]/pages - Get Pages in a space', () => {
       proposalCategoryPermissions: [{ assignee: { group: 'space', id: space.id }, permissionLevel: 'full_access' }]
     });
 
-    proposalVisibleInClassicModel = await testUtilsProposals.generateProposal({
-      spaceId: space.id,
-      userId: admin.id,
-      title: 'proposal visible in classic model',
-      proposalStatus: 'discussion',
-      categoryId: proposalCategoryWithSpacePermission.id
-    });
-
     proposalVisibleInProposalsEvaluationPermissionsModel = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: admin.id,
@@ -83,13 +74,11 @@ describe('GET /api/spaces/[id]/pages - Get Pages in a space', () => {
     const response = (
       await request(baseUrl).get(`/api/spaces/${space.id}/pages`).set('Cookie', normalMemberCookie).expect(200)
     ).body as PageMeta[];
-
     const expectedPageIds = stringUtils.sortUuids(
       arrayUtils.extractUuids([
         pageWithSpacePermission,
-        publicPage,
-        proposalVisibleInClassicModel,
-        proposalVisibleInProposalsEvaluationPermissionsModel
+        proposalVisibleInProposalsEvaluationPermissionsModel,
+        publicPage
       ])
     );
     expect(stringUtils.sortUuids(arrayUtils.extractUuids(response))).toEqual(expectedPageIds);
