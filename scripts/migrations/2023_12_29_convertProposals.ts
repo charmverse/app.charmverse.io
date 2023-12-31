@@ -10,10 +10,19 @@ import { getDefaultFeedbackEvaluation, getDefaultPermissions } from 'lib/proposa
 
 const { permissions: feedbackPermissions, id, ...feedbackEvaluation } = getDefaultFeedbackEvaluation();
 
-async function convertProposals() {
+const perBatch = 50;
+async function convertProposals({ offset = 0 }: { offset?: number } = {}) {
+  const count = await prisma.proposal.count({
+    where: {
+      status: {
+        not: 'published'
+      }
+    }
+  });
+  console.log('count remaining', count);
+
   const proposals = await prisma.proposal.findMany({
     where: {
-      spaceId: '92248bcf-6e01-4c9c-bbf1-3c0012fdf4be',
       status: {
         not: 'published'
       }
@@ -41,7 +50,12 @@ async function convertProposals() {
           proposalWorkflows: true
         }
       }
-    }
+    },
+    orderBy: {
+      id: 'asc'
+    },
+    skip: offset,
+    take: perBatch
   });
   const proposalsToUpdate = proposals.filter((p) => p.evaluations.length === 0);
   console.log('proposals to update', proposalsToUpdate.length);
@@ -223,8 +237,12 @@ async function convertProposals() {
       }
     })
   );
+
+  if (proposals.length > 0) {
+    console.log('checking', offset + perBatch, 'proposals. last id: ' + proposals[proposals.length - 1]?.id);
+    return convertProposals({ offset: offset + perBatch });
+  }
 }
-const perBatch = 100;
 async function createWorkflows({ offset = 0 }: { offset?: number } = {}) {
   const spaces = await prisma.space.findMany({
     include: {
