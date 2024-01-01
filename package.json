@@ -4,7 +4,9 @@
   "browserslist": [
     "defaults"
   ],
+  "type": "module",
   "scripts": {
+    "config:ceramic": "npx dotenv -e .env.local -- node --import tsx/esm lib/credentials/config/configure-node.ts",
     "build": "NODE_OPTIONS=\"--max_old_space_size=4096\" npx next build && npm run esbuild",
     "build:analyze": "cross-env ANALYZE=true next build",
     "esbuild": "tsx esbuild.config.ts",
