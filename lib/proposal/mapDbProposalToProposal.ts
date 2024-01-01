@@ -7,7 +7,7 @@ import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { getProposalFormFields } from 'lib/proposal/form/getProposalFormFields';
 
 import { getOldProposalStatus } from './getOldProposalStatus';
-import type { ProposalWithUsersAndRubric } from './interface';
+import type { ProposalFields, ProposalWithUsersAndRubric, ProposalWithUsersLite } from './interface';
 
 type FormFieldsIncludeType = {
   form: {
@@ -72,7 +72,7 @@ export function mapDbProposalToProposalLite({
     rewards: { id: string }[];
   };
   permissions?: ProposalPermissionFlags;
-}): ProposalWithUsers {
+}): ProposalWithUsersLite {
   const { rewards, ...rest } = proposal;
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
   const evaluationWithOldType = proposal.evaluations.find((e) => e.type === 'rubric' || e.type === 'vote');
@@ -83,8 +83,9 @@ export function mapDbProposalToProposalLite({
     evaluationType: evaluationWithOldType?.type || proposal.evaluationType,
     status: getOldProposalStatus(proposal),
     reviewers: currentEvaluation?.reviewers || proposal.reviewers,
-    rewardIds: rewards.map((r) => r.id) || null
+    rewardIds: rewards.map((r) => r.id) || null,
+    fields: (rest.fields as ProposalFields) ?? null
   };
 
-  return proposalWithUsers as ProposalWithUsers;
+  return proposalWithUsers;
 }

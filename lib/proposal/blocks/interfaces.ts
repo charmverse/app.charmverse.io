@@ -4,7 +4,6 @@ import type { ProposalBlock } from '@charmverse/core/prisma-client';
 import type { NewPageValues } from 'components/common/PageDialog/hooks/useNewPage';
 import type { BoardFields } from 'lib/focalboard/board';
 import type { BoardViewFields } from 'lib/focalboard/boardView';
-import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
 export type ProposalPropertyOption = { id: string; color: string; value: string };
 

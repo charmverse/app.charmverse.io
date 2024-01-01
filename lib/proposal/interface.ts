@@ -6,6 +6,7 @@ import type {
   Proposal,
   ProposalEvaluation,
   ProposalEvaluationPermission,
+  ProposalEvaluationType,
   Vote
 } from '@charmverse/core/prisma';
 import type { ProposalWithUsers as CoreProposalWithUsers } from '@charmverse/core/proposals';
@@ -67,6 +68,12 @@ export type ProposalFormData = {
 
 export type ProposalWithUsers = Omit<CoreProposalWithUsers, 'fields'> & {
   fields: ProposalFields | null;
+};
+
+export type ProposalWithUsersLite = ProposalWithUsers & {
+  currentEvaluationId?: string;
+  evaluationType: ProposalEvaluationType;
+  permissions?: ProposalPermissionFlags;
 };
 
 export type PopulatedEvaluation = ProposalRubricData &

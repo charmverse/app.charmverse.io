@@ -16,7 +16,7 @@ import type { ClearEvaluationResultRequest } from 'lib/proposal/clearEvaluationR
 import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import type { RubricProposalsUserInfo } from 'lib/proposal/getProposalsEvaluatedByUser';
 import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
-import type { ProposalWithUsers, ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { ProposalWithUsers, ProposalWithUsersAndRubric, ProposalWithUsersLite } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers';
 import type { RubricCriteriaUpsert } from 'lib/proposal/rubric/upsertRubricCriteria';
@@ -45,7 +45,7 @@ export function useGetProposalFlowFlags(proposalId: MaybeString) {
   return useGET<ProposalFlowPermissionFlags>(proposalId ? `/api/proposals/${proposalId}/compute-flow-flags` : null);
 }
 export function useGetProposalsBySpace({ spaceId, categoryIds }: Partial<ListProposalsRequest>) {
-  return useGET<ProposalWithUsers[]>(spaceId ? `/api/spaces/${spaceId}/proposals` : null, {
+  return useGET<ProposalWithUsersLite[]>(spaceId ? `/api/spaces/${spaceId}/proposals` : null, {
     categoryIds
   });
 }
