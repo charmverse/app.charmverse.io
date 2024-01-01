@@ -105,7 +105,7 @@ test.beforeAll(async () => {
           { group: 'role', id: role.id },
           { group: 'space_member' }
         ],
-        permissions: []
+        permissions: [{ assignee: { group: 'space_member' }, operation: 'edit' }]
       }
     ],
     categoryId: visibleProposalCategory.id

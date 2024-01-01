@@ -14,7 +14,6 @@ import Link from 'components/common/Link';
 import { SectionName } from 'components/common/PageLayout/components/Sidebar/components/SectionName';
 import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/components/SidebarButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import type { SettingsPath } from 'hooks/useSettingsDialog';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
@@ -84,7 +83,6 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
   const { space: currentSpace } = useCurrentSpace();
   const isMobile = useSmallScreen();
   const { memberSpaces } = useSpaces();
-  const isCharmverse = useIsCharmverseSpace();
   const { mappedFeatures } = useSpaceFeatures();
 
   const isSpaceSettingsVisible = !!memberSpaces.find((s) => s.name === currentSpace?.name);
@@ -122,25 +120,21 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
         )}
         {currentSpace &&
           isSpaceSettingsVisible &&
-          SPACE_SETTINGS_TABS.map(
-            (tab) =>
-              // TODO: Remove check when publishing new proposal flow
-              (tab.path !== 'proposals' || isCharmverse) && (
-                <SidebarLink
-                  data-test={`space-settings-tab-${tab.path}`}
-                  key={tab.path}
-                  label={mappedFeatures[tab.path as Feature]?.title || tab.label}
-                  icon={tab.icon}
-                  onClick={() => onSelectPath(tab.path)}
-                  active={activePath === tab.path}
-                  section={tab.path}
-                >
-                  {tab.path === 'subscription' && hasPassedBlockQuota && currentSpace.paidTier !== 'enterprise' ? (
-                    <UpgradeChip forceDisplay upgradeContext='upgrade' />
-                  ) : null}
-                </SidebarLink>
-              )
-          )}
+          SPACE_SETTINGS_TABS.map((tab) => (
+            <SidebarLink
+              data-test={`space-settings-tab-${tab.path}`}
+              key={tab.path}
+              label={mappedFeatures[tab.path as Feature]?.title || tab.label}
+              icon={tab.icon}
+              onClick={() => onSelectPath(tab.path)}
+              active={activePath === tab.path}
+              section={tab.path}
+            >
+              {tab.path === 'subscription' && hasPassedBlockQuota && currentSpace.paidTier !== 'enterprise' ? (
+                <UpgradeChip forceDisplay upgradeContext='upgrade' />
+              ) : null}
+            </SidebarLink>
+          ))}
         {subscriptionEnded && memberSpaces.length > 1 && (
           <Box>
             <SidebarLink

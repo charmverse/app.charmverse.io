@@ -10,11 +10,9 @@ import {
   useUpsertDraftRubricCriteriaAnswers,
   useDeleteRubricCriteriaAnswers
 } from 'charmClient/hooks/proposals';
+import { TextInput } from 'components/common/BoardEditor/components/properties/TextInput';
 import { Button } from 'components/common/Button';
-import {
-  IntegerInput,
-  CriteriaRow
-} from 'components/proposals/ProposalPage/components/ProposalProperties/components/OldProposalRubricCriteriaInput';
+import { getNumberFromString } from 'lib/utilities/numbers';
 
 export type FormInput = { answers: ProposalRubricCriteriaAnswer[] };
 
@@ -27,6 +25,53 @@ type Props = {
   criteriaList: ProposalRubricCriteria[];
   onSubmit: (props: { isDraft: boolean }) => void;
 };
+
+const CriteriaRow = styled(Box)`
+  position: relative;
+  flex-direction: row;
+
+  ${({ theme }) => theme.breakpoints.up('xs')} {
+    flex-direction: column;
+  }
+
+  ${({ theme }) => theme.breakpoints.up('sm')} {
+    flex-direction: row;
+  }
+
+  ${({ theme }) => theme.breakpoints.up('sm')} {
+    .show-on-hover {
+      opacity: 0;
+      transition: opacity 0.2s ease-in-out;
+    }
+    &:hover {
+      .show-on-hover {
+        opacity: 1;
+      }
+      .octo-propertyvalue:not(.readonly) {
+        background-color: var(--mui-action-hover);
+      }
+    }
+  }
+
+  .drag-indicator {
+    cursor: grab;
+    margin-top: 7px;
+    margin-left: -20px;
+    position: absolute;
+  }
+
+  .to-pseudo-element {
+    position: relative;
+  }
+  .to-pseudo-element::before {
+    content: '-';
+    left: -8px;
+    top: 4px;
+    position: absolute;
+    font-size: 16px;
+    color: var(--secondary-text);
+  }
+`;
 
 const StyledIcon = styled.div`
   align-items: center;
@@ -378,4 +423,40 @@ function convertMUIRatingToActual(value: number, min: number) {
 function convertActualToMUIRating(value: number, min: number) {
   const minOffset = 1 - min;
   return value + minOffset;
+}
+
+function IntegerInput({
+  value,
+  onChange,
+  readOnly,
+  readOnlyMessage,
+  inputProps,
+  disabled,
+  maxWidth,
+  sx
+}: {
+  value?: number | string | null;
+  onChange: (num: number | null) => void;
+  readOnly?: boolean;
+  readOnlyMessage?: string;
+  inputProps?: any;
+  disabled?: boolean;
+  maxWidth?: number;
+  sx?: any;
+}) {
+  return (
+    <TextInput
+      displayType='details'
+      fullWidth={!maxWidth}
+      inputProps={{ disabled, type: 'number', ...inputProps }}
+      onChange={(newValue) => onChange(getNumberFromString(newValue))}
+      readOnly={readOnly}
+      readOnlyMessage={readOnlyMessage}
+      sx={{
+        input: { textAlign: 'center', minWidth: '2.5em !important', maxWidth },
+        ...sx
+      }}
+      value={value?.toString() || ''}
+    />
+  );
 }

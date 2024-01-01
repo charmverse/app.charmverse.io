@@ -1,15 +1,12 @@
 import { log } from '@charmverse/core/log';
 import { useCallback, useEffect, useState } from 'react';
-import { mutate } from 'swr';
 
 import { useCreateProposal } from 'charmClient/hooks/proposals';
 import { checkFormFieldErrors } from 'components/common/form/checkFormFieldErrors';
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationStepSettings';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { RubricDataInput } from 'lib/proposal/rubric/upsertRubricCriteria';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -22,7 +19,6 @@ type Props = {
 };
 
 export function useNewProposal({ newProposal }: Props) {
-  const isCharmVerse = useIsCharmverseSpace();
   const { user } = useUser();
   const { showMessage } = useSnackbar();
   const { space: currentSpace } = useCurrentSpace();
@@ -50,25 +46,6 @@ export function useNewProposal({ newProposal }: Props) {
   async function createProposal({ isDraft }: { isDraft?: boolean }) {
     log.info('[user-journey] Create a proposal');
     if (formInputs.categoryId && currentSpace) {
-      // TODO: put validation inside the properties form component
-      try {
-        formInputs.rubricCriteria.forEach((criteria) => {
-          if (criteria.type === 'range') {
-            if (
-              (!criteria.parameters.min && criteria.parameters.min !== 0) ||
-              (!criteria.parameters.max && criteria.parameters.max !== 0)
-            ) {
-              throw new Error('Range values are invalid');
-            }
-            if (criteria.parameters.min >= criteria.parameters.max) {
-              throw new Error('Minimum must be less than Maximum');
-            }
-          }
-        });
-      } catch (error) {
-        showMessage((error as Error).message, 'error');
-        return;
-      }
       const result = await createProposalTrigger({
         proposalTemplateId: formInputs.proposalTemplateId,
         authors: formInputs.authors,
@@ -85,7 +62,6 @@ export function useNewProposal({ newProposal }: Props) {
         formFields: formInputs.formFields,
         evaluations: formInputs.evaluations,
         evaluationType: formInputs.evaluationType,
-        rubricCriteria: formInputs.rubricCriteria as RubricDataInput[],
         reviewers: formInputs.reviewers,
         spaceId: currentSpace.id,
         publishToLens: formInputs.publishToLens,
@@ -126,15 +102,8 @@ export function useNewProposal({ newProposal }: Props) {
     disabledTooltip = 'Content is required for free-form proposals';
   }
 
-  // old evaluation logic
-  if (!isCharmVerse) {
-    if (formInputs.reviewers.length === 0) {
-      disabledTooltip = 'Reviewers are required';
-    }
-  } else if (!disabledTooltip) {
-    // get the first validation error from the evaluations
-    disabledTooltip = formInputs.evaluations.map(getEvaluationFormError).filter(isTruthy)[0];
-  }
+  // get the first validation error from the evaluations
+  disabledTooltip = disabledTooltip || formInputs.evaluations.map(getEvaluationFormError).filter(isTruthy)[0];
 
   return {
     formInputs,
@@ -184,7 +153,6 @@ function emptyState({
     proposalTemplateId: null,
     reviewers: [],
     evaluations: [],
-    rubricCriteria: [],
     title: '',
     type: 'proposal',
     publishToLens: false,

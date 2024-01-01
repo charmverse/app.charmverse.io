@@ -20,9 +20,7 @@ let apiKey: SpaceApiToken;
 let superApiKey: SuperApiToken;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpace();
-  space = generated.space;
-  proposalAuthor = generated.user;
+  ({ space, user: proposalAuthor } = await testUtilsUser.generateUserAndSpace());
   spaceMember = await testUtilsUser.generateSpaceUser({
     spaceId: space.id
   });

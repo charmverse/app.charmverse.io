@@ -19,9 +19,7 @@ import {
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
 
-import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { Button } from 'components/common/Button';
-import FieldLabel from 'components/common/form/FieldLabel';
 import { NumericFieldWithButtons } from 'components/common/form/fields/NumericFieldWithButtons';
 import type { ProposalEvaluationInput } from 'lib/proposal/createProposal';
 
