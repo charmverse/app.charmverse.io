@@ -297,7 +297,6 @@ export async function createWorkspace({
   });
 
   await createDefaultProposal({
-    isCharmVerse: space.domain.includes('cvt-'),
     spaceId: space.id,
     userId: space.createdBy,
     categoryId:

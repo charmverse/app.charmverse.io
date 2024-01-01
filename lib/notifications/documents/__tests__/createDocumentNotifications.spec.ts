@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsUser } from '@charmverse/core/test';
+import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import { addComment } from 'lib/comments/addComment';
@@ -801,12 +801,12 @@ describe(`Test document events and notifications`, () => {
       spaceId: space.id
     });
 
-    const page = await generateProposal({
+    const page = await testUtilsProposals.generateProposal({
       categoryId: proposalCategory.id,
       spaceId: space.id,
       userId: user.id,
       authors: [user.id],
-      reviewers: [{ group: 'user', id: user2.id }]
+      evaluationInputs: [{ evaluationType: 'rubric', permissions: [], reviewers: [{ group: 'user', id: user2.id }] }]
     });
 
     await updateProposalStatus({

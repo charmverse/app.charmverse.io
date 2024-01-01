@@ -2,6 +2,7 @@ import { Delete, Edit } from '@mui/icons-material';
 import { Box, Grid, Hidden, IconButton, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 
+import { AddAPropertyButton } from 'components/common/BoardEditor/components/properties/AddAProperty';
 import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { SelectPreviewContainer } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
@@ -20,8 +21,7 @@ import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { ProposalPendingReward } from 'lib/proposal/blocks/interfaces';
-import type { ProposalReviewerInput } from 'lib/proposal/interface';
+import type { ProposalPendingReward, ProposalReviewerInput } from 'lib/proposal/interface';
 import { isTruthy } from 'lib/utilities/types';
 
 type Props = {
@@ -120,7 +120,7 @@ export function ProposalRewards({
                   <SelectPreviewContainer displayType='details' onClick={() => openReward(reward.id)}>
                     <Stack direction='row' justifyContent='space-between' alignItems='center'>
                       <Typography component='span' variant='subtitle1' fontWeight='normal'>
-                        {getRewardPage(reward.id)?.title || 'Untitled reward'}
+                        {getRewardPage(reward.id)?.title || 'Untitled'}
                       </Typography>
                       <Hidden mdDown>
                         <Stack alignItems='center' direction='row' height='100%'>
@@ -148,6 +148,17 @@ export function ProposalRewards({
     );
   }
 
+  if (!pendingRewards?.length) {
+    return (
+      <AttachRewardButton
+        readOnly={false}
+        onSave={onSave}
+        reviewers={reviewers}
+        assignedSubmitters={assignedSubmitters}
+      />
+    );
+  }
+
   return (
     <Stack>
       <Stack flexDirection='row' alignItems='center' height='fit-content' flex={1} className='octo-propertyrow'>
@@ -171,9 +182,9 @@ export function ProposalRewards({
                   flex={1}
                 >
                   <SelectPreviewContainer readOnly={readOnly} displayType='details'>
-                    <Stack direction='row' justifyContent='space-between' alignItems='center'>
+                    <Stack direction='row' justifyContent='space-between' alignItems='center' gap={1}>
                       <Typography component='span' variant='subtitle1' fontWeight='normal'>
-                        {page?.title || 'Untitled reward'}
+                        {page?.title || 'Untitled'}
                       </Typography>
                       <Hidden lgDown>
                         <Stack alignItems='center' direction='row' height='100%'>
@@ -191,7 +202,7 @@ export function ProposalRewards({
                         </Stack>
                       </Hidden>
 
-                      <Stack className='icons' sx={{ opacity: 0, transition: 'all 0.2s ease' }} direction='row' gap={1}>
+                      <Stack className='icons' sx={{ opacity: 0, transition: 'opacity 0.2s ease' }} direction='row'>
                         <IconButton size='small' onClick={() => editReward({ reward, page, draftId })}>
                           <Edit color='secondary' fontSize='small' />
                         </IconButton>

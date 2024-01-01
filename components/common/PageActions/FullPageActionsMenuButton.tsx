@@ -8,7 +8,7 @@ import type { ReactNode } from 'react';
 import { useMemo, useRef, useState } from 'react';
 
 import { useGetProposalDetails } from 'charmClient/hooks/proposals';
-import { undoEventName } from 'components/common/CharmEditor/utils';
+import { undoEventName } from 'components/common/CharmEditor/constants';
 import { DatabasePageActionList } from 'components/common/PageActions/components/DatabasePageActionList';
 import type { PageActionMeta } from 'components/common/PageActions/components/DocumentPageActionList';
 import { DocumentPageActionList, documentTypes } from 'components/common/PageActions/components/DocumentPageActionList';

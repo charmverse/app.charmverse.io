@@ -68,7 +68,7 @@ function getDefaultProperties({ categories }: { categories: ProposalCategory[] |
     getDefaultStatusProperty(),
     getDefaultEvaluationTypeProperty(),
     proposalDbProperties.proposalAuthor(AUTHORS_BLOCK_ID, 'Author'),
-    proposalDbProperties.proposalReviewer(PROPOSAL_REVIEWERS_BLOCK_ID, 'Reviewer')
+    proposalDbProperties.proposalReviewer(PROPOSAL_REVIEWERS_BLOCK_ID, 'Reviewers')
   ];
 }
 

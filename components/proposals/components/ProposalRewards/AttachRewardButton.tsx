@@ -9,8 +9,7 @@ import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { ProposalPendingReward } from 'lib/proposal/blocks/interfaces';
-import type { ProposalReviewerInput } from 'lib/proposal/interface';
+import type { ProposalPendingReward, ProposalReviewerInput } from 'lib/proposal/interface';
 import type { RewardReviewer } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 

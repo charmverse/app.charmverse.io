@@ -9,24 +9,22 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposal/interface';
 
-import { PassFailSidebar } from '../PassFailSidebar';
-
 import { RubricAnswersForm } from './RubricAnswersForm';
 import { RubricResults } from './RubricResults';
 
 export type Props = {
   proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'evaluations' | 'permissions' | 'status' | 'evaluationType'>;
+  permissions?: ProposalWithUsersAndRubric['permissions'];
   evaluation: PopulatedEvaluation;
   isCurrent?: boolean;
   refreshProposal?: VoidFunction;
 };
 
-export function RubricSidebar({ proposal, isCurrent, evaluation, refreshProposal }: Props) {
+export function RubricEvaluation({ proposal, permissions, isCurrent, evaluation, refreshProposal }: Props) {
   const [rubricView, setRubricView] = useState<number>(0);
   const isAdmin = useIsAdmin();
   const { user } = useUser();
-  const proposalPermissions = isCurrent ? proposal?.permissions : undefined;
-  const canAnswerRubric = proposalPermissions?.evaluate;
+  const canAnswerRubric = permissions?.evaluate;
   const rubricCriteria = evaluation?.rubricCriteria;
   const myRubricAnswers = useMemo(
     () => evaluation?.rubricAnswers.filter((answer) => answer.userId === user?.id) || [],

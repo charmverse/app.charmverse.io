@@ -14,7 +14,6 @@ import { InvalidInputError } from 'lib/utilities/errors';
 const handler = defaultHandler();
 
 handler
-  .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' }))
   .get(getWorkflowsController)
   .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
   .post(updateWorkflowController)

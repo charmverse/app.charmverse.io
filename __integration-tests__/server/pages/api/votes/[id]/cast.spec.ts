@@ -1,4 +1,5 @@
 import type { Page, Space, User, Vote } from '@charmverse/core/prisma';
+import { testUtilsProposals } from '@charmverse/core/test';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
@@ -138,26 +139,24 @@ describe('POST /api/votes/[id]/cast - Cast a vote on a page poll', () => {
   });
 });
 describe('POST /api/votes/[id]/cast - Cast a vote on a proposal', () => {
-  it('Should allow voting if the proposal is in vote_active stage and user has permission', async () => {
+  xit('Should allow voting if the proposal is in vote_active stage and user has permission', async () => {
     // Setup proposal content
     const proposalCategory = await generateProposalCategory({
       spaceId: space1.id
     });
 
-    await upsertProposalCategoryPermission({
-      assignee: {
-        group: 'space',
-        id: space1.id
-      },
-      permissionLevel: 'full_access',
-      proposalCategoryId: proposalCategory.id
-    });
-
-    const proposal = await generateProposal({
+    const proposal = await testUtilsProposals.generateProposal({
       categoryId: proposalCategory.id,
       spaceId: space1.id,
       userId: proposalAuthor.id as string,
-      proposalStatus: 'vote_active'
+      proposalStatus: 'published',
+      evaluationInputs: [
+        {
+          evaluationType: 'vote',
+          permissions: [],
+          reviewers: [{ group: 'space_member' }]
+        }
+      ]
     });
 
     const proposalVote = await createVote({

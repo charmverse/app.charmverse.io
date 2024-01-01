@@ -1,6 +1,5 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import type { TargetPermissionGroup } from '@charmverse/core/permissions';
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { useMemo, useState } from 'react';
 
 import { sortCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
@@ -28,9 +27,10 @@ import {
   STATUS_BLOCK_ID,
   CREATED_AT_ID
 } from 'lib/proposal/blocks/constants';
-import type { ProposalFields, ProposalFieldsProp, ProposalPropertyValue } from 'lib/proposal/blocks/interfaces';
+import type { ProposalPropertyValue } from 'lib/proposal/blocks/interfaces';
+import type { ProposalWithUsers, ProposalFields } from 'lib/proposal/interface';
 
-export type BoardProposal = { spaceId?: string; id?: string } & ProposalFieldsProp;
+export type BoardProposal = { spaceId?: string; id?: string; fields: ProposalFields | null };
 
 export function useProposalsBoardAdapter() {
   const [boardProposal, setBoardProposal] = useState<BoardProposal | null>(null);
@@ -150,7 +150,7 @@ function mapProposalToCardPage({
   proposalPage?: PageMeta;
   spaceId?: string;
 }) {
-  const proposalFields = (proposal?.fields || { properties: {} }) as ProposalFields;
+  const proposalFields: ProposalFields = proposal?.fields || { properties: {} };
   const proposalSpaceId = proposal?.spaceId || spaceId || '';
 
   proposalFields.properties = {
@@ -189,7 +189,7 @@ function mapProposalToCardPage({
     createdAt: proposalPage?.createdAt ? new Date(proposalPage?.createdAt).getTime() : 0,
     updatedAt: proposalPage?.updatedAt ? new Date(proposalPage?.updatedAt).getTime() : 0,
     deletedAt: null,
-    fields: { ...proposalFields, contentOrder: [] }
+    fields: { properties: {}, ...proposalFields, contentOrder: [] }
   };
 
   return { card, page: proposalPage };

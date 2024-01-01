@@ -2,6 +2,7 @@ import type { Proposal, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
+import { v4 as uuid } from 'uuid';
 
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
@@ -26,17 +27,21 @@ describe('PUT /api/proposals/[id]/rubric-answers - Update proposal rubric criter
       spaceId: space.id
     });
 
+    const evaluationId = uuid();
+
     proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: author.id,
       authors: [author.id],
-      reviewers: [{ group: 'user', id: reviewer.id }],
-      // This is important, we can only evaluate when evaluation is open
-      proposalStatus: 'evaluation_active'
+      proposalStatus: 'published',
+      evaluationInputs: [
+        { id: evaluationId, evaluationType: 'rubric', permissions: [], reviewers: [{ group: 'user', id: reviewer.id }] }
+      ]
     });
 
     const criteria = await upsertRubricCriteria({
       proposalId: proposal.id,
+      evaluationId,
       rubricCriteria: [{ parameters: { max: 10, min: 1 }, title: 'score', type: 'range' }]
     });
 
@@ -107,17 +112,21 @@ describe('DELETE /api/proposals/[id]/rubric-answers - Delete proposal rubric cri
       spaceId: space.id
     });
 
+    const evaluationId = uuid();
+
     proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: author.id,
       authors: [author.id],
-      reviewers: [{ group: 'user', id: reviewer.id }],
-      // This is important, we can only evaluate when evaluation is open
-      proposalStatus: 'evaluation_active'
+      proposalStatus: 'published',
+      evaluationInputs: [
+        { id: evaluationId, evaluationType: 'rubric', permissions: [], reviewers: [{ group: 'user', id: reviewer.id }] }
+      ]
     });
 
     const criteria = await upsertRubricCriteria({
       proposalId: proposal.id,
+      evaluationId,
       rubricCriteria: [{ parameters: { max: 10, min: 1 }, title: 'score', type: 'range' }]
     });
 
