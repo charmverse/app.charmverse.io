@@ -89,7 +89,7 @@ describe('utils', () => {
     it('should show month and day for current year', () => {
       const currentYear = new Date().getFullYear();
       const date = new Date(currentYear, 6, 9);
-      expect(Utils.displayDate(date, intl)).toBe('July 09, 2023');
+      expect(Utils.displayDate(date, intl)).toBe(`July 09, ${currentYear}`);
     });
 
     it('should show month, day and year for previous year', () => {
