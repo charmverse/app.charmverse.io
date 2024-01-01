@@ -6,7 +6,7 @@ import { DocumentPage } from '__e2e__/po/document.po';
 import { PagePermissionsDialog } from '__e2e__/po/pagePermissions.po';
 import { ProposalsListPage } from '__e2e__/po/proposalsList.po';
 
-import { generateSpaceRole, generateUser, loginBrowserUser, logoutBrowserUser } from '../utils/mocks';
+import { generateUser, loginBrowserUser, logoutBrowserUser } from '../utils/mocks';
 
 type Fixtures = {
   proposalListPage: ProposalsListPage;

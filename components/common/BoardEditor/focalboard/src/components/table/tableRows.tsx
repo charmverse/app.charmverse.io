@@ -97,14 +97,7 @@ function TableRows(props: Props): JSX.Element {
           board={board}
           activeView={activeView}
           card={card}
-          proposal={
-            page.proposalId && proposal
-              ? {
-                  currentEvaluationId: proposal?.currentEvaluationId,
-                  id: page.proposalId
-                }
-              : undefined
-          }
+          proposal={proposal}
           isStructuredProposal={isStructuredProposal}
           hasContent={page.hasContent}
           isSelected={props.selectedCardIds.includes(card.id)}

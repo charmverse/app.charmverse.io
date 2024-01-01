@@ -31,9 +31,8 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board, DatabaseProposalPropertyType, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
-import type { Card } from 'lib/focalboard/card';
+import type { Card, CardPage } from 'lib/focalboard/card';
 import { STATUS_BLOCK_ID } from 'lib/proposal/blocks/constants';
-import type { ProposalWithUsers } from 'lib/proposal/interface';
 import {
   REWARDS_APPLICANTS_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
@@ -78,10 +77,7 @@ type Props = {
   columnRef?: React.RefObject<HTMLDivElement>;
   mutator?: Mutator;
   subRowsEmptyValueContent?: ReactElement | string;
-  proposal?: {
-    id: string;
-    currentEvaluationId: string | null;
-  };
+  proposal?: CardPage['proposal'];
 };
 
 export const validatePropertyValue = (propType: string, val: string): boolean => {
@@ -316,31 +312,36 @@ function PropertyValueElement(props: Props) {
   } else if (propertyTemplate.type === 'proposalReviewer') {
     propertyValueElement = (
       <UserAndRoleSelect
-        displayType={displayType}
-        data-test='selected-reviewers'
-        readOnly={readOnly || (displayType !== 'details' && displayType !== 'table')}
+        readOnly={
+          !proposal ||
+          readOnly ||
+          (displayType !== 'details' && displayType !== 'table') ||
+          proposal.status === 'draft' ||
+          proposal.status === 'discussion'
+        }
         systemRoles={[allMembersSystemRole]}
         onChange={async (reviewers) => {
-          const evaluationId = proposal?.currentEvaluationId;
-          if (evaluationId) {
-            try {
-              await trigger({
-                reviewers: reviewers.map((reviewer) => ({
-                  roleId: reviewer.group === 'role' ? reviewer.id : null,
-                  systemRole: reviewer.group === 'system_role' ? (reviewer.id as ProposalSystemRole) : null,
-                  userId: reviewer.group === 'user' ? reviewer.id : null
-                })),
-                evaluationId
-              });
-              await mutate(`/api/spaces/${board.spaceId}/proposals`);
-            } catch (err) {
-              showMessage('Failed to update proposal reviewers', 'error');
+          if (reviewers.length) {
+            const evaluationId = proposal?.currentEvaluationId;
+            if (evaluationId) {
+              try {
+                await trigger({
+                  reviewers: reviewers.map((reviewer) => ({
+                    roleId: reviewer.group === 'role' ? reviewer.id : null,
+                    systemRole: reviewer.group === 'system_role' ? (reviewer.id as ProposalSystemRole) : null,
+                    userId: reviewer.group === 'user' ? reviewer.id : null
+                  })),
+                  evaluationId
+                });
+                await mutate(`/api/spaces/${board.spaceId}/proposals`);
+              } catch (err) {
+                showMessage('Failed to update proposal reviewers', 'error');
+              }
             }
           }
         }}
         value={propertyValue as any}
         showEmptyPlaceholder={showEmptyPlaceholder}
-        disallowEmpty
       />
     );
   } else if (propertyTemplate.type === 'proposalAuthor') {

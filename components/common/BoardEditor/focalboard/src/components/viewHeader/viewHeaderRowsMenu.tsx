@@ -1,5 +1,4 @@
 import type { ProposalSystemRole } from '@charmverse/core/prisma';
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import { Box, Menu, MenuItem, Stack, Typography } from '@mui/material';
@@ -573,10 +572,8 @@ export function ViewHeaderRowsMenu({
     for (const pageId of pageIds) {
       const proposalId = pages[pageId]?.proposalId;
       const proposal = proposalId ? proposals?.find((_proposal) => _proposal.id === proposalId) : null;
-      const proposalWithEvaluation = proposal as ProposalWithUsers & { currentEvaluationId?: string | null };
-      const evaluationId =
-        'currentEvaluationId' in proposalWithEvaluation ? proposalWithEvaluation.currentEvaluationId : undefined;
-      if (proposal && evaluationId && proposal.evaluationType !== 'feedback' && proposal.evaluationType !== 'vote') {
+      const proposalWithEvaluationId = proposal?.currentEvaluationId;
+      if (proposal && proposalWithEvaluationId && proposal.status !== 'draft' && proposal.status !== 'discussion') {
         await charmClient.proposals.updateProposalEvaluation({
           reviewers: reviewers.map((reviewer) => ({
             roleId: reviewer.group === 'role' ? reviewer.id : null,
@@ -584,11 +581,11 @@ export function ViewHeaderRowsMenu({
             userId: reviewer.group === 'user' ? reviewer.id : null
           })),
           proposalId: proposal.id,
-          evaluationId
+          evaluationId: proposalWithEvaluationId
         });
-        await mutate(`/api/spaces/${board.spaceId}/proposals`);
       }
     }
+    await mutate(`/api/spaces/${board.spaceId}/proposals`);
   }
 
   const filteredPropertyTemplates = useMemo(() => {

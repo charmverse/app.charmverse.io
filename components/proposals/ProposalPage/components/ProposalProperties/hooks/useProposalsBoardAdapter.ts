@@ -79,7 +79,9 @@ export function useProposalsBoardAdapter() {
             ...mapProposalToCardPage({ proposal: p, proposalPage: page, spaceId: space?.id }),
             isStructuredProposal,
             proposal: {
-              currentEvaluationId: p.currentEvaluationId
+              currentEvaluationId: p.currentEvaluationId,
+              id: p.id,
+              status: p.status
             }
           } as CardPage;
         })

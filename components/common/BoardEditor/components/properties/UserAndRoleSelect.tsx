@@ -71,17 +71,14 @@ function SelectedOptions({
   isRequiredValue = () => false,
   readOnly,
   onRemove,
-  wrapColumn,
-  disallowEmpty = false
+  wrapColumn
 }: {
   wrapColumn?: boolean;
   readOnly: boolean;
   value: SelectOptionPopulated[];
   isRequiredValue?: (option: SelectOptionPopulated) => boolean;
   onRemove: (reviewerId: string) => void;
-  disallowEmpty?: boolean;
 }) {
-  const showDeleteIcon = (disallowEmpty && value.length !== 1) || !disallowEmpty;
   return (
     <>
       {value.map((option) => {
@@ -97,7 +94,7 @@ function SelectedOptions({
                 sx={wrapColumn ? { justifyContent: 'space-between', overflowX: 'hidden' } : { overflowX: 'hidden' }}
               >
                 <UserDisplay fontSize={14} avatarSize='xSmall' userId={option.id} wrapName={wrapColumn} />
-                {!readOnly && !isRequiredValue(option) && showDeleteIcon && (
+                {!readOnly && !isRequiredValue(option) && (
                   <IconButton size='small' onClick={() => onRemove(option.id)}>
                     <CloseIcon
                       sx={{
@@ -120,16 +117,12 @@ function SelectedOptions({
                 size='small'
                 onDelete={readOnly || isRequiredValue(option) ? undefined : () => onRemove(option.id)}
                 deleteIcon={
-                  showDeleteIcon ? (
-                    <CloseIcon
-                      sx={{
-                        fontSize: 14
-                      }}
-                      cursor='pointer'
-                    />
-                  ) : (
-                    <div />
-                  )
+                  <CloseIcon
+                    sx={{
+                      fontSize: 14
+                    }}
+                    cursor='pointer'
+                  />
                 }
               />
             )}
@@ -144,16 +137,12 @@ function SelectedOptions({
                 size='small'
                 onDelete={readOnly || isRequiredValue(option) ? undefined : () => onRemove(option.id)}
                 deleteIcon={
-                  showDeleteIcon ? (
-                    <CloseIcon
-                      sx={{
-                        fontSize: 14
-                      }}
-                      cursor='pointer'
-                    />
-                  ) : (
-                    <div />
-                  )
+                  <CloseIcon
+                    sx={{
+                      fontSize: 14
+                    }}
+                    cursor='pointer'
+                  />
                 }
               />
             )}
@@ -181,7 +170,6 @@ type Props<T> = {
   wrapColumn?: boolean;
   type?: 'role' | 'roleAndUser';
   required?: boolean;
-  disallowEmpty?: boolean;
 };
 
 export function UserAndRoleSelect<T extends { id: string; group: string } = SelectOption>({
@@ -200,8 +188,7 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
   'data-test': dataTest,
   wrapColumn,
   type = 'roleAndUser',
-  required,
-  disallowEmpty = false
+  required
 }: Props<T>): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(false);
   const { roles } = useRoles();
@@ -280,11 +267,7 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
   }, [readOnly]);
 
   function removeOption(idToRemove: string) {
-    const leftOptions = populatedValue.filter(({ id }) => id !== idToRemove);
-    if (disallowEmpty && leftOptions.length === 0) {
-      return;
-    }
-    onChange(leftOptions);
+    onChange(populatedValue.filter(({ id }) => id !== idToRemove));
   }
 
   function getPlaceholderLabel() {
@@ -317,13 +300,7 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
             {applicableValues.length === 0 ? (
               showEmptyPlaceholder && <EmptyPlaceholder>{emptyPlaceholderContent}</EmptyPlaceholder>
             ) : (
-              <SelectedOptions
-                disallowEmpty={disallowEmpty}
-                wrapColumn={wrapColumn}
-                readOnly
-                value={populatedValue}
-                onRemove={removeOption}
-              />
+              <SelectedOptions wrapColumn={wrapColumn} readOnly value={populatedValue} onRemove={removeOption} />
             )}
           </Box>
         </Tooltip>
@@ -420,7 +397,6 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
               value={populatedValue}
               isRequiredValue={isRequiredValue}
               onRemove={removeOption}
-              disallowEmpty={disallowEmpty}
             />
           )}
           disabled={!!readOnly}
