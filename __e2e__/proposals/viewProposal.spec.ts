@@ -145,8 +145,8 @@ test.describe.serial('View proposal', () => {
     // Test to make sure the reviewers show up in the table
     const discussionProposalReviewers = await proposalListPage.getProposalRowReviewersLocators(discussionProposal.id);
 
-    // 1 role reviewer + 1 user reviewer
-    expect(discussionProposalReviewers).toHaveLength(2);
+    // 1 role reviewer + 1 user reviewer + 1 all space members
+    expect(discussionProposalReviewers).toHaveLength(3);
 
     for (const reviewer of discussionProposalReviewers) {
       await expect(reviewer).toBeVisible();
@@ -155,8 +155,9 @@ test.describe.serial('View proposal', () => {
 
       const showingReviewerRoleName = !!text.match(role.name);
       const showingReviewerUserName = !!text.match(proposalReviewer.username);
+      const showingReviewerSystemName = !!text.match('All members');
 
-      expect(showingReviewerRoleName || showingReviewerUserName).toBe(true);
+      expect(showingReviewerRoleName || showingReviewerUserName || showingReviewerSystemName).toBe(true);
     }
   });
 

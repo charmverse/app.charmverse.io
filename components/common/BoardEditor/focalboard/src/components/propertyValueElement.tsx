@@ -319,6 +319,7 @@ function PropertyValueElement(props: Props) {
           proposal.status === 'draft' ||
           proposal.status === 'discussion'
         }
+        data-test='selected-reviewers'
         systemRoles={[allMembersSystemRole]}
         onChange={async (reviewers) => {
           if (reviewers.length) {

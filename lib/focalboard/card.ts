@@ -1,5 +1,5 @@
 import type { PageMeta } from '@charmverse/core/pages';
-import type { ProposalEvaluationType, ProposalStatus } from '@charmverse/core/prisma-client';
+import type { ProposalStatus } from '@charmverse/core/prisma-client';
 
 import type { Block } from 'lib/focalboard/block';
 import { createBlock } from 'lib/focalboard/block';
