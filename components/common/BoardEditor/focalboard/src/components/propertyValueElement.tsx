@@ -11,6 +11,7 @@ import { useIntl } from 'react-intl';
 import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
+import { useUpdateProposalEvaluation } from 'charmClient/hooks/proposals';
 import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
@@ -27,6 +28,7 @@ import { RewardStatusChip } from 'components/rewards/components/RewardChip';
 import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board, DatabaseProposalPropertyType, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
@@ -76,7 +78,10 @@ type Props = {
   columnRef?: React.RefObject<HTMLDivElement>;
   mutator?: Mutator;
   subRowsEmptyValueContent?: ReactElement | string;
-  proposal?: ProposalWithUsers;
+  proposal?: {
+    id: string;
+    currentEvaluationId: string | null;
+  };
 };
 
 export const validatePropertyValue = (propType: string, val: string): boolean => {
@@ -135,7 +140,8 @@ function PropertyValueElement(props: Props) {
     subRowsEmptyValueContent,
     proposal
   } = props;
-
+  const { trigger } = useUpdateProposalEvaluation({ proposalId: proposal?.id });
+  const { showMessage } = useSnackbar();
   const { rubricProposalIdsWhereUserIsEvaluator, rubricProposalIdsWhereUserIsNotEvaluator } =
     useProposalsWhereUserIsEvaluator({
       spaceId:
@@ -315,20 +321,21 @@ function PropertyValueElement(props: Props) {
         readOnly={readOnly || (displayType !== 'details' && displayType !== 'table')}
         systemRoles={[allMembersSystemRole]}
         onChange={async (reviewers) => {
-          const proposalWithEvaluation = proposal as ProposalWithUsers & { currentEvaluationId?: string | null };
-          const evaluationId =
-            'currentEvaluationId' in proposalWithEvaluation ? proposalWithEvaluation.currentEvaluationId : undefined;
-          if (proposal && evaluationId) {
-            await charmClient.proposals.updateProposalEvaluation({
-              reviewers: reviewers.map((reviewer) => ({
-                roleId: reviewer.group === 'role' ? reviewer.id : null,
-                systemRole: reviewer.group === 'system_role' ? (reviewer.id as ProposalSystemRole) : null,
-                userId: reviewer.group === 'user' ? reviewer.id : null
-              })),
-              proposalId: proposal.id,
-              evaluationId
-            });
-            await mutate(`/api/spaces/${board.spaceId}/proposals`);
+          const evaluationId = proposal?.currentEvaluationId;
+          if (evaluationId) {
+            try {
+              await trigger({
+                reviewers: reviewers.map((reviewer) => ({
+                  roleId: reviewer.group === 'role' ? reviewer.id : null,
+                  systemRole: reviewer.group === 'system_role' ? (reviewer.id as ProposalSystemRole) : null,
+                  userId: reviewer.group === 'user' ? reviewer.id : null
+                })),
+                evaluationId
+              });
+              await mutate(`/api/spaces/${board.spaceId}/proposals`);
+            } catch (err) {
+              showMessage('Failed to update proposal reviewers', 'error');
+            }
           }
         }}
         value={propertyValue as any}

@@ -70,7 +70,10 @@ type Props = {
   emptySubPagesPlaceholder?: ReactNode;
   isChecked?: boolean;
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
-  proposal?: ProposalWithUsers;
+  proposal?: {
+    id: string;
+    currentEvaluationId: string | null;
+  };
 };
 
 export const StyledCheckbox = styled(Checkbox)<{ show?: boolean }>`

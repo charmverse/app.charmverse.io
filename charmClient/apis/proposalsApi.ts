@@ -49,8 +49,4 @@ export class ProposalsApi {
   deleteProposalCategory(spaceId: string, categoryId: string) {
     return http.DELETE<{ ok: true }>(`/api/spaces/${spaceId}/proposal-categories/${categoryId}`);
   }
-
-  updateProposalEvaluation({ proposalId, ...payload }: UpdateEvaluationRequest) {
-    return http.PUT(`/api/proposals/${proposalId}/evaluation`, payload);
-  }
 }

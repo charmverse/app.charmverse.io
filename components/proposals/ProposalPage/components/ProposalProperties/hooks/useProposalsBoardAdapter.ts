@@ -36,12 +36,12 @@ export function useProposalsBoardAdapter() {
   const [boardProposal, setBoardProposal] = useState<BoardProposal | null>(null);
   const { space } = useCurrentSpace();
   const { membersRecord } = useMembers();
-  const { proposals = [] } = useProposals();
+  const { proposals } = useProposals();
   const { categories } = useProposalCategories();
   const { pages } = usePages();
   const { proposalBoardBlock, proposalBlocks } = useProposalBlocks();
   const proposalPage = pages[boardProposal?.id || ''];
-  const proposal = proposals.find((p) => p.id === boardProposal?.id) ?? null;
+  const proposal = proposals?.find((p) => p.id === boardProposal?.id) ?? null;
 
   const localViewSettings = useLocalDbViewSettings(`proposals-${space?.id}-${DEFAULT_VIEW_BLOCK_ID}`);
 
@@ -78,7 +78,9 @@ export function useProposalsBoardAdapter() {
           return {
             ...mapProposalToCardPage({ proposal: p, proposalPage: page, spaceId: space?.id }),
             isStructuredProposal,
-            proposal: p
+            proposal: {
+              currentEvaluationId: p.currentEvaluationId
+            }
           } as CardPage;
         })
         .filter((cp): cp is CardPage => !!cp.card && !!cp.page) || [];
