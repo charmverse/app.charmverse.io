@@ -101,10 +101,10 @@ export async function parseCeramicRecord(result: any) {
     decodedPayload
   };
 }
-export async function getStreams() {
+export async function getCeramicStreams() {
   await authenticateCeramic();
 
-  const streams = await ceramic.pin.ls();
+  const streams = await ceramic.admin.pin.ls();
 
   return streams;
 }
