@@ -23,9 +23,6 @@ describe('POST /api/forums/posts/[postId]/convert-to-proposal - Convert post to 
     await request(baseUrl)
       .post(`/api/forums/posts/${post.id}/convert-to-proposal`)
       .set('Cookie', nonAdminCookie)
-      .send({
-        categoryId: proposalCategory.id
-      })
       .expect(200);
   });
 

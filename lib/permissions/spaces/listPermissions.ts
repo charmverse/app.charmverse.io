@@ -1,8 +1,7 @@
-import type { AssignedPostCategoryPermission, AssignedProposalCategoryPermission } from '@charmverse/core/permissions';
+import type { AssignedPostCategoryPermission } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { mapPostCategoryPermissionToAssignee } from '../forum/mapPostCategoryPermissionToAssignee';
-import { mapProposalCategoryPermissionToAssignee } from '../proposals/mapProposalCategoryPermissionToAssignee';
 
 import { AvailableSpacePermissions } from './availableSpacePermissions';
 import type { AssignedSpacePermission } from './mapSpacePermissionToAssignee';
@@ -10,21 +9,11 @@ import { mapSpacePermissionToAssignee } from './mapSpacePermissionToAssignee';
 
 export type SpacePermissions = {
   space: AssignedSpacePermission[];
-  proposalCategories: AssignedProposalCategoryPermission[];
   forumCategories: AssignedPostCategoryPermission[];
 };
 
 export async function listPermissions({ spaceId }: { spaceId: string }): Promise<SpacePermissions> {
-  const [proposalCategories, forumCategories, space] = await Promise.all([
-    prisma.proposalCategoryPermission
-      .findMany({
-        where: {
-          proposalCategory: {
-            spaceId
-          }
-        }
-      })
-      .then((permissions) => permissions.map(mapProposalCategoryPermissionToAssignee)),
+  const [forumCategories, space] = await Promise.all([
     prisma.postCategoryPermission
       .findMany({
         where: {
@@ -55,5 +44,5 @@ export async function listPermissions({ spaceId }: { spaceId: string }): Promise
     });
   }
 
-  return { proposalCategories, forumCategories, space };
+  return { forumCategories, space };
 }
