@@ -198,7 +198,7 @@ describe('updateCardsFromProposals()', () => {
     expect(newCreatedCard).toBeNull();
   });
 
-  it('should update the card proposalStatus and proposalCategory property if the proposal status or category was changed', async () => {
+  it('should update the card proposalStatus property if the proposal status was changed', async () => {
     const database = await generateBoard({
       createdBy: user.id,
       spaceId: space.id,
@@ -221,7 +221,7 @@ describe('updateCardsFromProposals()', () => {
       }
     });
 
-    const { proposalCategory, proposalStatus, proposalUrl } = extractDatabaseProposalProperties({
+    const { proposalStatus, proposalUrl } = extractDatabaseProposalProperties({
       boardBlock: databaseAfterUpdate as any
     });
 
@@ -247,7 +247,6 @@ describe('updateCardsFromProposals()', () => {
     const cardBlockProposalProps = extractCardProposalProperties({
       card: cardBlock as any,
       databaseProperties: {
-        proposalCategory,
         proposalStatus,
         proposalUrl
       }
@@ -256,29 +255,6 @@ describe('updateCardsFromProposals()', () => {
     expect(cardBlockProposalProps.cardProposalStatus).toBeDefined();
     expect(cardBlockProposalProps.cardProposalStatus?.value).toBe('discussion');
     expect(cardBlockProposalProps.cardProposalStatus?.propertyId).toBe(proposalStatus?.id);
-    expect(cardBlockProposalProps.cardProposalCategory).toBeDefined();
-    expect(cardBlockProposalProps.cardProposalCategory?.optionId).toBe(pageProposal.categoryId);
-    expect(cardBlockProposalProps.cardProposalCategory?.value).toBe(pageProposal.category?.title);
-    expect(cardBlockProposalProps.cardProposalCategory?.propertyId).toBe(proposalCategory?.id);
-
-    const updatedProposal = await prisma.proposal.update({
-      where: {
-        id: pageProposal.id
-      },
-      data: {
-        status: 'review',
-        category: {
-          create: {
-            color: '',
-            title: 'New category',
-            space: { connect: { id: space.id } }
-          }
-        }
-      },
-      include: {
-        category: true
-      }
-    });
 
     await updateCardsFromProposals({
       boardId: database.id,
@@ -306,10 +282,6 @@ describe('updateCardsFromProposals()', () => {
     expect(updatedCardBlockProposalProps.cardProposalStatus).toBeDefined();
     expect(updatedCardBlockProposalProps.cardProposalStatus?.value).toBe('review');
     expect(updatedCardBlockProposalProps.cardProposalStatus?.propertyId).toBe(proposalStatus?.id);
-    expect(updatedCardBlockProposalProps.cardProposalCategory).toBeDefined();
-    expect(updatedCardBlockProposalProps.cardProposalCategory?.optionId).toBe(updatedProposal.categoryId);
-    expect(updatedCardBlockProposalProps.cardProposalCategory?.value).toBe(updatedProposal.category?.title);
-    expect(updatedCardBlockProposalProps.cardProposalCategory?.propertyId).toBe(proposalCategory?.id);
   });
 
   it('should update the card proposalStatus to archived, or revert it to its status if unarchived', async () => {
@@ -335,7 +307,7 @@ describe('updateCardsFromProposals()', () => {
       }
     });
 
-    const { proposalCategory, proposalStatus, proposalUrl } = extractDatabaseProposalProperties({
+    const { proposalStatus, proposalUrl } = extractDatabaseProposalProperties({
       boardBlock: databaseAfterUpdate as any
     });
 
@@ -361,7 +333,6 @@ describe('updateCardsFromProposals()', () => {
     const cardBlockProposalProps = extractCardProposalProperties({
       card: cardBlock as any,
       databaseProperties: {
-        proposalCategory,
         proposalStatus,
         proposalUrl
       }
@@ -379,9 +350,6 @@ describe('updateCardsFromProposals()', () => {
       },
       data: {
         archived: true
-      },
-      include: {
-        category: true
       }
     });
 
@@ -413,9 +381,6 @@ describe('updateCardsFromProposals()', () => {
       },
       data: {
         archived: false
-      },
-      include: {
-        category: true
       }
     });
 

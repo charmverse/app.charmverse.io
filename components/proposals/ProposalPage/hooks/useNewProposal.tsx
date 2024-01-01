@@ -45,11 +45,10 @@ export function useNewProposal({ newProposal }: Props) {
 
   async function createProposal({ isDraft }: { isDraft?: boolean }) {
     log.info('[user-journey] Create a proposal');
-    if (formInputs.categoryId && currentSpace) {
+    if (currentSpace) {
       const result = await createProposalTrigger({
         proposalTemplateId: formInputs.proposalTemplateId,
         authors: formInputs.authors,
-        categoryId: formInputs.categoryId,
         pageProps: {
           content: formInputs.content,
           contentText: formInputs.contentText ?? '',
@@ -82,10 +81,6 @@ export function useNewProposal({ newProposal }: Props) {
   let disabledTooltip: string | undefined;
   if (!formInputs.title) {
     disabledTooltip = 'Title is required';
-  }
-
-  if (!formInputs.categoryId) {
-    disabledTooltip = 'Category is required';
   }
 
   if (formInputs.type === 'proposal' && currentSpace?.requireProposalTemplate && !formInputs.proposalTemplateId) {
@@ -144,7 +139,6 @@ function emptyState({
 }: Partial<ProposalPageAndPropertiesInput> & { userId?: string } = {}): ProposalPageAndPropertiesInput {
   return {
     proposalType: 'free_form',
-    categoryId: null,
     content: null,
     contentText: '',
     headerImage: null,

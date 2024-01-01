@@ -211,8 +211,7 @@ export async function createProposal({
         form: proposalFormId ? { connect: { id: proposalFormId } } : undefined
       },
       include: {
-        authors: true,
-        category: true
+        authors: true
       }
     }),
     prisma.proposalReviewer.createMany({

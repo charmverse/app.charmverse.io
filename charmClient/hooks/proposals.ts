@@ -1,8 +1,4 @@
-import type {
-  ProposalCategoryWithPermissions,
-  ProposalFlowPermissionFlags,
-  ProposalReviewerPool
-} from '@charmverse/core/permissions';
+import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import type { FormFieldAnswer } from '@charmverse/core/prisma-client';
 import type { ListProposalsRequest } from '@charmverse/core/proposals';
 
@@ -37,25 +33,16 @@ export function useGetProposalDetails(proposalId: MaybeString) {
 export function useGetIsReviewer(proposalId: MaybeString) {
   return useGET<boolean>(proposalId ? `/api/proposals/${proposalId}/is-reviewer` : null);
 }
-export function useGetReviewerPool(categoryId: MaybeString) {
-  return useGET<ProposalReviewerPool>(categoryId ? `/api/proposals/reviewer-pool?resourceId=${categoryId}` : null);
-}
 
 export function useGetProposalFlowFlags(proposalId: MaybeString) {
   return useGET<ProposalFlowPermissionFlags>(proposalId ? `/api/proposals/${proposalId}/compute-flow-flags` : null);
 }
-export function useGetProposalsBySpace({ spaceId, categoryIds }: Partial<ListProposalsRequest>) {
-  return useGET<ProposalWithUsers[]>(spaceId ? `/api/spaces/${spaceId}/proposals` : null, {
-    categoryIds
-  });
+export function useGetProposalsBySpace({ spaceId }: Partial<ListProposalsRequest>) {
+  return useGET<ProposalWithUsers[]>(spaceId ? `/api/spaces/${spaceId}/proposals` : null);
 }
 
 export function useGetProposalTemplatesBySpace(spaceId: MaybeString) {
   return useGET<ProposalTemplate[]>(spaceId ? `/api/spaces/${spaceId}/proposal-templates` : null);
-}
-
-export function useGetProposalCategories(spaceId?: string) {
-  return useGET<ProposalCategoryWithPermissions[]>(spaceId ? `/api/spaces/${spaceId}/proposal-categories` : null);
 }
 
 export function useGetProposalIdsEvaluatedByUser(spaceId: MaybeString) {

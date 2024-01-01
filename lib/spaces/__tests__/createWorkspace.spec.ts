@@ -1,15 +1,8 @@
-import type {
-  PostCategoryPermission,
-  ProposalCategoryPermission,
-  Space,
-  SpaceRole,
-  User
-} from '@charmverse/core/prisma';
+import type { PostCategoryPermission, Space, SpaceRole, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { defaultPostCategories } from 'lib/forums/categories/generateDefaultPostCategories';
-import { defaultProposalCategories } from 'lib/proposal/generateDefaultProposalCategoriesInput';
 import { uid } from 'lib/utilities/strings';
 import { gettingStartedPage } from 'seedData/gettingStartedPage';
 
@@ -178,39 +171,6 @@ describe('createWorkspace', () => {
         expect.objectContaining<Partial<PostCategoryPermission>>({
           spaceId: newWorkspace.id,
           postCategoryId: c.id,
-          permissionLevel: 'full_access'
-        })
-      );
-    });
-  });
-  it('should create default proposal categories for the workspace that are accessible to all space members by default', async () => {
-    const newWorkspace = await createWorkspace({
-      userId: user.id,
-      spaceData: {
-        name: `Name-${v4()}`,
-        domain: `domain-${v4()}`
-      }
-    });
-
-    const categories = await prisma.proposalCategory.findMany({
-      where: {
-        spaceId: newWorkspace.id
-      },
-      include: {
-        proposalCategoryPermissions: true
-      }
-    });
-
-    expect(categories).toHaveLength(defaultProposalCategories.length);
-
-    expect(categories.every((c) => defaultProposalCategories.includes(c.title))).toBe(true);
-
-    categories.forEach((c) => {
-      expect(c.proposalCategoryPermissions).toHaveLength(1);
-      expect(c.proposalCategoryPermissions[0]).toMatchObject(
-        expect.objectContaining<Partial<ProposalCategoryPermission>>({
-          spaceId: newWorkspace.id,
-          proposalCategoryId: c.id,
           permissionLevel: 'full_access'
         })
       );

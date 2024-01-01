@@ -19,7 +19,7 @@ import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { isProdEnv } from 'config/constants';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { ProposalFields, ProposalReviewerInput, ProposalCategory } from 'lib/proposal/interface';
+import type { ProposalFields, ProposalReviewerInput } from 'lib/proposal/interface';
 import {
   getProposalStatuses,
   nextProposalStatusUpdateMessage,
@@ -27,15 +27,11 @@ import {
 } from 'lib/proposal/proposalStatusTransition';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-import { useProposalCategories } from '../../../hooks/useProposalCategories';
 import type { ProposalEvaluationValues } from '../EvaluationSettingsSidebar/components/EvaluationStepSettings';
-
-import { ProposalCategorySelect } from './components/ProposalCategorySelect';
 
 export type ProposalPropertiesInput = {
   content?: PageContent | null;
   contentText?: string; // required to know if we can overwrite content when selecting a template
-  categoryId?: string | null;
   authors: string[];
   reviewers: ProposalReviewerInput[];
   workflowId?: string | null;
@@ -50,7 +46,6 @@ export type ProposalPropertiesInput = {
 type ProposalPropertiesProps = {
   isPublishingToLens?: boolean;
   proposalLensLink?: string;
-  readOnlyCategory?: boolean;
   isAdmin?: boolean;
   isFromTemplate?: boolean;
   pageId?: string;
@@ -77,7 +72,6 @@ export function ProposalPropertiesBase({
   proposalFlowFlags,
   proposalStatus,
   readOnlyAuthors,
-  readOnlyCategory,
   setProposalFormInputs,
   snapshotProposalId,
   updateProposalStatus,
@@ -87,11 +81,9 @@ export function ProposalPropertiesBase({
   rewardIds
 }: ProposalPropertiesProps) {
   const { user } = useUser();
-  const { proposalCategoriesWithCreatePermission, categories } = useProposalCategories();
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
   const { lensProfile } = useLensProfile();
-  const isMobile = useMediaQuery<Theme>((theme) => theme.breakpoints.down('sm'));
   const { account } = useWeb3Account();
   const previousConfirmationPopup = usePopupState({
     variant: 'popover',
@@ -131,27 +123,11 @@ export function ProposalPropertiesBase({
   }
 
   const isAuthor = proposalFormInputs.authors.includes(user?.id ?? '');
-  const proposalCategoryId = proposalFormInputs.categoryId;
-  const proposalCategory = categories?.find((category) => category.id === proposalCategoryId);
   const proposalAuthorIds = proposalFormInputs.authors;
   const proposalReviewers = proposalFormInputs.reviewers;
   const isNewProposal = !pageId;
   const voteProposal = proposalId && proposalStatus ? { id: proposalId, status: proposalStatus } : undefined;
   const pendingRewards = proposalFormInputs.fields?.pendingRewards || [];
-
-  async function onChangeCategory(updatedCategory: ProposalCategory | null) {
-    if (updatedCategory && updatedCategory.id !== proposalFormInputs.categoryId) {
-      setProposalFormInputs({
-        categoryId: updatedCategory.id,
-        proposalTemplateId: null
-      });
-    } else if (!updatedCategory) {
-      setProposalFormInputs({
-        categoryId: null,
-        proposalTemplateId: null
-      });
-    }
-  }
 
   function openVoteModal() {
     setIsVoteModalOpen(true);
@@ -188,24 +164,6 @@ export function ProposalPropertiesBase({
         </Stack>
       )}
       <Collapse in={detailsExpanded} timeout='auto' unmountOnExit>
-        {/* Select a category */}
-        <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
-          <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-            <PropertyLabel readOnly required={isNewProposal} highlighted>
-              Category
-            </PropertyLabel>
-            <Box display='flex' flex={1}>
-              <ProposalCategorySelect
-                readOnly={readOnlyCategory}
-                readOnlyMessage={isFromTemplate ? templateTooltip('category', isAdmin) : undefined}
-                options={(readOnlyCategory ? categories : proposalCategoriesWithCreatePermission) || []}
-                value={proposalCategory ?? null}
-                onChange={onChangeCategory}
-              />
-            </Box>
-          </Box>
-        </Box>
-
         {/* Select authors */}
         <Box justifyContent='space-between' gap={2} alignItems='center'>
           <div

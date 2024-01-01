@@ -26,7 +26,6 @@ export type Formatters = {
 
 export type PropertyContext = {
   users: { [key: string]: { username: string } };
-  proposalCategories: { [key: string]: string };
   spaceDomain: string;
 };
 
@@ -60,10 +59,6 @@ class OctoUtils {
           const options = propertyTemplate.options.filter((o) => propertyValue.includes(o.id));
           displayValue = options.map((o) => o.value);
         }
-        break;
-      }
-      case 'proposalCategory': {
-        displayValue = typeof propertyValue === 'string' ? context?.proposalCategories[propertyValue] : propertyValue;
         break;
       }
       case 'proposalStatus': {

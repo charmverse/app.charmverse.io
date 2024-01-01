@@ -1,14 +1,13 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import type { AssignedPostCategoryPermission, AssignedProposalCategoryPermission } from '@charmverse/core/permissions';
+import type { AssignedPostCategoryPermission } from '@charmverse/core/permissions';
 import type {
   MemberProperty,
   MemberPropertyPermission,
   Post,
   PostCategory,
   ProposalBlock,
-  ProposalCategory,
   RewardBlock,
   Role,
   Space,
@@ -18,7 +17,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsForum, testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 
 import { mapPostCategoryPermissionToAssignee } from 'lib/permissions/forum/mapPostCategoryPermissionToAssignee';
-import { mapProposalCategoryPermissionToAssignee } from 'lib/permissions/proposals/mapProposalCategoryPermissionToAssignee';
 import {
   mapSpacePermissionToAssignee,
   type AssignedSpacePermission
@@ -36,12 +34,8 @@ describe('exportSpaceData', () => {
   let secondProposalReviewerRole: Role;
 
   let spacePermissions: AssignedSpacePermission[];
-  let proposalCategoryPermissions: AssignedProposalCategoryPermission[];
   let postCategoryPermissions: AssignedPostCategoryPermission[];
 
-  let proposalCategory1WithoutPermissions: ProposalCategory;
-  let proposalCategory2WithSpacePermissions: ProposalCategory;
-  let proposalCategory3WithRolePermissions: ProposalCategory;
   let postCategoryWithPermissions: PostCategory;
 
   let posts: Post[];
@@ -96,32 +90,7 @@ describe('exportSpaceData', () => {
       ])
       .then((data) => data.map(mapSpacePermissionToAssignee));
 
-    [
-      proposalCategory1WithoutPermissions,
-      proposalCategory2WithSpacePermissions,
-      proposalCategory3WithRolePermissions,
-      postCategoryWithPermissions
-    ] = await Promise.all([
-      testUtilsProposals.generateProposalCategory({
-        spaceId: space.id,
-        proposalCategoryPermissions: [
-          { assignee: { group: 'role', id: proposalReviewerRole.id }, permissionLevel: 'view_comment_vote' }
-        ]
-      }),
-      testUtilsProposals.generateProposalCategory({
-        spaceId: space.id,
-        proposalCategoryPermissions: [
-          { assignee: { group: 'space', id: space.id }, permissionLevel: 'view_comment' },
-          { assignee: { group: 'role', id: proposalReviewerRole.id }, permissionLevel: 'full_access' }
-        ]
-      }),
-      testUtilsProposals.generateProposalCategory({
-        spaceId: space.id,
-        proposalCategoryPermissions: [
-          { assignee: { group: 'role', id: proposalReviewerRole.id }, permissionLevel: 'full_access' },
-          { assignee: { group: 'role', id: secondProposalReviewerRole.id }, permissionLevel: 'view_comment_vote' }
-        ]
-      }),
+    [postCategoryWithPermissions] = await Promise.all([
       testUtilsForum.generatePostCategory({
         spaceId: space.id,
         name: 'Example category xx',
@@ -146,16 +115,6 @@ describe('exportSpaceData', () => {
       categoryId: postCategoryWithPermissions.id
     });
 
-    proposalCategoryPermissions = await prisma.proposalCategoryPermission
-      .findMany({
-        where: {
-          proposalCategory: {
-            spaceId: space.id
-          }
-        }
-      })
-      .then((data) => data.map(mapProposalCategoryPermissionToAssignee));
-
     postCategoryPermissions = await prisma.postCategoryPermission
       .findMany({
         where: {
@@ -178,14 +137,7 @@ describe('exportSpaceData', () => {
       })
       .then((p) =>
         prisma.page.findUniqueOrThrow({
-          where: { id: p.id },
-          include: {
-            proposal: {
-              include: {
-                category: true
-              }
-            }
-          }
+          where: { id: p.id }
         })
       )
       .then((p) => ({ ...p, children: [], permissions: [] }));
@@ -201,14 +153,7 @@ describe('exportSpaceData', () => {
       })
       .then((p) =>
         prisma.page.findUniqueOrThrow({
-          where: { id: p.id },
-          include: {
-            proposal: {
-              include: {
-                category: true
-              }
-            }
-          }
+          where: { id: p.id }
         })
       )
       .then((p) => ({ ...p, children: [], permissions: [] }));
@@ -221,14 +166,7 @@ describe('exportSpaceData', () => {
       })
       .then((p) =>
         prisma.page.findUniqueOrThrow({
-          where: { id: p.id },
-          include: {
-            proposal: {
-              include: {
-                category: true
-              }
-            }
-          }
+          where: { id: p.id }
         })
       )
       .then((p) => ({ ...p, children: [], permissions: [] }));
@@ -362,7 +300,7 @@ describe('exportSpaceData', () => {
               cardOrder: [],
               openPageIn: 'center_peek',
               sortOptions: [{ reversed: false, propertyId: '__title' }],
-              columnWidths: { __title: 400, __status: 150, __authors: 150, __category: 200, __reviewers: 150 },
+              columnWidths: { __title: 400, __status: 150, __authors: 150, __reviewers: 150 },
               hiddenOptionIds: [],
               columnWrappedIds: [],
               visibleOptionIds: [],
@@ -370,7 +308,7 @@ describe('exportSpaceData', () => {
               collapsedOptionIds: [],
               columnCalculations: {},
               kanbanCalculations: {},
-              visiblePropertyIds: ['__category', '__status', '__evaluationType', '__authors', '__reviewers']
+              visiblePropertyIds: ['__status', '__evaluationType', '__authors', '__reviewers']
             }
           }
         }),
@@ -457,7 +395,6 @@ describe('exportSpaceData', () => {
     expect(exportedData).toHaveProperty('pages');
     expect(exportedData).toHaveProperty('roles');
     expect(exportedData).toHaveProperty('permissions');
-    expect(exportedData).toHaveProperty('proposalCategories');
 
     expect(exportedData).toMatchObject<SpaceDataExport>({
       space: {
@@ -477,15 +414,9 @@ describe('exportSpaceData', () => {
       roles: expect.arrayContaining([proposalReviewerRole, secondProposalReviewerRole]),
       permissions: {
         postCategoryPermissions: expect.arrayContaining(postCategoryPermissions),
-        proposalCategoryPermissions: expect.arrayContaining(proposalCategoryPermissions),
         spacePermissions: expect.arrayContaining(spacePermissions)
       },
       pages: expect.arrayContaining([proposalInCategory1, proposalInCategory2, proposalInCategory3]),
-      proposalCategories: expect.arrayContaining([
-        proposalCategory1WithoutPermissions,
-        proposalCategory2WithSpacePermissions,
-        proposalCategory3WithRolePermissions
-      ]),
       postCategories: expect.arrayContaining([postCategoryWithPermissions]),
       posts: expect.arrayContaining(posts)
     });
@@ -513,16 +444,10 @@ describe('exportSpaceData', () => {
       },
       roles: expect.arrayContaining([proposalReviewerRole, secondProposalReviewerRole]),
       permissions: {
-        proposalCategoryPermissions: expect.arrayContaining(proposalCategoryPermissions),
         spacePermissions: expect.arrayContaining(spacePermissions),
         postCategoryPermissions: expect.arrayContaining(postCategoryPermissions)
       },
       pages: expect.arrayContaining([proposalInCategory1, proposalInCategory2, proposalInCategory3]),
-      proposalCategories: expect.arrayContaining([
-        proposalCategory1WithoutPermissions,
-        proposalCategory2WithSpacePermissions,
-        proposalCategory3WithRolePermissions
-      ]),
       postCategories: expect.arrayContaining([postCategoryWithPermissions]),
       posts: expect.arrayContaining(posts)
     });
@@ -587,7 +512,6 @@ describe('exportSpaceData', () => {
       ]),
       permissions: {
         postCategoryPermissions: expect.arrayContaining(postCategoryPermissions),
-        proposalCategoryPermissions: expect.arrayContaining(proposalCategoryPermissions),
         spacePermissions: expect.arrayContaining(spacePermissions)
       },
       pages: expect.arrayContaining(
@@ -597,11 +521,6 @@ describe('exportSpaceData', () => {
           updatedAt: p.updatedAt.toISOString()
         }))
       ),
-      proposalCategories: expect.arrayContaining([
-        proposalCategory1WithoutPermissions,
-        proposalCategory2WithSpacePermissions,
-        proposalCategory3WithRolePermissions
-      ]),
       postCategories: expect.arrayContaining([postCategoryWithPermissions]),
       posts: expect.arrayContaining(
         posts.map((p) => ({ ...p, createdAt: p.createdAt.toISOString(), updatedAt: p.updatedAt.toISOString() }))

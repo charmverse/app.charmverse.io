@@ -39,9 +39,7 @@ describe('getImportData', () => {
       pages: [],
       roles: [],
       postCategories: [],
-      proposalCategories: [],
       permissions: {
-        proposalCategoryPermissions: [],
         spacePermissions: [],
         postCategoryPermissions: []
       }

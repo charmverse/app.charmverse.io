@@ -12646,62 +12646,6 @@
     }
   ],
   "permissions": {
-    "proposalCategoryPermissions": [
-      {
-        "id": "c9a6e8d7-b348-4de6-9343-0b6500312820",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "9444ff0c-486f-444a-a13c-91005a96013e",
-        "assignee": {
-          "group": "space",
-          "id": "278a443d-e0eb-49ea-ad39-411dea8164b9"
-        }
-      },
-      {
-        "id": "9b1bd6db-ad8e-4ffe-a6e5-9b6d23c90dbd",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "149c43a5-e29d-4f41-ba0d-2d17d12a8181",
-        "assignee": {
-          "group": "space",
-          "id": "278a443d-e0eb-49ea-ad39-411dea8164b9"
-        }
-      },
-      {
-        "id": "3e111957-3921-472d-95ba-ccc144e35d6a",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "04404f01-0c4f-4fcf-a347-3c85c91bd097",
-        "assignee": {
-          "group": "space",
-          "id": "278a443d-e0eb-49ea-ad39-411dea8164b9"
-        }
-      },
-      {
-        "id": "5a0fdbbc-5539-4033-b93b-e7b291a65536",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "eae26e92-bfaa-4196-9bbf-705cb95f1046",
-        "assignee": {
-          "group": "space",
-          "id": "278a443d-e0eb-49ea-ad39-411dea8164b9"
-        }
-      },
-      {
-        "id": "252277a3-ebad-42a0-b9b6-7eb388f721b6",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "e9b70e9b-2645-4646-bd1e-bfcba600836e",
-        "assignee": {
-          "group": "space",
-          "id": "278a443d-e0eb-49ea-ad39-411dea8164b9"
-        }
-      },
-      {
-        "id": "a8a5fd89-7f41-4a11-997b-033785e3d9cd",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "30c7da30-48f7-4355-bcf2-cddb56d95dc2",
-        "assignee": {
-          "group": "space",
-          "id": "278a443d-e0eb-49ea-ad39-411dea8164b9"
-        }
-      }
-    ],
     "postCategoryPermissions": [
       {
         "id": "4128279f-a9c7-4619-9abd-b797d33c2073",
@@ -12777,44 +12721,6 @@
       }
     ]
   },
-  "proposalCategories": [
-    {
-      "id": "9444ff0c-486f-444a-a13c-91005a96013e",
-      "spaceId": "278a443d-e0eb-49ea-ad39-411dea8164b9",
-      "title": "Operational Budget",
-      "color": "blue"
-    },
-    {
-      "id": "149c43a5-e29d-4f41-ba0d-2d17d12a8181",
-      "spaceId": "278a443d-e0eb-49ea-ad39-411dea8164b9",
-      "title": "Grants",
-      "color": "pink"
-    },
-    {
-      "id": "04404f01-0c4f-4fcf-a347-3c85c91bd097",
-      "spaceId": "278a443d-e0eb-49ea-ad39-411dea8164b9",
-      "title": "Investment",
-      "color": "gray"
-    },
-    {
-      "id": "eae26e92-bfaa-4196-9bbf-705cb95f1046",
-      "spaceId": "278a443d-e0eb-49ea-ad39-411dea8164b9",
-      "title": "Elections",
-      "color": "turquoise"
-    },
-    {
-      "id": "e9b70e9b-2645-4646-bd1e-bfcba600836e",
-      "spaceId": "278a443d-e0eb-49ea-ad39-411dea8164b9",
-      "title": "Governance",
-      "color": "turquoise"
-    },
-    {
-      "id": "30c7da30-48f7-4355-bcf2-cddb56d95dc2",
-      "spaceId": "278a443d-e0eb-49ea-ad39-411dea8164b9",
-      "title": "General",
-      "color": "purple"
-    }
-  ],
   "postCategories": [
     {
       "id": "51c9b9c7-e72b-4d4f-a115-e98623944913",

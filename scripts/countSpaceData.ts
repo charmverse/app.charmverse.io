@@ -21,7 +21,6 @@ async function countSpaceBlocksOldVersion({ spaceId }: { spaceId: string }) {
     inlineComments,
     pageComments,
     memberProperties,
-    proposalCategories,
     forumCategories
   ] = await Promise.all([
     prisma.block.findMany({
@@ -98,11 +97,6 @@ async function countSpaceBlocksOldVersion({ spaceId }: { spaceId: string }) {
         spaceId
       }
     }),
-    prisma.proposalCategory.count({
-      where: {
-        spaceId
-      }
-    }),
     prisma.postCategory.count({
       where: {
         spaceId
@@ -160,7 +154,6 @@ async function countSpaceBlocksOldVersion({ spaceId }: { spaceId: string }) {
     forumPostBlocks,
     forumPosts: posts.length,
     memberProperties,
-    proposalCategories,
     proposals: proposals.length,
     pages: pages.length,
     views
@@ -229,7 +222,6 @@ let record: OverallBlocksCount =  {
         "proposalViews": 0,
         "proposalProperties": 0,
         "proposalPropertyValues": 0,
-        "proposalCategories": 0,
         "proposalRubrics": 0,
         "proposalRubricAnswers": 0,
         "proposalFormFields": 0

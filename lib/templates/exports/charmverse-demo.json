@@ -900,18 +900,11 @@
         "archived": false,
         "reviewedBy": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
         "reviewedAt": "2022-09-08T11:46:55.784Z",
-        "categoryId": "49c9fc30-0e3d-4bfa-8708-d2efea9b8891",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
         "evaluationType": "vote",
-        "fields": null,
-        "category": {
-          "id": "49c9fc30-0e3d-4bfa-8708-d2efea9b8891",
-          "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-          "title": "General",
-          "color": "teal"
-        }
+        "fields": null
       }
     },
     {
@@ -2836,18 +2829,11 @@
         "archived": false,
         "reviewedBy": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
         "reviewedAt": "2022-09-19T18:22:07.761Z",
-        "categoryId": "49c9fc30-0e3d-4bfa-8708-d2efea9b8891",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
         "evaluationType": "vote",
-        "fields": null,
-        "category": {
-          "id": "49c9fc30-0e3d-4bfa-8708-d2efea9b8891",
-          "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-          "title": "General",
-          "color": "teal"
-        }
+        "fields": null
       }
     },
     {
@@ -2916,18 +2902,11 @@
         "archived": false,
         "reviewedBy": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
         "reviewedAt": "2022-10-28T15:30:53.157Z",
-        "categoryId": "f5527a96-4f10-4986-b5c5-7b4292d8c222",
         "snapshotProposalExpiry": "2023-10-05T14:48:47.000Z",
         "publishToLens": null,
         "lensPostLink": null,
         "evaluationType": "vote",
-        "fields": null,
-        "category": {
-          "id": "f5527a96-4f10-4986-b5c5-7b4292d8c222",
-          "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-          "title": "Protocol",
-          "color": "pink"
-        }
+        "fields": null
       }
     },
     {
@@ -3024,18 +3003,11 @@
         "archived": false,
         "reviewedBy": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
         "reviewedAt": "2022-09-08T13:44:05.265Z",
-        "categoryId": "49c9fc30-0e3d-4bfa-8708-d2efea9b8891",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
         "evaluationType": "vote",
-        "fields": null,
-        "category": {
-          "id": "49c9fc30-0e3d-4bfa-8708-d2efea9b8891",
-          "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-          "title": "General",
-          "color": "teal"
-        }
+        "fields": null
       }
     },
     {
@@ -3355,18 +3327,11 @@
         "archived": false,
         "reviewedBy": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
         "reviewedAt": "2022-11-08T19:38:40.135Z",
-        "categoryId": "f52208b1-2d4e-44b9-aad1-7fcab7d9036c",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
         "evaluationType": "vote",
-        "fields": null,
-        "category": {
-          "id": "f52208b1-2d4e-44b9-aad1-7fcab7d9036c",
-          "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-          "title": "Hackathon",
-          "color": "orange"
-        }
+        "fields": null
       }
     },
     {
@@ -4207,18 +4172,11 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "4532b730-f8fa-4925-a056-4d1b175d0d67",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
         "evaluationType": "rubric",
-        "fields": null,
-        "category": {
-          "id": "4532b730-f8fa-4925-a056-4d1b175d0d67",
-          "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-          "title": "Treasury",
-          "color": "gray"
-        }
+        "fields": null
       }
     },
     {
@@ -4641,18 +4599,11 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "4532b730-f8fa-4925-a056-4d1b175d0d67",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
         "evaluationType": "vote",
-        "fields": null,
-        "category": {
-          "id": "4532b730-f8fa-4925-a056-4d1b175d0d67",
-          "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-          "title": "Treasury",
-          "color": "gray"
-        }
+        "fields": null
       }
     },
     {
@@ -5294,18 +5245,11 @@
         "archived": false,
         "reviewedBy": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
         "reviewedAt": "2022-09-08T11:41:37.559Z",
-        "categoryId": "49c9fc30-0e3d-4bfa-8708-d2efea9b8891",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
         "evaluationType": "vote",
-        "fields": null,
-        "category": {
-          "id": "49c9fc30-0e3d-4bfa-8708-d2efea9b8891",
-          "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-          "title": "General",
-          "color": "teal"
-        }
+        "fields": null
       }
     },
     {
@@ -5918,18 +5862,11 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "f5527a96-4f10-4986-b5c5-7b4292d8c222",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
         "evaluationType": "vote",
-        "fields": null,
-        "category": {
-          "id": "f5527a96-4f10-4986-b5c5-7b4292d8c222",
-          "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-          "title": "Protocol",
-          "color": "pink"
-        }
+        "fields": null
       }
     },
     {
@@ -6622,18 +6559,11 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "fc1c1130-1f02-414a-86fb-505bc5061bb5",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
         "evaluationType": "vote",
-        "fields": null,
-        "category": {
-          "id": "fc1c1130-1f02-414a-86fb-505bc5061bb5",
-          "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-          "title": "Metagoverance",
-          "color": "pink"
-        }
+        "fields": null
       }
     },
     {
@@ -10001,18 +9931,11 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "4b869f0f-259a-4fec-8c8e-f3d9a4992c35",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
         "evaluationType": "vote",
-        "fields": null,
-        "category": {
-          "id": "4b869f0f-259a-4fec-8c8e-f3d9a4992c35",
-          "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-          "title": "Season 11",
-          "color": "turquoise"
-        }
+        "fields": null
       }
     },
     {
@@ -12457,7 +12380,7 @@
                 },
                 "content": [
                   {
-                    "text": "P00LS is your gateway to Web3, from NFTs to the metaverse and beyond.  We partner with creators + brands to CREATE THEIR OWN social tokens. Our approach is purpose-driven, community-first and always culturally attuned.",
+                    "text": "P00LS is your gateway to Web3, from NFTs to the metaverse and beyond.  We partner with creators + brands to CREATE THEIR OWN social tokens. Our approach is purpose-driven, community-first and always culturally attuned.",
                     "type": "text",
                     "marks": [
                       {
@@ -12615,7 +12538,7 @@
                     },
                     "content": [
                       {
-                        "text": "Interviewer: What is exciting to you currently that you want to jump into and pour some of that unfiltered creativity into? ",
+                        "text": "Interviewer: What is exciting to you currently that you want to jump into and pour some of that unfiltered creativity into? ",
                         "type": "text",
                         "marks": [
                           {
@@ -14273,7 +14196,7 @@
               }
             ]
           },
-          "contentText": "EXCLUSIVE CONTENT, EXPERIENCES AND OPPORTUNITIES FROM YOUR FAVORITE CREATORS & BRANDSP00LS is your gateway to Web3, from NFTs to the metaverse and beyond.  We partner with creators + brands to CREATE THEIR OWN social tokens. Our approach is purpose-driven, community-first and always culturally attuned.Press /Interviewer: What is exciting to you currently that you want to jump into and pour some of that unfiltered creativity into? EM: I mean off the top of my head, I can just think about my social coin that I made with P00LS. It's called $MAHCOIN-Evan Mock in V MagazineIt’s very new, and what I like about the whole thing is money is not the only currency. It’s like your taste becomes the currency here — your ability to smell talent and potential in people becomes the currency. Your loyalty to artists becomes currency. I really like this idea.-Hugo Comte in VogueBlogDeep Dive: P00LS Listening Party with $LITA and $FEVERThe Deep End: Julia Sisto and Joshua Kelly of SèveP00LS +1: Marion Abou00 TokensEarn Tokens  Buy Tokens  Redeem Code  ZER0ZER0 EXCHANGEFounders   Hugo Renaudin - Founder     JB Douseaut - Co Founder, CTORich Tong - Co Founder, CPO  Bassori Grace - Co FounderOfficial LinksBlogDiscordInstagramFBTwitterLinkedInTikTokRedditContact UsFor Press inquiries, contact:harrison@p00ls.ioFor Creator inquiries, contact:saskia@p00ls.ioFor support, please visit:p00ls.zendesk.com",
+          "contentText": "EXCLUSIVE CONTENT, EXPERIENCES AND OPPORTUNITIES FROM YOUR FAVORITE CREATORS & BRANDSP00LS is your gateway to Web3, from NFTs to the metaverse and beyond.  We partner with creators + brands to CREATE THEIR OWN social tokens. Our approach is purpose-driven, community-first and always culturally attuned.Press /Interviewer: What is exciting to you currently that you want to jump into and pour some of that unfiltered creativity into? EM: I mean off the top of my head, I can just think about my social coin that I made with P00LS. It's called $MAHCOIN-Evan Mock in V MagazineIt’s very new, and what I like about the whole thing is money is not the only currency. It’s like your taste becomes the currency here — your ability to smell talent and potential in people becomes the currency. Your loyalty to artists becomes currency. I really like this idea.-Hugo Comte in VogueBlogDeep Dive: P00LS Listening Party with $LITA and $FEVERThe Deep End: Julia Sisto and Joshua Kelly of SèveP00LS +1: Marion Abou00 TokensEarn Tokens  Buy Tokens  Redeem Code  ZER0ZER0 EXCHANGEFounders   Hugo Renaudin - Founder     JB Douseaut - Co Founder, CTORich Tong - Co Founder, CPO  Bassori Grace - Co FounderOfficial LinksBlogDiscordInstagramFBTwitterLinkedInTikTokRedditContact UsFor Press inquiries, contact:harrison@p00ls.ioFor Creator inquiries, contact:saskia@p00ls.ioFor support, please visit:p00ls.zendesk.com",
           "galleryImage": "",
           "hasContent": true,
           "headerImage": "https://s3.amazonaws.com/charm.public/user-content/5456438a-8f49-4ad1-bbb2-4a9ef884e323/536a2890-7d4a-4a04-bcac-74a9334cd1fa/Pools.jpeg",
@@ -17361,18 +17284,11 @@
         "archived": false,
         "reviewedBy": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
         "reviewedAt": "2023-08-31T15:32:05.631Z",
-        "categoryId": "4532b730-f8fa-4925-a056-4d1b175d0d67",
         "snapshotProposalExpiry": "2023-09-03T16:33:44.000Z",
         "publishToLens": true,
         "lensPostLink": "0x01c83b-0x02-DA-7666e5ec",
         "evaluationType": "vote",
-        "fields": {},
-        "category": {
-          "id": "4532b730-f8fa-4925-a056-4d1b175d0d67",
-          "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-          "title": "Treasury",
-          "color": "gray"
-        }
+        "fields": {}
       }
     },
     {
@@ -17564,18 +17480,11 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "4b869f0f-259a-4fec-8c8e-f3d9a4992c35",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
         "evaluationType": "rubric",
-        "fields": null,
-        "category": {
-          "id": "4b869f0f-259a-4fec-8c8e-f3d9a4992c35",
-          "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-          "title": "Season 11",
-          "color": "turquoise"
-        }
+        "fields": null
       }
     },
     {
@@ -17944,7 +17853,7 @@
                 ]
               },
               {
-                "text": " ",
+                "text": " ",
                 "type": "text",
                 "marks": [
                   {
@@ -18104,7 +18013,7 @@
                 ]
               },
               {
-                "text": ": ",
+                "text": ": ",
                 "type": "text",
                 "marks": [
                   {
@@ -19114,7 +19023,7 @@
                     },
                     "content": [
                       {
-                        "text": "Deck:  ",
+                        "text": "Deck:  ",
                         "type": "text",
                         "marks": [
                           {
@@ -19192,7 +19101,7 @@
                     },
                     "content": [
                       {
-                        "text": "Discord/Discourse/Community:  ",
+                        "text": "Discord/Discourse/Community:  ",
                         "type": "text",
                         "marks": [
                           {
@@ -20811,7 +20720,7 @@
           }
         ]
       },
-      "contentText": "Please do not post this form to the Governance Forum. Proposals should be submitted here. Before filling out this form, note that you are responsible for checking updates to the Landing Page, which will reproduce updates to the Forum and to Discord. Updates will be posted to the landing page, forum and #grants. The Grants Council will post the results of the Preliminary and Final reviews on the Forum. Proposer conduct and etiquette will be taken into account in assigning final scores.Basic DetailsProject name: What is your project about? (two sentences maximum):Point of contact and email:L2 recipient address: Which Voting Cycle are you applying for?:What is the size of your grant request (50k max OP)?:How do you justify the size of the request?:Scope:I confirm that I have read the landing pages for the Builders and Growth Experiments Sub-Committees and that I have determined my proposal is best suited to be reviewed by the Builders Sub-Committee:I understand that I will be required to provide additional KYC information to the Foundation to receive this grant: [Yes/No]:I understand that I will be expected to follow the public grant reporting requirements outlined here:I understand that Builders grants are subject to a 1-year lock-up, as explained further in this post: [Yes/No]:This project needs upfront capital and should be considered for a co-grant:Has the proposing group or organization received a grant from Optimism previously?Has the proposing group or organization received a grant from another ecosystem, protocol, or other source within last 12 months?Project DetailsWhat are you going to build?:Provide us with links to any of the following for the project:Demo: Website: Deck:  Twitter: Discord/Discourse/Community:  Please include all other relevant links below:Why is what you are going to build going to succeed?:Why is what you are going to build novel? (You can think of novelty in one of two ways: either your project is meaningfully different from what others are building in the blockchain industry or you can describe how you are approaching a problem in a way unique from how others are approaching the same problem, provided that the unique aspect of the proposed solution is a key driver of the value created).Is your project likely to bring new builders to the Optimism ecosystem? If so, please describe how:Is your project likely to improve the quality of developers in the Optimism ecosystem? If so, please describe how:Is your project likely to improve the commitment of developers in the Optimism ecosystem? If so, please describe how:Describe whether you expect to deploy smart contracts on Optimism and, if so, how you expect users and developers to interact with those contracts:Do you have any metrics on the project currently? (TVL, transactions, volume, unique addresses, etc. Optimism metrics preferred; please link to public sources such as Dune Analytics, etc.):Who are your competitors?:What differentiates you from your competitors?:Will your project be composable with other projects on Optimism? If so, please explain:Will your project be fee-based or free to the end user?Will your project be open-source?TeamWho are your founders?:What makes your founders well-positioned to accomplish your goals with this project (1-2 sentences on each)?:Tell us about the rest of your team (if there are more teammates):Is this your first Web3 project?:If not, what else have you built? (Share links, Github repository, or any other helpful information.):Is your project funded? If so, provide an estimate of how many months of funding runway your project has:RoadmapDescribe in discrete steps your plan for accomplishing your project:Please provide any additional information that will facilitate accountability: (smart contract addresses relevant to the proposal, relevant organizational wallet addresses, etc.)Does your plan depend on the receipt of OP tokens?:What is your plan for using the OP token after the 1-year lock-up?:MilestonesPlease refer to the Milestone Assessment guide before filling out this section.Please define critical milestones for this project by extending the table below. Critical milestones are meant to show good-faith efforts to accomplish the project. Non-completion of these milestones could lead to the revocation of remaining grant rewards. Do not use the distribution of the grant itself as a milestone:SecurityHas your project been the subject of a security breach? Please describe if so and any mitigation measures taken.Optimism RelationshipDoes your project solve a problem for the Optimism ecosystem?:How does your proposal offer a value proposition for solving the above problem?:Why will this solution be a source of growth for the Optimism ecosystem?:How committed are you (and your team) to building on Optimism?:Is your project (a) deployed on Optimism exclusively; (b) deployed on Optimism and other networks; (c) not yet deployed on Optimism but deployed on other networks; or (d) not yet deployed on Optimism or elsewhere?",
+      "contentText": "Please do not post this form to the Governance Forum. Proposals should be submitted here. Before filling out this form, note that you are responsible for checking updates to the Landing Page, which will reproduce updates to the Forum and to Discord. Updates will be posted to the landing page, forum and #grants. The Grants Council will post the results of the Preliminary and Final reviews on the Forum. Proposer conduct and etiquette will be taken into account in assigning final scores.Basic DetailsProject name: What is your project about? (two sentences maximum):Point of contact and email:L2 recipient address: Which Voting Cycle are you applying for?:What is the size of your grant request (50k max OP)?:How do you justify the size of the request?:Scope:I confirm that I have read the landing pages for the Builders and Growth Experiments Sub-Committees and that I have determined my proposal is best suited to be reviewed by the Builders Sub-Committee:I understand that I will be required to provide additional KYC information to the Foundation to receive this grant: [Yes/No]:I understand that I will be expected to follow the public grant reporting requirements outlined here:I understand that Builders grants are subject to a 1-year lock-up, as explained further in this post: [Yes/No]:This project needs upfront capital and should be considered for a co-grant:Has the proposing group or organization received a grant from Optimism previously?Has the proposing group or organization received a grant from another ecosystem, protocol, or other source within last 12 months?Project DetailsWhat are you going to build?:Provide us with links to any of the following for the project:Demo: Website: Deck:  Twitter: Discord/Discourse/Community:  Please include all other relevant links below:Why is what you are going to build going to succeed?:Why is what you are going to build novel? (You can think of novelty in one of two ways: either your project is meaningfully different from what others are building in the blockchain industry or you can describe how you are approaching a problem in a way unique from how others are approaching the same problem, provided that the unique aspect of the proposed solution is a key driver of the value created).Is your project likely to bring new builders to the Optimism ecosystem? If so, please describe how:Is your project likely to improve the quality of developers in the Optimism ecosystem? If so, please describe how:Is your project likely to improve the commitment of developers in the Optimism ecosystem? If so, please describe how:Describe whether you expect to deploy smart contracts on Optimism and, if so, how you expect users and developers to interact with those contracts:Do you have any metrics on the project currently? (TVL, transactions, volume, unique addresses, etc. Optimism metrics preferred; please link to public sources such as Dune Analytics, etc.):Who are your competitors?:What differentiates you from your competitors?:Will your project be composable with other projects on Optimism? If so, please explain:Will your project be fee-based or free to the end user?Will your project be open-source?TeamWho are your founders?:What makes your founders well-positioned to accomplish your goals with this project (1-2 sentences on each)?:Tell us about the rest of your team (if there are more teammates):Is this your first Web3 project?:If not, what else have you built? (Share links, Github repository, or any other helpful information.):Is your project funded? If so, provide an estimate of how many months of funding runway your project has:RoadmapDescribe in discrete steps your plan for accomplishing your project:Please provide any additional information that will facilitate accountability: (smart contract addresses relevant to the proposal, relevant organizational wallet addresses, etc.)Does your plan depend on the receipt of OP tokens?:What is your plan for using the OP token after the 1-year lock-up?:MilestonesPlease refer to the Milestone Assessment guide before filling out this section.Please define critical milestones for this project by extending the table below. Critical milestones are meant to show good-faith efforts to accomplish the project. Non-completion of these milestones could lead to the revocation of remaining grant rewards. Do not use the distribution of the grant itself as a milestone:SecurityHas your project been the subject of a security breach? Please describe if so and any mitigation measures taken.Optimism RelationshipDoes your project solve a problem for the Optimism ecosystem?:How does your proposal offer a value proposition for solving the above problem?:Why will this solution be a source of growth for the Optimism ecosystem?:How committed are you (and your team) to building on Optimism?:Is your project (a) deployed on Optimism exclusively; (b) deployed on Optimism and other networks; (c) not yet deployed on Optimism but deployed on other networks; or (d) not yet deployed on Optimism or elsewhere?",
       "galleryImage": null,
       "hasContent": true,
       "headerImage": null,
@@ -20849,18 +20758,11 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "4b869f0f-259a-4fec-8c8e-f3d9a4992c35",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
         "evaluationType": "rubric",
-        "fields": null,
-        "category": {
-          "id": "4b869f0f-259a-4fec-8c8e-f3d9a4992c35",
-          "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-          "title": "Season 11",
-          "color": "turquoise"
-        }
+        "fields": null
       }
     },
     {
@@ -21228,7 +21130,6 @@
         "archived": false,
         "reviewedBy": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
         "reviewedAt": "2023-11-02T07:25:09.430Z",
-        "categoryId": "4532b730-f8fa-4925-a056-4d1b175d0d67",
         "snapshotProposalExpiry": "2023-11-05T08:25:31.000Z",
         "publishToLens": false,
         "lensPostLink": null,
@@ -21239,16 +21140,9 @@
             "__authors": [
               null
             ],
-            "__category": "4532b730-f8fa-4925-a056-4d1b175d0d67",
             "__reviewers": [],
             "__evaluationType": "vote"
           }
-        },
-        "category": {
-          "id": "4532b730-f8fa-4925-a056-4d1b175d0d67",
-          "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-          "title": "Treasury",
-          "color": "gray"
         }
       }
     },
@@ -25672,134 +25566,6 @@
     }
   ],
   "permissions": {
-    "proposalCategoryPermissions": [
-      {
-        "id": "5cdaf7e0-7c56-4466-a740-c0ee65cff9f9",
-        "permissionLevel": "view_comment_vote",
-        "proposalCategoryId": "f5527a96-4f10-4986-b5c5-7b4292d8c222",
-        "assignee": {
-          "group": "role",
-          "id": "b34363eb-b393-458e-9217-f21302202adf"
-        }
-      },
-      {
-        "id": "7234c320-f19a-49da-9ce5-7e1f98d06ac9",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "4532b730-f8fa-4925-a056-4d1b175d0d67",
-        "assignee": {
-          "group": "role",
-          "id": "0b55837c-bee3-429c-b7dc-fd68d8e917f0"
-        }
-      },
-      {
-        "id": "70683b32-b043-462b-b95b-8d480b409304",
-        "permissionLevel": "create_comment",
-        "proposalCategoryId": "fc1c1130-1f02-414a-86fb-505bc5061bb5",
-        "assignee": {
-          "group": "role",
-          "id": "ae8b4999-8d81-4a01-8651-00d2b82de21f"
-        }
-      },
-      {
-        "id": "b02d95bf-7aab-4797-a81b-4db2bd3a8bd0",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "f5527a96-4f10-4986-b5c5-7b4292d8c222",
-        "assignee": {
-          "group": "space",
-          "id": "30bfda0c-19a6-463d-bef7-daccbf433a04"
-        }
-      },
-      {
-        "id": "807a17bb-03eb-40b7-b0e7-1f8617b8b036",
-        "permissionLevel": "view_comment_vote",
-        "proposalCategoryId": "49c9fc30-0e3d-4bfa-8708-d2efea9b8891",
-        "assignee": {
-          "group": "role",
-          "id": "b34363eb-b393-458e-9217-f21302202adf"
-        }
-      },
-      {
-        "id": "ba9a07fb-cbf8-46b2-a265-8f90c6ef9533",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "49c9fc30-0e3d-4bfa-8708-d2efea9b8891",
-        "assignee": {
-          "group": "space",
-          "id": "30bfda0c-19a6-463d-bef7-daccbf433a04"
-        }
-      },
-      {
-        "id": "d7b9e005-c38a-44aa-9aae-b39c260914c9",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "4532b730-f8fa-4925-a056-4d1b175d0d67",
-        "assignee": {
-          "group": "space",
-          "id": "30bfda0c-19a6-463d-bef7-daccbf433a04"
-        }
-      },
-      {
-        "id": "9fe5595f-0349-49c4-bb0b-649377eae9ab",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "fc1c1130-1f02-414a-86fb-505bc5061bb5",
-        "assignee": {
-          "group": "space",
-          "id": "30bfda0c-19a6-463d-bef7-daccbf433a04"
-        }
-      },
-      {
-        "id": "b2b85247-1b45-4fc1-b3a7-7521730e1c50",
-        "permissionLevel": "view",
-        "proposalCategoryId": "49c9fc30-0e3d-4bfa-8708-d2efea9b8891",
-        "assignee": {
-          "group": "role",
-          "id": "64358fcf-cd26-40f7-9052-fb1b87f25de1"
-        }
-      },
-      {
-        "id": "ad13f1ec-9781-4e79-80c8-9395744a527e",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "f52208b1-2d4e-44b9-aad1-7fcab7d9036c",
-        "assignee": {
-          "group": "space",
-          "id": "30bfda0c-19a6-463d-bef7-daccbf433a04"
-        }
-      },
-      {
-        "id": "74a2c8d1-eafe-4be6-a028-e6d29479a64c",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "f5527a96-4f10-4986-b5c5-7b4292d8c222",
-        "assignee": {
-          "group": "role",
-          "id": "ae8b4999-8d81-4a01-8651-00d2b82de21f"
-        }
-      },
-      {
-        "id": "c8320a0f-1d84-45a5-820c-9327fbd757af",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "4b869f0f-259a-4fec-8c8e-f3d9a4992c35",
-        "assignee": {
-          "group": "space",
-          "id": "30bfda0c-19a6-463d-bef7-daccbf433a04"
-        }
-      },
-      {
-        "id": "d04334f3-c9a3-4c63-86d7-d6692635e026",
-        "permissionLevel": "view_comment_vote",
-        "proposalCategoryId": "f52208b1-2d4e-44b9-aad1-7fcab7d9036c",
-        "assignee": {
-          "group": "role",
-          "id": "ae8b4999-8d81-4a01-8651-00d2b82de21f"
-        }
-      },
-      {
-        "id": "8e3eeb59-c687-4f44-a2d8-abf66aa7fc68",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "99a92118-af0b-45db-9e7f-be81f4b3b8fc",
-        "assignee": {
-          "group": "space",
-          "id": "30bfda0c-19a6-463d-bef7-daccbf433a04"
-        }
-      }
-    ],
     "postCategoryPermissions": [
       {
         "id": "a6626169-e863-4c30-bc63-fe148b380ed6",
@@ -25947,50 +25713,6 @@
       }
     ]
   },
-  "proposalCategories": [
-    {
-      "id": "fc1c1130-1f02-414a-86fb-505bc5061bb5",
-      "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-      "title": "Metagoverance",
-      "color": "pink"
-    },
-    {
-      "id": "4532b730-f8fa-4925-a056-4d1b175d0d67",
-      "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-      "title": "Treasury",
-      "color": "gray"
-    },
-    {
-      "id": "f5527a96-4f10-4986-b5c5-7b4292d8c222",
-      "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-      "title": "Protocol",
-      "color": "pink"
-    },
-    {
-      "id": "f52208b1-2d4e-44b9-aad1-7fcab7d9036c",
-      "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-      "title": "Hackathon",
-      "color": "orange"
-    },
-    {
-      "id": "99a92118-af0b-45db-9e7f-be81f4b3b8fc",
-      "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-      "title": "Governance",
-      "color": "purple"
-    },
-    {
-      "id": "49c9fc30-0e3d-4bfa-8708-d2efea9b8891",
-      "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-      "title": "General",
-      "color": "teal"
-    },
-    {
-      "id": "4b869f0f-259a-4fec-8c8e-f3d9a4992c35",
-      "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-      "title": "Season 11",
-      "color": "turquoise"
-    }
-  ],
   "postCategories": [
     {
       "id": "7d386386-673b-46ea-87e4-b5e5048b6e65",

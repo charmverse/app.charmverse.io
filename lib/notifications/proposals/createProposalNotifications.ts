@@ -31,7 +31,6 @@ export async function createProposalNotifications(webhookData: {
         },
         select: {
           createdBy: true,
-          categoryId: true,
           status: true,
           authors: {
             select: {
@@ -86,6 +85,7 @@ export async function createProposalNotifications(webhookData: {
         select: {
           userId: true,
           id: true,
+          isAdmin: true,
           spaceRoleToRole: {
             select: {
               role: {
@@ -98,10 +98,6 @@ export async function createProposalNotifications(webhookData: {
         }
       });
 
-      const spacePermissionsClient = await getPermissionsClient({
-        resourceId: spaceId,
-        resourceIdType: 'space'
-      });
       for (const spaceRole of spaceRoles) {
         // The user who triggered the event should not receive a notification
         if (spaceRole.userId === userId) {
@@ -109,22 +105,13 @@ export async function createProposalNotifications(webhookData: {
         }
         // We should not send role-based notifications for free spaces
         const roleIds = space.paidTier === 'free' ? [] : spaceRole.spaceRoleToRole.map(({ role }) => role.id);
-        const accessibleProposalCategories =
-          await spacePermissionsClient.client.proposals.getAccessibleProposalCategories({
-            spaceId,
-            userId
-          });
-        const accessibleProposalCategoryIds = accessibleProposalCategories.map(({ id }) => id);
-
         const isAuthor = proposalAuthorIds.includes(spaceRole.userId);
         const isReviewer =
           proposalReviewerIds.includes(spaceRole.userId) ||
           proposalReviewerRoleIds.some((roleId) => roleIds.includes(roleId));
-        const isProposalCategoryAccessible = proposal.categoryId
-          ? accessibleProposalCategoryIds.includes(proposal.categoryId)
-          : true;
+        const isProposalAccessible = (spaceRole.isAdmin || isAuthor || isReviewer) && proposal.status !== 'draft';
 
-        if (!isProposalCategoryAccessible) {
+        if (!isProposalAccessible) {
           continue;
         }
 

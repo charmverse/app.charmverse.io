@@ -62,7 +62,6 @@ export async function createCardsFromProposals({
     include: {
       proposal: {
         select: {
-          categoryId: true,
           status: true,
           evaluationType: true,
           id: true,
@@ -182,10 +181,6 @@ export async function createCardsFromProposals({
     const createdAt = pageProposal.createdAt;
 
     let properties: Record<string, BoardPropertyValue> = {};
-
-    if (proposalProps.proposalCategory) {
-      properties[proposalProps.proposalCategory.id] = pageProposal.proposal?.categoryId ?? '';
-    }
 
     if (proposalProps.proposalUrl) {
       properties[proposalProps.proposalUrl.id] = pageProposal.path;

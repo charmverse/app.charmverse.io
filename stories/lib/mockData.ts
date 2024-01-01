@@ -1,15 +1,11 @@
-import type { ProposalCategoryWithPermissions } from '@charmverse/core/permissions';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
 import type { Member, MemberPropertyWithPermissions, PropertyValueWithDetails } from 'lib/members/interfaces';
-import { generateDefaultProposalCategoriesInput } from 'lib/proposal/generateDefaultProposalCategoriesInput';
-import { getDefaultWorkflows } from 'lib/proposal/workflows/defaultWorkflows';
 import type { LoggedInUser } from 'models/User';
 import { createMemberProperty, createMemberPropertyValue } from 'testing/mocks/memberProperty';
 import { createMockSpace } from 'testing/mocks/space';
 import { createMockSpaceMember } from 'testing/mocks/spaceMember';
 import { createMockUser } from 'testing/mocks/user';
-import { brandColorNames } from 'theme/colors';
 
 import type { ListSpaceRolesResponse } from '../../pages/api/roles/index';
 

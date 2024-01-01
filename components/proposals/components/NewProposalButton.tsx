@@ -18,7 +18,6 @@ import { usePages } from 'hooks/usePages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { isTruthy } from 'lib/utilities/types';
 
-import { useProposalCategories } from '../hooks/useProposalCategories';
 import { useProposalTemplates } from '../hooks/useProposalTemplates';
 import type { ProposalPageAndPropertiesInput } from '../ProposalPage/NewProposalPage';
 

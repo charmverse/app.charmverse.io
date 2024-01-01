@@ -108,11 +108,9 @@ describe('createCardsFromProposals', () => {
     const properties = (databaseAfterUpdate?.fields as any).cardProperties as IPropertyTemplate[];
     const proposalUrlProp = properties.find((prop) => prop.type === 'proposalUrl');
     const proposalStatusProp = properties.find((prop) => prop.type === 'proposalStatus');
-    const proposalCategoryProp = properties.find((prop) => prop.type === 'proposalCategory');
 
     expect(proposalUrlProp).toBeDefined();
     expect(proposalStatusProp).toBeDefined();
-    expect(proposalCategoryProp).toBeDefined();
 
     const view = await prisma.block.findFirstOrThrow({
       where: {
@@ -123,7 +121,7 @@ describe('createCardsFromProposals', () => {
 
     const visibleProperties = (view?.fields as any).visiblePropertyIds as string[];
 
-    ['__title', proposalUrlProp?.id, proposalStatusProp?.id, proposalCategoryProp?.id].forEach((propertyKey) => {
+    ['__title', proposalUrlProp?.id, proposalStatusProp?.id].forEach((propertyKey) => {
       expect(visibleProperties.includes(propertyKey as string)).toBe(true);
     });
   });

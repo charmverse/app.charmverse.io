@@ -1,5 +1,4 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsProposals } from '@charmverse/core/test';
 
 import { createProposal } from 'lib/proposal/createProposal';
 import { updateProposalStatus } from 'lib/proposal/updateProposalStatus';
@@ -60,19 +59,8 @@ describe(`Test proposal events and notifications`, () => {
       )
     );
 
-    const proposalCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id,
-      proposalCategoryPermissions: [
-        {
-          permissionLevel: 'full_access',
-          assignee: { group: 'role', id: role.id }
-        }
-      ]
-    });
-
     const { proposal } = await createProposal({
       isDraft: true,
-      categoryId: proposalCategory.id,
       spaceId: space.id,
       userId: author1.id,
       authors: [author1.id, author2.id],
@@ -422,16 +410,6 @@ async function createDiscussionNotifications(input: Parameters<typeof generateUs
     name: 'Post Moderators'
   });
 
-  const proposalCategory = await testUtilsProposals.generateProposalCategory({
-    spaceId: space.id,
-    proposalCategoryPermissions: [
-      {
-        permissionLevel: 'full_access',
-        assignee: { group: 'role', id: role.id }
-      }
-    ]
-  });
-
   await Promise.all(
     [author1.id, reviewer.id].map((userId) =>
       assignRole({
@@ -442,7 +420,6 @@ async function createDiscussionNotifications(input: Parameters<typeof generateUs
   );
 
   const { proposal } = await createProposal({
-    categoryId: proposalCategory.id,
     spaceId: space.id,
     userId: author1.id,
     authors: [author1.id],
