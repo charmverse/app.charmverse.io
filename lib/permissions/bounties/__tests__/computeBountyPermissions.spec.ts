@@ -340,4 +340,38 @@ describe('computeBountyPermissions', () => {
       expect(computed[op]).toBe(false);
     });
   });
+
+  it('should not allow admin to work on assigned reward', async () => {
+    const { space, user } = await generateUserAndSpace({ isAdmin: false });
+    const adminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: true });
+
+    const bounty = await generateBounty({
+      createdBy: user.id,
+      approveSubmitters: true,
+      spaceId: space.id,
+      status: 'open'
+    });
+
+    await addBountyPermissionGroup({
+      resourceId: bounty.id,
+      level: 'submitter',
+      assignee: {
+        group: 'user',
+        id: user.id
+      }
+    });
+
+    const computed = await computeBountyPermissions({
+      resourceId: bounty.id,
+      userId: adminUser.id
+    });
+
+    typedKeys(computed).forEach((op) => {
+      if (op === 'work') {
+        expect(computed[op]).toBe(false);
+      } else {
+        expect(computed[op]).toBe(true);
+      }
+    });
+  });
 });

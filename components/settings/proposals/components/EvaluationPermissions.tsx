@@ -32,6 +32,23 @@ export const allMembersSystemRole = {
   label: 'All members'
 } as const;
 
+const currentReviewerSystemRole = {
+  group: 'system_role',
+  icon: (
+    <Tooltip title='Reviewers selected for this evaluation'>
+      <ProposalIcon color='secondary' fontSize='small' />
+    </Tooltip>
+  ),
+  id: ProposalSystemRole.current_reviewer,
+  label: 'Reviewers (Current Step)'
+} as const;
+
+// a copy of current reviewer, with a different label for vote
+const currentVoterSystemRole = {
+  ...currentReviewerSystemRole,
+  label: 'Voters (Current Step)'
+};
+
 export const extraEvaluationRoles: SystemRoleOptionPopulated<ProposalSystemRole>[] = [
   {
     group: 'system_role',
@@ -43,16 +60,7 @@ export const extraEvaluationRoles: SystemRoleOptionPopulated<ProposalSystemRole>
     id: ProposalSystemRole.author,
     label: 'Author'
   },
-  {
-    group: 'system_role',
-    icon: (
-      <Tooltip title='Reviewers selected for this evaluation'>
-        <ProposalIcon color='secondary' fontSize='small' />
-      </Tooltip>
-    ),
-    id: ProposalSystemRole.current_reviewer,
-    label: 'Reviewers (Current Step)'
-  },
+  currentReviewerSystemRole,
   {
     group: 'system_role',
     icon: (
@@ -174,11 +182,7 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
       {/* show evaluation action which is uneditable */}
       <Box className='octo-propertyrow' display='flex' alignItems='center !important'>
         <PropertyLabel readOnly>{evaluateVerbs[evaluation.type]}</PropertyLabel>
-        {evaluation.type === 'vote' ? (
-          <Typography color='secondary' variant='caption'>
-            Vote permissions are specified by Categories
-          </Typography>
-        ) : evaluation.type === 'feedback' ? (
+        {evaluation.type === 'feedback' ? (
           <Typography color='secondary' variant='caption'>
             There is no review step for Feedback
           </Typography>
@@ -187,7 +191,7 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
             readOnly
             wrapColumn
             value={[{ group: 'system_role', id: ProposalSystemRole.current_reviewer }]}
-            systemRoles={extraEvaluationRoles}
+            systemRoles={evaluation.type === 'vote' ? [currentVoterSystemRole] : [currentReviewerSystemRole]}
             onChange={() => {}}
           />
         )}

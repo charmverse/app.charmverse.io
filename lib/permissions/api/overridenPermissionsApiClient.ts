@@ -5,11 +5,9 @@ import type {
   ProposalPermissionsSwitch,
   Resource
 } from '@charmverse/core/permissions';
-import { PermissionsApiClient, getSpaceInfoViaResource } from '@charmverse/core/permissions';
-import type { Space } from '@charmverse/core/prisma-client';
+import { PermissionsApiClient } from '@charmverse/core/permissions';
 
 import { permissionsApiAuthKey, permissionsApiUrl } from 'config/constants';
-import { isCharmVerseSpace } from 'lib/featureFlag/isCharmVerseSpace';
 
 // Injected method for expanding args
 function withUseProposalPermissionsArgs<T>(args: T): Required<ProposalPermissionsSwitch> & T {

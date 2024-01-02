@@ -30,11 +30,9 @@ interface ProposalPropertiesProps {
   pagePermissions?: PagePermissionFlags;
   refreshPagePermissions?: () => void;
   openEvaluation?: (evaluationId?: string) => void;
-  isEvaluationSidebarOpen?: boolean;
   proposalPage: PageWithContent;
   proposal?: ProposalWithUsersAndRubric;
   refreshProposal: VoidFunction;
-  isCharmVerse: boolean;
 }
 
 export function ProposalProperties({
@@ -45,12 +43,10 @@ export function ProposalProperties({
   proposalId,
   snapshotProposalId,
   readOnly,
-  isEvaluationSidebarOpen,
   openEvaluation,
   proposalPage,
   proposal,
-  refreshProposal,
-  isCharmVerse
+  refreshProposal
 }: ProposalPropertiesProps) {
   const { mutate: mutateNotifications } = useNotifications();
   const { trigger: updateProposal } = useUpdateProposal({ proposalId });
