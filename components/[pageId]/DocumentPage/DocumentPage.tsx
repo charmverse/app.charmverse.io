@@ -53,6 +53,8 @@ import { PageSidebar } from './components/Sidebar/PageSidebar';
 import { usePageSidebar } from './hooks/usePageSidebar';
 import { useProposal } from './hooks/useProposal';
 
+export const defaultPageTop = 56; // we need to add some room for the announcement banner and other banners
+
 const RewardProperties = dynamic(
   () => import('components/rewards/components/RewardProperties/RewardProperties').then((r) => r.RewardProperties),
   { ssr: false }
@@ -142,7 +144,7 @@ function DocumentPage({
   const activeBoardView = boardViews[0];
 
   const showPageBanner = page.type !== 'proposal' && page.type !== 'proposal_template';
-  const pageTop = showPageBanner ? getPageTop(page) : 0;
+  const pageTop = showPageBanner ? getPageTop(page) : defaultPageTop;
 
   const { threads, isLoading: isLoadingThreads, currentPageId: threadsPageId } = useThreads();
   const isSharedPage = router.pathname.startsWith('/share');
