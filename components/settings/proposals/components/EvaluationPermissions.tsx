@@ -4,10 +4,10 @@ import { Box, Card, Stack, Tooltip, Typography } from '@mui/material';
 import { capitalize } from 'lodash';
 
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
-import { ProposalUserAndRoleSelect } from 'components/common/BoardEditor/components/properties/ProposalUserAndRoleSelect';
-import type {
-  SelectOption,
-  SystemRoleOptionPopulated
+import {
+  UserAndRoleSelect,
+  type SelectOption,
+  type SystemRoleOptionPopulated
 } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { MembersIcon, ProposalIcon } from 'components/common/PageIcon';
 
@@ -152,7 +152,7 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
       {proposalOperations.map((operation) => (
         <Box key={operation} className='octo-propertyrow'>
           <PropertyLabel readOnly>{capitalize(operation)}</PropertyLabel>
-          <ProposalUserAndRoleSelect
+          <UserAndRoleSelect
             readOnly={readOnly}
             variant='outlined'
             wrapColumn
@@ -183,7 +183,7 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
             There is no review step for Feedback
           </Typography>
         ) : (
-          <ProposalUserAndRoleSelect
+          <UserAndRoleSelect
             readOnly
             wrapColumn
             value={[{ group: 'system_role', id: ProposalSystemRole.current_reviewer }]}

@@ -1,7 +1,6 @@
 import type { ProposalEvaluation, ProposalSystemRole } from '@charmverse/core/prisma';
 import { Box, Typography, FormLabel } from '@mui/material';
 
-import { ProposalUserAndRoleSelect } from 'components/common/BoardEditor/components/properties/ProposalUserAndRoleSelect';
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
@@ -58,7 +57,7 @@ export function EvaluationStepSettings({
         </Typography>
       </FormLabel>
       <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow' mb={2}>
-        <ProposalUserAndRoleSelect
+        <UserAndRoleSelect
           data-test={`proposal-${evaluation.type}-select`}
           emptyPlaceholderContent='Select user or role'
           value={reviewerOptions as SelectOption[]}
