@@ -33,14 +33,6 @@ export function useGetProposalDetails(proposalId: MaybeString) {
 export function useGetIsReviewer(proposalId: MaybeString) {
   return useGET<boolean>(proposalId ? `/api/proposals/${proposalId}/is-reviewer` : null);
 }
-
-/**
- * Checks for list of roles and users that can be selected as reviewer for a proposal
- */
-export function useGetReviewerPool(spaceId: MaybeString) {
-  return useGET<ProposalReviewerPool>(spaceId ? `/api/proposals/reviewer-pool?resourceId=${spaceId}` : null);
-}
-
 export function useGetProposalsBySpace({ spaceId }: Partial<ListProposalsRequest>) {
   return useGET<ProposalWithUsers[]>(spaceId ? `/api/spaces/${spaceId}/proposals` : null);
 }

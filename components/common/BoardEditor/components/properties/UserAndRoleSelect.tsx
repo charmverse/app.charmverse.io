@@ -19,7 +19,6 @@ import { SelectPreviewContainer } from './TagSelect/TagSelect';
 export type RoleOption = TargetPermissionGroup<'role'>;
 type MemberOption = TargetPermissionGroup<'user'>;
 type SystemRoleOption<T extends string = string> = { group: 'system_role'; id: T };
-
 export type SelectOption = RoleOption | MemberOption | SystemRoleOption;
 type RoleOptionPopulated = ListSpaceRolesResponse & RoleOption;
 type MemberOptionPopulated = Member & MemberOption;
@@ -153,11 +152,12 @@ function SelectedOptions({
   );
 }
 
-export type UserAndRoleSelectProps<T = SelectOption> = {
+type Props<T> = {
   emptyPlaceholderContent?: string;
   inputPlaceholder?: string; // placeholder for the editable input of outlined variant
   displayType?: PropertyValueDisplayType;
   onChange: (value: SelectOptionPopulated[]) => void;
+  proposalCategoryId?: string | null;
   readOnly?: boolean;
   readOnlyMessage?: string;
   showEmptyPlaceholder?: boolean;
@@ -169,13 +169,12 @@ export type UserAndRoleSelectProps<T = SelectOption> = {
   wrapColumn?: boolean;
   type?: 'role' | 'roleAndUser';
   required?: boolean;
-  options?: SelectOption[] | null;
-  loading?: boolean;
 };
 
 export function UserAndRoleSelect<T extends { id: string; group: string } = SelectOption>({
   displayType = 'details',
   onChange,
+  proposalCategoryId,
   readOnly,
   readOnlyMessage,
   inputPlaceholder,
@@ -188,14 +187,13 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
   'data-test': dataTest,
   wrapColumn,
   type = 'roleAndUser',
-  required,
-  options,
-  loading
-}: UserAndRoleSelectProps<T>): JSX.Element | null {
+  required
+}: Props<T>): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(false);
   const { roles } = useRoles();
   const { members } = useMembers();
   const { isFreeSpace } = useIsFreeSpace();
+
   const filteredMembers = members.filter((member) => !member.isBot);
   // For public spaces, we don't want to show reviewer roles
   const applicableValues = isFreeSpace
@@ -207,37 +205,31 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
     roles?.map((includedRole) => ({ ...includedRole, group: 'role' } as ListSpaceRolesResponse & { group: 'role' })) ??
     [];
 
-  const { usersRecord, rolesRecord } = useMemo(() => {
-    const _usersRecord: Record<string, MemberOptionPopulated> = mappedMembers.reduce((acc, val) => {
-      acc[val.id] = val;
-      return acc;
-    }, {} as Record<string, MemberOptionPopulated>);
-    const _rolesRecord: Record<string, RoleOptionPopulated> = mappedRoles.reduce((acc, val) => {
-      acc[val.id] = val;
-      return acc;
-    }, {} as Record<string, RoleOptionPopulated>);
+  const filteredOptions = useMemo(() => {
+    let _filteredOptions: SelectOptionPopulated[] = [];
+    if (isFreeSpace) {
+      // In public space, don't include custom roles
+      _filteredOptions = type === 'role' ? [] : [...mappedMembers, ...systemRoles];
+    } else {
+      // For bounties, allow any space member or role to be selected
+      if (type === 'role') {
+        _filteredOptions = [...systemRoles, ...mappedRoles];
+      }
 
-    return { usersRecord: _usersRecord, rolesRecord: _rolesRecord };
-  }, [mappedRoles?.length, mappedMembers?.length]);
+      if (type === 'roleAndUser') {
+        _filteredOptions = [...mappedMembers, ...systemRoles, ...mappedRoles];
+      }
+    }
+    return _filteredOptions;
+  }, [systemRoles, isFreeSpace, filteredMembers, roles, proposalCategoryId, type]);
 
   const allOptions = useMemo(() => {
-    if (options) {
-      const optionsPopulated: SelectOptionPopulated[] = [...systemRoles];
-
-      options.forEach((opt) => {
-        if (opt.group === 'role') {
-          optionsPopulated.push(rolesRecord[opt.id]);
-        } else if (opt.group === 'user') {
-          optionsPopulated.push(usersRecord[opt.id]);
-        }
-      });
-      return optionsPopulated;
-    } else if (isFreeSpace) {
+    if (isFreeSpace) {
       return [...mappedMembers, ...systemRoles];
     } else {
       return [...mappedMembers, ...mappedRoles, ...systemRoles];
     }
-  }, [filteredMembers, roles, options]);
+  }, [filteredMembers, roles]);
 
   const populatedValue = inputValue.map(({ id }) => allOptions.find((opt) => opt.id === id)).filter(isTruthy);
 
@@ -318,14 +310,13 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
             return `${group[0].toUpperCase() + group.slice(1)}s`;
           }}
           isOptionEqualToValue={(option, val) => option.id === val.id}
-          loading={!roles || filteredMembers.length === 0 || loading}
+          loading={!roles || filteredMembers.length === 0}
           multiple
           noOptionsText='No more options available'
           onChange={(e, value) => onChange(value)}
           onClose={() => setIsOpen(false)}
           openOnFocus
-          // TODO - Fix this
-          options={[]}
+          options={filteredOptions}
           renderInput={(params) => (
             <TextField
               {...params}
