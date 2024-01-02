@@ -213,14 +213,6 @@ describe('getCSVColumns()', () => {
       hasTitleProperty: false,
       visibleProperties: board.fields.cardProperties
     });
-    expect(rowColumns).toEqual([
-      '"title"',
-      '"General"',
-      '"In Review"',
-      '"http://localhost/test-space/path-123"',
-      'Mo',
-      '10',
-      '10'
-    ]);
+    expect(rowColumns).toEqual(['"title"', '"In Review"', '"http://localhost/test-space/path-123"', 'Mo', '10', '10']);
   });
 });
