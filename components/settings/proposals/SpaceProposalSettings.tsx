@@ -1,5 +1,5 @@
 import type { Space } from '@charmverse/core/prisma';
-import { Divider, Tooltip, Typography } from '@mui/material';
+import { Box, Divider, Tooltip, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
@@ -99,14 +99,11 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
   return (
     <>
       <Legend>{getFeatureTitle('Proposals')}</Legend>
-      <Typography variant='h6'>Templates</Typography>
-      <RequireTemplatesForm />
-      <Divider sx={{ my: 2 }} />
-      <Typography variant='body1' gutterBottom>
-        Workflows define how {getFeatureTitle('Proposals')} are evaluated in this space.
-      </Typography>
-      <Legend display='flex' justifyContent='space-between' alignContent='flex-end' noBorder>
-        <div>Workflows</div>
+      <Typography variant='h6'>Workflows</Typography>
+      <Box display='flex' justifyContent='space-between' mb={2}>
+        <Typography variant='body1' gutterBottom>
+          Workflows define how {getFeatureTitle('Proposals')} are evaluated in this space.
+        </Typography>
         <Tooltip title={!isAdmin ? 'Only space admins can create workflows' : ''} arrow>
           {/* Tooltip on disabled button requires one block element below wrapper */}
           <span>
@@ -115,23 +112,27 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
             </Button>
           </span>
         </Tooltip>
-      </Legend>
+      </Box>
       {loadingWorkflows && <LoadingComponent minHeight={200} />}
-      {workflows.map((workflow, index) => (
-        <ProposalWorkflowItem
-          key={workflow.id}
-          workflow={workflow}
-          isExpanded={expanded === workflow.id}
-          toggleRow={setExpanded}
-          onSave={handleSaveWorkflow}
-          onUpdate={handleUpdateWorkflow}
-          onDelete={handleDeleteWorkflow}
-          onCancelChanges={handleCancelWorkflowChanges}
-          onDuplicate={duplicateWorkflow}
-          readOnly={!isAdmin}
-          preventDelete={workflows.length === 1}
-        />
-      ))}
+      <Box mb={2}>
+        {workflows.map((workflow, index) => (
+          <ProposalWorkflowItem
+            key={workflow.id}
+            workflow={workflow}
+            isExpanded={expanded === workflow.id}
+            toggleRow={setExpanded}
+            onSave={handleSaveWorkflow}
+            onUpdate={handleUpdateWorkflow}
+            onDelete={handleDeleteWorkflow}
+            onCancelChanges={handleCancelWorkflowChanges}
+            onDuplicate={duplicateWorkflow}
+            readOnly={!isAdmin}
+            preventDelete={workflows.length === 1}
+          />
+        ))}
+      </Box>
+      <Typography variant='h6'>Templates</Typography>
+      <RequireTemplatesForm />
     </>
   );
 }
