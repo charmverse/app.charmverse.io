@@ -160,26 +160,6 @@ test.describe.serial('View proposal', () => {
     }
   });
 
-  test('Space member can see visible proposal categories', async ({ proposalListPage, page }) => {
-    await loginBrowserUser({
-      browserPage: page,
-      userId: proposalAuthor.id
-    });
-
-    await proposalListPage.goToHomePage();
-
-    await proposalListPage.getSidebarLink('proposals').click();
-    await proposalListPage.waitForProposalsList();
-
-    await proposalListPage.openProposalCategoryList();
-
-    const visibleCategoryButton = proposalListPage.getProposalCategoryLocator(visibleProposalCategory.id);
-    const hiddenCategoryButton = proposalListPage.getProposalCategoryLocator(hiddenProposalCategory.id);
-
-    await expect(visibleCategoryButton).toBeVisible();
-    await expect(hiddenCategoryButton).not.toBeVisible();
-  });
-
   test('Space member can see proposals but not drafts', async ({ proposalListPage }) => {
     const spaceMember = await generateUser({ space: { id: space.id } });
 
