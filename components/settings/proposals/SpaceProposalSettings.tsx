@@ -1,5 +1,5 @@
 import type { Space } from '@charmverse/core/prisma';
-import { Tooltip, Typography } from '@mui/material';
+import { Divider, Tooltip, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
@@ -23,7 +23,7 @@ import { RequireTemplatesForm } from './components/RequireTemplatesForm';
 
 export function SpaceProposalSettings({ space }: { space: Space }) {
   const isAdmin = useIsAdmin();
-  const { mappedFeatures } = useSpaceFeatures();
+  const { getFeatureTitle } = useSpaceFeatures();
   const [expanded, setExpanded] = useState<string | false>(false);
   const [workflows, setWorkflows] = useState<WorkflowTemplateFormItem[]>([]);
   const { data: currentWorkflowTemplates, isLoading: loadingWorkflows } = useGetProposalWorkflows(space.id);
@@ -98,12 +98,14 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
 
   return (
     <>
-      <Legend>{mappedFeatures.proposals.title}</Legend>
+      <Legend>{getFeatureTitle('Proposals')}</Legend>
+      <Typography variant='h6'>Templates</Typography>
       <RequireTemplatesForm />
+      <Divider sx={{ my: 2 }} />
       <Typography variant='body1' gutterBottom>
-        Workflows define how {mappedFeatures.proposals.title} are evaluated in this space.
+        Workflows define how {getFeatureTitle('Proposals')} are evaluated in this space.
       </Typography>
-      <Legend display='flex' justifyContent='space-between' alignContent='flex-end'>
+      <Legend display='flex' justifyContent='space-between' alignContent='flex-end' noBorder>
         <div>Workflows</div>
         <Tooltip title={!isAdmin ? 'Only space admins can create workflows' : ''} arrow>
           {/* Tooltip on disabled button requires one block element below wrapper */}

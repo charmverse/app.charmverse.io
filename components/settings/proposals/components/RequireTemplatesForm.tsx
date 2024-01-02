@@ -10,11 +10,13 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useSpaces } from 'hooks/useSpaces';
 
 export function RequireTemplatesForm() {
   const { space } = useCurrentSpace();
   const { setSpace } = useSpaces();
+  const { getFeatureTitle } = useSpaceFeatures();
   const { isFreeSpace } = useIsFreeSpace();
   const rolesInfoPopup = usePopupState({ variant: 'popover', popupId: 'role-info-popup' });
   const [isUpdatingPagePermission, setIsUpdatingPagePermission] = useState(false);
@@ -78,11 +80,10 @@ export function RequireTemplatesForm() {
             </Box>
           </UpgradeWrapper>
         }
-        label='Require proposal template'
+        label={`Require a template when creating a ${getFeatureTitle('proposal')}`}
         labelPlacement='start'
       />
-      (
-      <Box display='flex' justifyContent='space-between'>
+      <Box display='flex' justifyContent='flex-end'>
         <Button
           onClick={() => saveForm()}
           disabled={!isAdmin || !settingsChanged || isUpdatingPagePermission}
@@ -95,7 +96,6 @@ export function RequireTemplatesForm() {
           Save
         </Button>
       </Box>
-      )
     </>
   );
 }
