@@ -124,7 +124,7 @@ export function NewProposalButton() {
               </ListItemIcon>
               <ListItemText>Edit</ListItemText>
             </MenuItem>
-            <CopyPageLinkAction path={`/proposals/new/template=${pageId}`} />
+            <CopyPageLinkAction path={`/proposals/new?template=${pageId}`} />
 
             <MenuItem
               onClick={(e) => {
