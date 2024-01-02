@@ -105,13 +105,11 @@ export async function createProposal({
       })
     : null;
 
-  const workflow = workflowId
-    ? ((await prisma.proposalWorkflow.findUnique({
-        where: {
-          id: workflowId
-        }
-      })) as ProposalWorkflowTyped | null)
-    : null;
+  const workflow = (await prisma.proposalWorkflow.findUniqueOrThrow({
+    where: {
+      id: workflowId
+    }
+  })) as ProposalWorkflowTyped;
 
   const validation = await validateProposalAuthorsAndReviewers({
     authors: authorsList,
@@ -140,9 +138,9 @@ export async function createProposal({
 
   // retrieve permissions and apply evaluation ids to reviewers
   if (evaluations.length > 0) {
-    evaluations.forEach(({ id: evaluationId, permissions: permissionsInput }, index) => {
+    evaluations.forEach(({ id: evaluationId }, index) => {
       const configuredEvaluation = workflow?.evaluations[index];
-      const permissions = configuredEvaluation?.permissions ?? permissionsInput;
+      const permissions = configuredEvaluation?.permissions;
       if (!permissions) {
         throw new Error(
           `Cannot find permissions for evaluation step. Workflow: ${workflowId}. Evaluation: ${evaluationId}`

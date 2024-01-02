@@ -36,8 +36,6 @@ import { useMdScreen } from 'hooks/useMediaScreens';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
-import { useUser } from 'hooks/useUser';
-import type { ProposalFields } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposal/rubric/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -82,7 +80,7 @@ export function NewProposalPage({
   const { proposalTemplates, isLoadingTemplates } = useProposalTemplates();
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>();
   const [, setPageTitle] = usePageTitle();
-  const { data: workflowOptions } = useGetProposalWorkflows(currentSpace?.id);
+  const { data: workflowOptions, isLoading: isLoadingWorkflows } = useGetProposalWorkflows(currentSpace?.id);
   const isMdScreen = useMdScreen();
   const {
     formInputs,
@@ -97,9 +95,7 @@ export function NewProposalPage({
   const [submittedDraft, setSubmittedDraft] = useState<boolean>(false);
 
   const [, { width: containerWidth }] = useElementSize();
-  const { user } = useUser();
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
-  const [readOnlyEditor, setReadOnlyEditor] = useState(false);
   const isAdmin = useIsAdmin();
 
   const sourceTemplate = proposalTemplates?.find((template) => template.id === formInputs.proposalTemplateId);
@@ -355,24 +351,17 @@ export function NewProposalPage({
   }, []);
 
   useEffect(() => {
-    if (isTemplateRequired) {
-      setReadOnlyEditor(!formInputs.proposalTemplateId);
+    if (!isLoadingTemplates && !isLoadingWorkflows) {
+      // populate with template if selected
+      if (templateIdFromUrl) {
+        applyTemplate(templateIdFromUrl);
+      }
+      // populate workflow if not set and template is not selected
+      else if (workflowOptions?.length) {
+        applyWorkflow(workflowOptions[0]);
+      }
     }
-  }, [formInputs.proposalTemplateId, isTemplateRequired]);
-
-  // populate workflow if not set and template is not selected
-  useEffect(() => {
-    if (workflowOptions?.length && !formInputs.workflowId && !templateIdFromUrl) {
-      applyWorkflow(workflowOptions[0]);
-    }
-  }, [!!workflowOptions]);
-
-  // populate with template if selected
-  useEffect(() => {
-    if (templateIdFromUrl && !isLoadingTemplates) {
-      applyTemplate(templateIdFromUrl);
-    }
-  }, [templateIdFromUrl, isLoadingTemplates]);
+  }, [templateIdFromUrl, isLoadingTemplates, isLoadingWorkflows]);
 
   // Keep the formAnswers in sync with the formFields using a ref as charmEditor fields uses the initial field value
   const formAnswersRef = useRef(formInputs.formAnswers);
@@ -435,7 +424,7 @@ export function NewProposalPage({
                   onContentChange={applyProposalContent}
                   focusOnInit
                   isContentControlled
-                  key={`${String(formInputs.proposalTemplateId)}.${readOnlyEditor}`}
+                  key={`${String(formInputs.proposalTemplateId)}`}
                 >
                   {/* temporary? disable editing of page title when in suggestion mode */}
                   {proposalPageContent}
