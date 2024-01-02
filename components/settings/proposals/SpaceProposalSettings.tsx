@@ -19,6 +19,7 @@ import Legend from '../Legend';
 
 import type { WorkflowTemplateFormItem } from './components/ProposalWorkflow';
 import { ProposalWorkflowItem } from './components/ProposalWorkflow';
+import { RequireTemplatesForm } from './components/RequireTemplatesForm';
 
 export function SpaceProposalSettings({ space }: { space: Space }) {
   const isAdmin = useIsAdmin();
@@ -98,6 +99,7 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
   return (
     <>
       <Legend>{mappedFeatures.proposals.title}</Legend>
+      <RequireTemplatesForm />
       <Typography variant='body1' gutterBottom>
         Workflows define how {mappedFeatures.proposals.title} are evaluated in this space.
       </Typography>
