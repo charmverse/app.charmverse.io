@@ -51,7 +51,7 @@ export const extraEvaluationRoles: SystemRoleOptionPopulated<ProposalSystemRole>
       </Tooltip>
     ),
     id: ProposalSystemRole.current_reviewer,
-    label: 'Current Reviewer'
+    label: 'Reviewers (Current Step)'
   },
   {
     group: 'system_role',
