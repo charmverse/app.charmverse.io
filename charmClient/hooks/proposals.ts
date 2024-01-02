@@ -1,4 +1,3 @@
-import type { ProposalReviewerPool } from '@charmverse/core/permissions';
 import type { FormFieldAnswer } from '@charmverse/core/prisma-client';
 import type { ListProposalsRequest } from '@charmverse/core/proposals';
 

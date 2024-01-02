@@ -37,14 +37,6 @@ export class PermissionsApiClientWithPermissionsSwitch extends PermissionsApiCli
       return permissions;
     };
 
-    // Override getReviewerPool method
-    const originalGetProposalReviewerPool = proposals.getProposalReviewerPool;
-
-    proposals.getProposalReviewerPool = async function (args: Resource) {
-      const reviewerPool = await originalGetProposalReviewerPool.apply(this, [withUseProposalPermissionsArgs(args)]);
-      return reviewerPool;
-    };
-
     // Override getAccessiblePageIds method
     const originalGetAccessiblePageIds = pages.getAccessiblePageIds;
 

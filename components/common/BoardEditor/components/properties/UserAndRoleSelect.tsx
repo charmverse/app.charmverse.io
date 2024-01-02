@@ -287,7 +287,6 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
         <StyledAutocomplete
           data-test={dataTest}
           autoHighlight
-          // disabled={!roles || (proposalId && !reviewerPool) || !noReviewersAvailable}
           disableClearable
           disableCloseOnSelect
           filterSelectedOptions
