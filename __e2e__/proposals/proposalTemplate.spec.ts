@@ -65,17 +65,6 @@ test.beforeAll(async () => {
     }
   });
 
-  proposalCategory = await testUtilsProposals.generateProposalCategory({
-    spaceId: space.id,
-    title: 'Proposals',
-    proposalCategoryPermissions: [
-      {
-        permissionLevel: 'full_access',
-        assignee: { group: 'space', id: space.id }
-      }
-    ]
-  });
-
   defaultWorkflows = getDefaultWorkflows(space.id);
   await prisma.proposalWorkflow.createMany({
     data: defaultWorkflows
@@ -126,7 +115,6 @@ test.describe.serial('Structured proposal template', () => {
 
     await formField.formFieldPrivateSwitch.nth(1).click();
 
-    await proposalPage.selectCategory(proposalCategory.id);
     await proposalPage.selectEvaluationReviewer('pass_fail', spaceAdmin.id);
     await proposalPage.selectEvaluationReviewer('vote', 'space_member');
 

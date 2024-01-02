@@ -3,7 +3,7 @@ import type { ProposalReviewerPool, Resource } from '@charmverse/core/permission
 import { prisma } from '@charmverse/core/prisma-client';
 
 export async function getProposalReviewerPool({ resourceId }: Resource): Promise<ProposalReviewerPool> {
-  const category = await prisma.proposalCategory.findUnique({
+  const proposal = await prisma.proposal.findUnique({
     where: {
       id: resourceId
     },
@@ -12,11 +12,11 @@ export async function getProposalReviewerPool({ resourceId }: Resource): Promise
     }
   });
 
-  if (!category) {
-    throw new DataNotFoundError(`Proposal category with id ${resourceId} not found`);
+  if (!proposal) {
+    throw new DataNotFoundError(`Proposal with id ${resourceId} not found`);
   }
 
-  const spaceId = category.spaceId;
+  const spaceId = proposal.spaceId;
 
   const spaceRoles = await prisma.spaceRole.findMany({
     where: {

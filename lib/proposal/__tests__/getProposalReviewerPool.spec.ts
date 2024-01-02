@@ -18,18 +18,13 @@ describe('getProposalReviewerPool', () => {
       createdBy: user.id
     });
 
-    const category = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id
-    });
-
     const proposal = await testUtilsProposals.generateProposal({
-      categoryId: category.id,
       spaceId: space.id,
       userId: user.id
     });
 
     const reviewerPool: ProposalReviewerPool = await getProposalReviewerPool({
-      resourceId: proposal.categoryId as string
+      resourceId: proposal.id
     });
 
     expect(reviewerPool.userIds).toEqual(expect.arrayContaining([user.id, extraUser.id]));

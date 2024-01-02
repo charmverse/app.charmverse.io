@@ -109,10 +109,6 @@ test.describe.serial('Proposal Evaluation', () => {
       operations: ['createProposals']
     });
     member = await generateUser({ space: { id: space.id, isAdmin: false } });
-    proposalCategory = await testUtilsProposals.generateProposalCategory({
-      title: 'General',
-      spaceId: space.id
-    });
     workflow = await prisma.proposalWorkflow.create({
       data: {
         index: 0,
@@ -155,8 +151,6 @@ test.describe.serial('Proposal Evaluation', () => {
     await documentPage.documentTitle.locator('textarea').first().fill(settingsToTest.proposalTemplateTitle);
 
     await documentPage.charmEditor.fill('This is a test proposal');
-
-    await proposalPage.selectCategory(proposalCategory.id);
 
     // Workflow auto-selected when loading the proposal
     const workflowSelectTextContent = await proposalPage.workflowSelect.textContent();

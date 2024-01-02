@@ -1,4 +1,4 @@
-import type { ProposalCategory, ProposalReviewer, Space, User } from '@charmverse/core/prisma';
+import type { ProposalReviewer, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
@@ -12,7 +12,6 @@ let author: User;
 let reviewer: User;
 let space: Space;
 let authorCookie: string;
-let proposalCategory: ProposalCategory;
 
 beforeAll(async () => {
   const generated1 = await testUtilsUser.generateUserAndSpace({ isAdmin: false, spacePaidTier: 'free' });
@@ -23,10 +22,6 @@ beforeAll(async () => {
   reviewer = generated2;
 
   authorCookie = await loginUser(author.id);
-
-  proposalCategory = await testUtilsProposals.generateProposalCategory({
-    spaceId: space.id
-  });
 });
 
 describe('GET /api/proposals/[id] - Get proposal - public space', () => {
@@ -131,8 +126,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
 
     const { page } = await testUtilsProposals.generateProposal({
       userId: adminUser.id,
-      spaceId: adminSpace.id,
-      categoryId: proposalCategory.id
+      spaceId: adminSpace.id
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
@@ -167,8 +161,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
 
     const proposalTemplate = await testUtilsProposals.generateProposalTemplate({
       spaceId: adminSpace.id,
-      userId: adminUser.id,
-      categoryId: proposalCategory.id
+      userId: adminUser.id
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
@@ -244,7 +237,6 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     const proposalTemplate = await testUtilsProposals.generateProposalTemplate({
       spaceId: adminSpace.id,
       userId: adminUser.id,
-      categoryId: proposalCategory.id,
       reviewers: [
         {
           group: 'user',

@@ -45,11 +45,6 @@ export class ProposalPage extends DocumentPage {
     return this.page.waitForURL(`**/${domain}/proposals/new?**`);
   }
 
-  async selectCategory(categoryId: string) {
-    await this.categorySelect.click();
-    await this.getSelectOption(categoryId).click();
-  }
-
   async selectWorkflow(workflowId: string) {
     await this.workflowSelect.click();
     await this.getSelectOption(workflowId).click();

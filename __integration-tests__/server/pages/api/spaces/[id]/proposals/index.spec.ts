@@ -1,4 +1,4 @@
-import type { ProposalCategory, Space, User } from '@charmverse/core/prisma';
+import type { Space, User } from '@charmverse/core/prisma';
 import type { Proposal } from '@charmverse/core/prisma-client';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
@@ -14,10 +14,7 @@ describe('GET /api/spaces/[id]/proposals - Get proposals in a space', () => {
   let adminCookie: string;
   let memberCookie: string;
 
-  let hiddenProposalCategory: ProposalCategory;
   let hiddenCategoryFeedbackProposal: Proposal;
-
-  let visibleProposalCategory: ProposalCategory;
 
   let visibleCategoryDraftProposal: Proposal;
   let visibleCategoryFeedbackProposalReviewedByAdmin: Proposal;
@@ -32,28 +29,16 @@ describe('GET /api/spaces/[id]/proposals - Get proposals in a space', () => {
     adminCookie = await loginUser(adminUser.id);
     memberCookie = await loginUser(memberUser.id);
 
-    hiddenProposalCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id,
-      proposalCategoryPermissions: []
-    });
-
     const { page: page1, ...proposal1 } = await testUtilsProposals.generateProposal({
       spaceId: space.id,
-      categoryId: hiddenProposalCategory.id,
       userId: adminUser.id,
       proposalStatus: 'discussion'
     });
 
     hiddenCategoryFeedbackProposal = proposal1;
 
-    visibleProposalCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id,
-      proposalCategoryPermissions: [{ assignee: { group: 'space', id: space.id }, permissionLevel: 'view' }]
-    });
-
     const { page: page2, ...proposal2 } = await testUtilsProposals.generateProposal({
       spaceId: space.id,
-      categoryId: visibleProposalCategory.id,
       userId: adminUser.id,
       proposalStatus: 'draft'
     });
@@ -62,7 +47,6 @@ describe('GET /api/spaces/[id]/proposals - Get proposals in a space', () => {
 
     const { page: page3, ...proposal3 } = await testUtilsProposals.generateProposal({
       spaceId: space.id,
-      categoryId: visibleProposalCategory.id,
       userId: adminUser.id,
       authors: [adminUser.id],
       proposalStatus: 'discussion',
@@ -73,7 +57,6 @@ describe('GET /api/spaces/[id]/proposals - Get proposals in a space', () => {
 
     const templateProposal = await testUtilsProposals.generateProposalTemplate({
       spaceId: space.id,
-      categoryId: visibleProposalCategory.id,
       userId: adminUser.id,
       authors: [adminUser.id],
       proposalStatus: 'discussion',
@@ -92,7 +75,6 @@ describe('GET /api/spaces/[id]/proposals - Get proposals in a space', () => {
       expect.arrayContaining<ProposalWithUsers>([
         expect.objectContaining<ProposalWithUsers>({
           ...visibleCategoryFeedbackProposalReviewedByAdmin,
-          category: visibleProposalCategory,
           authors: [
             {
               proposalId: visibleCategoryFeedbackProposalReviewedByAdmin.id,

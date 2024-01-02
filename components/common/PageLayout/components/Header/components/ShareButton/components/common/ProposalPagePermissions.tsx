@@ -29,25 +29,23 @@ export function ProposalPagePermissions({ proposalId }: Props) {
   const { space } = useCurrentSpace();
   const { isFreeSpace } = useIsFreeSpace();
 
-  const { data: proposalCategoryPermissions } = useSWR(
-    !proposal || isFreeSpace ? null : `/proposals/list-proposal-category-permissions-${proposal.categoryId}`,
-    () => charmClient.permissions.proposals.listProposalCategoryPermissions(proposal!.categoryId as string)
+  const { data: proposalPermissions } = useSWR(
+    !proposal || isFreeSpace ? null : `/proposals/permissions/${proposalId}`,
+    () => charmClient.permissions.proposals.computeProposalPermissions({ proposalIdOrPath: proposalId })
   );
-
-  const spaceLevelPermission = proposalCategoryPermissions?.find((permission) => permission.assignee.group === 'space');
 
   const defaultPermissionLabel = isFreeSpace
     ? userFriendlyProposalPagePermissionLabels.view_comment_vote
     : // Resume normal flow of checks for a paid space
-    spaceLevelPermission
-    ? userFriendlyProposalPagePermissionLabels[spaceLevelPermission.permissionLevel]
+    proposalPermissions
+    ? userFriendlyProposalPagePermissionLabels[proposalPermissions]
     : // When using public proposals, this also provides view permission to space members if no permission exists
     space?.publicProposals
     ? userFriendlyProposalPagePermissionLabels.view
     : 'No access';
 
   // Only wait for permissions if this is a paid space
-  if (!proposalCategoryPermissions && !isFreeSpace) {
+  if (!proposalPermissions && !isFreeSpace) {
     return (
       <Box sx={{ height: '100px' }}>
         <LoadingComponent />

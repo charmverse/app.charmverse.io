@@ -1,4 +1,4 @@
-import type { ProposalCategory, Space, User } from '@charmverse/core/prisma';
+import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
@@ -16,7 +16,6 @@ let author: User;
 let reviewer: User;
 let space: Space;
 let authorCookie: string;
-let proposalCategory: ProposalCategory;
 
 beforeAll(async () => {
   const generated1 = await testUtilsUser.generateUserAndSpace({ isAdmin: false });
@@ -27,10 +26,6 @@ beforeAll(async () => {
   reviewer = generated2;
 
   authorCookie = await loginUser(author.id);
-
-  proposalCategory = await testUtilsProposals.generateProposalCategory({
-    spaceId: space.id
-  });
 });
 
 describe('GET /api/proposals/[id] - Get proposal', () => {
@@ -155,14 +150,9 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     const { user: adminUser, space: adminSpace } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
     const adminCookie = await loginUser(adminUser.id);
 
-    const category = await testUtilsProposals.generateProposalCategory({
-      spaceId: adminSpace.id
-    });
-
     const { page } = await testUtilsProposals.generateProposal({
       userId: adminUser.id,
-      spaceId: adminSpace.id,
-      categoryId: category.id
+      spaceId: adminSpace.id
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
@@ -197,14 +187,9 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
 
     const role = await testUtilsMembers.generateRole({ createdBy: adminUser.id, spaceId: adminSpace.id });
 
-    const category = await testUtilsProposals.generateProposalCategory({
-      spaceId: adminSpace.id
-    });
-
     const proposalTemplate = await testUtilsProposals.generateProposalTemplate({
       spaceId: adminSpace.id,
-      userId: adminUser.id,
-      categoryId: category.id
+      userId: adminUser.id
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
@@ -247,14 +232,9 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
 
     const proposalAuthor = await testUtilsUser.generateSpaceUser({ isAdmin: false, spaceId: adminSpace.id });
 
-    const category = await testUtilsProposals.generateProposalCategory({
-      spaceId: adminSpace.id
-    });
-
     const { page } = await testUtilsProposals.generateProposal({
       userId: proposalAuthor.id,
       spaceId: adminSpace.id,
-      categoryId: category.id,
       proposalStatus: 'discussion'
     });
 
@@ -300,14 +280,9 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       operations: ['createPage']
     });
 
-    const category = await testUtilsProposals.generateProposalCategory({
-      spaceId: adminSpace.id
-    });
-
     const { page } = await testUtilsProposals.generateProposal({
       userId: proposalAuthor.id,
       spaceId: adminSpace.id,
-      categoryId: category.id,
       proposalStatus: 'discussion',
       reviewers: [{ group: 'user', id: userWithRole.id }]
     });
@@ -374,7 +349,6 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     const proposalTemplate = await testUtilsProposals.generateProposalTemplate({
       spaceId: adminSpace.id,
       userId: adminUser.id,
-      categoryId: proposalCategory.id,
       reviewers: [
         {
           group: 'user',

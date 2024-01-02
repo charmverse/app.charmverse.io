@@ -114,7 +114,6 @@ export async function updateProposalStatus({
       include: {
         authors: true,
         reviewers: true,
-        category: true,
         rubricAnswers: true,
         rubricCriteria: {
           orderBy: {

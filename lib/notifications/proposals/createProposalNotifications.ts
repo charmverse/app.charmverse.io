@@ -1,7 +1,7 @@
 /* eslint-disable no-continue */
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { getPermissionsClient } from 'lib/permissions/api';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { getProposalAction } from 'lib/proposal/getProposalAction';
 import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
@@ -109,10 +109,15 @@ export async function createProposalNotifications(webhookData: {
         const isReviewer =
           proposalReviewerIds.includes(spaceRole.userId) ||
           proposalReviewerRoleIds.some((roleId) => roleIds.includes(roleId));
-        const isProposalAccessible = (spaceRole.isAdmin || isAuthor || isReviewer) && proposal.status !== 'draft';
+
+        const proposalPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
+          resourceId: proposalId
+        });
+
+        const isProposalAccessible = proposalPermissions.view;
 
         if (!isProposalAccessible) {
-          continue;
+          return [];
         }
 
         const action = getProposalAction({
@@ -131,12 +136,9 @@ export async function createProposalNotifications(webhookData: {
           continue;
         }
 
-        const categoryPermission = accessibleProposalCategories.find(({ id }) => id === proposal.categoryId);
-
         if (
-          categoryPermission &&
-          ((action === 'start_discussion' && !categoryPermission.permissions.comment_proposals) ||
-            (action === 'vote' && !categoryPermission.permissions.vote_proposals))
+          (action === 'start_discussion' && !proposalPermissions.comment) ||
+          (action === 'vote' && !proposalPermissions.vote)
         ) {
           continue;
         }

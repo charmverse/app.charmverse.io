@@ -10,7 +10,7 @@ import { WorkflowSelect } from '../WorkflowSelect';
 import { EvaluationStepSettings } from './components/EvaluationStepSettings';
 
 export type Props = {
-  proposal?: Pick<ProposalPropertiesInput, 'categoryId' | 'fields' | 'evaluations' | 'workflowId'>;
+  proposal?: Pick<ProposalPropertiesInput, 'fields' | 'evaluations' | 'workflowId'>;
   onChangeEvaluation?: (evaluationId: string, updated: Partial<ProposalEvaluationValues>) => void;
   readOnly: boolean;
   readOnlyReviewers: boolean;
@@ -46,7 +46,6 @@ export function EvaluationSettingsSidebar({
               {/* <Divider sx={{ my: 1 }} /> */}
               {evaluation.type !== 'feedback' && (
                 <EvaluationStepSettings
-                  categoryId={proposal.categoryId}
                   readOnly={readOnly}
                   readOnlyReviewers={readOnlyReviewers}
                   readOnlyRubricCriteria={readOnlyRubricCriteria}

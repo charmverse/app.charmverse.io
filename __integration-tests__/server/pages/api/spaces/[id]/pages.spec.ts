@@ -1,5 +1,5 @@
 import type { PageMeta } from '@charmverse/core/pages';
-import type { Page, Proposal, ProposalCategory, Space, User } from '@charmverse/core/prisma-client';
+import type { Page, Proposal, Space, User } from '@charmverse/core/prisma-client';
 import { testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { arrayUtils, stringUtils } from '@charmverse/core/utilities';
 import request from 'supertest';
@@ -16,8 +16,6 @@ describe('GET /api/spaces/[id]/pages - Get Pages in a space', () => {
   let adminCookie: string;
   let normalMemberCookie: string;
   let reviewerUserCookie: string;
-
-  let proposalCategoryWithSpacePermission: ProposalCategory;
 
   let pageWithoutPermissions: Page;
   let pageWithSpacePermission: Page;
@@ -53,17 +51,11 @@ describe('GET /api/spaces/[id]/pages - Get Pages in a space', () => {
       pagePermissions: [{ assignee: { group: 'public' }, permissionLevel: 'view', allowDiscovery: true }]
     });
 
-    proposalCategoryWithSpacePermission = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id,
-      proposalCategoryPermissions: [{ assignee: { group: 'space', id: space.id }, permissionLevel: 'full_access' }]
-    });
-
     proposalVisibleInProposalsEvaluationPermissionsModel = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: admin.id,
       title: 'proposal visible in evaluations model',
       proposalStatus: 'published',
-      categoryId: proposalCategoryWithSpacePermission.id,
       evaluationInputs: [
         { evaluationType: 'vote', permissions: [], reviewers: [{ group: 'user', id: reviewerUser.id }] }
       ]
@@ -113,8 +105,6 @@ describe('GET /api/spaces/[id]/pages - Get Pages in a space using new proposal e
   let normalMemberCookie: string;
   let reviewerUserCookie: string;
 
-  let proposalCategoryWithSpacePermission: ProposalCategory;
-
   let pageWithoutPermissions: Page;
   let pageWithSpacePermission: Page;
   let publicPage: Page;
@@ -150,17 +140,11 @@ describe('GET /api/spaces/[id]/pages - Get Pages in a space using new proposal e
       pagePermissions: [{ assignee: { group: 'public' }, permissionLevel: 'view', allowDiscovery: true }]
     });
 
-    proposalCategoryWithSpacePermission = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id,
-      proposalCategoryPermissions: [{ assignee: { group: 'space', id: space.id }, permissionLevel: 'full_access' }]
-    });
-
     proposalVisibleInProposalsEvaluationPermissionsModel = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: admin.id,
       title: 'proposal visible in evaluations model',
       proposalStatus: 'published',
-      categoryId: proposalCategoryWithSpacePermission.id,
       evaluationInputs: [
         { evaluationType: 'vote', permissions: [], reviewers: [{ group: 'user', id: reviewerUser.id }] }
       ]

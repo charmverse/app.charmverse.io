@@ -90,7 +90,6 @@ export function ProposalProperties({
       : [];
 
   const proposalFormInputs: ProposalPropertiesInput = {
-    categoryId: proposal?.categoryId,
     evaluationType: proposal?.evaluationType || 'vote',
     authors: proposal?.authors.map((author) => author.userId) ?? [],
     evaluations: proposal?.evaluations ?? [],
@@ -134,8 +133,6 @@ export function ProposalProperties({
     mutateProposals();
   }
 
-  const readOnlyCategory = !isAdmin && (!proposalPermissions?.edit || !!proposal?.page?.sourceTemplateId);
-
   const canSeeEvaluation =
     (proposal?.status === 'evaluation_active' || proposal?.status === 'evaluation_closed') && isReviewer;
 
@@ -165,7 +162,6 @@ export function ProposalProperties({
           proposalId={proposal?.id}
           pageId={pageId}
           readOnlyAuthors={readOnlyProperties}
-          readOnlyCategory={readOnlyCategory}
           isAdmin={isAdmin}
           snapshotProposalId={snapshotProposalId}
           updateProposalStatus={updateProposalStatus}

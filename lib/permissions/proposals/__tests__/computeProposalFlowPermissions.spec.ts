@@ -1,4 +1,4 @@
-import type { ProposalCategory, Space, User } from '@charmverse/core/prisma';
+import type { Space, User } from '@charmverse/core/prisma';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 
 import { computeProposalFlowPermissions } from '../computeProposalFlowPermissions';
@@ -8,7 +8,6 @@ let author: User;
 let reviewer1: User;
 let reviewer2: User;
 let space: Space;
-let proposalCategory: ProposalCategory;
 
 beforeAll(async () => {
   const { user: user1, space: generatedSpace } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
@@ -20,9 +19,6 @@ beforeAll(async () => {
   author = await testUtilsUser.generateSpaceUser({ spaceId: space.id, isAdmin: false });
   reviewer1 = await testUtilsUser.generateSpaceUser({ spaceId: space.id, isAdmin: false });
   reviewer2 = await testUtilsUser.generateSpaceUser({ spaceId: space.id, isAdmin: false });
-  proposalCategory = await testUtilsProposals.generateProposalCategory({
-    spaceId: space.id
-  });
 });
 
 describe('computeProposalFlowPermissions', () => {
@@ -66,7 +62,6 @@ describe('computeProposalFlowPermissions', () => {
       spaceId: space.id,
       userId: author.id,
       authors: [],
-      categoryId: proposalCategory.id,
       reviewers: [
         {
           group: 'user',
@@ -147,7 +142,6 @@ describe('computeProposalFlowPermissions', () => {
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: author.id,
-      categoryId: proposalCategory.id,
       proposalStatus: 'discussion'
     });
 

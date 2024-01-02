@@ -158,7 +158,6 @@ type Props<T> = {
   inputPlaceholder?: string; // placeholder for the editable input of outlined variant
   displayType?: PropertyValueDisplayType;
   onChange: (value: SelectOptionPopulated[]) => void;
-  proposalCategoryId?: string | null;
   readOnly?: boolean;
   readOnlyMessage?: string;
   showEmptyPlaceholder?: boolean;
@@ -175,7 +174,6 @@ type Props<T> = {
 export function UserAndRoleSelect<T extends { id: string; group: string } = SelectOption>({
   displayType = 'details',
   onChange,
-  proposalCategoryId,
   readOnly,
   readOnlyMessage,
   inputPlaceholder,
@@ -195,7 +193,7 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
   const { members } = useMembers();
   const { isFreeSpace } = useIsFreeSpace();
   // TODO: Make this component agnostic to 'reviewers' by defining the options outside of it
-  const { data: reviewerPool } = useGetReviewerPool(proposalCategoryId);
+  const { data: reviewerPool } = useGetReviewerPool();
   const filteredMembers = members.filter((member) => !member.isBot);
   // For public spaces, we don't want to show reviewer roles
   const applicableValues = isFreeSpace

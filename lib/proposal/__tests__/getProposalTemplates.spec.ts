@@ -10,46 +10,19 @@ describe('getProposalTemplates', () => {
       spacePaidTier: 'community'
     });
 
-    const createableCategory = await testUtilsProposals.generateProposalCategory({
+    await testUtilsProposals.generateProposalTemplate({
       spaceId: space.id,
-      proposalCategoryPermissions: [
-        {
-          permissionLevel: 'full_access',
-          assignee: { group: 'space', id: space.id }
-        }
-      ]
+      userId: adminUser.id
     });
 
     await testUtilsProposals.generateProposalTemplate({
       spaceId: space.id,
-      userId: adminUser.id,
-      categoryId: createableCategory.id
-    });
-
-    const readonlyCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id,
-      proposalCategoryPermissions: [
-        {
-          permissionLevel: 'view',
-          assignee: { group: 'space', id: space.id }
-        }
-      ]
+      userId: adminUser.id
     });
 
     await testUtilsProposals.generateProposalTemplate({
       spaceId: space.id,
-      userId: adminUser.id,
-      categoryId: readonlyCategory.id
-    });
-
-    const invisibleCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id
-    });
-
-    await testUtilsProposals.generateProposalTemplate({
-      spaceId: space.id,
-      userId: adminUser.id,
-      categoryId: invisibleCategory.id
+      userId: adminUser.id
     });
 
     const spaceMember = await testUtilsUser.generateSpaceUser({
@@ -67,8 +40,6 @@ describe('getProposalTemplates', () => {
       expect.objectContaining<Partial<ProposalWithUsers>>({
         authors: expect.any(Array),
         reviewers: expect.any(Array),
-        category: createableCategory,
-        categoryId: createableCategory.id,
         createdBy: adminUser.id,
         id: expect.any(String)
       })
@@ -81,20 +52,9 @@ describe('getProposalTemplates', () => {
       spacePaidTier: 'community'
     });
 
-    const createableCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id,
-      proposalCategoryPermissions: [
-        {
-          permissionLevel: 'full_access',
-          assignee: { group: 'space', id: space.id }
-        }
-      ]
-    });
-
     const usableProposalTemplate = await testUtilsProposals.generateProposalTemplate({
       spaceId: space.id,
-      userId: adminUser.id,
-      categoryId: createableCategory.id
+      userId: adminUser.id
     });
     const templates = await getProposalTemplates({
       spaceId: space.id,
@@ -104,6 +64,7 @@ describe('getProposalTemplates', () => {
     expect(templates).toHaveLength(0);
   });
 });
+
 describe('getProposalTemplates - public space', () => {
   it('should return all templates for members in a public space', async () => {
     const { space, user: adminUser } = await testUtilsUser.generateUserAndSpace({
@@ -111,24 +72,14 @@ describe('getProposalTemplates - public space', () => {
       spacePaidTier: 'free'
     });
 
-    const firstCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id
+    await testUtilsProposals.generateProposalTemplate({
+      spaceId: space.id,
+      userId: adminUser.id
     });
 
     await testUtilsProposals.generateProposalTemplate({
       spaceId: space.id,
-      userId: adminUser.id,
-      categoryId: firstCategory.id
-    });
-
-    const secondCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id
-    });
-
-    await testUtilsProposals.generateProposalTemplate({
-      spaceId: space.id,
-      userId: adminUser.id,
-      categoryId: secondCategory.id
+      userId: adminUser.id
     });
 
     const spaceMember = await testUtilsUser.generateSpaceUser({
@@ -147,16 +98,12 @@ describe('getProposalTemplates - public space', () => {
         expect.objectContaining<Partial<ProposalWithUsers>>({
           authors: expect.any(Array),
           reviewers: expect.any(Array),
-          category: firstCategory,
-          categoryId: firstCategory.id,
           createdBy: adminUser.id,
           id: expect.any(String)
         }),
         expect.objectContaining<Partial<ProposalWithUsers>>({
           authors: expect.any(Array),
           reviewers: expect.any(Array),
-          category: secondCategory,
-          categoryId: secondCategory.id,
           createdBy: adminUser.id,
           id: expect.any(String)
         })
@@ -169,20 +116,9 @@ describe('getProposalTemplates - public space', () => {
       spacePaidTier: 'free'
     });
 
-    const createableCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id,
-      proposalCategoryPermissions: [
-        {
-          permissionLevel: 'full_access',
-          assignee: { group: 'space', id: space.id }
-        }
-      ]
-    });
-
     await testUtilsProposals.generateProposalTemplate({
       spaceId: space.id,
-      userId: adminUser.id,
-      categoryId: createableCategory.id
+      userId: adminUser.id
     });
 
     const templates = await getProposalTemplates({
