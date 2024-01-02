@@ -56,9 +56,7 @@ export function ProposalProperties({
   const { trigger: updateProposal } = useUpdateProposal({ proposalId });
   const { user } = useUser();
   const [isPublishingToLens, setIsPublishingToLens] = useState(false);
-  const { setupLensProfile } = useLensProfile();
   const { mutateProposals } = useProposals();
-  const { account } = useWeb3Account();
 
   const isMdScreen = useMdScreen();
   const { proposalTemplates } = useProposalTemplates({ load: !!proposal?.page?.sourceTemplateId });
@@ -171,22 +169,6 @@ export function ProposalProperties({
           isReviewer={isReviewer}
           rewardIds={proposal?.rewardIds}
         />
-        {isPublishingToLens && (
-          <CreateLensPublication
-            onError={() => {
-              setIsPublishingToLens(false);
-            }}
-            publicationType='post'
-            content={proposalPage.content as PageContent}
-            proposalId={proposalId}
-            proposalPath={proposalPage.path}
-            onSuccess={async () => {
-              await refreshProposal();
-              setIsPublishingToLens(false);
-            }}
-            proposalTitle={proposalPage.title}
-          />
-        )}
       </div>
     </Box>
   );
