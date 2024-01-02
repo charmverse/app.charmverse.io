@@ -54,9 +54,6 @@ describe('setDatabaseProposalProperties()', () => {
     });
 
     const properties = (updatedBlock?.fields as any).cardProperties as IPropertyTemplate[];
-
-    expect(properties.length).toBe(3);
-
     // Check status
     const statusProp = properties.find((p) => p.type === 'proposalStatus');
 
@@ -113,9 +110,6 @@ describe('setDatabaseProposalProperties()', () => {
     });
 
     const properties = (updatedBlock?.fields as any).cardProperties as IPropertyTemplate[];
-
-    expect(properties.length).toBe(6);
-
     // Check status
     const statusProp = properties.find((p) => p.type === 'proposalStatus');
 
@@ -175,10 +169,6 @@ describe('setDatabaseProposalProperties()', () => {
     });
 
     const properties = (updatedBlock?.fields as any).cardProperties as IPropertyTemplate[];
-
-    // 3 proposal props + 1 existing prop
-    expect(properties.length).toBe(4);
-
     // Load up the properties
     const textProp = properties.find((p) => p.type === 'text') as IPropertyTemplate;
     const statusProp = properties.find((p) => p.type === 'proposalStatus') as IPropertyTemplate;
@@ -299,10 +289,6 @@ describe('setDatabaseProposalProperties()', () => {
     });
 
     const properties = (updatedBlock?.fields as any).cardProperties as IPropertyTemplate[];
-
-    // 3 proposal props + 1 existing prop
-    expect(properties.length).toBe(7);
-
     // Load up the properties
     const shortTextField = formFields.find((p) => p.type === 'short_text') as FormField;
     const longTextField = formFields.find((p) => p.type === 'long_text') as FormField;

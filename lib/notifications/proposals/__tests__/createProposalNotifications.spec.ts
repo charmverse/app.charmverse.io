@@ -1,5 +1,5 @@
-import { testUtilsProposals } from '@charmverse/core/dist/cjs/test';
 import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsProposals } from '@charmverse/core/test';
 
 import { createProposal } from 'lib/proposal/createProposal';
 import { updateProposalStatus } from 'lib/proposal/updateProposalStatus';

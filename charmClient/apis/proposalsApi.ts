@@ -22,10 +22,6 @@ export class ProposalsApi {
     return http.PUT(`/api/proposals/${proposalId}/update-lens-properties`, rest);
   }
 
-  updateStatus(proposalId: string, newStatus: ProposalStatus) {
-    return http.PUT<ProposalWithUsers>(`/api/proposals/${proposalId}/status`, { newStatus });
-  }
-
   archiveProposal({ archived, proposalId }: ArchiveProposalRequest) {
     return http.POST<ProposalWithUsers>(`/api/proposals/${proposalId}/archive`, { archived });
   }

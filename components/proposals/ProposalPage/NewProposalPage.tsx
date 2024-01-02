@@ -304,7 +304,6 @@ export function NewProposalPage({
               </>
             )}
             <ProposalPropertiesBase
-              isFromTemplate={isFromTemplateSource}
               proposalStatus='draft'
               proposalFormInputs={formInputs}
               setProposalFormInputs={setFormInputs}

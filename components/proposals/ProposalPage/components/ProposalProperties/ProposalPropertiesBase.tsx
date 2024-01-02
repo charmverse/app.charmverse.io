@@ -1,27 +1,19 @@
 import type { PageType, ProposalEvaluationType, ProposalStatus } from '@charmverse/core/prisma';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Collapse, Divider, IconButton, Stack, Switch, Typography } from '@mui/material';
-import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import Link from 'components/common/Link';
 import { LoadingIcon } from 'components/common/LoadingComponent';
-import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import { ProposalRewards } from 'components/proposals/components/ProposalRewards/ProposalRewards';
 import { CustomPropertiesAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/CustomPropertiesAdapter';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
-import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { isProdEnv } from 'config/constants';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { ProposalFields, ProposalReviewerInput } from 'lib/proposal/interface';
-import {
-  getProposalStatuses,
-  nextProposalStatusUpdateMessage,
-  previousProposalStatusUpdateMessage
-} from 'lib/proposal/proposalStatusTransition';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { ProposalEvaluationValues } from '../EvaluationSettingsSidebar/components/EvaluationStepSettings';
@@ -43,16 +35,11 @@ export type ProposalPropertiesInput = {
 type ProposalPropertiesProps = {
   isPublishingToLens?: boolean;
   proposalLensLink?: string;
-  isAdmin?: boolean;
-  isFromTemplate?: boolean;
   pageId?: string;
-  proposalId?: string;
   proposalFormInputs: ProposalPropertiesInput;
   proposalStatus?: ProposalStatus;
   readOnlyAuthors?: boolean;
   setProposalFormInputs: (values: Partial<ProposalPropertiesInput>) => Promise<void> | void;
-  snapshotProposalId?: string | null;
-  updateProposalStatus?: (newStatus: ProposalStatus) => Promise<void>;
   readOnlyCustomProperties?: string[];
   isReviewer?: boolean;
   rewardIds?: string[] | null;
@@ -60,74 +47,26 @@ type ProposalPropertiesProps = {
 
 export function ProposalPropertiesBase({
   proposalLensLink,
-  isAdmin = false,
-  isFromTemplate,
   proposalFormInputs,
   pageId,
-  proposalId,
   proposalStatus,
   readOnlyAuthors,
   setProposalFormInputs,
-  snapshotProposalId,
-  updateProposalStatus,
   isPublishingToLens,
   readOnlyCustomProperties,
   isReviewer,
   rewardIds
 }: ProposalPropertiesProps) {
   const { user } = useUser();
-  const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
   const { lensProfile } = useLensProfile();
   const { account } = useWeb3Account();
-  const previousConfirmationPopup = usePopupState({
-    variant: 'popover',
-    popupId: 'previous-proposal-status-change-confirmation'
-  });
-  const nextConfirmationPopup = usePopupState({
-    variant: 'popover',
-    popupId: 'next-proposal-status-change-confirmation'
-  });
-
-  const statuses = getProposalStatuses(proposalFormInputs.evaluationType);
-  const currentStatusIndex = proposalStatus ? statuses.indexOf(proposalStatus) : -1;
-  const nextStatus = statuses[currentStatusIndex + 1];
-  const previousStatus = statuses[currentStatusIndex - 1];
-  const previousConfirmationMessage = previousProposalStatusUpdateMessage(previousStatus);
-  const nextConfirmationMessage = nextProposalStatusUpdateMessage(nextStatus);
-
-  async function handleProposalStatusUpdate(newStatus: ProposalStatus) {
-    switch (newStatus) {
-      case 'draft':
-      case 'discussion':
-      case 'review':
-      case 'vote_active':
-      case 'evaluation_active':
-      case 'evaluation_closed':
-      case 'reviewed':
-        if (newStatus === previousStatus) {
-          previousConfirmationPopup.open();
-        } else if (newStatus === nextStatus) {
-          nextConfirmationPopup.open();
-        }
-        break;
-      default:
-        await updateProposalStatus?.(newStatus);
-        break;
-    }
-  }
 
   const isAuthor = proposalFormInputs.authors.includes(user?.id ?? '');
   const proposalAuthorIds = proposalFormInputs.authors;
   const proposalReviewers = proposalFormInputs.reviewers;
   const isNewProposal = !pageId;
-  const voteProposal = proposalId && proposalStatus ? { id: proposalId, status: proposalStatus } : undefined;
   const pendingRewards = proposalFormInputs.fields?.pendingRewards || [];
-
-  function openVoteModal() {
-    setIsVoteModalOpen(true);
-  }
-
   useEffect(() => {
     setDetailsExpanded(proposalStatus === 'draft');
   }, [setDetailsExpanded, proposalStatus]);
@@ -301,46 +240,6 @@ export function ProposalPropertiesBase({
           my: 2
         }}
       />
-      <CreateVoteModal
-        readOnly={!isReviewer && !isAuthor}
-        proposal={voteProposal}
-        pageId={pageId}
-        snapshotProposalId={snapshotProposalId || null}
-        open={isVoteModalOpen}
-        onCreateVote={() => {
-          setIsVoteModalOpen(false);
-          updateProposalStatus?.('vote_active');
-        }}
-        onPublishToSnapshot={() => {
-          setIsVoteModalOpen(false);
-          updateProposalStatus?.('vote_active');
-        }}
-        onClose={() => {
-          setIsVoteModalOpen?.(false);
-        }}
-      />
-      <ModalWithButtons
-        open={previousConfirmationPopup.isOpen && !!previousConfirmationMessage}
-        buttonText='Continue'
-        onClose={previousConfirmationPopup.close}
-        onConfirm={() => updateProposalStatus?.(previousStatus)}
-      >
-        <Typography>{previousConfirmationMessage}</Typography>
-      </ModalWithButtons>
-      <ModalWithButtons
-        open={nextConfirmationPopup.isOpen && !!nextConfirmationMessage}
-        onClose={nextConfirmationPopup.close}
-        buttonText='Continue'
-        onConfirm={() => {
-          if (nextStatus === 'vote_active') {
-            openVoteModal?.();
-          } else {
-            updateProposalStatus?.(nextStatus);
-          }
-        }}
-      >
-        <Typography>{nextConfirmationMessage}</Typography>
-      </ModalWithButtons>
     </>
   );
 }
