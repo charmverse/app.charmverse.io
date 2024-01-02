@@ -36,6 +36,7 @@ import { useMdScreen } from 'hooks/useMediaScreens';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
+import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
 import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposal/rubric/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -206,7 +207,8 @@ export function NewProposalPage({
       });
       const workflow = workflowOptions?.find((w) => w.id === template.workflowId);
       if (workflow) {
-        applyWorkflow(workflow);
+        // pass in the template since the formState will not be updated in this instance of applyWorkflow
+        applyWorkflow(workflow, template);
       }
     }
   }
@@ -217,12 +219,14 @@ export function NewProposalPage({
     });
   }
 
-  function applyWorkflow(workflow: ProposalWorkflowTyped) {
+  function applyWorkflow(workflow: ProposalWorkflowTyped, template?: ProposalTemplate) {
     setFormInputs({
       workflowId: workflow.id,
       evaluations: workflow.evaluations.map((evaluation, index) => {
         // try to retain existing reviewers and configuration
-        const existingStep = formInputs.evaluations.find((e) => e.title === evaluation.title);
+        const existingStep = (template?.evaluations || formInputs.evaluations).find(
+          (e) => e.title === evaluation.title
+        );
         return {
           id: evaluation.id,
           index,
