@@ -192,11 +192,11 @@ function PageLayout({ children }: PageLayoutProps) {
                     <Header open={open} openSidebar={handleDrawerOpen} />
                     <BlocksExceededBanner />
                     <AnnouncementBanner
-                      actionLabel='Learn more'
-                      actionHref='https://x.com/CharmVerse/status/1705253749826929118?s=20'
-                      expiryDate='2023-09-29'
+                      actionLabel='Check it out'
+                      actionHref='https://tiny.charmverse.io/prop2-updates'
+                      expiryDate='2024-01-31'
                     >
-                      No more free trials! Everyone gets 30k blocks on us.
+                      NEW governance & decision-making workflow launched.
                     </AnnouncementBanner>
                   </AppBar>
                   {isMobile ? (

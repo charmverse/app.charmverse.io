@@ -18,7 +18,6 @@ import { usePagePermissions } from 'hooks/usePagePermissions';
 import { canReceiveManualPermissionUpdates } from 'lib/pages';
 
 import { AddPagePermissionsInput } from '../common/AddPagePermissionsInput';
-import { ProposalPagePermissions } from '../common/ProposalPagePermissions';
 
 import AddPagePermissionsForm from './AddPagePermissionsForm';
 import { PagePermissionRow } from './PagePermissionRow';
@@ -115,10 +114,6 @@ export default function PaidPagePermissions({ pageId, pagePermissions, refreshPe
     userPagePermissions?.grant_permissions === true &&
     !!page &&
     canReceiveManualPermissionUpdates({ pageType: page.type });
-
-  if (page?.type === 'proposal' && !!page.proposalId) {
-    return <ProposalPagePermissions proposalId={page.proposalId} />;
-  }
 
   return (
     <Box>

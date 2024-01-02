@@ -1,4 +1,5 @@
 import type { AssignedPagePermission } from '@charmverse/core/permissions';
+import type { PageType } from '@charmverse/core/prisma-client';
 import Box from '@mui/material/Box';
 import { useState } from 'react';
 
@@ -14,9 +15,10 @@ import PaidShareToWeb from './PaidPagePermissions/PaidShareToWeb';
 
 type Props = {
   pageId: string;
+  pageType: PageType;
 };
 
-export function PagePermissionsContainer({ pageId }: Props) {
+export function PagePermissionsContainer({ pageId, pageType }: Props) {
   const [activeTab, setActiveTab] = useState(0);
   const { isFreeSpace } = useIsFreeSpace();
 
@@ -40,36 +42,55 @@ export function PagePermissionsContainer({ pageId }: Props) {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         tabPanelSx={{ p: '10px 0' }}
-        tabs={[
-          [
-            'Share',
-            <Box key='0'>
-              {isFreeSpace ? (
-                <FreePagePermissions pageId={pageId} />
-              ) : (
-                <PaidPagePermissions
-                  pagePermissions={pagePermissions as AssignedPagePermission[]}
-                  refreshPermissions={refreshPermissions}
-                  pageId={pageId}
-                />
-              )}
-            </Box>
-          ],
-          [
-            'Publish',
-            <Box key='1'>
-              {isFreeSpace ? (
-                <FreeShareToWeb pageId={pageId} />
-              ) : (
-                <PaidShareToWeb
-                  pageId={pageId}
-                  pagePermissions={pagePermissions as AssignedPagePermission[]}
-                  refreshPermissions={refreshPermissions}
-                />
-              )}
-            </Box>
-          ]
-        ]}
+        tabs={
+          pageType === 'proposal' || pageType === 'proposal_template'
+            ? [
+                [
+                  'Publish',
+                  <Box key='1'>
+                    {isFreeSpace ? (
+                      <FreeShareToWeb pageId={pageId} />
+                    ) : (
+                      <PaidShareToWeb
+                        pageId={pageId}
+                        pagePermissions={pagePermissions as AssignedPagePermission[]}
+                        refreshPermissions={refreshPermissions}
+                      />
+                    )}
+                  </Box>
+                ]
+              ]
+            : [
+                [
+                  'Share',
+                  <Box key='0'>
+                    {isFreeSpace ? (
+                      <FreePagePermissions pageId={pageId} />
+                    ) : (
+                      <PaidPagePermissions
+                        pagePermissions={pagePermissions as AssignedPagePermission[]}
+                        refreshPermissions={refreshPermissions}
+                        pageId={pageId}
+                      />
+                    )}
+                  </Box>
+                ],
+                [
+                  'Publish',
+                  <Box key='1'>
+                    {isFreeSpace ? (
+                      <FreeShareToWeb pageId={pageId} />
+                    ) : (
+                      <PaidShareToWeb
+                        pageId={pageId}
+                        pagePermissions={pagePermissions as AssignedPagePermission[]}
+                        refreshPermissions={refreshPermissions}
+                      />
+                    )}
+                  </Box>
+                ]
+              ]
+        }
       />
     </Box>
   );
