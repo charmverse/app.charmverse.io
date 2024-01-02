@@ -194,7 +194,7 @@ function PageLayout({ children }: PageLayoutProps) {
                     <AnnouncementBanner
                       actionLabel='Check it out'
                       actionHref='https://tiny.charmverse.io/prop2-updates'
-                      expiryDate='2024-01-31'
+                      expiryDate='2024-01-09'
                     >
                       NEW governance & decision-making workflow launched.
                     </AnnouncementBanner>
