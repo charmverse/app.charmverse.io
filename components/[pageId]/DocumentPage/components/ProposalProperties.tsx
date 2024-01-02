@@ -4,7 +4,7 @@ import { Box } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
-import { useGetIsReviewer, useGetProposalFlowFlags, useUpdateProposal } from 'charmClient/hooks/proposals';
+import { useGetIsReviewer, useUpdateProposal } from 'charmClient/hooks/proposals';
 import { useNotifications } from 'components/nexus/hooks/useNotifications';
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
@@ -16,7 +16,7 @@ import { useMdScreen } from 'hooks/useMediaScreens';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { PageWithContent } from 'lib/pages';
-import type { ProposalFields, ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { CreateLensPublication } from './CreateLensPublication';
@@ -64,7 +64,6 @@ export function ProposalProperties({
   const { proposalTemplates } = useProposalTemplates({ load: !!proposal?.page?.sourceTemplateId });
 
   const { data: isReviewer } = useGetIsReviewer(pageId || undefined);
-  const { data: proposalFlowFlags, mutate: refreshProposalFlowFlags } = useGetProposalFlowFlags(proposalId);
   const isAdmin = useIsAdmin();
 
   // further restrict readOnly if user cannot update proposal properties specifically
@@ -112,7 +111,7 @@ export function ProposalProperties({
         }
       }
       await charmClient.proposals.updateStatus(proposal.id, newStatus);
-      await Promise.all([refreshProposal(), refreshProposalFlowFlags(), refreshPagePermissions()]);
+      await Promise.all([refreshProposal(), refreshPagePermissions()]);
       mutateNotifications();
       mutateProposals();
     }
@@ -129,7 +128,6 @@ export function ProposalProperties({
       });
     }
     refreshProposal();
-    refreshProposalFlowFlags(); // needs to run when reviewers change?
     mutateProposals();
   }
 
@@ -157,7 +155,6 @@ export function ProposalProperties({
         <ProposalPropertiesBase
           proposalLensLink={proposal?.lensPostLink ?? undefined}
           isFromTemplate={!!proposal?.page?.sourceTemplateId}
-          proposalFlowFlags={proposalFlowFlags}
           proposalStatus={proposal?.status}
           proposalId={proposal?.id}
           pageId={pageId}

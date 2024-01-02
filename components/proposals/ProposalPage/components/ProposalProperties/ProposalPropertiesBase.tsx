@@ -1,11 +1,8 @@
-import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import type { PageType, ProposalEvaluationType, ProposalStatus } from '@charmverse/core/prisma';
 import { KeyboardArrowDown } from '@mui/icons-material';
-import type { Theme } from '@mui/material';
 import { Box, Collapse, Divider, IconButton, Stack, Switch, Typography } from '@mui/material';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
@@ -50,7 +47,6 @@ type ProposalPropertiesProps = {
   isFromTemplate?: boolean;
   pageId?: string;
   proposalId?: string;
-  proposalFlowFlags?: ProposalFlowPermissionFlags;
   proposalFormInputs: ProposalPropertiesInput;
   proposalStatus?: ProposalStatus;
   readOnlyAuthors?: boolean;
@@ -69,7 +65,6 @@ export function ProposalPropertiesBase({
   proposalFormInputs,
   pageId,
   proposalId,
-  proposalFlowFlags,
   proposalStatus,
   readOnlyAuthors,
   setProposalFormInputs,
@@ -307,7 +302,7 @@ export function ProposalPropertiesBase({
         }}
       />
       <CreateVoteModal
-        proposalFlowFlags={proposalFlowFlags}
+        readOnly={!isReviewer && !isAuthor}
         proposal={voteProposal}
         pageId={pageId}
         snapshotProposalId={snapshotProposalId || null}

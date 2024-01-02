@@ -29,25 +29,14 @@ describe('getProposalTemplates', () => {
       spaceId: space.id,
       isAdmin: false
     });
-
-    const createableCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id
-    });
-
     const firstTemplate = await testUtilsProposals.generateProposalTemplate({
       spaceId: space.id,
-      userId: adminUser.id,
-      categoryId: createableCategory.id
-    });
-
-    const secondCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id
+      userId: adminUser.id
     });
 
     const secondTemplate = await testUtilsProposals.generateProposalTemplate({
       spaceId: space.id,
-      userId: adminUser.id,
-      categoryId: createableCategory.id
+      userId: adminUser.id
     });
 
     const templates = await getProposalTemplates({

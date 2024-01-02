@@ -1,4 +1,4 @@
-import type { ProposalFlowPermissionFlags, ProposalReviewerPool } from '@charmverse/core/permissions';
+import type { ProposalReviewerPool } from '@charmverse/core/permissions';
 import type { FormFieldAnswer } from '@charmverse/core/prisma-client';
 import type { ListProposalsRequest } from '@charmverse/core/proposals';
 
@@ -41,9 +41,6 @@ export function useGetReviewerPool(spaceId: MaybeString) {
   return useGET<ProposalReviewerPool>(spaceId ? `/api/proposals/reviewer-pool?resourceId=${spaceId}` : null);
 }
 
-export function useGetProposalFlowFlags(proposalId: MaybeString) {
-  return useGET<ProposalFlowPermissionFlags>(proposalId ? `/api/proposals/${proposalId}/compute-flow-flags` : null);
-}
 export function useGetProposalsBySpace({ spaceId }: Partial<ListProposalsRequest>) {
   return useGET<ProposalWithUsers[]>(spaceId ? `/api/spaces/${spaceId}/proposals` : null);
 }

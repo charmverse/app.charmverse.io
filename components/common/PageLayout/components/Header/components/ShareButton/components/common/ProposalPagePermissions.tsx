@@ -36,9 +36,6 @@ export function ProposalPagePermissions({ proposalId }: Props) {
 
   const defaultPermissionLabel = isFreeSpace
     ? userFriendlyProposalPagePermissionLabels.view_comment_vote
-    : // Resume normal flow of checks for a paid space
-    proposalPermissions
-    ? userFriendlyProposalPagePermissionLabels[proposalPermissions]
     : // When using public proposals, this also provides view permission to space members if no permission exists
     space?.publicProposals
     ? userFriendlyProposalPagePermissionLabels.view

@@ -2,7 +2,7 @@ import { ProposalStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { InvalidStateError } from 'lib/middleware';
-import { getPermissionsClient } from 'lib/permissions/api';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { getSnapshotProposal } from 'lib/snapshot/getProposal';
 import { coerceToMilliseconds } from 'lib/utilities/dates';
 import { InvalidInputError } from 'lib/utilities/errors';
@@ -48,15 +48,12 @@ export async function updateProposalStatus({
     throw new InvalidStateError(`Archived proposals cannot be updated`);
   }
 
-  const statusFlow = await getPermissionsClient({ resourceId: proposalId, resourceIdType: 'proposal' }).then(
-    ({ client }) =>
-      client.proposals.computeProposalFlowPermissions({
-        resourceId: proposalId,
-        userId
-      })
-  );
+  const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
+    resourceId: proposalId,
+    userId
+  });
 
-  if (newStatus !== 'published' && !statusFlow[newStatus]) {
+  if (!permissions.edit && !permissions.move) {
     throw new InvalidStateError(`Invalid transition to proposal status "${newStatus}"`);
   }
 
