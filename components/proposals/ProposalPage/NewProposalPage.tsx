@@ -16,6 +16,7 @@ import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/Page
 import { PrimaryColumn } from 'components/[pageId]/DocumentPage/components/PrimaryColumn';
 import { PageSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/PageSidebar';
 import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/components/StickyFooterContainer';
+import { defaultPageTop } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
@@ -380,7 +381,7 @@ export function NewProposalPage({
         <Box className={`document-print-container ${fontClassName}`} display='flex' flexDirection='column'>
           <PageTemplateBanner pageType={formInputs.type} isNewPage proposalType={formInputs.proposalType} />
           {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
-          <StyledContainer data-test='page-charmeditor' top={0} fullWidth={isSmallScreen}>
+          <StyledContainer data-test='page-charmeditor' top={defaultPageTop} fullWidth={isSmallScreen}>
             <Box minHeight={450}>
               {isStructured ? (
                 <>
