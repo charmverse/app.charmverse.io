@@ -64,83 +64,88 @@ export async function computeBountyPermissions({
     return allowedOperations.empty;
   }
 
-  // Start actually evaluating permissions
+  // Calculate actual available permissions
   let basePermissions = allowedOperations.empty as BountyPermissionFlags;
+  let workRestricted = false;
+
+  // At the point we execute this query, we are certain there is a requesting user who is a member of the target space
+  const rewardPermissions = await prisma.bountyPermission.findMany({
+    where: {
+      bountyId: resourceId
+    },
+    select: {
+      roleId: true,
+      userId: true,
+      spaceId: true,
+      permissionLevel: true
+    }
+  });
+
+  const mappedPermissions: Record<'space' | 'role' | 'user', Partial<BountyPermission>[]> = rewardPermissions.reduce(
+    (acc, val) => {
+      if (val.roleId) {
+        acc.role = [...(acc.role as any), val];
+      } else if (val.userId) {
+        acc.user = [...(acc.user as any), val];
+      } else if (val.spaceId) {
+        acc.space = [...(acc.space as any), val];
+      }
+
+      return acc;
+    },
+    { role: [], space: [], user: [] } as Record<'space' | 'role' | 'user', BountyPermission[]>
+  );
+
+  workRestricted =
+    mappedPermissions.role.some((p) => p.permissionLevel === 'submitter') ||
+    mappedPermissions.user.some((p) => p.permissionLevel === 'submitter');
+
+  // Default to explicit space-wide permission
+  if (!workRestricted) {
+    allowedOperations.addPermissions(bountyPermissionMapping.submitter.slice());
+  }
+
+  const applicableRolePermissions = mappedPermissions.role.length
+    ? await prisma.spaceRoleToRole.findMany({
+        where: {
+          spaceRole: {
+            userId
+          },
+          roleId: {
+            in: mappedPermissions.role.map((p) => p.roleId as string)
+          }
+        }
+      })
+    : [];
+
+  const permissions = [
+    ...mappedPermissions.role.filter((rolePermission) =>
+      applicableRolePermissions.some((p) => p.roleId === rolePermission.roleId)
+    ),
+    ...mappedPermissions.user.filter((p) => p.userId === userId),
+    ...mappedPermissions.space
+  ];
+
+  permissions.forEach((p) => {
+    allowedOperations.addPermissions(bountyPermissionMapping[p.permissionLevel as BountyPermissionLevel].slice());
+  });
+
+  basePermissions = allowedOperations.operationFlags;
 
   // Provision full set of operations
+  // work permissions (assigned rewards) are also applied for admins
   if (isAdmin) {
-    basePermissions = allowedOperations.full;
-  }
-  // Calculate actual available permissions
-  else {
-    // At the point we execute this query, we are certain there is a requesting user who is a member of the target space
-    const rewardPermissions = await prisma.bountyPermission.findMany({
-      where: {
-        bountyId: resourceId
-      },
-      select: {
-        roleId: true,
-        userId: true,
-        spaceId: true,
-        permissionLevel: true
-      }
-    });
-
-    const mappedPermissions: Record<'space' | 'role' | 'user', Partial<BountyPermission>[]> = rewardPermissions.reduce(
-      (acc, val) => {
-        if (val.roleId) {
-          acc.role = [...(acc.role as any), val];
-        } else if (val.userId) {
-          acc.user = [...(acc.user as any), val];
-        } else if (val.spaceId) {
-          acc.space = [...(acc.space as any), val];
-        }
-
-        return acc;
-      },
-      { role: [], space: [], user: [] } as Record<'space' | 'role' | 'user', BountyPermission[]>
-    );
-    const isRoleRestrictedReward =
-      mappedPermissions.role.some((p) => p.permissionLevel === 'submitter') ||
-      mappedPermissions.user.some((p) => p.permissionLevel === 'submitter');
-
-    // Default to explicit space-wide permission
-    if (!isRoleRestrictedReward) {
-      allowedOperations.addPermissions(bountyPermissionMapping.submitter.slice());
-    }
-
-    const applicableRolePermissions = mappedPermissions.role.length
-      ? await prisma.spaceRoleToRole.findMany({
-          where: {
-            spaceRole: {
-              userId
-            },
-            roleId: {
-              in: mappedPermissions.role.map((p) => p.roleId as string)
-            }
-          }
-        })
-      : [];
-
-    const permissions = [
-      ...mappedPermissions.role.filter((rolePermission) =>
-        applicableRolePermissions.some((p) => p.roleId === rolePermission.roleId)
-      ),
-      ...mappedPermissions.user.filter((p) => p.userId === userId),
-      ...mappedPermissions.space
-    ];
-
-    permissions.forEach((p) => {
-      allowedOperations.addPermissions(bountyPermissionMapping[p.permissionLevel as BountyPermissionLevel].slice());
-    });
-
-    basePermissions = allowedOperations.operationFlags;
+    basePermissions = { ...allowedOperations.full, work: basePermissions.work };
   }
 
   // ADD case-specific permissions
   // 1. If the bounty is created by the user, they always have creator-like abilities
   if (bounty.createdBy === userId) {
     bountyPermissionMapping.creator.forEach((op) => {
+      if (op === 'work' && workRestricted) {
+        return;
+      }
+
       basePermissions[op] = true;
     });
   }

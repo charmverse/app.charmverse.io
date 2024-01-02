@@ -166,6 +166,7 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
                 proposal={proposal}
                 isCurrent={isCurrent}
                 evaluation={evaluation}
+                addVote={() => setEvaluationInput(evaluation)}
               />
             )}
           </EvaluationStepRow>

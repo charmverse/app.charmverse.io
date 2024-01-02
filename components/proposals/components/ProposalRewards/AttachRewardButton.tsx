@@ -76,7 +76,6 @@ export function AttachRewardButton({
           titlePlaceholder='Reward title (required)'
           values={newPageValues}
           onChange={updateNewPageValues}
-          headerBannerTitle="You're creating a milestone reward"
         >
           <RewardPropertiesForm
             onChange={setRewardValues}

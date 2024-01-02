@@ -20,13 +20,11 @@ import { highlightDomElement, setUrlWithoutRerender } from 'lib/utilities/browse
 import { isTruthy } from 'lib/utilities/types';
 
 const Center = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   text-align: center;
   display: flex;
   align-items: center;
+  padding-top: ${({ theme }) => theme.spacing(3)};
+  padding-bottom: ${({ theme }) => theme.spacing(3)};
   flex-direction: column;
 `;
 
@@ -37,13 +35,14 @@ export const StyledSidebar = styled(List)`
   gap: ${({ theme }) => theme.spacing(1)};
   padding-top: 0px;
   padding-bottom: 0px;
-  height: calc(100% - 50px);
 `;
 
 const EmptyThreadContainerBox = styled(Box)`
-  position: relative;
   width: 100%;
   height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-color: ${({ theme }) => theme.palette.background.light};
 `;
 
@@ -150,7 +149,7 @@ function CommentsSidebarComponent({
           <MenuItem value='all'>All</MenuItem>
         </Select>
       </Box>
-      <StyledSidebar className='charm-inline-comment-sidebar'>
+      <StyledSidebar className='charm-inline-comment-sidebar' sx={{ height: '100%' }}>
         {sortedThreadList.length === 0 ? (
           <NoCommentsMessage
             icon={
@@ -183,14 +182,23 @@ function CommentsSidebarComponent({
   );
 }
 
-export function NoCommentsMessage({ icon, message }: { icon: ReactNode; message: string }) {
+export function NoCommentsMessage({
+  icon,
+  message,
+  children
+}: {
+  icon: ReactNode;
+  message: string;
+  children?: ReactNode;
+}) {
   return (
     <EmptyThreadContainerBox>
-      <Center>
+      <Center id='center'>
         {icon}
         <Typography variant='subtitle1' color='secondary'>
           {message}
         </Typography>
+        {children}
       </Center>
     </EmptyThreadContainerBox>
   );

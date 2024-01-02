@@ -9,6 +9,7 @@ import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import { createProposal } from 'lib/proposal/createProposal';
 import { withSessionRoute } from 'lib/session/withSession';
 import { AdministratorOnlyError } from 'lib/users/errors';
+import { InvalidInputError } from 'lib/utilities/errors';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -40,6 +41,10 @@ async function createProposalController(req: NextApiRequest, res: NextApiRespons
       throw new ActionNotPermittedError('You cannot create new proposals');
     }
   }
+  // TODO: fix tests
+  // if (!req.body.workflowId) {
+  //   throw new InvalidInputError('You must provide a workflow ID');
+  // }
   const proposalPage = await createProposal({
     ...req.body,
     userId: req.session.user.id

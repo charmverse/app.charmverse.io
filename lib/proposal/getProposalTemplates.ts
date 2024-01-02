@@ -38,22 +38,6 @@ export async function getProposalTemplates({ spaceId, userId }: SpaceResourcesRe
 
   let categoryIds: string[] | undefined;
 
-  // If this is a paid space, we only want to provide the user with templates within categories where they can create a proposal
-  if (space?.paidTier !== 'free') {
-    const accessibleCategories = await permissionsApiClient.proposals
-      .getAccessibleProposalCategories({
-        spaceId,
-        userId
-      })
-      .then((categories) => categories.filter((c) => c.permissions.create_proposal));
-
-    if (accessibleCategories.length === 0) {
-      return [];
-    }
-
-    categoryIds = accessibleCategories.map((c) => c.id);
-  }
-
   const templates = await prisma.proposal.findMany({
     where: {
       spaceId,

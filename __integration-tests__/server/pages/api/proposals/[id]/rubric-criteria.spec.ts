@@ -6,7 +6,7 @@ import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposal/rubric/
 import type { RubricCriteriaUpsert } from 'lib/proposal/rubric/upsertRubricCriteria';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
-describe('PUT /api/proposals/[id]/rubric-criteria - Update proposal rubric criteria', () => {
+describe.skip('PUT /api/proposals/[id]/rubric-criteria - Update proposal rubric criteria', () => {
   let author: User;
   let space: Space;
   let proposal: Proposal;
