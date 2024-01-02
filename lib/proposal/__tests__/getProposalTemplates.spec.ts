@@ -4,7 +4,7 @@ import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { getProposalTemplates } from '../getProposalTemplates';
 
 describe('getProposalTemplates', () => {
-  it('should return only templates in proposal categories user can create a proposal in within a paid space', async () => {
+  it('should return all templates within a paid space', async () => {
     const { space, user: adminUser } = await testUtilsUser.generateUserAndSpace({
       isAdmin: true,
       spacePaidTier: 'community'
@@ -28,6 +28,26 @@ describe('getProposalTemplates', () => {
     const spaceMember = await testUtilsUser.generateSpaceUser({
       spaceId: space.id,
       isAdmin: false
+    });
+
+    const createableCategory = await testUtilsProposals.generateProposalCategory({
+      spaceId: space.id
+    });
+
+    const firstTemplate = await testUtilsProposals.generateProposalTemplate({
+      spaceId: space.id,
+      userId: adminUser.id,
+      categoryId: createableCategory.id
+    });
+
+    const secondCategory = await testUtilsProposals.generateProposalCategory({
+      spaceId: space.id
+    });
+
+    const secondTemplate = await testUtilsProposals.generateProposalTemplate({
+      spaceId: space.id,
+      userId: adminUser.id,
+      categoryId: createableCategory.id
     });
 
     const templates = await getProposalTemplates({

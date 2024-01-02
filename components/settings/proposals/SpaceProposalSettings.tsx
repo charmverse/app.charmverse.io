@@ -84,7 +84,6 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
       setWorkflows((_workflows) => _workflows.filter((workflow) => workflow.id !== id));
     }
   }
-
   function duplicateWorkflow(workflow: WorkflowTemplateFormItem) {
     addNewWorkflow({ ...workflow, title: `${workflow.title} (copy)` });
   }
@@ -92,7 +91,7 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
   // set the workflow state on load - but from here on out the UI will maintain the latest 'state' since each row can be in an edited state at any given time
   useEffect(() => {
     if (currentWorkflowTemplates) {
-      setWorkflows(currentWorkflowTemplates ?? []);
+      setWorkflows([...currentWorkflowTemplates] ?? []);
     }
   }, [!!currentWorkflowTemplates]);
 
