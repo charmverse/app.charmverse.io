@@ -553,8 +553,8 @@ function DocumentPage({
             )}
           </PageEditorContainer>
         </Box>
-        {isCharmVerse && proposal.status === 'draft' && (
-          <ProposalStickyFooter proposal={proposal} refreshProposal={refreshProposal} />
+        {isCharmVerse && proposal.status === 'draft' && page && (
+          <ProposalStickyFooter proposal={proposal} page={page} refreshProposal={refreshProposal} />
         )}
       </PrimaryColumn>
     </>

@@ -91,7 +91,6 @@ export function ProposalPropertiesBase({
   const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
   const { lensProfile } = useLensProfile();
-  const isMobile = useMediaQuery<Theme>((theme) => theme.breakpoints.down('sm'));
   const { account } = useWeb3Account();
   const previousConfirmationPopup = usePopupState({
     variant: 'popover',
@@ -108,27 +107,6 @@ export function ProposalPropertiesBase({
   const previousStatus = statuses[currentStatusIndex - 1];
   const previousConfirmationMessage = previousProposalStatusUpdateMessage(previousStatus);
   const nextConfirmationMessage = nextProposalStatusUpdateMessage(nextStatus);
-
-  async function handleProposalStatusUpdate(newStatus: ProposalStatus) {
-    switch (newStatus) {
-      case 'draft':
-      case 'discussion':
-      case 'review':
-      case 'vote_active':
-      case 'evaluation_active':
-      case 'evaluation_closed':
-      case 'reviewed':
-        if (newStatus === previousStatus) {
-          previousConfirmationPopup.open();
-        } else if (newStatus === nextStatus) {
-          nextConfirmationPopup.open();
-        }
-        break;
-      default:
-        await updateProposalStatus?.(newStatus);
-        break;
-    }
-  }
 
   const isAuthor = proposalFormInputs.authors.includes(user?.id ?? '');
   const proposalCategoryId = proposalFormInputs.categoryId;

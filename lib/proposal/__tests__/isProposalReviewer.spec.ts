@@ -1,7 +1,6 @@
 import type { ProposalCategory, Role, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
-import { check } from 'prettier';
 
 import { generateUserAndSpace, generateSpaceUser, generateRole } from 'testing/setupDatabase';
 import { generateProposalCategory, generateProposal } from 'testing/utils/proposals';

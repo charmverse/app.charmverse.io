@@ -106,18 +106,13 @@ export function ProposalProperties({
 
   async function updateProposalStatus(newStatus: ProposalStatus) {
     if (proposal && newStatus !== proposal.status) {
-      if (account && newStatus === 'discussion' && proposalPage && !proposal.lensPostLink && proposal.publishToLens) {
-        const lensProfileSetup = await setupLensProfile();
-        if (lensProfileSetup) {
-          setIsPublishingToLens(true);
-        }
-      }
       await charmClient.proposals.updateStatus(proposal.id, newStatus);
       await Promise.all([refreshProposal(), refreshProposalFlowFlags(), refreshPagePermissions()]);
       mutateNotifications();
       mutateProposals();
     }
   }
+
   async function onChangeProperties(values: Partial<ProposalPropertiesInput>) {
     if (proposal) {
       await updateProposal({

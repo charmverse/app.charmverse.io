@@ -9,6 +9,7 @@ import { useElementSize } from 'usehooks-ts';
 import { v4 as uuid } from 'uuid';
 
 import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
+import { CreateLensPublication } from 'components/[pageId]/DocumentPage/components/CreateLensPublication';
 import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
 import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import { PageTemplateBanner } from 'components/[pageId]/DocumentPage/components/PageTemplateBanner';
@@ -29,6 +30,7 @@ import { getInitialFormFieldValue, useFormFields } from 'components/common/form/
 import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
+import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -37,7 +39,6 @@ import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
-import type { ProposalFields } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposal/rubric/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -95,6 +96,7 @@ export function NewProposalPage({
     newProposal: { type: isTemplate ? 'proposal_template' : 'proposal', proposalType }
   });
   const [submittedDraft, setSubmittedDraft] = useState<boolean>(false);
+  const { setupLensProfile } = useLensProfile();
 
   const [, { width: containerWidth }] = useElementSize();
   const { user } = useUser();
@@ -102,7 +104,8 @@ export function NewProposalPage({
   const [readOnlyEditor, setReadOnlyEditor] = useState(false);
   const isAdmin = useIsAdmin();
   const isReviewer = formInputs.reviewers?.some((r) => r.id === user?.id);
-
+  const [isPublishingToLens, setIsPublishingToLens] = useState(false);
+  const [proposalId, setProposalId] = useState<string | null>(null);
   const sourceTemplate = proposalTemplates?.find((template) => template.id === formInputs.proposalTemplateId);
   const isStructured = formInputs.proposalType === 'structured' || !!sourceTemplate?.formId;
   const proposalFormFields = isStructured
@@ -134,6 +137,10 @@ export function NewProposalPage({
   let disabledTooltip = _disabledTooltip;
   if (!disabledTooltip && !isProposalFormFieldsValid) {
     disabledTooltip = 'Please provide correct values for all proposal form fields';
+  }
+
+  if (isPublishingToLens) {
+    disabledTooltip = 'Publishing proposal to lens';
   }
 
   function toggleCollapse(fieldId: string) {
@@ -215,7 +222,13 @@ export function NewProposalPage({
   async function saveForm({ isDraft }: { isDraft?: boolean } = {}) {
     setSubmittedDraft(!!isDraft);
     const result = await createProposal({ isDraft });
-    if (result) {
+    if (!isDraft && result && formInputs.publishToLens) {
+      const lensProfileSetup = await setupLensProfile();
+      if (lensProfileSetup) {
+        setIsPublishingToLens(true);
+        setProposalId(result.id);
+      }
+    } else if (result) {
       navigateToSpacePath(`/${result.id}`);
     }
   }
@@ -486,6 +499,23 @@ export function NewProposalPage({
           }}
         />
       </PrimaryColumn>
+      {isPublishingToLens && proposalId && (
+        <CreateLensPublication
+          onError={() => {
+            setIsPublishingToLens(false);
+            navigateToSpacePath(`/${proposalId}`);
+          }}
+          publicationType='post'
+          content={formInputs.content as PageContent}
+          proposalId={proposalId}
+          proposalPath={proposalId}
+          onSuccess={async () => {
+            setIsPublishingToLens(false);
+            navigateToSpacePath(`/${proposalId}`);
+          }}
+          proposalTitle={formInputs.title ?? 'Untitled'}
+        />
+      )}
     </Box>
   );
 }
