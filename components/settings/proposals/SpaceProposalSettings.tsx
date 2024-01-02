@@ -1,5 +1,5 @@
 import type { Space } from '@charmverse/core/prisma';
-import { Tooltip, Typography } from '@mui/material';
+import { Box, Divider, Tooltip, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
@@ -19,10 +19,11 @@ import Legend from '../Legend';
 
 import type { WorkflowTemplateFormItem } from './components/ProposalWorkflow';
 import { ProposalWorkflowItem } from './components/ProposalWorkflow';
+import { RequireTemplatesForm } from './components/RequireTemplatesForm';
 
 export function SpaceProposalSettings({ space }: { space: Space }) {
   const isAdmin = useIsAdmin();
-  const { mappedFeatures } = useSpaceFeatures();
+  const { getFeatureTitle } = useSpaceFeatures();
   const [expanded, setExpanded] = useState<string | false>(false);
   const [workflows, setWorkflows] = useState<WorkflowTemplateFormItem[]>([]);
   const { data: currentWorkflowTemplates, isLoading: loadingWorkflows } = useGetProposalWorkflows(space.id);
@@ -97,12 +98,12 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
 
   return (
     <>
-      <Legend>{mappedFeatures.proposals.title}</Legend>
-      <Typography variant='body1' gutterBottom>
-        Workflows define how {mappedFeatures.proposals.title} are evaluated in this space.
-      </Typography>
-      <Legend display='flex' justifyContent='space-between' alignContent='flex-end'>
-        <div>Workflows</div>
+      <Legend>{getFeatureTitle('Proposals')}</Legend>
+      <Typography variant='h6'>Workflows</Typography>
+      <Box display='flex' justifyContent='space-between' mb={2}>
+        <Typography variant='body1' gutterBottom>
+          Workflows define how {getFeatureTitle('Proposals')} are evaluated in this space.
+        </Typography>
         <Tooltip title={!isAdmin ? 'Only space admins can create workflows' : ''} arrow>
           {/* Tooltip on disabled button requires one block element below wrapper */}
           <span>
@@ -111,23 +112,27 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
             </Button>
           </span>
         </Tooltip>
-      </Legend>
+      </Box>
       {loadingWorkflows && <LoadingComponent minHeight={200} />}
-      {workflows.map((workflow, index) => (
-        <ProposalWorkflowItem
-          key={workflow.id}
-          workflow={workflow}
-          isExpanded={expanded === workflow.id}
-          toggleRow={setExpanded}
-          onSave={handleSaveWorkflow}
-          onUpdate={handleUpdateWorkflow}
-          onDelete={handleDeleteWorkflow}
-          onCancelChanges={handleCancelWorkflowChanges}
-          onDuplicate={duplicateWorkflow}
-          readOnly={!isAdmin}
-          preventDelete={workflows.length === 1}
-        />
-      ))}
+      <Box mb={2}>
+        {workflows.map((workflow, index) => (
+          <ProposalWorkflowItem
+            key={workflow.id}
+            workflow={workflow}
+            isExpanded={expanded === workflow.id}
+            toggleRow={setExpanded}
+            onSave={handleSaveWorkflow}
+            onUpdate={handleUpdateWorkflow}
+            onDelete={handleDeleteWorkflow}
+            onCancelChanges={handleCancelWorkflowChanges}
+            onDuplicate={duplicateWorkflow}
+            readOnly={!isAdmin}
+            preventDelete={workflows.length === 1}
+          />
+        ))}
+      </Box>
+      <Typography variant='h6'>Templates</Typography>
+      <RequireTemplatesForm />
     </>
   );
 }
