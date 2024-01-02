@@ -169,7 +169,7 @@ export type UserAndRoleSelectProps<T = SelectOption> = {
   wrapColumn?: boolean;
   type?: 'role' | 'roleAndUser';
   required?: boolean;
-  options?: SelectOption[];
+  options?: SelectOption[] | null;
   loading?: boolean;
 };
 
@@ -189,6 +189,7 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
   wrapColumn,
   type = 'roleAndUser',
   required,
+  options,
   loading
 }: UserAndRoleSelectProps<T>): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(false);
@@ -206,13 +207,37 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
     roles?.map((includedRole) => ({ ...includedRole, group: 'role' } as ListSpaceRolesResponse & { group: 'role' })) ??
     [];
 
+  const { usersRecord, rolesRecord } = useMemo(() => {
+    const _usersRecord: Record<string, MemberOptionPopulated> = mappedMembers.reduce((acc, val) => {
+      acc[val.id] = val;
+      return acc;
+    }, {} as Record<string, MemberOptionPopulated>);
+    const _rolesRecord: Record<string, RoleOptionPopulated> = mappedRoles.reduce((acc, val) => {
+      acc[val.id] = val;
+      return acc;
+    }, {} as Record<string, RoleOptionPopulated>);
+
+    return { usersRecord: _usersRecord, rolesRecord: _rolesRecord };
+  }, [mappedRoles?.length, mappedMembers?.length]);
+
   const allOptions = useMemo(() => {
-    if (isFreeSpace) {
+    if (options) {
+      const optionsPopulated: SelectOptionPopulated[] = [...systemRoles];
+
+      options.forEach((opt) => {
+        if (opt.group === 'role') {
+          optionsPopulated.push(rolesRecord[opt.id]);
+        } else if (opt.group === 'user') {
+          optionsPopulated.push(usersRecord[opt.id]);
+        }
+      });
+      return optionsPopulated;
+    } else if (isFreeSpace) {
       return [...mappedMembers, ...systemRoles];
     } else {
       return [...mappedMembers, ...mappedRoles, ...systemRoles];
     }
-  }, [filteredMembers, roles]);
+  }, [filteredMembers, roles, options]);
 
   const populatedValue = inputValue.map(({ id }) => allOptions.find((opt) => opt.id === id)).filter(isTruthy);
 

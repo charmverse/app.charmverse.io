@@ -1,17 +1,17 @@
-import { ProposalSystemRole, ProposalOperation } from '@charmverse/core/prisma';
+import { ProposalOperation, ProposalSystemRole } from '@charmverse/core/prisma';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { Box, Card, Stack, Tooltip, Typography } from '@mui/material';
 import { capitalize } from 'lodash';
 
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
+import { ProposalUserAndRoleSelect } from 'components/common/BoardEditor/components/properties/ProposalUserAndRoleSelect';
 import type {
-  SystemRoleOptionPopulated,
-  SelectOption
+  SelectOption,
+  SystemRoleOptionPopulated
 } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import { ProposalIcon, MembersIcon } from 'components/common/PageIcon';
+import { MembersIcon, ProposalIcon } from 'components/common/PageIcon';
 
-import { evaluationIcons, evaluateVerbs } from '../constants';
+import { evaluateVerbs, evaluationIcons } from '../constants';
 
 import type { ContextMenuProps } from './EvaluationContextMenu';
 import { EvaluationContextMenu } from './EvaluationContextMenu';
@@ -152,7 +152,7 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
       {proposalOperations.map((operation) => (
         <Box key={operation} className='octo-propertyrow'>
           <PropertyLabel readOnly>{capitalize(operation)}</PropertyLabel>
-          <UserAndRoleSelect
+          <ProposalUserAndRoleSelect
             readOnly={readOnly}
             variant='outlined'
             wrapColumn
@@ -183,7 +183,7 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
             There is no review step for Feedback
           </Typography>
         ) : (
-          <UserAndRoleSelect
+          <ProposalUserAndRoleSelect
             readOnly
             wrapColumn
             value={[{ group: 'system_role', id: ProposalSystemRole.current_reviewer }]}

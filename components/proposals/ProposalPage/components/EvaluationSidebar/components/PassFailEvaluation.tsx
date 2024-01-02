@@ -2,6 +2,8 @@ import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } fr
 import { Box, Card, FormLabel, Stack, Typography } from '@mui/material';
 
 import { useSubmitEvaluationResult } from 'charmClient/hooks/proposals';
+import { ProposalUserAndRoleSelect } from 'components/common/BoardEditor/components/properties/ProposalUserAndRoleSelect';
+import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { Button } from 'components/common/Button';
 import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
@@ -63,11 +65,11 @@ export function PassFailEvaluation({
                 Reviewers
               </Typography>
             </FormLabel>
-            <UserAndRoleSelect
+            <ProposalUserAndRoleSelect
               data-test='evaluation-reviewer-select'
               systemRoles={[allMembersSystemRole]}
               readOnly={true}
-              value={reviewerOptions}
+              value={reviewerOptions as SelectOption[]}
               onChange={() => {}}
             />
           </Box>

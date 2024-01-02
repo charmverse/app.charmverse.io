@@ -8,15 +8,22 @@ import type { NestedDataTest } from 'testing/e2eType';
 import type { SelectOption, UserAndRoleSelectProps } from './UserAndRoleSelect';
 import { UserAndRoleSelect } from './UserAndRoleSelect';
 
-type ProposalUserAndRoleSelectProps = Pick<UserAndRoleSelectProps, 'systemRoles' | 'readOnly' | 'value' | 'onChange'>;
+type ProposalUserAndRoleSelectProps = Pick<
+  UserAndRoleSelectProps,
+  | 'systemRoles'
+  | 'readOnly'
+  | 'value'
+  | 'onChange'
+  | 'data-test'
+  | 'variant'
+  | 'isRequiredValue'
+  | 'wrapColumn'
+  | 'inputPlaceholder'
+  | 'emptyPlaceholderContent'
+  | 'required'
+>;
 
-export function ProposalUserAndRoleSelect({
-  onChange,
-  value,
-  readOnly,
-  systemRoles,
-  dataTest
-}: ProposalUserAndRoleSelectProps & NestedDataTest) {
+export function ProposalUserAndRoleSelect(props: ProposalUserAndRoleSelectProps) {
   // TODO: Make this component agnostic to 'reviewers' by defining the options outside of it
   const { space } = useCurrentSpace();
   const isFreeSpace = useIsFreeSpace();
@@ -27,7 +34,7 @@ export function ProposalUserAndRoleSelect({
       return null;
     }
 
-    const systemRolesToAdd = (systemRoles ?? []).map((r) => ({ group: 'system_role', id: r.id }));
+    const systemRolesToAdd = (props.systemRoles ?? []).map((r) => ({ group: 'system_role', id: r.id }));
 
     const userIdsToAdd = reviewerPool.userIds.map((userId) => ({ group: 'user', id: userId }));
 
@@ -38,16 +45,7 @@ export function ProposalUserAndRoleSelect({
     const roleIdsToAdd = reviewerPool.roleIds.map((roleId) => ({ group: 'role', id: roleId }));
 
     return [...userIdsToAdd, roleIdsToAdd, ...systemRolesToAdd] as SelectOption[];
-  }, [reviewerPool, systemRoles, isFreeSpace]);
+  }, [reviewerPool, props.systemRoles, isFreeSpace]);
 
-  return (
-    <UserAndRoleSelect
-      data-test={dataTest}
-      readOnly={readOnly}
-      onChange={onChange}
-      loading={!filteredOptions}
-      value={value}
-      options={(filteredOptions as any) ?? []}
-    />
-  );
+  return <UserAndRoleSelect {...props} loading={!filteredOptions} options={filteredOptions as SelectOption[]} />;
 }
