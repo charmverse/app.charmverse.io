@@ -183,33 +183,41 @@ export function ProposalRewards({
                 >
                   <SelectPreviewContainer readOnly={readOnly} displayType='details'>
                     <Stack direction='row' justifyContent='space-between' alignItems='center' gap={1}>
-                      <Typography component='span' variant='subtitle1' fontWeight='normal'>
-                        {page?.title || 'Untitled'}
-                      </Typography>
-                      <Hidden lgDown>
-                        <Stack alignItems='center' direction='row' height='100%'>
-                          {reward.customReward ? (
-                            <Typography component='span' variant='subtitle1' fontWeight='normal'>
-                              {reward.customReward}
-                            </Typography>
-                          ) : (
-                            <RewardTokenInfo
-                              chainId={reward.chainId || null}
-                              symbolOrAddress={reward.rewardToken || null}
-                              rewardAmount={reward.rewardAmount || null}
-                            />
-                          )}
-                        </Stack>
-                      </Hidden>
+                      <Grid container spacing={0.5}>
+                        <Grid item xs={8} lg={5}>
+                          <Typography component='span' variant='subtitle1' fontWeight='normal'>
+                            {page?.title || 'Untitled'}
+                          </Typography>
+                        </Grid>
+                        <Hidden lgDown>
+                          <Grid item xs={5}>
+                            <Stack alignItems='center' direction='row' height='100%'>
+                              {reward.customReward ? (
+                                <Typography component='span' variant='subtitle1' fontWeight='normal'>
+                                  {reward.customReward}
+                                </Typography>
+                              ) : (
+                                <RewardTokenInfo
+                                  chainId={reward.chainId || null}
+                                  symbolOrAddress={reward.rewardToken || null}
+                                  rewardAmount={reward.rewardAmount || null}
+                                />
+                              )}
+                            </Stack>
+                          </Grid>
+                        </Hidden>
 
-                      <Stack className='icons' sx={{ opacity: 0, transition: 'opacity 0.2s ease' }} direction='row'>
-                        <IconButton size='small' onClick={() => editReward({ reward, page, draftId })}>
-                          <Edit color='secondary' fontSize='small' />
-                        </IconButton>
-                        <IconButton size='small' onClick={() => onDelete(draftId)}>
-                          <Delete color='secondary' fontSize='small' />
-                        </IconButton>
-                      </Stack>
+                        <Grid item xs={4} lg={2}>
+                          <Stack className='icons' sx={{ opacity: 0, transition: 'opacity 0.2s ease' }} direction='row'>
+                            <IconButton size='small' onClick={() => editReward({ reward, page, draftId })}>
+                              <Edit color='secondary' fontSize='small' />
+                            </IconButton>
+                            <IconButton size='small' onClick={() => onDelete(draftId)}>
+                              <Delete color='secondary' fontSize='small' />
+                            </IconButton>
+                          </Stack>
+                        </Grid>
+                      </Grid>
                     </Stack>
                   </SelectPreviewContainer>
                 </Stack>
