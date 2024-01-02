@@ -1,5 +1,5 @@
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
-import { Tooltip, Typography } from '@mui/material';
+import { Stack, Tooltip, Typography } from '@mui/material';
 import { useEffect } from 'react';
 
 import charmClient from 'charmClient';
@@ -17,9 +17,10 @@ export type Props = {
   pageId: string;
   proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'permissions'>;
   evaluation: PopulatedEvaluation;
+  addVote?: () => void;
 };
 
-export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation }: Props) {
+export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation, addVote }: Props) {
   const { data: votes, mutate: refreshVotes, isLoading } = useGetVotesForPage(pageId ? { pageId } : undefined);
   const { showMessage } = useSnackbar();
   const isReviewer = isCurrent && proposal?.permissions.evaluate;
@@ -89,12 +90,16 @@ export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation }: Prop
             color='secondary'
             sx={{
               height: '2em',
-              width: '2em'
+              width: '100%'
             }}
           />
         }
         message='Vote has not been initiated yet'
-      />
+      >
+        <Button onClick={addVote} sx={{ width: 'fit-content', mt: 2 }}>
+          Create Vote
+        </Button>
+      </NoCommentsMessage>
     );
   }
 
