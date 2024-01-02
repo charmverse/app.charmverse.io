@@ -244,10 +244,10 @@ function DocumentPage({
   }, [isLoadingThreads, page.id, enableSidebar, threadsPageId]);
 
   useEffect(() => {
-    if (proposalId && enableSidebar && isCharmVerse) {
+    if (proposalId && enableSidebar) {
       setActiveView(isMdScreen ? 'proposal_evaluation' : null);
     }
-  }, [proposalId, enableSidebar, isCharmVerse, isMdScreen]);
+  }, [proposalId, enableSidebar, isMdScreen]);
 
   // keep a ref in sync for printing
   const printRef = useRef<HTMLDivElement>(null);
@@ -451,7 +451,7 @@ function DocumentPage({
                 readOnly={readOnly || !!enableSuggestingMode || !!page.syncWithPageId}
               />
             )}
-            {isCharmVerse && proposalId && !isMdScreen && (
+            {proposalId && !isMdScreen && (
               <Tabs
                 sx={{
                   mb: 1
@@ -553,7 +553,7 @@ function DocumentPage({
             )}
           </PageEditorContainer>
         </Box>
-        {isCharmVerse && proposal.status === 'draft' && (
+        {proposal?.status === 'draft' && page?.type !== 'proposal_template' && (
           <ProposalStickyFooter proposal={proposal} refreshProposal={refreshProposal} />
         )}
       </PrimaryColumn>

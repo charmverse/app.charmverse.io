@@ -101,7 +101,6 @@ export function NewProposalPage({
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const [readOnlyEditor, setReadOnlyEditor] = useState(false);
   const isAdmin = useIsAdmin();
-  const isReviewer = formInputs.reviewers?.some((r) => r.id === user?.id);
 
   const sourceTemplate = proposalTemplates?.find((template) => template.id === formInputs.proposalTemplateId);
   const isStructured = formInputs.proposalType === 'structured' || !!sourceTemplate?.formId;
@@ -147,14 +146,8 @@ export function NewProposalPage({
 
   const isFromTemplateSource = Boolean(formInputs.proposalTemplateId);
   const isTemplateRequired = Boolean(currentSpace?.requireProposalTemplate);
-  // rubric criteria can always be updated by reviewers and admins
-  const readOnlyRubricCriteria = isFromTemplateSource && !(isAdmin || isReviewer);
-
-  useEffect(() => {
-    if (isTemplateRequired) {
-      setReadOnlyEditor(!formInputs.proposalTemplateId);
-    }
-  }, [formInputs.proposalTemplateId, isTemplateRequired]);
+  // rubric criteria can always be updated by admins
+  const readOnlyRubricCriteria = isFromTemplateSource && !isAdmin;
 
   const readOnlyReviewers = !!proposalTemplates?.some((t) => t.id === formInputs?.proposalTemplateId);
 
@@ -183,43 +176,6 @@ export function NewProposalPage({
         }, [] as string[])
       : [];
 
-  function updateProposalContent({ doc, rawText }: ICharmEditorOutput) {
-    setFormInputs({
-      content: doc,
-      contentText: rawText
-    });
-  }
-
-  function selectEvaluationWorkflow(workflow: ProposalWorkflowTyped) {
-    setFormInputs({
-      workflowId: workflow.id,
-      evaluations: workflow.evaluations.map((evaluation, index) => ({
-        id: evaluation.id,
-        index,
-        reviewers: [],
-        rubricCriteria: [] as ProposalRubricCriteriaWithTypedParams[],
-        title: evaluation.title,
-        type: evaluation.type,
-        result: null,
-        permissions: evaluation.permissions as ProposalEvaluationPermission[]
-      }))
-    });
-  }
-
-  function clearTemplate() {
-    setFormInputs({
-      proposalTemplateId: null
-    });
-  }
-
-  async function saveForm({ isDraft }: { isDraft?: boolean } = {}) {
-    setSubmittedDraft(!!isDraft);
-    const result = await createProposal({ isDraft });
-    if (result) {
-      navigateToSpacePath(`/${result.id}`);
-    }
-  }
-
   function focusDocumentEditor() {
     const focusEvent = new CustomEvent(focusEventName);
     // TODO: use a ref passed down instead
@@ -240,7 +196,6 @@ export function NewProposalPage({
         proposalTemplateId: _templateId,
         headerImage: template.page.headerImage,
         icon: template.page.icon,
-        workflowId: template.workflowId,
         evaluationType: template.evaluationType,
         evaluations: template.evaluations,
         fields: template.fields || {},
@@ -253,6 +208,52 @@ export function NewProposalPage({
             value: getInitialFormFieldValue(proposalFormField) as FieldAnswerInput['value']
           }))
       });
+      const workflow = workflowOptions?.find((w) => w.id === template.workflowId);
+      if (workflow) {
+        applyWorkflow(workflow);
+      }
+    }
+  }
+
+  function clearTemplate() {
+    setFormInputs({
+      proposalTemplateId: null
+    });
+  }
+
+  function applyWorkflow(workflow: ProposalWorkflowTyped) {
+    setFormInputs({
+      workflowId: workflow.id,
+      evaluations: workflow.evaluations.map((evaluation, index) => {
+        // try to retain existing reviewers and configuration
+        const existingStep = formInputs.evaluations.find((e) => e.title === evaluation.title);
+        return {
+          id: evaluation.id,
+          index,
+          reviewers: existingStep?.reviewers || [],
+          rubricCriteria: existingStep?.rubricCriteria || ([] as ProposalRubricCriteriaWithTypedParams[]),
+          title: evaluation.title,
+          type: evaluation.type,
+          result: null,
+          voteSettings: existingStep?.voteSettings,
+          permissions: evaluation.permissions as ProposalEvaluationPermission[]
+        };
+      })
+    });
+  }
+
+  function applyProposalContent({ doc, rawText }: ICharmEditorOutput) {
+    setFormInputs({
+      content: doc,
+      contentText: rawText
+    });
+  }
+
+  async function saveForm({ isDraft }: { isDraft?: boolean } = {}) {
+    setSubmittedDraft(!!isDraft);
+    const result = await createProposal({ isDraft });
+    if (result) {
+      navigateToSpacePath(`/${result.id}`);
     }
   }
 
@@ -338,7 +339,7 @@ export function NewProposalPage({
               evaluations
             });
           }}
-          onChangeWorkflow={selectEvaluationWorkflow}
+          onChangeWorkflow={applyWorkflow}
         />
       )}
     </>
@@ -353,10 +354,16 @@ export function NewProposalPage({
     }
   }, []);
 
+  useEffect(() => {
+    if (isTemplateRequired) {
+      setReadOnlyEditor(!formInputs.proposalTemplateId);
+    }
+  }, [formInputs.proposalTemplateId, isTemplateRequired]);
+
   // populate workflow if not set and template is not selected
   useEffect(() => {
     if (workflowOptions?.length && !formInputs.workflowId && !templateIdFromUrl) {
-      selectEvaluationWorkflow(workflowOptions[0]);
+      applyWorkflow(workflowOptions[0]);
     }
   }, [!!workflowOptions]);
 
@@ -425,7 +432,7 @@ export function NewProposalPage({
                   containerWidth={containerWidth}
                   pageType='proposal'
                   disableNestedPages
-                  onContentChange={updateProposalContent}
+                  onContentChange={applyProposalContent}
                   focusOnInit
                   isContentControlled
                   key={`${String(formInputs.proposalTemplateId)}.${readOnlyEditor}`}
