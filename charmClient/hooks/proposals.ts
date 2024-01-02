@@ -1,4 +1,4 @@
-import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
+import type { ProposalFlowPermissionFlags, ProposalReviewerPool } from '@charmverse/core/permissions';
 import type { FormFieldAnswer } from '@charmverse/core/prisma-client';
 import type { ListProposalsRequest } from '@charmverse/core/proposals';
 
@@ -32,6 +32,13 @@ export function useGetProposalDetails(proposalId: MaybeString) {
 
 export function useGetIsReviewer(proposalId: MaybeString) {
   return useGET<boolean>(proposalId ? `/api/proposals/${proposalId}/is-reviewer` : null);
+}
+
+/**
+ * Checks for list of roles and users that can be selected as reviewer for a proposal
+ */
+export function useGetReviewerPool(spaceId: MaybeString) {
+  return useGET<ProposalReviewerPool>(spaceId ? `/api/proposals/reviewer-pool?resourceId=${spaceId}` : null);
 }
 
 export function useGetProposalFlowFlags(proposalId: MaybeString) {

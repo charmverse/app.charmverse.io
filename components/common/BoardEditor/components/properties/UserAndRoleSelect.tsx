@@ -4,7 +4,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import { Alert, Autocomplete, Box, Chip, IconButton, Stack, TextField, Tooltip } from '@mui/material';
 import { useCallback, useMemo, useState } from 'react';
 
-import { useGetReviewerPool } from 'charmClient/hooks/proposals';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import UserDisplay from 'components/common/UserDisplay';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
@@ -20,6 +19,7 @@ import { SelectPreviewContainer } from './TagSelect/TagSelect';
 export type RoleOption = TargetPermissionGroup<'role'>;
 type MemberOption = TargetPermissionGroup<'user'>;
 type SystemRoleOption<T extends string = string> = { group: 'system_role'; id: T };
+
 export type SelectOption = RoleOption | MemberOption | SystemRoleOption;
 type RoleOptionPopulated = ListSpaceRolesResponse & RoleOption;
 type MemberOptionPopulated = Member & MemberOption;
@@ -153,7 +153,7 @@ function SelectedOptions({
   );
 }
 
-type Props<T> = {
+export type UserAndRoleSelectProps<T = SelectOption> = {
   emptyPlaceholderContent?: string;
   inputPlaceholder?: string; // placeholder for the editable input of outlined variant
   displayType?: PropertyValueDisplayType;
@@ -169,6 +169,8 @@ type Props<T> = {
   wrapColumn?: boolean;
   type?: 'role' | 'roleAndUser';
   required?: boolean;
+  options?: SelectOption[];
+  loading?: boolean;
 };
 
 export function UserAndRoleSelect<T extends { id: string; group: string } = SelectOption>({
@@ -186,14 +188,13 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
   'data-test': dataTest,
   wrapColumn,
   type = 'roleAndUser',
-  required
-}: Props<T>): JSX.Element | null {
+  required,
+  loading
+}: UserAndRoleSelectProps<T>): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(false);
   const { roles } = useRoles();
   const { members } = useMembers();
   const { isFreeSpace } = useIsFreeSpace();
-  // TODO: Make this component agnostic to 'reviewers' by defining the options outside of it
-  const { data: reviewerPool } = useGetReviewerPool();
   const filteredMembers = members.filter((member) => !member.isBot);
   // For public spaces, we don't want to show reviewer roles
   const applicableValues = isFreeSpace
@@ -204,49 +205,6 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
   const mappedRoles: RoleOptionPopulated[] =
     roles?.map((includedRole) => ({ ...includedRole, group: 'role' } as ListSpaceRolesResponse & { group: 'role' })) ??
     [];
-
-  // Avoid mapping through userIds all the time
-  const mappedEligibleProposalReviewers = useMemo(() => {
-    return (reviewerPool?.userIds ?? []).reduce((acc, userId) => {
-      acc[userId] = userId;
-      return acc;
-    }, {} as Record<string, string>);
-  }, [reviewerPool]);
-
-  const filteredOptions = useMemo(() => {
-    let _filteredOptions: SelectOptionPopulated[] = [];
-    if (proposalCategoryId && isFreeSpace) {
-      _filteredOptions = reviewerPool
-        ? mappedMembers.filter((member) => !!mappedEligibleProposalReviewers[member.id])
-        : [];
-      _filteredOptions = [..._filteredOptions, ...systemRoles];
-    } else if (proposalCategoryId && !isFreeSpace) {
-      _filteredOptions = [
-        // For proposals we only want current space members and roles that are allowed to review proposals
-        ...(reviewerPool ? mappedMembers.filter((member) => !!mappedEligibleProposalReviewers[member.id]) : []),
-        ...systemRoles,
-        ...mappedRoles.filter((role) => reviewerPool?.roleIds.includes(role.id))
-      ];
-    } else if (isFreeSpace) {
-      // In public space, don't include custom roles
-      _filteredOptions = type === 'role' ? [] : [...mappedMembers, ...systemRoles];
-    } else {
-      // For bounties, allow any space member or role to be selected
-      if (type === 'role') {
-        _filteredOptions = [...systemRoles, ...mappedRoles];
-      }
-
-      if (type === 'roleAndUser') {
-        _filteredOptions = [...mappedMembers, ...systemRoles, ...mappedRoles];
-      }
-    }
-    return _filteredOptions;
-  }, [reviewerPool, systemRoles, isFreeSpace, filteredMembers, roles, proposalCategoryId, type]);
-
-  // Will only happen in the case of proposals
-  const noReviewersAvailable = Boolean(
-    proposalCategoryId && reviewerPool && reviewerPool.userIds.length === 0 && reviewerPool.roleIds.length === 0
-  );
 
   const allOptions = useMemo(() => {
     if (isFreeSpace) {
@@ -335,13 +293,14 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
             return `${group[0].toUpperCase() + group.slice(1)}s`;
           }}
           isOptionEqualToValue={(option, val) => option.id === val.id}
-          loading={!roles || filteredMembers.length === 0 || (!!proposalCategoryId && !reviewerPool)}
+          loading={!roles || filteredMembers.length === 0 || loading}
           multiple
           noOptionsText='No more options available'
           onChange={(e, value) => onChange(value)}
           onClose={() => setIsOpen(false)}
           openOnFocus
-          options={filteredOptions}
+          // TODO - Fix this
+          options={[]}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -400,11 +359,6 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
           disabled={!!readOnly}
           value={populatedValue}
         />
-        {noReviewersAvailable && (
-          <Alert severity='warning'>
-            No reviewers found: an admin must assign specific role(s) or all members as reviewers.
-          </Alert>
-        )}
       </StyledUserPropertyContainer>
     </Tooltip>
   );
