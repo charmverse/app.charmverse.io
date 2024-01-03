@@ -10,9 +10,13 @@ export async function task() {
     const proposalsToUpdate = await prisma.proposal.findMany({
       where: {
         status: 'vote_active',
-        snapshotProposalExpiry: {
-          not: null,
-          lte: new Date()
+        evaluations: {
+          some: {
+            snapshotExpiry: {
+              not: null,
+              lte: new Date()
+            }
+          }
         }
       }
     });

@@ -180,32 +180,4 @@ describe('updateProposalStatus', () => {
       })
     ).rejects.toBeInstanceOf(InvalidStateError);
   });
-
-  it('should save the snapshot expiry date when changing the status of the proposal to vote active if it was exported to snapshot', async () => {
-    const { id: proposalId, pageId } = await createProposalWithUsers({
-      spaceId: space.id,
-      proposalStatus: 'reviewed',
-      userId: user.id,
-      authors: [],
-      reviewers: [reviewer.id, { type: 'role', roleId: reviewerRole.id }]
-    });
-
-    await prisma.page.update({
-      where: {
-        id: pageId
-      },
-      data: {
-        // https://snapshot.org/#/olympusdao.eth/proposal/0x3236041d0857f7548c8da12f3890c6f590a016f02fd2f100230e1b8cbcfed078
-        snapshotProposalId: '0x3236041d0857f7548c8da12f3890c6f590a016f02fd2f100230e1b8cbcfed078'
-      }
-    });
-
-    const proposal = await updateProposalStatus({
-      proposalId,
-      newStatus: 'vote_active',
-      userId: user.id
-    });
-
-    expect(proposal.snapshotProposalExpiry?.toISOString()).toMatch('2022-10-13T20:55:51');
-  });
 });

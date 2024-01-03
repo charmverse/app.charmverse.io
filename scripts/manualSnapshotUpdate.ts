@@ -9,8 +9,7 @@ export async function updateSnapshot(proposalId: string, snapshotProposalId: str
       snapshotProposalId,
       proposal: {
         update: {
-          status: 'vote_active',
-          snapshotProposalExpiry: new Date(2023, 1, 26, 7, 22)
+          status: 'vote_active'
         }
       }
     },
