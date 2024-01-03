@@ -4,16 +4,17 @@ import { CharmEditor } from 'components/common/CharmEditor';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
+import type { FieldWrapperProps } from './FieldWrapper';
 import { FieldWrapperContainer } from './FieldWrapper';
 
-type Props = {
+type Props = FieldWrapperProps & {
   description?: PageContent;
   label?: string;
 };
 
-export function LabelField({ description, label }: Props) {
+export function LabelField({ description, label, ...props }: Props) {
   return (
-    <FieldWrapperContainer>
+    <FieldWrapperContainer {...props}>
       {label && <Typography variant='h1'>{label}</Typography>}
       {description && !checkIsContentEmpty(description) ? (
         <CharmEditor readOnly isContentControlled content={description as PageContent} />

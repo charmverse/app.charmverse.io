@@ -9,14 +9,10 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import FieldLabel from '../FieldLabel';
 
-type Props = {
+export type FieldWrapperProps = {
   children?: ReactNode;
   label?: string;
   inline?: boolean;
-  iconLabel?: ReactNode;
-  required?: boolean;
-  description?: PageContent;
-  endAdornment?: ReactNode;
   sx?: SxProps;
 };
 
@@ -36,7 +32,25 @@ export function FieldWrapperContainer({
   );
 }
 
-export function FieldWrapper({ sx, endAdornment, description, required, children, label, inline, iconLabel }: Props) {
+type ContentProps = {
+  children?: ReactNode;
+  iconLabel?: ReactNode;
+  required?: boolean;
+  description?: PageContent;
+  endAdornment?: ReactNode;
+};
+
+// a wrapper for FieldWrapper with props for label and description
+export function FieldWrapper({
+  sx,
+  endAdornment,
+  description,
+  required,
+  children,
+  label,
+  inline,
+  iconLabel
+}: ContentProps & FieldWrapperProps) {
   if (!label) {
     return children as JSX.Element;
   }
