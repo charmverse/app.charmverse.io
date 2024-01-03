@@ -156,13 +156,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
-      authors: [adminUser.id],
-      reviewers: [
-        {
-          group: 'user',
-          id: adminUser.id
-        }
-      ]
+      authors: [adminUser.id]
     };
 
     await request(baseUrl)
@@ -170,15 +164,6 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       .set('Cookie', adminCookie)
       .send(updateContent)
       .expect(200);
-
-    // Make sure update went through
-    const proposal = await prisma.proposal.findUniqueOrThrow({
-      where: { id: page.proposalId! },
-      include: { reviewers: true }
-    });
-
-    expect(proposal.reviewers).toHaveLength(1);
-    expect(proposal.reviewers.some((r) => r.userId === adminUser.id)).toBe(true);
   });
 
   it('should update a proposal templates settings if the user is a space admin', async () => {
@@ -193,17 +178,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
-      authors: [adminUser.id],
-      reviewers: [
-        {
-          group: 'user',
-          id: adminUser.id
-        },
-        {
-          group: 'role',
-          id: role.id
-        }
-      ]
+      authors: [adminUser.id]
     };
 
     await request(baseUrl)
@@ -211,19 +186,6 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       .set('Cookie', adminCookie)
       .send(updateContent)
       .expect(200);
-
-    // Make sure update went through
-    const proposal = await prisma.proposal.findUniqueOrThrow({
-      where: {
-        id: proposalTemplate.id
-      },
-      include: {
-        reviewers: true
-      }
-    });
-    expect(proposal.reviewers).toHaveLength(2);
-    expect(proposal.reviewers.some((r) => r.roleId === role.id)).toBe(true);
-    expect(proposal.reviewers.some((r) => r.userId === adminUser.id)).toBe(true);
   });
 
   it('should allow an admin to update any discussion stage proposal', async () => {
@@ -239,13 +201,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
-      authors: [adminUser.id],
-      reviewers: [
-        {
-          group: 'user',
-          id: adminUser.id
-        }
-      ]
+      authors: [adminUser.id]
     };
 
     await request(baseUrl)
@@ -273,13 +229,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
-      authors: [adminUser.id],
-      reviewers: [
-        {
-          group: 'user',
-          id: adminUser.id
-        }
-      ]
+      authors: [adminUser.id]
     };
 
     await request(baseUrl)

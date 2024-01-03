@@ -1,20 +1,15 @@
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
-import type { ProposalStatus } from '@charmverse/core/prisma';
 import { Box } from '@mui/material';
 import { useEffect, useState } from 'react';
 
-import charmClient from 'charmClient';
 import { useGetIsReviewer, useUpdateProposal } from 'charmClient/hooks/proposals';
-import { useNotifications } from 'components/nexus/hooks/useNotifications';
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { ProposalPropertiesBase } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
-import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import { useUser } from 'hooks/useUser';
-import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { PageWithContent } from 'lib/pages';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { PageContent } from 'lib/prosemirror/interfaces';
