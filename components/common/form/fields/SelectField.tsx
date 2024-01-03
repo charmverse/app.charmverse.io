@@ -161,7 +161,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
             );
           }}
           renderTags={(value, getTagProps) => (
-            <Stack flexDirection='row' gap={1}>
+            <Stack flexDirection='row' gap={1} flexGrow={1}>
               {value.map((option, index) => (
                 // eslint-disable-next-line react/jsx-key
                 <Chip
