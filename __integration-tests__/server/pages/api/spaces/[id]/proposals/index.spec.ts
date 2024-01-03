@@ -14,10 +14,11 @@ describe('GET /api/spaces/[id]/proposals - Get proposals in a space', () => {
   let adminCookie: string;
   let memberCookie: string;
 
-  let hiddenCategoryFeedbackProposal: Proposal;
+  let draftProposal: Proposal;
 
-  let visibleCategoryDraftProposal: Proposal;
-  let visibleCategoryFeedbackProposalReviewedByAdmin: Proposal;
+  let publishedProposal: Proposal;
+
+  let publishedProposalWithoutPermissions: Proposal;
 
   beforeAll(async () => {
     const { space: generatedSpace, user: generatedUser } = await testUtilsUser.generateUserAndSpace({
@@ -32,18 +33,32 @@ describe('GET /api/spaces/[id]/proposals - Get proposals in a space', () => {
     const { page: page1, ...proposal1 } = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: adminUser.id,
-      proposalStatus: 'discussion'
+      proposalStatus: 'draft',
+      evaluationInputs: [
+        {
+          evaluationType: 'feedback',
+          permissions: [],
+          reviewers: []
+        }
+      ]
     });
 
-    hiddenCategoryFeedbackProposal = proposal1;
+    draftProposal = proposal1;
 
     const { page: page2, ...proposal2 } = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: adminUser.id,
-      proposalStatus: 'draft'
+      proposalStatus: 'published',
+      evaluationInputs: [
+        {
+          evaluationType: 'feedback',
+          permissions: [{ assignee: { group: 'user', id: memberUser.id }, operation: 'view' }],
+          reviewers: []
+        }
+      ]
     });
 
-    visibleCategoryDraftProposal = proposal2;
+    publishedProposal = proposal2;
 
     const { page: page3, ...proposal3 } = await testUtilsProposals.generateProposal({
       spaceId: space.id,
@@ -53,13 +68,13 @@ describe('GET /api/spaces/[id]/proposals - Get proposals in a space', () => {
       evaluationInputs: [
         {
           evaluationType: 'feedback',
-          reviewers: [{ group: 'user', id: adminUser.id }],
-          permissions: [{ assignee: { group: 'space_member' }, operation: 'view' }]
+          permissions: [],
+          reviewers: []
         }
       ]
     });
 
-    visibleCategoryFeedbackProposalReviewedByAdmin = proposal3;
+    publishedProposalWithoutPermissions = proposal3;
 
     const templateProposal = await testUtilsProposals.generateProposalTemplate({
       spaceId: space.id,
@@ -77,26 +92,7 @@ describe('GET /api/spaces/[id]/proposals - Get proposals in a space', () => {
 
     expect(proposals).toHaveLength(1);
 
-    expect(proposals).toMatchObject(
-      expect.arrayContaining<ProposalWithUsers>([
-        expect.objectContaining<ProposalWithUsers>({
-          ...visibleCategoryFeedbackProposalReviewedByAdmin,
-          authors: [
-            {
-              proposalId: visibleCategoryFeedbackProposalReviewedByAdmin.id,
-              userId: adminUser.id
-            }
-          ],
-          reviewers: [
-            expect.objectContaining({
-              id: expect.any(String),
-              proposalId: visibleCategoryFeedbackProposalReviewedByAdmin.id,
-              userId: adminUser.id
-            })
-          ]
-        })
-      ])
-    );
+    expect(proposals[0].id).toBe(publishedProposal.id);
   });
 
   it('Should return all proposals for an admin, responding 200', async () => {
@@ -108,13 +104,13 @@ describe('GET /api/spaces/[id]/proposals - Get proposals in a space', () => {
 
     expect(proposals).toEqual([
       expect.objectContaining({
-        id: hiddenCategoryFeedbackProposal.id
+        id: draftProposal.id
       }),
       expect.objectContaining({
-        id: visibleCategoryDraftProposal.id
+        id: publishedProposal.id
       }),
       expect.objectContaining({
-        id: visibleCategoryFeedbackProposalReviewedByAdmin.id
+        id: publishedProposalWithoutPermissions.id
       })
     ]);
   });
