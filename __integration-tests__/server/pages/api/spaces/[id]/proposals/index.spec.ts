@@ -49,8 +49,14 @@ describe('GET /api/spaces/[id]/proposals - Get proposals in a space', () => {
       spaceId: space.id,
       userId: adminUser.id,
       authors: [adminUser.id],
-      proposalStatus: 'discussion',
-      reviewers: [{ group: 'user', id: adminUser.id }]
+      proposalStatus: 'published',
+      evaluationInputs: [
+        {
+          evaluationType: 'feedback',
+          reviewers: [{ group: 'user', id: adminUser.id }],
+          permissions: [{ assignee: { group: 'space_member' }, operation: 'view' }]
+        }
+      ]
     });
 
     visibleCategoryFeedbackProposalReviewedByAdmin = proposal3;
