@@ -46,7 +46,6 @@ export function createMockPage(input: Partial<PageWithContent> = {}): PageWithCo
     type: 'page',
     index: -1,
     fullWidth: false,
-    sourceTemplateId: null,
     ...input
   };
 }

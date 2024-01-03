@@ -30,4 +30,8 @@ export class ProposalsApi {
   deleteProposalTemplate({ proposalTemplateId }: { proposalTemplateId: string }): Promise<PageWithPermissions> {
     return http.DELETE(`/api/proposals/templates/${proposalTemplateId}`);
   }
+
+  updateProposalEvaluation({ proposalId, ...payload }: UpdateEvaluationRequest) {
+    return http.PUT(`/api/proposals/${proposalId}/evaluation`, payload);
+  }
 }
