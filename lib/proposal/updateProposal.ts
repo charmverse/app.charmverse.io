@@ -1,10 +1,7 @@
-import type { ProposalEvaluationType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { InvalidStateError } from 'lib/middleware';
 import type { ProposalFields } from 'lib/proposal/interface';
-
-import type { ProposalReviewerInput } from './interface';
 
 export type UpdateProposalRequest = {
   proposalId: string;
