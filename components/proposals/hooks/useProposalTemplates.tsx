@@ -18,9 +18,7 @@ export function useProposalTemplates({ load } = { load: true }) {
     isLoading: isLoadingTemplates
   } = useGetProposalTemplatesBySpace(load ? space?.id : null);
 
-  const usableTemplates = isAdmin
-    ? proposalTemplates
-    : proposalTemplates?.filter((template) => spacePermissions?.createProposals);
+  const usableTemplates = isAdmin || spacePermissions?.createProposals ? proposalTemplates : [];
 
   useEffect(() => {
     function handleDeleteEvent(value: WebSocketPayload<'pages_deleted'>) {

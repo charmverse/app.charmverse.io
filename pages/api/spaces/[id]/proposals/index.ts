@@ -18,9 +18,8 @@ async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWi
 
   const spaceId = req.query.id as string;
 
-  const { categoryIds, onlyAssigned } = req.query as any as ListProposalsRequest;
+  const { onlyAssigned } = req.query as any as ListProposalsRequest;
   const proposalIds = await permissionsApiClient.proposals.getAccessibleProposalIds({
-    categoryIds,
     onlyAssigned,
     userId,
     spaceId
@@ -39,7 +38,6 @@ async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWi
     include: {
       authors: true,
       reviewers: true,
-      category: true,
       rewards: true,
       evaluations: {
         orderBy: {

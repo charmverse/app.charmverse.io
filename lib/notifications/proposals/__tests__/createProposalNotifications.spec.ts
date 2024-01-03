@@ -55,18 +55,9 @@ describe.skip(`Test proposal events and notifications`, () => {
         })
       )
     );
-    const proposalCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id,
-      proposalCategoryPermissions: [
-        {
-          permissionLevel: 'full_access',
-          assignee: { group: 'role', id: role.id }
-        }
-      ]
-    });
+
     const proposal = await testUtilsProposals.generateProposal({
       proposalStatus: 'draft',
-      categoryId: proposalCategory.id,
       spaceId: space.id,
       userId: author1.id,
       authors: [author1.id, author2.id],
@@ -394,15 +385,6 @@ async function createDiscussionNotifications(input: Parameters<typeof generateUs
     spaceId: space.id,
     name: 'Post Moderators'
   });
-  const proposalCategory = await testUtilsProposals.generateProposalCategory({
-    spaceId: space.id,
-    proposalCategoryPermissions: [
-      {
-        permissionLevel: 'full_access',
-        assignee: { group: 'role', id: role.id }
-      }
-    ]
-  });
   await Promise.all(
     [author1.id, reviewer.id].map((userId) =>
       assignRole({
@@ -412,7 +394,6 @@ async function createDiscussionNotifications(input: Parameters<typeof generateUs
     )
   );
   const { proposal } = await createProposal({
-    categoryId: proposalCategory.id,
     spaceId: space.id,
     userId: author1.id,
     authors: [author1.id],

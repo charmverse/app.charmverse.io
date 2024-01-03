@@ -1,7 +1,7 @@
 /* eslint-disable no-continue */
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { getPermissionsClient } from 'lib/permissions/api';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { getProposalAction } from 'lib/proposal/getProposalAction';
 import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
@@ -31,7 +31,6 @@ export async function createProposalNotifications(webhookData: {
         },
         select: {
           createdBy: true,
-          categoryId: true,
           status: true,
           authors: {
             select: {
@@ -86,6 +85,7 @@ export async function createProposalNotifications(webhookData: {
         select: {
           userId: true,
           id: true,
+          isAdmin: true,
           spaceRoleToRole: {
             select: {
               role: {
@@ -98,10 +98,6 @@ export async function createProposalNotifications(webhookData: {
         }
       });
 
-      const spacePermissionsClient = await getPermissionsClient({
-        resourceId: spaceId,
-        resourceIdType: 'space'
-      });
       for (const spaceRole of spaceRoles) {
         // The user who triggered the event should not receive a notification
         if (spaceRole.userId === userId) {
@@ -109,23 +105,19 @@ export async function createProposalNotifications(webhookData: {
         }
         // We should not send role-based notifications for free spaces
         const roleIds = space.paidTier === 'free' ? [] : spaceRole.spaceRoleToRole.map(({ role }) => role.id);
-        const accessibleProposalCategories =
-          await spacePermissionsClient.client.proposals.getAccessibleProposalCategories({
-            spaceId,
-            userId
-          });
-        const accessibleProposalCategoryIds = accessibleProposalCategories.map(({ id }) => id);
-
         const isAuthor = proposalAuthorIds.includes(spaceRole.userId);
         const isReviewer =
           proposalReviewerIds.includes(spaceRole.userId) ||
           proposalReviewerRoleIds.some((roleId) => roleIds.includes(roleId));
-        const isProposalCategoryAccessible = proposal.categoryId
-          ? accessibleProposalCategoryIds.includes(proposal.categoryId)
-          : true;
 
-        if (!isProposalCategoryAccessible) {
-          continue;
+        const proposalPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
+          resourceId: proposalId
+        });
+
+        const isProposalAccessible = proposalPermissions.view;
+
+        if (!isProposalAccessible) {
+          return [];
         }
 
         const action = getProposalAction({
@@ -144,12 +136,9 @@ export async function createProposalNotifications(webhookData: {
           continue;
         }
 
-        const categoryPermission = accessibleProposalCategories.find(({ id }) => id === proposal.categoryId);
-
         if (
-          categoryPermission &&
-          ((action === 'start_discussion' && !categoryPermission.permissions.comment_proposals) ||
-            (action === 'vote' && !categoryPermission.permissions.vote_proposals))
+          (action === 'start_discussion' && !proposalPermissions.comment) ||
+          (action === 'vote' && !proposalPermissions.vote)
         ) {
           continue;
         }

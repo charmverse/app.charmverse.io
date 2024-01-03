@@ -16,8 +16,8 @@ import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import {
   DatabaseContainer,
-  DatabaseTitle,
-  DatabaseStickyHeader
+  DatabaseStickyHeader,
+  DatabaseTitle
 } from 'components/common/PageLayout/components/DatabasePageContent';
 import { NewProposalButton } from 'components/proposals/components/NewProposalButton';
 import { ProposalDialog } from 'components/proposals/components/ProposalDialog/ProposalDialog';
@@ -56,10 +56,7 @@ export function ProposalsPage({ title }: { title: string }) {
     let _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
 
     if (
-      (!_groupByProperty ||
-        (_groupByProperty?.type !== 'select' &&
-          _groupByProperty?.type !== 'proposalCategory' &&
-          _groupByProperty?.type !== 'proposalStatus')) &&
+      (!_groupByProperty || (_groupByProperty?.type !== 'select' && _groupByProperty?.type !== 'proposalStatus')) &&
       activeView?.fields.viewType === 'board'
     ) {
       _groupByProperty = activeBoard?.fields.cardProperties.find((o: any) => o.type === 'select');
@@ -249,7 +246,6 @@ export function ProposalsPage({ title }: { title: string }) {
               page={undefined}
               pageId={undefined}
               showView={() => {}}
-              withProposalCategories
             />
           </Stack>
         </Box>

@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
-import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { convertPageToProposal } from 'lib/proposal/convertPageToProposal';
@@ -24,7 +24,6 @@ handler
       resourceIdType: 'page'
     })
   )
-  .use(requireKeys(['categoryId'], 'body'))
   .post(convertToProposal);
 
 async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageMeta>) {
@@ -59,8 +58,6 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageM
     throw new ActionNotPermittedError('You do not have permission to update this page');
   }
 
-  const categoryId = req.body.categoryId;
-
   const proposalPermissions = await permissionsApiClient.spaces.computeSpacePermissions({
     resourceId: page.spaceId,
     userId
@@ -72,8 +69,7 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageM
 
   const proposalPage = await convertPageToProposal({
     page,
-    userId,
-    categoryId
+    userId
   });
 
   // Launch this job in the background

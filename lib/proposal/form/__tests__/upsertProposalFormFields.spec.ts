@@ -1,6 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { FormField, ProposalCategory, Space, User } from '@charmverse/core/prisma-client';
+import type { FormField, Space, User } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
@@ -22,20 +22,17 @@ const numberFieldInput: FormFieldInput = {
 describe('upsertProposalFormFields', () => {
   let user: User;
   let space: Space;
-  let proposalCategory: ProposalCategory;
 
   beforeAll(async () => {
     const generated = await testUtilsUser.generateUserAndSpace();
     user = generated.user;
     space = generated.space;
-    proposalCategory = await testUtilsProposals.generateProposalCategory({ spaceId: space.id });
   });
 
   it('should update existing fields and add new fields to existing proposal form template', async () => {
     const proposal = await testUtilsProposals.generateProposalTemplate({
       spaceId: space.id,
-      userId: user.id,
-      categoryId: proposalCategory.id
+      userId: user.id
     });
 
     const fieldsInput: FormFieldInput[] = [
@@ -92,8 +89,7 @@ describe('upsertProposalFormFields', () => {
   it('should delete criteria which were not provided', async () => {
     const proposal = await testUtilsProposals.generateProposalTemplate({
       spaceId: space.id,
-      userId: user.id,
-      categoryId: proposalCategory.id
+      userId: user.id
     });
 
     const fieldsInput: FormFieldInput[] = [

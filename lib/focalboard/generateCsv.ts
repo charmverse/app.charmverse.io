@@ -42,13 +42,7 @@ export async function loadAndGenerateCsv({
       id: targetPage.spaceId
     },
     select: {
-      domain: true,
-      proposalCategories: {
-        select: {
-          id: true,
-          title: true
-        }
-      }
+      domain: true
     }
   });
 
@@ -137,11 +131,7 @@ export async function loadAndGenerateCsv({
     },
     {
       users: spaceMembers,
-      spaceDomain: space.domain,
-      proposalCategories: space.proposalCategories.reduce((acc, category) => {
-        acc[category.id] = category.title;
-        return acc;
-      }, {} as Record<string, string>)
+      spaceDomain: space.domain
     }
   );
 

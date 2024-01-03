@@ -10,7 +10,6 @@ import type { Card, CardPage } from './card';
 export const proposalPropertyTypesList = [
   'proposalUrl',
   'proposalStatus',
-  'proposalCategory',
   'proposalEvaluatedBy',
   'proposalEvaluationTotal',
   'proposalEvaluationAverage',

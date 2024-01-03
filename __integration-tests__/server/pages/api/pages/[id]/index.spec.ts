@@ -99,14 +99,9 @@ describe('PUT /api/pages/{id} - update page', () => {
   });
 
   it('should update proposal template page content if the user is an admin and respond 200', async () => {
-    const proposalCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id
-    });
-
     const template = await createProposal({
       spaceId: space.id,
       userId: adminUser.id,
-      categoryId: proposalCategory.id,
       pageProps: {
         type: 'proposal_template'
       }
@@ -124,14 +119,9 @@ describe('PUT /api/pages/{id} - update page', () => {
   });
 
   it('should to fail update proposal template page content if the user is not a space admin and respond 401', async () => {
-    const proposalCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id
-    });
-
     const template = await createProposal({
       spaceId: space.id,
       userId: adminUser.id,
-      categoryId: proposalCategory.id,
       pageProps: {
         type: 'proposal_template'
       }
@@ -148,11 +138,6 @@ describe('PUT /api/pages/{id} - update page', () => {
 });
 
 describe('GET /api/pages/{id} - get page', () => {
-  const updateContent = {
-    content: {
-      paragraph: 'This is a paragraph'
-    }
-  };
   let adminUser: User;
   let normalMember: User;
   let space: Space;

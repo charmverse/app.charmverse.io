@@ -230,7 +230,6 @@ function PropertyValueElement(props: Props) {
   } else if (
     propertyTemplate.type === 'select' ||
     propertyTemplate.type === 'multiSelect' ||
-    propertyTemplate.type === 'proposalCategory' ||
     propertyTemplate.type === 'proposalEvaluationType'
   ) {
     propertyValueElement = (

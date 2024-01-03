@@ -1,4 +1,4 @@
-import { testUtilsProposals, testUtilsSpaces } from '@charmverse/core/test';
+import { testUtilsSpaces } from '@charmverse/core/test';
 import { test, expect } from '@playwright/test';
 import { ProposalPage } from '__e2e__/po/proposalPage.po';
 import { ProposalsListPage } from '__e2e__/po/proposalsList.po';
@@ -35,20 +35,8 @@ test.describe('Proposal templates', () => {
       userId
     });
 
-    const category = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id,
-      title: 'General',
-      proposalCategoryPermissions: [
-        {
-          permissionLevel: 'full_access',
-          assignee: { group: 'space', id: space.id }
-        }
-      ]
-    });
-
     const template = await generateProposal({
       userId,
-      categoryId: category.id,
       spaceId: space.id,
       title: 'Proposal template',
       pageType: 'proposal_template',

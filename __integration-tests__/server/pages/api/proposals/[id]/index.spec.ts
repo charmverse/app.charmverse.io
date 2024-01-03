@@ -1,4 +1,4 @@
-import type { ProposalCategory, Space, User } from '@charmverse/core/prisma';
+import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
@@ -16,7 +16,6 @@ let author: User;
 let reviewer: User;
 let space: Space;
 let authorCookie: string;
-let proposalCategory: ProposalCategory;
 
 beforeAll(async () => {
   const generated1 = await testUtilsUser.generateUserAndSpace({ isAdmin: false });
@@ -27,10 +26,6 @@ beforeAll(async () => {
   reviewer = generated2;
 
   authorCookie = await loginUser(author.id);
-
-  proposalCategory = await testUtilsProposals.generateProposalCategory({
-    spaceId: space.id
-  });
 });
 
 describe('GET /api/proposals/[id] - Get proposal', () => {
@@ -155,14 +150,9 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     const { user: adminUser, space: adminSpace } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
     const adminCookie = await loginUser(adminUser.id);
 
-    const category = await testUtilsProposals.generateProposalCategory({
-      spaceId: adminSpace.id
-    });
-
     const { page } = await testUtilsProposals.generateProposal({
       userId: adminUser.id,
-      spaceId: adminSpace.id,
-      categoryId: category.id
+      spaceId: adminSpace.id
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
@@ -197,14 +187,9 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
 
     const role = await testUtilsMembers.generateRole({ createdBy: adminUser.id, spaceId: adminSpace.id });
 
-    const category = await testUtilsProposals.generateProposalCategory({
-      spaceId: adminSpace.id
-    });
-
     const proposalTemplate = await testUtilsProposals.generateProposalTemplate({
       spaceId: adminSpace.id,
-      userId: adminUser.id,
-      categoryId: category.id
+      userId: adminUser.id
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
@@ -247,14 +232,9 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
 
     const proposalAuthor = await testUtilsUser.generateSpaceUser({ isAdmin: false, spaceId: adminSpace.id });
 
-    const category = await testUtilsProposals.generateProposalCategory({
-      spaceId: adminSpace.id
-    });
-
     const { page } = await testUtilsProposals.generateProposal({
       userId: proposalAuthor.id,
       spaceId: adminSpace.id,
-      categoryId: category.id,
       proposalStatus: 'discussion'
     });
 
@@ -275,96 +255,6 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       .expect(200);
   });
 
-  // This test is important so that it does not damage any existing proposals from before migrating our proposal system
-  // We should only use reviewer pool logic for new proposal reviewers
-  it('should fail to assign a new non-authorized user or role as a reviewer for a proposal', async () => {
-    const { user: adminUser, space: adminSpace } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
-    const adminCookie = await loginUser(adminUser.id);
-
-    const proposalAuthor = await testUtilsUser.generateSpaceUser({ isAdmin: false, spaceId: adminSpace.id });
-
-    const userWithRole = await testUtilsUser.generateSpaceUser({
-      spaceId: adminSpace.id
-    });
-
-    const roleWithoutAccess = await generateRole({
-      createdBy: adminUser.id,
-      spaceId: adminSpace.id,
-      assigneeUserIds: [userWithRole.id]
-    });
-
-    // This role can only create pages but not review proposals
-    await addSpaceOperations({
-      forSpaceId: adminSpace.id,
-      roleId: roleWithoutAccess.id,
-      operations: ['createPage']
-    });
-
-    const category = await testUtilsProposals.generateProposalCategory({
-      spaceId: adminSpace.id
-    });
-
-    const { page } = await testUtilsProposals.generateProposal({
-      userId: proposalAuthor.id,
-      spaceId: adminSpace.id,
-      categoryId: category.id,
-      proposalStatus: 'discussion',
-      reviewers: [{ group: 'user', id: userWithRole.id }]
-    });
-
-    const reviewerUserUpdate: Partial<UpdateProposalRequest> = {
-      authors: [adminUser.id],
-      reviewers: [
-        {
-          group: 'user',
-          id: userWithRole.id
-        },
-        // New valid reviewer being adding in, admins can always be reviewers
-        {
-          group: 'user',
-          id: adminUser.id
-        }
-      ]
-    };
-
-    // Disallowed reviewer, but already exists so we expect a 200
-    await request(baseUrl)
-      .put(`/api/proposals/${page.proposalId}`)
-      .set('Cookie', adminCookie)
-      .send(reviewerUserUpdate)
-      .expect(200);
-
-    await prisma.proposalReviewer.deleteMany({
-      where: {
-        proposalId: page.proposalId as string
-      }
-    });
-
-    // The reviewer doesn't exist anymore. This request should now be a 401
-    await request(baseUrl)
-      .put(`/api/proposals/${page.proposalId}`)
-      .set('Cookie', adminCookie)
-      .send(reviewerUserUpdate)
-      .expect(401);
-
-    const reviewerRoleUpdate: Partial<UpdateProposalRequest> = {
-      authors: [adminUser.id],
-      reviewers: [
-        {
-          group: 'role',
-          id: roleWithoutAccess.id
-        }
-      ]
-    };
-
-    // Same as above, but test with a role
-    await request(baseUrl)
-      .put(`/api/proposals/${page.proposalId}`)
-      .set('Cookie', adminCookie)
-      .send(reviewerRoleUpdate)
-      .expect(401);
-  });
-
   it('should fail to update a proposal template if the user is not a space admin', async () => {
     const { user: adminUser, space: adminSpace } = await testUtilsUser.generateUserAndSpace({ isAdmin: false });
     const nonAdminUser = await testUtilsUser.generateSpaceUser({ isAdmin: false, spaceId: adminSpace.id });
@@ -374,7 +264,6 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     const proposalTemplate = await testUtilsProposals.generateProposalTemplate({
       spaceId: adminSpace.id,
       userId: adminUser.id,
-      categoryId: proposalCategory.id,
       reviewers: [
         {
           group: 'user',

@@ -1,15 +1,13 @@
-import type { ProposalCategory, Role, Space, User } from '@charmverse/core/prisma';
+import type { Role, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
-import { check } from 'prettier';
 
 import { generateUserAndSpace, generateSpaceUser, generateRole } from 'testing/setupDatabase';
-import { generateProposalCategory, generateProposal } from 'testing/utils/proposals';
+import { generateProposal } from 'testing/utils/proposals';
 
 import { isProposalReviewer } from '../isProposalReviewer';
 
 let proposal: ProposalWithUsers;
-let proposalCategory: ProposalCategory;
 let space: Space;
 let proposalAuthor: User;
 let proposalReviewer: User;
@@ -26,17 +24,12 @@ beforeAll(async () => {
   spaceMember = await generateSpaceUser({ isAdmin: false, spaceId: space.id });
   proposalReviewer = await generateSpaceUser({ isAdmin: false, spaceId: space.id });
 
-  proposalCategory = await generateProposalCategory({
-    spaceId: space.id
-  });
-
   role = await generateRole({
     createdBy: generated.user.id,
     spaceId: space.id
   });
 
   proposal = await generateProposal({
-    categoryId: proposalCategory.id,
     authors: [proposalAuthor.id],
     proposalStatus: 'draft',
     spaceId: space.id,

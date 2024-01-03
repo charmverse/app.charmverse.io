@@ -61,7 +61,6 @@ export async function updateCardsFromProposals({
         select: {
           evaluationType: true,
           status: true,
-          categoryId: true,
           archived: true,
           createdBy: true,
           formId: true,
@@ -187,7 +186,7 @@ export async function updateCardsFromProposals({
     });
 
     if (card) {
-      const { cardProposalCategory, cardProposalStatus, cardProposalUrl } = extractCardProposalProperties({
+      const { cardProposalStatus, cardProposalUrl } = extractCardProposalProperties({
         card: card.block,
         databaseProperties: databaseProposalProps
       });
@@ -203,7 +202,6 @@ export async function updateCardsFromProposals({
         card.content?.toString() !== pageWithProposal.content?.toString() ||
         card.contentText !== pageWithProposal.contentText ||
         card.deletedAt !== pageWithProposal.deletedAt ||
-        cardProposalCategory?.optionId !== pageWithProposal.proposal?.categoryId ||
         cardProposalUrl?.value !== pageWithProposal.path ||
         (pageWithProposal.proposal?.archived && cardProposalStatus?.value !== 'archived') ||
         (!pageWithProposal.proposal?.archived && cardProposalStatus?.optionId === 'archived') ||
@@ -215,7 +213,6 @@ export async function updateCardsFromProposals({
         const newProps = {
           ...(card.block.fields as any).properties,
           [cardProposalUrl?.propertyId ?? '']: pageWithProposal.path,
-          [cardProposalCategory?.propertyId ?? '']: pageWithProposal.proposal?.categoryId,
           [cardProposalStatus?.propertyId ?? '']: pageWithProposal.proposal?.archived
             ? archivedStatusValueId
             : databaseProposalProps.proposalStatus?.options.find(
@@ -277,10 +274,6 @@ export async function updateCardsFromProposals({
       // Don't create new cards from archived cards
     } else if (!card && !pageWithProposal.proposal?.archived) {
       let properties: Record<string, BoardPropertyValue> = {};
-
-      if (databaseProposalProps.proposalCategory) {
-        properties[databaseProposalProps.proposalCategory.id] = pageWithProposal.proposal?.categoryId ?? '';
-      }
 
       if (databaseProposalProps.proposalUrl) {
         properties[databaseProposalProps.proposalUrl.id] = pageWithProposal.path;

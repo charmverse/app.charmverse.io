@@ -4,7 +4,7 @@ import { Box } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
-import { useGetIsReviewer, useGetProposalFlowFlags, useUpdateProposal } from 'charmClient/hooks/proposals';
+import { useGetIsReviewer, useUpdateProposal } from 'charmClient/hooks/proposals';
 import { useNotifications } from 'components/nexus/hooks/useNotifications';
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
@@ -16,7 +16,7 @@ import { useMdScreen } from 'hooks/useMediaScreens';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { PageWithContent } from 'lib/pages';
-import type { ProposalFields, ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { CreateLensPublication } from './CreateLensPublication';
@@ -26,9 +26,7 @@ interface ProposalPropertiesProps {
   enableSidebar?: boolean;
   pageId: string;
   proposalId: string;
-  snapshotProposalId: string | null;
   pagePermissions?: PagePermissionFlags;
-  refreshPagePermissions?: () => void;
   openEvaluation?: (evaluationId?: string) => void;
   proposalPage: PageWithContent;
   proposal?: ProposalWithUsersAndRubric;
@@ -38,33 +36,26 @@ interface ProposalPropertiesProps {
 export function ProposalProperties({
   enableSidebar,
   pagePermissions,
-  refreshPagePermissions = () => null,
   pageId,
   proposalId,
-  snapshotProposalId,
   readOnly,
   openEvaluation,
   proposalPage,
   proposal,
   refreshProposal
 }: ProposalPropertiesProps) {
-  const { mutate: mutateNotifications } = useNotifications();
   const { trigger: updateProposal } = useUpdateProposal({ proposalId });
   const { user } = useUser();
   const [isPublishingToLens, setIsPublishingToLens] = useState(false);
-  const { setupLensProfile } = useLensProfile();
   const { mutateProposals } = useProposals();
-  const { account } = useWeb3Account();
 
   const isMdScreen = useMdScreen();
   const { proposalTemplates } = useProposalTemplates({ load: !!proposal?.page?.sourceTemplateId });
 
   const { data: isReviewer } = useGetIsReviewer(pageId || undefined);
-  const { data: proposalFlowFlags, mutate: refreshProposalFlowFlags } = useGetProposalFlowFlags(proposalId);
   const isAdmin = useIsAdmin();
 
   // further restrict readOnly if user cannot update proposal properties specifically
-  const proposalPermissions = proposal?.permissions;
   const readOnlyProperties = readOnly || !(pagePermissions?.edit_content || isAdmin);
 
   const isFromTemplateSource = Boolean(proposal?.page?.sourceTemplateId);
@@ -86,7 +77,6 @@ export function ProposalProperties({
       : [];
 
   const proposalFormInputs: ProposalPropertiesInput = {
-    categoryId: proposal?.categoryId,
     evaluationType: proposal?.evaluationType || 'vote',
     authors: proposal?.authors.map((author) => author.userId) ?? [],
     evaluations: proposal?.evaluations ?? [],
@@ -100,20 +90,6 @@ export function ProposalProperties({
     fields: typeof proposal?.fields === 'object' && !!proposal?.fields ? proposal.fields : { properties: {} }
   };
 
-  async function updateProposalStatus(newStatus: ProposalStatus) {
-    if (proposal && newStatus !== proposal.status) {
-      if (account && newStatus === 'discussion' && proposalPage && !proposal.lensPostLink && proposal.publishToLens) {
-        const lensProfileSetup = await setupLensProfile();
-        if (lensProfileSetup) {
-          setIsPublishingToLens(true);
-        }
-      }
-      await charmClient.proposals.updateStatus(proposal.id, newStatus);
-      await Promise.all([refreshProposal(), refreshProposalFlowFlags(), refreshPagePermissions()]);
-      mutateNotifications();
-      mutateProposals();
-    }
-  }
   async function onChangeProperties(values: Partial<ProposalPropertiesInput>) {
     if (proposal) {
       await updateProposal({
@@ -126,11 +102,8 @@ export function ProposalProperties({
       });
     }
     refreshProposal();
-    refreshProposalFlowFlags(); // needs to run when reviewers change?
     mutateProposals();
   }
-
-  const readOnlyCategory = !isAdmin && (!proposalPermissions?.edit || !!proposal?.page?.sourceTemplateId);
 
   const canSeeEvaluation =
     (proposal?.status === 'evaluation_active' || proposal?.status === 'evaluation_closed') && isReviewer;
@@ -155,16 +128,9 @@ export function ProposalProperties({
       <div className='octo-propertylist'>
         <ProposalPropertiesBase
           proposalLensLink={proposal?.lensPostLink ?? undefined}
-          isFromTemplate={!!proposal?.page?.sourceTemplateId}
-          proposalFlowFlags={proposalFlowFlags}
           proposalStatus={proposal?.status}
-          proposalId={proposal?.id}
           pageId={pageId}
           readOnlyAuthors={readOnlyProperties}
-          readOnlyCategory={readOnlyCategory}
-          isAdmin={isAdmin}
-          snapshotProposalId={snapshotProposalId}
-          updateProposalStatus={updateProposalStatus}
           proposalFormInputs={proposalFormInputs}
           setProposalFormInputs={onChangeProperties}
           isPublishingToLens={isPublishingToLens}

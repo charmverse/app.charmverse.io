@@ -7,7 +7,6 @@ import { createPageComment } from 'lib/pages/comments/createPageComment';
 import { syncPageCommentsWithLensPost } from 'lib/pages/comments/syncPageCommentsWithLensPost';
 import { updatePageComment } from 'lib/pages/comments/updatePageComment';
 import { createProposal } from 'lib/proposal/createProposal';
-import { createProposalCategory } from 'lib/proposal/createProposalCategory';
 import { updateProposalLensProperties } from 'lib/proposal/updateProposalLensProperties';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
@@ -167,15 +166,7 @@ describe('syncPageCommentsWithLensPost', () => {
       userId: user.id
     });
 
-    const space1ProposalCategory = await createProposalCategory({
-      data: {
-        spaceId: space1.id,
-        title: 'Test Category'
-      }
-    });
-
     const space1ProposalPage = await createProposal({
-      categoryId: space1ProposalCategory.id,
       spaceId: space1.id,
       userId: user.id
     });
@@ -242,15 +233,7 @@ describe('syncPageCommentsWithLensPost', () => {
       userId: user.id
     });
 
-    const space2ProposalCategory = await createProposalCategory({
-      data: {
-        spaceId: space2.id,
-        title: 'Test Category'
-      }
-    });
-
     const space2ProposalPage = await createProposal({
-      categoryId: space2ProposalCategory.id,
       spaceId: space2.id,
       userId: user.id
     });

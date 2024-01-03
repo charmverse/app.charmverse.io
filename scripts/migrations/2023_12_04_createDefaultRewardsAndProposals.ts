@@ -49,6 +49,7 @@ export async function createDefaultRewardsAndProposals() {
         await createDefaultProposal({
           spaceId: space.id,
           userId: space.createdBy,
+          // @ts-ignore
           categoryId: space.proposalCategories[0]?.id
         });
       }
