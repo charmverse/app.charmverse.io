@@ -13,10 +13,7 @@ import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireUser)
-  .use(requireKeys(['categoryId'], 'body'))
-  .post(convertToProposal);
+handler.use(requireUser).post(convertToProposal);
 
 async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageMeta>) {
   const postId = req.query.postId as string;
@@ -45,8 +42,6 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageM
     throw new ActionNotPermittedError('Draft post cannot be converted to proposal');
   }
 
-  const categoryId = req.body.categoryId;
-
   const permissions = await permissionsApiClient.spaces.computeSpacePermissions({
     resourceId: post.spaceId,
     userId
@@ -59,8 +54,7 @@ async function convertToProposal(req: NextApiRequest, res: NextApiResponse<PageM
   const proposalPage = await convertPostToProposal({
     post,
     userId,
-    content: post.content,
-    categoryId
+    content: post.content
   });
 
   updateTrackPageProfile(proposalPage.id);

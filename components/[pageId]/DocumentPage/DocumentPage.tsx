@@ -279,8 +279,6 @@ function DocumentPage({
           pageId={page.id}
           proposalId={proposalId}
           pagePermissions={pagePermissions}
-          snapshotProposalId={page.snapshotProposalId}
-          refreshPagePermissions={refreshPage}
           readOnly={readonlyProposalProperties}
           proposalPage={page}
           openEvaluation={openEvaluation}

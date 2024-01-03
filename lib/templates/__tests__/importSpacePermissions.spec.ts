@@ -1,13 +1,8 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import type {
-  AssignedPostCategoryPermission,
-  AssignedProposalCategoryPermission,
-  TargetPermissionGroup
-} from '@charmverse/core/permissions';
-import { mapProposalCategoryPermissionToAssignee } from '@charmverse/core/permissions';
-import type { PostCategory, ProposalCategory, Role, Space } from '@charmverse/core/prisma-client';
+import type { AssignedPostCategoryPermission, TargetPermissionGroup } from '@charmverse/core/permissions';
+import type { PostCategory, Role, Space } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsForum, testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsForum, testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
 
 import { mapPostCategoryPermissionToAssignee } from 'lib/permissions/forum/mapPostCategoryPermissionToAssignee';
 import type { AssignedSpacePermission } from 'lib/permissions/spaces/mapSpacePermissionToAssignee';
@@ -20,9 +15,6 @@ import { importSpacePermissions } from '../importSpacePermissions';
 describe('importSpacePermissions', () => {
   let sourceSpace: Space;
 
-  let firstSourceProposalCategory: ProposalCategory;
-  let secondSourceProposalCategory: ProposalCategory;
-
   let firstSourcePostCategory: PostCategory;
   let secondSourcePostCategory: PostCategory;
 
@@ -31,7 +23,6 @@ describe('importSpacePermissions', () => {
   let exportedData: SpaceDataExport;
 
   let spacePermissions: AssignedSpacePermission[];
-  let proposalCategoryPermissions: AssignedProposalCategoryPermission[];
   let postCategoryPermissions: AssignedPostCategoryPermission[];
 
   beforeAll(async () => {
@@ -45,43 +36,6 @@ describe('importSpacePermissions', () => {
     secondSourceRole = await testUtilsMembers.generateRole({
       createdBy: sourceSpace.createdBy,
       spaceId: sourceSpace.id
-    });
-
-    firstSourceProposalCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: sourceSpace.id,
-      title: 'Example created 1',
-      proposalCategoryPermissions: [
-        {
-          assignee: { group: 'role', id: firstSourceRole.id },
-          permissionLevel: 'full_access'
-        },
-        {
-          assignee: { group: 'role', id: secondSourceRole.id },
-          permissionLevel: 'view_comment'
-        },
-        {
-          assignee: { group: 'space', id: sourceSpace.id },
-          permissionLevel: 'view'
-        }
-      ]
-    });
-    secondSourceProposalCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: sourceSpace.id,
-      title: 'Example created 2',
-      proposalCategoryPermissions: [
-        {
-          assignee: { group: 'role', id: firstSourceRole.id },
-          permissionLevel: 'full_access'
-        },
-        {
-          assignee: { group: 'role', id: secondSourceRole.id },
-          permissionLevel: 'view_comment'
-        },
-        {
-          assignee: { group: 'space', id: sourceSpace.id },
-          permissionLevel: 'view'
-        }
-      ]
     });
 
     firstSourcePostCategory = await testUtilsForum.generatePostCategory({
@@ -149,12 +103,6 @@ describe('importSpacePermissions', () => {
       ])
       .then((data) => data.map(mapSpacePermissionToAssignee));
 
-    proposalCategoryPermissions = await prisma.proposalCategoryPermission
-      .findMany({
-        where: { proposalCategory: { spaceId: sourceSpace.id } }
-      })
-      .then((data) => data.map(mapProposalCategoryPermissionToAssignee));
-
     postCategoryPermissions = await prisma.postCategoryPermission
       .findMany({
         where: { postCategory: { spaceId: sourceSpace.id } }
@@ -173,17 +121,6 @@ describe('importSpacePermissions', () => {
     });
 
     expect(importResult).toMatchObject<ImportedPermissions>({
-      proposalCategoryPermissions: expect.arrayContaining(
-        proposalCategoryPermissions.map((p) => ({
-          permissionLevel: p.permissionLevel,
-          id: expect.any(String),
-          proposalCategoryId: expect.any(String),
-          assignee: {
-            group: p.assignee.group,
-            id: p.assignee.group === 'space' ? targetSpace.id : expect.any(String)
-          } as TargetPermissionGroup<'role' | 'space'>
-        }))
-      ),
       postCategoryPermissions: expect.arrayContaining(
         postCategoryPermissions.map((p) => ({
           permissionLevel: p.permissionLevel,
@@ -229,11 +166,7 @@ describe('importSpacePermissions', () => {
       })
       .then((_roles) => _roles.map((r) => r.id));
 
-    const allPermissions = [
-      ...importResult.spacePermissions,
-      ...importResult.proposalCategoryPermissions,
-      ...importResult.postCategoryPermissions
-    ];
+    const allPermissions = [...importResult.spacePermissions, ...importResult.postCategoryPermissions];
 
     allPermissions.forEach((permission) => {
       if (permission.assignee.group === 'space') {
@@ -265,8 +198,7 @@ describe('importSpacePermissions', () => {
     // Idempotency check - assuming no duplicate entries are created
     expect(reimportedPermissions).toMatchObject({
       ...reimportedPermissions,
-      postCategoryPermissions: expect.arrayContaining(importedPermissions.postCategoryPermissions),
-      proposalCategoryPermissions: expect.arrayContaining(importedPermissions.proposalCategoryPermissions)
+      postCategoryPermissions: expect.arrayContaining(importedPermissions.postCategoryPermissions)
     });
   });
 
@@ -293,7 +225,6 @@ describe('importSpacePermissions', () => {
       })
     ).resolves.toMatchObject<ImportedPermissions>({
       postCategoryPermissions: [],
-      proposalCategoryPermissions: [],
       roles: [],
       spacePermissions: []
     });

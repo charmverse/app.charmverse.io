@@ -26,20 +26,6 @@ export interface ProposalReviewerInput {
   evaluationId?: string;
 }
 
-export interface NewProposalCategory {
-  title: string;
-  color: string;
-}
-
-export interface ProposalCategory extends NewProposalCategory {
-  id: string;
-  spaceId: string;
-}
-
-export interface ProposalWithCategory extends Proposal {
-  category: ProposalCategory | null;
-}
-
 export type ProposalRubricData = {
   rubricCriteria: ProposalRubricCriteriaWithTypedParams[];
   rubricAnswers: ProposalRubricCriteriaAnswerWithTypedResponse[];

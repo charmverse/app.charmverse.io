@@ -53,7 +53,8 @@ const boardPage: PageMeta = {
   type: 'board',
   updatedAt: new Date(),
   updatedBy: uuid(),
-  syncWithPageId: null
+  syncWithPageId: null,
+  sourceTemplateId: null
 };
 
 const card1 = createMockCard(board);

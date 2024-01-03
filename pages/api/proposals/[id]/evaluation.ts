@@ -67,48 +67,6 @@ async function updateEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
     throw new ActionNotPermittedError(`You can't update this proposal.`);
   }
 
-  // We want to filter out only new reviewers so that we don't affect existing proposals
-  if (proposal.page?.type === 'proposal' && (reviewers?.length || 0) > 0) {
-    const newReviewers = (reviewers ?? []).filter(
-      (updatedReviewer) =>
-        !proposal.reviewers.some((proposalReviewer) => {
-          return (
-            proposalReviewer.roleId === updatedReviewer.roleId ||
-            proposalReviewer.userId === updatedReviewer.userId ||
-            proposalReviewer.systemRole === updatedReviewer.systemRole
-          );
-        })
-    );
-    if (newReviewers.length > 0) {
-      const reviewerPool = await req.basePermissionsClient.proposals.getProposalReviewerPool({
-        resourceId: proposal.categoryId as string
-      });
-      for (const reviewer of newReviewers) {
-        if (reviewer.roleId && !reviewerPool.roleIds.includes(reviewer.roleId)) {
-          const role = await prisma.role.findUnique({
-            where: {
-              id: reviewer.roleId
-            },
-            select: {
-              name: true
-            }
-          });
-          throw new InsecureOperationError(`${role?.name} role cannot be added as a reviewer to this proposal`);
-        } else if (reviewer.userId && !reviewerPool.userIds.includes(reviewer.userId)) {
-          const user = await prisma.user.findUnique({
-            where: {
-              id: reviewer.userId
-            },
-            select: {
-              username: true
-            }
-          });
-          throw new InsecureOperationError(`User ${user?.username} cannot be added as a reviewer to this proposal`);
-        }
-      }
-    }
-  }
-
   await updateProposalEvaluation({
     proposalId: proposal.id,
     evaluationId,

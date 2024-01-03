@@ -3,12 +3,7 @@ import path from 'path';
 
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { PageMeta } from '@charmverse/core/pages';
-import type {
-  AssignedPostCategoryPermission,
-  AssignedProposalCategoryPermission,
-  TargetPermissionGroup
-} from '@charmverse/core/permissions';
-import { mapProposalCategoryPermissionToAssignee } from '@charmverse/core/permissions';
+import type { AssignedPostCategoryPermission, TargetPermissionGroup } from '@charmverse/core/permissions';
 import type {
   MemberProperty,
   MemberPropertyPermission,
@@ -16,7 +11,6 @@ import type {
   PostCategory,
   Proposal,
   ProposalBlock,
-  ProposalCategory,
   RewardBlock,
   Role,
   Space,
@@ -47,9 +41,6 @@ describe('importSpaceData', () => {
   let sourceSpace: Space;
   let sourceSpaceUser: User;
 
-  let firstSourceProposalCategory: ProposalCategory;
-  let secondSourceProposalCategory: ProposalCategory;
-
   let firstSourceProposal: Proposal;
   let firstSourceProposalPage: PageMeta;
   let secondSourceProposal: Proposal;
@@ -68,7 +59,6 @@ describe('importSpaceData', () => {
   let exportedData: SpaceDataExport;
 
   let spacePermissions: AssignedSpacePermission[];
-  let proposalCategoryPermissions: AssignedProposalCategoryPermission[];
   let postCategoryPermissions: AssignedPostCategoryPermission[];
 
   let memberProperty: MemberProperty & { permissions: MemberPropertyPermission[] };
@@ -92,43 +82,6 @@ describe('importSpaceData', () => {
     secondSourceRole = await testUtilsMembers.generateRole({
       createdBy: sourceSpace.createdBy,
       spaceId: sourceSpace.id
-    });
-
-    firstSourceProposalCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: sourceSpace.id,
-      title: 'Example created 1',
-      proposalCategoryPermissions: [
-        {
-          assignee: { group: 'role', id: firstSourceRole.id },
-          permissionLevel: 'full_access'
-        },
-        {
-          assignee: { group: 'role', id: secondSourceRole.id },
-          permissionLevel: 'view_comment'
-        },
-        {
-          assignee: { group: 'space', id: sourceSpace.id },
-          permissionLevel: 'view'
-        }
-      ]
-    });
-    secondSourceProposalCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: sourceSpace.id,
-      title: 'Example created 2',
-      proposalCategoryPermissions: [
-        {
-          assignee: { group: 'role', id: firstSourceRole.id },
-          permissionLevel: 'full_access'
-        },
-        {
-          assignee: { group: 'role', id: secondSourceRole.id },
-          permissionLevel: 'view_comment'
-        },
-        {
-          assignee: { group: 'space', id: sourceSpace.id },
-          permissionLevel: 'view'
-        }
-      ]
     });
 
     firstSourcePostCategory = await testUtilsForum.generatePostCategory({
@@ -196,12 +149,6 @@ describe('importSpaceData', () => {
       ])
       .then((data) => data.map(mapSpacePermissionToAssignee));
 
-    proposalCategoryPermissions = await prisma.proposalCategoryPermission
-      .findMany({
-        where: { proposalCategory: { spaceId: sourceSpace.id } }
-      })
-      .then((data) => data.map(mapProposalCategoryPermissionToAssignee));
-
     postCategoryPermissions = await prisma.postCategoryPermission
       .findMany({
         where: { postCategory: { spaceId: sourceSpace.id } }
@@ -210,14 +157,12 @@ describe('importSpaceData', () => {
 
     firstSourceProposal = await testUtilsProposals.generateProposal({
       spaceId: sourceSpace.id,
-      userId: sourceSpaceUser.id,
-      categoryId: firstSourceProposalCategory.id
+      userId: sourceSpaceUser.id
     });
 
     secondSourceProposal = await testUtilsProposals.generateProposal({
       spaceId: sourceSpace.id,
-      userId: sourceSpaceUser.id,
-      categoryId: secondSourceProposalCategory.id
+      userId: sourceSpaceUser.id
     });
 
     [firstSourceProposalPage, secondSourceProposalPage] = await Promise.all([
@@ -371,7 +316,7 @@ describe('importSpaceData', () => {
               cardOrder: [],
               openPageIn: 'center_peek',
               sortOptions: [{ reversed: false, propertyId: '__title' }],
-              columnWidths: { __title: 400, __status: 150, __authors: 150, __category: 200, __reviewers: 150 },
+              columnWidths: { __title: 400, __status: 150, __authors: 150, __reviewers: 150 },
               hiddenOptionIds: [],
               columnWrappedIds: [],
               visibleOptionIds: [],
@@ -379,7 +324,7 @@ describe('importSpaceData', () => {
               collapsedOptionIds: [],
               columnCalculations: {},
               kanbanCalculations: {},
-              visiblePropertyIds: ['__category', '__status', '__evaluationType', '__authors', '__reviewers']
+              visiblePropertyIds: ['__status', '__evaluationType', '__authors', '__reviewers']
             }
           }
         }),
@@ -568,13 +513,6 @@ describe('importSpaceData', () => {
       postCategories: expect.arrayContaining([
         { ...firstSourcePostCategory, spaceId: targetSpace.id, id: expect.any(String) }
       ]),
-      proposalCategories: expect.arrayContaining(
-        [firstSourceProposalCategory, secondSourceProposalCategory].map((c) => ({
-          ...c,
-          spaceId: targetSpace.id,
-          id: expect.any(String)
-        }))
-      ),
       roles: expect.arrayContaining([
         {
           ...firstSourceRole,
@@ -592,17 +530,6 @@ describe('importSpaceData', () => {
         }
       ]),
       permissions: {
-        proposalCategoryPermissions: expect.arrayContaining(
-          proposalCategoryPermissions.map((p) => ({
-            permissionLevel: p.permissionLevel,
-            id: expect.any(String),
-            proposalCategoryId: expect.any(String),
-            assignee: {
-              group: p.assignee.group,
-              id: p.assignee.group === 'space' ? targetSpace.id : expect.any(String)
-            } as TargetPermissionGroup<'role' | 'space'>
-          }))
-        ),
         postCategoryPermissions: expect.arrayContaining(
           postCategoryPermissions.map((p) => ({
             permissionLevel: p.permissionLevel,
@@ -646,10 +573,6 @@ describe('importSpaceData', () => {
         },
         postCategories: {
           [firstSourcePostCategory.id]: expect.any(String)
-        },
-        proposalCategories: {
-          [firstSourceProposalCategory.id]: expect.any(String),
-          [secondSourceProposalCategory.id]: expect.any(String)
         },
         roles: {
           [firstSourceRole.id]: expect.any(String),
@@ -771,13 +694,6 @@ describe('importSpaceData', () => {
       postCategories: expect.arrayContaining([
         { ...firstSourcePostCategory, spaceId: targetSpace.id, id: expect.any(String) }
       ]),
-      proposalCategories: expect.arrayContaining(
-        [firstSourceProposalCategory, secondSourceProposalCategory].map((c) => ({
-          ...c,
-          spaceId: targetSpace.id,
-          id: expect.any(String)
-        }))
-      ),
       roles: expect.arrayContaining([
         {
           ...firstSourceRole,
@@ -795,17 +711,6 @@ describe('importSpaceData', () => {
         }
       ]),
       permissions: {
-        proposalCategoryPermissions: expect.arrayContaining(
-          proposalCategoryPermissions.map((p) => ({
-            permissionLevel: p.permissionLevel,
-            id: expect.any(String),
-            proposalCategoryId: expect.any(String),
-            assignee: {
-              group: p.assignee.group,
-              id: p.assignee.group === 'space' ? targetSpace.id : expect.any(String)
-            } as TargetPermissionGroup<'role' | 'space'>
-          }))
-        ),
         postCategoryPermissions: expect.arrayContaining(
           postCategoryPermissions.map((p) => ({
             permissionLevel: p.permissionLevel,
@@ -850,10 +755,6 @@ describe('importSpaceData', () => {
         postCategories: {
           [firstSourcePostCategory.id]: expect.any(String)
         },
-        proposalCategories: {
-          [firstSourceProposalCategory.id]: expect.any(String),
-          [secondSourceProposalCategory.id]: expect.any(String)
-        },
         roles: {
           [firstSourceRole.id]: expect.any(String),
           [secondSourceRole.id]: expect.any(String)
@@ -890,7 +791,6 @@ describe('importSpaceData', () => {
       })
     ).resolves.toMatchObject<ImportedPermissions>({
       postCategoryPermissions: [],
-      proposalCategoryPermissions: [],
       roles: [],
       spacePermissions: []
     });

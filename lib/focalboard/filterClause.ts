@@ -134,10 +134,6 @@ export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
     datatype: 'text',
     conditions: TextDataTypeConditions
   },
-  proposalCategory: {
-    datatype: 'select',
-    conditions: SelectDataTypeConditions
-  },
   proposalStatus: {
     datatype: 'select',
     conditions: SelectDataTypeConditions

@@ -10,7 +10,7 @@ import { createMockPage } from 'testing/mocks/page';
 import { createMockProposal } from 'testing/mocks/proposal';
 import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 
-import { members, proposalCategories, userProfile } from '../lib/mockData';
+import { members, userProfile } from '../lib/mockData';
 
 import { ProposalsPageStory } from './ProposalsPageStory';
 
@@ -58,9 +58,6 @@ export function ProposalInEvaluation() {
 ProposalInEvaluation.parameters = {
   msw: {
     handlers: {
-      proposalReviewerPool: rest.get('/api/proposals/reviewer-pool', (req, res, ctx) => {
-        return res(ctx.json(null));
-      }),
       proposal: rest.get('/api/proposals/:proposalId', (req, res, ctx) => {
         const rubricCriteria: ProposalWithUsersAndRubric['rubricCriteria'] = [
           {
@@ -184,7 +181,6 @@ ProposalInEvaluation.parameters = {
             { evaluationId: null, id: '2', proposalId: '', roleId: null, userId: members[0].id, systemRole: null },
             { evaluationId: null, id: '3', proposalId: '', roleId: null, userId: members[1].id, systemRole: null }
           ],
-          categoryId: proposalCategories[0].id,
           evaluationType: 'rubric',
           status: 'evaluation_active',
           rubricCriteria,

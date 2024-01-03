@@ -1,11 +1,8 @@
 import type { PageMeta } from '@charmverse/core/pages';
 
-import { getSpace } from 'lib/spaces/getSpace';
-
 import type { SpaceDataExport } from './exportSpaceData';
 import { importForumPosts } from './importForumPosts';
 import { importPostCategories } from './importPostCategories';
-import { importProposalCategories } from './importProposalCategories';
 import { importRoles } from './importRoles';
 import { importSpacePermissions } from './importSpacePermissions';
 import { importSpaceSettings } from './importSpaceSettings';
@@ -17,7 +14,6 @@ export type SpaceDataImportResult = Omit<SpaceDataExport, 'pages'> & {
   oldNewHashMaps: {
     roles: Record<string, string>;
     postCategories: Record<string, string>;
-    proposalCategories: Record<string, string>;
     pages: Record<string, string>;
     posts: Record<string, string>;
   };
@@ -26,12 +22,9 @@ export type SpaceDataImportResult = Omit<SpaceDataExport, 'pages'> & {
 export async function importSpaceData(importParams: ImportParams): Promise<SpaceDataImportResult> {
   const { roles, oldNewRecordIdHashMap: oldNewRoleIdHashMap } = await importRoles(importParams);
 
-  const { proposalCategories, oldNewIdMap: oldNewProposalCategoryIdMap } = await importProposalCategories(importParams);
   const { postCategories, oldNewIdMap: oldNewPostCategoryIdMap } = await importPostCategories(importParams);
 
-  const { proposalCategoryPermissions, postCategoryPermissions, spacePermissions } = await importSpacePermissions(
-    importParams
-  );
+  const { postCategoryPermissions, spacePermissions } = await importSpacePermissions(importParams);
 
   const { pages, oldNewRecordIdHashMap: oldNewPageIdMap } = await importWorkspacePages({
     ...importParams,
@@ -52,15 +45,12 @@ export async function importSpaceData(importParams: ImportParams): Promise<Space
     posts,
     space: importedSpaceSettings,
     permissions: {
-      proposalCategoryPermissions,
       spacePermissions,
       postCategoryPermissions
     },
     postCategories,
-    proposalCategories,
     oldNewHashMaps: {
       roles: oldNewRoleIdHashMap,
-      proposalCategories: oldNewProposalCategoryIdMap,
       postCategories: oldNewPostCategoryIdMap,
       pages: oldNewPageIdMap,
       posts: postsIdHashmap

@@ -18,7 +18,7 @@ function GroupByOptions(props: LayoutOptionsProps) {
   const { groupByProperty, properties, view } = props;
   const showTableUngroup = view.fields.viewType === 'table' && view.fields.groupById;
 
-  const groupablePropertyTypes: PropertyType[] = ['select', 'proposalCategory', 'proposalStatus'];
+  const groupablePropertyTypes: PropertyType[] = ['select', 'proposalStatus'];
 
   const filteredProperties = (properties ?? [])?.filter((o: IPropertyTemplate) =>
     groupablePropertyTypes.includes(o.type)

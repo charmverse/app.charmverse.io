@@ -1,13 +1,12 @@
-import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/dist/cjs/proposals';
-import { InsecureOperationError, InvalidInputError } from '@charmverse/core/errors';
-import type { Prisma, ProposalCategory, Space, User } from '@charmverse/core/prisma';
+import type { WorkflowEvaluationJson } from '@charmverse/core/dist/cjs/proposals';
+import { InsecureOperationError } from '@charmverse/core/errors';
+import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
 import { v4 as uuid } from 'uuid';
 
 import type { FormFieldInput } from 'components/common/form/interfaces';
 import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
-import { generateProposalCategory } from 'testing/utils/proposals';
 
 import type { ProposalEvaluationInput } from '../createProposal';
 import { createProposal } from '../createProposal';
@@ -15,19 +14,15 @@ import type { ProposalWithUsersAndRubric } from '../interface';
 
 let user: User;
 let space: Space;
-let proposalCategory: ProposalCategory;
 
 beforeAll(async () => {
   const generated = await generateUserAndSpace();
   user = generated.user;
   space = generated.space;
-  proposalCategory = await generateProposalCategory({
-    spaceId: space.id
-  });
 });
 
 describe('Creates a page and proposal with relevant configuration', () => {
-  it('Create a page and proposal in a specific category, accepting page content, reviewers, authors and source template ID as input', async () => {
+  it('Create a page and proposal accepting page content, reviewers, authors and source template ID as input', async () => {
     const reviewerUser = await generateSpaceUser({
       isAdmin: false,
       spaceId: space.id
@@ -47,7 +42,6 @@ describe('Creates a page and proposal with relevant configuration', () => {
         title: pageTitle,
         sourceTemplateId: templateId
       },
-      categoryId: proposalCategory.id,
       userId: user.id,
       spaceId: space.id,
       authors: [user.id, extraUser.id],
@@ -133,7 +127,6 @@ describe('Creates a page and proposal with relevant configuration', () => {
         title: pageTitle,
         type: 'proposal_template'
       },
-      categoryId: proposalCategory.id,
       userId: user.id,
       spaceId: space.id,
       authors: [user.id, extraUser.id],
@@ -170,7 +163,6 @@ describe('Creates a page and proposal with relevant configuration', () => {
           contentText: '',
           title: 'page-title'
         },
-        categoryId: proposalCategory.id,
         userId: user.id,
         spaceId: space.id,
         authors: [user.id, outsideUser.id],
@@ -185,7 +177,6 @@ describe('Creates a page and proposal with relevant configuration', () => {
           contentText: '',
           title: 'page-title'
         },
-        categoryId: proposalCategory.id,
         userId: user.id,
         spaceId: space.id,
         authors: [user.id],
@@ -205,7 +196,6 @@ describe('Creates a page and proposal with relevant configuration', () => {
           contentText: '',
           title: 'page-title'
         },
-        categoryId: proposalCategory.id,
         userId: user.id,
         spaceId: space.id,
         authors: [user.id, outsideUser.id],
@@ -217,20 +207,6 @@ describe('Creates a page and proposal with relevant configuration', () => {
         ]
       })
     ).rejects.toBeInstanceOf(InsecureOperationError);
-  });
-
-  it('should throw an error if the category is not specified', async () => {
-    await expect(
-      createProposal({
-        pageProps: {
-          contentText: '',
-          title: 'page-title'
-        },
-        categoryId: null as any,
-        userId: user.id,
-        spaceId: space.id
-      })
-    ).rejects.toBeInstanceOf(InvalidInputError);
   });
 
   it('should create a proposal from a workflow and copy over its permissions', async () => {
@@ -379,7 +355,6 @@ describe('Creates a page and proposal with relevant configuration', () => {
     });
 
     const { proposal } = await createProposal({
-      categoryId: proposalCategory.id,
       spaceId: space.id,
       userId: user.id,
       workflowId: proposalWorkflow.id,

@@ -1,16 +1,11 @@
 import type { PagesRequest } from '@charmverse/core/pages';
-import type {
-  BulkPagePermissionCompute,
-  PermissionCompute,
-  ProposalPermissionsSwitch,
-  Resource
-} from '@charmverse/core/permissions';
+import type { BulkPagePermissionCompute, PermissionCompute, Resource } from '@charmverse/core/permissions';
 import { PermissionsApiClient } from '@charmverse/core/permissions';
 
 import { permissionsApiAuthKey, permissionsApiUrl } from 'config/constants';
 
 // Injected method for expanding args
-function withUseProposalPermissionsArgs<T>(args: T): Required<ProposalPermissionsSwitch> & T {
+function withUseProposalPermissionsArgs<T>(args: T): T {
   return { useProposalEvaluationPermissions: true, ...args };
 }
 
@@ -35,32 +30,6 @@ export class PermissionsApiClientWithPermissionsSwitch extends PermissionsApiCli
     pages.bulkComputePagePermissions = async function (args: BulkPagePermissionCompute) {
       const permissions = await originalBulkComputePagePermissions.apply(this, [withUseProposalPermissionsArgs(args)]);
       return permissions;
-    };
-
-    // Override getReviewerPool method
-    const originalGetProposalReviewerPool = proposals.getProposalReviewerPool;
-
-    proposals.getProposalReviewerPool = async function (args: Resource) {
-      const reviewerPool = await originalGetProposalReviewerPool.apply(this, [withUseProposalPermissionsArgs(args)]);
-      return reviewerPool;
-    };
-
-    // Override computeProposalCategoryPermissions method
-    const originalComputeProposalCategoryPermissions = proposals.computeProposalCategoryPermissions;
-
-    proposals.computeProposalCategoryPermissions = async function (args: PermissionCompute) {
-      const permissions = await originalComputeProposalCategoryPermissions.apply(this, [
-        withUseProposalPermissionsArgs(args)
-      ]);
-      return permissions;
-    };
-
-    // Override getAccessibleProposalCategories method
-    const originalGetAccessibleCategories = proposals.getAccessibleProposalCategories;
-
-    proposals.getAccessibleProposalCategories = async function (args: PagesRequest) {
-      const pageIds = await originalGetAccessibleCategories.apply(this, [withUseProposalPermissionsArgs(args)]);
-      return pageIds;
     };
 
     // Override getAccessiblePageIds method

@@ -1,5 +1,5 @@
 import type { User } from '@charmverse/core/prisma';
-import type { Proposal, ProposalCategory, Space } from '@charmverse/core/prisma-client';
+import type { Proposal, Space } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { test as base, expect } from '@playwright/test';
@@ -27,9 +27,7 @@ const test = base.extend<Fixtures>({
 let spaceUser: User;
 let space: Space;
 let databasePagePath: string;
-let databasePageId: string;
 
-let proposalCategory: ProposalCategory;
 let firstProposal: Proposal;
 let secondProposal: Proposal;
 let thirdProposal: Proposal;
@@ -43,35 +41,27 @@ test.beforeAll(async () => {
   spaceUser = generated.user;
   space = generated.space;
 
-  proposalCategory = await testUtilsProposals.generateProposalCategory({
-    spaceId: space.id
-  });
-
   firstProposal = await testUtilsProposals.generateProposal({
     spaceId: space.id,
     userId: spaceUser.id,
-    categoryId: proposalCategory.id,
     proposalStatus: 'discussion'
   });
 
   secondProposal = await testUtilsProposals.generateProposal({
     spaceId: space.id,
     userId: spaceUser.id,
-    categoryId: proposalCategory.id,
     proposalStatus: 'discussion'
   });
 
   thirdProposal = await testUtilsProposals.generateProposal({
     spaceId: space.id,
     userId: spaceUser.id,
-    categoryId: proposalCategory.id,
     proposalStatus: 'discussion'
   });
 
   draftProposal = await testUtilsProposals.generateProposal({
     spaceId: space.id,
     userId: spaceUser.id,
-    categoryId: proposalCategory.id,
     proposalStatus: 'draft'
   });
 });
@@ -151,12 +141,6 @@ test.describe.serial('Database with proposals as datasource', async () => {
       const row = databasePage.getTableRowByCardId({ cardId: card.id });
 
       await expect(row).toBeVisible();
-
-      const selectProps = await row.locator('data-test=select-preview').all();
-
-      const categorySelect = selectProps[0];
-
-      expect((await categorySelect.allInnerTexts())[0]).toEqual(proposalCategory.title);
 
       const proposalStatusBadge = databasePage.getTablePropertyProposalStatusLocator({ cardId: card.id });
 

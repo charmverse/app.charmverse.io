@@ -31,7 +31,7 @@ beforeAll(async () => {
   });
 });
 
-describe('PUT /api/proposals/[id]/status - Update proposal status', () => {
+describe('PUT /api/proposals/[id]/status-only - Update proposal status', () => {
   it('should allow an admin to update the proposal status and return 200', async () => {
     const proposal = await createProposalWithUsers({
       spaceId: space.id,
@@ -44,7 +44,7 @@ describe('PUT /api/proposals/[id]/status - Update proposal status', () => {
     const adminCookie = await loginUser(adminUser.id);
 
     await request(baseUrl)
-      .put(`/api/proposals/${proposal.id}/status`)
+      .put(`/api/proposals/${proposal.id}/status-only`)
       .set('Cookie', adminCookie)
       .send({
         newStatus: 'discussion'
@@ -59,7 +59,7 @@ describe('PUT /api/proposals/[id]/status - Update proposal status', () => {
       reviewers: [reviewer.id]
     });
 
-    await request(baseUrl).put(`/api/proposals/${proposal.id}/status`).set('Cookie', reviewerCookie).expect(400);
+    await request(baseUrl).put(`/api/proposals/${proposal.id}/status-only`).set('Cookie', reviewerCookie).expect(400);
   });
 
   it("should throw error and return 404 if the proposal doesn't exist", async () => {
@@ -95,7 +95,7 @@ describe('PUT /api/proposals/[id]/status - Update proposal status', () => {
     });
 
     await request(baseUrl)
-      .put(`/api/proposals/${proposal.id}/status`)
+      .put(`/api/proposals/${proposal.id}/status-only`)
       .set('Cookie', spaceMemberCookie)
       .send({
         newStatus: 'draft'
@@ -107,16 +107,16 @@ describe('PUT /api/proposals/[id]/status - Update proposal status', () => {
     const proposal = await createProposalWithUsers({
       spaceId: space.id,
       userId: author.id,
-      proposalStatus: 'discussion',
+      proposalStatus: 'draft',
       authors: [],
       reviewers: [reviewer.id]
     });
 
     await request(baseUrl)
-      .put(`/api/proposals/${proposal.id}/status`)
+      .put(`/api/proposals/${proposal.id}/status-only`)
       .set('Cookie', authorCookie)
       .send({
-        newStatus: 'draft'
+        newStatus: 'published'
       })
       .expect(200);
   });
