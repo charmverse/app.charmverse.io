@@ -15,11 +15,14 @@ async function transferProposalCategories() {
         select: {
           id: true,
           categoryId: true,
-          fields: true,
+          fields: true
         }
       },
+      createdAt: true,
       createdBy: true,
       proposalBlocks: true,
+      domain: true,
+      name: true,
       id: true,
       proposalCategories: {
         select: {
@@ -29,17 +32,33 @@ async function transferProposalCategories() {
         }
       }
     }
-  })
+  });
 
   const totalSpaces = spaces.length;
   let currentSpace = 0;
 
-  for (const {id: spaceId, createdBy, proposals, proposalCategories, proposalBlocks} of spaces) {
+  for (const space of spaces) {
+    const { id: spaceId, proposals, createdAt, createdBy, proposalCategories, proposalBlocks } = space;
+    if (proposals.length === 0) {
+      continue;
+    }
+    if (proposals.every((proposal) => !proposal.categoryId)) {
+      console.log('new space exists without proposal categories', { spaceId, createdAt, domain: space.domain });
+      continue;
+    }
     try {
-      const proposalBoardBlock = (proposalBlocks.find((block) => block.id === DEFAULT_BOARD_BLOCK_ID) ?? getDefaultBoard({
-        storedBoard: undefined,
-        customOnly: true
-      })) as ProposalBoardBlock;
+      const proposalBoardBlock = (proposalBlocks.find((block) => block.id === DEFAULT_BOARD_BLOCK_ID) ??
+        getDefaultBoard({
+          storedBoard: undefined,
+          customOnly: true
+        })) as ProposalBoardBlock;
+
+      if (!proposalBoardBlock.spaceId) {
+        proposalBoardBlock.rootId = spaceId;
+        proposalBoardBlock.createdBy = createdBy;
+        proposalBoardBlock.spaceId = spaceId;
+        proposalBoardBlock.updatedBy = createdBy;
+      }
 
       const newCategorySelectProperty: IPropertyTemplate = {
         id: v4(),
@@ -49,24 +68,25 @@ async function transferProposalCategories() {
           id: category.id,
           value: category.title
         })),
-        type: "select",
+        type: 'select'
+      };
+      if (proposalBoardBlock.fields.cardProperties.find((property) => property.name === 'Category')) {
+        console.warn('Space already has a category property', {
+          title: space.name,
+          id: space.id,
+          domain: space.domain
+        });
+        continue;
       }
-
       proposalBoardBlock.fields.cardProperties.push(newCategorySelectProperty);
 
-      const proposalBoardViewBlock = (proposalBlocks.find((block) => block.id === DEFAULT_VIEW_BLOCK_ID) ?? getDefaultTableView({
-        storedBoard: proposalBoardBlock
-      })) as unknown as BoardView;
+      const proposalBoardViewBlock = proposalBlocks.find(
+        (block) => block.id === DEFAULT_VIEW_BLOCK_ID
+      ) as unknown as BoardView | null;
 
-      [proposalBoardBlock, proposalBoardViewBlock].forEach((block) => {
-        block.rootId = spaceId;
-        block.createdBy = createdBy
-        block.spaceId = spaceId;
-        block.updatedBy = createdBy;
-      })
-
-      proposalBoardViewBlock.fields.visiblePropertyIds = proposalBoardViewBlock.fields.visiblePropertyIds.filter((id) => id !== newCategorySelectProperty.id);
-      proposalBoardViewBlock.fields.visiblePropertyIds.splice(2, 0, newCategorySelectProperty.id)
+      if (proposalBoardViewBlock) {
+        proposalBoardViewBlock.fields.visiblePropertyIds.splice(2, 0, newCategorySelectProperty.id);
+      }
 
       await prisma.$transaction([
         prisma.proposalBlock.upsert({
@@ -81,45 +101,54 @@ async function transferProposalCategories() {
             fields: proposalBoardBlock.fields
           }
         }),
-        prisma.proposalBlock.upsert({
-          where: {
-            id_spaceId: {
-              id: proposalBoardViewBlock.id,
-              spaceId
-            }
-          },
-          update: {
-            fields: proposalBoardViewBlock.fields
-          },
-          create: blockToPrisma(proposalBoardViewBlock)
-        }),
-        prisma.proposalCategory.deleteMany({
-          where: {
-            spaceId
-          }
-        }),
-        prisma.proposalCategoryPermission.deleteMany({
-          where: {
-            spaceId
-          }
-        }),
-        ...(proposals.filter(proposal => proposal.categoryId).map(proposal => prisma.proposal.update({
-          where: {
-            id: proposal.id
-          },
-          data: {
-            categoryId: null,
-            fields: {
-              properties: {
-                ...(proposal.fields as ProposalFields).properties,
-                [newCategorySelectProperty.id]: proposal.categoryId
+        ...(proposalBoardViewBlock
+          ? [
+              prisma.proposalBlock.update({
+                where: {
+                  id_spaceId: {
+                    id: proposalBoardViewBlock.id,
+                    spaceId
+                  }
+                },
+                data: {
+                  fields: proposalBoardViewBlock.fields
+                }
+              })
+            ]
+          : []),
+        // prisma.proposalCategory.deleteMany({
+        //   where: {
+        //     spaceId
+        //   }
+        // }),
+        // prisma.proposalCategoryPermission.deleteMany({
+        //   where: {
+        //     spaceId
+        //   }
+        // }),
+        ...proposals
+          .filter((proposal) => proposal.categoryId)
+          .map((proposal) => {
+            const fields = proposal.fields as ProposalFields | null;
+            return prisma.proposal.update({
+              where: {
+                id: proposal.id
+              },
+              data: {
+                //categoryId: null,
+                fields: {
+                  ...fields,
+                  properties: {
+                    ...(fields || {}).properties,
+                    [newCategorySelectProperty.id]: proposal.categoryId
+                  }
+                }
               }
-            }
-          }
-        })))
-      ])
+            });
+          })
+      ]);
     } catch (_) {
-      console.log(_)
+      console.log(_);
       console.error(`Failed to create proposal categories for space ${spaceId}`);
     } finally {
       currentSpace += 1;
