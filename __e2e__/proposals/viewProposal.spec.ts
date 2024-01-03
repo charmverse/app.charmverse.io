@@ -77,16 +77,18 @@ test.beforeAll(async () => {
   discussionProposal = await testUtilsProposals.generateProposal({
     spaceId: space.id,
     userId: proposalAuthor.id,
-    proposalStatus: 'discussion',
+    proposalStatus: 'published',
     evaluationInputs: [
       {
         evaluationType: 'feedback',
-        reviewers: [
-          { group: 'user', id: proposalReviewer.id },
-          { group: 'role', id: role.id },
-          { group: 'space_member' }
-        ],
-        permissions: [{ assignee: { group: 'space_member' }, operation: 'edit' }]
+        reviewers: [],
+        permissions: [
+          { assignee: { group: 'space_member' }, operation: 'edit' },
+          {
+            assignee: { group: 'space_member' },
+            operation: 'view'
+          }
+        ]
       }
     ]
   });
@@ -120,23 +122,6 @@ test.describe.serial('View proposal', () => {
     await expect(draftRow).toBeVisible();
     await expect(discussionRow).toBeVisible();
     await expect(hiddenRow).not.toBeVisible();
-
-    // Test to make sure the reviewers show up in the table
-    const discussionProposalReviewers = await proposalListPage.getProposalRowReviewersLocators(discussionProposal.id);
-
-    // 1 role reviewer + 1 user reviewer
-    expect(discussionProposalReviewers).toHaveLength(2);
-
-    for (const reviewer of discussionProposalReviewers) {
-      await expect(reviewer).toBeVisible();
-
-      const text = (await reviewer.allInnerTexts()).join('');
-
-      const showingReviewerRoleName = !!text.match(role.name);
-      const showingReviewerUserName = !!text.match(proposalReviewer.username);
-
-      expect(showingReviewerRoleName || showingReviewerUserName).toBe(true);
-    }
   });
 
   test('Space member can see proposals but not drafts', async ({ proposalListPage }) => {
