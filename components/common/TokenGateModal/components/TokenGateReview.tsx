@@ -20,7 +20,8 @@ import { TokenGateFooter } from './TokenGateFooter';
 export function TokenGateReview() {
   const { account } = useWeb3Account();
   const { showMessage } = useSnackbar();
-  const { resetModal, onSubmit, loadingToken, error, flow, setFlow, setDisplayedPage, tokenGate } = useTokenGateModal();
+  const { resetModal, onSubmit, loadingToken, error, flow, setFlow, setDisplayedPage, tokenGate, onDelete } =
+    useTokenGateModal();
   const { trigger: reviewTokenGate, data: initialData, isMutating } = useReviewTokenGate();
   const data = initialData?.[0];
 
@@ -52,14 +53,16 @@ export function TokenGateReview() {
 
   const goToHome = () => setDisplayedPage('home');
 
+  const handleDelete = flow !== 'single' && conditionsData && conditionsData.length > 1 ? onDelete : undefined;
+
   return (
     <>
       <Typography>Review your conditions and confirm</Typography>
-      <LoadingComponent isLoading={isMutating} />
+      <LoadingComponent isLoading={!conditionsData && isMutating} />
       {conditionsData && (
         <Card variant='outlined' color='default'>
           <CardContent>
-            <ConditionsGroup conditions={conditionsData} />
+            <ConditionsGroup conditions={conditionsData} onDelete={handleDelete} isLoading={isMutating} />
           </CardContent>
         </Card>
       )}
