@@ -15,28 +15,9 @@ describe('getProposalTemplates', () => {
       userId: adminUser.id
     });
 
-    await testUtilsProposals.generateProposalTemplate({
-      spaceId: space.id,
-      userId: adminUser.id
-    });
-
-    await testUtilsProposals.generateProposalTemplate({
-      spaceId: space.id,
-      userId: adminUser.id
-    });
-
     const spaceMember = await testUtilsUser.generateSpaceUser({
       spaceId: space.id,
       isAdmin: false
-    });
-    const firstTemplate = await testUtilsProposals.generateProposalTemplate({
-      spaceId: space.id,
-      userId: adminUser.id
-    });
-
-    const secondTemplate = await testUtilsProposals.generateProposalTemplate({
-      spaceId: space.id,
-      userId: adminUser.id
     });
 
     const templates = await getProposalTemplates({
