@@ -317,7 +317,8 @@ function PropertyValueElement(props: Props) {
           readOnly ||
           (displayType !== 'details' && displayType !== 'table') ||
           proposal.status === 'draft' ||
-          proposal.status === 'discussion'
+          proposal.currentEvaluation?.type === 'feedback' ||
+          !!proposal.sourceTemplateId
         }
         data-test='selected-reviewers'
         systemRoles={[allMembersSystemRole]}

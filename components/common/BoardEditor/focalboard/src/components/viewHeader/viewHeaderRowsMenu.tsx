@@ -506,10 +506,17 @@ export function ViewHeaderRowsMenu({
 
   async function updateProposalsReviewer(pageIds: string[], reviewers: SelectOption[]) {
     for (const pageId of pageIds) {
-      const proposalId = pages[pageId]?.proposalId;
+      const page = pages[pageId];
+      const proposalId = page?.proposalId;
       const proposal = proposalId ? proposals?.find((_proposal) => _proposal.id === proposalId) : null;
       const proposalWithEvaluationId = proposal?.currentEvaluationId;
-      if (proposal && proposalWithEvaluationId && proposal.status !== 'draft' && proposal.status !== 'discussion') {
+      if (
+        proposal &&
+        proposalWithEvaluationId &&
+        proposal.status !== 'draft' &&
+        proposal.currentEvaluation?.type === 'feedback' &&
+        !page?.sourceTemplateId
+      ) {
         await charmClient.proposals.updateProposalEvaluation({
           reviewers: reviewers.map((reviewer) => ({
             roleId: reviewer.group === 'role' ? reviewer.id : null,

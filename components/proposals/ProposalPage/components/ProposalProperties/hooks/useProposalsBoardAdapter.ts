@@ -81,7 +81,9 @@ export function useProposalsBoardAdapter() {
             proposal: {
               currentEvaluationId: p.currentEvaluationId,
               id: p.id,
-              status: p.status
+              status: p.status,
+              currentEvaluation: p.currentEvaluation,
+              sourceTemplateId: page?.sourceTemplateId
             }
           } as CardPage;
         })

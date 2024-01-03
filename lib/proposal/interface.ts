@@ -74,6 +74,7 @@ export type ProposalWithUsersLite = ProposalWithUsers & {
   currentEvaluationId?: string;
   evaluationType: ProposalEvaluationType;
   permissions?: ProposalPermissionFlags;
+  currentEvaluation?: Pick<ProposalEvaluation, 'title' | 'type'>;
 };
 
 export type PopulatedEvaluation = ProposalRubricData &
