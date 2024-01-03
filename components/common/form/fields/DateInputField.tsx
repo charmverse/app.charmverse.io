@@ -22,8 +22,7 @@ export const DateInputField = forwardRef<HTMLDivElement, Props>(
       error,
       helperText,
       disabled,
-      placeholder,
-      fieldWrapperSx
+      placeholder
     },
     ref
   ) => {
@@ -39,7 +38,6 @@ export const DateInputField = forwardRef<HTMLDivElement, Props>(
         label={label}
         inline={inline}
         iconLabel={iconLabel}
-        sx={fieldWrapperSx}
       >
         <DateTimePicker
           value={dateValue}

@@ -7,11 +7,11 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 
 type Props = ControlFieldProps & FieldProps & { multiline?: boolean; rows?: number };
 
-export function CharmEditorInputField({ placeholder, fieldWrapperSx, error, ...inputProps }: Props) {
+export function CharmEditorInputField({ placeholder, error, ...inputProps }: Props) {
   const theme = useTheme();
 
   return (
-    <FieldWrapper sx={fieldWrapperSx} {...inputProps}>
+    <FieldWrapper {...inputProps}>
       <CharmEditor
         onContentChange={({ doc, rawText }) => {
           inputProps.onChange?.({ content: doc, contentText: rawText });
