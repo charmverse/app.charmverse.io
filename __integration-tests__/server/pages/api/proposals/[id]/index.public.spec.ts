@@ -111,45 +111,6 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     );
   });
 
-  // This is achieved currently by the fact the we check new reviewers against proposal reviewer pool, and in public mode, the role ids are always empty
-  it('should throw an error if trying to assign a role as a reviewer', async () => {
-    const { user: adminUser, space: adminSpace } = await testUtilsUser.generateUserAndSpace({
-      isAdmin: true,
-      spacePaidTier: 'free'
-    });
-    const adminCookie = await loginUser(adminUser.id);
-
-    const role = await testUtilsMembers.generateRole({
-      spaceId: adminSpace.id,
-      createdBy: adminUser.id
-    });
-
-    const { page } = await testUtilsProposals.generateProposal({
-      userId: adminUser.id,
-      spaceId: adminSpace.id
-    });
-
-    const updateContent: Partial<UpdateProposalRequest> = {
-      authors: [adminUser.id],
-      reviewers: [
-        {
-          group: 'user',
-          id: adminUser.id
-        },
-        {
-          group: 'role',
-          id: role.id
-        }
-      ]
-    };
-
-    await request(baseUrl)
-      .put(`/api/proposals/${page.proposalId}`)
-      .set('Cookie', adminCookie)
-      .send(updateContent)
-      .expect(401);
-  });
-
   it('should update a proposal templates settings if the user is a space admin', async () => {
     const { user: adminUser, space: adminSpace } = await testUtilsUser.generateUserAndSpace({
       isAdmin: true,

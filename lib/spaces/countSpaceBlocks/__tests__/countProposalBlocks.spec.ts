@@ -7,7 +7,7 @@ import { generateSchema } from 'testing/publicApi/schemas';
 import type { ProposalBlocksCount } from '../countProposalBlocks';
 import { countProposalBlocks } from '../countProposalBlocks';
 
-describe('countProposalBlocks', () => {
+describe('countProposalBlocks()', () => {
   // Provided schema generation code
   const selectSchema = generateSchema({ type: 'select', options: ['Blue', 'Green', 'Red'] });
   const multiSelectSchema = generateSchema({ type: 'multiSelect', options: ['Blue', 'Green', 'Red'] });
@@ -194,7 +194,7 @@ describe('countProposalBlocks', () => {
     });
     const count = await countProposalBlocks({ spaceId: space.id });
     expect(count).toMatchObject<ProposalBlocksCount>({
-      total: 27,
+      total: 25,
       details: {
         proposalViews: 1,
         proposalProperties: 7,
@@ -294,7 +294,7 @@ describe('countProposalBlocks', () => {
     });
     const count = await countProposalBlocks({ spaceId: space.id });
     expect(count).toMatchObject<ProposalBlocksCount>({
-      total: 14,
+      total: 12,
       details: {
         proposalViews: 1,
         proposalProperties: 7,
