@@ -11,7 +11,7 @@ import type { ClearEvaluationResultRequest } from 'lib/proposal/clearEvaluationR
 import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import type { RubricProposalsUserInfo } from 'lib/proposal/getProposalsEvaluatedByUser';
 import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
-import type { ProposalWithUsers, ProposalWithUsersAndRubric, ProposalWithUsersLite } from 'lib/proposal/interface';
+import type { ProposalWithUsersAndRubric, ProposalWithUsersLite } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers';
 import type { RubricCriteriaUpsert } from 'lib/proposal/rubric/upsertRubricCriteria';
@@ -33,7 +33,7 @@ export function useGetIsReviewer(proposalId: MaybeString) {
   return useGET<boolean>(proposalId ? `/api/proposals/${proposalId}/is-reviewer` : null);
 }
 export function useGetProposalsBySpace({ spaceId }: Partial<ListProposalsRequest>) {
-  return useGET<ProposalWithUsers[]>(spaceId ? `/api/spaces/${spaceId}/proposals` : null);
+  return useGET<ProposalWithUsersLite[]>(spaceId ? `/api/spaces/${spaceId}/proposals` : null);
 }
 
 export function useGetProposalTemplatesBySpace(spaceId: MaybeString) {

@@ -13,7 +13,7 @@ type Props = {
   evaluation?: ProposalEvaluationValues;
   isPreviousStep: boolean;
   refreshProposal?: VoidFunction;
-  openSettings: (evaluation: ProposalEvaluationValues) => void;
+  openSettings?: () => void;
 };
 
 const preventAccordionToggle = (e: any) => e.stopPropagation();
@@ -43,12 +43,7 @@ export function EvaluationStepActions({
           title={!permissions?.edit ? 'You do not have permission to edit this evaluation' : 'Edit'}
         >
           <span className='show-on-hover' style={{ opacity: !evaluation ? 0 : undefined }}>
-            <IconButton
-              color='secondary'
-              disabled={!permissions?.edit}
-              size='small'
-              onClick={() => evaluation && openSettings(evaluation)}
-            >
+            <IconButton color='secondary' disabled={!permissions?.edit} size='small' onClick={() => openSettings?.()}>
               <EditIcon fontSize='small' />
             </IconButton>
           </span>

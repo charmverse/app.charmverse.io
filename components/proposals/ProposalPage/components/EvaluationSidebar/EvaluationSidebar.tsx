@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 
-import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
@@ -35,13 +34,13 @@ export type Props = {
   >;
   onChangeEvaluation?: (evaluationId: string, updated: Partial<ProposalEvaluationValues>) => void;
   refreshProposal?: VoidFunction;
+  templateId?: string | null;
 };
 
-export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refreshProposal }: Props) {
+export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refreshProposal, templateId }: Props) {
   const [activeEvaluationId, setActiveEvaluationId] = useState<string | undefined>(proposal?.currentEvaluationId);
   const { mappedFeatures } = useSpaceFeatures();
   const { showMessage } = useSnackbar();
-  const { proposalTemplates } = useProposalTemplates();
   const [evaluationInput, setEvaluationInput] = useState<ProposalEvaluationValues | null>(null);
   const rewardsTitle = mappedFeatures.rewards.title;
   const currentEvaluation = proposal?.evaluations.find((e) => e.id === proposal?.currentEvaluationId);
@@ -49,7 +48,6 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
   const isRewardsComplete = !!proposal?.rewardIds?.length;
   const hasRewardsStep = Boolean(pendingRewards?.length || isRewardsComplete);
   const isRewardsActive = hasRewardsStep && currentEvaluation?.result === 'pass';
-  const isFromTemplate = !!proposal?.page?.sourceTemplateId;
   // To find the previous step index. we have to calculate the position including Draft and Rewards steps
   let adjustedCurrentEvaluationIndex = 0; // "draft" step
   if (proposal && currentEvaluation) {
@@ -103,7 +101,6 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
             permissions={proposal?.permissions}
             proposalId={proposal?.id}
             refreshProposal={refreshProposal}
-            openSettings={setEvaluationInput}
           />
         }
       />
@@ -126,7 +123,7 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
                 proposalId={proposal?.id}
                 refreshProposal={refreshProposal}
                 evaluation={evaluation}
-                openSettings={(e) => setEvaluationInput({ ...e })}
+                openSettings={() => setEvaluationInput({ ...evaluation })}
               />
             }
           >
@@ -168,7 +165,7 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
                 proposal={proposal}
                 isCurrent={isCurrent}
                 evaluation={evaluation}
-                addVote={() => setEvaluationInput(evaluation)}
+                addVote={() => setEvaluationInput({ ...evaluation })}
               />
             )}
           </EvaluationStepRow>
@@ -196,7 +193,7 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
         <EvaluationStepSettingsModal
           close={closeSettings}
           evaluationInput={evaluationInput}
-          isFromTemplate={isFromTemplate}
+          templateId={templateId}
           saveEvaluation={saveEvaluation}
           updateEvaluation={updateEvaluation}
         />

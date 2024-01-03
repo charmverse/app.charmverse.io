@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { useGetIsReviewer, useUpdateProposal } from 'charmClient/hooks/proposals';
 import { useProposals } from 'components/proposals/hooks/useProposals';
-import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
+import { useProposalTemplateById } from 'components/proposals/hooks/useProposalTemplates';
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { ProposalPropertiesBase } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -45,18 +45,13 @@ export function ProposalProperties({
   const { mutateProposals } = useProposals();
 
   const isMdScreen = useMdScreen();
-  const { proposalTemplates } = useProposalTemplates();
+  const sourceTemplate = useProposalTemplateById(proposal?.page?.sourceTemplateId);
 
   const { data: isReviewer } = useGetIsReviewer(pageId || undefined);
   const isAdmin = useIsAdmin();
 
   // further restrict readOnly if user cannot update proposal properties specifically
   const readOnlyProperties = readOnly || !(pagePermissions?.edit_content || isAdmin);
-
-  const isFromTemplateSource = Boolean(proposal?.page?.sourceTemplateId);
-  const sourceTemplate = isFromTemplateSource
-    ? proposalTemplates?.find((template) => template.id === proposal?.page?.sourceTemplateId)
-    : undefined;
 
   // properties with values from templates should be read only
   const readOnlyCustomProperties =

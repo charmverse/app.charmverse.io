@@ -12,12 +12,9 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
   const { trigger: updateProposalEvaluation } = useUpdateProposalEvaluation({ proposalId });
   const { trigger: upsertRubricCriteria } = useUpsertRubricCriteria({ proposalId });
 
-  const readOnlyProperties = !proposal?.permissions.edit;
-  const readOnlyReviewers = Boolean(readOnlyProperties || !!proposal?.page?.sourceTemplateId);
+  const readOnlyReviewers = !proposal?.permissions.edit;
   // rubric criteria can always be updated by reviewers and admins, but criteria from a template are only editable by admin
-  const readOnlyRubricCriteria = Boolean(
-    readOnlyProperties && (!proposal?.permissions.evaluate || proposal?.page?.sourceTemplateId)
-  );
+  const readOnlyRubricCriteria = !proposal?.permissions.edit && !proposal?.permissions.evaluate;
 
   return useMemo(
     () => ({

@@ -54,11 +54,10 @@ type SidebarProps = {
   onChangeWorkflow: ProposalSettingsProps['onChangeWorkflow'];
   refreshProposal?: VoidFunction;
   isUnpublishedProposal?: boolean;
-  isProposalTemplate?: boolean;
-  readOnlyReviewers: boolean;
-  readOnlyRubricCriteria: boolean;
+  isReviewer?: boolean; // TODO: we need to know the reviewer for each step instead
   // eslint-disable-next-line react/no-unused-prop-types
   disabledViews?: PageSidebarView[];
+  proposalTemplateId?: string | null;
 };
 
 function PageSidebarComponent(props: SidebarProps) {
@@ -200,10 +199,9 @@ function SidebarContents({
   onChangeEvaluation,
   onChangeWorkflow,
   refreshProposal,
-  isProposalTemplate,
   isUnpublishedProposal,
-  readOnlyReviewers,
-  readOnlyRubricCriteria
+  isReviewer,
+  proposalTemplateId
 }: SidebarProps) {
   return (
     <>
@@ -212,11 +210,10 @@ function SidebarContents({
           <EvaluationSettingsSidebar
             proposal={proposalInput}
             readOnly={!!readOnlyProposalPermissions}
-            readOnlyWorkflowSelect={isProposalTemplate}
+            templateId={proposalTemplateId}
             onChangeEvaluation={onChangeEvaluation}
             onChangeWorkflow={onChangeWorkflow}
-            readOnlyReviewers={!!readOnlyReviewers}
-            readOnlyRubricCriteria={!!readOnlyRubricCriteria}
+            isReviewer={!!isReviewer}
           />
         ) : (
           <EvaluationSidebar
@@ -224,6 +221,7 @@ function SidebarContents({
             proposal={proposal}
             onChangeEvaluation={onChangeEvaluation}
             refreshProposal={refreshProposal}
+            templateId={proposalTemplateId}
           />
         ))}
       {sidebarView === 'suggestions' && (
