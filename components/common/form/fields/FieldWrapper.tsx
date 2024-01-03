@@ -73,10 +73,15 @@ export function FieldWrapper({
           )}
         </Box>
       )}
-      {description && !checkIsContentEmpty(description) ? (
-        <CharmEditor readOnly isContentControlled content={description} />
-      ) : null}
+      <ReadonlyCharmContent content={description} />
       {children}
     </FieldWrapperContainer>
   );
+}
+
+export function ReadonlyCharmContent({ content }: { content?: PageContent | null }) {
+  if (!content || checkIsContentEmpty(content)) {
+    return null;
+  }
+  return <CharmEditor readOnly isContentControlled content={content} />;
 }
