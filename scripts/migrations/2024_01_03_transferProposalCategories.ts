@@ -39,6 +39,9 @@ async function transferProposalCategories() {
 
   for (const space of spaces) {
     const { id: spaceId, proposals, createdAt, createdBy, proposalCategories, proposalBlocks } = space;
+    if (proposals.length === 0) {
+      continue;
+    }
     if (proposals.every((proposal) => !proposal.categoryId)) {
       console.log('new space exists without proposal categories', { spaceId, createdAt, domain: space.domain });
       continue;
@@ -125,22 +128,24 @@ async function transferProposalCategories() {
         // }),
         ...proposals
           .filter((proposal) => proposal.categoryId)
-          .map((proposal) =>
-            prisma.proposal.update({
+          .map((proposal) => {
+            const fields = proposal.fields as ProposalFields | null;
+            return prisma.proposal.update({
               where: {
                 id: proposal.id
               },
               data: {
                 //categoryId: null,
                 fields: {
+                  ...fields,
                   properties: {
-                    ...(proposal.fields as ProposalFields).properties,
+                    ...(fields || {}).properties,
                     [newCategorySelectProperty.id]: proposal.categoryId
                   }
                 }
               }
-            })
-          )
+            });
+          })
       ]);
     } catch (_) {
       console.log(_);
