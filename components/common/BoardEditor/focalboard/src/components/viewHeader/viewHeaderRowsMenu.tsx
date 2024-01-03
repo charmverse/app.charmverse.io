@@ -1,17 +1,24 @@
+import type { ProposalSystemRole } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import { Box, Menu, MenuItem, Stack, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState, useRef, useMemo } from 'react';
 import type { ReactNode, Dispatch, SetStateAction } from 'react';
+import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import type { TagSelectProps } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { TextInput } from 'components/common/BoardEditor/components/properties/TextInput';
+import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
+import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import type { UserSelectProps } from 'components/common/BoardEditor/components/properties/UserSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
+import { useProposals } from 'components/proposals/hooks/useProposals';
+import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
@@ -168,24 +175,20 @@ function PersonPropertyTemplateMenu({
   board,
   cards,
   propertyTemplate,
-  onChange,
-  onProposalAuthorSelect,
-  disallowEmpty
+  onChange
 }: {
-  disallowEmpty?: boolean;
   board: Board;
   cards: Card[];
   propertyTemplate: IPropertyTemplate<PropertyType>;
-  onChange?: VoidFunction;
-  onProposalAuthorSelect?: (userIds: string[]) => void;
+  onChange?: (userIds: string[]) => void;
 }) {
   const propertyValue = cards[0].fields.properties[propertyTemplate.id];
 
   const userSelectProps: UserSelectProps = {
     memberIds: typeof propertyValue === 'string' ? [propertyValue] : (propertyValue as string[]) ?? [],
     onChange: async (newValue) => {
-      if (onProposalAuthorSelect) {
-        onProposalAuthorSelect(newValue);
+      if (onChange) {
+        onChange(newValue);
       } else {
         await mutator.changePropertyValues(cards, propertyTemplate.id, newValue);
 
@@ -215,11 +218,9 @@ function PersonPropertyTemplateMenu({
             .flat()
         });
       }
-      onChange?.();
     },
     displayType: 'table',
-    showEmptyPlaceholder: true,
-    disallowEmpty
+    showEmptyPlaceholder: true
   };
 
   return (
@@ -306,7 +307,8 @@ function PropertyTemplateMenu({
   board,
   onChange,
   isAdmin,
-  onProposalAuthorSelect
+  onProposalAuthorSelect,
+  onProposalReviewerSelect
 }: {
   board: Board;
   checkedIds: string[];
@@ -314,7 +316,8 @@ function PropertyTemplateMenu({
   propertyTemplate: IPropertyTemplate<PropertyType>;
   onChange?: VoidFunction;
   isAdmin: boolean;
-  onProposalAuthorSelect?: (pageIds: string[], userIds: string[]) => void;
+  onProposalAuthorSelect: (pageIds: string[], userIds: string[]) => Promise<void>;
+  onProposalReviewerSelect: (pageIds: string[], options: SelectOption[]) => Promise<void>;
 }) {
   const isValidType = [
     'checkbox',
@@ -327,7 +330,8 @@ function PropertyTemplateMenu({
     'email',
     'phone',
     'person',
-    'proposalAuthor'
+    'proposalAuthor',
+    'proposalReviewer'
   ].includes(propertyTemplate.type);
 
   if (!isValidType || propertyTemplate.id === Constants.titleColumnId) {
@@ -388,15 +392,50 @@ function PropertyTemplateMenu({
       }
       return (
         <PersonPropertyTemplateMenu
-          onChange={onChange}
+          onChange={async (userIds) => {
+            await onProposalAuthorSelect(checkedIds, userIds);
+            if (onChange) {
+              onChange();
+            }
+          }}
           board={board}
           cards={checkedCards}
-          disallowEmpty
           propertyTemplate={propertyTemplate}
-          onProposalAuthorSelect={(userIds) => {
-            onProposalAuthorSelect?.(checkedIds, userIds);
-          }}
         />
+      );
+    }
+
+    case 'proposalReviewer': {
+      if (!isAdmin) {
+        return null;
+      }
+
+      return (
+        <PropertyMenu cards={cards} propertyTemplate={propertyTemplate}>
+          {({ isPropertyOpen }) =>
+            isPropertyOpen ? (
+              <UserAndRoleSelect
+                value={propertyValue as any}
+                systemRoles={[allMembersSystemRole]}
+                onChange={async (options) => {
+                  await onProposalReviewerSelect(checkedIds, options);
+                  if (onChange) {
+                    onChange();
+                  }
+                }}
+                required
+              />
+            ) : (
+              <UserAndRoleSelect
+                onChange={() => {}}
+                value={propertyValue as any}
+                systemRoles={[allMembersSystemRole]}
+                readOnly
+                required
+              />
+            )
+          }
+        </PropertyMenu>
       );
     }
 
@@ -417,8 +456,7 @@ export function ViewHeaderRowsMenu({
   board,
   propertyTemplates,
   onChange,
-  onDelete,
-  onProposalAuthorSelect
+  onDelete
 }: {
   board: Board;
   cards: Card[];
@@ -427,9 +465,10 @@ export function ViewHeaderRowsMenu({
   propertyTemplates: IPropertyTemplate<PropertyType>[];
   onChange?: VoidFunction;
   onDelete?: (pageIds: string[]) => Promise<void>;
-  onProposalAuthorSelect?: (pageIds: string[], userIds: string[]) => void;
 }) {
+  const { pages } = usePages();
   const isAdmin = useIsAdmin();
+  const { proposals } = useProposals();
   const [isDeleting, setIsDeleting] = useState(false);
   async function deleteCheckedCards() {
     setIsDeleting(true);
@@ -444,6 +483,53 @@ export function ViewHeaderRowsMenu({
     } finally {
       setCheckedIds([]);
       setIsDeleting(false);
+    }
+  }
+
+  async function updateProposalsAuthor(pageIds: string[], authorIds: string[]) {
+    for (const pageId of pageIds) {
+      const proposalId = pages[pageId]?.proposalId;
+      if (proposalId) {
+        try {
+          await charmClient.proposals.updateProposal({
+            authors: authorIds,
+            proposalId
+          });
+        } catch (err) {
+          //
+        }
+      }
+    }
+  }
+
+  async function updateProposalsReviewer(pageIds: string[], reviewers: SelectOption[]) {
+    let proposalReviewersChanged = false;
+    for (const pageId of pageIds) {
+      const page = pages[pageId];
+      const proposalId = page?.proposalId;
+      const proposal = proposalId ? proposals?.find((_proposal) => _proposal.id === proposalId) : null;
+      const proposalWithEvaluationId = proposal?.currentEvaluationId;
+      if (
+        proposal &&
+        proposalWithEvaluationId &&
+        proposal.status !== 'draft' &&
+        proposal.currentEvaluation?.type !== 'feedback' &&
+        !page?.sourceTemplateId
+      ) {
+        await charmClient.proposals.updateProposalEvaluation({
+          reviewers: reviewers.map((reviewer) => ({
+            roleId: reviewer.group === 'role' ? reviewer.id : null,
+            systemRole: reviewer.group === 'system_role' ? (reviewer.id as ProposalSystemRole) : null,
+            userId: reviewer.group === 'user' ? reviewer.id : null
+          })),
+          proposalId: proposal.id,
+          evaluationId: proposalWithEvaluationId
+        });
+        proposalReviewersChanged = true;
+      }
+    }
+    if (proposalReviewersChanged) {
+      await mutate(`/api/spaces/${board.spaceId}/proposals`);
     }
   }
 
@@ -468,7 +554,8 @@ export function ViewHeaderRowsMenu({
               propertyTemplate={propertyTemplate}
               key={propertyTemplate.id}
               onChange={onChange}
-              onProposalAuthorSelect={onProposalAuthorSelect}
+              onProposalAuthorSelect={updateProposalsAuthor}
+              onProposalReviewerSelect={updateProposalsReviewer}
             />
           ))
         : null}

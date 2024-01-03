@@ -69,6 +69,7 @@ type Props = {
   emptySubPagesPlaceholder?: ReactNode;
   isChecked?: boolean;
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
+  proposal?: CardPage['proposal'];
 };
 
 export const StyledCheckbox = styled(Checkbox)<{ show?: boolean }>`
@@ -119,7 +120,8 @@ function TableRow(props: Props) {
     isNested,
     subRowsEmptyValueContent,
     isChecked,
-    setCheckedIds
+    setCheckedIds,
+    proposal
   } = props;
   const { space } = useCurrentSpace();
   const isMobile = useSmallScreen();
@@ -349,7 +351,7 @@ function TableRow(props: Props) {
               readOnly={props.readOnly}
               syncWithPageId={cardPage?.syncWithPageId}
               card={card}
-              proposalId={cardPage.proposalId}
+              proposal={proposal}
               board={board}
               showEmptyPlaceholder={false}
               propertyTemplate={template}

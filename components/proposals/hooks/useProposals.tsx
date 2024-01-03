@@ -7,12 +7,12 @@ import { useGetProposalsBySpace } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';
-import type { ProposalWithUsers } from 'lib/proposal/interface';
+import type { ProposalWithUsersLite } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 
 type ProposalsContextType = {
-  proposals: ProposalWithUsers[] | undefined;
-  mutateProposals: KeyedMutator<ProposalWithUsers[]>;
+  proposals: ProposalWithUsersLite[] | undefined;
+  mutateProposals: KeyedMutator<ProposalWithUsersLite[]>;
   isLoading: boolean;
   archiveProposal: (input: ArchiveProposalRequest) => Promise<void>;
   updateProposal: (proposal: UpdateProposalRequest) => Promise<void>;

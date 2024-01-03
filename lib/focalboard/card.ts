@@ -1,7 +1,9 @@
 import type { PageMeta } from '@charmverse/core/pages';
+import type { ProposalStatus } from '@charmverse/core/prisma-client';
 
 import type { Block } from 'lib/focalboard/block';
 import { createBlock } from 'lib/focalboard/block';
+import type { ProposalWithUsersLite } from 'lib/proposal/interface';
 
 export type CardPropertyValue = string | string[] | number;
 
@@ -21,6 +23,13 @@ export type CardPage<V = CardPropertyValue> = {
   subPages?: CardPage<V>[];
   card: Card<V>;
   page: PageMeta;
+  proposal?: {
+    currentEvaluationId: string | null;
+    id: string;
+    status: ProposalStatus;
+    currentEvaluation: ProposalWithUsersLite['currentEvaluation'];
+    sourceTemplateId?: string;
+  };
   isStructuredProposal?: boolean;
 };
 

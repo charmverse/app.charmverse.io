@@ -353,7 +353,7 @@ function mapApplicationToCardPage({
     proposalId: null,
     syncWithPageId: null,
     updatedBy: application.createdBy,
-    sourceTemplateId: null
+    sourceTemplateId: rewardPage.sourceTemplateId
   };
 
   return { card, page: applicationPage };
