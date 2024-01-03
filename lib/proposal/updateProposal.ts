@@ -19,7 +19,7 @@ export async function updateProposal({ proposalId, authors, publishToLens, field
   }
 
   await prisma.$transaction(async (tx) => {
-    if (publishToLens !== undefined) {
+    if (typeof publishToLens === 'boolean') {
       await tx.proposal.update({
         where: {
           id: proposalId
