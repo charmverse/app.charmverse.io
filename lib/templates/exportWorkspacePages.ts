@@ -27,7 +27,7 @@ export interface PageWithBlocks {
     card?: Block;
   };
   votes?: (Vote & { voteOptions: VoteOptions[] })[];
-  proposal?: Proposal | null;
+  proposal?: Omit<Proposal, 'categoryId'> | null;
   bounty?: (Bounty & { permissions: BountyPermission[] }) | null;
 }
 
