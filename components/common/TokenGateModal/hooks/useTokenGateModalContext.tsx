@@ -184,6 +184,9 @@ export function TokenGateModalProvider({
     }
   };
 
+  /**
+   * Use this function to delete only lit protocol conditions
+   */
   const onDelete = (index: number) => {
     setTokenGate((prevState) => {
       if (prevState?.type === 'lit') {
