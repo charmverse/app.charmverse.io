@@ -1,16 +1,11 @@
 import type { PagesRequest } from '@charmverse/core/pages';
-import type {
-  BulkPagePermissionCompute,
-  PermissionCompute,
-  ProposalPermissionsSwitch,
-  Resource
-} from '@charmverse/core/permissions';
+import type { BulkPagePermissionCompute, PermissionCompute, Resource } from '@charmverse/core/permissions';
 import { PermissionsApiClient } from '@charmverse/core/permissions';
 
 import { permissionsApiAuthKey, permissionsApiUrl } from 'config/constants';
 
 // Injected method for expanding args
-function withUseProposalPermissionsArgs<T>(args: T): Required<ProposalPermissionsSwitch> & T {
+function withUseProposalPermissionsArgs<T>(args: T): T {
   return { useProposalEvaluationPermissions: true, ...args };
 }
 
