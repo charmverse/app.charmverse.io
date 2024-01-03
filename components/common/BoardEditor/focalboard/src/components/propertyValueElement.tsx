@@ -335,7 +335,7 @@ function PropertyValueElement(props: Props) {
                 })),
                 evaluationId
               });
-              await mutate(`/api/spaces/${board.spaceId}/proposals`);
+              await mutate(`/api/spaces/${card.spaceId}/proposals`);
             } catch (err) {
               showMessage('Failed to update proposal reviewers', 'error');
             }
