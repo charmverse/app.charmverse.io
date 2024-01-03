@@ -62,5 +62,6 @@ export class ProposalPage extends DocumentPage {
     await this.getSelectOption(assignee).click();
     // Close the menu afterwards
     await this.getEvaluationReviewerSelect(evaluationType).click();
+    await this.page.keyboard.press('Escape');
   }
 }
