@@ -1,5 +1,4 @@
-import type { ProposalReviewer, Space, User } from '@charmverse/core/prisma';
-import { prisma } from '@charmverse/core/prisma-client';
+import type { Space, User } from '@charmverse/core/prisma';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
@@ -80,13 +79,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
-      authors: [adminUser.id],
-      reviewers: [
-        {
-          group: 'user',
-          id: adminUser.id
-        }
-      ]
+      authors: [adminUser.id]
     };
 
     await request(baseUrl)
@@ -94,21 +87,6 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       .set('Cookie', adminCookie)
       .send(updateContent)
       .expect(200);
-
-    const proposal = await prisma.proposal.findUniqueOrThrow({
-      where: { id: page.proposalId! },
-      include: { reviewers: true }
-    });
-    // Make sure update went through
-    expect(proposal?.reviewers).toEqual<ProposalReviewer[]>(
-      expect.arrayContaining([
-        expect.objectContaining({
-          id: expect.any(String),
-          proposalId: page.proposalId as string,
-          userId: adminUser.id
-        })
-      ])
-    );
   });
 
   it('should update a proposal templates settings if the user is a space admin', async () => {
@@ -126,17 +104,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
-      authors: [adminUser.id],
-      reviewers: [
-        {
-          group: 'user',
-          id: adminUser.id
-        },
-        {
-          group: 'role',
-          id: role.id
-        }
-      ]
+      authors: [adminUser.id]
     };
 
     await request(baseUrl)
@@ -144,15 +112,6 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       .set('Cookie', adminCookie)
       .send(updateContent)
       .expect(200);
-
-    // Make sure update went through
-    const proposal = await prisma.proposal.findUniqueOrThrow({
-      where: { id: proposalTemplate.id },
-      include: { reviewers: true }
-    });
-    expect(proposal.reviewers).toHaveLength(2);
-    expect(proposal.reviewers.some((r) => r.roleId === role.id)).toBe(true);
-    expect(proposal.reviewers.some((r) => r.userId === adminUser.id)).toBe(true);
   });
 
   it('should allow an admin to update a draft proposal they did not create', async () => {
@@ -170,13 +129,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
-      authors: [adminUser.id],
-      reviewers: [
-        {
-          group: 'user',
-          id: adminUser.id
-        }
-      ]
+      authors: [adminUser.id]
     };
 
     await request(baseUrl)
@@ -207,13 +160,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
-      authors: [adminUser.id],
-      reviewers: [
-        {
-          group: 'user',
-          id: adminUser.id
-        }
-      ]
+      authors: [adminUser.id]
     };
 
     await request(baseUrl)
