@@ -427,6 +427,7 @@ function PropertyTemplateMenu({
                     onChange();
                   }
                 }}
+                required
               />
             ) : (
               <UserAndRoleSelect
@@ -434,6 +435,7 @@ function PropertyTemplateMenu({
                 value={propertyValue as any}
                 systemRoles={[allMembersSystemRole]}
                 readOnly
+                required
               />
             )
           }
@@ -505,6 +507,7 @@ export function ViewHeaderRowsMenu({
   }
 
   async function updateProposalsReviewer(pageIds: string[], reviewers: SelectOption[]) {
+    let proposalReviewersChanged = false;
     for (const pageId of pageIds) {
       const page = pages[pageId];
       const proposalId = page?.proposalId;
@@ -514,7 +517,7 @@ export function ViewHeaderRowsMenu({
         proposal &&
         proposalWithEvaluationId &&
         proposal.status !== 'draft' &&
-        proposal.currentEvaluation?.type === 'feedback' &&
+        proposal.currentEvaluation?.type !== 'feedback' &&
         !page?.sourceTemplateId
       ) {
         await charmClient.proposals.updateProposalEvaluation({
@@ -526,9 +529,12 @@ export function ViewHeaderRowsMenu({
           proposalId: proposal.id,
           evaluationId: proposalWithEvaluationId
         });
+        proposalReviewersChanged = true;
       }
     }
-    await mutate(`/api/spaces/${board.spaceId}/proposals`);
+    if (proposalReviewersChanged) {
+      await mutate(`/api/spaces/${board.spaceId}/proposals`);
+    }
   }
 
   const filteredPropertyTemplates = useMemo(() => {

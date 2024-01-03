@@ -320,25 +320,24 @@ function PropertyValueElement(props: Props) {
           proposal.currentEvaluation?.type === 'feedback' ||
           !!proposal.sourceTemplateId
         }
+        required
         data-test='selected-reviewers'
         systemRoles={[allMembersSystemRole]}
         onChange={async (reviewers) => {
-          if (reviewers.length) {
-            const evaluationId = proposal?.currentEvaluationId;
-            if (evaluationId) {
-              try {
-                await trigger({
-                  reviewers: reviewers.map((reviewer) => ({
-                    roleId: reviewer.group === 'role' ? reviewer.id : null,
-                    systemRole: reviewer.group === 'system_role' ? (reviewer.id as ProposalSystemRole) : null,
-                    userId: reviewer.group === 'user' ? reviewer.id : null
-                  })),
-                  evaluationId
-                });
-                await mutate(`/api/spaces/${board.spaceId}/proposals`);
-              } catch (err) {
-                showMessage('Failed to update proposal reviewers', 'error');
-              }
+          const evaluationId = proposal?.currentEvaluationId;
+          if (evaluationId) {
+            try {
+              await trigger({
+                reviewers: reviewers.map((reviewer) => ({
+                  roleId: reviewer.group === 'role' ? reviewer.id : null,
+                  systemRole: reviewer.group === 'system_role' ? (reviewer.id as ProposalSystemRole) : null,
+                  userId: reviewer.group === 'user' ? reviewer.id : null
+                })),
+                evaluationId
+              });
+              await mutate(`/api/spaces/${board.spaceId}/proposals`);
+            } catch (err) {
+              showMessage('Failed to update proposal reviewers', 'error');
             }
           }
         }}

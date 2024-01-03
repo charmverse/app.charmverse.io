@@ -43,6 +43,12 @@ export function mapDbProposalToProposal({
   const proposalWithUsers = {
     ...rest,
     permissions,
+    currentEvaluation: currentEvaluation
+      ? {
+          title: currentEvaluation.title,
+          type: currentEvaluation.type
+        }
+      : undefined,
     currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
     evaluationType: currentEvaluation?.type || proposal.evaluationType,
     status: getOldProposalStatus(proposal),
@@ -79,6 +85,12 @@ export function mapDbProposalToProposalLite({
   const proposalWithUsers = {
     ...rest,
     permissions,
+    currentEvaluation: currentEvaluation
+      ? {
+          title: currentEvaluation.title,
+          type: currentEvaluation.type
+        }
+      : undefined,
     currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
     evaluationType: evaluationWithOldType?.type || proposal.evaluationType,
     status: getOldProposalStatus(proposal),
