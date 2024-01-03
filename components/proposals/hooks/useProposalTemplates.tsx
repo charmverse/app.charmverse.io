@@ -7,16 +7,12 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
-export function useProposalTemplates({ load } = { load: true }) {
+export function useProposalTemplates() {
   const { space } = useCurrentSpace();
   const isAdmin = useIsAdmin();
   const [spacePermissions] = useCurrentSpacePermissions();
   const { subscribe } = useWebSocketClient();
-  const {
-    data: proposalTemplates,
-    mutate,
-    isLoading: isLoadingTemplates
-  } = useGetProposalTemplatesBySpace(load ? space?.id : null);
+  const { data: proposalTemplates, mutate, isLoading: isLoadingTemplates } = useGetProposalTemplatesBySpace(space?.id);
 
   const usableTemplates = isAdmin || spacePermissions?.createProposals ? proposalTemplates : [];
 

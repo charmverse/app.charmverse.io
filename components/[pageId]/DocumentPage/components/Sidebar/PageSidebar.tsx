@@ -46,6 +46,7 @@ type SidebarProps = {
   readOnlyProposalPermissions?: boolean;
   // eslint-disable-next-line react/no-unused-prop-types
   closeSidebar: () => void;
+  // eslint-disable-next-line react/no-unused-prop-types
   proposalId?: string | null;
   proposal?: EvaluationSidebarProps['proposal'];
   proposalInput?: ProposalSettingsProps['proposal'];
@@ -61,15 +62,12 @@ type SidebarProps = {
 };
 
 function PageSidebarComponent(props: SidebarProps) {
-  const { disabledViews = [], id, proposal, sidebarView, openSidebar, closeSidebar, isUnpublishedProposal } = props;
+  const { disabledViews = [], id, sidebarView, openSidebar, closeSidebar, isUnpublishedProposal } = props;
   const isMdScreen = useMdScreen();
   const isOpen = sidebarView !== null;
   const sidebarTitle = sidebarView && SIDEBAR_VIEWS[sidebarView]?.title;
   const canHideSidebar = isMdScreen && !props.proposalId; // dont allow closing the sidebar when viewing a proposal
-  const showEvaluationSidebarIcon =
-    (proposal?.evaluationType === 'rubric' &&
-      (proposal.status === 'evaluation_active' || proposal?.status === 'evaluation_closed')) ||
-    !!proposal;
+  const showEvaluationSidebarIcon = !!props.proposalId;
 
   function toggleSidebar() {
     if (sidebarView === null) {
@@ -197,7 +195,6 @@ function SidebarContents({
   editorState,
   threads,
   openSidebar,
-  proposalId,
   proposal,
   proposalInput,
   onChangeEvaluation,

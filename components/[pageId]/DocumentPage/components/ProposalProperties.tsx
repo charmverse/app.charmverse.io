@@ -45,7 +45,7 @@ export function ProposalProperties({
   const { mutateProposals } = useProposals();
 
   const isMdScreen = useMdScreen();
-  const { proposalTemplates } = useProposalTemplates({ load: !!proposal?.page?.sourceTemplateId });
+  const { proposalTemplates } = useProposalTemplates();
 
   const { data: isReviewer } = useGetIsReviewer(pageId || undefined);
   const isAdmin = useIsAdmin();

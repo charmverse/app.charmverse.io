@@ -1,5 +1,6 @@
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 
+import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationStepSettings';
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
@@ -28,6 +29,7 @@ export function EvaluationSettingsSidebar({
   onChangeWorkflow,
   readOnlyWorkflowSelect
 }: Props) {
+  const { proposalTemplates } = useProposalTemplates();
   const pendingRewards = proposal?.fields?.pendingRewards;
   const { mappedFeatures } = useSpaceFeatures();
   return (

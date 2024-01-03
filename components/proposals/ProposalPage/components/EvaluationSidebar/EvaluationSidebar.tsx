@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
@@ -40,6 +41,7 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
   const [activeEvaluationId, setActiveEvaluationId] = useState<string | undefined>(proposal?.currentEvaluationId);
   const { mappedFeatures } = useSpaceFeatures();
   const { showMessage } = useSnackbar();
+  const { proposalTemplates } = useProposalTemplates();
   const [evaluationInput, setEvaluationInput] = useState<ProposalEvaluationValues | null>(null);
   const rewardsTitle = mappedFeatures.rewards.title;
   const currentEvaluation = proposal?.evaluations.find((e) => e.id === proposal?.currentEvaluationId);
