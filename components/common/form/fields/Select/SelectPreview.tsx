@@ -31,6 +31,7 @@ export function SelectPreview({
   const valueOptions = values
     .map((v) => options?.find((o) => (o as SelectOptionType).id === v))
     .filter(Boolean) as SelectOptionType[];
+
   return (
     <Stack data-test='select-preview' sx={sx} gap={name ? 0.5 : 0}>
       {name && (

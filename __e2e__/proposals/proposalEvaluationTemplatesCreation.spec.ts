@@ -184,7 +184,7 @@ test.describe.serial('Proposal Evaluation', () => {
     await proposalPage.evaluationVoteDurationInput.fill(settingsToTest.voteDuration.toString());
     await proposalPage.evaluationVotePassThresholdInput.fill(settingsToTest.votePassThreshold.toString());
 
-    await proposalPage.saveDraftButton.click();
+    proposalPage.saveDraftButton.click();
 
     await proposalPage.page.waitForResponse('**/api/proposals');
 
@@ -334,7 +334,7 @@ test.describe.serial('Proposal Evaluation', () => {
 
     await documentPage.charmEditor.fill('This is a test proposal');
 
-    await proposalPage.saveDraftButton.click();
+    proposalPage.saveDraftButton.click();
 
     await proposalPage.page.waitForResponse('**/api/proposals');
 

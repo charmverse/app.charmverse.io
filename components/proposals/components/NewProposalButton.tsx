@@ -3,13 +3,16 @@ import styled from '@emotion/styled';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
-import { Box, ButtonGroup, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, ButtonGroup, MenuItem, Stack, Tooltip, Typography, ListItemIcon, ListItemText } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef } from 'react';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
+import { DeleteIcon } from 'components/common/Icons/DeleteIcon';
+import { EditIcon } from 'components/common/Icons/EditIcon';
 import Modal from 'components/common/Modal';
+import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
 import { TemplatesMenu } from 'components/common/TemplatesMenu';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
@@ -107,6 +110,34 @@ export function NewProposalButton() {
         popupState={popupState}
         enableItemOptions={isAdmin}
         enableNewTemplates={isAdmin}
+        // eslint-disable-next-line react/no-unstable-nested-components
+        pageActions={({ pageId }) => (
+          <>
+            <MenuItem
+              data-test={`template-menu-edit-${pageId}`}
+              onClick={() => {
+                editTemplate(pageId);
+              }}
+            >
+              <ListItemIcon>
+                <EditIcon fontSize='small' />
+              </ListItemIcon>
+              <ListItemText>Edit</ListItemText>
+            </MenuItem>
+            <CopyPageLinkAction path={`/proposals/new?template=${pageId}`} />
+
+            <MenuItem
+              onClick={(e) => {
+                deleteProposalTemplate(pageId);
+              }}
+            >
+              <ListItemIcon>
+                <DeleteIcon fontSize='small' />
+              </ListItemIcon>
+              <ListItemText>Delete</ListItemText>
+            </MenuItem>
+          </>
+        )}
       />
 
       <Modal

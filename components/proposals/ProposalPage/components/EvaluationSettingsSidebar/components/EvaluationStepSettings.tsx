@@ -1,10 +1,9 @@
 import type { ProposalEvaluation, ProposalSystemRole } from '@charmverse/core/prisma';
-import { Box, Divider, Typography, FormLabel } from '@mui/material';
+import { Box, Typography, FormLabel } from '@mui/material';
 
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
-import { evaluationIcons } from 'components/settings/proposals/constants';
 import type { ProposalEvaluationInput } from 'lib/proposal/createProposal';
 
 import { RubricCriteria } from './RubricCriteriaSettings';
@@ -25,7 +24,7 @@ type Props = {
   readOnlyRubricCriteria: boolean;
 };
 
-export function EvaluationSettings({
+export function EvaluationStepSettings({
   evaluation,
   categoryId,
   onChange,
@@ -53,15 +52,10 @@ export function EvaluationSettings({
   }
 
   return (
-    <Box ml={3} data-test='new-proposal-evaluation-settings'>
-      <Box display='flex' alignItems='center' gap='5px' ml='-25px'>
-        {evaluationIcons[evaluation.type]()}
-        <Typography variant='h6'>{evaluation.title}</Typography>
-      </Box>
-      <Divider sx={{ my: 1 }} />
-      <FormLabel required={evaluation.type !== 'vote'}>
+    <>
+      <FormLabel required>
         <Typography component='span' variant='subtitle1'>
-          {evaluation.type === 'vote' ? 'Voter' : 'Reviewer'}
+          {evaluation.type === 'vote' ? 'Voters' : 'Reviewers'}
         </Typography>
       </FormLabel>
       <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow' mb={2}>
@@ -74,6 +68,7 @@ export function EvaluationSettings({
           variant='outlined'
           proposalCategoryId={categoryId}
           onChange={handleOnChangeReviewers}
+          required
         />
       </Box>
       {evaluation.type === 'rubric' && (
@@ -108,6 +103,6 @@ export function EvaluationSettings({
           }
         />
       )}
-    </Box>
+    </>
   );
 }

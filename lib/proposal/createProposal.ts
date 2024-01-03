@@ -12,7 +12,7 @@ import { createForm } from 'lib/form/createForm';
 import { upsertProposalFormAnswers } from 'lib/form/upsertProposalFormAnswers';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { createPage } from 'lib/pages/server/createPage';
-import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
+import type { ProposalFields } from 'lib/proposal/interface';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
@@ -50,11 +50,12 @@ export type CreateProposalInput = {
   rubricCriteria?: RubricDataInput[];
   evaluations?: ProposalEvaluationInput[];
   publishToLens?: boolean;
-  fields?: ProposalFields;
+  fields?: ProposalFields | null;
   workflowId?: string;
   formFields?: FormFieldInput[];
   formAnswers?: FieldAnswerInput[];
   formId?: string;
+  isDraft?: boolean;
 };
 
 export type CreatedProposal = {
@@ -78,14 +79,15 @@ export async function createProposal({
   workflowId,
   formId,
   formFields,
-  formAnswers
+  formAnswers,
+  isDraft
 }: CreateProposalInput) {
   if (!categoryId) {
     throw new InvalidInputError('Proposal must be linked to a category');
   }
 
   const proposalId = uuid();
-  const proposalStatus: ProposalStatus = 'draft';
+  const proposalStatus: ProposalStatus = isDraft ? 'draft' : 'published';
 
   const authorsList = arrayUtils.uniqueValues(authors ? [...authors, userId] : [userId]);
 
@@ -138,9 +140,10 @@ export async function createProposal({
 
   // retrieve permissions and apply evaluation ids to reviewers
   if (evaluations.length > 0) {
-    evaluations.forEach(({ id: evaluationId, permissions: permissionsInput }, index) => {
+    // TODO: fix tests that need to pass in permissions
+    evaluations.forEach(({ id: evaluationId, permissions: providedPermissions }, index) => {
       const configuredEvaluation = workflow?.evaluations[index];
-      const permissions = configuredEvaluation?.permissions ?? permissionsInput;
+      const permissions = configuredEvaluation?.permissions || providedPermissions;
       if (!permissions) {
         throw new Error(
           `Cannot find permissions for evaluation step. Workflow: ${workflowId}. Evaluation: ${evaluationId}`
@@ -205,7 +208,7 @@ export async function createProposal({
             }))
           }
         },
-        fields,
+        fields: fields as any,
         workflow: workflowId
           ? {
               connect: {

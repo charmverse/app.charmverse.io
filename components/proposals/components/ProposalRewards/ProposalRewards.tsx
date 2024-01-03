@@ -2,6 +2,7 @@ import { Delete, Edit } from '@mui/icons-material';
 import { Box, Grid, Hidden, IconButton, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 
+import { AddAPropertyButton } from 'components/common/BoardEditor/components/properties/AddAProperty';
 import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { SelectPreviewContainer } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
@@ -20,8 +21,7 @@ import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { ProposalPendingReward } from 'lib/proposal/blocks/interfaces';
-import type { ProposalReviewerInput } from 'lib/proposal/interface';
+import type { ProposalPendingReward, ProposalReviewerInput } from 'lib/proposal/interface';
 import { isTruthy } from 'lib/utilities/types';
 
 type Props = {
@@ -120,7 +120,7 @@ export function ProposalRewards({
                   <SelectPreviewContainer displayType='details' onClick={() => openReward(reward.id)}>
                     <Stack direction='row' justifyContent='space-between' alignItems='center'>
                       <Typography component='span' variant='subtitle1' fontWeight='normal'>
-                        {getRewardPage(reward.id)?.title || 'Untitled reward'}
+                        {getRewardPage(reward.id)?.title || 'Untitled'}
                       </Typography>
                       <Hidden mdDown>
                         <Stack alignItems='center' direction='row' height='100%'>
@@ -148,6 +148,17 @@ export function ProposalRewards({
     );
   }
 
+  if (!pendingRewards?.length) {
+    return (
+      <AttachRewardButton
+        readOnly={false}
+        onSave={onSave}
+        reviewers={reviewers}
+        assignedSubmitters={assignedSubmitters}
+      />
+    );
+  }
+
   return (
     <Stack>
       <Stack flexDirection='row' alignItems='center' height='fit-content' flex={1} className='octo-propertyrow'>
@@ -171,34 +182,42 @@ export function ProposalRewards({
                   flex={1}
                 >
                   <SelectPreviewContainer readOnly={readOnly} displayType='details'>
-                    <Stack direction='row' justifyContent='space-between' alignItems='center'>
-                      <Typography component='span' variant='subtitle1' fontWeight='normal'>
-                        {page?.title || 'Untitled reward'}
-                      </Typography>
-                      <Hidden lgDown>
-                        <Stack alignItems='center' direction='row' height='100%'>
-                          {reward.customReward ? (
-                            <Typography component='span' variant='subtitle1' fontWeight='normal'>
-                              {reward.customReward}
-                            </Typography>
-                          ) : (
-                            <RewardTokenInfo
-                              chainId={reward.chainId || null}
-                              symbolOrAddress={reward.rewardToken || null}
-                              rewardAmount={reward.rewardAmount || null}
-                            />
-                          )}
-                        </Stack>
-                      </Hidden>
+                    <Stack direction='row' justifyContent='space-between' alignItems='center' gap={1}>
+                      <Grid container spacing={0.5}>
+                        <Grid item xs={8} lg={5}>
+                          <Typography component='span' variant='subtitle1' fontWeight='normal'>
+                            {page?.title || 'Untitled'}
+                          </Typography>
+                        </Grid>
+                        <Hidden lgDown>
+                          <Grid item xs={5}>
+                            <Stack alignItems='center' direction='row' height='100%'>
+                              {reward.customReward ? (
+                                <Typography component='span' variant='subtitle1' fontWeight='normal'>
+                                  {reward.customReward}
+                                </Typography>
+                              ) : (
+                                <RewardTokenInfo
+                                  chainId={reward.chainId || null}
+                                  symbolOrAddress={reward.rewardToken || null}
+                                  rewardAmount={reward.rewardAmount || null}
+                                />
+                              )}
+                            </Stack>
+                          </Grid>
+                        </Hidden>
 
-                      <Stack className='icons' sx={{ opacity: 0, transition: 'all 0.2s ease' }} direction='row' gap={1}>
-                        <IconButton size='small' onClick={() => editReward({ reward, page, draftId })}>
-                          <Edit color='secondary' fontSize='small' />
-                        </IconButton>
-                        <IconButton size='small' onClick={() => onDelete(draftId)}>
-                          <Delete color='secondary' fontSize='small' />
-                        </IconButton>
-                      </Stack>
+                        <Grid item xs={4} lg={2}>
+                          <Stack className='icons' sx={{ opacity: 0, transition: 'opacity 0.2s ease' }} direction='row'>
+                            <IconButton size='small' onClick={() => editReward({ reward, page, draftId })}>
+                              <Edit color='secondary' fontSize='small' />
+                            </IconButton>
+                            <IconButton size='small' onClick={() => onDelete(draftId)}>
+                              <Delete color='secondary' fontSize='small' />
+                            </IconButton>
+                          </Stack>
+                        </Grid>
+                      </Grid>
                     </Stack>
                   </SelectPreviewContainer>
                 </Stack>

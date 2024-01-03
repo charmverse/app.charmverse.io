@@ -1,8 +1,8 @@
+import type { PageType } from '@charmverse/core/prisma-client';
 import { IosShare } from '@mui/icons-material';
 import type { Theme } from '@mui/material';
 import { IconButton, Popover, Tooltip, useMediaQuery } from '@mui/material';
 import { bindTrigger, bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
-import { memo } from 'react';
 
 import { Button } from 'components/common/Button';
 
@@ -11,9 +11,10 @@ import { PagePermissionsContainer } from './components/PagePermissionsContainer'
 type Props = {
   headerHeight: number;
   pageId: string;
+  pageType: PageType;
 };
 
-export function ShareButton({ headerHeight, pageId }: Props) {
+export function ShareButton({ headerHeight, pageId, pageType }: Props) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'share-menu' });
 
   const isLargeScreen = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
@@ -56,7 +57,7 @@ export function ShareButton({ headerHeight, pageId }: Props) {
           }
         }}
       >
-        <PagePermissionsContainer pageId={pageId} />
+        <PagePermissionsContainer pageType={pageType} pageId={pageId} />
       </Popover>
     </>
   );

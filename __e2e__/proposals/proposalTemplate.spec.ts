@@ -130,7 +130,7 @@ test.describe.serial('Structured proposal template', () => {
     await proposalPage.selectEvaluationReviewer('pass_fail', spaceAdmin.id);
     await proposalPage.selectEvaluationReviewer('vote', 'space_member');
 
-    await proposalPage.saveDraftButton.click();
+    proposalPage.saveDraftButton.click();
     await proposalPage.page.waitForResponse(/\/api\/proposals/);
   });
 
@@ -258,7 +258,7 @@ test.describe.serial('Structured proposal template', () => {
     await formField.getFormFieldInput(formFieldIds[0]).fill('John');
     await formField.getFormFieldInput(formFieldIds[2]).fill('Doe');
 
-    await proposalPage.saveDraftButton.click();
+    proposalPage.saveDraftButton.click();
 
     await proposalPage.page.waitForResponse(/\/api\/proposals/);
   });

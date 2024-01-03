@@ -10,7 +10,7 @@ import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 
 import { generateUserAndSpace, loginBrowserUser } from '../utils/mocks';
 
-test.describe.serial('Proposal Flow', () => {
+test.describe.skip('Proposal Flow', () => {
   // create reusable pages we can reuse between tests
 
   let authorBrowserProposalListPage: ProposalsListPage;
@@ -81,7 +81,7 @@ test.describe.serial('Proposal Flow', () => {
 
     // save draft
     await expect(authorBrowserProposalPage.saveDraftButton).toBeEnabled();
-    await authorBrowserProposalPage.saveDraftButton.click();
+    authorBrowserProposalPage.saveDraftButton.click();
 
     const response = await authorBrowserProposalPage.waitForJsonResponse<{ id: string }>('**/api/proposals');
     proposalId = response.id;

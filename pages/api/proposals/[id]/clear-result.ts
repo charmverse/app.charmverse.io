@@ -25,7 +25,6 @@ async function updateEvaluationResultndpoint(req: NextApiRequest, res: NextApiRe
   // A proposal can only be updated when its in draft or discussion status and only the proposal author can update it
   const proposalPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
     resourceId: proposalId,
-    useProposalEvaluationPermissions: true,
     userId
   });
 

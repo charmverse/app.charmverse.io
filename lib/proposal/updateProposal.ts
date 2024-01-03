@@ -2,7 +2,7 @@ import type { ProposalEvaluationType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { InvalidStateError } from 'lib/middleware';
-import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
+import type { ProposalFields } from 'lib/proposal/interface';
 
 import type { ProposalReviewerInput } from './interface';
 
@@ -13,7 +13,7 @@ export type UpdateProposalRequest = {
   categoryId?: string | null;
   evaluationType?: ProposalEvaluationType | null;
   publishToLens?: boolean;
-  fields?: ProposalFields;
+  fields?: ProposalFields | null;
 };
 
 export async function updateProposal({

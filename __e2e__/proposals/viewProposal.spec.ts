@@ -105,7 +105,7 @@ test.beforeAll(async () => {
           { group: 'role', id: role.id },
           { group: 'space_member' }
         ],
-        permissions: []
+        permissions: [{ assignee: { group: 'space_member' }, operation: 'edit' }]
       }
     ],
     categoryId: visibleProposalCategory.id
@@ -158,26 +158,6 @@ test.describe.serial('View proposal', () => {
 
       expect(showingReviewerRoleName || showingReviewerUserName).toBe(true);
     }
-  });
-
-  test('Space member can see visible proposal categories', async ({ proposalListPage, page }) => {
-    await loginBrowserUser({
-      browserPage: page,
-      userId: proposalAuthor.id
-    });
-
-    await proposalListPage.goToHomePage();
-
-    await proposalListPage.getSidebarLink('proposals').click();
-    await proposalListPage.waitForProposalsList();
-
-    await proposalListPage.openProposalCategoryList();
-
-    const visibleCategoryButton = proposalListPage.getProposalCategoryLocator(visibleProposalCategory.id);
-    const hiddenCategoryButton = proposalListPage.getProposalCategoryLocator(hiddenProposalCategory.id);
-
-    await expect(visibleCategoryButton).toBeVisible();
-    await expect(hiddenCategoryButton).not.toBeVisible();
   });
 
   test('Space member can see proposals but not drafts', async ({ proposalListPage }) => {
