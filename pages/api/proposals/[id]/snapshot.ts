@@ -7,7 +7,9 @@ import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { getPage } from 'lib/pages/server';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { getSnapshotProposal } from 'lib/snapshot/getProposal';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
+import { coerceToMilliseconds } from 'lib/utilities/dates';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -44,12 +46,15 @@ async function recordSnapshotInfo(req: NextApiRequest, res: NextApiResponse<Page
     throw error;
   }
 
+  const snapshotProposal = snapshotProposalId ? await getSnapshotProposal(snapshotProposalId) : null;
+
   await prisma.proposalEvaluation.update({
     where: {
       id: evaluationId
     },
     data: {
-      snapshotId: snapshotProposalId
+      snapshotId: snapshotProposalId,
+      snapshotExpiry: snapshotProposal?.end ? new Date(coerceToMilliseconds(snapshotProposal.end)) : null
     }
   });
 
