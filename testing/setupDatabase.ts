@@ -1010,7 +1010,6 @@ export async function generateProposal({
       deletedAt,
       proposal: {
         create: {
-          category: { connect: { id: categoryIdToLink } },
           id: proposalId,
           createdBy: userId,
           evaluationType,
@@ -1042,8 +1041,7 @@ export async function generateProposal({
       proposal: {
         include: {
           authors: true,
-          reviewers: true,
-          category: true
+          reviewers: true
         }
       }
     }

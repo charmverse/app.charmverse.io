@@ -10,7 +10,6 @@ import type {
   Page,
   PagePermission,
   Proposal,
-  ProposalCategory,
   Vote,
   VoteOptions
 } from '@charmverse/core/prisma';
@@ -28,11 +27,7 @@ export interface PageWithBlocks {
     card?: Block;
   };
   votes?: (Vote & { voteOptions: VoteOptions[] })[];
-  proposal?:
-    | (Proposal & {
-        category: null | ProposalCategory;
-      })
-    | null;
+  proposal?: Proposal | null;
   bounty?: (Bounty & { permissions: BountyPermission[] }) | null;
 }
 
@@ -163,9 +158,6 @@ export async function exportWorkspacePages({
       node.proposal = await prisma.proposal.findUnique({
         where: {
           id: node.proposalId
-        },
-        include: {
-          category: true
         }
       });
     }
