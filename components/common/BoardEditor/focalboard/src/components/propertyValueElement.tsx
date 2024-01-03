@@ -323,8 +323,7 @@ function PropertyValueElement(props: Props) {
         data-test='selected-reviewers'
         systemRoles={[allMembersSystemRole]}
         onChange={async (reviewers) => {
-          const evaluationId = proposal?.currentEvaluationId;
-          if (evaluationId) {
+          if (proposal?.currentEvaluation) {
             try {
               await trigger({
                 reviewers: reviewers.map((reviewer) => ({
@@ -332,7 +331,7 @@ function PropertyValueElement(props: Props) {
                   systemRole: reviewer.group === 'system_role' ? (reviewer.id as ProposalSystemRole) : null,
                   userId: reviewer.group === 'user' ? reviewer.id : null
                 })),
-                evaluationId
+                evaluationId: proposal?.currentEvaluation.id
               });
               await mutate(`/api/spaces/${card.spaceId}/proposals`);
             } catch (err) {

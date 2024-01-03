@@ -3,7 +3,7 @@ import type {
   FormField,
   Page,
   PageComment,
-  Proposal,
+  ProposalReviewer,
   ProposalEvaluation,
   ProposalEvaluationPermission,
   ProposalEvaluationType,
@@ -56,11 +56,13 @@ export type ProposalWithUsers = Omit<CoreProposalWithUsers, 'fields'> & {
   fields: ProposalFields | null;
 };
 
-export type ProposalWithUsersLite = ProposalWithUsers & {
-  currentEvaluationId?: string;
+export type ProposalWithUsersLite = Omit<ProposalWithUsers, 'reviewers'> & {
+  // currentEvaluationId?: string;
   evaluationType: ProposalEvaluationType;
   permissions?: ProposalPermissionFlags;
-  currentEvaluation?: Pick<ProposalEvaluation, 'title' | 'type'>;
+  currentEvaluation?: Pick<ProposalEvaluation, 'id' | 'title' | 'type' | 'result'> & {
+    reviewers: ProposalReviewer[];
+  };
 };
 
 export type PopulatedEvaluation = ProposalRubricData &

@@ -24,11 +24,10 @@ export type CardPage<V = CardPropertyValue> = {
   card: Card<V>;
   page: PageMeta;
   proposal?: {
-    currentEvaluationId: string | null;
     id: string;
     status: ProposalStatus;
-    currentEvaluation: ProposalWithUsersLite['currentEvaluation'];
-    sourceTemplateId?: string;
+    currentEvaluation?: ProposalWithUsersLite['currentEvaluation'];
+    sourceTemplateId?: string | null;
   };
   isStructuredProposal?: boolean;
 };

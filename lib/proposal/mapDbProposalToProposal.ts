@@ -49,7 +49,6 @@ export function mapDbProposalToProposal({
     // Support old model: filter out evaluation-specific reviewers and rubric answers
     rubricAnswers: currentEvaluation?.rubricAnswers || proposal.rubricAnswers,
     draftRubricAnswers: currentEvaluation?.draftRubricAnswers || proposal.draftRubricAnswers,
-    reviewers: currentEvaluation?.reviewers || proposal.reviewers,
     rewardIds: rewards.map((r) => r.id) || null,
     form: form
       ? {
@@ -74,21 +73,23 @@ export function mapDbProposalToProposalLite({
   permissions?: ProposalPermissionFlags;
 }): ProposalWithUsersLite {
   const { rewards, ...rest } = proposal;
-  const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
+  const currentEvaluation = proposal.status !== 'draft' ? getCurrentEvaluation(proposal.evaluations) : undefined;
   const evaluationWithOldType = proposal.evaluations.find((e) => e.type === 'rubric' || e.type === 'vote');
   const proposalWithUsers = {
     ...rest,
     permissions,
     currentEvaluation: currentEvaluation
       ? {
+          id: currentEvaluation.id,
+          result: currentEvaluation.result,
           title: currentEvaluation.title,
-          type: currentEvaluation.type
+          type: currentEvaluation.type,
+          reviewers: currentEvaluation.reviewers
         }
       : undefined,
-    currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
+    // currentEvaluationId: currentEvaluation?.id,
     evaluationType: evaluationWithOldType?.type || proposal.evaluationType,
     status: getOldProposalStatus(proposal),
-    reviewers: currentEvaluation?.reviewers || proposal.reviewers,
     rewardIds: rewards.map((r) => r.id) || null,
     fields: (rest.fields as ProposalFields) ?? null
   };

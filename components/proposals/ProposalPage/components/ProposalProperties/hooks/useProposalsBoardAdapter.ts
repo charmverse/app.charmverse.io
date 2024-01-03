@@ -26,7 +26,7 @@ import {
   CREATED_AT_ID
 } from 'lib/proposal/blocks/constants';
 import type { ProposalPropertyValue } from 'lib/proposal/blocks/interfaces';
-import type { ProposalWithUsers, ProposalFields } from 'lib/proposal/interface';
+import type { ProposalWithUsersLite, ProposalFields } from 'lib/proposal/interface';
 
 export type BoardProposal = { spaceId?: string; id?: string; fields: ProposalFields | null };
 
@@ -75,7 +75,7 @@ export function useProposalsBoardAdapter() {
             ...mapProposalToCardPage({ proposal: p, proposalPage: page, spaceId: space?.id }),
             isStructuredProposal,
             proposal: {
-              currentEvaluationId: p.currentEvaluationId,
+              // currentEvaluationId: p.currentEvaluationId,
               id: p.id,
               status: p.status,
               currentEvaluation: p.currentEvaluation,
@@ -149,7 +149,7 @@ function mapProposalToCardPage({
   proposalPage,
   spaceId
 }: {
-  proposal: ProposalWithUsers | null;
+  proposal: ProposalWithUsersLite | null;
   proposalPage?: PageMeta;
   spaceId?: string;
 }) {
@@ -167,15 +167,13 @@ function mapProposalToCardPage({
     [EVALUATION_TYPE_BLOCK_ID]: (proposal && 'evaluationType' in proposal && proposal.evaluationType) || '',
     [AUTHORS_BLOCK_ID]: (proposal && 'authors' in proposal && proposal.authors?.map((a) => a.userId)) || '',
     [PROPOSAL_REVIEWERS_BLOCK_ID]:
-      proposal && 'reviewers' in proposal
-        ? proposal.reviewers.map(
-            (r) =>
-              ({
-                group: r.userId ? 'user' : r.roleId ? 'role' : 'system_role',
-                id: r.userId ?? r.roleId ?? r.systemRole
-              } as TargetPermissionGroup<'user' | 'role'>)
-          )
-        : []
+      proposal?.currentEvaluation?.reviewers.map(
+        (r) =>
+          ({
+            group: r.userId ? 'user' : r.roleId ? 'role' : 'system_role',
+            id: r.userId ?? r.roleId ?? r.systemRole
+          } as TargetPermissionGroup<'user' | 'role'>)
+      ) || []
   };
 
   const card: Card<ProposalPropertyValue> = {

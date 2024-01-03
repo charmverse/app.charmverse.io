@@ -508,10 +508,9 @@ export function ViewHeaderRowsMenu({
       const page = pages[pageId];
       const proposalId = page?.proposalId;
       const proposal = proposalId ? proposals?.find((_proposal) => _proposal.id === proposalId) : null;
-      const proposalWithEvaluationId = proposal?.currentEvaluationId;
       if (
         proposal &&
-        proposalWithEvaluationId &&
+        proposal?.currentEvaluation &&
         proposal.status !== 'draft' &&
         proposal.currentEvaluation?.type !== 'feedback' &&
         !page?.sourceTemplateId
@@ -523,7 +522,7 @@ export function ViewHeaderRowsMenu({
             userId: reviewer.group === 'user' ? reviewer.id : null
           })),
           proposalId: proposal.id,
-          evaluationId: proposalWithEvaluationId
+          evaluationId: proposal?.currentEvaluation.id
         });
         proposalReviewersChanged = true;
       }
