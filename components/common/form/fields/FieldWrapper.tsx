@@ -20,13 +20,29 @@ type Props = {
   sx?: SxProps;
 };
 
+export function FieldWrapperContainer({
+  inline,
+  sx,
+  children
+}: {
+  inline?: boolean;
+  sx?: SxProps;
+  children: ReactNode;
+}) {
+  return (
+    <Box flex={1} flexDirection={{ xs: 'column', sm: inline ? 'row' : 'column' }} display='flex' sx={sx}>
+      {children}
+    </Box>
+  );
+}
+
 export function FieldWrapper({ sx, endAdornment, description, required, children, label, inline, iconLabel }: Props) {
   if (!label) {
     return children as JSX.Element;
   }
 
   return (
-    <Box flex={1} flexDirection={{ xs: 'column', sm: inline ? 'row' : 'column' }} display='flex' my={1} sx={sx}>
+    <FieldWrapperContainer inline={inline} sx={sx}>
       {(label || !!iconLabel) && (
         <Box alignItems='center' display='flex' gap={1}>
           {iconLabel ?? null}
@@ -43,10 +59,10 @@ export function FieldWrapper({ sx, endAdornment, description, required, children
           )}
         </Box>
       )}
-      {description && !checkIsContentEmpty(description as PageContent) ? (
-        <CharmEditor readOnly isContentControlled content={description as PageContent} />
+      {description && !checkIsContentEmpty(description) ? (
+        <CharmEditor readOnly isContentControlled content={description} />
       ) : null}
       {children}
-    </Box>
+    </FieldWrapperContainer>
   );
 }

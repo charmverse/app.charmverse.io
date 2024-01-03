@@ -7,7 +7,7 @@ import type { ControlFieldProps, FieldProps, FieldType } from 'components/common
 
 import { CharmEditorInputField } from './CharmEditorInputField';
 import { DateInputField } from './DateInputField';
-import { FieldWrapper } from './FieldWrapper';
+import { LabelField } from './LabelField';
 import { PersonInputField } from './PersonInputField';
 
 type TextProps = {
@@ -52,7 +52,7 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
       }
 
       case 'label': {
-        return <FieldWrapper {...fieldProps} sx={fieldProps?.fieldWrapperSx} />;
+        return <LabelField {...fieldProps} />;
       }
 
       case 'multiselect':

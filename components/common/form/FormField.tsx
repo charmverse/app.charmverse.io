@@ -282,9 +282,6 @@ export function FormField(
         <Stack gap={1} width='100%' ml={readOnly ? 1 : 0}>
           {!isOpen || readOnly ? (
             <FieldTypeRenderer
-              fieldWrapperSx={{
-                my: 0
-              }}
               endAdornment={formField.private ? <Chip sx={{ mx: 1 }} label='Private' size='small' /> : undefined}
               type={formField.type as any}
               description={formField.description as PageContent}
