@@ -466,8 +466,7 @@ function DocumentPage({
                         <ProposalFormFieldInputs
                           proposalId={proposal.id}
                           formFields={proposal?.form.formFields ?? []}
-                          readOnly={!user || !proposalAuthors.includes(user.id)}
-                          proposalStatus={proposal.status}
+                          readOnly={!user || !pagePermissions.edit_content}
                         />
                       )}
                     </Box>
