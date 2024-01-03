@@ -31,6 +31,13 @@ async function updateEvaluationResultndpoint(req: NextApiRequest, res: NextApiRe
   const evaluation = await prisma.proposalEvaluation.findUniqueOrThrow({
     where: {
       id: evaluationId
+    },
+    include: {
+      proposal: {
+        select: {
+          spaceId: true
+        }
+      }
     }
   });
 
@@ -44,11 +51,13 @@ async function updateEvaluationResultndpoint(req: NextApiRequest, res: NextApiRe
   if (!result) {
     throw new ActionNotPermittedError(`You must provide a result.`);
   }
+
   await submitEvaluationResult({
     proposalId,
     evaluationId,
     result,
-    decidedBy: userId
+    decidedBy: userId,
+    spaceId: evaluation.proposal.spaceId
   });
 
   return res.status(200).end();

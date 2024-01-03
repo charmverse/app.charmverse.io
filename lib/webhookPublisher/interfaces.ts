@@ -196,8 +196,8 @@ export type WebhookEvent = WebhookEventSharedProps &
     | {
         scope: WebhookEventNames.ProposalStatusChanged;
         proposal: ProposalEntity;
-        newStatus: ProposalStatus;
-        oldStatus: ProposalStatus | null;
+        oldEvaluationId: string | null;
+        currentEvaluationId: string | null;
         user: UserEntity;
       }
     | {

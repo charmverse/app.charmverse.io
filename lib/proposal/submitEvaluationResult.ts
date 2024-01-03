@@ -5,6 +5,8 @@ import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
 import { createVote as createVoteService } from 'lib/votes/createVote';
 import type { VoteDTO } from 'lib/votes/interfaces';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 import type { VoteSettings } from './interface';
 
@@ -13,9 +15,16 @@ export type ReviewEvaluationRequest = {
   proposalId: string;
   evaluationId: string;
   result: ProposalEvaluationResult;
+  spaceId: string;
 };
 
-export async function submitEvaluationResult({ decidedBy, evaluationId, proposalId, result }: ReviewEvaluationRequest) {
+export async function submitEvaluationResult({
+  spaceId,
+  decidedBy,
+  evaluationId,
+  proposalId,
+  result
+}: ReviewEvaluationRequest) {
   await prisma.$transaction(async (tx) => {
     await tx.proposalEvaluation.update({
       where: {
@@ -37,7 +46,15 @@ export async function submitEvaluationResult({ decidedBy, evaluationId, proposal
           index: 'asc'
         }
       });
-      const nextEvaluation = await getCurrentEvaluation(evaluations);
+      const nextEvaluation = getCurrentEvaluation(evaluations);
+      await publishProposalEvent({
+        proposalId,
+        scope: WebhookEventNames.ProposalStatusChanged,
+        oldEvaluationId: evaluationId,
+        spaceId,
+        userId: decidedBy,
+        currentEvaluationId: nextEvaluation?.id || null
+      });
       if (nextEvaluation?.type === 'vote') {
         const settings = nextEvaluation.voteSettings as VoteSettings;
         if (!settings.publishToSnapshot) {

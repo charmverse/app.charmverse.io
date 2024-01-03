@@ -1,4 +1,3 @@
-import type { ProposalStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -7,6 +6,8 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { updateProposalStatusOnly } from 'lib/proposal/updateProposalStatusOnly';
 import { withSessionRoute } from 'lib/session/withSession';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -32,9 +33,30 @@ async function updateProposalStatusController(req: NextApiRequest, res: NextApiR
     },
     select: {
       id: true,
+      proposal: {
+        select: {
+          evaluations: {
+            select: {
+              id: true
+            }
+          }
+        }
+      },
       spaceId: true
     }
   });
+
+  const currentEvaluationId = proposalPage?.proposal?.evaluations[0]?.id || null;
+  if (proposalPage && currentEvaluationId) {
+    await publishProposalEvent({
+      oldEvaluationId: null,
+      proposalId,
+      scope: WebhookEventNames.ProposalStatusChanged,
+      spaceId: proposalPage.spaceId,
+      userId,
+      currentEvaluationId
+    });
+  }
 
   trackUserAction('new_proposal_stage', {
     userId,

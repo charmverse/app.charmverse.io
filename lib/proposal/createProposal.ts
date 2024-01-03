@@ -287,10 +287,10 @@ export async function createProposal({
   await publishProposalEvent({
     scope: WebhookEventNames.ProposalStatusChanged,
     proposalId: proposal.id,
-    newStatus: proposal.status,
+    currentEvaluationId: null,
+    oldEvaluationId: null,
     spaceId,
-    userId,
-    oldStatus: null
+    userId
   });
 
   return {

@@ -1,4 +1,4 @@
-import type { ProposalStatus } from '@charmverse/core/prisma';
+import type { ProposalEvaluationType } from '@charmverse/core/prisma';
 
 export type ProposalTaskAction =
   | 'reviewed'
@@ -11,32 +11,33 @@ export type ProposalTaskAction =
 
 export function getProposalAction({
   isAuthor,
-  currentStatus,
+  currentStep,
   isReviewer
 }: {
-  currentStatus: ProposalStatus;
+  currentStep: ProposalEvaluationType;
   isAuthor: boolean;
   isReviewer: boolean;
 }): ProposalTaskAction | null {
-  if (currentStatus === 'discussion') {
+  if (currentStep === 'feedback') {
     if (isAuthor) {
-      return 'start_review';
-    }
-    return 'start_discussion';
-  } else if (currentStatus === 'reviewed') {
-    if (isAuthor) {
+      return 'evaluation_active';
+    } else if (isReviewer) {
       return 'reviewed';
     }
-  } else if (currentStatus === 'vote_active') {
-    return 'vote';
-  } else if (currentStatus === 'review') {
-    if (isReviewer) {
+  } else if (currentStep === 'pass_fail') {
+    if (isAuthor) {
+      return 'evaluation_closed';
+    } else if (isReviewer) {
       return 'needs_review';
     }
-  } else if (currentStatus === 'evaluation_active' && isReviewer) {
-    return 'evaluation_active';
-  } else if (currentStatus === 'evaluation_closed' && isAuthor) {
-    return 'evaluation_closed';
+  } else if (currentStep === 'rubric') {
+    if (isAuthor) {
+      return 'evaluation_closed';
+    } else if (isReviewer) {
+      return 'start_review';
+    }
+  } else if (currentStep === 'vote') {
+    return 'vote';
   }
   return null;
 }

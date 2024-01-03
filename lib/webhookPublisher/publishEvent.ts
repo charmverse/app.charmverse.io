@@ -156,8 +156,8 @@ type ProposalEventContext =
       spaceId: string;
       proposalId: string;
       scope: WebhookEventNames.ProposalStatusChanged;
-      newStatus: ProposalStatus;
-      oldStatus: ProposalStatus | null;
+      currentEvaluationId: string | null;
+      oldEvaluationId: string | null;
     };
 
 export async function publishProposalEvent(context: ProposalEventContext) {
@@ -171,8 +171,8 @@ export async function publishProposalEvent(context: ProposalEventContext) {
         proposal,
         space,
         user,
-        oldStatus: context.oldStatus,
-        newStatus: context.newStatus
+        oldEvaluationId: context.oldEvaluationId,
+        currentEvaluationId: context.currentEvaluationId
       });
     }
     case WebhookEventNames.ProposalPassed:
