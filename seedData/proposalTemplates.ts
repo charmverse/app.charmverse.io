@@ -2039,7 +2039,6 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
       reviewedAt: null,
       archived: false,
       snapshotProposalExpiry: null,
-
       fields: null,
       workflowId: null,
       formId: null

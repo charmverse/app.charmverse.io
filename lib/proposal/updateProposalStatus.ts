@@ -3,8 +3,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { InvalidStateError } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { getSnapshotProposal } from 'lib/snapshot/getProposal';
-import { coerceToMilliseconds } from 'lib/utilities/dates';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
@@ -85,10 +83,6 @@ export async function updateProposalStatus({
     }
   });
 
-  const snapshotProposalId = proposalInfo?.page?.snapshotProposalId;
-
-  const snapshotProposal = snapshotProposalId ? await getSnapshotProposal(snapshotProposalId) : null;
-
   return prisma.$transaction(async (tx) => {
     if (proposalInfo) {
       await publishProposalEvent({
@@ -105,8 +99,7 @@ export async function updateProposalStatus({
         id: proposalId
       },
       data: {
-        status: newStatus,
-        snapshotProposalExpiry: snapshotProposal?.end ? new Date(coerceToMilliseconds(snapshotProposal.end)) : undefined
+        status: newStatus
       },
       include: {
         authors: true,
