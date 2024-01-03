@@ -91,16 +91,7 @@ export function ProposalProperties({
   };
 
   async function onChangeProperties(values: Partial<ProposalPropertiesInput>) {
-    if (proposal) {
-      await updateProposal({
-        authors: proposal.authors.map(({ userId }) => userId),
-        reviewers: proposal.reviewers.map((reviewer) => ({
-          id: reviewer.roleId ?? reviewer.userId ?? (reviewer.systemRole as string),
-          group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role'
-        })),
-        ...values
-      });
-    }
+    await updateProposal(values);
     refreshProposal();
     mutateProposals();
   }
