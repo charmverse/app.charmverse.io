@@ -24,7 +24,6 @@ export function createMockProposal(
     reviewedBy: null,
     draftRubricAnswers: [],
     rubricAnswers: [],
-    snapshotProposalExpiry: null,
     spaceId: '',
     status: 'draft',
     fields: null,

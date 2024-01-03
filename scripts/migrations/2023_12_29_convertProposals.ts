@@ -72,7 +72,7 @@ async function convertProposals({ offset = 0 }: { offset?: number } = {}) {
           type: vote?.type || 'Approval',
           options: vote?.voteOptions.map((o) => o.name) || ['Yes', 'No', 'Abstain'],
           maxChoices: vote?.maxChoices || 1,
-          publishToSnapshot: !!p.snapshotProposalExpiry || !!p.page?.snapshotProposalId,
+          publishToSnapshot: !!p.page?.snapshotProposalId,
           durationDays: vote ? Math.ceil((vote.deadline.getTime() - vote.createdAt.getTime()) / 1000 / 60 / 60 / 24) : 5
         };
         const result = votePassed ? 'pass' : voteFailed ? 'fail' : null;
@@ -136,7 +136,6 @@ async function convertProposals({ offset = 0 }: { offset?: number } = {}) {
               completedAt: result ? completedAt || new Date() : null,
               proposalId: p.id,
               snapshotId: p.page?.snapshotProposalId,
-              snapshotExpiry: p.snapshotProposalExpiry,
               voteId: vote?.id,
               voteSettings,
               reviewers: p.category
