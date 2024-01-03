@@ -1,7 +1,7 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import type { Page, Proposal, Space, User } from '@charmverse/core/prisma-client';
 import { testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
-import { arrayUtils, stringUtils } from '@charmverse/core/utilities';
+import { arrayUtils } from '@charmverse/core/utilities';
 import request from 'supertest';
 
 import { baseUrl, loginUser } from 'testing/mockApiCall';
@@ -55,7 +55,11 @@ describe('GET /api/spaces/[id]/pages - Get Pages in a space', () => {
       title: 'proposal visible in evaluations model',
       proposalStatus: 'published',
       evaluationInputs: [
-        { evaluationType: 'vote', permissions: [], reviewers: [{ group: 'user', id: reviewerUser.id }] }
+        {
+          evaluationType: 'vote',
+          permissions: [{ operation: 'view', assignee: { group: 'space_member' } }],
+          reviewers: [{ group: 'user', id: reviewerUser.id }]
+        }
       ]
     });
   });
@@ -64,15 +68,11 @@ describe('GET /api/spaces/[id]/pages - Get Pages in a space', () => {
     const response = (
       await request(baseUrl).get(`/api/spaces/${space.id}/pages`).set('Cookie', normalMemberCookie).expect(200)
     ).body as PageMeta[];
-    const expectedPageIds = stringUtils.sortUuids(
-      arrayUtils.extractUuids([
-        pageWithSpacePermission,
-        proposalVisibleInProposalsEvaluationPermissionsModel,
-        publicPage
-      ])
-    );
+    const expectedPageIds = arrayUtils
+      .extractUuids([pageWithSpacePermission, proposalVisibleInProposalsEvaluationPermissionsModel, publicPage])
+      .sort();
 
-    expect(stringUtils.sortUuids(arrayUtils.extractUuids(response))).toEqual(expectedPageIds);
+    expect(arrayUtils.extractUuids(response).sort()).toEqual(expectedPageIds);
   });
 
   it('should return public pages for a user outside the space and respond with status code 200', async () => {
