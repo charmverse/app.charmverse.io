@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import CancelIcon from '@mui/icons-material/Cancel';
+import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
@@ -98,7 +98,7 @@ function Condition({
       {onDelete && condition.content.some((c) => c.type !== 'operator') && (
         <Box>
           <IconButton onClick={onDelete} disabled={isLoading} color='default'>
-            <CancelIcon />
+            <DeleteIcon />
           </IconButton>
         </Box>
       )}
