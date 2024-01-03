@@ -175,10 +175,8 @@ function PersonPropertyTemplateMenu({
   board,
   cards,
   propertyTemplate,
-  onChange,
-  disallowEmpty
+  onChange
 }: {
-  disallowEmpty?: boolean;
   board: Board;
   cards: Card[];
   propertyTemplate: IPropertyTemplate<PropertyType>;
@@ -222,8 +220,7 @@ function PersonPropertyTemplateMenu({
       }
     },
     displayType: 'table',
-    showEmptyPlaceholder: true,
-    disallowEmpty
+    showEmptyPlaceholder: true
   };
 
   return (
@@ -403,7 +400,6 @@ function PropertyTemplateMenu({
           }}
           board={board}
           cards={checkedCards}
-          disallowEmpty
           propertyTemplate={propertyTemplate}
         />
       );

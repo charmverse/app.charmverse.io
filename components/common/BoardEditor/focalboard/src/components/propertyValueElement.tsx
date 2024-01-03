@@ -360,7 +360,6 @@ function PropertyValueElement(props: Props) {
             await mutate(`/api/spaces/${board.spaceId}/proposals`);
           }
         }}
-        disallowEmpty
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
         showEmptyPlaceholder={showEmptyPlaceholder}
       />
