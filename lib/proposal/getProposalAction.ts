@@ -10,32 +10,18 @@ export type ProposalTaskAction =
   | 'evaluation_closed';
 
 export function getProposalAction({
-  isAuthor,
-  currentStep,
-  isReviewer
+  currentStep
 }: {
   currentStep: ProposalEvaluationType;
   isAuthor: boolean;
   isReviewer: boolean;
 }): ProposalTaskAction | null {
   if (currentStep === 'feedback') {
-    if (isAuthor) {
-      return 'evaluation_active';
-    } else if (isReviewer) {
-      return 'reviewed';
-    }
+    return 'start_discussion';
   } else if (currentStep === 'pass_fail') {
-    if (isAuthor) {
-      return 'evaluation_closed';
-    } else if (isReviewer) {
-      return 'needs_review';
-    }
+    return 'needs_review';
   } else if (currentStep === 'rubric') {
-    if (isAuthor) {
-      return 'evaluation_closed';
-    } else if (isReviewer) {
-      return 'start_review';
-    }
+    return 'evaluation_active';
   } else if (currentStep === 'vote') {
     return 'vote';
   }
