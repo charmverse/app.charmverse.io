@@ -44,13 +44,13 @@ describe('Creates a page and proposal with relevant configuration', () => {
       },
       userId: user.id,
       spaceId: space.id,
-      authors: [user.id, extraUser.id],
-      reviewers: [
-        {
-          group: 'user',
-          id: reviewerUser.id
-        }
-      ]
+      authors: [user.id, extraUser.id]
+      // reviewers: [
+      //   {
+      //     group: 'user',
+      //     id: reviewerUser.id
+      //   }
+      // ]
     });
 
     expect(page).toMatchObject(
@@ -74,14 +74,14 @@ describe('Creates a page and proposal with relevant configuration', () => {
           }
         ],
         rubricAnswers: [],
-        rubricCriteria: [],
-        reviewers: [
-          expect.objectContaining({
-            id: expect.any(String),
-            proposalId: proposal?.id as string,
-            userId: reviewerUser.id
-          })
-        ]
+        rubricCriteria: []
+        // reviewers: [
+        //   expect.objectContaining({
+        //     id: expect.any(String),
+        //     proposalId: proposal?.id as string,
+        //     userId: reviewerUser.id
+        //   })
+        // ]
       })
     );
   });

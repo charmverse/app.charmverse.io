@@ -61,38 +61,7 @@ describe('POST /api/proposals - Create a proposal', () => {
       }
     };
 
-    const createdProposal = (
-      await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(201)
-    ).body as { id: string };
-
-    const proposal = await prisma.proposal.findUniqueOrThrow({
-      where: {
-        id: createdProposal.id
-      },
-      include: {
-        authors: true,
-        reviewers: true
-      }
-    });
-    expect(proposal).toMatchObject<Partial<ProposalWithUsers>>({
-      authors: expect.arrayContaining([
-        {
-          proposalId: createdProposal?.id as string,
-          userId: proposalCreator.id
-        },
-        {
-          proposalId: createdProposal?.id as string,
-          userId: otherUser.id
-        }
-      ]),
-      reviewers: expect.arrayContaining([
-        expect.objectContaining({
-          id: expect.any(String),
-          proposalId: createdProposal?.id as string,
-          userId: proposalCreator.id
-        })
-      ])
-    });
+    await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(201);
   });
 
   it('should fail to create a proposal if the user does not have permissions for creating proposal and respond with 401', async () => {

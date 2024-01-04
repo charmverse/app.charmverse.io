@@ -1,5 +1,6 @@
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 
+import { useProposalTemplateById } from 'components/proposals/hooks/useProposalTemplates';
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationStepSettings';
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
@@ -13,50 +14,53 @@ export type Props = {
   proposal?: Pick<ProposalPropertiesInput, 'fields' | 'evaluations' | 'workflowId'>;
   onChangeEvaluation?: (evaluationId: string, updated: Partial<ProposalEvaluationValues>) => void;
   readOnly: boolean;
-  readOnlyReviewers: boolean;
-  readOnlyRubricCriteria: boolean;
+  isReviewer: boolean;
   onChangeWorkflow: (workflow: ProposalWorkflowTyped) => void;
-  readOnlyWorkflowSelect?: boolean;
+  templateId?: string | null;
 };
 
 export function EvaluationSettingsSidebar({
   proposal,
   onChangeEvaluation,
   readOnly,
-  readOnlyReviewers,
-  readOnlyRubricCriteria,
   onChangeWorkflow,
-  readOnlyWorkflowSelect
+  isReviewer,
+  templateId
 }: Props) {
+  const proposalTemplate = useProposalTemplateById(templateId);
   const pendingRewards = proposal?.fields?.pendingRewards;
   const { mappedFeatures } = useSpaceFeatures();
   return (
     <div data-test='evaluation-settings-sidebar'>
-      <WorkflowSelect
-        value={proposal?.workflowId}
-        onChange={onChangeWorkflow}
-        readOnly={readOnlyWorkflowSelect}
-        required
-      />
+      <WorkflowSelect value={proposal?.workflowId} onChange={onChangeWorkflow} readOnly={!!templateId} required />
       <EvaluationStepRow index={0} result={null} title='Draft' />
       {proposal && (
         <>
-          {proposal?.evaluations?.map((evaluation, index) => (
-            <EvaluationStepRow key={evaluation.id} expanded result={null} index={index + 1} title={evaluation.title}>
-              {/* <Divider sx={{ my: 1 }} /> */}
-              {evaluation.type !== 'feedback' && (
-                <EvaluationStepSettings
-                  readOnly={readOnly}
-                  readOnlyReviewers={readOnlyReviewers}
-                  readOnlyRubricCriteria={readOnlyRubricCriteria}
-                  evaluation={evaluation}
-                  onChange={(updated) => {
-                    onChangeEvaluation?.(evaluation.id, updated);
-                  }}
-                />
-              )}
-            </EvaluationStepRow>
-          ))}
+          {proposal?.evaluations?.map((evaluation, index) => {
+            // find matching template step, and allow editing if there were no reviewers set
+            const matchingTemplateStep = proposalTemplate?.evaluations?.find((e) => e.title === evaluation.title);
+            const templateHasNoReviewers = matchingTemplateStep?.reviewers?.length === 0;
+            // reviewers are already readOnly if a template was used, so long as reviewers were set
+            const readOnlyReviewers = readOnly || (!!templateId && !templateHasNoReviewers);
+            // rubric criteria should be editable but authors and reviewers, unless a template was used
+            const readOnlyRubricCriteria = (readOnly && !isReviewer) || !!templateId;
+            return (
+              <EvaluationStepRow key={evaluation.id} expanded result={null} index={index + 1} title={evaluation.title}>
+                {/* <Divider sx={{ my: 1 }} /> */}
+                {evaluation.type !== 'feedback' && (
+                  <EvaluationStepSettings
+                    readOnly={readOnly}
+                    readOnlyReviewers={readOnlyReviewers}
+                    readOnlyRubricCriteria={readOnlyRubricCriteria}
+                    evaluation={evaluation}
+                    onChange={(updated) => {
+                      onChangeEvaluation?.(evaluation.id, updated);
+                    }}
+                  />
+                )}
+              </EvaluationStepRow>
+            );
+          })}
           {!!pendingRewards?.length && (
             <EvaluationStepRow
               index={proposal ? proposal.evaluations.length + 1 : 0}

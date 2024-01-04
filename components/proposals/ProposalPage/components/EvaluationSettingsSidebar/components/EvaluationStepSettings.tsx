@@ -77,7 +77,7 @@ export function EvaluationStepSettings({
           </FormLabel>
           <Box display='flex' flex={1} flexDirection='column'>
             <RubricCriteria
-              readOnly={readOnly || readOnlyRubricCriteria}
+              readOnly={readOnlyRubricCriteria}
               value={evaluation.rubricCriteria as RangeProposalCriteria[]}
               onChange={(rubricCriteria) =>
                 onChange({

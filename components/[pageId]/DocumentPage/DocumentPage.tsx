@@ -92,7 +92,7 @@ function DocumentPage({
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
 
-  const { proposal, readOnlyRubricCriteria, readOnlyReviewers, refreshProposal, onChangeEvaluation } = useProposal({
+  const { proposal, refreshProposal, onChangeEvaluation } = useProposal({
     proposalId
   });
 
@@ -307,8 +307,7 @@ function DocumentPage({
           proposalId={proposalId}
           isUnpublishedProposal={proposal?.status === 'draft' || page.type === 'proposal_template'}
           readOnlyProposalPermissions={!proposal?.permissions.edit}
-          readOnlyRubricCriteria={readOnlyRubricCriteria}
-          readOnlyReviewers={readOnlyReviewers}
+          isReviewer={proposal?.permissions.evaluate}
           pagePermissions={pagePermissions}
           editorState={editorState}
           sidebarView={sidebarView}
@@ -318,8 +317,8 @@ function DocumentPage({
           threads={threads}
           proposal={proposal}
           proposalInput={proposal}
+          proposalTemplateId={proposal?.page?.sourceTemplateId}
           onChangeEvaluation={onChangeEvaluation}
-          isProposalTemplate={page.type === 'proposal_template'}
           refreshProposal={refreshProposal}
           disabledViews={isStructuredProposal ? ['suggestions', 'comments'] : []}
           onChangeWorkflow={() => {}}
