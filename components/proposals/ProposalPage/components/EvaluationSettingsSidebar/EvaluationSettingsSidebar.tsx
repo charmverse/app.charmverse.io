@@ -39,20 +39,15 @@ export function EvaluationSettingsSidebar({
           {proposal?.evaluations?.map((evaluation, index) => {
             // find matching template step, and allow editing if there were no reviewers set
             const matchingTemplateStep = proposalTemplate?.evaluations?.find((e) => e.title === evaluation.title);
-            const templateHasNoReviewers = matchingTemplateStep?.reviewers?.length === 0;
-            // reviewers are already readOnly if a template was used, so long as reviewers were set
-            const readOnlyReviewers = readOnly || (!!templateId && !templateHasNoReviewers);
-            // rubric criteria should be editable but authors and reviewers, unless a template was used
-            const readOnlyRubricCriteria = (readOnly && !isReviewer) || !!templateId;
             return (
               <EvaluationStepRow key={evaluation.id} expanded result={null} index={index + 1} title={evaluation.title}>
                 {/* <Divider sx={{ my: 1 }} /> */}
                 {evaluation.type !== 'feedback' && (
                   <EvaluationStepSettings
-                    readOnly={readOnly}
-                    readOnlyReviewers={readOnlyReviewers}
-                    readOnlyRubricCriteria={readOnlyRubricCriteria}
                     evaluation={evaluation}
+                    evaluationTemplate={matchingTemplateStep}
+                    isReviewer={isReviewer}
+                    readOnly={readOnly}
                     onChange={(updated) => {
                       onChangeEvaluation?.(evaluation.id, updated);
                     }}

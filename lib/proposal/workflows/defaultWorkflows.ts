@@ -3,11 +3,13 @@ import { v4 as uuid } from 'uuid';
 
 import { getDefaultEvaluation, getDefaultFeedbackEvaluation } from './defaultEvaluation';
 
+export const defaultWorkflowTitle = 'Community Proposals';
+
 export const getDefaultWorkflows: (spaceId: string) => ProposalWorkflowTyped[] = (spaceId) => [
   {
     id: uuid(),
     createdAt: new Date(),
-    title: 'Community Proposals',
+    title: defaultWorkflowTitle,
     evaluations: [
       getDefaultFeedbackEvaluation(),
       getDefaultEvaluation({
