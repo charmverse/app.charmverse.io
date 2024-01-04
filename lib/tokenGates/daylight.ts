@@ -137,7 +137,7 @@ function getRequirement(condition: AccsDefaultParams) {
   }
 }
 
-export function getDaylightRequirements(tokenGate: TokenGate) {
+function getDaylightRequirements(tokenGate: TokenGate) {
   if (tokenGate.type === 'unlock') {
     return getDaylightUnlockRequirements(tokenGate.conditions);
   } else {
