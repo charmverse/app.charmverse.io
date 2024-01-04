@@ -33,9 +33,7 @@ export async function clearEvaluationResult({ evaluationId, proposalId }: ClearE
   }
 
   // Also reset all evaluations after this one
-  const evaluationsToReset = proposal.evaluations
-    .slice(evaluationIndex)
-    .filter((e) => e.id === evaluationId || e.result);
+  const evaluationsToReset = proposal.evaluations.slice(evaluationIndex).filter((e) => e.id === evaluationId);
 
   if (evaluationsToReset.some((evaluation) => evaluation.type === 'vote')) {
     throw new InvalidInputError('Cannot clear the results of a vote');

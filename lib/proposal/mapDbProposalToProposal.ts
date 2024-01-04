@@ -3,6 +3,7 @@ import type { ProposalReviewer } from '@charmverse/core/prisma';
 import type { FormField, Proposal, ProposalEvaluation } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
+import { sortBy } from 'lodash';
 
 import { getProposalFormFields } from 'lib/proposal/form/getProposalFormFields';
 
@@ -44,19 +45,13 @@ export function mapDbProposalToProposal({
   const { rewards, form, ...rest } = proposal;
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
   const formFields = getProposalFormFields(form?.formFields, !!canAccessPrivateFormFields);
-  const fields = (rest.fields as ProposalFields) ?? null;
 
   const proposalWithUsers = {
     ...rest,
     permissions,
     currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
     evaluationType: currentEvaluation?.type || proposal.evaluationType,
-    status: getProposalEvaluationStatus({
-      evaluations: proposal.evaluations,
-      hasPendingRewards: (fields.pendingRewards ?? []).length > 0,
-      hasRewards: rewards.length > 0,
-      status: proposal.status
-    }),
+    status: getOldProposalStatus(proposal),
     // Support old model: filter out evaluation-specific reviewers and rubric answers
     rubricAnswers: currentEvaluation?.rubricAnswers || proposal.rubricAnswers,
     draftRubricAnswers: currentEvaluation?.draftRubricAnswers || proposal.draftRubricAnswers,
@@ -87,8 +82,6 @@ export function mapDbProposalToProposalLite({
   const { rewards, ...rest } = proposal;
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
   const fields = (rest.fields as ProposalFields) ?? null;
-  const hasRewards = rewards.length > 0 || (fields.pendingRewards ?? []).length > 0;
-  const isLastEvaluation = currentEvaluation?.index === proposal.evaluations.length - 1;
   const evaluationStatus = getProposalEvaluationStatus({
     evaluations: proposal.evaluations,
     hasPendingRewards: (fields.pendingRewards ?? []).length > 0,
@@ -98,6 +91,13 @@ export function mapDbProposalToProposalLite({
 
   const proposalWithUsers = {
     ...rest,
+    evaluations: sortBy(proposal.evaluations, 'index').map((e) => ({
+      title: e.title,
+      index: e.index,
+      type: e.type,
+      result: e.result,
+      id: e.id
+    })),
     permissions,
     currentEvaluation:
       proposal.status === 'draft'

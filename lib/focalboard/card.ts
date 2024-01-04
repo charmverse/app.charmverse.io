@@ -1,5 +1,4 @@
 import type { PageMeta } from '@charmverse/core/pages';
-import type { ProposalStatus } from '@charmverse/core/prisma-client';
 
 import type { Block } from 'lib/focalboard/block';
 import { createBlock } from 'lib/focalboard/block';
@@ -19,17 +18,21 @@ export type Card<V = CardPropertyValue> = Block & {
   customIconType?: 'applicationStatus' | 'reward';
 };
 
+export type CardPageProposal = {
+  currentEvaluationId: string | null;
+  id: string;
+  status: ProposalEvaluationStatus;
+  currentEvaluation: ProposalWithUsersLite['currentEvaluation'];
+  sourceTemplateId?: string;
+  evaluations: ProposalWithUsersLite['evaluations'];
+  hasRewards: boolean;
+};
+
 export type CardPage<V = CardPropertyValue> = {
   subPages?: CardPage<V>[];
   card: Card<V>;
   page: PageMeta;
-  proposal?: {
-    currentEvaluationId: string | null;
-    id: string;
-    status: ProposalEvaluationStatus;
-    currentEvaluation: ProposalWithUsersLite['currentEvaluation'];
-    sourceTemplateId?: string;
-  };
+  proposal?: CardPageProposal;
   isStructuredProposal?: boolean;
 };
 

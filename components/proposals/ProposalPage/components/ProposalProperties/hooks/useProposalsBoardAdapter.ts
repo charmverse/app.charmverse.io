@@ -79,7 +79,9 @@ export function useProposalsBoardAdapter() {
               id: p.id,
               status: p.status,
               currentEvaluation: p.currentEvaluation,
-              sourceTemplateId: page?.sourceTemplateId
+              sourceTemplateId: page?.sourceTemplateId,
+              evaluations: p.evaluations,
+              hasRewards: (p.fields?.pendingRewards ?? []).length > 0 || (p.rewardIds ?? []).length > 0
             }
           } as CardPage;
         })

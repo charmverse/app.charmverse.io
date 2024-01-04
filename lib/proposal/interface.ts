@@ -6,6 +6,7 @@ import type {
   Proposal,
   ProposalEvaluation,
   ProposalEvaluationPermission,
+  ProposalEvaluationResult,
   ProposalEvaluationType,
   Vote
 } from '@charmverse/core/prisma';
@@ -63,6 +64,13 @@ export type ProposalWithUsersLite = ProposalWithUsers & {
   currentEvaluationId?: string;
   evaluationType: ProposalEvaluationType;
   permissions?: ProposalPermissionFlags;
+  evaluations: {
+    title: string;
+    type: ProposalEvaluationType;
+    id: string;
+    result: ProposalEvaluationResult | null;
+    index: number;
+  }[];
   currentEvaluation?: Pick<ProposalEvaluation, 'title'> & {
     step: ProposalEvaluationStep;
     status: ProposalEvaluationStatus;
