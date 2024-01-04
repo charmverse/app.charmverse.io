@@ -1,9 +1,9 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { PublicLockV13 } from '@unlock-protocol/contracts';
 import { readContract } from '@wagmi/core';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
+import { PublicLockV13 } from 'lib/tokenGates/unlock/abi';
 import { isValidChainAddress } from 'lib/tokens/validation';
 
 import { nftCheck, collectableOptions, poapNameMatch, poapTypes } from '../utils/utils';
@@ -39,7 +39,7 @@ const schema = yup.object({
               await readContract({
                 address: value,
                 chainId: Number(context.parent.chain),
-                abi: PublicLockV13.abi,
+                abi: PublicLockV13,
                 functionName: 'publicLockVersion'
               });
               return true;
