@@ -4,7 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 export type ClearEvaluationResultRequest = {
   proposalId: string;
-  evaluationId: string;
+  evaluationId?: string; // if not provided, clear all evaluations and go to draft status
 };
 
 // clear the result of a proposal evaluation and all evaluations after it
