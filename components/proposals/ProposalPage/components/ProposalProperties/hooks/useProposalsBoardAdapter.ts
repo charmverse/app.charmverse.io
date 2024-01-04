@@ -19,14 +19,14 @@ import { CardFilter } from 'lib/focalboard/cardFilter';
 import { Constants } from 'lib/focalboard/constants';
 import {
   AUTHORS_BLOCK_ID,
+  CREATED_AT_ID,
   DEFAULT_VIEW_BLOCK_ID,
   EVALUATION_TYPE_BLOCK_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID,
-  STATUS_BLOCK_ID,
-  CREATED_AT_ID
+  STATUS_BLOCK_ID
 } from 'lib/proposal/blocks/constants';
 import type { ProposalPropertyValue } from 'lib/proposal/blocks/interfaces';
-import type { ProposalWithUsers, ProposalFields } from 'lib/proposal/interface';
+import type { ProposalFields, ProposalWithUsers } from 'lib/proposal/interface';
 
 export type BoardProposal = { spaceId?: string; id?: string; fields: ProposalFields | null };
 

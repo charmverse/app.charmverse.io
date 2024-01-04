@@ -9,13 +9,14 @@ import { usePropertiesMutator } from './hooks/usePropertiesMutator';
 import { useProposalsBoardAdapter } from './hooks/useProposalsBoardAdapter';
 
 type Props = {
-  proposal: { spaceId?: string; id?: string; fields: ProposalFields | null };
+  proposal: { fields: ProposalFields | null; id?: string };
   onChange?: (properties: ProposalFields['properties']) => void;
   readOnly?: boolean;
   readOnlyProperties?: string[];
+  pageId?: string;
 };
 
-export function CustomPropertiesAdapter({ proposal, onChange, readOnly, readOnlyProperties }: Props) {
+export function CustomPropertiesAdapter({ proposal, onChange, readOnly, readOnlyProperties, pageId }: Props) {
   const { user } = useUser();
   const isAdmin = useIsAdmin();
 
@@ -25,7 +26,10 @@ export function CustomPropertiesAdapter({ proposal, onChange, readOnly, readOnly
   const mutator = usePropertiesMutator({ proposal, onChange });
 
   useEffect(() => {
-    setBoardProposal(proposal);
+    setBoardProposal({
+      ...proposal,
+      id: proposal.id ?? pageId
+    });
   }, [proposal]);
 
   return (
