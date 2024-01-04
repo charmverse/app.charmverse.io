@@ -5,6 +5,8 @@ import type { Block } from 'lib/focalboard/block';
 import { createBoard } from 'lib/focalboard/board';
 import { Constants } from 'lib/focalboard/constants';
 import {
+  PROPOSAL_STATUS_LABELS,
+  PROPOSAL_STEP_LABELS,
   proposalDbProperties,
   proposalStatusBoardColors,
   proposalStepBoardColors
@@ -20,13 +22,9 @@ import {
   PROPOSAL_STATUS_BLOCK_ID
 } from 'lib/proposal/blocks/constants';
 import type { ProposalBoardBlock } from 'lib/proposal/blocks/interfaces';
-import {
-  PROPOSAL_STATUS_LABELS,
-  PROPOSAL_STEP_LABELS,
-  type ProposalStatusWithArchived
-} from 'lib/proposal/proposalStatusTransition';
+import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
 
-const proposalStatuses = Object.keys(PROPOSAL_STATUS_LABELS) as ProposalStatusWithArchived[];
+const proposalStatuses = Object.keys(PROPOSAL_STATUS_LABELS) as ProposalEvaluationStatus[];
 const proposalSteps = Object.keys(PROPOSAL_STEP_LABELS) as ProposalEvaluationType[];
 
 export function getDefaultBoard({

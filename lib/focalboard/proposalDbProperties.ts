@@ -3,7 +3,7 @@ import { v4 as uuid } from 'uuid';
 
 import type { DatabaseProposalPropertyType, IPropertyTemplate } from 'lib/focalboard/board';
 import type { Constants } from 'lib/focalboard/constants';
-import type { ProposalStatusWithArchived } from 'lib/proposal/proposalStatusTransition';
+import type { ProposalEvaluationStatus, ProposalEvaluationStep } from 'lib/proposal/interface';
 
 export const proposalDbProperties: {
   [key in DatabaseProposalPropertyType]: (id?: string, name?: string) => IPropertyTemplate;
@@ -70,21 +70,31 @@ export const proposalDbProperties: {
   })
 };
 
-/**
- * See components/proposals/components/ProposalStatusBadge.tsx // ProposalStatusColors for the corresponding statuses
- */
+export const PROPOSAL_STATUS_LABELS: Record<ProposalEvaluationStatus, string> = {
+  complete: 'Complete',
+  declined: 'Declined',
+  in_progress: 'In Progress',
+  passed: 'Passed',
+  published: 'Published',
+  unpublished: 'Unpublished'
+};
 
-export const proposalStatusBoardColors: Record<ProposalStatusWithArchived, keyof (typeof Constants)['menuColors']> = {
-  archived: 'propColorGray',
-  draft: 'propColorGray',
-  discussion: 'propColorTeal',
-  review: 'propColorYellow',
-  reviewed: 'propColorPurple',
-  vote_active: 'propColorPink',
-  vote_closed: 'propColorRed',
-  evaluation_active: 'propColorRed',
-  evaluation_closed: 'propColorPink',
-  published: 'propColorGreen'
+export const PROPOSAL_STEP_LABELS: Record<ProposalEvaluationStep, string> = {
+  feedback: 'Feedback',
+  pass_fail: 'Review',
+  vote: 'Vote',
+  rubric: 'Rubric',
+  rewards: 'Rewards',
+  draft: 'Draft'
+};
+
+export const proposalStatusBoardColors: Record<ProposalEvaluationStatus, keyof (typeof Constants)['menuColors']> = {
+  complete: 'propColorGreen',
+  declined: 'propColorRed',
+  in_progress: 'propColorYellow',
+  passed: 'propColorGreen',
+  published: 'propColorGreen',
+  unpublished: 'propColorGray'
 };
 
 export const proposalStepBoardColors: Record<ProposalEvaluationType, keyof (typeof Constants)['menuColors']> = {

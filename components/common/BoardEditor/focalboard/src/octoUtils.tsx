@@ -10,8 +10,8 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
+import { PROPOSAL_STATUS_LABELS, PROPOSAL_STEP_LABELS } from 'lib/focalboard/proposalDbProperties';
 import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
-import { PROPOSAL_STATUS_LABELS, PROPOSAL_STEP_LABELS } from 'lib/proposal/proposalStatusTransition';
 import { getAbsolutePath } from 'lib/utilities/browser';
 import { isTruthy } from 'lib/utilities/types';
 

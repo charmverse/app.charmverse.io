@@ -7,6 +7,7 @@ import type { SelectOptionType } from 'components/common/form/fields/Select/inte
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import { proposalDbProperties, proposalStatusBoardColors } from 'lib/focalboard/proposalDbProperties';
 import { InvalidStateError } from 'lib/middleware/errors';
+import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 export async function setDatabaseProposalProperties({ boardId }: { boardId: string }): Promise<Board> {
@@ -199,7 +200,7 @@ function generateUpdatedProposalStatusProperty({ boardProperties }: { boardPrope
         const existingOption = proposalStatusProp.options.find((opt) => opt.value === status);
         if (!existingOption) {
           proposalStatusProp.options.push({
-            color: proposalStatusBoardColors[status as Exclude<ProposalStatus, 'draft'> | 'archived'],
+            color: proposalStatusBoardColors[status as ProposalEvaluationStatus],
             id: uuid(),
             value: status
           });

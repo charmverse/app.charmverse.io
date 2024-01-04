@@ -13,8 +13,8 @@ import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { Constants } from 'lib/focalboard/constants';
+import { PROPOSAL_STATUS_LABELS } from 'lib/focalboard/proposalDbProperties';
 import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
-import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';

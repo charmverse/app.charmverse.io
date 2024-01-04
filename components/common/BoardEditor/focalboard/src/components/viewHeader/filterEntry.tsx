@@ -1,4 +1,3 @@
-import type { ProposalStatus } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -32,9 +31,9 @@ import type { FilterClause, FilterCondition } from 'lib/focalboard/filterClause'
 import { propertyConfigs } from 'lib/focalboard/filterClause';
 import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import { createFilterGroup } from 'lib/focalboard/filterGroup';
+import { PROPOSAL_STATUS_LABELS } from 'lib/focalboard/proposalDbProperties';
 import { PROPOSAL_REVIEWERS_BLOCK_ID, AUTHORS_BLOCK_ID } from 'lib/proposal/blocks/constants';
 import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
-import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import { focalboardColorsMap } from 'theme/colors';
 
 import { iconForPropertyType } from '../../widgets/iconForPropertyType';

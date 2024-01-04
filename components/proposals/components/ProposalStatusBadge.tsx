@@ -2,8 +2,8 @@ import styled from '@emotion/styled';
 import type { ChipProps } from '@mui/material';
 import { Chip } from '@mui/material';
 
+import { PROPOSAL_STATUS_LABELS } from 'lib/focalboard/proposalDbProperties';
 import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
-import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import type { BrandColor } from 'theme/colors';
 
 export const ProposalStatusColors: Record<ProposalEvaluationStatus, BrandColor> = {
