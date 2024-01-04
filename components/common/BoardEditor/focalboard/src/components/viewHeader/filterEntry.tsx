@@ -33,7 +33,8 @@ import { propertyConfigs } from 'lib/focalboard/filterClause';
 import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import { createFilterGroup } from 'lib/focalboard/filterGroup';
 import { PROPOSAL_REVIEWERS_BLOCK_ID, AUTHORS_BLOCK_ID } from 'lib/proposal/blocks/constants';
-import { PROPOSAL_STATUS_LABELS_WITH_ARCHIVED } from 'lib/proposal/proposalStatusTransition';
+import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
+import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import { focalboardColorsMap } from 'theme/colors';
 
 import { iconForPropertyType } from '../../widgets/iconForPropertyType';
@@ -315,9 +316,7 @@ function FilterPropertyValue({
               size='small'
               label={
                 property.type === 'proposalStatus'
-                  ? PROPOSAL_STATUS_LABELS_WITH_ARCHIVED[
-                      foundOption.value as Exclude<ProposalStatus, 'draft'> | 'archived'
-                    ]
+                  ? PROPOSAL_STATUS_LABELS[foundOption.value as ProposalEvaluationStatus]
                   : foundOption.value
               }
               color={focalboardColorsMap[foundOption.color]}
@@ -341,9 +340,7 @@ function FilterPropertyValue({
                   size='small'
                   label={
                     property.type === 'proposalStatus'
-                      ? PROPOSAL_STATUS_LABELS_WITH_ARCHIVED[
-                          option.value as Exclude<ProposalStatus, 'draft'> | 'archived'
-                        ]
+                      ? PROPOSAL_STATUS_LABELS[option.value as ProposalEvaluationStatus]
                       : option.value
                   }
                   color={focalboardColorsMap[option.color]}

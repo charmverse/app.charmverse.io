@@ -1,5 +1,4 @@
-import type { ApplicationStatus, ProposalStatus, ProposalSystemRole } from '@charmverse/core/prisma';
-import { stringUtils } from '@charmverse/core/utilities';
+import type { ApplicationStatus, ProposalSystemRole } from '@charmverse/core/prisma';
 import PersonIcon from '@mui/icons-material/Person';
 import { Box, Link, Stack } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
@@ -34,6 +33,7 @@ import type { Board, DatabaseProposalPropertyType, IPropertyTemplate, PropertyTy
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { PROPOSAL_STATUS_BLOCK_ID, PROPOSAL_STEP_BLOCK_ID } from 'lib/proposal/blocks/constants';
+import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
 import {
   REWARDS_APPLICANTS_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
@@ -190,15 +190,7 @@ function PropertyValueElement(props: Props) {
   } else if (propertyTemplate.type === 'proposalStatus' || propertyTemplate.id === PROPOSAL_STATUS_BLOCK_ID) {
     // Proposals as datasource use proposalStatus column, whereas the actual proposals table uses STATUS_BLOCK_ID
     // We should migrate over the proposals as datasource blocks to the same format as proposals table
-    return (
-      <ProposalStatusChipTextOnly
-        status={
-          (stringUtils.isUUID(propertyValue as string)
-            ? propertyTemplate.options.find((opt) => opt.id === propertyValue)?.value
-            : propertyValue) as ProposalStatus
-        }
-      />
-    );
+    return <ProposalStatusChipTextOnly status={propertyValue as ProposalEvaluationStatus} />;
   } else if (propertyTemplate.type === 'proposalStep' || propertyTemplate.id === PROPOSAL_STEP_BLOCK_ID) {
     return <ProposalStepChipTextOnly label={proposal?.currentEvaluation?.title ?? 'Draft'} />;
   } else if (propertyTemplate.id === REWARD_PROPOSAL_LINK) {

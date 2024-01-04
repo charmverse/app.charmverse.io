@@ -6,7 +6,7 @@ import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
 import { getProposalFormFields } from 'lib/proposal/form/getProposalFormFields';
 
-import { getProposalEvaluationStatus } from './getProposalEvaluationStatus';
+import { getOldProposalStatus, getProposalEvaluationStatus } from './getProposalEvaluationStatus';
 import type {
   ProposalEvaluationStep,
   ProposalFields,
@@ -89,6 +89,12 @@ export function mapDbProposalToProposalLite({
   const fields = (rest.fields as ProposalFields) ?? null;
   const hasRewards = rewards.length > 0 || (fields.pendingRewards ?? []).length > 0;
   const isLastEvaluation = currentEvaluation?.index === proposal.evaluations.length - 1;
+  const evaluationStatus = getProposalEvaluationStatus({
+    evaluations: proposal.evaluations,
+    hasPendingRewards: (fields.pendingRewards ?? []).length > 0,
+    status: proposal.status,
+    hasRewards: rewards.length > 0
+  });
 
   const proposalWithUsers = {
     ...rest,
@@ -97,27 +103,25 @@ export function mapDbProposalToProposalLite({
       proposal.status === 'draft'
         ? {
             title: 'Draft',
-            step: 'draft' as ProposalEvaluationStep
+            step: 'draft' as ProposalEvaluationStep,
+            status: evaluationStatus
           }
         : currentEvaluation
-        ? isLastEvaluation && hasRewards
+        ? evaluationStatus === 'published' || evaluationStatus === 'unpublished'
           ? {
               title: 'Rewards',
-              step: 'rewards' as ProposalEvaluationStep
+              step: 'rewards' as ProposalEvaluationStep,
+              status: evaluationStatus
             }
           : {
               title: currentEvaluation.title,
-              step: currentEvaluation.type
+              step: currentEvaluation.type,
+              status: evaluationStatus
             }
         : undefined,
     currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
     evaluationType: currentEvaluation?.type || proposal.evaluationType,
-    status: getProposalEvaluationStatus({
-      evaluations: proposal.evaluations,
-      hasPendingRewards: (fields.pendingRewards ?? []).length > 0,
-      status: proposal.status,
-      hasRewards: rewards.length > 0
-    }),
+    status: getOldProposalStatus(proposal),
     reviewers: currentEvaluation?.reviewers || proposal.reviewers,
     rewardIds: rewards.map((r) => r.id) || null,
     fields

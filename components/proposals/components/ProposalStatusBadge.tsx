@@ -1,33 +1,21 @@
 import styled from '@emotion/styled';
-import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
-import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
-import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
-import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
-import ArchivedOutlinedIcon from '@mui/icons-material/Inventory2Outlined';
-import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
-import ReviewsOutlinedIcon from '@mui/icons-material/ReviewsOutlined';
 import type { ChipProps } from '@mui/material';
 import { Chip } from '@mui/material';
-import type { ReactNode } from 'react';
 
-import type { ProposalStatusWithArchived } from 'lib/proposal/proposalStatusTransition';
-import { PROPOSAL_STATUS_LABELS_WITH_ARCHIVED } from 'lib/proposal/proposalStatusTransition';
+import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
+import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 import type { BrandColor } from 'theme/colors';
 
-export const ProposalStatusColors: Record<ProposalStatusWithArchived, BrandColor> = {
-  draft: 'gray',
-  discussion: 'teal',
-  review: 'yellow',
-  reviewed: 'purple',
-  vote_active: 'pink',
-  vote_closed: 'red',
-  evaluation_active: 'pink',
-  evaluation_closed: 'red',
-  archived: 'gray',
+export const ProposalStatusColors: Record<ProposalEvaluationStatus, BrandColor> = {
+  complete: 'green',
+  declined: 'red',
+  in_progress: 'yellow',
+  passed: 'green',
+  unpublished: 'gray',
   published: 'green'
 };
 
-const StyledProposalStatusChipNormalText = styled(Chip)<{ status: ProposalStatusWithArchived }>`
+const StyledProposalStatusChipNormalText = styled(Chip)<{ status: ProposalEvaluationStatus }>`
   background-color: ${({ status, theme }) => {
     // @ts-ignore
     return theme.palette[ProposalStatusColors[status]]?.main;
@@ -52,14 +40,14 @@ export function ProposalStatusChipTextOnly({
   size = 'small'
 }: {
   size?: ChipProps['size'];
-  status: ProposalStatusWithArchived;
+  status: ProposalEvaluationStatus;
 }) {
   return (
     <StyledProposalStatusChipNormalText
       data-test='proposal-status-badge'
       size={size}
       status={status}
-      label={PROPOSAL_STATUS_LABELS_WITH_ARCHIVED[status]}
+      label={PROPOSAL_STATUS_LABELS[status]}
       variant='filled'
     />
   );

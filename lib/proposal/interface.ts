@@ -55,9 +55,8 @@ export type ProposalFormData = {
   };
 };
 
-export type ProposalWithUsers = Omit<CoreProposalWithUsers, 'fields' | 'status'> & {
+export type ProposalWithUsers = Omit<CoreProposalWithUsers, 'fields'> & {
   fields: ProposalFields | null;
-  status: ProposalEvaluationStatus;
 };
 
 export type ProposalWithUsersLite = ProposalWithUsers & {
@@ -66,6 +65,7 @@ export type ProposalWithUsersLite = ProposalWithUsers & {
   permissions?: ProposalPermissionFlags;
   currentEvaluation?: Pick<ProposalEvaluation, 'title'> & {
     step: ProposalEvaluationStep;
+    status: ProposalEvaluationStatus;
   };
 };
 

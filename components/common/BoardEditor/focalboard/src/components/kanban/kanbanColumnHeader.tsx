@@ -14,7 +14,8 @@ import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
-import { PROPOSAL_STATUS_LABELS_WITH_ARCHIVED } from 'lib/proposal/proposalStatusTransition';
+import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
+import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
 
 import mutator from '../../mutator';
 import IconButton from '../../widgets/buttons/iconButton';
@@ -93,7 +94,7 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
 
   const formattedGroupTitle =
     groupByProperty?.type === 'proposalStatus'
-      ? PROPOSAL_STATUS_LABELS_WITH_ARCHIVED[group.option.value as ProposalStatus]
+      ? PROPOSAL_STATUS_LABELS[group.option.value as ProposalEvaluationStatus]
       : groupTitle;
 
   return (

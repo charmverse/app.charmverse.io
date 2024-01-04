@@ -21,12 +21,12 @@ import {
 } from 'lib/proposal/blocks/constants';
 import type { ProposalBoardBlock } from 'lib/proposal/blocks/interfaces';
 import {
-  PROPOSAL_STATUS_LABELS_WITH_ARCHIVED,
+  PROPOSAL_STATUS_LABELS,
   PROPOSAL_STEP_LABELS,
   type ProposalStatusWithArchived
 } from 'lib/proposal/proposalStatusTransition';
 
-const proposalStatuses = Object.keys(PROPOSAL_STATUS_LABELS_WITH_ARCHIVED) as ProposalStatusWithArchived[];
+const proposalStatuses = Object.keys(PROPOSAL_STATUS_LABELS) as ProposalStatusWithArchived[];
 const proposalSteps = Object.keys(PROPOSAL_STEP_LABELS) as ProposalEvaluationType[];
 
 export function getDefaultBoard({
