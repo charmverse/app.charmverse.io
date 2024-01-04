@@ -26,20 +26,13 @@ export async function createVote(vote: VoteDTO & { spaceId: string }): Promise<E
   } = vote;
 
   if (pageId && evaluationId) {
-    const page = await prisma.page.findUniqueOrThrow({
+    const evaluation = await prisma.proposalEvaluation.findUniqueOrThrow({
       where: {
-        id: pageId
-      },
-      select: {
-        proposal: {
-          select: {
-            evaluations: true
-          }
-        }
+        id: evaluationId
       }
     });
 
-    if (page.proposal?.evaluations.find((ev) => ev.id === evaluationId)?.voteId) {
+    if (evaluation.voteId) {
       throw new DuplicateDataError('A vote already exists for this evaluation');
     }
   } else if (postId) {
