@@ -1,6 +1,7 @@
-import type { PaymentMethod } from '@charmverse/core/prisma';
+import type { Space, PaymentMethod } from '@charmverse/core/prisma';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 
+import type { CustomJoinParams } from 'lib/spaces/customConditionJoinSpace';
 import type { SpaceWithGates } from 'lib/spaces/interfaces';
 
 import type { MaybeString } from './helpers';
@@ -32,4 +33,8 @@ export function useDeleteProposalWorkflow(spaceId: MaybeString) {
 
 function stripUrlParts(maybeUrl: string) {
   return maybeUrl.replace('https://app.charmverse.io/', '').replace('http://localhost:3000/', '').split('/')[0];
+}
+
+export function useVerifyCustomJoinSpace(spaceId: MaybeString) {
+  return usePOST<CustomJoinParams, Space>(`/api/spaces/${spaceId}/custom-join`);
 }
