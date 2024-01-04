@@ -460,6 +460,7 @@ function DocumentPage({
                           readOnly={!isAdmin && (!user || !proposalAuthors.includes(user.id))}
                           proposalId={proposal.id}
                           formFields={proposal?.form.formFields ?? []}
+                          refreshProposal={refreshProposal}
                         />
                       ) : (
                         <ProposalFormFieldInputs
