@@ -14920,7 +14920,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
         "evaluationType": "rubric",
