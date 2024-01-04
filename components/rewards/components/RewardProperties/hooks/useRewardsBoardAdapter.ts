@@ -69,7 +69,7 @@ export function useRewardsBoardAdapter() {
       .map((vId) => rewardBlocks?.find((b) => b.id === vId) as BoardView)
       .filter(Boolean)
       .map((v) => {
-        const view = { ...v };
+        const view = { ...v, fields: { ...v.fields } };
         if (v.fields.viewType === 'table' && v.fields?.visiblePropertyIds?.length) {
           const visibleIds = [...v.fields.visiblePropertyIds];
           if (hasMilestoneRewards) {
