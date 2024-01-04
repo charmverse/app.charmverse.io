@@ -85,7 +85,7 @@ export function getDefaultStepProperty() {
     ...proposalDbProperties.proposalStep(PROPOSAL_STEP_BLOCK_ID, 'Step'),
     options: proposalSteps.map((s) => ({
       id: s,
-      value: s,
+      value: PROPOSAL_STEP_LABELS[s],
       color: proposalStepBoardColors[s]
     }))
   };

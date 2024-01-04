@@ -169,6 +169,10 @@ export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
   tokenChain: {
     datatype: 'multi_select',
     conditions: MultiSelectDataTypeConditions
+  },
+  proposalStep: {
+    datatype: 'select',
+    conditions: SelectDataTypeConditions
   }
 };
 
