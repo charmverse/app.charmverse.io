@@ -3,7 +3,6 @@ import type {
   FormField,
   Page,
   PageComment,
-  Proposal,
   ProposalEvaluation,
   ProposalEvaluationPermission,
   ProposalEvaluationResult,
@@ -17,6 +16,7 @@ import type { NewPageValues } from 'components/common/PageDialog/hooks/useNewPag
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
 import type { ProposalPropertiesField } from './blocks/interfaces';
+import type { ProposalStep } from './getCurrentStep';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   ProposalRubricCriteriaWithTypedParams
@@ -71,10 +71,7 @@ export type ProposalWithUsersLite = ProposalWithUsers & {
     result: ProposalEvaluationResult | null;
     index: number;
   }[];
-  currentStep?: Pick<ProposalEvaluation, 'title'> & {
-    step: ProposalEvaluationStep;
-    status: ProposalEvaluationStatus;
-  };
+  currentStep: ProposalStep;
 };
 
 export type PopulatedEvaluation = ProposalRubricData &
@@ -87,6 +84,7 @@ export type PopulatedEvaluation = ProposalRubricData &
 export type ProposalWithUsersAndRubric = ProposalWithUsers &
   ProposalRubricData &
   ProposalFormData & {
+    currentStep: ProposalStep;
     evaluations: PopulatedEvaluation[];
     fields: ProposalFields | null;
     page?: { sourceTemplateId: string | null } | null;

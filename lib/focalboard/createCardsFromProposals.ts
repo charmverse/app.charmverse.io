@@ -6,6 +6,7 @@ import { stringUtils } from '@charmverse/core/utilities';
 
 import { prismaToBlock } from 'lib/focalboard/block';
 import { canAccessPrivateFields } from 'lib/proposal/form/canAccessPrivateFields';
+import { getCurrentStep } from 'lib/proposal/getCurrentStep';
 import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
 import type { ProposalFields } from 'lib/proposal/interface';
 import type {
@@ -72,6 +73,7 @@ export async function createCardsFromProposals({
           status: true,
           evaluations: {
             select: {
+              title: true,
               index: true,
               result: true,
               type: true
@@ -200,16 +202,17 @@ export async function createCardsFromProposals({
     if (proposalProps.proposalUrl) {
       properties[proposalProps.proposalUrl.id] = pageProposal.path;
     }
-
     if (pageProposal.proposal && proposalProps.proposalStatus) {
-      const evaluationStatus = getProposalEvaluationStatus({
-        evaluations: pageProposal.proposal.evaluations ?? [],
+      const currentStep = getCurrentStep({
+        evaluations: pageProposal.proposal.evaluations,
         hasPendingRewards: ((pageProposal.proposal.fields as ProposalFields)?.pendingRewards ?? []).length > 0,
-        status: pageProposal.proposal.status,
-        hasRewards: pageProposal.proposal.rewards.length > 0
+        proposalStatus: pageProposal.proposal.status,
+        hasPublishedRewards: pageProposal.proposal.rewards.length > 0
       });
 
-      properties[proposalProps.proposalStatus.id] = evaluationStatus;
+      properties[proposalProps.proposalStatus.id] = getProposalEvaluationStatus({
+        proposalStep: currentStep
+      });
     }
 
     const formFields = pageProposal.proposal?.form?.formFields ?? [];

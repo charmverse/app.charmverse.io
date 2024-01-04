@@ -1,7 +1,7 @@
-import type { WorkflowEvaluationJson } from '@charmverse/core/dist/cjs/proposals';
 import { InsecureOperationError } from '@charmverse/core/errors';
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
 import { v4 as uuid } from 'uuid';
 

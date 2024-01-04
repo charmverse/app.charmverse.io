@@ -6,6 +6,7 @@ import { extractCardProposalProperties } from 'lib/focalboard/extractCardProposa
 import { extractDatabaseProposalProperties } from 'lib/focalboard/extractDatabaseProposalProperties';
 import { InvalidStateError } from 'lib/middleware';
 import { canAccessPrivateFields } from 'lib/proposal/form/canAccessPrivateFields';
+import { getCurrentStep } from 'lib/proposal/getCurrentStep';
 import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
 import type { ProposalFields } from 'lib/proposal/interface';
 import type {
@@ -71,6 +72,7 @@ export async function updateCardsFromProposals({
           id: true,
           evaluations: {
             select: {
+              title: true,
               index: true,
               result: true,
               type: true
@@ -200,14 +202,20 @@ export async function updateCardsFromProposals({
       proposalId: pageWithProposal.proposal!.id
     });
 
-    const proposalEvaluationStatus = pageWithProposal.proposal
-      ? getProposalEvaluationStatus({
+    const currentStep = pageWithProposal.proposal
+      ? getCurrentStep({
           evaluations: pageWithProposal.proposal.evaluations ?? [],
           hasPendingRewards: ((pageWithProposal.proposal.fields as ProposalFields)?.pendingRewards ?? []).length > 0,
-          status: pageWithProposal.proposal.status,
-          hasRewards: pageWithProposal.proposal.rewards.length > 0
+          hasPublishedRewards: pageWithProposal.proposal.rewards.length > 0,
+          proposalStatus: pageWithProposal.proposal.status
         })
-      : undefined;
+      : null;
+
+    const proposalEvaluationStatus = currentStep
+      ? getProposalEvaluationStatus({
+          proposalStep: currentStep
+        })
+      : null;
 
     if (card) {
       const { cardProposalStatus, cardProposalUrl } = extractCardProposalProperties({

@@ -10,14 +10,15 @@ import {
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { CardPageProposal } from 'lib/focalboard/card';
 import { PROPOSAL_STATUS_VERB_LABELS } from 'lib/focalboard/proposalDbProperties';
+import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
 import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
 
 import { ProposalStatusChipTextOnly } from './ProposalStatusBadge';
 
 export function ProposalStatusSelect({ proposal, spaceId }: { proposal: CardPageProposal; spaceId: string }) {
   const { trigger: submitEvaluationResult } = useSubmitEvaluationResult({ proposalId: proposal.id });
-  const currentEvaluationStep = proposal.currentStep?.step;
-  const currentEvaluationStatus = proposal.currentStep?.status;
+  const currentEvaluationStep = proposal.currentStep.step;
+  const currentEvaluationResult = proposal.currentStep.result;
   const currentEvaluationId = proposal.currentEvaluationId;
   const { trigger: updateProposalStatusOnly } = useUpdateProposalStatusOnly({ proposalId: proposal.id });
   const { trigger: createProposalRewards } = useCreateProposalRewards(proposal.id);
@@ -27,22 +28,22 @@ export function ProposalStatusSelect({ proposal, spaceId }: { proposal: CardPage
     if (currentEvaluationStep === 'draft') {
       return ['published'];
     } else if (currentEvaluationStep === 'rewards') {
-      if (currentEvaluationStatus === 'unpublished') {
+      if (currentEvaluationResult === null) {
         return ['published'];
       }
     } else if (currentEvaluationStep === 'feedback') {
-      if (currentEvaluationStatus === 'in_progress') {
+      if (currentEvaluationResult === null) {
         return ['complete'];
       }
     } else if (currentEvaluationStep === 'pass_fail' || currentEvaluationStep === 'rubric') {
-      if (currentEvaluationStatus === 'in_progress') {
+      if (currentEvaluationResult === null) {
         return ['passed', 'declined'];
-      } else if (currentEvaluationStatus === 'declined') {
+      } else if (currentEvaluationResult === 'fail') {
         return ['passed'];
       }
     }
     return [];
-  }, [currentEvaluationStep, currentEvaluationStatus]);
+  }, [currentEvaluationStep, currentEvaluationResult]);
 
   async function onChange(status: ProposalEvaluationStatus) {
     try {
@@ -70,7 +71,9 @@ export function ProposalStatusSelect({ proposal, spaceId }: { proposal: CardPage
     <Select<string>
       size='small'
       displayEmpty
-      value={currentEvaluationStatus ?? ''}
+      value={getProposalEvaluationStatus({
+        proposalStep: proposal.currentStep
+      })}
       onChange={(e) => onChange(e.target.value as ProposalEvaluationStatus)}
       renderValue={(status) => <ProposalStatusChipTextOnly status={status as ProposalEvaluationStatus} />}
       readOnly={statusOptions.length === 0}

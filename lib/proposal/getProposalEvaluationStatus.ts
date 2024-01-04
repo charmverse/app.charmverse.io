@@ -1,6 +1,7 @@
 import type { ProposalEvaluation, ProposalStatus } from '@charmverse/core/prisma';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
+import type { ProposalStep } from './getCurrentStep';
 import type { ProposalEvaluationStatus } from './interface';
 
 /**
@@ -30,44 +31,24 @@ export function getOldProposalStatus({
 }
 
 export function getProposalEvaluationStatus({
-  evaluations,
-  status,
-  hasPendingRewards,
-  hasRewards
+  proposalStep
 }: {
-  hasRewards: boolean;
-  hasPendingRewards: boolean;
-  status: ProposalStatus;
-  evaluations: Pick<ProposalEvaluation, 'index' | 'result' | 'type'>[];
+  proposalStep: ProposalStep;
 }): ProposalEvaluationStatus {
-  const currentEvaluation = getCurrentEvaluation(evaluations);
-  const isLastEvaluation = currentEvaluation?.index === evaluations.length - 1;
-  if (status === 'draft' || !currentEvaluation) {
+  if (proposalStep.step === 'draft') {
     return 'unpublished';
-  }
-
-  const currentEvaluationResult = currentEvaluation.result;
-
-  if (currentEvaluation.type === 'feedback') {
-    return currentEvaluationResult === null ? 'in_progress' : 'complete';
-  } else if (
-    currentEvaluation.type === 'pass_fail' ||
-    currentEvaluation.type === 'rubric' ||
-    currentEvaluation.type === 'vote'
-  ) {
-    if (currentEvaluationResult === null) {
+  } else if (proposalStep.step === 'feedback') {
+    return proposalStep.result === null ? 'in_progress' : 'complete';
+  } else if (proposalStep.step === 'pass_fail' || proposalStep.step === 'rubric' || proposalStep.step === 'vote') {
+    if (proposalStep.result === null) {
       return 'in_progress';
-    } else if (currentEvaluationResult === 'fail') {
+    } else if (proposalStep.result === 'fail') {
       return 'declined';
-    } else if (isLastEvaluation) {
-      if (hasRewards) {
-        return 'published';
-      } else if (hasPendingRewards) {
-        return 'unpublished';
-      }
+    } else if (proposalStep.result === 'pass') {
       return 'passed';
     }
-    return 'passed';
+  } else if (proposalStep.step === 'rewards') {
+    return proposalStep.result === null ? 'unpublished' : 'published';
   }
 
   return 'in_progress';
