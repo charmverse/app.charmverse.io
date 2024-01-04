@@ -204,7 +204,7 @@ export async function createCardsFromProposals({
     if (pageProposal.proposal && proposalProps.proposalStatus) {
       const evaluationStatus = getProposalEvaluationStatus({
         evaluations: pageProposal.proposal.evaluations ?? [],
-        hasPendingRewards: ((pageProposal.proposal.fields as ProposalFields).pendingRewards ?? []).length > 0,
+        hasPendingRewards: ((pageProposal.proposal.fields as ProposalFields)?.pendingRewards ?? []).length > 0,
         status: pageProposal.proposal.status,
         hasRewards: pageProposal.proposal.rewards.length > 0
       });

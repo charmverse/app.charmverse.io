@@ -84,7 +84,7 @@ export function mapDbProposalToProposalLite({
   const fields = (rest.fields as ProposalFields) ?? null;
   const evaluationStatus = getProposalEvaluationStatus({
     evaluations: proposal.evaluations,
-    hasPendingRewards: (fields.pendingRewards ?? []).length > 0,
+    hasPendingRewards: (fields?.pendingRewards ?? []).length > 0,
     status: proposal.status,
     hasRewards: rewards.length > 0
   });

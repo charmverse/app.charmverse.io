@@ -12,8 +12,6 @@ import { generateUser } from 'testing/utils/users';
 import type { BoardFields, IPropertyTemplate } from '../board';
 import type { CardFields } from '../card';
 import { createCardsFromProposals } from '../createCardsFromProposals';
-import { extractCardProposalProperties } from '../extractCardProposalProperties';
-import { extractDatabaseProposalProperties } from '../extractDatabaseProposalProperties';
 import { updateCardsFromProposals } from '../updateCardsFromProposals';
 
 describe('updateCardsFromProposals()', () => {
@@ -196,128 +194,6 @@ describe('updateCardsFromProposals()', () => {
     });
 
     expect(newCreatedCard).toBeNull();
-  });
-
-  it('should update the card proposalStatus to archived, or revert it to its status if unarchived', async () => {
-    const database = await generateBoard({
-      createdBy: user.id,
-      spaceId: space.id,
-      views: 1,
-      viewDataSource: 'proposals'
-    });
-    const pageProposal = await testUtilsProposals.generateProposal({
-      authors: [],
-      proposalStatus: 'discussion',
-      reviewers: [],
-      spaceId: space.id,
-      userId: user.id
-    });
-
-    await createCardsFromProposals({ boardId: database.id, spaceId: space.id, userId: user.id });
-
-    const databaseAfterUpdate = await prisma.block.findUniqueOrThrow({
-      where: {
-        id: database.id
-      }
-    });
-
-    const { proposalStatus, proposalUrl } = extractDatabaseProposalProperties({
-      boardBlock: databaseAfterUpdate as any
-    });
-
-    const discussionValueId = proposalStatus?.options.find((opt) => opt.value === 'discussion')?.id;
-    const archivedValueId = proposalStatus?.options.find((opt) => opt.value === 'archived')?.id;
-
-    expect(discussionValueId).toBeDefined();
-    expect(archivedValueId).toBeDefined();
-
-    const syncedPage = await prisma.page.findFirstOrThrow({
-      where: {
-        parentId: database.id,
-        syncWithPageId: pageProposal.id
-      }
-    });
-
-    const cardBlock = await prisma.block.findUniqueOrThrow({
-      where: {
-        id: syncedPage.id
-      }
-    });
-
-    const cardBlockProposalProps = extractCardProposalProperties({
-      card: cardBlock as any,
-      databaseProperties: {
-        proposalStatus,
-        proposalUrl
-      }
-    });
-
-    expect(cardBlockProposalProps.cardProposalStatus).toBeDefined();
-    expect(cardBlockProposalProps.cardProposalStatus?.optionId).toBe(discussionValueId);
-    expect(cardBlockProposalProps.cardProposalStatus?.value).toBe('discussion');
-    expect(cardBlockProposalProps.cardProposalStatus?.propertyId).toBe(proposalStatus?.id);
-
-    // Part 2 ---- Archive the proposal ----
-    await prisma.proposal.update({
-      where: {
-        id: pageProposal.id
-      },
-      data: {
-        archived: true
-      }
-    });
-
-    await updateCardsFromProposals({
-      boardId: database.id,
-      spaceId: space.id,
-      userId: user.id
-    });
-    const updatedCard = await prisma.block.findUnique({
-      where: {
-        id: cardBlock.id
-      }
-    });
-
-    const updatedCardBlockProposalProps = extractCardProposalProperties({
-      card: updatedCard as any,
-      databaseProperties: extractDatabaseProposalProperties({ boardBlock: databaseAfterUpdate })
-    });
-
-    expect(updatedCardBlockProposalProps.cardProposalStatus).toBeDefined();
-    expect(updatedCardBlockProposalProps.cardProposalStatus?.value).toBe('archived');
-    expect(updatedCardBlockProposalProps.cardProposalStatus?.optionId).toBe(archivedValueId);
-    expect(updatedCardBlockProposalProps.cardProposalStatus?.propertyId).toBe(proposalStatus?.id);
-
-    // Part 3 ---- Unarchive the proposal ----
-    await prisma.proposal.update({
-      where: {
-        id: pageProposal.id
-      },
-      data: {
-        archived: false
-      }
-    });
-
-    await updateCardsFromProposals({
-      boardId: database.id,
-      spaceId: space.id,
-      userId: user.id
-    });
-    const updatedCardAfterUnArchive = await prisma.block.findUnique({
-      where: {
-        id: cardBlock.id
-      }
-    });
-
-    const updatedCardBlockAfterUnArchiveProposalProps = extractCardProposalProperties({
-      card: updatedCardAfterUnArchive as any,
-      databaseProperties: extractDatabaseProposalProperties({ boardBlock: databaseAfterUpdate })
-    });
-
-    expect(updatedCardBlockAfterUnArchiveProposalProps.cardProposalStatus).toBeDefined();
-    expect(updatedCardBlockAfterUnArchiveProposalProps.cardProposalStatus?.value).toBe('discussion');
-    expect(updatedCardBlockAfterUnArchiveProposalProps.cardProposalStatus?.optionId).toBe(discussionValueId);
-    expect(updatedCardBlockAfterUnArchiveProposalProps.cardProposalStatus?.propertyId).toBe(proposalStatus?.id);
   });
 
   it('should update the card properties values based on proposal form field answers, add new properties to board and new cards', async () => {

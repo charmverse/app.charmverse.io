@@ -203,7 +203,7 @@ export async function updateCardsFromProposals({
     const proposalEvaluationStatus = pageWithProposal.proposal
       ? getProposalEvaluationStatus({
           evaluations: pageWithProposal.proposal.evaluations ?? [],
-          hasPendingRewards: ((pageWithProposal.proposal.fields as ProposalFields).pendingRewards ?? []).length > 0,
+          hasPendingRewards: ((pageWithProposal.proposal.fields as ProposalFields)?.pendingRewards ?? []).length > 0,
           status: pageWithProposal.proposal.status,
           hasRewards: pageWithProposal.proposal.rewards.length > 0
         })
