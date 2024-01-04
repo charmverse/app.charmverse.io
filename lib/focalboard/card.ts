@@ -3,7 +3,7 @@ import type { ProposalStatus } from '@charmverse/core/prisma-client';
 
 import type { Block } from 'lib/focalboard/block';
 import { createBlock } from 'lib/focalboard/block';
-import type { ProposalWithUsersLite } from 'lib/proposal/interface';
+import type { ProposalEvaluationStatus, ProposalWithUsersLite } from 'lib/proposal/interface';
 
 export type CardPropertyValue = string | string[] | number;
 
@@ -26,7 +26,7 @@ export type CardPage<V = CardPropertyValue> = {
   proposal?: {
     currentEvaluationId: string | null;
     id: string;
-    status: ProposalStatus;
+    status: ProposalEvaluationStatus;
     currentEvaluation: ProposalWithUsersLite['currentEvaluation'];
     sourceTemplateId?: string;
   };

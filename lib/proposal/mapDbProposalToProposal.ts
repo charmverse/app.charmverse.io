@@ -7,7 +7,12 @@ import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { getProposalFormFields } from 'lib/proposal/form/getProposalFormFields';
 
 import { getProposalEvaluationStatus } from './getProposalEvaluationStatus';
-import type { ProposalFields, ProposalWithUsersAndRubric, ProposalWithUsersLite } from './interface';
+import type {
+  ProposalEvaluationStep,
+  ProposalFields,
+  ProposalWithUsersAndRubric,
+  ProposalWithUsersLite
+} from './interface';
 
 type FormFieldsIncludeType = {
   form: {
@@ -82,15 +87,29 @@ export function mapDbProposalToProposalLite({
   const { rewards, ...rest } = proposal;
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
   const fields = (rest.fields as ProposalFields) ?? null;
+  const hasRewards = rewards.length > 0 || (fields.pendingRewards ?? []).length > 0;
+  const isLastEvaluation = currentEvaluation?.index === proposal.evaluations.length - 1;
+
   const proposalWithUsers = {
     ...rest,
     permissions,
-    currentEvaluation: currentEvaluation
-      ? {
-          title: currentEvaluation.title,
-          type: currentEvaluation.type
-        }
-      : undefined,
+    currentEvaluation:
+      proposal.status === 'draft'
+        ? {
+            title: 'Draft',
+            step: 'draft' as ProposalEvaluationStep
+          }
+        : currentEvaluation
+        ? isLastEvaluation && hasRewards
+          ? {
+              title: 'Rewards',
+              step: 'rewards' as ProposalEvaluationStep
+            }
+          : {
+              title: currentEvaluation.title,
+              step: currentEvaluation.type
+            }
+        : undefined,
     currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
     evaluationType: currentEvaluation?.type || proposal.evaluationType,
     status: getProposalEvaluationStatus({

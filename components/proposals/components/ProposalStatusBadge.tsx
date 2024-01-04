@@ -14,19 +14,6 @@ import type { ProposalStatusWithArchived } from 'lib/proposal/proposalStatusTran
 import { PROPOSAL_STATUS_LABELS_WITH_ARCHIVED } from 'lib/proposal/proposalStatusTransition';
 import type { BrandColor } from 'theme/colors';
 
-const PROPOSAL_STATUS_ICONS: Record<ProposalStatusWithArchived, ReactNode> = {
-  draft: <ModeEditOutlineOutlinedIcon />,
-  discussion: <ChatOutlinedIcon />,
-  review: <ReviewsOutlinedIcon />,
-  reviewed: <CheckOutlinedIcon />,
-  vote_active: <HowToVoteOutlinedIcon />,
-  vote_closed: <BarChartOutlinedIcon />,
-  evaluation_active: <HowToVoteOutlinedIcon />,
-  evaluation_closed: <BarChartOutlinedIcon />,
-  archived: <ArchivedOutlinedIcon />,
-  published: <HowToVoteOutlinedIcon />
-};
-
 export const ProposalStatusColors: Record<ProposalStatusWithArchived, BrandColor> = {
   draft: 'gray',
   discussion: 'teal',
@@ -39,45 +26,6 @@ export const ProposalStatusColors: Record<ProposalStatusWithArchived, BrandColor
   archived: 'gray',
   published: 'green'
 };
-
-const StyledProposalStatusChip = styled(Chip)<{ status: ProposalStatusWithArchived }>`
-  background-color: ${({ status, theme }) => {
-    // @ts-ignore
-    return theme.palette[ProposalStatusColors[status]]?.main;
-  }};
-  .MuiChip-icon {
-    display: flex;
-    opacity: 0.5;
-  }
-  .MuiChip-iconSmall svg {
-    font-size: 1rem;
-  }
-  .MuiChip-label {
-    font-weight: 600;
-  }
-  .MuiChip-labelMedium {
-    font-size: 0.98rem;
-  }
-`;
-
-export function ProposalStatusChip({
-  status,
-  size = 'small'
-}: {
-  size?: ChipProps['size'];
-  status: ProposalStatusWithArchived;
-}) {
-  return (
-    <StyledProposalStatusChip
-      data-test='proposal-status-badge'
-      size={size}
-      status={status}
-      label={PROPOSAL_STATUS_LABELS_WITH_ARCHIVED[status]}
-      variant='filled'
-      icon={<span>{PROPOSAL_STATUS_ICONS[status]}</span>}
-    />
-  );
-}
 
 const StyledProposalStatusChipNormalText = styled(Chip)<{ status: ProposalStatusWithArchived }>`
   background-color: ${({ status, theme }) => {

@@ -20,12 +20,13 @@ import { Constants } from 'lib/focalboard/constants';
 import {
   AUTHORS_BLOCK_ID,
   DEFAULT_VIEW_BLOCK_ID,
+  PROPOSAL_STEP_BLOCK_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID,
-  STATUS_BLOCK_ID,
+  PROPOSAL_STATUS_BLOCK_ID,
   CREATED_AT_ID
 } from 'lib/proposal/blocks/constants';
 import type { ProposalPropertyValue } from 'lib/proposal/blocks/interfaces';
-import type { ProposalWithUsers, ProposalFields } from 'lib/proposal/interface';
+import type { ProposalFields, ProposalWithUsersLite } from 'lib/proposal/interface';
 
 export type BoardProposal = { spaceId?: string; id?: string; fields: ProposalFields | null };
 
@@ -148,7 +149,7 @@ function mapProposalToCardPage({
   proposalPage,
   spaceId
 }: {
-  proposal: ProposalWithUsers | null;
+  proposal: ProposalWithUsersLite | null;
   proposalPage?: PageMeta;
   spaceId?: string;
 }) {
@@ -162,8 +163,9 @@ function mapProposalToCardPage({
       proposalPage && 'createdAt' in proposalPage && proposalPage.createdAt
         ? new Date(proposalPage?.createdAt).getTime()
         : '',
-    [STATUS_BLOCK_ID]: (proposal && 'status' in proposal && proposal.status) || '',
+    [PROPOSAL_STATUS_BLOCK_ID]: (proposal && 'status' in proposal && proposal.status) || '',
     [AUTHORS_BLOCK_ID]: (proposal && 'authors' in proposal && proposal.authors?.map((a) => a.userId)) || '',
+    [PROPOSAL_STEP_BLOCK_ID]: proposal?.currentEvaluation?.title ?? 'Draft',
     [PROPOSAL_REVIEWERS_BLOCK_ID]:
       proposal && 'reviewers' in proposal
         ? proposal.reviewers.map(

@@ -67,7 +67,6 @@ export async function createDefaultProposal({ spaceId, userId }: { spaceId: stri
             id: userId
           }
         ],
-        [STATUS_BLOCK_ID]: 'draft',
         [Constants.titleColumnId]: 'Getting Started'
       }
     },

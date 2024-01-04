@@ -19,6 +19,7 @@ import { UserSelect } from 'components/common/BoardEditor/components/properties/
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import { BreadcrumbPageTitle } from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
 import { ProposalStatusChipTextOnly } from 'components/proposals/components/ProposalStatusBadge';
+import { ProposalStepChipTextOnly } from 'components/proposals/components/ProposalStepBadge';
 import { useProposalsWhereUserIsEvaluator } from 'components/proposals/hooks/useProposalsWhereUserIsEvaluator';
 import {
   REWARD_APPLICATION_STATUS_LABELS,
@@ -32,7 +33,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board, DatabaseProposalPropertyType, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card, CardPage } from 'lib/focalboard/card';
-import { STATUS_BLOCK_ID } from 'lib/proposal/blocks/constants';
+import { PROPOSAL_STATUS_BLOCK_ID, PROPOSAL_STEP_BLOCK_ID } from 'lib/proposal/blocks/constants';
 import {
   REWARDS_APPLICANTS_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
@@ -186,7 +187,7 @@ function PropertyValueElement(props: Props) {
       return <RewardApplicationStatusChip status={propertyValue as ApplicationStatus} />;
     }
     return <RewardStatusChip status={propertyValue as RewardStatus} showIcon={false} />;
-  } else if (propertyTemplate.type === 'proposalStatus' || propertyTemplate.id === STATUS_BLOCK_ID) {
+  } else if (propertyTemplate.type === 'proposalStatus' || propertyTemplate.id === PROPOSAL_STATUS_BLOCK_ID) {
     // Proposals as datasource use proposalStatus column, whereas the actual proposals table uses STATUS_BLOCK_ID
     // We should migrate over the proposals as datasource blocks to the same format as proposals table
     return (
@@ -198,6 +199,8 @@ function PropertyValueElement(props: Props) {
         }
       />
     );
+  } else if (propertyTemplate.type === 'proposalStep' || propertyTemplate.id === PROPOSAL_STEP_BLOCK_ID) {
+    return <ProposalStepChipTextOnly label={proposal?.currentEvaluation?.title ?? 'Draft'} />;
   } else if (propertyTemplate.id === REWARD_PROPOSAL_LINK) {
     if (!Array.isArray(propertyValue) || !propertyValue.length || !propertyValue[0]) {
       return null;
@@ -315,8 +318,8 @@ function PropertyValueElement(props: Props) {
           !proposal ||
           readOnly ||
           (displayType !== 'details' && displayType !== 'table') ||
-          proposal.status === 'draft' ||
-          proposal.currentEvaluation?.type === 'feedback' ||
+          proposal.currentEvaluation?.step === 'draft' ||
+          proposal.currentEvaluation?.step === 'feedback' ||
           !!proposal.sourceTemplateId
         }
         required

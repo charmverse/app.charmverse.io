@@ -37,7 +37,8 @@ import {
   DEFAULT_BOARD_BLOCK_ID,
   DEFAULT_VIEW_BLOCK_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID,
-  STATUS_BLOCK_ID
+  PROPOSAL_STEP_BLOCK_ID,
+  PROPOSAL_STATUS_BLOCK_ID
 } from 'lib/proposal/blocks/constants';
 import { defaultRewardPropertyIds } from 'lib/rewards/blocks/constants';
 
@@ -67,7 +68,8 @@ type Props = {
 const DEFAULT_BLOCK_IDS = [
   DEFAULT_BOARD_BLOCK_ID,
   DEFAULT_VIEW_BLOCK_ID,
-  STATUS_BLOCK_ID,
+  PROPOSAL_STATUS_BLOCK_ID,
+  PROPOSAL_STEP_BLOCK_ID,
   AUTHORS_BLOCK_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID
 ];

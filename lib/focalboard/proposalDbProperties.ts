@@ -1,3 +1,4 @@
+import type { ProposalEvaluationType } from '@charmverse/core/dist/cjs/prisma-client';
 import { v4 as uuid } from 'uuid';
 
 import type { DatabaseProposalPropertyType, IPropertyTemplate } from 'lib/focalboard/board';
@@ -12,6 +13,12 @@ export const proposalDbProperties: {
     name: name || 'Proposal Status',
     options: [],
     type: 'proposalStatus'
+  }),
+  proposalStep: (id?: string, name?: string) => ({
+    id: id || uuid(),
+    name: name || 'Proposal Step',
+    options: [],
+    type: 'proposalStep'
   }),
   proposalUrl: (id?: string, name?: string) => ({
     id: id || uuid(),
@@ -78,4 +85,11 @@ export const proposalStatusBoardColors: Record<ProposalStatusWithArchived, keyof
   evaluation_active: 'propColorRed',
   evaluation_closed: 'propColorPink',
   published: 'propColorGreen'
+};
+
+export const proposalStepBoardColors: Record<ProposalEvaluationType, keyof (typeof Constants)['menuColors']> = {
+  feedback: 'propColorGray',
+  pass_fail: 'propColorGray',
+  rubric: 'propColorGray',
+  vote: 'propColorGray'
 };

@@ -22,6 +22,7 @@ import type {
 } from './rubric/interfaces';
 
 export type ProposalEvaluationStatus = 'in_progress' | 'complete' | 'passed' | 'declined' | 'unpublished' | 'published';
+export type ProposalEvaluationStep = ProposalEvaluationType | 'rewards' | 'draft';
 
 export interface ProposalReviewerInput {
   group: 'system_role' | 'role' | 'user';
@@ -63,7 +64,9 @@ export type ProposalWithUsersLite = ProposalWithUsers & {
   currentEvaluationId?: string;
   evaluationType: ProposalEvaluationType;
   permissions?: ProposalPermissionFlags;
-  currentEvaluation?: Pick<ProposalEvaluation, 'title' | 'type'>;
+  currentEvaluation?: Pick<ProposalEvaluation, 'title'> & {
+    step: ProposalEvaluationStep;
+  };
 };
 
 export type PopulatedEvaluation = ProposalRubricData &
