@@ -1,4 +1,4 @@
-import type { FormField, ProposalStatus } from '@charmverse/core/prisma-client';
+import type { FormField } from '@charmverse/core/prisma-client';
 
 import { useGetProposalFormFieldAnswers, useUpdateProposalFormFieldAnswers } from 'charmClient/hooks/proposals';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';

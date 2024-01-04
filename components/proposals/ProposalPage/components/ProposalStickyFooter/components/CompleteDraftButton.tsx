@@ -1,5 +1,3 @@
-import { ArrowForwardIos } from '@mui/icons-material';
-
 import { useUpdateProposalStatusOnly } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
 import { useSnackbar } from 'hooks/useSnackbar';

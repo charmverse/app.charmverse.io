@@ -1,6 +1,5 @@
 /* eslint-disable max-lines */
 
-import type { ProposalStatus } from '@charmverse/core/prisma';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowDropDownOutlinedIcon from '@mui/icons-material/ArrowDropDownOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';

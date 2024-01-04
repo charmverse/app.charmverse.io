@@ -1,5 +1,4 @@
 /* eslint-disable max-lines */
-import type { ProposalStatus } from '@charmverse/core/prisma-client';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';

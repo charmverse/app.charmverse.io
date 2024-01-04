@@ -58,12 +58,9 @@ export function ProposalStepSelect({ proposal, spaceId }: { proposal: CardPagePr
     <Select<string>
       size='small'
       displayEmpty
-      value={proposal.currentEvaluationId ?? ''}
+      value={evaluations[currentEvaluationIndex]?.id ?? ''}
       onChange={(e) => onChange(e.target.value)}
-      renderValue={() => {
-        const currentEvaluationTitle = proposal.currentEvaluation?.title ?? 'Draft';
-        return <ProposalStepChipTextOnly label={currentEvaluationTitle} />;
-      }}
+      renderValue={() => <ProposalStepChipTextOnly label={proposal.currentEvaluation?.title ?? 'Draft'} />}
     >
       {evaluations.map((evaluation, index) => {
         return (
