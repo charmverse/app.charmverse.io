@@ -43,15 +43,15 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
   const { showMessage } = useSnackbar();
   const [evaluationInput, setEvaluationInput] = useState<ProposalEvaluationValues | null>(null);
   const rewardsTitle = mappedFeatures.rewards.title;
-  const currentStep = proposal?.evaluations.find((e) => e.id === proposal?.currentEvaluationId);
+  const currentEvaluation = proposal?.evaluations.find((e) => e.id === proposal?.currentEvaluationId);
   const pendingRewards = proposal?.fields?.pendingRewards;
   const isRewardsComplete = !!proposal?.rewardIds?.length;
   const hasRewardsStep = Boolean(pendingRewards?.length || isRewardsComplete);
-  const isRewardsActive = hasRewardsStep && currentStep?.result === 'pass';
+  const isRewardsActive = hasRewardsStep && currentEvaluation?.result === 'pass';
   // To find the previous step index. we have to calculate the position including Draft and Rewards steps
   let adjustedCurrentEvaluationIndex = 0; // "draft" step
-  if (proposal && currentStep) {
-    adjustedCurrentEvaluationIndex = proposal.evaluations.findIndex((e) => e.id === currentStep?.id) + 1;
+  if (proposal && currentEvaluation) {
+    adjustedCurrentEvaluationIndex = proposal.evaluations.findIndex((e) => e.id === currentEvaluation?.id) + 1;
     if (isRewardsActive) {
       adjustedCurrentEvaluationIndex += 1;
     }
@@ -105,7 +105,7 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
         }
       />
       {proposal?.evaluations.map((evaluation, index) => {
-        const isCurrentEval = currentStep?.id === evaluation.id;
+        const isCurrentEval = currentEvaluation?.id === evaluation.id;
         const isCurrent = isCurrentEval && !isRewardsActive;
         return (
           <EvaluationStepRow
