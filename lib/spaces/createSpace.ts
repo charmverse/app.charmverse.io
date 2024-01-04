@@ -251,6 +251,7 @@ export async function createWorkspace({
       targetSpaceIdOrDomain: space.id,
       exportName: spaceTemplate
     });
+    await prisma.proposalWorkflow.createMany({ data: defaultWorkflows });
   }
 
   // Create a test reward, and the default rewards views
