@@ -1,23 +1,23 @@
-import { Chip, MenuItem, Select } from '@mui/material';
+import { MenuItem, Select } from '@mui/material';
 import { useMemo } from 'react';
 import { mutate } from 'swr';
 
-import { useSubmitEvaluationResult } from 'charmClient/hooks/proposals';
+import { useSubmitEvaluationResult, useUpdateProposalStatusOnly } from 'charmClient/hooks/proposals';
 import type { CardPageProposal } from 'lib/focalboard/card';
-import { PROPOSAL_STATUS_ACTION_LABELS, proposalStatusBoardColors } from 'lib/focalboard/proposalDbProperties';
+import { PROPOSAL_STATUS_ACTION_LABELS } from 'lib/focalboard/proposalDbProperties';
 import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
 
 import { ProposalStatusChipTextOnly } from './ProposalStatusBadge';
-import { ProposalStepChipTextOnly } from './ProposalStepBadge';
 
 export function ProposalStatusSelect({ proposal, spaceId }: { proposal: CardPageProposal; spaceId: string }) {
   const { trigger: submitEvaluationResult } = useSubmitEvaluationResult({ proposalId: proposal.id });
   const currentEvaluationStep = proposal.currentEvaluation?.step;
   const currentEvaluationStatus = proposal.currentEvaluation?.status;
   const currentEvaluationId = proposal.currentEvaluationId;
+  const { trigger: updateProposalStatusOnly } = useUpdateProposalStatusOnly({ proposalId: proposal.id });
 
   const statusOptions: ProposalEvaluationStatus[] = useMemo(() => {
-    if (currentEvaluationId === null) {
+    if (currentEvaluationStep === 'draft') {
       return ['published'];
     } else if (currentEvaluationStep === 'rewards') {
       if (currentEvaluationStatus === 'unpublished') {
@@ -39,13 +39,18 @@ export function ProposalStatusSelect({ proposal, spaceId }: { proposal: CardPage
       }
     }
     return [];
-  }, [currentEvaluationId, currentEvaluationStep, currentEvaluationStatus]);
+  }, [currentEvaluationStep, currentEvaluationStatus]);
 
   async function onChange(status: ProposalEvaluationStatus) {
     if (currentEvaluationId) {
       await submitEvaluationResult({
         evaluationId: currentEvaluationId,
-        result: status === 'complete' || status === 'passed' ? 'pass' : 'fail'
+        result: status === 'complete' || status === 'passed' || status === 'published' ? 'pass' : 'fail'
+      });
+      await mutate(`/api/spaces/${spaceId}/proposals`);
+    } else if (!currentEvaluationId && status === 'published') {
+      await updateProposalStatusOnly({
+        newStatus: 'published'
       });
       await mutate(`/api/spaces/${spaceId}/proposals`);
     }
@@ -57,9 +62,7 @@ export function ProposalStatusSelect({ proposal, spaceId }: { proposal: CardPage
       displayEmpty
       value={currentEvaluationStatus ?? ''}
       onChange={(e) => onChange(e.target.value as ProposalEvaluationStatus)}
-      renderValue={(status) => {
-        return <ProposalStatusChipTextOnly status={status as ProposalEvaluationStatus} />;
-      }}
+      renderValue={(status) => <ProposalStatusChipTextOnly status={status as ProposalEvaluationStatus} />}
       readOnly={statusOptions.length === 0}
     >
       {statusOptions.map((status) => {

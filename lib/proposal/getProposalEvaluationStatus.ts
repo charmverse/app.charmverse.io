@@ -43,7 +43,7 @@ export function getProposalEvaluationStatus({
   const currentEvaluation = getCurrentEvaluation(evaluations);
   const isLastEvaluation = currentEvaluation?.index === evaluations.length - 1;
   if (status === 'draft' || !currentEvaluation) {
-    return 'in_progress';
+    return 'unpublished';
   }
 
   const currentEvaluationResult = currentEvaluation.result;
