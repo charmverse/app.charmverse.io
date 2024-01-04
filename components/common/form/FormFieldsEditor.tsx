@@ -38,17 +38,20 @@ export function ControlledFormFieldsEditor({
 export function FormFieldsEditor({
   proposalId,
   formFields: initialFormFields,
-  readOnly
+  readOnly,
+  refreshProposal
 }: {
   proposalId: string;
   formFields: FormFieldInput[];
   readOnly?: boolean;
+  refreshProposal: VoidFunction;
 }) {
   const [formFields, setFormFields] = useState([...initialFormFields]);
   const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>(formFields.map((field) => field.id));
   const { trigger } = useUpdateProposalFormFields({ proposalId });
   const saveFormFields = async () => {
     await trigger({ formFields });
+    refreshProposal?.();
   };
 
   return (
