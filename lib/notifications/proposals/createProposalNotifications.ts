@@ -40,6 +40,7 @@ export async function createProposalNotifications(webhookData: {
               reviewers: true
             }
           },
+          status: true,
           authors: {
             select: {
               userId: true
@@ -104,6 +105,7 @@ export async function createProposalNotifications(webhookData: {
         select: {
           userId: true,
           id: true,
+          isAdmin: true,
           spaceRoleToRole: {
             select: {
               role: {

@@ -1,6 +1,6 @@
 import type { Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsProposals, testUtilsSpaces, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsSpaces, testUtilsUser } from '@charmverse/core/test';
 import { expect } from '@playwright/test';
 import { ProposalPage } from '__e2e__/po/proposalPage.po';
 import { ProposalsListPage } from '__e2e__/po/proposalsList.po';
@@ -50,16 +50,6 @@ test.describe.skip('Proposal Flow', () => {
       browserPage: authorBrowserProposalListPage.page,
       userId: proposalAuthor.id
     });
-    const category = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id,
-      title: 'General',
-      proposalCategoryPermissions: [
-        {
-          permissionLevel: 'full_access',
-          assignee: { group: 'space', id: space.id }
-        }
-      ]
-    });
 
     await authorBrowserProposalListPage.goToProposals(space.domain);
     await authorBrowserProposalListPage.waitForProposalsList();
@@ -71,8 +61,6 @@ test.describe.skip('Proposal Flow', () => {
 
     // enter required fields
     await authorBrowserProposalPage.documentTitle.type('Proposal title');
-    await authorBrowserProposalPage.categorySelect.click();
-    await authorBrowserProposalPage.getSelectOption(category.id).click();
     await authorBrowserProposalPage.charmEditor.scrollIntoViewIfNeeded();
     await authorBrowserProposalPage.charmEditor.type('Proposal content');
     await authorBrowserProposalPage.reviewerSelect.click();

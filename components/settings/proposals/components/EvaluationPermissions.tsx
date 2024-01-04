@@ -1,17 +1,17 @@
-import { ProposalSystemRole, ProposalOperation } from '@charmverse/core/prisma';
+import { ProposalOperation, ProposalSystemRole } from '@charmverse/core/prisma';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { Box, Card, Stack, Tooltip, Typography } from '@mui/material';
 import { capitalize } from 'lodash';
 
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
-import type {
-  SystemRoleOptionPopulated,
-  SelectOption
+import {
+  UserAndRoleSelect,
+  type SelectOption,
+  type SystemRoleOptionPopulated
 } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import { ProposalIcon, MembersIcon } from 'components/common/PageIcon';
+import { MembersIcon, ProposalIcon } from 'components/common/PageIcon';
 
-import { evaluationIcons, evaluateVerbs } from '../constants';
+import { evaluateVerbs, evaluationIcons } from '../constants';
 
 import type { ContextMenuProps } from './EvaluationContextMenu';
 import { EvaluationContextMenu } from './EvaluationContextMenu';

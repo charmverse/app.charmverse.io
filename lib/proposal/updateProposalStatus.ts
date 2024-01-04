@@ -2,9 +2,7 @@ import { ProposalStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { InvalidStateError } from 'lib/middleware';
-import { getPermissionsClient } from 'lib/permissions/api';
-import { getSnapshotProposal } from 'lib/snapshot/getProposal';
-import { coerceToMilliseconds } from 'lib/utilities/dates';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 import { ProposalNotFoundError } from './errors';
@@ -46,15 +44,12 @@ export async function updateProposalStatus({
     throw new InvalidStateError(`Archived proposals cannot be updated`);
   }
 
-  const statusFlow = await getPermissionsClient({ resourceId: proposalId, resourceIdType: 'proposal' }).then(
-    ({ client }) =>
-      client.proposals.computeProposalFlowPermissions({
-        resourceId: proposalId,
-        userId
-      })
-  );
+  const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
+    resourceId: proposalId,
+    userId
+  });
 
-  if (newStatus !== 'published' && !statusFlow[newStatus]) {
+  if (!permissions.edit && !permissions.move) {
     throw new InvalidStateError(`Invalid transition to proposal status "${newStatus}"`);
   }
 
@@ -86,23 +81,17 @@ export async function updateProposalStatus({
     }
   });
 
-  const snapshotProposalId = proposalInfo?.page?.snapshotProposalId;
-
-  const snapshotProposal = snapshotProposalId ? await getSnapshotProposal(snapshotProposalId) : null;
-
   return prisma.$transaction(async (tx) => {
     const updatedProposal = await tx.proposal.update({
       where: {
         id: proposalId
       },
       data: {
-        status: newStatus,
-        snapshotProposalExpiry: snapshotProposal?.end ? new Date(coerceToMilliseconds(snapshotProposal.end)) : undefined
+        status: newStatus
       },
       include: {
         authors: true,
         reviewers: true,
-        category: true,
         rubricAnswers: true,
         rubricCriteria: {
           orderBy: {

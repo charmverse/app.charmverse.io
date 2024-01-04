@@ -14920,18 +14920,11 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "c4cffeb1-9270-4544-aa22-0b2822f11531",
         "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
         "evaluationType": "rubric",
-        "fields": null,
-        "category": {
-          "id": "c4cffeb1-9270-4544-aa22-0b2822f11531",
-          "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
-          "title": "General",
-          "color": "gray"
-        }
+        "fields": null
       }
     }
   ]

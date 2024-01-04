@@ -17,7 +17,6 @@ export type ProposalEvaluationValues = Omit<ProposalEvaluationInput, 'permission
 
 type Props = {
   evaluation: ProposalEvaluationValues;
-  categoryId?: string | null;
   onChange: (criteria: Partial<ProposalEvaluationValues>) => void;
   readOnly: boolean;
   readOnlyReviewers: boolean;
@@ -26,7 +25,6 @@ type Props = {
 
 export function EvaluationStepSettings({
   evaluation,
-  categoryId,
   onChange,
   readOnly,
   readOnlyReviewers,
@@ -62,11 +60,10 @@ export function EvaluationStepSettings({
         <UserAndRoleSelect
           data-test={`proposal-${evaluation.type}-select`}
           emptyPlaceholderContent='Select user or role'
-          value={reviewerOptions}
+          value={reviewerOptions as SelectOption[]}
           readOnly={readOnly || readOnlyReviewers}
           systemRoles={[allMembersSystemRole]}
           variant='outlined'
-          proposalCategoryId={categoryId}
           onChange={handleOnChangeReviewers}
           required
         />
@@ -80,7 +77,7 @@ export function EvaluationStepSettings({
           </FormLabel>
           <Box display='flex' flex={1} flexDirection='column'>
             <RubricCriteria
-              readOnly={readOnly || readOnlyRubricCriteria}
+              readOnly={readOnlyRubricCriteria}
               value={evaluation.rubricCriteria as RangeProposalCriteria[]}
               onChange={(rubricCriteria) =>
                 onChange({

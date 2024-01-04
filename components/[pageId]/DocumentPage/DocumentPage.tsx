@@ -92,7 +92,7 @@ function DocumentPage({
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
 
-  const { proposal, readOnlyRubricCriteria, readOnlyReviewers, refreshProposal, onChangeEvaluation } = useProposal({
+  const { proposal, refreshProposal, onChangeEvaluation } = useProposal({
     proposalId
   });
 
@@ -279,8 +279,6 @@ function DocumentPage({
           pageId={page.id}
           proposalId={proposalId}
           pagePermissions={pagePermissions}
-          snapshotProposalId={page.snapshotProposalId}
-          refreshPagePermissions={refreshPage}
           readOnly={readonlyProposalProperties}
           proposalPage={page}
           openEvaluation={openEvaluation}
@@ -309,8 +307,7 @@ function DocumentPage({
           proposalId={proposalId}
           isUnpublishedProposal={proposal?.status === 'draft' || page.type === 'proposal_template'}
           readOnlyProposalPermissions={!proposal?.permissions.edit}
-          readOnlyRubricCriteria={readOnlyRubricCriteria}
-          readOnlyReviewers={readOnlyReviewers}
+          isReviewer={proposal?.permissions.evaluate}
           pagePermissions={pagePermissions}
           editorState={editorState}
           sidebarView={sidebarView}
@@ -320,8 +317,8 @@ function DocumentPage({
           threads={threads}
           proposal={proposal}
           proposalInput={proposal}
+          proposalTemplateId={proposal?.page?.sourceTemplateId}
           onChangeEvaluation={onChangeEvaluation}
-          isProposalTemplate={page.type === 'proposal_template'}
           refreshProposal={refreshProposal}
           disabledViews={isStructuredProposal ? ['suggestions', 'comments'] : []}
           onChangeWorkflow={() => {}}
@@ -468,8 +465,7 @@ function DocumentPage({
                         <ProposalFormFieldInputs
                           proposalId={proposal.id}
                           formFields={proposal?.form.formFields ?? []}
-                          readOnly={!user || !proposalAuthors.includes(user.id)}
-                          proposalStatus={proposal.status}
+                          readOnly={!user || !pagePermissions.edit_content}
                         />
                       )}
                     </Box>

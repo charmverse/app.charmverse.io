@@ -1,8 +1,3 @@
-import type {
-  ProposalCategoryWithPermissions,
-  ProposalFlowPermissionFlags,
-  ProposalReviewerPool
-} from '@charmverse/core/permissions';
 import type { FormFieldAnswer } from '@charmverse/core/prisma-client';
 import type { ListProposalsRequest } from '@charmverse/core/proposals';
 
@@ -16,7 +11,7 @@ import type { ClearEvaluationResultRequest } from 'lib/proposal/clearEvaluationR
 import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import type { RubricProposalsUserInfo } from 'lib/proposal/getProposalsEvaluatedByUser';
 import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
-import type { ProposalWithUsers, ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { ProposalWithUsersAndRubric, ProposalWithUsersLite } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers';
 import type { RubricCriteriaUpsert } from 'lib/proposal/rubric/upsertRubricCriteria';
@@ -37,25 +32,12 @@ export function useGetProposalDetails(proposalId: MaybeString) {
 export function useGetIsReviewer(proposalId: MaybeString) {
   return useGET<boolean>(proposalId ? `/api/proposals/${proposalId}/is-reviewer` : null);
 }
-export function useGetReviewerPool(categoryId: MaybeString) {
-  return useGET<ProposalReviewerPool>(categoryId ? `/api/proposals/reviewer-pool?resourceId=${categoryId}` : null);
-}
-
-export function useGetProposalFlowFlags(proposalId: MaybeString) {
-  return useGET<ProposalFlowPermissionFlags>(proposalId ? `/api/proposals/${proposalId}/compute-flow-flags` : null);
-}
-export function useGetProposalsBySpace({ spaceId, categoryIds }: Partial<ListProposalsRequest>) {
-  return useGET<ProposalWithUsers[]>(spaceId ? `/api/spaces/${spaceId}/proposals` : null, {
-    categoryIds
-  });
+export function useGetProposalsBySpace({ spaceId }: Partial<ListProposalsRequest>) {
+  return useGET<ProposalWithUsersLite[]>(spaceId ? `/api/spaces/${spaceId}/proposals` : null);
 }
 
 export function useGetProposalTemplatesBySpace(spaceId: MaybeString) {
   return useGET<ProposalTemplate[]>(spaceId ? `/api/spaces/${spaceId}/proposal-templates` : null);
-}
-
-export function useGetProposalCategories(spaceId?: string) {
-  return useGET<ProposalCategoryWithPermissions[]>(spaceId ? `/api/spaces/${spaceId}/proposal-categories` : null);
 }
 
 export function useGetProposalIdsEvaluatedByUser(spaceId: MaybeString) {

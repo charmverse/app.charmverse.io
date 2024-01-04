@@ -2,10 +2,8 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import type { SpaceResourcesRequest } from '@charmverse/core/permissions';
 import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { generateCategoryIdQuery } from '@charmverse/core/proposals';
 import { stringUtils } from '@charmverse/core/utilities';
 
-import { permissionsApiClient } from 'lib/permissions/api/client';
 import { mapDbProposalToProposal } from 'lib/proposal/mapDbProposalToProposal';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
@@ -36,21 +34,17 @@ export async function getProposalTemplates({ spaceId, userId }: SpaceResourcesRe
     return [];
   }
 
-  let categoryIds: string[] | undefined;
-
   const templates = await prisma.proposal.findMany({
     where: {
       spaceId,
       page: {
         type: 'proposal_template'
-      },
-      categoryId: generateCategoryIdQuery(categoryIds)
+      }
     },
     include: {
       authors: true,
       reviewers: true,
       rewards: true, // note that rewards table is not really used by templates, but makes life easier when we call mapDbProposalToProposal()
-      category: true,
       page: true,
       evaluations: {
         orderBy: {

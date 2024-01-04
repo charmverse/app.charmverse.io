@@ -7,7 +7,6 @@ import { getDefaultFeedbackEvaluation, getDefaultPermissions } from 'lib/proposa
 
 import {
   AUTHORS_BLOCK_ID,
-  CATEGORY_BLOCK_ID,
   CREATED_AT_ID,
   EVALUATION_TYPE_BLOCK_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID,
@@ -16,17 +15,8 @@ import {
 import { createProposal } from './createProposal';
 
 // replace the old method with this one once we have moved to new flow
-export async function createDefaultProposal({
-  categoryId,
-  spaceId,
-  userId
-}: {
-  categoryId: string;
-  spaceId: string;
-  userId: string;
-}) {
+export async function createDefaultProposal({ spaceId, userId }: { spaceId: string; userId: string }) {
   await createProposal({
-    categoryId,
     spaceId,
     userId,
     authors: [userId],
@@ -76,7 +66,6 @@ export async function createDefaultProposal({
     fields: {
       properties: {
         [AUTHORS_BLOCK_ID]: [userId],
-        [CATEGORY_BLOCK_ID]: categoryId,
         [CREATED_AT_ID]: '',
         [EVALUATION_TYPE_BLOCK_ID]: 'vote',
         [PROPOSAL_REVIEWERS_BLOCK_ID]: [

@@ -58,7 +58,6 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
       forcePopupIcon = 'auto',
       noOptionsText,
       helperText,
-      fieldWrapperSx,
       fluidWidth,
       ...inputProps
     },
@@ -122,7 +121,6 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
         required={required}
         inline={inline}
         iconLabel={iconLabel}
-        sx={fieldWrapperSx}
       >
         <Autocomplete
           data-test='autocomplete'
@@ -161,7 +159,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
             );
           }}
           renderTags={(value, getTagProps) => (
-            <Stack flexDirection='row' gap={1}>
+            <Stack flexDirection='row' gap={1} flexGrow={1}>
               {value.map((option, index) => (
                 // eslint-disable-next-line react/jsx-key
                 <Chip

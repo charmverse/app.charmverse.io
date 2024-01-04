@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
 import { IconButton, Box, Stack } from '@mui/material';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { ErrorWrapper } from 'components/common/BoardEditor/components/properties/ErrorWrapper';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';

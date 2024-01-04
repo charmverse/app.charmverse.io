@@ -142,21 +142,8 @@ export function NewProposalPage({
   }
   usePreventReload(contentUpdated);
 
-  const isFromTemplateSource = Boolean(formInputs.proposalTemplateId);
   const isTemplateRequired = Boolean(currentSpace?.requireProposalTemplate);
-  // rubric criteria can always be updated by admins
-  const readOnlyRubricCriteria = isFromTemplateSource && !isAdmin;
-
-  const readOnlyReviewers = !!proposalTemplates?.some((t) => t.id === formInputs?.proposalTemplateId);
-
-  const templateOptions = (proposalTemplates || [])
-    .filter((_proposal) => {
-      if (!formInputs.categoryId) {
-        return true;
-      }
-      return _proposal.categoryId === formInputs.categoryId;
-    })
-    .map((template) => template.page);
+  const templateOptions = (proposalTemplates || []).map((template) => template.page);
   const { pages } = usePages();
 
   const proposalTemplatePage = formInputs.proposalTemplateId ? pages[formInputs.proposalTemplateId] : null;
@@ -184,7 +171,6 @@ export function NewProposalPage({
     const template = proposalTemplates?.find((t) => t.id === _templateId);
     if (template) {
       setFormInputs({
-        categoryId: template.categoryId,
         content: template.page.content as PageContent,
         contentText: template.page.contentText,
         reviewers: template.reviewers.map((reviewer) => ({
@@ -312,8 +298,6 @@ export function NewProposalPage({
               </>
             )}
             <ProposalPropertiesBase
-              isFromTemplate={isFromTemplateSource}
-              readOnlyCategory={isFromTemplateSource}
               proposalStatus='draft'
               proposalFormInputs={formInputs}
               setProposalFormInputs={setFormInputs}
@@ -325,14 +309,13 @@ export function NewProposalPage({
       {currentSpace && (
         <PageSidebar
           isUnpublishedProposal
-          readOnlyReviewers={readOnlyReviewers}
-          readOnlyRubricCriteria={readOnlyRubricCriteria}
           id='page-action-sidebar'
           spaceId={currentSpace.id}
           sidebarView={internalSidebarView || null}
           closeSidebar={() => {}}
           openSidebar={setActiveView}
           proposalInput={formInputs}
+          proposalTemplateId={formInputs.proposalTemplateId}
           onChangeEvaluation={(evaluationId, updates) => {
             const evaluations = formInputs.evaluations.map((e) => (e.id === evaluationId ? { ...e, ...updates } : e));
             setFormInputs({

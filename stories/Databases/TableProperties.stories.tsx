@@ -49,7 +49,8 @@ const boardPage: PageMeta = {
   type: 'board',
   updatedAt: new Date(),
   updatedBy: uuid(),
-  syncWithPageId: null
+  syncWithPageId: null,
+  sourceTemplateId: null
 };
 
 const view = createTableView({ board });

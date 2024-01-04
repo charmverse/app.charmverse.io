@@ -9,24 +9,54 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import FieldLabel from '../FieldLabel';
 
-type Props = {
+export type FieldWrapperProps = {
   children?: ReactNode;
   label?: string;
   inline?: boolean;
+  sx?: SxProps;
+};
+
+export function FieldWrapperContainer({
+  inline,
+  sx,
+  children
+}: {
+  inline?: boolean;
+  sx?: SxProps;
+  children: ReactNode;
+}) {
+  return (
+    <Box flex={1} flexDirection={{ xs: 'column', sm: inline ? 'row' : 'column' }} display='flex' sx={sx}>
+      {children}
+    </Box>
+  );
+}
+
+type ContentProps = {
+  children?: ReactNode;
   iconLabel?: ReactNode;
   required?: boolean;
   description?: PageContent;
   endAdornment?: ReactNode;
-  sx?: SxProps;
 };
 
-export function FieldWrapper({ sx, endAdornment, description, required, children, label, inline, iconLabel }: Props) {
+// a wrapper for FieldWrapper with props for label and description
+export function FieldWrapper({
+  sx,
+  endAdornment,
+  description,
+  required,
+  children,
+  label,
+  inline,
+  iconLabel
+}: ContentProps & FieldWrapperProps) {
   if (!label) {
     return children as JSX.Element;
   }
 
   return (
-    <Box flex={1} flexDirection={{ xs: 'column', sm: inline ? 'row' : 'column' }} display='flex' my={1} sx={sx}>
+    <FieldWrapperContainer inline={inline} sx={sx}>
       {(label || !!iconLabel) && (
         <Box alignItems='center' display='flex' gap={1}>
           {iconLabel ?? null}
@@ -43,10 +73,15 @@ export function FieldWrapper({ sx, endAdornment, description, required, children
           )}
         </Box>
       )}
-      {description && !checkIsContentEmpty(description as PageContent) ? (
-        <CharmEditor readOnly isContentControlled content={description as PageContent} />
-      ) : null}
+      <ReadonlyCharmContent content={description} />
       {children}
-    </Box>
+    </FieldWrapperContainer>
   );
+}
+
+export function ReadonlyCharmContent({ content }: { content?: PageContent | null }) {
+  if (!content || checkIsContentEmpty(content)) {
+    return null;
+  }
+  return <CharmEditor readOnly isContentControlled content={content} />;
 }

@@ -41,7 +41,6 @@ export type CreateProposalInput = {
   pageId?: string;
   pageProps?: PageProps;
   proposalTemplateId?: string | null;
-  categoryId: string;
   reviewers?: ProposalReviewerInput[];
   authors?: string[];
   userId: string;
@@ -66,7 +65,6 @@ export type CreatedProposal = {
 export async function createProposal({
   userId,
   spaceId,
-  categoryId,
   pageProps,
   authors,
   reviewers,
@@ -82,28 +80,10 @@ export async function createProposal({
   formAnswers,
   isDraft
 }: CreateProposalInput) {
-  if (!categoryId) {
-    throw new InvalidInputError('Proposal must be linked to a category');
-  }
-
   const proposalId = uuid();
   const proposalStatus: ProposalStatus = isDraft ? 'draft' : 'published';
 
   const authorsList = arrayUtils.uniqueValues(authors ? [...authors, userId] : [userId]);
-
-  const sourceTemplate = proposalTemplateId
-    ? await prisma.proposal.findUniqueOrThrow({
-        where: { id: proposalTemplateId },
-        select: {
-          evaluations: {
-            orderBy: { index: 'asc' },
-            include: {
-              reviewers: true
-            }
-          }
-        }
-      })
-    : null;
 
   const workflow = workflowId
     ? ((await prisma.proposalWorkflow.findUnique({
@@ -126,22 +106,12 @@ export async function createProposal({
 
   const evaluationPermissionsToCreate: Prisma.ProposalEvaluationPermissionCreateManyInput[] = [];
 
-  let reviewersInput =
-    reviewers?.map(
-      (r) =>
-        ({
-          // id: r.group !== 'system_role' ? r.id : undefined, // system roles dont have ids
-          proposalId,
-          roleId: r.group === 'role' ? r.id : undefined,
-          systemRole: r.group === 'system_role' ? r.id : undefined,
-          userId: r.group === 'user' ? r.id : undefined
-        } as Prisma.ProposalReviewerCreateManyInput)
-    ) || [];
+  const reviewersInput: Prisma.ProposalReviewerCreateManyInput[] = [];
 
   // retrieve permissions and apply evaluation ids to reviewers
   if (evaluations.length > 0) {
     // TODO: fix tests that need to pass in permissions
-    evaluations.forEach(({ id: evaluationId, permissions: providedPermissions }, index) => {
+    evaluations.forEach(({ id: evaluationId, permissions: providedPermissions, reviewers: evalReviewers }, index) => {
       const configuredEvaluation = workflow?.evaluations[index];
       const permissions = configuredEvaluation?.permissions || providedPermissions;
       if (!permissions) {
@@ -156,17 +126,16 @@ export async function createProposal({
           systemRole: permission.systemRole
         }))
       );
+      reviewersInput.push(
+        ...evalReviewers.map((reviewer) => ({
+          roleId: reviewer.roleId,
+          systemRole: reviewer.systemRole,
+          userId: reviewer.userId,
+          proposalId,
+          evaluationId: evaluationIds[index]
+        }))
+      );
     });
-
-    reviewersInput = (sourceTemplate ? sourceTemplate.evaluations : evaluations).flatMap((evaluation, index) =>
-      evaluation.reviewers.map((reviewer) => ({
-        roleId: reviewer.roleId,
-        systemRole: reviewer.systemRole,
-        userId: reviewer.userId,
-        proposalId,
-        evaluationId: evaluationIds[index]
-      }))
-    );
   }
 
   let proposalFormId = formId;
@@ -189,7 +158,6 @@ export async function createProposal({
         id: proposalId,
         space: { connect: { id: spaceId } },
         status: proposalStatus,
-        category: { connect: { id: categoryId } },
         evaluationType,
         publishToLens,
         authors: {
@@ -219,8 +187,7 @@ export async function createProposal({
         form: proposalFormId ? { connect: { id: proposalFormId } } : undefined
       },
       include: {
-        authors: true,
-        category: true
+        authors: true
       }
     }),
     prisma.proposalReviewer.createMany({

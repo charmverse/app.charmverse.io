@@ -6,6 +6,7 @@ import type {
   Proposal,
   ProposalEvaluation,
   ProposalEvaluationPermission,
+  ProposalEvaluationType,
   Vote
 } from '@charmverse/core/prisma';
 import type { ProposalWithUsers as CoreProposalWithUsers } from '@charmverse/core/proposals';
@@ -24,20 +25,6 @@ export interface ProposalReviewerInput {
   group: 'system_role' | 'role' | 'user';
   id: string;
   evaluationId?: string;
-}
-
-export interface NewProposalCategory {
-  title: string;
-  color: string;
-}
-
-export interface ProposalCategory extends NewProposalCategory {
-  id: string;
-  spaceId: string;
-}
-
-export interface ProposalWithCategory extends Proposal {
-  category: ProposalCategory | null;
 }
 
 export type ProposalRubricData = {
@@ -67,6 +54,13 @@ export type ProposalFormData = {
 
 export type ProposalWithUsers = Omit<CoreProposalWithUsers, 'fields'> & {
   fields: ProposalFields | null;
+};
+
+export type ProposalWithUsersLite = ProposalWithUsers & {
+  currentEvaluationId?: string;
+  evaluationType: ProposalEvaluationType;
+  permissions?: ProposalPermissionFlags;
+  currentEvaluation?: Pick<ProposalEvaluation, 'title' | 'type'>;
 };
 
 export type PopulatedEvaluation = ProposalRubricData &

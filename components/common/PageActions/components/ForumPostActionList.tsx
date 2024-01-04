@@ -6,7 +6,6 @@ import Tooltip from '@mui/material/Tooltip';
 
 import charmClient from 'charmClient';
 import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
-import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useMembers } from 'hooks/useMembers';
@@ -38,8 +37,6 @@ export function ForumPostActionList({
   const { getMemberById, members } = useMembers();
   const [spacePermissions] = useCurrentSpacePermissions();
   const { navigateToSpacePath } = useCharmRouter();
-
-  const { getDefaultCreateCategory } = useProposalCategories();
 
   const canCreateProposal = spacePermissions?.createProposals;
 
@@ -73,8 +70,7 @@ export function ForumPostActionList({
   async function convertToProposal(pageId: string) {
     onComplete();
     const { path } = await charmClient.forum.convertToProposal({
-      postId: pageId,
-      categoryId: getDefaultCreateCategory()?.id
+      postId: pageId
     });
     navigateToSpacePath(`/${path}`);
   }

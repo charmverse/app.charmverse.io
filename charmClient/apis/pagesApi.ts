@@ -32,8 +32,8 @@ export class PagesApi {
     return http.PUT<void>(`/api/pages/${pageOpts.id}`, pageOpts);
   }
 
-  convertToProposal({ pageId, categoryId }: { pageId: string; categoryId: string }) {
-    return http.POST<PageMeta>(`/api/pages/${pageId}/convert-to-proposal`, { categoryId });
+  convertToProposal({ pageId }: { pageId: string }) {
+    return http.POST<PageMeta>(`/api/pages/${pageId}/convert-to-proposal`);
   }
 
   duplicatePage({ pageId }: { pageId: string }) {

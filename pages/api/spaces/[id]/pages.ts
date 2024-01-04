@@ -59,7 +59,8 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
       bountyId: true,
       hasContent: true,
       galleryImage: true,
-      syncWithPageId: true
+      syncWithPageId: true,
+      sourceTemplateId: true
     }
   });
 

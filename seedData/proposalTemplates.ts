@@ -497,15 +497,8 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
       reviewedBy: null,
       archived: false,
       reviewedAt: null,
-      categoryId: '4532b730-f8fa-4925-a056-4d1b175d0d67',
       snapshotProposalExpiry: null,
       evaluationType: 'vote',
-      category: {
-        id: '4532b730-f8fa-4925-a056-4d1b175d0d67',
-        spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
-        title: 'Treasury',
-        color: 'gray'
-      },
       fields: null,
       workflowId: null,
       formId: null
@@ -1631,14 +1624,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
       reviewedBy: null,
       reviewedAt: null,
       archived: false,
-      categoryId: '4532b730-f8fa-4925-a056-4d1b175d0d67',
       snapshotProposalExpiry: null,
-      category: {
-        id: '4532b730-f8fa-4925-a056-4d1b175d0d67',
-        spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
-        title: 'Treasury',
-        color: 'gray'
-      },
       fields: null,
       workflowId: null,
       formId: null
@@ -2052,14 +2038,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
       reviewedBy: null,
       reviewedAt: null,
       archived: false,
-      categoryId: '4532b730-f8fa-4925-a056-4d1b175d0d67',
       snapshotProposalExpiry: null,
-      category: {
-        id: '4532b730-f8fa-4925-a056-4d1b175d0d67',
-        spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
-        title: 'Treasury',
-        color: 'gray'
-      },
       fields: null,
       workflowId: null,
       formId: null
@@ -2401,14 +2380,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
       reviewedBy: null,
       reviewedAt: null,
       archived: false,
-      categoryId: 'f5527a96-4f10-4986-b5c5-7b4292d8c222',
       snapshotProposalExpiry: null,
-      category: {
-        id: 'f5527a96-4f10-4986-b5c5-7b4292d8c222',
-        spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
-        title: 'Protocol',
-        color: 'pink'
-      },
       fields: null,
       workflowId: null,
       formId: null
@@ -3092,14 +3064,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
       reviewedBy: null,
       reviewedAt: null,
       archived: false,
-      categoryId: 'fc1c1130-1f02-414a-86fb-505bc5061bb5',
       snapshotProposalExpiry: null,
-      category: {
-        id: 'fc1c1130-1f02-414a-86fb-505bc5061bb5',
-        spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
-        title: 'Metagoverance',
-        color: 'pink'
-      },
       fields: null,
       workflowId: null,
       formId: null
@@ -3781,14 +3746,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
       reviewedBy: null,
       reviewedAt: null,
       archived: false,
-      categoryId: 'fc1c1130-1f02-414a-86fb-505bc5061bb5',
       snapshotProposalExpiry: null,
-      category: {
-        id: 'fc1c1130-1f02-414a-86fb-505bc5061bb5',
-        spaceId: '30bfda0c-19a6-463d-bef7-daccbf433a04',
-        title: 'Metagoverance',
-        color: 'pink'
-      },
       fields: null,
       workflowId: null,
       formId: null

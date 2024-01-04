@@ -655,7 +655,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "67f004c9-ff0f-459a-a9d0-d02fd563158c",
         "snapshotProposalExpiry": null,
         "publishToLens": false,
         "lensPostLink": null,
@@ -664,7 +663,6 @@
           "properties": {
             "__status": "",
             "__authors": [],
-            "__category": "67f004c9-ff0f-459a-a9d0-d02fd563158c",
             "__createdAt": "",
             "__reviewers": [
               {
@@ -674,13 +672,7 @@
             "__evaluationType": "vote"
           }
         },
-        "workflowId": null,
-        "category": {
-          "id": "67f004c9-ff0f-459a-a9d0-d02fd563158c",
-          "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-          "title": "Grants",
-          "color": "pink"
-        }
+        "workflowId": null
       }
     },
     {
@@ -1455,7 +1447,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "e826b6ff-ea89-47aa-9bda-83234bff9491",
         "snapshotProposalExpiry": null,
         "publishToLens": false,
         "lensPostLink": null,
@@ -1464,7 +1455,6 @@
           "properties": {
             "__status": "",
             "__authors": [],
-            "__category": "e826b6ff-ea89-47aa-9bda-83234bff9491",
             "__createdAt": "",
             "__reviewers": [
               {
@@ -1474,13 +1464,7 @@
             "__evaluationType": "vote"
           }
         },
-        "workflowId": null,
-        "category": {
-          "id": "e826b6ff-ea89-47aa-9bda-83234bff9491",
-          "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-          "title": "Governance",
-          "color": "red"
-        }
+        "workflowId": null
       }
     },
     {
@@ -2233,7 +2217,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "037cac71-c4c7-4355-83dc-577a4cc30a08",
         "snapshotProposalExpiry": null,
         "publishToLens": false,
         "lensPostLink": null,
@@ -2242,7 +2225,6 @@
           "properties": {
             "__status": "",
             "__authors": [],
-            "__category": "037cac71-c4c7-4355-83dc-577a4cc30a08",
             "__createdAt": "",
             "__reviewers": [
               {
@@ -2252,13 +2234,7 @@
             "__evaluationType": "vote"
           }
         },
-        "workflowId": null,
-        "category": {
-          "id": "037cac71-c4c7-4355-83dc-577a4cc30a08",
-          "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-          "title": "Partnerships",
-          "color": "blue"
-        }
+        "workflowId": null
       }
     },
     {
@@ -2746,7 +2722,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "9d39b289-e4a9-4817-bfe6-4ea83f9094c9",
         "snapshotProposalExpiry": null,
         "publishToLens": false,
         "lensPostLink": null,
@@ -2755,7 +2730,6 @@
           "properties": {
             "__status": "",
             "__authors": [],
-            "__category": "9d39b289-e4a9-4817-bfe6-4ea83f9094c9",
             "__createdAt": "",
             "__reviewers": [
               {
@@ -2765,13 +2739,7 @@
             "__evaluationType": "vote"
           }
         },
-        "workflowId": null,
-        "category": {
-          "id": "9d39b289-e4a9-4817-bfe6-4ea83f9094c9",
-          "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-          "title": "Education",
-          "color": "orange"
-        }
+        "workflowId": null
       }
     },
     {
@@ -3457,7 +3425,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "3b721d2f-d5af-4119-a11f-a43419266146",
         "snapshotProposalExpiry": null,
         "publishToLens": false,
         "lensPostLink": null,
@@ -3466,7 +3433,6 @@
           "properties": {
             "__status": "",
             "__authors": [],
-            "__category": "3b721d2f-d5af-4119-a11f-a43419266146",
             "__createdAt": "",
             "__reviewers": [
               {
@@ -3476,13 +3442,7 @@
             "__evaluationType": "vote"
           }
         },
-        "workflowId": null,
-        "category": {
-          "id": "3b721d2f-d5af-4119-a11f-a43419266146",
-          "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-          "title": "Art Direction",
-          "color": "purple"
-        }
+        "workflowId": null
       }
     },
     {
@@ -4365,7 +4325,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "f7a37418-ffb8-483c-a260-c6162ae88155",
         "snapshotProposalExpiry": null,
         "publishToLens": false,
         "lensPostLink": null,
@@ -4374,7 +4333,6 @@
           "properties": {
             "__status": "",
             "__authors": [],
-            "__category": "f7a37418-ffb8-483c-a260-c6162ae88155",
             "__createdAt": "",
             "__reviewers": [
               {
@@ -4384,13 +4342,7 @@
             "__evaluationType": "vote"
           }
         },
-        "workflowId": null,
-        "category": {
-          "id": "f7a37418-ffb8-483c-a260-c6162ae88155",
-          "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-          "title": "Community",
-          "color": "green"
-        }
+        "workflowId": null
       }
     },
     {
@@ -5009,7 +4961,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "53726def-5070-4911-a095-681c85aeacaa",
         "snapshotProposalExpiry": null,
         "publishToLens": false,
         "lensPostLink": null,
@@ -5018,7 +4969,6 @@
           "properties": {
             "__status": "",
             "__authors": [],
-            "__category": "53726def-5070-4911-a095-681c85aeacaa",
             "__createdAt": "",
             "__reviewers": [
               {
@@ -5028,13 +4978,7 @@
             "__evaluationType": "vote"
           }
         },
-        "workflowId": null,
-        "category": {
-          "id": "53726def-5070-4911-a095-681c85aeacaa",
-          "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-          "title": "Tokenomics",
-          "color": "turquoise"
-        }
+        "workflowId": null
       }
     },
     {
@@ -5787,7 +5731,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "8e80fb13-ce4b-45e9-abcf-fe01aea62ddd",
         "snapshotProposalExpiry": null,
         "publishToLens": false,
         "lensPostLink": null,
@@ -5796,7 +5739,6 @@
           "properties": {
             "__status": "",
             "__authors": [],
-            "__category": "8e80fb13-ce4b-45e9-abcf-fe01aea62ddd",
             "__createdAt": "",
             "__reviewers": [
               {
@@ -5806,13 +5748,7 @@
             "__evaluationType": "vote"
           }
         },
-        "workflowId": null,
-        "category": {
-          "id": "8e80fb13-ce4b-45e9-abcf-fe01aea62ddd",
-          "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-          "title": "Tech",
-          "color": "yellow"
-        }
+        "workflowId": null
       }
     },
     {
@@ -16685,80 +16621,6 @@
     }
   ],
   "permissions": {
-    "proposalCategoryPermissions": [
-      {
-        "id": "f59434b4-f8f5-4f56-99ea-720556bcbc26",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "67f004c9-ff0f-459a-a9d0-d02fd563158c",
-        "assignee": {
-          "group": "space",
-          "id": "fabf2e24-fc13-41d6-b321-ba16dffcf882"
-        }
-      },
-      {
-        "id": "3fb7d3e2-7aac-41cd-af14-dcebe50a5d3a",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "8e80fb13-ce4b-45e9-abcf-fe01aea62ddd",
-        "assignee": {
-          "group": "space",
-          "id": "fabf2e24-fc13-41d6-b321-ba16dffcf882"
-        }
-      },
-      {
-        "id": "4df9c277-3a26-481c-ad0d-98c809453f14",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "037cac71-c4c7-4355-83dc-577a4cc30a08",
-        "assignee": {
-          "group": "space",
-          "id": "fabf2e24-fc13-41d6-b321-ba16dffcf882"
-        }
-      },
-      {
-        "id": "0449080a-19ce-4002-b6d3-331c19dbc971",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "9d39b289-e4a9-4817-bfe6-4ea83f9094c9",
-        "assignee": {
-          "group": "space",
-          "id": "fabf2e24-fc13-41d6-b321-ba16dffcf882"
-        }
-      },
-      {
-        "id": "78ed773c-7637-4782-8503-eee8853caeda",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "53726def-5070-4911-a095-681c85aeacaa",
-        "assignee": {
-          "group": "space",
-          "id": "fabf2e24-fc13-41d6-b321-ba16dffcf882"
-        }
-      },
-      {
-        "id": "de37e7f1-f771-41de-b390-6cedfae85ad5",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "f7a37418-ffb8-483c-a260-c6162ae88155",
-        "assignee": {
-          "group": "space",
-          "id": "fabf2e24-fc13-41d6-b321-ba16dffcf882"
-        }
-      },
-      {
-        "id": "5924b6cd-5797-47c9-bb54-7720d0f17b38",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "3b721d2f-d5af-4119-a11f-a43419266146",
-        "assignee": {
-          "group": "space",
-          "id": "fabf2e24-fc13-41d6-b321-ba16dffcf882"
-        }
-      },
-      {
-        "id": "93299177-7a7f-40da-8cd2-9920b19f6b59",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "e826b6ff-ea89-47aa-9bda-83234bff9491",
-        "assignee": {
-          "group": "space",
-          "id": "fabf2e24-fc13-41d6-b321-ba16dffcf882"
-        }
-      }
-    ],
     "postCategoryPermissions": [
       {
         "id": "d1d646c3-88df-4187-a043-c4fcaf941db3",
@@ -16875,56 +16737,6 @@
       }
     ]
   },
-  "proposalCategories": [
-    {
-      "id": "67f004c9-ff0f-459a-a9d0-d02fd563158c",
-      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-      "title": "Grants",
-      "color": "pink"
-    },
-    {
-      "id": "8e80fb13-ce4b-45e9-abcf-fe01aea62ddd",
-      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-      "title": "Tech",
-      "color": "yellow"
-    },
-    {
-      "id": "037cac71-c4c7-4355-83dc-577a4cc30a08",
-      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-      "title": "Partnerships",
-      "color": "blue"
-    },
-    {
-      "id": "9d39b289-e4a9-4817-bfe6-4ea83f9094c9",
-      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-      "title": "Education",
-      "color": "orange"
-    },
-    {
-      "id": "53726def-5070-4911-a095-681c85aeacaa",
-      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-      "title": "Tokenomics",
-      "color": "turquoise"
-    },
-    {
-      "id": "f7a37418-ffb8-483c-a260-c6162ae88155",
-      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-      "title": "Community",
-      "color": "green"
-    },
-    {
-      "id": "3b721d2f-d5af-4119-a11f-a43419266146",
-      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-      "title": "Art Direction",
-      "color": "purple"
-    },
-    {
-      "id": "e826b6ff-ea89-47aa-9bda-83234bff9491",
-      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-      "title": "Governance",
-      "color": "red"
-    }
-  ],
   "postCategories": [
     {
       "id": "ae5f885b-7958-4379-9521-6eb175d2f16a",

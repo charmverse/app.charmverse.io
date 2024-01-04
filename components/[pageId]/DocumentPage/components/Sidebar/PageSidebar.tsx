@@ -46,6 +46,7 @@ type SidebarProps = {
   readOnlyProposalPermissions?: boolean;
   // eslint-disable-next-line react/no-unused-prop-types
   closeSidebar: () => void;
+  // eslint-disable-next-line react/no-unused-prop-types
   proposalId?: string | null;
   proposal?: EvaluationSidebarProps['proposal'];
   proposalInput?: ProposalSettingsProps['proposal'];
@@ -53,23 +54,19 @@ type SidebarProps = {
   onChangeWorkflow: ProposalSettingsProps['onChangeWorkflow'];
   refreshProposal?: VoidFunction;
   isUnpublishedProposal?: boolean;
-  isProposalTemplate?: boolean;
-  readOnlyReviewers: boolean;
-  readOnlyRubricCriteria: boolean;
+  isReviewer?: boolean; // TODO: we need to know the reviewer for each step instead
   // eslint-disable-next-line react/no-unused-prop-types
   disabledViews?: PageSidebarView[];
+  proposalTemplateId?: string | null;
 };
 
 function PageSidebarComponent(props: SidebarProps) {
-  const { disabledViews = [], id, proposal, sidebarView, openSidebar, closeSidebar, isUnpublishedProposal } = props;
+  const { disabledViews = [], id, sidebarView, openSidebar, closeSidebar, isUnpublishedProposal } = props;
   const isMdScreen = useMdScreen();
   const isOpen = sidebarView !== null;
   const sidebarTitle = sidebarView && SIDEBAR_VIEWS[sidebarView]?.title;
   const canHideSidebar = isMdScreen && !props.proposalId; // dont allow closing the sidebar when viewing a proposal
-  const showEvaluationSidebarIcon =
-    (proposal?.evaluationType === 'rubric' &&
-      (proposal.status === 'evaluation_active' || proposal?.status === 'evaluation_closed')) ||
-    !!proposal;
+  const showEvaluationSidebarIcon = !!props.proposalId;
 
   function toggleSidebar() {
     if (sidebarView === null) {
@@ -197,16 +194,14 @@ function SidebarContents({
   editorState,
   threads,
   openSidebar,
-  proposalId,
   proposal,
   proposalInput,
   onChangeEvaluation,
   onChangeWorkflow,
   refreshProposal,
-  isProposalTemplate,
   isUnpublishedProposal,
-  readOnlyReviewers,
-  readOnlyRubricCriteria
+  isReviewer,
+  proposalTemplateId
 }: SidebarProps) {
   return (
     <>
@@ -215,11 +210,10 @@ function SidebarContents({
           <EvaluationSettingsSidebar
             proposal={proposalInput}
             readOnly={!!readOnlyProposalPermissions}
-            readOnlyWorkflowSelect={isProposalTemplate}
+            templateId={proposalTemplateId}
             onChangeEvaluation={onChangeEvaluation}
             onChangeWorkflow={onChangeWorkflow}
-            readOnlyReviewers={!!readOnlyReviewers}
-            readOnlyRubricCriteria={!!readOnlyRubricCriteria}
+            isReviewer={!!isReviewer}
           />
         ) : (
           <EvaluationSidebar
@@ -227,6 +221,7 @@ function SidebarContents({
             proposal={proposal}
             onChangeEvaluation={onChangeEvaluation}
             refreshProposal={refreshProposal}
+            templateId={proposalTemplateId}
           />
         ))}
       {sidebarView === 'suggestions' && (

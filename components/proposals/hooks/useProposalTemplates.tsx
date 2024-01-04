@@ -7,7 +7,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
-export function useProposalTemplates({ load } = { load: true }) {
+export function useProposalTemplates({ load = true }: { load?: boolean } = {}) {
   const { space } = useCurrentSpace();
   const isAdmin = useIsAdmin();
   const [spacePermissions] = useCurrentSpacePermissions();
@@ -18,9 +18,7 @@ export function useProposalTemplates({ load } = { load: true }) {
     isLoading: isLoadingTemplates
   } = useGetProposalTemplatesBySpace(load ? space?.id : null);
 
-  const usableTemplates = isAdmin
-    ? proposalTemplates
-    : proposalTemplates?.filter((template) => spacePermissions?.createProposals);
+  const usableTemplates = isAdmin || spacePermissions?.createProposals ? proposalTemplates : [];
 
   useEffect(() => {
     function handleDeleteEvent(value: WebSocketPayload<'pages_deleted'>) {
@@ -53,4 +51,10 @@ export function useProposalTemplates({ load } = { load: true }) {
     proposalTemplatePages: usableTemplates?.map((t) => t.page),
     isLoadingTemplates
   };
+}
+
+// TODO:  add an endpoint for a single template or return it along with the proposal??
+export function useProposalTemplateById(id: undefined | string | null) {
+  const { proposalTemplates } = useProposalTemplates({ load: !!id });
+  return proposalTemplates?.find((template) => template.id === id);
 }

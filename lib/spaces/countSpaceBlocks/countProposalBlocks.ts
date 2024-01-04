@@ -12,7 +12,6 @@ export type DetailedProposalBlocksCount = {
   proposalViews: number;
   proposalProperties: number;
   proposalPropertyValues: number;
-  proposalCategories: number;
   proposalRubrics: number;
   proposalRubricAnswers: number;
   proposalFormFields: number;
@@ -27,7 +26,6 @@ export async function countProposalBlocks({ spaceId, batchSize }: BlocksCountQue
       proposalViews: 0,
       proposalProperties: 0,
       proposalPropertyValues: 0,
-      proposalCategories: 0,
       proposalRubrics: 0,
       proposalRubricAnswers: 0,
       proposalFormFields: 0
@@ -37,11 +35,6 @@ export async function countProposalBlocks({ spaceId, batchSize }: BlocksCountQue
   // 1 - Count views
   detailedCount.details.proposalViews = await prisma.proposalBlock.count({
     where: { spaceId, type: 'view' }
-  });
-
-  // 2 - Count categories
-  detailedCount.details.proposalCategories = await prisma.proposalCategory.count({
-    where: { spaceId } // assuming proposalCategory has a spaceId field
   });
 
   // Retrieve the single proposal board block for the space

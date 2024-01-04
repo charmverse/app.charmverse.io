@@ -38,23 +38,6 @@ export async function saveRoleAndSpacePermissions(spaceId: string, permissions: 
         }
       });
     }),
-    ...permissions.proposalCategories
-      .filter(
-        // Since we delete role and space permissions only, we should also only recreate role and space permissions
-        (categoryPermission) =>
-          categoryPermission.assignee.group === 'role' || categoryPermission.assignee.group === 'space'
-      )
-      .map((permission) =>
-        prisma.proposalCategoryPermission.create({
-          data: {
-            id: permission.id ?? uuid,
-            proposalCategoryId: permission.proposalCategoryId,
-            permissionLevel: permission.permissionLevel,
-            roleId: permission.assignee.group === 'role' ? permission.assignee.id : undefined,
-            spaceId: permission.assignee.group === 'space' ? permission.assignee.id : undefined
-          }
-        })
-      ),
     ...permissions.forumCategories
       // Since we delete role and space permissions only, we should also only recreate role and space permissions
       .filter(
@@ -79,21 +62,6 @@ export async function saveRoleAndSpacePermissions(spaceId: string, permissions: 
 
 function getDeleteOpsForRoles(spaceId: string) {
   return [
-    prisma.proposalCategoryPermission.deleteMany({
-      where: {
-        OR: [
-          {
-            roleId: { not: null }
-          },
-          {
-            spaceId: { not: null }
-          }
-        ],
-        proposalCategory: {
-          spaceId
-        }
-      }
-    }),
     prisma.postCategoryPermission.deleteMany({
       where: {
         OR: [

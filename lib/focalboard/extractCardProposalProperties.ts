@@ -4,7 +4,6 @@ import type { ExtractedDatabaseProposalProperties } from './extractDatabasePropo
 
 export type ExtractedCardProposalProperties = {
   cardProposalUrl: { propertyId: string; value: string };
-  cardProposalCategory: { propertyId: string; optionId: string; value: string };
   cardProposalStatus: { propertyId: string; optionId: string; value: Exclude<ProposalStatus, 'draft'> | 'archived' };
   cardEvaluatedBy: { propertyId: string; value: string[] };
   cardEvaluationTotal: { propertyId: string; value: number };
@@ -21,17 +20,6 @@ export function extractCardProposalProperties({
   const cardValues = (card.fields as any).properties as Record<string, string | number | string[]>;
 
   const extractedPropertyValues: Partial<ExtractedCardProposalProperties> = {};
-
-  const proposalCategoryPropertyId = databaseProperties.proposalCategory?.id;
-  const proposalCategoryValueId = proposalCategoryPropertyId ? cardValues[proposalCategoryPropertyId] : undefined;
-
-  if (proposalCategoryPropertyId && proposalCategoryValueId) {
-    extractedPropertyValues.cardProposalCategory = {
-      propertyId: proposalCategoryPropertyId,
-      optionId: proposalCategoryValueId as string,
-      value: databaseProperties.proposalCategory?.options.find((opt) => opt.id === proposalCategoryValueId)?.value ?? ''
-    };
-  }
 
   const proposalStatusPropertyId = databaseProperties.proposalStatus?.id;
   const proposalStatusValueId = proposalStatusPropertyId ? cardValues[proposalStatusPropertyId] : undefined;

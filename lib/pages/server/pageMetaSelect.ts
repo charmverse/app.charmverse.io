@@ -23,6 +23,7 @@ export function pageMetaSelect(): Record<keyof PageMeta, true> {
     spaceId: true,
     updatedAt: true,
     updatedBy: true,
-    type: true
+    type: true,
+    sourceTemplateId: true
   };
 }

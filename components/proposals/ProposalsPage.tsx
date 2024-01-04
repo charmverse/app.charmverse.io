@@ -16,8 +16,8 @@ import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import {
   DatabaseContainer,
-  DatabaseTitle,
-  DatabaseStickyHeader
+  DatabaseStickyHeader,
+  DatabaseTitle
 } from 'components/common/PageLayout/components/DatabasePageContent';
 import { NewProposalButton } from 'components/proposals/components/NewProposalButton';
 import { ProposalDialog } from 'components/proposals/components/ProposalDialog/ProposalDialog';
@@ -31,8 +31,6 @@ import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
-import { UpdateProposalRequest } from 'lib/proposal/updateProposal';
-import { isTruthy } from 'lib/utilities/types';
 
 import { useProposalDialog } from './components/ProposalDialog/hooks/useProposalDialog';
 import { useProposals } from './hooks/useProposals';
@@ -58,10 +56,7 @@ export function ProposalsPage({ title }: { title: string }) {
     let _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
 
     if (
-      (!_groupByProperty ||
-        (_groupByProperty?.type !== 'select' &&
-          _groupByProperty?.type !== 'proposalCategory' &&
-          _groupByProperty?.type !== 'proposalStatus')) &&
+      (!_groupByProperty || (_groupByProperty?.type !== 'select' && _groupByProperty?.type !== 'proposalStatus')) &&
       activeView?.fields.viewType === 'board'
     ) {
       _groupByProperty = activeBoard?.fields.cardProperties.find((o: any) => o.type === 'select');
@@ -101,23 +96,6 @@ export function ProposalsPage({ title }: { title: string }) {
       if (proposalId) {
         try {
           await charmClient.deletePage(proposalId);
-        } catch (err) {
-          //
-        }
-      }
-    }
-    await mutateProposals();
-  }
-
-  async function updateProposalsAuthor(pageIds: string[], authorIds: string[]) {
-    for (const pageId of pageIds) {
-      const proposalId = pages[pageId]?.proposalId;
-      if (proposalId) {
-        try {
-          await charmClient.proposals.updateProposal({
-            authors: authorIds,
-            proposalId
-          });
         } catch (err) {
           //
         }
@@ -188,7 +166,6 @@ export function ProposalsPage({ title }: { title: string }) {
                   mutateProposals();
                 }}
                 onDelete={deleteProposals}
-                onProposalAuthorSelect={updateProposalsAuthor}
               />
             )}
             <div className='octo-spacer' />
@@ -269,7 +246,6 @@ export function ProposalsPage({ title }: { title: string }) {
               page={undefined}
               pageId={undefined}
               showView={() => {}}
-              withProposalCategories
             />
           </Stack>
         </Box>
