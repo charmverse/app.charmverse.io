@@ -19,10 +19,9 @@ async function migrate() {
     include: {
       proposal: {
         include: {
-          evaluations: true,
           page: {
             select: {
-              createdAt: true
+              type: true
             }
           },
           reviewers: true
@@ -30,6 +29,8 @@ async function migrate() {
       }
     }
   });
+
+  console.log(`Found ${evaluations.length} evaluations`);
 
   for (let evaluation of evaluations) {
     const proposalReviewers = evaluation.proposal.reviewers;
@@ -41,7 +42,7 @@ async function migrate() {
         }))
       });
     } else {
-      console.warn('proposal had no reviewers');
+      console.warn(evaluation.proposal.page?.type + ' had no reviewers');
     }
   }
 }
