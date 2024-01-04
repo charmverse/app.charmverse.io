@@ -92,7 +92,7 @@ function DocumentPage({
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
 
-  const { proposal, readOnlyRubricCriteria, readOnlyReviewers, refreshProposal, onChangeEvaluation } = useProposal({
+  const { proposal, refreshProposal, onChangeEvaluation } = useProposal({
     proposalId
   });
 
