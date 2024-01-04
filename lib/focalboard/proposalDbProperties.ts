@@ -78,6 +78,15 @@ export const PROPOSAL_STATUS_LABELS: Record<ProposalEvaluationStatus, string> = 
   unpublished: 'Unpublished'
 };
 
+export const PROPOSAL_STATUS_ACTION_LABELS: Record<ProposalEvaluationStatus, string> = {
+  complete: 'Complete',
+  declined: 'Decline',
+  in_progress: 'In Progress',
+  passed: 'Pass',
+  published: 'Publish',
+  unpublished: 'Unpublish'
+};
+
 export const PROPOSAL_STEP_LABELS: Record<ProposalEvaluationStep, string> = {
   draft: 'Draft',
   feedback: 'Feedback',

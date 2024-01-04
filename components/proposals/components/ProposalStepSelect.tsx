@@ -1,18 +1,13 @@
 import { Chip, MenuItem, Select } from '@mui/material';
 import { mutate } from 'swr';
 
-import {
-  useClearEvaluationResult,
-  useSubmitEvaluationResult,
-  useUpdateProposalStatusOnly
-} from 'charmClient/hooks/proposals';
+import { useClearEvaluationResult, useUpdateProposalStatusOnly } from 'charmClient/hooks/proposals';
 import type { CardPageProposal } from 'lib/focalboard/card';
 
 import { ProposalStepChipTextOnly } from './ProposalStepBadge';
 
 export function ProposalStepSelect({ proposal, spaceId }: { proposal: CardPageProposal; spaceId: string }) {
   const { trigger: updateProposalStatusOnly } = useUpdateProposalStatusOnly({ proposalId: proposal.id });
-  const { trigger: submitEvaluationResult } = useSubmitEvaluationResult({ proposalId: proposal.id });
   const { trigger: clearEvaluationResult } = useClearEvaluationResult({ proposalId: proposal.id });
   const evaluations = [
     {
@@ -41,7 +36,7 @@ export function ProposalStepSelect({ proposal, spaceId }: { proposal: CardPagePr
       : evaluations.findIndex((evaluation) => evaluation.id === currentEvaluationId);
 
   async function onChange(evaluationId?: string) {
-    if (evaluationId === 'draft') {
+    if (evaluationId !== 'draft') {
       await clearEvaluationResult({
         evaluationId
       });

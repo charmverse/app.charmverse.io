@@ -18,6 +18,7 @@ import { UserSelect } from 'components/common/BoardEditor/components/properties/
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import { BreadcrumbPageTitle } from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
 import { ProposalStatusChipTextOnly } from 'components/proposals/components/ProposalStatusBadge';
+import { ProposalStatusSelect } from 'components/proposals/components/ProposalStatusSelect';
 import { ProposalStepChipTextOnly } from 'components/proposals/components/ProposalStepBadge';
 import { ProposalStepSelect } from 'components/proposals/components/ProposalStepSelect';
 import { useProposalsWhereUserIsEvaluator } from 'components/proposals/hooks/useProposalsWhereUserIsEvaluator';
@@ -191,8 +192,20 @@ function PropertyValueElement(props: Props) {
   } else if (propertyTemplate.type === 'proposalStatus' || propertyTemplate.id === PROPOSAL_STATUS_BLOCK_ID) {
     // Proposals as datasource use proposalStatus column, whereas the actual proposals table uses STATUS_BLOCK_ID
     // We should migrate over the proposals as datasource blocks to the same format as proposals table
-    return <ProposalStatusChipTextOnly status={propertyValue as ProposalEvaluationStatus} />;
-  } else if (proposal && (propertyTemplate.type === 'proposalStep' || propertyTemplate.id === PROPOSAL_STEP_BLOCK_ID)) {
+    if (!proposal) {
+      return null;
+    }
+
+    if (!isAdmin) {
+      return <ProposalStatusChipTextOnly status={propertyValue as ProposalEvaluationStatus} />;
+    }
+
+    return <ProposalStatusSelect proposal={proposal} spaceId={card.spaceId} />;
+  } else if (propertyTemplate.type === 'proposalStep' || propertyTemplate.id === PROPOSAL_STEP_BLOCK_ID) {
+    if (!proposal) {
+      return null;
+    }
+
     if (!isAdmin) {
       return <ProposalStepChipTextOnly label={proposal.currentEvaluation?.title ?? 'Draft'} />;
     }
