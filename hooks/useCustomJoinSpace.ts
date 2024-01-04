@@ -70,6 +70,8 @@ export function useCustomJoinSpace() {
 
     if (customJoinRoutes.includes(router.pathname) && !isCheckingRef.current) {
       verifyCustomJoin();
+    } else {
+      setAccessChecked(true);
     }
   }, [accessChecked, isUserLoaded, isSpaceMember, router, user, verifyCustomJoin]);
 
