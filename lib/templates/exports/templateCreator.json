@@ -655,7 +655,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "snapshotProposalExpiry": null,
         "publishToLens": false,
         "lensPostLink": null,
         "evaluationType": "vote",

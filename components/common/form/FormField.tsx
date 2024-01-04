@@ -63,6 +63,7 @@ export interface FormFieldProps {
   onCreateOption?: (option: SelectOptionType) => void;
   onDeleteOption?: (option: SelectOptionType) => void;
   onUpdateOption?: (option: SelectOptionType) => void;
+  shouldFocus?: boolean;
 }
 
 function ExpandedFormField({
@@ -72,14 +73,15 @@ function ExpandedFormField({
   updateFormField,
   onCreateOption,
   onDeleteOption,
-  onUpdateOption
+  onUpdateOption,
+  shouldFocus
 }: Omit<FormFieldProps, 'isCollapsed'>) {
   const theme = useTheme();
   const titleTextFieldRef = useRef<HTMLInputElement | null>(null);
 
   // Auto focus on title text field when expanded
   useEffect(() => {
-    if (titleTextFieldRef.current) {
+    if (titleTextFieldRef.current && shouldFocus) {
       titleTextFieldRef.current.querySelector('input')?.focus();
     }
   }, [titleTextFieldRef]);
@@ -162,6 +164,7 @@ function ExpandedFormField({
         disablePageSpecificFeatures
         disableRowHandles
         placeholderText='Add your description here (optional)'
+        focusOnInit={false}
       />
       <FieldTypeRenderer
         type={formField.type as any}
@@ -208,9 +211,16 @@ export function FormField(
   props: FormFieldProps & {
     isOpen?: boolean;
     readOnly?: boolean;
+    forceFocus?: boolean;
   }
 ) {
-  const { readOnly, isOpen, formField, toggleOpen, updateFormField } = props;
+  const { readOnly, isOpen, formField, toggleOpen, updateFormField, forceFocus } = props;
+  const prevIsOpen = useRef(isOpen);
+  const shouldFocus = (!prevIsOpen.current && isOpen) || forceFocus;
+
+  useEffect(() => {
+    prevIsOpen.current = isOpen;
+  }, [isOpen]);
 
   const [{ offset }, drag, dragPreview] = useDrag(() => ({
     type: 'item',
@@ -292,7 +302,7 @@ export function FormField(
               placeholder={fieldTypePlaceholderRecord[formField.type]}
             />
           ) : (
-            <ExpandedFormField {...props} />
+            <ExpandedFormField {...props} shouldFocus={shouldFocus} />
           )}
         </Stack>
       </FormFieldContainer>

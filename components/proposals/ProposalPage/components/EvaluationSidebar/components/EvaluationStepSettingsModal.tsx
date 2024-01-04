@@ -25,19 +25,13 @@ export function EvaluationStepSettingsModal({
   const evaluationInputError = evaluationInput && getEvaluationFormError(evaluationInput);
   // find matching template step, and allow editing if there were no reviewers set
   const matchingTemplateStep = proposalTemplate?.evaluations?.find((e) => e.title === evaluationInput.title);
-  const templateHasNoReviewers = matchingTemplateStep?.reviewers?.length === 0;
-  // reviewers are already readOnly if a template was used, so long as reviewers were set
-  const readOnlyReviewers = !!templateId && !templateHasNoReviewers;
-  // rubric criteria should be editable but authors and reviewers, unless a template was used
-  const readOnlyRubricCriteria = !!templateId;
   return (
     <Modal open onClose={close} title={`Edit ${evaluationInput?.title}`}>
       <Box mb={1}>
         <EvaluationStepSettings
-          readOnly={false}
-          readOnlyReviewers={readOnlyReviewers}
-          readOnlyRubricCriteria={readOnlyRubricCriteria}
           evaluation={evaluationInput}
+          evaluationTemplate={matchingTemplateStep}
+          readOnly={false}
           onChange={updateEvaluation}
         />
       </Box>
