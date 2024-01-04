@@ -47,7 +47,8 @@ export function ProposalStatusSelect({
       return ['unpublished', 'published'];
     } else if (currentEvaluationStep === 'feedback') {
       return ['in_progress', 'complete'];
-    } else if (currentEvaluationStep === 'pass_fail' || currentEvaluationStep === 'rubric') {
+    } else {
+      // for vote, rubric, pass_fail, etc
       return ['in_progress', 'passed', 'declined'];
     }
     return [];
@@ -85,7 +86,7 @@ export function ProposalStatusSelect({
   return (
     <TagSelect
       wrapColumn
-      readOnly={readOnly || statusOptions.length === 0}
+      readOnly={readOnly || currentEvaluationStep === 'vote'}
       options={options}
       propertyValue={getProposalEvaluationStatus({
         proposalStep: proposal.currentStep
