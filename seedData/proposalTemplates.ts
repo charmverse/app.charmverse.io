@@ -497,6 +497,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
       reviewedBy: null,
       archived: false,
       reviewedAt: null,
+      snapshotProposalExpiry: null,
       evaluationType: 'vote',
       fields: null,
       workflowId: null,
@@ -1623,6 +1624,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
       reviewedBy: null,
       reviewedAt: null,
       archived: false,
+      snapshotProposalExpiry: null,
       fields: null,
       workflowId: null,
       formId: null
@@ -2036,6 +2038,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
       reviewedBy: null,
       reviewedAt: null,
       archived: false,
+      snapshotProposalExpiry: null,
       fields: null,
       workflowId: null,
       formId: null
@@ -2377,6 +2380,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
       reviewedBy: null,
       reviewedAt: null,
       archived: false,
+      snapshotProposalExpiry: null,
       fields: null,
       workflowId: null,
       formId: null
@@ -3060,6 +3064,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
       reviewedBy: null,
       reviewedAt: null,
       archived: false,
+      snapshotProposalExpiry: null,
       fields: null,
       workflowId: null,
       formId: null
@@ -3741,6 +3746,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
       reviewedBy: null,
       reviewedAt: null,
       archived: false,
+      snapshotProposalExpiry: null,
       fields: null,
       workflowId: null,
       formId: null
