@@ -1,5 +1,4 @@
 import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
-import { evaluationTypeOptions } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalEvaluationTypeSelect';
 import type { Block } from 'lib/focalboard/block';
 import { createBoard } from 'lib/focalboard/board';
 import { Constants } from 'lib/focalboard/constants';
@@ -10,7 +9,6 @@ import {
   CREATED_AT_ID,
   DEFAULT_BOARD_BLOCK_ID,
   DEFAULT_VIEW_BLOCK_ID,
-  EVALUATION_TYPE_BLOCK_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID,
   STATUS_BLOCK_ID
 } from 'lib/proposal/blocks/constants';
@@ -58,7 +56,6 @@ function getDefaultProperties() {
   return [
     proposalDbProperties.proposalCreatedAt(CREATED_AT_ID),
     getDefaultStatusProperty(),
-    getDefaultEvaluationTypeProperty(),
     proposalDbProperties.proposalAuthor(AUTHORS_BLOCK_ID, 'Author'),
     proposalDbProperties.proposalReviewer(PROPOSAL_REVIEWERS_BLOCK_ID, 'Reviewers')
   ];
@@ -72,13 +69,6 @@ export function getDefaultStatusProperty() {
       value: s,
       color: proposalStatusBoardColors[s]
     }))
-  };
-}
-
-function getDefaultEvaluationTypeProperty() {
-  return {
-    ...proposalDbProperties.proposalEvaluationType(EVALUATION_TYPE_BLOCK_ID, 'Type'),
-    options: evaluationTypeOptions
   };
 }
 

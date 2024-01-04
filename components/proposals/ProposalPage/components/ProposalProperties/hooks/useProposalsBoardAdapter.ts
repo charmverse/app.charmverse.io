@@ -20,7 +20,6 @@ import { Constants } from 'lib/focalboard/constants';
 import {
   AUTHORS_BLOCK_ID,
   DEFAULT_VIEW_BLOCK_ID,
-  EVALUATION_TYPE_BLOCK_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID,
   STATUS_BLOCK_ID,
   CREATED_AT_ID
@@ -164,7 +163,6 @@ function mapProposalToCardPage({
         ? new Date(proposalPage?.createdAt).getTime()
         : '',
     [STATUS_BLOCK_ID]: (proposal && 'status' in proposal && proposal.status) || '',
-    [EVALUATION_TYPE_BLOCK_ID]: (proposal && 'evaluationType' in proposal && proposal.evaluationType) || '',
     [AUTHORS_BLOCK_ID]: (proposal && 'authors' in proposal && proposal.authors?.map((a) => a.userId)) || '',
     [PROPOSAL_REVIEWERS_BLOCK_ID]:
       proposal && 'reviewers' in proposal

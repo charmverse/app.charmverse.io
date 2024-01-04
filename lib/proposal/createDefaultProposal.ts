@@ -5,13 +5,7 @@ import { VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/vid
 import { Constants } from 'lib/focalboard/constants';
 import { getDefaultFeedbackEvaluation, getDefaultPermissions } from 'lib/proposal/workflows/defaultEvaluation';
 
-import {
-  AUTHORS_BLOCK_ID,
-  CREATED_AT_ID,
-  EVALUATION_TYPE_BLOCK_ID,
-  PROPOSAL_REVIEWERS_BLOCK_ID,
-  STATUS_BLOCK_ID
-} from './blocks/constants';
+import { AUTHORS_BLOCK_ID, CREATED_AT_ID, PROPOSAL_REVIEWERS_BLOCK_ID, STATUS_BLOCK_ID } from './blocks/constants';
 import { createProposal } from './createProposal';
 
 // replace the old method with this one once we have moved to new flow
@@ -67,7 +61,6 @@ export async function createDefaultProposal({ spaceId, userId }: { spaceId: stri
       properties: {
         [AUTHORS_BLOCK_ID]: [userId],
         [CREATED_AT_ID]: '',
-        [EVALUATION_TYPE_BLOCK_ID]: 'vote',
         [PROPOSAL_REVIEWERS_BLOCK_ID]: [
           {
             group: 'user',
