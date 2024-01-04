@@ -202,7 +202,7 @@ function PropertyValueElement(props: Props) {
       return <ProposalStepSelect proposal={proposal} spaceId={card.spaceId} />;
     }
 
-    return <ProposalStepChipTextOnly label={proposal?.currentEvaluation?.title ?? (propertyValue as string)} />;
+    return <ProposalStepChipTextOnly label={proposal?.currentStep?.title ?? (propertyValue as string)} />;
   } else if (propertyTemplate.id === REWARD_PROPOSAL_LINK) {
     if (!Array.isArray(propertyValue) || !propertyValue.length || !propertyValue[0]) {
       return null;
@@ -320,8 +320,8 @@ function PropertyValueElement(props: Props) {
           !proposal ||
           readOnly ||
           (displayType !== 'details' && displayType !== 'table') ||
-          proposal.currentEvaluation?.step === 'draft' ||
-          proposal.currentEvaluation?.step === 'feedback' ||
+          proposal.currentStep?.step === 'draft' ||
+          proposal.currentStep?.step === 'feedback' ||
           !!proposal.sourceTemplateId
         }
         required

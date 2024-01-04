@@ -71,7 +71,7 @@ export type ProposalWithUsersLite = ProposalWithUsers & {
     result: ProposalEvaluationResult | null;
     index: number;
   }[];
-  currentEvaluation?: Pick<ProposalEvaluation, 'title'> & {
+  currentStep?: Pick<ProposalEvaluation, 'title'> & {
     step: ProposalEvaluationStep;
     status: ProposalEvaluationStatus;
   };

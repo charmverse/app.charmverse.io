@@ -512,8 +512,8 @@ export function ViewHeaderRowsMenu({
       if (
         proposal &&
         proposalWithEvaluationId &&
-        proposal.currentEvaluation?.step !== 'draft' &&
-        proposal.currentEvaluation?.step !== 'feedback' &&
+        proposal.currentStep?.step !== 'draft' &&
+        proposal.currentStep?.step !== 'feedback' &&
         !page?.sourceTemplateId
       ) {
         await charmClient.proposals.updateProposalEvaluation({

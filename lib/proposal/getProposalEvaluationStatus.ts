@@ -13,18 +13,18 @@ export function getOldProposalStatus({
   status: ProposalStatus;
   evaluations: Pick<ProposalEvaluation, 'index' | 'result' | 'type'>[];
 }): ProposalStatus {
-  const currentEvaluation = getCurrentEvaluation(evaluations);
+  const currentStep = getCurrentEvaluation(evaluations);
 
   if (status === 'draft') {
     return 'draft';
-  } else if (currentEvaluation?.type === 'feedback') {
+  } else if (currentStep?.type === 'feedback') {
     return 'discussion';
-  } else if (currentEvaluation?.type === 'vote') {
-    return currentEvaluation.result ? 'vote_closed' : 'vote_active';
-  } else if (currentEvaluation?.type === 'rubric') {
-    return currentEvaluation.result ? 'evaluation_closed' : 'evaluation_active';
-  } else if (currentEvaluation?.type === 'pass_fail') {
-    return currentEvaluation.result ? 'reviewed' : 'evaluation_active'; // we doint have a review_active
+  } else if (currentStep?.type === 'vote') {
+    return currentStep.result ? 'vote_closed' : 'vote_active';
+  } else if (currentStep?.type === 'rubric') {
+    return currentStep.result ? 'evaluation_closed' : 'evaluation_active';
+  } else if (currentStep?.type === 'pass_fail') {
+    return currentStep.result ? 'reviewed' : 'evaluation_active'; // we doint have a review_active
   }
   return status;
 }
@@ -40,21 +40,17 @@ export function getProposalEvaluationStatus({
   status: ProposalStatus;
   evaluations: Pick<ProposalEvaluation, 'index' | 'result' | 'type'>[];
 }): ProposalEvaluationStatus {
-  const currentEvaluation = getCurrentEvaluation(evaluations);
-  const isLastEvaluation = currentEvaluation?.index === evaluations.length - 1;
-  if (status === 'draft' || !currentEvaluation) {
+  const currentStep = getCurrentEvaluation(evaluations);
+  const isLastEvaluation = currentStep?.index === evaluations.length - 1;
+  if (status === 'draft' || !currentStep) {
     return 'unpublished';
   }
 
-  const currentEvaluationResult = currentEvaluation.result;
+  const currentEvaluationResult = currentStep.result;
 
-  if (currentEvaluation.type === 'feedback') {
+  if (currentStep.type === 'feedback') {
     return currentEvaluationResult === null ? 'in_progress' : 'complete';
-  } else if (
-    currentEvaluation.type === 'pass_fail' ||
-    currentEvaluation.type === 'rubric' ||
-    currentEvaluation.type === 'vote'
-  ) {
+  } else if (currentStep.type === 'pass_fail' || currentStep.type === 'rubric' || currentStep.type === 'vote') {
     if (currentEvaluationResult === null) {
       return 'in_progress';
     } else if (currentEvaluationResult === 'fail') {

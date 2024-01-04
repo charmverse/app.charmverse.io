@@ -16,8 +16,8 @@ import { ProposalStatusChipTextOnly } from './ProposalStatusBadge';
 
 export function ProposalStatusSelect({ proposal, spaceId }: { proposal: CardPageProposal; spaceId: string }) {
   const { trigger: submitEvaluationResult } = useSubmitEvaluationResult({ proposalId: proposal.id });
-  const currentEvaluationStep = proposal.currentEvaluation?.step;
-  const currentEvaluationStatus = proposal.currentEvaluation?.status;
+  const currentEvaluationStep = proposal.currentStep?.step;
+  const currentEvaluationStatus = proposal.currentStep?.status;
   const currentEvaluationId = proposal.currentEvaluationId;
   const { trigger: updateProposalStatusOnly } = useUpdateProposalStatusOnly({ proposalId: proposal.id });
   const { trigger: createProposalRewards } = useCreateProposalRewards(proposal.id);

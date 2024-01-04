@@ -43,19 +43,19 @@ export function mapDbProposalToProposal({
   canAccessPrivateFormFields?: boolean;
 }): ProposalWithUsersAndRubric {
   const { rewards, form, ...rest } = proposal;
-  const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
+  const currentStep = getCurrentEvaluation(proposal.evaluations);
   const formFields = getProposalFormFields(form?.formFields, !!canAccessPrivateFormFields);
 
   const proposalWithUsers = {
     ...rest,
     permissions,
-    currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
-    evaluationType: currentEvaluation?.type || proposal.evaluationType,
+    currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentStep?.id : undefined,
+    evaluationType: currentStep?.type || proposal.evaluationType,
     status: getOldProposalStatus(proposal),
     // Support old model: filter out evaluation-specific reviewers and rubric answers
-    rubricAnswers: currentEvaluation?.rubricAnswers || proposal.rubricAnswers,
-    draftRubricAnswers: currentEvaluation?.draftRubricAnswers || proposal.draftRubricAnswers,
-    reviewers: currentEvaluation?.reviewers || proposal.reviewers,
+    rubricAnswers: currentStep?.rubricAnswers || proposal.rubricAnswers,
+    draftRubricAnswers: currentStep?.draftRubricAnswers || proposal.draftRubricAnswers,
+    reviewers: currentStep?.reviewers || proposal.reviewers,
     rewardIds: rewards.map((r) => r.id) || null,
     form: form
       ? {
@@ -80,7 +80,7 @@ export function mapDbProposalToProposalLite({
   permissions?: ProposalPermissionFlags;
 }): ProposalWithUsersLite {
   const { rewards, ...rest } = proposal;
-  const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
+  const currentStep = getCurrentEvaluation(proposal.evaluations);
   const fields = (rest.fields as ProposalFields) ?? null;
   const evaluationStatus = getProposalEvaluationStatus({
     evaluations: proposal.evaluations,
@@ -99,14 +99,14 @@ export function mapDbProposalToProposalLite({
       id: e.id
     })),
     permissions,
-    currentEvaluation:
+    currentStep:
       proposal.status === 'draft'
         ? {
             title: 'Draft',
             step: 'draft' as ProposalEvaluationStep,
             status: evaluationStatus
           }
-        : currentEvaluation
+        : currentStep
         ? evaluationStatus === 'published' || evaluationStatus === 'unpublished'
           ? {
               title: 'Rewards',
@@ -114,15 +114,15 @@ export function mapDbProposalToProposalLite({
               status: evaluationStatus
             }
           : {
-              title: currentEvaluation.title,
-              step: currentEvaluation.type,
+              title: currentStep.title,
+              step: currentStep.type,
               status: evaluationStatus
             }
         : undefined,
-    currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
-    evaluationType: currentEvaluation?.type || proposal.evaluationType,
+    currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentStep?.id : undefined,
+    evaluationType: currentStep?.type || proposal.evaluationType,
     status: getOldProposalStatus(proposal),
-    reviewers: currentEvaluation?.reviewers || proposal.reviewers,
+    reviewers: currentStep?.reviewers || proposal.reviewers,
     rewardIds: rewards.map((r) => r.id) || null,
     fields
   };

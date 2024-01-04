@@ -144,7 +144,7 @@ test.describe.serial('Database with proposals as datasource', async () => {
 
       const proposalStatusBadge = databasePage.getTablePropertyProposalStatusLocator({ cardId: card.id });
 
-      expect((await proposalStatusBadge.allInnerTexts())[0]).toEqual('Feedback');
+      expect((await proposalStatusBadge.allInnerTexts())[0]).toEqual('Unpublished');
 
       const syncedProposalUrl = databasePage.getTablePropertyProposalUrlLocator({ cardId: card.id });
       const proposalPage = await prisma.page.findUniqueOrThrow({
@@ -217,6 +217,6 @@ test.describe.serial('Database with proposals as datasource', async () => {
 
     await expect(archivedRowProposalStatusBadge).toBeVisible();
 
-    await expect((await archivedRowProposalStatusBadge.allInnerTexts())[0]).toEqual('Archived');
+    await expect((await archivedRowProposalStatusBadge.allInnerTexts())[0]).toEqual('Unpublished');
   });
 });

@@ -78,7 +78,7 @@ export function useProposalsBoardAdapter() {
               currentEvaluationId: p.currentEvaluationId,
               id: p.id,
               status: p.status,
-              currentEvaluation: p.currentEvaluation,
+              currentStep: p.currentStep,
               sourceTemplateId: page?.sourceTemplateId,
               evaluations: p.evaluations,
               hasRewards: (p.fields?.pendingRewards ?? []).length > 0 || (p.rewardIds ?? []).length > 0
@@ -165,9 +165,9 @@ function mapProposalToCardPage({
       proposalPage && 'createdAt' in proposalPage && proposalPage.createdAt
         ? new Date(proposalPage?.createdAt).getTime()
         : '',
-    [PROPOSAL_STATUS_BLOCK_ID]: proposal?.currentEvaluation?.status ?? 'in_progress',
+    [PROPOSAL_STATUS_BLOCK_ID]: proposal?.currentStep?.status ?? 'in_progress',
     [AUTHORS_BLOCK_ID]: (proposal && 'authors' in proposal && proposal.authors?.map((a) => a.userId)) || '',
-    [PROPOSAL_STEP_BLOCK_ID]: proposal?.currentEvaluation?.title ?? 'Draft',
+    [PROPOSAL_STEP_BLOCK_ID]: proposal?.currentStep?.title ?? 'Draft',
     [PROPOSAL_REVIEWERS_BLOCK_ID]:
       proposal && 'reviewers' in proposal
         ? proposal.reviewers.map(

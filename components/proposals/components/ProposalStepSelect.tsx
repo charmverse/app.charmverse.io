@@ -33,7 +33,7 @@ export function ProposalStepSelect({ proposal, spaceId }: { proposal: CardPagePr
   const currentEvaluationIndex =
     currentEvaluationId === null
       ? 0
-      : currentEvaluationId === lastEvaluation.id && lastEvaluation.result === 'pass' && proposal.hasRewards
+      : currentEvaluationId === lastEvaluation?.id && lastEvaluation?.result === 'pass' && proposal.hasRewards
       ? evaluations.length - 1
       : evaluations.findIndex((evaluation) => evaluation.id === currentEvaluationId);
 
@@ -60,7 +60,7 @@ export function ProposalStepSelect({ proposal, spaceId }: { proposal: CardPagePr
       displayEmpty
       value={evaluations[currentEvaluationIndex]?.id ?? ''}
       onChange={(e) => onChange(e.target.value)}
-      renderValue={() => <ProposalStepChipTextOnly label={proposal.currentEvaluation?.title ?? 'Draft'} />}
+      renderValue={() => <ProposalStepChipTextOnly label={proposal.currentStep?.title ?? 'Draft'} />}
     >
       {evaluations.map((evaluation, index) => {
         return (

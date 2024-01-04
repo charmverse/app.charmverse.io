@@ -22,7 +22,7 @@ export type CardPageProposal = {
   currentEvaluationId: string | null;
   id: string;
   status: ProposalEvaluationStatus;
-  currentEvaluation: ProposalWithUsersLite['currentEvaluation'];
+  currentStep: ProposalWithUsersLite['currentStep'];
   sourceTemplateId?: string;
   evaluations: ProposalWithUsersLite['evaluations'];
   hasRewards: boolean;

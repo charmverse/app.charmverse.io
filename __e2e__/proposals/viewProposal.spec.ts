@@ -144,7 +144,7 @@ test.describe.serial('View proposal', () => {
     await expect(feedbackRow).toBeVisible();
 
     const feedbackRowStatusBadge = feedbackRow.locator('data-test=proposal-status-badge');
-    await expect((await feedbackRowStatusBadge.allInnerTexts())[0]).toEqual('Feedback');
+    await expect((await feedbackRowStatusBadge.allInnerTexts())[0]).toEqual('In Progress');
   });
 
   test('Proposal can be edited by the author and made public', async ({
