@@ -10,10 +10,10 @@ import { InvalidStateError } from 'lib/middleware';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposal } from 'testing/utils/proposals';
 
-import { PROPOSAL_STATUS_LABELS } from '../proposalDbProperties';
+import { PROPOSAL_RESULT_LABELS } from '../proposalDbProperties';
 import { setDatabaseProposalProperties } from '../setDatabaseProposalProperties';
 
-const statusPropertyOptions = objectUtils.typedKeys(PROPOSAL_STATUS_LABELS);
+const statusPropertyOptions = objectUtils.typedKeys(PROPOSAL_RESULT_LABELS);
 
 describe('setDatabaseProposalProperties()', () => {
   let space: Space;
