@@ -36,7 +36,7 @@ async function migrate() {
     const proposalReviewers = evaluation.proposal.reviewers;
     if (proposalReviewers.length > 0) {
       await prisma.proposalReviewer.createMany({
-        data: proposalReviewers.map((reviewer) => ({
+        data: proposalReviewers.map(({ id, ...reviewer }) => ({
           ...reviewer,
           evaluationId: evaluation.id
         }))
