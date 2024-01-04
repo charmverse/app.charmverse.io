@@ -2,8 +2,6 @@ import { type FormFieldType } from '@charmverse/core/prisma-client';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { Edit, EditOff, MoreHoriz } from '@mui/icons-material';
-import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown';
-import ChevronRightIcon from '@mui/icons-material/ArrowRight';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
@@ -134,7 +132,7 @@ function ExpandedFormField({
             </MenuList>
           }
         >
-          <IconButton size='small'>
+          <IconButton size='small' sx={{ mt: '-20px' }}>
             <MoreHoriz fontSize='small' />
           </IconButton>
         </PopperPopup>
@@ -315,8 +313,8 @@ export function FormField(
             data-test='toggle-form-field-button'
             sx={{
               position: 'absolute',
-              top: (theme) => theme.spacing(1.5),
-              right: (theme) => theme.spacing(1),
+              top: (theme) => theme.spacing(0.5),
+              right: (theme) => theme.spacing(0.5),
               opacity: isOpen ? 1 : 0,
               transition: 'opacity 0.2s ease'
             }}
