@@ -7,6 +7,7 @@ import {
   useSubmitEvaluationResult,
   useUpdateProposalStatusOnly
 } from 'charmClient/hooks/proposals';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { CardPageProposal } from 'lib/focalboard/card';
 import { PROPOSAL_STATUS_ACTION_LABELS } from 'lib/focalboard/proposalDbProperties';
 import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
@@ -20,6 +21,7 @@ export function ProposalStatusSelect({ proposal, spaceId }: { proposal: CardPage
   const currentEvaluationId = proposal.currentEvaluationId;
   const { trigger: updateProposalStatusOnly } = useUpdateProposalStatusOnly({ proposalId: proposal.id });
   const { trigger: createProposalRewards } = useCreateProposalRewards(proposal.id);
+  const { showMessage } = useSnackbar();
 
   const statusOptions: ProposalEvaluationStatus[] = useMemo(() => {
     if (currentEvaluationStep === 'draft') {
@@ -43,20 +45,24 @@ export function ProposalStatusSelect({ proposal, spaceId }: { proposal: CardPage
   }, [currentEvaluationStep, currentEvaluationStatus]);
 
   async function onChange(status: ProposalEvaluationStatus) {
-    if (currentEvaluationStep === 'rewards') {
-      await createProposalRewards();
-      await mutate(`/api/spaces/${spaceId}/proposals`);
-    } else if (currentEvaluationStep === 'draft' && status === 'published') {
-      await updateProposalStatusOnly({
-        newStatus: 'published'
-      });
-      await mutate(`/api/spaces/${spaceId}/proposals`);
-    } else if (currentEvaluationId) {
-      await submitEvaluationResult({
-        evaluationId: currentEvaluationId,
-        result: status === 'complete' || status === 'passed' ? 'pass' : 'fail'
-      });
-      await mutate(`/api/spaces/${spaceId}/proposals`);
+    try {
+      if (currentEvaluationStep === 'rewards') {
+        await createProposalRewards();
+        await mutate(`/api/spaces/${spaceId}/proposals`);
+      } else if (currentEvaluationStep === 'draft' && status === 'published') {
+        await updateProposalStatusOnly({
+          newStatus: 'published'
+        });
+        await mutate(`/api/spaces/${spaceId}/proposals`);
+      } else if (currentEvaluationId) {
+        await submitEvaluationResult({
+          evaluationId: currentEvaluationId,
+          result: status === 'complete' || status === 'passed' ? 'pass' : 'fail'
+        });
+        await mutate(`/api/spaces/${spaceId}/proposals`);
+      }
+    } catch (err: any) {
+      showMessage(err.message, 'error');
     }
   }
 

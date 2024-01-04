@@ -2,6 +2,7 @@ import { Chip, MenuItem, Select } from '@mui/material';
 import { mutate } from 'swr';
 
 import { useClearEvaluationResult, useUpdateProposalStatusOnly } from 'charmClient/hooks/proposals';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { CardPageProposal } from 'lib/focalboard/card';
 
 import { ProposalStepChipTextOnly } from './ProposalStepBadge';
@@ -26,6 +27,7 @@ export function ProposalStepSelect({ proposal, spaceId }: { proposal: CardPagePr
   ];
 
   const lastEvaluation = proposal.evaluations[proposal.evaluations.length - 1];
+  const { showMessage } = useSnackbar();
 
   const currentEvaluationId = proposal.currentEvaluationId;
   const currentEvaluationIndex =
@@ -36,16 +38,20 @@ export function ProposalStepSelect({ proposal, spaceId }: { proposal: CardPagePr
       : evaluations.findIndex((evaluation) => evaluation.id === currentEvaluationId);
 
   async function onChange(evaluationId?: string) {
-    if (evaluationId !== 'draft') {
-      await clearEvaluationResult({
-        evaluationId
-      });
-    } else {
-      await updateProposalStatusOnly({
-        newStatus: 'draft'
-      });
+    try {
+      if (evaluationId !== 'draft') {
+        await clearEvaluationResult({
+          evaluationId
+        });
+      } else {
+        await updateProposalStatusOnly({
+          newStatus: 'draft'
+        });
+      }
+      await mutate(`/api/spaces/${spaceId}/proposals`);
+    } catch (err: any) {
+      showMessage(err.message, 'error');
     }
-    await mutate(`/api/spaces/${spaceId}/proposals`);
   }
 
   return (
