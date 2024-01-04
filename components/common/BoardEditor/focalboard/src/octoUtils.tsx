@@ -1,4 +1,3 @@
-import type { ProposalEvaluationType } from '@charmverse/core/prisma';
 import { getChainById } from 'connectors/chains';
 import { DateUtils } from 'react-day-picker';
 
@@ -11,7 +10,7 @@ import { createBoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import { PROPOSAL_STATUS_LABELS, PROPOSAL_STEP_LABELS } from 'lib/focalboard/proposalDbProperties';
-import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
+import type { ProposalEvaluationStatus, ProposalEvaluationStep } from 'lib/proposal/interface';
 import { getAbsolutePath } from 'lib/utilities/browser';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -71,7 +70,7 @@ class OctoUtils {
       }
       case 'proposalStep': {
         const proposalStep = propertyTemplate.options.find((o) => propertyValue === o.id)?.value;
-        displayValue = proposalStep ? PROPOSAL_STEP_LABELS[proposalStep as ProposalEvaluationType] : propertyValue;
+        displayValue = proposalStep ? PROPOSAL_STEP_LABELS[proposalStep as ProposalEvaluationStep] : propertyValue;
         break;
       }
       case 'person':

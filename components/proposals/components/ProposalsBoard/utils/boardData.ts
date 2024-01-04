@@ -1,5 +1,3 @@
-import type { ProposalEvaluationType } from '@charmverse/core/prisma-client';
-
 import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
 import type { Block } from 'lib/focalboard/block';
 import { createBoard } from 'lib/focalboard/board';
@@ -22,10 +20,10 @@ import {
   PROPOSAL_STATUS_BLOCK_ID
 } from 'lib/proposal/blocks/constants';
 import type { ProposalBoardBlock } from 'lib/proposal/blocks/interfaces';
-import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
+import type { ProposalEvaluationStatus, ProposalEvaluationStep } from 'lib/proposal/interface';
 
 const proposalStatuses = Object.keys(PROPOSAL_STATUS_LABELS) as ProposalEvaluationStatus[];
-const proposalSteps = Object.keys(PROPOSAL_STEP_LABELS) as ProposalEvaluationType[];
+const proposalSteps = Object.keys(PROPOSAL_STEP_LABELS) as ProposalEvaluationStep[];
 
 export function getDefaultBoard({
   storedBoard,
