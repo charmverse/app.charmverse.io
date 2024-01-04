@@ -29,15 +29,15 @@ export function ProposalStatusSelect({
   spaceId,
   readOnly
 }: {
-  proposal: CardPageProposal;
+  proposal?: CardPageProposal;
   spaceId: string;
   readOnly?: boolean;
 }) {
-  const { trigger: submitEvaluationResult } = useSubmitEvaluationResult({ proposalId: proposal.id });
-  const currentEvaluationStep = proposal.currentStep.step;
-  const currentEvaluationId = proposal.currentEvaluationId;
-  const { trigger: updateProposalStatusOnly } = useUpdateProposalStatusOnly({ proposalId: proposal.id });
-  const { trigger: createProposalRewards } = useCreateProposalRewards(proposal.id);
+  const { trigger: submitEvaluationResult } = useSubmitEvaluationResult({ proposalId: proposal?.id });
+  const currentEvaluationStep = proposal?.currentStep.step;
+  const currentEvaluationId = proposal?.currentEvaluationId;
+  const { trigger: updateProposalStatusOnly } = useUpdateProposalStatusOnly({ proposalId: proposal?.id });
+  const { trigger: createProposalRewards } = useCreateProposalRewards(proposal?.id);
   const { showMessage } = useSnackbar();
 
   const statusOptions: ProposalEvaluationStatus[] = useMemo(() => {
@@ -88,9 +88,13 @@ export function ProposalStatusSelect({
       wrapColumn
       readOnly={readOnly || currentEvaluationStep === 'vote'}
       options={options}
-      propertyValue={getProposalEvaluationStatus({
-        proposalStep: proposal.currentStep
-      })}
+      propertyValue={
+        proposal
+          ? getProposalEvaluationStatus({
+              proposalStep: proposal.currentStep
+            })
+          : ''
+      }
       onChange={(newValue) => onChange(newValue as ProposalEvaluationStatus)}
     />
   );

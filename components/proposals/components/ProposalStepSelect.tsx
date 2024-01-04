@@ -80,6 +80,7 @@ export function ProposalStepSelect({
   return (
     <TagSelect
       wrapColumn
+      includeSelectedOptions
       readOnly={readOnly}
       options={options}
       propertyValue={currentValue ?? ''}
