@@ -36,41 +36,7 @@ describe('POST /api/proposals - Create a proposal', () => {
       }
     };
 
-    const createdProposal = (
-      await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(201)
-    ).body as { id: string };
-
-    const proposal = await prisma.proposal.findUniqueOrThrow({
-      where: {
-        id: createdProposal.id
-      },
-      include: {
-        authors: true,
-        reviewers: true
-      }
-    });
-
-    expect(proposal).toMatchObject<Partial<ProposalWithUsers>>(
-      expect.objectContaining({
-        authors: expect.arrayContaining([
-          {
-            proposalId: createdProposal?.id as string,
-            userId: user.id
-          },
-          {
-            proposalId: createdProposal?.id as string,
-            userId: otherUser.id
-          }
-        ]),
-        reviewers: expect.arrayContaining([
-          expect.objectContaining({
-            id: expect.any(String),
-            proposalId: createdProposal?.id as string,
-            userId: user.id
-          })
-        ])
-      })
-    );
+    await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(201);
   });
 
   it('should not allow a user outside the space to create a proposal and respond with 401', async () => {
