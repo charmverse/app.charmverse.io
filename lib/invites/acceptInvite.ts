@@ -1,16 +1,9 @@
 import { DataNotFoundError, InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
-import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { logInviteAccepted } from 'lib/metrics/postToDiscord';
-import { UnknownError } from 'lib/middleware';
 import { joinSpace } from 'lib/spaces/joinSpace';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishMemberEvent } from 'lib/webhookPublisher/publishEvent';
 
 import { validateInviteLink } from './validateInviteLink';
 
@@ -45,7 +38,6 @@ export async function acceptInvite({ inviteLinkId, userId }: InviteLinkAcceptanc
   const targetSpaceRole = await joinSpace({ userId, spaceId: invite.spaceId, source: 'invite_link' });
 
   if (!targetSpaceRole) {
-    throw new UnknownError(`Could not join space`);
     return;
   }
 
