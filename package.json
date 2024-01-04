@@ -271,6 +271,7 @@
     "zksync-web3": "^0.16.0"
   },
   "devDependencies": {
+    "@ceramicnetwork/cli": "^3.2.0",
     "@ceramicnetwork/streamid": "^3.2.0",
     "@composedb/devtools": "^0.6.1",
     "@composedb/devtools-node": "^0.6.1",
