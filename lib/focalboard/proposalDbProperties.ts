@@ -1,8 +1,13 @@
+import type { ProposalEvaluationResult } from '@charmverse/core/dist/cjs/prisma-client';
 import { v4 as uuid } from 'uuid';
 
 import type { DatabaseProposalPropertyType, IPropertyTemplate } from 'lib/focalboard/board';
 import type { Constants } from 'lib/focalboard/constants';
-import type { ProposalEvaluationStatus, ProposalEvaluationStep } from 'lib/proposal/interface';
+import type {
+  ProposalEvaluationResultExtended,
+  ProposalEvaluationStatus,
+  ProposalEvaluationStep
+} from 'lib/proposal/interface';
 
 export const proposalDbProperties: {
   [key in DatabaseProposalPropertyType]: (id?: string, name?: string) => IPropertyTemplate;
@@ -96,15 +101,6 @@ export const PROPOSAL_STEP_LABELS: Record<ProposalEvaluationStep, string> = {
   rewards: 'Rewards'
 };
 
-export const proposalStatusBoardColors: Record<ProposalEvaluationStatus, keyof (typeof Constants)['menuColors']> = {
-  complete: 'propColorGreen',
-  declined: 'propColorRed',
-  in_progress: 'propColorYellow',
-  passed: 'propColorGreen',
-  published: 'propColorGreen',
-  unpublished: 'propColorGray'
-};
-
 export const proposalStepBoardColors: Record<ProposalEvaluationStep, keyof (typeof Constants)['menuColors']> = {
   feedback: 'propColorGray',
   pass_fail: 'propColorGray',
@@ -112,4 +108,19 @@ export const proposalStepBoardColors: Record<ProposalEvaluationStep, keyof (type
   vote: 'propColorGray',
   draft: 'propColorGray',
   rewards: 'propColorGray'
+};
+
+export const PROPOSAL_RESULT_LABELS: Record<ProposalEvaluationResultExtended, string> = {
+  in_progress: 'In Progress',
+  fail: 'Failed',
+  pass: 'Passed'
+};
+
+export const proposalResultBoardColors: Record<
+  ProposalEvaluationResultExtended,
+  keyof (typeof Constants)['menuColors']
+> = {
+  fail: 'propColorRed',
+  in_progress: 'propColorYellow',
+  pass: 'propColorGreen'
 };

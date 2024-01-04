@@ -24,6 +24,7 @@ import type {
 
 export type ProposalEvaluationStatus = 'in_progress' | 'complete' | 'passed' | 'declined' | 'unpublished' | 'published';
 export type ProposalEvaluationStep = ProposalEvaluationType | 'rewards' | 'draft';
+export type ProposalEvaluationResultExtended = ProposalEvaluationResult | 'in_progress';
 
 export interface ProposalReviewerInput {
   group: 'system_role' | 'role' | 'user';

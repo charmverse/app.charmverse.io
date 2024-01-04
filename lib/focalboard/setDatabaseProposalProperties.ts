@@ -1,17 +1,16 @@
 import type { FormField } from '@charmverse/core/prisma';
-import { ProposalStatus, prisma } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 import { objectUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import {
-  PROPOSAL_STATUS_LABELS,
+  PROPOSAL_RESULT_LABELS,
   proposalDbProperties,
-  proposalStatusBoardColors
+  proposalResultBoardColors
 } from 'lib/focalboard/proposalDbProperties';
 import { InvalidStateError } from 'lib/middleware/errors';
-import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 export async function setDatabaseProposalProperties({ boardId }: { boardId: string }): Promise<Board> {
@@ -200,11 +199,11 @@ function generateUpdatedProposalStepProperty({ boardProperties }: { boardPropert
   };
 
   if (proposalStatusProp) {
-    [...objectUtils.typedKeys(PROPOSAL_STATUS_LABELS)].forEach((status) => {
+    [...objectUtils.typedKeys(PROPOSAL_RESULT_LABELS)].forEach((status) => {
       const existingOption = proposalStatusProp.options.find((opt) => opt.value === status);
       if (!existingOption) {
         proposalStatusProp.options.push({
-          color: proposalStatusBoardColors[status as ProposalEvaluationStatus],
+          color: proposalResultBoardColors[status],
           id: uuid(),
           value: status
         });
@@ -227,11 +226,11 @@ function generateUpdatedProposalStatusProperty({ boardProperties }: { boardPrope
   };
 
   if (proposalStatusProp) {
-    [...objectUtils.typedKeys(PROPOSAL_STATUS_LABELS)].forEach((status) => {
+    [...objectUtils.typedKeys(PROPOSAL_RESULT_LABELS)].forEach((status) => {
       const existingOption = proposalStatusProp.options.find((opt) => opt.value === status);
       if (!existingOption) {
         proposalStatusProp.options.push({
-          color: proposalStatusBoardColors[status as ProposalEvaluationStatus],
+          color: proposalResultBoardColors[status],
           id: uuid(),
           value: status
         });

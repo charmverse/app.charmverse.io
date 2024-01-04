@@ -34,8 +34,9 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board, DatabaseProposalPropertyType, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card, CardPage } from 'lib/focalboard/card';
+import { PROPOSAL_STATUS_LABELS } from 'lib/focalboard/proposalDbProperties';
 import { PROPOSAL_STATUS_BLOCK_ID, PROPOSAL_STEP_BLOCK_ID } from 'lib/proposal/blocks/constants';
-import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
+import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
 import {
   REWARDS_APPLICANTS_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
@@ -196,7 +197,18 @@ function PropertyValueElement(props: Props) {
       return <ProposalStatusSelect proposal={proposal} spaceId={card.spaceId} />;
     }
 
-    return <ProposalStatusChipTextOnly status={propertyValue as ProposalEvaluationStatus} />;
+    const proposalStatus = proposal
+      ? getProposalEvaluationStatus({
+          proposalStep: proposal.currentStep
+        })
+      : null;
+
+    return (
+      <ProposalStatusChipTextOnly
+        label={proposalStatus ? PROPOSAL_STATUS_LABELS[proposalStatus] : ''}
+        status={proposalStatus}
+      />
+    );
   } else if (propertyTemplate.type === 'proposalStep' || propertyTemplate.id === PROPOSAL_STEP_BLOCK_ID) {
     if (proposal && isAdmin) {
       return <ProposalStepSelect proposal={proposal} spaceId={card.spaceId} />;

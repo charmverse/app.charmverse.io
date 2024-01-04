@@ -2,7 +2,6 @@ import styled from '@emotion/styled';
 import type { ChipProps } from '@mui/material';
 import { Chip } from '@mui/material';
 
-import { PROPOSAL_STATUS_LABELS } from 'lib/focalboard/proposalDbProperties';
 import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
 import type { BrandColor } from 'theme/colors';
 
@@ -11,14 +10,14 @@ export const ProposalStatusColors: Record<ProposalEvaluationStatus, BrandColor> 
   declined: 'red',
   in_progress: 'yellow',
   passed: 'green',
-  unpublished: 'gray',
-  published: 'green'
+  published: 'green',
+  unpublished: 'gray'
 };
 
-const StyledProposalStatusChipNormalText = styled(Chip)<{ status: ProposalEvaluationStatus }>`
+const StyledProposalStatusChipNormalText = styled(Chip)<{ status: ProposalEvaluationStatus | null }>`
   background-color: ${({ status, theme }) => {
     // @ts-ignore
-    return theme.palette[ProposalStatusColors[status]]?.main;
+    return status ? theme.palette[ProposalStatusColors[status]]?.main : theme.palette.gray.main;
   }};
   .MuiChip-icon {
     display: flex;
@@ -41,15 +40,15 @@ export function ProposalStatusChipTextOnly({
   label
 }: {
   size?: ChipProps['size'];
-  status: ProposalEvaluationStatus;
-  label?: string;
+  status: ProposalEvaluationStatus | null;
+  label: string;
 }) {
   return (
     <StyledProposalStatusChipNormalText
       data-test='proposal-status-badge'
       size={size}
       status={status}
-      label={label ?? PROPOSAL_STATUS_LABELS[status]}
+      label={label}
       variant='filled'
     />
   );

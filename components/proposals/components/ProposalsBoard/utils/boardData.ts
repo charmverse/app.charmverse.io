@@ -1,12 +1,14 @@
+import type { ProposalEvaluationResult } from '@charmverse/core/dist/cjs/prisma-client';
+
 import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
 import type { Block } from 'lib/focalboard/block';
 import { createBoard } from 'lib/focalboard/board';
 import { Constants } from 'lib/focalboard/constants';
 import {
-  PROPOSAL_STATUS_LABELS,
+  PROPOSAL_RESULT_LABELS,
   PROPOSAL_STEP_LABELS,
   proposalDbProperties,
-  proposalStatusBoardColors,
+  proposalResultBoardColors,
   proposalStepBoardColors
 } from 'lib/focalboard/proposalDbProperties';
 import { createTableView } from 'lib/focalboard/tableView';
@@ -16,13 +18,13 @@ import {
   DEFAULT_BOARD_BLOCK_ID,
   DEFAULT_VIEW_BLOCK_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID,
-  PROPOSAL_STEP_BLOCK_ID,
-  PROPOSAL_STATUS_BLOCK_ID
+  PROPOSAL_STATUS_BLOCK_ID,
+  PROPOSAL_STEP_BLOCK_ID
 } from 'lib/proposal/blocks/constants';
 import type { ProposalBoardBlock } from 'lib/proposal/blocks/interfaces';
-import type { ProposalEvaluationStatus, ProposalEvaluationStep } from 'lib/proposal/interface';
+import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from 'lib/proposal/interface';
 
-const proposalStatuses = Object.keys(PROPOSAL_STATUS_LABELS) as ProposalEvaluationStatus[];
+const proposalResults = Object.keys(PROPOSAL_RESULT_LABELS) as ProposalEvaluationResultExtended[];
 const proposalSteps = Object.keys(PROPOSAL_STEP_LABELS) as ProposalEvaluationStep[];
 
 export function getDefaultBoard({
@@ -70,10 +72,10 @@ function getDefaultProperties() {
 export function getDefaultStatusProperty() {
   return {
     ...proposalDbProperties.proposalStatus(PROPOSAL_STATUS_BLOCK_ID, 'Status'),
-    options: proposalStatuses.map((s) => ({
+    options: proposalResults.map((s) => ({
       id: s,
       value: s,
-      color: proposalStatusBoardColors[s]
+      color: proposalResultBoardColors[s]
     }))
   };
 }

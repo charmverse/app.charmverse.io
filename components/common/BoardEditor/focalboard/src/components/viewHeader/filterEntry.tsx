@@ -5,13 +5,13 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import type { SelectChangeEvent } from '@mui/material';
 import {
   Button,
+  Checkbox,
   Chip,
   ListItemIcon,
   Menu,
   MenuItem,
   Select,
   Stack,
-  Checkbox,
   TextField,
   Typography
 } from '@mui/material';
@@ -31,9 +31,9 @@ import type { FilterClause, FilterCondition } from 'lib/focalboard/filterClause'
 import { propertyConfigs } from 'lib/focalboard/filterClause';
 import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import { createFilterGroup } from 'lib/focalboard/filterGroup';
-import { PROPOSAL_STATUS_LABELS } from 'lib/focalboard/proposalDbProperties';
-import { PROPOSAL_REVIEWERS_BLOCK_ID, AUTHORS_BLOCK_ID } from 'lib/proposal/blocks/constants';
-import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
+import { PROPOSAL_RESULT_LABELS } from 'lib/focalboard/proposalDbProperties';
+import { AUTHORS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposal/blocks/constants';
+import type { ProposalEvaluationResultExtended } from 'lib/proposal/interface';
 import { focalboardColorsMap } from 'theme/colors';
 
 import { iconForPropertyType } from '../../widgets/iconForPropertyType';
@@ -315,7 +315,7 @@ function FilterPropertyValue({
               size='small'
               label={
                 property.type === 'proposalStatus'
-                  ? PROPOSAL_STATUS_LABELS[foundOption.value as ProposalEvaluationStatus]
+                  ? PROPOSAL_RESULT_LABELS[foundOption.value as ProposalEvaluationResultExtended]
                   : foundOption.value
               }
               color={focalboardColorsMap[foundOption.color]}
@@ -339,7 +339,7 @@ function FilterPropertyValue({
                   size='small'
                   label={
                     property.type === 'proposalStatus'
-                      ? PROPOSAL_STATUS_LABELS[option.value as ProposalEvaluationStatus]
+                      ? PROPOSAL_RESULT_LABELS[option.value as ProposalEvaluationResultExtended]
                       : option.value
                   }
                   color={focalboardColorsMap[option.color]}
