@@ -1,6 +1,6 @@
 import type { Chain } from '@lit-protocol/types';
 
-import { getDaylightLitRequirements, getDaylightUnlockRequirements } from '../daylight';
+import { getDaylightLitRequirements, getDaylightStandardRequirements } from '../daylight';
 
 const walletCondition = {
   chain: 'ethereum' as Chain,
@@ -32,7 +32,7 @@ const nftCondition = {
   parameters: ['1337']
 };
 
-const unlockCondition = {
+const standardCondition = {
   chainId: 1,
   contract: '0x00003'
 };
@@ -210,10 +210,10 @@ describe('getDaylightRequirements', () => {
     });
   });
 
-  it('should return unlock protocol based requirement', () => {
-    const tokenGateConditions = unlockCondition;
+  it('should return a protocol based requirement', () => {
+    const tokenGateConditions = standardCondition;
 
-    expect(getDaylightUnlockRequirements(tokenGateConditions)).toEqual({
+    expect(getDaylightStandardRequirements(tokenGateConditions)).toEqual({
       operator: 'OR',
       requirements: [
         {

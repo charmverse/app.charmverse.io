@@ -13,7 +13,7 @@ import { isTruthy } from 'lib/utilities/types';
 
 import { createAuthSigs, getAllChains } from '../utils/helpers';
 
-export type DisplayedPage = 'tokens' | 'collectables' | 'home' | 'review' | 'wallet' | 'dao' | 'unlock';
+export type DisplayedPage = 'tokens' | 'collectables' | 'home' | 'review' | 'wallet' | 'dao' | 'unlock' | 'hypersub';
 export type Flow = 'single' | 'multiple_all' | 'multiple_one';
 
 export type ConditionsModalResult = Pick<JsonStoreSigningRequest, 'unifiedAccessControlConditions'> & {
@@ -100,6 +100,12 @@ export function TokenGateModalProvider({
     setTokenGate(undefined);
   };
 
+  const onSuccess = () => {
+    refreshTokenGates();
+    resetModal();
+    popupState.close();
+  };
+
   const createUnifiedAccessControlConditions = async () => {
     if (tokenGate?.type === 'lit' && tokenGate?.conditions?.unifiedAccessControlConditions) {
       const unifiedAccessControlConditions = tokenGate.conditions.unifiedAccessControlConditions;
@@ -145,12 +151,9 @@ export function TokenGateModalProvider({
           type: 'lit',
           id: tokenGateId
         });
-
-        refreshTokenGates();
       }
 
-      resetModal();
-      popupState.close();
+      onSuccess();
     }
   };
 
@@ -161,8 +164,7 @@ export function TokenGateModalProvider({
       await createTokenGate({
         conditions: {
           contract: tokenGate.conditions.contract,
-          chainId: tokenGate.conditions.chainId,
-          name: tokenGate.conditions.name || ''
+          chainId: tokenGate.conditions.chainId
         },
         type: 'unlock',
         resourceId: {},
@@ -170,9 +172,26 @@ export function TokenGateModalProvider({
         id
       });
 
-      refreshTokenGates();
-      resetModal();
-      popupState.close();
+      onSuccess();
+    }
+  };
+
+  const createHypersubGate = async () => {
+    if (tokenGate?.type === 'hypersub' && tokenGate.conditions) {
+      const id = uuid();
+
+      await createTokenGate({
+        conditions: {
+          contract: tokenGate.conditions.contract,
+          chainId: tokenGate.conditions.chainId
+        },
+        type: 'hypersub',
+        resourceId: {},
+        spaceId,
+        id
+      });
+
+      onSuccess();
     }
   };
 
@@ -181,6 +200,8 @@ export function TokenGateModalProvider({
       await createUnlockProtocolGate();
     } else if (tokenGate?.type === 'lit') {
       await createUnifiedAccessControlConditions();
+    } else if (tokenGate?.type === 'hypersub') {
+      await createHypersubGate();
     }
   };
 
