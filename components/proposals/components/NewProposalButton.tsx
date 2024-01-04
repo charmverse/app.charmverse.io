@@ -123,7 +123,12 @@ export function NewProposalButton() {
               </ListItemIcon>
               <ListItemText>Edit</ListItemText>
             </MenuItem>
-            <CopyPageLinkAction path={`/proposals/new?template=${pageId}`} />
+            {isAdmin && (
+              <CopyPageLinkAction
+                path={`/proposals/new?template=${pageId}`}
+                message='Link copied. NOTE: anyone can join your space using this link.'
+              />
+            )}
 
             <MenuItem
               onClick={(e) => {
