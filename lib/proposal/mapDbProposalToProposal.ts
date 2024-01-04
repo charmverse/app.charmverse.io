@@ -6,7 +6,7 @@ import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
 import { getProposalFormFields } from 'lib/proposal/form/getProposalFormFields';
 
-import { getOldProposalStatus } from './getOldProposalStatus';
+import { getProposalEvaluationStatus } from './getProposalEvaluationStatus';
 import type { ProposalFields, ProposalWithUsersAndRubric, ProposalWithUsersLite } from './interface';
 
 type FormFieldsIncludeType = {
@@ -39,13 +39,19 @@ export function mapDbProposalToProposal({
   const { rewards, form, ...rest } = proposal;
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
   const formFields = getProposalFormFields(form?.formFields, !!canAccessPrivateFormFields);
+  const fields = (rest.fields as ProposalFields) ?? null;
 
   const proposalWithUsers = {
     ...rest,
     permissions,
     currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
     evaluationType: currentEvaluation?.type || proposal.evaluationType,
-    status: getOldProposalStatus(proposal),
+    status: getProposalEvaluationStatus({
+      evaluations: proposal.evaluations,
+      hasPendingRewards: (fields.pendingRewards ?? []).length > 0,
+      hasRewards: rewards.length > 0,
+      status: proposal.status
+    }),
     // Support old model: filter out evaluation-specific reviewers and rubric answers
     rubricAnswers: currentEvaluation?.rubricAnswers || proposal.rubricAnswers,
     draftRubricAnswers: currentEvaluation?.draftRubricAnswers || proposal.draftRubricAnswers,
@@ -75,7 +81,7 @@ export function mapDbProposalToProposalLite({
 }): ProposalWithUsersLite {
   const { rewards, ...rest } = proposal;
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
-  const evaluationWithOldType = proposal.evaluations.find((e) => e.type === 'rubric' || e.type === 'vote');
+  const fields = (rest.fields as ProposalFields) ?? null;
   const proposalWithUsers = {
     ...rest,
     permissions,
@@ -86,11 +92,16 @@ export function mapDbProposalToProposalLite({
         }
       : undefined,
     currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
-    evaluationType: evaluationWithOldType?.type || proposal.evaluationType,
-    status: getOldProposalStatus(proposal),
+    evaluationType: currentEvaluation?.type || proposal.evaluationType,
+    status: getProposalEvaluationStatus({
+      evaluations: proposal.evaluations,
+      hasPendingRewards: (fields.pendingRewards ?? []).length > 0,
+      status: proposal.status,
+      hasRewards: rewards.length > 0
+    }),
     reviewers: currentEvaluation?.reviewers || proposal.reviewers,
     rewardIds: rewards.map((r) => r.id) || null,
-    fields: (rest.fields as ProposalFields) ?? null
+    fields
   };
 
   return proposalWithUsers;

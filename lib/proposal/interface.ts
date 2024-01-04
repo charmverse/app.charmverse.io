@@ -21,6 +21,8 @@ import type {
   ProposalRubricCriteriaWithTypedParams
 } from './rubric/interfaces';
 
+export type ProposalEvaluationStatus = 'in_progress' | 'complete' | 'passed' | 'declined' | 'unpublished' | 'published';
+
 export interface ProposalReviewerInput {
   group: 'system_role' | 'role' | 'user';
   id: string;
@@ -52,8 +54,9 @@ export type ProposalFormData = {
   };
 };
 
-export type ProposalWithUsers = Omit<CoreProposalWithUsers, 'fields'> & {
+export type ProposalWithUsers = Omit<CoreProposalWithUsers, 'fields' | 'status'> & {
   fields: ProposalFields | null;
+  status: ProposalEvaluationStatus;
 };
 
 export type ProposalWithUsersLite = ProposalWithUsers & {
