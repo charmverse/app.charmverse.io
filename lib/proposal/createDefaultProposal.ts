@@ -16,6 +16,8 @@ import type { ProposalEvaluationInput } from './createProposal';
 import { createProposal } from './createProposal';
 import { defaultWorkflowTitle } from './workflows/defaultWorkflows';
 
+export const defaultProposalTitle = 'Getting Started';
+
 // replace the old method with this one once we have moved to new flow
 export async function createDefaultProposal({ spaceId, userId }: { spaceId: string; userId: string }) {
   const workflow = await prisma.proposalWorkflow.findFirstOrThrow({
@@ -48,7 +50,7 @@ export async function createDefaultProposal({ spaceId, userId }: { spaceId: stri
       sourceTemplateId: null,
       contentText: '',
       type: 'proposal',
-      title: 'Getting Started',
+      title: defaultProposalTitle,
       content: {
         type: 'doc',
         content: [
