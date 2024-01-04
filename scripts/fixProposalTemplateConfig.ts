@@ -211,9 +211,7 @@ async function fixEmptyProposalTemplateConfig({
     prettyPrint({updatedProposal})
     console.log('------ NEW STATE ---------')
 
-
     console.log('///////////////////////////////////////')
-
 }
 
 // fixEmptyProposalTemplateConfig({
