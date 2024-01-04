@@ -42,12 +42,11 @@ export function ProposalStepSelect({
     ];
     const lastEvaluation = proposal && proposal.evaluations[proposal.evaluations.length - 1];
     const currentEvaluationId = proposal?.currentEvaluationId;
-    const currentEvaluationIndex =
-      currentEvaluationId === null
-        ? 0
-        : currentEvaluationId === lastEvaluation?.id && lastEvaluation?.result === 'pass' && proposal?.hasRewards
-        ? _options.length - 1
-        : _options.findIndex((e) => e.id === currentEvaluationId);
+    const currentEvaluationIndex = !currentEvaluationId
+      ? 0
+      : currentEvaluationId === lastEvaluation?.id && lastEvaluation?.result === 'pass' && proposal?.hasRewards
+      ? _options.length - 1
+      : _options.findIndex((e) => e.id === currentEvaluationId);
     _options.forEach((option, index) => {
       option.disabled = index >= currentEvaluationIndex || index < currentEvaluationIndex - 1;
     });
