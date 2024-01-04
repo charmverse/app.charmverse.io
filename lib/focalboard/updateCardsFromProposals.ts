@@ -6,6 +6,8 @@ import { extractCardProposalProperties } from 'lib/focalboard/extractCardProposa
 import { extractDatabaseProposalProperties } from 'lib/focalboard/extractDatabaseProposalProperties';
 import { InvalidStateError } from 'lib/middleware';
 import { canAccessPrivateFields } from 'lib/proposal/form/canAccessPrivateFields';
+import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
+import type { ProposalFields } from 'lib/proposal/interface';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   ProposalRubricCriteriaWithTypedParams
@@ -67,6 +69,19 @@ export async function updateCardsFromProposals({
           authors: true,
           spaceId: true,
           id: true,
+          evaluations: {
+            select: {
+              index: true,
+              result: true,
+              type: true
+            }
+          },
+          rewards: {
+            select: {
+              id: true
+            }
+          },
+          fields: true,
           form: {
             select: {
               formFields: {
@@ -185,15 +200,21 @@ export async function updateCardsFromProposals({
       proposalId: pageWithProposal.proposal!.id
     });
 
+    const proposalEvaluationStatus = pageWithProposal.proposal
+      ? getProposalEvaluationStatus({
+          evaluations: pageWithProposal.proposal.evaluations ?? [],
+          hasPendingRewards: ((pageWithProposal.proposal.fields as ProposalFields).pendingRewards ?? []).length > 0,
+          status: pageWithProposal.proposal.status,
+          hasRewards: pageWithProposal.proposal.rewards.length > 0
+        })
+      : undefined;
+
     if (card) {
       const { cardProposalStatus, cardProposalUrl } = extractCardProposalProperties({
         card: card.block,
         databaseProperties: databaseProposalProps
       });
 
-      const archivedStatusValueId = databaseProposalProps.proposalStatus?.options.find(
-        (opt) => opt.value === 'archived'
-      )?.id;
       if (
         // For now, always recalculate rubrics. We can optimise further later
         pageWithProposal.proposal?.evaluationType === 'rubric' ||
@@ -207,17 +228,12 @@ export async function updateCardsFromProposals({
         (!pageWithProposal.proposal?.archived && cardProposalStatus?.optionId === 'archived') ||
         (!pageWithProposal.proposal?.archived &&
           cardProposalStatus?.optionId !==
-            databaseProposalProps.proposalStatus?.options.find((opt) => opt.value === pageWithProposal.proposal?.status)
-              ?.id)
+            databaseProposalProps.proposalStatus?.options.find((opt) => opt.value === proposalEvaluationStatus)?.id)
       ) {
         const newProps = {
           ...(card.block.fields as any).properties,
           [cardProposalUrl?.propertyId ?? '']: pageWithProposal.path,
-          [cardProposalStatus?.propertyId ?? '']: pageWithProposal.proposal?.archived
-            ? archivedStatusValueId
-            : databaseProposalProps.proposalStatus?.options.find(
-                (opt) => opt.value === pageWithProposal.proposal?.status
-              )?.id ?? ''
+          [cardProposalStatus?.propertyId ?? '']: proposalEvaluationStatus
         };
 
         let newCardBlockFields = {
@@ -280,9 +296,7 @@ export async function updateCardsFromProposals({
       }
 
       if (databaseProposalProps.proposalStatus) {
-        properties[databaseProposalProps.proposalStatus.id] =
-          databaseProposalProps.proposalStatus.options.find((opt) => opt.value === pageWithProposal.proposal?.status)
-            ?.id ?? '';
+        properties[databaseProposalProps.proposalStatus.id] = proposalEvaluationStatus ?? '';
       }
       const createdAt = pageWithProposal.createdAt;
       if (pageWithProposal.proposal?.evaluationType) {
