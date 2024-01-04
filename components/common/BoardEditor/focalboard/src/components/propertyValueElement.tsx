@@ -17,9 +17,7 @@ import { UserAndRoleSelect } from 'components/common/BoardEditor/components/prop
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import { BreadcrumbPageTitle } from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
-import { ProposalStatusChipTextOnly } from 'components/proposals/components/ProposalStatusBadge';
 import { ProposalStatusSelect } from 'components/proposals/components/ProposalStatusSelect';
-import { ProposalStepChipTextOnly } from 'components/proposals/components/ProposalStepBadge';
 import { ProposalStepSelect } from 'components/proposals/components/ProposalStepSelect';
 import { useProposalsWhereUserIsEvaluator } from 'components/proposals/hooks/useProposalsWhereUserIsEvaluator';
 import {
@@ -190,25 +188,11 @@ function PropertyValueElement(props: Props) {
       return <RewardApplicationStatusChip status={propertyValue as ApplicationStatus} />;
     }
     return <RewardStatusChip status={propertyValue as RewardStatus} showIcon={false} />;
-  } else if (propertyTemplate.type === 'proposalStatus' || propertyTemplate.id === PROPOSAL_STATUS_BLOCK_ID) {
-    // Proposals as datasource use proposalStatus column, whereas the actual proposals table uses STATUS_BLOCK_ID
-    // We should migrate over the proposals as datasource blocks to the same format as proposals table
-    if (isAdmin && proposal) {
-      return <ProposalStatusSelect proposal={proposal} spaceId={card.spaceId} />;
-    }
-
-    const proposalStatus = proposal
-      ? getProposalEvaluationStatus({
-          proposalStep: proposal.currentStep
-        })
-      : null;
-
-    return (
-      <ProposalStatusChipTextOnly
-        label={proposalStatus ? PROPOSAL_STATUS_LABELS[proposalStatus] : ''}
-        status={proposalStatus}
-      />
-    );
+  }
+  // Proposals as datasource use proposalStatus column, whereas the actual proposals table uses STATUS_BLOCK_ID
+  // We should migrate over the proposals as datasource blocks to the same format as proposals table
+  else if (propertyTemplate.type === 'proposalStatus' || propertyTemplate.id === PROPOSAL_STATUS_BLOCK_ID) {
+    return <ProposalStatusSelect proposal={proposal} spaceId={card.spaceId} readOnly={!isAdmin} />;
   } else if (propertyTemplate.type === 'proposalStep' || propertyTemplate.id === PROPOSAL_STEP_BLOCK_ID) {
     return <ProposalStepSelect readOnly={!isAdmin} proposal={proposal} spaceId={card.spaceId} />;
     // return <ProposalStepChipTextOnly label={proposal?.currentStep?.title ?? (propertyValue as string)} />;

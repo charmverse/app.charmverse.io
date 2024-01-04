@@ -1,4 +1,3 @@
-import { MenuItem, Select } from '@mui/material';
 import { useMemo } from 'react';
 import { mutate } from 'swr';
 
@@ -7,18 +6,35 @@ import {
   useSubmitEvaluationResult,
   useUpdateProposalStatusOnly
 } from 'charmClient/hooks/proposals';
+import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { IPropertyOption } from 'lib/focalboard/board';
 import type { CardPageProposal } from 'lib/focalboard/card';
 import { PROPOSAL_STATUS_LABELS, PROPOSAL_STATUS_VERB_LABELS } from 'lib/focalboard/proposalDbProperties';
 import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
 import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
+import type { BrandColor } from 'theme/colors';
 
-import { ProposalStatusChipTextOnly } from './ProposalStatusBadge';
+const statusColors: Record<ProposalEvaluationStatus, BrandColor> = {
+  complete: 'green',
+  declined: 'red',
+  in_progress: 'yellow',
+  passed: 'green',
+  published: 'green',
+  unpublished: 'gray'
+};
 
-export function ProposalStatusSelect({ proposal, spaceId }: { proposal: CardPageProposal; spaceId: string }) {
+export function ProposalStatusSelect({
+  proposal,
+  spaceId,
+  readOnly
+}: {
+  proposal: CardPageProposal;
+  spaceId: string;
+  readOnly?: boolean;
+}) {
   const { trigger: submitEvaluationResult } = useSubmitEvaluationResult({ proposalId: proposal.id });
   const currentEvaluationStep = proposal.currentStep.step;
-  const currentEvaluationResult = proposal.currentStep.result;
   const currentEvaluationId = proposal.currentEvaluationId;
   const { trigger: updateProposalStatusOnly } = useUpdateProposalStatusOnly({ proposalId: proposal.id });
   const { trigger: createProposalRewards } = useCreateProposalRewards(proposal.id);
@@ -26,24 +42,16 @@ export function ProposalStatusSelect({ proposal, spaceId }: { proposal: CardPage
 
   const statusOptions: ProposalEvaluationStatus[] = useMemo(() => {
     if (currentEvaluationStep === 'draft') {
-      return ['published'];
+      return ['unpublished', 'published'];
     } else if (currentEvaluationStep === 'rewards') {
-      if (currentEvaluationResult === null) {
-        return ['published'];
-      }
+      return ['unpublished', 'published'];
     } else if (currentEvaluationStep === 'feedback') {
-      if (currentEvaluationResult === null) {
-        return ['complete'];
-      }
+      return ['in_progress', 'complete'];
     } else if (currentEvaluationStep === 'pass_fail' || currentEvaluationStep === 'rubric') {
-      if (currentEvaluationResult === null) {
-        return ['passed', 'declined'];
-      } else if (currentEvaluationResult === 'fail') {
-        return ['passed'];
-      }
+      return ['in_progress', 'passed', 'declined'];
     }
     return [];
-  }, [currentEvaluationStep, currentEvaluationResult]);
+  }, [currentEvaluationStep]);
 
   async function onChange(status: ProposalEvaluationStatus) {
     try {
@@ -67,28 +75,22 @@ export function ProposalStatusSelect({ proposal, spaceId }: { proposal: CardPage
     }
   }
 
+  const options: IPropertyOption[] = statusOptions.map((status) => ({
+    id: status,
+    value: PROPOSAL_STATUS_LABELS[status],
+    dropdownValue: PROPOSAL_STATUS_VERB_LABELS[status as ProposalEvaluationStatus],
+    color: statusColors[status]
+  }));
+
   return (
-    <Select<ProposalEvaluationStatus>
-      size='small'
-      displayEmpty
-      value={getProposalEvaluationStatus({
+    <TagSelect
+      wrapColumn
+      readOnly={readOnly || statusOptions.length === 0}
+      options={options}
+      propertyValue={getProposalEvaluationStatus({
         proposalStep: proposal.currentStep
       })}
-      onChange={(e) => onChange(e.target.value as ProposalEvaluationStatus)}
-      renderValue={(status) => <ProposalStatusChipTextOnly label={PROPOSAL_STATUS_LABELS[status]} status={status} />}
-      readOnly={statusOptions.length === 0}
-    >
-      {statusOptions.map((status) => {
-        return (
-          <MenuItem key={status} value={status}>
-            <ProposalStatusChipTextOnly
-              label={PROPOSAL_STATUS_VERB_LABELS[status as ProposalEvaluationStatus]}
-              size='small'
-              status={status}
-            />
-          </MenuItem>
-        );
-      })}
-    </Select>
+      onChange={(newValue) => onChange(newValue as ProposalEvaluationStatus)}
+    />
   );
 }

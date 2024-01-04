@@ -23,7 +23,7 @@ export function SelectOptionItem({ option, onChange, onDelete, onToggleOptionEdi
     >
       <Stack flexDirection='row' justifyContent='space-between' alignItems='center' flex={1} maxWidth='100%'>
         <Chip
-          label={option.name}
+          label={option.dropdownName || option.name}
           color={option.color}
           size='small'
           sx={{

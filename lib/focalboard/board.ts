@@ -64,6 +64,7 @@ interface IPropertyOption<T = string> {
   value: string;
   color: string;
   disabled?: boolean;
+  dropdownValue?: string; // the label to show in the dropdown, if its different from the normal value
 }
 
 // A template for card properties attached to a board
