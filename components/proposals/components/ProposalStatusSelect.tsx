@@ -27,11 +27,7 @@ export function ProposalStatusSelect({ proposal, spaceId }: { proposal: CardPage
       if (currentEvaluationStatus === 'in_progress') {
         return ['complete'];
       }
-    } else if (
-      currentEvaluationStep === 'pass_fail' ||
-      currentEvaluationStep === 'rubric' ||
-      currentEvaluationStep === 'vote'
-    ) {
+    } else if (currentEvaluationStep === 'pass_fail' || currentEvaluationStep === 'rubric') {
       if (currentEvaluationStatus === 'in_progress') {
         return ['passed', 'declined'];
       } else if (currentEvaluationStatus === 'declined') {

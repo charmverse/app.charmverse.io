@@ -67,6 +67,7 @@ export function getProposalEvaluationStatus({
       }
       return 'passed';
     }
+    return 'passed';
   }
 
   return 'in_progress';
