@@ -192,24 +192,17 @@ function PropertyValueElement(props: Props) {
   } else if (propertyTemplate.type === 'proposalStatus' || propertyTemplate.id === PROPOSAL_STATUS_BLOCK_ID) {
     // Proposals as datasource use proposalStatus column, whereas the actual proposals table uses STATUS_BLOCK_ID
     // We should migrate over the proposals as datasource blocks to the same format as proposals table
-    if (!proposal) {
-      return null;
+    if (isAdmin && proposal) {
+      return <ProposalStatusSelect proposal={proposal} spaceId={card.spaceId} />;
     }
 
-    if (!isAdmin) {
-      return <ProposalStatusChipTextOnly status={propertyValue as ProposalEvaluationStatus} />;
-    }
-
-    return <ProposalStatusSelect proposal={proposal} spaceId={card.spaceId} />;
+    return <ProposalStatusChipTextOnly status={propertyValue as ProposalEvaluationStatus} />;
   } else if (propertyTemplate.type === 'proposalStep' || propertyTemplate.id === PROPOSAL_STEP_BLOCK_ID) {
-    if (!proposal) {
-      return null;
+    if (proposal && isAdmin) {
+      return <ProposalStepSelect proposal={proposal} spaceId={card.spaceId} />;
     }
 
-    if (!isAdmin) {
-      return <ProposalStepChipTextOnly label={proposal.currentEvaluation?.title ?? 'Draft'} />;
-    }
-    return <ProposalStepSelect proposal={proposal} spaceId={card.spaceId} />;
+    return <ProposalStepChipTextOnly label={proposal?.currentEvaluation?.title ?? (propertyValue as string)} />;
   } else if (propertyTemplate.id === REWARD_PROPOSAL_LINK) {
     if (!Array.isArray(propertyValue) || !propertyValue.length || !propertyValue[0]) {
       return null;

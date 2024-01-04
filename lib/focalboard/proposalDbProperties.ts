@@ -78,7 +78,7 @@ export const PROPOSAL_STATUS_LABELS: Record<ProposalEvaluationStatus, string> = 
   unpublished: 'Unpublished'
 };
 
-export const PROPOSAL_STATUS_ACTION_LABELS: Record<ProposalEvaluationStatus, string> = {
+export const PROPOSAL_STATUS_VERB_LABELS: Record<ProposalEvaluationStatus, string> = {
   complete: 'Complete',
   declined: 'Decline',
   in_progress: 'In Progress',

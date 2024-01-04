@@ -5,7 +5,11 @@ import { v4 as uuid } from 'uuid';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
-import { proposalDbProperties, proposalStatusBoardColors } from 'lib/focalboard/proposalDbProperties';
+import {
+  PROPOSAL_STATUS_LABELS,
+  proposalDbProperties,
+  proposalStatusBoardColors
+} from 'lib/focalboard/proposalDbProperties';
 import { InvalidStateError } from 'lib/middleware/errors';
 import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -75,6 +79,7 @@ export function getBoardProperties({
 
   const statusProp = generateUpdatedProposalStatusProperty({ boardProperties });
   const proposalUrlProp = generateUpdatedProposalUrlProperty({ boardProperties });
+  const stepProp = generateUpdatedProposalStepProperty({ boardProperties });
 
   const existingStatusPropIndex = boardProperties.findIndex((p) => p.type === 'proposalStatus');
 
@@ -185,6 +190,33 @@ export function getBoardProperties({
   return boardProperties;
 }
 
+function generateUpdatedProposalStepProperty({ boardProperties }: { boardProperties: IPropertyTemplate[] }) {
+  // We will mutate and return this property
+  const proposalStatusProp = {
+    ...(boardProperties.find((p) => p.type === 'proposalStatus') ?? {
+      ...proposalDbProperties.proposalStatus(),
+      id: uuid()
+    })
+  };
+
+  if (proposalStatusProp) {
+    [...objectUtils.typedKeys(PROPOSAL_STATUS_LABELS)].forEach((status) => {
+      const existingOption = proposalStatusProp.options.find((opt) => opt.value === status);
+      if (!existingOption) {
+        proposalStatusProp.options.push({
+          color: proposalStatusBoardColors[status as ProposalEvaluationStatus],
+          id: uuid(),
+          value: status
+        });
+      }
+    });
+
+    return proposalStatusProp;
+  }
+
+  return proposalStatusProp;
+}
+
 function generateUpdatedProposalStatusProperty({ boardProperties }: { boardProperties: IPropertyTemplate[] }) {
   // We will mutate and return this property
   const proposalStatusProp = {
@@ -195,18 +227,17 @@ function generateUpdatedProposalStatusProperty({ boardProperties }: { boardPrope
   };
 
   if (proposalStatusProp) {
-    [...objectUtils.typedKeys(ProposalStatus), 'archived'].forEach((status) => {
-      if (status !== 'draft') {
-        const existingOption = proposalStatusProp.options.find((opt) => opt.value === status);
-        if (!existingOption) {
-          proposalStatusProp.options.push({
-            color: proposalStatusBoardColors[status as ProposalEvaluationStatus],
-            id: uuid(),
-            value: status
-          });
-        }
+    [...objectUtils.typedKeys(PROPOSAL_STATUS_LABELS)].forEach((status) => {
+      const existingOption = proposalStatusProp.options.find((opt) => opt.value === status);
+      if (!existingOption) {
+        proposalStatusProp.options.push({
+          color: proposalStatusBoardColors[status as ProposalEvaluationStatus],
+          id: uuid(),
+          value: status
+        });
       }
     });
+
     return proposalStatusProp;
   }
 

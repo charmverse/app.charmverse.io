@@ -6,6 +6,8 @@ import { stringUtils } from '@charmverse/core/utilities';
 
 import { prismaToBlock } from 'lib/focalboard/block';
 import { canAccessPrivateFields } from 'lib/proposal/form/canAccessPrivateFields';
+import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
+import type { ProposalFields } from 'lib/proposal/interface';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   ProposalRubricCriteriaWithTypedParams
@@ -62,12 +64,25 @@ export async function createCardsFromProposals({
     include: {
       proposal: {
         select: {
-          status: true,
           evaluationType: true,
           id: true,
           spaceId: true,
           authors: true,
           formId: true,
+          status: true,
+          evaluations: {
+            select: {
+              index: true,
+              result: true,
+              type: true
+            }
+          },
+          rewards: {
+            select: {
+              id: true
+            }
+          },
+          fields: true,
           createdBy: true,
           form: {
             select: {
@@ -186,9 +201,15 @@ export async function createCardsFromProposals({
       properties[proposalProps.proposalUrl.id] = pageProposal.path;
     }
 
-    if (proposalProps.proposalStatus) {
-      properties[proposalProps.proposalStatus.id] =
-        proposalProps.proposalStatus.options.find((opt) => opt.value === pageProposal.proposal?.status)?.id ?? '';
+    if (pageProposal.proposal && proposalProps.proposalStatus) {
+      const evaluationStatus = getProposalEvaluationStatus({
+        evaluations: pageProposal.proposal.evaluations ?? [],
+        hasPendingRewards: ((pageProposal.proposal.fields as ProposalFields).pendingRewards ?? []).length > 0,
+        status: pageProposal.proposal.status,
+        hasRewards: pageProposal.proposal.rewards.length > 0
+      });
+
+      properties[proposalProps.proposalStatus.id] = evaluationStatus;
     }
 
     const formFields = pageProposal.proposal?.form?.formFields ?? [];

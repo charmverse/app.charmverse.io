@@ -9,7 +9,7 @@ import {
 } from 'charmClient/hooks/proposals';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { CardPageProposal } from 'lib/focalboard/card';
-import { PROPOSAL_STATUS_ACTION_LABELS } from 'lib/focalboard/proposalDbProperties';
+import { PROPOSAL_STATUS_VERB_LABELS } from 'lib/focalboard/proposalDbProperties';
 import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
 
 import { ProposalStatusChipTextOnly } from './ProposalStatusBadge';
@@ -79,7 +79,7 @@ export function ProposalStatusSelect({ proposal, spaceId }: { proposal: CardPage
         return (
           <MenuItem key={status} value={status}>
             <ProposalStatusChipTextOnly
-              label={PROPOSAL_STATUS_ACTION_LABELS[status as ProposalEvaluationStatus]}
+              label={PROPOSAL_STATUS_VERB_LABELS[status as ProposalEvaluationStatus]}
               size='small'
               status={status}
             />
