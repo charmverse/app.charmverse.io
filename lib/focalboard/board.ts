@@ -63,6 +63,7 @@ interface IPropertyOption<T = string> {
   id: T;
   value: string;
   color: string;
+  disabled?: boolean;
 }
 
 // A template for card properties attached to a board

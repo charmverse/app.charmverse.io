@@ -1,42 +1,60 @@
-import { Chip, MenuItem, Select } from '@mui/material';
+import { useMemo } from 'react';
 import { mutate } from 'swr';
 
 import { useClearEvaluationResult, useUpdateProposalStatusOnly } from 'charmClient/hooks/proposals';
+import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { IPropertyOption } from 'lib/focalboard/board';
 import type { CardPageProposal } from 'lib/focalboard/card';
 
-import { ProposalStepChipTextOnly } from './ProposalStepBadge';
+export function ProposalStepSelect({
+  proposal,
+  spaceId,
+  readOnly
+}: {
+  proposal?: CardPageProposal;
+  spaceId: string;
+  readOnly: boolean;
+}) {
+  const { trigger: updateProposalStatusOnly } = useUpdateProposalStatusOnly({ proposalId: proposal?.id });
+  const { trigger: clearEvaluationResult } = useClearEvaluationResult({ proposalId: proposal?.id });
+  const { currentValue, options } = useMemo(() => {
+    const _options: IPropertyOption[] = [
+      {
+        id: 'draft',
+        value: 'Draft',
+        color: 'gray'
+      },
+      ...(proposal?.evaluations || []).map((evaluation) => ({
+        id: evaluation.id,
+        value: evaluation.title,
+        color: 'gray'
+      })),
+      ...(proposal?.hasRewards
+        ? [
+            {
+              id: 'rewards',
+              value: 'Rewards',
+              color: 'gray'
+            }
+          ]
+        : [])
+    ];
+    const lastEvaluation = proposal && proposal.evaluations[proposal.evaluations.length - 1];
+    const currentEvaluationId = proposal?.currentEvaluationId;
+    const currentEvaluationIndex =
+      currentEvaluationId === null
+        ? 0
+        : currentEvaluationId === lastEvaluation?.id && lastEvaluation?.result === 'pass' && proposal?.hasRewards
+        ? _options.length - 1
+        : _options.findIndex((e) => e.id === currentEvaluationId);
+    _options.forEach((option, index) => {
+      option.disabled = index >= currentEvaluationIndex || index < currentEvaluationIndex - 1;
+    });
+    return { options: _options, currentValue: _options[currentEvaluationIndex]?.id };
+  }, [proposal]);
 
-export function ProposalStepSelect({ proposal, spaceId }: { proposal: CardPageProposal; spaceId: string }) {
-  const { trigger: updateProposalStatusOnly } = useUpdateProposalStatusOnly({ proposalId: proposal.id });
-  const { trigger: clearEvaluationResult } = useClearEvaluationResult({ proposalId: proposal.id });
-  const evaluations = [
-    {
-      id: 'draft',
-      title: 'Draft'
-    },
-    ...proposal.evaluations,
-    ...(proposal.hasRewards
-      ? [
-          {
-            id: 'rewards',
-            title: 'Rewards'
-          }
-        ]
-      : [])
-  ];
-
-  const lastEvaluation = proposal.evaluations[proposal.evaluations.length - 1];
   const { showMessage } = useSnackbar();
-
-  const currentEvaluationId = proposal.currentEvaluationId;
-  const currentEvaluationIndex =
-    currentEvaluationId === null
-      ? 0
-      : currentEvaluationId === lastEvaluation?.id && lastEvaluation?.result === 'pass' && proposal.hasRewards
-      ? evaluations.length - 1
-      : evaluations.findIndex((evaluation) => evaluation.id === currentEvaluationId);
-
   async function onChange(evaluationId?: string) {
     try {
       if (evaluationId !== 'draft') {
@@ -53,26 +71,20 @@ export function ProposalStepSelect({ proposal, spaceId }: { proposal: CardPagePr
       showMessage(err.message, 'error');
     }
   }
+  function onValueChange(values: string | string[]) {
+    const newValue = Array.isArray(values) ? values[0] : values;
+    if (newValue) {
+      onChange(newValue);
+    }
+  }
 
   return (
-    <Select<string>
-      size='small'
-      displayEmpty
-      value={evaluations[currentEvaluationIndex]?.id ?? ''}
-      onChange={(e) => onChange(e.target.value)}
-      renderValue={() => <ProposalStepChipTextOnly label={proposal.currentStep?.title ?? 'Draft'} />}
-    >
-      {evaluations.map((evaluation, index) => {
-        return (
-          <MenuItem
-            disabled={index >= currentEvaluationIndex || index < currentEvaluationIndex - 1}
-            key={evaluation.id}
-            value={evaluation.id}
-          >
-            <Chip size='small' label={evaluation.title} color='gray' />
-          </MenuItem>
-        );
-      })}
-    </Select>
+    <TagSelect
+      wrapColumn
+      readOnly={readOnly}
+      options={options}
+      propertyValue={currentValue ?? ''}
+      onChange={onValueChange}
+    />
   );
 }

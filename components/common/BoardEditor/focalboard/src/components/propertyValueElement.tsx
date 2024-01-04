@@ -210,11 +210,8 @@ function PropertyValueElement(props: Props) {
       />
     );
   } else if (propertyTemplate.type === 'proposalStep' || propertyTemplate.id === PROPOSAL_STEP_BLOCK_ID) {
-    if (proposal && isAdmin) {
-      return <ProposalStepSelect proposal={proposal} spaceId={card.spaceId} />;
-    }
-
-    return <ProposalStepChipTextOnly label={proposal?.currentStep?.title ?? (propertyValue as string)} />;
+    return <ProposalStepSelect readOnly={!isAdmin} proposal={proposal} spaceId={card.spaceId} />;
+    // return <ProposalStepChipTextOnly label={proposal?.currentStep?.title ?? (propertyValue as string)} />;
   } else if (propertyTemplate.id === REWARD_PROPOSAL_LINK) {
     if (!Array.isArray(propertyValue) || !propertyValue.length || !propertyValue[0]) {
       return null;

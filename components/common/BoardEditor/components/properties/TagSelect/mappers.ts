@@ -7,7 +7,8 @@ export function mapSelectOptionToPropertyOption(option: SelectOptionType): IProp
   return {
     id: option.id,
     value: option.name,
-    color: mapMUIColorToProperty(option.color)
+    color: mapMUIColorToProperty(option.color),
+    disabled: option.disabled
   };
 }
 
@@ -15,6 +16,7 @@ export function mapPropertyOptionToSelectOption(option: IPropertyOption): Select
   return {
     id: option.id,
     name: option.value,
-    color: convertFocalboardToMUIColor(option.color)
+    color: convertFocalboardToMUIColor(option.color),
+    disabled: option.disabled
   };
 }
