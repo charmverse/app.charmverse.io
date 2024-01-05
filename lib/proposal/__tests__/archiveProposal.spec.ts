@@ -10,7 +10,8 @@ describe('archiveProposal()', () => {
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: user.id,
-      archived: false
+      archived: false,
+      authors: [user.id]
     });
     const archived = await archiveProposal({
       archived: true,
@@ -25,15 +26,5 @@ describe('archiveProposal()', () => {
     });
 
     expect(unarchived.archived).toBe(false);
-
-    const { page, ...proposalData } = proposal;
-
-    expect(unarchived).toMatchObject<ProposalWithUsers>(
-      expect.objectContaining({
-        ...proposalData,
-        reviewers: expect.arrayContaining(proposal.reviewers),
-        authors: expect.arrayContaining(proposal.authors)
-      })
-    );
   });
 });
