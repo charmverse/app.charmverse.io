@@ -3,7 +3,7 @@ import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 
 import { archiveProposal } from '../archiveProposal';
 
-describe('archiveProposal', () => {
+describe('archiveProposal()', () => {
   it('should update the proposal archived status and return the proposal with full data', async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace();
 
@@ -28,10 +28,12 @@ describe('archiveProposal', () => {
 
     const { page, ...proposalData } = proposal;
 
-    expect(unarchived).toMatchObject<ProposalWithUsers>({
-      ...proposalData,
-      reviewers: expect.arrayContaining(proposal.reviewers),
-      authors: expect.arrayContaining(proposal.authors)
-    });
+    expect(unarchived).toMatchObject<ProposalWithUsers>(
+      expect.objectContaining({
+        ...proposalData,
+        reviewers: expect.arrayContaining(proposal.reviewers),
+        authors: expect.arrayContaining(proposal.authors)
+      })
+    );
   });
 });
