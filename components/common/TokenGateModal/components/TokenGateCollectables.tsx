@@ -33,6 +33,12 @@ export function TokenGateCollectables() {
         conditions: { chainId: Number(values.chain), contract: values.contract }
       });
       setDisplayedPage('review');
+    } else if (values.collectableOption === 'HYPERSUB' && values.chain && values.contract) {
+      handleTokenGate({
+        type: 'hypersub',
+        conditions: { chainId: Number(values.chain), contract: values.contract }
+      });
+      setDisplayedPage('review');
     } else {
       const valueProps = getCollectablesUnifiedAccessControlConditions(values) || [];
 
@@ -60,7 +66,7 @@ export function TokenGateCollectables() {
           {...register('collectableOption')}
         >
           {collectableOptions
-            .filter((col) => !(col.id === 'UNLOCK' && flow !== 'single'))
+            .filter((col) => !((col.id === 'UNLOCK' || col.id === 'HYPERSUB') && flow !== 'single'))
             .map((type) => (
               <MenuItem key={type.id} value={type.id}>
                 {type.name}
