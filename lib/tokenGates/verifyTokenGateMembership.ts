@@ -9,7 +9,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { isTruthy } from 'lib/utilities/types';
 
-import { getUnlockProtocolValidTokenGate } from './evaluateEligibility';
+import { getHypersubValidTokenGate, getUnlockProtocolValidTokenGate } from './evaluateEligibility';
 import type { TokenGate } from './interfaces';
 
 const log = getLogger('tg-verification');
@@ -46,7 +46,7 @@ export async function verifyTokenGateMembership({
   const tokenGateVerificationPromises = userTokenGates.map(async (userTokenGate) => {
     const { jwt, tokenGate: tokenGateWithRoles, id, grantedRoles } = userTokenGate;
 
-    if (!jwt || !tokenGateWithRoles) {
+    if (!tokenGateWithRoles) {
       return { id, isVerified: false, roleIds: grantedRoles };
     }
 
@@ -70,7 +70,29 @@ export async function verifyTokenGateMembership({
         isVerified: values.some((v) => !!v?.tokenGateId),
         roleIds: tokenGate.tokenGateToRoles.map((r) => r.roleId)
       };
-    } else {
+    } else if (tokenGate.type === 'hypersub') {
+      const wallets = await prisma.userWallet.findMany({
+        where: {
+          userId
+        }
+      });
+      const values = await Promise.all(
+        wallets.map(async (w) => {
+          const valid = await getHypersubValidTokenGate(tokenGate, w.address);
+          return valid;
+        })
+      );
+
+      return {
+        id: tokenGate.id,
+        isVerified: values.some((v) => !!v?.tokenGateId),
+        roleIds: tokenGate.tokenGateToRoles.map((r) => r.roleId)
+      };
+    } else if (tokenGate.type === 'lit') {
+      if (!jwt) {
+        return { id, isVerified: false, roleIds: grantedRoles };
+      }
+
       const lit = await import('@lit-protocol/lit-node-client');
       const result = lit.verifyJwt({ jwt });
       const isVerified = result.verified && (result.payload as any)?.orgId === spaceId;
@@ -81,6 +103,8 @@ export async function verifyTokenGateMembership({
         roleIds: tokenGate.tokenGateToRoles.map((r) => r.roleId)
       };
     }
+
+    return { id, isVerified: false, roleIds: tokenGateWithRoles?.tokenGateToRoles?.map((r) => r.roleId) || [] };
   });
 
   const tokenGateVerificationResults = await Promise.allSettled(tokenGateVerificationPromises).then((_r) =>

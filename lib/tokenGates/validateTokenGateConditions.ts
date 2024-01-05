@@ -5,7 +5,7 @@ import { isValidChainAddress } from 'lib/tokens/validation';
 
 import type { TokenGate } from './interfaces';
 
-const UnlockProtocolSchema = yup.object().shape({
+const StandardProtocolSchema = yup.object().shape({
   contract: yup
     .string()
     .required()
@@ -49,8 +49,8 @@ const LitProtocolSchema = yup.object().shape({
 });
 
 export async function validateTokenGateConditions(tokenGate: TokenGate) {
-  if (tokenGate.type === 'unlock') {
-    await UnlockProtocolSchema.validate(tokenGate.conditions);
+  if (tokenGate.type === 'unlock' || tokenGate.type === 'hypersub') {
+    await StandardProtocolSchema.validate(tokenGate.conditions);
   } else if (tokenGate.type === 'lit') {
     await LitProtocolSchema.validate(tokenGate.conditions);
   } else {

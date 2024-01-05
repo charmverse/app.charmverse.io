@@ -99,7 +99,7 @@ export default function TokenGatesTable({ isAdmin, isLoading, tokenGates, refres
     }
   }
 
-  async function testUnlock(tokenGate: TokenGate<'unlock'>) {
+  async function testOthers(tokenGate: TokenGate<'unlock'> | TokenGate<'hypersub'>) {
     setTestResult({ status: 'loading' });
     if (space?.id && account) {
       await verifyTokenGate(
@@ -111,7 +111,7 @@ export default function TokenGatesTable({ isAdmin, isLoading, tokenGates, refres
         },
         {
           onError: () => {
-            setTestResult({ message: 'Your address does not meet the requirements for this lock', status: 'error' });
+            setTestResult({ message: 'Your address does not meet the requirements', status: 'error' });
           },
           onSuccess: () => {
             setTestResult({ status: 'success' });
@@ -123,9 +123,9 @@ export default function TokenGatesTable({ isAdmin, isLoading, tokenGates, refres
 
   async function testConnect(tokenGate: TokenGate) {
     if (account) {
-      if (tokenGate.type === 'unlock') {
-        await testUnlock(tokenGate);
-      } else if (litClient && tokenGate.type === 'lit') {
+      if (tokenGate.type === 'unlock' || tokenGate.type === 'hypersub') {
+        await testOthers(tokenGate);
+      } else if (tokenGate.type === 'lit') {
         await testLitTokenGate(tokenGate);
       }
     } else {
