@@ -184,7 +184,6 @@ test.describe.serial('Proposal Evaluation', () => {
         proposalId: proposal.id,
         title: settingsToTest.evaluationFeedbackTitle,
         reviewers: [],
-        rubricCriteria: [],
         permissions: expect.arrayContaining(
           proposalEvaluationPermissions[0].permissions.map((p) => expect.objectContaining(p))
         )
@@ -244,8 +243,7 @@ test.describe.serial('Proposal Evaluation', () => {
       result: null,
       snapshotExpiry: null,
       snapshotId: null,
-      title: settingsToTest.evaluationPassFailTitle,
-      rubricCriteria: []
+      title: settingsToTest.evaluationPassFailTitle
     });
 
     expect(proposal.evaluations[3]).toMatchObject({
@@ -277,8 +275,7 @@ test.describe.serial('Proposal Evaluation', () => {
         publishToSnapshot: false,
         threshold: settingsToTest.votePassThreshold,
         type: 'Approval'
-      },
-      rubricCriteria: []
+      }
     });
   });
 });
