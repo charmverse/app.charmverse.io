@@ -230,13 +230,12 @@ export async function updateCardsFromProposals({
         card.contentText !== pageWithProposal.contentText ||
         card.deletedAt !== pageWithProposal.deletedAt ||
         cardProposalUrl?.value !== pageWithProposal.path ||
-        (!pageWithProposal.proposal?.archived && cardProposalStatus?.optionId === 'archived') ||
         (!pageWithProposal.proposal?.archived &&
           cardProposalStatus?.optionId !==
             databaseProposalProps.proposalStatus?.options.find((opt) => opt.value === proposalEvaluationStatus)?.id) ||
         (!pageWithProposal.proposal?.archived &&
           cardEvaluationType?.optionId !==
-            databaseProposalProps.proposalEvaluationType?.options.find((opt) => opt.value === proposalEvaluationStatus)
+            databaseProposalProps.proposalEvaluationType?.options.find((opt) => opt.value === proposalEvaluationType)
               ?.id) ||
         (!pageWithProposal.proposal?.archived &&
           cardProposalStep?.optionId !==

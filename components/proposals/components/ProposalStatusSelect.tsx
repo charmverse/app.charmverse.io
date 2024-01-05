@@ -91,7 +91,6 @@ export function ProposalStatusSelect({
           : ''
       }
       disableClearable
-      dataTest='proposal-status-badge'
       onChange={(newValue) => onChange(newValue as ProposalEvaluationStatus)}
     />
   );

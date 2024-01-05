@@ -1,5 +1,4 @@
 import styled from '@emotion/styled';
-import type { SxProps } from '@mui/material';
 import { Stack } from '@mui/material';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -209,7 +208,6 @@ export function TagSelect({
 
   return (
     <StyledSelect
-      dataTest={props['data-test']}
       canEditOptions={canEditOptions}
       includeSelectedOptions={includeSelectedOptions}
       placeholder='Search for an option...'

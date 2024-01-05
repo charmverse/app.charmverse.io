@@ -365,6 +365,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             >
               <div
                 class="MuiStack-root css-1s6sld2-MuiStack-root"
+                data-test="closed-select-input"
               >
                 <div
                   class="MuiStack-root css-1a59yxd-MuiStack-root"
@@ -393,6 +394,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             >
               <div
                 class="MuiStack-root css-1s6sld2-MuiStack-root"
+                data-test="closed-select-input"
               >
                 <div
                   class="MuiStack-root css-1a59yxd-MuiStack-root"
@@ -506,6 +508,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             >
               <div
                 class="MuiStack-root css-1s6sld2-MuiStack-root"
+                data-test="closed-select-input"
               >
                 <div
                   class="MuiStack-root css-1a59yxd-MuiStack-root"
@@ -534,6 +537,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             >
               <div
                 class="MuiStack-root css-1s6sld2-MuiStack-root"
+                data-test="closed-select-input"
               >
                 <div
                   class="MuiStack-root css-1a59yxd-MuiStack-root"
@@ -1051,6 +1055,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             >
               <div
                 class="MuiStack-root css-1s6sld2-MuiStack-root"
+                data-test="closed-select-input"
               >
                 <div
                   class="MuiStack-root css-1a59yxd-MuiStack-root"
@@ -1079,6 +1084,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             >
               <div
                 class="MuiStack-root css-1s6sld2-MuiStack-root"
+                data-test="closed-select-input"
               >
                 <div
                   class="MuiStack-root css-1a59yxd-MuiStack-root"
@@ -1186,6 +1192,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             >
               <div
                 class="MuiStack-root css-1s6sld2-MuiStack-root"
+                data-test="closed-select-input"
               >
                 <div
                   class="MuiStack-root css-1a59yxd-MuiStack-root"
@@ -1214,6 +1221,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             >
               <div
                 class="MuiStack-root css-1s6sld2-MuiStack-root"
+                data-test="closed-select-input"
               >
                 <div
                   class="MuiStack-root css-1a59yxd-MuiStack-root"
@@ -1728,6 +1736,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             >
               <div
                 class="MuiStack-root css-1s6sld2-MuiStack-root"
+                data-test="closed-select-input"
               >
                 <div
                   class="MuiStack-root css-1a59yxd-MuiStack-root"
@@ -1756,6 +1765,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             >
               <div
                 class="MuiStack-root css-1s6sld2-MuiStack-root"
+                data-test="closed-select-input"
               >
                 <div
                   class="MuiStack-root css-1a59yxd-MuiStack-root"
@@ -1869,6 +1879,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             >
               <div
                 class="MuiStack-root css-1s6sld2-MuiStack-root"
+                data-test="closed-select-input"
               >
                 <div
                   class="MuiStack-root css-1a59yxd-MuiStack-root"
@@ -1897,6 +1908,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             >
               <div
                 class="MuiStack-root css-1s6sld2-MuiStack-root"
+                data-test="closed-select-input"
               >
                 <div
                   class="MuiStack-root css-1a59yxd-MuiStack-root"
@@ -2414,6 +2426,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             >
               <div
                 class="MuiStack-root css-1s6sld2-MuiStack-root"
+                data-test="closed-select-input"
               >
                 <div
                   class="MuiStack-root css-1a59yxd-MuiStack-root"
@@ -2442,6 +2455,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             >
               <div
                 class="MuiStack-root css-1s6sld2-MuiStack-root"
+                data-test="closed-select-input"
               >
                 <div
                   class="MuiStack-root css-1a59yxd-MuiStack-root"
@@ -2549,6 +2563,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             >
               <div
                 class="MuiStack-root css-1s6sld2-MuiStack-root"
+                data-test="closed-select-input"
               >
                 <div
                   class="MuiStack-root css-1a59yxd-MuiStack-root"
@@ -2577,6 +2592,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             >
               <div
                 class="MuiStack-root css-1s6sld2-MuiStack-root"
+                data-test="closed-select-input"
               >
                 <div
                   class="MuiStack-root css-1a59yxd-MuiStack-root"
