@@ -2,6 +2,7 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { updateTokenGateHypersubDetails } from 'lib/blockchain/updateHypersubDetails';
 import { updateTokenGateLitDetails } from 'lib/blockchain/updateLitDetails';
 import { updateTokenGateLockDetails } from 'lib/blockchain/updateLocksDetails';
 import { onError, onNoMatch } from 'lib/middleware';
@@ -21,6 +22,8 @@ async function reviewTokenGate(req: NextApiRequest, res: NextApiResponse) {
     updatedResult = await updateTokenGateLitDetails([body]);
   } else if (body.type === 'unlock') {
     updatedResult = await updateTokenGateLockDetails([body]);
+  } else if (body.type === 'hypersub') {
+    updatedResult = await updateTokenGateHypersubDetails([body]);
   } else {
     throw new InvalidInputError('Invalid token gate type');
   }

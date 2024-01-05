@@ -3,6 +3,7 @@ import { readContract } from '@wagmi/core';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
+import { subscriptionTokenV1ABI } from 'lib/tokenGates/hypersub/abi';
 import { PublicLockV13 } from 'lib/tokenGates/unlock/abi';
 import { isValidChainAddress } from 'lib/tokens/validation';
 
@@ -22,18 +23,18 @@ const schema = yup.object({
     .oneOf(collectableOptionIds, 'Invalid collectable option')
     .test('empty-collectable-option-check', 'Selection is required', (option) => !!option),
   chain: yup.string().when('collectableOption', {
-    is: (val: CollectableOptionsId) => val === 'ERC721' || val === 'ERC1155' || val === 'UNLOCK',
+    is: (val: CollectableOptionsId) => val === 'ERC721' || val === 'ERC1155' || val === 'UNLOCK' || val === 'HYPERSUB',
     then: () => yup.string().required('Chain is required'),
     otherwise: () => yup.string()
   }),
   contract: yup.string<`0x${string}`>().when('collectableOption', {
-    is: (val: CollectableOptionsId) => val === 'ERC721' || val === 'ERC1155' || val === 'UNLOCK',
+    is: (val: CollectableOptionsId) => val === 'ERC721' || val === 'ERC1155' || val === 'UNLOCK' || val === 'HYPERSUB',
     then: () =>
       yup
         .string<`0x${string}`>()
         .required('Contract is required')
         .test('isAddress', 'Invalid address', (value) => isValidChainAddress(value))
-        .test('isUnlockContract', 'Invalid Unlock contract or chain', async (value, context) => {
+        .test('isContract', 'Invalid contract or chain', async (value, context) => {
           if (context.parent.chain && context.parent.collectableOption === 'UNLOCK') {
             try {
               await readContract({
@@ -46,9 +47,21 @@ const schema = yup.object({
             } catch (err) {
               return false;
             }
-          } else {
-            return true;
+          } else if (context.parent.chain && context.parent.collectableOption === 'HYPERSUB') {
+            try {
+              await readContract({
+                address: value,
+                chainId: Number(context.parent.chain),
+                abi: subscriptionTokenV1ABI,
+                functionName: 'name'
+              });
+              return true;
+            } catch (err) {
+              return false;
+            }
           }
+
+          return true;
         }),
     otherwise: () => yup.string<`0x${string}`>()
   }),

@@ -41,6 +41,8 @@ export function getTitle(page: DisplayedPage) {
       return 'DAO Condition';
     case 'unlock':
       return 'Unlock Protocol Condition';
+    case 'hypersub':
+      return 'Hypersub Condition';
     default:
       return 'Select Condition';
   }
