@@ -25,7 +25,7 @@ import AddViewMenu from '../addViewMenu';
 import NewCardButton from './newCardButton';
 import ViewHeaderActionsMenu from './viewHeaderActionsMenu';
 import ViewHeaderDisplayByMenu from './viewHeaderDisplayByMenu';
-import { ViewHeaderRowsMenu } from './viewHeaderRowsMenu';
+import { ViewHeaderRowsMenu } from './viewHeaderRowsMenu/viewHeaderRowsMenu';
 import ViewTabs from './viewTabs';
 
 type Props = {
