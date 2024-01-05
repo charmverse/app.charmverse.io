@@ -133,8 +133,6 @@ test.describe.serial('Proposal Evaluation', () => {
     // Configure rubric
     await proposalPage.selectEvaluationReviewer('rubric', 'space_member' as ProposalSystemRole);
 
-    await proposalPage.addRubricCriteriaButton.click();
-
     await proposalPage.editRubricCriteriaLabel.fill(settingsToTest.rubricLabel);
     await proposalPage.editRubricCriteriaDescription.fill(settingsToTest.rubricDescription);
     await proposalPage.editRubricCriteriaMinScore.fill(settingsToTest.rubricMinScore.toString());
