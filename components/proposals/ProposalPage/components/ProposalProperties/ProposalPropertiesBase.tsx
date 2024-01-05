@@ -8,7 +8,6 @@ import { UserSelect } from 'components/common/BoardEditor/components/properties/
 import Link from 'components/common/Link';
 import { LoadingIcon } from 'components/common/LoadingComponent';
 import { ProposalRewards } from 'components/proposals/components/ProposalRewards/ProposalRewards';
-import { ProposalsProvider } from 'components/proposals/hooks/useProposals';
 import { CustomPropertiesAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/CustomPropertiesAdapter';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { isProdEnv } from 'config/constants';
@@ -183,19 +182,17 @@ export function ProposalPropertiesBase({
             </Box>
           </Box>
         )}
-        <ProposalsProvider>
-          <CustomPropertiesAdapter
-            readOnly={readOnlyAuthors}
-            readOnlyProperties={readOnlyCustomProperties}
-            proposal={proposalFormInputs}
-            pageId={pageId}
-            onChange={(properties: ProposalFields['properties']) => {
-              setProposalFormInputs({
-                fields: { ...proposalFormInputs.fields, properties: properties ? { ...properties } : {} }
-              });
-            }}
-          />
-        </ProposalsProvider>
+        <CustomPropertiesAdapter
+          readOnly={readOnlyAuthors}
+          readOnlyProperties={readOnlyCustomProperties}
+          proposal={proposalFormInputs}
+          pageId={pageId}
+          onChange={(properties: ProposalFields['properties']) => {
+            setProposalFormInputs({
+              fields: { ...proposalFormInputs.fields, properties: properties ? { ...properties } : {} }
+            });
+          }}
+        />
         <ProposalRewards
           pendingRewards={pendingRewards}
           reviewers={proposalReviewers}
