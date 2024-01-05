@@ -19,15 +19,15 @@ import { CardFilter } from 'lib/focalboard/cardFilter';
 import { Constants } from 'lib/focalboard/constants';
 import {
   AUTHORS_BLOCK_ID,
+  CREATED_AT_ID,
   DEFAULT_VIEW_BLOCK_ID,
   PROPOSAL_STEP_BLOCK_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID,
-  PROPOSAL_STATUS_BLOCK_ID,
-  CREATED_AT_ID
+  PROPOSAL_STATUS_BLOCK_ID
 } from 'lib/proposal/blocks/constants';
 import type { ProposalPropertyValue } from 'lib/proposal/blocks/interfaces';
 import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
-import type { ProposalFields, ProposalWithUsersLite } from 'lib/proposal/interface';
+import type { ProposalFields, ProposalWithUsersLite, ProposalWithUsers } from 'lib/proposal/interface';
 
 export type BoardProposal = { spaceId?: string; id?: string; fields: ProposalFields | null };
 
