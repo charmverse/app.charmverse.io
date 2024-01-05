@@ -99,6 +99,7 @@ export function ProposalStepSelect({
 
   return (
     <TagSelect
+      disableClearable
       wrapColumn
       includeSelectedOptions
       readOnly={readOnly}
