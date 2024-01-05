@@ -11,8 +11,7 @@ export function createMockProposal(
     currentStep: {
       step: 'draft',
       result: 'in_progress',
-      title: 'Draft',
-      id: uuid()
+      title: 'Draft'
     },
     lensPostLink: null,
     publishToLens: null,
