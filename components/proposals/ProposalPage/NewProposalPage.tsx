@@ -100,7 +100,7 @@ export function NewProposalPage({
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const isAdmin = useIsAdmin();
 
-  const sourceTemplate = proposalTemplates?.find((template) => template.id === formInputs.proposalTemplateId);
+  const sourceTemplate = proposalTemplates?.find((template) => template.page.id === formInputs.proposalTemplateId);
   const isStructured = formInputs.proposalType === 'structured' || !!sourceTemplate?.formId;
   const proposalFormFields = isStructured
     ? formInputs.formFields ??
@@ -143,7 +143,7 @@ export function NewProposalPage({
   usePreventReload(contentUpdated);
 
   const isTemplateRequired = Boolean(currentSpace?.requireProposalTemplate);
-  const templateOptions = (proposalTemplates || []).map((template) => template.page);
+  const templatePageOptions = (proposalTemplates || []).map((template) => template.page);
   const { pages } = usePages();
 
   const proposalTemplatePage = formInputs.proposalTemplateId ? pages[formInputs.proposalTemplateId] : null;
@@ -277,17 +277,17 @@ export function NewProposalPage({
                   </PropertyLabel>
                   <Box display='flex' flex={1}>
                     <TemplateSelect
-                      options={templateOptions}
+                      options={templatePageOptions}
                       value={proposalTemplatePage ?? null}
-                      onChange={(template) => {
-                        if (template === null) {
+                      onChange={(page) => {
+                        if (page === null) {
                           clearTemplate();
                           // if user has not updated the content, then just overwrite everything
                         } else if (formInputs.contentText?.length === 0) {
-                          applyTemplate(template.id);
+                          applyTemplate(page.id);
                         } else {
                           // set value to trigger a prompt
-                          setSelectedProposalTemplateId(template?.id ?? null);
+                          setSelectedProposalTemplateId(page.id);
                         }
                       }}
                     />
