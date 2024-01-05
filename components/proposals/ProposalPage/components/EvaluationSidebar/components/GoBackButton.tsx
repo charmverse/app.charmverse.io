@@ -1,7 +1,7 @@
 import { Tooltip, Typography } from '@mui/material';
 import { useState } from 'react';
 
-import { useClearEvaluationResult, useUpdateProposalStatusOnly } from 'charmClient/hooks/proposals';
+import { useGoBackToEvaluationStep, useUpdateProposalStatusOnly } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -24,7 +24,7 @@ export function GoBackButton({
   const { trigger: updateProposalStatusOnly, isMutating: isSavingProposal } = useUpdateProposalStatusOnly({
     proposalId
   });
-  const { trigger: clearEvaluationResult, isMutating: isSavingEvaluation } = useClearEvaluationResult({
+  const { trigger: goBackToEvaluationStep, isMutating: isSavingEvaluation } = useGoBackToEvaluationStep({
     proposalId
   });
   const disabledTooltip = !hasMovePermission
@@ -39,7 +39,7 @@ export function GoBackButton({
         // handle draft, which does not have a evaluation step to go to
         await updateProposalStatusOnly({ newStatus: 'draft' });
       } else {
-        await clearEvaluationResult({ evaluationId: previousStep.id });
+        await goBackToEvaluationStep({ evaluationId: previousStep.id });
       }
     } catch (error) {
       showMessage((error as Error).message, 'error');

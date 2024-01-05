@@ -111,6 +111,7 @@ export function ProposalProperties({
           proposalLensLink={proposal?.lensPostLink ?? undefined}
           proposalStatus={proposal?.status}
           pageId={pageId}
+          proposalId={proposalId}
           readOnlyAuthors={readOnlyProperties}
           proposalFormInputs={proposalFormInputs}
           setProposalFormInputs={onChangeProperties}
