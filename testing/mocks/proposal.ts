@@ -10,6 +10,7 @@ export function createMockProposal(
   return {
     currentStep: {
       step: 'draft',
+      result: 'in_progress',
       title: 'Draft'
     },
     lensPostLink: null,

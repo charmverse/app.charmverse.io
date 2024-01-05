@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { mutate } from 'swr';
 
-import { useClearEvaluationResult, useUpdateProposalStatusOnly } from 'charmClient/hooks/proposals';
+import { useGoBackToEvaluationStep, useUpdateProposalStatusOnly } from 'charmClient/hooks/proposals';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPropertyOption } from 'lib/focalboard/board';
@@ -36,7 +36,7 @@ export function ProposalStepSelect({
   readOnly: boolean;
 }) {
   const { trigger: updateProposalStatusOnly } = useUpdateProposalStatusOnly({ proposalId: proposal.id });
-  const { trigger: clearEvaluationResult } = useClearEvaluationResult({ proposalId: proposal.id });
+  const { trigger: goBackToEvaluationStep } = useGoBackToEvaluationStep({ proposalId: proposal.id });
   const { currentValue, options } = useMemo(() => {
     const _options: IPropertyOption[] = [
       {
@@ -77,7 +77,7 @@ export function ProposalStepSelect({
   async function onChange(evaluationId?: string) {
     try {
       if (evaluationId !== 'draft') {
-        await clearEvaluationResult({
+        await goBackToEvaluationStep({
           evaluationId
         });
       } else {

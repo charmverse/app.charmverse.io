@@ -26,7 +26,6 @@ import {
   PROPOSAL_STATUS_BLOCK_ID
 } from 'lib/proposal/blocks/constants';
 import type { ProposalPropertyValue } from 'lib/proposal/blocks/interfaces';
-import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
 import type { ProposalFields, ProposalWithUsersLite, ProposalWithUsers } from 'lib/proposal/interface';
 
 export type BoardProposal = { spaceId?: string; id?: string; fields: ProposalFields | null };
