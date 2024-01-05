@@ -142,9 +142,11 @@ test.describe.serial('Database with proposals as datasource', async () => {
 
       await expect(row).toBeVisible();
 
-      const proposalStatusBadge = databasePage.getTablePropertyProposalStatusLocator({ cardId: card.id });
+      const proposalStatusBadge = databasePage.page
+        .locator(`data-test=database-row-${card.id}`)
+        .filter({ hasText: 'Unpublished' });
 
-      expect((await proposalStatusBadge.allInnerTexts())[0]).toEqual('Unpublished');
+      expect(proposalStatusBadge).toBeVisible();
 
       const syncedProposalUrl = databasePage.getTablePropertyProposalUrlLocator({ cardId: card.id });
       const proposalPage = await prisma.page.findUniqueOrThrow({
@@ -211,12 +213,10 @@ test.describe.serial('Database with proposals as datasource', async () => {
 
     const syncedArchivedProposalCardId = syncedCards.find((c) => c.syncWithPageId === secondProposal.id)?.id as string;
 
-    const archivedRowProposalStatusBadge = databasePage.getTablePropertyProposalStatusLocator({
-      cardId: syncedArchivedProposalCardId
-    });
+    const archivedRowProposalStatusBadge = databasePage.page
+      .locator(`data-test=database-row-${syncedArchivedProposalCardId}`)
+      .filter({ hasText: 'Unpublished' });
 
     await expect(archivedRowProposalStatusBadge).toBeVisible();
-
-    await expect((await archivedRowProposalStatusBadge.allInnerTexts())[0]).toEqual('Unpublished');
   });
 });

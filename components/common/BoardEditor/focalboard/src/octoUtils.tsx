@@ -69,8 +69,11 @@ class OctoUtils {
         break;
       }
       case 'proposalStep': {
-        const proposalStep = propertyTemplate.options.find((o) => propertyValue === o.id)?.value;
-        displayValue = proposalStep ? PROPOSAL_STEP_LABELS[proposalStep as ProposalEvaluationStep] : propertyValue;
+        displayValue = propertyValue;
+        break;
+      }
+      case 'proposalEvaluationType': {
+        displayValue = PROPOSAL_STEP_LABELS[propertyValue as ProposalEvaluationStep];
         break;
       }
       case 'person':

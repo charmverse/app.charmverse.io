@@ -112,7 +112,7 @@ export type TagSelectProps = {
   onUpdateOption?: (option: IPropertyOption) => void;
   onDeleteOption?: (option: IPropertyOption) => void;
   wrapColumn?: boolean;
-  'data-test'?: string;
+  dataTest?: string;
   fluidWidth?: boolean;
 };
 
@@ -131,7 +131,7 @@ export function TagSelect({
   displayType = 'details',
   noOptionsText,
   wrapColumn,
-  'data-test': dataTest,
+  dataTest,
   defaultOpened = false,
   disableClearable = false,
   fluidWidth
@@ -183,6 +183,7 @@ export function TagSelect({
   if (displayType === 'kanban' && isEmptyValue(selectValue)) {
     return null;
   }
+
   if (!isOpened) {
     return (
       <SelectPreviewContainer
@@ -208,7 +209,7 @@ export function TagSelect({
 
   return (
     <StyledSelect
-      data-test={dataTest}
+      dataTest={dataTest}
       canEditOptions={canEditOptions}
       includeSelectedOptions={includeSelectedOptions}
       placeholder='Search for an option...'

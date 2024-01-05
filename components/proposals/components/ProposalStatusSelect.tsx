@@ -90,6 +90,7 @@ export function ProposalStatusSelect({
             })
           : ''
       }
+      dataTest='proposal-status-badge'
       onChange={(newValue) => onChange(newValue as ProposalEvaluationStatus)}
     />
   );
