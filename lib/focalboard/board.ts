@@ -16,7 +16,8 @@ export const proposalPropertyTypesList = [
   'proposalAuthor',
   'proposalReviewer',
   'proposalEvaluationType',
-  'proposalCreatedAt'
+  'proposalCreatedAt',
+  'proposalStep'
 ] as const;
 export type DatabaseProposalPropertyType = (typeof proposalPropertyTypesList)[number];
 
@@ -62,6 +63,8 @@ interface IPropertyOption<T = string> {
   id: T;
   value: string;
   color: string;
+  disabled?: boolean;
+  dropdownValue?: string; // the label to show in the dropdown, if its different from the normal value
 }
 
 // A template for card properties attached to a board

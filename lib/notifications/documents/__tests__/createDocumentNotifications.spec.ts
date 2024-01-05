@@ -8,7 +8,7 @@ import { createForumPost } from 'lib/forums/posts/createForumPost';
 import { createNotificationsFromEvent } from 'lib/notifications/createNotificationsFromEvent';
 import { createPageComment } from 'lib/pages/comments/createPageComment';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
-import { updateProposalStatus } from 'lib/proposal/updateProposalStatus';
+import { updateProposalStatusOnly } from 'lib/proposal/updateProposalStatusOnly';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
 import { createReward } from 'lib/rewards/createReward';
@@ -803,8 +803,8 @@ describe(`Test document events and notifications`, () => {
       evaluationInputs: [{ evaluationType: 'rubric', permissions: [], reviewers: [{ group: 'user', id: user2.id }] }]
     });
 
-    await updateProposalStatus({
-      newStatus: 'discussion',
+    await updateProposalStatusOnly({
+      newStatus: 'published',
       proposalId: page.id,
       userId: user.id
     });

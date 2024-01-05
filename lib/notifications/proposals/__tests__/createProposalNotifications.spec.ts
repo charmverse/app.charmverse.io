@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals } from '@charmverse/core/test';
 
 import { createProposal } from 'lib/proposal/createProposal';
-import { updateProposalStatus } from 'lib/proposal/updateProposalStatus';
+import { updateProposalStatusOnly } from 'lib/proposal/updateProposalStatusOnly';
 import { assignRole } from 'lib/roles';
 import { getProposalEntity, getSpaceEntity, getUserEntity } from 'lib/webhookPublisher/entities';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
@@ -151,8 +151,8 @@ describe.skip(`Test proposal events and notifications`, () => {
     expect(proposalDiscussionStatusChangedMember1Notification).toBeTruthy();
     expect(proposalDiscussionStatusChangedMember2Notification).toBeTruthy();
     // Move to review status
-    await updateProposalStatus({
-      newStatus: 'review',
+    await updateProposalStatusOnly({
+      newStatus: 'published',
       proposalId: proposal.id,
       userId: author1.id
     });
@@ -213,8 +213,8 @@ describe.skip(`Test proposal events and notifications`, () => {
     expect(proposalReviewStatusChangedMember1Notification).toBeFalsy();
     expect(proposalReviewStatusChangedMember2Notification).toBeFalsy();
     // Move to reviewed status
-    await updateProposalStatus({
-      newStatus: 'reviewed',
+    await updateProposalStatusOnly({
+      newStatus: 'published',
       proposalId: proposal.id,
       userId: reviewer.id
     });
@@ -275,8 +275,8 @@ describe.skip(`Test proposal events and notifications`, () => {
     expect(proposalReviewedStatusChangedMember1Notification).toBeFalsy();
     expect(proposalReviewedStatusChangedMember2Notification).toBeFalsy();
     // Move to vote_active status
-    await updateProposalStatus({
-      newStatus: 'vote_active',
+    await updateProposalStatusOnly({
+      newStatus: 'published',
       proposalId: proposal.id,
       userId: author1.id
     });
@@ -408,8 +408,8 @@ async function createDiscussionNotifications(input: Parameters<typeof generateUs
   const spaceEntity = await getSpaceEntity(space.id);
   const proposalEntity = await getProposalEntity(proposal.id);
   // Move to discussion status
-  await updateProposalStatus({
-    newStatus: 'discussion',
+  await updateProposalStatusOnly({
+    newStatus: 'published',
     proposalId: proposal.id,
     userId: author1.id
   });

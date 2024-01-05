@@ -1,13 +1,17 @@
-import type { Block, ProposalStatus } from '@charmverse/core/prisma';
+import type { Block } from '@charmverse/core/prisma';
+
+import type { ProposalEvaluationResultExtended, ProposalEvaluationStatus } from 'lib/proposal/interface';
 
 import type { ExtractedDatabaseProposalProperties } from './extractDatabaseProposalProperties';
 
 export type ExtractedCardProposalProperties = {
   cardProposalUrl: { propertyId: string; value: string };
-  cardProposalStatus: { propertyId: string; optionId: string; value: Exclude<ProposalStatus, 'draft'> | 'archived' };
+  cardProposalStatus: { propertyId: string; optionId: string; value: ProposalEvaluationStatus };
   cardEvaluatedBy: { propertyId: string; value: string[] };
   cardEvaluationTotal: { propertyId: string; value: number };
   cardEvaluationAverage: { propertyId: string; value: number };
+  cardEvaluationType: { propertyId: string; value: ProposalEvaluationResultExtended; optionId: string };
+  cardProposalStep: { propertyId: string; optionId: string; value: string };
 };
 
 export function extractCardProposalProperties({
@@ -21,15 +25,41 @@ export function extractCardProposalProperties({
 
   const extractedPropertyValues: Partial<ExtractedCardProposalProperties> = {};
 
+  const proposalEvaluationTypePropertyId = databaseProperties.proposalEvaluationType?.id;
+  const proposalEvaluationTypeValueId = proposalEvaluationTypePropertyId
+    ? cardValues[proposalEvaluationTypePropertyId]
+    : undefined;
+
+  if (proposalEvaluationTypePropertyId) {
+    extractedPropertyValues.cardEvaluationType = {
+      propertyId: proposalEvaluationTypePropertyId,
+      optionId: proposalEvaluationTypeValueId as string,
+      value: databaseProperties.proposalEvaluationType?.options.find((opt) => opt.id === proposalEvaluationTypeValueId)
+        ?.value as ProposalEvaluationResultExtended
+    };
+  }
+
   const proposalStatusPropertyId = databaseProperties.proposalStatus?.id;
   const proposalStatusValueId = proposalStatusPropertyId ? cardValues[proposalStatusPropertyId] : undefined;
 
-  if (proposalStatusPropertyId && proposalStatusValueId) {
+  if (proposalStatusPropertyId) {
     extractedPropertyValues.cardProposalStatus = {
       propertyId: proposalStatusPropertyId,
       optionId: proposalStatusValueId as string,
-      value: databaseProperties.proposalStatus?.options.find((opt) => opt.id === proposalStatusValueId)?.value as  // eslint-disable-next-line prettier/prettier
-         (Exclude<ProposalStatus, 'draft'>  | 'archived')
+      value: databaseProperties.proposalStatus?.options.find((opt) => opt.id === proposalStatusValueId)
+        ?.value as ProposalEvaluationStatus
+    };
+  }
+
+  const proposalStepPropertyId = databaseProperties.proposalStep?.id;
+  const proposalStepValueId = proposalStepPropertyId ? cardValues[proposalStepPropertyId] : undefined;
+
+  if (proposalStepPropertyId) {
+    extractedPropertyValues.cardProposalStep = {
+      propertyId: proposalStepPropertyId,
+      optionId: proposalStepValueId as string,
+      value: databaseProperties.proposalStep?.options.find((opt) => opt.id === proposalStepValueId)
+        ?.value as ProposalEvaluationStatus
     };
   }
 

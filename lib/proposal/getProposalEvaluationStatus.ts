@@ -1,8 +1,10 @@
 import type { ProposalEvaluation, ProposalStatus } from '@charmverse/core/prisma';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
+
+import type { ProposalEvaluationResultExtended, ProposalEvaluationStatus, ProposalEvaluationStep } from './interface';
+
 /**
- * find the first evalation that does not have a result
- *
+ * find the first evaluation that does not have a result
  * */
 export function getOldProposalStatus({
   evaluations,
@@ -25,4 +27,30 @@ export function getOldProposalStatus({
     return currentEvaluation.result ? 'reviewed' : 'evaluation_active'; // we doint have a review_active
   }
   return status;
+}
+
+export function getProposalEvaluationStatus({
+  step,
+  result
+}: {
+  step: ProposalEvaluationStep;
+  result: ProposalEvaluationResultExtended;
+}): ProposalEvaluationStatus {
+  if (step === 'draft') {
+    return 'unpublished';
+  } else if (step === 'feedback') {
+    return result === 'in_progress' ? 'in_progress' : 'complete';
+  } else if (step === 'pass_fail' || step === 'rubric' || step === 'vote') {
+    if (result === 'in_progress') {
+      return 'in_progress';
+    } else if (result === 'fail') {
+      return 'declined';
+    } else if (result === 'pass') {
+      return 'passed';
+    }
+  } else if (step === 'rewards') {
+    return result === 'in_progress' ? 'unpublished' : 'published';
+  }
+
+  return 'in_progress';
 }
