@@ -302,7 +302,7 @@ function CardDetailProperties(props: Props) {
       {!props.readOnly && !disableEditPropertyOption && activeView && (
         <>
           <div className='octo-propertyname add-property'>
-            <Button {...bindTrigger(addPropertyPopupState)}>
+            <Button {...bindTrigger(addPropertyPopupState)} data-dataTest='add-custom-property'>
               <FormattedMessage id='CardDetail.add-property' defaultMessage='+ Add a property' />
             </Button>
             {!isSmallScreen && (
