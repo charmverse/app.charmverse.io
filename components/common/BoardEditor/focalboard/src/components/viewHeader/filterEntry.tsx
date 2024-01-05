@@ -31,9 +31,9 @@ import type { FilterClause, FilterCondition } from 'lib/focalboard/filterClause'
 import { propertyConfigs } from 'lib/focalboard/filterClause';
 import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import { createFilterGroup } from 'lib/focalboard/filterGroup';
-import { PROPOSAL_RESULT_LABELS } from 'lib/focalboard/proposalDbProperties';
+import { PROPOSAL_RESULT_LABELS, PROPOSAL_STEP_LABELS } from 'lib/focalboard/proposalDbProperties';
 import { AUTHORS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposal/blocks/constants';
-import type { ProposalEvaluationResultExtended } from 'lib/proposal/interface';
+import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from 'lib/proposal/interface';
 import { focalboardColorsMap } from 'theme/colors';
 
 import { iconForPropertyType } from '../../widgets/iconForPropertyType';
@@ -94,6 +94,7 @@ function FilterPropertyValue({
     propertyRecord[filter.propertyId].type.match(/person|createdBy|updatedBy/) ||
     filter.propertyId === PROPOSAL_REVIEWERS_BLOCK_ID ||
     filter.propertyId === AUTHORS_BLOCK_ID;
+  const isPropertyTypeEvaluationType = propertyRecord[filter.propertyId].type === 'proposalEvaluationType';
   const isPropertyTypeMultiSelect = propertyRecord[filter.propertyId].type === 'multiSelect';
   const isPropertyTypeTokenChain = propertyRecord[filter.propertyId].type === 'tokenChain';
   const property = propertyRecord[filter.propertyId];
@@ -314,7 +315,9 @@ function FilterPropertyValue({
             <Chip
               size='small'
               label={
-                property.type === 'proposalStatus'
+                isPropertyTypeEvaluationType
+                  ? PROPOSAL_STEP_LABELS[foundOption.value as ProposalEvaluationStep]
+                  : property.type === 'proposalStatus'
                   ? PROPOSAL_RESULT_LABELS[foundOption.value as ProposalEvaluationResultExtended]
                   : foundOption.value
               }
@@ -338,7 +341,9 @@ function FilterPropertyValue({
                 <Chip
                   size='small'
                   label={
-                    property.type === 'proposalStatus'
+                    isPropertyTypeEvaluationType
+                      ? PROPOSAL_STEP_LABELS[option.value as ProposalEvaluationStep]
+                      : property.type === 'proposalStatus'
                       ? PROPOSAL_RESULT_LABELS[option.value as ProposalEvaluationResultExtended]
                       : option.value
                   }
