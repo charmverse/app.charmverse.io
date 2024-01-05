@@ -93,7 +93,7 @@ function DocumentPage({
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
 
-  const { proposal, refreshProposal, onChangeEvaluation } = useProposal({
+  const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow } = useProposal({
     proposalId
   });
 
@@ -324,7 +324,7 @@ function DocumentPage({
           onChangeEvaluation={onChangeEvaluation}
           refreshProposal={refreshProposal}
           disabledViews={isStructuredProposal ? ['suggestions', 'comments'] : []}
-          onChangeWorkflow={() => {}}
+          onChangeWorkflow={onChangeWorkflow}
         />
       )}
     </CardPropertiesWrapper>

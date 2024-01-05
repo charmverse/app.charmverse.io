@@ -3,6 +3,7 @@ import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { useProposalTemplateById } from 'components/proposals/hooks/useProposalTemplates';
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationStepSettings';
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
 import { EvaluationStepRow } from '../EvaluationSidebar/components/EvaluationStepRow';
@@ -17,6 +18,7 @@ export type Props = {
   isReviewer: boolean;
   onChangeWorkflow: (workflow: ProposalWorkflowTyped) => void;
   templateId?: string | null;
+  requireWorkflowChangeConfirmation?: boolean;
 };
 
 export function EvaluationSettingsSidebar({
@@ -25,14 +27,22 @@ export function EvaluationSettingsSidebar({
   readOnly,
   onChangeWorkflow,
   isReviewer,
-  templateId
+  templateId,
+  requireWorkflowChangeConfirmation
 }: Props) {
   const proposalTemplate = useProposalTemplateById(templateId);
   const pendingRewards = proposal?.fields?.pendingRewards;
   const { mappedFeatures } = useSpaceFeatures();
+  const isAdmin = useIsAdmin();
   return (
     <div data-test='evaluation-settings-sidebar'>
-      <WorkflowSelect value={proposal?.workflowId} onChange={onChangeWorkflow} readOnly={!!templateId} required />
+      <WorkflowSelect
+        value={proposal?.workflowId}
+        onChange={onChangeWorkflow}
+        readOnly={!!templateId && !isAdmin}
+        required
+        requireConfirmation={requireWorkflowChangeConfirmation}
+      />
       <EvaluationStepRow index={0} result={null} title='Draft' />
       {proposal && (
         <>
