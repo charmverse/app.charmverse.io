@@ -9,6 +9,7 @@ import { verifiedJWTResponse } from 'testing/utils/litProtocol';
 import {
   addRoleToTokenGate,
   deleteTokenGate,
+  generateHypersubTokenGate,
   generateTokenGate,
   generateUnlockTokenGate
 } from 'testing/utils/tokenGates';
@@ -133,6 +134,7 @@ describe('verifyTokenGateMembership', () => {
     const tokenGate1 = await generateTokenGate({ userId: user.id, spaceId: space.id });
     const tokenGate2 = await generateTokenGate({ userId: user.id, spaceId: space.id });
     const tokenGate3 = await generateUnlockTokenGate({ userId: user.id, spaceId: space.id });
+    const tokenGate4 = await generateHypersubTokenGate({ userId: user.id, spaceId: space.id });
 
     mockedLitSDK.verifyJwt
       // verify to apply token gate
@@ -160,6 +162,10 @@ describe('verifyTokenGateMembership', () => {
       readContract: jest.fn().mockReturnValueOnce('My New Lock').mockReturnValueOnce(true)
     } as any);
 
+    mockGetPublicClient.mockReturnValueOnce({
+      readContract: jest.fn().mockReturnValueOnce('My New Hypersub').mockReturnValueOnce(true)
+    } as any);
+
     await applyTokenGates({
       spaceId: space.id,
       userId: user.id,
@@ -167,9 +173,10 @@ describe('verifyTokenGateMembership', () => {
       tokens: [
         { tokenGateId: tokenGate1.id, signedToken: 'jwt1' },
         { tokenGateId: tokenGate2.id, signedToken: 'jwt2' },
-        { tokenGateId: tokenGate3.id, signedToken: '' }
+        { tokenGateId: tokenGate3.id, signedToken: '' },
+        { tokenGateId: tokenGate4.id, signedToken: '' }
       ],
-      walletAddress: '0x123'
+      walletAddress: '0x1bd0d6edb387114b2fdf20d683366fa9f94a07f4'
     });
 
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
@@ -185,7 +192,7 @@ describe('verifyTokenGateMembership', () => {
     });
 
     const spaceUser = await getSpaceUser();
-    expect(verifyUser.user.userTokenGates.length).toBe(3);
+    expect(verifyUser.user.userTokenGates.length).toBe(4);
     expect(res).toEqual({ removedRoles: 0, verified: false });
     expect(spaceUser).toBeNull();
   });
