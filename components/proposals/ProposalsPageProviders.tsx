@@ -27,3 +27,14 @@ export function ProposalsPageProviders({ children }: { children: ReactNode }) {
     </PageDialogProvider>
   );
 }
+export function ProposalDataProvider({ children }: { children: ReactNode }) {
+  return (
+    <ProposalsProvider>
+      <DbViewSettingsProvider>
+        <ProposalBlocksProvider>
+          <ProposalsBoardProvider>{children}</ProposalsBoardProvider>
+        </ProposalBlocksProvider>
+      </DbViewSettingsProvider>
+    </ProposalsProvider>
+  );
+}
