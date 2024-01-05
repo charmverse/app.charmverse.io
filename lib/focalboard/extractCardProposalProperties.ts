@@ -30,7 +30,7 @@ export function extractCardProposalProperties({
     ? cardValues[proposalEvaluationTypePropertyId]
     : undefined;
 
-  if (proposalEvaluationTypePropertyId && proposalEvaluationTypeValueId) {
+  if (proposalEvaluationTypePropertyId) {
     extractedPropertyValues.cardEvaluationType = {
       propertyId: proposalEvaluationTypePropertyId,
       optionId: proposalEvaluationTypeValueId as string,
@@ -42,7 +42,7 @@ export function extractCardProposalProperties({
   const proposalStatusPropertyId = databaseProperties.proposalStatus?.id;
   const proposalStatusValueId = proposalStatusPropertyId ? cardValues[proposalStatusPropertyId] : undefined;
 
-  if (proposalStatusPropertyId && proposalStatusValueId) {
+  if (proposalStatusPropertyId) {
     extractedPropertyValues.cardProposalStatus = {
       propertyId: proposalStatusPropertyId,
       optionId: proposalStatusValueId as string,
@@ -54,7 +54,7 @@ export function extractCardProposalProperties({
   const proposalStepPropertyId = databaseProperties.proposalStep?.id;
   const proposalStepValueId = proposalStepPropertyId ? cardValues[proposalStepPropertyId] : undefined;
 
-  if (proposalStepPropertyId && proposalStepValueId) {
+  if (proposalStepPropertyId) {
     extractedPropertyValues.cardProposalStep = {
       propertyId: proposalStepPropertyId,
       optionId: proposalStepValueId as string,
