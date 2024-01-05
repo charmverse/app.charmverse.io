@@ -10,6 +10,7 @@ import Avatar from 'components/common/Avatar';
 import { Button } from 'components/common/Button';
 import type { HumanizeConditionsContent, HumanizeCondition } from 'lib/tokenGates/humanizeConditions';
 import { isTruthy } from 'lib/utilities/types';
+import HypersubIcon from 'public/images/logos/fabric-xyz.svg';
 
 const StyledOperator = styled(Box)`
   &:after,
@@ -72,6 +73,7 @@ function Condition({
 }) {
   const image = condition.image;
   const textConditions = condition.content;
+  const text = textConditions.map(generateComponent).filter(isTruthy);
   const isOperator = condition.content.some((c) => c.type === 'operator');
   const isExternalImage = !!condition.image?.startsWith('http');
   const imageFittingType = isExternalImage ? 'cover' : 'contain!important';
@@ -79,7 +81,7 @@ function Condition({
 
   return (
     <Box display='flex' alignItems='center' my={isOperator ? 2 : undefined}>
-      {image && (
+      {typeof image === 'string' && (
         <Box mr={2}>
           <Avatar
             size='large'
@@ -87,14 +89,17 @@ function Condition({
             sx={{
               img: {
                 objectFit: imageFittingType
-              }
+              },
+              backgroundColor: 'initial'
             }}
             name='Token Gate condition'
             isNft={['POAP', 'ERC721', 'ERC1155'].includes(contractType) && isExternalImage}
-          />
+          >
+            {contractType === 'HYPERSUB' ? <HypersubIcon /> : undefined}
+          </Avatar>
         </Box>
       )}
-      <Box width='100%'>{textConditions.map(generateComponent).filter(isTruthy)}</Box>
+      <Box width='100%'>{text}</Box>
       {onDelete && condition.content.some((c) => c.type !== 'operator') && (
         <Box>
           <IconButton onClick={onDelete} disabled={isLoading} color='default'>

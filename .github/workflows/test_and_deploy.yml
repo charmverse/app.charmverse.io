@@ -39,6 +39,7 @@ jobs:
         uses: ./.github/actions/install
         with:
           core_pkg_version: ${{ inputs.core_pkg_version }}
+          commit_core_pkg_upgrade: true
           save_cache: true
 
       - name: Build app
@@ -57,8 +58,6 @@ jobs:
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
-        with:
-          core_pkg_version: ${{ inputs.core_pkg_version }}
 
       - name: Restore app from cache
         uses: ./.github/actions/build
@@ -124,8 +123,6 @@ jobs:
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
-        with:
-          core_pkg_version: ${{ inputs.core_pkg_version }}
 
       - name: Setup test database
         run: npx dotenv -e .env.test.local -- npm run prisma:reset
@@ -181,7 +178,6 @@ jobs:
   deploy:
     name: Deploy to production
     runs-on: ubuntu-latest
-    # Re-enable condition before merge
     if: github.ref == 'refs/heads/main'
     needs: [test, integration-test]
     steps:
@@ -193,9 +189,6 @@ jobs:
 
       - name: Install dependencies
         uses: ./.github/actions/install
-        with:
-          core_pkg_version: ${{ inputs.core_pkg_version }}
-          commit_core_pkg_upgrade: true
 
       - name: Calculate Build ID and add to env file
         id: get_build_id

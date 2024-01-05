@@ -7,10 +7,10 @@ import type {
   ProposalBlockUpdateInput,
   ProposalBlockWithTypedFields
 } from 'lib/proposal/blocks/interfaces';
-import type { ClearEvaluationResultRequest } from 'lib/proposal/clearEvaluationResult';
 import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import type { RubricProposalsUserInfo } from 'lib/proposal/getProposalsEvaluatedByUser';
 import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
+import type { GoBackToEvaluationStepRequest } from 'lib/proposal/goBackToEvaluationStep';
 import type { ProposalWithUsersAndRubric, ProposalWithUsersLite } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers';
@@ -70,8 +70,10 @@ export function useSubmitEvaluationResult({ proposalId }: { proposalId: MaybeStr
   return usePUT<Partial<Omit<ReviewEvaluationRequest, 'proposalId'>>>(`/api/proposals/${proposalId}/submit-result`);
 }
 
-export function useClearEvaluationResult({ proposalId }: { proposalId: MaybeString }) {
-  return usePUT<Partial<Omit<ClearEvaluationResultRequest, 'proposalId'>>>(`/api/proposals/${proposalId}/clear-result`);
+export function useGoBackToEvaluationStep({ proposalId }: { proposalId: MaybeString }) {
+  return usePUT<Partial<Omit<GoBackToEvaluationStepRequest, 'proposalId'>>>(
+    `/api/proposals/${proposalId}/back-to-step`
+  );
 }
 
 export function useUpsertRubricCriteria({ proposalId }: { proposalId: MaybeString }) {

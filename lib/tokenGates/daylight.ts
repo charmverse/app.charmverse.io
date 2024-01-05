@@ -5,7 +5,7 @@ import { flatten } from 'lodash';
 
 import { baseUrl } from 'config/constants';
 
-import type { LitTokenGateConditions, Lock, TokenGate } from './interfaces';
+import type { Hypersub, LitTokenGateConditions, Lock, TokenGate } from './interfaces';
 import { getAccessType } from './utils';
 
 const DAYLIGHT_API_KEY = process.env.DAYLIGHT_API_KEY;
@@ -139,14 +139,14 @@ function getRequirement(condition: AccsDefaultParams) {
 }
 
 function getDaylightRequirements(tokenGate: TokenGate) {
-  if (tokenGate.type === 'unlock') {
-    return getDaylightUnlockRequirements(tokenGate.conditions);
+  if (tokenGate.type === 'unlock' || tokenGate.type === 'hypersub') {
+    return getDaylightStandardRequirements(tokenGate.conditions);
   } else {
     return getDaylightLitRequirements(tokenGate.conditions);
   }
 }
 
-export function getDaylightUnlockRequirements(tkConditions: Lock) {
+export function getDaylightStandardRequirements(tkConditions: Lock | Hypersub) {
   const operator = 'OR';
 
   // Daylight currently supports only ethereum
