@@ -1,10 +1,8 @@
 import type { Role, Space, User } from '@charmverse/core/prisma';
-import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals } from '@charmverse/core/test';
 
 import { InvalidStateError } from 'lib/middleware';
 import { createProposalWithUsers, generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
-import { generateProposal } from 'testing/utils/proposals';
 
 import { updateProposalStatusOnly } from '../updateProposalStatusOnly';
 
@@ -35,8 +33,7 @@ describe('updateProposalStatusOnly()', () => {
 
     const proposal = await updateProposalStatusOnly({
       proposalId,
-      newStatus: 'published',
-      userId: user.id
+      newStatus: 'published'
     });
 
     expect(proposal.status).toBe('published');
@@ -56,8 +53,7 @@ describe('updateProposalStatusOnly()', () => {
     await expect(
       updateProposalStatusOnly({
         proposalId: archivedProposal.id,
-        newStatus: 'published',
-        userId: user.id
+        newStatus: 'published'
       })
     ).rejects.toBeInstanceOf(InvalidStateError);
   });
