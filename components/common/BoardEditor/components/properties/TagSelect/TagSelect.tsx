@@ -112,7 +112,7 @@ export type TagSelectProps = {
   onUpdateOption?: (option: IPropertyOption) => void;
   onDeleteOption?: (option: IPropertyOption) => void;
   wrapColumn?: boolean;
-  dataTest?: string;
+  'data-test'?: string;
   fluidWidth?: boolean;
 };
 
@@ -131,10 +131,10 @@ export function TagSelect({
   displayType = 'details',
   noOptionsText,
   wrapColumn,
-  dataTest,
   defaultOpened = false,
   disableClearable = false,
-  fluidWidth
+  fluidWidth,
+  ...props
 }: TagSelectProps) {
   const [isOpened, setIsOpened] = useState(defaultOpened);
 
@@ -187,7 +187,7 @@ export function TagSelect({
   if (!isOpened) {
     return (
       <SelectPreviewContainer
-        data-test={dataTest}
+        data-test={props['data-test']}
         onClick={onEdit}
         displayType={displayType}
         readOnly={readOnly}
@@ -209,7 +209,7 @@ export function TagSelect({
 
   return (
     <StyledSelect
-      dataTest={dataTest}
+      dataTest={props['data-test']}
       canEditOptions={canEditOptions}
       includeSelectedOptions={includeSelectedOptions}
       placeholder='Search for an option...'

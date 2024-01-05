@@ -18,7 +18,6 @@ test.describe.serial('Proposal Evaluation', () => {
   let space: Space;
   let admin: User;
   let member: User;
-  let proposalCategory: ProposalCategory;
   let role: Role;
 
   const settingsToTest = {
