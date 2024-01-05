@@ -84,6 +84,7 @@ export function NewProposalPage({
   const [, setPageTitle] = usePageTitle();
   const { data: workflowOptions, isLoading: isLoadingWorkflows } = useGetProposalWorkflows(currentSpace?.id);
   const isMdScreen = useMdScreen();
+  const proposalPageType = isTemplate ? 'proposal_template' : 'proposal';
   const {
     formInputs,
     setFormInputs,
@@ -92,7 +93,7 @@ export function NewProposalPage({
     isCreatingProposal,
     createProposal
   } = useNewProposal({
-    newProposal: { type: isTemplate ? 'proposal_template' : 'proposal', proposalType }
+    newProposal: { type: proposalPageType, proposalType }
   });
   const [submittedDraft, setSubmittedDraft] = useState<boolean>(false);
 
@@ -183,7 +184,7 @@ export function NewProposalPage({
         evaluationType: template.evaluationType,
         evaluations: template.evaluations,
         fields: template.fields || {},
-        type: 'proposal',
+        type: proposalPageType,
         formId: template.formId ?? undefined,
         formAnswers: (template?.form?.formFields ?? [])
           .filter((formField) => formField.type !== 'label')
