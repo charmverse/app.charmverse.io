@@ -26,4 +26,4 @@ async function deployComposite() {
 }
 
 // eslint-disable-next-line no-console
-deployComposite().then(() => console.log('Done!'));
+generateCompositeFile().then(() => deployComposite().then(() => console.log('Done!')));
