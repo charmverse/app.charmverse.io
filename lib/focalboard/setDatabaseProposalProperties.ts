@@ -2,13 +2,11 @@ import type { FormField } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { objectUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
-import { object } from 'yup';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import {
   PROPOSAL_RESULT_LABELS,
-  PROPOSAL_STATUS_LABELS,
   PROPOSAL_STEP_LABELS,
   proposalDbProperties,
   proposalResultBoardColors
@@ -272,7 +270,7 @@ function generateUpdatedProposalEvaluationTypeProperty({ boardProperties }: { bo
       if (!existingOption) {
         proposalEvaluationTypeProp.options.push({
           color: 'propColorGray',
-          id: uuid(),
+          id: evaluationType,
           value: evaluationType
         });
       }
@@ -299,7 +297,7 @@ function generateUpdatedProposalStatusProperty({ boardProperties }: { boardPrope
       if (!existingOption) {
         proposalStatusProp.options.push({
           color: proposalResultBoardColors[status],
-          id: uuid(),
+          id: status,
           value: status
         });
       }

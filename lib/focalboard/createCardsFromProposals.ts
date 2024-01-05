@@ -158,6 +158,10 @@ export async function createCardsFromProposals({
 
   const proposalProps = extractDatabaseProposalProperties({ boardBlock });
 
+  const proposalEvaluationTypeProperty = boardBlock.fields.cardProperties.find(
+    (cardProperty) => cardProperty.type === 'proposalEvaluationType'
+  );
+
   const updatedViewBlocks = await prisma.$transaction(
     views.map((block) => {
       return prisma.block.update({
@@ -165,12 +169,13 @@ export async function createCardsFromProposals({
         data: {
           fields: {
             ...(block.fields as BoardViewFields),
+            // Hide the proposal evaluation type property from the view
             visiblePropertyIds: [
               ...new Set([
                 ...(block.fields as BoardViewFields).visiblePropertyIds,
                 ...(boardBlock.fields as any as BoardFields).cardProperties.map((p) => p.id)
               ])
-            ],
+            ].filter((id) => id !== proposalEvaluationTypeProperty?.id),
             sourceType: 'proposals'
           },
           updatedAt: new Date(),
