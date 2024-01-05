@@ -43,6 +43,7 @@ type ProposalPropertiesProps = {
   readOnlyCustomProperties?: string[];
   isReviewer?: boolean;
   rewardIds?: string[] | null;
+  proposalId?: string;
 };
 
 export function ProposalPropertiesBase({
@@ -55,7 +56,8 @@ export function ProposalPropertiesBase({
   isPublishingToLens,
   readOnlyCustomProperties,
   isReviewer,
-  rewardIds
+  rewardIds,
+  proposalId
 }: ProposalPropertiesProps) {
   const { user } = useUser();
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
@@ -186,6 +188,7 @@ export function ProposalPropertiesBase({
           readOnly={readOnlyAuthors}
           readOnlyProperties={readOnlyCustomProperties}
           proposal={proposalFormInputs}
+          proposalId={proposalId}
           onChange={(properties: ProposalFields['properties']) => {
             setProposalFormInputs({
               fields: { ...proposalFormInputs.fields, properties: properties ? { ...properties } : {} }
