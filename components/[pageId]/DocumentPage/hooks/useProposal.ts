@@ -35,7 +35,8 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
         await refreshProposal();
       },
       onChangeWorkflow: async ({ id }: { id: string }) => {
-        updateProposalWorkflow({ workflowId: id });
+        await updateProposalWorkflow({ workflowId: id });
+        await refreshProposal();
       }
     }),
     [proposal, refreshProposal, updateProposalEvaluation, updateProposalWorkflow, upsertRubricCriteria]
