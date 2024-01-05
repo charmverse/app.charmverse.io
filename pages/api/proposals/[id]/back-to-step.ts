@@ -4,7 +4,7 @@ import nc from 'next-connect';
 import { ActionNotPermittedError, requireKeys, onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
-import { clearEvaluationResult } from 'lib/proposal/clearEvaluationResult';
+import { goBackToEvaluationStep } from 'lib/proposal/goBackToEvaluationStep';
 import type { ReviewEvaluationRequest } from 'lib/proposal/submitEvaluationResult';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -31,7 +31,7 @@ async function updateEvaluationResultndpoint(req: NextApiRequest, res: NextApiRe
   if (!proposalPermissions.move) {
     throw new ActionNotPermittedError(`You don't have permission to review this proposal.`);
   }
-  await clearEvaluationResult({
+  await goBackToEvaluationStep({
     proposalId,
     evaluationId
   });
