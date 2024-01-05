@@ -1,7 +1,6 @@
 import { Box, Grid, Stack, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFilterControl';
@@ -20,7 +19,6 @@ import {
   DatabaseTitle
 } from 'components/common/PageLayout/components/DatabasePageContent';
 import { NewProposalButton } from 'components/proposals/components/NewProposalButton';
-import { ProposalDialog } from 'components/proposals/components/ProposalDialog/ProposalDialog';
 import { useProposalsBoardMutator } from 'components/proposals/components/ProposalsBoard/hooks/useProposalsBoardMutator';
 import { useProposalsBoard } from 'components/proposals/hooks/useProposalsBoard';
 import { useCharmRouter } from 'hooks/useCharmRouter';
@@ -32,7 +30,6 @@ import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 
-import { useProposalDialog } from './components/ProposalDialog/hooks/useProposalDialog';
 import { useProposals } from './hooks/useProposals';
 
 export function ProposalsPage({ title }: { title: string }) {
@@ -45,9 +42,7 @@ export function ProposalsPage({ title }: { title: string }) {
   const { navigateToSpacePath, updateURLQuery } = useCharmRouter();
   const isAdmin = useIsAdmin();
   const { user } = useUser();
-  const { props, showProposal, hideProposal } = useProposalDialog();
   const { board: activeBoard, views, cardPages, activeView, cards } = useProposalsBoard();
-  const router = useRouter();
   const [showSidebar, setShowSidebar] = useState(false);
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
@@ -72,23 +67,9 @@ export function ProposalsPage({ title }: { title: string }) {
     navigateToSpacePath(`/${pageId}`);
   }
 
-  function closeDialog() {
-    updateURLQuery({ id: null });
-  }
-
   const onDelete = useCallback(async (proposalId: string) => {
     await charmClient.deletePage(proposalId);
   }, []);
-
-  useEffect(() => {
-    if (typeof router.query.id === 'string') {
-      showProposal({
-        pageId: router.query.id
-      });
-    } else {
-      hideProposal();
-    }
-  }, [router.query.id]);
 
   async function deleteProposals(pageIds: string[]) {
     for (const pageId of pageIds) {
@@ -250,7 +231,6 @@ export function ProposalsPage({ title }: { title: string }) {
           </Stack>
         </Box>
       )}
-      {props.pageId && <ProposalDialog pageId={props.pageId} closeDialog={closeDialog} />}
     </DatabaseContainer>
   );
 }
