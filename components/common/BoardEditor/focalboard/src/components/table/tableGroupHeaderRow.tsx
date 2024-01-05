@@ -12,8 +12,8 @@ import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { Constants } from 'lib/focalboard/constants';
-import { PROPOSAL_RESULT_LABELS } from 'lib/focalboard/proposalDbProperties';
-import type { ProposalEvaluationResultExtended } from 'lib/proposal/interface';
+import { PROPOSAL_RESULT_LABELS, PROPOSAL_STEP_LABELS } from 'lib/focalboard/proposalDbProperties';
+import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from 'lib/proposal/interface';
 
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
@@ -46,7 +46,9 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
   const intl = useIntl();
 
   const formattedGroupTitle =
-    groupByProperty?.type === 'proposalStatus'
+    groupByProperty?.type === 'proposalEvaluationType'
+      ? PROPOSAL_STEP_LABELS[group.option.value as ProposalEvaluationStep]
+      : groupByProperty?.type === 'proposalStatus'
       ? PROPOSAL_RESULT_LABELS[group.option.value as ProposalEvaluationResultExtended]
       : groupTitle;
 
