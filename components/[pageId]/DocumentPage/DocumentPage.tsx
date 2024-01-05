@@ -1,4 +1,5 @@
 import type { Page } from '@charmverse/core/prisma';
+import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import type { Theme } from '@mui/material';
 import { Box, Tab, Tabs, useMediaQuery } from '@mui/material';
 import dynamic from 'next/dynamic';
@@ -93,7 +94,7 @@ function DocumentPage({
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
 
-  const { proposal, refreshProposal, onChangeEvaluation } = useProposal({
+  const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow } = useProposal({
     proposalId
   });
 
@@ -324,7 +325,7 @@ function DocumentPage({
           onChangeEvaluation={onChangeEvaluation}
           refreshProposal={refreshProposal}
           disabledViews={isStructuredProposal ? ['suggestions', 'comments'] : []}
-          onChangeWorkflow={() => {}}
+          onChangeWorkflow={onChangeWorkflow}
         />
       )}
     </CardPropertiesWrapper>
