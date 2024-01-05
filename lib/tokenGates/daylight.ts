@@ -18,6 +18,7 @@ const SOURCE_PREFIX = 'charmverse-';
 
 type Operator = 'AND' | 'OR';
 
+// TODO: Delete this if not used at all in 2024
 export async function addDaylightAbility(tokenGate: TokenGate) {
   const space = await prisma.space.findUnique({ where: { id: tokenGate.spaceId } });
   if (!space) {
