@@ -1,11 +1,7 @@
 import { useMemo } from 'react';
 import { mutate } from 'swr';
 
-import {
-  useCreateProposalRewards,
-  useSubmitEvaluationResult,
-  useUpdateProposalStatusOnly
-} from 'charmClient/hooks/proposals';
+import { useCreateProposalRewards, useSubmitEvaluationResult, usePublishProposal } from 'charmClient/hooks/proposals';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPropertyOption } from 'lib/focalboard/board';
@@ -31,7 +27,7 @@ export function ProposalStatusSelect({
   const currentEvaluationStep = proposal.currentStep.step;
   const currentEvaluationResult = proposal.currentStep.result;
   const currentEvaluationId = proposal.currentEvaluationId;
-  const { trigger: updateProposalStatusOnly } = useUpdateProposalStatusOnly({ proposalId: proposal.id });
+  const { trigger: publishProposal } = usePublishProposal({ proposalId: proposal.id });
   const { trigger: createProposalRewards } = useCreateProposalRewards(proposal.id);
   const { showMessage } = useSnackbar();
 
@@ -54,9 +50,7 @@ export function ProposalStatusSelect({
         await createProposalRewards();
         await mutate(`/api/spaces/${spaceId}/proposals`);
       } else if (currentEvaluationStep === 'draft' && status === 'published') {
-        await updateProposalStatusOnly({
-          newStatus: 'published'
-        });
+        await publishProposal();
         await mutate(`/api/spaces/${spaceId}/proposals`);
       } else if (currentEvaluationId) {
         await submitEvaluationResult({

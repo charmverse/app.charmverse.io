@@ -1,7 +1,7 @@
 import { Tooltip, Typography } from '@mui/material';
 import { useState } from 'react';
 
-import { useGoBackToEvaluationStep, useUpdateProposalStatusOnly } from 'charmClient/hooks/proposals';
+import { useGoBackToStep } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -21,10 +21,7 @@ export function GoBackButton({
 }) {
   const { showMessage } = useSnackbar();
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
-  const { trigger: updateProposalStatusOnly, isMutating: isSavingProposal } = useUpdateProposalStatusOnly({
-    proposalId
-  });
-  const { trigger: goBackToEvaluationStep, isMutating: isSavingEvaluation } = useGoBackToEvaluationStep({
+  const { trigger: goBackToStep, isMutating: isSavingEvaluation } = useGoBackToStep({
     proposalId
   });
   const disabledTooltip = !hasMovePermission
@@ -35,12 +32,7 @@ export function GoBackButton({
 
   async function goToPreviousStep() {
     try {
-      if (!previousStep) {
-        // handle draft, which does not have a evaluation step to go to
-        await updateProposalStatusOnly({ newStatus: 'draft' });
-      } else {
-        await goBackToEvaluationStep({ evaluationId: previousStep.id });
-      }
+      await goBackToStep({ evaluationId: previousStep?.id || 'draft' });
     } catch (error) {
       showMessage((error as Error).message, 'error');
     }
@@ -65,7 +57,7 @@ export function GoBackButton({
       <Tooltip title={`Move back to ${previousStep?.title || 'Draft'}`}>
         <Button
           color='secondary'
-          loading={isSavingProposal || isSavingEvaluation}
+          loading={isSavingEvaluation}
           size='small'
           variant='outlined'
           disabled={!!disabledTooltip}
