@@ -65,17 +65,6 @@ test.beforeAll(async () => {
     }
   });
 
-  proposalCategory = await testUtilsProposals.generateProposalCategory({
-    spaceId: space.id,
-    title: 'Proposals',
-    proposalCategoryPermissions: [
-      {
-        permissionLevel: 'full_access',
-        assignee: { group: 'space', id: space.id }
-      }
-    ]
-  });
-
   defaultWorkflows = getDefaultWorkflows(space.id);
   await prisma.proposalWorkflow.createMany({
     data: defaultWorkflows
@@ -126,7 +115,6 @@ test.describe.serial('Structured proposal template', () => {
 
     await formField.formFieldPrivateSwitch.nth(1).click();
 
-    await proposalPage.selectCategory(proposalCategory.id);
     await proposalPage.selectEvaluationReviewer('pass_fail', spaceAdmin.id);
     await proposalPage.selectEvaluationReviewer('vote', 'space_member');
 
@@ -311,12 +299,7 @@ test.describe.serial('Structured proposal template', () => {
       path: proposal.page!.path
     });
 
-    // Should be disabled as no changes were mage
-    await expect(formField.formFieldsAnswersSaveButton).toBeDisabled();
-
     await formField.getFormFieldInput(formFieldIds[1]).fill('John Doe');
-
-    await formField.formFieldsAnswersSaveButton.click();
 
     await proposalPage.completeDraftButton.click();
 

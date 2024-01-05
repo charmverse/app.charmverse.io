@@ -16,7 +16,6 @@ inputs:
       If set core_pkg_version and commit_core_pkg_upgrade will be ignored.
       Add your branch to this variable below to install your custom branch.
     required: false
-    default:
 outputs:
   core_bump_commit_hash:
     description: |

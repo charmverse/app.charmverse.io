@@ -1,16 +1,18 @@
-import type { FormField, ProposalCategory } from '@charmverse/core/prisma';
-import { ProposalStatus, prisma } from '@charmverse/core/prisma-client';
+import type { FormField } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { objectUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
-import { getBoardColorFromColor } from 'lib/focalboard/constants';
-import { proposalDbProperties, proposalStatusBoardColors } from 'lib/focalboard/proposalDbProperties';
+import {
+  PROPOSAL_RESULT_LABELS,
+  PROPOSAL_STEP_LABELS,
+  proposalDbProperties,
+  proposalResultBoardColors
+} from 'lib/focalboard/proposalDbProperties';
 import { InvalidStateError } from 'lib/middleware/errors';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-
-type ProposalCategoryFields = Pick<ProposalCategory, 'title' | 'id' | 'color'>;
 
 export async function setDatabaseProposalProperties({ boardId }: { boardId: string }): Promise<Board> {
   const boardBlock = (await prisma.block.findUniqueOrThrow({
@@ -21,16 +23,6 @@ export async function setDatabaseProposalProperties({ boardId }: { boardId: stri
   if (boardBlock.fields.sourceType !== 'proposals') {
     throw new InvalidStateError(`Cannot add proposal cards to a database which does not have proposals as its source`);
   }
-  const proposalCategories = await prisma.proposalCategory.findMany({
-    where: {
-      spaceId: boardBlock.spaceId
-    },
-    select: {
-      id: true,
-      color: true,
-      title: true
-    }
-  });
 
   const rubricProposals = await prisma.proposal.count({
     where: {
@@ -57,9 +49,34 @@ export async function setDatabaseProposalProperties({ boardId }: { boardId: stri
   });
 
   const formFields = forms.flatMap((p) => p.formFields);
+  const proposals = await prisma.proposal.findMany({
+    where: {
+      spaceId: boardBlock.spaceId
+    },
+    select: {
+      evaluations: {
+        select: {
+          title: true
+        }
+      }
+    }
+  });
+
+  const evaluationStepTitles: Set<string> = new Set();
+
+  proposals.forEach((p) => {
+    p.evaluations.forEach((e) => {
+      evaluationStepTitles.add(e.title);
+    });
+  });
 
   const spaceUsesRubrics = rubricProposals > 0;
-  const boardProperties = getBoardProperties({ formFields, boardBlock, proposalCategories, spaceUsesRubrics });
+  const boardProperties = getBoardProperties({
+    evaluationStepTitles: Array.from(evaluationStepTitles),
+    formFields,
+    boardBlock,
+    spaceUsesRubrics
+  });
 
   return prisma.block.update({
     where: {
@@ -76,31 +93,21 @@ export async function setDatabaseProposalProperties({ boardId }: { boardId: stri
 
 export function getBoardProperties({
   boardBlock,
-  proposalCategories,
   spaceUsesRubrics,
-  formFields = []
+  formFields = [],
+  evaluationStepTitles = []
 }: {
+  evaluationStepTitles?: string[];
   boardBlock: Board;
-  proposalCategories: ProposalCategoryFields[];
   spaceUsesRubrics: boolean;
   formFields?: FormField[];
 }) {
   const boardProperties = boardBlock.fields.cardProperties ?? [];
 
-  const categoryProp = generateUpdatedProposalCategoryProperty({
-    boardProperties,
-    proposalCategories
-  });
   const statusProp = generateUpdatedProposalStatusProperty({ boardProperties });
   const proposalUrlProp = generateUpdatedProposalUrlProperty({ boardProperties });
-
-  const existingCategoryPropIndex = boardProperties.findIndex((p) => p.type === 'proposalCategory');
-
-  if (existingCategoryPropIndex > -1) {
-    boardProperties[existingCategoryPropIndex] = categoryProp;
-  } else {
-    boardProperties.push(categoryProp);
-  }
+  const proposalEvaluationTypeProp = generateUpdatedProposalEvaluationTypeProperty({ boardProperties });
+  const stepProp = generateUpdatedProposalStepProperty({ boardProperties, evaluationStepTitles });
 
   const existingStatusPropIndex = boardProperties.findIndex((p) => p.type === 'proposalStatus');
 
@@ -116,6 +123,21 @@ export function getBoardProperties({
     boardProperties[existingUrlPropIndex] = proposalUrlProp;
   } else {
     boardProperties.push(proposalUrlProp);
+  }
+
+  const existingEvaluationTypePropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluationType');
+  const existingStepPropIndex = boardProperties.findIndex((p) => p.type === 'proposalStep');
+
+  if (existingEvaluationTypePropIndex > -1) {
+    boardProperties[existingEvaluationTypePropIndex] = proposalEvaluationTypeProp;
+  } else {
+    boardProperties.push(proposalEvaluationTypeProp);
+  }
+
+  if (existingStepPropIndex > -1) {
+    boardProperties[existingStepPropIndex] = stepProp;
+  } else {
+    boardProperties.push(stepProp);
   }
 
   if (spaceUsesRubrics) {
@@ -211,36 +233,53 @@ export function getBoardProperties({
   return boardProperties;
 }
 
-function generateUpdatedProposalCategoryProperty({
+function generateUpdatedProposalStepProperty({
   boardProperties,
-  proposalCategories
+  evaluationStepTitles
 }: {
+  evaluationStepTitles: string[];
   boardProperties: IPropertyTemplate[];
-  proposalCategories: ProposalCategoryFields[];
 }) {
   // We will mutate and return this property
-  const proposalCategoryProp = {
-    ...(boardProperties.find((p) => p.type === 'proposalCategory') ?? {
-      ...proposalDbProperties.proposalCategory(),
+  const proposalStepProp = {
+    ...(boardProperties.find((p) => p.type === 'proposalStep') ?? {
+      ...proposalDbProperties.proposalStep(),
+      id: uuid(),
+      options: ['Draft', 'Rewards', ...evaluationStepTitles].map((title) => ({
+        color: 'propColorGray',
+        id: title,
+        value: title
+      }))
+    })
+  };
+
+  return proposalStepProp;
+}
+
+function generateUpdatedProposalEvaluationTypeProperty({ boardProperties }: { boardProperties: IPropertyTemplate[] }) {
+  const proposalEvaluationTypeProp = {
+    ...(boardProperties.find((p) => p.type === 'proposalEvaluationType') ?? {
+      ...proposalDbProperties.proposalEvaluationType(),
       id: uuid()
     })
   };
 
-  proposalCategories.forEach((c) => {
-    const existingPropertyValue = proposalCategoryProp.options.find((opt) => opt.id === c.id);
+  if (proposalEvaluationTypeProp) {
+    objectUtils.typedKeys(PROPOSAL_STEP_LABELS).forEach((evaluationType) => {
+      const existingOption = proposalEvaluationTypeProp.options.find((opt) => opt.value === evaluationType);
+      if (!existingOption) {
+        proposalEvaluationTypeProp.options.push({
+          color: 'propColorGray',
+          id: evaluationType,
+          value: evaluationType
+        });
+      }
+    });
 
-    if (!existingPropertyValue) {
-      proposalCategoryProp.options.push({
-        id: c.id,
-        value: c.title,
-        color: getBoardColorFromColor(c.color)
-      });
-    } else {
-      existingPropertyValue.value = c.title;
-    }
-  });
+    return proposalEvaluationTypeProp;
+  }
 
-  return proposalCategoryProp;
+  return proposalEvaluationTypeProp;
 }
 
 function generateUpdatedProposalStatusProperty({ boardProperties }: { boardProperties: IPropertyTemplate[] }) {
@@ -253,18 +292,17 @@ function generateUpdatedProposalStatusProperty({ boardProperties }: { boardPrope
   };
 
   if (proposalStatusProp) {
-    [...objectUtils.typedKeys(ProposalStatus), 'archived'].forEach((status) => {
-      if (status !== 'draft') {
-        const existingOption = proposalStatusProp.options.find((opt) => opt.value === status);
-        if (!existingOption) {
-          proposalStatusProp.options.push({
-            color: proposalStatusBoardColors[status as Exclude<ProposalStatus, 'draft'> | 'archived'],
-            id: uuid(),
-            value: status
-          });
-        }
+    [...objectUtils.typedKeys(PROPOSAL_RESULT_LABELS)].forEach((status) => {
+      const existingOption = proposalStatusProp.options.find((opt) => opt.value === status);
+      if (!existingOption) {
+        proposalStatusProp.options.push({
+          color: proposalResultBoardColors[status],
+          id: status,
+          value: status
+        });
       }
     });
+
     return proposalStatusProp;
   }
 

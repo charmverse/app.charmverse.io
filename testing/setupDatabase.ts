@@ -241,6 +241,7 @@ export async function generateUserAndSpace({
 }
 
 export async function generateBounty({
+  proposalId,
   content = undefined,
   contentText = '',
   spaceId,
@@ -263,6 +264,7 @@ export async function generateBounty({
     Pick<
       Bounty,
       | 'id'
+      | 'proposalId'
       | 'maxSubmissions'
       | 'chainId'
       | 'rewardAmount'
@@ -309,6 +311,7 @@ export async function generateBounty({
         createdBy,
         allowMultipleApplications,
         chainId,
+        proposalId,
         rewardAmount,
         rewardToken,
         status,
@@ -779,7 +782,6 @@ export async function createProposalWithUsers({
   reviewers,
   userId,
   spaceId,
-  proposalCategoryId,
   ...pageCreateInput
 }: {
   authors: string[];
@@ -787,22 +789,8 @@ export async function createProposalWithUsers({
   spaceId: string;
   userId: string;
   proposalStatus?: ProposalStatus;
-  proposalCategoryId?: string;
 } & Partial<Prisma.PageCreateInput>): Promise<{ id: string; pageId: string }> {
   const proposalId = v4();
-
-  const proposalCategoryIdToLink = !proposalCategoryId
-    ? (
-        await prisma.proposalCategory.create({
-          data: {
-            title: `Category - ${v4()}`,
-            color: `#ffffff`,
-            space: { connect: { id: spaceId } }
-          }
-        })
-      ).id
-    : proposalCategoryId;
-
   const proposalPage = await createPageDb({
     data: {
       ...pageCreateInput,
@@ -830,7 +818,6 @@ export async function createProposalWithUsers({
               id: spaceId
             }
           },
-          category: { connect: { id: proposalCategoryIdToLink } },
           createdBy: userId,
           status: proposalStatus,
           authors: {
@@ -1026,7 +1013,6 @@ export async function generateProposal({
       deletedAt,
       proposal: {
         create: {
-          category: { connect: { id: categoryIdToLink } },
           id: proposalId,
           createdBy: userId,
           evaluationType,
@@ -1058,8 +1044,7 @@ export async function generateProposal({
       proposal: {
         include: {
           authors: true,
-          reviewers: true,
-          category: true
+          reviewers: true
         }
       }
     }

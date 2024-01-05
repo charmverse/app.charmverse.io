@@ -26,62 +26,6 @@ beforeAll(async () => {
 });
 
 describe('Update proposal specific data', () => {
-  it('Update the reviewers and authors list of a proposal', async () => {
-    // Create a test proposal first
-    const proposal = await createProposalWithUsers({
-      spaceId: space.id,
-      userId: author1.id,
-      authors: [],
-      reviewers: [reviewer2.id]
-    });
-
-    await updateProposal({
-      proposalId: proposal.id,
-      authors: [author2.id],
-      reviewers: [
-        {
-          group: 'user',
-          id: reviewer1.id
-        }
-      ]
-    });
-
-    const [proposalReviewer1, proposalReviewer2, proposalAuthor1, proposalAuthor2] = await Promise.all([
-      prisma.proposalReviewer.findFirst({
-        where: {
-          proposalId: proposal.id,
-          userId: reviewer1.id
-        }
-      }),
-      prisma.proposalReviewer.findFirst({
-        where: {
-          proposalId: proposal.id,
-          userId: reviewer2.id
-        }
-      }),
-      prisma.proposalAuthor.findFirst({
-        where: {
-          proposalId: proposal.id,
-          userId: author1.id
-        }
-      }),
-      prisma.proposalAuthor.findFirst({
-        where: {
-          proposalId: proposal.id,
-          userId: author2.id
-        }
-      })
-    ]);
-
-    // This records should be deleted
-    expect(proposalReviewer2).toBeFalsy();
-    expect(proposalAuthor1).toBeFalsy();
-
-    // This records should be created
-    expect(proposalReviewer1).toBeTruthy();
-    expect(proposalAuthor2).toBeTruthy();
-  });
-
   it('Should throw error if at least one author is not selected for a proposal', async () => {
     // Create a test proposal first
     const result = await createProposalWithUsers({
@@ -94,13 +38,7 @@ describe('Update proposal specific data', () => {
     await expect(
       updateProposal({
         proposalId: result.id,
-        authors: [],
-        reviewers: [
-          {
-            group: 'user',
-            id: reviewer1.id
-          }
-        ]
+        authors: []
       })
     ).rejects.toBeInstanceOf(InvalidStateError);
   });

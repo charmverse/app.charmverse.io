@@ -12,8 +12,6 @@ export type DetailedProposalBlocksCount = {
   proposalViews: number;
   proposalProperties: number;
   proposalPropertyValues: number;
-  proposalCategories: number;
-  proposalRubrics: number;
   proposalRubricAnswers: number;
   proposalFormFields: number;
 };
@@ -27,8 +25,6 @@ export async function countProposalBlocks({ spaceId, batchSize }: BlocksCountQue
       proposalViews: 0,
       proposalProperties: 0,
       proposalPropertyValues: 0,
-      proposalCategories: 0,
-      proposalRubrics: 0,
       proposalRubricAnswers: 0,
       proposalFormFields: 0
     }
@@ -37,11 +33,6 @@ export async function countProposalBlocks({ spaceId, batchSize }: BlocksCountQue
   // 1 - Count views
   detailedCount.details.proposalViews = await prisma.proposalBlock.count({
     where: { spaceId, type: 'view' }
-  });
-
-  // 2 - Count categories
-  detailedCount.details.proposalCategories = await prisma.proposalCategory.count({
-    where: { spaceId } // assuming proposalCategory has a spaceId field
   });
 
   // Retrieve the single proposal board block for the space
@@ -72,17 +63,6 @@ export async function countProposalBlocks({ spaceId, batchSize }: BlocksCountQue
   detailedCount.details.proposalProperties = Object.keys(proposalSchema).length;
 
   // 3 - Handle rubrics
-  detailedCount.details.proposalRubrics = await prisma.proposalRubricCriteria.count({
-    where: {
-      proposal: {
-        page: {
-          deletedAt: null
-        },
-        spaceId
-      }
-    }
-  });
-
   detailedCount.details.proposalRubricAnswers = await prisma.proposalRubricCriteriaAnswer.count({
     where: {
       proposal: {
@@ -120,11 +100,10 @@ export async function countProposalBlocks({ spaceId, batchSize }: BlocksCountQue
   });
 
   const totalFormFieldsCount = proposalsWithFormData.reduce<number>((acc, proposal) => {
-    const formFieldsCount = (proposal.form?.formFields ?? []).length;
     const formFieldAnswersCount = proposal.formAnswers.filter(
-      (answer) => answer.value !== undefined && answer.value !== null
+      (answer) => answer.value !== undefined && answer.value !== null && answer.value !== ''
     ).length;
-    return acc + formFieldsCount + formFieldAnswersCount;
+    return acc + formFieldAnswersCount;
   }, 0);
 
   detailedCount.details.proposalFormFields = totalFormFieldsCount;
@@ -150,7 +129,13 @@ export async function countProposalBlocks({ spaceId, batchSize }: BlocksCountQue
       const proposalProps = Object.entries((proposal.fields as CardFields)?.properties ?? {});
       return proposalProps.reduce((proposalPropAcc, [propId, propValue]) => {
         const matchingSchema = proposalSchema[propId];
-        if ((!propValue && propValue !== 0) || (Array.isArray(propValue) && !propValue.length) || !matchingSchema) {
+        if (
+          propValue === null ||
+          propValue === undefined ||
+          propValue === '' ||
+          (Array.isArray(propValue) && !propValue.length) ||
+          !matchingSchema
+        ) {
           return proposalPropAcc;
         }
         return proposalPropAcc + 1;

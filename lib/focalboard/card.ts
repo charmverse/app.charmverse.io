@@ -2,6 +2,7 @@ import type { PageMeta } from '@charmverse/core/pages';
 
 import type { Block } from 'lib/focalboard/block';
 import { createBlock } from 'lib/focalboard/block';
+import type { ProposalEvaluationStatus, ProposalWithUsersLite } from 'lib/proposal/interface';
 
 export type CardPropertyValue = string | string[] | number;
 
@@ -17,10 +18,21 @@ export type Card<V = CardPropertyValue> = Block & {
   customIconType?: 'applicationStatus' | 'reward';
 };
 
+export type CardPageProposal = {
+  currentEvaluationId: string | null;
+  id: string;
+  status: ProposalEvaluationStatus;
+  currentStep: ProposalWithUsersLite['currentStep'];
+  sourceTemplateId?: string;
+  evaluations: ProposalWithUsersLite['evaluations'];
+  hasRewards: boolean;
+};
+
 export type CardPage<V = CardPropertyValue> = {
   subPages?: CardPage<V>[];
   card: Card<V>;
   page: PageMeta;
+  proposal?: CardPageProposal;
   isStructuredProposal?: boolean;
 };
 

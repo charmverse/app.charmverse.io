@@ -11,7 +11,6 @@ import PersonIcon from '@mui/icons-material/Person';
 import PhoneIcon from '@mui/icons-material/Phone';
 import SubjectIcon from '@mui/icons-material/Subject';
 import type { SvgIconProps } from '@mui/material';
-import { SiChainlink } from 'react-icons/si';
 
 import type { PropertyType } from 'lib/focalboard/board';
 
@@ -41,7 +40,7 @@ export const iconForPropertyType = (propertyType: PropertyType, props?: SvgIconP
       return <PersonIcon fontSize='small' {...props} />;
     case 'phone':
       return <PhoneIcon fontSize='small' {...props} />;
-    case 'proposalCategory':
+    case 'proposalStep':
     case 'proposalStatus':
     case 'proposalEvaluationType':
     case 'select':

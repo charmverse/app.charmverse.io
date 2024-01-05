@@ -3,9 +3,10 @@ import type {
   FormField,
   Page,
   PageComment,
-  Proposal,
   ProposalEvaluation,
   ProposalEvaluationPermission,
+  ProposalEvaluationResult,
+  ProposalEvaluationType,
   Vote
 } from '@charmverse/core/prisma';
 import type { ProposalWithUsers as CoreProposalWithUsers } from '@charmverse/core/proposals';
@@ -15,29 +16,20 @@ import type { NewPageValues } from 'components/common/PageDialog/hooks/useNewPag
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
 import type { ProposalPropertiesField } from './blocks/interfaces';
+import type { ProposalStep } from './getCurrentStep';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   ProposalRubricCriteriaWithTypedParams
 } from './rubric/interfaces';
 
+export type ProposalEvaluationStatus = 'in_progress' | 'complete' | 'passed' | 'declined' | 'unpublished' | 'published';
+export type ProposalEvaluationStep = ProposalEvaluationType | 'rewards' | 'draft';
+export type ProposalEvaluationResultExtended = ProposalEvaluationResult | 'in_progress';
+
 export interface ProposalReviewerInput {
   group: 'system_role' | 'role' | 'user';
   id: string;
   evaluationId?: string;
-}
-
-export interface NewProposalCategory {
-  title: string;
-  color: string;
-}
-
-export interface ProposalCategory extends NewProposalCategory {
-  id: string;
-  spaceId: string;
-}
-
-export interface ProposalWithCategory extends Proposal {
-  category: ProposalCategory | null;
 }
 
 export type ProposalRubricData = {
@@ -69,6 +61,20 @@ export type ProposalWithUsers = Omit<CoreProposalWithUsers, 'fields'> & {
   fields: ProposalFields | null;
 };
 
+export type ProposalWithUsersLite = ProposalWithUsers & {
+  currentEvaluationId?: string;
+  evaluationType: ProposalEvaluationType;
+  permissions?: ProposalPermissionFlags;
+  evaluations: {
+    title: string;
+    type: ProposalEvaluationType;
+    id: string;
+    result: ProposalEvaluationResult | null;
+    index: number;
+  }[];
+  currentStep: ProposalStep;
+};
+
 export type PopulatedEvaluation = ProposalRubricData &
   Omit<ProposalEvaluation, 'voteSettings'> & {
     permissions: ProposalEvaluationPermission[];
@@ -79,6 +85,7 @@ export type PopulatedEvaluation = ProposalRubricData &
 export type ProposalWithUsersAndRubric = ProposalWithUsers &
   ProposalRubricData &
   ProposalFormData & {
+    currentStep: ProposalStep;
     evaluations: PopulatedEvaluation[];
     fields: ProposalFields | null;
     page?: { sourceTemplateId: string | null } | null;

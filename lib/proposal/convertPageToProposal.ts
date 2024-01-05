@@ -5,17 +5,14 @@ import { createProposal } from 'lib/proposal/createProposal';
 
 export async function convertPageToProposal({
   userId,
-  page,
-  categoryId
+  page
 }: {
-  categoryId: string;
   page: Pick<Post, 'content' | 'contentText' | 'spaceId' | 'title' | 'id'>;
   userId: string;
 }) {
   const { page: proposalPage } = await createProposal({
     userId,
     spaceId: page.spaceId,
-    categoryId,
     pageProps: {
       content: page.content,
       contentText: page.contentText,

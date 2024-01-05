@@ -5,7 +5,6 @@ import { useMemo, useState } from 'react';
 import { sortCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
 import { getDefaultBoard, getDefaultTableView } from 'components/proposals/components/ProposalsBoard/utils/boardData';
-import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
@@ -20,15 +19,14 @@ import { CardFilter } from 'lib/focalboard/cardFilter';
 import { Constants } from 'lib/focalboard/constants';
 import {
   AUTHORS_BLOCK_ID,
-  CATEGORY_BLOCK_ID,
+  CREATED_AT_ID,
   DEFAULT_VIEW_BLOCK_ID,
-  EVALUATION_TYPE_BLOCK_ID,
+  PROPOSAL_STEP_BLOCK_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID,
-  STATUS_BLOCK_ID,
-  CREATED_AT_ID
+  PROPOSAL_STATUS_BLOCK_ID
 } from 'lib/proposal/blocks/constants';
 import type { ProposalPropertyValue } from 'lib/proposal/blocks/interfaces';
-import type { ProposalWithUsers, ProposalFields } from 'lib/proposal/interface';
+import type { ProposalFields, ProposalWithUsersLite } from 'lib/proposal/interface';
 
 export type BoardProposal = { spaceId?: string; id?: string; fields: ProposalFields | null };
 
@@ -37,17 +35,27 @@ export function useProposalsBoardAdapter() {
   const { space } = useCurrentSpace();
   const { membersRecord } = useMembers();
   const { proposals } = useProposals();
-  const { categories } = useProposalCategories();
   const { pages } = usePages();
   const { proposalBoardBlock, proposalBlocks } = useProposalBlocks();
   const proposalPage = pages[boardProposal?.id || ''];
+  const proposal = proposals?.find((p) => p.id === boardProposal?.id) ?? null;
 
   const localViewSettings = useLocalDbViewSettings(`proposals-${space?.id}-${DEFAULT_VIEW_BLOCK_ID}`);
+
+  const evaluationStepTitles = useMemo(() => {
+    const _evaluationStepTitles: Set<string> = new Set();
+    proposals?.forEach((p) => {
+      p.evaluations.forEach((e) => {
+        _evaluationStepTitles.add(e.title);
+      });
+    });
+    return Array.from(_evaluationStepTitles);
+  }, [proposals]);
 
   // board with all proposal properties and default properties
   const board: Board = getDefaultBoard({
     storedBoard: proposalBoardBlock,
-    categories
+    evaluationStepTitles
   });
 
   const activeView = useMemo(() => {
@@ -55,7 +63,7 @@ export function useProposalsBoardAdapter() {
     const viewBlock = proposalBlocks?.find((b) => b.id === DEFAULT_VIEW_BLOCK_ID);
 
     if (!viewBlock) {
-      return getDefaultTableView({ storedBoard: proposalBoardBlock, categories });
+      return getDefaultTableView({ evaluationStepTitles, storedBoard: proposalBoardBlock });
     }
 
     const boardView = blockToFBBlock(viewBlock) as BoardView;
@@ -66,7 +74,7 @@ export function useProposalsBoardAdapter() {
     }
 
     return boardView;
-  }, [categories, proposalBoardBlock, proposalBlocks]);
+  }, [evaluationStepTitles, proposalBoardBlock, proposalBlocks]);
 
   const cardPages: CardPage[] = useMemo(() => {
     let cards =
@@ -76,7 +84,16 @@ export function useProposalsBoardAdapter() {
           const isStructuredProposal = !!p.formId;
           return {
             ...mapProposalToCardPage({ proposal: p, proposalPage: page, spaceId: space?.id }),
-            isStructuredProposal
+            isStructuredProposal,
+            proposal: {
+              currentEvaluationId: p.currentEvaluationId,
+              id: p.id,
+              status: p.status,
+              currentStep: p.currentStep,
+              sourceTemplateId: page?.sourceTemplateId,
+              evaluations: p.evaluations,
+              hasRewards: (p.fields?.pendingRewards ?? []).length > 0 || (p.rewardIds ?? []).length > 0
+            }
           } as CardPage;
         })
         .filter((cp): cp is CardPage => !!cp.card && !!cp.page) || [];
@@ -111,12 +128,12 @@ export function useProposalsBoardAdapter() {
   const boardCustomProperties: Board = getDefaultBoard({
     storedBoard: proposalBoardBlock,
     customOnly: true,
-    categories: []
+    evaluationStepTitles
   });
 
   // card from current proposal
   const card: Card<ProposalPropertyValue> = mapProposalToCardPage({
-    proposal: boardProposal,
+    proposal,
     proposalPage,
     spaceId: space?.id
   }).card;
@@ -146,13 +163,12 @@ function mapProposalToCardPage({
   proposalPage,
   spaceId
 }: {
-  proposal: BoardProposal | ProposalWithUsers | null;
+  proposal: ProposalWithUsersLite | null;
   proposalPage?: PageMeta;
   spaceId?: string;
 }) {
   const proposalFields: ProposalFields = proposal?.fields || { properties: {} };
   const proposalSpaceId = proposal?.spaceId || spaceId || '';
-
   proposalFields.properties = {
     ...proposalFields.properties,
     [Constants.titleColumnId]: proposalPage?.title || '',
@@ -161,17 +177,17 @@ function mapProposalToCardPage({
       proposalPage && 'createdAt' in proposalPage && proposalPage.createdAt
         ? new Date(proposalPage?.createdAt).getTime()
         : '',
-    [CATEGORY_BLOCK_ID]: (proposal && 'categoryId' in proposal && proposal.categoryId) || '',
-    [STATUS_BLOCK_ID]: (proposal && 'status' in proposal && proposal.status) || '',
-    [EVALUATION_TYPE_BLOCK_ID]: (proposal && 'evaluationType' in proposal && proposal.evaluationType) || '',
+    [PROPOSAL_STATUS_BLOCK_ID]: proposal?.currentStep.result ?? 'in_progress',
     [AUTHORS_BLOCK_ID]: (proposal && 'authors' in proposal && proposal.authors?.map((a) => a.userId)) || '',
+    [PROPOSAL_STEP_BLOCK_ID]: proposal?.currentStep?.title ?? 'Draft',
     [PROPOSAL_REVIEWERS_BLOCK_ID]:
       proposal && 'reviewers' in proposal
         ? proposal.reviewers.map(
             (r) =>
-              ({ group: r.userId ? 'user' : 'role', id: r.userId ?? r.roleId } as TargetPermissionGroup<
-                'user' | 'role'
-              >)
+              ({
+                group: r.userId ? 'user' : r.roleId ? 'role' : 'system_role',
+                id: r.userId ?? r.roleId ?? r.systemRole
+              } as TargetPermissionGroup<'user' | 'role'>)
           )
         : []
   };

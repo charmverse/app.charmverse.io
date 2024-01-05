@@ -8,7 +8,7 @@ import type {
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
-import { testUtilsMembers, testUtilsProposals, testUtilsSpaces } from '@charmverse/core/test';
+import { testUtilsMembers, testUtilsSpaces } from '@charmverse/core/test';
 import { expect, test } from '__e2e__/utils/test';
 import { v4 as uuid } from 'uuid';
 
@@ -18,7 +18,6 @@ test.describe.serial('Proposal Evaluation', () => {
   let space: Space;
   let admin: User;
   let member: User;
-  let proposalCategory: ProposalCategory;
   let role: Role;
 
   const settingsToTest = {
@@ -89,10 +88,6 @@ test.describe.serial('Proposal Evaluation', () => {
       operations: ['createProposals']
     });
     member = await generateUser({ space: { id: space.id, isAdmin: false } });
-    proposalCategory = await testUtilsProposals.generateProposalCategory({
-      title: 'General',
-      spaceId: space.id
-    });
     workflow = await prisma.proposalWorkflow.create({
       data: {
         index: 0,
@@ -127,8 +122,6 @@ test.describe.serial('Proposal Evaluation', () => {
     await documentPage.documentTitle.locator('textarea').first().fill(settingsToTest.proposalTitle);
 
     await documentPage.charmEditor.fill('This is a test proposal');
-
-    await proposalPage.selectCategory(proposalCategory.id);
 
     // Workflow auto-selected when loading the proposal
     const workflowSelectTextContent = await proposalPage.workflowSelect.textContent();

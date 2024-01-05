@@ -34,7 +34,7 @@ export function processTokenGateConditions(tokenGate: TokenGate): {
     return { accessTypes, numberOfConditions, chainType, accesType };
   }
 
-  if (tokenGate.type === 'unlock') {
+  if (tokenGate.type === 'unlock' || tokenGate.type === 'hypersub') {
     if (tokenGate.conditions?.contract && tokenGate.conditions?.chainId) {
       const chain = getChainById(tokenGate.conditions.chainId)?.chainName;
       return {

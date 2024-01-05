@@ -481,18 +481,10 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "506bd977-75a1-47e6-8936-74b18ce3be49",
-        "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
         "evaluationType": "vote",
-        "fields": null,
-        "category": {
-          "id": "506bd977-75a1-47e6-8936-74b18ce3be49",
-          "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-          "title": "Treasury",
-          "color": "gray"
-        }
+        "fields": null
       }
     },
     {
@@ -915,18 +907,10 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "506bd977-75a1-47e6-8936-74b18ce3be49",
-        "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
         "evaluationType": "vote",
-        "fields": null,
-        "category": {
-          "id": "506bd977-75a1-47e6-8936-74b18ce3be49",
-          "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-          "title": "Treasury",
-          "color": "gray"
-        }
+        "fields": null
       }
     },
     {
@@ -1275,18 +1259,10 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "598ae8e5-7fc5-42b3-95cd-380a84c666fb",
-        "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
         "evaluationType": "vote",
-        "fields": null,
-        "category": {
-          "id": "598ae8e5-7fc5-42b3-95cd-380a84c666fb",
-          "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-          "title": "Protocol",
-          "color": "pink"
-        }
+        "fields": null
       }
     },
     {
@@ -1979,18 +1955,10 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "11a463b0-859d-49e2-894e-bd9c5e5574b0",
-        "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
         "evaluationType": "vote",
-        "fields": null,
-        "category": {
-          "id": "11a463b0-859d-49e2-894e-bd9c5e5574b0",
-          "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-          "title": "Metagoverance",
-          "color": "pink"
-        }
+        "fields": null
       }
     },
     {
@@ -2683,18 +2651,10 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "11a463b0-859d-49e2-894e-bd9c5e5574b0",
-        "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
         "evaluationType": "vote",
-        "fields": null,
-        "category": {
-          "id": "11a463b0-859d-49e2-894e-bd9c5e5574b0",
-          "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-          "title": "Metagoverance",
-          "color": "pink"
-        }
+        "fields": null
       }
     },
     {
@@ -46729,18 +46689,10 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "506bd977-75a1-47e6-8936-74b18ce3be49",
-        "snapshotProposalExpiry": null,
         "publishToLens": null,
         "lensPostLink": null,
         "evaluationType": "vote",
-        "fields": null,
-        "category": {
-          "id": "506bd977-75a1-47e6-8936-74b18ce3be49",
-          "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-          "title": "Treasury",
-          "color": "gray"
-        }
+        "fields": null
       }
     },
     {
@@ -49335,89 +49287,6 @@
   ],
   "roles": [],
   "permissions": {
-    "proposalCategoryPermissions": [
-      {
-        "id": "f8fda206-74ba-492b-889b-10b4fdbd9fcb",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "c004d136-fea9-4381-bf0d-5c93f514dd8a",
-        "assignee": {
-          "group": "space",
-          "id": "3055a63c-b535-41fb-a178-281db8170bfe"
-        }
-      },
-      {
-        "id": "e94ddfdc-893a-4055-8efe-c7f0565f8f36",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "68b88fa3-5db1-44d6-914f-ed10247d8fee",
-        "assignee": {
-          "group": "space",
-          "id": "3055a63c-b535-41fb-a178-281db8170bfe"
-        }
-      },
-      {
-        "id": "6c061000-5954-483c-9219-730c03e161f6",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "6a4d83dc-f3f1-4325-96e5-830e64724ab9",
-        "assignee": {
-          "group": "space",
-          "id": "3055a63c-b535-41fb-a178-281db8170bfe"
-        }
-      },
-      {
-        "id": "cf3b884c-ce54-40ed-a726-4c1c2126135c",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "56532016-471f-42d9-a8bd-78877b78d00a",
-        "assignee": {
-          "group": "space",
-          "id": "3055a63c-b535-41fb-a178-281db8170bfe"
-        }
-      },
-      {
-        "id": "b5ab1dc6-eb86-4554-8aff-a41f5cf13c6e",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "a2996f2f-af07-470a-b22d-a56c921950e6",
-        "assignee": {
-          "group": "space",
-          "id": "3055a63c-b535-41fb-a178-281db8170bfe"
-        }
-      },
-      {
-        "id": "2171035b-f443-4ba0-aa7b-cf8a0457061b",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "9821c563-96de-4956-b027-170b904c6018",
-        "assignee": {
-          "group": "space",
-          "id": "3055a63c-b535-41fb-a178-281db8170bfe"
-        }
-      },
-      {
-        "id": "d2c7beb8-0740-49a9-81b9-8eea4cee106e",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "506bd977-75a1-47e6-8936-74b18ce3be49",
-        "assignee": {
-          "group": "space",
-          "id": "3055a63c-b535-41fb-a178-281db8170bfe"
-        }
-      },
-      {
-        "id": "8842f415-31ce-434d-ad9c-6f41e35a5c13",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "598ae8e5-7fc5-42b3-95cd-380a84c666fb",
-        "assignee": {
-          "group": "space",
-          "id": "3055a63c-b535-41fb-a178-281db8170bfe"
-        }
-      },
-      {
-        "id": "bb1e1c88-d645-4c7b-8024-d14d6908d2b0",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "11a463b0-859d-49e2-894e-bd9c5e5574b0",
-        "assignee": {
-          "group": "space",
-          "id": "3055a63c-b535-41fb-a178-281db8170bfe"
-        }
-      }
-    ],
     "postCategoryPermissions": [
       {
         "id": "47217d73-beb3-44d6-8a2c-b69a902ae000",
@@ -49493,62 +49362,6 @@
       }
     ]
   },
-  "proposalCategories": [
-    {
-      "id": "c004d136-fea9-4381-bf0d-5c93f514dd8a",
-      "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-      "title": "General",
-      "color": "pink"
-    },
-    {
-      "id": "68b88fa3-5db1-44d6-914f-ed10247d8fee",
-      "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-      "title": "Operational Budget",
-      "color": "teal"
-    },
-    {
-      "id": "6a4d83dc-f3f1-4325-96e5-830e64724ab9",
-      "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-      "title": "Grants",
-      "color": "yellow"
-    },
-    {
-      "id": "56532016-471f-42d9-a8bd-78877b78d00a",
-      "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-      "title": "Investment",
-      "color": "purple"
-    },
-    {
-      "id": "a2996f2f-af07-470a-b22d-a56c921950e6",
-      "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-      "title": "Elections",
-      "color": "purple"
-    },
-    {
-      "id": "9821c563-96de-4956-b027-170b904c6018",
-      "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-      "title": "Governance",
-      "color": "purple"
-    },
-    {
-      "id": "506bd977-75a1-47e6-8936-74b18ce3be49",
-      "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-      "title": "Treasury",
-      "color": "gray"
-    },
-    {
-      "id": "598ae8e5-7fc5-42b3-95cd-380a84c666fb",
-      "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-      "title": "Protocol",
-      "color": "pink"
-    },
-    {
-      "id": "11a463b0-859d-49e2-894e-bd9c5e5574b0",
-      "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-      "title": "Metagoverance",
-      "color": "pink"
-    }
-  ],
   "postCategories": [
     {
       "id": "ca5ad096-0c24-4a44-bcb8-59951d4877a6",

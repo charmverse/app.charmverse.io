@@ -2,6 +2,7 @@ import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } fr
 import { Box, Card, FormLabel, Stack, Typography } from '@mui/material';
 
 import { useSubmitEvaluationResult } from 'charmClient/hooks/proposals';
+import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { Button } from 'components/common/Button';
 import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
@@ -67,7 +68,7 @@ export function PassFailEvaluation({
               data-test='evaluation-reviewer-select'
               systemRoles={[allMembersSystemRole]}
               readOnly={true}
-              value={reviewerOptions}
+              value={reviewerOptions as SelectOption[]}
               onChange={() => {}}
             />
           </Box>
@@ -89,7 +90,7 @@ export function PassFailEvaluation({
                 onClick={() => onSubmitReview('fail')}
                 disabled={!!disabledTooltip}
                 disabledTooltip={disabledTooltip}
-                color='error'
+                color='errorPale'
               >
                 Decline
               </Button>
@@ -97,7 +98,7 @@ export function PassFailEvaluation({
                 onClick={() => onSubmitReview('pass')}
                 disabled={!!disabledTooltip}
                 disabledTooltip={disabledTooltip}
-                color='success'
+                color='successPale'
               >
                 Pass
               </Button>

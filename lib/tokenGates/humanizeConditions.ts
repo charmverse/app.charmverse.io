@@ -54,6 +54,19 @@ export function humanizeUnlockConditionsData(conditions: TokenGate<'unlock'>['co
   ];
 }
 
+export function humanizeHypersubConditionsData(conditions: TokenGate<'hypersub'>['conditions']): HumanizeCondition[] {
+  return [
+    {
+      image: conditions.image || '',
+      standardContractType: 'HYPERSUB',
+      content: [
+        { type: 'text', content: 'Hypersub -' },
+        { type: 'text', content: conditions.name || 'Membership' }
+      ]
+    }
+  ];
+}
+
 export function humanizeLitConditionsData(conditions: TokenGate<'lit'>['conditions']): HumanizeCondition[] {
   const myWalletAddress = conditions.myWalletAddress;
   const humanReadableConditions = conditions.unifiedAccessControlConditions
@@ -310,6 +323,8 @@ export function humanizeConditionsData<T extends TokenGateConditions>(tokenGate:
       return humanizeLitConditionsData({ ...conditions, myWalletAddress: walletAddress });
     case 'unlock':
       return humanizeUnlockConditionsData(conditions);
+    case 'hypersub':
+      return humanizeHypersubConditionsData(conditions);
     default:
       return [];
   }

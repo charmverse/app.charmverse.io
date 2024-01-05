@@ -8,7 +8,7 @@ import { createForumPost } from 'lib/forums/posts/createForumPost';
 import { createNotificationsFromEvent } from 'lib/notifications/createNotificationsFromEvent';
 import { createPageComment } from 'lib/pages/comments/createPageComment';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
-import { updateProposalStatus } from 'lib/proposal/updateProposalStatus';
+import { updateProposalStatusOnly } from 'lib/proposal/updateProposalStatusOnly';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
 import { createReward } from 'lib/rewards/createReward';
@@ -29,7 +29,6 @@ import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { builders as _ } from 'testing/prosemirror/builders';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
-import { generateProposal, generateProposalCategory } from 'testing/utils/proposals';
 import { createRole } from 'testing/utils/roles';
 
 import { createDocumentNotifications } from '../createDocumentNotifications';
@@ -797,20 +796,15 @@ describe(`Test document events and notifications`, () => {
       spaceId: space.id
     });
 
-    const proposalCategory = await generateProposalCategory({
-      spaceId: space.id
-    });
-
     const page = await testUtilsProposals.generateProposal({
-      categoryId: proposalCategory.id,
       spaceId: space.id,
       userId: user.id,
       authors: [user.id],
       evaluationInputs: [{ evaluationType: 'rubric', permissions: [], reviewers: [{ group: 'user', id: user2.id }] }]
     });
 
-    await updateProposalStatus({
-      newStatus: 'discussion',
+    await updateProposalStatusOnly({
+      newStatus: 'published',
       proposalId: page.id,
       userId: user.id
     });

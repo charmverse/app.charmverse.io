@@ -40,7 +40,6 @@ export type FieldProps = {
   helperText?: ReactNode;
   description?: PageContent;
   endAdornment?: ReactNode;
-  fieldWrapperSx?: SxProps;
 } & SelectFieldProps;
 
 export type FormFieldInput = Pick<

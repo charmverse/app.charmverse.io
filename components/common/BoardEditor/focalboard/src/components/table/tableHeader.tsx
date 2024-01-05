@@ -34,12 +34,11 @@ import type { Card } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
 import {
   AUTHORS_BLOCK_ID,
-  CATEGORY_BLOCK_ID,
   DEFAULT_BOARD_BLOCK_ID,
   DEFAULT_VIEW_BLOCK_ID,
-  EVALUATION_TYPE_BLOCK_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID,
-  STATUS_BLOCK_ID
+  PROPOSAL_STEP_BLOCK_ID,
+  PROPOSAL_STATUS_BLOCK_ID
 } from 'lib/proposal/blocks/constants';
 import { defaultRewardPropertyIds } from 'lib/rewards/blocks/constants';
 
@@ -68,10 +67,9 @@ type Props = {
 
 const DEFAULT_BLOCK_IDS = [
   DEFAULT_BOARD_BLOCK_ID,
-  CATEGORY_BLOCK_ID,
   DEFAULT_VIEW_BLOCK_ID,
-  STATUS_BLOCK_ID,
-  EVALUATION_TYPE_BLOCK_ID,
+  PROPOSAL_STATUS_BLOCK_ID,
+  PROPOSAL_STEP_BLOCK_ID,
   AUTHORS_BLOCK_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID
 ];

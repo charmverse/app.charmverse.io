@@ -24,8 +24,7 @@ const formatters: Formatters = {
 
 const emptyContext: PropertyContext = {
   spaceDomain: 'test-space',
-  users: {},
-  proposalCategories: {}
+  users: {}
 };
 
 describe('CsvExporter', () => {
@@ -175,21 +174,19 @@ describe('getCSVColumns()', () => {
     board.fields.cardProperties = [];
     const boardProperties = getBoardProperties({
       boardBlock: board,
-      proposalCategories: [{ id: 'category_id', title: 'MockCategory', color: 'red' }],
       spaceUsesRubrics: true
     });
 
     board.fields.cardProperties = boardProperties;
-    const proposalStatusProperty = boardProperties.find((prop) => prop.type === 'proposalStatus');
-    const reviewStatusOptionId = proposalStatusProperty?.options?.find((opt) => opt.value === 'review')?.id;
     const databaseProperties = extractDatabaseProposalProperties({
       boardBlock: board
     });
     const properties = {
-      [databaseProperties.proposalCategory!.id]: 'category_id',
       [databaseProperties.proposalUrl!.id]: 'path-123',
-      [databaseProperties.proposalStatus!.id]: reviewStatusOptionId,
-      [databaseProperties.proposalEvaluatedBy!.id]: 'user_1'
+      [databaseProperties.proposalStatus!.id]: 'in_progress',
+      [databaseProperties.proposalEvaluatedBy!.id]: 'user_1',
+      [databaseProperties.proposalEvaluationType!.id]: 'rubric',
+      [databaseProperties.proposalStep!.id]: 'Rubric evaluation'
     };
     const card = createMockCard(board);
     const criteria = {
@@ -207,7 +204,6 @@ describe('getCSVColumns()', () => {
 
     const context: PropertyContext = {
       users: { user_1: { username: 'Mo' } },
-      proposalCategories: { category_id: 'General' },
       spaceDomain: 'test-space'
     };
     const rowColumns = getCSVColumns({
@@ -217,11 +213,13 @@ describe('getCSVColumns()', () => {
       hasTitleProperty: false,
       visibleProperties: board.fields.cardProperties
     });
+
     expect(rowColumns).toEqual([
       '"title"',
-      '"General"',
-      '"In Review"',
+      '"In Progress"',
       '"http://localhost/test-space/path-123"',
+      '"Rubric"',
+      '"Rubric evaluation"',
       'Mo',
       '10',
       '10'

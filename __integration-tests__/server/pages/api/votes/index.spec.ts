@@ -1,4 +1,4 @@
-import type { Page, ProposalCategory, Space } from '@charmverse/core/prisma';
+import type { Page, Space } from '@charmverse/core/prisma';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
@@ -6,12 +6,10 @@ import type { VoteDTO } from 'lib/votes/interfaces';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { createPage, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generateProposalCategory } from 'testing/utils/proposals';
 
 let page: Page;
 let space: Space;
 let user: LoggedInUser;
-let proposalCategory: ProposalCategory;
 
 let userCookie: string;
 
@@ -32,9 +30,6 @@ beforeAll(async () => {
   });
 
   userCookie = await loginUser(user.id);
-  proposalCategory = await generateProposalCategory({
-    spaceId: space.id
-  });
 });
 
 describe('GET /api/votes?id={id} - Get an individual vote', () => {

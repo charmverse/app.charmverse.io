@@ -2,7 +2,6 @@ import type { PageMeta } from '@charmverse/core/pages';
 import { ClickAwayListener, Collapse } from '@mui/material';
 import { memo, useEffect, useState } from 'react';
 
-import { ProposalCategoriesList } from 'components/proposals/components/ProposalCategoriesList';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView, IViewType } from 'lib/focalboard/boardView';
 
@@ -31,7 +30,6 @@ interface Props {
   hideGroupOptions?: boolean;
   hideLayoutSelectOptions?: boolean;
   hidePropertiesRow?: boolean;
-  withProposalCategories?: boolean;
   supportedViewTypes?: IViewType[];
 }
 
@@ -89,16 +87,6 @@ function ViewSidebar(props: Props) {
                     view={props.view}
                     groupByProperty={props.groupByProperty}
                   />
-                </>
-              )}
-              {sidebarView === 'proposalCategories' && (
-                <>
-                  <DatabaseSidebarHeader
-                    goBack={goToSidebarHome}
-                    title='Proposal categories'
-                    onClose={props.closeSidebar}
-                  />
-                  <ProposalCategoriesList />
                 </>
               )}
             </>

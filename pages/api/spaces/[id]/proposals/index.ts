@@ -1,10 +1,11 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWithUsers, ListProposalsRequest } from '@charmverse/core/proposals';
+import type { ListProposalsRequest } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
+import type { ProposalWithUsersLite } from 'lib/proposal/interface';
 import { mapDbProposalToProposalLite } from 'lib/proposal/mapDbProposalToProposal';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -12,14 +13,13 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.get(getProposals);
 
-async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWithUsers[]>) {
+async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWithUsersLite[]>) {
   const userId = req.session.user?.id;
 
   const spaceId = req.query.id as string;
 
-  const { categoryIds, onlyAssigned } = req.query as any as ListProposalsRequest;
+  const { onlyAssigned } = req.query as any as ListProposalsRequest;
   const proposalIds = await permissionsApiClient.proposals.getAccessibleProposalIds({
-    categoryIds,
     onlyAssigned,
     userId,
     spaceId
@@ -38,7 +38,6 @@ async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWi
     include: {
       authors: true,
       reviewers: true,
-      category: true,
       rewards: true,
       evaluations: {
         orderBy: {
@@ -60,7 +59,7 @@ async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWi
     }
   });
 
-  const proposalsWithUsers: ProposalWithUsers[] = proposals.map((proposal) => {
+  const proposalsWithUsers = proposals.map((proposal) => {
     return mapDbProposalToProposalLite({ proposal });
   });
 

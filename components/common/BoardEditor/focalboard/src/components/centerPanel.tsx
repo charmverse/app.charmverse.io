@@ -176,8 +176,8 @@ function CenterPanel(props: Props) {
   if (
     (!groupByProperty ||
       (_groupByProperty?.type !== 'select' &&
-        _groupByProperty?.type !== 'proposalCategory' &&
-        _groupByProperty?.type !== 'proposalStatus')) &&
+        _groupByProperty?.type !== 'proposalStatus' &&
+        _groupByProperty?.type !== 'proposalStep')) &&
     activeView?.fields.viewType === 'board'
   ) {
     groupByProperty = activeBoard?.fields.cardProperties.find((o: any) => o.type === 'select');

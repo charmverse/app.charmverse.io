@@ -38,17 +38,20 @@ export function ControlledFormFieldsEditor({
 export function FormFieldsEditor({
   proposalId,
   formFields: initialFormFields,
-  readOnly
+  readOnly,
+  refreshProposal
 }: {
   proposalId: string;
   formFields: FormFieldInput[];
   readOnly?: boolean;
+  refreshProposal: VoidFunction;
 }) {
   const [formFields, setFormFields] = useState([...initialFormFields]);
   const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>(formFields.map((field) => field.id));
   const { trigger } = useUpdateProposalFormFields({ proposalId });
   const saveFormFields = async () => {
     await trigger({ formFields });
+    refreshProposal?.();
   };
 
   return (
@@ -89,6 +92,7 @@ function FormFieldsEditorBase({
   const { showMessage } = useSnackbar();
   // Using a ref to keep the formFields state updated, since it becomes stale inside the functions
   const formFieldsRef = useRef(formFields);
+  const lastInsertedIndexRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     formFieldsRef.current = formFields;
@@ -154,7 +158,14 @@ function FormFieldsEditorBase({
         id: fieldId
       }
     ]);
+
+    lastInsertedIndexRef.current = formFields.length;
   }
+
+  useEffect(() => {
+    // reset last inserted index after render
+    lastInsertedIndexRef.current = undefined;
+  });
 
   function duplicateFormField(fieldId: string) {
     const index = formFields.findIndex((f) => f.id === fieldId);
@@ -246,6 +257,7 @@ function FormFieldsEditorBase({
           onUpdateOption={(option) => {
             onUpdateOption(formField.id, option);
           }}
+          forceFocus={lastInsertedIndexRef.current === formField.index}
         />
       ))}
       {!readOnly && (

@@ -3,28 +3,21 @@ import { useMemo } from 'react';
 import {
   useUpdateProposalEvaluation,
   useGetProposalDetails,
-  useUpsertRubricCriteria
+  useUpsertRubricCriteria,
+  useUpdateWorkflow
 } from 'charmClient/hooks/proposals';
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationStepSettings';
+import { useSnackbar } from 'hooks/useSnackbar';
 
 export function useProposal({ proposalId }: { proposalId?: string | null }) {
   const { data: proposal, mutate: refreshProposal } = useGetProposalDetails(proposalId);
   const { trigger: updateProposalEvaluation } = useUpdateProposalEvaluation({ proposalId });
   const { trigger: upsertRubricCriteria } = useUpsertRubricCriteria({ proposalId });
-
-  const readOnlyProperties = !proposal?.permissions.edit;
-  const readOnlyReviewers = Boolean(readOnlyProperties || !!proposal?.page?.sourceTemplateId);
-  // rubric criteria can always be updated by reviewers and admins, but criteria from a template are only editable by admin
-  const readOnlyRubricCriteria = Boolean(
-    readOnlyProperties && (!proposal?.permissions.evaluate || proposal?.page?.sourceTemplateId)
-  );
-
+  const { trigger: updateProposalWorkflow } = useUpdateWorkflow({ proposalId });
   return useMemo(
     () => ({
       proposal,
       permissions: proposal?.permissions,
-      readOnlyReviewers,
-      readOnlyRubricCriteria,
       refreshProposal: () => refreshProposal(), // wrap it in a function so click handlers dont pass in the event
       async onChangeEvaluation(evaluationId: string, updatedEvaluation: Partial<ProposalEvaluationValues>) {
         if (updatedEvaluation.rubricCriteria) {
@@ -41,15 +34,12 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
           });
         }
         await refreshProposal();
+      },
+      onChangeWorkflow: async ({ id }: { id: string }) => {
+        await updateProposalWorkflow({ workflowId: id });
+        await refreshProposal();
       }
     }),
-    [
-      proposal,
-      refreshProposal,
-      readOnlyReviewers,
-      readOnlyRubricCriteria,
-      updateProposalEvaluation,
-      upsertRubricCriteria
-    ]
+    [proposal, refreshProposal, updateProposalEvaluation, updateProposalWorkflow, upsertRubricCriteria]
   );
 }

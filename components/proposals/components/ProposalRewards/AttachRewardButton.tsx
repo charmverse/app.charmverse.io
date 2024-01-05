@@ -8,6 +8,7 @@ import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
+import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalPendingReward, ProposalReviewerInput } from 'lib/proposal/interface';
 import type { RewardReviewer } from 'lib/rewards/interfaces';
@@ -26,6 +27,7 @@ export function AttachRewardButton({
   readOnly: boolean;
   children?: React.ReactNode;
 }) {
+  const { isSpaceMember } = useIsSpaceMember();
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
   const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, isSavingReward } = useNewReward();
   const { getFeatureTitle } = useSpaceFeatures();
@@ -49,7 +51,7 @@ export function AttachRewardButton({
     closeDialog();
   }
 
-  if (readOnly) {
+  if (readOnly || !isSpaceMember) {
     return null;
   }
 
@@ -76,7 +78,6 @@ export function AttachRewardButton({
           titlePlaceholder='Reward title (required)'
           values={newPageValues}
           onChange={updateNewPageValues}
-          headerBannerTitle="You're creating a milestone reward"
         >
           <RewardPropertiesForm
             onChange={setRewardValues}

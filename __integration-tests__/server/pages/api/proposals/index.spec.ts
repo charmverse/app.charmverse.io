@@ -13,8 +13,6 @@ import { createRole } from 'testing/utils/roles';
 let space: Space;
 let proposalCreator: User;
 let spaceMember: User;
-let proposalCategory: ProposalCategory;
-let readonlyProposalCategory: ProposalCategory;
 let proposalCreatorRole: Role;
 
 beforeAll(async () => {
@@ -22,18 +20,6 @@ beforeAll(async () => {
   space = generated.space;
   proposalCreator = generated.user;
   spaceMember = await testUtilsUser.generateSpaceUser({
-    spaceId: space.id
-  });
-  proposalCategory = await testUtilsProposals.generateProposalCategory({
-    spaceId: space.id,
-    proposalCategoryPermissions: [
-      {
-        permissionLevel: 'full_access',
-        assignee: { group: 'space', id: space.id }
-      }
-    ]
-  });
-  readonlyProposalCategory = await testUtilsProposals.generateProposalCategory({
     spaceId: space.id
   });
   proposalCreatorRole = await createRole({
@@ -64,7 +50,6 @@ describe('POST /api/proposals - Create a proposal', () => {
     });
 
     const input: CreateProposalInput = {
-      categoryId: proposalCategory.id,
       spaceId: space.id,
       userId: proposalCreator.id,
       authors: [proposalCreator.id, otherUser.id],
@@ -76,46 +61,13 @@ describe('POST /api/proposals - Create a proposal', () => {
       }
     };
 
-    const createdProposal = (
-      await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(201)
-    ).body as { id: string };
-
-    const proposal = await prisma.proposal.findUniqueOrThrow({
-      where: {
-        id: createdProposal.id
-      },
-      include: {
-        authors: true,
-        reviewers: true
-      }
-    });
-    expect(proposal).toMatchObject<Partial<ProposalWithUsers>>({
-      authors: expect.arrayContaining([
-        {
-          proposalId: createdProposal?.id as string,
-          userId: proposalCreator.id
-        },
-        {
-          proposalId: createdProposal?.id as string,
-          userId: otherUser.id
-        }
-      ]),
-      reviewers: expect.arrayContaining([
-        expect.objectContaining({
-          id: expect.any(String),
-          proposalId: createdProposal?.id as string,
-          userId: proposalCreator.id
-        })
-      ])
-    });
+    await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(201);
   });
 
   it('should fail to create a proposal if the user does not have permissions for creating proposal and respond with 401', async () => {
     const userCookie = await loginUser(spaceMember.id);
 
     const input: CreateProposalInput = {
-      // This is the important bit
-      categoryId: readonlyProposalCategory.id,
       spaceId: space.id,
       userId: spaceMember.id,
       authors: [spaceMember.id],
@@ -136,7 +88,6 @@ describe('POST /api/proposals - Create a proposal', () => {
     });
 
     const input: CreateProposalInput = {
-      categoryId: proposalCategory.id,
       spaceId: space.id,
       userId: proposalCreator.id,
       authors: [proposalCreator.id, otherUser.id],

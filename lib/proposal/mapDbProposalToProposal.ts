@@ -1,13 +1,25 @@
 import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalReviewer } from '@charmverse/core/prisma';
-import type { FormField, Proposal, ProposalEvaluation } from '@charmverse/core/prisma-client';
+import {
+  ProposalEvaluationResult,
+  type FormField,
+  type Proposal,
+  type ProposalEvaluation
+} from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
+import { sortBy } from 'lodash';
 
 import { getProposalFormFields } from 'lib/proposal/form/getProposalFormFields';
 
-import { getOldProposalStatus } from './getOldProposalStatus';
-import type { ProposalWithUsersAndRubric } from './interface';
+import { getCurrentStep } from './getCurrentStep';
+import { getOldProposalStatus } from './getProposalEvaluationStatus';
+import type {
+  ProposalEvaluationStep,
+  ProposalFields,
+  ProposalWithUsersAndRubric,
+  ProposalWithUsersLite
+} from './interface';
 
 type FormFieldsIncludeType = {
   form: {
@@ -39,6 +51,7 @@ export function mapDbProposalToProposal({
   const { rewards, form, ...rest } = proposal;
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
   const formFields = getProposalFormFields(form?.formFields, !!canAccessPrivateFormFields);
+  const fields = (rest.fields as ProposalFields) ?? null;
 
   const proposalWithUsers = {
     ...rest,
@@ -56,7 +69,13 @@ export function mapDbProposalToProposal({
           formFields: formFields || null,
           id: form?.id || null
         }
-      : null
+      : null,
+    currentStep: getCurrentStep({
+      evaluations: proposal.evaluations,
+      hasPendingRewards: (fields?.pendingRewards ?? []).length > 0,
+      proposalStatus: proposal.status,
+      hasPublishedRewards: rewards.length > 0
+    })
   };
 
   return proposalWithUsers as ProposalWithUsersAndRubric;
@@ -72,19 +91,34 @@ export function mapDbProposalToProposalLite({
     rewards: { id: string }[];
   };
   permissions?: ProposalPermissionFlags;
-}): ProposalWithUsers {
+}): ProposalWithUsersLite {
   const { rewards, ...rest } = proposal;
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
-  const evaluationWithOldType = proposal.evaluations.find((e) => e.type === 'rubric' || e.type === 'vote');
+  const fields = (rest.fields as ProposalFields) ?? null;
+
   const proposalWithUsers = {
     ...rest,
+    evaluations: sortBy(proposal.evaluations, 'index').map((e) => ({
+      title: e.title,
+      index: e.index,
+      type: e.type,
+      result: e.result,
+      id: e.id
+    })),
     permissions,
+    currentStep: getCurrentStep({
+      evaluations: proposal.evaluations,
+      hasPendingRewards: (fields?.pendingRewards ?? []).length > 0,
+      proposalStatus: proposal.status,
+      hasPublishedRewards: rewards.length > 0
+    }),
     currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
-    evaluationType: evaluationWithOldType?.type || proposal.evaluationType,
+    evaluationType: currentEvaluation?.type || proposal.evaluationType,
     status: getOldProposalStatus(proposal),
     reviewers: currentEvaluation?.reviewers || proposal.reviewers,
-    rewardIds: rewards.map((r) => r.id) || null
+    rewardIds: rewards.map((r) => r.id) || null,
+    fields
   };
 
-  return proposalWithUsers as ProposalWithUsers;
+  return proposalWithUsers;
 }

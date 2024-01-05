@@ -1,13 +1,15 @@
 import { VoteStatus } from '@charmverse/core/prisma';
+import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { v4 as uuid } from 'uuid';
 
 import { DuplicateDataError } from 'lib/utilities/errors';
-import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createPage } from 'testing/setupDatabase';
 
 import { createVote as createVoteService } from '../createVote';
 
 describe('createVote', () => {
   it('should create and return vote', async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
+    const { space, user } = await testUtilsUser.generateUserAndSpace();
 
     const page = await createPage({
       createdBy: user.id,
@@ -44,28 +46,76 @@ describe('createVote', () => {
       })
     );
   });
+  it('should create a proposal vote for individual evaluations, but not allow duplicate votes for the same evaluation', async () => {
+    const { space, user } = await testUtilsUser.generateUserAndSpace();
 
-  it('should fail to create a proposal vote if a proposal-level vote already exists for this page', async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
+    const voteStepId = uuid();
+    const secondVoteStepId = uuid();
 
-    const page = await createPage({
-      createdBy: user.id,
-      spaceId: space.id
+    const proposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: user.id,
+      evaluationInputs: [
+        {
+          id: voteStepId,
+          evaluationType: 'vote',
+          permissions: [],
+          reviewers: []
+        },
+        {
+          id: secondVoteStepId,
+          evaluationType: 'vote',
+          permissions: [],
+          reviewers: []
+        }
+      ]
     });
 
-    await createVoteService({
+    const createdVote = await createVoteService({
       createdBy: user.id,
       deadline: new Date(),
       content: null,
       contentText: '',
-      pageId: page.id,
+      pageId: proposal.id,
       spaceId: space.id,
       threshold: 50,
       title: 'First vote',
       type: 'Approval',
-      context: 'proposal',
+      context: 'inline',
       voteOptions: ['1', '2', '3'],
-      maxChoices: 2
+      maxChoices: 1,
+      evaluationId: voteStepId
+    });
+    expect(createdVote).toMatchObject(
+      expect.objectContaining({
+        totalVotes: 0,
+        status: VoteStatus.InProgress,
+        aggregatedResult: {
+          1: 0,
+          2: 0,
+          3: 0
+        },
+        userChoice: null,
+        pageId: proposal.id,
+        spaceId: space.id,
+        createdBy: user.id
+      })
+    );
+
+    const secondCreatedVote = await createVoteService({
+      createdBy: user.id,
+      deadline: new Date(),
+      content: null,
+      contentText: '',
+      pageId: proposal.id,
+      spaceId: space.id,
+      threshold: 50,
+      title: 'First vote',
+      type: 'Approval',
+      context: 'inline',
+      voteOptions: ['1', '2', '3'],
+      maxChoices: 1,
+      evaluationId: secondVoteStepId
     });
 
     await expect(
@@ -74,14 +124,33 @@ describe('createVote', () => {
         deadline: new Date(),
         content: null,
         contentText: '',
-        pageId: page.id,
+        pageId: proposal.id,
         spaceId: space.id,
         threshold: 50,
         title: 'First vote',
         type: 'Approval',
-        context: 'proposal',
+        context: 'inline',
         voteOptions: ['1', '2', '3'],
-        maxChoices: 3
+        maxChoices: 1,
+        evaluationId: voteStepId
+      })
+    ).rejects.toBeInstanceOf(DuplicateDataError);
+
+    await expect(
+      createVoteService({
+        createdBy: user.id,
+        deadline: new Date(),
+        content: null,
+        contentText: '',
+        pageId: proposal.id,
+        spaceId: space.id,
+        threshold: 50,
+        title: 'First vote',
+        type: 'Approval',
+        context: 'inline',
+        voteOptions: ['1', '2', '3'],
+        maxChoices: 1,
+        evaluationId: secondVoteStepId
       })
     ).rejects.toBeInstanceOf(DuplicateDataError);
   });

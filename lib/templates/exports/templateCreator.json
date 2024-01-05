@@ -655,8 +655,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "03c19185-9b4e-4e8f-9740-98d7b7c18cdb",
-        "snapshotProposalExpiry": null,
         "publishToLens": false,
         "lensPostLink": null,
         "evaluationType": "vote",
@@ -664,7 +662,6 @@
           "properties": {
             "__status": "",
             "__authors": [],
-            "__category": "03c19185-9b4e-4e8f-9740-98d7b7c18cdb",
             "__createdAt": "",
             "__reviewers": [
               {
@@ -673,12 +670,6 @@
             ],
             "__evaluationType": "vote"
           }
-        },
-        "category": {
-          "id": "03c19185-9b4e-4e8f-9740-98d7b7c18cdb",
-          "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
-          "title": "Grants",
-          "color": "orange"
         }
       }
     },
@@ -5909,71 +5900,6 @@
     }
   ],
   "permissions": {
-    "proposalCategoryPermissions": [
-      {
-        "id": "5e8038b5-5178-4a08-bb79-cdaa90472c5a",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "03c19185-9b4e-4e8f-9740-98d7b7c18cdb",
-        "assignee": {
-          "group": "space",
-          "id": "702fe846-919a-41f9-a20b-3b40fa07d5d8"
-        }
-      },
-      {
-        "id": "f7005429-3584-42d0-82eb-39518fdb1167",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "511a1415-4d5c-4abc-8606-241801fe966d",
-        "assignee": {
-          "group": "space",
-          "id": "702fe846-919a-41f9-a20b-3b40fa07d5d8"
-        }
-      },
-      {
-        "id": "04af26d6-c00d-4491-84f6-9acddca28df9",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "4a41fe9c-79d2-473a-86ca-7bb24c655f34",
-        "assignee": {
-          "group": "space",
-          "id": "702fe846-919a-41f9-a20b-3b40fa07d5d8"
-        }
-      },
-      {
-        "id": "b068e892-5677-4598-9cc9-ab04bbf69e1a",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "2920d4a9-2b64-4b45-8fad-6df67a499a34",
-        "assignee": {
-          "group": "space",
-          "id": "702fe846-919a-41f9-a20b-3b40fa07d5d8"
-        }
-      },
-      {
-        "id": "04f77f0c-72b1-4355-b9b3-8f2459dae59a",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "57ea8438-9a19-4c93-924f-063ba3d71ce8",
-        "assignee": {
-          "group": "space",
-          "id": "702fe846-919a-41f9-a20b-3b40fa07d5d8"
-        }
-      },
-      {
-        "id": "4a661317-8436-4d82-82ad-6a5be458736e",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "c480284c-ddba-4589-aa99-01a1e8640f6c",
-        "assignee": {
-          "group": "space",
-          "id": "702fe846-919a-41f9-a20b-3b40fa07d5d8"
-        }
-      },
-      {
-        "id": "cdbc3a2b-1744-4146-99f6-d889c06b4fa5",
-        "permissionLevel": "full_access",
-        "proposalCategoryId": "6537d78e-e2c5-41ea-8f37-9022d172949f",
-        "assignee": {
-          "group": "space",
-          "id": "702fe846-919a-41f9-a20b-3b40fa07d5d8"
-        }
-      }
-    ],
     "postCategoryPermissions": [
       {
         "id": "87732426-0bab-4217-8aff-9bdea42ad952",
@@ -6092,50 +6018,6 @@
       }
     ]
   },
-  "proposalCategories": [
-    {
-      "id": "03c19185-9b4e-4e8f-9740-98d7b7c18cdb",
-      "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
-      "title": "Grants",
-      "color": "orange"
-    },
-    {
-      "id": "511a1415-4d5c-4abc-8606-241801fe966d",
-      "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
-      "title": "Governance",
-      "color": "purple"
-    },
-    {
-      "id": "4a41fe9c-79d2-473a-86ca-7bb24c655f34",
-      "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
-      "title": "Community",
-      "color": "pink"
-    },
-    {
-      "id": "2920d4a9-2b64-4b45-8fad-6df67a499a34",
-      "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
-      "title": "Content Creation",
-      "color": "purple"
-    },
-    {
-      "id": "57ea8438-9a19-4c93-924f-063ba3d71ce8",
-      "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
-      "title": "Tech",
-      "color": "yellow"
-    },
-    {
-      "id": "c480284c-ddba-4589-aa99-01a1e8640f6c",
-      "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
-      "title": "Partnerships",
-      "color": "orange"
-    },
-    {
-      "id": "6537d78e-e2c5-41ea-8f37-9022d172949f",
-      "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
-      "title": "Outreach",
-      "color": "orange"
-    }
-  ],
   "postCategories": [
     {
       "id": "bd535b45-3aa2-4691-8096-512431442fcf",

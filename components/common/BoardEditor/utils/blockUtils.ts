@@ -12,9 +12,13 @@ export async function fixBlocks(blocks: FBBlock[]): Promise<FBBlock[]> {
 }
 
 export function blockToFBBlock(block: Block): FBBlock {
-  const fields = block.fields as FBBlock['fields'];
+  let fields = block.fields as FBBlock['fields'];
   if ('headerImage' in fields) {
-    fields.headerImage = replaceS3Domain(fields.headerImage);
+    // reassign fields to avoid mutation error
+    fields = {
+      ...fields,
+      headerImage: replaceS3Domain(fields.headerImage)
+    };
   }
   return {
     ...block,

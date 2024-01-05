@@ -8,8 +8,7 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys, requireSpaceMembership } from 'lib/middleware';
 import requireValidation from 'lib/middleware/requireValidation';
 import { withSessionRoute } from 'lib/session/withSession';
-import { addDaylightAbility } from 'lib/tokenGates/daylight';
-import type { TokenGate, TokenGateWithRoles } from 'lib/tokenGates/interfaces';
+import type { TokenGateWithRoles } from 'lib/tokenGates/interfaces';
 import { processTokenGateConditions } from 'lib/tokenGates/processTokenGateConditions';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
@@ -38,15 +37,14 @@ async function saveTokenGate(req: NextApiRequest, res: NextApiResponse<void>) {
 
   const { accessTypes, numberOfConditions, chainType, accesType } = processTokenGateConditions(req.body);
 
-  const result = (await prisma.tokenGate.create({
+  const result = await prisma.tokenGate.create({
     data: {
       createdBy: req.session.user.id,
       ...req.body,
       accessTypes
     }
-  })) as TokenGate;
+  });
 
-  addDaylightAbility(result);
   trackUserAction('add_a_gate', {
     userId,
     spaceId,

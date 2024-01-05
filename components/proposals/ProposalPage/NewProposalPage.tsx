@@ -16,6 +16,7 @@ import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/Page
 import { PrimaryColumn } from 'components/[pageId]/DocumentPage/components/PrimaryColumn';
 import { PageSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/PageSidebar';
 import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/components/StickyFooterContainer';
+import { defaultPageTop } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
@@ -36,8 +37,7 @@ import { useMdScreen } from 'hooks/useMediaScreens';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
-import { useUser } from 'hooks/useUser';
-import type { ProposalFields } from 'lib/proposal/interface';
+import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
 import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposal/rubric/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -82,8 +82,9 @@ export function NewProposalPage({
   const { proposalTemplates, isLoadingTemplates } = useProposalTemplates();
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>();
   const [, setPageTitle] = usePageTitle();
-  const { data: workflowOptions } = useGetProposalWorkflows(currentSpace?.id);
+  const { data: workflowOptions, isLoading: isLoadingWorkflows } = useGetProposalWorkflows(currentSpace?.id);
   const isMdScreen = useMdScreen();
+  const proposalPageType = isTemplate ? 'proposal_template' : 'proposal';
   const {
     formInputs,
     setFormInputs,
@@ -92,18 +93,15 @@ export function NewProposalPage({
     isCreatingProposal,
     createProposal
   } = useNewProposal({
-    newProposal: { type: isTemplate ? 'proposal_template' : 'proposal', proposalType }
+    newProposal: { type: proposalPageType, proposalType }
   });
   const [submittedDraft, setSubmittedDraft] = useState<boolean>(false);
 
   const [, { width: containerWidth }] = useElementSize();
-  const { user } = useUser();
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
-  const [readOnlyEditor, setReadOnlyEditor] = useState(false);
   const isAdmin = useIsAdmin();
-  const isReviewer = formInputs.reviewers?.some((r) => r.id === user?.id);
 
-  const sourceTemplate = proposalTemplates?.find((template) => template.id === formInputs.proposalTemplateId);
+  const sourceTemplate = proposalTemplates?.find((template) => template.page.id === formInputs.proposalTemplateId);
   const isStructured = formInputs.proposalType === 'structured' || !!sourceTemplate?.formId;
   const proposalFormFields = isStructured
     ? formInputs.formFields ??
@@ -145,27 +143,8 @@ export function NewProposalPage({
   }
   usePreventReload(contentUpdated);
 
-  const isFromTemplateSource = Boolean(formInputs.proposalTemplateId);
   const isTemplateRequired = Boolean(currentSpace?.requireProposalTemplate);
-  // rubric criteria can always be updated by reviewers and admins
-  const readOnlyRubricCriteria = isFromTemplateSource && !(isAdmin || isReviewer);
-
-  useEffect(() => {
-    if (isTemplateRequired) {
-      setReadOnlyEditor(!formInputs.proposalTemplateId);
-    }
-  }, [formInputs.proposalTemplateId, isTemplateRequired]);
-
-  const readOnlyReviewers = !!proposalTemplates?.some((t) => t.id === formInputs?.proposalTemplateId);
-
-  const templateOptions = (proposalTemplates || [])
-    .filter((_proposal) => {
-      if (!formInputs.categoryId) {
-        return true;
-      }
-      return _proposal.categoryId === formInputs.categoryId;
-    })
-    .map((template) => template.page);
+  const templatePageOptions = (proposalTemplates || []).map((template) => template.page);
   const { pages } = usePages();
 
   const proposalTemplatePage = formInputs.proposalTemplateId ? pages[formInputs.proposalTemplateId] : null;
@@ -183,43 +162,6 @@ export function NewProposalPage({
         }, [] as string[])
       : [];
 
-  function updateProposalContent({ doc, rawText }: ICharmEditorOutput) {
-    setFormInputs({
-      content: doc,
-      contentText: rawText
-    });
-  }
-
-  function selectEvaluationWorkflow(workflow: ProposalWorkflowTyped) {
-    setFormInputs({
-      workflowId: workflow.id,
-      evaluations: workflow.evaluations.map((evaluation, index) => ({
-        id: evaluation.id,
-        index,
-        reviewers: [],
-        rubricCriteria: [] as ProposalRubricCriteriaWithTypedParams[],
-        title: evaluation.title,
-        type: evaluation.type,
-        result: null,
-        permissions: evaluation.permissions as ProposalEvaluationPermission[]
-      }))
-    });
-  }
-
-  function clearTemplate() {
-    setFormInputs({
-      proposalTemplateId: null
-    });
-  }
-
-  async function saveForm({ isDraft }: { isDraft?: boolean } = {}) {
-    setSubmittedDraft(!!isDraft);
-    const result = await createProposal({ isDraft });
-    if (result) {
-      navigateToSpacePath(`/${result.id}`);
-    }
-  }
-
   function focusDocumentEditor() {
     const focusEvent = new CustomEvent(focusEventName);
     // TODO: use a ref passed down instead
@@ -230,7 +172,6 @@ export function NewProposalPage({
     const template = proposalTemplates?.find((t) => t.id === _templateId);
     if (template) {
       setFormInputs({
-        categoryId: template.categoryId,
         content: template.page.content as PageContent,
         contentText: template.page.contentText,
         reviewers: template.reviewers.map((reviewer) => ({
@@ -240,11 +181,10 @@ export function NewProposalPage({
         proposalTemplateId: _templateId,
         headerImage: template.page.headerImage,
         icon: template.page.icon,
-        workflowId: template.workflowId,
         evaluationType: template.evaluationType,
         evaluations: template.evaluations,
         fields: template.fields || {},
-        type: 'proposal',
+        type: proposalPageType,
         formId: template.formId ?? undefined,
         formAnswers: (template?.form?.formFields ?? [])
           .filter((formField) => formField.type !== 'label')
@@ -253,6 +193,55 @@ export function NewProposalPage({
             value: getInitialFormFieldValue(proposalFormField) as FieldAnswerInput['value']
           }))
       });
+      const workflow = workflowOptions?.find((w) => w.id === template.workflowId);
+      if (workflow) {
+        // pass in the template since the formState will not be updated in this instance of applyWorkflow
+        applyWorkflow(workflow, template);
+      }
+    }
+  }
+
+  function clearTemplate() {
+    setFormInputs({
+      proposalTemplateId: null
+    });
+  }
+
+  function applyWorkflow(workflow: ProposalWorkflowTyped, template?: ProposalTemplate) {
+    setFormInputs({
+      workflowId: workflow.id,
+      evaluations: workflow.evaluations.map((evaluation, index) => {
+        // try to retain existing reviewers and configuration
+        const existingStep = (template?.evaluations || formInputs.evaluations).find(
+          (e) => e.title === evaluation.title
+        );
+        return {
+          id: evaluation.id,
+          index,
+          reviewers: existingStep?.reviewers || [],
+          rubricCriteria: existingStep?.rubricCriteria || ([] as ProposalRubricCriteriaWithTypedParams[]),
+          title: evaluation.title,
+          type: evaluation.type,
+          result: null,
+          voteSettings: existingStep?.voteSettings,
+          permissions: evaluation.permissions as ProposalEvaluationPermission[]
+        };
+      })
+    });
+  }
+
+  function applyProposalContent({ doc, rawText }: ICharmEditorOutput) {
+    setFormInputs({
+      content: doc,
+      contentText: rawText
+    });
+  }
+
+  async function saveForm({ isDraft }: { isDraft?: boolean } = {}) {
+    setSubmittedDraft(!!isDraft);
+    const result = await createProposal({ isDraft });
+    if (result) {
+      navigateToSpacePath(`/${result.id}`);
     }
   }
 
@@ -289,17 +278,17 @@ export function NewProposalPage({
                   </PropertyLabel>
                   <Box display='flex' flex={1}>
                     <TemplateSelect
-                      options={templateOptions}
+                      options={templatePageOptions}
                       value={proposalTemplatePage ?? null}
-                      onChange={(template) => {
-                        if (template === null) {
+                      onChange={(page) => {
+                        if (page === null) {
                           clearTemplate();
                           // if user has not updated the content, then just overwrite everything
                         } else if (formInputs.contentText?.length === 0) {
-                          applyTemplate(template.id);
+                          applyTemplate(page.id);
                         } else {
                           // set value to trigger a prompt
-                          setSelectedProposalTemplateId(template?.id ?? null);
+                          setSelectedProposalTemplateId(page.id);
                         }
                       }}
                     />
@@ -310,8 +299,6 @@ export function NewProposalPage({
               </>
             )}
             <ProposalPropertiesBase
-              isFromTemplate={isFromTemplateSource}
-              readOnlyCategory={isFromTemplateSource}
               proposalStatus='draft'
               proposalFormInputs={formInputs}
               setProposalFormInputs={setFormInputs}
@@ -323,14 +310,13 @@ export function NewProposalPage({
       {currentSpace && (
         <PageSidebar
           isUnpublishedProposal
-          readOnlyReviewers={readOnlyReviewers}
-          readOnlyRubricCriteria={readOnlyRubricCriteria}
           id='page-action-sidebar'
           spaceId={currentSpace.id}
           sidebarView={internalSidebarView || null}
           closeSidebar={() => {}}
           openSidebar={setActiveView}
           proposalInput={formInputs}
+          proposalTemplateId={formInputs.proposalTemplateId}
           onChangeEvaluation={(evaluationId, updates) => {
             const evaluations = formInputs.evaluations.map((e) => (e.id === evaluationId ? { ...e, ...updates } : e));
             setFormInputs({
@@ -338,7 +324,7 @@ export function NewProposalPage({
               evaluations
             });
           }}
-          onChangeWorkflow={selectEvaluationWorkflow}
+          onChangeWorkflow={applyWorkflow}
         />
       )}
     </>
@@ -353,19 +339,18 @@ export function NewProposalPage({
     }
   }, []);
 
-  // populate workflow if not set and template is not selected
   useEffect(() => {
-    if (workflowOptions?.length && !formInputs.workflowId && !templateIdFromUrl) {
-      selectEvaluationWorkflow(workflowOptions[0]);
+    if (!isLoadingTemplates && !isLoadingWorkflows) {
+      // populate with template if selected
+      if (templateIdFromUrl) {
+        applyTemplate(templateIdFromUrl);
+      }
+      // populate workflow if not set and template is not selected
+      else if (workflowOptions?.length) {
+        applyWorkflow(workflowOptions[0]);
+      }
     }
-  }, [!!workflowOptions]);
-
-  // populate with template if selected
-  useEffect(() => {
-    if (templateIdFromUrl && !isLoadingTemplates) {
-      applyTemplate(templateIdFromUrl);
-    }
-  }, [templateIdFromUrl, isLoadingTemplates]);
+  }, [templateIdFromUrl, isLoadingTemplates, isLoadingWorkflows]);
 
   // Keep the formAnswers in sync with the formFields using a ref as charmEditor fields uses the initial field value
   const formAnswersRef = useRef(formInputs.formAnswers);
@@ -380,7 +365,7 @@ export function NewProposalPage({
         <Box className={`document-print-container ${fontClassName}`} display='flex' flexDirection='column'>
           <PageTemplateBanner pageType={formInputs.type} isNewPage proposalType={formInputs.proposalType} />
           {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
-          <StyledContainer data-test='page-charmeditor' top={0} fullWidth={isSmallScreen}>
+          <StyledContainer data-test='page-charmeditor' top={defaultPageTop} fullWidth={isSmallScreen}>
             <Box minHeight={450}>
               {isStructured ? (
                 <>
@@ -425,10 +410,10 @@ export function NewProposalPage({
                   containerWidth={containerWidth}
                   pageType='proposal'
                   disableNestedPages
-                  onContentChange={updateProposalContent}
+                  onContentChange={applyProposalContent}
                   focusOnInit
                   isContentControlled
-                  key={`${String(formInputs.proposalTemplateId)}.${readOnlyEditor}`}
+                  key={`${String(formInputs.proposalTemplateId)}`}
                 >
                   {/* temporary? disable editing of page title when in suggestion mode */}
                   {proposalPageContent}

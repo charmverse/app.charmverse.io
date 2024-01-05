@@ -19,6 +19,7 @@ export function createMockPage(input: Partial<PageWithContent> = {}): PageWithCo
     galleryImage: null,
     hasContent: false,
     updatedAt: new Date(),
+    sourceTemplateId: null,
     updatedBy: '',
     headerImage: null,
     icon: null,

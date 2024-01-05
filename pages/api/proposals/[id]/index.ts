@@ -51,7 +51,6 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
         }
       },
       authors: true,
-      category: true,
       page: { select: { id: true, sourceTemplateId: true, type: true } },
       reviewers: true,
       rewards: true,
@@ -107,7 +106,7 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const { publishToLens, authors, reviewers, categoryId, evaluationType, fields } = req.body as UpdateProposalRequest;
+  const { publishToLens, authors, fields } = req.body as UpdateProposalRequest;
 
   const proposal = await prisma.proposal.findUnique({
     where: {
@@ -151,52 +150,9 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
     throw new ActionNotPermittedError(`You can't update this proposal.`);
   }
 
-  // We want to filter out only new reviewers so that we don't affect existing proposals
-  if (proposal.page?.type === 'proposal' && (reviewers?.length || 0) > 0) {
-    const newReviewers = (reviewers ?? []).filter(
-      (updatedReviewer) =>
-        !proposal.reviewers.some((proposalReviewer) => {
-          return updatedReviewer.group === 'role'
-            ? proposalReviewer.roleId === updatedReviewer.id
-            : proposalReviewer.userId === updatedReviewer.id;
-        })
-    );
-    if (newReviewers.length > 0) {
-      const reviewerPool = await req.basePermissionsClient.proposals.getProposalReviewerPool({
-        resourceId: proposal.categoryId as string
-      });
-      for (const reviewer of newReviewers) {
-        if (reviewer.group === 'role' && !reviewerPool.roleIds.includes(reviewer.id)) {
-          const role = await prisma.role.findUnique({
-            where: {
-              id: reviewer.id
-            },
-            select: {
-              name: true
-            }
-          });
-          throw new InsecureOperationError(`${role?.name} role cannot be added as a reviewer to this proposal`);
-        } else if (reviewer.group === 'user' && !reviewerPool.userIds.includes(reviewer.id)) {
-          const user = await prisma.user.findUnique({
-            where: {
-              id: reviewer.id
-            },
-            select: {
-              username: true
-            }
-          });
-          throw new InsecureOperationError(`User ${user?.username} cannot be added as a reviewer to this proposal`);
-        }
-      }
-    }
-  }
-
   await updateProposal({
     proposalId: proposal.id,
     authors,
-    reviewers,
-    categoryId,
-    evaluationType,
     publishToLens,
     fields
   });
