@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { mutate } from 'swr';
 
-import { useGoBackToStep, useUpdateProposalStatusOnly } from 'charmClient/hooks/proposals';
+import { useGoBackToStep } from 'charmClient/hooks/proposals';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPropertyOption } from 'lib/focalboard/board';
@@ -35,7 +35,6 @@ export function ProposalStepSelect({
   spaceId: string;
   readOnly: boolean;
 }) {
-  const { trigger: updateProposalStatusOnly } = useUpdateProposalStatusOnly({ proposalId: proposal.id });
   const { trigger: goBackToStep } = useGoBackToStep({ proposalId: proposal.id });
   const currentEvaluationStep = proposal.currentStep.step;
   const currentEvaluationResult = proposal.currentStep.result;
