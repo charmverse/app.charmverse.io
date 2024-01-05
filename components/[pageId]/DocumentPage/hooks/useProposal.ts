@@ -7,6 +7,7 @@ import {
   useUpdateWorkflow
 } from 'charmClient/hooks/proposals';
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationStepSettings';
+import { useSnackbar } from 'hooks/useSnackbar';
 
 export function useProposal({ proposalId }: { proposalId?: string | null }) {
   const { data: proposal, mutate: refreshProposal } = useGetProposalDetails(proposalId);

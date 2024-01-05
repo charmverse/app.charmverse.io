@@ -28,16 +28,22 @@ export async function updateProposalWorkflow({ proposalId, workflowId }: UpdateW
         proposalId
       }
     });
-    await tx.proposalEvaluation.createMany({
-      data: typedWorkflow.evaluations.map((evaluation, index) => ({
-        proposalId,
-        index,
-        title: evaluation.title,
-        type: evaluation.type,
-        permissions: {
-          create: evaluation.permissions
+    // prisma does not support nested createMany
+    for (let index = 0; index < typedWorkflow.evaluations.length; index++) {
+      const evaluation = typedWorkflow.evaluations[index];
+      await tx.proposalEvaluation.create({
+        data: {
+          proposalId,
+          index,
+          title: evaluation.title,
+          type: evaluation.type,
+          permissions: {
+            createMany: {
+              data: evaluation.permissions
+            }
+          }
         }
-      }))
-    });
+      });
+    }
   });
 }
