@@ -3,9 +3,48 @@ import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 
 import { createVote, generateBounty } from 'testing/setupDatabase';
 
-import { goBackToEvaluationStep } from '../goBackToEvaluationStep';
+import { goBackToStep } from '../goBackToStep';
 
-describe('goBackToEvaluationStep()', () => {
+describe('goBackToStep()', () => {
+  it('should return a proposal to draft state', async () => {
+    const { space, user } = await testUtilsUser.generateUserAndSpace();
+
+    const proposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: user.id,
+      proposalStatus: 'published',
+      evaluationInputs: [
+        {
+          evaluationType: 'feedback',
+          title: 'Feedback',
+          result: 'pass',
+          reviewers: [],
+          permissions: []
+        }
+      ]
+    });
+
+    await goBackToStep({
+      proposalId: proposal.id,
+      evaluationId: 'draft'
+    });
+
+    const updated = await prisma.proposal.findUniqueOrThrow({
+      where: {
+        id: proposal.id
+      },
+      include: {
+        evaluations: {
+          orderBy: {
+            index: 'asc'
+          }
+        }
+      }
+    });
+    expect(updated.status).toBe('draft');
+    expect(updated.evaluations[0].result).toBe(null);
+  });
+
   it('should clear the result from the step', async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace();
 
@@ -24,7 +63,7 @@ describe('goBackToEvaluationStep()', () => {
       ]
     });
 
-    await goBackToEvaluationStep({
+    await goBackToStep({
       proposalId: proposal.id,
       evaluationId: proposal.evaluations[0].id
     });
@@ -41,6 +80,7 @@ describe('goBackToEvaluationStep()', () => {
         }
       }
     });
+    expect(updated.status).toBe('published');
     expect(updated.evaluations[0].result).toBe(null);
   });
 
@@ -70,7 +110,7 @@ describe('goBackToEvaluationStep()', () => {
       ]
     });
 
-    await goBackToEvaluationStep({
+    await goBackToStep({
       proposalId: proposal.id,
       evaluationId: proposal.evaluations[0].id
     });
@@ -119,7 +159,7 @@ describe('goBackToEvaluationStep()', () => {
       ]
     });
 
-    await goBackToEvaluationStep({
+    await goBackToStep({
       proposalId: proposal.id,
       // go back to 'feedback' step
       evaluationId: proposal.evaluations[0].id
@@ -176,7 +216,7 @@ describe('goBackToEvaluationStep()', () => {
       ]
     });
 
-    await goBackToEvaluationStep({
+    await goBackToStep({
       proposalId: proposal.id,
       // go back to 'feedback' step
       evaluationId: proposal.evaluations[0].id
@@ -228,7 +268,7 @@ describe('goBackToEvaluationStep()', () => {
     });
 
     await expect(
-      goBackToEvaluationStep({
+      goBackToStep({
         proposalId: proposal.id,
         // go back to 'feedback' step
         evaluationId: proposal.evaluations[0].id
@@ -266,7 +306,7 @@ describe('goBackToEvaluationStep()', () => {
     });
 
     await expect(
-      goBackToEvaluationStep({
+      goBackToStep({
         proposalId: proposal.id,
         // go back to 'feedback' step
         evaluationId: proposal.evaluations[0].id
