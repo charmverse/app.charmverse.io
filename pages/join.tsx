@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 
 import { useSearchByDomain } from 'charmClient/hooks/spaces';
+import { useGetTokenGates } from 'charmClient/hooks/tokenGates';
 import { getLayout as getBaseLayout } from 'components/common/BaseLayout/getLayout';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -41,7 +42,8 @@ export default function JoinWorkspace() {
   const domain = router.query.domain as string;
   const { spaces } = useSpaces();
   const [isRouterReady, setRouterReady] = useState(false);
-  const { data: spaceFromPath, isLoading: isSpaceLoading, error: spaceError } = useSearchByDomain(domain);
+  const { data: spaceFromPath, isLoading: isSpaceLoading, error: spaceError, mutate } = useSearchByDomain(domain);
+  const { data: tokenGates, isLoading: isLoadingTokenGates } = useGetTokenGates('', domain);
 
   useEffect(() => {
     const connectedSpace = filterSpaceByDomain(spaces, domain);
@@ -57,6 +59,21 @@ export default function JoinWorkspace() {
     }
   }, [router.isReady]);
 
+  useEffect(() => {
+    // Update token gate details with image and names
+    if (tokenGates && tokenGates?.length > 0) {
+      mutate((_space) => {
+        if (_space) {
+          return {
+            ..._space,
+            tokenGates
+          };
+        }
+        return undefined;
+      });
+    }
+  }, [!!tokenGates]);
+
   const spaceFromPathNotFound = domain && !isSpaceLoading && !spaceFromPath;
 
   return (
@@ -64,9 +81,11 @@ export default function JoinWorkspace() {
       <Card sx={{ p: 4, mb: 3 }} variant='outlined'>
         <DialogTitle>Join space</DialogTitle>
         <Divider />
-        {domain && isSpaceLoading && <LoadingComponent height='80px' isLoading={true} />}
-        {domain && !isSpaceLoading && spaceError && <Alert severity='error'>No space found</Alert>}
-        {domain && spaceFromPath && <SpaceAccessGate space={spaceFromPath} />}
+        {domain && (isSpaceLoading || isLoadingTokenGates) && <LoadingComponent height='80px' isLoading={true} />}
+        {domain && (!isSpaceLoading || !isLoadingTokenGates) && spaceError && (
+          <Alert severity='error'>No space found</Alert>
+        )}
+        {domain && spaceFromPath && tokenGates && <SpaceAccessGate space={spaceFromPath} />}
         {isRouterReady && (spaceFromPathNotFound || !domain) && <SpaceAccessGateWithSearch defaultValue={domain} />}
       </Card>
       <AlternateRouteButton href={`${getAppUrl()}createSpace`}>Create a space</AlternateRouteButton>

@@ -9,8 +9,8 @@ import type { TokenGate, TokenGateWithRoles, TokenGateConditions } from 'lib/tok
 
 import { useDELETE, useGET, usePOST, usePUT } from './helpers';
 
-export function useGetTokenGates(spaceId: string) {
-  return useGET<TokenGateWithRoles[]>(spaceId ? '/api/token-gates' : null, { spaceId });
+export function useGetTokenGates(spaceId: string, spaceDomain?: string) {
+  return useGET<TokenGateWithRoles[]>(spaceId ? '/api/token-gates' : null, { spaceId, spaceDomain });
 }
 
 export function useCreateTokenGate() {
