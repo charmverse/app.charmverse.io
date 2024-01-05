@@ -26,7 +26,7 @@ import {
   PROPOSAL_STATUS_BLOCK_ID
 } from 'lib/proposal/blocks/constants';
 import type { ProposalPropertyValue } from 'lib/proposal/blocks/interfaces';
-import type { ProposalFields, ProposalWithUsersLite, ProposalWithUsers } from 'lib/proposal/interface';
+import type { ProposalFields, ProposalWithUsersLite } from 'lib/proposal/interface';
 
 export type BoardProposal = { spaceId?: string; id?: string; fields: ProposalFields | null };
 
@@ -42,9 +42,20 @@ export function useProposalsBoardAdapter() {
 
   const localViewSettings = useLocalDbViewSettings(`proposals-${space?.id}-${DEFAULT_VIEW_BLOCK_ID}`);
 
+  const evaluationStepTitles = useMemo(() => {
+    const _evaluationStepTitles: Set<string> = new Set();
+    proposals?.forEach((p) => {
+      p.evaluations.forEach((e) => {
+        _evaluationStepTitles.add(e.title);
+      });
+    });
+    return Array.from(_evaluationStepTitles);
+  }, [proposals]);
+
   // board with all proposal properties and default properties
   const board: Board = getDefaultBoard({
-    storedBoard: proposalBoardBlock
+    storedBoard: proposalBoardBlock,
+    evaluationStepTitles
   });
 
   const activeView = useMemo(() => {
@@ -52,7 +63,7 @@ export function useProposalsBoardAdapter() {
     const viewBlock = proposalBlocks?.find((b) => b.id === DEFAULT_VIEW_BLOCK_ID);
 
     if (!viewBlock) {
-      return getDefaultTableView({ storedBoard: proposalBoardBlock });
+      return getDefaultTableView({ evaluationStepTitles, storedBoard: proposalBoardBlock });
     }
 
     const boardView = blockToFBBlock(viewBlock) as BoardView;
@@ -63,7 +74,7 @@ export function useProposalsBoardAdapter() {
     }
 
     return boardView;
-  }, [proposalBoardBlock, proposalBlocks]);
+  }, [evaluationStepTitles, proposalBoardBlock, proposalBlocks]);
 
   const cardPages: CardPage[] = useMemo(() => {
     let cards =
@@ -116,7 +127,8 @@ export function useProposalsBoardAdapter() {
 
   const boardCustomProperties: Board = getDefaultBoard({
     storedBoard: proposalBoardBlock,
-    customOnly: true
+    customOnly: true,
+    evaluationStepTitles
   });
 
   // card from current proposal
