@@ -13,10 +13,10 @@ type Props = {
   onChange?: (properties: ProposalFields['properties']) => void;
   readOnly?: boolean;
   readOnlyProperties?: string[];
-  pageId?: string;
+  proposalId?: string;
 };
 
-export function CustomPropertiesAdapter({ proposal, onChange, readOnly, readOnlyProperties, pageId }: Props) {
+export function CustomPropertiesAdapter({ proposal, onChange, readOnly, readOnlyProperties, proposalId }: Props) {
   const { user } = useUser();
   const isAdmin = useIsAdmin();
 
@@ -28,7 +28,7 @@ export function CustomPropertiesAdapter({ proposal, onChange, readOnly, readOnly
   useEffect(() => {
     setBoardProposal({
       ...proposal,
-      id: proposal.id ?? pageId
+      id: proposal.id ?? proposalId
     });
   }, [proposal]);
 
