@@ -38,7 +38,8 @@ export function useProposalsBoardAdapter() {
   const { pages } = usePages();
   const { proposalBoardBlock, proposalBlocks } = useProposalBlocks();
   const proposalPage = pages[boardProposal?.id || ''];
-  const proposal = proposals?.find((p) => p.id === boardProposal?.id) ?? null;
+  const proposalData = proposals?.find((p) => p.id === boardProposal?.id);
+  const proposal = { ...boardProposal, ...proposalData };
 
   const localViewSettings = useLocalDbViewSettings(`proposals-${space?.id}-${DEFAULT_VIEW_BLOCK_ID}`);
 
@@ -133,7 +134,7 @@ export function useProposalsBoardAdapter() {
 
   // card from current proposal
   const card: Card<ProposalPropertyValue> = mapProposalToCardPage({
-    proposal,
+    proposal: proposal as ProposalWithUsersLite,
     proposalPage,
     spaceId: space?.id
   }).card;
@@ -177,7 +178,7 @@ function mapProposalToCardPage({
       proposalPage && 'createdAt' in proposalPage && proposalPage.createdAt
         ? new Date(proposalPage?.createdAt).getTime()
         : '',
-    [PROPOSAL_STATUS_BLOCK_ID]: proposal?.currentStep.result ?? 'in_progress',
+    [PROPOSAL_STATUS_BLOCK_ID]: proposal?.currentStep?.result ?? 'in_progress',
     [AUTHORS_BLOCK_ID]: (proposal && 'authors' in proposal && proposal.authors?.map((a) => a.userId)) || '',
     [PROPOSAL_STEP_BLOCK_ID]: proposal?.currentStep?.title ?? 'Draft',
     [PROPOSAL_REVIEWERS_BLOCK_ID]:

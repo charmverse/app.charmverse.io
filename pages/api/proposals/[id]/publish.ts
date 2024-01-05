@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { onError, onNoMatch, requireUser, ActionNotPermittedError } from 'lib/middleware';
+import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { updateProposalStatusOnly } from 'lib/proposal/updateProposalStatusOnly';
 import { withSessionRoute } from 'lib/session/withSession';
