@@ -7,17 +7,36 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPropertyOption } from 'lib/focalboard/board';
 import type { CardPageProposal } from 'lib/focalboard/card';
 
+export function ProposalStepSelectWithoutProposal({
+  options,
+  currentValue
+}: {
+  options: IPropertyOption[];
+  currentValue?: string;
+}) {
+  return (
+    <TagSelect
+      wrapColumn
+      includeSelectedOptions
+      readOnly
+      options={options}
+      propertyValue={currentValue ?? ''}
+      onChange={() => {}}
+    />
+  );
+}
+
 export function ProposalStepSelect({
   proposal,
   spaceId,
   readOnly
 }: {
-  proposal?: CardPageProposal;
+  proposal: CardPageProposal;
   spaceId: string;
   readOnly: boolean;
 }) {
-  const { trigger: updateProposalStatusOnly } = useUpdateProposalStatusOnly({ proposalId: proposal?.id });
-  const { trigger: clearEvaluationResult } = useClearEvaluationResult({ proposalId: proposal?.id });
+  const { trigger: updateProposalStatusOnly } = useUpdateProposalStatusOnly({ proposalId: proposal.id });
+  const { trigger: clearEvaluationResult } = useClearEvaluationResult({ proposalId: proposal.id });
   const { currentValue, options } = useMemo(() => {
     const _options: IPropertyOption[] = [
       {
@@ -25,12 +44,12 @@ export function ProposalStepSelect({
         value: 'Draft',
         color: 'gray'
       },
-      ...(proposal?.evaluations || []).map((evaluation) => ({
+      ...(proposal.evaluations || []).map((evaluation) => ({
         id: evaluation.id,
         value: evaluation.title,
         color: 'gray'
       })),
-      ...(proposal?.hasRewards
+      ...(proposal.hasRewards
         ? [
             {
               id: 'rewards',
@@ -41,10 +60,10 @@ export function ProposalStepSelect({
         : [])
     ];
     const lastEvaluation = proposal && proposal.evaluations[proposal.evaluations.length - 1];
-    const currentEvaluationId = proposal?.currentEvaluationId;
+    const currentEvaluationId = proposal.currentEvaluationId;
     const currentEvaluationIndex = !currentEvaluationId
       ? 0
-      : currentEvaluationId === lastEvaluation?.id && lastEvaluation?.result === 'pass' && proposal?.hasRewards
+      : currentEvaluationId === lastEvaluation?.id && lastEvaluation?.result === 'pass' && proposal.hasRewards
       ? _options.length - 1
       : _options.findIndex((e) => e.id === currentEvaluationId);
     _options.forEach((option, index) => {
@@ -54,6 +73,7 @@ export function ProposalStepSelect({
   }, [proposal]);
 
   const { showMessage } = useSnackbar();
+
   async function onChange(evaluationId?: string) {
     try {
       if (evaluationId !== 'draft') {

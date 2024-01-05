@@ -2,11 +2,14 @@ import type { FormField } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { objectUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
+import { object } from 'yup';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import {
   PROPOSAL_RESULT_LABELS,
+  PROPOSAL_STATUS_LABELS,
+  PROPOSAL_STEP_LABELS,
   proposalDbProperties,
   proposalResultBoardColors
 } from 'lib/focalboard/proposalDbProperties';
@@ -48,9 +51,34 @@ export async function setDatabaseProposalProperties({ boardId }: { boardId: stri
   });
 
   const formFields = forms.flatMap((p) => p.formFields);
+  const proposals = await prisma.proposal.findMany({
+    where: {
+      spaceId: boardBlock.spaceId
+    },
+    select: {
+      evaluations: {
+        select: {
+          title: true
+        }
+      }
+    }
+  });
+
+  const evaluationStepTitles: Set<string> = new Set();
+
+  proposals.forEach((p) => {
+    p.evaluations.forEach((e) => {
+      evaluationStepTitles.add(e.title);
+    });
+  });
 
   const spaceUsesRubrics = rubricProposals > 0;
-  const boardProperties = getBoardProperties({ formFields, boardBlock, spaceUsesRubrics });
+  const boardProperties = getBoardProperties({
+    evaluationStepTitles: Array.from(evaluationStepTitles),
+    formFields,
+    boardBlock,
+    spaceUsesRubrics
+  });
 
   return prisma.block.update({
     where: {
@@ -68,8 +96,10 @@ export async function setDatabaseProposalProperties({ boardId }: { boardId: stri
 export function getBoardProperties({
   boardBlock,
   spaceUsesRubrics,
-  formFields = []
+  formFields = [],
+  evaluationStepTitles = []
 }: {
+  evaluationStepTitles?: string[];
   boardBlock: Board;
   spaceUsesRubrics: boolean;
   formFields?: FormField[];
@@ -78,7 +108,8 @@ export function getBoardProperties({
 
   const statusProp = generateUpdatedProposalStatusProperty({ boardProperties });
   const proposalUrlProp = generateUpdatedProposalUrlProperty({ boardProperties });
-  const stepProp = generateUpdatedProposalStepProperty({ boardProperties });
+  const proposalEvaluationTypeProp = generateUpdatedProposalEvaluationTypeProperty({ boardProperties });
+  const stepProp = generateUpdatedProposalStepProperty({ boardProperties, evaluationStepTitles });
 
   const existingStatusPropIndex = boardProperties.findIndex((p) => p.type === 'proposalStatus');
 
@@ -94,6 +125,21 @@ export function getBoardProperties({
     boardProperties[existingUrlPropIndex] = proposalUrlProp;
   } else {
     boardProperties.push(proposalUrlProp);
+  }
+
+  const existingEvaluationTypePropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluationType');
+  const existingStepPropIndex = boardProperties.findIndex((p) => p.type === 'proposalStep');
+
+  if (existingEvaluationTypePropIndex > -1) {
+    boardProperties[existingEvaluationTypePropIndex] = proposalEvaluationTypeProp;
+  } else {
+    boardProperties.push(proposalEvaluationTypeProp);
+  }
+
+  if (existingStepPropIndex > -1) {
+    boardProperties[existingStepPropIndex] = stepProp;
+  } else {
+    boardProperties.push(stepProp);
   }
 
   if (spaceUsesRubrics) {
@@ -189,31 +235,53 @@ export function getBoardProperties({
   return boardProperties;
 }
 
-function generateUpdatedProposalStepProperty({ boardProperties }: { boardProperties: IPropertyTemplate[] }) {
+function generateUpdatedProposalStepProperty({
+  boardProperties,
+  evaluationStepTitles
+}: {
+  evaluationStepTitles: string[];
+  boardProperties: IPropertyTemplate[];
+}) {
   // We will mutate and return this property
-  const proposalStatusProp = {
-    ...(boardProperties.find((p) => p.type === 'proposalStatus') ?? {
-      ...proposalDbProperties.proposalStatus(),
+  const proposalStepProp = {
+    ...(boardProperties.find((p) => p.type === 'proposalStep') ?? {
+      ...proposalDbProperties.proposalStep(),
+      id: uuid(),
+      options: ['Draft', 'Rewards', ...evaluationStepTitles].map((title) => ({
+        color: 'propColorGray',
+        id: title,
+        value: title
+      }))
+    })
+  };
+
+  return proposalStepProp;
+}
+
+function generateUpdatedProposalEvaluationTypeProperty({ boardProperties }: { boardProperties: IPropertyTemplate[] }) {
+  const proposalEvaluationTypeProp = {
+    ...(boardProperties.find((p) => p.type === 'proposalEvaluationType') ?? {
+      ...proposalDbProperties.proposalEvaluationType(),
       id: uuid()
     })
   };
 
-  if (proposalStatusProp) {
-    [...objectUtils.typedKeys(PROPOSAL_RESULT_LABELS)].forEach((status) => {
-      const existingOption = proposalStatusProp.options.find((opt) => opt.value === status);
+  if (proposalEvaluationTypeProp) {
+    objectUtils.typedKeys(PROPOSAL_STEP_LABELS).forEach((evaluationType) => {
+      const existingOption = proposalEvaluationTypeProp.options.find((opt) => opt.value === evaluationType);
       if (!existingOption) {
-        proposalStatusProp.options.push({
-          color: proposalResultBoardColors[status],
+        proposalEvaluationTypeProp.options.push({
+          color: 'propColorGray',
           id: uuid(),
-          value: status
+          value: evaluationType
         });
       }
     });
 
-    return proposalStatusProp;
+    return proposalEvaluationTypeProp;
   }
 
-  return proposalStatusProp;
+  return proposalEvaluationTypeProp;
 }
 
 function generateUpdatedProposalStatusProperty({ boardProperties }: { boardProperties: IPropertyTemplate[] }) {

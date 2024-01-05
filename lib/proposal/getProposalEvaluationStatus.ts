@@ -2,7 +2,7 @@ import type { ProposalEvaluation, ProposalStatus } from '@charmverse/core/prisma
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
 import type { ProposalStep } from './getCurrentStep';
-import type { ProposalEvaluationStatus } from './interface';
+import type { ProposalEvaluationResultExtended, ProposalEvaluationStatus, ProposalEvaluationStep } from './interface';
 
 /**
  * find the first evaluation that does not have a result
@@ -31,24 +31,26 @@ export function getOldProposalStatus({
 }
 
 export function getProposalEvaluationStatus({
-  proposalStep
+  step,
+  result
 }: {
-  proposalStep: ProposalStep;
+  step: ProposalEvaluationStep;
+  result: ProposalEvaluationResultExtended;
 }): ProposalEvaluationStatus {
-  if (proposalStep.step === 'draft') {
+  if (step === 'draft') {
     return 'unpublished';
-  } else if (proposalStep.step === 'feedback') {
-    return proposalStep.result === null ? 'in_progress' : 'complete';
-  } else if (proposalStep.step === 'pass_fail' || proposalStep.step === 'rubric' || proposalStep.step === 'vote') {
-    if (proposalStep.result === null) {
+  } else if (step === 'feedback') {
+    return result === null ? 'in_progress' : 'complete';
+  } else if (step === 'pass_fail' || step === 'rubric' || step === 'vote') {
+    if (result === null) {
       return 'in_progress';
-    } else if (proposalStep.result === 'fail') {
+    } else if (result === 'fail') {
       return 'declined';
-    } else if (proposalStep.result === 'pass') {
+    } else if (result === 'pass') {
       return 'passed';
     }
-  } else if (proposalStep.step === 'rewards') {
-    return proposalStep.result === null ? 'unpublished' : 'published';
+  } else if (step === 'rewards') {
+    return result === null ? 'unpublished' : 'published';
   }
 
   return 'in_progress';

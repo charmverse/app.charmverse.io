@@ -10,46 +10,40 @@ import { TagSelect } from 'components/common/BoardEditor/components/properties/T
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPropertyOption } from 'lib/focalboard/board';
 import type { CardPageProposal } from 'lib/focalboard/card';
-import { PROPOSAL_STATUS_LABELS, PROPOSAL_STATUS_VERB_LABELS } from 'lib/focalboard/proposalDbProperties';
+import {
+  PROPOSAL_STATUS_LABELS,
+  PROPOSAL_STATUS_VERB_LABELS,
+  proposalStatusColors
+} from 'lib/focalboard/proposalDbProperties';
 import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
 import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
-import type { BrandColor } from 'theme/colors';
-
-const statusColors: Record<ProposalEvaluationStatus, BrandColor> = {
-  complete: 'green',
-  declined: 'red',
-  in_progress: 'yellow',
-  passed: 'green',
-  published: 'green',
-  unpublished: 'gray'
-};
 
 export function ProposalStatusSelect({
   proposal,
   spaceId,
   readOnly
 }: {
-  proposal?: CardPageProposal;
+  proposal: CardPageProposal;
   spaceId: string;
   readOnly?: boolean;
 }) {
-  const { trigger: submitEvaluationResult } = useSubmitEvaluationResult({ proposalId: proposal?.id });
-  const currentEvaluationStep = proposal?.currentStep.step;
-  const currentEvaluationId = proposal?.currentEvaluationId;
-  const { trigger: updateProposalStatusOnly } = useUpdateProposalStatusOnly({ proposalId: proposal?.id });
-  const { trigger: createProposalRewards } = useCreateProposalRewards(proposal?.id);
+  const { trigger: submitEvaluationResult } = useSubmitEvaluationResult({ proposalId: proposal.id });
+  const currentEvaluationStep = proposal.currentStep.step;
+  const currentEvaluationId = proposal.currentEvaluationId;
+  const { trigger: updateProposalStatusOnly } = useUpdateProposalStatusOnly({ proposalId: proposal.id });
+  const { trigger: createProposalRewards } = useCreateProposalRewards(proposal.id);
   const { showMessage } = useSnackbar();
 
   const statusOptions: ProposalEvaluationStatus[] = useMemo(() => {
     if (currentEvaluationStep === 'draft') {
-      return ['unpublished', 'published'];
+      return ['published'];
     } else if (currentEvaluationStep === 'rewards') {
-      return ['unpublished', 'published'];
+      return ['published'];
     } else if (currentEvaluationStep === 'feedback') {
-      return ['in_progress', 'complete'];
+      return ['complete'];
     } else {
       // for vote, rubric, pass_fail, etc
-      return ['in_progress', 'passed', 'declined'];
+      return ['passed', 'declined'];
     }
     return [];
   }, [currentEvaluationStep]);
@@ -80,7 +74,7 @@ export function ProposalStatusSelect({
     id: status,
     value: PROPOSAL_STATUS_LABELS[status],
     dropdownValue: PROPOSAL_STATUS_VERB_LABELS[status as ProposalEvaluationStatus],
-    color: statusColors[status]
+    color: proposalStatusColors[status]
   }));
 
   return (
@@ -91,7 +85,8 @@ export function ProposalStatusSelect({
       propertyValue={
         proposal
           ? getProposalEvaluationStatus({
-              proposalStep: proposal.currentStep
+              result: proposal.currentStep.result ?? 'in_progress',
+              step: proposal.currentStep.step
             })
           : ''
       }

@@ -1,4 +1,3 @@
-import type { ProposalEvaluationResult } from '@charmverse/core/dist/cjs/prisma-client';
 import { v4 as uuid } from 'uuid';
 
 import type { DatabaseProposalPropertyType, IPropertyTemplate } from 'lib/focalboard/board';
@@ -8,6 +7,7 @@ import type {
   ProposalEvaluationStatus,
   ProposalEvaluationStep
 } from 'lib/proposal/interface';
+import type { BrandColor } from 'theme/colors';
 
 export const proposalDbProperties: {
   [key in DatabaseProposalPropertyType]: (id?: string, name?: string) => IPropertyTemplate;
@@ -123,4 +123,13 @@ export const proposalResultBoardColors: Record<
   fail: 'propColorRed',
   in_progress: 'propColorYellow',
   pass: 'propColorGreen'
+};
+
+export const proposalStatusColors: Record<ProposalEvaluationStatus, BrandColor> = {
+  complete: 'green',
+  declined: 'red',
+  in_progress: 'yellow',
+  passed: 'green',
+  published: 'green',
+  unpublished: 'gray'
 };

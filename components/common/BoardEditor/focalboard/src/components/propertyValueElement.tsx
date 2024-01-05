@@ -1,4 +1,4 @@
-import type { ApplicationStatus, ProposalSystemRole } from '@charmverse/core/prisma';
+import type { ApplicationStatus, ProposalEvaluationResult, ProposalSystemRole } from '@charmverse/core/prisma';
 import PersonIcon from '@mui/icons-material/Person';
 import { Box, Link, Stack } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
@@ -32,9 +32,14 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board, DatabaseProposalPropertyType, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card, CardPage } from 'lib/focalboard/card';
-import { PROPOSAL_STATUS_LABELS } from 'lib/focalboard/proposalDbProperties';
+import {
+  PROPOSAL_STATUS_LABELS,
+  PROPOSAL_STEP_LABELS,
+  proposalStatusColors
+} from 'lib/focalboard/proposalDbProperties';
 import { PROPOSAL_STATUS_BLOCK_ID, PROPOSAL_STEP_BLOCK_ID } from 'lib/proposal/blocks/constants';
 import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
+import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from 'lib/proposal/interface';
 import {
   REWARDS_APPLICANTS_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
@@ -192,10 +197,66 @@ function PropertyValueElement(props: Props) {
   // Proposals as datasource use proposalStatus column, whereas the actual proposals table uses STATUS_BLOCK_ID
   // We should migrate over the proposals as datasource blocks to the same format as proposals table
   else if (propertyTemplate.type === 'proposalStatus' || propertyTemplate.id === PROPOSAL_STATUS_BLOCK_ID) {
-    return <ProposalStatusSelect proposal={proposal} spaceId={card.spaceId} readOnly={!isAdmin} />;
+    if (proposal) {
+      return <ProposalStatusSelect proposal={proposal} spaceId={card.spaceId} readOnly={!isAdmin} />;
+    }
+
+    const evaluationTypeProperty = board.fields.cardProperties.find(
+      (cardProperty) => cardProperty.type === 'proposalEvaluationType'
+    );
+    const evaluationType = card.fields.properties[evaluationTypeProperty?.id ?? ''] as ProposalEvaluationStep;
+    const proposalEvaluationStatus = getProposalEvaluationStatus({
+      result: propertyValue as ProposalEvaluationResultExtended,
+      step: evaluationType
+    });
+
+    return (
+      <TagSelect
+        wrapColumn
+        readOnly
+        options={[
+          {
+            color: proposalStatusColors[proposalEvaluationStatus],
+            id: proposalEvaluationStatus,
+            value: PROPOSAL_STATUS_LABELS[proposalEvaluationStatus]
+          }
+        ]}
+        propertyValue={proposalEvaluationStatus}
+        onChange={() => {}}
+      />
+    );
   } else if (propertyTemplate.type === 'proposalStep' || propertyTemplate.id === PROPOSAL_STEP_BLOCK_ID) {
+    if (!proposal) {
+      return (
+        <TagSelect
+          wrapColumn
+          includeSelectedOptions
+          readOnly
+          options={propertyTemplate.options}
+          propertyValue={(propertyValue as string) ?? ''}
+          onChange={() => {}}
+        />
+      );
+    }
     return <ProposalStepSelect readOnly={!isAdmin} proposal={proposal} spaceId={card.spaceId} />;
     // return <ProposalStepChipTextOnly label={proposal?.currentStep?.title ?? (propertyValue as string)} />;
+  } else if (propertyTemplate.type === 'proposalEvaluationType') {
+    return (
+      <TagSelect
+        wrapColumn
+        includeSelectedOptions
+        readOnly
+        options={[
+          {
+            color: 'gray',
+            id: propertyValue as string,
+            value: PROPOSAL_STEP_LABELS[propertyValue as ProposalEvaluationStep]
+          }
+        ]}
+        propertyValue={propertyValue as string}
+        onChange={() => {}}
+      />
+    );
   } else if (propertyTemplate.id === REWARD_PROPOSAL_LINK) {
     if (!Array.isArray(propertyValue) || !propertyValue.length || !propertyValue[0]) {
       return null;
@@ -225,11 +286,7 @@ function PropertyValueElement(props: Props) {
         value={propertyValue as any}
       />
     );
-  } else if (
-    propertyTemplate.type === 'select' ||
-    propertyTemplate.type === 'multiSelect' ||
-    propertyTemplate.type === 'proposalEvaluationType'
-  ) {
+  } else if (propertyTemplate.type === 'select' || propertyTemplate.type === 'multiSelect') {
     propertyValueElement = (
       <TagSelect
         data-test='closed-select-input'

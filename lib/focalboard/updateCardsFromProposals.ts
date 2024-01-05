@@ -213,7 +213,8 @@ export async function updateCardsFromProposals({
 
     const proposalEvaluationStatus = currentStep
       ? getProposalEvaluationStatus({
-          proposalStep: currentStep
+          result: currentStep.result ?? 'in_progress',
+          step: currentStep.step
         })
       : null;
 

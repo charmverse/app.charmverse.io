@@ -202,17 +202,25 @@ export async function createCardsFromProposals({
     if (proposalProps.proposalUrl) {
       properties[proposalProps.proposalUrl.id] = pageProposal.path;
     }
-    if (pageProposal.proposal && proposalProps.proposalStatus) {
-      const currentStep = getCurrentStep({
-        evaluations: pageProposal.proposal.evaluations,
-        hasPendingRewards: ((pageProposal.proposal.fields as ProposalFields)?.pendingRewards ?? []).length > 0,
-        proposalStatus: pageProposal.proposal.status,
-        hasPublishedRewards: pageProposal.proposal.rewards.length > 0
-      });
+    const currentStep = pageProposal.proposal
+      ? getCurrentStep({
+          evaluations: pageProposal.proposal.evaluations,
+          hasPendingRewards: ((pageProposal.proposal.fields as ProposalFields)?.pendingRewards ?? []).length > 0,
+          proposalStatus: pageProposal.proposal.status,
+          hasPublishedRewards: pageProposal.proposal.rewards.length > 0
+        })
+      : null;
 
-      properties[proposalProps.proposalStatus.id] = getProposalEvaluationStatus({
-        proposalStep: currentStep
-      });
+    if (currentStep && proposalProps.proposalStatus) {
+      properties[proposalProps.proposalStatus.id] = currentStep.result ?? 'in_progress';
+    }
+
+    if (currentStep && proposalProps.proposalEvaluationType) {
+      properties[proposalProps.proposalEvaluationType.id] = currentStep.step;
+    }
+
+    if (currentStep && proposalProps.proposalStep) {
+      properties[proposalProps.proposalStep.id] = currentStep.title;
     }
 
     const formFields = pageProposal.proposal?.form?.formFields ?? [];
