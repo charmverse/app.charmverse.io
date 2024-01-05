@@ -20,8 +20,6 @@ beforeAll(async () => {
 
   authorCookie = await loginUser(author.id);
 
-  reviewerCookie = await loginUser(reviewer.id);
-
   await prisma.spaceRole.create({
     data: {
       spaceId: space.id,
