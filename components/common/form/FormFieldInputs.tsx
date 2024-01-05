@@ -1,14 +1,13 @@
 import type { FormField } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
-import { Box, Chip, Stack } from '@mui/material';
-import { useState } from 'react';
+import { Chip, Stack } from '@mui/material';
+import { useEffect, useState } from 'react';
 import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
+import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-
-import { Button } from '../Button';
 
 import { fieldTypePlaceholderRecord } from './constants';
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
@@ -88,29 +87,35 @@ function FormFieldInputsBase({
   errors,
   onFormChange
 }: FormFieldInputsProps) {
-  const [isUpdatingFormFieldAnswers, setIsUpdatingFormFieldAnswers] = useState(false);
   const [isFormDirty, setIsFormDirty] = useState(false);
   const { showMessage } = useSnackbar();
 
+  const debouncedValues = useDebouncedValue(values, 300);
+  const hasErrors = Object.keys(errors).length !== 0;
+
   async function saveFormFieldAnswers() {
-    setIsUpdatingFormFieldAnswers(true);
+    if (hasErrors) {
+      showMessage('Your form contains errors and cannot be saved.', 'error');
+      return;
+    }
+
+    if (!onSave || disabled || !isFormDirty) return;
+
     try {
       await onSave?.(Object.entries(values ?? {}).map(([id, value]) => ({ id, value })));
-      showMessage('Answers saved successfully');
-    } catch (_) {
-      //
+    } catch (e: any) {
+      showMessage(e.message, 'error');
     } finally {
       setIsFormDirty(false);
-      setIsUpdatingFormFieldAnswers(false);
     }
   }
 
-  const disabledTooltip =
-    Object.keys(errors).length !== 0
-      ? 'Please fix the errors before saving'
-      : !isFormDirty
-      ? 'No changes to save'
-      : undefined;
+  useEffect(() => {
+    // auto-save form fields if the form is dirty and there are no errors
+    if (debouncedValues) {
+      saveFormFieldAnswers();
+    }
+  }, [debouncedValues]);
 
   return (
     <Stack gap={1} mb={15}>
@@ -148,23 +153,6 @@ function FormFieldInputsBase({
           />
         ))}
       </FormFieldInputsContainer>
-      {onSave && !disabled && (
-        <Box
-          sx={{
-            width: 'fit-content'
-          }}
-        >
-          <Button
-            data-test='form-fields-answers-save-button'
-            onClick={saveFormFieldAnswers}
-            disabledTooltip={disabledTooltip}
-            loading={isUpdatingFormFieldAnswers}
-            disabled={!!disabledTooltip}
-          >
-            Save
-          </Button>
-        </Box>
-      )}
     </Stack>
   );
 }
