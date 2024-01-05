@@ -73,6 +73,7 @@ export async function createCardsFromProposals({
           status: true,
           evaluations: {
             select: {
+              id: true,
               title: true,
               index: true,
               result: true,

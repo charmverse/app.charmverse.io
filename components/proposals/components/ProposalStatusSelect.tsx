@@ -29,6 +29,7 @@ export function ProposalStatusSelect({
 }) {
   const { trigger: submitEvaluationResult } = useSubmitEvaluationResult({ proposalId: proposal.id });
   const currentEvaluationStep = proposal.currentStep.step;
+  const currentEvaluationResult = proposal.currentStep.result;
   const currentEvaluationId = proposal.currentEvaluationId;
   const { trigger: updateProposalStatusOnly } = useUpdateProposalStatusOnly({ proposalId: proposal.id });
   const { trigger: createProposalRewards } = useCreateProposalRewards(proposal.id);
@@ -38,7 +39,7 @@ export function ProposalStatusSelect({
     if (currentEvaluationStep === 'draft') {
       return ['published', 'unpublished'];
     } else if (currentEvaluationStep === 'rewards') {
-      return ['published'];
+      return ['published', 'unpublished'];
     } else if (currentEvaluationStep === 'feedback') {
       return ['complete', 'in_progress'];
     } else {
@@ -80,7 +81,11 @@ export function ProposalStatusSelect({
   return (
     <TagSelect
       wrapColumn
-      readOnly={readOnly || currentEvaluationStep === 'vote' || statusOptions.length === 0}
+      readOnly={
+        readOnly ||
+        currentEvaluationStep === 'vote' ||
+        (currentEvaluationResult === 'pass' && currentEvaluationStep === 'rewards')
+      }
       options={options}
       propertyValue={
         proposal

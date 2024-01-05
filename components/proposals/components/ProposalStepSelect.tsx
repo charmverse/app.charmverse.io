@@ -37,6 +37,9 @@ export function ProposalStepSelect({
 }) {
   const { trigger: updateProposalStatusOnly } = useUpdateProposalStatusOnly({ proposalId: proposal.id });
   const { trigger: goBackToEvaluationStep } = useGoBackToEvaluationStep({ proposalId: proposal.id });
+  const currentEvaluationStep = proposal.currentStep.step;
+  const currentEvaluationResult = proposal.currentStep.result;
+
   const { currentValue, options } = useMemo(() => {
     const _options: IPropertyOption[] = [
       {
@@ -67,10 +70,13 @@ export function ProposalStepSelect({
       ? _options.length - 1
       : _options.findIndex((e) => e.id === currentEvaluationId);
     _options.forEach((option, index) => {
-      option.disabled = index >= currentEvaluationIndex || index < currentEvaluationIndex - 1;
+      option.disabled =
+        index >= currentEvaluationIndex ||
+        index < currentEvaluationIndex - 1 ||
+        (currentEvaluationStep === 'rewards' && currentEvaluationResult === 'pass');
     });
     return { options: _options, currentValue: _options[currentEvaluationIndex]?.id };
-  }, [proposal]);
+  }, [proposal, currentEvaluationResult, currentEvaluationStep]);
 
   const { showMessage } = useSnackbar();
 

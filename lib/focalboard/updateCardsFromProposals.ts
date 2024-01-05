@@ -71,6 +71,7 @@ export async function updateCardsFromProposals({
           id: true,
           evaluations: {
             select: {
+              id: true,
               title: true,
               index: true,
               result: true,
