@@ -8,6 +8,7 @@ export type ProposalStep = {
   title: string;
   step: ProposalEvaluationStep;
   result: ProposalEvaluationResultExtended;
+  id: string;
 };
 
 export function getCurrentStep({
@@ -31,7 +32,8 @@ export function getCurrentStep({
     return {
       title: 'Draft',
       step: 'draft' as ProposalEvaluationStep,
-      result: 'in_progress'
+      result: 'in_progress',
+      id: 'draft'
     };
   }
 
@@ -39,13 +41,15 @@ export function getCurrentStep({
     return {
       title: 'Rewards',
       step: 'rewards' as ProposalEvaluationStep,
-      result: hasPublishedRewards ? ProposalEvaluationResult.pass : 'in_progress'
+      result: hasPublishedRewards ? ProposalEvaluationResult.pass : 'in_progress',
+      id: 'rewards'
     };
   }
 
   return {
     title: currentEvaluation.title,
     step: currentEvaluation.type,
-    result: currentEvaluation.result ?? 'in_progress'
+    result: currentEvaluation.result ?? 'in_progress',
+    id: currentEvaluation.id
   };
 }

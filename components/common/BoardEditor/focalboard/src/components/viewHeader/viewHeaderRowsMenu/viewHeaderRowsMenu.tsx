@@ -9,10 +9,13 @@ import { mutate } from 'swr';
 import charmClient from 'charmClient';
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { useProposals } from 'components/proposals/hooks/useProposals';
+import { useProposalUpdateStatusAndStep } from 'components/proposals/hooks/useProposalUpdateStatusAndStep';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
+import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
 
 import mutator from '../../../mutator';
 
@@ -54,8 +57,11 @@ export function ViewHeaderRowsMenu({
 }) {
   const { pages } = usePages();
   const isAdmin = useIsAdmin();
-  const { proposals } = useProposals();
+  const { proposalsMap } = useProposals();
+  const { space } = useCurrentSpace();
   const [isDeleting, setIsDeleting] = useState(false);
+  const { updateProposalStatus, updateProposalStep } = useProposalUpdateStatusAndStep();
+
   async function deleteCheckedCards() {
     setIsDeleting(true);
     try {
@@ -93,13 +99,13 @@ export function ViewHeaderRowsMenu({
     for (const pageId of pageIds) {
       const page = pages[pageId];
       const proposalId = page?.proposalId;
-      const proposal = proposalId ? proposals?.find((_proposal) => _proposal.id === proposalId) : null;
+      const proposal = proposalId ? proposalsMap[proposalId] : null;
       const proposalWithEvaluationId = proposal?.currentEvaluationId;
       if (
         proposal &&
         proposalWithEvaluationId &&
-        proposal.currentStep?.step !== 'draft' &&
-        proposal.currentStep?.step !== 'feedback' &&
+        proposal.currentStep.step !== 'draft' &&
+        proposal.currentStep.step !== 'feedback' &&
         !page?.sourceTemplateId
       ) {
         await charmClient.proposals.updateProposalEvaluation({
@@ -119,9 +125,58 @@ export function ViewHeaderRowsMenu({
     }
   }
 
+  async function onProposalStepUpdate(pageIds: string[], status: ProposalEvaluationStatus) {
+    if (pageIds.length === 0) {
+      return;
+    }
+
+    const firstProposal = proposalsMap[pages[pageIds[0]]?.proposalId ?? ''];
+
+    if (!firstProposal) {
+      return;
+    }
+
+    const proposalsData: {
+      proposalId: string;
+      evaluationId?: string;
+    }[] = [];
+
+    pageIds.forEach((pageId) => {
+      const proposal = proposalsMap[pages[pageId]?.proposalId ?? ''];
+      if (proposal?.currentStep.step === firstProposal.currentStep.step) {
+        proposalsData.push({
+          proposalId: proposal.id,
+          evaluationId: proposal.currentEvaluationId
+        });
+      }
+    });
+
+    await updateProposalStatus({
+      proposalsData,
+      status,
+      currentEvaluationStep: firstProposal.currentStep.step
+    });
+  }
+
   const filteredPropertyTemplates = useMemo(() => {
     return propertyTemplates.filter((propertyTemplate) => !propertyTemplate.formFieldId);
   }, [propertyTemplates]);
+
+  const firstCheckedProposal = useMemo(() => {
+    let firstCheckedProposalId;
+    for (const checkedId of checkedIds) {
+      const proposalId = pages[checkedId]?.proposalId;
+      if (proposalId) {
+        firstCheckedProposalId = proposalId;
+        break;
+      }
+    }
+    return firstCheckedProposalId ? proposalsMap[firstCheckedProposalId] : undefined;
+  }, [checkedIds, pages, proposalsMap]);
+
+  if (!space) {
+    return null;
+  }
 
   return (
     <StyledStack>
@@ -140,8 +195,10 @@ export function ViewHeaderRowsMenu({
               propertyTemplate={propertyTemplate}
               key={propertyTemplate.id}
               onChange={onChange}
+              firstCheckedProposal={firstCheckedProposal}
               onProposalAuthorSelect={updateProposalsAuthor}
               onProposalReviewerSelect={updateProposalsReviewer}
+              onProposalStepUpdate={onProposalStepUpdate}
             />
           ))
         : null}

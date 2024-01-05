@@ -1,9 +1,15 @@
+import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
+import { ProposalStatusChip } from 'components/proposals/components/ProposalStatusChip';
+import { ControlledProposalStatusSelect } from 'components/proposals/components/ProposalStatusSelect';
 import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
+import { PROPOSAL_STATUS_LABELS, proposalStatusColors } from 'lib/focalboard/proposalDbProperties';
+import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
+import type { ProposalEvaluationStatus, ProposalWithUsersLite } from 'lib/proposal/interface';
 
 import mutator from '../../../mutator';
 
@@ -21,7 +27,9 @@ export function PropertyTemplateMenu({
   onChange,
   isAdmin,
   onProposalAuthorSelect,
-  onProposalReviewerSelect
+  onProposalReviewerSelect,
+  onProposalStepUpdate,
+  firstCheckedProposal
 }: {
   board: Board;
   checkedIds: string[];
@@ -31,6 +39,8 @@ export function PropertyTemplateMenu({
   isAdmin: boolean;
   onProposalAuthorSelect: (pageIds: string[], userIds: string[]) => Promise<void>;
   onProposalReviewerSelect: (pageIds: string[], options: SelectOption[]) => Promise<void>;
+  onProposalStepUpdate(pageIds: string[], status: ProposalEvaluationStatus): Promise<void>;
+  firstCheckedProposal?: ProposalWithUsersLite;
 }) {
   const isValidType = [
     'checkbox',
@@ -44,7 +54,9 @@ export function PropertyTemplateMenu({
     'phone',
     'person',
     'proposalAuthor',
-    'proposalReviewer'
+    'proposalReviewer',
+    'proposalStep',
+    'proposalStatus'
   ].includes(propertyTemplate.type);
 
   if (!isValidType || propertyTemplate.id === Constants.titleColumnId) {
@@ -154,6 +166,25 @@ export function PropertyTemplateMenu({
 
     case 'date': {
       return <DatePropertyTemplateMenu onChange={onChange} cards={checkedCards} propertyTemplate={propertyTemplate} />;
+    }
+
+    case 'proposalStatus': {
+      if (firstCheckedProposal) {
+        return (
+          <PropertyMenu cards={cards} propertyTemplate={propertyTemplate}>
+            <ControlledProposalStatusSelect
+              onChange={async (status) => {
+                await onProposalStepUpdate(checkedIds, status);
+                if (onChange) {
+                  onChange();
+                }
+              }}
+              proposal={firstCheckedProposal}
+            />
+          </PropertyMenu>
+        );
+      }
+      return null;
     }
 
     default: {

@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import type { SxProps } from '@mui/material';
 import { Stack } from '@mui/material';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -186,6 +187,7 @@ export function TagSelect({
   if (!isOpened) {
     return (
       <SelectPreviewContainer
+        className='SelectPreviewContainer'
         data-test={props['data-test']}
         onClick={onEdit}
         displayType={displayType}

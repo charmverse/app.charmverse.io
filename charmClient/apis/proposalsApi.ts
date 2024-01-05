@@ -3,6 +3,7 @@ import type { PageWithPermissions } from '@charmverse/core/pages';
 import * as http from 'adapters/http';
 import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';
 import type { ProposalWithUsers, ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { ReviewEvaluationRequest } from 'lib/proposal/submitEvaluationResult';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import type { UpdateEvaluationRequest } from 'lib/proposal/updateProposalEvaluation';
 import type { UpdateProposalLensPropertiesRequest } from 'lib/proposal/updateProposalLensProperties';
@@ -32,5 +33,21 @@ export class ProposalsApi {
 
   updateProposalEvaluation({ proposalId, ...payload }: UpdateEvaluationRequest) {
     return http.PUT(`/api/proposals/${proposalId}/evaluation`, payload);
+  }
+
+  submitEvaluationResult({ proposalId, ...payload }: ReviewEvaluationRequest) {
+    return http.PUT(`/api/proposals/${proposalId}/submit-result`, payload);
+  }
+
+  updateProposalStatusOnly({ proposalId, ...payload }: { proposalId: string; newStatus: 'draft' | 'published' }) {
+    return http.PUT(`/api/proposals/${proposalId}/status-only`, payload);
+  }
+
+  createProposalRewards({ proposalId }: { proposalId: string }) {
+    return http.PUT(`/api/proposals/${proposalId}/rewards`);
+  }
+
+  goBackToEvaluationStep({ proposalId, ...payload }: { proposalId: string; evaluationId?: string }) {
+    return http.PUT(`/api/proposals/${proposalId}/back-to-step`, payload);
   }
 }

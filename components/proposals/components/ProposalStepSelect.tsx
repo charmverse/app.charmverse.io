@@ -1,45 +1,16 @@
 import { useMemo } from 'react';
-import { mutate } from 'swr';
 
-import { useGoBackToEvaluationStep, useUpdateProposalStatusOnly } from 'charmClient/hooks/proposals';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
-import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPropertyOption } from 'lib/focalboard/board';
 import type { CardPageProposal } from 'lib/focalboard/card';
 
-export function ProposalStepSelectWithoutProposal({
-  options,
-  currentValue
-}: {
-  options: IPropertyOption[];
-  currentValue?: string;
-}) {
-  return (
-    <TagSelect
-      wrapColumn
-      includeSelectedOptions
-      readOnly
-      options={options}
-      propertyValue={currentValue ?? ''}
-      onChange={() => {}}
-    />
-  );
-}
+import { useProposalUpdateStatusAndStep } from '../hooks/useProposalUpdateStatusAndStep';
 
-export function ProposalStepSelect({
-  proposal,
-  spaceId,
-  readOnly
-}: {
-  proposal: CardPageProposal;
-  spaceId: string;
-  readOnly: boolean;
-}) {
-  const { trigger: updateProposalStatusOnly } = useUpdateProposalStatusOnly({ proposalId: proposal.id });
-  const { trigger: goBackToEvaluationStep } = useGoBackToEvaluationStep({ proposalId: proposal.id });
+export function ProposalStepSelect({ proposal, readOnly }: { proposal: CardPageProposal; readOnly: boolean }) {
   const currentEvaluationStep = proposal.currentStep.step;
   const currentEvaluationResult = proposal.currentStep.result;
 
+  const { updateProposalStep } = useProposalUpdateStatusAndStep();
   const { currentValue, options } = useMemo(() => {
     const _options: IPropertyOption[] = [
       {
@@ -78,23 +49,11 @@ export function ProposalStepSelect({
     return { options: _options, currentValue: _options[currentEvaluationIndex]?.id };
   }, [proposal, currentEvaluationResult, currentEvaluationStep]);
 
-  const { showMessage } = useSnackbar();
-
   async function onChange(evaluationId?: string) {
-    try {
-      if (evaluationId !== 'draft') {
-        await goBackToEvaluationStep({
-          evaluationId
-        });
-      } else {
-        await updateProposalStatusOnly({
-          newStatus: 'draft'
-        });
-      }
-      await mutate(`/api/spaces/${spaceId}/proposals`);
-    } catch (err: any) {
-      showMessage(err.message, 'error');
-    }
+    updateProposalStep({
+      proposalIds: [proposal.id],
+      evaluationId
+    });
   }
   function onValueChange(values: string | string[]) {
     const newValue = Array.isArray(values) ? values[0] : values;

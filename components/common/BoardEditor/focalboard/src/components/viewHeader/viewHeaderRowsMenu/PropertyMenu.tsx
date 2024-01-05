@@ -40,7 +40,7 @@ export function PropertyMenu({
 }: {
   cards: Card[];
   propertyTemplate: IPropertyTemplate<PropertyType>;
-  children: (option: { isPropertyOpen: boolean; closeMenu: VoidFunction }) => ReactNode;
+  children: ReactNode | ((option: { isPropertyOpen: boolean; closeMenu: VoidFunction }) => ReactNode);
 }) {
   const popupState = usePopupState({ variant: 'popover' });
   // Without this state, the options menu list is not placed in the correct position
@@ -80,10 +80,11 @@ export function PropertyMenu({
       >
         <Box
           sx={{
-            padding: '2px 4px'
+            padding: '2px 4px',
+            display: 'flex'
           }}
         >
-          {children({ isPropertyOpen, closeMenu: popupState.close })}
+          {typeof children === 'function' ? children({ isPropertyOpen, closeMenu: popupState.close }) : children}
         </Box>
       </Menu>
     </>
