@@ -2,13 +2,15 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
-export type ClearEvaluationResultRequest = {
+import { isTruthy } from 'lib/utilities/types';
+
+export type GoBackToEvaluationStepRequest = {
   proposalId: string;
   evaluationId?: string; // if not provided, clear all evaluations and go to draft status
 };
 
 // clear the result of a proposal evaluation and all evaluations after it
-export async function clearEvaluationResult({ evaluationId, proposalId }: ClearEvaluationResultRequest) {
+export async function goBackToEvaluationStep({ evaluationId, proposalId }: GoBackToEvaluationStepRequest) {
   const proposal = await prisma.proposal.findUniqueOrThrow({
     where: {
       id: proposalId
@@ -32,19 +34,27 @@ export async function clearEvaluationResult({ evaluationId, proposalId }: ClearE
     throw new InvalidInputError('Cannot clear the results of a proposal with rewards');
   }
 
-  // Also reset all evaluations after this one
-  const evaluationsToReset = proposal.evaluations
-    .slice(evaluationIndex)
-    .filter((e) => e.id === evaluationId || e.result);
+  const evaluation = proposal.evaluations[evaluationIndex];
 
-  if (evaluationsToReset.some((evaluation) => evaluation.type === 'vote')) {
+  if (!evaluation.result) {
+    log.debug('No proposal result to clear', { proposalId, evaluationId, voteId: evaluation.voteId });
+    return;
+  }
+
+  const evaluationsToUpdate = proposal.evaluations.slice(evaluationIndex);
+
+  const evaluationsToReset = evaluationsToUpdate.filter((e) => e.result);
+
+  if (evaluationsToReset.some((e) => e.type === 'vote')) {
     throw new InvalidInputError('Cannot clear the results of a vote');
   }
+
   log.debug('Clearing the result of proposal evaluation', {
     evaluationId,
     proposalId,
-    stepsCleared: evaluationsToReset.length
+    stepsToClear: evaluationsToReset.length
   });
+
   await prisma.proposalEvaluation.updateMany({
     where: {
       id: {
@@ -54,18 +64,19 @@ export async function clearEvaluationResult({ evaluationId, proposalId }: ClearE
     data: {
       result: null,
       decidedBy: null,
-      completedAt: null
+      completedAt: null,
+      voteId: null
     }
   });
 
-  const evaluation = proposal.evaluations.find((e) => e.id === evaluationId);
   // clear out vote
-  if (evaluation?.voteId) {
+  const votesToDelete = evaluationsToUpdate.map((e) => e.voteId).filter(isTruthy);
+  for (const voteId of votesToDelete) {
     await prisma.vote.deleteMany({
       where: {
-        id: evaluation.voteId
+        id: voteId
       }
     });
-    log.info('Cleared vote tied to proposal', { proposalId, evaluationId, voteId: evaluation.voteId });
+    log.info('Cleared vote tied to proposal', { proposalId, evaluationId });
   }
 }
