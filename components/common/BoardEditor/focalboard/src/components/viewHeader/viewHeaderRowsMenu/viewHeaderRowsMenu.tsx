@@ -125,7 +125,7 @@ export function ViewHeaderRowsMenu({
     }
   }
 
-  async function onProposalStepUpdate(pageIds: string[], status: ProposalEvaluationStatus) {
+  async function onProposalStatusUpdate(pageIds: string[], status: ProposalEvaluationStatus) {
     if (pageIds.length === 0) {
       return;
     }
@@ -156,6 +156,55 @@ export function ViewHeaderRowsMenu({
       status,
       currentEvaluationStep: firstProposal.currentStep.step
     });
+  }
+
+  async function onProposalStepUpdate(pageIds: string[], evaluationId: string) {
+    if (pageIds.length === 0) {
+      return;
+    }
+
+    const firstProposal = proposalsMap[pages[pageIds[0]]?.proposalId ?? ''];
+
+    if (!firstProposal) {
+      return;
+    }
+
+    const evaluationIndex = firstProposal.evaluations.findIndex((evaluation) => evaluation.id === evaluationId);
+
+    const proposalsData: {
+      proposalId: string;
+      evaluationId: string;
+    }[] = [];
+
+    pageIds.forEach((pageId) => {
+      const proposal = proposalsMap[pages[pageId]?.proposalId ?? ''];
+      if (proposal) {
+        const isSameWorkflow =
+          proposal.evaluations.length === firstProposal.evaluations.length &&
+          proposal.evaluations.every((evaluation, index) => {
+            const firstProposalEvaluation = firstProposal.evaluations[index];
+            return (
+              evaluation.type === firstProposalEvaluation.type && evaluation.title === firstProposalEvaluation.title
+            );
+          });
+
+        if (
+          isSameWorkflow &&
+          ((evaluationId === 'rewards' &&
+            ((proposal.fields?.pendingRewards ?? []).length > 0 || (proposal.rewardIds ?? [])?.length > 0)) ||
+            evaluationId !== 'rewards')
+        ) {
+          proposalsData.push({
+            proposalId: proposal.id,
+            evaluationId: evaluationId === 'draft' ? evaluationId : proposal.evaluations[evaluationIndex].id
+          });
+        }
+      }
+    });
+
+    if (proposalsData.length) {
+      await updateProposalStep(proposalsData);
+    }
   }
 
   const filteredPropertyTemplates = useMemo(() => {
@@ -198,6 +247,7 @@ export function ViewHeaderRowsMenu({
               firstCheckedProposal={firstCheckedProposal}
               onProposalAuthorSelect={updateProposalsAuthor}
               onProposalReviewerSelect={updateProposalsReviewer}
+              onProposalStatusUpdate={onProposalStatusUpdate}
               onProposalStepUpdate={onProposalStepUpdate}
             />
           ))

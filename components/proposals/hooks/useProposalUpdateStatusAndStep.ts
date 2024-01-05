@@ -49,11 +49,11 @@ export function useProposalUpdateStatusAndStep() {
     }
   }
 
-  async function updateProposalStep({ evaluationId, proposalIds }: { evaluationId?: string; proposalIds: string[] }) {
+  async function updateProposalStep(proposalsData: { evaluationId: string; proposalId: string }[]) {
     if (space) {
       const { id: spaceId } = space;
       try {
-        for (const proposalId of proposalIds) {
+        for (const { evaluationId, proposalId } of proposalsData) {
           if (evaluationId !== 'draft') {
             await charmClient.proposals.goBackToEvaluationStep({
               evaluationId,

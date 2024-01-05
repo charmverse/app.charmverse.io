@@ -1,14 +1,11 @@
-import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import { ProposalStatusChip } from 'components/proposals/components/ProposalStatusChip';
 import { ControlledProposalStatusSelect } from 'components/proposals/components/ProposalStatusSelect';
+import { ControlledProposalStepSelect } from 'components/proposals/components/ProposalStepSelect';
 import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
-import { PROPOSAL_STATUS_LABELS, proposalStatusColors } from 'lib/focalboard/proposalDbProperties';
-import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
 import type { ProposalEvaluationStatus, ProposalWithUsersLite } from 'lib/proposal/interface';
 
 import mutator from '../../../mutator';
@@ -17,7 +14,6 @@ import { DatePropertyTemplateMenu } from './DatePropertyTemplateMenu';
 import { PersonPropertyTemplateMenu } from './PersonPropertyTemplateMenu';
 import { PropertyMenu, StyledMenuItem } from './PropertyMenu';
 import { SelectPropertyTemplateMenu } from './SelectPropertyTemplateMenu';
-import { TextPropertyTemplateMenu } from './TextPropertyTemplateMenu';
 
 export function PropertyTemplateMenu({
   propertyTemplate,
@@ -29,6 +25,7 @@ export function PropertyTemplateMenu({
   onProposalAuthorSelect,
   onProposalReviewerSelect,
   onProposalStepUpdate,
+  onProposalStatusUpdate,
   firstCheckedProposal
 }: {
   board: Board;
@@ -39,7 +36,8 @@ export function PropertyTemplateMenu({
   isAdmin: boolean;
   onProposalAuthorSelect: (pageIds: string[], userIds: string[]) => Promise<void>;
   onProposalReviewerSelect: (pageIds: string[], options: SelectOption[]) => Promise<void>;
-  onProposalStepUpdate(pageIds: string[], status: ProposalEvaluationStatus): Promise<void>;
+  onProposalStepUpdate(pageIds: string[], evaluationId: string): Promise<void>;
+  onProposalStatusUpdate(pageIds: string[], status: ProposalEvaluationStatus): Promise<void>;
   firstCheckedProposal?: ProposalWithUsersLite;
 }) {
   const isValidType = [
@@ -173,12 +171,7 @@ export function PropertyTemplateMenu({
         return (
           <PropertyMenu cards={cards} propertyTemplate={propertyTemplate}>
             <ControlledProposalStatusSelect
-              onChange={async (status) => {
-                await onProposalStepUpdate(checkedIds, status);
-                if (onChange) {
-                  onChange();
-                }
-              }}
+              onChange={(status) => onProposalStatusUpdate(checkedIds, status)}
               proposal={firstCheckedProposal}
             />
           </PropertyMenu>
@@ -187,8 +180,30 @@ export function PropertyTemplateMenu({
       return null;
     }
 
+    case 'proposalStep': {
+      if (firstCheckedProposal) {
+        return (
+          <PropertyMenu cards={cards} propertyTemplate={propertyTemplate}>
+            <ControlledProposalStepSelect
+              onChange={(evaluationId) => onProposalStepUpdate(checkedIds, evaluationId)}
+              proposal={{
+                currentStep: firstCheckedProposal.currentStep,
+                id: firstCheckedProposal.id,
+                evaluations: firstCheckedProposal.evaluations,
+                currentEvaluationId: firstCheckedProposal.currentEvaluationId,
+                hasRewards:
+                  (firstCheckedProposal.rewardIds ?? []).length > 0 ||
+                  (firstCheckedProposal.fields?.pendingRewards ?? []).length > 0
+              }}
+            />
+          </PropertyMenu>
+        );
+      }
+      return null;
+    }
+
     default: {
-      return <TextPropertyTemplateMenu onChange={onChange} cards={checkedCards} propertyTemplate={propertyTemplate} />;
+      return null;
     }
   }
 }
