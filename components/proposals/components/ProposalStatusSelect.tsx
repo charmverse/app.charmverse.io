@@ -36,16 +36,15 @@ export function ProposalStatusSelect({
 
   const statusOptions: ProposalEvaluationStatus[] = useMemo(() => {
     if (currentEvaluationStep === 'draft') {
-      return ['published'];
+      return ['published', 'unpublished'];
     } else if (currentEvaluationStep === 'rewards') {
       return ['published'];
     } else if (currentEvaluationStep === 'feedback') {
-      return ['complete'];
+      return ['complete', 'in_progress'];
     } else {
       // for vote, rubric, pass_fail, etc
-      return ['passed', 'declined'];
+      return ['passed', 'declined', 'in_progress'];
     }
-    return [];
   }, [currentEvaluationStep]);
 
   async function onChange(status: ProposalEvaluationStatus) {
@@ -74,13 +73,14 @@ export function ProposalStatusSelect({
     id: status,
     value: PROPOSAL_STATUS_LABELS[status],
     dropdownValue: PROPOSAL_STATUS_VERB_LABELS[status as ProposalEvaluationStatus],
-    color: proposalStatusColors[status]
+    color: proposalStatusColors[status],
+    disabled: status === 'in_progress'
   }));
 
   return (
     <TagSelect
       wrapColumn
-      readOnly={readOnly || currentEvaluationStep === 'vote'}
+      readOnly={readOnly || currentEvaluationStep === 'vote' || statusOptions.length === 0}
       options={options}
       propertyValue={
         proposal

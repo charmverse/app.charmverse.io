@@ -2,12 +2,12 @@ import type { ProposalEvaluation, ProposalStatus } from '@charmverse/core/prisma
 import { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
-import type { ProposalEvaluationStep } from './interface';
+import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from './interface';
 
 export type ProposalStep = {
   title: string;
   step: ProposalEvaluationStep;
-  result: ProposalEvaluationResult | null;
+  result: ProposalEvaluationResultExtended;
 };
 
 export function getCurrentStep({
@@ -28,17 +28,17 @@ export function getCurrentStep({
     ? {
         title: 'Draft',
         step: 'draft' as ProposalEvaluationStep,
-        result: null
+        result: 'in_progress'
       }
     : currentEvaluation && !hasRewards
     ? {
         title: currentEvaluation.title,
         step: currentEvaluation.type,
-        result: currentEvaluation.result
+        result: currentEvaluation.result ?? 'in_progress'
       }
     : {
         title: 'Rewards',
         step: 'rewards' as ProposalEvaluationStep,
-        result: hasPublishedRewards ? ProposalEvaluationResult.pass : null
+        result: hasPublishedRewards ? ProposalEvaluationResult.pass : 'in_progress'
       };
 }
