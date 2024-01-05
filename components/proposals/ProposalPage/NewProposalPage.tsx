@@ -43,6 +43,7 @@ import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
+import { getNewCriteria } from './components/EvaluationSettingsSidebar/components/RubricCriteriaSettings';
 import type { ProposalPropertiesInput } from './components/ProposalProperties/ProposalPropertiesBase';
 import { ProposalPropertiesBase } from './components/ProposalProperties/ProposalPropertiesBase';
 import { TemplateSelect } from './components/TemplateSelect';
@@ -219,7 +220,8 @@ export function NewProposalPage({
           id: evaluation.id,
           index,
           reviewers: existingStep?.reviewers || [],
-          rubricCriteria: existingStep?.rubricCriteria || ([] as ProposalRubricCriteriaWithTypedParams[]),
+          rubricCriteria:
+            existingStep?.rubricCriteria || ([getNewCriteria()] as ProposalRubricCriteriaWithTypedParams[]),
           title: evaluation.title,
           type: evaluation.type,
           result: null,
