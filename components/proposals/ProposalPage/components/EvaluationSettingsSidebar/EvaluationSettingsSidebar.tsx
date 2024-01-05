@@ -18,6 +18,7 @@ export type Props = {
   isReviewer: boolean;
   onChangeWorkflow: (workflow: ProposalWorkflowTyped) => void;
   templateId?: string | null;
+  requireWorkflowChangeConfirmation?: boolean;
 };
 
 export function EvaluationSettingsSidebar({
@@ -26,7 +27,8 @@ export function EvaluationSettingsSidebar({
   readOnly,
   onChangeWorkflow,
   isReviewer,
-  templateId
+  templateId,
+  requireWorkflowChangeConfirmation
 }: Props) {
   const proposalTemplate = useProposalTemplateById(templateId);
   const pendingRewards = proposal?.fields?.pendingRewards;
@@ -39,6 +41,7 @@ export function EvaluationSettingsSidebar({
         onChange={onChangeWorkflow}
         readOnly={!!templateId && !isAdmin}
         required
+        requireConfirmation={requireWorkflowChangeConfirmation}
       />
       <EvaluationStepRow index={0} result={null} title='Draft' />
       {proposal && (
