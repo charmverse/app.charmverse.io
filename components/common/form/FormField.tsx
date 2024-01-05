@@ -1,13 +1,12 @@
 import { type FormFieldType } from '@charmverse/core/prisma-client';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { MoreHoriz } from '@mui/icons-material';
-import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown';
-import ChevronRightIcon from '@mui/icons-material/ArrowRight';
+import { Edit, EditOff, MoreHoriz } from '@mui/icons-material';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import {
+  Box,
   Chip,
   Divider,
   IconButton,
@@ -52,6 +51,7 @@ const FormFieldContainer = styled(Stack, {
   flex-direction: row;
   align-items: flex-start;
   width: 100%;
+  position: relative;
 `;
 
 export interface FormFieldProps {
@@ -88,7 +88,7 @@ function ExpandedFormField({
 
   return (
     <>
-      <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
+      <Stack flexDirection='row' justifyContent='space-between' alignItems='center' pr={4}>
         <Select<FormFieldType>
           value={formField.type}
           onChange={(e) =>
@@ -132,7 +132,7 @@ function ExpandedFormField({
             </MenuList>
           }
         >
-          <IconButton size='small'>
+          <IconButton size='small' sx={{ mt: '-20px' }}>
             <MoreHoriz fontSize='small' />
           </IconButton>
         </PopperPopup>
@@ -267,7 +267,17 @@ export function FormField(
   const isAdjacentActive = canDrop && isOverCurrent;
 
   return (
-    <Stack flexDirection='row' gap={0.5} alignItems='flex-start' ref={readOnly ? null : mergeRefs([dragPreview, drop])}>
+    <Stack
+      flexDirection='row'
+      gap={0.5}
+      alignItems='flex-start'
+      ref={readOnly ? null : mergeRefs([dragPreview, drop])}
+      sx={{
+        '&:hover .icons': {
+          opacity: 1
+        }
+      }}
+    >
       {!readOnly && (
         <div ref={readOnly ? null : drag}>
           <DragIndicatorIcon
@@ -280,16 +290,7 @@ export function FormField(
         </div>
       )}
       <FormFieldContainer dragDirection={isAdjacentActive ? ((offset?.y ?? 0) < 0 ? 'top' : 'bottom') : undefined}>
-        {!readOnly ? (
-          <span data-test='toggle-form-field-button'>
-            {isOpen ? (
-              <ExpandMoreIcon onClick={toggleOpen} sx={{ cursor: 'pointer', mt: 1 }} />
-            ) : (
-              <ChevronRightIcon onClick={toggleOpen} sx={{ cursor: 'pointer' }} />
-            )}
-          </span>
-        ) : null}
-        <Stack gap={1} width='100%' ml={readOnly ? 1 : 0}>
+        <Stack gap={1} width='100%' ml={1}>
           {!isOpen || readOnly ? (
             <FieldTypeRenderer
               endAdornment={formField.private ? <Chip sx={{ mx: 1 }} label='Private' size='small' /> : undefined}
@@ -305,6 +306,24 @@ export function FormField(
             <ExpandedFormField {...props} shouldFocus={shouldFocus} />
           )}
         </Stack>
+
+        {!readOnly ? (
+          <Box
+            className='icons'
+            data-test='toggle-form-field-button'
+            sx={{
+              position: 'absolute',
+              top: (theme) => theme.spacing(0.5),
+              right: (theme) => theme.spacing(0.5),
+              opacity: isOpen ? 1 : 0,
+              transition: 'opacity 0.2s ease'
+            }}
+          >
+            <IconButton size='small' onClick={toggleOpen}>
+              {isOpen ? <EditOff color='secondary' fontSize='small' /> : <Edit color='secondary' fontSize='small' />}
+            </IconButton>
+          </Box>
+        ) : null}
       </FormFieldContainer>
     </Stack>
   );
