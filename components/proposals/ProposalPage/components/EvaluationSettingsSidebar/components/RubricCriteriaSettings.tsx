@@ -7,7 +7,6 @@ import { v4 as uuid } from 'uuid';
 
 import { AddAPropertyButton } from 'components/common/BoardEditor/components/properties/AddAProperty';
 import { TextInput } from 'components/common/BoardEditor/components/properties/TextInput';
-import { Button } from 'components/common/Button';
 import { DraggableListItem } from 'components/common/DraggableListItem';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ReactDndProvider from 'components/common/ReactDndProvider';
@@ -73,25 +72,27 @@ export const CriteriaRow = styled(Box)`
   }
 `;
 
-export function RubricCriteria({ readOnly, readOnlyMessage, value, onChange, proposalStatus, answers }: Props) {
-  const [criteriaList, setCriteriaList] = useState<RangeProposalCriteria[]>([]);
+export function getNewCriteria({ parameters }: Partial<RangeProposalCriteria> = {}): RangeProposalCriteria {
+  return {
+    id: uuid(),
+    index: -1,
+    description: '',
+    title: '',
+    type: 'range',
+    parameters: parameters || { min: 1, max: 5 }
+  };
+}
 
+export function RubricCriteriaSettings({ readOnly, readOnlyMessage, value, onChange, proposalStatus, answers }: Props) {
+  const [criteriaList, setCriteriaList] = useState<RangeProposalCriteria[]>(value);
   const [rubricCriteriaIdToDelete, setRubricCriteriaIdToDelete] = useState<string | null>(null);
 
   function addCriteria() {
     if (readOnly) {
       return;
     }
-    const lastCriteria = criteriaList[criteriaList.length - 1]?.parameters;
-    const parameters = { min: lastCriteria?.min || 1, max: lastCriteria?.max || 5 };
-    const newCriteria: RangeProposalCriteria = {
-      id: uuid(),
-      index: -1,
-      description: '',
-      title: '',
-      type: 'range',
-      parameters
-    };
+    const lastCriteria = criteriaList[criteriaList.length - 1];
+    const newCriteria = getNewCriteria(lastCriteria);
     const updatedList = [...criteriaList, newCriteria];
     setCriteriaList(updatedList);
   }

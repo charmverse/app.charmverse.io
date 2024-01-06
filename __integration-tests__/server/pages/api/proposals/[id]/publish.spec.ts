@@ -10,7 +10,6 @@ let author: User;
 let reviewer: User;
 let space: Space;
 let authorCookie: string;
-let reviewerCookie: string;
 
 beforeAll(async () => {
   const generated1 = await generateUserAndSpace(undefined);
@@ -21,8 +20,6 @@ beforeAll(async () => {
 
   authorCookie = await loginUser(author.id);
 
-  reviewerCookie = await loginUser(reviewer.id);
-
   await prisma.spaceRole.create({
     data: {
       spaceId: space.id,
@@ -31,7 +28,7 @@ beforeAll(async () => {
   });
 });
 
-describe('PUT /api/proposals/[id]/status-only - Update proposal status', () => {
+describe('PUT /api/proposals/[id]/publish - Publish proposal', () => {
   it('should allow an admin to update the proposal status and return 200', async () => {
     const proposal = await createProposalWithUsers({
       spaceId: space.id,
@@ -43,23 +40,7 @@ describe('PUT /api/proposals/[id]/status-only - Update proposal status', () => {
     const adminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: true });
     const adminCookie = await loginUser(adminUser.id);
 
-    await request(baseUrl)
-      .put(`/api/proposals/${proposal.id}/status-only`)
-      .set('Cookie', adminCookie)
-      .send({
-        newStatus: 'discussion'
-      })
-      .expect(200);
-  });
-  it('should throw error and return 400 if the newStatus is not passed in body', async () => {
-    const proposal = await createProposalWithUsers({
-      spaceId: space.id,
-      userId: author.id,
-      authors: [],
-      reviewers: [reviewer.id]
-    });
-
-    await request(baseUrl).put(`/api/proposals/${proposal.id}/status-only`).set('Cookie', reviewerCookie).expect(400);
+    await request(baseUrl).put(`/api/proposals/${proposal.id}/publish`).set('Cookie', adminCookie).send().expect(200);
   });
 
   it("should throw error and return 404 if the proposal doesn't exist", async () => {
@@ -70,16 +51,10 @@ describe('PUT /api/proposals/[id]/status-only - Update proposal status', () => {
       reviewers: [reviewer.id]
     });
 
-    await request(baseUrl)
-      .put(`/api/proposals/${v4()}/status`)
-      .set('Cookie', authorCookie)
-      .send({
-        newStatus: 'draft'
-      })
-      .expect(404);
+    await request(baseUrl).put(`/api/proposals/${v4()}/status`).set('Cookie', authorCookie).send().expect(404);
   });
 
-  it('should throw error and return 400 if the user cannot update the status', async () => {
+  it('should throw error and return 401 if the user cannot update the status', async () => {
     const spaceMember = await generateSpaceUser({
       spaceId: space.id,
       isAdmin: false
@@ -95,12 +70,10 @@ describe('PUT /api/proposals/[id]/status-only - Update proposal status', () => {
     });
 
     await request(baseUrl)
-      .put(`/api/proposals/${proposal.id}/status-only`)
+      .put(`/api/proposals/${proposal.id}/publish`)
       .set('Cookie', spaceMemberCookie)
-      .send({
-        newStatus: 'draft'
-      })
-      .expect(400);
+      .send()
+      .expect(401);
   });
 
   it('should successfully update the status of proposal and return 200', async () => {
@@ -112,12 +85,6 @@ describe('PUT /api/proposals/[id]/status-only - Update proposal status', () => {
       reviewers: [reviewer.id]
     });
 
-    await request(baseUrl)
-      .put(`/api/proposals/${proposal.id}/status-only`)
-      .set('Cookie', authorCookie)
-      .send({
-        newStatus: 'published'
-      })
-      .expect(200);
+    await request(baseUrl).put(`/api/proposals/${proposal.id}/publish`).set('Cookie', authorCookie).send().expect(200);
   });
 });
