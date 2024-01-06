@@ -9,27 +9,23 @@ import {
   proposalStatusColors
 } from 'lib/focalboard/proposalDbProperties';
 import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
-import type { ProposalEvaluationStatus, ProposalWithUsersLite } from 'lib/proposal/interface';
+import type { ProposalEvaluationStatus, ProposalEvaluationStep, ProposalWithUsersLite } from 'lib/proposal/interface';
 
 import { useProposalUpdateStatusAndStep } from '../hooks/useProposalUpdateStatusAndStep';
+
+type ProposalProp = Pick<ProposalWithUsersLite, 'currentStep' | 'currentEvaluationId' | 'evaluations' | 'id'>;
 
 export function ControlledProposalStatusSelect({
   proposal,
   onChange
 }: {
-  proposal: Pick<ProposalWithUsersLite, 'currentStep' | 'currentEvaluationId'>;
+  proposal: ProposalProp;
   onChange: (result: ProposalEvaluationResult | null) => void;
 }) {
   return <ProposalStatusSelectBase proposal={proposal} onChange={onChange} readOnly={false} />;
 }
 
-export function ProposalStatusSelect({
-  proposal,
-  readOnly
-}: {
-  proposal: Pick<ProposalWithUsersLite, 'currentStep' | 'currentEvaluationId' | 'id'>;
-  readOnly?: boolean;
-}) {
+export function ProposalStatusSelect({ proposal, readOnly }: { proposal: ProposalProp; readOnly?: boolean }) {
   const currentEvaluationStep = proposal.currentStep.step;
   const currentEvaluationId = proposal.currentStep.id;
   const { batchUpdateProposalStatuses } = useProposalUpdateStatusAndStep();
@@ -55,24 +51,29 @@ function ProposalStatusSelectBase({
   onChange,
   readOnly
 }: {
-  proposal: Pick<ProposalWithUsersLite, 'currentStep' | 'currentEvaluationId'>;
+  proposal: ProposalProp;
   onChange: (result: ProposalEvaluationResult | null) => void;
   readOnly?: boolean;
 }) {
   const currentEvaluationStep = proposal.currentStep.step;
   const currentEvaluationResult = proposal.currentStep.result;
+  const hasPublishedRewards = currentEvaluationStep === 'rewards' && currentEvaluationResult === 'pass';
+  const lastEvaluation = proposal.evaluations[proposal.evaluations.length - 1];
+
   const statusOptions: ProposalEvaluationStatus[] = useMemo(() => {
-    if (currentEvaluationStep === 'draft') {
+    const evaluationStep = lastEvaluation && hasPublishedRewards ? lastEvaluation.type : currentEvaluationStep;
+
+    if (evaluationStep === 'draft') {
       return ['published', 'unpublished'];
-    } else if (currentEvaluationStep === 'rewards') {
+    } else if (evaluationStep === 'rewards') {
       return ['published', 'unpublished'];
-    } else if (currentEvaluationStep === 'feedback') {
+    } else if (evaluationStep === 'feedback') {
       return ['complete', 'in_progress'];
     } else {
       // for vote, rubric, pass_fail, etc
       return ['passed', 'declined', 'in_progress'];
     }
-  }, [currentEvaluationStep]);
+  }, [currentEvaluationStep, lastEvaluation, hasPublishedRewards]);
 
   const options: IPropertyOption[] = statusOptions.map((status) => ({
     id: status,
@@ -84,19 +85,20 @@ function ProposalStatusSelectBase({
   return (
     <TagSelect
       wrapColumn
-      readOnly={
-        readOnly ||
-        currentEvaluationStep === 'vote' ||
-        (currentEvaluationResult === 'pass' && currentEvaluationStep === 'rewards')
-      }
+      readOnly={readOnly || currentEvaluationStep === 'vote' || hasPublishedRewards}
       options={options}
       propertyValue={
-        proposal
+        hasPublishedRewards && lastEvaluation
+          ? getProposalEvaluationStatus({
+              result: 'pass',
+              step: lastEvaluation.type as ProposalEvaluationStep
+            })
+          : proposal
           ? getProposalEvaluationStatus({
               result: proposal.currentStep.result ?? 'in_progress',
               step: proposal.currentStep.step
             })
-          : ''
+          : 'in_progress'
       }
       disableClearable
       onChange={(status) => {

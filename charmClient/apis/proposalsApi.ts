@@ -44,7 +44,7 @@ export class ProposalsApi {
   }
 
   createProposalRewards({ proposalId }: { proposalId: string }) {
-    return http.PUT(`/api/proposals/${proposalId}/rewards`);
+    return http.POST(`/api/proposals/${proposalId}/rewards`);
   }
 
   goBackToEvaluationStep({ proposalId, ...payload }: { proposalId: string; evaluationId?: string }) {

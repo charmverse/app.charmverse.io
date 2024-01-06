@@ -53,12 +53,12 @@ export function ProposalStepSelectBase({
   onChange: (data: { evaluationId: string; moveForward: boolean }) => void;
 }) {
   const hasRewards = proposal.hasRewards;
+  const currentEvaluationStep = proposal.currentStep.step;
+  const currentEvaluationIndex = proposal.currentStep.index;
+  const currentEvaluationResult = proposal.currentStep.result;
+  const hasPublishedRewards = currentEvaluationStep === 'rewards' && currentEvaluationResult === 'pass';
 
   const { options } = useMemo(() => {
-    const currentEvaluationStep = proposal.currentStep.step;
-    const currentEvaluationIndex = proposal.currentStep.index;
-    const currentEvaluationResult = proposal.currentStep.result;
-
     const _options: IPropertyOption[] = [
       {
         id: 'draft',
@@ -87,24 +87,26 @@ export function ProposalStepSelectBase({
         index < currentEvaluationIndex - 1 ||
         index > currentEvaluationIndex + 1 ||
         // If we are on the vote step, then we can only go back to the previous step
-        (currentEvaluationStep === 'vote' ? index >= currentEvaluationIndex : false) ||
-        (currentEvaluationStep === 'rewards' && currentEvaluationResult === 'pass');
+        (currentEvaluationStep === 'vote' ? index >= currentEvaluationIndex : false);
     });
     return { options: _options };
-  }, [proposal, hasRewards]);
+  }, [proposal, hasRewards, currentEvaluationStep, currentEvaluationIndex]);
 
   return (
     <TagSelect
       disableClearable
       wrapColumn
       includeSelectedOptions
-      readOnly={readOnly}
+      readOnly={readOnly || hasPublishedRewards}
       options={options}
-      propertyValue={proposal.currentStep.id}
+      propertyValue={
+        hasPublishedRewards
+          ? proposal.evaluations[proposal.evaluations.length - 1]?.id ?? proposal.currentStep.id
+          : proposal.currentStep.id
+      }
       onChange={(values) => {
         const evaluationId = Array.isArray(values) ? values[0] : values;
         if (evaluationId) {
-          const currentEvaluationIndex = proposal.currentStep.index;
           const newEvaluationIdIndex = options.findIndex((option) => option.id === evaluationId);
           const moveForward = newEvaluationIdIndex > currentEvaluationIndex;
           // If we are moving forward then pass the current step, otherwise go back to the previous step

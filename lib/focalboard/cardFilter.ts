@@ -1,4 +1,3 @@
-import { ProposalEvaluationResult } from '@charmverse/core/dist/cjs/prisma-client';
 import { log } from '@charmverse/core/log';
 
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
