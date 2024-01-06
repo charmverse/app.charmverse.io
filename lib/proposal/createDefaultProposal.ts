@@ -8,11 +8,12 @@ import { Constants } from 'lib/focalboard/constants';
 import { AUTHORS_BLOCK_ID, CREATED_AT_ID, PROPOSAL_REVIEWERS_BLOCK_ID } from './blocks/constants';
 import type { ProposalEvaluationInput } from './createProposal';
 import { createProposal } from './createProposal';
+import type { VoteSettings } from './interface';
 import { defaultWorkflowTitle } from './workflows/defaultWorkflows';
 
 export const defaultProposalTitle = 'Getting Started';
 
-const voteSettings: ProposalEvaluationInput['voteSettings'] = {
+export const voteSettings: VoteSettings = {
   threshold: 50,
   type: 'Approval',
   options: ['Yes', 'No', 'Abstain'],
