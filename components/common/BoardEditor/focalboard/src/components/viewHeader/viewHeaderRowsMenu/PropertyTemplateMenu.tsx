@@ -7,7 +7,6 @@ import { ControlledProposalStepSelect } from 'components/proposals/components/Pr
 import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
-import { Constants } from 'lib/focalboard/constants';
 import type { ProposalWithUsersLite } from 'lib/proposal/interface';
 
 import mutator from '../../../mutator';
@@ -28,7 +27,8 @@ export function PropertyTemplateMenu({
   onProposalReviewerSelect,
   onProposalStepUpdate,
   onProposalStatusUpdate,
-  firstCheckedProposal
+  firstCheckedProposal,
+  disabled
 }: {
   board: Board;
   checkedIds: string[];
@@ -41,28 +41,8 @@ export function PropertyTemplateMenu({
   onProposalStepUpdate(pageIds: string[], evaluationId: string, moveForward: boolean): Promise<void>;
   onProposalStatusUpdate(pageIds: string[], result: ProposalEvaluationResult | null): Promise<void>;
   firstCheckedProposal?: ProposalWithUsersLite;
+  disabled?: boolean;
 }) {
-  const isValidType = [
-    'checkbox',
-    'text',
-    'number',
-    'date',
-    'multiSelect',
-    'select',
-    'url',
-    'email',
-    'phone',
-    'person',
-    'proposalAuthor',
-    'proposalReviewer',
-    'proposalStep',
-    'proposalStatus'
-  ].includes(propertyTemplate.type);
-
-  if (!isValidType || propertyTemplate.id === Constants.titleColumnId) {
-    return null;
-  }
-
   const checkedCards = cards.filter((card) => checkedIds.includes(card.id));
 
   if (checkedCards.length === 0) {
@@ -136,7 +116,7 @@ export function PropertyTemplateMenu({
       }
 
       return (
-        <PropertyMenu cards={cards} propertyTemplate={propertyTemplate}>
+        <PropertyMenu disabled={disabled} cards={cards} propertyTemplate={propertyTemplate}>
           {({ isPropertyOpen }) =>
             isPropertyOpen ? (
               <UserAndRoleSelect
@@ -171,7 +151,7 @@ export function PropertyTemplateMenu({
     case 'proposalStatus': {
       if (firstCheckedProposal) {
         return (
-          <PropertyMenu cards={cards} propertyTemplate={propertyTemplate}>
+          <PropertyMenu cards={cards} disabled={disabled} propertyTemplate={propertyTemplate}>
             <ControlledProposalStatusSelect
               onChange={(result) => onProposalStatusUpdate(checkedIds, result)}
               proposal={firstCheckedProposal}
@@ -185,7 +165,7 @@ export function PropertyTemplateMenu({
     case 'proposalStep': {
       if (firstCheckedProposal) {
         return (
-          <PropertyMenu cards={cards} propertyTemplate={propertyTemplate}>
+          <PropertyMenu disabled={disabled} cards={cards} propertyTemplate={propertyTemplate}>
             <ControlledProposalStepSelect
               onChange={({ evaluationId, moveForward }) => onProposalStepUpdate(checkedIds, evaluationId, moveForward)}
               proposal={{

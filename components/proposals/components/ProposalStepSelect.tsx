@@ -16,12 +16,14 @@ type ProposalProp = {
 
 export function ControlledProposalStepSelect({
   proposal,
-  onChange
+  onChange,
+  readOnly
 }: {
+  readOnly?: boolean;
   proposal: ProposalProp;
   onChange: (data: { evaluationId: string; moveForward: boolean }) => void;
 }) {
-  return <ProposalStepSelectBase proposal={proposal} onChange={onChange} readOnly={false} />;
+  return <ProposalStepSelectBase readOnly={readOnly} proposal={proposal} onChange={onChange} />;
 }
 
 export function ProposalStepSelect({ proposal, readOnly }: { proposal: ProposalProp; readOnly: boolean }) {
@@ -49,7 +51,7 @@ export function ProposalStepSelectBase({
   onChange
 }: {
   proposal: ProposalProp;
-  readOnly: boolean;
+  readOnly?: boolean;
   onChange: (data: { evaluationId: string; moveForward: boolean }) => void;
 }) {
   const hasRewards = proposal.hasRewards;

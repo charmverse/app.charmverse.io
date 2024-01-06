@@ -35,9 +35,11 @@ export const StyledMenuItem = styled(MenuItem)`
 
 export function PropertyMenu({
   cards,
+  disabled,
   propertyTemplate,
   children
 }: {
+  disabled?: boolean;
   cards: Card[];
   propertyTemplate: IPropertyTemplate<PropertyType>;
   children: ReactNode | ((option: { isPropertyOpen: boolean; closeMenu: VoidFunction }) => ReactNode);
@@ -53,6 +55,7 @@ export function PropertyMenu({
   return (
     <>
       <StyledMenuItem
+        disabled={disabled}
         ref={ref}
         onClick={() => {
           popupState.open();

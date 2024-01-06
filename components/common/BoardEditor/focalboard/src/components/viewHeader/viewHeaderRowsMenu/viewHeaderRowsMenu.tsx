@@ -15,7 +15,9 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
+import { Constants } from 'lib/focalboard/constants';
 import type { ProposalEvaluationStep } from 'lib/proposal/interface';
+import { isTruthy } from 'lib/utilities/types';
 
 import mutator from '../../../mutator';
 
@@ -37,6 +39,23 @@ const StyledStack = styled(Stack)`
   -ms-overflow-style: none;
   scrollbar-width: none;
 `;
+
+const validPropertyTypes = [
+  'checkbox',
+  'text',
+  'number',
+  'date',
+  'multiSelect',
+  'select',
+  'url',
+  'email',
+  'phone',
+  'person',
+  'proposalAuthor',
+  'proposalReviewer',
+  'proposalStep',
+  'proposalStatus'
+] as PropertyType[];
 
 export function ViewHeaderRowsMenu({
   cards,
@@ -78,7 +97,7 @@ export function ViewHeaderRowsMenu({
     }
   }
 
-  async function updateProposalsAuthor(pageIds: string[], authorIds: string[]) {
+  async function onProposalAuthorSelect(pageIds: string[], authorIds: string[]) {
     for (const pageId of pageIds) {
       const proposalId = pages[pageId]?.proposalId;
       if (proposalId) {
@@ -94,20 +113,57 @@ export function ViewHeaderRowsMenu({
     }
   }
 
-  async function updateProposalsReviewer(pageIds: string[], reviewers: SelectOption[]) {
+  const { isStepDisabled, isStatusDisabled, isReviewersDisabled } = useMemo(() => {
+    const checkedPages = checkedIds.map((id) => pages[id]).filter(isTruthy);
+    const firstProposal = proposalsMap[checkedPages[0]?.proposalId ?? ''];
+    const _isReviewerDisabled = checkedPages.some((checkedPage) => {
+      const proposal = proposalsMap[checkedPage.proposalId ?? ''];
+      return (
+        !proposal ||
+        proposal.currentStep.step === 'draft' ||
+        proposal.currentStep.step === 'feedback' ||
+        checkedPage.sourceTemplateId
+      );
+    });
+
+    const _isStatusDisabled =
+      !firstProposal ||
+      checkedPages.some((checkedPage) => {
+        const proposal = proposalsMap[checkedPage.proposalId ?? ''];
+        return !proposal || proposal.currentStep.step !== firstProposal.currentStep.step;
+      });
+
+    const _isStepDisabled =
+      !firstProposal ||
+      checkedPages.some((checkedPage) => {
+        const proposal = proposalsMap[checkedPage.proposalId ?? ''];
+        return (
+          !proposal ||
+          proposal.evaluations.length !== firstProposal.evaluations.length ||
+          proposal.evaluations.some((evaluation, index) => {
+            const firstProposalEvaluation = firstProposal.evaluations[index];
+            return (
+              evaluation.type !== firstProposalEvaluation.type || evaluation.title !== firstProposalEvaluation.title
+            );
+          })
+        );
+      });
+
+    return {
+      isStepDisabled: _isStepDisabled,
+      isStatusDisabled: _isStatusDisabled,
+      isReviewersDisabled: _isReviewerDisabled
+    };
+  }, [pages, checkedIds, proposalsMap]);
+
+  async function onProposalReviewerSelect(pageIds: string[], reviewers: SelectOption[]) {
     let proposalReviewersChanged = false;
     for (const pageId of pageIds) {
       const page = pages[pageId];
       const proposalId = page?.proposalId;
       const proposal = proposalId ? proposalsMap[proposalId] : null;
       const proposalWithEvaluationId = proposal?.currentEvaluationId;
-      if (
-        proposal &&
-        proposalWithEvaluationId &&
-        proposal.currentStep.step !== 'draft' &&
-        proposal.currentStep.step !== 'feedback' &&
-        !page?.sourceTemplateId
-      ) {
+      if (proposal && proposalWithEvaluationId) {
         await charmClient.proposals.updateProposalEvaluation({
           reviewers: reviewers.map((reviewer) => ({
             roleId: reviewer.group === 'role' ? reviewer.id : null,
@@ -151,11 +207,13 @@ export function ViewHeaderRowsMenu({
       }
     });
 
-    await batchUpdateProposalStatuses({
-      proposalsData,
-      result,
-      currentEvaluationStep: firstProposal.currentStep.step
-    });
+    if (proposalsData.length) {
+      await batchUpdateProposalStatuses({
+        proposalsData,
+        result,
+        currentEvaluationStep: firstProposal.currentStep.step
+      });
+    }
   }
 
   async function onProposalStepUpdate(pageIds: string[], evaluationId: string, moveForward: boolean) {
@@ -180,20 +238,10 @@ export function ViewHeaderRowsMenu({
     pageIds.forEach((pageId) => {
       const proposal = proposalsMap[pages[pageId]?.proposalId ?? ''];
       if (proposal) {
-        const isSameWorkflow =
-          proposal.evaluations.length === firstProposal.evaluations.length &&
-          proposal.evaluations.every((evaluation, index) => {
-            const firstProposalEvaluation = firstProposal.evaluations[index];
-            return (
-              evaluation.type === firstProposalEvaluation.type && evaluation.title === firstProposalEvaluation.title
-            );
-          });
-
         if (
-          isSameWorkflow &&
-          ((evaluationId === 'rewards' &&
+          (evaluationId === 'rewards' &&
             ((proposal.fields?.pendingRewards ?? []).length > 0 || (proposal.rewardIds ?? [])?.length > 0)) ||
-            evaluationId !== 'rewards')
+          evaluationId !== 'rewards'
         ) {
           proposalsData.push({
             proposalId: proposal.id,
@@ -210,7 +258,12 @@ export function ViewHeaderRowsMenu({
   }
 
   const filteredPropertyTemplates = useMemo(() => {
-    return propertyTemplates.filter((propertyTemplate) => !propertyTemplate.formFieldId);
+    return propertyTemplates.filter(
+      (propertyTemplate) =>
+        !propertyTemplate.formFieldId &&
+        validPropertyTypes.includes(propertyTemplate.type) &&
+        propertyTemplate.id !== Constants.titleColumnId
+    );
   }, [propertyTemplates]);
 
   const firstCheckedProposal = useMemo(() => {
@@ -247,10 +300,19 @@ export function ViewHeaderRowsMenu({
               key={propertyTemplate.id}
               onChange={onChange}
               firstCheckedProposal={firstCheckedProposal}
-              onProposalAuthorSelect={updateProposalsAuthor}
-              onProposalReviewerSelect={updateProposalsReviewer}
+              onProposalAuthorSelect={onProposalAuthorSelect}
+              onProposalReviewerSelect={onProposalReviewerSelect}
               onProposalStatusUpdate={onProposalStatusUpdate}
               onProposalStepUpdate={onProposalStepUpdate}
+              disabled={
+                propertyTemplate.type === 'proposalStep'
+                  ? isStepDisabled
+                  : propertyTemplate.type === 'proposalStatus'
+                  ? isStatusDisabled
+                  : propertyTemplate.type === 'proposalReviewer'
+                  ? isReviewersDisabled
+                  : false
+              }
             />
           ))
         : null}

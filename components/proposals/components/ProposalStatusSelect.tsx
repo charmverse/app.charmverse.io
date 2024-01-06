@@ -17,12 +17,14 @@ type ProposalProp = Pick<ProposalWithUsersLite, 'currentStep' | 'currentEvaluati
 
 export function ControlledProposalStatusSelect({
   proposal,
-  onChange
+  onChange,
+  readOnly
 }: {
+  readOnly?: boolean;
   proposal: ProposalProp;
   onChange: (result: ProposalEvaluationResult | null) => void;
 }) {
-  return <ProposalStatusSelectBase proposal={proposal} onChange={onChange} readOnly={false} />;
+  return <ProposalStatusSelectBase readOnly={readOnly} proposal={proposal} onChange={onChange} />;
 }
 
 export function ProposalStatusSelect({ proposal, readOnly }: { proposal: ProposalProp; readOnly?: boolean }) {
