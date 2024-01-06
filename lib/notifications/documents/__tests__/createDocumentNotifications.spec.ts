@@ -805,8 +805,7 @@ describe(`Test document events and notifications`, () => {
 
     await updateProposalStatusOnly({
       newStatus: 'published',
-      proposalId: page.id,
-      userId: user.id
+      proposalId: page.id
     });
 
     const mentionId = v4();
