@@ -216,12 +216,14 @@ export function NewProposalPage({
         const existingStep = (template?.evaluations || formInputs.evaluations).find(
           (e) => e.title === evaluation.title
         );
+        const rubricCriteria = (
+          evaluation.type === 'rubric' ? existingStep?.rubricCriteria || [getNewCriteria()] : []
+        ) as ProposalRubricCriteriaWithTypedParams[];
         return {
           id: evaluation.id,
           index,
           reviewers: existingStep?.reviewers || [],
-          rubricCriteria:
-            existingStep?.rubricCriteria || ([getNewCriteria()] as ProposalRubricCriteriaWithTypedParams[]),
+          rubricCriteria,
           title: evaluation.title,
           type: evaluation.type,
           result: null,
