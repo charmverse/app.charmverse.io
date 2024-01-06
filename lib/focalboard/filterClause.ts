@@ -135,8 +135,8 @@ export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
     conditions: TextDataTypeConditions
   },
   proposalStatus: {
-    datatype: 'select',
-    conditions: SelectDataTypeConditions
+    datatype: 'multi_select',
+    conditions: MultiSelectDataTypeConditions
   },
   proposalEvaluatedBy: {
     datatype: 'multi_select',

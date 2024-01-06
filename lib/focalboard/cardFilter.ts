@@ -1,3 +1,4 @@
+import { ProposalEvaluationResult } from '@charmverse/core/dist/cjs/prisma-client';
 import { log } from '@charmverse/core/log';
 
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
@@ -15,6 +16,9 @@ import type {
 } from 'lib/focalboard/filterClause';
 import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import { isAFilterGroupInstance } from 'lib/focalboard/filterGroup';
+import { PROPOSAL_EVALUATION_TYPE_ID } from 'lib/proposal/blocks/constants';
+import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
+import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from 'lib/proposal/interface';
 
 import { Constants } from './constants';
 
@@ -61,6 +65,10 @@ class CardFilter {
 
   static isClauseMet(filter: FilterClause, templates: readonly IPropertyTemplate[], card: Card): boolean {
     const filterProperty = templates.find((o) => o.id === filter.propertyId);
+    const proposalEvaluationTypeProperty = templates.find((o) => o.id === PROPOSAL_EVALUATION_TYPE_ID);
+    const proposalEvaluationType = proposalEvaluationTypeProperty
+      ? (card.fields.properties[proposalEvaluationTypeProperty.id] as ProposalEvaluationStep)
+      : null;
     let value = card.fields.properties[filter.propertyId] ?? [];
     switch (filterProperty?.type) {
       case 'updatedBy': {
@@ -181,13 +189,26 @@ class CardFilter {
       } else if (filterPropertyDataType === 'multi_select') {
         const condition = filter.condition as (typeof MultiSelectDataTypeConditions)[number];
         switch (condition) {
-          case 'contains': {
-            return valueArray.length !== 0 && valueArray.some((sourceValue) => filter.values.includes(sourceValue));
-          }
+          case 'contains':
           case 'does_not_contain': {
-            return valueArray.length === 0
-              ? true
-              : valueArray.every((sourceValue) => !filter.values.includes(sourceValue));
+            let contains = false;
+            if (filterProperty.type === 'proposalStatus') {
+              contains =
+                valueArray.length !== 0 &&
+                !!proposalEvaluationType &&
+                (valueArray as ProposalEvaluationResultExtended[]).some((sourceValue) => {
+                  return filter.values.includes(
+                    getProposalEvaluationStatus({
+                      result: sourceValue,
+                      step: proposalEvaluationType
+                    })
+                  );
+                });
+            } else {
+              contains =
+                valueArray.length !== 0 && valueArray.some((sourceValue) => filter.values.includes(sourceValue));
+            }
+            return condition === 'contains' ? contains : !contains;
           }
           case 'is_empty': {
             return valueArray.length === 0;

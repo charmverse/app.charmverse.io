@@ -3,9 +3,9 @@ import type { Block } from 'lib/focalboard/block';
 import { createBoard } from 'lib/focalboard/board';
 import { Constants } from 'lib/focalboard/constants';
 import {
-  PROPOSAL_RESULT_LABELS,
+  PROPOSAL_STATUS_LABELS,
   proposalDbProperties,
-  proposalResultBoardColors
+  proposalStatusColors
 } from 'lib/focalboard/proposalDbProperties';
 import { createTableView } from 'lib/focalboard/tableView';
 import {
@@ -18,9 +18,9 @@ import {
   PROPOSAL_STEP_BLOCK_ID
 } from 'lib/proposal/blocks/constants';
 import type { ProposalBoardBlock } from 'lib/proposal/blocks/interfaces';
-import type { ProposalEvaluationResultExtended } from 'lib/proposal/interface';
+import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
 
-const proposalResults = Object.keys(PROPOSAL_RESULT_LABELS) as ProposalEvaluationResultExtended[];
+const proposalStatuses = Object.keys(PROPOSAL_STATUS_LABELS) as ProposalEvaluationStatus[];
 
 export function getDefaultBoard({
   storedBoard,
@@ -69,10 +69,10 @@ function getDefaultProperties({ evaluationStepTitles }: { evaluationStepTitles: 
 export function getDefaultStatusProperty() {
   return {
     ...proposalDbProperties.proposalStatus(PROPOSAL_STATUS_BLOCK_ID, 'Status'),
-    options: proposalResults.map((s) => ({
+    options: proposalStatuses.map((s) => ({
       id: s,
       value: s,
-      color: proposalResultBoardColors[s]
+      color: `propColor${proposalStatusColors[s].charAt(0).toUpperCase() + proposalStatusColors[s].slice(1)}`
     }))
   };
 }

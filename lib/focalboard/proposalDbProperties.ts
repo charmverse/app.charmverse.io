@@ -116,15 +116,6 @@ export const PROPOSAL_RESULT_LABELS: Record<ProposalEvaluationResultExtended, st
   pass: 'Passed'
 };
 
-export const proposalResultBoardColors: Record<
-  ProposalEvaluationResultExtended,
-  keyof (typeof Constants)['menuColors']
-> = {
-  fail: 'propColorRed',
-  in_progress: 'propColorYellow',
-  pass: 'propColorGreen'
-};
-
 export const proposalStatusColors: Record<ProposalEvaluationStatus, BrandColor> = {
   complete: 'green',
   declined: 'red',

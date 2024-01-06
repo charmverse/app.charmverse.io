@@ -31,9 +31,9 @@ import type { FilterClause, FilterCondition } from 'lib/focalboard/filterClause'
 import { propertyConfigs } from 'lib/focalboard/filterClause';
 import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import { createFilterGroup } from 'lib/focalboard/filterGroup';
-import { PROPOSAL_RESULT_LABELS, PROPOSAL_STEP_LABELS } from 'lib/focalboard/proposalDbProperties';
+import { PROPOSAL_STATUS_LABELS, PROPOSAL_STEP_LABELS } from 'lib/focalboard/proposalDbProperties';
 import { AUTHORS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposal/blocks/constants';
-import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from 'lib/proposal/interface';
+import type { ProposalEvaluationStatus, ProposalEvaluationStep } from 'lib/proposal/interface';
 import { focalboardColorsMap } from 'theme/colors';
 
 import { iconForPropertyType } from '../../widgets/iconForPropertyType';
@@ -192,52 +192,7 @@ function FilterPropertyValue({
   } else if (propertyDataType === 'boolean') {
     return <Checkbox checked={filter.values[0] === 'true'} onChange={updateBooleanValue} />;
   } else if (propertyDataType === 'multi_select') {
-    if (isPropertyTypeMultiSelect) {
-      return (
-        <Select<string[]>
-          size='small'
-          multiple
-          displayEmpty
-          value={filter.values}
-          onChange={updateMultiSelectValue}
-          renderValue={(selected) => {
-            return selected.length === 0 ? (
-              <Typography fontSize='small' color='secondary'>
-                Select an option
-              </Typography>
-            ) : (
-              <SelectMenuItemsContainer>
-                {selected.map((optionId) => {
-                  const foundOption = property.options?.find((o) => o.id === optionId);
-                  return foundOption ? (
-                    <Chip
-                      key={foundOption.id}
-                      size='small'
-                      label={foundOption.value}
-                      color={focalboardColorsMap[foundOption.color]}
-                    />
-                  ) : null;
-                })}
-              </SelectMenuItemsContainer>
-            );
-          }}
-        >
-          {property.options.length === 0 ? (
-            <Typography sx={{ mx: 1, textAlign: 'center' }} color='secondary' variant='subtitle1'>
-              No options available
-            </Typography>
-          ) : (
-            property.options?.map((option) => {
-              return (
-                <MenuItem key={option.id} value={option.id}>
-                  <Chip size='small' label={option.value} color={focalboardColorsMap[option.color]} />
-                </MenuItem>
-              );
-            })
-          )}
-        </Select>
-      );
-    } else if (isPropertyTypePerson) {
+    if (isPropertyTypePerson) {
       return (
         <Select<string[]>
           size='small'
@@ -303,6 +258,63 @@ function FilterPropertyValue({
           })}
         </Select>
       );
+    } else {
+      return (
+        <Select<string[]>
+          size='small'
+          multiple
+          displayEmpty
+          value={filter.values}
+          onChange={updateMultiSelectValue}
+          renderValue={(selected) => {
+            return selected.length === 0 ? (
+              <Typography fontSize='small' color='secondary'>
+                Select an option
+              </Typography>
+            ) : (
+              <SelectMenuItemsContainer>
+                {selected.map((optionId) => {
+                  const foundOption = property.options?.find((o) => o.id === optionId);
+                  return foundOption ? (
+                    <Chip
+                      key={foundOption.id}
+                      size='small'
+                      label={
+                        property.type === 'proposalStatus'
+                          ? PROPOSAL_STATUS_LABELS[foundOption.value as ProposalEvaluationStatus]
+                          : foundOption.value
+                      }
+                      color={focalboardColorsMap[foundOption.color]}
+                    />
+                  ) : null;
+                })}
+              </SelectMenuItemsContainer>
+            );
+          }}
+        >
+          {property.options.length === 0 ? (
+            <Typography sx={{ mx: 1, textAlign: 'center' }} color='secondary' variant='subtitle1'>
+              No options available
+            </Typography>
+          ) : (
+            property.options?.map((option) => {
+              return (
+                <MenuItem key={option.id} value={option.id}>
+                  <Chip
+                    size='small'
+                    label={
+                      property.type === 'proposalStatus'
+                        ? PROPOSAL_STATUS_LABELS[option.value as ProposalEvaluationStatus]
+                        : option.value
+                    }
+                    color={focalboardColorsMap[option.color]}
+                  />
+                </MenuItem>
+              );
+            })
+          )}
+        </Select>
+      );
     }
   } else if (propertyDataType === 'select') {
     return (
@@ -317,8 +329,6 @@ function FilterPropertyValue({
               label={
                 isPropertyTypeEvaluationType
                   ? PROPOSAL_STEP_LABELS[foundOption.value as ProposalEvaluationStep]
-                  : property.type === 'proposalStatus'
-                  ? PROPOSAL_RESULT_LABELS[foundOption.value as ProposalEvaluationResultExtended]
                   : foundOption.value
               }
               color={focalboardColorsMap[foundOption.color]}
@@ -343,8 +353,6 @@ function FilterPropertyValue({
                   label={
                     isPropertyTypeEvaluationType
                       ? PROPOSAL_STEP_LABELS[option.value as ProposalEvaluationStep]
-                      : property.type === 'proposalStatus'
-                      ? PROPOSAL_RESULT_LABELS[option.value as ProposalEvaluationResultExtended]
                       : option.value
                   }
                   color={focalboardColorsMap[option.color]}
