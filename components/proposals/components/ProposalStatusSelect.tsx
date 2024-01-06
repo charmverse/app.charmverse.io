@@ -1,3 +1,4 @@
+import type { ProposalEvaluationResult } from '@charmverse/core/dist/cjs/prisma-client';
 import { useMemo } from 'react';
 
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
@@ -17,7 +18,7 @@ export function ControlledProposalStatusSelect({
   onChange
 }: {
   proposal: Pick<ProposalWithUsersLite, 'currentStep' | 'currentEvaluationId'>;
-  onChange: (status: ProposalEvaluationStatus) => void;
+  onChange: (result: ProposalEvaluationResult) => void;
 }) {
   return <ProposalStatusSelectBase proposal={proposal} onChange={onChange} readOnly={false} />;
 }
@@ -31,17 +32,17 @@ export function ProposalStatusSelect({
 }) {
   const currentEvaluationStep = proposal.currentStep.step;
   const currentEvaluationId = proposal.currentEvaluationId;
-  const { updateProposalStatus } = useProposalUpdateStatusAndStep();
+  const { batchUpdateProposalStatuses } = useProposalUpdateStatusAndStep();
 
-  async function onChange(status: ProposalEvaluationStatus) {
-    updateProposalStatus({
+  async function onChange(result: ProposalEvaluationResult) {
+    batchUpdateProposalStatuses({
       proposalsData: [
         {
           proposalId: proposal.id,
           evaluationId: currentEvaluationId
         }
       ],
-      status,
+      result,
       currentEvaluationStep
     });
   }
@@ -55,7 +56,7 @@ function ProposalStatusSelectBase({
   readOnly
 }: {
   proposal: Pick<ProposalWithUsersLite, 'currentStep' | 'currentEvaluationId'>;
-  onChange: (status: ProposalEvaluationStatus) => void;
+  onChange: (result: ProposalEvaluationResult) => void;
   readOnly?: boolean;
 }) {
   const currentEvaluationStep = proposal.currentStep.step;
@@ -99,7 +100,9 @@ function ProposalStatusSelectBase({
           : ''
       }
       disableClearable
-      onChange={(newValue) => onChange(newValue as ProposalEvaluationStatus)}
+      onChange={(status) => {
+        onChange(status === 'complete' || status === 'passed' || status === 'published' ? 'pass' : 'fail');
+      }}
     />
   );
 }

@@ -1,4 +1,4 @@
-import type { ProposalSystemRole } from '@charmverse/core/prisma';
+import type { ProposalEvaluationResult, ProposalSystemRole } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import { Stack, Typography } from '@mui/material';
@@ -15,7 +15,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
-import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
+import type { ProposalEvaluationStep } from 'lib/proposal/interface';
 
 import mutator from '../../../mutator';
 
@@ -60,7 +60,7 @@ export function ViewHeaderRowsMenu({
   const { proposalsMap } = useProposals();
   const { space } = useCurrentSpace();
   const [isDeleting, setIsDeleting] = useState(false);
-  const { updateProposalStatus, updateProposalStep } = useProposalUpdateStatusAndStep();
+  const { batchUpdateProposalStatuses, batchUpdateProposalSteps } = useProposalUpdateStatusAndStep();
 
   async function deleteCheckedCards() {
     setIsDeleting(true);
@@ -125,7 +125,7 @@ export function ViewHeaderRowsMenu({
     }
   }
 
-  async function onProposalStatusUpdate(pageIds: string[], status: ProposalEvaluationStatus) {
+  async function onProposalStatusUpdate(pageIds: string[], result: ProposalEvaluationResult) {
     if (pageIds.length === 0) {
       return;
     }
@@ -151,14 +151,14 @@ export function ViewHeaderRowsMenu({
       }
     });
 
-    await updateProposalStatus({
+    await batchUpdateProposalStatuses({
       proposalsData,
-      status,
+      result,
       currentEvaluationStep: firstProposal.currentStep.step
     });
   }
 
-  async function onProposalStepUpdate(pageIds: string[], evaluationId: string) {
+  async function onProposalStepUpdate(pageIds: string[], evaluationId: string, moveForward: boolean) {
     if (pageIds.length === 0) {
       return;
     }
@@ -174,6 +174,7 @@ export function ViewHeaderRowsMenu({
     const proposalsData: {
       proposalId: string;
       evaluationId: string;
+      currentEvaluationStep: ProposalEvaluationStep;
     }[] = [];
 
     pageIds.forEach((pageId) => {
@@ -196,14 +197,15 @@ export function ViewHeaderRowsMenu({
         ) {
           proposalsData.push({
             proposalId: proposal.id,
-            evaluationId: evaluationId === 'draft' ? evaluationId : proposal.evaluations[evaluationIndex].id
+            evaluationId: evaluationId === 'draft' ? evaluationId : proposal.evaluations[evaluationIndex].id,
+            currentEvaluationStep: proposal.currentStep.step
           });
         }
       }
     });
 
     if (proposalsData.length) {
-      await updateProposalStep(proposalsData);
+      await batchUpdateProposalSteps(proposalsData, moveForward);
     }
   }
 

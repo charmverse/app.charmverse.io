@@ -1,3 +1,5 @@
+import type { ProposalEvaluationResult } from '@charmverse/core/dist/cjs/prisma-client';
+
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { ControlledProposalStatusSelect } from 'components/proposals/components/ProposalStatusSelect';
@@ -6,7 +8,7 @@ import { allMembersSystemRole } from 'components/settings/proposals/components/E
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
-import type { ProposalEvaluationStatus, ProposalWithUsersLite } from 'lib/proposal/interface';
+import type { ProposalWithUsersLite } from 'lib/proposal/interface';
 
 import mutator from '../../../mutator';
 
@@ -36,8 +38,8 @@ export function PropertyTemplateMenu({
   isAdmin: boolean;
   onProposalAuthorSelect: (pageIds: string[], userIds: string[]) => Promise<void>;
   onProposalReviewerSelect: (pageIds: string[], options: SelectOption[]) => Promise<void>;
-  onProposalStepUpdate(pageIds: string[], evaluationId: string): Promise<void>;
-  onProposalStatusUpdate(pageIds: string[], status: ProposalEvaluationStatus): Promise<void>;
+  onProposalStepUpdate(pageIds: string[], evaluationId: string, moveForward: boolean): Promise<void>;
+  onProposalStatusUpdate(pageIds: string[], result: ProposalEvaluationResult): Promise<void>;
   firstCheckedProposal?: ProposalWithUsersLite;
 }) {
   const isValidType = [
@@ -171,7 +173,7 @@ export function PropertyTemplateMenu({
         return (
           <PropertyMenu cards={cards} propertyTemplate={propertyTemplate}>
             <ControlledProposalStatusSelect
-              onChange={(status) => onProposalStatusUpdate(checkedIds, status)}
+              onChange={(result) => onProposalStatusUpdate(checkedIds, result)}
               proposal={firstCheckedProposal}
             />
           </PropertyMenu>
@@ -185,7 +187,7 @@ export function PropertyTemplateMenu({
         return (
           <PropertyMenu cards={cards} propertyTemplate={propertyTemplate}>
             <ControlledProposalStepSelect
-              onChange={(evaluationId) => onProposalStepUpdate(checkedIds, evaluationId)}
+              onChange={({ evaluationId, moveForward }) => onProposalStepUpdate(checkedIds, evaluationId, moveForward)}
               proposal={{
                 currentStep: firstCheckedProposal.currentStep,
                 id: firstCheckedProposal.id,

@@ -35,7 +35,7 @@ export class ProposalsApi {
     return http.PUT(`/api/proposals/${proposalId}/evaluation`, payload);
   }
 
-  submitEvaluationResult({ proposalId, ...payload }: ReviewEvaluationRequest) {
+  submitEvaluationResult({ proposalId, ...payload }: Omit<ReviewEvaluationRequest, 'decidedBy'>) {
     return http.PUT(`/api/proposals/${proposalId}/submit-result`, payload);
   }
 

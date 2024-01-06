@@ -1,46 +1,61 @@
+import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
 import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useUser } from 'hooks/useUser';
-import type { ProposalEvaluationStatus, ProposalEvaluationStep } from 'lib/proposal/interface';
+import type { ProposalEvaluationStep } from 'lib/proposal/interface';
 
 export function useProposalUpdateStatusAndStep() {
   const { space } = useCurrentSpace();
   const { showMessage } = useSnackbar();
-  const { user: currentUser } = useUser();
 
   async function updateProposalStatus({
+    proposalData,
+    result,
+    currentEvaluationStep
+  }: {
+    proposalData: { proposalId: string; evaluationId?: string | null };
+    currentEvaluationStep: ProposalEvaluationStep;
+    result: ProposalEvaluationResult;
+  }) {
+    const { proposalId, evaluationId } = proposalData;
+    if (currentEvaluationStep === 'rewards' && result === 'pass') {
+      await charmClient.proposals.createProposalRewards({
+        proposalId
+      });
+    } else if (currentEvaluationStep === 'draft' && result === 'pass') {
+      await charmClient.proposals.updateProposalStatusOnly({
+        proposalId,
+        newStatus: 'published'
+      });
+    } else if (evaluationId) {
+      await charmClient.proposals.submitEvaluationResult({
+        proposalId,
+        evaluationId,
+        result
+      });
+    }
+  }
+
+  async function batchUpdateProposalStatuses({
     proposalsData,
-    status,
+    result,
     currentEvaluationStep
   }: {
     proposalsData: { proposalId: string; evaluationId?: string | null }[];
     currentEvaluationStep: ProposalEvaluationStep;
-    status: ProposalEvaluationStatus;
+    result: ProposalEvaluationResult;
   }) {
-    if (space && currentUser) {
+    if (space) {
       const { id: spaceId } = space;
       try {
-        for (const { proposalId, evaluationId } of proposalsData) {
-          if (currentEvaluationStep === 'rewards') {
-            await charmClient.proposals.createProposalRewards({
-              proposalId
-            });
-          } else if (currentEvaluationStep === 'draft' && status === 'published') {
-            await charmClient.proposals.updateProposalStatusOnly({
-              proposalId,
-              newStatus: 'published'
-            });
-          } else if (evaluationId) {
-            await charmClient.proposals.submitEvaluationResult({
-              proposalId,
-              evaluationId,
-              decidedBy: currentUser.id,
-              result: status === 'complete' || status === 'passed' ? 'pass' : 'fail'
-            });
-          }
+        for (const proposalData of proposalsData) {
+          await updateProposalStatus({
+            currentEvaluationStep,
+            proposalData,
+            result
+          });
         }
         await mutate(`/api/spaces/${spaceId}/proposals`);
       } catch (err: any) {
@@ -49,12 +64,21 @@ export function useProposalUpdateStatusAndStep() {
     }
   }
 
-  async function updateProposalStep(proposalsData: { evaluationId: string; proposalId: string }[]) {
+  async function batchUpdateProposalSteps(
+    proposalsData: { evaluationId: string; proposalId: string; currentEvaluationStep: ProposalEvaluationStep }[],
+    moveForward: boolean
+  ) {
     if (space) {
       const { id: spaceId } = space;
       try {
-        for (const { evaluationId, proposalId } of proposalsData) {
-          if (evaluationId !== 'draft') {
+        for (const { currentEvaluationStep, evaluationId, proposalId } of proposalsData) {
+          if (moveForward) {
+            await updateProposalStatus({
+              proposalData: { proposalId, evaluationId },
+              currentEvaluationStep,
+              result: 'pass'
+            });
+          } else if (evaluationId !== 'draft') {
             await charmClient.proposals.goBackToEvaluationStep({
               evaluationId,
               proposalId
@@ -74,7 +98,7 @@ export function useProposalUpdateStatusAndStep() {
   }
 
   return {
-    updateProposalStep,
-    updateProposalStatus
+    batchUpdateProposalStatuses,
+    batchUpdateProposalSteps
   };
 }

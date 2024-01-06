@@ -12,7 +12,8 @@ export function createMockProposal(
       step: 'draft',
       result: 'in_progress',
       title: 'Draft',
-      id: 'draft'
+      id: 'draft',
+      index: 0
     },
     lensPostLink: null,
     publishToLens: null,

@@ -19,21 +19,25 @@ export function ControlledProposalStepSelect({
   onChange
 }: {
   proposal: ProposalProp;
-  onChange: (evaluationId: string) => void;
+  onChange: (data: { evaluationId: string; moveForward: boolean }) => void;
 }) {
   return <ProposalStepSelectBase proposal={proposal} onChange={onChange} readOnly={false} />;
 }
 
 export function ProposalStepSelect({ proposal, readOnly }: { proposal: ProposalProp; readOnly: boolean }) {
-  const { updateProposalStep } = useProposalUpdateStatusAndStep();
+  const { batchUpdateProposalSteps } = useProposalUpdateStatusAndStep();
 
-  function onValueChange(evaluationId: string) {
-    updateProposalStep([
-      {
-        evaluationId,
-        proposalId: proposal.id
-      }
-    ]);
+  function onValueChange({ evaluationId, moveForward }: { evaluationId: string; moveForward: boolean }) {
+    batchUpdateProposalSteps(
+      [
+        {
+          evaluationId,
+          proposalId: proposal.id,
+          currentEvaluationStep: proposal.currentStep.step
+        }
+      ],
+      moveForward
+    );
   }
 
   return <ProposalStepSelectBase proposal={proposal} onChange={onValueChange} readOnly={readOnly} />;
@@ -46,12 +50,15 @@ export function ProposalStepSelectBase({
 }: {
   proposal: ProposalProp;
   readOnly: boolean;
-  onChange: (evaluationId: string) => void;
+  onChange: (data: { evaluationId: string; moveForward: boolean }) => void;
 }) {
-  const currentEvaluationStep = proposal.currentStep.step;
-  const currentEvaluationResult = proposal.currentStep.result;
   const hasRewards = proposal.hasRewards;
-  const { currentValue, options } = useMemo(() => {
+
+  const { options } = useMemo(() => {
+    const currentEvaluationStep = proposal.currentStep.step;
+    const currentEvaluationIndex = proposal.currentStep.index;
+    const currentEvaluationResult = proposal.currentStep.result;
+
     const _options: IPropertyOption[] = [
       {
         id: 'draft',
@@ -73,21 +80,18 @@ export function ProposalStepSelectBase({
           ]
         : [])
     ];
-    const lastEvaluation = proposal && proposal.evaluations[proposal.evaluations.length - 1];
-    const currentEvaluationId = proposal.currentEvaluationId;
-    const currentEvaluationIndex = !currentEvaluationId
-      ? 0
-      : currentEvaluationId === lastEvaluation?.id && lastEvaluation?.result === 'pass' && hasRewards
-      ? _options.length - 1
-      : _options.findIndex((e) => e.id === currentEvaluationId);
+
     _options.forEach((option, index) => {
       option.disabled =
-        index >= currentEvaluationIndex ||
+        index === currentEvaluationIndex ||
         index < currentEvaluationIndex - 1 ||
+        index > currentEvaluationIndex + 1 ||
+        // If we are on the vote step, then we can only go back to the previous step
+        (currentEvaluationStep === 'vote' ? index >= currentEvaluationIndex : false) ||
         (currentEvaluationStep === 'rewards' && currentEvaluationResult === 'pass');
     });
-    return { options: _options, currentValue: _options[currentEvaluationIndex]?.id };
-  }, [proposal, currentEvaluationResult, currentEvaluationStep, hasRewards]);
+    return { options: _options };
+  }, [proposal, hasRewards]);
 
   return (
     <TagSelect
@@ -96,11 +100,18 @@ export function ProposalStepSelectBase({
       includeSelectedOptions
       readOnly={readOnly}
       options={options}
-      propertyValue={currentValue ?? ''}
+      propertyValue={proposal.currentStep.id}
       onChange={(values) => {
         const evaluationId = Array.isArray(values) ? values[0] : values;
         if (evaluationId) {
-          onChange(evaluationId);
+          const currentEvaluationIndex = proposal.currentStep.index;
+          const newEvaluationIdIndex = options.findIndex((option) => option.id === evaluationId);
+          const moveForward = newEvaluationIdIndex > currentEvaluationIndex;
+          // If we are moving forward then pass the current step, otherwise go back to the previous step
+          onChange({
+            evaluationId: moveForward ? proposal.currentStep.id : evaluationId,
+            moveForward
+          });
         }
       }}
     />
