@@ -54,7 +54,7 @@ describe('PUT /api/proposals/[id]/publish - Publish proposal', () => {
     await request(baseUrl).put(`/api/proposals/${v4()}/status`).set('Cookie', authorCookie).send().expect(404);
   });
 
-  it('should throw error and return 400 if the user cannot update the status', async () => {
+  it('should throw error and return 401 if the user cannot update the status', async () => {
     const spaceMember = await generateSpaceUser({
       spaceId: space.id,
       isAdmin: false
@@ -73,7 +73,7 @@ describe('PUT /api/proposals/[id]/publish - Publish proposal', () => {
       .put(`/api/proposals/${proposal.id}/publish`)
       .set('Cookie', spaceMemberCookie)
       .send()
-      .expect(400);
+      .expect(401);
   });
 
   it('should successfully update the status of proposal and return 200', async () => {

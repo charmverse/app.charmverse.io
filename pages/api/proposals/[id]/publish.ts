@@ -3,7 +3,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { updateProposalStatusOnly } from 'lib/proposal/updateProposalStatusOnly';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -15,10 +16,18 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
+  const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
+    resourceId: proposalId,
+    userId
+  });
+
+  if (!permissions.move) {
+    throw new ActionNotPermittedError(`You do not have permission to publish this proposal`);
+  }
+
   await updateProposalStatusOnly({
     proposalId,
-    newStatus: 'published',
-    userId
+    newStatus: 'published'
   });
 
   const proposalPage = await prisma.page.findUnique({

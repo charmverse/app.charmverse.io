@@ -153,8 +153,7 @@ describe.skip(`Test proposal events and notifications`, () => {
     // Move to review status
     await updateProposalStatusOnly({
       newStatus: 'published',
-      proposalId: proposal.id,
-      userId: author1.id
+      proposalId: proposal.id
     });
     await createProposalNotifications({
       event: {
@@ -215,8 +214,7 @@ describe.skip(`Test proposal events and notifications`, () => {
     // Move to reviewed status
     await updateProposalStatusOnly({
       newStatus: 'published',
-      proposalId: proposal.id,
-      userId: reviewer.id
+      proposalId: proposal.id
     });
     await createProposalNotifications({
       event: {
@@ -277,8 +275,7 @@ describe.skip(`Test proposal events and notifications`, () => {
     // Move to vote_active status
     await updateProposalStatusOnly({
       newStatus: 'published',
-      proposalId: proposal.id,
-      userId: author1.id
+      proposalId: proposal.id
     });
     await createProposalNotifications({
       event: {
@@ -410,8 +407,7 @@ async function createDiscussionNotifications(input: Parameters<typeof generateUs
   // Move to discussion status
   await updateProposalStatusOnly({
     newStatus: 'published',
-    proposalId: proposal.id,
-    userId: author1.id
+    proposalId: proposal.id
   });
   await createNotificationsFromEvent({
     event: {

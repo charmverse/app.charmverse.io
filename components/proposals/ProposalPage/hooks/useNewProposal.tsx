@@ -78,27 +78,10 @@ export function useNewProposal({ newProposal }: Props) {
     }
   }
 
-  let disabledTooltip: string | undefined;
-  if (!formInputs.title) {
-    disabledTooltip = 'Title is required';
-  }
-
-  if (formInputs.type === 'proposal' && currentSpace?.requireProposalTemplate && !formInputs.proposalTemplateId) {
-    disabledTooltip = 'Template is required';
-  }
-
-  if (formInputs.proposalType === 'structured') {
-    disabledTooltip = checkFormFieldErrors(formInputs.formFields ?? []);
-  } else if (
-    formInputs.proposalType === 'free_form' &&
-    formInputs.type === 'proposal_template' &&
-    checkIsContentEmpty(formInputs.content)
-  ) {
-    disabledTooltip = 'Content is required for free-form proposals';
-  }
-
-  // get the first validation error from the evaluations
-  disabledTooltip = disabledTooltip || formInputs.evaluations.map(getEvaluationFormError).filter(isTruthy)[0];
+  const disabledTooltip = getProposalErrors({
+    proposal: formInputs,
+    requireTemplates: !!currentSpace?.requireProposalTemplate
+  }).join('\n');
 
   return {
     formInputs,
@@ -108,6 +91,41 @@ export function useNewProposal({ newProposal }: Props) {
     isCreatingProposal,
     contentUpdated
   };
+}
+
+export function getProposalErrors({
+  proposal,
+  requireTemplates
+}: {
+  proposal: Pick<
+    ProposalPageAndPropertiesInput,
+    'title' | 'type' | 'proposalTemplateId' | 'formFields' | 'content' | 'proposalType' | 'evaluations'
+  >;
+  requireTemplates?: boolean;
+}) {
+  const errors = [];
+  if (!proposal.title) {
+    errors.push('Title is required');
+  }
+
+  if (requireTemplates && proposal.type === 'proposal' && !proposal.proposalTemplateId) {
+    errors.push('Template is required');
+  }
+
+  if (proposal.proposalType === 'structured') {
+    errors.push(checkFormFieldErrors(proposal.formFields ?? []));
+  } else if (
+    proposal.proposalType === 'free_form' &&
+    proposal.type === 'proposal_template' &&
+    checkIsContentEmpty(proposal.content)
+  ) {
+    errors.push('Content is required for free-form proposals');
+  }
+
+  // get the first validation error from the evaluations
+  errors.push(...proposal.evaluations.map(getEvaluationFormError).filter(isTruthy));
+
+  return errors.filter(isTruthy);
 }
 
 export function getEvaluationFormError(evaluation: ProposalEvaluationValues): string | false {
