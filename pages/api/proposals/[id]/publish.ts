@@ -5,7 +5,7 @@ import nc from 'next-connect';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { updateProposalStatusOnly } from 'lib/proposal/updateProposalStatusOnly';
+import { publishProposal } from 'lib/proposal/publishProposal';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -25,9 +25,9 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
     throw new ActionNotPermittedError(`You do not have permission to publish this proposal`);
   }
 
-  await updateProposalStatusOnly({
+  await publishProposal({
     proposalId,
-    newStatus: 'published'
+    userId
   });
 
   const proposalPage = await prisma.page.findUnique({
