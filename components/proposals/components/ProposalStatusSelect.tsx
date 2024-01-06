@@ -18,7 +18,7 @@ export function ControlledProposalStatusSelect({
   onChange
 }: {
   proposal: Pick<ProposalWithUsersLite, 'currentStep' | 'currentEvaluationId'>;
-  onChange: (result: ProposalEvaluationResult) => void;
+  onChange: (result: ProposalEvaluationResult | null) => void;
 }) {
   return <ProposalStatusSelectBase proposal={proposal} onChange={onChange} readOnly={false} />;
 }
@@ -31,10 +31,10 @@ export function ProposalStatusSelect({
   readOnly?: boolean;
 }) {
   const currentEvaluationStep = proposal.currentStep.step;
-  const currentEvaluationId = proposal.currentEvaluationId;
+  const currentEvaluationId = proposal.currentStep.id;
   const { batchUpdateProposalStatuses } = useProposalUpdateStatusAndStep();
 
-  async function onChange(result: ProposalEvaluationResult) {
+  async function onChange(result: ProposalEvaluationResult | null) {
     batchUpdateProposalStatuses({
       proposalsData: [
         {
@@ -56,7 +56,7 @@ function ProposalStatusSelectBase({
   readOnly
 }: {
   proposal: Pick<ProposalWithUsersLite, 'currentStep' | 'currentEvaluationId'>;
-  onChange: (result: ProposalEvaluationResult) => void;
+  onChange: (result: ProposalEvaluationResult | null) => void;
   readOnly?: boolean;
 }) {
   const currentEvaluationStep = proposal.currentStep.step;
@@ -78,8 +78,7 @@ function ProposalStatusSelectBase({
     id: status,
     value: PROPOSAL_STATUS_LABELS[status],
     dropdownValue: PROPOSAL_STATUS_VERB_LABELS[status as ProposalEvaluationStatus],
-    color: proposalStatusColors[status],
-    disabled: status === 'in_progress'
+    color: proposalStatusColors[status]
   }));
 
   return (
@@ -101,7 +100,13 @@ function ProposalStatusSelectBase({
       }
       disableClearable
       onChange={(status) => {
-        onChange(status === 'complete' || status === 'passed' || status === 'published' ? 'pass' : 'fail');
+        onChange(
+          status === 'complete' || status === 'passed' || status === 'published'
+            ? 'pass'
+            : status === 'declined' || status === 'unpublished'
+            ? 'fail'
+            : null
+        );
       }}
     />
   );

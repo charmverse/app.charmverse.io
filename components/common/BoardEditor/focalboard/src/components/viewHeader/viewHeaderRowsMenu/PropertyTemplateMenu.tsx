@@ -39,7 +39,7 @@ export function PropertyTemplateMenu({
   onProposalAuthorSelect: (pageIds: string[], userIds: string[]) => Promise<void>;
   onProposalReviewerSelect: (pageIds: string[], options: SelectOption[]) => Promise<void>;
   onProposalStepUpdate(pageIds: string[], evaluationId: string, moveForward: boolean): Promise<void>;
-  onProposalStatusUpdate(pageIds: string[], result: ProposalEvaluationResult): Promise<void>;
+  onProposalStatusUpdate(pageIds: string[], result: ProposalEvaluationResult | null): Promise<void>;
   firstCheckedProposal?: ProposalWithUsersLite;
 }) {
   const isValidType = [

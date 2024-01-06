@@ -1,5 +1,4 @@
 import styled from '@emotion/styled';
-import type { SxProps } from '@mui/material';
 import { Stack } from '@mui/material';
 import { useCallback, useMemo, useState } from 'react';
 

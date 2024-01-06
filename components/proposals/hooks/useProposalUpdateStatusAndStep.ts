@@ -17,7 +17,7 @@ export function useProposalUpdateStatusAndStep() {
   }: {
     proposalData: { proposalId: string; evaluationId?: string | null };
     currentEvaluationStep: ProposalEvaluationStep;
-    result: ProposalEvaluationResult;
+    result: ProposalEvaluationResult | null;
   }) {
     const { proposalId, evaluationId } = proposalData;
     if (currentEvaluationStep === 'rewards' && result === 'pass') {
@@ -30,11 +30,18 @@ export function useProposalUpdateStatusAndStep() {
         newStatus: 'published'
       });
     } else if (evaluationId) {
-      await charmClient.proposals.submitEvaluationResult({
-        proposalId,
-        evaluationId,
-        result
-      });
+      if (result === null) {
+        await charmClient.proposals.goBackToEvaluationStep({
+          proposalId,
+          evaluationId
+        });
+      } else {
+        await charmClient.proposals.submitEvaluationResult({
+          proposalId,
+          evaluationId,
+          result
+        });
+      }
     }
   }
 
@@ -45,7 +52,7 @@ export function useProposalUpdateStatusAndStep() {
   }: {
     proposalsData: { proposalId: string; evaluationId?: string | null }[];
     currentEvaluationStep: ProposalEvaluationStep;
-    result: ProposalEvaluationResult;
+    result: ProposalEvaluationResult | null;
   }) {
     if (space) {
       const { id: spaceId } = space;
