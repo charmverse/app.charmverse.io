@@ -28,7 +28,7 @@ export function PropertyTemplateMenu({
   onProposalStepUpdate,
   onProposalStatusUpdate,
   firstCheckedProposal,
-  disabled
+  disabledTooltip
 }: {
   board: Board;
   checkedIds: string[];
@@ -41,7 +41,7 @@ export function PropertyTemplateMenu({
   onProposalStepUpdate(pageIds: string[], evaluationId: string, moveForward: boolean): Promise<void>;
   onProposalStatusUpdate(pageIds: string[], result: ProposalEvaluationResult | null): Promise<void>;
   firstCheckedProposal?: ProposalWithUsersLite;
-  disabled?: boolean;
+  disabledTooltip?: string;
 }) {
   const checkedCards = cards.filter((card) => checkedIds.includes(card.id));
 
@@ -116,7 +116,7 @@ export function PropertyTemplateMenu({
       }
 
       return (
-        <PropertyMenu disabled={disabled} cards={cards} propertyTemplate={propertyTemplate}>
+        <PropertyMenu disabledTooltip={disabledTooltip} cards={cards} propertyTemplate={propertyTemplate}>
           {({ isPropertyOpen }) =>
             isPropertyOpen ? (
               <UserAndRoleSelect
@@ -151,7 +151,7 @@ export function PropertyTemplateMenu({
     case 'proposalStatus': {
       if (firstCheckedProposal) {
         return (
-          <PropertyMenu cards={cards} disabled={disabled} propertyTemplate={propertyTemplate}>
+          <PropertyMenu cards={cards} disabledTooltip={disabledTooltip} propertyTemplate={propertyTemplate}>
             <ControlledProposalStatusSelect
               onChange={(result) => onProposalStatusUpdate(checkedIds, result)}
               proposal={firstCheckedProposal}
@@ -165,7 +165,7 @@ export function PropertyTemplateMenu({
     case 'proposalStep': {
       if (firstCheckedProposal) {
         return (
-          <PropertyMenu disabled={disabled} cards={cards} propertyTemplate={propertyTemplate}>
+          <PropertyMenu disabledTooltip={disabledTooltip} cards={cards} propertyTemplate={propertyTemplate}>
             <ControlledProposalStepSelect
               onChange={({ evaluationId, moveForward }) => onProposalStepUpdate(checkedIds, evaluationId, moveForward)}
               proposal={{

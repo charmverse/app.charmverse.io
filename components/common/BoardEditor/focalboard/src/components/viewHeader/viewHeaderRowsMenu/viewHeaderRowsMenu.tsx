@@ -140,6 +140,7 @@ export function ViewHeaderRowsMenu({
         return (
           !proposal ||
           proposal.evaluations.length !== firstProposal.evaluations.length ||
+          // Check if all evaluations are in the same workflow
           proposal.evaluations.some((evaluation, index) => {
             const firstProposalEvaluation = firstProposal.evaluations[index];
             return (
@@ -284,7 +285,11 @@ export function ViewHeaderRowsMenu({
 
   return (
     <StyledStack>
-      <StyledMenuItem>
+      <StyledMenuItem
+        sx={{
+          borderRadius: `4px 0 0 4px`
+        }}
+      >
         <Typography onClick={() => setCheckedIds([])} color='primary' variant='body2'>
           {checkedIds.length} selected
         </Typography>
@@ -304,19 +309,26 @@ export function ViewHeaderRowsMenu({
               onProposalReviewerSelect={onProposalReviewerSelect}
               onProposalStatusUpdate={onProposalStatusUpdate}
               onProposalStepUpdate={onProposalStepUpdate}
-              disabled={
-                propertyTemplate.type === 'proposalStep'
-                  ? isStepDisabled
-                  : propertyTemplate.type === 'proposalStatus'
-                  ? isStatusDisabled
-                  : propertyTemplate.type === 'proposalReviewer'
-                  ? isReviewersDisabled
-                  : false
+              disabledTooltip={
+                propertyTemplate.type === 'proposalStep' && isStepDisabled
+                  ? 'To change multiple proposals, they must use the same workflow and be in the same step'
+                  : propertyTemplate.type === 'proposalStatus' && isStatusDisabled
+                  ? 'To change multiple proposals, they must be in the same step'
+                  : propertyTemplate.type === 'proposalReviewer' && isReviewersDisabled
+                  ? 'To change multiple proposals, they must not be in draft or feedback step and must not have a source template'
+                  : undefined
               }
             />
           ))
         : null}
-      <StyledMenuItem onClick={deleteCheckedCards} disabled={isDeleting}>
+      <StyledMenuItem
+        onClick={deleteCheckedCards}
+        disabled={isDeleting}
+        sx={{
+          borderRight: (theme) => `1px solid ${theme.palette.divider}`,
+          borderRadius: '0 4px 4px 0'
+        }}
+      >
         <DeleteOutlinedIcon fontSize='small' />
       </StyledMenuItem>
     </StyledStack>
