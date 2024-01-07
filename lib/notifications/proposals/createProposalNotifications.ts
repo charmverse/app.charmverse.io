@@ -32,17 +32,17 @@ export async function createProposalNotifications(webhookData: {
           id: proposalId
         },
         select: {
-          createdBy: true,
-          categoryId: true,
           evaluations: {
-            include: {
-              reviewers: true
+            select: {
+              index: true,
+              result: true,
+              type: true,
+              id: true
             },
             orderBy: {
               index: 'asc'
             }
           },
-          fields: true,
           rewards: {
             select: {
               id: true
@@ -76,9 +76,6 @@ export async function createProposalNotifications(webhookData: {
           id: spaceId
         },
         select: {
-          domain: true,
-          name: true,
-          paidTier: true,
           notificationToggles: true
         }
       });
@@ -88,8 +85,7 @@ export async function createProposalNotifications(webhookData: {
           spaceId
         },
         select: {
-          userId: true,
-          id: true
+          userId: true
         }
       });
 
