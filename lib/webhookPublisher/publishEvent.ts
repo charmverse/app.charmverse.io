@@ -1,5 +1,3 @@
-import type { ProposalStatus } from '@charmverse/core/prisma-client';
-
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
 import type { CardPropertyEntity } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
@@ -147,7 +145,7 @@ export async function publishBountyEvent(context: BountyEventContext) {
 
 type ProposalEventContext =
   | {
-      scope: WebhookEventNames.ProposalPassed | WebhookEventNames.ProposalFailed;
+      scope: WebhookEventNames.ProposalPassed;
       proposalId: string;
       spaceId: string;
     }
@@ -156,8 +154,7 @@ type ProposalEventContext =
       spaceId: string;
       proposalId: string;
       scope: WebhookEventNames.ProposalStatusChanged;
-      currentEvaluationId: string | null;
-      oldEvaluationId: string | null;
+      currentEvaluationId: string;
     };
 
 export async function publishProposalEvent(context: ProposalEventContext) {
@@ -171,12 +168,10 @@ export async function publishProposalEvent(context: ProposalEventContext) {
         proposal,
         space,
         user,
-        oldEvaluationId: context.oldEvaluationId,
         currentEvaluationId: context.currentEvaluationId
       });
     }
-    case WebhookEventNames.ProposalPassed:
-    case WebhookEventNames.ProposalFailed: {
+    case WebhookEventNames.ProposalPassed: {
       return publishWebhookEvent(context.spaceId, {
         scope: context.scope,
         proposal,

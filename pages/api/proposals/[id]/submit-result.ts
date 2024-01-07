@@ -14,10 +14,10 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler
   .use(providePermissionClients({ key: 'id', location: 'query', resourceIdType: 'proposal' }))
   .use(requireKeys(['evaluationId', 'result'], 'body'))
-  .put(updateEvaluationResultndpoint);
+  .put(updateEvaluationResultEndpoint);
 
 // for submitting a review or removing a previous one
-async function updateEvaluationResultndpoint(req: NextApiRequest, res: NextApiResponse) {
+async function updateEvaluationResultEndpoint(req: NextApiRequest, res: NextApiResponse) {
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 

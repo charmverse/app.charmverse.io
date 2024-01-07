@@ -1,5 +1,4 @@
 /* eslint-disable no-continue */
-import type { ProposalSystemRole } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
@@ -23,7 +22,7 @@ export async function createProposalNotifications(webhookData: {
       const spaceId = webhookData.spaceId;
       const proposalId = webhookData.event.proposal.id;
       const currentEvaluationId = webhookData.event.currentEvaluationId;
-      // Moved to draft stage
+
       if (!currentEvaluationId) {
         break;
       }
@@ -38,22 +37,21 @@ export async function createProposalNotifications(webhookData: {
           evaluations: {
             include: {
               reviewers: true
+            },
+            orderBy: {
+              index: 'asc'
+            }
+          },
+          fields: true,
+          rewards: {
+            select: {
+              id: true
             }
           },
           status: true,
           authors: {
             select: {
               userId: true
-            }
-          },
-          reviewers: {
-            select: {
-              userId: true,
-              role: {
-                select: {
-                  id: true
-                }
-              }
             }
           },
           page: {
@@ -72,19 +70,6 @@ export async function createProposalNotifications(webhookData: {
       }
 
       const proposalAuthorIds = proposal.authors.map(({ userId: authorId }) => authorId);
-      const proposalReviewerUserIds: string[] = [];
-      const proposalReviewerRoleIds: string[] = [];
-      const proposalReviewerSystemRoles: ProposalSystemRole[] = [];
-
-      currentEvaluation.reviewers.forEach(({ roleId, systemRole, userId: _userId }) => {
-        if (_userId) {
-          proposalReviewerUserIds.push(_userId);
-        } else if (roleId) {
-          proposalReviewerRoleIds.push(roleId);
-        } else if (systemRole) {
-          proposalReviewerSystemRoles.push(systemRole);
-        }
-      });
 
       const space = await prisma.space.findUniqueOrThrow({
         where: {
@@ -104,17 +89,7 @@ export async function createProposalNotifications(webhookData: {
         },
         select: {
           userId: true,
-          id: true,
-          isAdmin: true,
-          spaceRoleToRole: {
-            select: {
-              role: {
-                select: {
-                  id: true
-                }
-              }
-            }
-          }
+          id: true
         }
       });
 
@@ -123,8 +98,6 @@ export async function createProposalNotifications(webhookData: {
         if (spaceRole.userId === userId) {
           continue;
         }
-        // We should not send role-based notifications for free spaces
-        const roleIds = space.paidTier === 'free' ? [] : spaceRole.spaceRoleToRole.map(({ role }) => role.id);
         const proposalPermission = await permissionsApiClient.proposals.computeProposalPermissions({
           resourceId: proposalId,
           userId: spaceRole.userId
@@ -135,15 +108,21 @@ export async function createProposalNotifications(webhookData: {
         }
 
         const isAuthor = proposalAuthorIds.includes(spaceRole.userId);
-        const isReviewer =
-          proposalReviewerUserIds.includes(spaceRole.userId) ||
-          proposalReviewerRoleIds.some((roleId) => roleIds.includes(roleId)) ||
-          proposalReviewerSystemRoles.some((systemRole) => systemRole === 'space_member');
+        const isReviewer = proposalPermission.review || proposalPermission.evaluate;
+        const isVoter = proposalPermission.vote;
+        const canComment = proposalPermission.comment;
+        const lastEvaluation = proposal.evaluations[proposal.evaluations.length - 1];
+        const previousEvaluation =
+          currentEvaluation?.index && currentEvaluation.index > 0 && currentEvaluation.id !== lastEvaluation.id
+            ? proposal.evaluations[currentEvaluation.index - 1]
+            : null;
 
         const action = getProposalAction({
-          currentStep: currentEvaluation.type,
           isAuthor,
-          isReviewer
+          isReviewer,
+          isVoter,
+          proposal,
+          canComment
         });
 
         if (!action) {
@@ -156,20 +135,14 @@ export async function createProposalNotifications(webhookData: {
           continue;
         }
 
-        if (
-          (action === 'start_discussion' && !proposalPermission.comment) ||
-          (action === 'vote' && !proposalPermission.vote)
-        ) {
-          continue;
-        }
-
         const { id } = await saveProposalNotification({
           createdAt: webhookData.createdAt,
           createdBy: userId,
           proposalId,
           spaceId,
           userId: spaceRole.userId,
-          type: action
+          type: action,
+          evaluationId: action === 'step_failed' && previousEvaluation ? previousEvaluation.id : currentEvaluation.id
         });
         ids.push(id);
       }

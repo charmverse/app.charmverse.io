@@ -192,7 +192,6 @@ function getProposalContent(n: ProposalNotification, actorUsername?: string): st
   const { type, createdBy } = n;
   const username = actorUsername ?? createdBy?.username;
   switch (type) {
-    case 'start_review':
     case 'start_discussion': {
       return username ? (
         <span>
@@ -202,20 +201,26 @@ function getProposalContent(n: ProposalNotification, actorUsername?: string): st
         `Feedback requested for a proposal`
       );
     }
-    case 'reviewed': {
-      return `Review completed for a proposal`;
+    case 'vote_closed': {
+      return `The vote on ${n.pageTitle} has been completed. View results.`;
+    }
+    case 'reward_published': {
+      return `Your proposal reward has been created`;
+    }
+    case 'proposal_passed': {
+      return `Your proposal has been passed`;
+    }
+    case 'step_failed': {
+      return `Your proposal has been declined in ${n.evaluation?.title ?? 'current step'}`;
+    }
+    case 'step_passed': {
+      return `Your proposal has been moved to ${n.evaluation?.title ?? 'the next step'}`;
     }
     case 'vote': {
       return `Voting started for a proposal`;
     }
-    case 'needs_review': {
+    case 'review_required': {
       return `Review required for a proposal`;
-    }
-    case 'evaluation_active': {
-      return `Evaluation started for a proposal`;
-    }
-    case 'evaluation_closed': {
-      return `Evaluation completed for a proposal`;
     }
     default: {
       return '';

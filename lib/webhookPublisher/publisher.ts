@@ -66,6 +66,8 @@ export async function publishWebhookEvent(spaceId: string, event: WebhookEvent) 
       webhookPayload.signingSecret = subscription.space.webhookSigningSecret;
     }
 
+    await createNotificationsFromEvent(webhookPayload);
+
     // Add the message to the queue
     if (event.scope === 'document.mention.created') {
       setTimeout(() => {

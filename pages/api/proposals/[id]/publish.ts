@@ -54,7 +54,6 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
   const currentEvaluationId = proposalPage?.proposal?.evaluations[0]?.id || null;
   if (proposalPage && currentEvaluationId) {
     await publishProposalEvent({
-      oldEvaluationId: null,
       proposalId,
       scope: WebhookEventNames.ProposalStatusChanged,
       spaceId: proposalPage.spaceId,

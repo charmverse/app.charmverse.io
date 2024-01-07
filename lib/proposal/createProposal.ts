@@ -13,8 +13,6 @@ import { upsertProposalFormAnswers } from 'lib/form/upsertProposalFormAnswers';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { createPage } from 'lib/pages/server/createPage';
 import type { ProposalFields } from 'lib/proposal/interface';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 import { getPagePath } from '../pages';
 
@@ -250,15 +248,6 @@ export async function createProposal({
     formId && formAnswers?.length && page.type === 'proposal'
       ? await upsertProposalFormAnswers({ formId, proposalId, answers: formAnswers })
       : null;
-
-  await publishProposalEvent({
-    scope: WebhookEventNames.ProposalStatusChanged,
-    proposalId: proposal.id,
-    currentEvaluationId: null,
-    oldEvaluationId: null,
-    spaceId,
-    userId
-  });
 
   return {
     page: page as PageWithPermissions,

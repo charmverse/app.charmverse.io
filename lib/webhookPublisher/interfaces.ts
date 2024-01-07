@@ -1,4 +1,4 @@
-import type { PageType, ProposalStatus } from '@charmverse/core/prisma';
+import type { PageType } from '@charmverse/core/prisma';
 
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
 
@@ -122,7 +122,6 @@ export enum WebhookEventNames {
   ForumCommentDownvoted = 'forum.comment.downvoted',
   ForumPostCreated = 'forum.post.created',
   ProposalPassed = 'proposal.passed',
-  ProposalFailed = 'proposal.failed',
   ProposalSuggestionApproved = 'proposal.suggestion_approved',
   ProposalUserVoted = 'proposal.user_voted',
   ProposalStatusChanged = 'proposal.status_changed',
@@ -180,10 +179,6 @@ export type WebhookEvent = WebhookEventSharedProps &
         proposal: ProposalEntity;
       }
     | {
-        scope: WebhookEventNames.ProposalFailed;
-        proposal: ProposalEntity;
-      }
-    | {
         scope: WebhookEventNames.ProposalSuggestionApproved;
         proposal: ProposalEntity;
         user: UserEntity;
@@ -196,7 +191,6 @@ export type WebhookEvent = WebhookEventSharedProps &
     | {
         scope: WebhookEventNames.ProposalStatusChanged;
         proposal: ProposalEntity;
-        oldEvaluationId: string | null;
         currentEvaluationId: string | null;
         user: UserEntity;
       }

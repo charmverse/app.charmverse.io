@@ -97,22 +97,15 @@ const updateVoteStatus = async () => {
   ]);
 
   await Promise.all([
-    ...rejectedVotes.map((vote) => {
-      if (vote.pageId) {
-        return publishProposalEvent({
-          scope: WebhookEventNames.ProposalFailed,
-          spaceId: vote.spaceId,
-          proposalId: vote.pageId
-        });
-      }
-      return Promise.resolve();
-    }),
     ...passedVotes.map((vote) => {
-      if (vote.pageId) {
+      const evaluation = passedEvaluations.find((e) => e.voteId === vote.id);
+      if (vote.pageId && evaluation) {
         return publishProposalEvent({
-          scope: WebhookEventNames.ProposalPassed,
+          scope: WebhookEventNames.ProposalStatusChanged,
           spaceId: vote.spaceId,
-          proposalId: vote.pageId
+          proposalId: vote.pageId,
+          currentEvaluationId: evaluation.id,
+          userId: evaluation.decidedBy ?? vote.createdBy
         });
       }
       return Promise.resolve();
