@@ -4,7 +4,10 @@ import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import type { ProposalNotificationType } from 'lib/notifications/interfaces';
 import type { Reward } from 'lib/rewards/interfaces';
 
-import type { ProposalFields } from './interface';
+export type ProposalWithEvaluation = Pick<Proposal, 'status'> & {
+  evaluations: Pick<ProposalEvaluation, 'index' | 'result' | 'type' | 'id'>[];
+  rewards: Pick<Reward, 'id'>[];
+};
 
 export function getProposalAction({
   isAuthor,
@@ -13,10 +16,7 @@ export function getProposalAction({
   proposal,
   canComment
 }: {
-  proposal: Pick<Proposal, 'status' | 'fields'> & {
-    evaluations: ProposalEvaluation[];
-    rewards: Pick<Reward, 'id'>[];
-  };
+  proposal: ProposalWithEvaluation;
   isVoter: boolean;
   isAuthor: boolean;
   isReviewer: boolean;
@@ -25,16 +25,13 @@ export function getProposalAction({
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
   const lastEvaluation = proposal.evaluations[proposal.evaluations.length - 1];
   const previousEvaluation =
-    currentEvaluation?.index && currentEvaluation.index > 0 && currentEvaluation.id !== lastEvaluation.id
-      ? proposal.evaluations[currentEvaluation.index - 1]
-      : null;
+    currentEvaluation?.index && currentEvaluation.index > 0 ? proposal.evaluations[currentEvaluation.index - 1] : null;
 
   if (!currentEvaluation || proposal.status === 'draft') {
     return null;
   }
 
-  const hasRewards =
-    ((proposal.fields as ProposalFields)?.pendingRewards ?? []).length > 0 || proposal.rewards.length > 0;
+  const hasRewards = proposal.rewards.length > 0;
 
   const isPreviousStepReviewable = previousEvaluation?.type === 'pass_fail' || previousEvaluation?.type === 'rubric';
   const isCurrentStepReviewable = currentEvaluation.type === 'pass_fail' || currentEvaluation.type === 'rubric';
@@ -67,7 +64,7 @@ export function getProposalAction({
     }
 
     if (isAuthor) {
-      return currentEvaluation.result === 'fail' ? 'step_failed' : 'step_passed';
+      return currentEvaluation.result === 'fail' ? 'step_failed' : null;
     }
   }
 
