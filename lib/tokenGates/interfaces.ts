@@ -14,14 +14,23 @@ export type Lock = {
   image?: string; // lock image
 };
 
+export type Hypersub = {
+  name?: string; // hypersub name
+  contract: string; // hypersub contract address
+  chainId: number; // hypersub chain id
+  image?: string; // hypersub image
+};
+
 // TODO: Verify chains is being used by Lit, even tho its not on lit's types
 export type LitTokenGateConditions = HumanizedAccsProps & { chains?: string[] };
 
 export type LockConditions = { conditions: Lock; type: 'unlock' };
 
+export type HypersubConditions = { conditions: Hypersub; type: 'hypersub' };
+
 export type LitConditions = { conditions: LitTokenGateConditions; type: 'lit' };
 
-export type TokenGateConditions = LitConditions | LockConditions;
+export type TokenGateConditions = LitConditions | LockConditions | HypersubConditions;
 
 type TokenGateOptions = TokenGateConditions & TokenGateFields;
 

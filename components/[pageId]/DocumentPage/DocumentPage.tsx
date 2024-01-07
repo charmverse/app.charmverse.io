@@ -23,6 +23,7 @@ import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import { EvaluationSidebar } from 'components/proposals/ProposalPage/components/EvaluationSidebar/EvaluationSidebar';
 import { ProposalFormFieldInputs } from 'components/proposals/ProposalPage/components/ProposalFormFieldInputs';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
+import { ProposalsPageProviders } from 'components/proposals/ProposalsPageProviders';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmEditor } from 'hooks/useCharmEditor';
@@ -92,7 +93,7 @@ function DocumentPage({
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
 
-  const { proposal, refreshProposal, onChangeEvaluation } = useProposal({
+  const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow } = useProposal({
     proposalId
   });
 
@@ -274,17 +275,19 @@ function DocumentPage({
         </>
       )}
       {proposalId && (
-        <ProposalProperties
-          enableSidebar={enableSidebar}
-          pageId={page.id}
-          proposalId={proposalId}
-          pagePermissions={pagePermissions}
-          readOnly={readonlyProposalProperties}
-          proposalPage={page}
-          openEvaluation={openEvaluation}
-          proposal={proposal}
-          refreshProposal={refreshProposal}
-        />
+        <ProposalsPageProviders>
+          <ProposalProperties
+            enableSidebar={enableSidebar}
+            pageId={page.id}
+            proposalId={proposalId}
+            pagePermissions={pagePermissions}
+            readOnly={readonlyProposalProperties}
+            proposalPage={page}
+            openEvaluation={openEvaluation}
+            proposal={proposal}
+            refreshProposal={refreshProposal}
+          />
+        </ProposalsPageProviders>
       )}
       {reward && (
         <RewardProperties
@@ -321,7 +324,7 @@ function DocumentPage({
           onChangeEvaluation={onChangeEvaluation}
           refreshProposal={refreshProposal}
           disabledViews={isStructuredProposal ? ['suggestions', 'comments'] : []}
-          onChangeWorkflow={() => {}}
+          onChangeWorkflow={onChangeWorkflow}
         />
       )}
     </CardPropertiesWrapper>
@@ -460,6 +463,7 @@ function DocumentPage({
                           readOnly={!isAdmin && (!user || !proposalAuthors.includes(user.id))}
                           proposalId={proposal.id}
                           formFields={proposal?.form.formFields ?? []}
+                          refreshProposal={refreshProposal}
                         />
                       ) : (
                         <ProposalFormFieldInputs
@@ -518,7 +522,7 @@ function DocumentPage({
           </PageEditorContainer>
         </Box>
         {proposal?.status === 'draft' && page?.type !== 'proposal_template' && (
-          <ProposalStickyFooter proposal={proposal} refreshProposal={refreshProposal} />
+          <ProposalStickyFooter page={page} proposal={proposal} refreshProposal={refreshProposal} />
         )}
       </PrimaryColumn>
     </>

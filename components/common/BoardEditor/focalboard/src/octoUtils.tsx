@@ -1,4 +1,4 @@
-import type { ProposalStatus } from '@charmverse/core/prisma';
+import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
 import { getChainById } from 'connectors/chains';
 import { DateUtils } from 'react-day-picker';
 
@@ -10,7 +10,8 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
-import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
+import { PROPOSAL_RESULT_LABELS, PROPOSAL_STEP_LABELS } from 'lib/focalboard/proposalDbProperties';
+import type { ProposalEvaluationStep } from 'lib/proposal/interface';
 import { getAbsolutePath } from 'lib/utilities/browser';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -62,8 +63,17 @@ class OctoUtils {
         break;
       }
       case 'proposalStatus': {
-        const proposalStatus = propertyTemplate.options.find((o) => propertyValue === o.id)?.value;
-        displayValue = proposalStatus ? PROPOSAL_STATUS_LABELS[proposalStatus as ProposalStatus] : propertyValue;
+        displayValue = propertyValue
+          ? PROPOSAL_RESULT_LABELS[propertyValue as ProposalEvaluationResult]
+          : 'In Progress';
+        break;
+      }
+      case 'proposalStep': {
+        displayValue = propertyValue;
+        break;
+      }
+      case 'proposalEvaluationType': {
+        displayValue = PROPOSAL_STEP_LABELS[propertyValue as ProposalEvaluationStep];
         break;
       }
       case 'person':

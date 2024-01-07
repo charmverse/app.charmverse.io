@@ -1,21 +1,35 @@
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
 import { MAX_EMBED_WIDTH } from 'components/common/CharmEditor/components/iframe/config';
 import { VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/video/videoSpec';
 import { Constants } from 'lib/focalboard/constants';
-import { getDefaultFeedbackEvaluation, getDefaultPermissions } from 'lib/proposal/workflows/defaultEvaluation';
 
-import {
-  AUTHORS_BLOCK_ID,
-  CREATED_AT_ID,
-  EVALUATION_TYPE_BLOCK_ID,
-  PROPOSAL_REVIEWERS_BLOCK_ID,
-  STATUS_BLOCK_ID
-} from './blocks/constants';
+import { AUTHORS_BLOCK_ID, CREATED_AT_ID, PROPOSAL_REVIEWERS_BLOCK_ID } from './blocks/constants';
+import type { ProposalEvaluationInput } from './createProposal';
 import { createProposal } from './createProposal';
+import type { VoteSettings } from './interface';
+import { defaultWorkflowTitle } from './workflows/defaultWorkflows';
 
+export const defaultProposalTitle = 'Getting Started';
+
+export const voteSettings: VoteSettings = {
+  threshold: 50,
+  type: 'Approval',
+  options: ['Yes', 'No', 'Abstain'],
+  maxChoices: 1,
+  publishToSnapshot: false,
+  durationDays: 5
+};
 // replace the old method with this one once we have moved to new flow
 export async function createDefaultProposal({ spaceId, userId }: { spaceId: string; userId: string }) {
+  const workflow = await prisma.proposalWorkflow.findFirstOrThrow({
+    where: {
+      spaceId,
+      title: defaultWorkflowTitle
+    }
+  });
+
   await createProposal({
     spaceId,
     userId,
@@ -23,30 +37,24 @@ export async function createDefaultProposal({ spaceId, userId }: { spaceId: stri
     evaluationType: 'vote',
     publishToLens: false,
     rubricCriteria: [],
-    evaluations: [
-      {
-        index: 0,
-        ...getDefaultFeedbackEvaluation(),
-        reviewers: [], // reviewers are irrelevant for Feebdack
-        rubricCriteria: []
-      },
-      {
-        index: 1,
-        id: uuid(),
-        title: 'Review',
-        type: 'pass_fail',
-        reviewers: [{ systemRole: 'space_member' }],
-        rubricCriteria: [],
-        permissions: getDefaultPermissions()
-      }
-    ],
+    workflowId: workflow.id,
+    evaluations: workflow.evaluations.map(
+      (evaluation: any, index) =>
+        ({
+          ...evaluation,
+          id: uuid(),
+          index,
+          reviewers: [{ systemRole: 'space_member' }],
+          voteSettings: evaluation.type === 'vote' ? voteSettings : null
+        } as ProposalEvaluationInput)
+    ) as ProposalEvaluationInput[],
     pageProps: {
       headerImage: null,
       icon: null,
       sourceTemplateId: null,
       contentText: '',
       type: 'proposal',
-      title: 'Getting Started',
+      title: defaultProposalTitle,
       content: {
         type: 'doc',
         content: [
@@ -67,14 +75,12 @@ export async function createDefaultProposal({ spaceId, userId }: { spaceId: stri
       properties: {
         [AUTHORS_BLOCK_ID]: [userId],
         [CREATED_AT_ID]: '',
-        [EVALUATION_TYPE_BLOCK_ID]: 'vote',
         [PROPOSAL_REVIEWERS_BLOCK_ID]: [
           {
             group: 'user',
             id: userId
           }
         ],
-        [STATUS_BLOCK_ID]: 'draft',
         [Constants.titleColumnId]: 'Getting Started'
       }
     },

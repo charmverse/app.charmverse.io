@@ -3,14 +3,17 @@ import { useMemo } from 'react';
 import {
   useUpdateProposalEvaluation,
   useGetProposalDetails,
-  useUpsertRubricCriteria
+  useUpsertRubricCriteria,
+  useUpdateWorkflow
 } from 'charmClient/hooks/proposals';
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationStepSettings';
+import { useSnackbar } from 'hooks/useSnackbar';
 
 export function useProposal({ proposalId }: { proposalId?: string | null }) {
   const { data: proposal, mutate: refreshProposal } = useGetProposalDetails(proposalId);
   const { trigger: updateProposalEvaluation } = useUpdateProposalEvaluation({ proposalId });
   const { trigger: upsertRubricCriteria } = useUpsertRubricCriteria({ proposalId });
+  const { trigger: updateProposalWorkflow } = useUpdateWorkflow({ proposalId });
   return useMemo(
     () => ({
       proposal,
@@ -31,8 +34,12 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
           });
         }
         await refreshProposal();
+      },
+      onChangeWorkflow: async ({ id }: { id: string }) => {
+        await updateProposalWorkflow({ workflowId: id });
+        await refreshProposal();
       }
     }),
-    [proposal, refreshProposal, updateProposalEvaluation, upsertRubricCriteria]
+    [proposal, refreshProposal, updateProposalEvaluation, updateProposalWorkflow, upsertRubricCriteria]
   );
 }

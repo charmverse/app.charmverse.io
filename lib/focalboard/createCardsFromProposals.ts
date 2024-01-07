@@ -6,6 +6,9 @@ import { stringUtils } from '@charmverse/core/utilities';
 
 import { prismaToBlock } from 'lib/focalboard/block';
 import { canAccessPrivateFields } from 'lib/proposal/form/canAccessPrivateFields';
+import { getCurrentStep } from 'lib/proposal/getCurrentStep';
+import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
+import type { ProposalFields } from 'lib/proposal/interface';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   ProposalRubricCriteriaWithTypedParams
@@ -62,12 +65,27 @@ export async function createCardsFromProposals({
     include: {
       proposal: {
         select: {
-          status: true,
           evaluationType: true,
           id: true,
           spaceId: true,
           authors: true,
           formId: true,
+          status: true,
+          evaluations: {
+            select: {
+              id: true,
+              title: true,
+              index: true,
+              result: true,
+              type: true
+            }
+          },
+          rewards: {
+            select: {
+              id: true
+            }
+          },
+          fields: true,
           createdBy: true,
           form: {
             select: {
@@ -141,6 +159,10 @@ export async function createCardsFromProposals({
 
   const proposalProps = extractDatabaseProposalProperties({ boardBlock });
 
+  const proposalEvaluationTypeProperty = boardBlock.fields.cardProperties.find(
+    (cardProperty) => cardProperty.type === 'proposalEvaluationType'
+  );
+
   const updatedViewBlocks = await prisma.$transaction(
     views.map((block) => {
       return prisma.block.update({
@@ -148,12 +170,13 @@ export async function createCardsFromProposals({
         data: {
           fields: {
             ...(block.fields as BoardViewFields),
+            // Hide the proposal evaluation type property from the view
             visiblePropertyIds: [
               ...new Set([
                 ...(block.fields as BoardViewFields).visiblePropertyIds,
                 ...(boardBlock.fields as any as BoardFields).cardProperties.map((p) => p.id)
               ])
-            ],
+            ].filter((id) => id !== proposalEvaluationTypeProperty?.id),
             sourceType: 'proposals'
           },
           updatedAt: new Date(),
@@ -185,10 +208,25 @@ export async function createCardsFromProposals({
     if (proposalProps.proposalUrl) {
       properties[proposalProps.proposalUrl.id] = pageProposal.path;
     }
+    const currentStep = pageProposal.proposal
+      ? getCurrentStep({
+          evaluations: pageProposal.proposal.evaluations,
+          hasPendingRewards: ((pageProposal.proposal.fields as ProposalFields)?.pendingRewards ?? []).length > 0,
+          proposalStatus: pageProposal.proposal.status,
+          hasPublishedRewards: pageProposal.proposal.rewards.length > 0
+        })
+      : null;
 
-    if (proposalProps.proposalStatus) {
-      properties[proposalProps.proposalStatus.id] =
-        proposalProps.proposalStatus.options.find((opt) => opt.value === pageProposal.proposal?.status)?.id ?? '';
+    if (currentStep && proposalProps.proposalStatus) {
+      properties[proposalProps.proposalStatus.id] = currentStep.result ?? 'in_progress';
+    }
+
+    if (currentStep && proposalProps.proposalEvaluationType) {
+      properties[proposalProps.proposalEvaluationType.id] = currentStep.step;
+    }
+
+    if (currentStep && proposalProps.proposalStep) {
+      properties[proposalProps.proposalStep.id] = currentStep.title;
     }
 
     const formFields = pageProposal.proposal?.form?.formFields ?? [];

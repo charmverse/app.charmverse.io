@@ -1,4 +1,9 @@
-import { humanizeConditions, humanizeLitConditionsData, humanizeUnlockConditionsData } from '../humanizeConditions';
+import {
+  humanizeConditions,
+  humanizeHypersubConditionsData,
+  humanizeLitConditionsData,
+  humanizeUnlockConditionsData
+} from '../humanizeConditions';
 
 describe('humanizeConditions', () => {
   const walletAddress = '0x1bd0d6edb387114b2fdf20d683366fa9f94a07f4';
@@ -362,12 +367,23 @@ describe('humanizeConditions', () => {
 
   it('should return an unlock protocol condition', () => {
     const conditions = {
-      contract: '0x1f98431c8ad98523631ae4a59f267346ea31f984',
+      contract: '0x1f98431c8ad12323631ae4a59f267346ea31f984',
       chainId: 1,
       name: 'The Cool One'
     } as const;
     const data = humanizeUnlockConditionsData({ ...conditions });
     const result = humanizeConditions(data);
     expect(result).toBe('Unlock Protocol - The Cool One');
+  });
+
+  it('should return a hypersub condition', () => {
+    const conditions = {
+      contract: '0x1f98431c8ad12323631ae4a59f267346ea31f984',
+      chainId: 1,
+      name: 'The Cool One'
+    } as const;
+    const data = humanizeHypersubConditionsData({ ...conditions });
+    const result = humanizeConditions(data);
+    expect(result).toBe('Hypersub - The Cool One');
   });
 });

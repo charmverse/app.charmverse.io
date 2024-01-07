@@ -241,6 +241,7 @@ export async function generateUserAndSpace({
 }
 
 export async function generateBounty({
+  proposalId,
   content = undefined,
   contentText = '',
   spaceId,
@@ -263,6 +264,7 @@ export async function generateBounty({
     Pick<
       Bounty,
       | 'id'
+      | 'proposalId'
       | 'maxSubmissions'
       | 'chainId'
       | 'rewardAmount'
@@ -309,6 +311,7 @@ export async function generateBounty({
         createdBy,
         allowMultipleApplications,
         chainId,
+        proposalId,
         rewardAmount,
         rewardToken,
         status,

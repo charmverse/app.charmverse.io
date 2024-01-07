@@ -45,10 +45,11 @@ export function useFormFields({
   const {
     control,
     formState: { isValid, errors, isDirty, isSubmitting },
-    getValues,
+    watch,
     setValue,
     handleSubmit,
-    reset
+    reset,
+    getValues
   } = useForm({
     mode: 'onChange',
     defaultValues: fields
@@ -174,7 +175,7 @@ export function useFormFields({
     )
   });
 
-  const values = getValues() as Record<string, FormFieldValue>;
+  const values = watch() as Record<string, FormFieldValue>;
 
   function onFormChange(updatedFields: { id: string; value: FormFieldValue }[]) {
     updatedFields.forEach((updatedField) => {

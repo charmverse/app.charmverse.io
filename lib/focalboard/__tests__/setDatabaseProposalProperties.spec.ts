@@ -1,5 +1,5 @@
 import type { FormField, Prisma, Space, User } from '@charmverse/core/prisma-client';
-import { ProposalStatus, prisma } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { objectUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
@@ -10,9 +10,10 @@ import { InvalidStateError } from 'lib/middleware';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposal } from 'testing/utils/proposals';
 
+import { PROPOSAL_RESULT_LABELS } from '../proposalDbProperties';
 import { setDatabaseProposalProperties } from '../setDatabaseProposalProperties';
 
-const statusPropertyOptions = [...objectUtils.typedKeys(ProposalStatus).filter((s) => s !== 'draft'), 'archived'];
+const statusPropertyOptions = objectUtils.typedKeys(PROPOSAL_RESULT_LABELS);
 
 describe('setDatabaseProposalProperties()', () => {
   let space: Space;

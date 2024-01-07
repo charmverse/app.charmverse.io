@@ -1,4 +1,4 @@
-import { InsecureOperationError, InvalidInputError } from '@charmverse/core/errors';
+import { InsecureOperationError } from '@charmverse/core/errors';
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page, ProposalReviewer, ProposalStatus } from '@charmverse/core/prisma';
 import type { Prisma, ProposalEvaluation, ProposalEvaluationType } from '@charmverse/core/prisma-client';
@@ -150,7 +150,7 @@ export async function createProposal({
   }
 
   // Using a transaction to ensure both the proposal and page gets created together
-  const [proposal, , , page] = await prisma.$transaction([
+  const [proposal, _reviewerCreation, _evaluationPermissions, page] = await prisma.$transaction([
     prisma.proposal.create({
       data: {
         // Add page creator as the proposal's first author
@@ -232,7 +232,7 @@ export async function createProposal({
 
   await Promise.all(
     evaluations.map(async (evaluation, index) => {
-      if (evaluation.rubricCriteria.length > 0) {
+      if (evaluation.rubricCriteria?.length > 0) {
         await upsertRubricCriteria({
           evaluationId: evaluationIds[index],
           proposalId: proposal.id,

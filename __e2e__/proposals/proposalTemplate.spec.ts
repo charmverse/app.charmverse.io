@@ -299,12 +299,7 @@ test.describe.serial('Structured proposal template', () => {
       path: proposal.page!.path
     });
 
-    // Should be disabled as no changes were mage
-    await expect(formField.formFieldsAnswersSaveButton).toBeDisabled();
-
     await formField.getFormFieldInput(formFieldIds[1]).fill('John Doe');
-
-    await formField.formFieldsAnswersSaveButton.click();
 
     await proposalPage.completeDraftButton.click();
 

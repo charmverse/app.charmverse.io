@@ -3,6 +3,7 @@ import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { useProposalTemplateById } from 'components/proposals/hooks/useProposalTemplates';
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationStepSettings';
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
 import { EvaluationStepRow } from '../EvaluationSidebar/components/EvaluationStepRow';
@@ -17,6 +18,7 @@ export type Props = {
   isReviewer: boolean;
   onChangeWorkflow: (workflow: ProposalWorkflowTyped) => void;
   templateId?: string | null;
+  requireWorkflowChangeConfirmation?: boolean;
 };
 
 export function EvaluationSettingsSidebar({
@@ -25,34 +27,37 @@ export function EvaluationSettingsSidebar({
   readOnly,
   onChangeWorkflow,
   isReviewer,
-  templateId
+  templateId,
+  requireWorkflowChangeConfirmation
 }: Props) {
   const proposalTemplate = useProposalTemplateById(templateId);
   const pendingRewards = proposal?.fields?.pendingRewards;
   const { mappedFeatures } = useSpaceFeatures();
+  const isAdmin = useIsAdmin();
   return (
     <div data-test='evaluation-settings-sidebar'>
-      <WorkflowSelect value={proposal?.workflowId} onChange={onChangeWorkflow} readOnly={!!templateId} required />
+      <WorkflowSelect
+        value={proposal?.workflowId}
+        onChange={onChangeWorkflow}
+        readOnly={!!templateId && !isAdmin}
+        required
+        requireConfirmation={requireWorkflowChangeConfirmation}
+      />
       <EvaluationStepRow index={0} result={null} title='Draft' />
       {proposal && (
         <>
           {proposal?.evaluations?.map((evaluation, index) => {
             // find matching template step, and allow editing if there were no reviewers set
             const matchingTemplateStep = proposalTemplate?.evaluations?.find((e) => e.title === evaluation.title);
-            const templateHasNoReviewers = matchingTemplateStep?.reviewers?.length === 0;
-            // reviewers are already readOnly if a template was used, so long as reviewers were set
-            const readOnlyReviewers = readOnly || (!!templateId && !templateHasNoReviewers);
-            // rubric criteria should be editable but authors and reviewers, unless a template was used
-            const readOnlyRubricCriteria = (readOnly && !isReviewer) || !!templateId;
             return (
               <EvaluationStepRow key={evaluation.id} expanded result={null} index={index + 1} title={evaluation.title}>
                 {/* <Divider sx={{ my: 1 }} /> */}
                 {evaluation.type !== 'feedback' && (
                   <EvaluationStepSettings
-                    readOnly={readOnly}
-                    readOnlyReviewers={readOnlyReviewers}
-                    readOnlyRubricCriteria={readOnlyRubricCriteria}
                     evaluation={evaluation}
+                    evaluationTemplate={matchingTemplateStep}
+                    isReviewer={isReviewer}
+                    readOnly={readOnly}
                     onChange={(updated) => {
                       onChangeEvaluation?.(evaluation.id, updated);
                     }}
