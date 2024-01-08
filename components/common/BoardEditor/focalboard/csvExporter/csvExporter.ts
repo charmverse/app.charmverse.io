@@ -132,6 +132,7 @@ export function getCSVColumns({
     const propertyValue = card.fields.properties[propertyTemplate.id];
     const displayValue =
       OctoUtils.propertyDisplayValue({ block: card, context, propertyValue, propertyTemplate, formatters }) || '';
+
     if (propertyTemplate.id === Constants.titleColumnId) {
       columns.push(`"${encodeText(card.title)}"`);
     } else if (

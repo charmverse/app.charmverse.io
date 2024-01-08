@@ -50,7 +50,8 @@ async function transferProposalCategories() {
       const proposalBoardBlock = (proposalBlocks.find((block) => block.id === DEFAULT_BOARD_BLOCK_ID) ??
         getDefaultBoard({
           storedBoard: undefined,
-          customOnly: true
+          customOnly: true,
+          evaluationStepTitles: []
         })) as ProposalBoardBlock;
 
       if (!proposalBoardBlock.spaceId) {

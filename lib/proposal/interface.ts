@@ -3,9 +3,9 @@ import type {
   FormField,
   Page,
   PageComment,
-  Proposal,
   ProposalEvaluation,
   ProposalEvaluationPermission,
+  ProposalEvaluationResult,
   ProposalEvaluationType,
   Vote
 } from '@charmverse/core/prisma';
@@ -16,10 +16,15 @@ import type { NewPageValues } from 'components/common/PageDialog/hooks/useNewPag
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
 import type { ProposalPropertiesField } from './blocks/interfaces';
+import type { ProposalStep } from './getCurrentStep';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   ProposalRubricCriteriaWithTypedParams
 } from './rubric/interfaces';
+
+export type ProposalEvaluationStatus = 'in_progress' | 'complete' | 'passed' | 'declined' | 'unpublished' | 'published';
+export type ProposalEvaluationStep = ProposalEvaluationType | 'rewards' | 'draft';
+export type ProposalEvaluationResultExtended = ProposalEvaluationResult | 'in_progress';
 
 export interface ProposalReviewerInput {
   group: 'system_role' | 'role' | 'user';
@@ -60,7 +65,14 @@ export type ProposalWithUsersLite = ProposalWithUsers & {
   currentEvaluationId?: string;
   evaluationType: ProposalEvaluationType;
   permissions?: ProposalPermissionFlags;
-  currentEvaluation?: Pick<ProposalEvaluation, 'title' | 'type'>;
+  evaluations: {
+    title: string;
+    type: ProposalEvaluationType;
+    id: string;
+    result: ProposalEvaluationResult | null;
+    index: number;
+  }[];
+  currentStep: ProposalStep;
 };
 
 export type PopulatedEvaluation = ProposalRubricData &
@@ -73,6 +85,7 @@ export type PopulatedEvaluation = ProposalRubricData &
 export type ProposalWithUsersAndRubric = ProposalWithUsers &
   ProposalRubricData &
   ProposalFormData & {
+    currentStep: ProposalStep;
     evaluations: PopulatedEvaluation[];
     fields: ProposalFields | null;
     page?: { sourceTemplateId: string | null } | null;

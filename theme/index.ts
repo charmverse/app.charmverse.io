@@ -59,6 +59,8 @@ declare module '@mui/material/styles/createPalette' {
     twitter: PaletteOptions['primary'];
     white: PaletteOptions['primary'];
     quoteMarker: PaletteOptions['primary'];
+    successPale: PaletteOptions['primary'];
+    errorPale: PaletteOptions['primary'];
   }
   interface Palette extends CustomColors {
     blue: Palette['primary'];
@@ -214,6 +216,14 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       pink: {
         main: colors.pink[mode || 'light'],
         contrastText
+      },
+      successPale: {
+        main: colors.green.light,
+        contrastText: '#000'
+      },
+      errorPale: {
+        main: colors.red.light,
+        contrastText: '#000'
       },
       // custom components
       settingsHeader: {

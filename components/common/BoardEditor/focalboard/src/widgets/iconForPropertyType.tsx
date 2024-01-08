@@ -40,6 +40,7 @@ export const iconForPropertyType = (propertyType: PropertyType, props?: SvgIconP
       return <PersonIcon fontSize='small' {...props} />;
     case 'phone':
       return <PhoneIcon fontSize='small' {...props} />;
+    case 'proposalStep':
     case 'proposalStatus':
     case 'proposalEvaluationType':
     case 'select':

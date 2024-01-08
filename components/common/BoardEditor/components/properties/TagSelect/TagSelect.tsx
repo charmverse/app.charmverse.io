@@ -1,5 +1,4 @@
 import styled from '@emotion/styled';
-import type { SxProps } from '@mui/material';
 import { Stack } from '@mui/material';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -131,10 +130,10 @@ export function TagSelect({
   displayType = 'details',
   noOptionsText,
   wrapColumn,
-  'data-test': dataTest,
   defaultOpened = false,
   disableClearable = false,
-  fluidWidth
+  fluidWidth,
+  ...props
 }: TagSelectProps) {
   const [isOpened, setIsOpened] = useState(defaultOpened);
 
@@ -183,10 +182,11 @@ export function TagSelect({
   if (displayType === 'kanban' && isEmptyValue(selectValue)) {
     return null;
   }
+
   if (!isOpened) {
     return (
       <SelectPreviewContainer
-        data-test={dataTest}
+        data-test={props['data-test']}
         onClick={onEdit}
         displayType={displayType}
         readOnly={readOnly}
@@ -208,7 +208,6 @@ export function TagSelect({
 
   return (
     <StyledSelect
-      data-test={dataTest}
       canEditOptions={canEditOptions}
       includeSelectedOptions={includeSelectedOptions}
       placeholder='Search for an option...'

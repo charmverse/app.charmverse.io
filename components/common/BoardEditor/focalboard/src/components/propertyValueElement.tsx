@@ -1,5 +1,4 @@
-import type { ApplicationStatus, ProposalStatus, ProposalSystemRole } from '@charmverse/core/prisma';
-import { stringUtils } from '@charmverse/core/utilities';
+import type { ApplicationStatus, ProposalSystemRole } from '@charmverse/core/prisma';
 import PersonIcon from '@mui/icons-material/Person';
 import { Box, Link, Stack } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
@@ -18,7 +17,8 @@ import { UserAndRoleSelect } from 'components/common/BoardEditor/components/prop
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import { BreadcrumbPageTitle } from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
-import { ProposalStatusChipTextOnly } from 'components/proposals/components/ProposalStatusBadge';
+import { ProposalStatusSelect } from 'components/proposals/components/ProposalStatusSelect';
+import { ProposalStepSelect } from 'components/proposals/components/ProposalStepSelect';
 import { useProposalsWhereUserIsEvaluator } from 'components/proposals/hooks/useProposalsWhereUserIsEvaluator';
 import {
   REWARD_APPLICATION_STATUS_LABELS,
@@ -32,7 +32,14 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board, DatabaseProposalPropertyType, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card, CardPage } from 'lib/focalboard/card';
-import { STATUS_BLOCK_ID } from 'lib/proposal/blocks/constants';
+import {
+  PROPOSAL_STATUS_LABELS,
+  PROPOSAL_STEP_LABELS,
+  proposalStatusColors
+} from 'lib/focalboard/proposalDbProperties';
+import { PROPOSAL_STATUS_BLOCK_ID, PROPOSAL_STEP_BLOCK_ID } from 'lib/proposal/blocks/constants';
+import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
+import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from 'lib/proposal/interface';
 import {
   REWARDS_APPLICANTS_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
@@ -186,16 +193,68 @@ function PropertyValueElement(props: Props) {
       return <RewardApplicationStatusChip status={propertyValue as ApplicationStatus} />;
     }
     return <RewardStatusChip status={propertyValue as RewardStatus} showIcon={false} />;
-  } else if (propertyTemplate.type === 'proposalStatus' || propertyTemplate.id === STATUS_BLOCK_ID) {
-    // Proposals as datasource use proposalStatus column, whereas the actual proposals table uses STATUS_BLOCK_ID
-    // We should migrate over the proposals as datasource blocks to the same format as proposals table
+  }
+  // Proposals as datasource use proposalStatus column, whereas the actual proposals table uses STATUS_BLOCK_ID
+  // We should migrate over the proposals as datasource blocks to the same format as proposals table
+  else if (propertyTemplate.type === 'proposalStatus' || propertyTemplate.id === PROPOSAL_STATUS_BLOCK_ID) {
+    if (proposal) {
+      return <ProposalStatusSelect proposal={proposal} spaceId={card.spaceId} readOnly={!isAdmin} />;
+    }
+
+    const evaluationTypeProperty = board.fields.cardProperties.find(
+      (cardProperty) => cardProperty.type === 'proposalEvaluationType'
+    );
+    const evaluationType = card.fields.properties[evaluationTypeProperty?.id ?? ''] as ProposalEvaluationStep;
+    const proposalEvaluationStatus = getProposalEvaluationStatus({
+      result: propertyValue as ProposalEvaluationResultExtended,
+      step: evaluationType
+    });
+
     return (
-      <ProposalStatusChipTextOnly
-        status={
-          (stringUtils.isUUID(propertyValue as string)
-            ? propertyTemplate.options.find((opt) => opt.id === propertyValue)?.value
-            : propertyValue) as ProposalStatus
-        }
+      <TagSelect
+        wrapColumn
+        readOnly
+        options={[
+          {
+            color: proposalStatusColors[proposalEvaluationStatus],
+            id: proposalEvaluationStatus,
+            value: PROPOSAL_STATUS_LABELS[proposalEvaluationStatus]
+          }
+        ]}
+        propertyValue={proposalEvaluationStatus}
+        onChange={() => {}}
+      />
+    );
+  } else if (propertyTemplate.type === 'proposalStep' || propertyTemplate.id === PROPOSAL_STEP_BLOCK_ID) {
+    if (!proposal) {
+      return (
+        <TagSelect
+          wrapColumn
+          includeSelectedOptions
+          readOnly
+          options={propertyTemplate.options}
+          propertyValue={(propertyValue as string) ?? ''}
+          onChange={() => {}}
+        />
+      );
+    }
+    return <ProposalStepSelect readOnly={!isAdmin} proposal={proposal} spaceId={card.spaceId} />;
+    // return <ProposalStepChipTextOnly label={proposal?.currentStep?.title ?? (propertyValue as string)} />;
+  } else if (propertyTemplate.type === 'proposalEvaluationType') {
+    return (
+      <TagSelect
+        wrapColumn
+        includeSelectedOptions
+        readOnly
+        options={[
+          {
+            color: 'gray',
+            id: propertyValue as string,
+            value: PROPOSAL_STEP_LABELS[propertyValue as ProposalEvaluationStep]
+          }
+        ]}
+        propertyValue={propertyValue as string}
+        onChange={() => {}}
       />
     );
   } else if (propertyTemplate.id === REWARD_PROPOSAL_LINK) {
@@ -227,11 +286,7 @@ function PropertyValueElement(props: Props) {
         value={propertyValue as any}
       />
     );
-  } else if (
-    propertyTemplate.type === 'select' ||
-    propertyTemplate.type === 'multiSelect' ||
-    propertyTemplate.type === 'proposalEvaluationType'
-  ) {
+  } else if (propertyTemplate.type === 'select' || propertyTemplate.type === 'multiSelect') {
     propertyValueElement = (
       <TagSelect
         data-test='closed-select-input'
@@ -315,8 +370,8 @@ function PropertyValueElement(props: Props) {
           !proposal ||
           readOnly ||
           (displayType !== 'details' && displayType !== 'table') ||
-          proposal.status === 'draft' ||
-          proposal.currentEvaluation?.type === 'feedback' ||
+          proposal.currentStep?.step === 'draft' ||
+          proposal.currentStep?.step === 'feedback' ||
           !!proposal.sourceTemplateId
         }
         required

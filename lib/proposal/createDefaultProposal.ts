@@ -5,20 +5,15 @@ import { MAX_EMBED_WIDTH } from 'components/common/CharmEditor/components/iframe
 import { VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/video/videoSpec';
 import { Constants } from 'lib/focalboard/constants';
 
-import {
-  AUTHORS_BLOCK_ID,
-  CREATED_AT_ID,
-  EVALUATION_TYPE_BLOCK_ID,
-  PROPOSAL_REVIEWERS_BLOCK_ID,
-  STATUS_BLOCK_ID
-} from './blocks/constants';
+import { AUTHORS_BLOCK_ID, CREATED_AT_ID, PROPOSAL_REVIEWERS_BLOCK_ID } from './blocks/constants';
 import type { ProposalEvaluationInput } from './createProposal';
 import { createProposal } from './createProposal';
+import type { VoteSettings } from './interface';
 import { defaultWorkflowTitle } from './workflows/defaultWorkflows';
 
 export const defaultProposalTitle = 'Getting Started';
 
-const voteSettings: ProposalEvaluationInput['voteSettings'] = {
+export const voteSettings: VoteSettings = {
   threshold: 50,
   type: 'Approval',
   options: ['Yes', 'No', 'Abstain'],
@@ -80,14 +75,12 @@ export async function createDefaultProposal({ spaceId, userId }: { spaceId: stri
       properties: {
         [AUTHORS_BLOCK_ID]: [userId],
         [CREATED_AT_ID]: '',
-        [EVALUATION_TYPE_BLOCK_ID]: 'vote',
         [PROPOSAL_REVIEWERS_BLOCK_ID]: [
           {
             group: 'user',
             id: userId
           }
         ],
-        [STATUS_BLOCK_ID]: 'draft',
         [Constants.titleColumnId]: 'Getting Started'
       }
     },

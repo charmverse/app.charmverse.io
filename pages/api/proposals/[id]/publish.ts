@@ -1,28 +1,32 @@
-import type { ProposalStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { updateProposalStatusOnly } from 'lib/proposal/updateProposalStatusOnly';
+import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { permissionsApiClient } from 'lib/permissions/api/client';
+import { publishProposal } from 'lib/proposal/publishProposal';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireUser)
-  .use(requireKeys(['newStatus'], 'body'))
-  .put(updateProposalStatusController);
+handler.use(requireUser).put(publishProposalStatusController);
 
-async function updateProposalStatusController(req: NextApiRequest, res: NextApiResponse) {
+async function publishProposalStatusController(req: NextApiRequest, res: NextApiResponse) {
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
-  const newStatus = req.body.newStatus as 'draft' | 'published';
 
-  await updateProposalStatusOnly({
+  const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
+    resourceId: proposalId,
+    userId
+  });
+
+  if (!permissions.move) {
+    throw new ActionNotPermittedError(`You do not have permission to publish this proposal`);
+  }
+
+  await publishProposal({
     proposalId,
-    newStatus,
     userId
   });
 
@@ -40,7 +44,7 @@ async function updateProposalStatusController(req: NextApiRequest, res: NextApiR
     userId,
     pageId: proposalPage?.id || '',
     resourceId: proposalId,
-    status: newStatus,
+    status: 'published',
     spaceId: proposalPage?.spaceId || ''
   });
 

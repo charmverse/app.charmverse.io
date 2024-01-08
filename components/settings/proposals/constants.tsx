@@ -1,5 +1,7 @@
 import { ProposalEvaluationType } from '@charmverse/core/prisma';
 import { FeedbackOutlined, HowToVoteOutlined } from '@mui/icons-material';
+import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
+import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import type { SvgIconProps } from '@mui/material';
 import { SvgIcon, Tooltip } from '@mui/material';
 import { forwardRef } from 'react';
@@ -44,6 +46,20 @@ export const evaluationIcons = {
     <Tooltip title='Pass / Fail'>
       <SvgIconWithRef inheritViewBox {...defaultProps} {...props}>
         <MdOutlineThumbsUpDown />
+      </SvgIconWithRef>
+    </Tooltip>
+  ),
+  draft: (props: SvgIconProps = {}) => (
+    <Tooltip title='Draft'>
+      <SvgIconWithRef inheritViewBox {...defaultProps} {...props}>
+        <ModeEditOutlineOutlinedIcon />
+      </SvgIconWithRef>
+    </Tooltip>
+  ),
+  rewards: (props: SvgIconProps = {}) => (
+    <Tooltip title='Rewards'>
+      <SvgIconWithRef inheritViewBox {...defaultProps} {...props}>
+        <BountyIcon />
       </SvgIconWithRef>
     </Tooltip>
   )

@@ -14,6 +14,9 @@ export function extractDatabaseProposalProperties({
     proposalUrl: (boardBlock.fields as BoardFields).cardProperties.find(
       (prop: IPropertyTemplate) => prop.type === 'proposalUrl'
     ),
+    proposalStep: (boardBlock.fields as BoardFields).cardProperties.find(
+      (prop: IPropertyTemplate) => prop.type === 'proposalStep'
+    ),
     proposalStatus: (boardBlock.fields as BoardFields).cardProperties.find(
       (prop: IPropertyTemplate) => prop.type === 'proposalStatus'
     ),
@@ -25,6 +28,9 @@ export function extractDatabaseProposalProperties({
     ),
     proposalEvaluationTotal: (boardBlock.fields as BoardFields).cardProperties.find(
       (prop: IPropertyTemplate) => prop.type === 'proposalEvaluationTotal'
+    ),
+    proposalEvaluationType: (boardBlock.fields as BoardFields).cardProperties.find(
+      (prop: IPropertyTemplate) => prop.type === 'proposalEvaluationType'
     )
   };
 }

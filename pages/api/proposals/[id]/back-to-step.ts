@@ -4,7 +4,7 @@ import nc from 'next-connect';
 import { ActionNotPermittedError, requireKeys, onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
-import { goBackToEvaluationStep } from 'lib/proposal/goBackToEvaluationStep';
+import { goBackToStep } from 'lib/proposal/goBackToStep';
 import type { ReviewEvaluationRequest } from 'lib/proposal/submitEvaluationResult';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -13,10 +13,10 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler
   .use(providePermissionClients({ key: 'id', location: 'query', resourceIdType: 'proposal' }))
   .use(requireKeys(['evaluationId'], 'body'))
-  .put(updateEvaluationResultndpoint);
+  .put(updateEvaluationResultEndpoint);
 
 // for submitting a review or removing a previous one
-async function updateEvaluationResultndpoint(req: NextApiRequest, res: NextApiResponse) {
+async function updateEvaluationResultEndpoint(req: NextApiRequest, res: NextApiResponse) {
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
@@ -31,7 +31,7 @@ async function updateEvaluationResultndpoint(req: NextApiRequest, res: NextApiRe
   if (!proposalPermissions.move) {
     throw new ActionNotPermittedError(`You don't have permission to review this proposal.`);
   }
-  await goBackToEvaluationStep({
+  await goBackToStep({
     proposalId,
     evaluationId
   });
