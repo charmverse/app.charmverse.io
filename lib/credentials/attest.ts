@@ -11,7 +11,10 @@ import { Wallet, providers, Signer, VoidSigner } from 'ethers';
 import { credentialsWalletPrivateKey } from 'config/constants';
 import { getENSName } from 'lib/blockchain';
 import { isValidChainAddress } from 'lib/tokens/validation';
+import { prettyPrint } from 'lib/utilities/strings';
 
+import type { PublishedSignedCredential } from './config/queriesAndMutations';
+import { publishSignedCredential } from './config/queriesAndMutations';
 import type { EasSchemaChain } from './connectors';
 import { easSchemaChains, getEasConnector, getEasInstance } from './connectors';
 import { EthersV5toV6WalletAdapter } from './ethersAdapter';
@@ -128,6 +131,32 @@ export async function signCharmverseCredential({
     timestamp: Number(signature.message.time) * 1000
   };
   return signedCredential;
+}
+
+export async function signAndPublishCharmverseCredential({
+  chainId,
+  credential,
+  recipient
+}: CharmVerseCredentialInput) {
+  const signedCredential = await signCharmverseCredential({ chainId, credential, recipient });
+
+  const contentToPublish: Omit<PublishedSignedCredential, 'author'> = {
+    chainId,
+    recipient: signedCredential.recipient,
+    content: JSON.stringify(credential.data),
+    timestamp: signedCredential.timestamp,
+    type: credential.type,
+    verificationUrl: signedCredential.verificationUrl,
+    issuer: signedCredential.signer.wallet,
+    schemaId: getAttestationSchemaId({ chainId, credentialType: credential.type }),
+    sig: JSON.stringify(signedCredential.sig)
+  };
+
+  prettyPrint({ contentToPublish });
+
+  const published = await publishSignedCredential(contentToPublish);
+
+  return published;
 }
 
 function getOffchainUrl({ chainId, pkg }: { pkg: AttestationShareablePackageObject; chainId: EasSchemaChain }) {

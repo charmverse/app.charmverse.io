@@ -4,10 +4,10 @@
   "browserslist": [
     "defaults"
   ],
-  "type": "module",
   "scripts": {
     "config:ceramic": "npx dotenv -e .env.local -- node --import tsx/esm lib/credentials/config/configure-node.ts",
     "ceramic:local": "CERAMIC_ENABLE_EXPERIMENTAL_COMPOSE_DB='true' npx ceramic daemon",
+    "ceramic:graphql:local": "npx dotenv -e .env.local --  tsx --tsconfig ./tsconfig.ceramic.json  lib/credentials/config/run-deploy.ts",
     "build": "NODE_OPTIONS=\"--max_old_space_size=4096\" npx next build && npm run esbuild",
     "build:analyze": "cross-env ANALYZE=true next build",
     "esbuild": "tsx esbuild.config.ts",
@@ -78,7 +78,7 @@
   },
   "dependencies": {
     "@ankr.com/ankr.js": "^0.4.0",
-    "@apollo/client": "^3.8.4",
+    "@apollo/client": "^3.8.8",
     "@aws-sdk/client-acm": "^3.363.0",
     "@aws-sdk/client-elastic-load-balancing-v2": "^3.363.0",
     "@aws-sdk/client-s3": "^3.347.1",
@@ -184,6 +184,7 @@
     "formidable": "^3.5.0",
     "gaxios": "^5.0.2",
     "google-auth-library": "^8.7.0",
+    "graphql": "^16.8.1",
     "hot-shots": "^9.0.0",
     "html-to-text": "^8.2.0",
     "immutable": "^4.0.0",
@@ -277,6 +278,7 @@
     "@composedb/devtools": "^0.6.1",
     "@composedb/devtools-node": "^0.6.1",
     "@depay/web3-mock": "^13.18.1",
+    "@graphql-codegen/typescript-react-apollo": "^4.1.0",
     "@lit-protocol/types": "^2.2.61",
     "@next/eslint-plugin-next": "^13.5.6",
     "@playwright/test": "^1.40.1",
@@ -306,6 +308,7 @@
     "@types/emoji-mart": "^3.0.9",
     "@types/formidable": "^3.4.0",
     "@types/google.accounts": "^0.0.4",
+    "@types/graphql": "^14.5.0",
     "@types/html-to-text": "^8.1.0",
     "@types/jest": "^29.5",
     "@types/koa": "^2.13.4",

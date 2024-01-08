@@ -51,3 +51,5 @@ export const awsS3Bucket = process.env.S3_UPLOAD_BUCKET as string;
 export const ceramicHost = process.env.CERAMIC_HOST as string;
 export const ceramicSeed = process.env.CERAMIC_SEED as string;
 export const ceramicDid = process.env.CERAMIC_DID as string;
+
+export const graphQlServerEndpoint = process.env.GRAPHQL_SERVER_ENDPOINT as string;

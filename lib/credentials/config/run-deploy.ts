@@ -1,13 +1,9 @@
 /* eslint-disable no-console */
-import { spawn } from 'child_process';
-import { EventEmitter } from 'events';
-
 import { serveEncodedDefinition } from '@composedb/devtools-node';
-import ora from 'ora';
 
 import { ceramicHost } from 'config/constants';
 
-import { compositeDefinitionFile, writeComposite } from './deploy-composites';
+import { compositeDefinitionFile } from './deploy-composites';
 
 async function bootstrapGqlServer() {
   return serveEncodedDefinition({
@@ -18,10 +14,10 @@ async function bootstrapGqlServer() {
   });
 }
 
-const server = await bootstrapGqlServer();
+const server = bootstrapGqlServer();
 console.log(`Server started`);
 
 process.on('SIGTERM', async () => {
-  await server.stop();
+  (await server).stop();
   console.log('Server stopped');
 });

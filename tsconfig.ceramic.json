@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.next.json",
+  "exclude": [
+    "node_modules",
+    "__e2e__"
+  ],
+  "ts-node": {
+    "transpileOnly": true,
+    "moduleTypes": {
+      "**/*.ts": "esm",
+    }
+  },
+  "compilerOptions": {
+    "module": "ES6"
+  }
+}
