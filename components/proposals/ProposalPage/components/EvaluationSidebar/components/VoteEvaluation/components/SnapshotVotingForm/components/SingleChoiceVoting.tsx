@@ -1,11 +1,9 @@
 import { Box, Chip, FormControlLabel, Radio, RadioGroup, Stack, Typography } from '@mui/material';
 import { useEffect } from 'react';
 
-import { DisplayChoiceScore } from 'components/proposals/components/SnapshotVoting/DisplayChoiceScore';
-import type {
-  SnapshotVotingProps,
-  VoteChoiceFormProps
-} from 'components/proposals/components/SnapshotVoting/SnapshotVotingForm';
+import type { SnapshotVotingProps, VoteChoiceFormProps } from '../SnapshotVotingForm';
+
+import { DisplayChoiceScore } from './DisplayChoiceScore';
 
 export function SingleChoiceVoting({
   snapshotProposal,

@@ -34,7 +34,6 @@ import { DuplicatePageAction } from './DuplicatePageAction';
 import { ExportMarkdownAction } from './ExportMarkdownAction';
 import { ExportToPDFAction } from './ExportToPDFAction';
 import { RewardActions } from './RewardActions';
-import { PublishToSnapshot } from './SnapshotAction/PublishToSnapshot';
 import { UndoAction } from './UndoAction';
 
 export type PageActionMeta = Pick<
@@ -326,16 +325,6 @@ export function DocumentPageActionList({
         />
       )}
       <Divider />
-      <PublishToSnapshot
-        pageId={pageId}
-        snapshotProposalId={page.snapshotProposalId}
-        renderContent={({ label, onClick, icon }) => (
-          <ListItemButton onClick={onClick}>
-            {icon}
-            <ListItemText primary={label} />
-          </ListItemButton>
-        )}
-      />
       <ExportMarkdownAction disabled={!isExportablePage} onClick={exportMarkdownPage} />
       <ExportToPDFAction pdfTitle={page.title} onComplete={onComplete} />
       {pageType === 'bounty' && basePageBounty && (
