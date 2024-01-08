@@ -11,10 +11,9 @@ const customJoinRoutes = ['/[domain]/proposals/new'];
 
 export function useCustomJoinSpace() {
   const { router } = useCharmRouter();
-  const { user, refreshUser, isLoaded: isUserLoaded } = useUser();
+  const { user, isLoaded: isUserLoaded } = useUser();
   const { isSpaceMember } = useIsSpaceMember();
   const { space } = useCurrentSpace();
-  const { setSpaces, spaces } = useSpaces();
 
   const [accessChecked, setAccessChecked] = useState(!!isSpaceMember);
   const { trigger: tryJoinSpace } = useVerifyCustomJoinSpace(space?.id);
@@ -38,10 +37,8 @@ export function useCustomJoinSpace() {
 
         const joinedSpace = await tryJoinSpace({ proposalTemplate: template });
         if (joinedSpace) {
-          setSpaces([...spaces, joinedSpace]);
+          router.reload();
         }
-
-        await refreshUser();
         setAccessChecked(true);
       } catch (error) {
         // not allowed to join
@@ -50,7 +47,7 @@ export function useCustomJoinSpace() {
         isCheckingRef.current = false;
       }
     }
-  }, [refreshUser, router.pathname, router.query, setSpaces, space, spaces, tryJoinSpace]);
+  }, [router, space, tryJoinSpace]);
 
   useEffect(() => {
     if (space?.id || user?.id) {
