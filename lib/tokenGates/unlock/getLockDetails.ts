@@ -1,7 +1,7 @@
 import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
-import { PublicLockV13 } from '@unlock-protocol/contracts';
 import { getAddress } from 'viem';
 
+import { PublicLockV13 } from 'lib/tokenGates/unlock/abi';
 import { isNumber } from 'lib/utilities/numbers';
 
 import { getPublicClient } from '../../blockchain/publicClient';
@@ -33,11 +33,11 @@ export async function getLockDetails(
   try {
     const publicClient = getPublicClient(chainId);
 
-    const name = (await publicClient.readContract({
+    const name = await publicClient.readContract({
       address,
-      abi: PublicLockV13.abi,
+      abi: PublicLockV13,
       functionName: 'name'
-    })) as string;
+    });
 
     const locksmithData = withMetadata ? await getLockMetadata({ contract, chainId }) : undefined;
 
@@ -49,12 +49,14 @@ export async function getLockDetails(
     };
 
     if (walletAddress) {
-      const validKey = (await publicClient.readContract({
+      const wallet = getAddress(walletAddress);
+
+      const validKey = await publicClient.readContract({
         address,
-        abi: PublicLockV13.abi,
+        abi: PublicLockV13,
         functionName: 'getHasValidKey',
-        args: [walletAddress]
-      })) as boolean;
+        args: [wallet]
+      });
 
       return {
         ...lockMetadata,

@@ -2,6 +2,7 @@ import { useFormContext } from 'react-hook-form';
 
 import type { FormValues } from '../hooks/useCollectablesForm';
 
+import { TokenGateHypersub } from './TokenGateHypersub';
 import { TokenGateNft } from './TokenGateNft';
 import { TokenGatePoap } from './TokenGatePoap';
 import { TokenGateUnlockProtocol } from './TokenGateUnlockProtocol';
@@ -20,6 +21,10 @@ export function TokenGateCollectableFields() {
 
   if (collectableOption === 'UNLOCK') {
     return <TokenGateUnlockProtocol />;
+  }
+
+  if (collectableOption === 'HYPERSUB') {
+    return <TokenGateHypersub />;
   }
 
   return null;

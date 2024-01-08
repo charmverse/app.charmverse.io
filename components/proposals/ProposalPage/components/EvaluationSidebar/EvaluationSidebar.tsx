@@ -1,3 +1,4 @@
+import { Tooltip } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -89,7 +90,11 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
 
   return (
     <div>
-      <WorkflowSelect value={proposal?.workflowId} readOnly />
+      <Tooltip title='Workflow can be changed in Draft step'>
+        <span>
+          <WorkflowSelect value={proposal?.workflowId} readOnly />
+        </span>
+      </Tooltip>
       <EvaluationStepRow
         isCurrent={!proposal?.currentEvaluationId}
         index={0}

@@ -112,6 +112,7 @@ export type InitialAvatarProps = {
   isNft?: boolean;
   sx?: SxProps<Theme>;
   onMouseEnter?: (e: React.MouseEvent<HTMLElement>) => void;
+  children?: React.ReactNode;
 };
 
 export default function InitialAvatar({
@@ -122,7 +123,8 @@ export default function InitialAvatar({
   size = 'medium',
   isNft,
   onMouseEnter,
-  sx = {}
+  sx = {},
+  children
 }: InitialAvatarProps) {
   const nameStr = (name || '').replace('0x', ''); // ignore the universal prefix of addresses
   const muiVariant = isNft ? 'square' : variant;
@@ -142,7 +144,7 @@ export default function InitialAvatar({
       imgProps={{ referrerPolicy: 'no-referrer' }}
       alt={name}
     >
-      {nameStr.charAt(0).toUpperCase()}
+      {children || nameStr.charAt(0).toUpperCase()}
     </AvatarComponent>
   );
 }

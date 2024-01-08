@@ -61,8 +61,9 @@ export const CharmedButton = forwardRef<HTMLButtonElement, InputProps<ElementTyp
     </StyledButton>
   );
   if (disabledTooltip) {
+    // wrap the tooltip in a span so we can add support for line breaks in the tooltip
     return (
-      <Tooltip title={disabled ? disabledTooltip : ''} enterDelay={100}>
+      <Tooltip title={disabled ? <div style={{ whiteSpace: 'pre-line' }}>{disabledTooltip}</div> : ''} enterDelay={100}>
         <span>{buttonComponent}</span>
       </Tooltip>
     );

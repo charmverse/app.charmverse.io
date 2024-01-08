@@ -1,5 +1,4 @@
 import type { PageWithPermissions } from '@charmverse/core/pages';
-import type { ProposalStatus } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';

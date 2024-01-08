@@ -178,15 +178,15 @@ describe('getCSVColumns()', () => {
     });
 
     board.fields.cardProperties = boardProperties;
-    const proposalStatusProperty = boardProperties.find((prop) => prop.type === 'proposalStatus');
-    const reviewStatusOptionId = proposalStatusProperty?.options?.find((opt) => opt.value === 'review')?.id;
     const databaseProperties = extractDatabaseProposalProperties({
       boardBlock: board
     });
     const properties = {
       [databaseProperties.proposalUrl!.id]: 'path-123',
-      [databaseProperties.proposalStatus!.id]: reviewStatusOptionId,
-      [databaseProperties.proposalEvaluatedBy!.id]: 'user_1'
+      [databaseProperties.proposalStatus!.id]: 'in_progress',
+      [databaseProperties.proposalEvaluatedBy!.id]: 'user_1',
+      [databaseProperties.proposalEvaluationType!.id]: 'rubric',
+      [databaseProperties.proposalStep!.id]: 'Rubric evaluation'
     };
     const card = createMockCard(board);
     const criteria = {
@@ -213,6 +213,16 @@ describe('getCSVColumns()', () => {
       hasTitleProperty: false,
       visibleProperties: board.fields.cardProperties
     });
-    expect(rowColumns).toEqual(['"title"', '"In Review"', '"http://localhost/test-space/path-123"', 'Mo', '10', '10']);
+
+    expect(rowColumns).toEqual([
+      '"title"',
+      '"In Progress"',
+      '"http://localhost/test-space/path-123"',
+      '"Rubric"',
+      '"Rubric evaluation"',
+      'Mo',
+      '10',
+      '10'
+    ]);
   });
 });

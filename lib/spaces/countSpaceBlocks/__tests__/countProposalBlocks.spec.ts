@@ -2,6 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 as uuid } from 'uuid';
 
+import checkbox from 'components/common/BoardEditor/focalboard/src/widgets/checkbox';
 import { generateSchema } from 'testing/publicApi/schemas';
 
 import type { ProposalBlocksCount } from '../countProposalBlocks';
@@ -27,7 +28,7 @@ describe('countProposalBlocks()', () => {
     urlSchema
   ];
 
-  it('should count each rubric criteria, rubric criteria answer, proposal view, proposal properties, proposal form field with answers, proposal property values as 1 block', async () => {
+  it('should count each rubric criteria, rubric criteria answer, proposal view, proposal properties, proposal form field answers, proposal property values as 1 block', async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace({
       customProposalProperties: propertyTemplates
     });
@@ -39,7 +40,8 @@ describe('countProposalBlocks()', () => {
       userId: user.id,
       customProperties: {
         [textSchema.id]: 'Text',
-        [selectSchema.id]: selectSchema.options[0].id
+        [selectSchema.id]: selectSchema.options[0].id,
+        [checkboxSchema.id]: false
       }
     });
 
@@ -56,7 +58,11 @@ describe('countProposalBlocks()', () => {
     const proposal3 = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: user.id,
-      evaluationType: 'feedback'
+      evaluationType: 'feedback',
+      customProperties: {
+        // Empty string should be ignored
+        [textSchema.id]: ''
+      }
     });
 
     const form = await prisma.form.create({
@@ -194,14 +200,13 @@ describe('countProposalBlocks()', () => {
     });
     const count = await countProposalBlocks({ spaceId: space.id });
     expect(count).toMatchObject<ProposalBlocksCount>({
-      total: 25,
+      total: 20,
       details: {
         proposalViews: 1,
         proposalProperties: 7,
-        proposalPropertyValues: 4,
+        proposalPropertyValues: 5,
         proposalRubricAnswers: 4,
-        proposalRubrics: 2,
-        proposalFormFields: 7
+        proposalFormFields: 3
       }
     });
   });
@@ -300,7 +305,6 @@ describe('countProposalBlocks()', () => {
         proposalProperties: 7,
         proposalPropertyValues: 4,
         proposalRubricAnswers: 0,
-        proposalRubrics: 0,
         proposalFormFields: 0
       }
     });
@@ -318,7 +322,6 @@ describe('countProposalBlocks()', () => {
         proposalProperties: 0,
         proposalPropertyValues: 0,
         proposalRubricAnswers: 0,
-        proposalRubrics: 0,
         proposalFormFields: 0
       }
     });

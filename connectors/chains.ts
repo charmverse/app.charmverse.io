@@ -47,6 +47,7 @@ export interface IChainDetails {
   shortName: string;
   litNetwork?: string;
   unlockNetwork?: boolean;
+  hypersubNetwork?: boolean;
   viem: Chain;
 }
 
@@ -81,7 +82,8 @@ const RPC: Record<string, IChainDetails> = {
     rpcUrls: ['https://eth.llamarpc.com'],
     shortName: 'eth',
     litNetwork: 'ethereum',
-    unlockNetwork: true
+    unlockNetwork: true,
+    hypersubNetwork: true
   },
   GOERLI: {
     ...EVM_DEFAULT,
@@ -110,7 +112,8 @@ const RPC: Record<string, IChainDetails> = {
     testnet: true,
     shortName: 'sep',
     litNetwork: 'sepolia',
-    unlockNetwork: true
+    unlockNetwork: true,
+    hypersubNetwork: true
   },
   OPTIMISM: {
     ...EVM_DEFAULT,
@@ -124,7 +127,8 @@ const RPC: Record<string, IChainDetails> = {
     iconUrl: '/images/cryptoLogos/optimism.svg',
     shortName: 'oeth',
     litNetwork: 'optimism',
-    unlockNetwork: true
+    unlockNetwork: true,
+    hypersubNetwork: true
   },
   // https://docs.base.org/network-information/
   BASE: {
@@ -139,7 +143,8 @@ const RPC: Record<string, IChainDetails> = {
     iconUrl: '/images/cryptoLogos/base-logo.svg',
     shortName: 'base',
     litNetwork: 'base',
-    unlockNetwork: true
+    unlockNetwork: true,
+    hypersubNetwork: true
   },
   BASE_TESTNET: {
     ...EVM_DEFAULT,
@@ -484,6 +489,8 @@ export const litDaoChains: IChainDetailsWithLit[] = litChains.filter((chain) =>
 );
 
 export const unlockChains = RPCList.filter((chain) => !!chain.unlockNetwork).sort(sortChainList);
+
+export const hypersubChains = RPCList.filter((chain) => !!chain.hypersubNetwork).sort(sortChainList);
 
 function sortChainList<T extends IChainDetails>(a: T, b: T) {
   const isMainnet = (chain: T) => !chain.testnet;

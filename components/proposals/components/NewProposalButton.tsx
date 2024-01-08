@@ -2,6 +2,7 @@ import type { PageMeta } from '@charmverse/core/pages';
 import styled from '@emotion/styled';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import FileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined';
 import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
 import { Box, ButtonGroup, MenuItem, Stack, Tooltip, Typography, ListItemIcon, ListItemText } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -78,6 +79,10 @@ export function NewProposalButton() {
     navigateToSpacePath(`/proposals/new`, { template: pageId });
   }
 
+  function duplicateTemplate(pageId: string) {
+    navigateToSpacePath(`/proposals/new`, { type: 'proposal_template', template: pageId });
+  }
+
   return (
     <>
       <Tooltip title={!canCreateProposal ? 'You do not have the permission to create a proposal.' : ''}>
@@ -130,6 +135,16 @@ export function NewProposalButton() {
               />
             )}
 
+            <MenuItem
+              onClick={() => {
+                duplicateTemplate(pageId);
+              }}
+            >
+              <ListItemIcon>
+                <FileCopyOutlinedIcon fontSize='small' />
+              </ListItemIcon>
+              <ListItemText>Duplicate</ListItemText>
+            </MenuItem>
             <MenuItem
               onClick={(e) => {
                 deleteProposalTemplate(pageId);

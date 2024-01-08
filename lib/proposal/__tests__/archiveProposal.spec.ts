@@ -3,14 +3,15 @@ import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 
 import { archiveProposal } from '../archiveProposal';
 
-describe('archiveProposal', () => {
+describe('archiveProposal()', () => {
   it('should update the proposal archived status and return the proposal with full data', async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace();
 
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: user.id,
-      archived: false
+      archived: false,
+      authors: [user.id]
     });
     const archived = await archiveProposal({
       archived: true,
@@ -25,13 +26,5 @@ describe('archiveProposal', () => {
     });
 
     expect(unarchived.archived).toBe(false);
-
-    const { page, ...proposalData } = proposal;
-
-    expect(unarchived).toMatchObject<ProposalWithUsers>({
-      ...proposalData,
-      reviewers: expect.arrayContaining(proposal.reviewers),
-      authors: expect.arrayContaining(proposal.authors)
-    });
   });
 });

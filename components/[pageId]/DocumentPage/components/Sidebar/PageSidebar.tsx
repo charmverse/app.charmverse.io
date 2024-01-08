@@ -203,6 +203,7 @@ function SidebarContents({
   isReviewer,
   proposalTemplateId
 }: SidebarProps) {
+  const isNotNewProposal = !!proposal;
   return (
     <>
       {sidebarView === 'proposal_evaluation' &&
@@ -214,6 +215,7 @@ function SidebarContents({
             onChangeEvaluation={onChangeEvaluation}
             onChangeWorkflow={onChangeWorkflow}
             isReviewer={!!isReviewer}
+            requireWorkflowChangeConfirmation={isNotNewProposal}
           />
         ) : (
           <EvaluationSidebar

@@ -5,19 +5,22 @@ import { MAX_EMBED_WIDTH } from 'components/common/CharmEditor/components/iframe
 import { VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/video/videoSpec';
 import { Constants } from 'lib/focalboard/constants';
 
-import {
-  AUTHORS_BLOCK_ID,
-  CREATED_AT_ID,
-  EVALUATION_TYPE_BLOCK_ID,
-  PROPOSAL_REVIEWERS_BLOCK_ID,
-  STATUS_BLOCK_ID
-} from './blocks/constants';
+import { AUTHORS_BLOCK_ID, CREATED_AT_ID, PROPOSAL_REVIEWERS_BLOCK_ID } from './blocks/constants';
 import type { ProposalEvaluationInput } from './createProposal';
 import { createProposal } from './createProposal';
+import type { VoteSettings } from './interface';
 import { defaultWorkflowTitle } from './workflows/defaultWorkflows';
 
 export const defaultProposalTitle = 'Getting Started';
 
+export const voteSettings: VoteSettings = {
+  threshold: 50,
+  type: 'Approval',
+  options: ['Yes', 'No', 'Abstain'],
+  maxChoices: 1,
+  publishToSnapshot: false,
+  durationDays: 5
+};
 // replace the old method with this one once we have moved to new flow
 export async function createDefaultProposal({ spaceId, userId }: { spaceId: string; userId: string }) {
   const workflow = await prisma.proposalWorkflow.findFirstOrThrow({
@@ -41,7 +44,8 @@ export async function createDefaultProposal({ spaceId, userId }: { spaceId: stri
           ...evaluation,
           id: uuid(),
           index,
-          reviewers: [{ systemRole: 'space_member' }]
+          reviewers: [{ systemRole: 'space_member' }],
+          voteSettings: evaluation.type === 'vote' ? voteSettings : null
         } as ProposalEvaluationInput)
     ) as ProposalEvaluationInput[],
     pageProps: {
@@ -71,14 +75,12 @@ export async function createDefaultProposal({ spaceId, userId }: { spaceId: stri
       properties: {
         [AUTHORS_BLOCK_ID]: [userId],
         [CREATED_AT_ID]: '',
-        [EVALUATION_TYPE_BLOCK_ID]: 'vote',
         [PROPOSAL_REVIEWERS_BLOCK_ID]: [
           {
             group: 'user',
             id: userId
           }
         ],
-        [STATUS_BLOCK_ID]: 'draft',
         [Constants.titleColumnId]: 'Getting Started'
       }
     },

@@ -43,6 +43,7 @@ import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
+import { getNewCriteria } from './components/EvaluationSettingsSidebar/components/RubricCriteriaSettings';
 import type { ProposalPropertiesInput } from './components/ProposalProperties/ProposalPropertiesBase';
 import { ProposalPropertiesBase } from './components/ProposalProperties/ProposalPropertiesBase';
 import { TemplateSelect } from './components/TemplateSelect';
@@ -84,6 +85,7 @@ export function NewProposalPage({
   const [, setPageTitle] = usePageTitle();
   const { data: workflowOptions, isLoading: isLoadingWorkflows } = useGetProposalWorkflows(currentSpace?.id);
   const isMdScreen = useMdScreen();
+  const proposalPageType = isTemplate ? 'proposal_template' : 'proposal';
   const {
     formInputs,
     setFormInputs,
@@ -92,7 +94,7 @@ export function NewProposalPage({
     isCreatingProposal,
     createProposal
   } = useNewProposal({
-    newProposal: { type: isTemplate ? 'proposal_template' : 'proposal', proposalType }
+    newProposal: { type: proposalPageType, proposalType }
   });
   const [submittedDraft, setSubmittedDraft] = useState<boolean>(false);
 
@@ -100,7 +102,7 @@ export function NewProposalPage({
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const isAdmin = useIsAdmin();
 
-  const sourceTemplate = proposalTemplates?.find((template) => template.id === formInputs.proposalTemplateId);
+  const sourceTemplate = proposalTemplates?.find((template) => template.page.id === formInputs.proposalTemplateId);
   const isStructured = formInputs.proposalType === 'structured' || !!sourceTemplate?.formId;
   const proposalFormFields = isStructured
     ? formInputs.formFields ??
@@ -143,7 +145,7 @@ export function NewProposalPage({
   usePreventReload(contentUpdated);
 
   const isTemplateRequired = Boolean(currentSpace?.requireProposalTemplate);
-  const templateOptions = (proposalTemplates || []).map((template) => template.page);
+  const templatePageOptions = (proposalTemplates || []).map((template) => template.page);
   const { pages } = usePages();
 
   const proposalTemplatePage = formInputs.proposalTemplateId ? pages[formInputs.proposalTemplateId] : null;
@@ -183,7 +185,7 @@ export function NewProposalPage({
         evaluationType: template.evaluationType,
         evaluations: template.evaluations,
         fields: template.fields || {},
-        type: 'proposal',
+        type: proposalPageType,
         formId: template.formId ?? undefined,
         formAnswers: (template?.form?.formFields ?? [])
           .filter((formField) => formField.type !== 'label')
@@ -214,11 +216,14 @@ export function NewProposalPage({
         const existingStep = (template?.evaluations || formInputs.evaluations).find(
           (e) => e.title === evaluation.title
         );
+        const rubricCriteria = (
+          evaluation.type === 'rubric' ? existingStep?.rubricCriteria || [getNewCriteria()] : []
+        ) as ProposalRubricCriteriaWithTypedParams[];
         return {
           id: evaluation.id,
           index,
           reviewers: existingStep?.reviewers || [],
-          rubricCriteria: existingStep?.rubricCriteria || ([] as ProposalRubricCriteriaWithTypedParams[]),
+          rubricCriteria,
           title: evaluation.title,
           type: evaluation.type,
           result: null,
@@ -277,17 +282,17 @@ export function NewProposalPage({
                   </PropertyLabel>
                   <Box display='flex' flex={1}>
                     <TemplateSelect
-                      options={templateOptions}
+                      options={templatePageOptions}
                       value={proposalTemplatePage ?? null}
-                      onChange={(template) => {
-                        if (template === null) {
+                      onChange={(page) => {
+                        if (page === null) {
                           clearTemplate();
                           // if user has not updated the content, then just overwrite everything
                         } else if (formInputs.contentText?.length === 0) {
-                          applyTemplate(template.id);
+                          applyTemplate(page.id);
                         } else {
                           // set value to trigger a prompt
-                          setSelectedProposalTemplateId(template?.id ?? null);
+                          setSelectedProposalTemplateId(page.id);
                         }
                       }}
                     />

@@ -7,10 +7,10 @@ import type {
   ProposalBlockUpdateInput,
   ProposalBlockWithTypedFields
 } from 'lib/proposal/blocks/interfaces';
-import type { ClearEvaluationResultRequest } from 'lib/proposal/clearEvaluationResult';
 import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import type { RubricProposalsUserInfo } from 'lib/proposal/getProposalsEvaluatedByUser';
 import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
+import type { GoBackToStepRequest } from 'lib/proposal/goBackToStep';
 import type { ProposalWithUsersAndRubric, ProposalWithUsersLite } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers';
@@ -58,8 +58,8 @@ export function useUpdateProposal({ proposalId }: { proposalId: MaybeString }) {
   return usePUT<Omit<UpdateProposalRequest, 'proposalId'>>(`/api/proposals/${proposalId}`);
 }
 
-export function useUpdateProposalStatusOnly({ proposalId }: { proposalId: MaybeString }) {
-  return usePUT<{ newStatus: 'draft' | 'published' }>(`/api/proposals/${proposalId}/status-only`);
+export function usePublishProposal({ proposalId }: { proposalId: MaybeString }) {
+  return usePUT(`/api/proposals/${proposalId}/publish`);
 }
 
 export function useUpdateProposalEvaluation({ proposalId }: { proposalId: MaybeString }) {
@@ -70,8 +70,8 @@ export function useSubmitEvaluationResult({ proposalId }: { proposalId: MaybeStr
   return usePUT<Partial<Omit<ReviewEvaluationRequest, 'proposalId'>>>(`/api/proposals/${proposalId}/submit-result`);
 }
 
-export function useClearEvaluationResult({ proposalId }: { proposalId: MaybeString }) {
-  return usePUT<Partial<Omit<ClearEvaluationResultRequest, 'proposalId'>>>(`/api/proposals/${proposalId}/clear-result`);
+export function useGoBackToStep({ proposalId }: { proposalId: MaybeString }) {
+  return usePUT<Partial<Omit<GoBackToStepRequest, 'proposalId'>>>(`/api/proposals/${proposalId}/back-to-step`);
 }
 
 export function useUpsertRubricCriteria({ proposalId }: { proposalId: MaybeString }) {
@@ -127,4 +127,8 @@ export function useUpdateProposalFormFieldAnswers({ proposalId }: { proposalId: 
 
 export function useUpdateSnapshotProposal({ proposalId }: { proposalId: MaybeString }) {
   return usePUT<{ snapshotProposalId: string | null; evaluationId: string }>(`/api/proposals/${proposalId}/snapshot`);
+}
+
+export function useUpdateWorkflow({ proposalId }: { proposalId: MaybeString }) {
+  return usePUT<{ workflowId: string }>(`/api/proposals/${proposalId}/workflow`);
 }

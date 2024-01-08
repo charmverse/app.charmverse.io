@@ -56,5 +56,5 @@ export function useProposalTemplates({ load = true }: { load?: boolean } = {}) {
 // TODO:  add an endpoint for a single template or return it along with the proposal??
 export function useProposalTemplateById(id: undefined | string | null) {
   const { proposalTemplates } = useProposalTemplates({ load: !!id });
-  return proposalTemplates?.find((template) => template.id === id);
+  return proposalTemplates?.find((template) => template.page.id === id);
 }
