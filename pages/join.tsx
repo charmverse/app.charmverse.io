@@ -59,21 +59,6 @@ export default function JoinWorkspace() {
     }
   }, [router.isReady]);
 
-  useEffect(() => {
-    // Update token gate details with image and names
-    if (tokenGates && tokenGates?.length > 0) {
-      mutate((_space) => {
-        if (_space) {
-          return {
-            ..._space,
-            tokenGates
-          };
-        }
-        return undefined;
-      });
-    }
-  }, [!!tokenGates]);
-
   const spaceFromPathNotFound = domain && !isSpaceLoading && !spaceFromPath;
 
   return (
@@ -85,7 +70,7 @@ export default function JoinWorkspace() {
         {domain && (!isSpaceLoading || !isLoadingTokenGates) && spaceError && (
           <Alert severity='error'>No space found</Alert>
         )}
-        {domain && spaceFromPath && tokenGates && <SpaceAccessGate space={spaceFromPath} />}
+        {domain && spaceFromPath && tokenGates && <SpaceAccessGate space={{ ...spaceFromPath, tokenGates }} />}
         {isRouterReady && (spaceFromPathNotFound || !domain) && <SpaceAccessGateWithSearch defaultValue={domain} />}
       </Card>
       <AlternateRouteButton href={`${getAppUrl()}createSpace`}>Create a space</AlternateRouteButton>
