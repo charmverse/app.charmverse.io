@@ -33,13 +33,17 @@ import type { Board, DatabaseProposalPropertyType, IPropertyTemplate, PropertyTy
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import {
-  PROPOSAL_STATUS_LABELS,
+  EVALUATION_STATUS_LABELS,
   PROPOSAL_STEP_LABELS,
   proposalStatusColors
 } from 'lib/focalboard/proposalDbProperties';
 import { PROPOSAL_STATUS_BLOCK_ID, PROPOSAL_STEP_BLOCK_ID } from 'lib/proposal/blocks/constants';
 import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
-import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from 'lib/proposal/interface';
+import type {
+  ProposalEvaluationResultExtended,
+  ProposalEvaluationStep,
+  ProposalWithUsersLite
+} from 'lib/proposal/interface';
 import {
   REWARDS_APPLICANTS_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
@@ -198,7 +202,7 @@ function PropertyValueElement(props: Props) {
   // We should migrate over the proposals as datasource blocks to the same format as proposals table
   else if (propertyTemplate.type === 'proposalStatus' || propertyTemplate.id === PROPOSAL_STATUS_BLOCK_ID) {
     if (proposal) {
-      return <ProposalStatusSelect proposal={proposal} spaceId={card.spaceId} readOnly={!isAdmin} />;
+      return <ProposalStatusSelect proposal={proposal} readOnly={!isAdmin} />;
     }
 
     const evaluationTypeProperty = board.fields.cardProperties.find(
@@ -218,7 +222,7 @@ function PropertyValueElement(props: Props) {
           {
             color: proposalStatusColors[proposalEvaluationStatus],
             id: proposalEvaluationStatus,
-            value: PROPOSAL_STATUS_LABELS[proposalEvaluationStatus]
+            value: EVALUATION_STATUS_LABELS[proposalEvaluationStatus]
           }
         ]}
         propertyValue={proposalEvaluationStatus}
@@ -238,8 +242,7 @@ function PropertyValueElement(props: Props) {
         />
       );
     }
-    return <ProposalStepSelect readOnly={!isAdmin} proposal={proposal} spaceId={card.spaceId} />;
-    // return <ProposalStepChipTextOnly label={proposal?.currentStep?.title ?? (propertyValue as string)} />;
+    return <ProposalStepSelect readOnly={!isAdmin} proposal={proposal} />;
   } else if (propertyTemplate.type === 'proposalEvaluationType') {
     return (
       <TagSelect
