@@ -48,7 +48,7 @@ describe('updateCardsFromProposals()', () => {
   it('should update cards from proposals', async () => {
     const pageProposal = await testUtilsProposals.generateProposal({
       authors: [user.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [
         {
           group: 'user',
@@ -98,7 +98,7 @@ describe('updateCardsFromProposals()', () => {
   it('should create cards from proposals if there are new proposals added', async () => {
     await testUtilsProposals.generateProposal({
       authors: [user.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [
         {
           group: 'user',
@@ -113,7 +113,7 @@ describe('updateCardsFromProposals()', () => {
 
     const pageProposal2 = await testUtilsProposals.generateProposal({
       authors: [user.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [
         {
           group: 'user',
@@ -173,7 +173,7 @@ describe('updateCardsFromProposals()', () => {
 
     const pageProposal2 = await testUtilsProposals.generateProposal({
       authors: [],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [],
       spaceId: space.id,
       userId: user.id,
@@ -206,7 +206,7 @@ describe('updateCardsFromProposals()', () => {
 
     const proposal = await generateProposal({
       authors: [proposalAuthor.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [
         {
           group: 'user',
@@ -269,7 +269,7 @@ describe('updateCardsFromProposals()', () => {
 
     const proposal2 = await generateProposal({
       authors: [proposalAuthor.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [
         {
           group: 'user',
@@ -405,7 +405,7 @@ describe('updateCardsFromProposals()', () => {
   it('should delete cards from proposals', async () => {
     const pageProposal = await testUtilsProposals.generateProposal({
       authors: [user.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [
         {
           group: 'user',
@@ -447,7 +447,7 @@ describe('updateCardsFromProposals()', () => {
   it('should permanently delete cards from proposals', async () => {
     const pageProposal = await testUtilsProposals.generateProposal({
       authors: [user.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [
         {
           group: 'user',

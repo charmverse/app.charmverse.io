@@ -33,7 +33,7 @@ beforeAll(async () => {
   proposal = await testUtilsProposals.generateProposal({
     spaceId: generated.space.id,
     userId: proposalAuthor.id,
-    proposalStatus: 'vote_active',
+    proposalStatus: 'published',
     authors: [proposalAuthor.id],
     snapshotProposalId
   });
@@ -86,21 +86,6 @@ describe('POST /api/v1/proposals/{proposalId}/snapshot-vote', () => {
       .set('Authorization', `Bearer ${apiKey.token}`);
     expect(response.statusCode).toBe(404);
     expect(response.body.message).toBe(`Proposal with id ${proposalId} was not found.`);
-  });
-
-  it('should throw 404 error if proposal was not published to snapshot', async () => {
-    const testProposal = await testUtilsProposals.generateProposal({
-      spaceId: space.id,
-      userId: proposalAuthor.id,
-      proposalStatus: 'vote_active',
-      authors: [proposalAuthor.id]
-    });
-    const response = await request(baseUrl)
-      .post(`/api/v1/proposals/${testProposal.id}/snapshot-vote`)
-      .send(payload)
-      .set('Authorization', `Bearer ${apiKey.token}`);
-    expect(response.statusCode).toBe(404);
-    expect(response.body.message).toBe(`Proposal with id ${testProposal.id} was not published to snapshot.`);
   });
 
   it('should throw 400 error if proposal was not found on snapshot', async () => {

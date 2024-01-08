@@ -21,7 +21,7 @@ beforeAll(async () => {
     userId: user.id,
     authors: [],
     reviewers: [user.id],
-    proposalStatus: 'vote_active'
+    proposalStatus: 'published'
   });
   proposalId = proposal.id;
 
@@ -53,7 +53,7 @@ describe('castProposalVote', () => {
       userId: user.id,
       authors: [],
       reviewers: [user.id],
-      proposalStatus: 'vote_closed'
+      proposalStatus: 'published'
     });
 
     await createVote({

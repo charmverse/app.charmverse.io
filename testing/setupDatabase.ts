@@ -974,20 +974,6 @@ export async function generateProposal({
 
   const colors = ['gray', 'orange', 'yellow', 'green', 'teal', 'blue', 'turquoise', 'purple', 'pink', 'red'];
 
-  const randomColor = colors[Math.floor(Math.random() * colors.length)];
-
-  const categoryIdToLink =
-    categoryId ??
-    (
-      await prisma.proposalCategory.create({
-        data: {
-          title: `Category - ${v4()}`,
-          color: randomColor,
-          space: { connect: { id: spaceId } }
-        }
-      })
-    ).id;
-
   const result = await createPageDb({
     data: {
       id: proposalId,

@@ -197,7 +197,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     const { page } = await testUtilsProposals.generateProposal({
       userId: proposalAuthor.id,
       spaceId: adminSpace.id,
-      proposalStatus: 'discussion'
+      proposalStatus: 'published'
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {

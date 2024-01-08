@@ -86,16 +86,6 @@ export function ProposalProperties({
     mutateProposals();
   }
 
-  const canSeeEvaluation =
-    (proposal?.status === 'evaluation_active' || proposal?.status === 'evaluation_closed') && isReviewer;
-
-  // open the rubric sidebar by default
-  useEffect(() => {
-    if (enableSidebar && canSeeEvaluation && !isMdScreen) {
-      openEvaluation?.();
-    }
-  }, [canSeeEvaluation]);
-
   return (
     <Box
       className='CardDetail content'

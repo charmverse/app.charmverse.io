@@ -141,7 +141,7 @@ const proposals: ProposalNotification[] = proposalNotificationTypes
     pageId: '_',
     pagePath: '/proposal',
     pageTitle: 'Test proposal',
-    status: 'discussion' as const
+    status: 'published' as const
   }))
   .map((notification) => ({ ...baseFields, ...notification, id: uuid() }));
 

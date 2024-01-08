@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Page, Proposal, Space, Vote, VoteStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
@@ -18,6 +19,7 @@ type ProposalOutput = {
 };
 
 export async function closeOutProposals({ proposalIds }: Input): Promise<ProposalOutput[]> {
+  throw new Error('This script does not support the evaluation-based proposal flow');
   const proposals = await prisma.proposal.findMany({
     where: {
       id: {

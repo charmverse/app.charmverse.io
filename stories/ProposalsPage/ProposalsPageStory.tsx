@@ -34,7 +34,7 @@ export const proposals = [
       { evaluationId: null, id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null }
     ],
     evaluationType: 'vote',
-    status: 'discussion'
+    status: 'published'
   }),
   createMockProposal({
     authors: [{ proposalId: '', userId: members[2].id }],
@@ -42,7 +42,7 @@ export const proposals = [
       { evaluationId: null, id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null }
     ],
     evaluationType: 'rubric',
-    status: 'review'
+    status: 'published'
   })
 ];
 

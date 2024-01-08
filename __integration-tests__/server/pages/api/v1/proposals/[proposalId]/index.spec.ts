@@ -225,7 +225,7 @@ describe('GET /api/v1/proposals/{proposalId}', () => {
       spaceId: secondSpace.id,
       userId: secondSpaceUser.id,
       authors: [secondSpaceUser.id],
-      proposalStatus: 'discussion'
+      proposalStatus: 'published'
     });
 
     const otherSuperApiKey = await generateSuperApiKey({ spaceId: secondSpace.id });

@@ -20,7 +20,7 @@ describe.skip('PUT /api/proposals/[id]/rubric-criteria - Update proposal rubric 
       spaceId: space.id,
       userId: author.id,
       authors: [author.id],
-      proposalStatus: 'discussion'
+      proposalStatus: 'published'
     });
   });
 

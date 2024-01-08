@@ -1,4 +1,4 @@
-import type { Space, User, ProposalCategory, Role } from '@charmverse/core/prisma';
+import type { Space, User, Role } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
