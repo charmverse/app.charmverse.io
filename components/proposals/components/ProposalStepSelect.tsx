@@ -1,45 +1,71 @@
 import { useMemo } from 'react';
-import { mutate } from 'swr';
 
-import { useGoBackToStep } from 'charmClient/hooks/proposals';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
-import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPropertyOption } from 'lib/focalboard/board';
-import type { CardPageProposal } from 'lib/focalboard/card';
+import type { ProposalWithUsersLite } from 'lib/proposal/interface';
 
-export function ProposalStepSelectWithoutProposal({
-  options,
-  currentValue
-}: {
-  options: IPropertyOption[];
-  currentValue?: string;
-}) {
-  return (
-    <TagSelect
-      wrapColumn
-      includeSelectedOptions
-      readOnly
-      options={options}
-      propertyValue={currentValue ?? ''}
-      onChange={() => {}}
-    />
-  );
-}
+import { useBatchUpdateProposalStatusOrStep } from '../hooks/useBatchUpdateProposalStatusOrStep';
 
-export function ProposalStepSelect({
+type ProposalProp = {
+  currentStep: ProposalWithUsersLite['currentStep'];
+  currentEvaluationId?: ProposalWithUsersLite['currentEvaluationId'];
+  evaluations: ProposalWithUsersLite['evaluations'];
+  hasRewards: boolean;
+  id: string;
+};
+
+export function ControlledProposalStepSelect({
   proposal,
-  spaceId,
+  onChange,
   readOnly
 }: {
-  proposal: CardPageProposal;
-  spaceId: string;
-  readOnly: boolean;
+  readOnly?: boolean;
+  proposal: ProposalProp;
+  onChange: (data: { evaluationId: string; moveForward: boolean }) => void;
 }) {
-  const { trigger: goBackToStep } = useGoBackToStep({ proposalId: proposal.id });
-  const currentEvaluationStep = proposal.currentStep.step;
-  const currentEvaluationResult = proposal.currentStep.result;
+  return <ProposalStepSelectBase readOnly={readOnly} proposal={proposal} onChange={onChange} />;
+}
 
-  const { currentValue, options } = useMemo(() => {
+export function ProposalStepSelect({ proposal, readOnly }: { proposal: ProposalProp; readOnly: boolean }) {
+  const { updateSteps } = useBatchUpdateProposalStatusOrStep();
+
+  function onValueChange({ evaluationId, moveForward }: { evaluationId: string; moveForward: boolean }) {
+    updateSteps(
+      [
+        {
+          evaluationId,
+          proposalId: proposal.id,
+          currentEvaluationStep: proposal.currentStep.step
+        }
+      ],
+      moveForward
+    );
+  }
+
+  return <ProposalStepSelectBase proposal={proposal} onChange={onValueChange} readOnly={readOnly} />;
+}
+
+export function ProposalStepSelectBase({
+  proposal,
+  readOnly,
+  onChange
+}: {
+  proposal: ProposalProp;
+  readOnly?: boolean;
+  onChange: (data: { evaluationId: string; moveForward: boolean }) => void;
+}) {
+  const hasRewards = proposal.hasRewards;
+  const currentEvaluationStep = proposal.currentStep.step;
+  const currentEvaluationIndex = proposal.currentStep.index;
+  const currentEvaluationResult = proposal.currentStep.result;
+  const hasPublishedRewards = currentEvaluationStep === 'rewards' && currentEvaluationResult === 'pass';
+
+  const { options } = useMemo(() => {
+    const proposalEvaluationsMap: Record<string, ProposalWithUsersLite['evaluations'][number] | undefined> = {};
+    proposal.evaluations.forEach((evaluation) => {
+      proposalEvaluationsMap[evaluation.id] = evaluation;
+    });
+
     const _options: IPropertyOption[] = [
       {
         id: 'draft',
@@ -51,7 +77,7 @@ export function ProposalStepSelect({
         value: evaluation.title,
         color: 'gray'
       })),
-      ...(proposal.hasRewards
+      ...(hasRewards
         ? [
             {
               id: 'rewards',
@@ -61,48 +87,50 @@ export function ProposalStepSelect({
           ]
         : [])
     ];
-    const lastEvaluation = proposal && proposal.evaluations[proposal.evaluations.length - 1];
-    const currentEvaluationId = proposal.currentEvaluationId;
-    const currentEvaluationIndex = !currentEvaluationId
-      ? 0
-      : currentEvaluationId === lastEvaluation?.id && lastEvaluation?.result === 'pass' && proposal.hasRewards
-      ? _options.length - 1
-      : _options.findIndex((e) => e.id === currentEvaluationId);
+
     _options.forEach((option, index) => {
+      const evaluation = proposalEvaluationsMap[option.id];
+
       option.disabled =
-        index >= currentEvaluationIndex ||
+        index === currentEvaluationIndex ||
         index < currentEvaluationIndex - 1 ||
-        (currentEvaluationStep === 'rewards' && currentEvaluationResult === 'pass');
+        index > currentEvaluationIndex + 1 ||
+        // Disable option if it is a vote step and its not in progress
+        (evaluation?.type === 'vote' && evaluation?.result !== null) ||
+        // If we are on the vote step, then we can only go back to the previous step
+        (currentEvaluationStep === 'vote'
+          ? currentEvaluationResult === 'in_progress' && index >= currentEvaluationIndex
+          : false);
     });
-    return { options: _options, currentValue: _options[currentEvaluationIndex]?.id };
-  }, [proposal, currentEvaluationResult, currentEvaluationStep]);
-
-  const { showMessage } = useSnackbar();
-
-  async function onChange(evaluationId: string) {
-    try {
-      await goBackToStep({ evaluationId });
-      await mutate(`/api/spaces/${spaceId}/proposals`);
-    } catch (err: any) {
-      showMessage(err.message, 'error');
-    }
-  }
-  function onValueChange(values: string | string[]) {
-    const newValue = Array.isArray(values) ? values[0] : values;
-    if (newValue) {
-      onChange(newValue);
-    }
-  }
+    return { options: _options };
+  }, [proposal, hasRewards, currentEvaluationStep, currentEvaluationIndex, currentEvaluationResult]);
 
   return (
     <TagSelect
       disableClearable
       wrapColumn
       includeSelectedOptions
-      readOnly={readOnly}
+      readOnly={
+        readOnly || hasPublishedRewards || (currentEvaluationStep === 'vote' && currentEvaluationResult === 'fail')
+      }
       options={options}
-      propertyValue={currentValue ?? ''}
-      onChange={onValueChange}
+      propertyValue={
+        hasPublishedRewards
+          ? proposal.evaluations[proposal.evaluations.length - 1]?.id ?? proposal.currentStep.id
+          : proposal.currentStep.id
+      }
+      onChange={(values) => {
+        const evaluationId = Array.isArray(values) ? values[0] : values;
+        if (evaluationId) {
+          const newEvaluationIdIndex = options.findIndex((option) => option.id === evaluationId);
+          const moveForward = newEvaluationIdIndex > currentEvaluationIndex;
+          // If we are moving forward then pass the current step, otherwise go back to the previous step
+          onChange({
+            evaluationId: moveForward ? proposal.currentStep.id : evaluationId,
+            moveForward
+          });
+        }
+      }}
     />
   );
 }
