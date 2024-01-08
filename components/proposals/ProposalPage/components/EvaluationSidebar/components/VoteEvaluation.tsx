@@ -1,4 +1,4 @@
-import HowToVoteIcon from '@mui/icons-material/HowToVote';
+import HowToVoteIcon from '@mui/icons-material/HowToVoteOutlined';
 import { Stack, Tooltip, Typography } from '@mui/material';
 import { useEffect } from 'react';
 
@@ -96,13 +96,15 @@ export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation, addVot
         }
         message='Vote has not been initiated yet'
       >
-        <Tooltip
-          title={!isReviewer ? 'Only proposal authors and space admins can publish this proposal to snapshot' : ''}
-        >
-          <Button disabled={!isReviewer} onClick={addVote} sx={{ width: 'fit-content', mt: 2 }}>
-            Create Vote
-          </Button>
-        </Tooltip>
+        {evaluation.snapshotId && (
+          <Tooltip
+            title={!isReviewer ? 'Only proposal authors and space admins can publish this proposal to snapshot' : ''}
+          >
+            <Button disabled={!isReviewer} onClick={addVote} sx={{ width: 'fit-content', mt: 2 }}>
+              Create Vote
+            </Button>
+          </Tooltip>
+        )}
       </NoCommentsMessage>
     );
   }
