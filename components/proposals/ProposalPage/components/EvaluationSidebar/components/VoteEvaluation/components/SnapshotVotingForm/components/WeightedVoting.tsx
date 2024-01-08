@@ -3,12 +3,11 @@ import { Box, Chip, FormControlLabel, FormGroup, Stack, TextField, Typography } 
 import { useEffect, useMemo } from 'react';
 
 import { Button } from 'components/common/Button';
-import { DisplayChoiceScore } from 'components/proposals/components/SnapshotVoting/DisplayChoiceScore';
-import type {
-  SnapshotVotingProps,
-  VoteChoiceFormProps
-} from 'components/proposals/components/SnapshotVoting/SnapshotVotingForm';
 import { getNumberFromString, percent } from 'lib/utilities/numbers';
+
+import type { SnapshotVotingProps, VoteChoiceFormProps } from '../SnapshotVotingForm';
+
+import { DisplayChoiceScore } from './DisplayChoiceScore';
 
 const isValidChoiceRecord = (choice: any): choice is Record<string, number> => {
   return typeof choice === 'object' && !Array.isArray(choice) && choice !== null;

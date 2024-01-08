@@ -8,19 +8,20 @@ import { NoCommentsMessage } from 'components/[pageId]/DocumentPage/components/S
 import { Button } from 'components/common/Button';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { PublishToSnapshot } from 'components/common/PageActions/components/SnapshotAction/PublishToSnapshot';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposal/interface';
+
+import { PublishToSnapshot } from './components/PublishToSnapshot/PublishToSnapshot';
+import { SnapshotVoteDetails } from './components/SnapshotVoteDetails';
 
 export type Props = {
   isCurrent: boolean;
   pageId: string;
   proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'permissions'>;
   evaluation: PopulatedEvaluation;
-  addVote?: () => void;
 };
 
-export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation, addVote }: Props) {
+export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation }: Props) {
   const { data: votes, mutate: refreshVotes, isLoading } = useGetVotesForPage(pageId ? { pageId } : undefined);
   const { showMessage } = useSnackbar();
   const isReviewer = isCurrent && proposal?.permissions.evaluate;
@@ -100,6 +101,10 @@ export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation, addVot
   }
 
   vote.title = evaluation.title;
+
+  if (proposal?.id && evaluation.snapshotId) {
+    return <SnapshotVoteDetails snapshotProposalId={proposal.id} />;
+  }
 
   return (
     <VoteDetail

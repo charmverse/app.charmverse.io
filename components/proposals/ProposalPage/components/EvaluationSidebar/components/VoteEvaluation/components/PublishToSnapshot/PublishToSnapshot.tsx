@@ -13,7 +13,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { getSnapshotProposal } from 'lib/snapshot/getProposal';
 import type { SnapshotProposal } from 'lib/snapshot/interfaces';
 
-import { PublishingForm } from './PublishingForm';
+import { PublishingForm } from './components/PublishingForm';
 
 interface Props {
   pageId: string;
