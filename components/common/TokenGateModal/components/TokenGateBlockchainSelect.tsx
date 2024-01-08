@@ -2,14 +2,12 @@ import type { SelectProps } from '@mui/material';
 import { FormHelperText, ListItemIcon, ListItemText, MenuItem, Select } from '@mui/material';
 import type { IChainDetails } from 'connectors/chains';
 import { getChainById, litChains } from 'connectors/chains';
-import type { ReactNode } from 'react';
+import { forwardRef, type ReactNode } from 'react';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import TokenLogo from 'components/common/TokenLogo';
 
-export function TokenGateBlockchainSelect(
-  props: SelectProps<string> & { helperMessage?: ReactNode; chains?: IChainDetails[] }
-) {
+function SelectField(props: SelectProps<string> & { helperMessage?: ReactNode; chains?: IChainDetails[] }) {
   const { helperMessage, children, chains = litChains, ...restProps } = props;
 
   return (
@@ -43,3 +41,5 @@ export function TokenGateBlockchainSelect(
     </FieldWrapper>
   );
 }
+
+export const TokenGateBlockchainSelect = forwardRef(SelectField);
