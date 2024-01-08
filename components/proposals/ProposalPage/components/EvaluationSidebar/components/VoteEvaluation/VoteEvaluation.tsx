@@ -102,8 +102,24 @@ export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation }: Prop
 
   vote.title = evaluation.title;
 
-  if (evaluation.snapshotId) {
-    return <SnapshotVoteDetails snapshotProposalId={evaluation.snapshotId} />;
+  if (evaluation.voteSettings?.publishToSnapshot) {
+    return evaluation.snapshotId ? (
+      <SnapshotVoteDetails snapshotProposalId={evaluation.snapshotId} />
+    ) : (
+      <NoCommentsMessage
+        icon={
+          <HowToVoteIcon
+            fontSize='large'
+            color='secondary'
+            sx={{
+              height: '2em',
+              width: '100%'
+            }}
+          />
+        }
+        message='Snapshot vote is missing'
+      />
+    );
   }
 
   return (
