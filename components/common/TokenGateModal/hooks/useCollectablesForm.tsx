@@ -70,13 +70,19 @@ const schema = yup.object({
                 abi: [
                   {
                     inputs: [],
-                    name: 'totalSupply',
-                    outputs: [{ type: 'uint256' }],
+                    name: 'name',
+                    outputs: [
+                      {
+                        internalType: 'string',
+                        name: '',
+                        type: 'string'
+                      }
+                    ],
                     stateMutability: 'view',
                     type: 'function'
                   }
                 ] as const,
-                functionName: 'totalSupply'
+                functionName: 'name'
               });
               return true;
             } catch (err) {
