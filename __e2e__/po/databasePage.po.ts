@@ -125,4 +125,8 @@ export class DatabasePage extends GlobalPage {
   getTemplateMenuEditOption({ pageId }: { pageId: string }) {
     return this.page.locator(`data-test=template-menu-edit-${pageId}`);
   }
+
+  getCardDetailsTextInput() {
+    return this.page.locator('data-test=card-detail-properties').locator('textarea.octo-propertyvalue').first();
+  }
 }

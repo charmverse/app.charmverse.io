@@ -503,7 +503,8 @@ function PropertyValueElement(props: Props) {
     validator: (newValue: string) => validatePropertyValue(propertyTemplate.type, newValue),
     spellCheck: propertyTemplate.type === 'text',
     wrapColumn: props.wrapColumn ?? false,
-    columnRef: props.columnRef
+    columnRef: props.columnRef,
+    'data-test': `property-value-${propertyTemplate.type}`
   };
 
   if (editableFields.includes(propertyTemplate.type)) {
