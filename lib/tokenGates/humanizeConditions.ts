@@ -57,7 +57,7 @@ export function humanizeUnlockConditionsData(conditions: TokenGate<'unlock'>['co
 export function humanizeHypersubConditionsData(conditions: TokenGate<'hypersub'>['conditions']): HumanizeCondition[] {
   return [
     {
-      image: conditions.image || '',
+      image: conditions.image,
       standardContractType: 'HYPERSUB',
       content: [
         { type: 'text', content: 'Hypersub -' },

@@ -1,13 +1,13 @@
-import { Card, Paper } from '@mui/material';
+import Card from '@mui/material/Card';
+import Paper from '@mui/material/Paper';
 import { mockTokenGateResult, mockTokenGates } from 'stories/lib/mockTokenGataData';
 
 import { TokenGate } from 'components/common/SpaceAccessGate/components/TokenGate/TokenGate';
-import UserDescription from 'components/settings/profile/components/UserDescription';
 import { TokenGateContainer } from 'pages/join';
 
 export default {
-  title: 'common/Token Gate',
-  component: UserDescription
+  title: 'tokengate/Token Gate',
+  component: TokenGate
 };
 
 export function Conditions() {
