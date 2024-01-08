@@ -171,6 +171,8 @@ test.describe.serial('Proposal Evaluation', () => {
     // We need to click elsewhere for the input value to propagate
     await documentPage.documentTitle.click();
 
+    await documentPage.page.waitForTimeout(1000);
+
     // await documentPage.page.pause();
 
     await documentPage.page.reload({ waitUntil: 'domcontentloaded' });
