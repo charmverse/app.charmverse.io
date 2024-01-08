@@ -6,7 +6,7 @@ import { v4 as uuid } from 'uuid';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import {
-  PROPOSAL_STATUS_LABELS,
+  EVALUATION_STATUS_LABELS,
   PROPOSAL_STEP_LABELS,
   proposalDbProperties,
   proposalStatusColors
@@ -292,7 +292,7 @@ function generateUpdatedProposalStatusProperty({ boardProperties }: { boardPrope
   };
 
   if (proposalStatusProp) {
-    [...objectUtils.typedKeys(PROPOSAL_STATUS_LABELS)].forEach((status) => {
+    [...objectUtils.typedKeys(EVALUATION_STATUS_LABELS)].forEach((status) => {
       const existingOption = proposalStatusProp.options.find((opt) => opt.value === status);
       if (!existingOption) {
         proposalStatusProp.options.push({

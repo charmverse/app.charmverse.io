@@ -4,7 +4,7 @@ import { TagSelect } from 'components/common/BoardEditor/components/properties/T
 import type { IPropertyOption } from 'lib/focalboard/board';
 import type { ProposalWithUsersLite } from 'lib/proposal/interface';
 
-import { useProposalUpdateStatusAndStep } from '../hooks/useProposalUpdateStatusAndStep';
+import { useBatchUpdateProposalStatusOrStep } from '../hooks/useBatchUpdateProposalStatusOrStep';
 
 type ProposalProp = {
   currentStep: ProposalWithUsersLite['currentStep'];
@@ -27,10 +27,10 @@ export function ControlledProposalStepSelect({
 }
 
 export function ProposalStepSelect({ proposal, readOnly }: { proposal: ProposalProp; readOnly: boolean }) {
-  const { batchUpdateProposalSteps } = useProposalUpdateStatusAndStep();
+  const { updateSteps } = useBatchUpdateProposalStatusOrStep();
 
   function onValueChange({ evaluationId, moveForward }: { evaluationId: string; moveForward: boolean }) {
-    batchUpdateProposalSteps(
+    updateSteps(
       [
         {
           evaluationId,
@@ -61,6 +61,11 @@ export function ProposalStepSelectBase({
   const hasPublishedRewards = currentEvaluationStep === 'rewards' && currentEvaluationResult === 'pass';
 
   const { options } = useMemo(() => {
+    const proposalEvaluationsMap: Record<string, ProposalWithUsersLite['evaluations'][number] | undefined> = {};
+    proposal.evaluations.forEach((evaluation) => {
+      proposalEvaluationsMap[evaluation.id] = evaluation;
+    });
+
     const _options: IPropertyOption[] = [
       {
         id: 'draft',
@@ -84,22 +89,30 @@ export function ProposalStepSelectBase({
     ];
 
     _options.forEach((option, index) => {
+      const evaluation = proposalEvaluationsMap[option.id];
+
       option.disabled =
         index === currentEvaluationIndex ||
         index < currentEvaluationIndex - 1 ||
         index > currentEvaluationIndex + 1 ||
+        // Disable option if it is a vote step and its not in progress
+        (evaluation?.type === 'vote' && evaluation?.result !== null) ||
         // If we are on the vote step, then we can only go back to the previous step
-        (currentEvaluationStep === 'vote' ? index >= currentEvaluationIndex : false);
+        (currentEvaluationStep === 'vote'
+          ? currentEvaluationResult === 'in_progress' && index >= currentEvaluationIndex
+          : false);
     });
     return { options: _options };
-  }, [proposal, hasRewards, currentEvaluationStep, currentEvaluationIndex]);
+  }, [proposal, hasRewards, currentEvaluationStep, currentEvaluationIndex, currentEvaluationResult]);
 
   return (
     <TagSelect
       disableClearable
       wrapColumn
       includeSelectedOptions
-      readOnly={readOnly || hasPublishedRewards}
+      readOnly={
+        readOnly || hasPublishedRewards || (currentEvaluationStep === 'vote' && currentEvaluationResult === 'fail')
+      }
       options={options}
       propertyValue={
         hasPublishedRewards

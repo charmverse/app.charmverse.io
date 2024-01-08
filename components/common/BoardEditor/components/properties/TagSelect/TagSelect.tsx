@@ -186,7 +186,6 @@ export function TagSelect({
   if (!isOpened) {
     return (
       <SelectPreviewContainer
-        className='SelectPreviewContainer'
         data-test={props['data-test']}
         onClick={onEdit}
         displayType={displayType}

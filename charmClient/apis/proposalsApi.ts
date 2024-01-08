@@ -39,8 +39,8 @@ export class ProposalsApi {
     return http.PUT(`/api/proposals/${proposalId}/submit-result`, payload);
   }
 
-  updateProposalStatusOnly({ proposalId, ...payload }: { proposalId: string; newStatus: 'draft' | 'published' }) {
-    return http.PUT(`/api/proposals/${proposalId}/status-only`, payload);
+  publishProposal(proposalId: string) {
+    return http.PUT(`/api/proposals/${proposalId}/publish`);
   }
 
   createProposalRewards({ proposalId }: { proposalId: string }) {

@@ -4,14 +4,14 @@ import { useMemo } from 'react';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import type { IPropertyOption } from 'lib/focalboard/board';
 import {
-  PROPOSAL_STATUS_LABELS,
-  PROPOSAL_STATUS_VERB_LABELS,
+  EVALUATION_STATUS_LABELS,
+  EVALUATION_STATUS_VERB_LABELS,
   proposalStatusColors
 } from 'lib/focalboard/proposalDbProperties';
 import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
 import type { ProposalEvaluationStatus, ProposalEvaluationStep, ProposalWithUsersLite } from 'lib/proposal/interface';
 
-import { useProposalUpdateStatusAndStep } from '../hooks/useProposalUpdateStatusAndStep';
+import { useBatchUpdateProposalStatusOrStep } from '../hooks/useBatchUpdateProposalStatusOrStep';
 
 type ProposalProp = Pick<ProposalWithUsersLite, 'currentStep' | 'currentEvaluationId' | 'evaluations' | 'id'>;
 
@@ -30,10 +30,10 @@ export function ControlledProposalStatusSelect({
 export function ProposalStatusSelect({ proposal, readOnly }: { proposal: ProposalProp; readOnly?: boolean }) {
   const currentEvaluationStep = proposal.currentStep.step;
   const currentEvaluationId = proposal.currentStep.id;
-  const { batchUpdateProposalStatuses } = useProposalUpdateStatusAndStep();
+  const { updateStatuses } = useBatchUpdateProposalStatusOrStep();
 
   async function onChange(result: ProposalEvaluationResult | null) {
-    batchUpdateProposalStatuses({
+    updateStatuses({
       proposalsData: [
         {
           proposalId: proposal.id,
@@ -79,8 +79,8 @@ function ProposalStatusSelectBase({
 
   const options: IPropertyOption[] = statusOptions.map((status) => ({
     id: status,
-    value: PROPOSAL_STATUS_LABELS[status],
-    dropdownValue: PROPOSAL_STATUS_VERB_LABELS[status as ProposalEvaluationStatus],
+    value: EVALUATION_STATUS_LABELS[status],
+    dropdownValue: EVALUATION_STATUS_VERB_LABELS[status as ProposalEvaluationStatus],
     color: proposalStatusColors[status]
   }));
 

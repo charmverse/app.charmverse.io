@@ -33,7 +33,7 @@ import type { Board, DatabaseProposalPropertyType, IPropertyTemplate, PropertyTy
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import {
-  PROPOSAL_STATUS_LABELS,
+  EVALUATION_STATUS_LABELS,
   PROPOSAL_STEP_LABELS,
   proposalStatusColors
 } from 'lib/focalboard/proposalDbProperties';
@@ -222,7 +222,7 @@ function PropertyValueElement(props: Props) {
           {
             color: proposalStatusColors[proposalEvaluationStatus],
             id: proposalEvaluationStatus,
-            value: PROPOSAL_STATUS_LABELS[proposalEvaluationStatus]
+            value: EVALUATION_STATUS_LABELS[proposalEvaluationStatus]
           }
         ]}
         propertyValue={proposalEvaluationStatus}

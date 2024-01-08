@@ -6,7 +6,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { ProposalEvaluationStep } from 'lib/proposal/interface';
 
-export function useProposalUpdateStatusAndStep() {
+export function useBatchUpdateProposalStatusOrStep() {
   const { space } = useCurrentSpace();
   const { showMessage } = useSnackbar();
 
@@ -25,11 +25,11 @@ export function useProposalUpdateStatusAndStep() {
         proposalId
       });
     } else if (currentEvaluationStep === 'draft' && result === 'pass') {
-      await charmClient.proposals.updateProposalStatusOnly({
-        proposalId,
-        newStatus: 'published'
-      });
+      await charmClient.proposals.publishProposal(proposalId);
     } else if (evaluationId) {
+      // Unset the result of the current evaluation step, when In progress status is selected,
+      // the evaluationId is the current evaluation id,
+      // technically its not going back to the previous step, but only the result is being unset
       if (result === null) {
         await charmClient.proposals.goBackToEvaluationStep({
           proposalId,
@@ -45,7 +45,7 @@ export function useProposalUpdateStatusAndStep() {
     }
   }
 
-  async function batchUpdateProposalStatuses({
+  async function updateStatuses({
     proposalsData,
     result,
     currentEvaluationStep
@@ -71,8 +71,8 @@ export function useProposalUpdateStatusAndStep() {
     }
   }
 
-  async function batchUpdateProposalSteps(
-    proposalsData: { evaluationId: string; proposalId: string; currentEvaluationStep: ProposalEvaluationStep }[],
+  async function updateSteps(
+    proposalsData: { evaluationId?: string; proposalId: string; currentEvaluationStep: ProposalEvaluationStep }[],
     moveForward: boolean
   ) {
     if (space) {
@@ -85,14 +85,9 @@ export function useProposalUpdateStatusAndStep() {
               currentEvaluationStep,
               result: 'pass'
             });
-          } else if (evaluationId !== 'draft') {
+          } else {
             await charmClient.proposals.goBackToEvaluationStep({
               evaluationId,
-              proposalId
-            });
-          } else {
-            await charmClient.proposals.updateProposalStatusOnly({
-              newStatus: 'draft',
               proposalId
             });
           }
@@ -105,7 +100,7 @@ export function useProposalUpdateStatusAndStep() {
   }
 
   return {
-    batchUpdateProposalStatuses,
-    batchUpdateProposalSteps
+    updateStatuses,
+    updateSteps
   };
 }

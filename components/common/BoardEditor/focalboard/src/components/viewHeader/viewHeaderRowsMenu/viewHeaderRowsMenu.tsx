@@ -8,8 +8,8 @@ import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
+import { useBatchUpdateProposalStatusOrStep } from 'components/proposals/hooks/useBatchUpdateProposalStatusOrStep';
 import { useProposals } from 'components/proposals/hooks/useProposals';
-import { useProposalUpdateStatusAndStep } from 'components/proposals/hooks/useProposalUpdateStatusAndStep';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
@@ -79,7 +79,7 @@ export function ViewHeaderRowsMenu({
   const { proposalsMap } = useProposals();
   const { space } = useCurrentSpace();
   const [isDeleting, setIsDeleting] = useState(false);
-  const { batchUpdateProposalStatuses, batchUpdateProposalSteps } = useProposalUpdateStatusAndStep();
+  const { updateStatuses, updateSteps } = useBatchUpdateProposalStatusOrStep();
 
   async function deleteCheckedCards() {
     setIsDeleting(true);
@@ -209,7 +209,7 @@ export function ViewHeaderRowsMenu({
     });
 
     if (proposalsData.length) {
-      await batchUpdateProposalStatuses({
+      await updateStatuses({
         proposalsData,
         result,
         currentEvaluationStep: firstProposal.currentStep.step
@@ -254,7 +254,7 @@ export function ViewHeaderRowsMenu({
     });
 
     if (proposalsData.length) {
-      await batchUpdateProposalSteps(proposalsData, moveForward);
+      await updateSteps(proposalsData, moveForward);
     }
   }
 

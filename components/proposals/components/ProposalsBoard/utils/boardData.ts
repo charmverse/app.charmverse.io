@@ -3,7 +3,7 @@ import type { Block } from 'lib/focalboard/block';
 import { createBoard } from 'lib/focalboard/board';
 import { Constants } from 'lib/focalboard/constants';
 import {
-  PROPOSAL_STATUS_LABELS,
+  EVALUATION_STATUS_LABELS,
   proposalDbProperties,
   proposalStatusColors
 } from 'lib/focalboard/proposalDbProperties';
@@ -20,7 +20,7 @@ import {
 import type { ProposalBoardBlock } from 'lib/proposal/blocks/interfaces';
 import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
 
-const proposalStatuses = Object.keys(PROPOSAL_STATUS_LABELS) as ProposalEvaluationStatus[];
+const proposalStatuses = Object.keys(EVALUATION_STATUS_LABELS) as ProposalEvaluationStatus[];
 
 export function getDefaultBoard({
   storedBoard,

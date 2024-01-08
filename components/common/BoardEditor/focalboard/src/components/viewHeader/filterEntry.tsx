@@ -31,7 +31,7 @@ import type { FilterClause, FilterCondition } from 'lib/focalboard/filterClause'
 import { propertyConfigs } from 'lib/focalboard/filterClause';
 import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import { createFilterGroup } from 'lib/focalboard/filterGroup';
-import { PROPOSAL_STATUS_LABELS, PROPOSAL_STEP_LABELS } from 'lib/focalboard/proposalDbProperties';
+import { EVALUATION_STATUS_LABELS, PROPOSAL_STEP_LABELS } from 'lib/focalboard/proposalDbProperties';
 import { AUTHORS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposal/blocks/constants';
 import type { ProposalEvaluationStatus, ProposalEvaluationStep } from 'lib/proposal/interface';
 import { focalboardColorsMap } from 'theme/colors';
@@ -281,7 +281,7 @@ function FilterPropertyValue({
                       size='small'
                       label={
                         property.type === 'proposalStatus'
-                          ? PROPOSAL_STATUS_LABELS[foundOption.value as ProposalEvaluationStatus]
+                          ? EVALUATION_STATUS_LABELS[foundOption.value as ProposalEvaluationStatus]
                           : foundOption.value
                       }
                       color={focalboardColorsMap[foundOption.color]}
@@ -304,7 +304,7 @@ function FilterPropertyValue({
                     size='small'
                     label={
                       property.type === 'proposalStatus'
-                        ? PROPOSAL_STATUS_LABELS[option.value as ProposalEvaluationStatus]
+                        ? EVALUATION_STATUS_LABELS[option.value as ProposalEvaluationStatus]
                         : option.value
                     }
                     color={focalboardColorsMap[option.color]}
