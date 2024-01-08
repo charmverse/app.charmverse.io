@@ -10,8 +10,7 @@ export class FormField extends DocumentPage {
     public formFieldRequiredSwitch = page.locator('data-test=form-field-required-switch'),
     public formFieldPrivateSwitch = page.locator('data-test=form-field-private-switch'),
     public toggleFormFieldButton = page.locator('data-test=toggle-form-field-button'),
-    public formFieldsSaveButton = page.locator('data-test=form-fields-save-button'),
-    public formFieldsAnswersSaveButton = page.locator('data-test=form-fields-answers-save-button')
+    public formFieldsSaveButton = page.locator('data-test=form-fields-save-button')
   ) {
     super(page);
   }

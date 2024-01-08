@@ -8,7 +8,7 @@ import { ViewSettingsRow } from 'components/common/BoardEditor/components/ViewSe
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
 import ViewHeaderActionsMenu from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderActionsMenu';
-import { ViewHeaderRowsMenu } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderRowsMenu';
+import { ViewHeaderRowsMenu } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderRowsMenu/viewHeaderRowsMenu';
 import ViewSidebar from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import ErrorPage from 'components/common/errors/ErrorPage';

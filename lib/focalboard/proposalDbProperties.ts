@@ -2,7 +2,12 @@ import { v4 as uuid } from 'uuid';
 
 import type { DatabaseProposalPropertyType, IPropertyTemplate } from 'lib/focalboard/board';
 import type { Constants } from 'lib/focalboard/constants';
-import type { ProposalStatusWithArchived } from 'lib/proposal/proposalStatusTransition';
+import type {
+  ProposalEvaluationResultExtended,
+  ProposalEvaluationStatus,
+  ProposalEvaluationStep
+} from 'lib/proposal/interface';
+import type { BrandColor } from 'theme/colors';
 
 export const proposalDbProperties: {
   [key in DatabaseProposalPropertyType]: (id?: string, name?: string) => IPropertyTemplate;
@@ -12,6 +17,12 @@ export const proposalDbProperties: {
     name: name || 'Proposal Status',
     options: [],
     type: 'proposalStatus'
+  }),
+  proposalStep: (id?: string, name?: string) => ({
+    id: id || uuid(),
+    name: name || 'Proposal Step',
+    options: [],
+    type: 'proposalStep'
   }),
   proposalUrl: (id?: string, name?: string) => ({
     id: id || uuid(),
@@ -63,19 +74,62 @@ export const proposalDbProperties: {
   })
 };
 
-/**
- * See components/proposals/components/ProposalStatusBadge.tsx // ProposalStatusColors for the corresponding statuses
- */
+export const PROPOSAL_STATUS_LABELS: Record<ProposalEvaluationStatus, string> = {
+  complete: 'Complete',
+  declined: 'Declined',
+  in_progress: 'In Progress',
+  passed: 'Passed',
+  published: 'Published',
+  unpublished: 'Unpublished'
+};
 
-export const proposalStatusBoardColors: Record<ProposalStatusWithArchived, keyof (typeof Constants)['menuColors']> = {
-  archived: 'propColorGray',
+export const PROPOSAL_STATUS_VERB_LABELS: Record<ProposalEvaluationStatus, string> = {
+  complete: 'Complete',
+  declined: 'Decline',
+  in_progress: 'In Progress',
+  passed: 'Pass',
+  published: 'Publish',
+  unpublished: 'Unpublish'
+};
+
+export const PROPOSAL_STEP_LABELS: Record<ProposalEvaluationStep, string> = {
+  draft: 'Draft',
+  feedback: 'Feedback',
+  pass_fail: 'Review',
+  rubric: 'Rubric',
+  vote: 'Vote',
+  rewards: 'Rewards'
+};
+
+export const proposalStepBoardColors: Record<ProposalEvaluationStep, keyof (typeof Constants)['menuColors']> = {
+  feedback: 'propColorGray',
+  pass_fail: 'propColorGray',
+  rubric: 'propColorGray',
+  vote: 'propColorGray',
   draft: 'propColorGray',
-  discussion: 'propColorTeal',
-  review: 'propColorYellow',
-  reviewed: 'propColorPurple',
-  vote_active: 'propColorPink',
-  vote_closed: 'propColorRed',
-  evaluation_active: 'propColorRed',
-  evaluation_closed: 'propColorPink',
-  published: 'propColorGreen'
+  rewards: 'propColorGray'
+};
+
+export const PROPOSAL_RESULT_LABELS: Record<ProposalEvaluationResultExtended, string> = {
+  in_progress: 'In Progress',
+  fail: 'Failed',
+  pass: 'Passed'
+};
+
+export const proposalResultBoardColors: Record<
+  ProposalEvaluationResultExtended,
+  keyof (typeof Constants)['menuColors']
+> = {
+  fail: 'propColorRed',
+  in_progress: 'propColorYellow',
+  pass: 'propColorGreen'
+};
+
+export const proposalStatusColors: Record<ProposalEvaluationStatus, BrandColor> = {
+  complete: 'green',
+  declined: 'red',
+  in_progress: 'yellow',
+  passed: 'green',
+  published: 'green',
+  unpublished: 'gray'
 };

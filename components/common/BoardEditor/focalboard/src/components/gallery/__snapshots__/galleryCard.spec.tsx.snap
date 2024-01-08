@@ -33,9 +33,6 @@ exports[`src/components/gallery/GalleryCard without block content should match s
         </button>
       </div>
       <div
-        class="gallery-item"
-      />
-      <div
         class="gallery-title"
       >
         <div

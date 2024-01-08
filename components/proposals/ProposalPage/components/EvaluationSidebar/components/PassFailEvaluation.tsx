@@ -90,7 +90,7 @@ export function PassFailEvaluation({
                 onClick={() => onSubmitReview('fail')}
                 disabled={!!disabledTooltip}
                 disabledTooltip={disabledTooltip}
-                color='error'
+                color='errorPale'
               >
                 Decline
               </Button>
@@ -98,7 +98,7 @@ export function PassFailEvaluation({
                 onClick={() => onSubmitReview('pass')}
                 disabled={!!disabledTooltip}
                 disabledTooltip={disabledTooltip}
-                color='success'
+                color='successPale'
               >
                 Pass
               </Button>
