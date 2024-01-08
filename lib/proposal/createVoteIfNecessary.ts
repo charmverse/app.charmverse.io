@@ -16,7 +16,7 @@ export async function createVoteIfNecessary({ createdBy, proposalId }: { created
       index: 'asc'
     }
   });
-  const nextEvaluation = await getCurrentEvaluation(evaluations);
+  const nextEvaluation = getCurrentEvaluation(evaluations);
   if (nextEvaluation?.type === 'vote') {
     const settings = nextEvaluation.voteSettings as VoteSettings;
     if (!settings.publishToSnapshot) {
