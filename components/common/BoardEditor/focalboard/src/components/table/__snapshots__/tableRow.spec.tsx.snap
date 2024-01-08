@@ -302,7 +302,7 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
         style="align-items: flex-start; width: 100px; overflow-x: hidden;"
       >
         <div
-          class="MuiStack-root SelectPreviewContainer css-1s6sld2-MuiStack-root"
+          class="MuiStack-root css-1s6sld2-MuiStack-root"
           data-test="closed-select-input"
         >
           <div
@@ -331,7 +331,7 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
         style="align-items: flex-start; width: 100px; overflow-x: hidden;"
       >
         <div
-          class="MuiStack-root SelectPreviewContainer css-1s6sld2-MuiStack-root"
+          class="MuiStack-root css-1s6sld2-MuiStack-root"
           data-test="closed-select-input"
         >
           <div
@@ -632,7 +632,7 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
         style="align-items: flex-start; width: 100px; overflow-x: hidden;"
       >
         <div
-          class="MuiStack-root SelectPreviewContainer css-1s6sld2-MuiStack-root"
+          class="MuiStack-root css-1s6sld2-MuiStack-root"
           data-test="closed-select-input"
         >
           <div
@@ -661,7 +661,7 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
         style="align-items: flex-start; width: 100px; overflow-x: hidden;"
       >
         <div
-          class="MuiStack-root SelectPreviewContainer css-1s6sld2-MuiStack-root"
+          class="MuiStack-root css-1s6sld2-MuiStack-root"
           data-test="closed-select-input"
         >
           <div
