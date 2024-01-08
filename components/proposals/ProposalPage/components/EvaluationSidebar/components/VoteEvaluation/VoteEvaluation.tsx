@@ -117,7 +117,7 @@ export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation }: Prop
             }}
           />
         }
-        message='Snapshot vote is missing'
+        message='Waiting for Snapshot vote...'
       />
     );
   }
