@@ -102,8 +102,8 @@ export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation }: Prop
 
   vote.title = evaluation.title;
 
-  if (proposal?.id && evaluation.snapshotId) {
-    return <SnapshotVoteDetails snapshotProposalId={proposal.id} />;
+  if (evaluation.snapshotId) {
+    return <SnapshotVoteDetails snapshotProposalId={evaluation.snapshotId} />;
   }
 
   return (
