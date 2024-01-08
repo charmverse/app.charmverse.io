@@ -39,7 +39,7 @@ const requirementButton: ButtonProps[] = [
   },
   {
     name: 'dao',
-    title: 'MolochDAOv2.1',
+    title: 'DAO Membership',
     icon: WaterDropIcon,
     iconColor: 'error'
   }
