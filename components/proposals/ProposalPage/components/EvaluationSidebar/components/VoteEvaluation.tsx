@@ -95,17 +95,7 @@ export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation, addVot
           />
         }
         message='Vote has not been initiated yet'
-      >
-        {evaluation.snapshotId && (
-          <Tooltip
-            title={!isReviewer ? 'Only proposal authors and space admins can publish this proposal to snapshot' : ''}
-          >
-            <Button disabled={!isReviewer} onClick={addVote} sx={{ width: 'fit-content', mt: 2 }}>
-              Create Vote
-            </Button>
-          </Tooltip>
-        )}
-      </NoCommentsMessage>
+      />
     );
   }
 
