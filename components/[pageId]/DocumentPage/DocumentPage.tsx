@@ -522,7 +522,7 @@ function DocumentPage({
           </PageEditorContainer>
         </Box>
         {proposal?.status === 'draft' && page?.type !== 'proposal_template' && (
-          <ProposalStickyFooter proposal={proposal} refreshProposal={refreshProposal} />
+          <ProposalStickyFooter page={page} proposal={proposal} refreshProposal={refreshProposal} />
         )}
       </PrimaryColumn>
     </>

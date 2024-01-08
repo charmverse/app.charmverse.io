@@ -72,7 +72,6 @@ const GalleryCard = React.memo((props: Props) => {
           <img className='ImageElement' src={galleryImageUrl} alt='Gallery item' />
         </div>
       )}
-      {!galleryImageUrl && <div className='gallery-item' />}
       {props.visibleTitle && (
         <div className='gallery-title'>
           {cardPage?.icon ? (

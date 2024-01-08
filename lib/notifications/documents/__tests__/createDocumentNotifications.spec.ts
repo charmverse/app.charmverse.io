@@ -8,7 +8,6 @@ import { createForumPost } from 'lib/forums/posts/createForumPost';
 import { createNotificationsFromEvent } from 'lib/notifications/createNotificationsFromEvent';
 import { createPageComment } from 'lib/pages/comments/createPageComment';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
-import { updateProposalStatusOnly } from 'lib/proposal/updateProposalStatusOnly';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
 import { createReward } from 'lib/rewards/createReward';
@@ -800,13 +799,8 @@ describe(`Test document events and notifications`, () => {
       spaceId: space.id,
       userId: user.id,
       authors: [user.id],
+      proposalStatus: 'published',
       evaluationInputs: [{ evaluationType: 'rubric', permissions: [], reviewers: [{ group: 'user', id: user2.id }] }]
-    });
-
-    await updateProposalStatusOnly({
-      newStatus: 'published',
-      proposalId: page.id,
-      userId: user.id
     });
 
     const mentionId = v4();

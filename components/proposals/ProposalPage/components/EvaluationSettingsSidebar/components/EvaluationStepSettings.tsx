@@ -8,7 +8,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { ProposalEvaluationInput } from 'lib/proposal/createProposal';
 import type { PopulatedEvaluation } from 'lib/proposal/interface';
 
-import { RubricCriteria } from './RubricCriteriaSettings';
+import { RubricCriteriaSettings } from './RubricCriteriaSettings';
 import type { RangeProposalCriteria } from './RubricCriteriaSettings';
 import { VoteSettings } from './VoteSettings';
 
@@ -75,7 +75,7 @@ export function EvaluationStepSettings({ evaluation, evaluationTemplate, isRevie
             </Typography>
           </FormLabel>
           <Box display='flex' flex={1} flexDirection='column'>
-            <RubricCriteria
+            <RubricCriteriaSettings
               readOnly={readOnlyRubricCriteria}
               value={evaluation.rubricCriteria as RangeProposalCriteria[]}
               onChange={(rubricCriteria) =>
