@@ -62,6 +62,9 @@ export async function loadAndGenerateCsv({
         },
         rootId: targetPage.id,
         type: 'card'
+      },
+      orderBy: {
+        createdAt: 'asc'
       }
     }),
     // Necessary as card title may not be synced to page
