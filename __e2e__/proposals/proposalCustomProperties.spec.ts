@@ -46,7 +46,7 @@ test.describe.serial('Proposal Evaluation', () => {
       spaceDomain: `cvt-${uuid()}`
     }));
     member = await generateUser({
-      space: { id: member.id }
+      space: { id: space.id }
     });
     await testUtilsSpaces.addSpaceOperations({
       forSpaceId: space.id,
@@ -217,10 +217,8 @@ test.describe.serial('Proposal Evaluation', () => {
     // Move into configuring the actual evaluation
     await expect(proposalPage.evaluationSettingsSidebar).toBeVisible();
 
-    await proposalPage.addCardPropertyButton.click();
-
-    // <m>embers cannot see the option to add a custom property
-    await expect(databasePage.getPropertyTypeOptionLocator({ type: 'text' })).not.toBeVisible();
+    // members cannot see the option to add a custom property. They can only fill existing properties
+    await expect(proposalPage.addCardPropertyButton).not.toBeVisible();
 
     const textInput = databasePage.getCardDetailsTextInput();
 
