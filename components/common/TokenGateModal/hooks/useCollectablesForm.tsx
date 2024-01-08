@@ -119,15 +119,15 @@ const schema = yup.object({
 export type FormValues = yup.InferType<typeof schema>;
 
 const defaultValues: FormValues = {
-  collectableOption: undefined,
+  collectableOption: '' as CollectableOptionsId,
   chain: '',
   contract: '' as `0x${string}`,
-  check: undefined,
+  check: '' as NftCheck,
   quantity: '',
   tokenId: '',
   poapType: undefined,
   poapId: '',
-  poapName: undefined,
+  poapName: '',
   poapNameMatch: undefined
 };
 

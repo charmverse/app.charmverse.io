@@ -33,7 +33,7 @@ export type FormValues = yup.InferType<typeof schema>;
 
 const defaultValues: FormValues = {
   chain: '',
-  check: undefined,
+  check: '' as FormValues['check'],
   contract: '',
   quantity: ''
 };

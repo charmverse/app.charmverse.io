@@ -1,13 +1,17 @@
-import type { SelectProps } from '@mui/material';
 import { FormHelperText, ListItemIcon, ListItemText, MenuItem, Select } from '@mui/material';
+import type { SelectProps } from '@mui/material/Select';
 import type { IChainDetails } from 'connectors/chains';
 import { getChainById, litChains } from 'connectors/chains';
-import { forwardRef, type ReactNode } from 'react';
+import { forwardRef } from 'react';
+import type { Ref, ReactNode } from 'react';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import TokenLogo from 'components/common/TokenLogo';
 
-function SelectField(props: SelectProps<string> & { helperMessage?: ReactNode; chains?: IChainDetails[] }) {
+function SelectField(
+  props: SelectProps<string> & { helperMessage?: ReactNode; chains?: IChainDetails[] },
+  ref: Ref<unknown>
+) {
   const { helperMessage, children, chains = litChains, ...restProps } = props;
 
   return (
@@ -16,6 +20,7 @@ function SelectField(props: SelectProps<string> & { helperMessage?: ReactNode; c
         fullWidth
         displayEmpty
         renderValue={(selected) => getChainById(Number(selected))?.chainName || 'Select a Chain'}
+        ref={ref}
         {...restProps}
       >
         {children ||
