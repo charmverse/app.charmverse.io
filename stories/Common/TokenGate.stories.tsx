@@ -1,16 +1,33 @@
+import Card from '@mui/material/Card';
+import Paper from '@mui/material/Paper';
 import { getChainById } from 'connectors/chains';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { rest } from 'msw';
+import { mockTokenGateResult, mockTokenGates } from 'stories/lib/mockTokenGataData';
 
+import { TokenGate as TokenGateComponent } from 'components/common/SpaceAccessGate/components/TokenGate/TokenGate';
 import { TokenGateModalProvider } from 'components/common/TokenGateModal/hooks/useTokenGateModalContext';
 import TokenGateModal from 'components/common/TokenGateModal/TokenGateModal';
 import type { TokenGate } from 'lib/tokenGates/interfaces';
 import { LIT_CHAINS } from 'lib/tokenGates/utils';
+import { TokenGateContainer } from 'pages/join';
 
 export default {
-  title: 'tokengate/Token Gate creation modal',
-  component: TokenGateModal
+  title: 'common/Token Gate',
+  component: TokenGateComponent
 };
+
+export function Conditions() {
+  return (
+    <Paper sx={{ p: 4 }}>
+      <TokenGateContainer>
+        <Card sx={{ p: 4, mb: 3 }} variant='outlined'>
+          <TokenGateComponent tokenGates={mockTokenGates} isVerifying={false} tokenGateResult={mockTokenGateResult} />
+        </Card>
+      </TokenGateContainer>
+    </Paper>
+  );
+}
 
 export function Modal() {
   return (
