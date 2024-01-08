@@ -412,9 +412,11 @@ export function boardWithCardsArgs({
     } else if (page.type === 'card') {
       const cardBlock = (page as any as PageWithBlocks).blocks.card!;
       // First index is the root board node, thus we need to subtract 1
-      const cardPropertyValue = Array.isArray(customProps?.cardPropertyValues)
+      const cardPropertyValue = (Array.isArray(customProps?.cardPropertyValues)
         ? customProps?.cardPropertyValues[index - 1]
-        : customProps?.cardPropertyValues;
+        : customProps?.cardPropertyValues) ?? {
+        ...(cardBlock.fields as CardFields).properties
+      };
 
       cardBlock.title = page.title;
 
