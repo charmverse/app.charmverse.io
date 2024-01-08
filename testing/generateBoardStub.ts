@@ -3,6 +3,8 @@ import { v4 } from 'uuid';
 
 import type { BoardFields, DataSourceType, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardViewFields, IViewType } from 'lib/focalboard/boardView';
+import type { CardFields } from 'lib/focalboard/card';
+import { Constants } from 'lib/focalboard/constants';
 import type { PageWithBlocks } from 'lib/templates/exportWorkspacePages';
 import { typedKeys } from 'lib/utilities/objects';
 
@@ -10,7 +12,7 @@ import { pageContentStub } from './generatePageStub';
 
 export type CustomBoardProps = {
   propertyTemplates: (Omit<IPropertyTemplate, 'options'> & { options?: IPropertyOption[] | undefined })[];
-  cardPropertyValues: Record<string, any>;
+  cardPropertyValues: Record<string, any> | Record<string, any>[];
 };
 
 /**
@@ -91,7 +93,10 @@ export function boardWithCardsArgs({
         createdBy,
         updatedAt: '2022-08-26T09:56:33.994Z',
         updatedBy: createdBy,
-        title: 'Beer to Web3',
+        title:
+          (Array.isArray(customProps?.cardPropertyValues)
+            ? customProps?.cardPropertyValues[0]?.[Constants.titleColumnId]
+            : customProps?.cardPropertyValues[Constants.titleColumnId]) ?? 'Beer to Web3',
         content: {
           type: 'doc',
           content: [
@@ -137,7 +142,7 @@ export function boardWithCardsArgs({
             title: 'Card 3',
             fields: {
               isTemplate: false,
-              properties: customProps?.cardPropertyValues ?? {
+              properties: {
                 '4452f79d-cfbf-4d18-aa80-b5c0bc002c5f': 'd21b567d-fd35-496e-8f7c-1ee62e95d4f2',
                 '01221ad0-94d5-4d88-9ceb-c517573ad765': '{"from":1661169600000}'
               },
@@ -153,7 +158,10 @@ export function boardWithCardsArgs({
         createdBy,
         updatedAt: '2022-09-14T14:13:05.326Z',
         updatedBy: createdBy,
-        title: 'How to web3 in Uni?',
+        title:
+          (Array.isArray(customProps?.cardPropertyValues)
+            ? customProps?.cardPropertyValues[1]?.[Constants.titleColumnId]
+            : customProps?.cardPropertyValues[Constants.titleColumnId]) ?? 'How to web3 in Uni?',
         content: {
           type: 'doc',
           content: [
@@ -208,7 +216,7 @@ export function boardWithCardsArgs({
             fields: {
               icon: '',
               isTemplate: false,
-              properties: customProps?.cardPropertyValues ?? {
+              properties: {
                 '4452f79d-cfbf-4d18-aa80-b5c0bc002c5f': 'c5689c24-eb32-4af9-8e8d-e4191fbeb0a1',
                 '01221ad0-94d5-4d88-9ceb-c517573ad765': '{"from":1661515200000}'
               },
@@ -285,10 +293,15 @@ export function boardWithCardsArgs({
   const cardPages = rootBoardNode.children;
 
   for (let i = 2; i < cardCount; i++) {
+    const title =
+      (Array.isArray(customProps?.cardPropertyValues)
+        ? customProps?.cardPropertyValues[i]?.[Constants.titleColumnId]
+        : customProps?.cardPropertyValues?.[Constants.titleColumnId]) ?? cardPages[i % 2 === 0 ? 0 : 1].title;
+
     if (i % 2 === 0) {
-      cardPages.push({ ...cardPages[0], id: cardIds[i] || v4() });
+      cardPages.push({ ...cardPages[0], id: cardIds[i] || v4(), title });
     } else {
-      cardPages.push({ ...cardPages[1], id: cardIds[i] || v4() });
+      cardPages.push({ ...cardPages[1], id: cardIds[i] || v4(), title });
     }
   }
 
@@ -343,7 +356,7 @@ export function boardWithCardsArgs({
         }
       };
 
-  [rootBoardNode, ...rootBoardNode.children].forEach((page) => {
+  [rootBoardNode, ...rootBoardNode.children].forEach((page, index) => {
     // Handle the root board node ------------------
     const {
       bountyId: droppedBountyId,
@@ -398,6 +411,17 @@ export function boardWithCardsArgs({
       blocks.push(boardBlock, ...viewBlocks);
     } else if (page.type === 'card') {
       const cardBlock = (page as any as PageWithBlocks).blocks.card!;
+      // First index is the root board node, thus we need to subtract 1
+      const cardPropertyValue = Array.isArray(customProps?.cardPropertyValues)
+        ? customProps?.cardPropertyValues[index - 1]
+        : customProps?.cardPropertyValues;
+
+      cardBlock.title = page.title;
+
+      (cardBlock.fields as CardFields) = {
+        ...(cardBlock.fields as CardFields),
+        properties: cardPropertyValue
+      };
       cardBlock.id = pageCreateInput.id as string;
       blocks.push(cardBlock);
     }
