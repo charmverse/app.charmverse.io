@@ -45,7 +45,8 @@ describe('setDatabaseProposalProperties()', () => {
     });
 
     await setDatabaseProposalProperties({
-      boardId: rootId
+      boardId: rootId,
+      cardProperties: []
     });
 
     const updatedBlock = await prisma.block.findUnique({
@@ -101,7 +102,8 @@ describe('setDatabaseProposalProperties()', () => {
     });
 
     await setDatabaseProposalProperties({
-      boardId: rootId
+      boardId: rootId,
+      cardProperties: []
     });
 
     const updatedBlock = await prisma.block.findUnique({
@@ -160,7 +162,8 @@ describe('setDatabaseProposalProperties()', () => {
     });
 
     await setDatabaseProposalProperties({
-      boardId: rootId
+      boardId: rootId,
+      cardProperties: []
     });
 
     const updatedBlock = await prisma.block.findUnique({
@@ -177,10 +180,12 @@ describe('setDatabaseProposalProperties()', () => {
 
     // --- Run this a second and third time
     await setDatabaseProposalProperties({
-      boardId: rootId
+      boardId: rootId,
+      cardProperties: []
     });
     await setDatabaseProposalProperties({
-      boardId: rootId
+      boardId: rootId,
+      cardProperties: []
     });
 
     const blockAfterMultiUpdate = await prisma.block.findUniqueOrThrow({
@@ -280,7 +285,8 @@ describe('setDatabaseProposalProperties()', () => {
     });
 
     await setDatabaseProposalProperties({
-      boardId: rootId
+      boardId: rootId,
+      cardProperties: []
     });
 
     const updatedBlock = await prisma.block.findUnique({
@@ -346,7 +352,8 @@ describe('setDatabaseProposalProperties()', () => {
 
     // --- Run this a second and third time
     await setDatabaseProposalProperties({
-      boardId: rootId
+      boardId: rootId,
+      cardProperties: []
     });
 
     const blockAfterMultiUpdate = await prisma.block.findUniqueOrThrow({
@@ -400,7 +407,8 @@ describe('setDatabaseProposalProperties()', () => {
 
     await expect(
       setDatabaseProposalProperties({
-        boardId: rootId
+        boardId: rootId,
+        cardProperties: []
       })
     ).rejects.toBeInstanceOf(InvalidStateError);
   });

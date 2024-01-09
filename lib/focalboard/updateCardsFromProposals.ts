@@ -344,7 +344,7 @@ export async function updateCardsFromProposals({
       boardBlock.fields.cardProperties.forEach((prop) => {
         const proposalFieldValue = (pageWithProposal.proposal?.fields as ProposalFields)?.properties?.[prop.id];
         const cardFieldValue = cardProperties[prop.id];
-        if (proposalFieldValue !== cardFieldValue) {
+        if (proposalFieldValue && proposalFieldValue !== cardFieldValue) {
           hasCustomPropertyValueChanged = true;
           cardProperties[prop.id] = proposalFieldValue as CardPropertyValue;
         }
@@ -452,7 +452,7 @@ export async function updateCardsFromProposals({
 
       boardBlock.fields.cardProperties.forEach((cardProperty) => {
         if (!proposalPropertyTypesList.includes(cardProperty.type as any)) {
-          const proposalFieldValue = (pageWithProposal.proposal?.fields as ProposalFields).properties?.[
+          const proposalFieldValue = (pageWithProposal.proposal?.fields as ProposalFields)?.properties?.[
             cardProperty.id
           ];
           if (proposalFieldValue) {

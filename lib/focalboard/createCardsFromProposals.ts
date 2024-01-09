@@ -225,7 +225,7 @@ export async function createCardsFromProposals({
 
     boardBlock.fields.cardProperties.forEach((cardProperty) => {
       if (!proposalPropertyTypesList.includes(cardProperty.type as any)) {
-        const proposalFieldValue = (pageProposal.proposal?.fields as ProposalFields).properties?.[cardProperty.id];
+        const proposalFieldValue = (pageProposal.proposal?.fields as ProposalFields)?.properties?.[cardProperty.id];
         if (proposalFieldValue) {
           properties[cardProperty.id] = proposalFieldValue as BoardPropertyValue;
         }
