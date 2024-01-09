@@ -20,6 +20,7 @@ import PageContainer from 'components/common/PageLayout/components/PageContainer
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { useSmallScreen } from 'hooks/useMediaScreens';
+import { ProposalBlocksProvider } from 'hooks/useProposalBlocks';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { useUser } from 'hooks/useUser';
 import darkLogoImage from 'public/images/charmverse_logo_icon.png';
@@ -74,95 +75,97 @@ export function SharedPageLayout({ children, basePageId, basePageType }: Props) 
   const router = useRouter();
 
   return (
-    <DocumentPageProviders>
-      <Head>
-        <CurrentPageFavicon />
-      </Head>
-      <LayoutContainer data-test='public-page-layout'>
-        <AppBar sidebarWidth={0} position='fixed' open={false}>
-          <StyledToolbar variant='dense'>
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                gap: 1,
-                width: '100%'
-              }}
-            >
-              {!isMobile ? (
-                <Box display='flex' alignItems='center' gap={6}>
+    <ProposalBlocksProvider>
+      <DocumentPageProviders>
+        <Head>
+          <CurrentPageFavicon />
+        </Head>
+        <LayoutContainer data-test='public-page-layout'>
+          <AppBar sidebarWidth={0} position='fixed' open={false}>
+            <StyledToolbar variant='dense'>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  gap: 1,
+                  width: '100%'
+                }}
+              >
+                {!isMobile ? (
+                  <Box display='flex' alignItems='center' gap={6}>
+                    <PageTitleWithBreadcrumbs pageId={basePageId} pageType={basePageType} />
+
+                    {publicPageType === 'proposals' && <JoinSpaceWithPublicProposals />}
+                  </Box>
+                ) : (
                   <PageTitleWithBreadcrumbs pageId={basePageId} pageType={basePageType} />
-
-                  {publicPageType === 'proposals' && <JoinSpaceWithPublicProposals />}
-                </Box>
-              ) : (
-                <PageTitleWithBreadcrumbs pageId={basePageId} pageType={basePageType} />
-              )}
-
-              <Box>
-                {user && (
-                  <Button
-                    endIcon={<ArrowRightIcon />}
-                    variant='text'
-                    color='inherit'
-                    href='/'
-                    external // avoid space domain being added
-                  >
-                    Go to my space
-                  </Button>
                 )}
-                {!user && (
-                  <>
+
+                <Box>
+                  {user && (
                     <Button
-                      variant='outlined'
-                      color='inherit'
-                      href={`/?returnUrl=${router.asPath}`}
-                      sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
-                      external // avoid space domain being added
-                    >
-                      Sign in
-                    </Button>
-                    <Button
-                      startIcon={
-                        <Box position='relative' width={24} height={20} mt='-12px'>
-                          <LogoImage
-                            style={{ position: 'absolute', top: 0 }}
-                            width={32}
-                            height={32}
-                            src={logo}
-                            alt=''
-                          />
-                        </Box>
-                      }
+                      endIcon={<ArrowRightIcon />}
                       variant='text'
                       color='inherit'
                       href='/'
-                      sx={{ ml: 1 }}
                       external // avoid space domain being added
                     >
-                      Try CharmVerse
+                      Go to my space
                     </Button>
-                  </>
-                )}
+                  )}
+                  {!user && (
+                    <>
+                      <Button
+                        variant='outlined'
+                        color='inherit'
+                        href={`/?returnUrl=${router.asPath}`}
+                        sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
+                        external // avoid space domain being added
+                      >
+                        Sign in
+                      </Button>
+                      <Button
+                        startIcon={
+                          <Box position='relative' width={24} height={20} mt='-12px'>
+                            <LogoImage
+                              style={{ position: 'absolute', top: 0 }}
+                              width={32}
+                              height={32}
+                              src={logo}
+                              alt=''
+                            />
+                          </Box>
+                        }
+                        variant='text'
+                        color='inherit'
+                        href='/'
+                        sx={{ ml: 1 }}
+                        external // avoid space domain being added
+                      >
+                        Try CharmVerse
+                      </Button>
+                    </>
+                  )}
+                </Box>
               </Box>
-            </Box>
-          </StyledToolbar>
-          {isMobile && publicPageType === 'proposals' && (
-            <Box sx={{ width: '100%', ml: 1 }}>
-              <JoinSpaceWithPublicProposals />
-            </Box>
-          )}
-        </AppBar>
+            </StyledToolbar>
+            {isMobile && publicPageType === 'proposals' && (
+              <Box sx={{ width: '100%', ml: 1 }}>
+                <JoinSpaceWithPublicProposals />
+              </Box>
+            )}
+          </AppBar>
 
-        <PageDialogProvider>
-          <PageContainer>
-            <HeaderSpacer />
-            {children}
-            <PageDialogGlobal />
-          </PageContainer>
-        </PageDialogProvider>
-      </LayoutContainer>
-    </DocumentPageProviders>
+          <PageDialogProvider>
+            <PageContainer>
+              <HeaderSpacer />
+              {children}
+              <PageDialogGlobal />
+            </PageContainer>
+          </PageDialogProvider>
+        </LayoutContainer>
+      </DocumentPageProviders>
+    </ProposalBlocksProvider>
   );
 }

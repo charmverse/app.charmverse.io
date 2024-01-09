@@ -275,19 +275,17 @@ function DocumentPage({
         </>
       )}
       {proposalId && (
-        <ProposalsPageProviders>
-          <ProposalProperties
-            enableSidebar={enableSidebar}
-            pageId={page.id}
-            proposalId={proposalId}
-            pagePermissions={pagePermissions}
-            readOnly={readonlyProposalProperties}
-            proposalPage={page}
-            openEvaluation={openEvaluation}
-            proposal={proposal}
-            refreshProposal={refreshProposal}
-          />
-        </ProposalsPageProviders>
+        <ProposalProperties
+          enableSidebar={enableSidebar}
+          pageId={page.id}
+          proposalId={proposalId}
+          pagePermissions={pagePermissions}
+          readOnly={readonlyProposalProperties}
+          proposalPage={page}
+          openEvaluation={openEvaluation}
+          proposal={proposal}
+          refreshProposal={refreshProposal}
+        />
       )}
       {reward && (
         <RewardProperties

@@ -8,9 +8,7 @@ import { ProposalsBoardProvider } from './hooks/useProposalsBoard';
 export function ProposalsPageProviders({ children }: { children: ReactNode }) {
   return (
     <DbViewSettingsProvider>
-      <ProposalBlocksProvider>
-        <ProposalsBoardProvider>{children}</ProposalsBoardProvider>
-      </ProposalBlocksProvider>
+      <ProposalsBoardProvider>{children}</ProposalsBoardProvider>
     </DbViewSettingsProvider>
   );
 }
