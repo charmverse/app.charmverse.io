@@ -35,11 +35,14 @@ const schema = yup.object({
         .required('Contract is required')
         .test('isAddress', 'Invalid address', (value) => isValidChainAddress(value))
         .test('isContract', 'Invalid contract or chain', async (value, context) => {
-          if (context.parent.chain && context.parent.collectableOption === 'UNLOCK') {
+          const collectableOption = context.parent.collectableOption;
+          const chain = context.parent.chain;
+
+          if (chain && collectableOption === 'UNLOCK') {
             try {
               await readContract({
                 address: value,
-                chainId: Number(context.parent.chain),
+                chainId: Number(chain),
                 abi: PublicLockV13,
                 functionName: 'publicLockVersion'
               });
@@ -47,12 +50,38 @@ const schema = yup.object({
             } catch (err) {
               return false;
             }
-          } else if (context.parent.chain && context.parent.collectableOption === 'HYPERSUB') {
+          } else if (chain && collectableOption === 'HYPERSUB') {
             try {
               await readContract({
                 address: value,
-                chainId: Number(context.parent.chain),
+                chainId: Number(chain),
                 abi: subscriptionTokenV1ABI,
+                functionName: 'name'
+              });
+              return true;
+            } catch (err) {
+              return false;
+            }
+          } else if (chain && ['ERC721', 'ERC1155'].includes(collectableOption)) {
+            try {
+              await readContract({
+                address: value,
+                chainId: Number(chain),
+                abi: [
+                  {
+                    inputs: [],
+                    name: 'name',
+                    outputs: [
+                      {
+                        internalType: 'string',
+                        name: '',
+                        type: 'string'
+                      }
+                    ],
+                    stateMutability: 'view',
+                    type: 'function'
+                  }
+                ] as const,
                 functionName: 'name'
               });
               return true;
