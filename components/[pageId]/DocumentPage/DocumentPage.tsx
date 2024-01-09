@@ -353,7 +353,7 @@ function DocumentPage({
       <PrimaryColumn id='file-drop-container' ref={containerRef} showPageActionSidebar={showPageActionSidebar}>
         <Box
           ref={printRef}
-          className={`document-print-container ${fontClassName}`}
+          className={`document-print-container ${fontClassName} drag-area-container`}
           display='flex'
           flexDirection='column'
           flexGrow={1}

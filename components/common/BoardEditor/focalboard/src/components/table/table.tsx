@@ -89,7 +89,7 @@ function Table(props: Props): JSX.Element {
 
   useEffect(() => {
     if (!tableContainerRef.current) {
-      tableContainerRef.current = document.querySelector('.BoardComponent');
+      tableContainerRef.current = document.querySelector('.drag-area-container');
     }
   }, []);
 
