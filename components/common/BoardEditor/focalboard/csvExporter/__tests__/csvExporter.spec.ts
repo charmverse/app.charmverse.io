@@ -196,7 +196,15 @@ describe('getCSVColumns()', () => {
       cardProps: { fields: { properties } },
       databaseProperties,
       rubricCriteria: [criteria],
-      rubricAnswers: [{ userId: 'user_1', rubricCriteriaId: criteria.id, response: { score: 10 }, comment: '' }]
+      rubricAnswers: [
+        {
+          userId: 'user_1',
+          rubricCriteriaId: criteria.id,
+          response: { score: 10 },
+          comment: '',
+          evaluationId: 'step_1'
+        }
+      ]
     });
 
     Object.assign(card.fields, fields);
