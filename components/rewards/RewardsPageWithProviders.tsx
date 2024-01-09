@@ -11,14 +11,11 @@ export function RewardsPageWithProviders() {
   const { mappedFeatures } = useSpaceFeatures();
   const rewardsTitle = mappedFeatures.rewards.title;
   useStaticPageTitle(rewardsTitle);
-
   return (
-    <RewardsProvider>
-      <RewardBlocksProvider>
-        <RewardsBoardProvider>
-          <RewardsPage title={rewardsTitle} />
-        </RewardsBoardProvider>
-      </RewardBlocksProvider>
-    </RewardsProvider>
+    <RewardBlocksProvider>
+      <RewardsBoardProvider>
+        <RewardsPage title={rewardsTitle} />
+      </RewardsBoardProvider>
+    </RewardBlocksProvider>
   );
 }

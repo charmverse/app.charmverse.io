@@ -52,7 +52,6 @@ export function RewardsPage({ title }: { title: string }) {
   const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
   const { isFreeSpace } = useIsFreeSpace();
   const { rewards, isLoading: loadingData } = useRewards();
-
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
   const canSeeRewards = hasAccess || isFreeSpace || currentSpace?.publicBountyBoard === true;
   const { getRewardPage } = useRewardPage();
