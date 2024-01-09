@@ -91,7 +91,7 @@ export function useAreaSelection({ readOnly = false, innerContainer }: UseAreaSe
       // Skip if the click is on a disable-drag-selection element, don't start the selection box
       const disableDragSelectionElement =
         (e.target as HTMLElement)?.classList.contains('disable-drag-selection') ||
-        (e.target as HTMLElement)?.parentElement?.classList.contains('disable-drag-selection');
+        (e.target as HTMLElement)?.closest('.disable-drag-selection');
 
       if (disableDragSelectionElement) return;
 
