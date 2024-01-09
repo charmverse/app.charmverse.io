@@ -160,6 +160,18 @@ export async function updateCardsFromProposals({
     );
   }
 
+  const updatedBoardBlock = await prisma.block.findFirstOrThrow({
+    where: {
+      id: boardId,
+      spaceId
+    },
+    select: {
+      fields: true
+    }
+  });
+
+  const boardBlockCardProperties = (updatedBoardBlock.fields as unknown as BoardFields)?.cardProperties ?? [];
+
   // Ideally all the views should have sourceType proposal when created, but there are views which doesn't have sourceType proposal even though they are created from proposal source
   if ((boardBlock.fields as any as BoardFields).sourceType !== 'proposals') {
     throw new InvalidStateError('Database not configured to use proposals as a source');
@@ -341,7 +353,7 @@ export async function updateCardsFromProposals({
 
       let hasCustomPropertyValueChanged = false;
       const cardProperties = (card.block.fields as CardFields).properties;
-      boardBlock.fields.cardProperties.forEach((prop) => {
+      boardBlockCardProperties.forEach((prop) => {
         const proposalFieldValue = (pageWithProposal.proposal?.fields as ProposalFields)?.properties?.[prop.id];
         const cardFieldValue = cardProperties[prop.id];
         if (proposalFieldValue && proposalFieldValue !== cardFieldValue) {
@@ -450,12 +462,12 @@ export async function updateCardsFromProposals({
         properties[databaseProposalProps.proposalStep.id] = proposalEvaluationStep ?? '';
       }
 
-      boardBlock.fields.cardProperties.forEach((cardProperty) => {
-        if (!proposalPropertyTypesList.includes(cardProperty.type as any)) {
+      boardBlockCardProperties.forEach((cardProperty) => {
+        if (!proposalPropertyTypesList.includes(cardProperty.type as any) && cardProperty.proposalFieldId) {
           const proposalFieldValue = (pageWithProposal.proposal?.fields as ProposalFields)?.properties?.[
             cardProperty.id
           ];
-          if (proposalFieldValue) {
+          if (proposalFieldValue !== null && proposalFieldValue !== undefined) {
             properties[cardProperty.id] = proposalFieldValue as BoardPropertyValue;
           }
         }
@@ -478,7 +490,6 @@ export async function updateCardsFromProposals({
       }
 
       const formFields = pageWithProposal.proposal?.form?.formFields ?? [];
-      const boardBlockCardProperties = boardBlock.fields.cardProperties ?? [];
 
       const formFieldProperties = await updateCardFormFieldPropertiesValue({
         accessPrivateFields,

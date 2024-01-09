@@ -51,7 +51,7 @@ export function boardWithCardsArgs({
   boardPageType?: Extract<PageType, 'board' | 'inline_board' | 'inline_linked_board' | 'linked_board'>;
   boardTitle?: string;
   linkedSourceId?: string;
-  customProps?: CustomBoardProps;
+  customProps?: Partial<CustomBoardProps>;
   deletedAt?: null | Date;
 }): { pageArgs: Prisma.PageCreateArgs[]; blockArgs: Prisma.BlockCreateManyArgs } {
   const boardId = v4();
@@ -96,7 +96,7 @@ export function boardWithCardsArgs({
         title:
           (Array.isArray(customProps?.cardPropertyValues)
             ? customProps?.cardPropertyValues[0]?.[Constants.titleColumnId]
-            : customProps?.cardPropertyValues[Constants.titleColumnId]) ?? 'Beer to Web3',
+            : customProps?.cardPropertyValues?.[Constants.titleColumnId]) ?? 'Beer to Web3',
         content: {
           type: 'doc',
           content: [
@@ -161,7 +161,7 @@ export function boardWithCardsArgs({
         title:
           (Array.isArray(customProps?.cardPropertyValues)
             ? customProps?.cardPropertyValues[1]?.[Constants.titleColumnId]
-            : customProps?.cardPropertyValues[Constants.titleColumnId]) ?? 'How to web3 in Uni?',
+            : customProps?.cardPropertyValues?.[Constants.titleColumnId]) ?? 'How to web3 in Uni?',
         content: {
           type: 'doc',
           content: [
