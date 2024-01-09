@@ -75,6 +75,7 @@ export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
   options: IPropertyOption[];
   description?: string;
   formFieldId?: string;
+  proposalFieldId?: string;
 };
 
 export type DataSourceType = 'board_page' | 'google_form' | 'proposals';

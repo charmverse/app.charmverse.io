@@ -1,15 +1,18 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import type { FormField, Page, Space, User } from '@charmverse/core/prisma-client';
+import type { FormField, Page, Prisma, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import isEqual from 'lodash/isEqual';
 import { v4 } from 'uuid';
 
+import { getDefaultBoard } from 'components/proposals/components/ProposalsBoard/utils/boardData';
 import type { BoardFields, IPropertyTemplate } from 'lib/focalboard/board';
+import type { ProposalFields } from 'lib/proposal/interface';
 import { generateBoard, generateProposal, generateUserAndSpace } from 'testing/setupDatabase';
 import { addUserToSpace } from 'testing/utils/spaces';
 import { generateUser } from 'testing/utils/users';
 
+import type { BoardViewFields } from '../boardView';
 import type { CardFields } from '../card';
 import { createCardsFromProposals } from '../createCardsFromProposals';
 
@@ -124,6 +127,159 @@ describe('createCardsFromProposals', () => {
     ['__title', proposalUrlProp?.id, proposalStatusProp?.id].forEach((propertyKey) => {
       expect(visibleProperties.includes(propertyKey as string)).toBe(true);
     });
+  });
+
+  it(`should add custom proposal properties as card properties and add them to visible properties for all views as an admin`, async () => {
+    const { user: proposalAuthor, space: testSpace } = await generateUserAndSpace({
+      isAdmin: true
+    });
+
+    const proposal = await testUtilsProposals.generateProposal({
+      authors: [proposalAuthor.id],
+      proposalStatus: 'discussion',
+      reviewers: [
+        {
+          group: 'user',
+          id: proposalAuthor.id
+        }
+      ],
+      spaceId: testSpace.id,
+      userId: proposalAuthor.id
+    });
+
+    const defaultBoard = getDefaultBoard({
+      evaluationStepTitles: []
+    });
+
+    const customProperties: IPropertyTemplate[] = [
+      {
+        id: v4(),
+        name: 'Text',
+        type: 'text',
+        options: []
+      },
+      {
+        id: v4(),
+        name: 'Select',
+        type: 'select',
+        options: [
+          {
+            id: v4(),
+            value: 'Option 1',
+            color: 'propColorGray'
+          },
+          {
+            id: v4(),
+            value: 'Option 2',
+            color: 'propColorGray'
+          }
+        ]
+      }
+    ];
+
+    await prisma.proposalBlock.create({
+      data: {
+        fields: {
+          ...defaultBoard.fields,
+          cardProperties: [
+            ...defaultBoard.fields.cardProperties,
+            ...customProperties
+          ] as unknown as Prisma.InputJsonArray
+        },
+        id: defaultBoard.id,
+        spaceId: testSpace.id,
+        createdBy: proposalAuthor.id,
+        rootId: testSpace.id,
+        updatedBy: proposalAuthor.id,
+        type: 'board',
+        title: 'Proposals',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: null,
+        parentId: testSpace.id,
+        schema: 1
+      }
+    });
+
+    const proposalFields = (proposal.fields as ProposalFields) ?? {};
+
+    await prisma.proposal.update({
+      where: {
+        id: proposal.id
+      },
+      data: {
+        fields: {
+          ...proposalFields,
+          properties: {
+            ...proposalFields.properties,
+            [customProperties[0].id]: 'Text',
+            [customProperties[1].id]: customProperties[1].options[0].id
+          }
+        }
+      }
+    });
+
+    const databaseBoard = await generateBoard({
+      createdBy: proposalAuthor.id,
+      spaceId: testSpace.id,
+      views: 1,
+      viewDataSource: 'proposals'
+    });
+
+    const [cardPage] = await createCardsFromProposals({
+      boardId: databaseBoard.id,
+      spaceId: testSpace.id,
+      userId: proposalAuthor.id
+    });
+
+    const cardBlock = await prisma.block.findUniqueOrThrow({
+      where: {
+        id: cardPage.cardId!
+      },
+      select: {
+        fields: true
+      }
+    });
+
+    const cardBlockFields = cardBlock?.fields as unknown as CardFields;
+
+    const databaseBlock = await prisma.block.findUniqueOrThrow({
+      where: {
+        id: databaseBoard.boardId!
+      },
+      select: {
+        fields: true
+      }
+    });
+
+    const boardCardProperties = (databaseBlock?.fields as unknown as BoardFields)?.cardProperties ?? [];
+
+    const textProperty = boardCardProperties.find(
+      (prop) => prop.id === customProperties[0].id && prop.proposalFieldId === customProperties[0].id
+    );
+    const selectProperty = boardCardProperties.find(
+      (prop) => prop.id === customProperties[1].id && prop.proposalFieldId === customProperties[1].id
+    );
+
+    expect(textProperty).toBeDefined();
+    expect(selectProperty).toBeDefined();
+
+    expect(cardBlockFields.properties[customProperties[0].id]).toBe('Text');
+    expect(cardBlockFields.properties[customProperties[1].id]).toBe(customProperties[1].options[0].id);
+
+    const views = await prisma.block.findMany({
+      where: {
+        parentId: databaseBoard.id,
+        type: 'view'
+      },
+      select: {
+        fields: true
+      }
+    });
+
+    const viewFields = views[0]?.fields as unknown as BoardViewFields;
+    expect(viewFields.visiblePropertyIds.includes(customProperties[0].id)).toBe(true);
+    expect(viewFields.visiblePropertyIds.includes(customProperties[1].id)).toBe(true);
   });
 
   it(`should add proposal form fields as card properties and add them to visible properties for all views as an admin`, async () => {

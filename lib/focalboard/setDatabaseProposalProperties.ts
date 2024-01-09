@@ -14,12 +14,19 @@ import {
 import { InvalidStateError } from 'lib/middleware/errors';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-export async function setDatabaseProposalProperties({ boardId }: { boardId: string }): Promise<Board> {
+export async function setDatabaseProposalProperties({
+  boardId,
+  cardProperties
+}: {
+  boardId: string;
+  cardProperties: IPropertyTemplate[];
+}): Promise<Board> {
   const boardBlock = (await prisma.block.findUniqueOrThrow({
     where: {
       id: boardId
     }
   })) as any as Board;
+
   if (boardBlock.fields.sourceType !== 'proposals') {
     throw new InvalidStateError(`Cannot add proposal cards to a database which does not have proposals as its source`);
   }
@@ -75,7 +82,8 @@ export async function setDatabaseProposalProperties({ boardId }: { boardId: stri
     evaluationStepTitles: Array.from(evaluationStepTitles),
     formFields,
     boardBlock,
-    spaceUsesRubrics
+    spaceUsesRubrics,
+    cardProperties
   });
 
   return prisma.block.update({
@@ -95,8 +103,10 @@ export function getBoardProperties({
   boardBlock,
   spaceUsesRubrics,
   formFields = [],
-  evaluationStepTitles = []
+  evaluationStepTitles = [],
+  cardProperties = []
 }: {
+  cardProperties?: IPropertyTemplate[];
   evaluationStepTitles?: string[];
   boardBlock: Board;
   spaceUsesRubrics: boolean;
@@ -139,6 +149,19 @@ export function getBoardProperties({
   } else {
     boardProperties.push(stepProp);
   }
+
+  cardProperties.forEach((cardProp) => {
+    const existingPropIndex = boardProperties.findIndex((p) => p.id === cardProp.id);
+
+    if (existingPropIndex > -1) {
+      boardProperties[existingPropIndex] = { ...cardProp, proposalFieldId: cardProp.id };
+    } else {
+      boardProperties.push({
+        ...cardProp,
+        proposalFieldId: cardProp.id
+      });
+    }
+  });
 
   if (spaceUsesRubrics) {
     const evaluatedByProp = generateUpdatedProposalEvaluatedByProperty({ boardProperties });
