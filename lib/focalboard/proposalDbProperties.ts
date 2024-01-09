@@ -74,7 +74,7 @@ export const proposalDbProperties: {
   })
 };
 
-export const PROPOSAL_STATUS_LABELS: Record<ProposalEvaluationStatus, string> = {
+export const EVALUATION_STATUS_LABELS: Record<ProposalEvaluationStatus, string> = {
   complete: 'Complete',
   declined: 'Declined',
   in_progress: 'In Progress',
@@ -83,7 +83,7 @@ export const PROPOSAL_STATUS_LABELS: Record<ProposalEvaluationStatus, string> = 
   unpublished: 'Unpublished'
 };
 
-export const PROPOSAL_STATUS_VERB_LABELS: Record<ProposalEvaluationStatus, string> = {
+export const EVALUATION_STATUS_VERB_LABELS: Record<ProposalEvaluationStatus, string> = {
   complete: 'Complete',
   declined: 'Decline',
   in_progress: 'In Progress',
@@ -114,15 +114,6 @@ export const PROPOSAL_RESULT_LABELS: Record<ProposalEvaluationResultExtended, st
   in_progress: 'In Progress',
   fail: 'Failed',
   pass: 'Passed'
-};
-
-export const proposalResultBoardColors: Record<
-  ProposalEvaluationResultExtended,
-  keyof (typeof Constants)['menuColors']
-> = {
-  fail: 'propColorRed',
-  in_progress: 'propColorYellow',
-  pass: 'propColorGreen'
 };
 
 export const proposalStatusColors: Record<ProposalEvaluationStatus, BrandColor> = {
