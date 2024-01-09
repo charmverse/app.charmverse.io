@@ -24,13 +24,6 @@ export async function setDatabaseProposalProperties({ boardId }: { boardId: stri
     throw new InvalidStateError(`Cannot add proposal cards to a database which does not have proposals as its source`);
   }
 
-  const rubricProposals = await prisma.proposal.count({
-    where: {
-      spaceId: boardBlock.spaceId,
-      evaluationType: 'rubric'
-    }
-  });
-
   const forms = await prisma.form.findMany({
     where: {
       proposal: {
@@ -70,12 +63,10 @@ export async function setDatabaseProposalProperties({ boardId }: { boardId: stri
     });
   });
 
-  const spaceUsesRubrics = rubricProposals > 0;
   const boardProperties = getBoardProperties({
     evaluationStepTitles: Array.from(evaluationStepTitles),
     formFields,
-    boardBlock,
-    spaceUsesRubrics
+    boardBlock
   });
 
   return prisma.block.update({
@@ -93,13 +84,11 @@ export async function setDatabaseProposalProperties({ boardId }: { boardId: stri
 
 export function getBoardProperties({
   boardBlock,
-  spaceUsesRubrics,
   formFields = [],
   evaluationStepTitles = []
 }: {
   evaluationStepTitles?: string[];
   boardBlock: Board;
-  spaceUsesRubrics: boolean;
   formFields?: FormField[];
 }) {
   const boardProperties = boardBlock.fields.cardProperties ?? [];
@@ -140,34 +129,32 @@ export function getBoardProperties({
     boardProperties.push(stepProp);
   }
 
-  if (spaceUsesRubrics) {
-    const evaluatedByProp = generateUpdatedProposalEvaluatedByProperty({ boardProperties });
-    const evaluationTotalProp = generateUpdatedProposalEvaluationTotalProperty({ boardProperties });
-    const evaluationAverageProp = generateUpdatedProposalEvaluationAverageProperty({ boardProperties });
+  const evaluatedByProp = generateUpdatedProposalEvaluatedByProperty({ boardProperties });
+  const evaluationTotalProp = generateUpdatedProposalEvaluationTotalProperty({ boardProperties });
+  const evaluationAverageProp = generateUpdatedProposalEvaluationAverageProperty({ boardProperties });
 
-    const existingEvaluatedByPropPropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluatedBy');
+  const existingEvaluatedByPropPropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluatedBy');
 
-    if (existingEvaluatedByPropPropIndex > -1) {
-      boardProperties[existingEvaluatedByPropPropIndex] = evaluatedByProp;
-    } else {
-      boardProperties.push(evaluatedByProp);
-    }
+  if (existingEvaluatedByPropPropIndex > -1) {
+    boardProperties[existingEvaluatedByPropPropIndex] = evaluatedByProp;
+  } else {
+    boardProperties.push(evaluatedByProp);
+  }
 
-    const existingEvaluationTotalPropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluationTotal');
+  const existingEvaluationTotalPropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluationTotal');
 
-    if (existingEvaluationTotalPropIndex > -1) {
-      boardProperties[existingEvaluationTotalPropIndex] = evaluationTotalProp;
-    } else {
-      boardProperties.push(evaluationTotalProp);
-    }
+  if (existingEvaluationTotalPropIndex > -1) {
+    boardProperties[existingEvaluationTotalPropIndex] = evaluationTotalProp;
+  } else {
+    boardProperties.push(evaluationTotalProp);
+  }
 
-    const existingEvaluationAveragePropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluationAverage');
+  const existingEvaluationAveragePropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluationAverage');
 
-    if (existingEvaluationAveragePropIndex > -1) {
-      boardProperties[existingEvaluationAveragePropIndex] = evaluationAverageProp;
-    } else {
-      boardProperties.push(evaluationAverageProp);
-    }
+  if (existingEvaluationAveragePropIndex > -1) {
+    boardProperties[existingEvaluationAveragePropIndex] = evaluationAverageProp;
+  } else {
+    boardProperties.push(evaluationAverageProp);
   }
 
   formFields.forEach((formField) => {

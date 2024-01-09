@@ -1,4 +1,10 @@
-import type { Block, Page, ProposalRubricCriteria, ProposalRubricCriteriaAnswer } from '@charmverse/core/prisma-client';
+import type {
+  Block,
+  Page,
+  ProposalEvaluationType,
+  ProposalRubricCriteria,
+  ProposalRubricCriteriaAnswer
+} from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { prismaToBlock } from 'lib/focalboard/block';
@@ -13,6 +19,7 @@ import type {
   ProposalRubricCriteriaWithTypedParams
 } from 'lib/proposal/rubric/interfaces';
 import type { BoardPropertyValue } from 'lib/public-api';
+import { prettyPrint } from 'lib/utilities/strings';
 import { relay } from 'lib/websockets/relay';
 
 import { createCardPage } from '../pages/createCardPage';
@@ -195,6 +202,8 @@ export async function updateCardsFromProposals({
   for (const pageWithProposal of pageProposals) {
     const card = existingSyncedCardsWithBlocks[pageWithProposal.id];
 
+    prettyPrint({ card });
+
     const accessPrivateFields = await canAccessPrivateFields({
       // Use the board creator to check if private fields are accessible
       userId: boardBlock.createdBy,
@@ -224,7 +233,7 @@ export async function updateCardsFromProposals({
 
       if (
         // For now, always recalculate rubrics. We can optimise further later
-        pageWithProposal.proposal?.evaluationType === 'rubric' ||
+        currentStep?.step === 'rubric' ||
         card.title !== pageWithProposal.title ||
         card.hasContent !== pageWithProposal.hasContent ||
         card.content?.toString() !== pageWithProposal.content?.toString() ||
@@ -255,16 +264,17 @@ export async function updateCardsFromProposals({
           properties: newProps
         };
 
-        if (pageWithProposal.proposal?.evaluationType) {
+        if (currentStep?.step === 'rubric') {
           const criteria = mappedRubricCriteriaByProposal[pageWithProposal.id] ?? [];
+
           const answers = mappedRubricAnswersByProposal[pageWithProposal.id] ?? [];
 
           const updatedCardShape = generateResyncedProposalEvaluationForCard({
-            proposalEvaluationType: pageWithProposal.proposal.evaluationType,
             cardProps: { fields: newCardBlockFields },
             databaseProperties: databaseProposalProps,
-            rubricCriteria: criteria as ProposalRubricCriteriaWithTypedParams[],
-            rubricAnswers: answers as ProposalRubricCriteriaAnswerWithTypedResponse[]
+            rubricCriteria: criteria,
+            rubricAnswers: answers as ProposalRubricCriteriaAnswerWithTypedResponse[],
+            currentStep: { id: currentStep.id, type: currentStep.step }
           });
 
           newCardBlockFields = updatedCardShape.fields;
@@ -322,21 +332,21 @@ export async function updateCardsFromProposals({
       }
 
       const createdAt = pageWithProposal.createdAt;
-      if (pageWithProposal.proposal?.evaluationType) {
+
+      if (currentStep) {
         const criteria = mappedRubricCriteriaByProposal[pageWithProposal.id] ?? [];
         const answers = mappedRubricAnswersByProposal[pageWithProposal.id] ?? [];
 
         const updatedCardShape = generateResyncedProposalEvaluationForCard({
-          proposalEvaluationType: pageWithProposal.proposal.evaluationType,
           cardProps: { fields: properties },
           databaseProperties: databaseProposalProps,
           rubricCriteria: criteria as ProposalRubricCriteriaWithTypedParams[],
-          rubricAnswers: answers as ProposalRubricCriteriaAnswerWithTypedResponse[]
+          rubricAnswers: answers as ProposalRubricCriteriaAnswerWithTypedResponse[],
+          currentStep: { id: currentStep.id, type: currentStep.step as ProposalEvaluationType }
         });
 
         properties = updatedCardShape.fields;
       }
-
       const formFields = pageWithProposal.proposal?.form?.formFields ?? [];
       const boardBlockCardProperties = boardBlock.fields.cardProperties ?? [];
 
@@ -365,6 +375,7 @@ export async function updateCardsFromProposals({
       newCards.push(_card);
     }
   }
+  prettyPrint({ updatedCards });
 
   if (updatedCards.length > 0) {
     relay.broadcast(
