@@ -122,6 +122,7 @@ export enum WebhookEventNames {
   ForumCommentDownvoted = 'forum.comment.downvoted',
   ForumPostCreated = 'forum.post.created',
   ProposalPassed = 'proposal.passed',
+  ProposalFailed = 'proposal.failed',
   ProposalSuggestionApproved = 'proposal.suggestion_approved',
   ProposalUserVoted = 'proposal.user_voted',
   ProposalStatusChanged = 'proposal.status_changed',
@@ -176,6 +177,10 @@ export type WebhookEvent = WebhookEventSharedProps &
       }
     | {
         scope: WebhookEventNames.ProposalPassed;
+        proposal: ProposalEntity;
+      }
+    | {
+        scope: WebhookEventNames.ProposalFailed;
         proposal: ProposalEntity;
       }
     | {

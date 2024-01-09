@@ -43,6 +43,9 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
           evaluations: {
             select: {
               id: true
+            },
+            orderBy: {
+              index: 'asc'
             }
           }
         }

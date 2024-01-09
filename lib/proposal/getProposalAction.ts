@@ -33,38 +33,44 @@ export function getProposalAction({
 
   const hasRewards = proposal.rewards.length > 0;
 
-  const isPreviousStepReviewable = previousEvaluation?.type === 'pass_fail' || previousEvaluation?.type === 'rubric';
-  const isCurrentStepReviewable = currentEvaluation.type === 'pass_fail' || currentEvaluation.type === 'rubric';
-
-  if (isPreviousStepReviewable) {
-    if (isAuthor && previousEvaluation.result === 'pass') {
-      return 'step_passed';
+  if (currentEvaluation.id === lastEvaluation.id && isAuthor) {
+    if (currentEvaluation.result === 'pass') {
+      return hasRewards ? 'reward_published' : 'proposal_passed';
+    } else if (currentEvaluation.result === 'fail') {
+      return 'proposal_failed';
     }
   }
 
-  if (currentEvaluation.type === 'feedback') {
-    return canComment ? 'start_discussion' : null;
+  if (currentEvaluation.type === 'feedback' && canComment) {
+    return 'start_discussion';
   }
 
-  if (currentEvaluation.type === 'vote') {
-    if (currentEvaluation.result === 'pass' && (isAuthor || isVoter)) {
-      return 'vote_closed';
-    }
-    return currentEvaluation.result === null && isVoter ? 'vote' : null;
+  if (currentEvaluation.type === 'vote' && isVoter) {
+    return currentEvaluation.result === 'pass'
+      ? 'vote_passed'
+      : currentEvaluation.result === 'fail'
+      ? 'vote_failed'
+      : 'vote';
   }
 
-  // Passed last evaluation
-  if (currentEvaluation.id === lastEvaluation.id && currentEvaluation.result === 'pass') {
-    return isAuthor ? (hasRewards ? 'reward_published' : 'proposal_passed') : null;
-  }
-
-  if (isCurrentStepReviewable) {
+  if (currentEvaluation.type === 'pass_fail' || currentEvaluation.type === 'rubric') {
     if (currentEvaluation.result === null && isReviewer) {
       return 'review_required';
     }
 
+    if (isAuthor && currentEvaluation.result === 'fail') {
+      return 'proposal_failed';
+    }
+  }
+
+  if (currentEvaluation.result === null && previousEvaluation) {
     if (isAuthor) {
-      return currentEvaluation.result === 'fail' ? 'step_failed' : null;
+      if (previousEvaluation.result === 'fail') {
+        return previousEvaluation.type === 'vote' ? 'vote_failed' : 'proposal_failed';
+      }
+      return previousEvaluation.type === 'vote' ? 'vote_passed' : 'step_passed';
+    } else if (isVoter && previousEvaluation.type === 'vote') {
+      return previousEvaluation.result === 'pass' ? 'vote_passed' : 'vote_failed';
     }
   }
 

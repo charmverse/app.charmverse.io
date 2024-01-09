@@ -201,8 +201,11 @@ function getProposalContent(n: ProposalNotification, actorUsername?: string): st
         `Feedback requested for a proposal`
       );
     }
-    case 'vote_closed': {
-      return `The vote on ${n.pageTitle} has been completed. View results.`;
+    case 'vote_passed': {
+      return `The vote on ${n.pageTitle} has passed. View results.`;
+    }
+    case 'vote_failed': {
+      return `The vote on ${n.pageTitle} has failed. View results.`;
     }
     case 'reward_published': {
       return `Your proposal reward has been created`;
@@ -210,8 +213,8 @@ function getProposalContent(n: ProposalNotification, actorUsername?: string): st
     case 'proposal_passed': {
       return `Your proposal has been passed`;
     }
-    case 'step_failed': {
-      return `Your proposal has been declined in ${n.evaluation?.title ?? 'current step'}`;
+    case 'proposal_failed': {
+      return `Your proposal has failed in ${n.evaluation?.title ?? 'current step'}`;
     }
     case 'step_passed': {
       return `Your proposal has been moved to ${n.evaluation?.title ?? 'the next step'}`;

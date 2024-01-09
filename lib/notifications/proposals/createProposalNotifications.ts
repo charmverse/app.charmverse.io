@@ -6,6 +6,7 @@ import { permissionsApiClient } from 'lib/permissions/api/client';
 import { getProposalAction } from 'lib/proposal/getProposalAction';
 import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 import type { NotificationToggles } from '../notificationToggles';
 import { saveProposalNotification } from '../saveNotification';
@@ -94,19 +95,21 @@ export async function createProposalNotifications(webhookData: {
         if (spaceRole.userId === userId) {
           continue;
         }
-        const proposalPermission = await permissionsApiClient.proposals.computeProposalPermissions({
+        const proposalPermissionsRecord = await permissionsApiClient.proposals.computeAllProposalEvaluationPermissions({
           resourceId: proposalId,
           userId: spaceRole.userId
         });
 
-        if (!proposalPermission.view) {
+        const currentEvaluationPermissions = proposalPermissionsRecord[currentEvaluationId];
+
+        if (!currentEvaluationPermissions.view) {
           continue;
         }
 
         const isAuthor = proposalAuthorIds.includes(spaceRole.userId);
-        const isReviewer = proposalPermission.review || proposalPermission.evaluate;
-        const isVoter = proposalPermission.vote;
-        const canComment = proposalPermission.comment;
+        const isReviewer = currentEvaluationPermissions.review || currentEvaluationPermissions.evaluate;
+        const isVoter = currentEvaluationPermissions.vote && currentEvaluationPermissions.view;
+        const canComment = currentEvaluationPermissions.comment && currentEvaluationPermissions.view;
         const lastEvaluation = proposal.evaluations[proposal.evaluations.length - 1];
         const previousEvaluation =
           currentEvaluation?.index && currentEvaluation.index > 0 && currentEvaluation.id !== lastEvaluation.id
@@ -138,8 +141,23 @@ export async function createProposalNotifications(webhookData: {
           spaceId,
           userId: spaceRole.userId,
           type: action,
-          evaluationId: action === 'step_failed' && previousEvaluation ? previousEvaluation.id : currentEvaluation.id
+          evaluationId:
+            action === 'proposal_failed' && previousEvaluation ? previousEvaluation.id : currentEvaluation.id
         });
+
+        if (action === 'proposal_passed') {
+          await publishProposalEvent({
+            proposalId,
+            scope: WebhookEventNames.ProposalPassed,
+            spaceId
+          });
+        } else if (action === 'proposal_failed') {
+          await publishProposalEvent({
+            proposalId,
+            scope: WebhookEventNames.ProposalFailed,
+            spaceId
+          });
+        }
         ids.push(id);
       }
 

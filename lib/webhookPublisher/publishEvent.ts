@@ -145,7 +145,7 @@ export async function publishBountyEvent(context: BountyEventContext) {
 
 type ProposalEventContext =
   | {
-      scope: WebhookEventNames.ProposalPassed;
+      scope: WebhookEventNames.ProposalPassed | WebhookEventNames.ProposalFailed;
       proposalId: string;
       spaceId: string;
     }
@@ -171,7 +171,8 @@ export async function publishProposalEvent(context: ProposalEventContext) {
         currentEvaluationId: context.currentEvaluationId
       });
     }
-    case WebhookEventNames.ProposalPassed: {
+    case WebhookEventNames.ProposalPassed:
+    case WebhookEventNames.ProposalFailed: {
       return publishWebhookEvent(context.spaceId, {
         scope: context.scope,
         proposal,

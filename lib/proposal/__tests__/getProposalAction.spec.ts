@@ -85,7 +85,7 @@ describe('getProposalAction', () => {
             id: v4(),
             index: 0,
             type: 'feedback',
-            result: 'pass'
+            result: null
           }
         ]
       },
@@ -98,7 +98,7 @@ describe('getProposalAction', () => {
     expect(memberAction).toBe('start_discussion');
   });
 
-  it(`Should return 'vote' if current step is vote, vote has completed and user can vote or is an author`, async () => {
+  it(`Should return 'vote_passed' if current step is vote, vote has passed and user can vote or is an author`, async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace();
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
@@ -121,6 +121,12 @@ describe('getProposalAction', () => {
           index: 1,
           type: 'vote',
           result: 'pass'
+        },
+        {
+          id: v4(),
+          index: 2,
+          type: 'rubric',
+          result: null
         }
       ]
     };
@@ -141,8 +147,8 @@ describe('getProposalAction', () => {
       canComment: false
     });
 
-    expect(voterAction).toBe('vote_closed');
-    expect(authorAction).toBe('vote_closed');
+    expect(voterAction).toBe('vote_passed');
+    expect(authorAction).toBe('vote_passed');
   });
 
   it(`Should return 'vote' if current step is vote, vote has on going and user can vote`, async () => {
@@ -301,7 +307,7 @@ describe('getProposalAction', () => {
     expect(reviewerAction).toBe('review_required');
   });
 
-  it(`Should return 'step_failed' if current step has failed and user is an author`, async () => {
+  it(`Should return 'proposal_failed' if current step has failed and user is an author`, async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace();
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
@@ -334,6 +340,6 @@ describe('getProposalAction', () => {
       canComment: false
     });
 
-    expect(authorAction).toBe('step_failed');
+    expect(authorAction).toBe('proposal_failed');
   });
 });

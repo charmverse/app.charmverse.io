@@ -97,7 +97,7 @@ const updateVoteStatus = async () => {
   ]);
 
   await Promise.all([
-    ...passedVotes.map((vote) => {
+    [...rejectedVotes, ...passedVotes].map((vote) => {
       const evaluation = passedEvaluations.find((e) => e.voteId === vote.id);
       if (vote.pageId && evaluation) {
         return publishProposalEvent({
