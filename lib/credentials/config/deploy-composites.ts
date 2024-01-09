@@ -1,3 +1,4 @@
+import { write } from 'node:fs';
 import fs from 'node:fs/promises';
 
 import {
@@ -7,6 +8,9 @@ import {
   writeEncodedCompositeRuntime
 } from '@composedb/devtools-node';
 import type { Ora as OraSpinner } from 'ora';
+import ora from 'ora';
+
+import { ceramicHost } from 'config/constants';
 
 import { getCeramicClient } from './authenticate';
 
@@ -22,7 +26,7 @@ export const compositeDefinitionFile = getCompositesFolder('composite-definition
  * @param {Ora} spinner - to provide progress status.
  * @return {Promise<void>} - return void when composite finishes deploying.
  */
-export async function writeComposite(spinner: OraSpinner) {
+export async function writeComposite({ spinner }: { spinner: OraSpinner } = { spinner: ora() }) {
   const ceramic = await getCeramicClient();
 
   const result = await fs.readdir(getCompositesFolder('')).catch(() => null);
@@ -42,3 +46,4 @@ export async function writeComposite(spinner: OraSpinner) {
   await deployComposite.startIndexingOn(ceramic);
   spinner.succeed('composite deployed & ready for use');
 }
+// writeComposite().then(() => console.log('Complete deployment complete on:', ceramicHost));

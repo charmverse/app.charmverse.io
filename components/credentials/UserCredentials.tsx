@@ -10,17 +10,15 @@ export function UserCredentials({ account }: { account: string }) {
     charmClient.credentials.getUserCredentials({ account })
   );
 
-  console.log('Fetched credentials for ', account, credentials);
-
   return (
     <div>
       <Typography variant='h3'>Received Credentials</Typography>
 
       {isLoading && <Typography>Loading...</Typography>}
 
-      {/* {credentials?.map((credential: any) => (
-        <p key={JSON.stringify(credential)}>{JSON.stringify(credential)}</p>
-      ))} */}
+      {credentials?.map((credential) => (
+        <ProposalCredentialCard key={credential.id} credential={credential} />
+      ))}
     </div>
   );
 }

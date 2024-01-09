@@ -1,9 +1,5 @@
-import type { SignedOffchainAttestation } from '@ethereum-attestation-service/eas-sdk';
 import { yupResolver } from '@hookform/resolvers/yup';
-import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormGroup from '@mui/material/FormGroup';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
@@ -13,16 +9,14 @@ import * as yup from 'yup';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
-import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { SignedCredential } from 'lib/credentials/attest';
-import type { CredentialData, ProposalCredential } from 'lib/credentials/schemas';
+import type { PublishedSignedCredential } from 'lib/credentials/config/queriesAndMutations';
+import type { ProposalCredential } from 'lib/credentials/schemas';
 import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
-
-import { ProposalCredentialCard } from './ProposalCredentialCard';
 
 const schema = yup.object({
   name: yup.string().required(),
@@ -42,7 +36,7 @@ export function ProposalCredentialForm() {
   const { account } = useWeb3Account();
   const { showMessage } = useSnackbar();
 
-  const [signedAttestation, setSignedAttestation] = useState<SignedCredential | null>(null);
+  const [signedAttestation, setSignedAttestation] = useState<PublishedSignedCredential | null>(null);
 
   async function attest(values: FormValues) {
     setIsAttesting(true);
@@ -82,7 +76,7 @@ export function ProposalCredentialForm() {
       description: 'Request for Grants 7: Tooling for 6551',
       status: 'applied',
       url: `${getAppApexDomain()}/${space?.domain}/proposals`,
-      recipient: '0x9b56c451f593e1BF5E458A3ecaDfD3Ef17A36998'
+      recipient: '0x4A29c8fF7D6669618580A68dc691565B07b19e25'
     },
     // mode: 'onChange',
     resolver: yupResolver(schema)
@@ -150,11 +144,11 @@ export function ProposalCredentialForm() {
         </Stack>
       </form>
       <Divider />
-      {signedAttestation && (
+      {/* {signedAttestation && (
         <Box sx={{ maxWidth: '400px' }}>
           <ProposalCredentialCard credential={signedAttestation} />
         </Box>
-      )}
+      )} */}
     </>
   );
 }

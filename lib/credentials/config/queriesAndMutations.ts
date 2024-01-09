@@ -1,5 +1,4 @@
-import type { ApolloQueryResult } from '@apollo/client';
-import { gql, ApolloClient, InMemoryCache } from '@apollo/client';
+import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
 
 import { graphQlServerEndpoint } from 'config/constants';
 
@@ -16,7 +15,7 @@ const apolloClient = new ApolloClient({
  * @content - The actual keymap values of the credential created using EAS
  */
 export type PublishedSignedCredential = {
-  author: DID;
+  id: string;
   issuer: string;
   recipient: string;
   content: string;
@@ -25,12 +24,12 @@ export type PublishedSignedCredential = {
   verificationUrl: string;
   chainId: number;
   schemaId: string;
-  timestamp: number;
+  timestamp: Date;
 };
 
 const CREATE_SIGNED_CREDENTIAL_MUTATION = gql`
-  mutation CreateCredentials($i: CreateSignedCredentialTwoInput!) {
-    createSignedCredentialTwo(input: $i) {
+  mutation CreateCredentials($i: CreateSignedCredentialThreeInput!) {
+    createSignedCredentialThree(input: $i) {
       document {
         id
         sig
@@ -47,25 +46,31 @@ const CREATE_SIGNED_CREDENTIAL_MUTATION = gql`
   }
 `;
 
-export async function publishSignedCredential(input: Omit<PublishedSignedCredential, 'author'>) {
-  try {
-    const response = await apolloClient.mutate({
-      mutation: CREATE_SIGNED_CREDENTIAL_MUTATION,
-      variables: { i: input }
-    });
-    return response.data.createSignedCredentialTwo.document;
-  } catch (error) {
-    // Handle or throw the error based on your application's error handling logic
-    console.error('Error creating SignedCredentialTwo:', error);
-    throw error;
-  }
+export type CredentialToPublish = Omit<PublishedSignedCredential, 'author' | 'id'>;
+
+export async function publishSignedCredential(input: CredentialToPublish) {
+  const response = await apolloClient.mutate({
+    mutation: CREATE_SIGNED_CREDENTIAL_MUTATION,
+    variables: {
+      i: {
+        content: {
+          ...input,
+          issuer: input.issuer.toLowerCase(),
+          recipient: input.recipient.toLowerCase(),
+          timestamp: new Date(input.timestamp).toISOString()
+        }
+      }
+    }
+  });
+  return response.data.createSignedCredentialThree.document;
 }
 
-const GET_CREDENTIALS_BY_RECIPIENT = gql`
-  query GetCredentialsByRecipient($recipient: String!) {
-    signedCredentialTwoIndex(recipient: $recipient, first: 2) {
+const GET_CREDENTIALS = gql`
+  query GetCredentials($filter: SignedCredentialThreeFiltersInput!) {
+    signedCredentialThreeIndex(filters: $filter, first: 1000) {
       edges {
         node {
+          id
           issuer
           recipient
           content
@@ -81,11 +86,15 @@ const GET_CREDENTIALS_BY_RECIPIENT = gql`
   }
 `;
 
-export async function getCredentialsByRecipient(recipient: string): Promise<PublishedSignedCredential> {
+export async function getCredentialsByRecipient({
+  recipient
+}: {
+  recipient: string;
+}): Promise<PublishedSignedCredential> {
   return apolloClient
     .query({
-      query: GET_CREDENTIALS_BY_RECIPIENT,
-      variables: { recipient }
+      query: GET_CREDENTIALS,
+      variables: { filter: { where: { recipient: { equalTo: recipient.toLowerCase() } } } }
     })
-    .then(({ data }) => data.signedCredentialTwoIndex.edges[0].node);
+    .then(({ data }) => data.signedCredentialThreeIndex.edges.map((e: any) => e.node));
 }

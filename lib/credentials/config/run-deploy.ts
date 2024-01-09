@@ -3,14 +3,20 @@ import { serveEncodedDefinition } from '@composedb/devtools-node';
 
 import { ceramicHost } from 'config/constants';
 
-import { compositeDefinitionFile } from './deploy-composites';
+import { getCeramicClient } from './authenticate';
+import { compositeDefinitionFile, writeComposite } from './deploy-composites';
 
 async function bootstrapGqlServer() {
+  const ceramic = await getCeramicClient();
+
+  await writeComposite();
+
   return serveEncodedDefinition({
     ceramicURL: ceramicHost,
     graphiql: true,
     path: compositeDefinitionFile,
-    port: 5001
+    port: 5001,
+    did: ceramic.did
   });
 }
 

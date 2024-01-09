@@ -140,11 +140,11 @@ export async function signAndPublishCharmverseCredential({
 }: CharmVerseCredentialInput) {
   const signedCredential = await signCharmverseCredential({ chainId, credential, recipient });
 
-  const contentToPublish: Omit<PublishedSignedCredential, 'author'> = {
+  const contentToPublish: Omit<PublishedSignedCredential, 'author' | 'id'> = {
     chainId,
     recipient: signedCredential.recipient,
     content: JSON.stringify(credential.data),
-    timestamp: signedCredential.timestamp,
+    timestamp: new Date(signedCredential.timestamp),
     type: credential.type,
     verificationUrl: signedCredential.verificationUrl,
     issuer: signedCredential.signer.wallet,
@@ -152,7 +152,7 @@ export async function signAndPublishCharmverseCredential({
     sig: JSON.stringify(signedCredential.sig)
   };
 
-  prettyPrint({ contentToPublish });
+  prettyPrint(contentToPublish);
 
   const published = await publishSignedCredential(contentToPublish);
 
