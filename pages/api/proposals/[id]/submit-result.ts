@@ -14,10 +14,10 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler
   .use(providePermissionClients({ key: 'id', location: 'query', resourceIdType: 'proposal' }))
   .use(requireKeys(['evaluationId', 'result'], 'body'))
-  .put(updateEvaluationResultndpoint);
+  .put(updateEvaluationResultEndpoint);
 
 // for submitting a review or removing a previous one
-async function updateEvaluationResultndpoint(req: NextApiRequest, res: NextApiResponse) {
+async function updateEvaluationResultEndpoint(req: NextApiRequest, res: NextApiResponse) {
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
@@ -31,6 +31,13 @@ async function updateEvaluationResultndpoint(req: NextApiRequest, res: NextApiRe
   const evaluation = await prisma.proposalEvaluation.findUniqueOrThrow({
     where: {
       id: evaluationId
+    },
+    include: {
+      proposal: {
+        select: {
+          spaceId: true
+        }
+      }
     }
   });
 
@@ -44,11 +51,13 @@ async function updateEvaluationResultndpoint(req: NextApiRequest, res: NextApiRe
   if (!result) {
     throw new ActionNotPermittedError(`You must provide a result.`);
   }
+
   await submitEvaluationResult({
     proposalId,
     evaluationId,
     result,
-    decidedBy: userId
+    decidedBy: userId,
+    spaceId: evaluation.proposal.spaceId
   });
 
   return res.status(200).end();
