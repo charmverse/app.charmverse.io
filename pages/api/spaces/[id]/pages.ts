@@ -68,6 +68,11 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
     page.galleryImage = replaceS3Domain(page.galleryImage);
     page.headerImage = replaceS3Domain(page.headerImage);
     page.icon = replaceS3Domain(page.icon);
+    for (const [key, value] of Object.entries(page)) {
+      if (value === null) {
+        delete page[key as keyof PageMeta];
+      }
+    }
   });
 
   const createdPages: PageMeta[] = [];
