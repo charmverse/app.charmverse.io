@@ -1,14 +1,12 @@
-import { yupResolver } from '@hookform/resolvers/yup';
 import { MenuItem, Select } from '@mui/material';
 import { litDaoChains } from 'connectors/chains';
-import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 import type { TokenGateConditions } from 'lib/tokenGates/interfaces';
-import { isValidChainAddress } from 'lib/tokens/validation';
 
+import type { FormValues } from '../hooks/useDaoForm';
+import { useDaoForm } from '../hooks/useDaoForm';
 import { useTokenGateModal } from '../hooks/useTokenGateModalContext';
 import { getDaoUnifiedAccessControlConditions } from '../utils/getDaoUnifiedAccessControlConditions';
 import { daoCheck } from '../utils/utils';
@@ -16,36 +14,14 @@ import { daoCheck } from '../utils/utils';
 import { TokenGateBlockchainSelect } from './TokenGateBlockchainSelect';
 import { TokenGateFooter } from './TokenGateFooter';
 
-type DaoOptions = (typeof daoCheck)[number]['id'];
-
-const schema = yup.object({
-  chain: yup.string().when('check', {
-    is: (val: DaoOptions) => val === 'moloch',
-    then: () => yup.string().required('Chain is required'),
-    otherwise: () => yup.string()
-  }),
-  check: yup.string<DaoOptions>().required('DAO type is required'),
-  contract: yup
-    .string()
-    .required('Contract is required')
-    .test('isAddress', 'Invalid address', (value) => isValidChainAddress(value))
-});
-
-export type FormValues = yup.InferType<typeof schema>;
-
 export function TokenGateDao() {
   const {
     register,
     getValues,
-    reset,
     watch,
-    formState: { errors, isValid }
-  } = useForm<FormValues>({
-    resolver: yupResolver(schema),
-    mode: 'onChange',
-    defaultValues: { contract: '', chain: '', check: undefined }
-  });
-
+    formState: { errors, isValid },
+    reset
+  } = useDaoForm();
   const check = watch('check');
 
   const { setDisplayedPage, handleTokenGate } = useTokenGateModal();
