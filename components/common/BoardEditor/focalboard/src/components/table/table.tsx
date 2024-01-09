@@ -1,7 +1,7 @@
 import { Add } from '@mui/icons-material';
 import { Typography, Box } from '@mui/material';
 import type { Dispatch, LegacyRef, ReactNode, SetStateAction } from 'react';
-import React, { forwardRef, useCallback, useMemo, useRef } from 'react';
+import React, { forwardRef, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDrop } from 'react-dnd';
 
 import { SelectionContext, useAreaSelection } from 'hooks/useAreaSelection';
@@ -83,8 +83,15 @@ function Table(props: Props): JSX.Element {
   const isManualSort = activeView.fields.sortOptions?.length === 0;
   const dispatch = useAppDispatch();
   const selectContainerRef = useRef<HTMLDivElement | null>(null);
-  const areaSelection = useAreaSelection({ readOnly, container: selectContainerRef });
+  const tableContainerRef = useRef<HTMLDivElement | null>(null);
+  const areaSelection = useAreaSelection({ readOnly, innerContainer: tableContainerRef });
   const { resetState } = areaSelection;
+
+  useEffect(() => {
+    if (!tableContainerRef.current) {
+      tableContainerRef.current = document.querySelector('.BoardComponent');
+    }
+  }, []);
 
   useKeydownPress(
     () => {
