@@ -101,7 +101,7 @@ beforeAll(async () => {
   proposal = (await prisma.proposal.create({
     data: {
       createdBy: proposalAuthor.id,
-      status: 'vote_active',
+      status: 'published',
       space: { connect: { id: space.id } },
       page: {
         create: {

@@ -29,7 +29,7 @@ describe('POST /api/v1/proposals/vote', () => {
       userId: user.id,
       authors: [],
       reviewers: [user.id],
-      proposalStatus: 'vote_active'
+      proposalStatus: 'published'
     });
     proposalId = proposal.id;
 

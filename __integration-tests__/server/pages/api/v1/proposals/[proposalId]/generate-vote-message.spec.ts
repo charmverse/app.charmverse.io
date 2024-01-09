@@ -79,7 +79,7 @@ describe('POST /api/v1/proposals/{proposalId}/generate-vote-message', () => {
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: proposalAuthor.id,
-      proposalStatus: 'vote_active',
+      proposalStatus: 'published',
       authors: [proposalAuthor.id]
     });
     const response = await request(baseUrl)
@@ -97,7 +97,7 @@ describe('POST /api/v1/proposals/{proposalId}/generate-vote-message', () => {
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: proposalAuthor.id,
-      proposalStatus: 'vote_active',
+      proposalStatus: 'published',
       authors: [proposalAuthor.id],
       snapshotProposalId: v4()
     });
@@ -122,7 +122,7 @@ describe('POST /api/v1/proposals/{proposalId}/generate-vote-message', () => {
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: generated.space.id,
       userId: proposalAuthor.id,
-      proposalStatus: 'vote_active',
+      proposalStatus: 'published',
       authors: [proposalAuthor.id],
       snapshotProposalId
     });
@@ -163,7 +163,7 @@ describe('POST /api/v1/proposals/{proposalId}/generate-vote-message', () => {
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: generated.space.id,
       userId: proposalAuthor.id,
-      proposalStatus: 'vote_active',
+      proposalStatus: 'published',
       authors: [proposalAuthor.id],
       snapshotProposalId
     });
