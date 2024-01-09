@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals } from '@charmverse/core/test';
 
 import { createProposal } from 'lib/proposal/createProposal';
-import { updateProposalStatusOnly } from 'lib/proposal/updateProposalStatusOnly';
+import { publishProposal } from 'lib/proposal/publishProposal';
 import { assignRole } from 'lib/roles';
 import { getProposalEntity, getSpaceEntity, getUserEntity } from 'lib/webhookPublisher/entities';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
@@ -151,8 +151,8 @@ describe.skip(`Test proposal events and notifications`, () => {
     expect(proposalDiscussionStatusChangedMember1Notification).toBeTruthy();
     expect(proposalDiscussionStatusChangedMember2Notification).toBeTruthy();
     // Move to review status
-    await updateProposalStatusOnly({
-      newStatus: 'published',
+    await publishProposal({
+      userId: author1.id,
       proposalId: proposal.id
     });
     await createProposalNotifications({
@@ -212,8 +212,8 @@ describe.skip(`Test proposal events and notifications`, () => {
     expect(proposalReviewStatusChangedMember1Notification).toBeFalsy();
     expect(proposalReviewStatusChangedMember2Notification).toBeFalsy();
     // Move to reviewed status
-    await updateProposalStatusOnly({
-      newStatus: 'published',
+    await publishProposal({
+      userId: author1.id,
       proposalId: proposal.id
     });
     await createProposalNotifications({
@@ -273,8 +273,8 @@ describe.skip(`Test proposal events and notifications`, () => {
     expect(proposalReviewedStatusChangedMember1Notification).toBeFalsy();
     expect(proposalReviewedStatusChangedMember2Notification).toBeFalsy();
     // Move to vote_active status
-    await updateProposalStatusOnly({
-      newStatus: 'published',
+    await publishProposal({
+      userId: author1.id,
       proposalId: proposal.id
     });
     await createProposalNotifications({
@@ -405,8 +405,8 @@ async function createDiscussionNotifications(input: Parameters<typeof generateUs
   const spaceEntity = await getSpaceEntity(space.id);
   const proposalEntity = await getProposalEntity(proposal.id);
   // Move to discussion status
-  await updateProposalStatusOnly({
-    newStatus: 'published',
+  await publishProposal({
+    userId: author1.id,
     proposalId: proposal.id
   });
   await createNotificationsFromEvent({
