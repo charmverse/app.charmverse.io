@@ -31,13 +31,6 @@ export async function setDatabaseProposalProperties({
     throw new InvalidStateError(`Cannot add proposal cards to a database which does not have proposals as its source`);
   }
 
-  const rubricProposals = await prisma.proposal.count({
-    where: {
-      spaceId: boardBlock.spaceId,
-      evaluationType: 'rubric'
-    }
-  });
-
   const forms = await prisma.form.findMany({
     where: {
       proposal: {
@@ -77,12 +70,10 @@ export async function setDatabaseProposalProperties({
     });
   });
 
-  const spaceUsesRubrics = rubricProposals > 0;
   const boardProperties = getBoardProperties({
     evaluationStepTitles: Array.from(evaluationStepTitles),
     formFields,
     boardBlock,
-    spaceUsesRubrics,
     cardProperties
   });
 
@@ -101,7 +92,6 @@ export async function setDatabaseProposalProperties({
 
 export function getBoardProperties({
   boardBlock,
-  spaceUsesRubrics,
   formFields = [],
   evaluationStepTitles = [],
   cardProperties = []
@@ -109,7 +99,6 @@ export function getBoardProperties({
   cardProperties?: IPropertyTemplate[];
   evaluationStepTitles?: string[];
   boardBlock: Board;
-  spaceUsesRubrics: boolean;
   formFields?: FormField[];
 }) {
   const boardProperties = boardBlock.fields.cardProperties ?? [];
@@ -150,6 +139,10 @@ export function getBoardProperties({
     boardProperties.push(stepProp);
   }
 
+  const evaluatedByProp = generateUpdatedProposalEvaluatedByProperty({ boardProperties });
+  const evaluationTotalProp = generateUpdatedProposalEvaluationTotalProperty({ boardProperties });
+  const evaluationAverageProp = generateUpdatedProposalEvaluationAverageProperty({ boardProperties });
+
   cardProperties.forEach((cardProp) => {
     const existingPropIndex = boardProperties.findIndex((p) => p.id === cardProp.id);
 
@@ -163,34 +156,28 @@ export function getBoardProperties({
     }
   });
 
-  if (spaceUsesRubrics) {
-    const evaluatedByProp = generateUpdatedProposalEvaluatedByProperty({ boardProperties });
-    const evaluationTotalProp = generateUpdatedProposalEvaluationTotalProperty({ boardProperties });
-    const evaluationAverageProp = generateUpdatedProposalEvaluationAverageProperty({ boardProperties });
+  const existingEvaluatedByPropPropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluatedBy');
 
-    const existingEvaluatedByPropPropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluatedBy');
+  if (existingEvaluatedByPropPropIndex > -1) {
+    boardProperties[existingEvaluatedByPropPropIndex] = evaluatedByProp;
+  } else {
+    boardProperties.push(evaluatedByProp);
+  }
 
-    if (existingEvaluatedByPropPropIndex > -1) {
-      boardProperties[existingEvaluatedByPropPropIndex] = evaluatedByProp;
-    } else {
-      boardProperties.push(evaluatedByProp);
-    }
+  const existingEvaluationTotalPropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluationTotal');
 
-    const existingEvaluationTotalPropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluationTotal');
+  if (existingEvaluationTotalPropIndex > -1) {
+    boardProperties[existingEvaluationTotalPropIndex] = evaluationTotalProp;
+  } else {
+    boardProperties.push(evaluationTotalProp);
+  }
 
-    if (existingEvaluationTotalPropIndex > -1) {
-      boardProperties[existingEvaluationTotalPropIndex] = evaluationTotalProp;
-    } else {
-      boardProperties.push(evaluationTotalProp);
-    }
+  const existingEvaluationAveragePropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluationAverage');
 
-    const existingEvaluationAveragePropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluationAverage');
-
-    if (existingEvaluationAveragePropIndex > -1) {
-      boardProperties[existingEvaluationAveragePropIndex] = evaluationAverageProp;
-    } else {
-      boardProperties.push(evaluationAverageProp);
-    }
+  if (existingEvaluationAveragePropIndex > -1) {
+    boardProperties[existingEvaluationAveragePropIndex] = evaluationAverageProp;
+  } else {
+    boardProperties.push(evaluationAverageProp);
   }
 
   formFields.forEach((formField) => {
