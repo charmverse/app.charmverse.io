@@ -5,6 +5,7 @@ FROM node:18.19.0-slim AS BASE_APP
 
 # useful for node-alpine
 # RUN apk add --no-cache libc6-compat git
+RUN apt update
 RUN apt install openssl -y
 
 WORKDIR /app
