@@ -1,5 +1,6 @@
-import { MenuItem, Select } from '@mui/material';
-import { litDaoChains } from 'connectors/chains';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import { builderDaoChains, litDaoChains } from 'connectors/chains';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
@@ -23,6 +24,7 @@ export function TokenGateDao() {
     reset
   } = useDaoForm();
   const check = watch('check');
+  const chain = watch('chain');
 
   const { setDisplayedPage, handleTokenGate } = useTokenGateModal();
 
@@ -39,6 +41,8 @@ export function TokenGateDao() {
     reset();
   };
 
+  const chains = check === 'builder' ? builderDaoChains : litDaoChains;
+
   return (
     <>
       <FieldWrapper label='Select a DAO Membership'>
@@ -46,7 +50,9 @@ export function TokenGateDao() {
           displayEmpty
           fullWidth
           renderValue={(selected) => daoCheck.find((c) => c.id === selected)?.name || selected || 'Select...'}
-          {...register('check')}
+          {...register('check', {
+            deps: ['chain']
+          })}
         >
           {daoCheck.map((type) => (
             <MenuItem key={type.id} value={type.id}>
@@ -55,14 +61,14 @@ export function TokenGateDao() {
           ))}
         </Select>
       </FieldWrapper>
-      {check === 'moloch' && (
-        <TokenGateBlockchainSelect
-          error={!!errors.chain?.message}
-          helperMessage={errors.chain?.message}
-          chains={litDaoChains}
-          {...register('chain')}
-        />
-      )}
+      <TokenGateBlockchainSelect
+        error={!!errors.chain?.message}
+        helperMessage={errors.chain?.message}
+        chains={chains}
+        {...register('chain', {
+          deps: ['check']
+        })}
+      />
       <TextInputField
         label='DAO Contract Address'
         error={errors.contract?.message}
