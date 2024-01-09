@@ -1,3 +1,5 @@
+import { prisma } from '@charmverse/core/prisma-client';
+
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
 import type { CardPropertyEntity } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
@@ -143,7 +145,48 @@ export async function publishBountyEvent(context: BountyEventContext) {
   }
 }
 
-type ProposalEventContext =
+type ProposalEventContext = {
+  userId: string;
+  spaceId: string;
+  proposalId: string;
+  currentEvaluationId: string;
+};
+
+export async function publishProposalEvent({ currentEvaluationId, proposalId, spaceId, userId }: ProposalEventContext) {
+  const proposalEvaluations = await prisma.proposalEvaluation.findMany({
+    where: {
+      proposalId
+    },
+    orderBy: {
+      index: 'asc'
+    },
+    select: {
+      index: true,
+      id: true,
+      result: true
+    }
+  });
+
+  const lastEvaluation = proposalEvaluations[proposalEvaluations.length - 1];
+
+  if (lastEvaluation.id === currentEvaluationId && lastEvaluation.result) {
+    await publishProposalEventBase({
+      proposalId,
+      scope: lastEvaluation.result === 'fail' ? WebhookEventNames.ProposalFailed : WebhookEventNames.ProposalPassed,
+      spaceId
+    });
+  } else {
+    await publishProposalEventBase({
+      currentEvaluationId,
+      proposalId,
+      spaceId,
+      userId,
+      scope: WebhookEventNames.ProposalStatusChanged
+    });
+  }
+}
+
+type ProposalEventBaseContext =
   | {
       scope: WebhookEventNames.ProposalPassed | WebhookEventNames.ProposalFailed;
       proposalId: string;
@@ -157,7 +200,7 @@ type ProposalEventContext =
       currentEvaluationId: string;
     };
 
-export async function publishProposalEvent(context: ProposalEventContext) {
+export async function publishProposalEventBase(context: ProposalEventBaseContext) {
   const [space, proposal] = await Promise.all([getSpaceEntity(context.spaceId), getProposalEntity(context.proposalId)]);
 
   switch (context.scope) {

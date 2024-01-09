@@ -7,7 +7,6 @@ import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/mi
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { publishProposal } from 'lib/proposal/publishProposal';
 import { withSessionRoute } from 'lib/session/withSession';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -58,7 +57,6 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
   if (proposalPage && currentEvaluationId) {
     await publishProposalEvent({
       proposalId,
-      scope: WebhookEventNames.ProposalStatusChanged,
       spaceId: proposalPage.spaceId,
       userId,
       currentEvaluationId

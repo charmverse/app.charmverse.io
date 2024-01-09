@@ -3,7 +3,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { isTruthy } from 'lib/utilities/types';
 import { getVotesByState } from 'lib/votes/getVotesByState';
 import { VOTE_STATUS } from 'lib/votes/interfaces';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 const updateVoteStatus = async () => {
@@ -101,7 +100,6 @@ const updateVoteStatus = async () => {
       const evaluation = passedEvaluations.find((e) => e.voteId === vote.id);
       if (vote.pageId && evaluation) {
         return publishProposalEvent({
-          scope: WebhookEventNames.ProposalStatusChanged,
           spaceId: vote.spaceId,
           proposalId: vote.pageId,
           currentEvaluationId: evaluation.id,

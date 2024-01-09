@@ -9,7 +9,7 @@ import { createReward } from 'lib/rewards/createReward';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
+import { publishProposalEvent, publishProposalEventBase } from 'lib/webhookPublisher/publishEvent';
 import { relay } from 'lib/websockets/relay';
 
 export async function createRewardsForProposal({ proposalId, userId }: { userId: string; proposalId: string }) {
@@ -123,7 +123,7 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
   );
 
   if (currentEvaluation) {
-    await publishProposalEvent({
+    await publishProposalEventBase({
       currentEvaluationId: currentEvaluation.id,
       proposalId: proposal.id,
       scope: WebhookEventNames.ProposalStatusChanged,

@@ -1,7 +1,6 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 import { createVoteIfNecessary } from './createVoteIfNecessary';
@@ -36,7 +35,6 @@ export async function submitEvaluationResult({
   await publishProposalEvent({
     currentEvaluationId: evaluationId,
     proposalId,
-    scope: WebhookEventNames.ProposalStatusChanged,
     spaceId,
     userId: decidedBy
   });
