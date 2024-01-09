@@ -24,6 +24,11 @@ export async function getProposalNotifications({ id, userId }: QueryCondition): 
           }
         }
       },
+      evaluation: {
+        select: {
+          title: true
+        }
+      },
       notificationMetadata: {
         select: notificationMetadataSelectStatement
       }
@@ -46,7 +51,8 @@ export async function getProposalNotifications({ id, userId }: QueryCondition): 
       type: notification.type,
       archived: !!notification.notificationMetadata.archivedAt,
       read: !!notification.notificationMetadata.seenAt,
-      group: 'proposal'
+      group: 'proposal',
+      evaluation: notification.evaluation
     } as ProposalNotification;
 
     return proposalNotification;

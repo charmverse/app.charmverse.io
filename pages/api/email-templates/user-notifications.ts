@@ -162,7 +162,7 @@ const createProposalNotification = ({
   status
 }: Pick<ProposalNotification, 'status' | 'spaceName' | 'pageTitle'>): ProposalNotification => {
   return {
-    type: 'reviewed',
+    type: 'proposal_passed',
     pagePath: randomName(),
     pageTitle,
     id: v4(),
@@ -175,7 +175,10 @@ const createProposalNotification = ({
     createdBy: dummyUser,
     archived: false,
     group: 'proposal',
-    read: false
+    read: false,
+    evaluation: {
+      title: 'Review'
+    }
   };
 };
 

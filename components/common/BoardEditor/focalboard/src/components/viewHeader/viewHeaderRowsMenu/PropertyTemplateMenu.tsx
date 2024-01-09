@@ -1,4 +1,4 @@
-import type { ProposalEvaluationResult } from '@charmverse/core/dist/cjs/prisma-client';
+import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
 
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
