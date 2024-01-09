@@ -25,3 +25,8 @@ export const nftCheck = [
   { id: 'group', name: 'Any NFT in this collection' },
   { id: 'individual', name: 'A specific token id' }
 ] as const;
+
+export const daoCheck = [
+  { id: 'moloch', name: 'MolochDAOv2.1' },
+  { id: 'builder', name: 'Builder Protocol' }
+] as const;
