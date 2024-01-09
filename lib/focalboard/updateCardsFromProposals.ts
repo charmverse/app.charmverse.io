@@ -17,7 +17,9 @@ import { relay } from 'lib/websockets/relay';
 
 import { createCardPage } from '../pages/createCardPage';
 
-import { proposalPropertyTypesList, type BoardFields } from './board';
+import { proposalPropertyTypesList } from './board';
+import type { IPropertyTemplate, BoardFields } from './board';
+import type { BoardViewFields } from './boardView';
 import type { CardFields, CardPropertyValue } from './card';
 import { DEFAULT_BOARD_BLOCK_ID } from './customBlocks/constants';
 import { generateResyncedProposalEvaluationForCard } from './generateResyncedProposalEvaluationForCard';
@@ -58,6 +60,105 @@ export async function updateCardsFromProposals({
     boardId,
     cardProperties: []
   });
+
+  const boardBlockCardPropertiesRecord: Record<string, IPropertyTemplate> = {};
+
+  boardBlock.fields.cardProperties.forEach((prop) => {
+    boardBlockCardPropertiesRecord[prop.id] = prop;
+  });
+
+  // Get the newly added proposal properties
+  const newlyAddedProposalProperties =
+    proposalBoardBlock?.fields.cardProperties.filter((prop) => !boardBlockCardPropertiesRecord[prop.id]) ?? [];
+
+  // Looping through proposal board block properties since its the source of truth for the properties
+  const proposalBoardPropertiesUpdated =
+    (newlyAddedProposalProperties.length > 0 ||
+      proposalBoardBlock?.fields.cardProperties.some((cardProperty) => {
+        const boardBlockCardProperty = boardBlockCardPropertiesRecord[cardProperty.id];
+        // If a new property was added to the proposal board block, we need to update the board block
+        if (!boardBlockCardProperty) {
+          return true;
+        }
+
+        // If a property was renamed in the proposal board block, we need to update the board block
+        if (boardBlockCardProperty.name !== cardProperty.name) {
+          return true;
+        }
+
+        // If a property type changed in the proposal board block, we need to update the board block
+        if (boardBlockCardProperty.type !== cardProperty.type) {
+          return true;
+        }
+
+        // Check if the options changed
+        if (JSON.stringify(boardBlockCardProperty.options) !== JSON.stringify(cardProperty.options)) {
+          return true;
+        }
+
+        return false;
+      })) ??
+    false;
+
+  if (proposalBoardPropertiesUpdated) {
+    // Existing custom properties that are not proposal properties
+    const nonProposalCustomProperties = boardBlock.fields.cardProperties.filter((prop) => !prop.proposalFieldId);
+    // Add the new proposal properties
+    proposalBoardBlock?.fields.cardProperties.forEach((cardProperty) => {
+      nonProposalCustomProperties.push({
+        ...cardProperty,
+        proposalFieldId: cardProperty.id
+      });
+    });
+
+    await prisma.block.update({
+      where: {
+        id: boardId
+      },
+      data: {
+        fields: {
+          ...boardBlock.fields,
+          cardProperties: nonProposalCustomProperties as any
+        }
+      }
+    });
+  }
+
+  // Add the newly added proposal properties to all the view blocks visiblePropertyIds
+  if (newlyAddedProposalProperties.length) {
+    const views = await prisma.block.findMany({
+      select: {
+        fields: true,
+        id: true
+      },
+      where: {
+        type: 'view',
+        parentId: boardId
+      }
+    });
+
+    await prisma.$transaction(
+      views.map((block) => {
+        return prisma.block.update({
+          where: { id: block.id },
+          data: {
+            fields: {
+              ...(block.fields as BoardViewFields),
+              // Hide the proposal evaluation type property from the view
+              visiblePropertyIds: [
+                ...new Set([
+                  ...(block.fields as BoardViewFields).visiblePropertyIds,
+                  ...newlyAddedProposalProperties.map((p) => p.id)
+                ])
+              ]
+            },
+            updatedAt: new Date(),
+            updatedBy: userId
+          }
+        });
+      })
+    );
+  }
 
   // Ideally all the views should have sourceType proposal when created, but there are views which doesn't have sourceType proposal even though they are created from proposal source
   if ((boardBlock.fields as any as BoardFields).sourceType !== 'proposals') {
