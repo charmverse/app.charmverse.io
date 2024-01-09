@@ -50,7 +50,7 @@ export function useAreaSelection({ readOnly = false, innerContainer }: UseAreaSe
 
   useEffect(() => {
     if (!container.current) {
-      container.current = document.body;
+      container.current = document.querySelector('.app-content');
     }
   }, []);
 
@@ -96,7 +96,7 @@ export function useAreaSelection({ readOnly = false, innerContainer }: UseAreaSe
       if (disableDragSelectionElement) return;
 
       if (container?.current && container.current.contains(e.target as HTMLElement)) {
-        document.addEventListener('mousemove', handleMouseMove);
+        container.current.addEventListener('mousemove', handleMouseMove);
         innerContainer.current?.addEventListener('scroll', handleScroll);
 
         setDrawArea({
@@ -116,7 +116,7 @@ export function useAreaSelection({ readOnly = false, innerContainer }: UseAreaSe
 
   const handleMouseUp = useCallback((e: MouseEvent) => {
     document.body.style.userSelect = 'initial';
-    document.removeEventListener('mousemove', handleMouseMove);
+    container.current?.removeEventListener('mousemove', handleMouseMove);
     innerContainer.current?.removeEventListener('scroll', handleScroll);
 
     setMouseDown(false);
@@ -145,11 +145,11 @@ export function useAreaSelection({ readOnly = false, innerContainer }: UseAreaSe
     if (containerElement && !readOnly) {
       containerElement.addEventListener('mousedown', handleMouseDown);
 
-      document.addEventListener('mouseup', handleMouseUp);
+      container.current?.addEventListener('mouseup', handleMouseUp);
 
       return () => {
         containerElement.removeEventListener('mousedown', handleMouseDown);
-        document.removeEventListener('mouseup', handleMouseUp);
+        container.current?.removeEventListener('mouseup', handleMouseUp);
       };
     }
   }, [container, readOnly]);
