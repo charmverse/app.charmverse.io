@@ -5,7 +5,6 @@
     "defaults"
   ],
   "scripts": {
-    "config:ceramic": "npx dotenv -e .env.local -- node --import tsx/esm lib/credentials/config/configure-node.ts",
     "ceramic:local": "CERAMIC_ENABLE_EXPERIMENTAL_COMPOSE_DB='true' npx ceramic daemon",
     "ceramic:graphql:local": "npx dotenv -e .env.local --  tsx --tsconfig ./tsconfig.ceramic.json  lib/credentials/config/run-deploy.ts",
     "build": "NODE_OPTIONS=\"--max_old_space_size=4096\" npx next build && npm run esbuild",

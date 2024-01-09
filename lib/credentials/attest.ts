@@ -4,9 +4,8 @@ import type {
   SignedOffchainAttestation
 } from '@ethereum-attestation-service/eas-sdk';
 import { Offchain, createOffchainURL } from '@ethereum-attestation-service/eas-sdk';
-import type { SignerOrProvider } from '@ethereum-attestation-service/eas-sdk/dist/transaction';
 import { getChainById } from 'connectors/chains';
-import { Wallet, providers, Signer, VoidSigner } from 'ethers';
+import { Wallet, providers } from 'ethers';
 
 import { credentialsWalletPrivateKey } from 'config/constants';
 import { getENSName } from 'lib/blockchain';
@@ -17,8 +16,7 @@ import type { PublishedSignedCredential } from './config/queriesAndMutations';
 import { publishSignedCredential } from './config/queriesAndMutations';
 import type { EasSchemaChain } from './connectors';
 import { easSchemaChains, getEasConnector, getEasInstance } from './connectors';
-import { EthersV5toV6WalletAdapter } from './ethersAdapter';
-import { encodeAttestion, type CredentialData, type CredentialType, getAttestationSchemaId } from './schemas';
+import { encodeAttestion, getAttestationSchemaId, type CredentialData, type CredentialType } from './schemas';
 
 type AttestationInput<T extends CredentialType = CredentialType> = {
   recipient: string;
