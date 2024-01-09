@@ -1,7 +1,7 @@
 import type { UnifiedAccessControlConditions } from '@lit-protocol/types';
 import { getChainById } from 'connectors/chains';
 
-import type { FormValues } from '../components/TokenGateDao';
+import type { FormValues } from '../hooks/useDaoForm';
 
 export function getDaoUnifiedAccessControlConditions(values: FormValues): UnifiedAccessControlConditions | undefined {
   const { chain, contract, check } = values;
