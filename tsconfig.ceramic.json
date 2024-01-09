@@ -7,7 +7,7 @@
   "ts-node": {
     "transpileOnly": true,
     "moduleTypes": {
-      "**/*.ts": "esm",
+      "**/*.ts": "esm", // This is in progress. We have a CJS / ESM issue with multiformats library imported by ceramic when running writeComposite & graphQl server. Currently can be overcome by setting package.json type to module. This tsconfig is a search for a better solution that works out of the box.
     }
   },
   "compilerOptions": {

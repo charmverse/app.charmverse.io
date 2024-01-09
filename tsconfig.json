@@ -58,5 +58,5 @@
     }
   },
   "exclude": ["node_modules"],
-  "include": ["**/*.ts", "**/*.tsx", "lib/credentials/config/run-deploy.mts"]
+  "include": ["**/*.ts", "**/*.tsx"]
 }
