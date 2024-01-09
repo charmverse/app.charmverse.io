@@ -23,19 +23,13 @@ export function getProposalAction({
   canComment: boolean;
 }): ProposalNotificationType | null {
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
-  const lastEvaluation = proposal.evaluations[proposal.evaluations.length - 1];
-  const previousEvaluation =
-    currentEvaluation?.index && currentEvaluation.index > 0 ? proposal.evaluations[currentEvaluation.index - 1] : null;
-
   if (!currentEvaluation || proposal.status === 'draft') {
     return null;
   }
 
-  const hasRewards = proposal.rewards.length > 0;
-
-  if (currentEvaluation.id === lastEvaluation.id && isAuthor) {
+  if (currentEvaluation.index === proposal.evaluations.length - 1 && isAuthor) {
     if (currentEvaluation.result === 'pass') {
-      return hasRewards ? 'reward_published' : 'proposal_passed';
+      return proposal.rewards.length > 0 ? 'reward_published' : 'proposal_passed';
     } else if (currentEvaluation.result === 'fail') {
       return 'proposal_failed';
     }
@@ -45,12 +39,12 @@ export function getProposalAction({
     return 'start_discussion';
   }
 
-  if (currentEvaluation.type === 'vote' && isVoter) {
-    return currentEvaluation.result === 'pass'
-      ? 'vote_passed'
-      : currentEvaluation.result === 'fail'
-      ? 'vote_failed'
-      : 'vote';
+  if (currentEvaluation.type === 'vote') {
+    if (currentEvaluation.result === null && isVoter) {
+      return 'vote';
+    } else if (currentEvaluation.result === 'fail' && (isAuthor || isVoter)) {
+      return 'vote_failed';
+    }
   }
 
   if (currentEvaluation.type === 'pass_fail' || currentEvaluation.type === 'rubric') {
@@ -63,14 +57,14 @@ export function getProposalAction({
     }
   }
 
+  const previousEvaluation = currentEvaluation.index > 0 ? proposal.evaluations[currentEvaluation.index - 1] : null;
+
   if (currentEvaluation.result === null && previousEvaluation) {
-    if (isAuthor) {
-      if (previousEvaluation.result === 'fail') {
-        return previousEvaluation.type === 'vote' ? 'vote_failed' : 'proposal_failed';
-      }
-      return previousEvaluation.type === 'vote' ? 'vote_passed' : 'step_passed';
-    } else if (isVoter && previousEvaluation.type === 'vote') {
+    if (previousEvaluation.type === 'vote' && (isAuthor || isVoter)) {
       return previousEvaluation.result === 'pass' ? 'vote_passed' : 'vote_failed';
+    }
+    if (isAuthor) {
+      return previousEvaluation.result === 'pass' ? 'step_passed' : null;
     }
   }
 
