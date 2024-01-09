@@ -6,7 +6,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
     class="variable variable"
   >
     <div
-      class="BoardComponent "
+      class="BoardComponent drag-area-container "
       data-test="database-container-1"
     >
       <div
@@ -716,7 +716,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
     class="variable variable"
   >
     <div
-      class="BoardComponent "
+      class="BoardComponent drag-area-container "
       data-test="database-container-1"
     >
       <div
@@ -1104,7 +1104,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
     class="variable variable"
   >
     <div
-      class="BoardComponent "
+      class="BoardComponent drag-area-container "
       data-test="database-container-1"
     >
       <div
@@ -1704,7 +1704,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
     class="variable variable"
   >
     <div
-      class="BoardComponent "
+      class="BoardComponent drag-area-container "
       data-test="database-container-1"
     >
       <div
