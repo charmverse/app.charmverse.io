@@ -102,7 +102,8 @@ export function SpaceAccessGate({
   const isVerified = summonGate.isVerified || tokenGate.isVerified || discordGate.isVerified;
   const isJoiningSpace = summonGate.joiningSpace || tokenGate.joiningSpace || discordGate.joiningSpace;
 
-  const noGateConditions = !discordGate.isEnabled && !summonGate.isEnabled && !tokenGate.isEnabled;
+  const noGateConditions =
+    !discordGate.isEnabled && !summonGate.isEnabled && !tokenGate.isEnabled && tokenGate.tokenGates?.length === 0;
 
   const hasRoles = tokenGate.tokenGateResult?.eligibleGates
     ?.map((gate) => gate.tokenGateId)
