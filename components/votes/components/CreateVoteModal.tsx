@@ -24,7 +24,7 @@ import { CharmEditor } from 'components/common/CharmEditor';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { NumericFieldWithButtons } from 'components/common/form/fields/NumericFieldWithButtons';
-import { PublishToSnapshot } from 'components/common/PageActions/components/SnapshotAction/PublishToSnapshot';
+import { PublishToSnapshot } from 'components/proposals/ProposalPage/components/EvaluationSidebar/components/VoteEvaluation/components/PublishToSnapshot/PublishToSnapshot';
 import { useVotes } from 'hooks/useVotes';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';

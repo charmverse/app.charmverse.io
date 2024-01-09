@@ -6,8 +6,9 @@ import { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 import { Button } from 'components/common/Button';
-import { DisplayChoiceScore } from 'components/proposals/components/SnapshotVoting/DisplayChoiceScore';
 import type { SnapshotProposal } from 'lib/snapshot/interfaces';
+
+import { DisplayChoiceScore } from './DisplayChoiceScore';
 
 type DragItem = {
   index: number;
