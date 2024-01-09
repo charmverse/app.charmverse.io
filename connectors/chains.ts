@@ -488,6 +488,10 @@ export const litDaoChains: IChainDetailsWithLit[] = litChains.filter((chain) =>
   ['ethereum', 'arbitrum', 'optimism', 'polygon'].includes(chain.litNetwork)
 );
 
+export const builderDaoChains: IChainDetailsWithLit[] = litChains.filter((chain) =>
+  ['ethereum', 'base', 'optimism', 'zora'].includes(chain.litNetwork)
+);
+
 export const unlockChains = RPCList.filter((chain) => !!chain.unlockNetwork).sort(sortChainList);
 
 export const hypersubChains = RPCList.filter((chain) => !!chain.hypersubNetwork).sort(sortChainList);
