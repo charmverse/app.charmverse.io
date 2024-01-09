@@ -14,12 +14,19 @@ import {
 import { InvalidStateError } from 'lib/middleware/errors';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-export async function setDatabaseProposalProperties({ boardId }: { boardId: string }): Promise<Board> {
+export async function setDatabaseProposalProperties({
+  boardId,
+  cardProperties
+}: {
+  boardId: string;
+  cardProperties: IPropertyTemplate[];
+}): Promise<Board> {
   const boardBlock = (await prisma.block.findUniqueOrThrow({
     where: {
       id: boardId
     }
   })) as any as Board;
+
   if (boardBlock.fields.sourceType !== 'proposals') {
     throw new InvalidStateError(`Cannot add proposal cards to a database which does not have proposals as its source`);
   }
@@ -66,7 +73,8 @@ export async function setDatabaseProposalProperties({ boardId }: { boardId: stri
   const boardProperties = getBoardProperties({
     evaluationStepTitles: Array.from(evaluationStepTitles),
     formFields,
-    boardBlock
+    boardBlock,
+    cardProperties
   });
 
   return prisma.block.update({
@@ -85,8 +93,10 @@ export async function setDatabaseProposalProperties({ boardId }: { boardId: stri
 export function getBoardProperties({
   boardBlock,
   formFields = [],
-  evaluationStepTitles = []
+  evaluationStepTitles = [],
+  cardProperties = []
 }: {
+  cardProperties?: IPropertyTemplate[];
   evaluationStepTitles?: string[];
   boardBlock: Board;
   formFields?: FormField[];
@@ -132,6 +142,19 @@ export function getBoardProperties({
   const evaluatedByProp = generateUpdatedProposalEvaluatedByProperty({ boardProperties });
   const evaluationTotalProp = generateUpdatedProposalEvaluationTotalProperty({ boardProperties });
   const evaluationAverageProp = generateUpdatedProposalEvaluationAverageProperty({ boardProperties });
+
+  cardProperties.forEach((cardProp) => {
+    const existingPropIndex = boardProperties.findIndex((p) => p.id === cardProp.id);
+
+    if (existingPropIndex > -1) {
+      boardProperties[existingPropIndex] = { ...cardProp, proposalFieldId: cardProp.id };
+    } else {
+      boardProperties.push({
+        ...cardProp,
+        proposalFieldId: cardProp.id
+      });
+    }
+  });
 
   const existingEvaluatedByPropPropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluatedBy');
 

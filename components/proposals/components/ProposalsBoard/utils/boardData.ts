@@ -27,7 +27,7 @@ export function getDefaultBoard({
   customOnly = false,
   evaluationStepTitles
 }: {
-  storedBoard: ProposalBoardBlock | undefined;
+  storedBoard?: ProposalBoardBlock | undefined;
   customOnly?: boolean;
   evaluationStepTitles: string[];
 }) {
