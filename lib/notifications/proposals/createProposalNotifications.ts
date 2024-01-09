@@ -6,7 +6,6 @@ import { permissionsApiClient } from 'lib/permissions/api/client';
 import { getProposalAction } from 'lib/proposal/getProposalAction';
 import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 import type { NotificationToggles } from '../notificationToggles';
 import { saveProposalNotification } from '../saveNotification';
@@ -105,14 +104,10 @@ export async function createProposalNotifications(webhookData: {
         }
 
         const isAuthor = proposalAuthorIds.includes(spaceRole.userId);
-        const isReviewer = (proposalPermissions.review || proposalPermissions.evaluate) && proposalPermissions.view;
-        const isVoter = proposalPermissions.vote && proposalPermissions.view;
+        const isReviewer = proposalPermissions.review || proposalPermissions.evaluate;
+        // New proposal permissions .vote is invalid
+        const isVoter = proposalPermissions.evaluate;
         const canComment = proposalPermissions.comment && proposalPermissions.view;
-        const lastEvaluation = proposal.evaluations[proposal.evaluations.length - 1];
-        const previousEvaluation =
-          currentEvaluation?.index && currentEvaluation.index > 0 && currentEvaluation.id !== lastEvaluation.id
-            ? proposal.evaluations[currentEvaluation.index - 1]
-            : null;
 
         const action = getProposalAction({
           isAuthor,
@@ -139,8 +134,7 @@ export async function createProposalNotifications(webhookData: {
           spaceId,
           userId: spaceRole.userId,
           type: action,
-          evaluationId:
-            action === 'proposal_failed' && previousEvaluation ? previousEvaluation.id : currentEvaluation.id
+          evaluationId: currentEvaluation.id
         });
 
         ids.push(id);

@@ -4,6 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { isTestEnv } from 'config/constants';
 import { addMessageToSQS } from 'lib/aws/SQS';
+import { createNotificationsFromEvent } from 'lib/notifications/createNotificationsFromEvent';
 import type { WebhookEvent, WebhookPayload } from 'lib/webhookPublisher/interfaces';
 
 const SQS_QUEUE_NAME = process.env.SQS_WEBHOOK_PUBLISHER_QUEUE_NAME;
@@ -64,6 +65,8 @@ export async function publishWebhookEvent(spaceId: string, event: WebhookEvent) 
       webhookPayload.webhookURL = subscription.space.webhookSubscriptionUrl;
       webhookPayload.signingSecret = subscription.space.webhookSigningSecret;
     }
+
+    await createNotificationsFromEvent(webhookPayload);
 
     // Add the message to the queue
     if (event.scope === 'document.mention.created') {

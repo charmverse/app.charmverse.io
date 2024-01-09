@@ -208,7 +208,7 @@ function getProposalContent(n: ProposalNotification, actorUsername?: string): st
       return `Your proposal reward has been created`;
     }
     case 'proposal_passed': {
-      return `Your proposal has been passed`;
+      return `Your proposal has passed`;
     }
     case 'proposal_failed': {
       return `Your proposal has failed in ${n.evaluation?.title ?? 'current step'}`;

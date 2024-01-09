@@ -175,15 +175,15 @@ export async function publishProposalEvent({ currentEvaluationId, proposalId, sp
       scope: lastEvaluation.result === 'fail' ? WebhookEventNames.ProposalFailed : WebhookEventNames.ProposalPassed,
       spaceId
     });
-  } else {
-    await publishProposalEventBase({
-      currentEvaluationId,
-      proposalId,
-      spaceId,
-      userId,
-      scope: WebhookEventNames.ProposalStatusChanged
-    });
   }
+
+  await publishProposalEventBase({
+    currentEvaluationId,
+    proposalId,
+    spaceId,
+    userId,
+    scope: WebhookEventNames.ProposalStatusChanged
+  });
 }
 
 type ProposalEventBaseContext =

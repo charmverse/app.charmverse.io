@@ -32,13 +32,6 @@ export async function submitEvaluationResult({
     }
   });
 
-  await publishProposalEvent({
-    currentEvaluationId: evaluationId,
-    proposalId,
-    spaceId,
-    userId: decidedBy
-  });
-
   // determine if we should create vote for the next stage
   if (result === 'pass') {
     await createVoteIfNecessary({
@@ -46,4 +39,11 @@ export async function submitEvaluationResult({
       proposalId
     });
   }
+
+  await publishProposalEvent({
+    currentEvaluationId: evaluationId,
+    proposalId,
+    spaceId,
+    userId: decidedBy
+  });
 }

@@ -57,12 +57,12 @@ export function getProposalAction({
 
   const previousEvaluation = currentEvaluation.index > 0 ? proposal.evaluations[currentEvaluation.index - 1] : null;
 
-  if (currentEvaluation.result === null && previousEvaluation) {
-    if (previousEvaluation.type === 'vote' && (isAuthor || isVoter) && previousEvaluation.result === 'pass') {
+  if (currentEvaluation.result === null && previousEvaluation && previousEvaluation.result === 'pass') {
+    if (previousEvaluation.type === 'vote' && (isAuthor || isVoter)) {
       return 'vote_passed';
     }
     if (isAuthor) {
-      return previousEvaluation.result === 'pass' ? 'step_passed' : null;
+      return 'step_passed';
     }
   }
 
