@@ -173,8 +173,7 @@ describe('getCSVColumns()', () => {
     const board = createMockBoard();
     board.fields.cardProperties = [];
     const boardProperties = getBoardProperties({
-      boardBlock: board,
-      spaceUsesRubrics: true
+      boardBlock: board
     });
 
     board.fields.cardProperties = boardProperties;
@@ -193,7 +192,7 @@ describe('getCSVColumns()', () => {
       id: uuid()
     };
     const { fields } = generateResyncedProposalEvaluationForCard({
-      proposalEvaluationType: 'rubric',
+      currentStep: { id: 'step_1', type: 'rubric' },
       cardProps: { fields: { properties } },
       databaseProperties,
       rubricCriteria: [criteria],

@@ -7,7 +7,6 @@ import { stringUtils } from '@charmverse/core/utilities';
 import { prismaToBlock } from 'lib/focalboard/block';
 import { canAccessPrivateFields } from 'lib/proposal/form/canAccessPrivateFields';
 import { getCurrentStep } from 'lib/proposal/getCurrentStep';
-import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
 import type { ProposalFields } from 'lib/proposal/interface';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
@@ -245,13 +244,13 @@ export async function createCardsFromProposals({
       proposalId: pageProposal.proposal!.id
     });
 
-    if (pageProposal?.proposal?.evaluationType === 'rubric') {
+    if (currentStep?.step === 'rubric') {
       const criteria = mappedRubricCriteriaByProposal[pageProposal.id] ?? [];
       const answers = mappedRubricAnswersByProposal[pageProposal.id] ?? [];
 
       const updatedCardShape = generateResyncedProposalEvaluationForCard({
-        proposalEvaluationType: pageProposal.proposal.evaluationType,
         cardProps: { fields: properties },
+        currentStep: { id: currentStep.id, type: currentStep.step },
         databaseProperties: databaseProposalProps,
         rubricCriteria: criteria as ProposalRubricCriteriaWithTypedParams[],
         rubricAnswers: answers as ProposalRubricCriteriaAnswerWithTypedResponse[]

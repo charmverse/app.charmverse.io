@@ -27,8 +27,8 @@ export type AggregateResults = {
 
 export type AnswerData = Pick<
   ProposalRubricCriteriaAnswerWithTypedResponse,
-  'comment' | 'userId' | 'response' | 'rubricCriteriaId' | 'evaluationId'
->;
+  'comment' | 'userId' | 'response' | 'rubricCriteriaId'
+> & { evaluationId?: string | null };
 
 export function aggregateResults({
   criteria,
