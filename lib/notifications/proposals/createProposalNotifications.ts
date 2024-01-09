@@ -95,21 +95,19 @@ export async function createProposalNotifications(webhookData: {
         if (spaceRole.userId === userId) {
           continue;
         }
-        const proposalPermissionsRecord = await permissionsApiClient.proposals.computeAllProposalEvaluationPermissions({
+        const proposalPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
           resourceId: proposalId,
           userId: spaceRole.userId
         });
 
-        const currentEvaluationPermissions = proposalPermissionsRecord[currentEvaluationId];
-
-        if (!currentEvaluationPermissions.view) {
+        if (!proposalPermissions.view) {
           continue;
         }
 
         const isAuthor = proposalAuthorIds.includes(spaceRole.userId);
-        const isReviewer = currentEvaluationPermissions.review || currentEvaluationPermissions.evaluate;
-        const isVoter = currentEvaluationPermissions.vote && currentEvaluationPermissions.view;
-        const canComment = currentEvaluationPermissions.comment && currentEvaluationPermissions.view;
+        const isReviewer = (proposalPermissions.review || proposalPermissions.evaluate) && proposalPermissions.view;
+        const isVoter = proposalPermissions.vote && proposalPermissions.view;
+        const canComment = proposalPermissions.comment && proposalPermissions.view;
         const lastEvaluation = proposal.evaluations[proposal.evaluations.length - 1];
         const previousEvaluation =
           currentEvaluation?.index && currentEvaluation.index > 0 && currentEvaluation.id !== lastEvaluation.id
@@ -145,19 +143,6 @@ export async function createProposalNotifications(webhookData: {
             action === 'proposal_failed' && previousEvaluation ? previousEvaluation.id : currentEvaluation.id
         });
 
-        if (action === 'proposal_passed') {
-          await publishProposalEvent({
-            proposalId,
-            scope: WebhookEventNames.ProposalPassed,
-            spaceId
-          });
-        } else if (action === 'proposal_failed') {
-          await publishProposalEvent({
-            proposalId,
-            scope: WebhookEventNames.ProposalFailed,
-            spaceId
-          });
-        }
         ids.push(id);
       }
 

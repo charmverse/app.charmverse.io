@@ -212,59 +212,6 @@ describe('getProposalAction', () => {
     expect(voterAction).toBe('vote');
   });
 
-  it(`Should return 'vote_failed' if current step is vote, vote has failed and user can vote or is an author`, async () => {
-    const { space, user } = await testUtilsUser.generateUserAndSpace();
-    const proposal = await testUtilsProposals.generateProposal({
-      spaceId: space.id,
-      userId: user.id,
-      proposalStatus: 'published'
-    });
-
-    const proposalWithEvaluation: ProposalWithEvaluation = {
-      ...proposal,
-      rewards: [],
-      evaluations: [
-        {
-          id: v4(),
-          index: 0,
-          type: 'feedback',
-          result: 'pass'
-        },
-        {
-          id: v4(),
-          index: 1,
-          type: 'vote',
-          result: 'fail'
-        },
-        {
-          id: v4(),
-          index: 1,
-          type: 'rubric',
-          result: null
-        }
-      ]
-    };
-
-    const voterAction = getProposalAction({
-      proposal: proposalWithEvaluation,
-      isAuthor: false,
-      isReviewer: false,
-      isVoter: true,
-      canComment: false
-    });
-
-    const authorAction = getProposalAction({
-      proposal: proposalWithEvaluation,
-      isAuthor: true,
-      isReviewer: false,
-      isVoter: false,
-      canComment: false
-    });
-
-    expect(voterAction).toBe('vote_failed');
-    expect(authorAction).toBe('vote_failed');
-  });
-
   it(`Should return 'review_required' if current step is reviewable, review is not yet completed and user is an reviewer`, async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace();
     const proposal = await testUtilsProposals.generateProposal({
@@ -394,53 +341,6 @@ describe('getProposalAction', () => {
 
     expect(authorAction).toBe('vote_passed');
     expect(voterAction).toBe('vote_passed');
-  });
-
-  it(`Should return 'vote_failed' if current step is in progress, previous step is vote, vote has failed and user is an author`, async () => {
-    const { space, user } = await testUtilsUser.generateUserAndSpace();
-    const proposal = await testUtilsProposals.generateProposal({
-      spaceId: space.id,
-      userId: user.id,
-      proposalStatus: 'published'
-    });
-
-    const proposalWithEvaluation: ProposalWithEvaluation = {
-      ...proposal,
-      rewards: [],
-      evaluations: [
-        {
-          id: v4(),
-          index: 0,
-          type: 'vote',
-          result: 'fail'
-        },
-        {
-          id: v4(),
-          index: 1,
-          type: 'rubric',
-          result: null
-        }
-      ]
-    };
-
-    const authorAction = getProposalAction({
-      proposal: proposalWithEvaluation,
-      isAuthor: true,
-      isReviewer: false,
-      isVoter: false,
-      canComment: false
-    });
-
-    const voterAction = getProposalAction({
-      proposal: proposalWithEvaluation,
-      isAuthor: false,
-      isReviewer: false,
-      isVoter: true,
-      canComment: false
-    });
-
-    expect(authorAction).toBe('vote_failed');
-    expect(voterAction).toBe('vote_failed');
   });
 
   it(`Should return 'step_passed' if current step is in progress, previous step has passed and user is an author`, async () => {

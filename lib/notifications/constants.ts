@@ -16,7 +16,6 @@ export const proposalNotificationTypes = [
   'review_required',
   'vote',
   'vote_passed',
-  'vote_failed',
   'reward_published',
   'proposal_passed',
   'step_passed',

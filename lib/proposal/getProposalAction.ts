@@ -42,8 +42,6 @@ export function getProposalAction({
   if (currentEvaluation.type === 'vote') {
     if (currentEvaluation.result === null && isVoter) {
       return 'vote';
-    } else if (currentEvaluation.result === 'fail' && (isAuthor || isVoter)) {
-      return 'vote_failed';
     }
   }
 
@@ -60,8 +58,8 @@ export function getProposalAction({
   const previousEvaluation = currentEvaluation.index > 0 ? proposal.evaluations[currentEvaluation.index - 1] : null;
 
   if (currentEvaluation.result === null && previousEvaluation) {
-    if (previousEvaluation.type === 'vote' && (isAuthor || isVoter)) {
-      return previousEvaluation.result === 'pass' ? 'vote_passed' : 'vote_failed';
+    if (previousEvaluation.type === 'vote' && (isAuthor || isVoter) && previousEvaluation.result === 'pass') {
+      return 'vote_passed';
     }
     if (isAuthor) {
       return previousEvaluation.result === 'pass' ? 'step_passed' : null;

@@ -204,9 +204,6 @@ function getProposalContent(n: ProposalNotification, actorUsername?: string): st
     case 'vote_passed': {
       return `The vote on ${n.pageTitle} has passed. View results.`;
     }
-    case 'vote_failed': {
-      return `The vote on ${n.pageTitle} has failed. View results.`;
-    }
     case 'reward_published': {
       return `Your proposal reward has been created`;
     }
