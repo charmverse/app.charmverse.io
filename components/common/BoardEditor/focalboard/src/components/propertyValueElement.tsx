@@ -39,11 +39,7 @@ import {
 } from 'lib/focalboard/proposalDbProperties';
 import { PROPOSAL_STATUS_BLOCK_ID, PROPOSAL_STEP_BLOCK_ID } from 'lib/proposal/blocks/constants';
 import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
-import type {
-  ProposalEvaluationResultExtended,
-  ProposalEvaluationStep,
-  ProposalWithUsersLite
-} from 'lib/proposal/interface';
+import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from 'lib/proposal/interface';
 import {
   REWARDS_APPLICANTS_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
@@ -162,8 +158,8 @@ function PropertyValueElement(props: Props) {
   const intl = useIntl();
   const propertyValue = card.fields.properties[propertyTemplate.id];
   const cardProperties = board.fields.cardProperties;
-  const readOnly =
-    props.readOnly || !!cardProperties.find((cardProperty) => cardProperty.id === propertyTemplate.id)?.formFieldId;
+  const cardProperty = cardProperties.find((_cardProperty) => _cardProperty.id === propertyTemplate.id);
+  const readOnly = props.readOnly || !!cardProperty?.formFieldId || !!cardProperty?.proposalFieldId;
 
   const displayValue = OctoUtils.propertyDisplayValue({
     block: card,
@@ -206,7 +202,7 @@ function PropertyValueElement(props: Props) {
     }
 
     const evaluationTypeProperty = board.fields.cardProperties.find(
-      (cardProperty) => cardProperty.type === 'proposalEvaluationType'
+      (_cardProperty) => _cardProperty.type === 'proposalEvaluationType'
     );
     const evaluationType = card.fields.properties[evaluationTypeProperty?.id ?? ''] as ProposalEvaluationStep;
     const proposalEvaluationStatus = getProposalEvaluationStatus({

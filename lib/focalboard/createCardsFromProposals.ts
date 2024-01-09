@@ -5,9 +5,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
 import { prismaToBlock } from 'lib/focalboard/block';
+import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposal/blocks/constants';
 import { canAccessPrivateFields } from 'lib/proposal/form/canAccessPrivateFields';
 import { getCurrentStep } from 'lib/proposal/getCurrentStep';
-import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
 import type { ProposalFields } from 'lib/proposal/interface';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
@@ -18,7 +18,7 @@ import { relay } from 'lib/websockets/relay';
 
 import { createCardPage } from '../pages/createCardPage';
 
-import type { BoardFields } from './board';
+import { proposalPropertyTypesList, type BoardFields } from './board';
 import type { BoardViewFields } from './boardView';
 import { extractDatabaseProposalProperties } from './extractDatabaseProposalProperties';
 import { generateResyncedProposalEvaluationForCard } from './generateResyncedProposalEvaluationForCard';
@@ -39,6 +39,19 @@ export async function createCardsFromProposals({
   } else if (!stringUtils.isUUID(boardId)) {
     throw new InvalidInputError('Invalid boardId');
   }
+
+  const proposalBoardBlock = (await prisma.proposalBlock.findUnique({
+    where: {
+      id_spaceId: {
+        id: DEFAULT_BOARD_BLOCK_ID,
+        spaceId
+      }
+    },
+    select: {
+      fields: true
+    }
+  })) as null | { fields: BoardFields };
+
   await prisma.space.findUniqueOrThrow({
     where: {
       id: spaceId
@@ -110,7 +123,8 @@ export async function createCardsFromProposals({
   });
 
   const boardBlock = await setDatabaseProposalProperties({
-    boardId
+    boardId,
+    cardProperties: proposalBoardBlock?.fields.cardProperties ?? []
   });
 
   const views = await prisma.block.findMany({
@@ -208,6 +222,16 @@ export async function createCardsFromProposals({
     if (proposalProps.proposalUrl) {
       properties[proposalProps.proposalUrl.id] = pageProposal.path;
     }
+
+    boardBlock.fields.cardProperties.forEach((cardProperty) => {
+      if (!proposalPropertyTypesList.includes(cardProperty.type as any)) {
+        const proposalFieldValue = (pageProposal.proposal?.fields as ProposalFields)?.properties?.[cardProperty.id];
+        if (proposalFieldValue) {
+          properties[cardProperty.id] = proposalFieldValue as BoardPropertyValue;
+        }
+      }
+    });
+
     const currentStep = pageProposal.proposal
       ? getCurrentStep({
           evaluations: pageProposal.proposal.evaluations,
