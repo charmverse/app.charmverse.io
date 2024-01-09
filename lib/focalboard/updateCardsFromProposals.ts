@@ -17,7 +17,9 @@ import { relay } from 'lib/websockets/relay';
 
 import { createCardPage } from '../pages/createCardPage';
 
-import type { BoardFields } from './board';
+import { proposalPropertyTypesList, type BoardFields } from './board';
+import type { CardFields, CardPropertyValue } from './card';
+import { DEFAULT_BOARD_BLOCK_ID } from './customBlocks/constants';
 import { generateResyncedProposalEvaluationForCard } from './generateResyncedProposalEvaluationForCard';
 import { setDatabaseProposalProperties } from './setDatabaseProposalProperties';
 import { updateCardFormFieldPropertiesValue } from './updateCardFormFieldPropertiesValue';
@@ -40,9 +42,23 @@ export async function updateCardsFromProposals({
     });
   }
 
+  const proposalBoardBlock = (await prisma.proposalBlock.findUnique({
+    where: {
+      id_spaceId: {
+        id: DEFAULT_BOARD_BLOCK_ID,
+        spaceId
+      }
+    },
+    select: {
+      fields: true
+    }
+  })) as null | { fields: BoardFields };
+
   const boardBlock = await setDatabaseProposalProperties({
-    boardId
+    boardId,
+    cardProperties: []
   });
+
   // Ideally all the views should have sourceType proposal when created, but there are views which doesn't have sourceType proposal even though they are created from proposal source
   if ((boardBlock.fields as any as BoardFields).sourceType !== 'proposals') {
     throw new InvalidStateError('Database not configured to use proposals as a source');
@@ -222,6 +238,17 @@ export async function updateCardsFromProposals({
           databaseProperties: databaseProposalProps
         });
 
+      let hasCustomPropertyValueChanged = false;
+      const cardProperties = (card.block.fields as CardFields).properties;
+      boardBlock.fields.cardProperties.forEach((prop) => {
+        const proposalFieldValue = (pageWithProposal.proposal?.fields as ProposalFields)?.properties?.[prop.id];
+        const cardFieldValue = cardProperties[prop.id];
+        if (proposalFieldValue !== cardFieldValue) {
+          hasCustomPropertyValueChanged = true;
+          cardProperties[prop.id] = proposalFieldValue as CardPropertyValue;
+        }
+      });
+
       if (
         // For now, always recalculate rubrics. We can optimise further later
         pageWithProposal.proposal?.evaluationType === 'rubric' ||
@@ -240,7 +267,8 @@ export async function updateCardsFromProposals({
               ?.id) ||
         (!pageWithProposal.proposal?.archived &&
           cardProposalStep?.optionId !==
-            databaseProposalProps.proposalStep?.options.find((opt) => opt.value === proposalEvaluationStep)?.id)
+            databaseProposalProps.proposalStep?.options.find((opt) => opt.value === proposalEvaluationStep)?.id) ||
+        hasCustomPropertyValueChanged
       ) {
         const newProps = {
           ...(card.block.fields as any).properties,
@@ -320,6 +348,17 @@ export async function updateCardsFromProposals({
       if (databaseProposalProps.proposalStep) {
         properties[databaseProposalProps.proposalStep.id] = proposalEvaluationStep ?? '';
       }
+
+      boardBlock.fields.cardProperties.forEach((cardProperty) => {
+        if (!proposalPropertyTypesList.includes(cardProperty.type as any)) {
+          const proposalFieldValue = (pageWithProposal.proposal?.fields as ProposalFields).properties?.[
+            cardProperty.id
+          ];
+          if (proposalFieldValue) {
+            properties[cardProperty.id] = proposalFieldValue as BoardPropertyValue;
+          }
+        }
+      });
 
       const createdAt = pageWithProposal.createdAt;
       if (pageWithProposal.proposal?.evaluationType) {
