@@ -1,20 +1,20 @@
+import type { Space } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { getSpaceWithTokenGates } from 'lib/spaces/getSpaceWithTokenGates';
-import type { SpaceWithGates } from 'lib/spaces/interfaces';
+import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
 import { replaceS3Domain } from 'lib/utilities/url';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.get(requireKeys([{ key: 'search', valueType: 'truthy' }], 'query'), getSpaceInfoController);
 
-async function getSpaceInfoController(req: NextApiRequest, res: NextApiResponse<SpaceWithGates | null>) {
+async function getSpaceInfoController(req: NextApiRequest, res: NextApiResponse<Space | null>) {
   const { search } = req.query;
 
-  const publicSpace = await getSpaceWithTokenGates(search as string);
+  const publicSpace = await getSpaceByDomain(search as string);
 
   if (publicSpace?.spaceImage) {
     publicSpace.spaceImage = replaceS3Domain(publicSpace.spaceImage);
