@@ -9,7 +9,7 @@ import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 
-const excludedPageTypes: (PageType | undefined)[] = ['bounty_template'];
+const excludedPageTypes: (PageType | undefined)[] = ['bounty_template', 'proposal'];
 
 export function DuplicatePageAction({
   pageId,
