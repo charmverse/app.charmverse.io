@@ -21,7 +21,6 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
 
   const spaceId = req.query.id as string;
   const { archived, limit, search } = req.query as any as PagesRequest;
-
   const accessiblePageIds = await permissionsApiClient.pages.getAccessiblePageIds({
     spaceId,
     userId,
@@ -29,7 +28,6 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
     limit,
     search
   });
-
   const pages: PageMeta[] = await prisma.page.findMany({
     where: {
       spaceId,
@@ -69,7 +67,7 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
     page.headerImage = replaceS3Domain(page.headerImage);
     page.icon = replaceS3Domain(page.icon);
     for (const [key, value] of Object.entries(page)) {
-      if (value === null) {
+      if (value === null || page[key as keyof PageMeta] === '') {
         delete page[key as keyof PageMeta];
       }
     }
