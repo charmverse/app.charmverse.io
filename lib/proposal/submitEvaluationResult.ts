@@ -11,7 +11,6 @@ export type ReviewEvaluationRequest = {
   proposalId: string;
   evaluationId: string;
   result: ProposalEvaluationResult;
-  spaceId: string;
 };
 
 export async function submitEvaluationResult({
@@ -20,7 +19,9 @@ export async function submitEvaluationResult({
   proposalId,
   result,
   spaceId
-}: ReviewEvaluationRequest) {
+}: ReviewEvaluationRequest & {
+  spaceId: string;
+}) {
   await prisma.proposalEvaluation.update({
     where: {
       id: evaluationId
