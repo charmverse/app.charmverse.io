@@ -1,11 +1,6 @@
 import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalReviewer } from '@charmverse/core/prisma';
-import {
-  ProposalEvaluationResult,
-  type FormField,
-  type Proposal,
-  type ProposalEvaluation
-} from '@charmverse/core/prisma-client';
+import { type FormField, type Proposal, type ProposalEvaluation } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { sortBy } from 'lodash';

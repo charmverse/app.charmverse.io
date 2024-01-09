@@ -1,5 +1,6 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import type { TargetPermissionGroup } from '@charmverse/core/permissions';
+import { objectUtils } from '@charmverse/core/utilities';
 import { useMemo, useState } from 'react';
 
 import { sortCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
@@ -17,13 +18,15 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
 import { Constants } from 'lib/focalboard/constants';
+import { PROPOSAL_STEP_LABELS } from 'lib/focalboard/proposalDbProperties';
 import {
   AUTHORS_BLOCK_ID,
   CREATED_AT_ID,
   DEFAULT_VIEW_BLOCK_ID,
   PROPOSAL_STEP_BLOCK_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID,
-  PROPOSAL_STATUS_BLOCK_ID
+  PROPOSAL_STATUS_BLOCK_ID,
+  PROPOSAL_EVALUATION_TYPE_ID
 } from 'lib/proposal/blocks/constants';
 import type { ProposalPropertyValue } from 'lib/proposal/blocks/interfaces';
 import type { ProposalFields, ProposalWithUsersLite } from 'lib/proposal/interface';
@@ -103,9 +106,23 @@ export function useProposalsBoardAdapter() {
     // filter cards by active view filter
     if (filter) {
       const cardsRaw = cards.map((cp) => cp.card);
-      const filteredCardsIds = CardFilter.applyFilterGroup(filter, board.fields.cardProperties, cardsRaw).map(
-        (c) => c.id
-      );
+      const filteredCardsIds = CardFilter.applyFilterGroup(
+        filter,
+        [
+          ...board.fields.cardProperties,
+          {
+            id: PROPOSAL_EVALUATION_TYPE_ID,
+            name: 'Evaluation Type',
+            options: objectUtils.typedKeys(PROPOSAL_STEP_LABELS).map((evaluationType) => ({
+              color: 'propColorGray',
+              id: evaluationType,
+              value: evaluationType
+            })),
+            type: 'proposalEvaluationType'
+          }
+        ],
+        cardsRaw
+      ).map((c) => c.id);
 
       cards = cards.filter((cp) => filteredCardsIds.includes(cp.card.id));
     }
@@ -181,6 +198,7 @@ function mapProposalToCardPage({
     [PROPOSAL_STATUS_BLOCK_ID]: proposal?.currentStep?.result ?? 'in_progress',
     [AUTHORS_BLOCK_ID]: (proposal && 'authors' in proposal && proposal.authors?.map((a) => a.userId)) || '',
     [PROPOSAL_STEP_BLOCK_ID]: proposal?.currentStep?.title ?? 'Draft',
+    [PROPOSAL_EVALUATION_TYPE_ID]: proposal?.currentStep?.step ?? 'draft',
     [PROPOSAL_REVIEWERS_BLOCK_ID]:
       proposal && 'reviewers' in proposal
         ? proposal.reviewers.map(
