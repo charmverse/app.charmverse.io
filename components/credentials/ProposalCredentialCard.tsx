@@ -1,3 +1,4 @@
+import { Tooltip } from '@mui/material';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
@@ -9,6 +10,7 @@ import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
 import type { PublishedSignedCredential } from 'lib/credentials/config/queriesAndMutations';
 import type { ProposalCredential } from 'lib/credentials/schemas';
+import { shortWalletAddress } from 'lib/utilities/blockchain';
 
 type Props = {
   credential: PublishedSignedCredential;
@@ -20,34 +22,38 @@ export function ProposalCredentialCard({ credential }: Props) {
   return (
     <Card sx={{ minWidth: 275 }}>
       <CardContent>
-        <Grid container>
-          <Grid item>
-            <Typography sx={{ fontSize: 14 }} color='text.secondary' gutterBottom>
-              Credential issued by {credential.issuer}
-            </Typography>
+        <Grid container display='flex' flexDirection='column'>
+          <Grid item xs>
+            <Tooltip title={credential.issuer}>
+              <Typography
+                display='flex'
+                sx={{ fontSize: 14, width: 'fit-content' }}
+                color='text.secondary'
+                gutterBottom
+              >
+                Credential issued by {shortWalletAddress(credential.issuer)}
+              </Typography>
+            </Tooltip>
           </Grid>
-          <Grid item>
+          <Grid item xs>
             <Typography variant='body2'>
               <b>Organization:</b> {content.organization}
             </Typography>
           </Grid>
-          <Grid item>
+          <Grid item xs>
             <Typography variant='body2'>
               <b>Name:</b> {content.name}
             </Typography>
           </Grid>
-          <Grid item>
+          <Grid item xs>
             <Typography variant='body2'>
               <b>Description:</b> {content.description}
             </Typography>
           </Grid>
-          <Grid item>
+          <Grid item xs>
             <Typography variant='body2'>
               <b>Status:</b> {content.status}
             </Typography>
-          </Grid>
-          <Grid item>
-            <Link>{credential.verificationUrl}</Link>
           </Grid>
         </Grid>
       </CardContent>

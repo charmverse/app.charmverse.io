@@ -1,4 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
@@ -17,6 +18,8 @@ import type { SignedCredential } from 'lib/credentials/attest';
 import type { PublishedSignedCredential } from 'lib/credentials/config/queriesAndMutations';
 import type { ProposalCredential } from 'lib/credentials/schemas';
 import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
+
+import { ProposalCredentialCard } from './ProposalCredentialCard';
 
 const schema = yup.object({
   name: yup.string().required(),
@@ -144,11 +147,11 @@ export function ProposalCredentialForm() {
         </Stack>
       </form>
       <Divider />
-      {/* {signedAttestation && (
+      {signedAttestation && (
         <Box sx={{ maxWidth: '400px' }}>
           <ProposalCredentialCard credential={signedAttestation} />
         </Box>
-      )} */}
+      )}
     </>
   );
 }
