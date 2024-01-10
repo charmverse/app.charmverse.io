@@ -1,4 +1,4 @@
-import type { Block, Page, PageType, Prisma } from '@charmverse/core/prisma';
+import type { Block, Page, PagePermission, PageType, Prisma } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import type { BoardFields, DataSourceType, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
