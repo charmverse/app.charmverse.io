@@ -51,6 +51,15 @@ export async function updateCardsFromProposals({
     });
   }
 
+  const rootPagePermissions = await prisma.page.findFirstOrThrow({
+    where: {
+      id: boardId
+    },
+    select: {
+      permissions: true
+    }
+  });
+
   const proposalBoardBlock = (await prisma.proposalBlock.findUnique({
     where: {
       id_spaceId: {
@@ -521,7 +530,16 @@ export async function updateCardsFromProposals({
         hasContent: pageWithProposal.hasContent,
         content: pageWithProposal.content,
         contentText: pageWithProposal.contentText,
-        syncWithPageId: pageWithProposal.id
+        syncWithPageId: pageWithProposal.id,
+        permissions: rootPagePermissions.permissions.map((permission) => ({
+          permissionLevel: permission.permissionLevel,
+          allowDiscovery: permission.allowDiscovery,
+          inheritedFromPermission: permission.id,
+          public: permission.public,
+          roleId: permission.roleId,
+          spaceId: permission.spaceId,
+          userId: permission.userId
+        }))
       });
       newCards.push(_card);
     }

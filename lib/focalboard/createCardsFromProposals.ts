@@ -40,6 +40,15 @@ export async function createCardsFromProposals({
     throw new InvalidInputError('Invalid boardId');
   }
 
+  const rootPagePermissions = await prisma.page.findFirstOrThrow({
+    where: {
+      id: boardId
+    },
+    select: {
+      permissions: true
+    }
+  });
+
   const proposalBoardBlock = (await prisma.proposalBlock.findUnique({
     where: {
       id_spaceId: {
@@ -297,7 +306,16 @@ export async function createCardsFromProposals({
       hasContent: pageProposal.hasContent,
       content: pageProposal.content,
       contentText: pageProposal.contentText,
-      syncWithPageId: pageProposal.id
+      syncWithPageId: pageProposal.id,
+      permissions: rootPagePermissions.permissions.map((permission) => ({
+        permissionLevel: permission.permissionLevel,
+        allowDiscovery: permission.allowDiscovery,
+        inheritedFromPermission: permission.id,
+        public: permission.public,
+        roleId: permission.roleId,
+        spaceId: permission.spaceId,
+        userId: permission.userId
+      }))
     });
     cards.push(_card);
   }
