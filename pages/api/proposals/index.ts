@@ -73,11 +73,16 @@ async function createProposalController(req: NextApiRequest, res: NextApiRespons
       if (!matchingEvaluation) {
         return false;
       }
-      if (matchingEvaluation.reviewers.length !== evaluation.reviewers.length) {
+      if (matchingEvaluation.type !== evaluation.type) {
         return false;
       }
-      return matchingEvaluation.reviewers.every((reviewer) =>
-        evaluation.reviewers.some((evaluationReviewer) => evaluationReviewer.userId === reviewer.userId)
+      return evaluation.reviewers.every((reviewer) =>
+        matchingEvaluation.reviewers.some(
+          (evaluationReviewer) =>
+            evaluationReviewer.userId === reviewer.userId ||
+            evaluationReviewer.systemRole === reviewer.systemRole ||
+            evaluationReviewer.roleId === reviewer.roleId
+        )
       );
     });
     if (!isValidEvaluationSteps) {

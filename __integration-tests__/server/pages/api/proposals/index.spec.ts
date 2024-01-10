@@ -154,6 +154,48 @@ describe('POST /api/proposals - Create a proposal', () => {
     await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(401);
   });
 
+  it('should succeed if the proposal matches the template and respond with 201', async () => {
+    const template = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: proposalCreator.id,
+      authors: [proposalCreator.id],
+      proposalStatus: 'draft',
+      evaluationInputs: [
+        {
+          evaluationType: 'pass_fail',
+          reviewers: [{ group: 'user', id: proposalCreator.id }],
+          permissions: [],
+          title: 'Feedback'
+        }
+      ]
+    });
+    const userCookie = await loginUser(proposalCreator.id);
+
+    const input: CreateProposalInput = {
+      spaceId: space.id,
+      userId: spaceMember.id,
+      authors: [spaceMember.id],
+      pageProps: {
+        sourceTemplateId: template.id,
+        title: 'Proposal title',
+        content: { ...emptyDocument },
+        contentText: 'Empty proposal'
+      },
+      evaluations: [
+        {
+          id: template.evaluations[0].id,
+          type: 'pass_fail',
+          reviewers: [{ userId: proposalCreator.id }],
+          title: 'Feedback',
+          permissions: [],
+          index: 0,
+          rubricCriteria: []
+        }
+      ]
+    };
+    await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(201);
+  });
+
   it('should fail if the proposal does not match the template and respond with 401', async () => {
     const template = await testUtilsProposals.generateProposal({
       spaceId: space.id,
