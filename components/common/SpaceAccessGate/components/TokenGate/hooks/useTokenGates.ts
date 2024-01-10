@@ -79,15 +79,13 @@ export function useTokenGates({
     setJoiningSpace(true);
 
     try {
-      if (account) {
-        await verifyTokenGateAndJoin({
-          commit: true,
-          spaceId: space.id,
-          tokens: tokenGateResult?.eligibleGates ?? [],
-          joinType,
-          walletAddress: account
-        });
-      }
+      await verifyTokenGateAndJoin({
+        commit: true,
+        spaceId: space.id,
+        tokens: tokenGateResult?.eligibleGates ?? [],
+        joinType,
+        walletAddress: account || ''
+      });
 
       showMessage(`You have joined the ${space.name} space.`, 'success');
 
