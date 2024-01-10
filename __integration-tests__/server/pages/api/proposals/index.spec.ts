@@ -163,7 +163,7 @@ describe('POST /api/proposals - Create a proposal', () => {
       evaluationInputs: [
         {
           evaluationType: 'pass_fail',
-          reviewers: [{ group: 'user', id: proposalCreator.id }],
+          reviewers: [{ group: 'user', id: proposalCreator.id }, { group: 'space_member' }],
           permissions: [],
           title: 'Feedback'
         }
@@ -185,7 +185,7 @@ describe('POST /api/proposals - Create a proposal', () => {
         {
           id: template.evaluations[0].id,
           type: 'pass_fail',
-          reviewers: [{ userId: proposalCreator.id }],
+          reviewers: [{ userId: proposalCreator.id }, { systemRole: 'space_member' }],
           title: 'Feedback',
           permissions: [],
           index: 0,

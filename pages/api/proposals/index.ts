@@ -76,6 +76,9 @@ async function createProposalController(req: NextApiRequest, res: NextApiRespons
       if (matchingEvaluation.type !== evaluation.type) {
         return false;
       }
+      if (matchingEvaluation.reviewers.length !== evaluation.reviewers.length) {
+        return false;
+      }
       return evaluation.reviewers.every((reviewer) =>
         matchingEvaluation.reviewers.some(
           (evaluationReviewer) =>
