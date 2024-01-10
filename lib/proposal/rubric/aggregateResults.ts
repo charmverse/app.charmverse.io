@@ -97,6 +97,6 @@ export function aggregateResults({
   return {
     reviewersResults: mappedReviewerResults,
     criteriaSummary,
-    allScores: { sum: allScoresSum, average: Number(allScoresAverage) }
+    allScores: { sum: allScoresSum, average: allScoresAverage !== null ? Number(allScoresAverage) : null }
   };
 }
