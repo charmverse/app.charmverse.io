@@ -69,15 +69,15 @@ export class RewardsMutator extends Mutator {
   }
 
   async reorderProperties(boardId: string, cardProperties: IPropertyTemplate[]): Promise<void> {
-    const rewardPropertiesBlock = this.blocksContext.rewardPropertiesBlock;
-    const oldFields = rewardPropertiesBlock?.fields || {};
+    const rewardBoardBlock = this.blocksContext.rewardBoardBlock;
+    const oldFields = rewardBoardBlock?.fields || {};
 
-    if (!rewardPropertiesBlock) {
+    if (!rewardBoardBlock) {
       return;
     }
 
     await this.blocksContext.updateBlock({
-      ...rewardPropertiesBlock,
+      ...rewardBoardBlock,
       fields: { ...oldFields, cardProperties } as RewardPropertiesBlockFields
     });
   }
@@ -114,13 +114,13 @@ export class RewardsMutator extends Mutator {
   }
 
   async changePropertyOption(board: Board, template: IPropertyTemplate, updatedOption: IPropertyOption) {
-    const rewardPropertiesBlock = this.blocksContext.rewardPropertiesBlock;
+    const rewardBoardBlock = this.blocksContext.rewardBoardBlock;
 
-    const updatedProperties = rewardPropertiesBlock?.fields?.cardProperties
-      ? [...rewardPropertiesBlock.fields.cardProperties]
+    const updatedProperties = rewardBoardBlock?.fields?.cardProperties
+      ? [...rewardBoardBlock.fields.cardProperties]
       : [];
 
-    if (!rewardPropertiesBlock) {
+    if (!rewardBoardBlock) {
       return;
     }
 
@@ -137,10 +137,10 @@ export class RewardsMutator extends Mutator {
       };
     });
 
-    const oldFields = rewardPropertiesBlock?.fields || {};
+    const oldFields = rewardBoardBlock?.fields || {};
 
     await this.blocksContext.updateBlock({
-      ...rewardPropertiesBlock,
+      ...rewardBoardBlock,
       fields: { ...oldFields, cardProperties: properties } as RewardPropertiesBlockFields
     });
   }
@@ -151,13 +151,13 @@ export class RewardsMutator extends Mutator {
     option: IPropertyOption,
     description = 'add option'
   ) {
-    const rewardPropertiesBlock = this.blocksContext.rewardPropertiesBlock;
+    const rewardBoardBlock = this.blocksContext.rewardBoardBlock;
 
-    const updatedProperties = rewardPropertiesBlock?.fields?.cardProperties
-      ? [...rewardPropertiesBlock.fields.cardProperties]
+    const updatedProperties = rewardBoardBlock?.fields?.cardProperties
+      ? [...rewardBoardBlock.fields.cardProperties]
       : [];
 
-    if (!rewardPropertiesBlock) {
+    if (!rewardBoardBlock) {
       return;
     }
 
@@ -166,23 +166,23 @@ export class RewardsMutator extends Mutator {
     if (udpatedTemplate) {
       udpatedTemplate.options = udpatedTemplate.options ? [...udpatedTemplate.options, option] : [option];
 
-      const oldFields = rewardPropertiesBlock?.fields || {};
+      const oldFields = rewardBoardBlock?.fields || {};
 
       await this.blocksContext.updateBlock({
-        ...rewardPropertiesBlock,
+        ...rewardBoardBlock,
         fields: { ...oldFields, cardProperties: updatedProperties } as RewardPropertiesBlockFields
       });
     }
   }
 
   async deletePropertyOption(board: Board, template: IPropertyTemplate, option: IPropertyOption) {
-    const rewardPropertiesBlock = this.blocksContext.rewardPropertiesBlock;
+    const rewardBoardBlock = this.blocksContext.rewardBoardBlock;
 
-    const updatedProperties = rewardPropertiesBlock?.fields?.cardProperties
-      ? [...rewardPropertiesBlock.fields.cardProperties]
+    const updatedProperties = rewardBoardBlock?.fields?.cardProperties
+      ? [...rewardBoardBlock.fields.cardProperties]
       : [];
 
-    if (!rewardPropertiesBlock) {
+    if (!rewardBoardBlock) {
       return;
     }
 
@@ -191,10 +191,10 @@ export class RewardsMutator extends Mutator {
     if (udpatedTemplate) {
       udpatedTemplate.options = udpatedTemplate.options?.filter((o) => o.id !== option.id) || [];
 
-      const oldFields = rewardPropertiesBlock?.fields || {};
+      const oldFields = rewardBoardBlock?.fields || {};
 
       await this.blocksContext.updateBlock({
-        ...rewardPropertiesBlock,
+        ...rewardBoardBlock,
         fields: { ...oldFields, cardProperties: updatedProperties } as RewardPropertiesBlockFields
       });
     }

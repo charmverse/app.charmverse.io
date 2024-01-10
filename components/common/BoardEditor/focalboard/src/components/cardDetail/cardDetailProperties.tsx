@@ -9,9 +9,11 @@ import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import { proposalPropertyTypesList, type Board, type IPropertyTemplate, type PropertyType } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
+import { Constants } from 'lib/focalboard/constants';
+import { defaultRewardPropertyIds } from 'lib/rewards/blocks/constants';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { Mutator } from '../../mutator';
@@ -34,6 +36,7 @@ type Props = {
   pageUpdatedAt: string;
   mutator?: Mutator;
   readOnlyProperties?: string[];
+  disableEditPropertyOption?: boolean;
 };
 
 function CardDetailProperties(props: Props) {
@@ -46,7 +49,8 @@ function CardDetailProperties(props: Props) {
     pageUpdatedAt,
     pageUpdatedBy,
     syncWithPageId,
-    mutator = defaultMutator
+    mutator = defaultMutator,
+    disableEditPropertyOption
   } = props;
   const [newTemplateId, setNewTemplateId] = useState('');
   const intl = useIntl();
@@ -250,7 +254,20 @@ function CardDetailProperties(props: Props) {
   return (
     <div className='octo-propertylist' data-test='card-detail-properties'>
       {board.fields?.cardProperties.map((propertyTemplate) => {
+        const cardProperty = (board.fields?.cardProperties ?? []).find(
+          (_cardProperty) => _cardProperty.id === propertyTemplate.id
+        );
         const readOnly = props.readOnly || props.readOnlyProperties?.includes(propertyTemplate.id) || false;
+        const isReadonlyTemplateProperty =
+          readOnly ||
+          proposalPropertyTypesList.includes(propertyTemplate.type as any) ||
+          defaultRewardPropertyIds.includes(propertyTemplate.id) ||
+          !!cardProperty?.formFieldId ||
+          !!cardProperty?.proposalFieldId;
+
+        if (propertyTemplate.id === Constants.titleColumnId) {
+          return null;
+        }
 
         return (
           <CardDetailProperty
@@ -267,8 +284,9 @@ function CardDetailProperties(props: Props) {
             pageUpdatedAt={pageUpdatedAt}
             pageUpdatedBy={pageUpdatedBy}
             property={propertyTemplate}
-            readOnly={readOnly}
+            readOnly={isReadonlyTemplateProperty}
             mutator={mutator}
+            disableEditPropertyOption={disableEditPropertyOption}
           />
         );
       })}
@@ -284,10 +302,10 @@ function CardDetailProperties(props: Props) {
         />
       )}
 
-      {!props.readOnly && activeView && (
+      {!props.readOnly && !disableEditPropertyOption && activeView && (
         <>
           <div className='octo-propertyname add-property'>
-            <Button {...bindTrigger(addPropertyPopupState)}>
+            <Button {...bindTrigger(addPropertyPopupState)} data-dataTest='add-custom-property'>
               <FormattedMessage id='CardDetail.add-property' defaultMessage='+ Add a property' />
             </Button>
             {!isSmallScreen && (

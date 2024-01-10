@@ -41,7 +41,7 @@ export async function replaceNestedPages(convertedToMarkdown: string): Promise<s
       (await import('lib/pages/server/generatePageLink')).generatePageLink
     : // Client-side method
       (pageId: string) => {
-        const documentNode = document.querySelector(`[data-id="page-${pageId}"]`) as HTMLDivElement;
+        const documentNode = document.querySelector(`[data-id="${pageId}"]`) as HTMLDivElement;
         const pageLink: PageLink = {
           title: (documentNode?.getAttribute('data-title') as string) ?? '',
           url: (documentNode?.getAttribute('data-path') as string) ?? ''

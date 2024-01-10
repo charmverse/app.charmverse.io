@@ -3,7 +3,7 @@ import type { SpaceApiToken } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
-import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import type { PublicProposalApiPermissions } from 'pages/api/v1/proposals/[proposalId]/compute-permissions';
 import { generateSpaceApiKey, generateSuperApiKey } from 'testing/generators/apiKeys';
 import { baseUrl } from 'testing/mockApiCall';
@@ -20,9 +20,7 @@ let apiKey: SpaceApiToken;
 let superApiKey: SuperApiToken;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpace();
-  space = generated.space;
-  proposalAuthor = generated.user;
+  ({ space, user: proposalAuthor } = await testUtilsUser.generateUserAndSpace());
   spaceMember = await testUtilsUser.generateSpaceUser({
     spaceId: space.id
   });
@@ -49,7 +47,7 @@ describe('GET /api/v1/proposals/{proposalId}/compute-permissions', () => {
         .expect(200)
     ).body as PublicProposalApiPermissions;
 
-    const authorPermissions = await premiumPermissionsApiClient.proposals.computeProposalPermissions({
+    const authorPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
       resourceId: proposal.id,
       userId: proposalAuthor.id
     });
@@ -72,7 +70,7 @@ describe('GET /api/v1/proposals/{proposalId}/compute-permissions', () => {
         .expect(200)
     ).body as PublicProposalApiPermissions;
 
-    const memberPermissions = await premiumPermissionsApiClient.proposals.computeProposalPermissions({
+    const memberPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
       resourceId: proposal.id,
       userId: spaceMember.id
     });
@@ -94,7 +92,7 @@ describe('GET /api/v1/proposals/{proposalId}/compute-permissions', () => {
         .expect(200)
     ).body as PublicProposalApiPermissions;
 
-    const authorPermissions = await premiumPermissionsApiClient.proposals.computeProposalPermissions({
+    const authorPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
       resourceId: proposal.id,
       userId: proposalAuthor.id
     });
@@ -114,7 +112,7 @@ describe('GET /api/v1/proposals/{proposalId}/compute-permissions', () => {
         .expect(200)
     ).body as PublicProposalApiPermissions;
 
-    const memberPermissions = await premiumPermissionsApiClient.proposals.computeProposalPermissions({
+    const memberPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
       resourceId: proposal.id,
       userId: spaceMember.id
     });

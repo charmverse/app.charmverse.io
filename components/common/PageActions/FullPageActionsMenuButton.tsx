@@ -7,7 +7,8 @@ import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useMemo, useRef, useState } from 'react';
 
-import { undoEventName } from 'components/common/CharmEditor/utils';
+import { useGetProposalDetails } from 'charmClient/hooks/proposals';
+import { undoEventName } from 'components/common/CharmEditor/constants';
 import { DatabasePageActionList } from 'components/common/PageActions/components/DatabasePageActionList';
 import type { PageActionMeta } from 'components/common/PageActions/components/DocumentPageActionList';
 import { DocumentPageActionList, documentTypes } from 'components/common/PageActions/components/DocumentPageActionList';
@@ -22,9 +23,16 @@ type Props = {
   page?: PageActionMeta | null;
   post?: PostWithVotes | null;
   onDelete?: VoidFunction;
+  isInsideDialog?: boolean;
 };
 
-export function FullPageActionsMenuButton({ pageId, page: pageProp, post, onDelete }: Props) {
+export function FullPageActionsMenuButton({
+  isInsideDialog,
+  page: pageProp,
+  pageId = pageProp?.id,
+  post,
+  onDelete
+}: Props) {
   let pageOptionsList: ReactNode = null;
   const router = useRouter();
   const { page: pageFromId } = usePage({ pageIdOrPath: pageId });
@@ -40,6 +48,7 @@ export function FullPageActionsMenuButton({ pageId, page: pageProp, post, onDele
     postIdOrPath: post?.id,
     isNewPost: !post
   });
+  const { data: proposalDetails } = useGetProposalDetails(pageMenuAnchorElement ? pageFromId?.proposalId : undefined);
   const currentPageOrPostId = pageId ?? pageProp?.id ?? post?.id;
 
   const page = pageFromId || pageProp;
@@ -74,11 +83,13 @@ export function FullPageActionsMenuButton({ pageId, page: pageProp, post, onDele
   if (isBasePageDocument && page) {
     pageOptionsList = (
       <DocumentPageActionList
+        isInsideDialog={isInsideDialog}
         page={page}
         pagePermissions={pagePermissions}
         onComplete={closeMenu}
         onDelete={onDelete}
         undoEditorChanges={undoEditorChanges}
+        isStructuredProposal={!!proposalDetails?.formId}
       />
     );
   } else if (isBasePageDatabase && page) {

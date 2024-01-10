@@ -15,9 +15,10 @@ import PersonIcon from '@mui/icons-material/Person';
 import PhoneIcon from '@mui/icons-material/Phone';
 import SubjectIcon from '@mui/icons-material/Subject';
 import TextIcon from '@mui/icons-material/TextFields';
-import TwitterIcon from '@mui/icons-material/Twitter';
 import { ListItemIcon, ListItemText } from '@mui/material';
 import type { ReactNode } from 'react';
+import { FaGoogle, FaTelegramPlane, FaWallet } from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
 
 import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
 import { MEMBER_PROPERTY_CONFIG, PREMIUM_MEMBER_PROPERTIES } from 'lib/members/constants';
@@ -36,12 +37,14 @@ export const MemberPropertyIcons: Record<MemberPropertyType, ReactNode> = {
   profile_pic: <InsertPhotoIcon fontSize='small' />,
   timezone: <AccessTimeIcon fontSize='small' />,
   discord: <DiscordIcon width={18.5} height={18.5} />,
-  twitter: <TwitterIcon fontSize='small' />,
+  twitter: <FaXTwitter width={18.5} height={18.5} />,
   linked_in: <LinkedInIcon width={18.5} height={18.5} />,
   github: <GithubIcon fontSize='small' />,
-  name: <DriveFileRenameOutlineIcon fontSize='small' />,
   bio: <PersonIcon fontSize='small' />,
-  join_date: <CalendarMonthIcon fontSize='small' />
+  join_date: <CalendarMonthIcon fontSize='small' />,
+  google: <FaGoogle fontSize='small' />,
+  telegram: <FaTelegramPlane fontSize='small' />,
+  wallet: <FaWallet fontSize='small' />
 };
 
 type Props = {

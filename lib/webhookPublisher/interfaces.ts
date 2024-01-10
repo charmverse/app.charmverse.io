@@ -1,4 +1,4 @@
-import type { PageType, ProposalStatus } from '@charmverse/core/prisma';
+import type { PageType } from '@charmverse/core/prisma';
 
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
 
@@ -83,6 +83,13 @@ export type InlineCommentEntity = {
   author: UserEntity;
 };
 
+export type ApplicationCommentEntity = {
+  createdAt: string;
+  id: string;
+  applicationId: string;
+  author: UserEntity;
+};
+
 export type BlockCommentEntity = {
   createdAt: string;
   id: string;
@@ -124,6 +131,7 @@ export enum WebhookEventNames {
   DocumentCommentCreated = 'document.comment.created',
   DocumentInlineCommentCreated = 'document.inline_comment.created',
   DocumentMentionCreated = 'document.mention.created',
+  DocumentApplicationCommentCreated = 'document.application_comment.created',
   CardPersonPropertyAssigned = 'card.person_property.assigned',
   VoteCreated = 'vote.created'
 }
@@ -188,8 +196,7 @@ export type WebhookEvent = WebhookEventSharedProps &
     | {
         scope: WebhookEventNames.ProposalStatusChanged;
         proposal: ProposalEntity;
-        newStatus: ProposalStatus;
-        oldStatus: ProposalStatus | null;
+        currentEvaluationId: string | null;
         user: UserEntity;
       }
     | {
@@ -252,6 +259,11 @@ export type WebhookEvent = WebhookEventSharedProps &
         scope: WebhookEventNames.DocumentInlineCommentCreated;
         document: DocumentEntity;
         inlineComment: InlineCommentEntity;
+      }
+    | {
+        scope: WebhookEventNames.DocumentApplicationCommentCreated;
+        document: DocumentEntity;
+        applicationComment: ApplicationCommentEntity;
       }
     | {
         scope: WebhookEventNames.UserJoined;

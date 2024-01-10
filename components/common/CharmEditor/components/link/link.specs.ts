@@ -1,5 +1,6 @@
 import { link } from '@bangle.dev/base-components';
-import type { BaseRawMarkSpec } from '@bangle.dev/core';
+
+import type { BaseRawMarkSpec } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 export function spec() {
   const linkSpec = link.spec({

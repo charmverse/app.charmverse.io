@@ -1,17 +1,15 @@
 import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { AccsRegularParams } from '@lit-protocol/types';
-import { flatten } from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { accessTypeDict } from 'lib/metrics/mixpanel/constants';
+import { updateTokenGatesDetails } from 'lib/blockchain/updateTokenGateDetails';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
+import { onError, onNoMatch, requireKeys, requireSpaceMembership } from 'lib/middleware';
+import requireValidation from 'lib/middleware/requireValidation';
 import { withSessionRoute } from 'lib/session/withSession';
-import { addDaylightAbility } from 'lib/token-gates/daylight';
-import type { TokenGateWithRoles } from 'lib/token-gates/interfaces';
-import { getAccessTypes } from 'lib/token-gates/utils';
+import type { TokenGateWithRoles } from 'lib/tokenGates/interfaces';
+import { processTokenGateConditions } from 'lib/tokenGates/processTokenGateConditions';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 
@@ -19,10 +17,12 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .get(getTokenGates)
+  .use(requireKeys(['spaceId', 'type', 'conditions'], 'body'))
   .use(requireSpaceMembership({ adminOnly: true }))
+  .use(requireValidation('tokenGateConditions'))
   .post(saveTokenGate);
 
-async function saveTokenGate(req: NextApiRequest, res: NextApiResponse) {
+async function saveTokenGate(req: NextApiRequest, res: NextApiResponse<void>) {
   const userId = req.session.user.id;
   const spaceId = req.body.spaceId;
 
@@ -35,17 +35,7 @@ async function saveTokenGate(req: NextApiRequest, res: NextApiResponse) {
     throw error;
   }
 
-  // Flatten to get all nested conditions in the same flat array
-  const conditionsArr: AccsRegularParams[] = flatten(req.body.conditions?.unifiedAccessControlConditions);
-  const conditions = conditionsArr.filter((c) => Boolean(c.chain));
-  const chains: string[] = req.body.conditions?.chains || [];
-  const numberOfConditions = conditions.length;
-  const accessTypes = getAccessTypes(conditions);
-
-  // Make sure token gate has at least 1 condition.
-  if (numberOfConditions < 1) {
-    throw new InvalidInputError('Your token gate must contain at least one condition.');
-  }
+  const { accessTypes, numberOfConditions, chainType, accesType } = processTokenGateConditions(req.body);
 
   const result = await prisma.tokenGate.create({
     data: {
@@ -55,20 +45,16 @@ async function saveTokenGate(req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  addDaylightAbility(result);
-
-  const chainTypeParam = chains.length === 1 ? chains[0] : chains;
-  const accessTypesParam =
-    accessTypes.length === 1 ? accessTypeDict[accessTypes[0]] : accessTypes.map((at) => accessTypeDict[at]);
   trackUserAction('add_a_gate', {
     userId,
     spaceId,
-    accesType: accessTypesParam,
-    chainType: chainTypeParam,
+    accesType,
+    chainType,
+    gateType: result.type,
     numberOfConditions
   });
 
-  res.status(200).json(result);
+  res.status(200).end();
 }
 
 async function getTokenGates(req: NextApiRequest, res: NextApiResponse<TokenGateWithRoles[]>) {
@@ -97,21 +83,22 @@ async function getTokenGates(req: NextApiRequest, res: NextApiResponse<TokenGate
     throw new InvalidInputError('spaceId is required');
   }
 
-  const result = await prisma.tokenGate.findMany({
+  const result = (await prisma.tokenGate.findMany({
     where: {
       spaceId
     },
     include: {
-      space: true,
       tokenGateToRoles: {
         include: {
           role: true
         }
       }
     }
-  });
+  })) as TokenGateWithRoles[];
 
-  res.status(200).json(result);
+  const tokenGatesWithDetails = await updateTokenGatesDetails(result);
+
+  res.status(200).json(tokenGatesWithDetails);
 }
 
 export default withSessionRoute(handler);

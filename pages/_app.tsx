@@ -1,6 +1,9 @@
 import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
 import type { EmotionCache } from '@emotion/utils';
+import type { LensConfig } from '@lens-protocol/react-web';
+import { development, LensProvider, production } from '@lens-protocol/react-web';
+import { bindings as wagmiBindings } from '@lens-protocol/wagmi';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
 import type { NextPage } from 'next';
@@ -25,15 +28,15 @@ import ReactDndProvider from 'components/common/ReactDndProvider';
 import RouteGuard from 'components/common/RouteGuard';
 import Snackbar from 'components/common/Snackbar';
 import { UserProfileProvider } from 'components/members/hooks/useMemberDialog';
-import { ApplicationDialogProvider } from 'components/rewards/hooks/useApplicationDialog';
+import { ProposalsProvider } from 'components/proposals/hooks/useProposals';
 import { RewardsProvider } from 'components/rewards/hooks/useRewards';
-import { isDevEnv } from 'config/constants';
-import { BountiesProvider } from 'hooks/useBounties';
+import { isDevEnv, isProdEnv } from 'config/constants';
 import { CurrentSpaceProvider } from 'hooks/useCurrentSpace';
 import { DiscordProvider } from 'hooks/useDiscordConnection';
 import { PostCategoriesProvider } from 'hooks/useForumCategories';
 import { useInterval } from 'hooks/useInterval';
 import { IsSpaceMemberProvider } from 'hooks/useIsSpaceMember';
+import { DbViewSettingsProvider } from 'hooks/useLocalDbViewSettings';
 import { MemberPropertiesProvider } from 'hooks/useMemberProperties';
 import { MembersProvider } from 'hooks/useMembers';
 import { NotionProvider } from 'hooks/useNotionImport';
@@ -53,9 +56,6 @@ import '@bangle.dev/tooltip/style.css';
 import 'components/common/BoardEditor/focalboard/src/components/calculations/calculation.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calendar/fullcalendar.scss';
 import 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetail.scss';
-import 'components/common/BoardEditor/focalboard/src/components/cardDetail/comment.scss';
-import 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList.scss';
-import 'components/common/BoardEditor/focalboard/src/components/cardDialog.scss';
 import 'components/common/BoardEditor/focalboard/src/components/centerPanel.scss';
 import 'components/common/BoardEditor/focalboard/src/components/dialog.scss';
 import 'components/common/BoardEditor/focalboard/src/components/gallery/gallery.scss';
@@ -78,6 +78,7 @@ import 'components/common/BoardEditor/focalboard/src/components/viewTitle.scss';
 import 'components/common/BoardEditor/focalboard/src/styles/_markdown.scss';
 import 'components/common/BoardEditor/focalboard/src/styles/labels.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/buttons/iconButton.scss';
+import 'components/common/BoardEditor/focalboard/src/widgets/checkbox.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/editable.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/label.scss';
@@ -88,34 +89,14 @@ import 'components/common/BoardEditor/focalboard/src/widgets/menu/separatorOptio
 import 'components/common/BoardEditor/focalboard/src/widgets/menu/subMenuOption.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/menuWrapper.scss';
 import 'components/common/BoardEditor/focalboard/src/widgets/propertyMenu.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/checkbox.scss';
-import 'components/common/CharmEditor/components/listItemNew/czi-vars.scss';
 import 'components/common/CharmEditor/components/listItemNew/czi-indent.scss';
 import 'components/common/CharmEditor/components/listItemNew/czi-list.scss';
-import 'components/common/LitProtocolModal/index.css';
-import 'components/common/LitProtocolModal/reusableComponents/litChainSelector/LitChainSelector.css';
-import 'components/common/LitProtocolModal/reusableComponents/litCheckbox/LitCheckbox.css';
-import 'components/common/LitProtocolModal/reusableComponents/litChooseAccessButton/LitChooseAccessButton.css';
-import 'components/common/LitProtocolModal/reusableComponents/litConfirmationModal/LitConfirmationModal.css';
-import 'components/common/LitProtocolModal/reusableComponents/litDeleteModal/LitDeleteModal.css';
-import 'components/common/LitProtocolModal/reusableComponents/litFooter/LitBackButton.css';
-import 'components/common/LitProtocolModal/reusableComponents/litFooter/LitFooter.css';
-import 'components/common/LitProtocolModal/reusableComponents/litFooter/LitNextButton.css';
-import 'components/common/LitProtocolModal/reusableComponents/litHeader/LitHeader.css';
-import 'components/common/LitProtocolModal/reusableComponents/litInput/LitInput.css';
-import 'components/common/LitProtocolModal/shareModal/devMode/DevModeContent.css';
-import 'components/common/LitProtocolModal/shareModal/multipleConditionSelect/MultipleAddCondition.css';
-import 'components/common/LitProtocolModal/shareModal/multipleConditionSelect/MultipleConditionEditor.css';
-import 'components/common/LitProtocolModal/shareModal/multipleConditionSelect/MultipleConditionSelect.css';
-import 'components/common/LitProtocolModal/shareModal/reviewConditions/ReviewConditions.css';
-import 'components/common/LitProtocolModal/shareModal/ShareModal.css';
-import 'components/common/LitProtocolModal/shareModal/singleConditionSelect/SingleConditionSelect.css';
+import 'components/common/CharmEditor/components/listItemNew/czi-vars.scss';
 import 'prosemirror-menu/style/menu.css';
 import 'react-resizable/css/styles.css';
 import 'theme/@bangle.dev/styles.scss';
 import 'theme/focalboard/focalboard.button.scss';
 import 'theme/focalboard/focalboard.main.scss';
-import 'theme/lit-protocol/lit-protocol.scss';
 import 'theme/print.scss';
 import 'theme/prosemirror-tables/prosemirror-tables.scss';
 import 'theme/styles.scss';
@@ -184,9 +165,9 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
           <DataProviders>
             <SettingsDialogProvider>
               <LocalizationProvider>
-                <FocalBoardProvider>
-                  <NotionProvider>
-                    <IntlProvider>
+                <NotionProvider>
+                  <IntlProvider>
+                    <DbViewSettingsProvider>
                       <PageHead {...pageProps} />
 
                       <RouteGuard>
@@ -209,9 +190,9 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
                           <GlobalComponents />
                         </ErrorBoundary>
                       </RouteGuard>
-                    </IntlProvider>
-                  </NotionProvider>
-                </FocalBoardProvider>
+                    </DbViewSettingsProvider>
+                  </IntlProvider>
+                </NotionProvider>
               </LocalizationProvider>
             </SettingsDialogProvider>
           </DataProviders>
@@ -220,6 +201,11 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
     </AppThemeProvider>
   );
 }
+
+const lensConfig: LensConfig = {
+  bindings: wagmiBindings(),
+  environment: isProdEnv ? production : development
+};
 
 function DataProviders({ children }: { children: ReactNode }) {
   return (
@@ -242,19 +228,23 @@ function DataProviders({ children }: { children: ReactNode }) {
                       <IsSpaceMemberProvider>
                         <WebSocketClientProvider>
                           <MembersProvider>
-                            <BountiesProvider>
-                              <RewardsProvider>
-                                <PaymentMethodsProvider>
-                                  <PagesProvider>
-                                    <MemberPropertiesProvider>
-                                      <UserProfileProvider>
-                                        <PageTitleProvider>{children}</PageTitleProvider>
-                                      </UserProfileProvider>
-                                    </MemberPropertiesProvider>
-                                  </PagesProvider>
-                                </PaymentMethodsProvider>
-                              </RewardsProvider>
-                            </BountiesProvider>
+                            <PaymentMethodsProvider>
+                              <FocalBoardProvider>
+                                <PagesProvider>
+                                  <RewardsProvider>
+                                    <ProposalsProvider>
+                                      <MemberPropertiesProvider>
+                                        <LensProvider config={lensConfig}>
+                                          <UserProfileProvider>
+                                            <PageTitleProvider>{children}</PageTitleProvider>
+                                          </UserProfileProvider>
+                                        </LensProvider>
+                                      </MemberPropertiesProvider>
+                                    </ProposalsProvider>
+                                  </RewardsProvider>
+                                </PagesProvider>
+                              </FocalBoardProvider>
+                            </PaymentMethodsProvider>
                           </MembersProvider>
                         </WebSocketClientProvider>
                       </IsSpaceMemberProvider>

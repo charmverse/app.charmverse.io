@@ -2,9 +2,15 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 
-import type { ThreadCreate, ThreadWithComments } from './interfaces';
+import type { ThreadCreatePayload, ThreadWithComments } from './interfaces';
 
-export async function createThread({ comment, pageId, userId, context }: ThreadCreate): Promise<ThreadWithComments> {
+export async function createThread({
+  comment,
+  pageId,
+  userId,
+  context,
+  accessGroups
+}: ThreadCreatePayload): Promise<ThreadWithComments> {
   if (!comment) {
     throw new InvalidInputError('Please provide a valid comment');
   }
@@ -24,7 +30,7 @@ export async function createThread({ comment, pageId, userId, context }: ThreadC
   });
 
   if (!existingPage) {
-    throw new DataNotFoundError(`Cannot create thread as linked page with id ${pageId} was not found.`);
+    throw new DataNotFoundError(`Cannot create thread as page with id ${pageId} was not found.`);
   }
 
   const thread = await prisma.thread.create({
@@ -46,6 +52,7 @@ export async function createThread({ comment, pageId, userId, context }: ThreadC
           id: userId
         }
       },
+      accessGroups: accessGroups?.map((ag) => ({ ...ag })) ?? [],
       comments: {
         create: {
           content: comment,

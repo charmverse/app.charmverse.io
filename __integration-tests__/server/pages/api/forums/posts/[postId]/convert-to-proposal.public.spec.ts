@@ -1,4 +1,4 @@
-import { testUtilsForum, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsForum, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
 import { baseUrl, loginUser } from 'testing/mockApiCall';
@@ -14,18 +14,11 @@ describe('POST /api/forums/posts/[postId]/convert-to-proposal - Convert post to 
       userId: nonAdminUser1.id
     });
 
-    const proposalCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id
-    });
-
     const nonAdminCookie = await loginUser(nonAdminUser1.id);
 
     await request(baseUrl)
       .post(`/api/forums/posts/${post.id}/convert-to-proposal`)
       .set('Cookie', nonAdminCookie)
-      .send({
-        categoryId: proposalCategory.id
-      })
       .expect(200);
   });
 
@@ -42,18 +35,11 @@ describe('POST /api/forums/posts/[postId]/convert-to-proposal - Convert post to 
       userId: user.id
     });
 
-    const proposalCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id
-    });
-
     const outsideUserCookie = await loginUser(outsideUser.id);
 
     await request(baseUrl)
       .post(`/api/forums/posts/${post.id}/convert-to-proposal`)
       .set('Cookie', outsideUserCookie)
-      .send({
-        categoryId: proposalCategory.id
-      })
       .expect(401);
   });
 });

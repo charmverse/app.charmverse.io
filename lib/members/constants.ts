@@ -16,11 +16,6 @@ export const MEMBER_PROPERTY_CONFIG: Record<MemberPropertyType, MemberPropertyCo
     readonly: true,
     unhideable: true
   },
-  name: {
-    label: 'Name',
-    default: true,
-    unhideable: true
-  },
   role: {
     label: 'Roles',
     default: true,
@@ -37,7 +32,7 @@ export const MEMBER_PROPERTY_CONFIG: Record<MemberPropertyType, MemberPropertyCo
     readonly: true
   },
   twitter: {
-    label: 'Twitter',
+    label: 'X',
     default: true,
     readonly: true
   },
@@ -60,6 +55,21 @@ export const MEMBER_PROPERTY_CONFIG: Record<MemberPropertyType, MemberPropertyCo
     label: 'Join date',
     default: true,
     readonly: true,
+    hidden: true
+  },
+  google: {
+    label: 'Google',
+    default: true,
+    hidden: true
+  },
+  wallet: {
+    label: 'Wallet',
+    default: true,
+    hidden: true
+  },
+  telegram: {
+    label: 'Telegram',
+    default: true,
     hidden: true
   },
   email: {
@@ -97,3 +107,5 @@ export const HIDDEN_MEMBER_PROPERTIES = propertyTypes.filter((prop) => MEMBER_PR
 export const DEFAULT_MEMBER_PROPERTIES = propertyTypes.filter((prop) => MEMBER_PROPERTY_CONFIG[prop].default);
 
 export const PREMIUM_MEMBER_PROPERTIES: MemberPropertyType[] = ['role'];
+
+export const NON_DEFAULT_MEMBER_PROPERTIES = propertyTypes.filter((prop) => !DEFAULT_MEMBER_PROPERTIES.includes(prop));

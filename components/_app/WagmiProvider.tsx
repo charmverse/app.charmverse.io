@@ -3,18 +3,18 @@ import type { ReactNode } from 'react';
 import { useState, useEffect } from 'react';
 import { WagmiConfig } from 'wagmi';
 
-import { isTestEnv } from 'config/constants';
+import { isDevEnv, isTestEnv } from 'config/constants';
 
 type Props = {
   children: ReactNode;
 };
 
 export function WagmiProvider({ children }: Props) {
-  const [config, setConfig] = useState(() => (isTestEnv ? undefined : wagmiConfig));
+  const [config, setConfig] = useState(() => (isTestEnv && !isDevEnv ? undefined : wagmiConfig));
 
   useEffect(() => {
     // get config with mocked injector for tests
-    if (isTestEnv && typeof window !== 'undefined' && !config) {
+    if (isTestEnv && !isDevEnv && typeof window !== 'undefined' && !config) {
       setConfig(getTestWagmiConfig() as any);
     }
   }, [config]);

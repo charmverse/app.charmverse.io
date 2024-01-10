@@ -1,26 +1,23 @@
-import type { EditorState, EditorView } from '@bangle.dev/pm';
+import type { EditorView } from '@bangle.dev/pm';
 import { Node } from '@bangle.dev/pm';
-import { useEditorState } from '@bangle.dev/react';
 import { log } from '@charmverse/core/log';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { Box, Divider } from '@mui/material';
-import type { CryptoCurrency, FiatCurrency } from 'connectors';
+import type { CryptoCurrency, FiatCurrency } from 'connectors/chains';
 import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 import { useRouter } from 'next/router';
+import type { EditorState } from 'prosemirror-state';
 import type { CSSProperties, ReactNode } from 'react';
 import { memo, useEffect, useRef, useState } from 'react';
 import { useSWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
-import { CommentsSidebar } from 'components/[pageId]/DocumentPage/components/CommentsSidebar';
-import { SuggestionsSidebar } from 'components/[pageId]/DocumentPage/components/SuggestionsSidebar';
+import type { IPageSidebarContext } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { IPageSidebarContext } from 'hooks/usePageSidebar';
-import { usePageSidebar } from 'hooks/usePageSidebar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -28,6 +25,7 @@ import { extractDeletedThreadIds } from 'lib/prosemirror/plugins/inlineComments/
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 import { BangleEditor as ReactBangleEditor } from './components/@bangle.dev/react/ReactEditor';
+import { useEditorState } from './components/@bangle.dev/react/useEditorState';
 import { BookmarkNodeView } from './components/bookmark/BookmarkNodeView';
 import Callout from './components/callout/components/Callout';
 import { CryptoPrice } from './components/CryptoPrice';
@@ -44,31 +42,30 @@ import { InlineDatabase } from './components/inlineDatabase/components/InlineDat
 import InlineCommandPalette from './components/inlinePalette/components/InlineCommandPalette';
 import { LinksPopup } from './components/link/LinksPopup';
 import LinkedPagesList from './components/linkedPage/components/LinkedPagesList';
-import Mention, { MentionSuggest } from './components/mention';
+import { Mention, MentionSuggest } from './components/mention/components';
 import NestedPage from './components/nestedPage/components/NestedPage';
 import { NFTNodeView } from './components/nft/NFTNodeView';
 import type { CharmNodeViewProps } from './components/nodeView/nodeView';
+import ResizablePDF from './components/pdf/ResizablePDF';
 import { PollNodeView } from './components/poll/PollComponent';
 import Quote from './components/quote/components/Quote';
 import ResizableImage from './components/ResizableImage';
-import ResizablePDF from './components/ResizablePDF';
 import RowActionsMenu from './components/rowActions/RowActionsMenu';
-import { SIDEBAR_VIEWS, SidebarDrawer } from './components/SidebarDrawer';
 import { SuggestionsPopup } from './components/suggestions/SuggestionPopup';
 import { TableOfContents } from './components/tableOfContents/TableOfContents';
 import { TweetNodeView } from './components/tweet/TweetNodeView';
 import { VideoNodeView } from './components/video/VideoNodeView';
 import {
-  suggestionsPluginKey,
-  inlinePalettePluginKey,
-  floatingMenuPluginKey,
-  linkedPagePluginKey,
-  mentionPluginKey,
-  emojiPluginKey,
   actionsPluginKey,
+  charmEditorPlugins,
+  emojiPluginKey,
+  floatingMenuPluginKey,
   inlineCommentPluginKey,
+  inlinePalettePluginKey,
+  linkedPagePluginKey,
   linksPluginKey,
-  charmEditorPlugins
+  mentionPluginKey,
+  suggestionsPluginKey
 } from './plugins';
 import { specRegistry } from './specRegistry';
 
@@ -90,7 +87,12 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{
   ${({ colorMode }) =>
     colorMode === 'dark'
       ? `
-          background-color: var(--background-light);`
+          background-color: var(--input-bg);
+          border: 1px solid var(--input-border);
+          .loaded .ProseMirror[data-placeholder]::before {
+            color: var(--primary-text);
+            opacity: 0.5;
+          }`
       : ''};
 
   ${({ disableRowHandles }) =>
@@ -136,7 +138,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{
   ${({ disablePageSpecificFeatures }) =>
     !disablePageSpecificFeatures &&
     `
-    .charm-inline-comment.active {
+    .charm-inline-comment span.active {
       background: rgba(255,212,0,0.14);
       border-bottom: 2px solid rgb(255, 212, 0);
       padding-bottom: 2px;
@@ -161,7 +163,7 @@ const defaultContent: PageContent = {
 
 export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 
-interface CharmEditorProps {
+type CharmEditorProps = {
   colorMode?: 'dark';
   content?: PageContent;
   autoFocus?: boolean;
@@ -170,7 +172,8 @@ interface CharmEditorProps {
   onContentChange?: UpdatePageContent;
   readOnly?: boolean;
   style?: CSSProperties;
-  PageSidebar?: IPageSidebarContext['activeView'];
+  sidebarView?: IPageSidebarContext['activeView'];
+  setSidebarView?: IPageSidebarContext['setActiveView'];
   disablePageSpecificFeatures?: boolean;
   isContentControlled?: boolean; // whether or not the parent component is controlling and updating the content
   enableVoting?: boolean;
@@ -190,12 +193,15 @@ interface CharmEditorProps {
   isPollOrVote?: boolean;
   disableMention?: boolean;
   allowClickingFooter?: boolean;
-}
+  disableVideo?: boolean;
+  setEditorState?: (state: EditorState) => void; // this is used to pass the state to the suggestions sidebar
+  threadIds?: string[];
+};
 
 function CharmEditor({
   colorMode,
   enableSuggestingMode = false,
-  content = defaultContent,
+  content,
   children,
   onContentChange,
   style,
@@ -208,6 +214,7 @@ function CharmEditor({
   postId,
   containerWidth,
   pageType,
+  setEditorState,
   snapshotProposalId,
   pagePermissions,
   placeholderText,
@@ -216,16 +223,19 @@ function CharmEditor({
   disableRowHandles = false,
   disableNestedPages = false,
   onConnectionEvent,
-  isPollOrVote = false,
   disableMention = false,
-  allowClickingFooter
+  allowClickingFooter,
+  disableVideo = false,
+  sidebarView,
+  setSidebarView,
+  threadIds
 }: CharmEditorProps) {
   const router = useRouter();
   const { showMessage } = useSnackbar();
   const { mutate } = useSWRConfig();
   const { space: currentSpace } = useCurrentSpace();
-  const { activeView: sidebarView, setActiveView } = usePageSidebar();
   const { user } = useUser();
+
   const isTemplate = pageType ? pageType.includes('template') : false;
   const disableNestedPage = disablePageSpecificFeatures || enableSuggestingMode || isTemplate || disableNestedPages;
   const onThreadResolveDebounced = debounce((_pageId: string, doc: EditorState['doc'], prevDoc: EditorState['doc']) => {
@@ -239,8 +249,8 @@ function CharmEditor({
         .then(() => {
           charmClient.comments
             .getThreads(_pageId)
-            .then((threads) => {
-              mutate(`pages/${_pageId}/threads`, threads);
+            .then((_threads) => {
+              mutate(`pages/${_pageId}/threads`, _threads);
             })
             .catch((err) => {
               log.warn(`Failed to fetch threads for page ${_pageId}`, err);
@@ -281,27 +291,26 @@ function CharmEditor({
 
   const editorRef = useRef<HTMLDivElement>(null);
 
-  const [suggestionState, setSuggestionState] = useState<EditorState | null>(null);
-
   function onSelectionSet(state: EditorState) {
     // update state that triggers updates in the sidebar
-    setSuggestionState(state);
+    setEditorState?.(state);
     // expand the sidebar if the user is selecting a suggestion
-    setActiveView((sidebarState) => {
-      if (sidebarState) {
+    setSidebarView?.((currentView) => {
+      if (currentView) {
         const selected = getSelectedChanges(state);
         const hasSelection = Object.values(selected).some((value) => value);
         if (hasSelection) {
           return 'suggestions';
         }
       }
-      return sidebarState;
+      return currentView;
     });
   }
 
   function getPlugins() {
     return charmEditorPlugins({
       disableRowHandles,
+      disableVideo,
       onContentChange: (view: EditorView, prevDoc: Node) => {
         debouncedUpdate(view, prevDoc);
         sendPageEvent();
@@ -317,7 +326,8 @@ function CharmEditor({
       pageId,
       spaceId: currentSpace?.id,
       userId: user?.id,
-      disableMention
+      disableMention,
+      threadIds
     });
   }
 
@@ -368,15 +378,19 @@ function CharmEditor({
 
   return (
     <StyledReactBangleEditor
+      threadIds={threadIds}
       allowClickingFooter={allowClickingFooter}
       colorMode={colorMode}
       pageId={pageId}
+      postId={postId}
+      pageType={pageType}
       focusOnInit={focusOnInit}
       disablePageSpecificFeatures={disablePageSpecificFeatures}
       disableRowHandles={disableRowHandles}
       isContentControlled={isContentControlled}
       initialContent={content}
       enableSuggestions={enableSuggestingMode}
+      linksPluginKey={linksPluginKey}
       onParticipantUpdate={onParticipantUpdate}
       trackChanges
       readOnly={readOnly}
@@ -405,10 +419,12 @@ function CharmEditor({
             const view = props.view;
             const tr = view.state.tr;
             const start = props.getPos();
-            const end = start + props.node.nodeSize;
-            tr.deleteRange(start, end);
-            tr.deleteSelection();
-            view.dispatch(tr);
+            if (typeof start === 'number') {
+              const end = start + props.node.nodeSize;
+              tr.deleteRange(start, end);
+              tr.deleteSelection();
+              view.dispatch(tr);
+            }
           }
         };
 
@@ -453,7 +469,7 @@ function CharmEditor({
           case 'iframe': {
             // support old video nodes which piggybacked on iframe type
             if (props.node.attrs.type === 'video') {
-              return <VideoNodeView isPollOrVote={isPollOrVote} isPost={pageType === 'post'} {...allProps} />;
+              return disableVideo ? null : <VideoNodeView {...allProps} />;
             }
             return <iframe.Component {...allProps} />;
           }
@@ -491,7 +507,7 @@ function CharmEditor({
             return <NFTNodeView {...allProps} />;
           }
           case 'video': {
-            return <VideoNodeView isPollOrVote={isPollOrVote} isPost={pageType === 'post'} {...allProps} />;
+            return disableVideo ? null : <VideoNodeView {...allProps} />;
           }
           default: {
             return null;
@@ -500,6 +516,7 @@ function CharmEditor({
       }}
     >
       <FloatingMenu
+        pageType={pageType}
         palettePluginKey={inlinePalettePluginKey}
         // disable comments in suggestions mode since they dont interact well
         enableComments={enableComments}
@@ -524,26 +541,14 @@ function CharmEditor({
       {children}
       {!disablePageSpecificFeatures && (
         <span className='font-family-default'>
-          {(enableComments || enableSuggestingMode) && (
-            <SidebarDrawer
-              id='page-action-sidebar'
-              title={sidebarView ? SIDEBAR_VIEWS[sidebarView].title : ''}
-              open={!!sidebarView}
-            >
-              {sidebarView === 'suggestions' && currentSpace && pageId && (
-                <SuggestionsSidebar
-                  pageId={pageId}
-                  spaceId={currentSpace.id}
-                  readOnly={!pagePermissions?.edit_content}
-                  state={suggestionState}
-                />
-              )}
-              {sidebarView === 'comments' && <CommentsSidebar permissions={pagePermissions} />}
-            </SidebarDrawer>
-          )}
-          <InlineCommentThread permissions={pagePermissions} pluginKey={inlineCommentPluginKey} />
+          <InlineCommentThread
+            isCommentSidebarOpen={sidebarView === 'comments'}
+            permissions={pagePermissions}
+            pluginKey={inlineCommentPluginKey}
+          />
           {currentSpace && pageId && (
             <SuggestionsPopup
+              isSuggestionSidebarOpen={sidebarView === 'suggestions'}
               pageId={pageId}
               spaceId={currentSpace.id}
               pluginKey={suggestionsPluginKey}

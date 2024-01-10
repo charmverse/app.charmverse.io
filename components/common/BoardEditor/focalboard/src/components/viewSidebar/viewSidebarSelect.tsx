@@ -1,3 +1,4 @@
+import { Apps } from '@mui/icons-material';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import GroupIcon from '@mui/icons-material/GroupWorkOutlined';
 import ArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
@@ -8,7 +9,7 @@ import { capitalize } from 'lodash';
 import { FcGoogle } from 'react-icons/fc';
 import { RiFolder2Line } from 'react-icons/ri';
 
-import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
+import { PageIcon } from 'components/common/PageIcon';
 import { usePages } from 'hooks/usePages';
 import type { Board, DataSourceType, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
@@ -62,6 +63,7 @@ type Props = {
   hideLayoutOptions?: boolean;
   hideSourceOptions?: boolean;
   hideGroupOptions?: boolean;
+  hidePropertiesRow?: boolean;
 };
 
 type SourceIconType = DataSourceType | 'linked';
@@ -92,7 +94,8 @@ export function ViewSidebarSelect({
   groupByProperty,
   hideLayoutOptions,
   hideSourceOptions,
-  hideGroupOptions
+  hideGroupOptions,
+  hidePropertiesRow
 }: Props) {
   const { pages } = usePages();
 
@@ -131,12 +134,14 @@ export function ViewSidebarSelect({
           value={capitalize(currentLayout)}
         />
       )}
-      <MenuRow
-        onClick={() => setSidebarView('card-properties')}
-        icon={<FormatListBulletedIcon color='secondary' />}
-        title='Properties'
-        value={currentProperties > 0 ? `${currentProperties} shown` : 'None'}
-      />
+      {!hidePropertiesRow && (
+        <MenuRow
+          onClick={() => setSidebarView('card-properties')}
+          icon={<FormatListBulletedIcon color='secondary' />}
+          title='Properties'
+          value={currentProperties > 0 ? `${currentProperties} shown` : 'None'}
+        />
+      )}
       {withGroupBy && !hideGroupOptions && (
         <MenuRow
           onClick={() => setSidebarView('group-by')}

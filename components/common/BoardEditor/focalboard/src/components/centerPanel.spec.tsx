@@ -3,7 +3,8 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
-import { Constants } from '../constants';
+import { Constants } from 'lib/focalboard/constants';
+
 import Mutator from '../mutator';
 import { TestBlockFactory } from '../test/testBlockFactory';
 import { mockDOM, mockStateStore, wrapDNDIntl, wrapPagesProvider } from '../testUtils';
@@ -28,7 +29,6 @@ jest.mock('next/router', () => ({
 }));
 
 const mockedUtils = jest.mocked(Utils, { shallow: true });
-const mockedMutator = jest.mocked(Mutator, { shallow: true });
 mockedUtils.createGuid.mockReturnValue('test-id');
 describe('components/centerPanel', () => {
   const board = TestBlockFactory.createBoard();
@@ -44,10 +44,6 @@ describe('components/centerPanel', () => {
   card2.id = '2';
   card2.title = 'card2';
   card2.fields.properties = { id: 'property_value_id_1' };
-  const comment1 = TestBlockFactory.createComment(card1);
-  comment1.id = '1';
-  const comment2 = TestBlockFactory.createComment(card2);
-  comment2.id = '2';
   const state = {
     clientConfig: {
       value: {
@@ -74,9 +70,6 @@ describe('components/centerPanel', () => {
         [activeView.id]: activeView
       },
       current: activeView.id
-    },
-    comments: {
-      comments: [comment1, comment2]
     }
   };
   const store = mockStateStore([], state);
@@ -174,7 +167,7 @@ describe('components/centerPanel', () => {
       const kanbanCardElement = kanbanCardElements[0];
       userEvent.click(kanbanCardElement);
       expect(container).toMatchSnapshot();
-      expect(mockedShowCard).toBeCalledWith(card1.id);
+      expect(mockedShowCard).toBeCalledWith(card1.id, undefined);
     });
   });
 });

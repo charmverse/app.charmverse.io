@@ -1,16 +1,11 @@
 import { Chip, Typography, Stack } from '@mui/material';
 
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
+import Link from 'components/common/Link';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { PropertyValueWithDetails } from 'lib/members/interfaces';
 
-export function MemberProperties({
-  properties,
-  onClickEdit
-}: {
-  properties: PropertyValueWithDetails[];
-  onClickEdit?: () => void;
-}) {
+export function MemberProperties({ properties }: { properties: PropertyValueWithDetails[] }) {
   const { formatDate } = useDateFormatter();
 
   return (
@@ -23,8 +18,6 @@ export function MemberProperties({
           case 'text':
           case 'text_multiline':
           case 'phone':
-          case 'name':
-          case 'url':
           case 'email':
           case 'number': {
             return (
@@ -39,6 +32,18 @@ export function MemberProperties({
                   >
                     {property.value as string}
                   </Typography>
+                </Stack>
+              )
+            );
+          }
+          case 'url': {
+            return (
+              property.value && (
+                <Stack key={property.memberPropertyId}>
+                  <Typography fontWeight='bold'>{property.name}</Typography>
+                  <Link external target='_blank' color='inherit' href={property.value as string}>
+                    {property.value as string}
+                  </Link>
                 </Stack>
               )
             );

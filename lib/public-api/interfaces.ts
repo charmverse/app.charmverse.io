@@ -23,7 +23,7 @@ export type BoardPropertyValue = string | string[] | number | null | boolean | R
  *          example: https://google.com/image.png
  *        wallet:
  *          type: string
- *          example: 0x7684F0170a3B37640423b1CD9d8Cb817Edf301aE
+ *          example: '0x7684F0170a3B37640423b1CD9d8Cb817Edf301aE'
  *        username:
  *          type: string
  *          example: testuser
@@ -508,27 +508,6 @@ export interface SpaceApiResponse {
  */
 export interface CreateWorkspaceResponseBody extends SpaceApiResponse {
   webhookSigningSecret?: string;
-}
-
-/**
- * @swagger
- * components:
- *  schemas:
- *    CreateSpaceMemberRequestBody:
- *      required:
- *        - wallet
- *      type: object
- *      properties:
- *        email:
- *          type: string
- *          example: john.doe@gmail.com
- *        wallet:
- *          type: string
- *          example: '0x7684F0170a3B37640423b1CD9d8Cb817Edf301aE'
- */
-export interface CreateSpaceMemberRequestBody {
-  email?: string;
-  wallet: string;
 }
 
 /**

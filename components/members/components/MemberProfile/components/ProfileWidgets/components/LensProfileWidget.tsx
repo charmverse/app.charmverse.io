@@ -1,8 +1,9 @@
-import type { ProfilePictureSetFragment, ProfileFragment } from '@lens-protocol/client';
+import type { ProfileFragment } from '@lens-protocol/client';
+import type { Profile } from '@lens-protocol/react-web';
 import LanguageIcon from '@mui/icons-material/Language';
-import TwitterIcon from '@mui/icons-material/Twitter';
 import { Divider, Link, Stack, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
+import { FaXTwitter } from 'react-icons/fa6';
 
 import Avatar from 'components/common/Avatar';
 
@@ -11,7 +12,7 @@ import { ProfileWidget } from './ProfileWidget';
 function LensProfileAttributes({ href, icon, label }: { href: string; icon: ReactNode; label: string }) {
   return (
     <Link href={href} target='_blank' display='flex'>
-      <Stack direction='row' spacing={0.5}>
+      <Stack direction='row' spacing={1}>
         {icon}
         <Typography
           color='initial'
@@ -30,7 +31,7 @@ function LensProfileAttributes({ href, icon, label }: { href: string; icon: Reac
 export function LensProfileWidget({ lensProfile }: { lensProfile: ProfileFragment }) {
   return (
     <ProfileWidget
-      link={`https://www.lensfrens.xyz/${lensProfile.handle}`}
+      link={`https://www.lensfrens.xyz/${lensProfile.handle?.localName}`}
       title='Lens Protocol'
       avatarSrc='/images/logos/lens_logo.svg'
     >
@@ -38,8 +39,13 @@ export function LensProfileWidget({ lensProfile }: { lensProfile: ProfileFragmen
         <Stack direction='row' spacing={1}>
           <Avatar
             size='large'
-            name={lensProfile.name ?? ''}
-            avatar={(lensProfile.picture as ProfilePictureSetFragment)?.original?.url}
+            name={lensProfile.handle?.fullHandle ?? lensProfile.metadata?.displayName ?? lensProfile.id}
+            avatar={
+              (lensProfile.metadata?.picture?.__typename === 'ImageSet'
+                ? lensProfile.metadata?.picture?.optimized?.uri || lensProfile.metadata?.picture?.raw.uri
+                : lensProfile.metadata?.picture?.image?.optimized?.uri ||
+                  lensProfile.metadata?.picture?.image?.raw?.uri) || 'https://www.lensfrens.xyz/assets/defaultPfp.png'
+            }
             variant='circular'
           />
           <Stack>
@@ -53,7 +59,7 @@ export function LensProfileWidget({ lensProfile }: { lensProfile: ProfileFragmen
               }}
             >
               <Typography variant='body1' fontWeight='bold'>
-                {lensProfile.name ?? lensProfile.handle}
+                {lensProfile.metadata?.displayName ?? lensProfile.handle?.fullHandle}
               </Typography>
               <Typography
                 variant='subtitle2'
@@ -66,39 +72,42 @@ export function LensProfileWidget({ lensProfile }: { lensProfile: ProfileFragmen
                 #{lensProfile.id}
               </Typography>
             </Stack>
-            <Typography variant='subtitle1'>{lensProfile.handle}</Typography>
+            <Typography variant='subtitle1'>{lensProfile.handle?.fullHandle}</Typography>
           </Stack>
         </Stack>
         <Stack direction='row'>
           <Typography variant='body2'>
-            Followers: {lensProfile.stats?.totalFollowers ?? 0} | Following: {lensProfile.stats?.totalFollowing ?? 0}
+            Followers: {lensProfile.stats?.followers ?? 0} | Following: {lensProfile.stats?.following ?? 0}
           </Typography>
         </Stack>
-        <Divider />
-        <Typography variant='subtitle1'>{lensProfile.bio}</Typography>
-
-        {(lensProfile.attributes ?? []).map((attribute) => {
-          if (attribute.key === 'website') {
-            return (
-              <LensProfileAttributes
-                href={attribute.value}
-                key={attribute.key}
-                icon={<LanguageIcon fontSize='small' />}
-                label={`Website: ${attribute.value}`}
-              />
-            );
-          } else if (attribute.key === 'twitter') {
-            return (
-              <LensProfileAttributes
-                key={attribute.key}
-                href={`https://twitter.com/${attribute.value}`}
-                icon={<TwitterIcon style={{ color: '#00ACEE', height: 20 }} />}
-                label={`Twitter: ${attribute.value}`}
-              />
-            );
-          }
-          return null;
-        })}
+        {lensProfile.metadata?.bio || (lensProfile.metadata?.attributes ?? []).length ? (
+          <>
+            <Divider />
+            <Typography variant='subtitle1'>{lensProfile.metadata?.bio}</Typography>
+            {(lensProfile.metadata?.attributes ?? []).map((attribute) => {
+              if (attribute.key === 'website') {
+                return (
+                  <LensProfileAttributes
+                    href={attribute.value}
+                    key={attribute.key}
+                    icon={<LanguageIcon fontSize='small' />}
+                    label={attribute.value}
+                  />
+                );
+              } else if (attribute.key === 'twitter') {
+                return (
+                  <LensProfileAttributes
+                    key={attribute.key}
+                    href={`https://twitter.com/${attribute.value}`}
+                    icon={<FaXTwitter style={{ color: '#888', height: 20, width: 18 }} />}
+                    label={attribute.value}
+                  />
+                );
+              }
+              return null;
+            })}
+          </>
+        ) : null}
       </Stack>
     </ProfileWidget>
   );

@@ -1,11 +1,12 @@
 /* eslint-disable react/no-unused-prop-types */
-import { usePluginState } from '@bangle.dev/react';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
+import type { PageType } from '@charmverse/core/prisma-client';
 import type { PluginKey } from 'prosemirror-state';
 import reactDOM from 'react-dom';
 
 import { InlinePalletteFloatingMenu } from 'components/common/CharmEditor/components/inlinePalette/InlinePalletteFloatingMenu';
 
+import { usePluginState } from '../@bangle.dev/react/hooks';
 import { InlineCommentSubMenu } from '../inlineComment/components/InlineCommentSubMenu';
 import { TextColorMenuDropdown } from '../textColor/ColorMenuDropdown';
 
@@ -39,6 +40,7 @@ type MenuProps = {
   disableNestedPage?: boolean;
   palettePluginKey?: PluginKey;
   pageId?: string;
+  pageType?: 'post' | PageType;
 };
 
 export default function FloatingMenuComponent(props: MenuProps) {
@@ -123,7 +125,7 @@ function MenuByType(props: MenuProps) {
   if (type === 'inlineCommentSubMenu' && !inline) {
     return (
       <Menu type={type} noScroll>
-        <InlineCommentSubMenu pageId={pageId} pluginKey={pluginKey} />
+        <InlineCommentSubMenu pageType={props.pageType} pageId={pageId} pluginKey={pluginKey} />
       </Menu>
     );
   }

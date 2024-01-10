@@ -21,7 +21,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -73,7 +73,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -137,7 +137,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -201,7 +201,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -277,30 +277,36 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
         </div>
         <div
           class="table-row-container"
+          style="margin-top: 2px;"
         >
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-1"
-            draggable="true"
-            style="opacity: 1;"
+            style="background-color: transparent; opacity: 1; cursor: default;"
           >
             <div
-              class="icons row-actions MuiBox-root css-0"
+              class="MuiStack-root css-1v111ru-MuiStack-root"
             >
               <div
-                class="charm-drag-handle MuiBox-root css-0"
+                class="icons row-actions"
+                draggable="true"
+                style="padding: 0px;"
               >
-                <svg
-                  aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
-                  data-testid="DragIndicatorIcon"
-                  focusable="false"
-                  viewBox="0 0 24 24"
+                <div
+                  class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
                 >
-                  <path
-                    d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
-                  />
-                </svg>
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                    data-testid="DragIndicatorIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                    />
+                  </svg>
+                </div>
               </div>
             </div>
             <div
@@ -314,7 +320,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
                   style="align-self: flex-start; align-items: flex-start;"
                 >
                   <div
-                    class="css-emwlh8"
+                    class="css-jm1ma0"
                   >
                     <img
                       src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -340,7 +346,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
                 </div>
                 <div
                   class="open-button"
-                  data-test="database-row-open-card-id-1"
+                  data-test="database-open-button-card-id-1"
                 >
                   <button
                     class="Button size--small"
@@ -358,19 +364,19 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   >
                     <div
-                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-1v6zf4t-MuiChip-root"
+                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
                     >
                       <span
                         class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
@@ -387,15 +393,15 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   />
                 </div>
@@ -419,26 +425,31 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-2"
-            draggable="true"
-            style="opacity: 1;"
+            style="background-color: transparent; opacity: 1; cursor: default;"
           >
             <div
-              class="icons row-actions MuiBox-root css-0"
+              class="MuiStack-root css-1v111ru-MuiStack-root"
             >
               <div
-                class="charm-drag-handle MuiBox-root css-0"
+                class="icons row-actions"
+                draggable="true"
+                style="padding: 0px;"
               >
-                <svg
-                  aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
-                  data-testid="DragIndicatorIcon"
-                  focusable="false"
-                  viewBox="0 0 24 24"
+                <div
+                  class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
                 >
-                  <path
-                    d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
-                  />
-                </svg>
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                    data-testid="DragIndicatorIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                    />
+                  </svg>
+                </div>
               </div>
             </div>
             <div
@@ -452,7 +463,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
                   style="align-self: flex-start; align-items: flex-start;"
                 >
                   <div
-                    class="css-emwlh8"
+                    class="css-jm1ma0"
                   >
                     <img
                       src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -478,7 +489,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
                 </div>
                 <div
                   class="open-button"
-                  data-test="database-row-open-card-id-2"
+                  data-test="database-open-button-card-id-2"
                 >
                   <button
                     class="Button size--small"
@@ -496,19 +507,19 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   >
                     <div
-                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-1v6zf4t-MuiChip-root"
+                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
                     >
                       <span
                         class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
@@ -525,15 +536,15 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   />
                 </div>
@@ -587,6 +598,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
         </div>
         <div
           class="CalculationRow octo-table-row"
+          style="margin-left: 25px;"
         >
           <div
             class="Calculation count octo-table-cell   "
@@ -619,12 +631,12 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -642,12 +654,12 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -665,12 +677,12 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -702,7 +714,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -754,7 +766,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -818,7 +830,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -882,7 +894,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -955,30 +967,36 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
         </div>
         <div
           class="table-row-container"
+          style="margin-top: 2px;"
         >
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-1"
-            draggable="true"
-            style="opacity: 1;"
+            style="background-color: transparent; opacity: 1; cursor: default;"
           >
             <div
-              class="icons row-actions MuiBox-root css-0"
+              class="MuiStack-root css-1v111ru-MuiStack-root"
             >
               <div
-                class="charm-drag-handle MuiBox-root css-0"
+                class="icons row-actions"
+                draggable="true"
+                style="padding: 0px;"
               >
-                <svg
-                  aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
-                  data-testid="DragIndicatorIcon"
-                  focusable="false"
-                  viewBox="0 0 24 24"
+                <div
+                  class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
                 >
-                  <path
-                    d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
-                  />
-                </svg>
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                    data-testid="DragIndicatorIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                    />
+                  </svg>
+                </div>
               </div>
             </div>
             <div
@@ -992,7 +1010,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
                   style="align-self: flex-start; align-items: flex-start;"
                 >
                   <div
-                    class="css-emwlh8"
+                    class="css-jm1ma0"
                   >
                     <img
                       src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -1018,7 +1036,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
                 </div>
                 <div
                   class="open-button"
-                  data-test="database-row-open-card-id-1"
+                  data-test="database-open-button-card-id-1"
                 >
                   <button
                     class="Button size--small"
@@ -1036,19 +1054,19 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   >
                     <div
-                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-1v6zf4t-MuiChip-root"
+                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
                     >
                       <span
                         class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
@@ -1065,15 +1083,15 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   />
                 </div>
@@ -1091,26 +1109,31 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-2"
-            draggable="true"
-            style="opacity: 1;"
+            style="background-color: transparent; opacity: 1; cursor: default;"
           >
             <div
-              class="icons row-actions MuiBox-root css-0"
+              class="MuiStack-root css-1v111ru-MuiStack-root"
             >
               <div
-                class="charm-drag-handle MuiBox-root css-0"
+                class="icons row-actions"
+                draggable="true"
+                style="padding: 0px;"
               >
-                <svg
-                  aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
-                  data-testid="DragIndicatorIcon"
-                  focusable="false"
-                  viewBox="0 0 24 24"
+                <div
+                  class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
                 >
-                  <path
-                    d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
-                  />
-                </svg>
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                    data-testid="DragIndicatorIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                    />
+                  </svg>
+                </div>
               </div>
             </div>
             <div
@@ -1124,7 +1147,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
                   style="align-self: flex-start; align-items: flex-start;"
                 >
                   <div
-                    class="css-emwlh8"
+                    class="css-jm1ma0"
                   >
                     <img
                       src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -1150,7 +1173,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
                 </div>
                 <div
                   class="open-button"
-                  data-test="database-row-open-card-id-2"
+                  data-test="database-open-button-card-id-2"
                 >
                   <button
                     class="Button size--small"
@@ -1168,19 +1191,19 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   >
                     <div
-                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-1v6zf4t-MuiChip-root"
+                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
                     >
                       <span
                         class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
@@ -1197,15 +1220,15 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   />
                 </div>
@@ -1253,6 +1276,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
         </div>
         <div
           class="CalculationRow octo-table-row"
+          style="margin-left: 25px;"
         >
           <div
             class="Calculation count octo-table-cell   "
@@ -1285,12 +1309,12 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -1308,12 +1332,12 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -1331,12 +1355,12 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -1368,7 +1392,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -1420,7 +1444,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -1484,7 +1508,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -1548,7 +1572,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -1624,30 +1648,36 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
         </div>
         <div
           class="table-row-container"
+          style="margin-top: 2px;"
         >
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-1"
-            draggable="true"
-            style="opacity: 1;"
+            style="background-color: transparent; opacity: 1; cursor: default;"
           >
             <div
-              class="icons row-actions MuiBox-root css-0"
+              class="MuiStack-root css-1v111ru-MuiStack-root"
             >
               <div
-                class="charm-drag-handle MuiBox-root css-0"
+                class="icons row-actions"
+                draggable="true"
+                style="padding: 0px;"
               >
-                <svg
-                  aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
-                  data-testid="DragIndicatorIcon"
-                  focusable="false"
-                  viewBox="0 0 24 24"
+                <div
+                  class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
                 >
-                  <path
-                    d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
-                  />
-                </svg>
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                    data-testid="DragIndicatorIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                    />
+                  </svg>
+                </div>
               </div>
             </div>
             <div
@@ -1661,7 +1691,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
                   style="align-self: flex-start; align-items: flex-start;"
                 >
                   <div
-                    class="css-emwlh8"
+                    class="css-jm1ma0"
                   >
                     <img
                       src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -1687,7 +1717,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
                 </div>
                 <div
                   class="open-button"
-                  data-test="database-row-open-card-id-1"
+                  data-test="database-open-button-card-id-1"
                 >
                   <button
                     class="Button size--small"
@@ -1705,19 +1735,19 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   >
                     <div
-                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-1v6zf4t-MuiChip-root"
+                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
                     >
                       <span
                         class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
@@ -1734,15 +1764,15 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   />
                 </div>
@@ -1766,26 +1796,31 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-2"
-            draggable="true"
-            style="opacity: 1;"
+            style="background-color: transparent; opacity: 1; cursor: default;"
           >
             <div
-              class="icons row-actions MuiBox-root css-0"
+              class="MuiStack-root css-1v111ru-MuiStack-root"
             >
               <div
-                class="charm-drag-handle MuiBox-root css-0"
+                class="icons row-actions"
+                draggable="true"
+                style="padding: 0px;"
               >
-                <svg
-                  aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
-                  data-testid="DragIndicatorIcon"
-                  focusable="false"
-                  viewBox="0 0 24 24"
+                <div
+                  class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
                 >
-                  <path
-                    d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
-                  />
-                </svg>
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                    data-testid="DragIndicatorIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                    />
+                  </svg>
+                </div>
               </div>
             </div>
             <div
@@ -1799,7 +1834,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
                   style="align-self: flex-start; align-items: flex-start;"
                 >
                   <div
-                    class="css-emwlh8"
+                    class="css-jm1ma0"
                   >
                     <img
                       src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -1825,7 +1860,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
                 </div>
                 <div
                   class="open-button"
-                  data-test="database-row-open-card-id-2"
+                  data-test="database-open-button-card-id-2"
                 >
                   <button
                     class="Button size--small"
@@ -1843,19 +1878,19 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   >
                     <div
-                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-1v6zf4t-MuiChip-root"
+                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
                     >
                       <span
                         class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
@@ -1872,15 +1907,15 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   />
                 </div>
@@ -1934,6 +1969,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
         </div>
         <div
           class="CalculationRow octo-table-row"
+          style="margin-left: 25px;"
         >
           <div
             class="Calculation count octo-table-cell   "
@@ -1966,12 +2002,12 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -1989,12 +2025,12 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -2012,12 +2048,12 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -2049,7 +2085,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -2101,7 +2137,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -2165,7 +2201,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -2229,7 +2265,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -2302,30 +2338,36 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
         </div>
         <div
           class="table-row-container"
+          style="margin-top: 2px;"
         >
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-1"
-            draggable="true"
-            style="opacity: 1;"
+            style="background-color: transparent; opacity: 1; cursor: default;"
           >
             <div
-              class="icons row-actions MuiBox-root css-0"
+              class="MuiStack-root css-1v111ru-MuiStack-root"
             >
               <div
-                class="charm-drag-handle MuiBox-root css-0"
+                class="icons row-actions"
+                draggable="true"
+                style="padding: 0px;"
               >
-                <svg
-                  aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
-                  data-testid="DragIndicatorIcon"
-                  focusable="false"
-                  viewBox="0 0 24 24"
+                <div
+                  class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
                 >
-                  <path
-                    d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
-                  />
-                </svg>
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                    data-testid="DragIndicatorIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                    />
+                  </svg>
+                </div>
               </div>
             </div>
             <div
@@ -2339,7 +2381,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
                   style="align-self: flex-start; align-items: flex-start;"
                 >
                   <div
-                    class="css-emwlh8"
+                    class="css-jm1ma0"
                   >
                     <img
                       src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -2365,7 +2407,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
                 </div>
                 <div
                   class="open-button"
-                  data-test="database-row-open-card-id-1"
+                  data-test="database-open-button-card-id-1"
                 >
                   <button
                     class="Button size--small"
@@ -2383,19 +2425,19 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   >
                     <div
-                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-1v6zf4t-MuiChip-root"
+                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
                     >
                       <span
                         class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
@@ -2412,15 +2454,15 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   />
                 </div>
@@ -2438,26 +2480,31 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-2"
-            draggable="true"
-            style="opacity: 1;"
+            style="background-color: transparent; opacity: 1; cursor: default;"
           >
             <div
-              class="icons row-actions MuiBox-root css-0"
+              class="MuiStack-root css-1v111ru-MuiStack-root"
             >
               <div
-                class="charm-drag-handle MuiBox-root css-0"
+                class="icons row-actions"
+                draggable="true"
+                style="padding: 0px;"
               >
-                <svg
-                  aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
-                  data-testid="DragIndicatorIcon"
-                  focusable="false"
-                  viewBox="0 0 24 24"
+                <div
+                  class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
                 >
-                  <path
-                    d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
-                  />
-                </svg>
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                    data-testid="DragIndicatorIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                    />
+                  </svg>
+                </div>
               </div>
             </div>
             <div
@@ -2471,7 +2518,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
                   style="align-self: flex-start; align-items: flex-start;"
                 >
                   <div
-                    class="css-emwlh8"
+                    class="css-jm1ma0"
                   >
                     <img
                       src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -2497,7 +2544,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
                 </div>
                 <div
                   class="open-button"
-                  data-test="database-row-open-card-id-2"
+                  data-test="database-open-button-card-id-2"
                 >
                   <button
                     class="Button size--small"
@@ -2515,19 +2562,19 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   >
                     <div
-                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-1v6zf4t-MuiChip-root"
+                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
                     >
                       <span
                         class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
@@ -2544,15 +2591,15 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="css-1s6sld2-MuiStack-root"
+                class="MuiStack-root css-1s6sld2-MuiStack-root"
                 data-test="closed-select-input"
               >
                 <div
-                  class="css-1a59yxd-MuiStack-root"
+                  class="MuiStack-root css-1a59yxd-MuiStack-root"
                   data-test="select-preview"
                 >
                   <div
-                    class=" css-b3ouwx-MuiStack-root"
+                    class="MuiStack-root css-b3ouwx-MuiStack-root"
                     data-mui-internal-clone-element="true"
                   />
                 </div>
@@ -2600,6 +2647,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
         </div>
         <div
           class="CalculationRow octo-table-row"
+          style="margin-left: 25px;"
         >
           <div
             class="Calculation count octo-table-cell   "
@@ -2632,12 +2680,12 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -2655,12 +2703,12 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -2678,12 +2726,12 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -2715,7 +2763,7 @@ exports[`components/table/Table should match snapshot 1`] = `
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -2767,7 +2815,7 @@ exports[`components/table/Table should match snapshot 1`] = `
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -2831,7 +2879,7 @@ exports[`components/table/Table should match snapshot 1`] = `
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -2916,6 +2964,7 @@ exports[`components/table/Table should match snapshot 1`] = `
         </div>
         <div
           class="table-row-container"
+          style="margin-top: 2px;"
         />
         <div
           class="octo-table-footer"
@@ -2949,6 +2998,7 @@ exports[`components/table/Table should match snapshot 1`] = `
         </div>
         <div
           class="CalculationRow octo-table-row"
+          style="margin-left: 25px;"
         >
           <div
             class="Calculation count octo-table-cell   "
@@ -2981,12 +3031,12 @@ exports[`components/table/Table should match snapshot 1`] = `
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -3004,12 +3054,12 @@ exports[`components/table/Table should match snapshot 1`] = `
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -3041,7 +3091,7 @@ exports[`components/table/Table should match snapshot with GroupBy 1`] = `
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -3093,7 +3143,7 @@ exports[`components/table/Table should match snapshot with GroupBy 1`] = `
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -3157,7 +3207,7 @@ exports[`components/table/Table should match snapshot with GroupBy 1`] = `
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -3242,6 +3292,7 @@ exports[`components/table/Table should match snapshot with GroupBy 1`] = `
         </div>
         <div
           class="table-row-container"
+          style="margin-top: 2px;"
         >
           <div
             class="octo-table-group"
@@ -3333,6 +3384,7 @@ exports[`components/table/Table should match snapshot with GroupBy 1`] = `
         />
         <div
           class="CalculationRow octo-table-row"
+          style="margin-left: 25px;"
         >
           <div
             class="Calculation count octo-table-cell   "
@@ -3365,12 +3417,12 @@ exports[`components/table/Table should match snapshot with GroupBy 1`] = `
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -3388,12 +3440,12 @@ exports[`components/table/Table should match snapshot with GroupBy 1`] = `
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -3425,7 +3477,7 @@ exports[`components/table/Table should match snapshot, read-only 1`] = `
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <span
                 class="Label empty "
@@ -3464,7 +3516,7 @@ exports[`components/table/Table should match snapshot, read-only 1`] = `
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <span
                 class="Label empty "
@@ -3503,7 +3555,7 @@ exports[`components/table/Table should match snapshot, read-only 1`] = `
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="css-19zgtxi-MuiStack-root"
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
             >
               <span
                 class="Label empty "
@@ -3543,12 +3595,14 @@ exports[`components/table/Table should match snapshot, read-only 1`] = `
         </div>
         <div
           class="table-row-container"
+          style="margin-top: 2px;"
         />
         <div
           class="octo-table-footer"
         />
         <div
           class="CalculationRow octo-table-row"
+          style="margin-left: 0px;"
         >
           <div
             class="Calculation count octo-table-cell disabled  "
@@ -3581,12 +3635,12 @@ exports[`components/table/Table should match snapshot, read-only 1`] = `
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>
@@ -3604,12 +3658,12 @@ exports[`components/table/Table should match snapshot, read-only 1`] = `
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
-              data-testid="ExpandLessIcon"
+              data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
             >
               <path
-                d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
           </div>

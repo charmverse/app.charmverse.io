@@ -13,6 +13,8 @@ import { useUserPreferences } from 'hooks/useUserPreferences';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
+import { Constants } from 'lib/focalboard/constants';
+import { isTruthy } from 'lib/utilities/types';
 
 import mutator from '../../mutator';
 import type { DateProperty } from '../properties/dateRange/dateRange';
@@ -70,7 +72,7 @@ function CalendarFullView(props: Props): JSX.Element | null {
     () =>
       activeView.fields.visiblePropertyIds
         .map((id) => board.fields.cardProperties.find((t) => t.id === id))
-        .filter((i) => i) as IPropertyTemplate[],
+        .filter((i) => isTruthy(i) && i.id !== Constants.titleColumnId) as IPropertyTemplate[],
     [board.fields.cardProperties, activeView.fields.visiblePropertyIds]
   );
 
@@ -154,12 +156,12 @@ function CalendarFullView(props: Props): JSX.Element | null {
                 board={board}
                 syncWithPageId={page?.syncWithPageId}
                 key={template.id}
-                readOnly={true}
+                readOnly
                 card={card}
                 updatedAt={page?.updatedAt.toString() ?? ''}
                 updatedBy={page?.updatedBy ?? ''}
                 propertyTemplate={template}
-                showEmptyPlaceholder={true}
+                showEmptyPlaceholder
                 showTooltip
                 displayType='calendar'
               />

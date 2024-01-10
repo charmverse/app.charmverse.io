@@ -3,15 +3,15 @@ import getPageLayout from 'components/common/PageLayout/getLayout';
 import { PostDialogProvider } from 'components/forum/components/PostDialog/hooks/usePostDialog';
 import PostDialogGlobal from 'components/forum/components/PostDialog/PostDialogGlobal';
 import { ForumPage } from 'components/forum/ForumFeedPage';
-import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
-import { setTitle } from 'hooks/usePageTitle';
+import { useStaticPageTitle } from 'hooks/usePageTitle';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
 export default function ForumPageComponent() {
-  const { mappedFeatures } = useFeaturesAndMembers();
+  const { mappedFeatures } = useSpaceFeatures();
   const forumTitle = mappedFeatures.forum.title;
   useTrackPageView({ type: 'forum_posts_list' });
 
-  setTitle(forumTitle);
+  useStaticPageTitle(forumTitle);
 
   return (
     <PostDialogProvider>

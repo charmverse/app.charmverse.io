@@ -3,7 +3,7 @@ import { ClickAwayListener, Collapse } from '@mui/material';
 import { memo, useEffect, useState } from 'react';
 
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
+import type { BoardView, IViewType } from 'lib/focalboard/boardView';
 
 import { DatabaseSidebarHeader } from './databaseSidebarHeader';
 import { StyledSidebar } from './styledSidebar';
@@ -28,6 +28,9 @@ interface Props {
   hideLayoutOptions?: boolean;
   hideSourceOptions?: boolean;
   hideGroupOptions?: boolean;
+  hideLayoutSelectOptions?: boolean;
+  hidePropertiesRow?: boolean;
+  supportedViewTypes?: IViewType[];
 }
 
 function getDefaultView(hasBoardView: boolean): SidebarView {
@@ -48,13 +51,13 @@ function ViewSidebar(props: Props) {
   }, [props.isOpen]);
 
   return (
-    <ClickAwayListener mouseEvent={props.isOpen ? 'onClick' : false} onClickAway={props.closeSidebar}>
+    <ClickAwayListener mouseEvent={props.isOpen ? 'onMouseDown' : false} onClickAway={props.closeSidebar}>
       <Collapse
         in={props.isOpen}
         orientation='horizontal'
         sx={{ position: 'absolute', right: 0, top: 0, bottom: 0, zIndex: 1000 }}
       >
-        <StyledSidebar>
+        <StyledSidebar data-test='view-sidebar-content'>
           {sidebarView === 'view-options' && <ViewSidebarSelect {...props} setSidebarView={setSidebarView} />}
 
           {props.view && (
@@ -62,7 +65,12 @@ function ViewSidebar(props: Props) {
               {sidebarView === 'layout' && (
                 <>
                   <DatabaseSidebarHeader goBack={goToSidebarHome} title='Layout' onClose={props.closeSidebar} />
-                  <ViewLayoutOptions board={props.board} view={props.view} />
+                  <ViewLayoutOptions
+                    hideLayoutSelectOptions={props.hideLayoutSelectOptions}
+                    board={props.board}
+                    view={props.view}
+                    supportedViewTypes={props.supportedViewTypes}
+                  />
                 </>
               )}
               {sidebarView === 'card-properties' && (

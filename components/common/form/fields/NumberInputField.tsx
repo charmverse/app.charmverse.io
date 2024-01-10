@@ -7,10 +7,28 @@ import type { ControlFieldProps, FieldProps } from 'components/common/form/inter
 type Props = ControlFieldProps & FieldProps;
 
 export const NumberInputField = forwardRef<HTMLDivElement, Props>(
-  ({ label, iconLabel, inline, error, ...inputProps }: Props, ref) => {
+  (
+    { label, endAdornment, iconLabel, description, inline, error, required, placeholder, ...inputProps }: Props,
+    ref
+  ) => {
     return (
-      <FieldWrapper label={label} inline={inline} iconLabel={iconLabel}>
-        <TextField fullWidth error={!!error} {...inputProps} ref={ref} type='number' />
+      <FieldWrapper
+        endAdornment={endAdornment}
+        description={description}
+        required={required}
+        label={label}
+        inline={inline}
+        iconLabel={iconLabel}
+      >
+        <TextField
+          fullWidth
+          error={!!error}
+          required={required}
+          placeholder={placeholder}
+          {...inputProps}
+          ref={ref}
+          type='number'
+        />
       </FieldWrapper>
     );
   }

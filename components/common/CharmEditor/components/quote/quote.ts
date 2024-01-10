@@ -1,6 +1,10 @@
-import { type BaseRawNodeSpec } from '@bangle.dev/core';
 import type { DOMOutputSpec, Node } from '@bangle.dev/pm';
+import { getNodeType } from '@bangle.dev/utils';
+import { wrappingInputRule } from 'prosemirror-inputrules';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
+
+import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
+import type { BaseRawNodeSpec } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 const name = 'quote';
 
@@ -31,5 +35,12 @@ export function spec(): BaseRawNodeSpec {
         }
       }
     }
+  };
+}
+
+export function plugins(): RawPlugins {
+  return ({ schema }) => {
+    const type = getNodeType(schema, name);
+    return [wrappingInputRule(/^\s*>\s$/, type)];
   };
 }

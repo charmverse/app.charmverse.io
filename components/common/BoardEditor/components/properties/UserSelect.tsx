@@ -3,6 +3,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { IconButton, Box, Stack } from '@mui/material';
 import { useCallback, useState } from 'react';
 
+import { ErrorWrapper } from 'components/common/BoardEditor/components/properties/ErrorWrapper';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import UserDisplay from 'components/common/UserDisplay';
@@ -12,7 +13,7 @@ import { isTruthy } from 'lib/utilities/types';
 import { EmptyPlaceholder } from './EmptyPlaceholder';
 import { SelectPreviewContainer } from './TagSelect/TagSelect';
 
-type Props = {
+export type UserSelectProps = {
   memberIds: string[];
   readOnly?: boolean;
   onChange: (memberIds: string[]) => void;
@@ -20,6 +21,9 @@ type Props = {
   displayType?: PropertyValueDisplayType;
   wrapColumn?: boolean;
   'data-test'?: string;
+  defaultOpened?: boolean;
+  error?: string;
+  disallowEmpty?: boolean;
 };
 
 type ContainerProps = {
@@ -55,8 +59,10 @@ function MembersDisplay({
   memberIds,
   readOnly,
   setMemberIds,
-  wrapColumn
+  wrapColumn,
+  disallowEmpty
 }: {
+  disallowEmpty?: boolean;
   wrapColumn: boolean;
   readOnly: boolean;
   memberIds: string[];
@@ -71,6 +77,7 @@ function MembersDisplay({
   }
 
   const members = memberIds.map((memberId) => membersRecord[memberId]).filter(isTruthy);
+  const showDeleteIcon = (disallowEmpty && memberIds.length !== 1) || !disallowEmpty;
 
   return memberIds.length === 0 ? null : (
     <Stack flexDirection='row' gap={1} rowGap={0.5} flexWrap={wrapColumn ? 'wrap' : 'nowrap'}>
@@ -83,8 +90,8 @@ function MembersDisplay({
             gap={0.5}
             sx={wrapColumn ? { justifyContent: 'space-between', overflowX: 'hidden' } : { overflowX: 'hidden' }}
           >
-            <UserDisplay fontSize={14} avatarSize='xSmall' user={user} wrapName={wrapColumn} />
-            {!readOnly && (
+            <UserDisplay fontSize={14} avatarSize='xSmall' userId={user.id} wrapName={wrapColumn} />
+            {!readOnly && showDeleteIcon && (
               <IconButton size='small' onClick={() => removeMember(user.id)}>
                 <CloseIcon
                   sx={{
@@ -110,17 +117,20 @@ export function UserSelect({
   readOnly,
   showEmptyPlaceholder,
   wrapColumn,
-  'data-test': dataTest
-}: Props): JSX.Element | null {
-  const [isOpen, setIsOpen] = useState(false);
+  defaultOpened,
+  'data-test': dataTest,
+  error,
+  disallowEmpty = false
+}: UserSelectProps): JSX.Element | null {
+  const [isOpen, setIsOpen] = useState(defaultOpened);
 
   const _onChange = useCallback(
     (newMemberIds: string[]) => {
-      if (!readOnly) {
+      if (!readOnly && ((disallowEmpty && newMemberIds.length !== 0) || !disallowEmpty)) {
         onChange(newMemberIds);
       }
     },
-    [readOnly, onChange]
+    [readOnly, onChange, disallowEmpty]
   );
 
   const onClickToEdit = useCallback(() => {
@@ -131,50 +141,60 @@ export function UserSelect({
 
   if (!isOpen) {
     return (
-      <SelectPreviewContainer
-        data-test={dataTest}
-        isHidden={isOpen}
-        displayType={displayType}
-        readOnly={readOnly}
-        onClick={onClickToEdit}
-      >
-        <Stack gap={0.5}>
-          {memberIds.length === 0 ? (
-            showEmptyPlaceholder && <EmptyPlaceholder>Empty</EmptyPlaceholder>
-          ) : (
+      <ErrorWrapper error={error}>
+        <SelectPreviewContainer
+          data-test={dataTest}
+          isHidden={isOpen}
+          displayType={displayType}
+          readOnly={readOnly}
+          onClick={onClickToEdit}
+        >
+          <Stack gap={0.5}>
+            {memberIds.length === 0 ? (
+              showEmptyPlaceholder && <EmptyPlaceholder>Empty</EmptyPlaceholder>
+            ) : (
+              <MembersDisplay
+                wrapColumn={wrapColumn ?? false}
+                readOnly={true}
+                memberIds={memberIds}
+                setMemberIds={_onChange}
+              />
+            )}
+          </Stack>
+        </SelectPreviewContainer>
+      </ErrorWrapper>
+    );
+  }
+  return (
+    <ErrorWrapper error={error}>
+      <StyledUserPropertyContainer displayType={displayType}>
+        <InputSearchMemberMultiple
+          data-test={dataTest}
+          disableClearable
+          clearOnBlur
+          open
+          openOnFocus
+          disableCloseOnSelect
+          defaultValue={memberIds}
+          onClose={() => setIsOpen(false)}
+          fullWidth
+          onChange={_onChange}
+          getOptionLabel={(user) => (typeof user === 'string' ? user : user?.username)}
+          readOnly={readOnly}
+          placeholder={memberIds.length === 0 ? 'Search for a person...' : ''}
+          inputVariant='standard'
+          forcePopupIcon={false}
+          renderTags={() => (
             <MembersDisplay
-              wrapColumn={wrapColumn ?? false}
-              readOnly={true}
+              disallowEmpty={disallowEmpty}
+              wrapColumn={true}
+              readOnly={!!readOnly}
               memberIds={memberIds}
               setMemberIds={_onChange}
             />
           )}
-        </Stack>
-      </SelectPreviewContainer>
-    );
-  }
-  return (
-    <StyledUserPropertyContainer displayType={displayType}>
-      <InputSearchMemberMultiple
-        data-test={dataTest}
-        disableClearable
-        clearOnBlur
-        open
-        openOnFocus
-        disableCloseOnSelect
-        defaultValue={memberIds}
-        onClose={() => setIsOpen(false)}
-        fullWidth
-        onChange={_onChange}
-        getOptionLabel={(user) => (typeof user === 'string' ? user : user?.username)}
-        readOnly={readOnly}
-        placeholder={memberIds.length === 0 ? 'Search for a person...' : ''}
-        inputVariant='standard'
-        forcePopupIcon={false}
-        renderTags={() => (
-          <MembersDisplay wrapColumn={true} readOnly={!!readOnly} memberIds={memberIds} setMemberIds={_onChange} />
-        )}
-      />
-    </StyledUserPropertyContainer>
+        />
+      </StyledUserPropertyContainer>
+    </ErrorWrapper>
   );
 }

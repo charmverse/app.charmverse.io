@@ -32,7 +32,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
-import type { DiscordAccount } from 'lib/discord/getDiscordAccount';
+import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
 import { countConnectableIdentities } from 'lib/users/countConnectableIdentities';
 import { shortWalletAddress } from 'lib/utilities/blockchain';
 import randomName from 'lib/utilities/randomName';
@@ -48,7 +48,7 @@ import { TelegramLoginIframe } from './TelegramLoginIframe';
 
 export function IdentityProviders() {
   const { isConnectingIdentity } = useWeb3ConnectionManager();
-  const { account, sign, isSigning, verifiableWalletDetected, disconnectWallet } = useWeb3Account();
+  const { account, requestSignature, isSigning, verifiableWalletDetected, disconnectWallet } = useWeb3Account();
   const { user, setUser, updateUser } = useUser();
   const { showMessage } = useSnackbar();
   const { disconnectVerifiedEmailAccount } = useFirebaseAuth();
@@ -90,7 +90,7 @@ export function IdentityProviders() {
 
   const generateWalletAuth = async () => {
     try {
-      const authSig = await sign();
+      const authSig = await requestSignature();
       await signSuccess(authSig);
     } catch (error) {
       log.error('Error requesting wallet signature in login page', error);
@@ -125,7 +125,7 @@ export function IdentityProviders() {
     disconnectTelegramError?.error;
 
   const onIdentityChange = async (event: SelectChangeEvent<string>) => {
-    const val = identityTypes.find((t) => t.username === event.target.value);
+    const val = identityTypes.find((t) => t.type === event.target.value);
 
     if (val) {
       await saveUser({
@@ -149,13 +149,13 @@ export function IdentityProviders() {
         </InputLabel>
         <Box display='flex' alignItems='center'>
           <Select
-            value={user?.username}
+            value={user?.identityType ?? ''}
             onChange={onIdentityChange}
             disabled={isLoadingUserUpdate}
             sx={{ width: '400px', mr: 1 }}
           >
             {identityTypes.map((identity) => (
-              <MenuItem key={identity.username} value={identity.username}>
+              <MenuItem key={identity.type} value={identity.type}>
                 <Box display='flex' justifyContent='space-between' alignItems='center' width='100%'>
                   {identity.username}
                   <Chip variant='filled' label={identity.type.replace(/([A-Z])/g, ' $1').trim()} sx={{ ml: 2 }} />

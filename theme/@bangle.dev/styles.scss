@@ -1,6 +1,3 @@
-.bangle-heading-collapsed {
-  border-radius: 8px;
-}
 
 .bangle-tooltip {
   z-index: var(--z-index-modal);
@@ -278,6 +275,11 @@ ol li {
   transition: background-color 150ms ease-in-out;
 }
 
+#Prosemirror-hovered-page-node {
+  background-color: var(--charmeditor-active);
+  transition: background-color 150ms ease-in-out;
+}
+
 .bangle-nv-container {
   transition: background-color 150ms ease-in-out;
 }
@@ -489,19 +491,21 @@ ol li {
   }
 }
 
-/** placeholder **/
-.ProseMirror[data-placeholder]::before,
-.charm-placeholder::before  {
-  display: block;
-  height: 0;
-  color: var(--secondary-text);
-  content: attr(data-placeholder);
-  opacity: 0.75;
-  pointer-events: none;
-  position: relative;
-}
-.ProseMirror[data-placeholder]::before  {
-  top: 3px;
+/** placeholder - do not show while content is loading **/
+.content-loaded  {
+  .ProseMirror[data-placeholder]::before,
+  .charm-placeholder::before  {
+    display: block;
+    height: 0;
+    color: var(--secondary-text);
+    content: attr(data-placeholder);
+    opacity: 0.75;
+    pointer-events: none;
+    position: relative;
+  }
+  .ProseMirror[data-placeholder]::before  {
+    top: 3px;
+  }
 }
 
 .readonly {

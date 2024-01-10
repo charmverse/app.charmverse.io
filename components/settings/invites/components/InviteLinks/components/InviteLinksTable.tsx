@@ -15,9 +15,11 @@ import Countdown from 'react-countdown';
 import ButtonChip from 'components/common/ButtonChip';
 import TableRow from 'components/common/Table/TableRow';
 import TokenGateRolesSelect from 'components/settings/invites/components/TokenGates/components/TokenGateRolesSelect';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
 import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
+import { validateInviteLink } from 'lib/invites/validateInviteLink';
 
 import { ConfirmInviteLinkDeletion } from './ConfirmInviteLinkDeletion';
 
@@ -25,7 +27,7 @@ export function InvitesTable() {
   const isAdmin = useIsAdmin();
   const { updateInviteLinkRoles, deleteInviteLink, privateInvites } = useSpaceInvitesList();
   const [copied, setCopied] = useState<{ [id: string]: boolean }>({});
-
+  const { space } = useCurrentSpace();
   const [inviteToDelete, setInviteToDelete] = useState<InviteLinkWithRoles | null>(null);
 
   function onCopy(id: string) {
@@ -65,73 +67,94 @@ export function InvitesTable() {
               </TableCell>
             </TableRow>
           )}
-          {privateInvites?.map((invite) => (
-            <TableRow key={invite.id}>
-              <TableCell sx={{ padding: '20px 16px' }}>
-                <Box display='flex' justifyContent='flex-start' gap={1}>
-                  Private Link
-                </Box>
-              </TableCell>
-              <TableCell>
-                <Typography>
-                  {invite.useCount}
-                  {invite.maxUses > 0 ? ` / ${invite.maxUses}` : ''}
-                </Typography>
-              </TableCell>
-              <TableCell width={150}>{getExpires(invite)}</TableCell>
-              <TableCell width={150}>
-                <TokenGateRolesSelect
-                  isAdmin={isAdmin}
-                  selectedRoleIds={invite.roleIds}
-                  onChange={(roleIds) => {
-                    updateInviteLinkRoles({ inviteLinkId: invite.id, roleIds });
-                  }}
-                  onDelete={(roleId) => {
-                    updateInviteLinkRoles({
-                      inviteLinkId: invite.id,
-                      roleIds: invite.roleIds.filter((role) => role !== roleId)
-                    });
-                  }}
-                />
-              </TableCell>
-              <TableCell width={90}>
-                <Tooltip
-                  arrow
-                  placement='top'
-                  title={copied[invite.id] ? 'Copied!' : 'Click to copy link'}
-                  disableInteractive
-                >
-                  <Box component='span'>
-                    <CopyToClipboard text={getInviteLink(invite.code)} onCopy={() => onCopy(invite.id)}>
-                      <Chip
-                        sx={{ width: 90 }}
+          {privateInvites?.map((invite) => {
+            const isValid = space
+              ? validateInviteLink({
+                  invite: {
+                    ...invite,
+                    space
+                  }
+                })
+              : { valid: false };
+
+            return (
+              <TableRow key={invite.id}>
+                <TableCell sx={{ padding: '20px 16px' }}>
+                  <Typography variant='body2'>Private Link</Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography>
+                    {invite.useCount}
+                    {invite.maxUses > 0 ? ` / ${invite.maxUses}` : ''}
+                  </Typography>
+                </TableCell>
+                <TableCell width={150}>{getExpires(invite)}</TableCell>
+                <TableCell width={150}>
+                  <Tooltip arrow placement='top' title={!isValid.valid ? isValid.message ?? 'Invite invalid' : ''}>
+                    <div>
+                      <TokenGateRolesSelect
+                        disabled={!isValid.valid}
+                        isAdmin={isAdmin}
+                        selectedRoleIds={invite.roleIds}
+                        onChange={(roleIds) => {
+                          updateInviteLinkRoles({ inviteLinkId: invite.id, roleIds });
+                        }}
+                        onDelete={(roleId) => {
+                          updateInviteLinkRoles({
+                            inviteLinkId: invite.id,
+                            roleIds: invite.roleIds.filter((role) => role !== roleId)
+                          });
+                        }}
+                      />
+                    </div>
+                  </Tooltip>
+                </TableCell>
+                <TableCell width={90}>
+                  <Tooltip
+                    arrow
+                    placement='top'
+                    title={
+                      !isValid.valid
+                        ? isValid.message ?? 'Invite invalid'
+                        : copied[invite.id]
+                        ? 'Copied!'
+                        : 'Click to copy link'
+                    }
+                    disableInteractive
+                  >
+                    <Box component='span'>
+                      <CopyToClipboard text={getInviteLink(invite.code)} onCopy={() => onCopy(invite.id)}>
+                        <Chip
+                          disabled={!isValid.valid}
+                          sx={{ width: 90 }}
+                          clickable
+                          color='secondary'
+                          size='small'
+                          variant='outlined'
+                          label={copied[invite.id] ? 'Copied!' : 'Copy Link'}
+                        />
+                      </CopyToClipboard>
+                    </Box>
+                  </Tooltip>
+                </TableCell>
+                <TableCell width={30}>
+                  {isAdmin && (
+                    <Tooltip arrow placement='top' title='Delete'>
+                      <ButtonChip
+                        className='row-actions'
+                        icon={<CloseIcon />}
                         clickable
                         color='secondary'
                         size='small'
                         variant='outlined'
-                        label={copied[invite.id] ? 'Copied!' : 'Copy Link'}
+                        onClick={() => triggerInviteDeletion(invite)}
                       />
-                    </CopyToClipboard>
-                  </Box>
-                </Tooltip>
-              </TableCell>
-              <TableCell width={30}>
-                {isAdmin && (
-                  <Tooltip arrow placement='top' title='Delete'>
-                    <ButtonChip
-                      className='row-actions'
-                      icon={<CloseIcon />}
-                      clickable
-                      color='secondary'
-                      size='small'
-                      variant='outlined'
-                      onClick={() => triggerInviteDeletion(invite)}
-                    />
-                  </Tooltip>
-                )}
-              </TableCell>
-            </TableRow>
-          ))}
+                    </Tooltip>
+                  )}
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
       {inviteToDelete && (

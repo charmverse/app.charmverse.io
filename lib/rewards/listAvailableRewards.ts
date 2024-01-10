@@ -29,7 +29,7 @@ export async function listAvailableRewards({ spaceId }: AvailableResourcesReques
       where: {
         spaceId,
         page: {
-          // Prevents returning bounties from other spaces
+          // Prevents returning rewards from other spaces
           spaceId,
           deletedAt: null
         }

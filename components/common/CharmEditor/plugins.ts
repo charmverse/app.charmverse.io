@@ -1,16 +1,14 @@
 import { bold, code, hardBreak, italic, strike, underline } from '@bangle.dev/base-components';
-import type { RawPlugins } from '@bangle.dev/core';
-import { NodeView, Plugin } from '@bangle.dev/core';
 import type { EditorState, EditorView } from '@bangle.dev/pm';
 import { PluginKey } from '@bangle.dev/pm';
-import type { PageType } from '@charmverse/core/prisma-client';
+import { Plugin } from 'prosemirror-state';
 
-import { emitSocketMessage } from 'hooks/useWebSocketClient';
+import { NodeView } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
+import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
 
 import * as codeBlock from './components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from './components/@bangle.dev/base-components/image';
 import { plugins as bookmarkPlugins } from './components/bookmark/bookmarkPlugins';
-import * as bulletList from './components/bulletList';
 import * as callout from './components/callout/callout';
 import { userDataPlugin } from './components/charm/charm.plugins';
 import * as columnLayout from './components/columnLayout/columnLayout.plugins';
@@ -32,16 +30,18 @@ import * as listItem from './components/listItem/listItem';
 import { plugins as listPlugins } from './components/listItemNew/listItemPlugins';
 import { plugins as markdownPlugins } from './components/markdown/markdown.plugins';
 import { mentionPluginKeyName, mentionPlugins } from './components/mention';
-import { nestedPagePlugins } from './components/nestedPage';
+import { nestedPagePlugins, pageNodeDropPlugin } from './components/nestedPage';
 import * as nft from './components/nft/nft.plugins';
-import paragraph from './components/paragraph';
+import { plugins as paragraphPlugins } from './components/paragraph/paragraph';
 import * as pasteChecker from './components/pasteChecker/pasteChecker';
 import { placeholderPlugin } from './components/placeholder/placeholder';
+import { plugins as quotePlugins } from './components/quote/quote';
 import * as rowActions from './components/rowActions/rowActions';
 import { plugins as trackPlugins } from './components/suggestions/suggestions.plugins';
 import * as tabIndent from './components/tabIndent';
 import { plugins as tablePlugins } from './components/table/table.plugins';
 import { plugins as tableOfContentPlugins } from './components/tableOfContents/tableOfContents.plugins';
+import { plugins as threadPlugins } from './components/thread/thread.plugins';
 import * as trailingNode from './components/trailingNode';
 import * as tweet from './components/tweet/tweet';
 import { plugins as videoPlugins } from './components/video/video';
@@ -72,7 +72,9 @@ export function charmEditorPlugins({
   spaceId = null,
   placeholderText,
   disableRowHandles = false,
-  disableMention = false
+  disableMention = false,
+  threadIds,
+  disableVideo = false
 }: {
   disableMention?: boolean;
   disableRowHandles?: boolean;
@@ -87,55 +89,12 @@ export function charmEditorPlugins({
   enableVoting?: boolean;
   enableComments?: boolean;
   placeholderText?: string;
+  threadIds?: string[];
+  disableVideo?: boolean;
 } = {}): () => RawPlugins[] {
   const basePlugins: RawPlugins[] = [
-    new Plugin({
-      props: {
-        handleDOMEvents: {
-          drop(view, ev) {
-            if (!ev.dataTransfer || !pageId) {
-              return false;
-            }
-
-            const coordinates = view.posAtCoords({
-              left: ev.clientX,
-              top: ev.clientY
-            });
-
-            if (!coordinates) {
-              return false;
-            }
-
-            const data = ev.dataTransfer.getData('sidebar-page');
-            if (!data) {
-              return false;
-            }
-
-            try {
-              const parsedData = JSON.parse(data) as { pageId: string | null; pageType: PageType };
-              if (!parsedData.pageId) {
-                return false;
-              }
-              ev.preventDefault();
-              emitSocketMessage({
-                type: 'page_reordered',
-                payload: {
-                  pageId: parsedData.pageId,
-                  newParentId: pageId,
-                  newIndex: -1,
-                  trigger: 'sidebar-to-editor',
-                  pos: coordinates.pos + (view.state.doc.nodeAt(coordinates.pos) ? 0 : 1)
-                }
-              });
-              // + 1 for dropping in non empty node
-              // + 0 for dropping in empty node (blank line)
-              return false;
-            } catch (_) {
-              return false;
-            }
-          }
-        }
-      }
+    pageNodeDropPlugin({
+      pageId
     }),
     // this trackPlugin should be called before the one below which calls onSelectionSet().
     // TODO: find a cleaner way to combine this logic?
@@ -167,9 +126,7 @@ export function charmEditorPlugins({
       key: linkedPagePluginKey
     }),
     nestedPagePlugins(),
-    imagePlugins({
-      handleDragAndDrop: false
-    })
+    imagePlugins()
   ];
 
   // Breaking the array in order to make sure the plugins order is correct
@@ -201,7 +158,7 @@ export function charmEditorPlugins({
       key: columnsPluginKey,
       readOnly
     }),
-    paragraph.plugins(),
+    paragraphPlugins(),
     strike.plugins(),
     underline.plugins() as RawPlugins,
     emoji.plugins({
@@ -248,14 +205,26 @@ export function charmEditorPlugins({
     nft.plugins(),
     tweet.plugins(),
     trailingNode.plugins(),
-    videoPlugins(),
     iframe.plugins(),
     markdownPlugins(),
     tableOfContentPlugins(),
     filePlugins(),
     placeholderPlugin(placeholderText),
+    quotePlugins(),
     tabIndent.plugins() // tabIndent should be triggered last so other plugins can override the keymap
   );
+
+  if (threadIds) {
+    basePlugins.push(
+      threadPlugins({
+        threadIds
+      })
+    );
+  }
+
+  if (!disableVideo) {
+    basePlugins.push(videoPlugins());
+  }
 
   if (!readOnly && !disableRowHandles) {
     // add rowActions before the table plugin, or else mousedown is not triggered

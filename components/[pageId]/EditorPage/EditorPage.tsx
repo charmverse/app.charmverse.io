@@ -5,6 +5,7 @@ import { useCallback, useEffect } from 'react';
 
 import { trackPageView } from 'charmClient/hooks/track';
 import ErrorPage from 'components/common/errors/ErrorPage';
+import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -20,6 +21,7 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
   const { editMode, resetPageProps, setPageProps } = useCharmEditor();
   const [, setTitleState] = usePageTitle();
   const { space: currentSpace } = useCurrentSpace();
+  useRewardsNavigation();
 
   const {
     error: pageWithContentError,
@@ -121,8 +123,8 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
     } else {
       // Document page is used in a few places, so it is responsible for retrieving its own permissions
       return (
-        <Box height='100%' sx={{ overflowY: 'auto' }}>
-          <DocumentPage page={page} refreshPage={refreshPage} readOnly={readOnly} savePage={savePage} />
+        <Box flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
+          <DocumentPage page={page} refreshPage={refreshPage} readOnly={readOnly} savePage={savePage} enableSidebar />
         </Box>
       );
     }

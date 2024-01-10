@@ -1,9 +1,12 @@
 import type { BountyStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { ethers } from 'ethers';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import { resolveENSName } from 'lib/blockchain';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import { apiHandler } from 'lib/public-api/handler';
+import { isTruthy } from 'lib/utilities/types';
 
 const handler = apiHandler();
 
@@ -19,7 +22,7 @@ handler.get(getBounties);
  *        address:
  *          type: string
  *          example: 0x7684F0170a3B37640423b1CD9d8Cb817Edf301aE
- *    Bounty:
+ *    Reward:
  *      type: object
  *      properties:
  *        id:
@@ -74,7 +77,7 @@ handler.get(getBounties);
  *          example: https://app.charmverse.io/my-workspace/bounties/5985679461310778
  *
  */
-export interface PublicApiBounty {
+export interface PublicApiReward {
   id: string;
   createdAt: string;
   content: {
@@ -113,8 +116,8 @@ interface BountyVC {
  * @swagger
  * /bounties:
  *   get:
- *     summary: Retrieve a list of bounties
- *     description: Retrieve bounties from your workspace.
+ *     summary: Retrieve a list of rewards
+ *     description: Retrieve rewards from your space.
  *     tags:
  *      - 'Space API'
  *     parameters:
@@ -123,14 +126,14 @@ interface BountyVC {
  *        type: string
  *     responses:
  *       200:
- *         description: List of bounties
+ *         description: List of rewards
  *         content:
  *            application/json:
  *              schema:
  *                type: array
  *                items:
  *                  type: object
- *                  $ref: '#/components/schemas/Bounty'
+ *                  $ref: '#/components/schemas/Reward'
  */
 async function getBounties(req: NextApiRequest, res: NextApiResponse) {
   const { status } = req.query;
@@ -177,9 +180,27 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse) {
   function getRecipients(bounty: (typeof bounties)[number]) {
     return bounty.applications
       .filter((application) => application.status === 'paid' && application.walletAddress)
-      .map((application) => ({
-        address: application.walletAddress as string
-      }));
+      .map(async (application) => {
+        if (
+          application.walletAddress &&
+          application.walletAddress.endsWith('.eth') &&
+          ethers.utils.isValidName(application.walletAddress)
+        ) {
+          const walletAddress = await resolveENSName(application.walletAddress as string);
+
+          if (walletAddress) {
+            return null;
+          }
+
+          return {
+            address: walletAddress as string
+          };
+        }
+
+        return {
+          address: application.walletAddress as string
+        };
+      });
   }
 
   function getUrl(bounty: (typeof bounties)[number]) {
@@ -199,8 +220,10 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse) {
     }
   }
 
-  const bountiesResponse = bounties.map(
-    (bounty, index): PublicApiBounty => ({
+  const bountiesResponse: PublicApiReward[] = [];
+  let index = 0;
+  for (const bounty of bounties) {
+    const bountyResponse: PublicApiReward = {
       createdAt: bounty.createdAt.toISOString(),
       content: {
         text: bounty.page?.contentText ?? '',
@@ -210,7 +233,7 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse) {
       issuer: {
         address: bounty.author.wallets[0]?.address
       },
-      recipients: getRecipients(bounty),
+      recipients: (await Promise.all(getRecipients(bounty))).filter(isTruthy),
       reward: {
         amount: bounty.rewardAmount,
         chain: bounty.chainId,
@@ -220,8 +243,10 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse) {
       title: bounty.page?.title ?? 'Untitled',
       status: bounty.status,
       url: getUrl(bounty)
-    })
-  );
+    };
+    index += 1;
+    bountiesResponse.push(bountyResponse);
+  }
 
   return res.status(200).json(bountiesResponse);
 }

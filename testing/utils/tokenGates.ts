@@ -3,9 +3,63 @@ import { prisma } from '@charmverse/core/prisma-client';
 export async function generateTokenGate({ userId, spaceId }: { spaceId: string; userId: string }) {
   return prisma.tokenGate.create({
     data: {
-      conditions: {},
+      conditions: {
+        unifiedAccessControlConditions: [
+          {
+            conditionType: 'evmBasic',
+            contractAddress: '',
+            standardContractType: '',
+            chain: 'ethereum',
+            method: '',
+            parameters: [':userAddress'],
+            returnValueTest: {
+              comparator: '=',
+              value: '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2'
+            }
+          }
+        ]
+      },
       createdBy: userId,
       resourceId: {},
+      type: 'lit',
+      space: {
+        connect: {
+          id: spaceId
+        }
+      }
+    }
+  });
+}
+
+export async function generateUnlockTokenGate({ userId, spaceId }: { spaceId: string; userId: string }) {
+  return prisma.tokenGate.create({
+    data: {
+      conditions: {
+        contract: '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2',
+        chainId: 1
+      },
+      createdBy: userId,
+      resourceId: {},
+      type: 'unlock',
+      space: {
+        connect: {
+          id: spaceId
+        }
+      }
+    }
+  });
+}
+
+export async function generateHypersubTokenGate({ userId, spaceId }: { spaceId: string; userId: string }) {
+  return prisma.tokenGate.create({
+    data: {
+      conditions: {
+        contract: '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2',
+        chainId: 1
+      },
+      createdBy: userId,
+      resourceId: {},
+      type: 'hypersub',
       space: {
         connect: {
           id: spaceId

@@ -15,10 +15,19 @@ import type {
 } from 'lib/focalboard/filterClause';
 import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import { isAFilterGroupInstance } from 'lib/focalboard/filterGroup';
+import { PROPOSAL_EVALUATION_TYPE_ID } from 'lib/proposal/blocks/constants';
+import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
+import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from 'lib/proposal/interface';
+
+import { Constants } from './constants';
 
 class CardFilter {
   static applyFilterGroup(filterGroup: FilterGroup, templates: readonly IPropertyTemplate[], cards: Card[]): Card[] {
-    return cards.filter((card) => this.isFilterGroupMet(filterGroup, templates, card));
+    const hasTitleProperty = templates.find((o) => o.id === Constants.titleColumnId);
+    const cardProperties: readonly IPropertyTemplate[] = hasTitleProperty
+      ? templates
+      : [...templates, { id: Constants.titleColumnId, name: 'Title', options: [], type: 'text' }];
+    return cards.filter((card) => this.isFilterGroupMet(filterGroup, cardProperties, card));
   }
 
   static isFilterGroupMet(filterGroup: FilterGroup, templates: readonly IPropertyTemplate[], card: Card): boolean {
@@ -54,11 +63,42 @@ class CardFilter {
   }
 
   static isClauseMet(filter: FilterClause, templates: readonly IPropertyTemplate[], card: Card): boolean {
-    const value = card.fields.properties[filter.propertyId] ?? [];
     const filterProperty = templates.find((o) => o.id === filter.propertyId);
+    const proposalEvaluationTypeProperty = templates.find((o) => o.id === PROPOSAL_EVALUATION_TYPE_ID);
+    const proposalEvaluationType = proposalEvaluationTypeProperty
+      ? (card.fields.properties[proposalEvaluationTypeProperty.id] as ProposalEvaluationStep)
+      : null;
+    let value = card.fields.properties[filter.propertyId] ?? [];
+    switch (filterProperty?.type) {
+      case 'updatedBy': {
+        value = card.updatedBy;
+        break;
+      }
+      case 'createdBy': {
+        value = card.createdBy;
+        break;
+      }
+      case 'createdTime': {
+        value = card.createdAt;
+        break;
+      }
+      case 'updatedTime': {
+        value = card.updatedAt;
+        break;
+      }
+      default: {
+        break;
+      }
+    }
     const filterValue = filter.values[0]?.toString()?.toLowerCase() ?? '';
-    const valueArray = (Array.isArray(value) ? value : [value]).map((v) => v.toString());
+    const valueArray = (Array.isArray(value) ? value : [value]).map((v: string | number | Record<'id', string>) => {
+      // In some cases we get an object with an id as value
+      if (typeof v === 'object' && 'id' in v) {
+        return v.id as string;
+      }
 
+      return v.toString();
+    });
     if (filterProperty) {
       const filterPropertyDataType = propertyConfigs[filterProperty.type].datatype;
       if (filterPropertyDataType === 'text') {
@@ -118,19 +158,19 @@ class CardFilter {
         const sourceValue = valueArray[0]?.toLowerCase() ?? '';
         switch (condition) {
           case 'equal': {
-            return sourceValue.length === 0 ? true : Number(sourceValue) === Number(filterValue);
+            return sourceValue.length === 0 ? false : Number(sourceValue) === Number(filterValue);
           }
           case 'greater_than': {
-            return sourceValue.length === 0 ? true : Number(sourceValue) > Number(filterValue);
+            return sourceValue.length === 0 ? false : Number(sourceValue) > Number(filterValue);
           }
           case 'less_than': {
-            return sourceValue.length === 0 ? true : Number(sourceValue) < Number(filterValue);
+            return sourceValue.length === 0 ? false : Number(sourceValue) < Number(filterValue);
           }
           case 'less_than_equal': {
-            return sourceValue.length === 0 ? true : Number(sourceValue) <= Number(filterValue);
+            return sourceValue.length === 0 ? false : Number(sourceValue) <= Number(filterValue);
           }
           case 'greater_than_equal': {
-            return sourceValue.length === 0 ? true : Number(sourceValue) >= Number(filterValue);
+            return sourceValue.length === 0 ? false : Number(sourceValue) >= Number(filterValue);
           }
           case 'is_empty': {
             return sourceValue === '';
@@ -148,13 +188,26 @@ class CardFilter {
       } else if (filterPropertyDataType === 'multi_select') {
         const condition = filter.condition as (typeof MultiSelectDataTypeConditions)[number];
         switch (condition) {
-          case 'contains': {
-            return valueArray.length !== 0 && valueArray.some((sourceValue) => filter.values.includes(sourceValue));
-          }
+          case 'contains':
           case 'does_not_contain': {
-            return valueArray.length === 0
-              ? true
-              : valueArray.every((sourceValue) => !filter.values.includes(sourceValue));
+            let contains = false;
+            if (filterProperty.type === 'proposalStatus') {
+              contains =
+                valueArray.length !== 0 &&
+                !!proposalEvaluationType &&
+                (valueArray as ProposalEvaluationResultExtended[]).some((sourceValue) => {
+                  return filter.values.includes(
+                    getProposalEvaluationStatus({
+                      result: sourceValue,
+                      step: proposalEvaluationType
+                    })
+                  );
+                });
+            } else {
+              contains =
+                valueArray.length !== 0 && valueArray.some((sourceValue) => filter.values.includes(sourceValue));
+            }
+            return condition === 'contains' ? contains : !contains;
           }
           case 'is_empty': {
             return valueArray.length === 0;
@@ -191,10 +244,17 @@ class CardFilter {
         const propertyValue = valueArray[0];
         let sourceValue: { from?: number } = {};
         try {
-          sourceValue = propertyValue ? (JSON.parse(propertyValue) as { from: number }) : { from: undefined };
+          // property value would be a valid number if its createdTime or updatedTime
+          // For custom date properties, it would be stringified object
+          sourceValue = !Number.isNaN(Number(propertyValue))
+            ? { from: Number(propertyValue) }
+            : typeof propertyValue === 'string'
+            ? (JSON.parse(propertyValue) as { from: number })
+            : { from: undefined };
         } catch (error) {
           log.error('Could not parse card property value', { propertyValue, error });
         }
+
         switch (condition) {
           case 'is': {
             return (
@@ -288,11 +348,6 @@ class CardFilter {
     filterClause: FilterClause,
     templates: readonly IPropertyTemplate[]
   ): { id: string; value?: string | string[] } {
-    const template = templates.find((o) => o.id === filterClause.propertyId);
-    if (!template) {
-      Utils.assertFailure(`propertyThatMeetsFilterClause. Cannot find template: ${filterClause.propertyId}`);
-      return { id: filterClause.propertyId };
-    }
     const filterProperty = templates.find((o) => o.id === filterClause.propertyId);
     if (filterProperty) {
       const filterPropertyDataType = propertyConfigs[filterProperty.type].datatype;
@@ -360,10 +415,16 @@ class CardFilter {
         switch (condition) {
           case 'contains':
           case 'is_not_empty': {
+            if (filterProperty.type === 'person') {
+              return {
+                id: filterClause.propertyId,
+                value: filterClause.values
+              };
+            }
             return {
               id: filterClause.propertyId,
               value: filterClause.values.filter((filterValue) =>
-                template.options.find((option) => option.id === filterValue)
+                filterProperty.options.find((option) => option.id === filterValue)
               )
             };
           }
@@ -383,7 +444,7 @@ class CardFilter {
           case 'is_not_empty': {
             return {
               id: filterClause.propertyId,
-              value: template.options.find((option) => option.id === filterClause.values[0])
+              value: filterProperty.options.find((option) => option.id === filterClause.values[0])
                 ? [filterClause.values[0]]
                 : []
             };
@@ -432,6 +493,9 @@ class CardFilter {
           }
         }
       }
+    } else {
+      Utils.assertFailure(`propertyThatMeetsFilterClause. Cannot find template: ${filterClause.propertyId}`);
+      return { id: filterClause.propertyId };
     }
 
     return { id: filterClause.propertyId };

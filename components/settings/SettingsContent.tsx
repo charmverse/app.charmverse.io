@@ -1,4 +1,3 @@
-import type { Space } from '@charmverse/core/prisma';
 import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -17,16 +16,19 @@ import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/com
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import type { SettingsPath } from 'hooks/useSettingsDialog';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useSpaces } from 'hooks/useSpaces';
+import type { Feature } from 'lib/features/constants';
 import { getSpaceUrl } from 'lib/utilities/browser';
 
 import { AccountSettings } from './account/AccountSettings';
 import { ApiSettings } from './api/ApiSettings';
 import type { SpaceSettingsTab, UserSettingsTab } from './config';
-import { ACCOUNT_TABS, SETTINGS_TABS } from './config';
+import { ACCOUNT_TABS, SPACE_SETTINGS_TABS } from './config';
 import { ImportSettings } from './import/ImportSettings';
 import { Invites } from './invites/Invites';
 import ProfileSettings from './profile/ProfileSettings';
+import { SpaceProposalSettings } from './proposals/SpaceProposalSettings';
 import { RoleSettings } from './roles/RoleSettings';
 import { SpaceSettings } from './space/SpaceSettings';
 import { useSpaceSubscription } from './subscription/hooks/useSpaceSubscription';
@@ -50,7 +52,8 @@ const spaceTabs: Record<SpaceSettingsTab['path'], typeof SpaceSettings> = {
   invites: Invites,
   roles: RoleSettings,
   subscription: SubscriptionSettings,
-  space: SpaceSettings
+  space: SpaceSettings,
+  proposals: SpaceProposalSettings
 };
 
 function TabPanel(props: TabPanelProps) {
@@ -80,13 +83,14 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
   const { space: currentSpace } = useCurrentSpace();
   const isMobile = useSmallScreen();
   const { memberSpaces } = useSpaces();
+  const { mappedFeatures } = useSpaceFeatures();
 
   const isSpaceSettingsVisible = !!memberSpaces.find((s) => s.name === currentSpace?.name);
 
   const { subscriptionEnded, hasPassedBlockQuota } = useSpaceSubscription();
   const switchSpaceMenu = usePopupState({ variant: 'popover', popupId: 'switch-space' });
   return (
-    <Box data-test-active-path={activePath} display='flex' flexDirection='row' flex='1' overflow='hidden'>
+    <Box data-test-active-path={activePath} display='flex' flexDirection='row' flex='1' overflow='hidden' height='100%'>
       <Box
         component='aside'
         width={{ xs: '100%', md: 300 }}
@@ -116,11 +120,11 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
         )}
         {currentSpace &&
           isSpaceSettingsVisible &&
-          SETTINGS_TABS.map((tab) => (
+          SPACE_SETTINGS_TABS.map((tab) => (
             <SidebarLink
               data-test={`space-settings-tab-${tab.path}`}
               key={tab.path}
-              label={tab.label}
+              label={mappedFeatures[tab.path as Feature]?.title || tab.label}
               icon={tab.icon}
               onClick={() => onSelectPath(tab.path)}
               active={activePath === tab.path}
@@ -185,7 +189,7 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
             </TabPanel>
           );
         })}
-        {SETTINGS_TABS.map((tab) => {
+        {SPACE_SETTINGS_TABS.map((tab) => {
           const TabView = spaceTabs[tab.path];
           return (
             <TabPanel key={tab.path} value={activePath ?? ''} index={tab.path}>

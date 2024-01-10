@@ -5,8 +5,9 @@ import { createContext, useContext, useMemo } from 'react';
 import type { BoardReward } from 'components/rewards/components/RewardProperties/hooks/useRewardsBoardAdapter';
 import { useRewardsBoardAdapter } from 'components/rewards/components/RewardProperties/hooks/useRewardsBoardAdapter';
 import type { Board } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
+import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
 import type { CardPage } from 'lib/focalboard/card';
+import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import type { RewardCard, RewardPropertyValue } from 'lib/rewards/blocks/interfaces';
 
 type RewardsBoardContextType = {
@@ -22,7 +23,7 @@ type RewardsBoardContextType = {
   setBoardReward: (boardReward: BoardReward | null) => void;
 };
 
-export const RewardsBoardContext = createContext<Readonly<RewardsBoardContextType>>({
+const RewardsBoardContext = createContext<Readonly<RewardsBoardContextType>>({
   board: {} as Board,
   boardCustomProperties: {} as Board,
   card: {} as RewardCard,
@@ -36,36 +37,9 @@ export const RewardsBoardContext = createContext<Readonly<RewardsBoardContextTyp
 });
 
 export function RewardsBoardProvider({ children }: { children: ReactNode }) {
-  const {
-    board,
-    boardCustomProperties,
-    card,
-    cards,
-    activeView,
-    views,
-    rewardPage,
-    setBoardReward,
-    boardReward,
-    cardPages
-  } = useRewardsBoardAdapter();
+  const boardContext = useRewardsBoardAdapter();
 
-  const value = useMemo(
-    () => ({
-      board,
-      boardCustomProperties,
-      card,
-      cards,
-      activeView,
-      views,
-      rewardPage,
-      setBoardReward,
-      boardReward,
-      cardPages
-    }),
-    [board, boardCustomProperties, card, cards, activeView, views, rewardPage, setBoardReward, boardReward, cardPages]
-  );
-
-  return <RewardsBoardContext.Provider value={value}>{children}</RewardsBoardContext.Provider>;
+  return <RewardsBoardContext.Provider value={boardContext}>{children}</RewardsBoardContext.Provider>;
 }
 
 export const useRewardsBoard = () => useContext(RewardsBoardContext);

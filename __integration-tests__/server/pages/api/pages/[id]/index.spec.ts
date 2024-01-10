@@ -1,36 +1,35 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { PageWithPermissions } from '@charmverse/core/pages';
-import type { Page } from '@charmverse/core/prisma';
-import type { Space, User } from '@charmverse/core/prisma-client';
+import type { Page, Space, User } from '@charmverse/core/prisma';
 import { testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
 import { getPage } from 'lib/pages/server';
-import { createProposalTemplate } from 'lib/templates/proposals/createProposalTemplate';
+import { createProposal } from 'lib/proposal/createProposal';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
-const updateContent = {
-  content: {
-    paragraph: 'This is a paragraph'
-  }
-};
-let adminUser: User;
-let normalMember: User;
-let space: Space;
-
-beforeAll(async () => {
-  const generated = await testUtilsUser.generateUserAndSpace({
-    isAdmin: true
-  });
-  adminUser = generated.user;
-  space = generated.space;
-  normalMember = await testUtilsUser.generateSpaceUser({
-    spaceId: space.id,
-    isAdmin: false
-  });
-});
-
 describe('PUT /api/pages/{id} - update page', () => {
+  const updateContent = {
+    content: {
+      paragraph: 'This is a paragraph'
+    }
+  };
+  let adminUser: User;
+  let normalMember: User;
+  let space: Space;
+
+  beforeAll(async () => {
+    const generated = await testUtilsUser.generateUserAndSpace({
+      isAdmin: true
+    });
+    adminUser = generated.user;
+    space = generated.space;
+    normalMember = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id,
+      isAdmin: false
+    });
+  });
+
   it('should allow user with permissions to update the page content, title, header image, and icon', async () => {
     const page = await testUtilsPages.generatePage({
       createdBy: adminUser.id,
@@ -100,43 +99,63 @@ describe('PUT /api/pages/{id} - update page', () => {
   });
 
   it('should update proposal template page content if the user is an admin and respond 200', async () => {
-    const proposalCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id
-    });
-
-    const template = await createProposalTemplate({
+    const template = await createProposal({
       spaceId: space.id,
       userId: adminUser.id,
-      categoryId: proposalCategory.id
+      pageProps: {
+        type: 'proposal_template'
+      }
     });
 
     const adminCookie = await loginUser(adminUser.id);
 
     const body = (
-      await request(baseUrl).put(`/api/pages/${template.id}`).set('Cookie', adminCookie).send(updateContent).expect(200)
+      await request(baseUrl)
+        .put(`/api/pages/${template.page.id}`)
+        .set('Cookie', adminCookie)
+        .send(updateContent)
+        .expect(200)
     ).body as PageWithPermissions;
   });
 
   it('should to fail update proposal template page content if the user is not a space admin and respond 401', async () => {
-    const proposalCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id
-    });
-
-    const template = await createProposalTemplate({
+    const template = await createProposal({
       spaceId: space.id,
       userId: adminUser.id,
-      categoryId: proposalCategory.id
+      pageProps: {
+        type: 'proposal_template'
+      }
     });
 
     const memberCookie = await loginUser(normalMember.id);
 
-    await request(baseUrl).put(`/api/pages/${template.id}`).set('Cookie', memberCookie).send(updateContent).expect(401);
+    await request(baseUrl)
+      .put(`/api/pages/${template.page.id}`)
+      .set('Cookie', memberCookie)
+      .send(updateContent)
+      .expect(401);
   });
 });
 
 describe('GET /api/pages/{id} - get page', () => {
+  let adminUser: User;
+  let normalMember: User;
+  let space: Space;
+
+  beforeAll(async () => {
+    const generated = await testUtilsUser.generateUserAndSpace({
+      isAdmin: true
+    });
+    adminUser = generated.user;
+    space = generated.space;
+    normalMember = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id,
+      isAdmin: false
+    });
+  });
+
   it('should return a page to a user with permission to access it and respond 200', async () => {
-    const { createdAt, updatedAt, ...page } = await testUtilsPages.generatePage({
+    const { createdAt, updatedAt, content, ...page } = await testUtilsPages.generatePage({
       createdBy: adminUser.id,
       spaceId: space.id,
       pagePermissions: [
@@ -154,7 +173,7 @@ describe('GET /api/pages/{id} - get page', () => {
   });
 
   it('should support queries by page path and space domain for a user with permission to access the page and respond 200', async () => {
-    const { createdAt, updatedAt, ...page } = await testUtilsPages.generatePage({
+    const { createdAt, updatedAt, content, ...page } = await testUtilsPages.generatePage({
       createdBy: adminUser.id,
       spaceId: space.id,
       pagePermissions: [

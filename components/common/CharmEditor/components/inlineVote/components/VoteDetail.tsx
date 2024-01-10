@@ -1,5 +1,5 @@
-import { useEditorViewContext } from '@bangle.dev/react';
-import { VoteType, type UserVote } from '@charmverse/core/prisma';
+import { VoteType } from '@charmverse/core/prisma';
+import type { UserVote } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import { Box, Button, Card, Chip, Divider, FormControl, List, ListItem, ListItemText, Typography } from '@mui/material';
@@ -12,6 +12,7 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 import { CharmEditor } from 'components/common/CharmEditor';
+import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import { MultiChoiceForm } from 'components/common/CharmEditor/components/inlineVote/components/MultiChoiceForm';
 import { SingleChoiceForm } from 'components/common/CharmEditor/components/inlineVote/components/SingleChoiceForm';
 import Modal from 'components/common/Modal';
@@ -32,9 +33,9 @@ export interface VoteDetailProps {
   vote: ExtendedVote;
   detailed?: boolean;
   isProposal?: boolean;
-  castVote: (voteId: string, choices: string[]) => Promise<UserVote>;
-  deleteVote: (voteId: string) => Promise<void>;
-  cancelVote: (voteId: string) => Promise<void>;
+  castVote: (voteId: string, choices: string[]) => Promise<UserVote | void>;
+  deleteVote?: (voteId: string) => Promise<void>;
+  cancelVote?: (voteId: string) => Promise<void>;
   updateDeadline: (voteId: string, deadline: Date) => Promise<void>;
   disableVote?: boolean;
 }
@@ -97,29 +98,31 @@ export function VoteDetail({
     const choiceArray = typeof v === 'string' ? [v] : v;
     const userVote = await castVote(id, choiceArray);
     refetchNotifications();
-    mutate(
-      (_userVotes) => {
-        if (_userVotes) {
-          const existingUserVoteIndex = _userVotes.findIndex((_userVote) => _userVote.userId === user.id);
-          // User already voted
-          if (existingUserVoteIndex !== -1) {
-            _userVotes.splice(existingUserVoteIndex, 1);
-          }
+    if (userVote) {
+      mutate(
+        (_userVotes) => {
+          if (_userVotes) {
+            const existingUserVoteIndex = _userVotes.findIndex((_userVote) => _userVote.userId === user.id);
+            // User already voted
+            if (existingUserVoteIndex !== -1) {
+              _userVotes.splice(existingUserVoteIndex, 1);
+            }
 
-          return [
-            {
-              ...userVote,
-              user
-            },
-            ..._userVotes
-          ];
+            return [
+              {
+                ...userVote,
+                user
+              },
+              ..._userVotes
+            ];
+          }
+          return undefined;
+        },
+        {
+          revalidate: false
         }
-        return undefined;
-      },
-      {
-        revalidate: false
-      }
-    );
+      );
+    }
   };
 
   function removeFromPage(voteId: string) {
@@ -132,7 +135,7 @@ export function VoteDetail({
     <VotesWrapper data-test='vote-container' detailed={detailed} id={`vote.${vote.id}`}>
       <Box display='flex' justifyContent='space-between' alignItems='center'>
         <Typography variant='h6' fontWeight='bold' component='span'>
-          {!isProposal ? title : 'Poll on this proposal'}
+          {title || 'Poll on this proposal'}
         </Typography>
         <VoteActionsMenu
           deleteVote={deleteVote}

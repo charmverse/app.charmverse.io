@@ -1,6 +1,6 @@
 import type { PostPermissionFlags } from '@charmverse/core/permissions';
 import { AvailablePostPermissions } from '@charmverse/core/permissions';
-import type { ProposalCategory, Space, User } from '@charmverse/core/prisma';
+import type { Space, User } from '@charmverse/core/prisma';
 import { PostOperation } from '@charmverse/core/prisma';
 import { testUtilsForum, testUtilsUser } from '@charmverse/core/test';
 import { objectUtils } from '@charmverse/core/utilities';
@@ -9,7 +9,6 @@ import { v4 } from 'uuid';
 import { convertPostToProposal } from 'lib/forums/posts/convertPostToProposal';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { InvalidInputError } from 'lib/utilities/errors';
-import { generateProposalCategory } from 'testing/utils/proposals';
 
 import { baseComputePostPermissions, computePostPermissions } from '../computePostPermissions';
 
@@ -24,8 +23,6 @@ let space: Space;
 let otherSpace: Space;
 let otherSpaceAdminUser: User;
 
-let proposalCategory: ProposalCategory;
-
 beforeAll(async () => {
   const generated = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
   adminUser = generated.user;
@@ -36,9 +33,6 @@ beforeAll(async () => {
   const secondGenerated = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
   otherSpaceAdminUser = secondGenerated.user;
   otherSpace = secondGenerated.space;
-  proposalCategory = await generateProposalCategory({
-    spaceId: space.id
-  });
 });
 
 // We don't configure permissions in public mode, so these are the default permissions we expect
@@ -227,8 +221,7 @@ describe('computePostPermissions - with proposal permission filtering policy', (
 
     await convertPostToProposal({
       post,
-      userId: authorUser.id,
-      categoryId: proposalCategory.id
+      userId: authorUser.id
     });
 
     const permissionsAfterConversion = await computePostPermissions({
@@ -249,8 +242,7 @@ describe('computePostPermissions - with proposal permission filtering policy', (
 
     await convertPostToProposal({
       post,
-      userId: authorUser.id,
-      categoryId: proposalCategory.id
+      userId: authorUser.id
     });
 
     const permissions = await computePostPermissions({
@@ -278,8 +270,7 @@ describe('computePostPermissions - with proposal permission filtering policy', (
 
     await convertPostToProposal({
       post,
-      userId: authorUser.id,
-      categoryId: proposalCategory.id
+      userId: authorUser.id
     });
 
     const permissions = await computePostPermissions({

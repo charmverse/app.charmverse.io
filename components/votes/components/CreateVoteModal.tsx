@@ -1,4 +1,3 @@
-import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import { VoteType } from '@charmverse/core/prisma';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import AddCircle from '@mui/icons-material/AddCircle';
@@ -25,7 +24,7 @@ import { CharmEditor } from 'components/common/CharmEditor';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { NumericFieldWithButtons } from 'components/common/form/fields/NumericFieldWithButtons';
-import { PublishToSnapshot } from 'components/common/PageActions/components/SnapshotAction/PublishToSnapshot';
+import { PublishToSnapshot } from 'components/proposals/ProposalPage/components/EvaluationSidebar/components/VoteEvaluation/components/PublishToSnapshot/PublishToSnapshot';
 import { useVotes } from 'hooks/useVotes';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -40,7 +39,7 @@ interface CreateVoteModalProps {
   postId?: string;
   snapshotProposalId: string | null;
   proposal?: Pick<ProposalWithUsers, 'status' | 'id'>;
-  proposalFlowFlags?: ProposalFlowPermissionFlags;
+  readOnly?: boolean;
 }
 
 export function CreateVoteModal({
@@ -52,7 +51,7 @@ export function CreateVoteModal({
   postId,
   snapshotProposalId,
   proposal,
-  proposalFlowFlags
+  readOnly
 }: CreateVoteModalProps) {
   const [voteTitle, setVoteTitle] = useState('');
   const [passThreshold, setPassThreshold] = useState<number>(50);
@@ -146,17 +145,11 @@ export function CreateVoteModal({
           {proposal?.status === 'reviewed' && (
             <>
               or
-              <Tooltip
-                title={
-                  !proposalFlowFlags?.vote_active
-                    ? 'Only proposal authors and space admins can publish this proposal to snapshot'
-                    : ''
-                }
-              >
+              <Tooltip title={readOnly ? 'You cannot publish this proposal to snapshot' : ''}>
                 <div>
                   <PublishToSnapshot
                     renderContent={({ label, onClick, icon }) => (
-                      <Button disabled={!proposalFlowFlags?.vote_active} onClick={onClick}>
+                      <Button disabled={readOnly} onClick={onClick}>
                         {icon}
                         <Typography>{label}</Typography>
                       </Button>
@@ -198,7 +191,6 @@ export function CreateVoteModal({
                 backgroundColor: 'var(--input-bg)'
               }}
               disableMention
-              isPollOrVote
               colorMode='dark'
               placeholderText='Details (Optional)'
               content={voteContent.content as PageContent}

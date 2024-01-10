@@ -1,5 +1,6 @@
-import type { BaseRawNodeSpec } from '@bangle.dev/core';
 import type { DOMOutputSpec, Node } from 'prosemirror-model';
+
+import type { BaseRawNodeSpec } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 export type BookmarkNodeAttrs = {
   url: string;

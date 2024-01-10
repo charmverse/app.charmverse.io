@@ -15,7 +15,7 @@ exports[`components/table/TableHeaders should match snapshot 1`] = `
         style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
       >
         <div
-          class="css-19zgtxi-MuiStack-root"
+          class="MuiStack-root css-19zgtxi-MuiStack-root"
         >
           <div>
             <div>

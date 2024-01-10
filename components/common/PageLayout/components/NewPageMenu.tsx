@@ -13,7 +13,7 @@ import { memo, useState } from 'react';
 
 import { greyColor2 } from 'theme/colors';
 
-import { StyledDatabaseIcon } from './PageIcon';
+import { StyledDatabaseIcon } from '../../PageIcon';
 
 export const StyledIconButton = styled(IconButton)`
   border-radius: 3px;

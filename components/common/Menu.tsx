@@ -21,6 +21,8 @@ interface Props {
   valueUpdated: (value: string) => void;
   options: MenuOption[];
   closeOnSelect?: boolean;
+  buttonSize?: string;
+  disabled?: boolean;
 }
 
 export default function SelectMenu({
@@ -29,7 +31,9 @@ export default function SelectMenu({
   options,
   loading = false,
   title,
-  closeOnSelect = true
+  closeOnSelect = true,
+  buttonSize,
+  disabled
 }: Props) {
   const popupState = usePopupState({ variant: 'popover', popupId: `menu-${v4()}` });
 
@@ -45,8 +49,9 @@ export default function SelectMenu({
       <Button
         color='secondary'
         variant='outlined'
-        disabled={loading}
+        disabled={loading || disabled}
         loading={loading}
+        size={buttonSize}
         endIcon={!loading && <KeyboardArrowDownIcon fontSize='small' />}
         {...bindTrigger(popupState)}
       >
@@ -71,6 +76,7 @@ export default function SelectMenu({
                   popupState.close();
                 }
               }}
+              disabled={loading || disabled}
             >
               <StyledListItemText primary={primary} secondary={secondary} />
             </MenuItem>

@@ -1,10 +1,11 @@
-import { Plugin, NodeView } from '@bangle.dev/core';
-import type { EditorView, Slice } from '@bangle.dev/pm';
+import { Plugin } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 
+import { NodeView } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 import { isPdfEmbedLink } from 'lib/pdf/extractPdfEmbedLink';
 import { insertNode } from 'lib/prosemirror/insertNode';
 
-import type { PdfNodeAttrs } from '../ResizablePDF';
+import type { PdfNodeAttrs } from '../pdf/pdf';
 import { extractYoutubeLinkType } from '../video/utils';
 import type { VideoNodeAttrs } from '../video/videoSpec';
 import { name as videoName } from '../video/videoSpec';

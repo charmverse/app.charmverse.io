@@ -1,20 +1,20 @@
-import type { ProfileFragment } from '@lens-protocol/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { fetchLensProfile } from 'lib/lens/fetchLensProfile';
 import { onError, onNoMatch } from 'lib/middleware';
-import { getDefaultLensProfile } from 'lib/profile/getDefaultLensProfile';
+import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.get(getLensProfileController);
+handler.get(getLensProfile);
 
-async function getLensProfileController(req: NextApiRequest, res: NextApiResponse<ProfileFragment | null>) {
+async function getLensProfile(req: NextApiRequest, res: NextApiResponse) {
   const userId = req.query.userId as string;
 
-  const defaultLensProfile = await getDefaultLensProfile(userId);
+  const lensProfile = await fetchLensProfile(userId);
 
-  res.status(200).json(defaultLensProfile);
+  return res.status(200).send(lensProfile);
 }
 
-export default handler;
+export default withSessionRoute(handler);

@@ -1,15 +1,15 @@
-import type { RawPlugins } from '@bangle.dev/core';
-import { Plugin } from '@bangle.dev/core';
-import type { PluginKey, EditorState, EditorView, Node, Schema } from '@bangle.dev/pm';
+import type { EditorState, EditorView, PluginKey } from '@bangle.dev/pm';
 import { Decoration, DecorationSet } from '@bangle.dev/pm';
+import { Plugin } from 'prosemirror-state';
 import { createRoot } from 'react-dom/client';
 
+import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
 import { highlightMarkedElement, highlightElement } from 'lib/prosemirror/highlightMarkedElement';
 import { extractInlineCommentRows } from 'lib/prosemirror/plugins/inlineComments/findTotalInlineComments';
 
 import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
 import { referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
-import { getLinkElement } from '../link/getLinkElement';
+import { threadPluginKey } from '../thread/thread.plugins';
 
 import RowDecoration from './components/InlineCommentRowDecoration';
 import { markName } from './inlineComment.constants';
@@ -61,11 +61,9 @@ export function plugin({ key }: { key: PluginKey }): RawPlugins {
       key,
       props: {
         handleClickOn: (view: EditorView, pos: number, node, nodePos, event: MouseEvent) => {
-          const className =
-            (event.target as HTMLElement).className +
-            ((event.target as HTMLElement).parentNode as HTMLElement).className;
-
-          if (/charm-inline-comment/.test(className)) {
+          const domNode = view.domAtPos(pos);
+          const className = domNode.node.parentElement?.className ?? '';
+          if (className.includes('active') && className.includes('charm-thread-comment')) {
             return highlightMarkedElement({
               view,
               elementId: 'page-action-sidebar',
@@ -74,6 +72,7 @@ export function plugin({ key }: { key: PluginKey }): RawPlugins {
               prefix: 'thread'
             });
           }
+
           return false;
         }
       }
@@ -95,11 +94,11 @@ export function plugin({ key }: { key: PluginKey }): RawPlugins {
     // a plugin to display icons to the right of each paragraph and header
     new Plugin({
       state: {
-        init(_, { doc, schema }) {
-          return getDecorations({ schema, doc });
+        init(_, state) {
+          return getDecorations(state);
         },
-        apply(tr, old, _, editorState) {
-          return tr.docChanged ? getDecorations({ schema: editorState.schema, doc: tr.doc }) : old;
+        apply(tr, old, _, newState) {
+          return tr.docChanged ? getDecorations(newState) : old;
         }
       },
       props: {
@@ -126,18 +125,20 @@ export function plugin({ key }: { key: PluginKey }): RawPlugins {
   ];
 }
 
-function getDecorations({ schema, doc }: { doc: Node; schema: Schema }) {
-  const rows = extractInlineCommentRows(schema, doc);
-  const uniqueCommentIds: Set<string> = new Set();
-
+function getDecorations(state: EditorState) {
+  const threadIds = threadPluginKey.getState(state) ?? [];
+  const rows = extractInlineCommentRows(state.schema, state.doc, threadIds);
+  const uniqueThreadIds: Set<string> = new Set();
   const decorations: Decoration[] = [];
 
   rows.forEach((row) => {
     // inject decoration at the start of the paragraph/header
     const firstPos = row.pos + 1;
-    const commentIds = row.nodes.map((node) => node.marks[0]?.attrs.id).filter(Boolean);
-    const newIds = Array.from(new Set(commentIds.filter((commentId) => !uniqueCommentIds.has(commentId))));
-    commentIds.forEach((commentId) => uniqueCommentIds.add(commentId));
+    const commentIds = row.nodes
+      .map((node) => node.marks.find((mark) => mark.type.name === 'inline-comment')?.attrs.id)
+      .filter(Boolean);
+    const newIds = Array.from(new Set(commentIds.filter((commentId) => !uniqueThreadIds.has(commentId))));
+    commentIds.forEach((commentId) => uniqueThreadIds.add(commentId));
 
     if (newIds.length !== 0) {
       const container = document.createElement('div');
@@ -149,5 +150,5 @@ function getDecorations({ schema, doc }: { doc: Node; schema: Schema }) {
     }
   });
 
-  return DecorationSet.create(doc, decorations);
+  return DecorationSet.create(state.doc, decorations);
 }

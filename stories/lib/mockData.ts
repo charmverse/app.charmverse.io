@@ -1,14 +1,11 @@
-import type { ProposalCategoryWithPermissions } from '@charmverse/core/permissions';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 
 import type { Member, MemberPropertyWithPermissions, PropertyValueWithDetails } from 'lib/members/interfaces';
-import { generateDefaultProposalCategoriesInput } from 'lib/proposal/generateDefaultProposalCategoriesInput';
 import type { LoggedInUser } from 'models/User';
 import { createMemberProperty, createMemberPropertyValue } from 'testing/mocks/memberProperty';
 import { createMockSpace } from 'testing/mocks/space';
 import { createMockSpaceMember } from 'testing/mocks/spaceMember';
 import { createMockUser } from 'testing/mocks/user';
-import { brandColorNames } from 'theme/colors';
 
 import type { ListSpaceRolesResponse } from '../../pages/api/roles/index';
 
@@ -27,7 +24,6 @@ const seeds = [
 
 export const memberPropertyTypes = [
   'profile_pic',
-  'name',
   'role',
   'bio',
   'discord',
@@ -38,7 +34,8 @@ export const memberPropertyTypes = [
   'join_date'
 ] as const;
 
-export const spaces = [createMockSpace({ id: seeds[0] })];
+// use cvt- in domain so that feature flags are enabled
+export const spaces = [createMockSpace({ id: seeds[0], domain: `cvt-${seeds[0]}` })];
 
 export const memberProperties: MemberPropertyWithPermissions[] = memberPropertyTypes.map((type, index) => {
   const memberProperty = createMemberProperty({
@@ -96,24 +93,7 @@ export const members: Member[] = seeds.map((seed) => {
 
 export const spaceRoles: ListSpaceRolesResponse[] = [
   { id: '1', name: 'Moderator', spacePermissions: [], source: null },
-  { id: '1', name: 'Grant Reviewer', spacePermissions: [], source: null }
+  { id: '2', name: 'Grant Reviewer', spacePermissions: [], source: null }
 ];
-
-export const proposalCategories: ProposalCategoryWithPermissions[] = generateDefaultProposalCategoriesInput(
-  'space-id'
-).map((cat, i) => ({
-  id: 'some-id',
-  permissions: {
-    manage_permissions: true,
-    edit: true,
-    delete: true,
-    create_proposal: true,
-    view_category: true,
-    comment_proposals: true,
-    vote_proposals: true
-  },
-  ...cat,
-  color: brandColorNames[i % brandColorNames.length]
-}));
 
 export const proposalTemplates: ProposalWithUsers[] = [];

@@ -2,14 +2,16 @@ import type { PageMeta } from '@charmverse/core/pages';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 
-import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
+import { tokenChainOptions } from 'components/rewards/components/RewardsBoard/utils/boardData';
+import type { Board } from 'lib/focalboard/board';
+import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
+import { Constants } from 'lib/focalboard/constants';
+import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import type { Member } from 'lib/members/interfaces';
-import type { PagesMap } from 'lib/pages';
+import { PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposal/blocks/constants';
 
-import { Constants } from '../constants';
 import { Utils } from '../utils';
 
 import { blockLoad, initialDatabaseLoad } from './databaseBlocksLoad';
@@ -21,6 +23,16 @@ type CardsState = {
   cards: { [key: string]: Card };
   templates: { [key: string]: Card };
 };
+
+function updateCardTitleProperty({ card, cards }: { cards: CardsState['cards']; card: Card }) {
+  const cardTitle = card.title || cards[card.id]?.title;
+  const cardAfterUpdate = Object.assign(cards[card.id] || {}, card);
+  cardAfterUpdate.title = cardTitle;
+  cards[card.id] = cardAfterUpdate;
+  if (cardAfterUpdate.fields && cardAfterUpdate.fields.properties) {
+    cardAfterUpdate.fields.properties[Constants.titleColumnId] = cardAfterUpdate.title || '';
+  }
+}
 
 const cardsSlice = createSlice({
   name: 'cards',
@@ -34,30 +46,27 @@ const cardsSlice = createSlice({
       state.current = action.payload;
     },
     addCard: (state, action: PayloadAction<Card>) => {
-      state.cards[action.payload.id] = action.payload;
+      updateCardTitleProperty({
+        card: action.payload,
+        cards: state.cards
+      });
     },
     addTemplate: (state, action: PayloadAction<Card>) => {
       state.templates[action.payload.id] = action.payload;
     },
-    updateCards: (state, action: PayloadAction<Card[]>) => {
+    updateCards: (state, action: PayloadAction<(Partial<Card> & { id: string })[]>) => {
       for (const card of action.payload) {
         if (card.deletedAt) {
           delete state.cards[card.id];
           delete state.templates[card.id];
-        } else if (card.fields.isTemplate) {
+        } else if (card.fields?.isTemplate) {
           const cardAfterUpdate = Object.assign(state.templates[card.id] || {}, card);
           state.templates[card.id] = cardAfterUpdate;
         } else {
-          const cardAfterUpdate = Object.assign(state.cards[card.id] || {}, card);
-          state.cards[card.id] = cardAfterUpdate;
-        }
-      }
-    },
-    updateCard: (state, { payload }: PayloadAction<Partial<Card>>) => {
-      if (payload.id) {
-        const card = state.cards[payload.id];
-        if (card) {
-          state.cards[payload.id] = { ...card, ...payload };
+          updateCardTitleProperty({
+            card: card as Card,
+            cards: state.cards
+          });
         }
       }
     },
@@ -69,29 +78,33 @@ const cardsSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
-    builder.addCase(initialDatabaseLoad.fulfilled, (state, action) => {
-      state.cards = state.cards ?? {};
-      state.templates = state.templates ?? {};
-      for (const block of action.payload) {
-        if (block.type === 'card' && block.fields.isTemplate) {
-          state.templates[block.id] = block as Card;
-        } else if (block.type === 'card' && !block.fields.isTemplate) {
-          state.cards[block.id] = block as Card;
-        }
-      }
-    });
-
     builder.addCase(blockLoad.fulfilled, (state, action) => {
       state.cards = state.cards ?? {};
       const block = action.payload;
       if (block.type === 'card') {
-        state.cards[block.id] = block as Card;
+        updateCardTitleProperty({
+          card: block as Card,
+          cards: state.cards
+        });
+      }
+    });
+
+    builder.addCase(initialDatabaseLoad.fulfilled, (state, action) => {
+      for (const block of action.payload) {
+        if (block.type === 'card' && block.fields.isTemplate) {
+          state.templates[block.id] = block as Card;
+        } else if (block.type === 'card' && !block.fields.isTemplate) {
+          updateCardTitleProperty({
+            card: block as Card,
+            cards: state.cards
+          });
+        }
       }
     });
   }
 });
 
-export const { updateCards, updateCard, addCard, addTemplate, setCurrent, deleteCards } = cardsSlice.actions;
+export const { updateCards, addCard, addTemplate, setCurrent, deleteCards } = cardsSlice.actions;
 export const { reducer } = cardsSlice;
 
 export const getCards = (state: RootState): { [key: string]: Card } => state.cards.cards;
@@ -166,15 +179,19 @@ function manualOrder(activeView: BoardView, cardA: CardPage, cardB: CardPage) {
   return indexA - indexB;
 }
 
-export function sortCards(cardPages: CardPage[], board: Board, activeView: BoardView, members: Member[]): CardPage[] {
+export function sortCards(
+  cardPages: CardPage[],
+  board: Board,
+  activeView: BoardView,
+  members: Record<string, Member>,
+  localSort?: ISortOption[] | null
+): CardPage[] {
   if (!activeView) {
     return cardPages;
   }
-  const { sortOptions } = activeView.fields;
-  const membersById = members.reduce<{ [id: string]: string }>((acc, member) => {
-    acc[member.id] = member.username;
-    return acc;
-  }, {});
+
+  const { sortOptions: globalSortOptions } = activeView.fields;
+  const sortOptions = localSort || globalSortOptions;
 
   if (sortOptions?.length < 1) {
     return cardPages.sort((a, b) => manualOrder(activeView, a, b));
@@ -195,24 +212,28 @@ export function sortCards(cardPages: CardPage[], board: Board, activeView: Board
         Utils.logError(`Missing template for property id: ${sortPropertyId}`);
         return sortedCards;
       }
-      Utils.log(`Sort by property: ${template?.name}`);
       sortedCards = sortedCards.sort((a, b) => {
         let aValue = a.card.fields.properties[sortPropertyId] || '';
         let bValue = b.card.fields.properties[sortPropertyId] || '';
 
         if (template.type === 'createdBy') {
-          aValue = membersById[a.page.createdBy] || '';
-          bValue = membersById[b.page.createdBy] || '';
+          aValue = members[a.page.createdBy]?.username || '';
+          bValue = members[b.page.createdBy]?.username || '';
         } else if (template.type === 'updatedBy') {
-          aValue = membersById[a.page.updatedBy] || '';
-          bValue = membersById[b.page.updatedBy] || '';
+          aValue = members[a.page.updatedBy]?.username || '';
+          bValue = members[b.page.updatedBy]?.username || '';
         } else if (template.type === 'date') {
-          aValue = aValue === '' ? '' : JSON.parse(aValue as string).from;
-          bValue = bValue === '' ? '' : JSON.parse(bValue as string).from;
+          if (typeof aValue !== 'number') {
+            aValue = aValue === '' ? '' : JSON.parse(aValue as string).from;
+          }
+
+          if (typeof bValue !== 'number') {
+            bValue = bValue === '' ? '' : JSON.parse(bValue as string).from;
+          }
         }
 
         let result = 0;
-        if (template.type === 'number' || template.type === 'date') {
+        if (template.type === 'number' || template.type === 'date' || template.type === 'tokenAmount') {
           // Always put empty values at the bottom
           if (aValue && !bValue) {
             return -1;
@@ -238,6 +259,12 @@ export function sortCards(cardPages: CardPage[], board: Board, activeView: Board
           } else {
             result = titleOrCreatedOrder(a.page, b.page);
           }
+        } else if (template.id === PROPOSAL_REVIEWERS_BLOCK_ID) {
+          const value1 = (Array.isArray(aValue) ? aValue[0] : aValue) as unknown as Record<string, any>;
+          const value2 = (Array.isArray(bValue) ? bValue[0] : bValue) as unknown as Record<string, any>;
+          aValue = typeof value1 === 'object' && 'id' in value1 ? members[value1.id]?.username || '' : '';
+          bValue = typeof value2 === 'object' && 'id' in value2 ? members[value2.id]?.username || '' : '';
+          result = aValue.localeCompare(bValue);
         } else {
           // Text-based sort
 
@@ -258,6 +285,11 @@ export function sortCards(cardPages: CardPage[], board: Board, activeView: Board
           if (template.type === 'select' || template.type === 'multiSelect') {
             aValue = template.options.find((o) => o.id === (Array.isArray(aValue) ? aValue[0] : aValue))?.value || '';
             bValue = template.options.find((o) => o.id === (Array.isArray(bValue) ? bValue[0] : bValue))?.value || '';
+          }
+
+          if (template.type === 'tokenChain') {
+            aValue = tokenChainOptions.find((o) => o.id === (Array.isArray(aValue) ? aValue[0] : aValue))?.value || '';
+            bValue = tokenChainOptions.find((o) => o.id === (Array.isArray(bValue) ? bValue[0] : bValue))?.value || '';
           }
 
           if (result === 0) {
@@ -320,25 +352,30 @@ function searchFilterCards(cards: Card[], board: Board, searchTextRaw: string): 
   });
 }
 
-type getViewCardsProps = { viewId: string; boardId: string };
+type getViewCardsProps = { viewId: string; boardId: string; localFilters?: FilterGroup | null };
 
 export const makeSelectViewCardsSortedFilteredAndGrouped = () =>
   createSelector(
-    getCards,
-    (state: RootState, props: getViewCardsProps) => state.boards.boards[props.boardId],
-    (state: RootState, props: getViewCardsProps) => state.views.views[props.viewId],
-    (cards, board, view) => {
+    (state: RootState, props: getViewCardsProps) => {
+      const cards = getCards(state);
+      const board = state.boards.boards[props.boardId];
+      const view = state.views.views[props.viewId];
+      const filter = props.localFilters || view?.fields.filter;
+
+      return {
+        cards,
+        board,
+        view,
+        filter
+      };
+    },
+    ({ cards, board, view, filter }) => {
       if (!view || !board || !cards) {
         return [];
       }
-      let result = Object.values(cards).filter((c) => c.parentId === board.id) as Card[];
-      const hasTitleProperty = board.fields.cardProperties.find((o) => o.id === Constants.titleColumnId);
-      const cardProperties: IPropertyTemplate[] = hasTitleProperty
-        ? board.fields.cardProperties
-        : [...board.fields.cardProperties, { id: Constants.titleColumnId, name: 'Title', options: [], type: 'text' }];
-
+      const result = Object.values(cards).filter((c) => c.parentId === board.id) as Card[];
       if (view.fields.filter) {
-        result = CardFilter.applyFilterGroup(view.fields.filter, cardProperties, result);
+        return CardFilter.applyFilterGroup(filter, board.fields.cardProperties, result);
       }
       return result;
     }

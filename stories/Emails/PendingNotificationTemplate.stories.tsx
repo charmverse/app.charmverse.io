@@ -15,6 +15,8 @@ export function PendingNotificationTemplate() {
   return (
     <PendingNotification
       notification={{
+        applicationCommentId: null,
+        applicationId: null,
         group: 'document',
         archived: false,
         commentId: null,
@@ -43,6 +45,18 @@ export function PendingNotificationTemplate() {
         spaceName: 'Example',
         type: 'mention.created'
       }}
+      user={{
+        avatar: null,
+        id: v4(),
+        username: 'Doe John'
+      }}
+      spaceFeatures={[
+        {
+          id: 'rewards',
+          isHidden: false,
+          title: 'Rewards'
+        }
+      ]}
     />
   );
 }

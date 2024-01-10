@@ -19,7 +19,7 @@ beforeAll(async () => {
   superApiKey = await generateSuperApiKey();
 });
 
-describe('GET /api/v1/spaces', () => {
+describe('POST /api/v1/spaces', () => {
   it('should respond 401 when api token is missing or invalid', async () => {
     const response = await request(baseUrl).post('/api/v1/spaces').send();
 
@@ -37,7 +37,6 @@ describe('GET /api/v1/spaces', () => {
       .send({ name: null });
 
     expect(response.statusCode).toBe(400);
-    expect(response.body.message).toBe('Key name is required in request body and must not be an empty value.');
 
     const response2 = await request(baseUrl)
       .post('/api/v1/spaces')

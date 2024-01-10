@@ -8,14 +8,16 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { v4 } from 'uuid';
 
+import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
+import { useViewFilter } from 'hooks/useViewFilter';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
+import { Constants } from 'lib/focalboard/constants';
 import type { FilterClause, FilterCondition } from 'lib/focalboard/filterClause';
 import { createFilterClause } from 'lib/focalboard/filterClause';
-import type { FilterGroupOperation } from 'lib/focalboard/filterGroup';
+import type { FilterGroup, FilterGroupOperation } from 'lib/focalboard/filterGroup';
 import { createFilterGroup, isAFilterGroupInstance } from 'lib/focalboard/filterGroup';
 
-import { Constants } from '../../constants';
 import mutator from '../../mutator';
 
 import FilterEntry from './filterEntry';
@@ -33,21 +35,34 @@ const StyledFilterComponent = styled(Box)`
 
 const FilterComponent = React.memo((props: Props) => {
   const { activeView, properties } = props;
+  const localViewSettings = useLocalDbViewSettings();
+  const currentFilter = useViewFilter(activeView);
+
+  const changeViewFilter = (filterGroup: FilterGroup) => {
+    // update filters locally if local settings context exist
+    if (localViewSettings) {
+      localViewSettings.setLocalFilters(filterGroup);
+      return;
+    }
+
+    mutator.changeViewFilter(activeView.id, currentFilter, filterGroup);
+  };
 
   const conditionClicked = (condition: FilterCondition, filter: FilterClause): void => {
-    const filterGroup = createFilterGroup(activeView.fields.filter);
+    const filterGroup = createFilterGroup(currentFilter);
     const filterClause = filterGroup.filters.find(
       (_filter) => (_filter as FilterClause).filterId === filter.filterId
     ) as FilterClause;
 
     if (filterClause && filterClause.condition !== condition) {
       filterClause.condition = condition;
-      mutator.changeViewFilter(activeView.id, activeView.fields.filter, filterGroup);
+
+      changeViewFilter(filterGroup);
     }
   };
 
   const addFilterClicked = () => {
-    const filterGroup = createFilterGroup(activeView.fields.filter);
+    const filterGroup = createFilterGroup(currentFilter);
 
     const filter = createFilterClause({
       condition: 'contains',
@@ -57,20 +72,20 @@ const FilterComponent = React.memo((props: Props) => {
     });
 
     filterGroup.filters.push(filter);
-    mutator.changeViewFilter(activeView.id, activeView.fields.filter, filterGroup);
+    changeViewFilter(filterGroup);
   };
 
   const deleteFilters = () => {
-    mutator.changeViewFilter(activeView.id, activeView.fields.filter, { filters: [], operation: 'and' });
+    changeViewFilter({ filters: [], operation: 'and' });
   };
 
   const filters: FilterClause[] =
-    (activeView.fields.filter?.filters.filter((o) => !isAFilterGroupInstance(o)) as FilterClause[]) || [];
+    (currentFilter?.filters.filter((o) => !isAFilterGroupInstance(o)) as FilterClause[]) || [];
 
   function changeFilterGroupOperation(operation: FilterGroupOperation) {
-    const filterGroup = createFilterGroup(activeView.fields.filter);
+    const filterGroup = createFilterGroup(currentFilter);
     filterGroup.operation = operation;
-    mutator.changeViewFilter(activeView.id, activeView.fields.filter, filterGroup);
+    changeViewFilter(filterGroup);
   }
 
   return (
@@ -88,7 +103,7 @@ const FilterComponent = React.memo((props: Props) => {
                 {filterIndex === 1 ? (
                   <Select<FilterGroupOperation>
                     size='small'
-                    value={activeView.fields.filter.operation}
+                    value={currentFilter.operation}
                     onChange={(e) => changeFilterGroupOperation(e.target.value as FilterGroupOperation)}
                     renderValue={(selected) => <Typography fontSize='small'>{capitalize(selected)}</Typography>}
                   >
@@ -102,22 +117,29 @@ const FilterComponent = React.memo((props: Props) => {
                   </Select>
                 ) : (
                   <Typography fontSize='small'>
-                    {filterIndex === 0 ? 'Where' : capitalize(activeView.fields.filter.operation)}
+                    {filterIndex === 0 ? 'Where' : capitalize(currentFilter.operation)}
                   </Typography>
                 )}
               </Stack>
               <FilterEntry
+                changeViewFilter={changeViewFilter}
                 properties={properties}
-                view={activeView}
                 conditionClicked={conditionClicked}
                 filter={filter}
+                currentFilter={currentFilter}
               />
             </Stack>
           ))}
         </Stack>
       )}
 
-      <Button variant='outlined' color='secondary' size='small' onClick={addFilterClicked} sx={{ mt: 1 }}>
+      <Button
+        variant='outlined'
+        color='secondary'
+        size='small'
+        onClick={addFilterClicked}
+        sx={{ mt: filters.length !== 0 ? 1 : 0 }}
+      >
         <FormattedMessage id='FilterComponent.add-filter' defaultMessage='+ Add filter' />
       </Button>
       {filters.length !== 0 && (

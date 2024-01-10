@@ -1,17 +1,15 @@
-import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import styled from '@emotion/styled';
 import { Box, ClickAwayListener, Grow, Paper } from '@mui/material';
 import type { PluginKey } from 'prosemirror-state';
-import React from 'react';
 import { createPortal } from 'react-dom';
 
-import { usePageSidebar } from 'hooks/usePageSidebar';
+import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import { useThreads } from 'hooks/useThreads';
 import { isTruthy } from 'lib/utilities/types';
 
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
-import PageThread from '../../PageThread';
+import PageThread from '../../thread/PageThread';
 import type { InlineCommentPluginState } from '../inlineComment.plugins';
 
 export const ThreadContainer = styled(Paper)`
@@ -32,16 +30,17 @@ export const ThreadContainer = styled(Paper)`
 
 export function InlineCommentThread({
   pluginKey,
-  permissions
+  permissions,
+  isCommentSidebarOpen
 }: {
   pluginKey: PluginKey<InlineCommentPluginState>;
   permissions?: PagePermissionFlags;
+  isCommentSidebarOpen: boolean;
 }) {
   const view = useEditorViewContext();
   const { tooltipContentDOM, show: isVisible, ids } = usePluginState(pluginKey) as InlineCommentPluginState;
   const { threads } = useThreads();
 
-  const { activeView } = usePageSidebar();
   // Find unresolved threads in the thread ids and sort them based on desc order of createdAt
   const unResolvedThreads = ids
     .map((threadId) => threads[threadId])
@@ -51,7 +50,7 @@ export function InlineCommentThread({
       threadA && threadB ? new Date(threadB.createdAt).getTime() - new Date(threadA.createdAt).getTime() : 0
     );
 
-  if ((activeView !== 'comments' || permissions) && isVisible && unResolvedThreads.length !== 0) {
+  if ((!isCommentSidebarOpen || permissions) && isVisible && unResolvedThreads.length !== 0) {
     // Only show comment thread on inline comment if the page threads list is not active
     return createPortal(
       <ClickAwayListener
@@ -73,7 +72,7 @@ export function InlineCommentThread({
             {unResolvedThreads.map((resolvedThread) => (
               <ThreadContainer key={resolvedThread.id} elevation={4}>
                 <PageThread
-                  permissions={permissions}
+                  canCreateComments={permissions?.comment}
                   inline={ids.length === 1}
                   key={resolvedThread.id}
                   threadId={resolvedThread?.id}

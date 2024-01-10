@@ -3,7 +3,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { isTruthy } from 'lib/utilities/types';
 import { getVotesByState } from 'lib/votes/getVotesByState';
 import { VOTE_STATUS } from 'lib/votes/interfaces';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 const updateVoteStatus = async () => {
@@ -26,6 +25,17 @@ const updateVoteStatus = async () => {
     .filter((v) => v.context === 'proposal')
     .map((v) => v.pageId)
     .filter(isTruthy);
+
+  const evaluationsToUpdate = await prisma.proposalEvaluation.findMany({
+    where: {
+      voteId: {
+        in: votesPassedDeadline.map((v) => v.id)
+      }
+    }
+  });
+
+  const passedEvaluations = evaluationsToUpdate.filter((e) => passedVotes.some((vote) => vote.id === e.voteId));
+  const failedEvaluations = evaluationsToUpdate.filter((e) => rejectedVotes.some((vote) => vote.id === e.voteId));
 
   await prisma.$transaction([
     // update passed votes
@@ -60,26 +70,40 @@ const updateVoteStatus = async () => {
       data: {
         status: 'vote_closed'
       }
+    }),
+    prisma.proposalEvaluation.updateMany({
+      where: {
+        id: {
+          in: passedEvaluations.map((e) => e.id)
+        }
+      },
+      data: {
+        result: 'pass',
+        completedAt: new Date()
+      }
+    }),
+    prisma.proposalEvaluation.updateMany({
+      where: {
+        id: {
+          in: failedEvaluations.map((e) => e.id)
+        }
+      },
+      data: {
+        result: 'fail',
+        completedAt: new Date()
+      }
     })
   ]);
 
   await Promise.all([
-    ...rejectedVotes.map((vote) => {
-      if (vote.pageId) {
+    [...rejectedVotes, ...passedVotes].map((vote) => {
+      const evaluation = passedEvaluations.find((e) => e.voteId === vote.id);
+      if (vote.pageId && evaluation) {
         return publishProposalEvent({
-          scope: WebhookEventNames.ProposalFailed,
           spaceId: vote.spaceId,
-          proposalId: vote.pageId
-        });
-      }
-      return Promise.resolve();
-    }),
-    ...passedVotes.map((vote) => {
-      if (vote.pageId) {
-        return publishProposalEvent({
-          scope: WebhookEventNames.ProposalPassed,
-          spaceId: vote.spaceId,
-          proposalId: vote.pageId
+          proposalId: vote.pageId,
+          currentEvaluationId: evaluation.id,
+          userId: evaluation.decidedBy ?? vote.createdBy
         });
       }
       return Promise.resolve();

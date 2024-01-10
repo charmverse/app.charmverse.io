@@ -35,7 +35,7 @@ export default function Authenticate() {
     if (userSpaces?.length && domainFromRedirect && userSpaces.find((s) => s.domain === domainFromRedirect)) {
       router.push(redirectPath);
     } else if (userSpaces?.length) {
-      router.push(`/${userSpaces[0].domain}`);
+      router.push({ pathname: `/[domain]`, query: { domain: userSpaces[0].domain } });
     } else {
       router.push('/createSpace');
     }
@@ -46,6 +46,7 @@ export default function Authenticate() {
     if (!emailForSignIn) {
       return;
     }
+
     setIsAuthenticating(true);
     validateMagicLink(emailForSignIn)
       .then(() => {
@@ -54,7 +55,10 @@ export default function Authenticate() {
       })
       .catch((err) => {
         if (user) {
-          redirectLoggedInUser();
+          showMessage(err.message ?? 'Invalid invite link', 'error');
+          setTimeout(() => {
+            redirectLoggedInUser();
+          }, 1500);
         } else {
           setIsAuthenticating(false);
           setLoginError(true);

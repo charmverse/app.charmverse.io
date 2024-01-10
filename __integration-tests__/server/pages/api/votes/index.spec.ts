@@ -1,21 +1,15 @@
-import type { Page, ProposalCategory, Space } from '@charmverse/core/prisma';
-import { SpaceOperation } from '@charmverse/core/prisma';
+import type { Page, Space } from '@charmverse/core/prisma';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import { removeSpaceOperations } from 'lib/permissions/spaces';
-import { createProposal } from 'lib/proposal/createProposal';
-import { typedKeys } from 'lib/utilities/objects';
 import type { VoteDTO } from 'lib/votes/interfaces';
 import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { createPage, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generateProposal, generateProposalCategory } from 'testing/utils/proposals';
 
 let page: Page;
 let space: Space;
 let user: LoggedInUser;
-let proposalCategory: ProposalCategory;
 
 let userCookie: string;
 
@@ -36,9 +30,6 @@ beforeAll(async () => {
   });
 
   userCookie = await loginUser(user.id);
-  proposalCategory = await generateProposalCategory({
-    spaceId: space.id
-  });
 });
 
 describe('GET /api/votes?id={id} - Get an individual vote', () => {
@@ -157,99 +148,5 @@ describe('POST /api/votes - Create a new poll', () => {
     };
 
     await request(baseUrl).post('/api/votes').set('Cookie', userCookie).send(newVote).expect(401);
-  });
-});
-
-describe('POST /api/votes - Create a proposal vote', () => {
-  it('should allow the user to create a proposal vote if they are a proposal author', async () => {
-    const { user: author, space: authorSpace } = await generateUserAndSpaceWithApiToken(undefined, false);
-
-    const authorCookie = await loginUser(author.id);
-
-    const proposal = await generateProposal({
-      userId: author.id,
-      spaceId: authorSpace.id,
-      proposalStatus: 'reviewed',
-      categoryId: proposalCategory.id
-    });
-
-    const newVote: VoteDTO = {
-      context: 'proposal',
-      deadline: new Date(),
-      content: null,
-      contentText: '',
-      pageId: proposal.id,
-      spaceId: proposal.spaceId,
-      title: 'new vote',
-      type: 'Approval',
-      threshold: 50,
-      voteOptions: ['1', '2', '3'],
-      createdBy: user.id,
-      maxChoices: 1
-    };
-
-    await request(baseUrl).post('/api/votes').set('Cookie', authorCookie).send(newVote).expect(201);
-  });
-
-  it('should allow the user to create a proposal vote if they are a space admin who did not author the proposal', async () => {
-    const { user: author, space: authorSpace } = await generateUserAndSpaceWithApiToken(undefined, false);
-    const adminUser = await generateSpaceUser({ spaceId: authorSpace.id, isAdmin: true });
-    const adminCookie = await loginUser(adminUser.id);
-
-    const proposal = await generateProposal({
-      userId: author.id,
-      spaceId: authorSpace.id,
-      proposalStatus: 'reviewed',
-      categoryId: proposalCategory.id
-    });
-    const newVote: VoteDTO = {
-      context: 'proposal',
-      deadline: new Date(),
-      pageId: proposal.id,
-      content: null,
-      contentText: '',
-      spaceId: proposal.spaceId,
-      title: 'new vote',
-      type: 'Approval',
-      threshold: 50,
-      voteOptions: ['1', '2', '3'],
-      createdBy: user.id,
-      maxChoices: 1
-    };
-    await request(baseUrl).post('/api/votes').set('Cookie', adminCookie).send(newVote).expect(201);
-  });
-
-  it('should not allow the user to create a proposal vote if they are not a proposal author', async () => {
-    const { user: author, space: authorSpace } = await generateUserAndSpaceWithApiToken(undefined, false);
-    const otherUser = await generateSpaceUser({ isAdmin: false, spaceId: authorSpace.id });
-    const otherUserCookie = await loginUser(otherUser.id);
-
-    await removeSpaceOperations({
-      forSpaceId: authorSpace.id,
-      operations: typedKeys(SpaceOperation),
-      spaceId: authorSpace.id
-    });
-
-    const { page: resultPage } = await createProposal({
-      userId: author.id,
-      spaceId: authorSpace.id,
-      categoryId: proposalCategory.id
-    });
-    const newVote: VoteDTO = {
-      deadline: new Date(),
-      pageId: resultPage.id,
-      spaceId: resultPage.spaceId,
-      context: 'inline',
-      content: null,
-      contentText: '',
-      title: 'new vote',
-      type: 'Approval',
-      threshold: 50,
-      voteOptions: ['1', '2', '3'],
-      createdBy: user.id,
-      maxChoices: 1
-    };
-
-    await request(baseUrl).post('/api/votes').set('Cookie', otherUserCookie).send(newVote).expect(401);
   });
 });

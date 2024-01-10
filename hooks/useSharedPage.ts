@@ -3,24 +3,17 @@ import { useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
+import { useSearchByDomain } from 'charmClient/hooks/spaces';
 import { useSpaces } from 'hooks/useSpaces';
 import { filterSpaceByDomain } from 'lib/spaces/filterSpaceByDomain';
 
-// Using both rewards and bounty for now until we complete the switch
-const BOUNTIES_PATH = '/[domain]/bounties';
 const REWARDS_PATH = '/[domain]/rewards';
-
 const PROPOSALS_PATH = '/[domain]/proposals';
 const DOCUMENT_PATH = '/[domain]/[pageId]';
 const FORUM_PATH = '/[domain]/forum';
-const PUBLIC_PAGE_PATHS = [REWARDS_PATH, BOUNTIES_PATH, DOCUMENT_PATH, FORUM_PATH, PROPOSALS_PATH];
+const PUBLIC_PAGE_PATHS = [REWARDS_PATH, DOCUMENT_PATH, FORUM_PATH, PROPOSALS_PATH];
 
-type PublicPageType =
-  | 'forum'
-  | 'proposals'
-  // Using both rewards and bounty for now until we complete the switch
-  | 'rewards'
-  | 'bounties';
+type PublicPageType = 'forum' | 'proposals' | 'rewards';
 
 export const useSharedPage = () => {
   const { pathname, query, isReady: isRouterReady } = useRouter();
@@ -40,7 +33,7 @@ export const useSharedPage = () => {
     }
 
     if (isRewardsPath) {
-      return `${spaceDomain}/bounties`;
+      return `${spaceDomain}/rewards`;
     }
 
     if (isForumPath) {
@@ -68,9 +61,7 @@ export const useSharedPage = () => {
     () => charmClient.getPublicPage(pageKey || '')
   );
 
-  const { data: space, isLoading: isSpaceLoading } = useSWRImmutable(spaceDomain ? `space/${spaceDomain}` : null, () =>
-    charmClient.spaces.searchByDomain(spaceDomain || '')
-  );
+  const { data: space, isLoading: isSpaceLoading } = useSearchByDomain(spaceDomain || '');
 
   const hasPublicRewards = space?.publicBountyBoard || space?.paidTier === 'free';
   const hasPublicProposals = space?.publicProposals || space?.paidTier === 'free';
@@ -88,7 +79,7 @@ export const useSharedPage = () => {
     isPublicPath,
     publicPage,
     publicPageType: (isRewardsPath
-      ? 'bounties'
+      ? 'rewards'
       : isProposalsPath
       ? 'proposals'
       : isForumPath
@@ -106,7 +97,7 @@ export function isPublicDocumentPath(path: string): boolean {
 }
 
 export function isRewardsPagePath(path: string): boolean {
-  return path.startsWith(REWARDS_PATH) || path.startsWith(BOUNTIES_PATH);
+  return path.startsWith(REWARDS_PATH);
 }
 
 export function isForumPagePath(path: string): boolean {

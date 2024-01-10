@@ -25,7 +25,7 @@ export function SharedPage({ publicPage }: Props) {
   const dispatch = useAppDispatch();
   const { setCurrentPageId } = useCurrentPage();
   const { pages } = usePages();
-  const [, setTitleState] = usePageTitle();
+  const [, setPageTitle] = usePageTitle();
   const { space } = useCurrentSpace();
 
   const basePageId = publicPage?.page?.id || '';
@@ -49,7 +49,7 @@ export function SharedPage({ publicPage }: Props) {
       spaceDomain: space?.domain
     });
 
-    setTitleState(rootPage.title);
+    setPageTitle(rootPage.title);
     setCurrentPageId(rootPage.id);
 
     dispatch(setCurrent(rootPage.id));
@@ -85,14 +85,15 @@ export function SharedPage({ publicPage }: Props) {
   }
 
   return currentPage.type.match(/board/) ? (
-    <DatabasePage page={currentPage} setPage={() => null} readOnly={true} />
+    <DatabasePage page={currentPage} setPage={() => null} readOnly />
   ) : (
     <Box sx={{ overflowY: 'auto' }}>
       <DocumentPage
         page={publicPage.page}
         refreshPage={() => Promise.resolve()}
         savePage={() => null}
-        readOnly={true}
+        readOnly
+        enableSidebar
       />
     </Box>
   );

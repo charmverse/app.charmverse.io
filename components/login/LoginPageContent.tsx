@@ -7,6 +7,8 @@ import { useEffect, useState } from 'react';
 
 import Image from 'components/common/Image';
 import LoadingComponent from 'components/common/LoadingComponent';
+import WorkspaceAvatar from 'components/common/PageLayout/components/Sidebar/components/WorkspaceAvatar';
+import { useBaseCurrentDomain } from 'hooks/useBaseCurrentDomain';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import type { ErrorType } from 'lib/utilities/errors';
@@ -25,6 +27,7 @@ type Props = {
 export function LoginPageContent({ hideLoginOptions, isLoggingIn, children }: Props) {
   const { showMessage } = useSnackbar();
   const router = useRouter();
+  const { customDomain, spaceFromPath, isSpaceLoading } = useBaseCurrentDomain();
 
   // We either have disabled account error (handled by our modal) or discord error (handled with snackbar)
   const [discordLoginError, setDiscordLoginError] = useState<string | null>(null);
@@ -46,6 +49,49 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn, children }: Pr
       clearError();
     }
   }, [discordLoginError]);
+
+  if (customDomain === undefined) {
+    return <Container px={3} data-test='login-page-content' />;
+  }
+
+  if (customDomain && isSpaceLoading) {
+    return (
+      <Container px={3} data-test='login-page-content'>
+        <LoadingComponent isLoading={true} size={60} />
+      </Container>
+    );
+  }
+
+  const image = spaceFromPath ? (
+    <WorkspaceAvatar
+      image={spaceFromPath?.spaceArtwork || spaceFromPath?.spaceImage || ''}
+      name={spaceFromPath?.name || ''}
+      size='3xLarge'
+    />
+  ) : customDomain === null ? (
+    <Image src={splashImage} px={3} />
+  ) : null;
+
+  const subtitle = customDomain === null && (
+    <Typography
+      sx={{
+        display: { xs: 'none', md: 'block' },
+        fontSize: 20,
+        mb: { sm: 2, md: 6 },
+        maxWidth: { md: '520px' }
+      }}
+    >
+      The solution for token communities to build relationships, work together and vote
+    </Typography>
+  );
+
+  const title = spaceFromPath ? (
+    `Login to ${spaceFromPath?.name}`
+  ) : customDomain === null ? (
+    <>
+      Powering the Future <br /> of Work through Web3
+    </>
+  ) : null;
 
   return (
     <Container px={3} data-test='login-page-content'>
@@ -73,23 +119,12 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn, children }: Pr
                 mb: 3
               }}
             >
-              Powering the Future <br />
-              of Work through Web3
+              {title}
             </Typography>
-
             <Box display={{ xs: 'flex', md: 'none' }} mb={2} mx={2} justifyContent='center'>
-              <Image src={splashImage} maxWidth={400} />
+              {image}
             </Box>
-            <Typography
-              sx={{
-                display: { xs: 'none', md: 'block' },
-                fontSize: 20,
-                mb: { sm: 2, md: 6 },
-                maxWidth: { md: '520px' }
-              }}
-            >
-              The solution for token communities to build relationships, work together and vote
-            </Typography>
+            {subtitle}
             <Box
               display={{ md: 'flex' }}
               gap={2}
@@ -103,7 +138,7 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn, children }: Pr
           </Box>
         </Grid>
         <Grid item md={6} display={{ xs: 'none', md: 'block' }} alignItems='center'>
-          <Image px={3} src={splashImage} />
+          {image}
         </Grid>
       </Grid>
       <LoginErrorModal open={isDisabledAccountError(discordLoginError)} onClose={clearError} />

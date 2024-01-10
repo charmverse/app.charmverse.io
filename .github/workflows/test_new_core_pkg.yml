@@ -23,11 +23,13 @@ jobs:
       - name: Install dependencies
         uses: ./.github/actions/install
         with:
+          save_cache: true
           core_pkg_version: ${{ inputs.core_pkg_version }}
 
       - name: Build app
         uses: ./.github/actions/build
         with:
+          save_cache: true
           REACT_APP_APP_ENV: 'test'
 
   integration-test:
@@ -58,11 +60,11 @@ jobs:
           - test_name: 'Type check'
             test_command: 'npm run typecheck'
           - test_name: 'Basic tests #1'
-            test_command: 'npm run test:ci -- --shard 1/3'
+            test_command: 'npm run test:ci -- --config="./lib/jest.config.ts" --shard 1/3'
           - test_name: 'Basic tests #2'
-            test_command: 'npm run test:ci -- --shard 2/3'
+            test_command: 'npm run test:ci -- --config="./lib/jest.config.ts" --shard 2/3'
           - test_name: 'Basic tests #3'
-            test_command: 'npm run test:ci -- --shard 3/3'
+            test_command: 'npm run test:ci -- --config="./lib/jest.config.ts" --shard 3/3'
 
     steps:
       - uses: actions/checkout@v3

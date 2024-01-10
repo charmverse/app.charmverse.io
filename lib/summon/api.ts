@@ -28,7 +28,7 @@ export async function findUserByIdentity(
     discordHandle?: string;
     githubUsername?: string;
   },
-  summonApiUrl: string
+  summonApiUrl: string = SUMMON_BASE_URL
 ): Promise<string | null> {
   const result = await http.GET<ApiResponse<{ userId: string }>>(`${summonApiUrl}/scan/identity`, query, {
     headers

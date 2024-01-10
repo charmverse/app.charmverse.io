@@ -13,7 +13,7 @@ import type {
   UserDetails,
   UserWallet
 } from '@charmverse/core/prisma';
-import type { FiatCurrency, IPairQuote } from 'connectors';
+import type { FiatCurrency, IPairQuote } from 'connectors/chains';
 
 import * as http from 'adapters/http';
 import { blockToFBBlock, fbBlockToBlock, fixBlocks } from 'components/common/BoardEditor/utils/blockUtils';
@@ -36,7 +36,6 @@ import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { BlockchainApi } from './apis/blockchainApi';
-import { BountiesApi } from './apis/bountiesApi';
 import { CommentsApi } from './apis/commentsApi';
 import { DiscordApi } from './apis/discordApi';
 import { FileApi } from './apis/fileApi';
@@ -57,7 +56,6 @@ import { RolesApi } from './apis/rolesApi';
 import { SpacesApi } from './apis/spacesApi';
 import { SubscriptionApi } from './apis/subscriptionApi';
 import { SummonApi } from './apis/summonApi';
-import { TokenGatesApi } from './apis/tokenGates';
 import { TrackApi } from './apis/trackApi';
 import { UnstoppableDomainsApi } from './apis/unstoppableApi';
 import { VotesApi } from './apis/votesApi';
@@ -69,8 +67,6 @@ type BlockUpdater = (blocks: FBBlock[]) => void;
 //
 class CharmClient {
   blockchain = new BlockchainApi();
-
-  bounties = new BountiesApi();
 
   comments = new CommentsApi();
 
@@ -111,8 +107,6 @@ class CharmClient {
   unstoppableDomains = new UnstoppableDomainsApi();
 
   votes = new VotesApi();
-
-  tokenGates = new TokenGatesApi();
 
   subscription = new SubscriptionApi();
 
@@ -292,7 +286,7 @@ class CharmClient {
   }
 
   async deleteBlocks(blockIds: string[], updater: BlockUpdater): Promise<void> {
-    const rootBlocks = await http.DELETE<Block[]>(`/api/blocks`, blockIds);
+    const rootBlocks = await http.DELETE<Block[]>(`/api/blocks`, { blockIds });
     const fbBlocks = rootBlocks.map((rootBlock) => ({
       ...blockToFBBlock(rootBlock),
       deletedAt: new Date().getTime()
@@ -332,6 +326,7 @@ class CharmClient {
       const fbBlockInput = Object.assign(currentFBBlock, updates, {
         fields: { ...(currentFBBlock.fields as object), ...updatedFields }
       });
+
       deletedFields.forEach((field) => delete fbBlockInput.fields[field]);
       return fbBlockToBlock(fbBlockInput);
     });
@@ -355,35 +350,12 @@ class CharmClient {
     return http.DELETE('/api/aws/s3-delete', { src });
   }
 
-  // evaluate ({ , jwt }: { id: string, jwt: string }): Promise<{ error?: string, success?: boolean }> {
-
-  //   return http.POST(`/api/token-gates/${id}/verify`, { jwt });
-  // }
-
-  unlockTokenGate({
-    id,
-    jwt
-  }: {
-    id: string;
-    jwt: string;
-  }): Promise<{ error?: string; success?: boolean; space: Space }> {
-    return http.POST(`/api/token-gates/${id}/verify`, { commit: true, jwt });
-  }
-
-  updateTokenGateRoles(tokenGateId: string, spaceId: string, roleIds: string[]) {
-    return http.PUT<TokenGateToRole[]>(`/api/token-gates/${tokenGateId}/roles`, { spaceId, roleIds });
-  }
-
   getTokenMetaData({ chainId, contractAddress }: ITokenMetadataRequest): Promise<ITokenMetadata> {
     return http.GET('/api/tokens/metadata', { chainId, contractAddress });
   }
 
   createPaymentMethod(paymentMethod: Partial<PaymentMethod>): Promise<PaymentMethod> {
     return http.POST('/api/payment-methods', paymentMethod);
-  }
-
-  listPaymentMethods(spaceId: string): Promise<PaymentMethod[]> {
-    return http.GET('/api/payment-methods', { spaceId });
   }
 
   deletePaymentMethod(paymentMethodId: string) {
@@ -433,8 +405,12 @@ class CharmClient {
     });
   }
 
-  createEvent({ payload, spaceId }: { spaceId: string; payload: CreateEventPayload }) {
+  createEvents({ payload, spaceId }: { spaceId: string; payload: CreateEventPayload[] }) {
     return http.POST<void>(`/api/spaces/${spaceId}/event`, payload);
+  }
+
+  resolveEnsName(ens: string) {
+    return http.GET<string | null>('/api/resolve-ens', { ens });
   }
 }
 

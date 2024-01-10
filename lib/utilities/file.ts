@@ -1,5 +1,7 @@
 import fs from 'node:fs/promises';
 
+import JSZip from 'jszip';
+
 // https://github.com/sindresorhus/callsites/blob/main/index.js
 function getCallerDirectory() {
   const _prepareStackTrace = Error.prepareStackTrace;
@@ -35,4 +37,50 @@ export async function writeToSameFolder({
   append?: boolean;
 }) {
   await (append ? fs.appendFile : fs.writeFile)(`${getCallerDirectory()}/${fileName}`, data);
+}
+
+export type MarkdownPageToCompress = {
+  title: string;
+  contentMarkdown: string;
+};
+
+export type ContentToCompress = {
+  pages?: MarkdownPageToCompress[];
+  csv?: { title: string; content: string }[];
+};
+
+export function zipContent({ csv = [], pages = [] }: ContentToCompress) {
+  // Ensure no duplicates
+  function getUniqueFilename(_filename: string, _existingFilenames: Set<string>, extension: 'md' | 'csv') {
+    // Remove any forward slashes and backslashes in the filename so they don't show up as a subfolder in the end-users' device
+    // eslint-disable-next-line no-useless-escape
+    const sanitizedFilename = _filename.replace(/[\/\\]/g, '');
+
+    let count = 1;
+    let newFilename = sanitizedFilename;
+    while (_existingFilenames.has(newFilename)) {
+      newFilename = `${sanitizedFilename} (${count})`;
+      count += 1;
+    }
+    _existingFilenames.add(newFilename);
+    return `${newFilename}.${extension}`;
+  }
+
+  const zip = new JSZip();
+  const existingFilenames = new Set<string>();
+
+  // Handle CSV files
+  csv.forEach((file) => {
+    const filename = getUniqueFilename(`${file.title}`, existingFilenames, 'csv');
+    zip.file(filename, file.content ?? '');
+  });
+
+  // Handle Markdown files
+  pages.forEach((page) => {
+    const filename = getUniqueFilename(`${page.title}`, existingFilenames, 'md');
+    zip.file(filename, page.contentMarkdown ?? ''); // Assuming page.content is already in Markdown format
+  });
+
+  // Generate ZIP file
+  return zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE' });
 }

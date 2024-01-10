@@ -1,15 +1,17 @@
-import type { RawPlugins } from '@bangle.dev/core';
-import type { Command, EditorView, Node, NodeType, Schema } from '@bangle.dev/pm';
-import { InputRule, NodeSelection, Plugin, PluginKey } from '@bangle.dev/pm';
-import { safeInsert } from '@bangle.dev/utils';
+import type { Schema } from '@bangle.dev/pm';
+import { InputRule, Plugin, PluginKey } from '@bangle.dev/pm';
+import { v4 } from 'uuid';
 
-import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
+import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
+
+// example: <img src=”data:image/gif;base64, R0lGODlhCAAFAIABAMaAgP///yH5BAEAAAEALAAAAAAIAAUAAAIKBBKGebzqoJKtAAA7″ />
 
 export const plugins = pluginsFactory;
 export const commands = {};
 
 const name = 'image';
 
+export const imageFileDropEventName = 'imageFileDrop';
 const getTypeFromSchema = (schema: Schema) => schema.nodes[name];
 
 export interface ImageNodeSchemaAttrs {
@@ -20,12 +22,10 @@ export interface ImageNodeSchemaAttrs {
 
 function pluginsFactory({
   handleDragAndDrop = true,
-  acceptFileType = 'image/*',
-  createImageNodes = defaultCreateImageNodes
+  acceptFileType = 'image/*'
 }: {
   handleDragAndDrop?: boolean;
   acceptFileType?: string;
-  createImageNodes?: (files: File[], imageType: NodeType, view: EditorView) => Promise<Node[]>;
 } = {}): RawPlugins {
   return ({ schema }) => {
     const type = getTypeFromSchema(schema);
@@ -56,9 +56,6 @@ function pluginsFactory({
                 }
                 const files = getFileData(event.dataTransfer, acceptFileType, true);
 
-                // TODO should we handle all drops but just show error?
-                // returning false here would just default to native behaviour
-                // But then any drop handler would fail to work.
                 if (!files || files.length === 0) {
                   return false;
                 }
@@ -68,10 +65,24 @@ function pluginsFactory({
                   top: event.clientY
                 });
 
-                createImageNodes(files, getTypeFromSchema(view.state.schema), view).then((imageNodes) => {
-                  addImagesToView(view, coordinates == null ? undefined : coordinates.pos, imageNodes);
-                });
+                if (!coordinates) {
+                  return true;
+                }
+                const imageType = getTypeFromSchema(view.state.schema);
+                const { pos } = coordinates;
 
+                for (const [index, file] of files.entries()) {
+                  convertFileToBase64(file).then((base64) => {
+                    view.dispatch(
+                      view.state.tr.insert(
+                        pos + index,
+                        imageType.create({
+                          src: base64
+                        })
+                      )
+                    );
+                  });
+                }
                 return true;
               }
             },
@@ -85,10 +96,21 @@ function pluginsFactory({
               if (!files || files.length === 0) {
                 return false;
               }
-              createImageNodes(files, getTypeFromSchema(view.state.schema), view).then((imageNodes) => {
-                addImagesToView(view, view.state.selection.from, imageNodes);
-              });
 
+              const imageType = getTypeFromSchema(view.state.schema);
+              const pos = view.state.selection.from;
+              for (const [index, file] of files.entries()) {
+                convertFileToBase64(file).then((base64) => {
+                  view.dispatch(
+                    view.state.tr.insert(
+                      pos + index,
+                      imageType.create({
+                        src: base64
+                      })
+                    )
+                  );
+                });
+              }
               return true;
             }
           }
@@ -97,27 +119,63 @@ function pluginsFactory({
   };
 }
 
-async function defaultCreateImageNodes(files: File[], imageType: NodeType, _view: EditorView) {
-  const { url } = await uploadToS3(files[0]);
-  return [
-    imageType.create({
-      src: url
-    })
-  ];
+export function convertFileToBase64(file: File) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+  });
 }
 
-function addImagesToView(view: EditorView, pos: number | undefined, imageNodes: Node[]) {
-  for (const node of imageNodes) {
-    const { tr } = view.state;
-    const newTr = safeInsert(node, pos)(tr);
-
-    if (newTr !== tr) {
-      view.dispatch(newTr);
+export const handleImageFileDrop =
+  ({
+    pageId,
+    postId,
+    readOnly,
+    parentElementId
+  }: {
+    readOnly: boolean;
+    pageId?: string;
+    postId?: string;
+    parentElementId: string;
+  }) =>
+  (event: React.DragEvent<HTMLElement>) => {
+    // prevent drop event from firing when dropping into the editor
+    if (
+      event.dataTransfer == null ||
+      readOnly ||
+      (event.target instanceof HTMLElement &&
+        event.target.parentElement?.id !== parentElementId &&
+        event.target.parentElement?.parentElement?.id !== parentElementId)
+    ) {
+      return;
     }
-  }
-}
+    const files = getFileData(event.dataTransfer, 'image/*', true);
 
-function getFileData(data: DataTransfer, accept: string, multiple: boolean) {
+    if (!files || files.length === 0) {
+      return;
+    }
+    event.preventDefault();
+
+    const imageFileDropEvent = new CustomEvent(imageFileDropEventName, {
+      detail: {
+        files
+      }
+    });
+
+    if (pageId) {
+      document
+        .querySelector(`.bangle-editor-core[data-page-id="${pageId}"]`)
+        ?.dispatchEvent(imageFileDropEvent as Event);
+    } else if (postId) {
+      document
+        .querySelector(`.bangle-editor-core[data-post-id="${postId}"]`)
+        ?.dispatchEvent(imageFileDropEvent as Event);
+    }
+  };
+
+export function getFileData(data: DataTransfer, accept: string, multiple: boolean) {
   const dragDataItems = getMatchingItems(data.items, accept, multiple);
   const files: File[] = [];
 
@@ -177,24 +235,32 @@ function getMatchingItems(list: DataTransferItemList, accept: string, multiple: 
   return results;
 }
 
-export const updateImageNodeAttribute =
-  (attr: Node['attrs'] = {}): Command =>
-  (state, dispatch) => {
-    if (!(state.selection instanceof NodeSelection) || !state.selection.node) {
-      return false;
-    }
-    const { node } = state.selection;
-    if (node.type !== getTypeFromSchema(state.schema)) {
-      return false;
-    }
+// does not work for svg sources: data:image/svg+xml,%3csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20version=%271.1%27%20width=%27379%27%20height=%27820%27/%3e
+export function getFileBinary(src: string): File | null {
+  if (src.startsWith('data')) {
+    const contentType = src.split('image/')[1].split(';')[0];
+    const fileExtension = contentType.split('+')[0]; // handle svg+xml
+    const fileName = `${v4()}.${fileExtension}`;
+    const rawFileContent = src.split(';base64,')[1];
+    // not all data sources are base64, like svg:
+    if (rawFileContent) {
+      const fileContent = Buffer.from(rawFileContent, 'base64');
 
-    if (dispatch) {
-      dispatch(
-        state.tr.setNodeMarkup(state.selection.$from.pos, undefined, {
-          ...node.attrs,
-          ...attr
-        })
-      );
+      // Break the buffer string into chunks of 1 kilobyte
+      const chunkSize = 1024 * 1;
+
+      const bufferLength = fileContent.length;
+
+      const bufferChunks = [];
+
+      for (let i = 0; i < bufferLength; i += chunkSize) {
+        const chunk = fileContent.slice(i, i + chunkSize);
+        bufferChunks.push(chunk);
+      }
+
+      const file: File = new File(bufferChunks, fileName, { type: `image/${contentType}` });
+      return file;
     }
-    return true;
-  };
+  }
+  return null;
+}

@@ -14,10 +14,10 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
 import { usePageIdFromPath } from 'hooks/usePageFromPath';
 
-import RewardsShareButton from './components/BountyShareButton/BountyShareButton';
 import { DocumentHeaderElements } from './components/DocumentHeaderElements';
 import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
 import ProposalShareButton from './components/ProposalsShareButton/ProposalsShareButton';
+import RewardsShareButton from './components/RewardsShareButton/RewardsShareButton';
 
 export const headerHeight = 56;
 
@@ -48,8 +48,9 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
 
   // Post permissions hook will not make an API call if post ID is null. Since we can't conditionally render hooks, we pass null as the post ID. This is the reason for the 'null as any' statement
   const forumPostInfo = usePostByPath();
-  const isRewardsList = router.route === '/[domain]/rewards' || router.route === '/[domain]/bounties';
+  const isRewardsList = router.route === '/[domain]/rewards';
   const isProposalsPage = router.route === '/[domain]/proposals';
+  const isNewProposalPage = router.route === '/[domain]/proposals/new';
 
   return (
     <StyledToolbar variant='dense'>
@@ -79,13 +80,12 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         }}
       >
         <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          <PageTitleWithBreadcrumbs pageId={basePage?.id} pageType={basePage?.type} />
+          <PageTitleWithBreadcrumbs pageId={basePage?.id} pageType={basePage?.type} post={forumPostInfo?.forumPost} />
         </div>
 
         <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1} gap={0.5}>
           {isRewardsList && <RewardsShareButton headerHeight={headerHeight} />}
           {isProposalsPage && <ProposalShareButton headerHeight={headerHeight} />}
-
           {basePage && <DocumentHeaderElements headerHeight={headerHeight} page={basePage} />}
 
           <FullPageActionsMenuButton page={basePage} post={forumPostInfo?.forumPost} />

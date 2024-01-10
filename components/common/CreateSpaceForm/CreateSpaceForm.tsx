@@ -25,17 +25,18 @@ import { useSpaces } from 'hooks/useSpaces';
 import { generateNotionImportRedirectUrl } from 'lib/notion/generateNotionImportRedirectUrl';
 import { spaceTemplateIds } from 'lib/spaces/config';
 import type { SpaceTemplateType } from 'lib/spaces/config';
-import { getSpaceUrl } from 'lib/utilities/browser';
+import { setCookie, getSpaceUrl } from 'lib/utilities/browser';
 import randomName from 'lib/utilities/randomName';
 
 import { ImportZippedMarkdown } from '../ImportZippedMarkdown';
 import { SpaceAccessGateWithSearch } from '../SpaceAccessGate/SpaceAccessGateWithSearch';
 
+import { spaceTemplateCookie } from './constants';
 import { SelectNewSpaceTemplate } from './SelectNewSpaceTemplate';
 
 const schema = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
-  spaceImage: yup.string().nullable(true),
+  spaceImage: yup.string().nullable(),
   spaceTemplateOption: yup.mixed<SpaceTemplateType>().oneOf(spaceTemplateIds).default('default')
 });
 type FormValues = yup.InferType<typeof schema>;
@@ -53,7 +54,6 @@ type SpaceFormStep = 'select_template' | 'create_space' | 'join_space';
 export function CreateSpaceForm({ className, defaultValues, onCancel, submitText }: Props) {
   const { createNewSpace, isCreatingSpace } = useSpaces();
   const { showMessage } = useSnackbar();
-
   const [newSpace, setNewSpace] = useState<Space | null>(null);
 
   const [step, setStep] = useState<SpaceFormStep>('select_template');
@@ -143,6 +143,12 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
 
       setNewSpace(space);
 
+      // record for onboarding
+      setCookie({
+        name: spaceTemplateCookie,
+        value: values.spaceTemplateOption,
+        expiresAfterSession: true
+      });
       if ((values.spaceTemplateOption as SpaceTemplateType) === 'importNotion') {
         const notionUrl = generateNotionImportRedirectUrl({
           origin: window?.location.origin,
@@ -163,6 +169,10 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
     }
   }, []);
 
+  const isBanned =
+    (typeof saveError === 'string' && saveError.includes('blocked')) ||
+    (saveError instanceof Error && saveError.message.includes('blocked'));
+
   function randomizeName() {
     const name = randomName();
     setValue('name', name);
@@ -176,6 +186,8 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
   function goToSelectTemplate() {
     setStep('select_template');
   }
+
+  const errorText = typeof saveError === 'string' ? saveError : saveError?.message ?? 'Error creating space';
 
   if (step === 'join_space') {
     return (
@@ -255,7 +267,7 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
               {watchSpaceTemplate !== 'importMarkdown' && (
                 <Button
                   size='large'
-                  disabled={!watchName || !!newSpace}
+                  disabled={!watchName || !!newSpace || isBanned}
                   type='submit'
                   data-test='create-workspace'
                   loading={isCreatingSpace}
@@ -275,7 +287,7 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
             </Grid>
             {saveError && (
               <Grid item>
-                <Alert severity='error'>{saveError}</Alert>
+                <Alert severity='error'>{errorText}</Alert>
               </Grid>
             )}
           </Grid>

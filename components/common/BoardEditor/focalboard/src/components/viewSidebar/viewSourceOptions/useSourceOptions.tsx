@@ -33,7 +33,7 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
   const { pages, updatePage } = usePages();
   const { space } = useCurrentSpace();
   const { user } = useUser();
-  const { members } = useMembers();
+  const { membersRecord } = useMembers();
   const dispatch = useAppDispatch();
 
   const { showMessage } = useSnackbar();
@@ -126,7 +126,7 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
               const view = activeView ?? (await onCreateDatabase());
               await addNewCards({
                 board: rootBoard,
-                members,
+                members: membersRecord,
                 results,
                 spaceId: space?.id,
                 userId: user.id,

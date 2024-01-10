@@ -11,14 +11,20 @@ export type Web3LoginRequest = {
   walletSignature: AuthSig;
 };
 
-export function requireWalletSignature(req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
+export async function requireWalletSignature(req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
   const { address, walletSignature } = req.body as Web3LoginRequest;
 
   if (!address || !walletSignature) {
     throw new MissingDataError('Please provide an address and wallet signature');
   }
 
-  if (!isValidWalletSignature({ address, signature: walletSignature, host: req.headers.origin as string })) {
+  const isValidSignature = await isValidWalletSignature({
+    address,
+    signature: walletSignature,
+    host: req.headers.origin as string
+  });
+
+  if (!isValidSignature) {
     throw new MissingDataError('Invalid wallet signature');
   } else {
     next();

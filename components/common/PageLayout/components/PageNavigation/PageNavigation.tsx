@@ -3,13 +3,13 @@ import { pageTree } from '@charmverse/core/pages/utilities';
 import type { Page } from '@charmverse/core/prisma';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
 import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
-import { useRouter } from 'next/router';
 import type { SyntheticEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo } from 'react';
 
 import charmClient from 'charmClient';
 import { NavIconHover } from 'components/common/PageLayout/components/PageNavigation/components/NavIconHover';
 import { TreeRoot } from 'components/common/PageLayout/components/PageNavigation/components/TreeRoot';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useFavoritePages } from 'hooks/useFavoritePages';
 import { useLocalStorage } from 'hooks/useLocalStorage';
@@ -49,7 +49,7 @@ type PageNavigationProps = {
 };
 
 function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageNavigationProps) {
-  const router = useRouter();
+  const { navigateToSpacePath, router } = useCharmRouter();
   const { pages, setPages, mutatePage } = usePages();
 
   const currentPage = usePageFromPath();
@@ -142,12 +142,10 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
         // dropped on root level, so remove child page reference in parent's content
         if (droppedItem.parentId !== containerItem.parentId) {
           emitSocketMessage({
-            type: 'page_reordered',
+            type: 'page_reordered_sidebar_to_sidebar',
             payload: {
               pageId: droppedItem.id,
-              newParentId: containerItem.parentId,
-              newIndex: droppedItem.index,
-              trigger: 'sidebar-to-sidebar'
+              newParentId: containerItem.parentId
             }
           });
         }
@@ -190,12 +188,10 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
 
       if (parentId) {
         emitSocketMessage({
-          type: 'page_reordered',
+          type: 'page_reordered_sidebar_to_sidebar',
           payload: {
             pageId: droppedItem.id,
-            newParentId: containerItem.id,
-            newIndex: droppedItem.index,
-            trigger: 'sidebar-to-sidebar'
+            newParentId: containerItem.id
           }
         });
       }
@@ -240,7 +236,9 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
           createdBy: user.id,
           spaceId: space.id
         };
-        return addPageAndRedirect(newPage, router);
+        return addPageAndRedirect(newPage, (path) => {
+          navigateToSpacePath(path);
+        });
       }
     },
     [space?.id, user?.id]

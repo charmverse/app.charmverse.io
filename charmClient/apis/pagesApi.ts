@@ -12,7 +12,7 @@ export interface UpdateProfileItemRequest {
 }
 
 export class PagesApi {
-  getPages(spaceId: string) {
+  getPages({ spaceId }: { spaceId: string }) {
     return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`);
   }
 
@@ -32,8 +32,8 @@ export class PagesApi {
     return http.PUT<void>(`/api/pages/${pageOpts.id}`, pageOpts);
   }
 
-  convertToProposal({ pageId, categoryId }: { pageId: string; categoryId: string }) {
-    return http.POST<PageMeta>(`/api/pages/${pageId}/convert-to-proposal`, { categoryId });
+  convertToProposal({ pageId }: { pageId: string }) {
+    return http.POST<PageMeta>(`/api/pages/${pageId}/convert-to-proposal`);
   }
 
   duplicatePage({ pageId }: { pageId: string }) {
@@ -66,7 +66,11 @@ export class PagesApi {
     return http.PUT(`/api/pages/${pageId}/comments/${commentId}/vote`, { upvoted });
   }
 
-  syncPageComments({ pageId }: { pageId: string }): Promise<PageCommentWithVote[]> {
+  syncPageCommentsWithLensPost({ pageId }: { pageId: string }): Promise<PageCommentWithVote[]> {
     return http.POST(`/api/pages/${pageId}/sync-page-comments`);
+  }
+
+  exportZippedDatabasePage({ databaseId }: { databaseId: string }) {
+    return http.GET(`/api/pages/${databaseId}/export-database`);
   }
 }

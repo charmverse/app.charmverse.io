@@ -5,10 +5,10 @@ import type { ParseResult } from 'papaparse';
 import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
 
 import charmClient from 'charmClient';
-import { Constants } from 'components/common/BoardEditor/focalboard/src/constants';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { createCard } from 'lib/focalboard/card';
+import { Constants } from 'lib/focalboard/constants';
 import type { Member } from 'lib/members/interfaces';
 import { focalboardColorsMap } from 'theme/colors';
 
@@ -141,7 +141,7 @@ export function createNewPropertiesForBoard(
 export function createCardFieldProperties(
   csvRow: Record<string, string>,
   mappedBoardProperties: { [key: string]: MappedProperties },
-  members: Member[]
+  members: Record<string, Member>
 ) {
   return Object.entries(csvRow).reduce<Record<string, string | string[]>>((acc, [key, value]) => {
     // Exclude the name. That prop is used only for the card title
@@ -153,11 +153,7 @@ export function createCardFieldProperties(
     const propId = mappedBoardProperties[key]?.id;
 
     // Verify that we have the person in the members array
-    if (
-      mappedBoardProperties[key]?.type === 'person' &&
-      uuidValidate(value) &&
-      !!members.find((member) => member.id === value)
-    ) {
+    if (mappedBoardProperties[key]?.type === 'person' && uuidValidate(value) && !!members[value]) {
       return {
         ...acc,
         [propId]: value
@@ -334,7 +330,7 @@ export async function addNewCards({
   results: ParseResult<Record<string, string>>;
   spaceId: string;
   userId: string;
-  members: Member[];
+  members: Record<string, Member>;
   apiPageKeys?: ApiPageKey[];
 }) {
   // We assume that the first column is the title so we rename it accordingly

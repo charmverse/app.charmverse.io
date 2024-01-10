@@ -9,11 +9,13 @@ import type { Card } from 'lib/focalboard/card';
 import { onError, onNoMatch } from 'lib/middleware';
 import { NotFoundError } from 'lib/middleware/errors';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
-import { getPermissionsClient } from 'lib/permissions/api';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { mapDbRewardToReward } from 'lib/rewards/mapDbRewardToReward';
+import { checkPageContent } from 'lib/security/checkPageContent';
 import { withSessionRoute } from 'lib/session/withSession';
 import { isUUID } from 'lib/utilities/strings';
+import { replaceS3Domain } from 'lib/utilities/url';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -199,17 +201,18 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
     throw new NotFoundError('Page not found');
   }
 
-  const computed = await getPermissionsClient({ resourceId: page.id, resourceIdType: 'page' }).then(({ client }) =>
-    client.pages.computePagePermissions({
-      resourceId: page!.id
-    })
-  );
+  const computed = await permissionsApiClient.pages.computePagePermissions({
+    resourceId: page!.id,
+    userId: req.session.user?.id
+  });
 
   if (computed.read !== true && page.type !== 'bounty') {
     throw new NotFoundError('Page not found');
   } else if (computed.read !== true && page.type === 'bounty' && !space.publicBountyBoard) {
     throw new NotFoundError('Page not found');
   }
+
+  checkPageContent(page.content);
 
   const boardPages: Page[] = [];
   let boards: Board[] = [];
@@ -280,6 +283,15 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
       }
     });
   }
+
+  boardPages.forEach((p) => {
+    p.headerImage = replaceS3Domain(p.headerImage);
+    p.icon = replaceS3Domain(p.icon);
+  });
+
+  page.headerImage = replaceS3Domain(page.headerImage);
+  page.icon = replaceS3Domain(page.icon);
+
   return res.status(200).json({
     bounty: bounty
       ? {

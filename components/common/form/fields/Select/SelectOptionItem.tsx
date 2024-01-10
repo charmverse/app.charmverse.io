@@ -15,14 +15,25 @@ type Props = {
 export function SelectOptionItem({ option, onChange, onDelete, onToggleOptionEdit, menuItemProps = {} }: Props) {
   const readOnly = !onChange && !onDelete;
   return (
-    <MenuItem {...menuItemProps} sx={{ display: 'flex' }} data-test={`select-option-${option.id}`}>
+    <MenuItem
+      {...menuItemProps}
+      sx={{ display: 'flex' }}
+      disabled={option.disabled}
+      data-test={`select-option-${option.id}`}
+    >
       <Stack flexDirection='row' justifyContent='space-between' alignItems='center' flex={1} maxWidth='100%'>
         <Chip
-          label={option.name}
+          label={option.dropdownName || option.name}
           color={option.color}
           size='small'
-          // 100% - 24px to not collide with ellipsis
-          sx={{ maxWidth: readOnly ? '100%' : 'calc(100% - 24px)', px: 0.5, zIndex: 0, position: 'relative' }}
+          sx={{
+            cursor: 'pointer',
+            // 100% - 24px to not collide with ellipsis
+            maxWidth: readOnly ? '100%' : 'calc(100% - 24px)',
+            px: 0.5,
+            zIndex: 0,
+            position: 'relative'
+          }}
         />
 
         {!readOnly && (

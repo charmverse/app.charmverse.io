@@ -1,3 +1,4 @@
+import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { prisma } from '@charmverse/core/prisma-client';
 
 /**
@@ -13,17 +14,15 @@ import { prisma } from '@charmverse/core/prisma-client';
  */
 
 async function search() {
-
-  const acc = await prisma.user.findMany({
+  const acc = await prisma.block.findMany({
     where: {
-      username: {
-        contains: '0x036'
-      } 
+      space: {
+        domain: 'example-domain'
+      }
     }
-  })
+  });
 
-
-  console.log(JSON.stringify({acc}, null, 2))
+  console.log(acc);
 }
 
 search().then(() => console.log('Done'));

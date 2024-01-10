@@ -2,7 +2,9 @@ import styled from '@emotion/styled';
 import EmailIcon from '@mui/icons-material/Email';
 import type { AutocompleteChangeReason, AutocompleteProps } from '@mui/material';
 import { Autocomplete, TextField } from '@mui/material';
+import type { ReactNode } from 'react';
 import { createRef, useEffect, useState } from 'react';
+import { v4 } from 'uuid';
 
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
@@ -39,15 +41,19 @@ interface Props extends Omit<AutocompleteProps<Member, boolean, boolean, boolean
   openOnFocus?: boolean;
   allowEmail?: boolean;
   inputVariant?: 'standard' | 'outlined' | 'filled';
+  helperText?: ReactNode;
+  error?: boolean;
 }
 
-export function InputSearchMemberBase({
+function InputSearchMemberBase({
   filter,
   options,
   placeholder,
   openOnFocus = false,
   inputVariant,
   allowEmail,
+  helperText,
+  error,
   ...props
 }: Props) {
   const inputRef = createRef<HTMLInputElement>();
@@ -60,10 +66,10 @@ export function InputSearchMemberBase({
       options={filteredOptions}
       autoHighlight
       // freeSolo={props.allowEmail}
-      getOptionDisabled={(option) => option.id === 'email' && !isValidEmail(option.username)}
+      getOptionDisabled={(option) => option.id.startsWith('email') && !isValidEmail(option.username)}
       onInputChange={(_event, value) => {
         if (allowEmail) {
-          const emailOption = filteredOptions.find((opt) => opt.id === 'email');
+          const emailOption = filteredOptions.find((opt) => opt.id.startsWith('email'));
 
           if (emailOption && !value) {
             filteredOptions.pop();
@@ -71,7 +77,7 @@ export function InputSearchMemberBase({
             emailOption.username = value;
           } else if (!emailOption && value) {
             filteredOptions.push({
-              id: 'email',
+              id: `email-${v4()}`,
               username: inputRef.current?.value,
               isBot: false,
               avatar: '/images/Google_G-grayscale.png'
@@ -85,9 +91,9 @@ export function InputSearchMemberBase({
       renderOption={(_props, user) => (
         <UserDisplay
           {...(_props as any)}
-          user={user}
+          userId={user.id}
           avatarSize='small'
-          avatarIcon={user.id === 'email' ? <EmailIcon fontSize='large' /> : undefined}
+          avatarIcon={user.id.startsWith('email') ? <EmailIcon fontSize='large' /> : undefined}
         />
       )}
       noOptionsText='No options available'
@@ -96,6 +102,8 @@ export function InputSearchMemberBase({
         // @ts-ignore - MUI types are wrong
         <TextField
           {...params}
+          helperText={helperText}
+          error={error}
           placeholder={placeholder ?? ''}
           size='small'
           autoFocus={openOnFocus}
@@ -112,49 +120,6 @@ export function InputSearchMemberBase({
   );
 }
 
-interface IInputSearchMemberProps {
-  onChange: (id: string) => void;
-  defaultValue?: string;
-  filter?: IMembersFilter;
-  onClear?: VoidFunction;
-  openOnFocus?: boolean;
-}
-
-export function InputSearchMember({ defaultValue, onChange, onClear, openOnFocus, ...props }: IInputSearchMemberProps) {
-  const { getMemberById, members } = useMembers();
-  const [value, setValue] = useState<Member | null>(null);
-
-  useEffect(() => {
-    if (defaultValue && !value) {
-      const member = getMemberById(defaultValue);
-      if (member) {
-        setValue(member);
-      }
-    }
-  }, [defaultValue, getMemberById]);
-
-  function emitValue(selectedUser: Member) {
-    if (selectedUser) {
-      onChange(selectedUser.id === 'email' ? selectedUser.username : selectedUser.id);
-    }
-    if (onClear && !selectedUser) {
-      onClear();
-    }
-    setValue(selectedUser);
-  }
-
-  return (
-    <InputSearchMemberBase
-      options={members}
-      onChange={(e, _value) => emitValue(_value as Member)}
-      placeholder='Select a user'
-      value={value}
-      openOnFocus={openOnFocus}
-      {...props}
-    />
-  );
-}
-
 interface IInputSearchMemberMultipleProps
   extends Partial<Omit<AutocompleteProps<Member, boolean, boolean, boolean>, 'onChange'>> {
   onChange: (id: string[], reason: AutocompleteChangeReason) => void;
@@ -163,6 +128,8 @@ interface IInputSearchMemberMultipleProps
   disableCloseOnSelect?: boolean;
   allowEmail?: boolean;
   inputVariant?: 'standard' | 'outlined' | 'filled';
+  helperText?: ReactNode;
+  error?: boolean;
 }
 
 export function InputSearchMemberMultiple({
@@ -172,12 +139,12 @@ export function InputSearchMemberMultiple({
   ...props
 }: IInputSearchMemberMultipleProps) {
   const { members, membersRecord } = useMembers();
-  const defaultMembers = (defaultValue || []).map((userId) => membersRecord[userId]).filter(Boolean);
+  const defaultMembers = (defaultValue ?? []).map((userId) => membersRecord[userId]).filter(Boolean);
   const [value, setValue] = useState<Member[]>(defaultMembers);
 
   function emitValue(users: Member[], reason: AutocompleteChangeReason) {
     onChange(
-      users.map((user) => (user.id === 'email' ? user.username : user.id)),
+      users.map((user) => (user.id.startsWith('email') ? user.username : user.id)),
       reason
     );
     setValue(users);
@@ -185,7 +152,7 @@ export function InputSearchMemberMultiple({
 
   useEffect(() => {
     if (defaultValue && value.length === 0) {
-      const _defaultMembers = defaultValue.map((userId) => membersRecord[userId]).filter(Boolean);
+      const _defaultMembers = (defaultValue ?? []).map((userId) => membersRecord[userId]).filter(Boolean);
       if (_defaultMembers.length > 0) {
         setValue(_defaultMembers);
       }
@@ -196,12 +163,12 @@ export function InputSearchMemberMultiple({
     <InputSearchMemberBase
       filterSelectedOptions
       multiple
-      placeholder='Select users'
       value={value}
       disableCloseOnSelect={disableCloseOnSelect}
       onChange={(e, _value, reason) => emitValue(_value as Member[], reason)}
       isOptionEqualToValue={(option, val) => option.id === val.id}
       {...props}
+      placeholder={defaultValue?.length !== 0 || value.length !== 0 ? undefined : props.placeholder ?? 'Select members'}
       options={members.filter((member) => !member.isBot)}
     />
   );

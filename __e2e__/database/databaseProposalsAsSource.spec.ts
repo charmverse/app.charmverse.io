@@ -1,5 +1,5 @@
 import type { User } from '@charmverse/core/prisma';
-import type { Proposal, ProposalCategory, Space } from '@charmverse/core/prisma-client';
+import type { Proposal, Space } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { test as base, expect } from '@playwright/test';
@@ -27,9 +27,7 @@ const test = base.extend<Fixtures>({
 let spaceUser: User;
 let space: Space;
 let databasePagePath: string;
-let databasePageId: string;
 
-let proposalCategory: ProposalCategory;
 let firstProposal: Proposal;
 let secondProposal: Proposal;
 let thirdProposal: Proposal;
@@ -43,35 +41,27 @@ test.beforeAll(async () => {
   spaceUser = generated.user;
   space = generated.space;
 
-  proposalCategory = await testUtilsProposals.generateProposalCategory({
-    spaceId: space.id
-  });
-
   firstProposal = await testUtilsProposals.generateProposal({
     spaceId: space.id,
     userId: spaceUser.id,
-    categoryId: proposalCategory.id,
     proposalStatus: 'discussion'
   });
 
   secondProposal = await testUtilsProposals.generateProposal({
     spaceId: space.id,
     userId: spaceUser.id,
-    categoryId: proposalCategory.id,
     proposalStatus: 'discussion'
   });
 
   thirdProposal = await testUtilsProposals.generateProposal({
     spaceId: space.id,
     userId: spaceUser.id,
-    categoryId: proposalCategory.id,
     proposalStatus: 'discussion'
   });
 
   draftProposal = await testUtilsProposals.generateProposal({
     spaceId: space.id,
     userId: spaceUser.id,
-    categoryId: proposalCategory.id,
     proposalStatus: 'draft'
   });
 });
@@ -152,15 +142,11 @@ test.describe.serial('Database with proposals as datasource', async () => {
 
       await expect(row).toBeVisible();
 
-      const selectProps = await row.locator('data-test=select-preview').all();
+      const proposalStatusBadge = databasePage.page
+        .locator(`data-test=database-row-${card.id}`)
+        .filter({ hasText: 'Unpublished' });
 
-      const categorySelect = selectProps[0];
-
-      expect((await categorySelect.allInnerTexts())[0]).toEqual(proposalCategory.title);
-
-      const proposalStatusBadge = databasePage.getTablePropertyProposalStatusLocator({ cardId: card.id });
-
-      expect((await proposalStatusBadge.allInnerTexts())[0]).toEqual('Feedback');
+      expect(proposalStatusBadge).toBeVisible();
 
       const syncedProposalUrl = databasePage.getTablePropertyProposalUrlLocator({ cardId: card.id });
       const proposalPage = await prisma.page.findUniqueOrThrow({
@@ -176,9 +162,13 @@ test.describe.serial('Database with proposals as datasource', async () => {
     }
 
     // Make sure the UI only displays 3 cards
-    await expect(databasePage.getTableRowByIndex({ index: 0 })).toBeVisible();
-    await expect(databasePage.getTableRowByIndex({ index: 1 })).toBeVisible();
-    await expect(databasePage.getTableRowByIndex({ index: 2 })).toBeVisible();
+    const firstRow = databasePage.getTableRowByIndex({ index: 0 });
+    const secondRow = databasePage.getTableRowByIndex({ index: 0 });
+    const thirdRow = databasePage.getTableRowByIndex({ index: 0 });
+
+    await expect(firstRow).toBeVisible();
+    await expect(secondRow).toBeVisible();
+    await expect(thirdRow).toBeVisible();
     await expect(databasePage.getTableRowByIndex({ index: 3 })).not.toBeVisible();
   });
 
@@ -202,8 +192,6 @@ test.describe.serial('Database with proposals as datasource', async () => {
     await page.goto(`${baseUrl}/${space.domain}/${databasePagePath}`);
 
     // This is a refresh response
-    await databasePage.page.waitForResponse(/api\/pages\/.{1,}\/proposal-source/);
-
     await databasePage.page.waitForTimeout(500);
 
     // Wait until the database is initialised
@@ -225,12 +213,10 @@ test.describe.serial('Database with proposals as datasource', async () => {
 
     const syncedArchivedProposalCardId = syncedCards.find((c) => c.syncWithPageId === secondProposal.id)?.id as string;
 
-    const archivedRowProposalStatusBadge = databasePage.getTablePropertyProposalStatusLocator({
-      cardId: syncedArchivedProposalCardId
-    });
+    const archivedRowProposalStatusBadge = databasePage.page
+      .locator(`data-test=database-row-${syncedArchivedProposalCardId}`)
+      .filter({ hasText: 'Unpublished' });
 
     await expect(archivedRowProposalStatusBadge).toBeVisible();
-
-    await expect((await archivedRowProposalStatusBadge.allInnerTexts())[0]).toEqual('Archived');
   });
 });

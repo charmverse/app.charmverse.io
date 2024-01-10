@@ -50,6 +50,7 @@ export function NumericFieldWithButtons({ value, disabled, onChange, name, min =
       </Button>
 
       <TextField
+        data-test='numeric-field'
         value={value}
         onChange={handleInputChange}
         name={name}

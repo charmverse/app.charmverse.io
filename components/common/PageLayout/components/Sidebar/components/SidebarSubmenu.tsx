@@ -162,7 +162,7 @@ export default function SidebarSubmenu({
             columnGap: 1
           }}
         >
-          <UserDisplay user={user} hideName gridColumn='1' gridRow='1/3' />
+          <UserDisplay userId={user?.id} hideName gridColumn='1' gridRow='1/3' />
           <Typography variant='body2' noWrap>
             {user?.username}
           </Typography>
@@ -195,7 +195,7 @@ export default function SidebarSubmenu({
           Sign out
         </MenuItem>
       </Menu>
-      <Box sx={{ position: 'absolute', right: 0 }} px={1.5}>
+      <Box sx={{ position: 'absolute', right: 0 }} pr={1}>
         {currentSpace && (
           <Tooltip title='Close sidebar' placement='bottom'>
             <IconButton onClick={closeSidebar} size='small'>

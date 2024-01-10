@@ -1,7 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { extractMentions } from 'lib/prosemirror/extractMentions';
-import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -26,28 +24,22 @@ export async function getDocumentNotifications({ id, userId }: QueryCondition): 
         }
       },
       inlineCommentId: true,
+      applicationCommentId: true,
+      applicationComment: {
+        select: {
+          application: {
+            select: {
+              id: true
+            }
+          }
+        }
+      },
       mentionId: true,
       post: {
         select: {
           id: true,
           path: true,
-          title: true,
-          content: true
-        }
-      },
-      pageComment: {
-        select: {
-          contentText: true
-        }
-      },
-      postComment: {
-        select: {
-          contentText: true
-        }
-      },
-      inlineComment: {
-        select: {
-          content: true
+          title: true
         }
       },
       notificationMetadata: {
@@ -73,6 +65,8 @@ export async function getDocumentNotifications({ id, userId }: QueryCondition): 
         title: string;
         content: PageContent;
       };
+      const applicationId = notification.applicationComment?.application.id ?? null;
+
       const documentNotification = {
         id: notification.id,
         inlineCommentId: notification.inlineCommentId,
@@ -85,6 +79,8 @@ export async function getDocumentNotifications({ id, userId }: QueryCondition): 
         spaceDomain: notificationMetadata.space.domain,
         spaceId: notificationMetadata.spaceId,
         spaceName: notificationMetadata.space.name,
+        applicationCommentId: notification.applicationCommentId,
+        applicationId,
         pageType: page.type,
         content: notification.content,
         type: notification.type,

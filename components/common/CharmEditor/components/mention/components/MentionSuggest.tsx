@@ -1,20 +1,21 @@
-import { useEditorViewContext, usePluginState } from '@bangle.dev/react';
 import type { PageMeta } from '@charmverse/core/pages';
 import { MoreHoriz } from '@mui/icons-material';
 import { Divider, ListItemIcon, MenuItem, Typography, Box } from '@mui/material';
 import type { PluginKey } from 'prosemirror-state';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
+import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
+import { PagesList } from 'components/common/PagesList';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
+import { useRoles } from 'hooks/useRoles';
 import type { Member } from 'lib/members/interfaces';
 import { safeScrollIntoViewIfNeeded } from 'lib/utilities/browser';
 import { sanitizeForRegex } from 'lib/utilities/strings';
 
 import type { PluginState as SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
-import PagesList from '../../PageList';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 import type { MentionPluginState } from '../mention.interfaces';
 import { selectMention } from '../mention.utils';
@@ -32,6 +33,7 @@ const DEFAULT_ITEM_LIMIT = 5;
 
 function MentionSuggestMenu({ pluginKey }: { pluginKey: PluginKey }) {
   const { members } = useMembers();
+  const { roles = [] } = useRoles();
   const view = useEditorViewContext();
   const { tooltipContentDOM, suggestTooltipKey } = usePluginState(pluginKey);
   const { show: isVisible, triggerText, counter } = usePluginState(suggestTooltipKey) as SuggestTooltipPluginState;
@@ -46,16 +48,12 @@ function MentionSuggestMenu({ pluginKey }: { pluginKey: PluginKey }) {
 
   const [showAllMembers, setShowAllMembers] = useState(false);
   const [showAllPages, setShowAllPages] = useState(false);
+  const [showAllRoles, setShowAllRoles] = useState(false);
   const searchText = sanitizeForRegex(triggerText).toLowerCase();
   const filteredMembers = useMemo(
     () =>
       searchText.length !== 0
-        ? members.filter(
-            (member) =>
-              filterByUserCustomName(member, searchText) ||
-              filterByDiscordName(member, searchText) ||
-              filterByUsername(member, searchText)
-          )
+        ? members.filter((member) => filterByUsername(member, searchText) || filterByDiscordName(member, searchText))
         : members,
     [members, searchText, searchText]
   );
@@ -68,12 +66,40 @@ function MentionSuggestMenu({ pluginKey }: { pluginKey: PluginKey }) {
     [pages, searchText]
   );
 
+  const filteredRoles = useMemo<{ name: string; id: string }[]>(
+    () =>
+      [
+        {
+          name: 'Admin',
+          id: 'admin'
+        },
+        {
+          name: 'Everyone',
+          id: 'everyone'
+        },
+        ...(roles ?? [])
+      ].filter((role) => role.name.toLowerCase().startsWith(searchText)) ?? [],
+    [roles, searchText]
+  );
+
   const visibleFilteredMembers = showAllMembers ? filteredMembers : filteredMembers.slice(0, DEFAULT_ITEM_LIMIT);
   const visibleFilteredPages = showAllPages ? filteredPages : filteredPages.slice(0, DEFAULT_ITEM_LIMIT);
-  const totalItems = filteredMembers.length + filteredPages.length;
+  const visibleFilteredRoles = showAllRoles ? filteredRoles : filteredRoles.slice(0, DEFAULT_ITEM_LIMIT);
+  const totalItems = filteredRoles.length + filteredMembers.length + filteredPages.length;
   const roundedCounter = (counter < 0 ? (counter % totalItems) + totalItems : counter) % totalItems;
-  const selectedGroup = roundedCounter < filteredMembers.length ? 'members' : 'pages';
-  const activeItemIndex = selectedGroup === 'members' ? roundedCounter : roundedCounter - filteredMembers.length;
+  const selectedGroup =
+    roundedCounter < filteredMembers.length
+      ? 'members'
+      : roundedCounter < filteredMembers.length + filteredPages.length
+      ? 'pages'
+      : 'roles';
+
+  const activeItemIndex =
+    selectedGroup === 'members'
+      ? roundedCounter
+      : selectedGroup === 'pages'
+      ? roundedCounter - filteredMembers.length
+      : roundedCounter - filteredMembers.length - filteredPages.length;
 
   function showAllMembersToggle() {
     setShowAllMembers(true);
@@ -83,8 +109,13 @@ function MentionSuggestMenu({ pluginKey }: { pluginKey: PluginKey }) {
     setShowAllPages(true);
   }
 
+  function showAllRolesToggle() {
+    setShowAllRoles(true);
+  }
+
   const hiddenPagesCount = filteredPages.length - DEFAULT_ITEM_LIMIT;
   const hiddenMembersCount = filteredMembers.length - DEFAULT_ITEM_LIMIT;
+  const hiddenRolesCount = filteredRoles.length - DEFAULT_ITEM_LIMIT;
 
   useEffect(() => {
     const activeDomElement = document.querySelector('.mention-selected') as HTMLDivElement;
@@ -127,7 +158,7 @@ function MentionSuggestMenu({ pluginKey }: { pluginKey: PluginKey }) {
                   data-type='user'
                   className={isSelected ? 'mention-selected' : ''}
                 >
-                  <UserDisplay fontSize={14} user={member} avatarSize='small' />
+                  <UserDisplay fontSize={14} userId={member.id} avatarSize='small' />
                 </MenuItem>
               );
             })}
@@ -151,6 +182,39 @@ function MentionSuggestMenu({ pluginKey }: { pluginKey: PluginKey }) {
         {!showAllPages && hiddenPagesCount > 0 && (
           <ShowMoreMenuItem onClick={showAllPagesToggle}>{hiddenPagesCount} more results</ShowMoreMenuItem>
         )}
+        <Divider
+          sx={{
+            my: 1
+          }}
+        />
+        <GroupLabel>Roles</GroupLabel>
+        {filteredRoles.length === 0 ? (
+          <Typography sx={{ ml: 2 }} variant='subtitle2' color='secondary'>
+            No roles found
+          </Typography>
+        ) : (
+          <div>
+            {visibleFilteredRoles.map((role, roleIndex) => {
+              const isSelected = selectedGroup === 'roles' ? activeItemIndex === roleIndex : false;
+              return (
+                <MenuItem
+                  component='div'
+                  key={role.id}
+                  selected={isSelected}
+                  data-value={role.id}
+                  data-type='role'
+                  onClick={() => onSelectMention(role.id, 'role')}
+                  className={isSelected ? 'mention-selected' : ''}
+                >
+                  <Typography fontSize={14}>{role.name}</Typography>
+                </MenuItem>
+              );
+            })}
+            {!showAllRoles && hiddenRolesCount > 0 && (
+              <ShowMoreMenuItem onClick={showAllRolesToggle}>{hiddenRolesCount} more results</ShowMoreMenuItem>
+            )}
+          </div>
+        )}
       </Box>
     </PopoverMenu>
   );
@@ -165,14 +229,6 @@ function ShowMoreMenuItem({ onClick, children }: { onClick: VoidFunction; childr
       <Typography color='secondary'>{children}</Typography>
     </MenuItem>
   );
-}
-
-function filterByUserCustomName(member: Member, searchText: string) {
-  return member.properties
-    .find((prop) => prop.type === 'name')
-    ?.value?.toString()
-    .toLowerCase()
-    .match(searchText);
 }
 
 function filterByDiscordName(member: Member, searchText: string) {

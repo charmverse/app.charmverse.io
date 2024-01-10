@@ -4,6 +4,7 @@ import { expect, test as base } from '@playwright/test';
 
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { randomETHWalletAddress } from 'testing/generateStubs';
+import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 
 import { ForumHomePage } from '../po/forumHome.po';
@@ -95,15 +96,7 @@ test.describe.serial('Comment on forum posts', () => {
         },
         post: { connect: { id: post.id } },
         contentText: topLevelContentText,
-        content: {
-          type: 'doc',
-          content: [
-            {
-              text: topLevelContentText,
-              type: 'text'
-            }
-          ]
-        }
+        content: jsonDoc(_.p(topLevelContentText))
       }
     });
 
@@ -114,15 +107,7 @@ test.describe.serial('Comment on forum posts', () => {
         },
         post: { connect: { id: post.id } },
         contentText: childContentText,
-        content: {
-          type: 'doc',
-          content: [
-            {
-              text: childContentText,
-              type: 'text'
-            }
-          ]
-        }
+        content: jsonDoc(_.p(childContentText))
       }
     });
 

@@ -10,15 +10,16 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
-import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
+import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { CommentReply } from 'components/common/comments/CommentReply';
 import { CommentVote } from 'components/common/comments/CommentVote';
 import type { CreateCommentPayload, UpdateCommentPayload } from 'components/common/comments/interfaces';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMemberDialog } from 'components/members/hooks/useMemberDialog';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
-import { isDevEnv } from 'config/constants';
+import { isProdEnv } from 'config/constants';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { CommentPermissions, CommentWithChildren, GenericCommentWithVote } from 'lib/comments';
@@ -39,7 +40,7 @@ const StyledStack = styled(Stack)`
   }
 `;
 
-type Props = {
+export type CommentProps = {
   replyingDisabled?: boolean;
   comment: CommentWithChildren;
   permissions?: CommentPermissions;
@@ -65,11 +66,12 @@ export function Comment({
   handleVoteComment,
   lensPostLink,
   isPublishingComments
-}: Props) {
+}: CommentProps) {
   const { user } = useUser();
   const { lensProfile } = useLensProfile();
   const [publishCommentsToLens, setPublishCommentsToLens] = useState(!!user?.publishToLensDefault);
   const router = useRouter();
+  const { updateURLQuery } = useCharmRouter();
   const [showCommentReply, setShowCommentReply] = useState(false);
   const theme = useTheme();
   const { getMemberById } = useMembers();
@@ -79,7 +81,7 @@ export function Comment({
     doc: comment.content as PageContent,
     rawText: comment.contentText
   });
-  const commentContainerRef = useRef<HTMLElement | null>(null);
+  const commentContainerRef = useRef<HTMLDivElement | null>(null);
   const [commentEditContent, setCommentEditContent] = useState<ICharmEditorOutput>(commentContent);
   const { showUserId } = useMemberDialog();
   const { commentId } = router.query as { commentId: string | null };
@@ -129,9 +131,10 @@ export function Comment({
         commentContainerRef.current.scrollIntoView({
           behavior: 'smooth'
         });
+        updateURLQuery({ commentId: null });
       }
     }, 1500);
-  }, [commentId, commentContainerRef, comment.id]);
+  }, [commentId, updateURLQuery, commentContainerRef, comment.id]);
 
   const isCommentAuthor = comment.createdBy === user?.id;
   const canEditComment = isCommentAuthor;
@@ -152,7 +155,8 @@ export function Comment({
       placeholderText: 'What are your thoughts?',
       onContentChange: updateCommentContent,
       content: commentEditContent.doc,
-      isContentControlled: true
+      isContentControlled: true,
+      disableNestedPages: true
     };
 
     if (!inlineCharmEditor) {
@@ -165,11 +169,11 @@ export function Comment({
   return (
     <Stack my={1} position='relative' ref={commentContainerRef}>
       {/** test marker is here to avoid accidentally loading comments from recursive post comment components */}
-      <StyledStack id={`post-comment-${comment.id}`} data-test={`post-comment-${comment.id}`}>
+      <StyledStack id={`comment-${comment.id}`} data-test={`comment-${comment.id}`}>
         <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
           <Stack flexDirection='row' alignItems='center'>
             <Box mr={1}>
-              <UserDisplay showMiniProfile avatarSize='small' user={commentUser} hideName={true} />
+              <UserDisplay showMiniProfile avatarSize='small' userId={commentUser?.id} hideName={true} />
             </Box>
             <Typography
               mr={1}
@@ -192,7 +196,7 @@ export function Comment({
             <IconButton
               className='comment-actions'
               size='small'
-              data-test={`post-comment-menu-${comment.id}`}
+              data-test={`comment-menu-${comment.id}`}
               onClick={(event) => {
                 menuState.open(event.currentTarget);
               }}
@@ -211,7 +215,7 @@ export function Comment({
             left: 10
           }}
         />
-        <Box data-test={`post-comment-charmeditor-${comment.id}`} ml={3}>
+        <Box data-test={`comment-charmeditor-${comment.id}`} ml={3}>
           {isEditingComment ? (
             <Stack>
               {editor}
@@ -247,6 +251,7 @@ export function Comment({
               key={isEditingComment.toString()}
               content={commentContent.doc}
               isContentControlled
+              disableNestedPages
             />
           )}
           {!comment.deletedAt && !replyingDisabled && (
@@ -273,7 +278,7 @@ export function Comment({
               </Tooltip>
               {comment.lensCommentLink && (
                 <Link
-                  href={`https://${isDevEnv ? 'testnet.' : ''}lenster.xyz/posts/${comment.lensCommentLink}`}
+                  href={`https://${!isProdEnv ? 'testnet.' : ''}hey.xyz/posts/${comment.lensCommentLink}`}
                   target='_blank'
                   rel='noopener noreferrer'
                 >
@@ -292,7 +297,6 @@ export function Comment({
                 setPublishToLens={setPublishCommentsToLens}
                 showPublishToLens={Boolean(lensPostLink) && Boolean(lensProfile) && Boolean(comment.lensCommentLink)}
                 commentId={comment.id}
-                lensCommentLink={comment.lensCommentLink}
                 handleCreateComment={handleCreateComment}
                 onCancelComment={() => setShowCommentReply(false)}
               />
@@ -311,6 +315,7 @@ export function Comment({
             handleVoteComment={handleVoteComment}
             handleUpdateComment={handleUpdateComment}
             handleCreateComment={handleCreateComment}
+            lensPostLink={lensPostLink}
           />
         ))}
       </Box>

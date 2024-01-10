@@ -1,119 +1,81 @@
 import { log } from '@charmverse/core/log';
-import { useRouter } from 'next/router';
-import { use, useCallback, useEffect, useState } from 'react';
-import { mutate } from 'swr';
+import { useCallback, useState } from 'react';
 
-import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
-import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
-import { useRewards } from 'components/rewards/hooks/useRewards';
+import { useCreateReward } from 'charmClient/hooks/rewards';
+import { EMPTY_PAGE_VALUES } from 'components/common/PageDialog/hooks/useNewPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useUser } from 'hooks/useUser';
-import type { RewardPageAndPropertiesInput } from 'lib/rewards/interfaces';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
+import type { RewardPageProps } from 'lib/rewards/createReward';
+import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
-type Props = {
-  initValues?: Partial<RewardPageAndPropertiesInput>;
-};
-
-export function useNewReward({ initValues }: Props = {}) {
-  const { updateNewPageContext, clearNewPage, isDirty, newPageValues } = useNewPage();
-  const { user } = useUser();
+export function useNewReward() {
   const { showMessage } = useSnackbar();
   const { space: currentSpace } = useCurrentSpace();
-  const { showPage } = usePageDialog();
-  const { refreshPage } = usePages();
-  const router = useRouter();
 
   const [contentUpdated, setContentUpdated] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [formInputs, setFormInputsRaw] = useState<RewardPageAndPropertiesInput>(
-    emptyState({ ...initValues, userId: user?.id })
-  );
-  const { createReward: createRewardTrigger } = useRewards();
+  const [rewardValues, setRewardValuesRaw] = useState<UpdateableRewardFields>(emptyState());
+  const { trigger: createRewardTrigger } = useCreateReward();
 
-  const setFormInputs = useCallback((partialFormInputs: Partial<RewardPageAndPropertiesInput>) => {
-    setContentUpdated(true);
-    setFormInputsRaw((existingFormInputs) => ({ ...existingFormInputs, ...partialFormInputs }));
+  const setRewardValues = useCallback(
+    (partialFormInputs: Partial<UpdateableRewardFields>, { skipDirty }: { skipDirty?: boolean } = {}) => {
+      if (!skipDirty) {
+        setContentUpdated(true);
+      }
+      setRewardValuesRaw((existingFormInputs) => ({ ...existingFormInputs, ...partialFormInputs }));
+    },
+    []
+  );
+
+  const clearRewardValues = useCallback(() => {
+    setRewardValuesRaw(emptyState());
+    setContentUpdated(false);
   }, []);
 
-  const clearFormInputs = useCallback(() => {
-    setFormInputs(emptyState());
-    setContentUpdated(false);
-  }, [setFormInputs]);
+  const createReward = useCallback(
+    async (pageValues: (RewardPageProps & { linkedPageId?: string }) | null) => {
+      pageValues ||= EMPTY_PAGE_VALUES;
+      log.info('[user-journey] Create a reward');
+      if (currentSpace) {
+        setIsSaving(true);
 
-  const createReward = useCallback(async () => {
-    log.info('[user-journey] Create a proposal');
-    if (currentSpace) {
-      setIsSaving(true);
-      const { content, contentText, title, headerImage, icon, ...rewardProps } = formInputs;
-
-      const createdReward = await createRewardTrigger({
-        pageProps: newPageValues || {
-          content: null,
-          contentText: '',
-          title: '',
-          headerImage: null,
-          icon: null
-        },
-        spaceId: currentSpace.id,
-        ...rewardProps
-      })
-        .catch((err: any) => {
-          showMessage(err.message ?? 'Something went wrong', 'error');
-          throw err;
+        return createRewardTrigger({
+          pageProps: pageValues?.linkedPageId
+            ? undefined
+            : {
+                content: pageValues.content,
+                contentText: pageValues.contentText ?? '',
+                title: pageValues.title,
+                sourceTemplateId: pageValues.sourceTemplateId,
+                headerImage: pageValues.headerImage,
+                icon: pageValues.icon,
+                type: pageValues.type
+              },
+          ...rewardValues,
+          linkedPageId: pageValues.linkedPageId,
+          spaceId: currentSpace.id
         })
-        .finally(() => {
-          setIsSaving(false);
-        });
-
-      if (createdReward) {
-        refreshPage(createdReward.id);
-        mutate(`/api/spaces/${currentSpace.id}/proposals`);
-        showPage({
-          pageId: createdReward.id,
-          onClose() {
-            setUrlWithoutRerender(router.pathname, { id: null });
-          }
-        });
-        setTimeout(() => {
-          clearNewPage();
-          clearFormInputs();
-        }, 100);
-        setUrlWithoutRerender(router.pathname, { id: createdReward.id });
-        setContentUpdated(false);
+          .catch((err: any) => {
+            showMessage(err.message ?? 'Something went wrong', 'error');
+            throw err;
+          })
+          .then(() => {
+            setContentUpdated(false);
+            return true;
+          })
+          .finally(() => {
+            setIsSaving(false);
+            return false;
+          });
       }
-    }
-  }, [
-    clearFormInputs,
-    clearNewPage,
-    createRewardTrigger,
-    currentSpace,
-    formInputs,
-    newPageValues,
-    refreshPage,
-    router.pathname,
-    showMessage,
-    showPage
-  ]);
-
-  useEffect(() => {
-    if (isDirty) {
-      setContentUpdated(true);
-    }
-  }, [isDirty]);
-
-  useEffect(() => {
-    updateNewPageContext({
-      contentUpdated
-    });
-  }, [contentUpdated, updateNewPageContext]);
+    },
+    [createRewardTrigger, rewardValues, currentSpace, showMessage]
+  );
 
   return {
-    formInputs,
-    setFormInputs,
-    clearFormInputs,
+    rewardValues,
+    setRewardValues,
+    clearRewardValues,
     createReward,
     isSavingReward: isSaving,
     contentUpdated
@@ -123,18 +85,9 @@ export function useNewReward({ initValues }: Props = {}) {
 export function emptyState({
   userId,
   ...inputs
-}: Partial<RewardPageAndPropertiesInput> & { userId?: string } = {}): RewardPageAndPropertiesInput {
+}: Partial<UpdateableRewardFields> & { userId?: string } = {}): UpdateableRewardFields {
   return {
-    content: null,
-    contentText: '',
-    headerImage: null,
-    icon: null,
-    reviewers: [],
-    title: '',
     fields: { properties: {} },
-    chainId: 1,
-    rewardAmount: 1,
-    rewardToken: 'ETH',
     ...inputs
   };
 }

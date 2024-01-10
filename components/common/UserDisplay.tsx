@@ -7,7 +7,9 @@ import type { InitialAvatarProps } from 'components/common/Avatar';
 import Avatar from 'components/common/Avatar';
 import { useMemberDialog } from 'components/members/hooks/useMemberDialog';
 import { useENSName } from 'hooks/useENSName';
+import { useMembers } from 'hooks/useMembers';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
+import type { LoggedInUser } from 'models';
 
 /**
  * @avatarIcon Pass this to override the user avatar with a custom icon
@@ -79,19 +81,17 @@ export const AnonUserDisplay = memo(AnonUserDisplayComponent);
  * @linkToProfile Whether we show a link to user's public profile. Defaults to false.
  */
 interface UserDisplayProps extends StyleProps {
-  user?: {
-    avatar?: string | null;
-    username: string;
-    path?: string | null;
-    id: string;
-  } | null;
+  userId?: string;
   showMiniProfile?: boolean;
+  user?: LoggedInUser;
 }
 
-function UserDisplay({ showMiniProfile = false, user, ...props }: UserDisplayProps) {
+function UserDisplay({ showMiniProfile = false, user, userId, ...props }: UserDisplayProps) {
   const { showUserId } = useMemberDialog();
+  const { membersRecord } = useMembers();
+  const member = user ?? (userId ? membersRecord[userId] : null);
 
-  if (!user) {
+  if (!member) {
     // strip out invalid names
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { hideName, avatarSize, ...boxProps } = props;
@@ -102,21 +102,21 @@ function UserDisplay({ showMiniProfile = false, user, ...props }: UserDisplayPro
     );
   }
 
-  const isNft = hasNftAvatar(user);
+  const isNft = hasNftAvatar(member);
 
   return (
     <BaseComponent
       onClick={
         showMiniProfile
           ? () => {
-              if (showMiniProfile) {
-                showUserId(user.id);
+              if (showMiniProfile && userId) {
+                showUserId(userId);
               }
             }
           : undefined
       }
-      username={user.username}
-      avatar={user.avatar}
+      username={member.username}
+      avatar={member.avatar}
       isNft={isNft}
       {...props}
     />

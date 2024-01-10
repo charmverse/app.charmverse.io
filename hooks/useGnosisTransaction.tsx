@@ -1,13 +1,13 @@
 import type { Transaction } from '@charmverse/core/prisma';
 import EthersAdapter from '@safe-global/safe-ethers-lib';
 import SafeServiceClient from '@safe-global/safe-service-client';
-import { getChainById } from 'connectors';
+import { getChainById } from 'connectors/chains';
 import { ethers } from 'ethers';
 import { useMemo } from 'react';
 import useSWR from 'swr';
 
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import { getTransaction } from 'lib/gnosis/mantleClient';
+import { getMantleSafeTransaction } from 'lib/gnosis/mantleClient';
 
 const GNOSIS_TX_BASE_URL = 'https://app.safe.global/transactions/queue?safe=';
 const MANTLE_TX_BASE_URL = 'https://multisig.mantle.xyz/transactions/queue?safe=';
@@ -37,7 +37,7 @@ export function useGnosisTransaction({ tx }: { tx?: Transaction }) {
       const safeChainName = network?.shortName ? `${network?.shortName}:` : '';
 
       if (safeTxHash && tx && (tx.chainId === '5001' || tx.chainId === '5000')) {
-        const transaction = await getTransaction({
+        const transaction = await getMantleSafeTransaction({
           chainId: parseInt(tx.chainId),
           safeTxHash
         });

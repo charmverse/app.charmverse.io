@@ -7,24 +7,6 @@ import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { extractDatabaseProposalProperties } from '../extractDatabaseProposalProperties';
 import type { ExtractedDatabaseProposalProperties } from '../extractDatabaseProposalProperties';
 
-const categoryProp: IPropertyTemplate = {
-  id: uuid(),
-  name: 'Proposal Category',
-  type: 'proposalCategory',
-  options: [
-    {
-      id: uuid(),
-      color: 'propColorTeal',
-      value: 'General'
-    },
-    {
-      id: uuid(),
-      color: 'propColorTeal',
-      value: 'Admin-only'
-    }
-  ]
-};
-
 const statusProp: IPropertyTemplate = {
   id: uuid(),
   name: 'Proposal Status',
@@ -73,7 +55,6 @@ const evaluatedAverageProp: IPropertyTemplate = {
 describe('extractDatabaseProposalProperties', () => {
   it('should extract database proposal properties', () => {
     const exampleProperties: IPropertyTemplate[] = [
-      categoryProp,
       statusProp,
       urlProp,
       evaluatedByProp,
@@ -90,7 +71,6 @@ describe('extractDatabaseProposalProperties', () => {
     });
 
     expect(extractedProps).toMatchObject<ExtractedDatabaseProposalProperties>({
-      proposalCategory: categoryProp,
       proposalStatus: statusProp,
       proposalUrl: urlProp,
       proposalEvaluatedBy: evaluatedByProp,
@@ -100,7 +80,7 @@ describe('extractDatabaseProposalProperties', () => {
   });
 
   it('should work if only some properties are present', () => {
-    const exampleProperties: IPropertyTemplate[] = [categoryProp];
+    const exampleProperties: IPropertyTemplate[] = [];
 
     const extractedProps = extractDatabaseProposalProperties({
       boardBlock: {
@@ -110,8 +90,6 @@ describe('extractDatabaseProposalProperties', () => {
       }
     });
 
-    expect(extractedProps).toMatchObject<Partial<ExtractedDatabaseProposalProperties>>({
-      proposalCategory: categoryProp
-    });
+    expect(extractedProps).toMatchObject<Partial<ExtractedDatabaseProposalProperties>>({});
   });
 });

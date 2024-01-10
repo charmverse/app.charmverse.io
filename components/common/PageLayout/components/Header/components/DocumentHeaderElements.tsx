@@ -11,18 +11,19 @@ type Props = {
   page: {
     deletedAt?: string | Date | null;
     id: string;
-    type: string;
+    type: PageType;
   };
+  isInsideDialog?: boolean;
 };
 
-export function DocumentHeaderElements({ headerHeight, page }: Props) {
+export function DocumentHeaderElements({ headerHeight, isInsideDialog, page }: Props) {
   const { deletedAt, id, type } = page;
   const isBasePageDocument = documentTypes.includes(type as PageType);
   return (
     <>
       {isBasePageDocument && <DocumentParticipants />}
       {isBasePageDocument && <EditingModeToggle />}
-      {!deletedAt && <ShareButton headerHeight={headerHeight} pageId={id} />}
+      {!deletedAt && <ShareButton pageType={type} headerHeight={headerHeight} pageId={id} />}
     </>
   );
 }

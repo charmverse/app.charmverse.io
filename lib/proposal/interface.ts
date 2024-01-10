@@ -1,30 +1,35 @@
-import type { Page, PageComment, Proposal } from '@charmverse/core/prisma';
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
+import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
+import type {
+  FormField,
+  Page,
+  PageComment,
+  ProposalEvaluation,
+  ProposalEvaluationPermission,
+  ProposalEvaluationResult,
+  ProposalEvaluationType,
+  Vote
+} from '@charmverse/core/prisma';
+import type { ProposalWithUsers as CoreProposalWithUsers } from '@charmverse/core/proposals';
 
-import type { AssignablePermissionGroups } from 'lib/permissions/interfaces';
+import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import type { NewPageValues } from 'components/common/PageDialog/hooks/useNewPage';
+import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
+import type { ProposalPropertiesField } from './blocks/interfaces';
+import type { ProposalStep } from './getCurrentStep';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   ProposalRubricCriteriaWithTypedParams
 } from './rubric/interfaces';
 
+export type ProposalEvaluationStatus = 'in_progress' | 'complete' | 'passed' | 'declined' | 'unpublished' | 'published';
+export type ProposalEvaluationStep = ProposalEvaluationType | 'rewards' | 'draft';
+export type ProposalEvaluationResultExtended = ProposalEvaluationResult | 'in_progress';
+
 export interface ProposalReviewerInput {
-  group: Extract<AssignablePermissionGroups, 'role' | 'user'>;
+  group: 'system_role' | 'role' | 'user';
   id: string;
-}
-
-export interface NewProposalCategory {
-  title: string;
-  color: string;
-}
-
-export interface ProposalCategory extends NewProposalCategory {
-  id: string;
-  spaceId: string;
-}
-
-export interface ProposalWithCategory extends Proposal {
-  category: ProposalCategory | null;
+  evaluationId?: string;
 }
 
 export type ProposalRubricData = {
@@ -33,8 +38,67 @@ export type ProposalRubricData = {
   draftRubricAnswers: ProposalRubricCriteriaAnswerWithTypedResponse[];
 };
 
+export type VoteSettings = Pick<Vote, 'type' | 'threshold' | 'maxChoices'> & {
+  durationDays: number;
+  options: string[];
+  publishToSnapshot: boolean;
+};
+
+export type ProposalPendingReward = { reward: UpdateableRewardFields; page: NewPageValues | null; draftId: string };
+export type ProposalFields = { properties?: ProposalPropertiesField; pendingRewards?: ProposalPendingReward[] };
+export type ProposalFormData = {
+  form: {
+    id: string;
+    formFields:
+      | (Omit<FormField, 'options'> & {
+          options: SelectOptionType[];
+        })[]
+      | null;
+  };
+};
+
+export type ProposalWithUsers = Omit<CoreProposalWithUsers, 'fields'> & {
+  fields: ProposalFields | null;
+};
+
+export type ProposalWithUsersLite = ProposalWithUsers & {
+  currentEvaluationId?: string;
+  evaluationType: ProposalEvaluationType;
+  permissions?: ProposalPermissionFlags;
+  evaluations: {
+    title: string;
+    type: ProposalEvaluationType;
+    id: string;
+    result: ProposalEvaluationResult | null;
+    index: number;
+  }[];
+  currentStep: ProposalStep;
+};
+
+export type PopulatedEvaluation = ProposalRubricData &
+  Omit<ProposalEvaluation, 'voteSettings'> & {
+    permissions: ProposalEvaluationPermission[];
+    reviewers: ProposalWithUsers['reviewers'];
+    voteSettings: VoteSettings | null;
+  };
+
 export type ProposalWithUsersAndRubric = ProposalWithUsers &
-  ProposalRubricData & { page?: { sourceTemplateId: string | null } | null };
+  ProposalRubricData &
+  ProposalFormData & {
+    currentStep: ProposalStep;
+    evaluations: PopulatedEvaluation[];
+    fields: ProposalFields | null;
+    page?: { sourceTemplateId: string | null } | null;
+    permissions: ProposalPermissionFlags;
+    currentEvaluationId?: string;
+    form?: {
+      formFields:
+        | (Omit<FormField, 'options'> & {
+            options: SelectOptionType[];
+          })[]
+        | null;
+    };
+  };
 
 export interface ProposalWithCommentsAndUsers extends ProposalWithUsers {
   page: Page & { comments: PageComment[] };

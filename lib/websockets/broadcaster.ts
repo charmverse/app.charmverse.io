@@ -1,10 +1,13 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { createAdapter } from '@socket.io/redis-adapter';
+import { createAdapter as createPostgresAdapter } from '@socket.io/postgres-adapter';
+import { createAdapter as createRedisAdapter } from '@socket.io/redis-adapter';
 import type { Socket } from 'socket.io';
 import { Server } from 'socket.io';
 
+import { getClient as getPostgresClient } from 'adapters/postgres/postgresClient';
 import { redisClient } from 'adapters/redis/redisClient';
+import { isDevEnv, isTestEnv } from 'config/constants';
 import { SpaceMembershipRequiredError } from 'lib/permissions/errors';
 
 import { authOnConnect } from './authentication';
@@ -23,6 +26,7 @@ export class WebsocketBroadcaster implements AbstractWebsocketBroadcaster {
   // Only called once in the app lifecycle once the server is initialised
   async bindServer(io: Server): Promise<void> {
     this.io = io;
+    // add support for passing messages in production
     if (redisClient) {
       const pubClient = redisClient;
       const subClient = pubClient.duplicate();
@@ -31,7 +35,14 @@ export class WebsocketBroadcaster implements AbstractWebsocketBroadcaster {
 
       log.debug('Connecting to Redis for socket.io');
       // @ts-ignore
-      io.adapter(createAdapter(pubClient, subClient));
+      io.adapter(createRedisAdapter(pubClient, subClient));
+      log.debug('Enabled Redis adapter for socket.io');
+    }
+    // add support for passing messages in local dev
+    else if (typeof process.env.DATABASE_URL === 'string' && (isDevEnv || isTestEnv)) {
+      const pool = getPostgresClient(process.env.DATABASE_URL);
+      io.adapter(createPostgresAdapter(pool));
+      log.debug('Enabled Postgres adapter for socket.io');
     }
 
     // Function for debugging amount of connections

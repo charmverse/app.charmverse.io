@@ -49,10 +49,21 @@ const documents: DocumentNotification[] = [
     type: 'inline_comment.mention.created' as const
   },
   {
+    type: 'application_comment.created' as const
+  },
+  {
+    type: 'application_comment.replied' as const
+  },
+  {
+    type: 'application_comment.mention.created' as const
+  },
+  {
     type: 'mention.created' as const
   }
 ].map((notification) => ({
   ...baseFields,
+  applicationCommentId: '_',
+  applicationId: '_',
   content: null,
   group: 'document' as const,
   commentId: '_',
@@ -82,7 +93,10 @@ const cards: CardNotification[] = [
     pagePath: '/card',
     pageTitle: 'Test card',
     type: 'person_assigned' as const,
-    personPropertyId: '_',
+    personProperty: {
+      id: '_',
+      name: 'John Doe'
+    },
     group: 'card' as const
   }
 ].map((notification) => ({ ...baseFields, ...notification }));
@@ -127,7 +141,10 @@ const proposals: ProposalNotification[] = proposalNotificationTypes
     pageId: '_',
     pagePath: '/proposal',
     pageTitle: 'Test proposal',
-    status: 'discussion' as const
+    status: 'discussion' as const,
+    evaluation: {
+      title: 'Review'
+    }
   }))
   .map((notification) => ({ ...baseFields, ...notification, id: uuid() }));
 
@@ -149,7 +166,7 @@ const groups = [
     notifications: polls
   },
   {
-    title: 'Bounties',
+    title: 'Rewards',
     notifications: bounties
   },
   {

@@ -7,21 +7,20 @@ import DoDisturbOutlinedIcon from '@mui/icons-material/DoDisturbOutlined';
 import ModeStandbyIcon from '@mui/icons-material/ModeStandby';
 import PaidIcon from '@mui/icons-material/Paid';
 import RuleIcon from '@mui/icons-material/Rule';
-import type { SvgIconTypeMap } from '@mui/material';
+import type { SvgIconTypeMap, SxProps } from '@mui/material';
 import type { ChipProps } from '@mui/material/Chip';
 import Chip from '@mui/material/Chip';
 import type { OverridableComponent } from '@mui/material/OverridableComponent';
 import Tooltip from '@mui/material/Tooltip';
-import type { ReactNode } from 'react';
 
 import type { BrandColor } from 'theme/colors';
 
 export const REWARD_APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string> = {
   applied: 'Applied',
-  submission_rejected: 'Submission rejected',
+  submission_rejected: 'Submission denied',
   cancelled: 'Cancelled',
   inProgress: 'In progress',
-  rejected: 'Application rejected',
+  rejected: 'Application denied',
   review: 'Review',
   complete: 'Approved',
   processing: 'Processing payment',
@@ -29,7 +28,7 @@ export const REWARD_APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string>
 };
 
 export const REWARD_APPLICATION_STATUS_COLORS: Record<ApplicationStatus, BrandColor> = {
-  applied: 'teal',
+  applied: 'pink',
   cancelled: 'gray',
   rejected: 'red',
   submission_rejected: 'red',
@@ -73,14 +72,14 @@ const REWARD_APPLICATION_STATUS_ICONS: Record<
   cancelled: DoDisturbOutlinedIcon
 };
 
+export const applicationStatuses = ['applied', 'rejected'];
+
 export function RewardApplicationStatusIcon({
   status,
-  showTooltip,
-  fontSize = 'small'
+  showTooltip
 }: {
   status: ApplicationStatus;
   showTooltip?: boolean;
-  fontSize?: 'small' | 'medium';
 }) {
   const Icon = REWARD_APPLICATION_STATUS_ICONS[status];
 
@@ -90,7 +89,10 @@ export function RewardApplicationStatusIcon({
 
   return (
     <Tooltip title={showTooltip ? REWARD_APPLICATION_STATUS_LABELS[status] : ''}>
-      <Icon color='secondary' />
+      <Icon
+        color='secondary'
+        style={{ color: `var(--text-${REWARD_APPLICATION_STATUS_COLORS[status]})`, opacity: 0.8 }}
+      />
     </Tooltip>
   );
 }
@@ -98,16 +100,20 @@ export function RewardApplicationStatusIcon({
 export function RewardApplicationStatusChip({
   status,
   size = 'small',
-  showIcon
+  showIcon,
+  sx
 }: {
+  sx?: SxProps;
   size?: ChipProps['size'];
   status: ApplicationStatus;
   showIcon?: boolean;
 }) {
   return (
     <StyledRewardApplicationStatusChip
+      data-test='reward-application-status-chip'
       style={{ justifyContent: 'flex-start' }}
       size={size}
+      sx={sx}
       status={status}
       label={REWARD_APPLICATION_STATUS_LABELS[status]}
       variant='filled'

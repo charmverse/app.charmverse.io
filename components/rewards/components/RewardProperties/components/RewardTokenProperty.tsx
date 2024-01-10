@@ -1,24 +1,27 @@
 import type { PaymentMethod } from '@charmverse/core/prisma';
-import { Box, Stack, TextField, Typography } from '@mui/material';
-import type { CryptoCurrency } from 'connectors/index';
-import { getChainById } from 'connectors/index';
-import { useEffect, useMemo, useState } from 'react';
+import { Box, Stack, TextField } from '@mui/material';
+import type { CryptoCurrency } from 'connectors/chains';
+import { getChainById } from 'connectors/chains';
+import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
-import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { SelectPreviewContainer } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { Button } from 'components/common/Button';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
-import TokenLogo from 'components/common/TokenLogo';
+import { RewardTokenInfo } from 'components/rewards/components/RewardProperties/components/RewardTokenInfo';
 import { RewardTokenSelect } from 'components/rewards/components/RewardProperties/components/RewardTokenSelect';
-import type { RewardTokenDetails } from 'components/rewards/components/RewardProperties/interfaces';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
-import { getTokenInfo } from 'lib/tokens/tokenData';
 import { isTruthy } from 'lib/utilities/types';
+
+export type RewardTokenDetails = {
+  chainId: number;
+  rewardToken: string;
+  rewardAmount: number;
+};
 
 type Props = {
   onChange: (value: RewardTokenDetails | null) => void;
@@ -39,12 +42,11 @@ export function RewardTokenProperty({ onChange, currentReward, readOnly }: Props
   const [paymentMethods] = usePaymentMethods();
   const {
     control,
-    register,
     handleSubmit,
     reset,
     setValue,
     watch,
-    formState: { errors }
+    formState: { errors, isValid }
   } = useForm<FormInput>({
     defaultValues: {
       rewardToken: currentReward?.rewardToken || '',
@@ -52,17 +54,6 @@ export function RewardTokenProperty({ onChange, currentReward, readOnly }: Props
       rewardAmount: currentReward?.rewardAmount || undefined
     }
   });
-
-  const tokenInfo =
-    (!!currentReward &&
-      !!currentReward.chainId &&
-      !!currentReward.rewardToken &&
-      getTokenInfo({
-        chainId: currentReward?.chainId,
-        symbolOrAddress: currentReward?.rewardToken,
-        methods: paymentMethods
-      })) ||
-    null;
 
   const watchChainId = watch('chainId');
 
@@ -104,16 +95,22 @@ export function RewardTokenProperty({ onChange, currentReward, readOnly }: Props
     }
   }
 
-  useEffect(() => {
-    if (currentReward) {
-      refreshCryptoList(currentReward.chainId || 1, currentReward.rewardToken || undefined);
+  function openTokenSettings() {
+    if (readOnly) {
+      return;
     }
-
+    setIsOpen(true);
     reset({
       rewardToken: currentReward?.rewardToken || '',
       chainId: currentReward?.chainId || undefined,
       rewardAmount: currentReward?.rewardAmount || undefined
     });
+  }
+
+  useEffect(() => {
+    if (currentReward) {
+      refreshCryptoList(currentReward.chainId || 1, currentReward.rewardToken || undefined);
+    }
   }, [currentReward, reset]);
 
   useEffect(() => {
@@ -127,34 +124,14 @@ export function RewardTokenProperty({ onChange, currentReward, readOnly }: Props
     return null;
   }
 
-  const currentChain = currentReward.chainId && getChainById(currentReward.chainId);
-
   return (
     <>
-      <SelectPreviewContainer readOnly={readOnly} displayType='details' onClick={() => !readOnly && setIsOpen(true)}>
-        {tokenInfo ? (
-          <Stack direction='row'>
-            <Box
-              component='span'
-              sx={{
-                width: 25,
-                display: 'flex',
-                alignItems: 'center'
-              }}
-            >
-              <TokenLogo height={20} src={tokenInfo.canonicalLogo} />
-            </Box>
-
-            <Typography component='span' variant='subtitle1' fontWeight='normal'>
-              {currentReward.rewardAmount}
-            </Typography>
-            <Typography ml={0.5} component='span' variant='subtitle1' fontWeight='normal'>
-              {tokenInfo.tokenSymbol} {currentChain ? `(${currentChain.chainName})` : ''}
-            </Typography>
-          </Stack>
-        ) : (
-          <EmptyPlaceholder>Empty</EmptyPlaceholder>
-        )}
+      <SelectPreviewContainer readOnly={readOnly} displayType='details' onClick={openTokenSettings}>
+        <RewardTokenInfo
+          chainId={currentReward.chainId}
+          symbolOrAddress={currentReward.rewardToken}
+          rewardAmount={currentReward.rewardAmount}
+        />
       </SelectPreviewContainer>
 
       <Dialog
@@ -175,6 +152,7 @@ export function RewardTokenProperty({ onChange, currentReward, readOnly }: Props
             </Button>
 
             <Button
+              disabled={!isValid}
               onClick={handleSubmit(onSubmit)}
               sx={{
                 alignSelf: 'flex-start'
@@ -233,21 +211,29 @@ export function RewardTokenProperty({ onChange, currentReward, readOnly }: Props
 
           <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
             <PropertyLabel readOnly>Amount</PropertyLabel>
-            <TextField
-              {...register('rewardAmount', { required: true, validate: (value) => Number(value) > 0 })}
-              data-test='reward-property-amount'
-              type='number'
-              inputProps={{
-                step: 0.01,
-                style: { height: 'auto' }
-              }}
-              sx={{
-                width: '100%'
-              }}
-              required
-              disabled={readOnly}
-              placeholder='Number greater than 0'
-              error={!!errors.rewardAmount}
+            <Controller
+              name='rewardAmount'
+              control={control}
+              rules={{ required: true, validate: (value) => Number(value) > 0 }}
+              render={({ field: { onChange: _onChange, value } }) => (
+                <TextField
+                  onChange={_onChange}
+                  value={value ?? undefined}
+                  data-test='reward-property-amount'
+                  type='number'
+                  inputProps={{
+                    step: 0.01,
+                    style: { height: 'auto' }
+                  }}
+                  sx={{
+                    width: '100%'
+                  }}
+                  required
+                  disabled={readOnly}
+                  placeholder='Number greater than 0'
+                  error={!!errors.rewardAmount}
+                />
+              )}
             />
           </Box>
         </Stack>

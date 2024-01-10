@@ -10,13 +10,13 @@ import type { BoardView, ISortOption, KanbanCalculationFields } from 'lib/focalb
 import { createBoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
+import { Constants } from 'lib/focalboard/constants';
 import type { FilterClause } from 'lib/focalboard/filterClause';
 import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { publishIncrementalUpdate } from '../../publisher';
 
-import { Constants } from './constants';
 import octoClient from './octoClient';
 import { OctoUtils } from './octoUtils';
 import undoManager from './undomanager';
@@ -32,6 +32,10 @@ type BlockUpdater = (blocks: Block[]) => void;
 export type MutatorUpdaters = {
   patchBlock(blockId: string, blockPatch: BlockPatch, updater: BlockUpdater): Promise<void>;
   patchBlocks(blocks: Block[], blockPatches: BlockPatch[], updater: BlockUpdater): Promise<void>;
+  insertBlock?: (block: Block, updater: BlockUpdater) => Promise<Block[]>;
+  insertBlocks?: (fbBlocks: Block[], updater: BlockUpdater) => Promise<Block[]>;
+  deleteBlock?: (blockId: string, updater: BlockUpdater) => Promise<void>;
+  deleteBlocks?: (blockIds: string[], updater: BlockUpdater) => Promise<void>;
 };
 
 //
@@ -51,6 +55,22 @@ export class Mutator {
 
   get patchBlocks() {
     return this.customMutatorUpdaters?.patchBlocks || charmClient.patchBlocks;
+  }
+
+  get insertBlockApi() {
+    return this.customMutatorUpdaters?.insertBlock || charmClient.insertBlock;
+  }
+
+  get insertBlocksApi() {
+    return this.customMutatorUpdaters?.insertBlocks || charmClient.insertBlocks;
+  }
+
+  get deleteBlockApi() {
+    return this.customMutatorUpdaters?.deleteBlock || charmClient.deleteBlock;
+  }
+
+  get deleteBlocksApi() {
+    return this.customMutatorUpdaters?.deleteBlocks || charmClient.deleteBlocks;
   }
 
   setCustomMutatorUpdaters(updaters: MutatorUpdaters | null) {
@@ -136,14 +156,14 @@ export class Mutator {
   ): Promise<Block> {
     return undoManager.perform(
       async () => {
-        const jsonres = await charmClient.insertBlock(block, publishIncrementalUpdate);
+        const jsonres = await this.insertBlockApi(block, publishIncrementalUpdate);
         const newBlock = jsonres[0] as Block;
         await afterRedo?.(newBlock);
         return newBlock;
       },
       async (newBlock: Block) => {
         await beforeUndo?.(newBlock);
-        await charmClient.deleteBlock(newBlock.id, publishIncrementalUpdate);
+        await this.deleteBlockApi(newBlock.id, publishIncrementalUpdate);
       },
       description,
       this.undoGroupId
@@ -159,7 +179,7 @@ export class Mutator {
   ) {
     return undoManager.perform(
       async () => {
-        const newBlocks = await charmClient.insertBlocks(blocks, publishIncrementalUpdate);
+        const newBlocks = await this.insertBlocksApi(blocks, publishIncrementalUpdate);
         await afterRedo?.(newBlocks);
         return newBlocks;
       },
@@ -167,7 +187,7 @@ export class Mutator {
         await beforeUndo?.();
         const awaits = [];
         for (const block of newBlocks) {
-          awaits.push(charmClient.deleteBlock(block.id, publishIncrementalUpdate));
+          awaits.push(this.deleteBlockApi(block.id, publishIncrementalUpdate));
         }
         await Promise.all(awaits);
       },
@@ -187,7 +207,7 @@ export class Mutator {
     await undoManager.perform(
       async () => {
         await beforeRedo?.();
-        await charmClient.deleteBlock(block.id, publishIncrementalUpdate);
+        await this.deleteBlockApi(block.id, publishIncrementalUpdate);
       },
       async () => {
         // await charmClient.insertBlock(block, publishIncrementalUpdate)
@@ -207,7 +227,7 @@ export class Mutator {
     await undoManager.perform(
       async () => {
         await beforeRedo?.();
-        await charmClient.deleteBlocks(blockIds, publishIncrementalUpdate);
+        await this.deleteBlocksApi(blockIds, publishIncrementalUpdate);
       },
       async () => {
         // await charmClient.insertBlock(block, publishIncrementalUpdate)
@@ -599,6 +619,36 @@ export class Mutator {
     } else {
       return { newBlock: newCard, block: card };
     }
+  }
+
+  changePropertyValues(
+    cards: Card[],
+    propertyId: string,
+    value?: string | string[] | number,
+    description = 'change property'
+  ) {
+    const oldBlocks: Block[] = [];
+    const newBlocks: Block[] = [];
+
+    cards
+      .filter((card) => {
+        const oldValue = card.fields.properties[propertyId];
+        return oldValue !== value && (oldValue || value);
+      })
+      .forEach((card) => {
+        const newCard = createCard(card);
+        if (value) {
+          newCard.fields.properties[propertyId] = value;
+        } else {
+          delete newCard.fields.properties[propertyId];
+        }
+
+        newBlocks.push(newCard);
+        oldBlocks.push(card);
+      });
+
+    // dont save anything if property value was not changed.
+    return this.updateBlocks(newBlocks, oldBlocks, description);
   }
 
   async changePropertyTypeAndName(
@@ -1009,13 +1059,12 @@ export class Mutator {
   }): Promise<[Block[], string]> {
     const blocks = await charmClient.getSubtree({ pageId: cardId });
     const pageDetails = await charmClient.pages.getPage(cardId);
-    const [newBlocks1, newCard] = OctoUtils.duplicateBlockTree(blocks, cardId) as [
+    const [newBlocks, newCard] = OctoUtils.duplicateBlockTree(blocks, cardId) as [
       Block[],
       Card,
       Record<string, string>
     ];
 
-    const newBlocks = newBlocks1.filter((o) => o.type !== 'comment');
     Utils.log(`duplicateCard: duplicating ${newBlocks.length} blocks`);
     if (asTemplate === newCard.fields.isTemplate) {
       // Copy template

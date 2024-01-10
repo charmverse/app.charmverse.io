@@ -11,16 +11,16 @@ describe('getGnosisTransactionQueueUrl', () => {
     getMantleTransactionMock = jest.fn();
     getAllMantleTransactionsMock = jest.fn();
 
-    jest.mock('../gnosis.ts', () => ({
-      getGnosisService: () => ({
+    jest.mock('../safe/getSafeApiClient.ts', () => ({
+      getSafeApiClient: () => ({
         getTransaction: getTransactionMock,
         getAllTransactions: getAllTransactionsMock
       })
     }));
 
     jest.mock('../mantleClient.ts', () => ({
-      getTransaction: getMantleTransactionMock,
-      getAllTransactions: getAllMantleTransactionsMock
+      getMantleSafeTransaction: getMantleTransactionMock,
+      getAllMantleSafeTransactions: getAllMantleTransactionsMock
     }));
   });
 

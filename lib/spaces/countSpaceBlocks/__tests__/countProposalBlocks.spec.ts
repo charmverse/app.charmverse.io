@@ -2,12 +2,13 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 as uuid } from 'uuid';
 
+import checkbox from 'components/common/BoardEditor/focalboard/src/widgets/checkbox';
 import { generateSchema } from 'testing/publicApi/schemas';
 
 import type { ProposalBlocksCount } from '../countProposalBlocks';
 import { countProposalBlocks } from '../countProposalBlocks';
 
-describe('countProposalBlocks', () => {
+describe('countProposalBlocks()', () => {
   // Provided schema generation code
   const selectSchema = generateSchema({ type: 'select', options: ['Blue', 'Green', 'Red'] });
   const multiSelectSchema = generateSchema({ type: 'multiSelect', options: ['Blue', 'Green', 'Red'] });
@@ -27,36 +28,108 @@ describe('countProposalBlocks', () => {
     urlSchema
   ];
 
-  it('should count each rubric criteria, rubric criteria answer, proposal view, proposal categories, proposal properties, proposal property values as 1 block', async () => {
+  it('should count each rubric criteria, rubric criteria answer, proposal view, proposal properties, proposal form field answers, proposal property values as 1 block', async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace({
       customProposalProperties: propertyTemplates
     });
 
     const spaceMember = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
 
-    // Generating two proposal categories
-    const proposalCategory1 = await testUtilsProposals.generateProposalCategory({ spaceId: space.id });
-    const proposalCategory2 = await testUtilsProposals.generateProposalCategory({ spaceId: space.id });
-
-    // Generating proposals for each category
     const proposal1 = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: user.id,
-      categoryId: proposalCategory1.id,
       customProperties: {
         [textSchema.id]: 'Text',
-        [selectSchema.id]: selectSchema.options[0].id
+        [selectSchema.id]: selectSchema.options[0].id,
+        [checkboxSchema.id]: false
       }
     });
+
     const proposal2 = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: user.id,
       evaluationType: 'rubric',
-      categoryId: proposalCategory2.id,
       customProperties: {
         [numberSchema.id]: 8,
         [urlSchema.id]: 'www.example.com'
       }
+    });
+
+    const proposal3 = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: user.id,
+      evaluationType: 'feedback',
+      customProperties: {
+        // Empty string should be ignored
+        [textSchema.id]: ''
+      }
+    });
+
+    const form = await prisma.form.create({
+      data: {
+        formFields: {
+          createMany: {
+            data: [
+              {
+                name: 'Short Text',
+                type: 'short_text'
+              },
+              {
+                name: 'Email',
+                type: 'email'
+              }
+            ]
+          }
+        }
+      },
+      include: {
+        formFields: true
+      }
+    });
+
+    await Promise.all(
+      [proposal1.id, proposal2.id].map((proposalId) =>
+        prisma.form.update({
+          where: {
+            id: form.id
+          },
+          data: {
+            proposal: {
+              connect: {
+                id: proposalId
+              }
+            }
+          }
+        })
+      )
+    );
+
+    await prisma.formFieldAnswer.createMany({
+      data: [
+        {
+          fieldId: form.formFields[0].id,
+          proposalId: proposal1.id,
+          type: 'short_text',
+          value: 'Short Text Answer'
+        },
+        {
+          fieldId: form.formFields[1].id,
+          proposalId: proposal1.id,
+          type: 'email',
+          value: 'john.doe@gmail.com'
+        }
+      ]
+    });
+
+    await prisma.formFieldAnswer.createMany({
+      data: [
+        {
+          fieldId: form.formFields[0].id,
+          proposalId: proposal2.id,
+          type: 'short_text',
+          value: 'Short Text Answer 2'
+        }
+      ]
     });
 
     const rubricCriteria = await Promise.all([
@@ -131,10 +204,9 @@ describe('countProposalBlocks', () => {
       details: {
         proposalViews: 1,
         proposalProperties: 7,
-        proposalPropertyValues: 4,
-        proposalCategories: 2,
+        proposalPropertyValues: 5,
         proposalRubricAnswers: 4,
-        proposalRubrics: 2
+        proposalFormFields: 3
       }
     });
   });
@@ -144,15 +216,9 @@ describe('countProposalBlocks', () => {
       customProposalProperties: propertyTemplates
     });
 
-    // Generating two proposal categories
-    const proposalCategory1 = await testUtilsProposals.generateProposalCategory({ spaceId: space.id });
-    const proposalCategory2 = await testUtilsProposals.generateProposalCategory({ spaceId: space.id });
-
-    // Generating proposals for each category
     const proposal1 = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: user.id,
-      categoryId: proposalCategory1.id,
       customProperties: {
         [textSchema.id]: 'Text',
         [selectSchema.id]: selectSchema.options[0].id
@@ -161,7 +227,6 @@ describe('countProposalBlocks', () => {
     const proposal2 = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: user.id,
-      categoryId: proposalCategory2.id,
       customProperties: {
         [numberSchema.id]: 8,
         [urlSchema.id]: 'www.example.com'
@@ -172,7 +237,6 @@ describe('countProposalBlocks', () => {
       spaceId: space.id,
       userId: user.id,
       deletedAt: new Date(),
-      categoryId: proposalCategory2.id,
       customProperties: {
         [numberSchema.id]: 8,
         [urlSchema.id]: 'www.example.com'
@@ -235,22 +299,21 @@ describe('countProposalBlocks', () => {
     });
     const count = await countProposalBlocks({ spaceId: space.id });
     expect(count).toMatchObject<ProposalBlocksCount>({
-      total: 14,
+      total: 12,
       details: {
         proposalViews: 1,
         proposalProperties: 7,
         proposalPropertyValues: 4,
-        proposalCategories: 2,
         proposalRubricAnswers: 0,
-        proposalRubrics: 0
+        proposalFormFields: 0
       }
     });
   });
 
-  it('should return 0 when there are no proposals, views, or categories', async () => {
+  it('should return 0 when there are no proposals or views', async () => {
     const { space } = await testUtilsUser.generateUserAndSpace();
 
-    // Assuming that a new space has no proposals, views, or categories
+    // Assuming that a new space has no proposals or views
     const count = await countProposalBlocks({ spaceId: space.id });
     expect(count).toMatchObject<ProposalBlocksCount>({
       total: 0,
@@ -258,9 +321,8 @@ describe('countProposalBlocks', () => {
         proposalViews: 0,
         proposalProperties: 0,
         proposalPropertyValues: 0,
-        proposalCategories: 0,
         proposalRubricAnswers: 0,
-        proposalRubrics: 0
+        proposalFormFields: 0
       }
     });
   });

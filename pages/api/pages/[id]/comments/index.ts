@@ -8,36 +8,35 @@ import { createPageComment } from 'lib/pages/comments/createPageComment';
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
 import { listPageComments } from 'lib/pages/comments/listPageComments';
 import { PageNotFoundError } from 'lib/pages/server';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishDocumentEvent } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(
-    providePermissionClients({
-      key: 'id',
-      location: 'query',
-      resourceIdType: 'page'
-    })
-  )
-  .get(listPageCommentsHandler)
-  .use(requireUser)
-  .post(createPageCommentHandler);
+handler.get(listPageCommentsHandler).use(requireUser).post(createPageCommentHandler);
 
 async function listPageCommentsHandler(req: NextApiRequest, res: NextApiResponse<PageCommentWithVote[]>) {
   const { id: pageId } = req.query as any as { id: string };
 
   const userId = req.session.user?.id;
 
-  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
+  const pagePermissions = await prisma.pagePermission.count({
+    where: {
+      pageId,
+      public: true
+    }
+  });
+
+  const isPublic = pagePermissions !== 0;
+
+  const permissions = await permissionsApiClient.pages.computePagePermissions({
     resourceId: pageId,
     userId
   });
 
-  if (permissions.comment !== true) {
+  if (permissions.comment !== true && !isPublic) {
     throw new ActionNotPermittedError('You do not have permission to view comments this page');
   }
 
@@ -60,7 +59,7 @@ async function createPageCommentHandler(req: NextApiRequest, res: NextApiRespons
     throw new PageNotFoundError(pageId);
   }
 
-  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
+  const permissions = await permissionsApiClient.pages.computePagePermissions({
     resourceId: pageId,
     userId
   });

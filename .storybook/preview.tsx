@@ -5,6 +5,7 @@ import { AppThemeProvider } from '../theme/AppThemeProvider';
 import { initialize, mswLoader } from 'msw-storybook-addon';
 import { IntlProvider } from 'react-intl';
 import ReactDndProvider from '../components/common/ReactDndProvider';
+import { LocalizationProvider } from '../components/_app/LocalizationProvider';
 
 import '@bangle.dev/tooltip/style.css';
 import 'prosemirror-menu/style/menu.css';
@@ -14,9 +15,6 @@ import 'theme/print.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calculations/calculation.scss';
 import 'components/common/BoardEditor/focalboard/src/components/calendar/fullcalendar.scss';
 import 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetail.scss';
-import 'components/common/BoardEditor/focalboard/src/components/cardDetail/comment.scss';
-import 'components/common/BoardEditor/focalboard/src/components/cardDetail/commentsList.scss';
-import 'components/common/BoardEditor/focalboard/src/components/cardDialog.scss';
 import 'components/common/BoardEditor/focalboard/src/components/centerPanel.scss';
 import 'components/common/BoardEditor/focalboard/src/components/dialog.scss';
 import 'components/common/BoardEditor/focalboard/src/components/gallery/gallery.scss';
@@ -56,26 +54,7 @@ import 'components/common/CharmEditor/components/listItemNew/czi-list.scss';
 import 'theme/focalboard/focalboard.button.scss';
 import 'theme/focalboard/focalboard.main.scss';
 import 'react-resizable/css/styles.css';
-import 'theme/lit-protocol/lit-protocol.scss';
 import 'theme/styles.scss';
-import 'components/common/LitProtocolModal/index.css';
-import 'components/common/LitProtocolModal/reusableComponents/litChainSelector/LitChainSelector.css';
-import 'components/common/LitProtocolModal/reusableComponents/litCheckbox/LitCheckbox.css';
-import 'components/common/LitProtocolModal/reusableComponents/litChooseAccessButton/LitChooseAccessButton.css';
-import 'components/common/LitProtocolModal/reusableComponents/litConfirmationModal/LitConfirmationModal.css';
-import 'components/common/LitProtocolModal/reusableComponents/litDeleteModal/LitDeleteModal.css';
-import 'components/common/LitProtocolModal/reusableComponents/litFooter/LitBackButton.css';
-import 'components/common/LitProtocolModal/reusableComponents/litFooter/LitFooter.css';
-import 'components/common/LitProtocolModal/reusableComponents/litFooter/LitNextButton.css';
-import 'components/common/LitProtocolModal/reusableComponents/litHeader/LitHeader.css';
-import 'components/common/LitProtocolModal/reusableComponents/litInput/LitInput.css';
-import 'components/common/LitProtocolModal/shareModal/devMode/DevModeContent.css';
-import 'components/common/LitProtocolModal/shareModal/multipleConditionSelect/MultipleAddCondition.css';
-import 'components/common/LitProtocolModal/shareModal/multipleConditionSelect/MultipleConditionEditor.css';
-import 'components/common/LitProtocolModal/shareModal/multipleConditionSelect/MultipleConditionSelect.css';
-import 'components/common/LitProtocolModal/shareModal/reviewConditions/ReviewConditions.css';
-import 'components/common/LitProtocolModal/shareModal/ShareModal.css';
-import 'components/common/LitProtocolModal/shareModal/singleConditionSelect/SingleConditionSelect.css';
 
 import { handlers } from './mockApi';
 import { WagmiConfig, configureChains, createConfig, mainnet } from 'wagmi';
@@ -96,6 +75,7 @@ const preview: Preview = {
         { name: 'light', value: '#fff' }
       ]
     },
+    layout: 'fullscreen', // removes padding around the views
     actions: { argTypesRegex: '^on[A-Z].*' },
     controls: {
       matchers: {
@@ -146,7 +126,9 @@ export const globalProviders = (Story, context) => {
     <WagmiConfig config={wagmiConfig}>
       <IntlProvider locale='en'>
         <ReactDndProvider>
-          <Story />
+          <LocalizationProvider>
+            <Story />
+          </LocalizationProvider>
         </ReactDndProvider>
       </IntlProvider>
     </WagmiConfig>

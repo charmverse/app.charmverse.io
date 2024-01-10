@@ -1,6 +1,20 @@
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
-import type { RewardType } from 'components/rewards/components/RewardProperties/interfaces';
 import type { IPropertyOption } from 'lib/focalboard/board';
+
+export const rewardTypeOptions: IPropertyOption[] = [
+  {
+    id: 'Token' as const,
+    value: 'Token',
+    color: 'teal'
+  },
+  {
+    id: 'Custom' as const,
+    value: 'Custom',
+    color: 'yellow'
+  }
+];
+
+export type RewardType = (typeof rewardTypeOptions)[number]['id'];
 
 type Props = {
   readOnly?: boolean;
@@ -8,19 +22,6 @@ type Props = {
   value: RewardType;
   onChange: (value: RewardType) => void;
 };
-
-export const rewardTypeOptions: IPropertyOption<RewardType>[] = [
-  {
-    id: 'Token',
-    value: 'Token',
-    color: 'teal'
-  },
-  {
-    id: 'Custom',
-    value: 'Custom',
-    color: 'yellow'
-  }
-];
 
 export function RewardTypeSelect({ readOnly, readOnlyMessage, value, onChange }: Props) {
   function onValueChange(values: string | string[]) {

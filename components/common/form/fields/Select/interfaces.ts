@@ -4,6 +4,8 @@ export type SelectOptionType = {
   id: string;
   name: string;
   color: SupportedColor;
+  disabled?: boolean;
+  dropdownName?: string;
   index?: number;
   temp?: boolean;
 };

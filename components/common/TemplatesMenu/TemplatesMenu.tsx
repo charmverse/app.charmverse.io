@@ -1,24 +1,27 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import { useTheme } from '@emotion/react';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
 import { Box, Divider, ListItemIcon, ListItemText } from '@mui/material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { bindMenu } from 'material-ui-popup-state/hooks';
+import type { ReactNode } from 'react';
 
 import { AddIcon } from 'components/common/Icons/AddIcon';
 import { fancyTrim } from 'lib/utilities/strings';
 
 import LoadingComponent from '../LoadingComponent';
 
-import { TemplatePageMenuActions } from './TemplatePageMenuActions';
+import type { Props as ActionMenuProps } from './TemplatePageActionMenu';
+import { TemplatePageActionMenu } from './TemplatePageActionMenu';
 
 /**
  * @enableItemOptions Defaults to true. Adds an external condition to decide if we enable the menu item options.
  */
 interface Props {
-  pages?: PageMeta[];
+  pages?: (PageMeta & { isStructuredProposal?: boolean })[];
   createTemplate: () => void;
   editTemplate: (pageId: string) => void;
   deleteTemplate: (pageId: string) => void;
@@ -29,6 +32,7 @@ interface Props {
   enableItemOptions?: boolean;
   enableNewTemplates?: boolean;
   isLoading?: boolean;
+  pageActions?: ActionMenuProps['pageActions'];
 }
 
 export function TemplatesMenu({
@@ -42,7 +46,8 @@ export function TemplatesMenu({
   boardTitle,
   enableItemOptions,
   enableNewTemplates,
-  isLoading
+  isLoading,
+  pageActions
 }: Props) {
   const theme = useTheme();
 
@@ -94,18 +99,19 @@ export function TemplatesMenu({
               }}
             >
               <ListItemIcon>
-                <DescriptionOutlinedIcon />
+                {page.isStructuredProposal ? <WidgetsOutlinedIcon /> : <DescriptionOutlinedIcon />}
               </ListItemIcon>
               <ListItemText>{fancyTrim(page.title || 'Untitled', maxTitleLength)}</ListItemText>
 
               {/* TODO - Revisit nested menu using this npm package https://github.com/steviebaa/mui-nested-menu */}
               <Box ml={1} onClick={(e) => e.stopPropagation()}>
                 {enableItemOptions && (
-                  <TemplatePageMenuActions
+                  <TemplatePageActionMenu
                     editTemplate={editTemplate}
                     deleteTemplate={deleteTemplate}
                     pageId={page.id}
                     closeParentPopup={popupState.close}
+                    pageActions={pageActions}
                   />
                 )}
               </Box>
@@ -119,6 +125,7 @@ export function TemplatesMenu({
           dense
           sx={{ color: `${theme.palette.primary.main} !important` }}
           onClick={createTemplate}
+          data-test='new-template-button'
         >
           <AddIcon />
           <ListItemText>New template</ListItemText>

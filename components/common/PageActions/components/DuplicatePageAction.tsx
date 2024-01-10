@@ -2,15 +2,14 @@ import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
 import FileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined';
 import { ListItemIcon, ListItemText, MenuItem, Tooltip } from '@mui/material';
-import { useRouter } from 'next/router';
 
 import charmClient from 'charmClient';
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useRewards } from 'components/rewards/hooks/useRewards';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 
-const excludedPageTypes: (PageType | undefined)[] = ['bounty_template', 'proposal_template'];
+const excludedPageTypes: (PageType | undefined)[] = ['bounty_template', 'proposal'];
 
 export function DuplicatePageAction({
   pageId,
@@ -25,31 +24,33 @@ export function DuplicatePageAction({
   onComplete?: VoidFunction;
   pagePermissions: PagePermissionFlags | undefined;
 }) {
-  const { space: currentSpace } = useCurrentSpace();
   const [userSpacePermissions] = useCurrentSpacePermissions();
-  const router = useRouter();
+  const { navigateToSpacePath } = useCharmRouter();
   const { refreshReward } = useRewards();
   const { refreshProposal } = useProposals();
 
   const disabled = !pagePermissions?.read || !userSpacePermissions?.createPage;
 
   async function duplicatePage() {
-    if (currentSpace) {
+    if (pageType === 'proposal_template') {
+      navigateToSpacePath(`/proposals/new`, { type: 'proposal_template', template: pageId });
+      onComplete?.();
+    } else {
       const duplicatePageResponse = await charmClient.pages.duplicatePage({
         pageId
       });
       const { pages, rootPageId } = duplicatePageResponse;
       const duplicatedRootPage = pages.find((_page) => _page.id === rootPageId);
       if (duplicatedRootPage && redirect) {
-        router.push(`/${router.query.domain}/${duplicatedRootPage.path}`);
+        navigateToSpacePath(`/${duplicatedRootPage.path}`);
       }
       if (pageType === 'bounty' || pageType === 'bounty_template') {
         refreshReward(duplicatePageResponse.rootPageId);
       } else if (pageType === 'proposal') {
         refreshProposal(duplicatePageResponse.rootPageId);
       }
-      onComplete?.();
     }
+    onComplete?.();
   }
 
   return (

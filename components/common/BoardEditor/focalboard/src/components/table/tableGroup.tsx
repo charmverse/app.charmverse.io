@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */
+import type { Dispatch, ReactElement, SetStateAction } from 'react';
 import React from 'react';
 import { useDrop } from 'react-dnd';
 
@@ -19,7 +20,7 @@ type Props = {
   selectedCardIds: string[];
   cardIdToFocusOnRender: string;
   hideGroup: (groupByOptionId: string) => void;
-  addCard: (groupByOptionId?: string) => Promise<void>;
+  addCard: (groupByOptionId?: string) => Promise<void> | void;
   showCard: (cardId: string) => void;
   propertyNameChanged: (option: IPropertyOption, text: string) => Promise<void>;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
@@ -28,6 +29,9 @@ type Props = {
   onDropToGroup: (srcCard: Card, groupID: string, dstCardID: string) => void;
   disableAddingCards?: boolean;
   readOnlyTitle?: boolean;
+  subRowsEmptyValueContent?: ReactElement | string;
+  checkedIds?: string[];
+  setCheckedIds?: Dispatch<SetStateAction<string[]>>;
 };
 
 const TableGroup = React.memo((props: Props): JSX.Element => {
@@ -86,6 +90,9 @@ const TableGroup = React.memo((props: Props): JSX.Element => {
           onCardClicked={props.onCardClicked}
           onDrop={props.onDropToCard}
           readOnlyTitle={props.readOnlyTitle}
+          subRowsEmptyValueContent={props.subRowsEmptyValueContent}
+          checkedIds={props.checkedIds}
+          setCheckedIds={props.setCheckedIds}
         />
       )}
     </div>

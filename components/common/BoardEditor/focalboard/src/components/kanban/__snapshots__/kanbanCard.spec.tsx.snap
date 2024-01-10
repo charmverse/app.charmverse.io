@@ -8,7 +8,7 @@ exports[`src/components/kanban/kanbanCard return kanbanCard and click on delete 
     class="variable variable"
   >
     <a
-      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1mu6lya-MuiTypography-root-MuiLink-root"
+      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-uufjfw-MuiTypography-root-MuiLink-root"
       draggable="false"
       href="/test-space/86382f29-b73b-42c2-b3bd-b69d2143e7f3"
     >
@@ -44,7 +44,7 @@ exports[`src/components/kanban/kanbanCard return kanbanCard and click on delete 
         >
           <div>
             <div
-              class="css-emwlh8"
+              class="css-jm1ma0"
             >
               <img
                 src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -58,7 +58,7 @@ exports[`src/components/kanban/kanbanCard return kanbanCard and click on delete 
           </div>
         </div>
         <div
-          class="css-1qh2y1i-MuiStack-root"
+          class="MuiStack-root css-1qh2y1i-MuiStack-root"
         />
       </div>
     </a>
@@ -72,7 +72,7 @@ exports[`src/components/kanban/kanbanCard should match snapshot 1`] = `
     class="variable variable"
   >
     <a
-      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1mu6lya-MuiTypography-root-MuiLink-root"
+      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-uufjfw-MuiTypography-root-MuiLink-root"
       draggable="false"
       href="/test-space/86382f29-b73b-42c2-b3bd-b69d2143e7f3"
     >
@@ -108,7 +108,7 @@ exports[`src/components/kanban/kanbanCard should match snapshot 1`] = `
         >
           <div>
             <div
-              class="css-emwlh8"
+              class="css-jm1ma0"
             >
               <img
                 src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -122,7 +122,7 @@ exports[`src/components/kanban/kanbanCard should match snapshot 1`] = `
           </div>
         </div>
         <div
-          class="css-1qh2y1i-MuiStack-root"
+          class="MuiStack-root css-1qh2y1i-MuiStack-root"
         />
       </div>
     </a>
@@ -136,7 +136,7 @@ exports[`src/components/kanban/kanbanCard should match snapshot with readonly 1`
     class="variable variable"
   >
     <a
-      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1mu6lya-MuiTypography-root-MuiLink-root"
+      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-uufjfw-MuiTypography-root-MuiLink-root"
       draggable="false"
       href="/test-space/86382f29-b73b-42c2-b3bd-b69d2143e7f3"
     >
@@ -151,7 +151,7 @@ exports[`src/components/kanban/kanbanCard should match snapshot with readonly 1`
         >
           <div>
             <div
-              class="css-emwlh8"
+              class="css-jm1ma0"
             >
               <img
                 src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -165,7 +165,7 @@ exports[`src/components/kanban/kanbanCard should match snapshot with readonly 1`
           </div>
         </div>
         <div
-          class="css-1qh2y1i-MuiStack-root"
+          class="MuiStack-root css-1qh2y1i-MuiStack-root"
         />
       </div>
     </a>

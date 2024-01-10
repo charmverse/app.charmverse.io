@@ -5,19 +5,19 @@ import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { getPermissionsClient } from 'lib/permissions/api';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { ThreadCreate, ThreadWithComments } from 'lib/threads';
+import type { ThreadCreatePayload, ThreadWithComments } from 'lib/threads';
 import { createThread } from 'lib/threads';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishDocumentEvent } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).post(requireKeys<ThreadCreate>(['context', 'pageId', 'comment'], 'body'), startThread);
+handler.use(requireUser).post(requireKeys<ThreadCreatePayload>(['context', 'pageId', 'comment'], 'body'), startThread);
 
 async function startThread(req: NextApiRequest, res: NextApiResponse<ThreadWithComments>) {
-  const { comment, context, pageId } = req.body as ThreadCreate;
+  const { comment, accessGroups, context, pageId } = req.body as ThreadCreatePayload;
 
   const userId = req.session.user.id;
 
@@ -30,9 +30,7 @@ async function startThread(req: NextApiRequest, res: NextApiResponse<ThreadWithC
     throw new PageNotFoundError(pageId);
   }
 
-  const permissions = await getPermissionsClient({ resourceId: pageId, resourceIdType: 'page' }).then(({ client }) =>
-    client.pages.computePagePermissions({ resourceId: pageId, userId })
-  );
+  const permissions = await permissionsApiClient.pages.computePagePermissions({ resourceId: pageId, userId });
 
   if (!permissions.comment) {
     throw new ActionNotPermittedError();
@@ -42,7 +40,8 @@ async function startThread(req: NextApiRequest, res: NextApiResponse<ThreadWithC
     comment,
     context,
     pageId,
-    userId
+    userId,
+    accessGroups
   });
 
   const inlineCommentId = newThread.comments[0].id;

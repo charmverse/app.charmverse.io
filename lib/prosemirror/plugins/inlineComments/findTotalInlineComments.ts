@@ -1,12 +1,12 @@
 import type { MarkType, Node, Schema } from '@bangle.dev/pm';
 import { findChildrenByMark, findChildrenByType } from 'prosemirror-utils';
 
-import type { ThreadWithCommentsAndAuthors } from 'lib/threads/interfaces';
+import type { ThreadWithComments } from 'lib/threads/interfaces';
 
 export function findTotalInlineComments(
   schema: Schema,
   node: Node,
-  threads: Record<string, ThreadWithCommentsAndAuthors | undefined>,
+  threads: Record<string, ThreadWithComments | undefined>,
   keepResolved?: boolean
 ) {
   keepResolved = keepResolved ?? false;
@@ -33,7 +33,11 @@ export function findTotalInlineComments(
 }
 
 // find and group comments by paragraph and heading
-export function extractInlineCommentRows(schema: Schema, node: Node): { pos: number; nodes: Node[] }[] {
+export function extractInlineCommentRows(
+  schema: Schema,
+  node: Node,
+  threadIds: string[]
+): { pos: number; nodes: Node[] }[] {
   const inlineCommentMarkSchema = schema.marks['inline-comment'] as MarkType;
   const paragraphs = findChildrenByType(node, schema.nodes.paragraph);
   const headings = findChildrenByType(node, schema.nodes.heading);
@@ -43,7 +47,11 @@ export function extractInlineCommentRows(schema: Schema, node: Node): { pos: num
       pos: _node.pos,
       nodes: findChildrenByMark(_node.node, inlineCommentMarkSchema)
         .map((nodeWithPos) => nodeWithPos.node)
-        .filter((__node) => __node.marks[0].attrs.id && !__node.marks[0].attrs.resolved)
+        .filter((__node) =>
+          __node.marks.find(
+            (mark) => mark.type.name === 'inline-comment' && threadIds.includes(mark.attrs.id) && !mark.attrs.resolved
+          )
+        )
     }))
     .filter(({ nodes }) => nodes.length > 0);
 }

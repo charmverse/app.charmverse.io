@@ -1,4 +1,4 @@
-import type { TargetPermissionGroup } from '@charmverse/core/dist/cjs/permissions';
+import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { PagePermission, Role, Space, User } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsPages, testUtilsUser } from '@charmverse/core/test';
@@ -50,7 +50,7 @@ describe('createReward', () => {
       allowedSubmitterRoles: [submitterRole.id]
     };
 
-    const reward = await createReward(rewardData);
+    const { reward } = await createReward(rewardData);
 
     expect(reward).toMatchObject({
       chainId: 2,
@@ -62,7 +62,49 @@ describe('createReward', () => {
       customReward: 'Special Badge',
       fields: { fieldName: 'sampleField', type: 'text' },
       reviewers: expect.arrayContaining(reviewers),
-      allowedSubmitterRoles: [submitterRole.id]
+      allowedSubmitterRoles: [submitterRole.id],
+      assignedSubmitters: null
+    });
+  });
+
+  it('should successfully create assigned reward based on assignedSubmitters', async () => {
+    const reviewers: TargetPermissionGroup<'role' | 'user'>[] = [
+      { id: user.id, group: 'user' },
+      { id: reviewerRole.id, group: 'role' }
+    ];
+
+    const rewardData: RewardCreationData = {
+      spaceId: space.id,
+      userId: user.id,
+      chainId: 2,
+      rewardAmount: 100,
+      rewardToken: 'ETH',
+      approveSubmitters: true,
+      allowMultipleApplications: true,
+      maxSubmissions: 10,
+      dueDate: new Date(),
+      customReward: 'Special Badge',
+      fields: { fieldName: 'sampleField', type: 'text' },
+      reviewers,
+      allowedSubmitterRoles: [submitterRole.id],
+      assignedSubmitters: [user.id]
+    };
+
+    const { reward } = await createReward(rewardData);
+
+    expect(reward).toMatchObject({
+      chainId: 2,
+      rewardAmount: 100,
+      rewardToken: 'ETH',
+      approveSubmitters: false,
+      allowMultipleApplications: false,
+      maxSubmissions: 1,
+      dueDate: expect.any(Date),
+      customReward: 'Special Badge',
+      fields: { fieldName: 'sampleField', type: 'text' },
+      reviewers: expect.arrayContaining(reviewers),
+      allowedSubmitterRoles: null,
+      assignedSubmitters: [user.id]
     });
   });
 
@@ -72,7 +114,7 @@ describe('createReward', () => {
       userId: user.id
     };
 
-    const reward = await createReward(rewardData);
+    const { reward } = await createReward(rewardData);
 
     expect(reward).toMatchObject<Partial<Reward>>({
       chainId: 1,
@@ -107,7 +149,7 @@ describe('createReward', () => {
       allowedSubmitterRoles: [submitterRole.id]
     };
 
-    const reward = await createReward(rewardData);
+    const { reward } = await createReward(rewardData);
 
     // Assuming you now add this reward to a page or it's added in the createReward function
     // Fetch the page to check if the reward is attached
@@ -142,7 +184,7 @@ describe('createReward', () => {
       allowedSubmitterRoles: [submitterRole.id]
     };
 
-    const reward = await createReward(rewardData);
+    const { reward } = await createReward(rewardData);
 
     const permissions = await prisma.pagePermission.findMany({
       where: {

@@ -3,19 +3,21 @@ import { v4 } from 'uuid';
 import type { Block } from 'lib/focalboard/block';
 import { createBlock } from 'lib/focalboard/block';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import { replaceS3Domain } from 'lib/utilities/url';
 
 import type { Card, CardPage } from './card';
 
 export const proposalPropertyTypesList = [
   'proposalUrl',
   'proposalStatus',
-  'proposalCategory',
   'proposalEvaluatedBy',
   'proposalEvaluationTotal',
   'proposalEvaluationAverage',
   'proposalAuthor',
   'proposalReviewer',
-  'proposalEvaluationType'
+  'proposalEvaluationType',
+  'proposalCreatedAt',
+  'proposalStep'
 ] as const;
 export type DatabaseProposalPropertyType = (typeof proposalPropertyTypesList)[number];
 
@@ -35,6 +37,8 @@ export type PropertyType =
   | 'createdBy'
   | 'updatedTime'
   | 'updatedBy'
+  | 'tokenAmount'
+  | 'tokenChain'
   | DatabaseProposalPropertyType;
 
 export const propertyTypesList: PropertyType[] = [
@@ -59,6 +63,8 @@ interface IPropertyOption<T = string> {
   id: T;
   value: string;
   color: string;
+  disabled?: boolean;
+  dropdownValue?: string; // the label to show in the dropdown, if its different from the normal value
 }
 
 // A template for card properties attached to a board
@@ -68,6 +74,8 @@ export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
   type: T;
   options: IPropertyOption[];
   description?: string;
+  formFieldId?: string;
+  proposalFieldId?: string;
 };
 
 export type DataSourceType = 'board_page' | 'google_form' | 'proposals';
@@ -147,7 +155,7 @@ function createBoard({
       icon: block?.fields?.icon ?? '',
       isTemplate: block?.fields?.isTemplate ?? false,
       columnCalculations: block?.fields?.columnCalculations ?? [],
-      headerImage: block?.fields?.headerImage ?? null,
+      headerImage: replaceS3Domain(block?.fields?.headerImage ?? null),
       viewIds: block?.fields?.viewIds ?? [],
       ...block?.fields,
       cardProperties

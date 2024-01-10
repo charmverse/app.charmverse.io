@@ -1,7 +1,10 @@
+import type { User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import type { FeatureJson } from 'lib/features/constants';
 import * as mailer from 'lib/mailer';
 import * as emails from 'lib/mailer/emails';
+import { getMemberUsernameBySpaceRole } from 'lib/members/getMemberUsername';
 import { getCardNotifications } from 'lib/notifications/cards/getCardNotifications';
 import { getDocumentNotifications } from 'lib/notifications/documents/getDocumentNotifications';
 import { getPostNotifications } from 'lib/notifications/forum/getForumNotifications';
@@ -12,7 +15,7 @@ import { getBountyNotifications } from 'lib/notifications/rewards/getRewardNotif
 
 const notificationSelectFields = {
   notificationMetadata: {
-    select: { user: { select: { id: true, email: true, username: true, emailNotifications: true } } }
+    select: { user: { select: { id: true, email: true, username: true, emailNotifications: true, avatar: true } } }
   }
 };
 
@@ -35,7 +38,8 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             user: {
               email: user.email,
               username: user.username,
-              id: user.id
+              id: user.id,
+              avatar: user.avatar
             }
           });
         }
@@ -58,7 +62,8 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             user: {
               email: user.email,
               username: user.username,
-              id: user.id
+              id: user.id,
+              avatar: user.avatar
             }
           });
         }
@@ -81,7 +86,8 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             user: {
               email: user.email,
               username: user.username,
-              id: user.id
+              id: user.id,
+              avatar: user.avatar
             }
           });
         }
@@ -104,7 +110,8 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             user: {
               email: user.email,
               username: user.username,
-              id: user.id
+              id: user.id,
+              avatar: user.avatar
             }
           });
         }
@@ -127,7 +134,8 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             user: {
               email: user.email,
               username: user.username,
-              id: user.id
+              id: user.id,
+              avatar: user.avatar
             }
           });
         }
@@ -150,7 +158,8 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             user: {
               email: user.email,
               username: user.username,
-              id: user.id
+              id: user.id,
+              avatar: user.avatar
             }
           });
         }
@@ -169,42 +178,50 @@ async function sendEmail({
   user
 }: {
   notification: Notification;
-  user: { username: string; email: string; id: string };
+  user: Pick<User, 'id' | 'username' | 'id' | 'avatar' | 'email'>;
 }) {
   const notificationSpaceId = notification.spaceId;
-  const userId = notification.createdBy.id;
-
-  const memberProperty = await prisma.memberProperty.findFirst({
+  const space = await prisma.space.findUniqueOrThrow({
     where: {
-      spaceId: notificationSpaceId,
-      type: 'name'
+      id: notificationSpaceId
+    },
+    select: {
+      features: true
+    }
+  });
+  const spaceFeatures = (space.features ?? []) as FeatureJson[];
+  const notificationAuthorSpaceRole = await prisma.spaceRole.findFirstOrThrow({
+    where: {
+      userId: notification.createdBy.id,
+      spaceId: notificationSpaceId
     },
     select: {
       id: true
     }
   });
 
-  if (memberProperty) {
-    const memberPropertyValue = await prisma.memberPropertyValue.findFirst({
-      where: {
-        spaceId: notificationSpaceId,
-        userId,
-        memberPropertyId: memberProperty.id
-      },
-      select: {
-        value: true
-      }
-    });
-    if (memberPropertyValue?.value) {
-      notification.createdBy.username = memberPropertyValue.value as string;
+  const notificationTargetSpaceRole = await prisma.spaceRole.findFirstOrThrow({
+    where: {
+      userId: notification.createdBy.id,
+      spaceId: notificationSpaceId
+    },
+    select: {
+      id: true
     }
-  }
+  });
 
-  const template = emails.getPendingNotificationEmail(notification);
+  notification.createdBy.username = await getMemberUsernameBySpaceRole({ spaceRoleId: notificationAuthorSpaceRole.id });
+  const primaryIdentity = await getMemberUsernameBySpaceRole({ spaceRoleId: notificationTargetSpaceRole.id });
+
+  const template = emails.getPendingNotificationEmail({
+    notification,
+    user: { ...user, username: primaryIdentity },
+    spaceFeatures
+  });
   const result = await mailer.sendEmail({
     to: {
       displayName: user.username,
-      email: user.email,
+      email: user.email!,
       userId: user.id
     },
     subject: template.subject,

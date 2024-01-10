@@ -4,11 +4,23 @@ import Avatar from '@mui/material/Avatar';
 import React from 'react';
 
 import { stringToColor } from 'lib/utilities/strings';
+import { replaceS3Domain } from 'lib/utilities/url';
 
-export type AvatarSize = 'xSmall' | 'small' | 'medium' | 'large' | 'xLarge' | '2xLarge';
+export type AvatarSize = 'xSmall' | 'small' | 'medium' | 'large' | 'xLarge' | '2xLarge' | '3xLarge';
 export type AvatarVariant = 'circular' | 'rounded' | 'square';
 
-const sizeStyleMap: Record<AvatarSize, React.CSSProperties> = {
+const sizeStyleMap: Record<AvatarSize, SxProps<Theme>> = {
+  '3xLarge': {
+    height: {
+      xs: '300px',
+      sm: '500px'
+    },
+    width: {
+      xs: '300px',
+      sm: '500px'
+    },
+    fontSize: '10rem'
+  },
   '2xLarge': {
     height: 150,
     width: 150,
@@ -41,7 +53,12 @@ const sizeStyleMap: Record<AvatarSize, React.CSSProperties> = {
   }
 };
 
-const sizeVariantStyleMap: Partial<Record<AvatarSize, Record<AvatarVariant, React.CSSProperties | null>>> = {
+const sizeVariantStyleMap: Partial<Record<AvatarSize, Record<AvatarVariant, SxProps<Theme>>>> = {
+  '3xLarge': {
+    rounded: { borderRadius: '1.625rem' },
+    circular: null,
+    square: null
+  },
   '2xLarge': {
     rounded: { borderRadius: '1.625rem' },
     circular: null,
@@ -95,6 +112,7 @@ export type InitialAvatarProps = {
   isNft?: boolean;
   sx?: SxProps<Theme>;
   onMouseEnter?: (e: React.MouseEvent<HTMLElement>) => void;
+  children?: React.ReactNode;
 };
 
 export default function InitialAvatar({
@@ -105,7 +123,8 @@ export default function InitialAvatar({
   size = 'medium',
   isNft,
   onMouseEnter,
-  sx = {}
+  sx = {},
+  children
 }: InitialAvatarProps) {
   const nameStr = (name || '').replace('0x', ''); // ignore the universal prefix of addresses
   const muiVariant = isNft ? 'square' : variant;
@@ -121,11 +140,11 @@ export default function InitialAvatar({
         ...sx
       }}
       variant={muiVariant}
-      src={avatar ?? undefined}
+      src={replaceS3Domain(avatar ?? undefined)}
       imgProps={{ referrerPolicy: 'no-referrer' }}
       alt={name}
     >
-      {nameStr.charAt(0).toUpperCase()}
+      {children || nameStr.charAt(0).toUpperCase()}
     </AvatarComponent>
   );
 }

@@ -5,7 +5,6 @@ import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
 
 import { useGetProposalDetails } from 'charmClient/hooks/proposals';
-import { useProposalPermissions } from 'components/proposals/hooks/useProposalPermissions';
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { usePage } from 'hooks/usePage';
 
@@ -23,14 +22,14 @@ export function ArchiveProposalAction({
 }) {
   const { archiveProposal, proposals } = useProposals();
 
-  const { mutate: refreshProposal } = useGetProposalDetails(refreshPageOnChange ? proposalId : null);
+  const { data: { permissions } = {}, mutate: refreshProposal } = useGetProposalDetails(
+    refreshPageOnChange ? proposalId : null
+  );
   const { refreshPage } = usePage({
     pageIdOrPath: refreshPageOnChange ? proposalId : null
   });
 
   const proposal = proposals?.find((p) => p.id === proposalId);
-
-  const { permissions } = useProposalPermissions({ proposalIdOrPath: proposalId });
 
   const disabled = proposal?.archived ? !permissions?.unarchive : !permissions?.archive;
 

@@ -15,15 +15,18 @@ import type { IPropertyOption } from 'lib/focalboard/board';
 
 type ContainerProps = {
   displayType?: PropertyValueDisplayType;
+  disableClearable?: boolean;
   isHidden?: boolean;
   readOnly?: boolean;
+  fluidWidth?: boolean;
 };
 export const SelectPreviewContainer = styled(Stack, {
-  shouldForwardProp: (prop: string) => prop !== 'displayType' && prop !== 'isHidden' && prop !== 'readOnly'
+  shouldForwardProp: (prop: string) =>
+    prop !== 'displayType' && prop !== 'isHidden' && prop !== 'readOnly' && prop !== 'fluidWidth'
 })<ContainerProps>`
   border-radius: ${({ theme }) => theme.spacing(0.5)};
   display: ${({ isHidden }) => (isHidden ? 'none' : 'initial')};
-  width: 100%;
+  ${({ fluidWidth }) => (!fluidWidth ? 'width: 100%;' : '')}
   height: 100%;
   justify-content: center;
   padding: ${({ theme }) => theme.spacing(0.25, 0)};
@@ -57,7 +60,7 @@ export const SelectPreviewContainer = styled(Stack, {
 `;
 
 const StyledSelect = styled(SelectField)<ContainerProps>`
-  flex-grow: 1;
+  ${({ fluidWidth }) => (!fluidWidth ? 'flex-grow: 1;' : '')}
   .MuiInputBase-root {
     background-color: ${({ theme }) => theme.palette.background.paper};
 
@@ -86,29 +89,37 @@ const StyledSelect = styled(SelectField)<ContainerProps>`
   .MuiOutlinedInput-notchedOutline {
     border: 0 none !important;
   }
+
+  /* Hide the clear icons on each tag - useful for requried selects */
+  ${({ disableClearable }) => (disableClearable ? '.MuiSvgIcon-root { display: none; }' : '')}
 `;
 
-type Props = {
+export type TagSelectProps = {
+  defaultOpened?: boolean;
   readOnly?: boolean;
   readOnlyMessage?: string;
   canEditOptions?: boolean; // TODO: allow editing options
   multiselect?: boolean;
+  includeSelectedOptions?: boolean;
   noOptionsText?: string;
   options: IPropertyOption[];
   propertyValue: string | string[];
   displayType?: PropertyValueDisplayType;
+  disableClearable?: boolean;
   onChange: (option: string | string[]) => void;
   onCreateOption?: (option: IPropertyOption) => void;
   onUpdateOption?: (option: IPropertyOption) => void;
   onDeleteOption?: (option: IPropertyOption) => void;
   wrapColumn?: boolean;
   'data-test'?: string;
+  fluidWidth?: boolean;
 };
 
 export function TagSelect({
   readOnly,
   readOnlyMessage,
   canEditOptions = false,
+  includeSelectedOptions,
   options,
   propertyValue,
   multiselect = false,
@@ -119,9 +130,12 @@ export function TagSelect({
   displayType = 'details',
   noOptionsText,
   wrapColumn,
-  'data-test': dataTest
-}: Props) {
-  const [isOpened, setIsOpened] = useState(false);
+  defaultOpened = false,
+  disableClearable = false,
+  fluidWidth,
+  ...props
+}: TagSelectProps) {
+  const [isOpened, setIsOpened] = useState(defaultOpened);
 
   const onEdit = useCallback(() => {
     if (!readOnly) {
@@ -168,9 +182,16 @@ export function TagSelect({
   if (displayType === 'kanban' && isEmptyValue(selectValue)) {
     return null;
   }
+
   if (!isOpened) {
     return (
-      <SelectPreviewContainer data-test={dataTest} onClick={onEdit} displayType={displayType} readOnly={readOnly}>
+      <SelectPreviewContainer
+        data-test={props['data-test']}
+        onClick={onEdit}
+        displayType={displayType}
+        readOnly={readOnly}
+        fluidWidth={fluidWidth}
+      >
         <SelectPreview
           readOnly={readOnly}
           readOnlyMessage={readOnlyMessage}
@@ -187,13 +208,14 @@ export function TagSelect({
 
   return (
     <StyledSelect
-      data-test={dataTest}
       canEditOptions={canEditOptions}
+      includeSelectedOptions={includeSelectedOptions}
       placeholder='Search for an option...'
       noOptionsText={noOptionsText}
       autoOpen
       multiselect={multiselect}
       disabled={readOnly}
+      disableClearable={disableClearable}
       value={selectValue}
       options={selectOptions}
       onChange={onChange}
@@ -203,6 +225,7 @@ export function TagSelect({
       onBlur={() => setIsOpened(false)}
       forcePopupIcon={false}
       displayType={displayType}
+      fluidWidth={fluidWidth}
     />
   );
 }

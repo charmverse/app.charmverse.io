@@ -11,7 +11,8 @@ import { NftAvatarGalleryPopup } from 'components/members/components/MemberProfi
 import { AvatarEditMenu } from 'components/settings/space/components/AvatarEditMenu';
 import { useS3UploadInput } from 'hooks/useS3UploadInput';
 import type { NFTData } from 'lib/blockchain/getNFTs';
-import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
+import type { SupportedChainId } from 'lib/blockchain/provider/alchemy/config';
+import { ResizeType } from 'lib/file/constants';
 import type { UserAvatar } from 'lib/users/interfaces';
 
 import { ProgressOverlay } from './ProgressOverlay';
@@ -94,9 +95,9 @@ export default function LargeAvatar(props: LargeAvatarProps) {
     updateAvatar?.(userAvatar);
   }
 
-  const { inputRef, openFilePicker, onFileChange } = useS3UploadInput({
+  const { inputRef, isUploading, openFilePicker, onFileChange } = useS3UploadInput({
     onFileUpload: updateImageAvatar,
-    resize: true
+    resizeType: ResizeType.Artwork
   });
 
   function onEditClick(event: React.MouseEvent<HTMLElement>) {
@@ -113,7 +114,7 @@ export default function LargeAvatar(props: LargeAvatarProps) {
 
   return (
     <StyledBox>
-      <ProgressOverlay isLoading={isSaving}>
+      <ProgressOverlay isLoading={isSaving || isUploading}>
         <input type='file' hidden accept='image/*' ref={inputRef} onChange={onFileChange} />
         <StyledAvatarWithIcons
           alwaysShow={props.alwaysShowEdit}

@@ -72,7 +72,8 @@ export function useGoogleLogin() {
             showMessage(message, 'success');
           }
         } catch (error: any) {
-          log.debug({ error });
+          log.error('Failed to login with google', { error });
+          showMessage(error.message, 'error');
         }
       }
     };

@@ -7,10 +7,17 @@ import type { ControlFieldProps, FieldProps } from 'components/common/form/inter
 type Props = ControlFieldProps & FieldProps & { multiline?: boolean; rows?: number };
 
 export const TextInputField = forwardRef<HTMLDivElement, Props>(
-  ({ label, iconLabel, inline, error, multiline = false, value, ...inputProps }, ref) => {
+  ({ label, endAdornment, iconLabel, inline, error, description, multiline = false, required, ...inputProps }, ref) => {
     return (
-      <FieldWrapper label={label} inline={inline} iconLabel={iconLabel}>
-        <TextField fullWidth error={!!error} multiline={multiline} {...inputProps} value={value || ''} ref={ref} />
+      <FieldWrapper
+        endAdornment={endAdornment}
+        description={description}
+        required={required}
+        label={label}
+        inline={inline}
+        iconLabel={iconLabel}
+      >
+        <TextField fullWidth required={required} error={!!error} multiline={multiline} {...inputProps} ref={ref} />
       </FieldWrapper>
     );
   }

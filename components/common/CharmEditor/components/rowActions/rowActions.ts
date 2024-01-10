@@ -1,4 +1,3 @@
-import { createElement } from '@bangle.dev/core';
 import type { EditorView, PluginKey } from '@bangle.dev/pm';
 import { Plugin } from '@bangle.dev/pm';
 import { log } from '@charmverse/core/log';
@@ -6,6 +5,8 @@ import throttle from 'lodash/throttle';
 import { NodeSelection } from 'prosemirror-state';
 // @ts-ignore
 import { __serializeForClipboard as serializeForClipboard } from 'prosemirror-view';
+
+import { createElement } from 'components/common/CharmEditor/components/@bangle.dev/core/createElement';
 
 // TODO: Support disclosures somehow. BUt if we use 'disclosureDetails', then you cant drag/drop the toggle. There is no 'container' for the hidden contents
 const containerNodeTypes = ['columnBlock', 'columnLayout', 'bulletList', 'orderedList', 'bullet_list', 'ordered_list'];

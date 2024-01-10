@@ -1,6 +1,3 @@
-import fs from 'node:fs/promises';
-import path from 'node:path';
-
 import { log } from '@charmverse/core/log';
 import type { PageMeta } from '@charmverse/core/pages';
 import type { Page } from '@charmverse/core/prisma';
@@ -13,24 +10,26 @@ import { createPage } from 'lib/pages/server/createPage';
 import { generatePagePathFromPathAndTitle, getPagePath } from 'lib/pages/utils';
 import type { PageContent, TextContent, TextMark } from 'lib/prosemirror/interfaces';
 import type { Reward } from 'lib/rewards/interfaces';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { getSpace } from 'lib/spaces/getSpace';
 import { typedKeys } from 'lib/utilities/objects';
 
-import type { WorkspaceExport, ExportedPage } from './exportWorkspacePages';
+import type { ExportedPage } from './exportWorkspacePages';
+import { getImportData } from './getImportData';
+import type { ImportParams, OldNewIdHashMap } from './interfaces';
 
-type WorkspaceImportOptions = {
-  exportData?: WorkspaceExport;
-  exportName?: string;
-  targetSpaceIdOrDomain: string;
+type WorkspaceImportOptions = ImportParams & {
   // Parent id of root pages, could be another page or null if space is parent
   parentId?: string | null;
+  importingToDifferentSpace?: boolean;
   updateTitle?: boolean;
   includePermissions?: boolean;
   resetPaths?: boolean;
+  oldNewRoleIdHashMap?: Record<string, string>;
+  oldNewCustomProposalPropertyIdHashMap?: Record<string, string>;
+  oldNewCustomRewardPropertyIdHashMap?: Record<string, string>;
 };
-
 type UpdateRefs = {
-  oldNewPageIdHashMap: Record<string, string>;
+  oldNewRecordIdHashMap: Record<string, string>;
   pages: Page[];
 };
 
@@ -48,7 +47,7 @@ function recurse(node: PageContent, cb: (node: PageContent | TextContent) => voi
 /**
  * Mutates the provided content to replace nested page refs
  */
-function updateReferences({ oldNewPageIdHashMap, pages }: UpdateRefs) {
+function updateReferences({ oldNewRecordIdHashMap, pages }: UpdateRefs) {
   const extractedPolls: Map<string, { pageId: string; newPollId: string; originalId: string }> = new Map();
 
   for (const page of pages) {
@@ -63,12 +62,12 @@ function updateReferences({ oldNewPageIdHashMap, pages }: UpdateRefs) {
       } else if (node.type === 'page' || node.type === 'linkedPage') {
         const attrs = node.attrs as { id: string };
         const oldPageId = attrs.id;
-        let newPageId = oldPageId ? oldNewPageIdHashMap[oldPageId] : undefined;
+        let newPageId = oldPageId ? oldNewRecordIdHashMap[oldPageId] : undefined;
 
         if (oldPageId && !newPageId) {
           newPageId = uuid();
-          oldNewPageIdHashMap[oldPageId] = newPageId;
-          oldNewPageIdHashMap[newPageId] = oldPageId;
+          oldNewRecordIdHashMap[oldPageId] = newPageId;
+          oldNewRecordIdHashMap[newPageId] = oldPageId;
         }
         if (oldPageId && newPageId) {
           attrs.id = newPageId;
@@ -76,12 +75,12 @@ function updateReferences({ oldNewPageIdHashMap, pages }: UpdateRefs) {
       } else if (node.type === 'mention' && node.attrs?.type === 'page') {
         const attrs = node.attrs as { value: string };
         const oldPageId = attrs.value;
-        let newPageId = oldPageId ? oldNewPageIdHashMap[oldPageId] : undefined;
+        let newPageId = oldPageId ? oldNewRecordIdHashMap[oldPageId] : undefined;
 
         if (oldPageId && !newPageId) {
           newPageId = uuid();
-          oldNewPageIdHashMap[oldPageId] = newPageId;
-          oldNewPageIdHashMap[newPageId] = oldPageId;
+          oldNewRecordIdHashMap[oldPageId] = newPageId;
+          oldNewRecordIdHashMap[newPageId] = oldPageId;
         }
         if (oldPageId && newPageId) {
           attrs.value = newPageId;
@@ -89,12 +88,12 @@ function updateReferences({ oldNewPageIdHashMap, pages }: UpdateRefs) {
       } else if (node.type === 'inlineDatabase') {
         const attrs = node.attrs as { pageId: string };
         const oldPageId = attrs.pageId;
-        let newPageId = oldPageId ? oldNewPageIdHashMap[oldPageId] : undefined;
+        let newPageId = oldPageId ? oldNewRecordIdHashMap[oldPageId] : undefined;
 
         if (oldPageId && !newPageId) {
           newPageId = uuid();
-          oldNewPageIdHashMap[oldPageId] = newPageId;
-          oldNewPageIdHashMap[newPageId] = oldPageId;
+          oldNewRecordIdHashMap[oldPageId] = newPageId;
+          oldNewRecordIdHashMap[newPageId] = oldPageId;
         }
 
         if (oldPageId && newPageId) {
@@ -122,7 +121,7 @@ type WorkspaceImportResult = {
   rootPageIds: string[];
   bounties: Reward[];
   blockIds: string[];
-};
+} & OldNewIdHashMap;
 
 export async function generateImportWorkspacePages({
   targetSpaceIdOrDomain,
@@ -131,33 +130,37 @@ export async function generateImportWorkspacePages({
   parentId: rootParentId,
   updateTitle,
   includePermissions,
-  resetPaths
-}: WorkspaceImportOptions): Promise<{
-  pageArgs: Prisma.PageCreateArgs[];
-  blockArgs: Prisma.BlockCreateManyArgs;
-  voteArgs: Prisma.VoteCreateManyArgs;
-  voteOptionsArgs: Prisma.VoteOptionsCreateManyArgs;
-  bountyArgs: Prisma.BountyCreateManyArgs;
-  bountyPermissionArgs: Prisma.BountyPermissionCreateManyArgs;
-  proposalArgs: Prisma.ProposalCreateManyArgs;
-  proposalCategoryArgs: Prisma.ProposalCategoryCreateManyArgs;
-  proposalCategoryPermissionArgs: Prisma.ProposalCategoryPermissionCreateManyArgs;
-}> {
+  resetPaths,
+  oldNewRoleIdHashMap,
+  importingToDifferentSpace
+}: WorkspaceImportOptions): Promise<
+  {
+    pageArgs: Prisma.PageCreateArgs[];
+    blockArgs: Prisma.BlockCreateManyArgs;
+    voteArgs: Prisma.VoteCreateManyArgs;
+    voteOptionsArgs: Prisma.VoteOptionsCreateManyArgs;
+    bountyArgs: Prisma.BountyCreateManyArgs;
+    bountyPermissionArgs: Prisma.BountyPermissionCreateManyArgs;
+    proposalArgs: Prisma.ProposalCreateManyArgs;
+  } & OldNewIdHashMap
+> {
   const isUuid = validate(targetSpaceIdOrDomain);
 
   const space = await prisma.space.findUniqueOrThrow({
-    where: isUuid ? { id: targetSpaceIdOrDomain } : { domain: targetSpaceIdOrDomain },
-    include: {
-      proposalCategories: true
-    }
+    where: isUuid ? { id: targetSpaceIdOrDomain } : { domain: targetSpaceIdOrDomain }
   });
-  const resolvedPath = path.resolve(path.join('lib', 'templates', 'exports', `${exportName}.json`));
-  const dataToImport: WorkspaceExport = exportData ?? JSON.parse(await fs.readFile(resolvedPath, 'utf-8'));
 
-  if (!dataToImport) {
-    throw new InvalidInputError('Please provide the source export data, or export path');
-  }
+  const dataToImport = await getImportData({ exportData, exportName });
+
   const pageArgs: Prisma.PageCreateArgs[] = [];
+
+  const sourcePagesMap = (dataToImport.pages ?? []).reduce((acc, page) => {
+    acc[page.id] = page;
+    if (page.bountyId) {
+      acc[page.bountyId] = page;
+    }
+    return acc;
+  }, {} as Record<string, PageMeta>);
 
   const voteArgs: Prisma.VoteCreateManyInput[] = [];
   const voteOptionsArgs: Prisma.VoteOptionsCreateManyInput[] = [];
@@ -165,11 +168,9 @@ export async function generateImportWorkspacePages({
   const bountyArgs: Prisma.BountyCreateManyInput[] = [];
   const bountyPermissionArgs: Prisma.BountyPermissionCreateManyInput[] = [];
   const proposalArgs: Prisma.ProposalCreateManyInput[] = [];
-  const proposalCategoryArgs: Prisma.ProposalCategoryCreateManyInput[] = [];
-  const proposalCategoryPermissionArgs: Prisma.ProposalCategoryPermissionCreateManyInput[] = [];
 
   // 2 way hashmap to find link between new and old page ids
-  const oldNewPageIdHashMap: Record<string, string> = {};
+  const oldNewRecordIdHashMap: Record<string, string> = {};
 
   /**
    * Mutates the pages, updating their ids
@@ -188,13 +189,18 @@ export async function generateImportWorkspacePages({
     rootSpacePermissionId?: string;
     oldNewPermissionMap: Record<string, string>;
   }) {
+    // Don't process duplicate nodes in the export
+    if (oldNewRecordIdHashMap[node.id]) {
+      return;
+    }
+
     const existingNewPageId =
-      node.type === 'page' || isBoardPageType(node.type) ? oldNewPageIdHashMap[node.id] : undefined;
+      node.type === 'page' || isBoardPageType(node.type) ? oldNewRecordIdHashMap[node.id] : undefined;
 
     const newId = rootPageId ?? existingNewPageId ?? uuid();
 
-    oldNewPageIdHashMap[newId] = node.id;
-    oldNewPageIdHashMap[node.id] = newId;
+    oldNewRecordIdHashMap[newId] = node.id;
+    oldNewRecordIdHashMap[node.id] = newId;
     const {
       children,
       createdBy,
@@ -226,21 +232,30 @@ export async function generateImportWorkspacePages({
     rootSpacePermissionId = rootSpacePermissionId ?? newPermissionId;
 
     const pagePermissions = includePermissions
-      ? node.permissions.map(({ sourcePermission, pageId, inheritedFromPermission, ...permission }) => {
-          const newPagePermissionId = uuid();
+      ? node.permissions
+          .map(({ sourcePermission, pageId, inheritedFromPermission, ...permission }) => {
+            const newPagePermissionId = uuid();
 
-          oldNewPermissionMap[permission.id] = newPagePermissionId;
+            oldNewPermissionMap[permission.id] = newPagePermissionId;
 
-          const newSourcePermissionId = inheritedFromPermission
-            ? oldNewPermissionMap[inheritedFromPermission]
-            : undefined;
+            const newSourcePermissionId = inheritedFromPermission
+              ? oldNewPermissionMap[inheritedFromPermission]
+              : undefined;
 
-          return {
-            ...permission,
-            inheritedFromPermission: newSourcePermissionId,
-            id: newPagePermissionId
-          };
-        })
+            return {
+              ...permission,
+              permissionLevel: permission.permissionLevel ?? 'full_access',
+              spaceId: permission.spaceId && importingToDifferentSpace ? space.id : permission.spaceId,
+              roleId:
+                permission.roleId && importingToDifferentSpace
+                  ? oldNewRoleIdHashMap?.[permission.roleId]
+                  : permission.roleId,
+              userId: permission.userId ? (importingToDifferentSpace ? space.createdBy : permission.userId) : undefined,
+              inheritedFromPermission: newSourcePermissionId,
+              id: newPagePermissionId
+            };
+          })
+          .filter((permission) => permission.userId || permission.roleId || permission.spaceId || permission.public)
       : [
           {
             id: newPermissionId,
@@ -376,59 +391,69 @@ export async function generateImportWorkspacePages({
       });
     } else if ((node.type === 'bounty' || node.type === 'bounty_template') && node.bounty) {
       pageArgs.push(newPageContent);
-      const { createdAt, updatedAt, createdBy: bountyCreatedBy, permissions, ...bounty } = node.bounty;
+      const {
+        createdAt,
+        updatedAt,
+        createdBy: bountyCreatedBy,
+        permissions: bountyPermissions,
+        ...bounty
+      } = node.bounty;
       bountyArgs.push({
         ...bounty,
         fields: (bounty.fields as any) || undefined,
         spaceId: space.id,
         createdBy: space.createdBy,
-        id: oldNewPageIdHashMap[node.id]
+        id: oldNewRecordIdHashMap[node.id]
       });
-      permissions.forEach(({ id, ...bountyPermission }) => {
-        bountyPermissionArgs.push({
-          ...bountyPermission,
-          spaceId: bountyPermission.spaceId ? space.id : null,
-          bountyId: oldNewPageIdHashMap[node.id]
-        });
+      bountyPermissions.forEach(({ id, ...sourceBountyPermission }) => {
+        const sourceBounty = sourcePagesMap[sourceBountyPermission.bountyId];
+
+        const permissionToCreate: Prisma.BountyPermissionCreateManyInput = {
+          id: uuid(),
+          userId: undefined,
+          spaceId: undefined,
+          roleId: undefined,
+          bountyId: newId,
+          permissionLevel: sourceBountyPermission.permissionLevel
+        };
+
+        if (sourceBountyPermission.spaceId) {
+          permissionToCreate.spaceId = space.id;
+        } else if (sourceBountyPermission.userId) {
+          if (sourceBounty.spaceId !== space.id) {
+            permissionToCreate.userId = space.createdBy;
+          } else {
+            permissionToCreate.userId = sourceBountyPermission.userId;
+          }
+        } else if (sourceBountyPermission.roleId) {
+          if (sourceBounty.spaceId !== space.id && oldNewRoleIdHashMap?.[sourceBountyPermission.roleId]) {
+            permissionToCreate.roleId = oldNewRoleIdHashMap?.[sourceBountyPermission.roleId];
+          } else {
+            permissionToCreate.roleId = sourceBountyPermission.roleId;
+          }
+        }
+
+        if (permissionToCreate.userId || permissionToCreate.roleId || permissionToCreate.spaceId) {
+          bountyPermissionArgs.push(permissionToCreate);
+        }
       });
     } else if ((node.type === 'proposal' || node.type === 'proposal_template') && node.proposal) {
       // TODO: Handle cross space reviewers and authors
-      const { category, ...proposal } = node.proposal;
-      let categoryId: string | undefined;
-      if (category) {
-        categoryId =
-          space.proposalCategories.find((cat) => cat.title === category.title)?.id ||
-          proposalCategoryArgs.find((proposalCategoryArg) => proposalCategoryArg.title === category.title)?.id;
-        if (!categoryId) {
-          categoryId = uuid();
-          proposalCategoryArgs.push({
-            id: categoryId,
-            title: category.title,
-            color: category.color,
-            spaceId: space.id
-          });
-          proposalCategoryPermissionArgs.push({
-            permissionLevel: 'full_access',
-            proposalCategoryId: categoryId,
-            spaceId: space.id
-          });
-        }
-      }
+      const proposal = node.proposal;
       proposalArgs.push({
         ...proposal,
-        categoryId,
         reviewedBy: undefined,
         spaceId: space.id,
         createdBy: space.createdBy,
         status: 'draft',
-        id: oldNewPageIdHashMap[node.id],
+        id: oldNewRecordIdHashMap[node.id],
         fields: proposal.fields || {}
       });
       pageArgs.push(newPageContent);
     }
 
     const { extractedPolls } = updateReferences({
-      oldNewPageIdHashMap,
+      oldNewRecordIdHashMap,
       pages: [node]
     });
 
@@ -440,8 +465,9 @@ export async function generateImportWorkspacePages({
           const { voteOptions, ...vote } = pageVote;
           voteArgs.push({
             ...vote,
+            spaceId: space.id,
             createdBy: space.createdBy,
-            pageId: oldNewPageIdHashMap[pageVote.pageId],
+            pageId: oldNewRecordIdHashMap[pageVote.pageId],
             id: extractedPoll.newPollId as string,
             content: vote.content ?? Prisma.DbNull,
             contentText: vote.contentText
@@ -458,7 +484,7 @@ export async function generateImportWorkspacePages({
     }
   }
 
-  dataToImport.pages.forEach((page) => {
+  dataToImport.pages?.forEach((page) => {
     recursivePagePrep({ node: page, newParentId: null, oldNewPermissionMap: {} });
   });
 
@@ -482,12 +508,7 @@ export async function generateImportWorkspacePages({
     proposalArgs: {
       data: proposalArgs
     },
-    proposalCategoryArgs: {
-      data: proposalCategoryArgs
-    },
-    proposalCategoryPermissionArgs: {
-      data: proposalCategoryPermissionArgs
-    }
+    oldNewRecordIdHashMap
   };
 }
 
@@ -498,8 +519,12 @@ export async function importWorkspacePages({
   parentId,
   updateTitle,
   includePermissions,
-  resetPaths
+  resetPaths,
+  oldNewRoleIdHashMap,
+  importingToDifferentSpace
 }: WorkspaceImportOptions): Promise<Omit<WorkspaceImportResult, 'bounties'>> {
+  const _target = await getSpace(targetSpaceIdOrDomain);
+
   const {
     pageArgs,
     blockArgs,
@@ -507,17 +532,18 @@ export async function importWorkspacePages({
     voteArgs,
     voteOptionsArgs,
     proposalArgs,
-    proposalCategoryArgs,
-    proposalCategoryPermissionArgs,
-    bountyPermissionArgs
+    bountyPermissionArgs,
+    oldNewRecordIdHashMap
   } = await generateImportWorkspacePages({
-    targetSpaceIdOrDomain,
+    targetSpaceIdOrDomain: _target.id,
     exportData,
     exportName,
     parentId,
     updateTitle,
     includePermissions,
-    resetPaths
+    resetPaths,
+    oldNewRoleIdHashMap,
+    importingToDifferentSpace
   });
 
   const pagesToCreate = pageArgs.length;
@@ -529,8 +555,6 @@ export async function importWorkspacePages({
     prisma.block.createMany(blockArgs),
     prisma.bounty.createMany(bountyArgs),
     prisma.bountyPermission.createMany(bountyPermissionArgs),
-    prisma.proposalCategory.createMany(proposalCategoryArgs),
-    prisma.proposalCategoryPermission.createMany(proposalCategoryPermissionArgs),
     prisma.proposal.createMany(proposalArgs),
     ...pageArgs.map((p) => {
       totalCreatedPages += 1;
@@ -553,6 +577,7 @@ export async function importWorkspacePages({
     totalPages: createdPages.length,
     pages: createdPages,
     totalBlocks: blockIds.length,
-    rootPageIds: createdPages.filter((page) => page.parentId === parentId).map((p) => p.id)
+    rootPageIds: createdPages.filter((page) => page.parentId === parentId).map((p) => p.id),
+    oldNewRecordIdHashMap
   };
 }

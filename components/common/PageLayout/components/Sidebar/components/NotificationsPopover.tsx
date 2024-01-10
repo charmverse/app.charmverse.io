@@ -1,12 +1,12 @@
-import type { MemberProperty, MemberPropertyType } from '@charmverse/core/prisma-client';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
+import PersonIcon from '@mui/icons-material/Person';
 import QueryBuilderOutlinedIcon from '@mui/icons-material/QueryBuilderOutlined';
-import { Divider, Typography, Badge, Stack, Tooltip, Popover, Card, IconButton } from '@mui/material';
+import { Badge, Card, Divider, IconButton, Popover, Stack, Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { Fragment, useMemo, useState } from 'react';
@@ -25,8 +25,10 @@ import MultiTabs from 'components/common/MultiTabs';
 import { useNotifications } from 'components/nexus/hooks/useNotifications';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useSmallScreen } from 'hooks/useMediaScreens';
-import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
+import { useUser } from 'hooks/useUser';
+import type { Member } from 'lib/members/interfaces';
 import { getNotificationMetadata } from 'lib/notifications/getNotificationMetadata';
 import type { Notification } from 'lib/notifications/interfaces';
 import type { MarkNotifications } from 'lib/notifications/markNotifications';
@@ -60,7 +62,7 @@ export const NotificationCountBox = styled(Box)`
   color: white;
 `;
 
-export function NotificationUpdates() {
+export function NotificationUpdates({ closeSidebar }: { closeSidebar?: VoidFunction }) {
   const notificationPopupState = usePopupState({ variant: 'popover', popupId: 'notifications-menu' });
   const {
     currentSpaceNotifications,
@@ -68,6 +70,11 @@ export function NotificationUpdates() {
     isLoading,
     mutate: mutateNotifications
   } = useNotifications();
+
+  function close() {
+    notificationPopupState.close();
+    closeSidebar?.();
+  }
 
   return (
     <Box>
@@ -100,7 +107,7 @@ export function NotificationUpdates() {
           notifications={currentSpaceNotifications}
           mutateNotifications={mutateNotifications}
           isLoading={isLoading}
-          close={notificationPopupState.close}
+          close={close}
         />
       </Popover>
     </Box>
@@ -118,7 +125,10 @@ export function NotificationsPopover({
   mutateNotifications: KeyedMutator<Notification[]>;
   isLoading: boolean;
 }) {
-  const { getDisplayProperties } = useMemberProperties();
+  const { user } = useUser();
+
+  const { membersRecord } = useMembers();
+  const currentMember = user?.id ? membersRecord[user.id] : undefined;
   const theme = useTheme();
   const [inboxState, setInboxState] = useState<'unread' | 'unarchived'>('unarchived');
   const [activeTab, setActiveState] = useState<'Inbox' | 'Archived'>('Inbox');
@@ -154,8 +164,6 @@ export function NotificationsPopover({
         readUnArchivedNotifications: _readUnArchivedNotifications
       };
     }, [notifications]);
-
-  const { membersRecord } = useMembers();
 
   const markNotifications = async (payload: MarkNotifications) => {
     await charmClient.notifications.markNotifications(payload);
@@ -292,6 +300,7 @@ export function NotificationsPopover({
                           <NotificationContent
                             notification={notification}
                             markNotifications={markNotifications}
+                            user={currentMember}
                             onClose={close}
                             actorUsername={notificationMember?.username ?? notification.createdBy.username}
                           />
@@ -323,6 +332,7 @@ export function NotificationsPopover({
                           <NotificationContent
                             notification={notification}
                             markNotifications={markNotifications}
+                            user={currentMember}
                             onClose={close}
                             actorUsername={notificationMember?.username ?? notification.createdBy.username}
                           />
@@ -377,6 +387,7 @@ export function NotificationsPopover({
                     return (
                       <Fragment key={notification.id}>
                         <NotificationContent
+                          user={currentMember}
                           actorUsername={notificationMember?.username ?? notification.createdBy.username}
                           notification={notification}
                           markNotifications={markNotifications}
@@ -415,17 +426,24 @@ export function NotificationContent({
   notification,
   markNotifications,
   onClose,
-  actorUsername
+  actorUsername,
+  user
 }: {
   actorUsername: string;
   notification: Notification;
   markNotifications: (payload: MarkNotifications) => Promise<void>;
   onClose: VoidFunction;
+  user?: Member;
 }) {
+  const { features } = useSpaceFeatures();
   const read = notification.read;
   const archived = notification.archived;
   const { spaceName, createdBy, id, createdAt, spaceDomain } = notification;
-  const { href, content, pageTitle } = getNotificationMetadata(notification, actorUsername);
+  const { href, content, pageTitle } = getNotificationMetadata({
+    notification,
+    actorUsername,
+    spaceFeatures: features
+  });
   const notificationContent = notification.group === 'document' ? notification.content : null;
   const { formatDate, formatTime } = useDateFormatter();
   const date = new Date(createdAt);
@@ -557,6 +575,34 @@ export function NotificationContent({
                 }}
               />
             )}
+            {notification.type === 'person_assigned' && notification.personProperty ? (
+              <Stack my={1} gap={0.5}>
+                <Stack flexDirection='row' gap={0.5} alignItems='center'>
+                  <PersonIcon fontSize='small' />
+                  <Typography
+                    whiteSpace='nowrap'
+                    overflow='hidden'
+                    textOverflow='ellipsis'
+                    variant='subtitle2'
+                    fontSize={12}
+                  >
+                    {notification.personProperty.name}
+                  </Typography>
+                </Stack>
+                <Stack flexDirection='row' gap={1}>
+                  <Avatar size='xSmall' name={user?.username} avatar={user?.avatar} />
+                  <Typography
+                    whiteSpace='nowrap'
+                    overflow='hidden'
+                    textOverflow='ellipsis'
+                    variant='caption'
+                    fontSize={12}
+                  >
+                    {user?.username}
+                  </Typography>
+                </Stack>
+              </Stack>
+            ) : null}
             {archived && (
               <Button
                 sx={{

@@ -15,7 +15,7 @@ import { FormError } from 'components/common/form/FormError.class';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import type { SupportedChainId } from 'lib/blockchain/provider/alchemy';
+import type { SupportedChainId } from 'lib/blockchain/provider/alchemy/config';
 import type { ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import type { ISystemError } from 'lib/utilities/errors';
@@ -32,10 +32,10 @@ export const schema = yup.object({
   contractAddress: yup.string().test('verifyContractFormat', 'Invalid contract address', (value) => {
     return !value || isValidChainAddress(value);
   }),
-  tokenSymbol: yup.string().nullable(true),
-  tokenName: yup.string().nullable(true),
-  tokenLogo: yup.string().nullable(true),
-  tokenDecimals: yup.number().nullable(true)
+  tokenSymbol: yup.string().nullable(),
+  tokenName: yup.string().nullable(),
+  tokenLogo: yup.string().nullable(),
+  tokenDecimals: yup.number().nullable()
 });
 
 type FormValues = yup.InferType<typeof schema>;
@@ -62,7 +62,7 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
     resolver: yupResolver(schema)
   });
 
-  const [, , refreshPaymentMethods] = usePaymentMethods();
+  const [, refreshPaymentMethods] = usePaymentMethods();
   const { space } = useCurrentSpace();
 
   const [allowManualInput, setAllowManualInput] = useState(false);
@@ -148,7 +148,7 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
       {/* @ts-ignore */}
       <form
         onSubmit={(event) => {
-          // stop propagation so it doesnt submit parent forms, like bounty editor
+          // stop propagation so it doesnt submit parent forms, like reward editor
           event.stopPropagation();
           event.preventDefault();
           handleSubmit(addPaymentMethod as any)(event);

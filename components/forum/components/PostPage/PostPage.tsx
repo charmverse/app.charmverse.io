@@ -1,26 +1,31 @@
 import type { Post, PostCategory } from '@charmverse/core/prisma';
 import CommentIcon from '@mui/icons-material/Comment';
-import { Box, Divider, Stack, Typography } from '@mui/material';
-import { useRouter } from 'next/router';
+import { Box, Chip, Divider, Stack, Typography } from '@mui/material';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
 import { ProposalBanner } from 'components/[pageId]/DocumentPage/components/ProposalBanner';
-import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
+import { handleImageFileDrop } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
+import { focusEventName } from 'components/common/CharmEditor/constants';
+import { Comment } from 'components/common/comments/Comment';
 import type { CommentSortType } from 'components/common/comments/CommentSort';
 import { CommentSort } from 'components/common/comments/CommentSort';
-import { processComments, sortComments } from 'components/common/comments/utils';
+import type { CreateCommentPayload, UpdateCommentPayload } from 'components/common/comments/interfaces';
+import { getUpdatedCommentVote, processComments, sortComments } from 'components/common/comments/utils';
 import ErrorPage from 'components/common/errors/ErrorPage';
+import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import UserDisplay from 'components/common/UserDisplay';
 import { PostCommentForm } from 'components/forum/components/PostPage/components/PostCommentForm';
 import { usePostCategoryPermissions } from 'components/forum/hooks/usePostCategoryPermissions';
 import { useCharmEditor } from 'hooks/useCharmEditor';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useMembers } from 'hooks/useMembers';
@@ -39,12 +44,12 @@ import { usePostDialog } from '../PostDialog/hooks/usePostDialog';
 
 import { CategoryPosts } from './components/CategoryPosts';
 import { PostCategoryInput } from './components/PostCategoryInput';
-import { PostComment } from './components/PostComment';
 import { DraftPostBanner } from './DraftPostBanner';
 
 type Props = {
   spaceId: string;
   post: Post | null;
+  isInsideDialog?: boolean;
   setFormInputs: (params: Partial<FormInputs>) => void;
   formInputs: FormInputs;
   contentUpdated: boolean;
@@ -56,6 +61,7 @@ type Props = {
 
 export function PostPage({
   onTitleChange,
+  isInsideDialog,
   post,
   spaceId,
   setFormInputs,
@@ -93,7 +99,7 @@ export function PostPage({
   const { permissions: categoryPermissions } = usePostCategoryPermissions(categoryId as string);
 
   const { getMemberById } = useMembers();
-  const router = useRouter();
+  const { navigateToSpacePath, router } = useCharmRouter();
   const {
     data: postComments = [],
     mutate: setPostComments,
@@ -108,7 +114,9 @@ export function PostPage({
   const [commentSort, setCommentSort] = useState<CommentSortType>('latest');
 
   const isLoading = !postComments && isValidating;
+  const isPublishedPost = post && !post.isDraft;
 
+  const postCategory = getForumCategoryById(categoryId);
   const createdBy = getMemberById(post?.createdBy);
 
   function updateTitle(updates: { title: string; updatedAt: any }) {
@@ -160,7 +168,7 @@ export function PostPage({
           throw err;
         });
       if (!isDraft) {
-        router.push(`/${router.query.domain}/forum/post/${newPost.path}`);
+        navigateToSpacePath(`/forum/post/${newPost.path}`);
       } else {
         showPost({
           postId: newPost.id,
@@ -185,7 +193,7 @@ export function PostPage({
         isDraft: false
       });
       setIsPublishingDraftPost(false);
-      router.push(`/${router.query.domain}/forum/post/${draftPost.path}`);
+      navigateToSpacePath(`/[domain]/forum/post/${draftPost.path}`);
     }
   }
 
@@ -226,11 +234,81 @@ export function PostPage({
 
   const canEdit = !!permissions?.edit_post;
 
+  async function updateComment({ id, content, contentText }: UpdateCommentPayload) {
+    const comment = postComments.find((_comment) => _comment.id === id);
+    if (comment) {
+      const updatedComment = await charmClient.forum.updatePostComment({
+        commentId: id,
+        content,
+        contentText,
+        postId: comment.postId
+      });
+
+      setPostComments((comments) =>
+        comments?.map((_comment) => (_comment.id === comment.id ? { ..._comment, ...updatedComment } : _comment))
+      );
+    }
+  }
+
+  async function voteComment({ upvoted, commentId }: { upvoted: boolean | null; commentId: string }) {
+    const comment = postComments.find((_comment) => _comment.id === commentId);
+    if (comment) {
+      await charmClient.forum.upOrDownVoteComment({
+        postId: comment.postId,
+        commentId,
+        upvoted
+      });
+
+      const postCommentVote = getUpdatedCommentVote(comment, upvoted);
+
+      setPostComments((comments) =>
+        comments?.map((_comment) =>
+          _comment.id === comment.id
+            ? {
+                ...comment,
+                ...postCommentVote
+              }
+            : _comment
+        )
+      );
+    }
+  }
+
+  async function addComment({ content, contentText, parentId }: CreateCommentPayload) {
+    const parentComment = postComments.find((_comment) => _comment.id === parentId);
+    if (parentComment) {
+      const postComment = await charmClient.forum.createPostComment(parentComment.postId, {
+        content,
+        contentText,
+        parentId
+      });
+      setPostComments((comments) => (comments ? [postComment, ...comments] : []));
+    }
+  }
+
+  async function deleteComment(commentId: string) {
+    const parentComment = postComments.find((_comment) => _comment.id === commentId);
+    if (parentComment) {
+      await charmClient.forum.deletePostComment({ commentId, postId: parentComment.postId });
+      setPostComments((comments) =>
+        comments?.map((_comment) =>
+          _comment.id === parentComment.id ? { ..._comment, deletedAt: new Date() } : _comment
+        )
+      );
+    }
+  }
+
+  function focusDocumentEditor() {
+    const focusEvent = new CustomEvent(focusEventName);
+    // TODO: use a ref passed down instead
+    document.querySelector(`.bangle-editor-core[data-post-id="${post?.id}"]`)?.dispatchEvent(focusEvent);
+  }
+
   useEffect(() => {
     const commentId = router.query.commentId;
     if (commentId && typeof window !== 'undefined' && !isValidating && postComments.length) {
       setTimeout(() => {
-        const commentDomElement = window.document.getElementById(`post-comment-${commentId}`);
+        const commentDomElement = window.document.getElementById(`comment-${commentId}`);
         if (commentDomElement) {
           requestAnimationFrame(() => {
             commentDomElement.scrollIntoView({
@@ -259,23 +337,47 @@ export function PostPage({
         style={{
           overflowY: 'auto'
         }}
+        id={`post-charmeditor-${post?.id}`}
       >
-        <Stack flexDirection='row'>
-          <Container top={50}>
+        <Stack
+          flexDirection='row'
+          onDrop={handleImageFileDrop({
+            parentElementId: `post-charmeditor-${post?.id}`,
+            readOnly: !canEdit,
+            postId: post?.id
+          })}
+        >
+          <PageEditorContainer top={50}>
             <Box minHeight={300} data-test='post-charmeditor'>
-              <PageTitleInput readOnly={!canEdit} value={formInputs.title} onChange={updateTitle} />
+              {isPublishedPost && isInsideDialog && (
+                <Chip
+                  label={postCategory?.name}
+                  sx={{
+                    cursor: 'pointer',
+                    opacity: postCategory ? 1 : 0
+                  }}
+                  size='small'
+                  component={Link}
+                  href={`/forum/${postCategory?.path}`}
+                />
+              )}
+              <PageTitleInput
+                readOnly={!canEdit}
+                value={formInputs.title}
+                onChange={updateTitle}
+                focusDocumentEditor={focusDocumentEditor}
+              />
               {createdBy && (
-                <UserDisplay showMiniProfile user={createdBy} avatarSize='small' fontSize='medium' mt={2} mb={3} />
+                <UserDisplay showMiniProfile userId={createdBy.id} avatarSize='small' fontSize='medium' mt={2} mb={3} />
               )}
               <Box my={2}>
-                <PostCategoryInput readOnly={!canEdit} setCategoryId={updateCategoryId} categoryId={categoryId} />
+                {canEdit && <PostCategoryInput setCategoryId={updateCategoryId} categoryId={categoryId} />}
               </Box>
               <CharmEditor
                 allowClickingFooter={true}
                 pageType='post'
                 autoFocus={false}
                 readOnly={!canEdit}
-                PageSidebar={null}
                 postId={post?.id}
                 disablePageSpecificFeatures
                 enableVoting={true}
@@ -357,12 +459,15 @@ export function PostPage({
                         <Stack gap={1}>
                           <CommentSort commentSort={commentSort} setCommentSort={setCommentSort} />
                           {topLevelComments.map((comment) => (
-                            <PostComment
-                              post={post}
+                            <Comment
                               permissions={permissions}
-                              setPostComments={setPostComments}
                               comment={comment}
                               key={comment.id}
+                              handleCreateComment={addComment}
+                              handleUpdateComment={updateComment}
+                              handleDeleteComment={deleteComment}
+                              handleVoteComment={voteComment}
+                              deletingDisabled={!!post?.proposalId}
                             />
                           ))}
                         </Stack>
@@ -383,7 +488,7 @@ export function PostPage({
                 )}
               </>
             )}
-          </Container>
+          </PageEditorContainer>
           {post && showOtherCategoryPosts && (
             <Box
               width='25%'

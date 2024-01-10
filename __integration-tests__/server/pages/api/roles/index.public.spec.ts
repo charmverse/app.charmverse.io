@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Role, Space, User } from '@charmverse/core/prisma-client';
+import type { Role, Space, User } from '@charmverse/core/prisma';
 import { testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 import { v4 as uuid } from 'uuid';

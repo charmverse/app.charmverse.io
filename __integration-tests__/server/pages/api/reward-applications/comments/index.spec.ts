@@ -58,7 +58,7 @@ describe('POST /api/reward-applications/comments - create comment on an applicat
       .expect(201);
   });
 
-  it('should not allow a user who is neither a reward reviewer nor the creator to create a comment and respond with 401', async () => {
+  it('should  allow a user who is neither a reward reviewer nor the creator to create a comment', async () => {
     const otherUser = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
     const otherUserCookie = await loginUser(otherUser.id);
 
@@ -71,7 +71,7 @@ describe('POST /api/reward-applications/comments - create comment on an applicat
       .post(`/api/reward-applications/comments`)
       .set('Cookie', otherUserCookie)
       .send(commentContent)
-      .expect(401);
+      .expect(201);
   });
 });
 

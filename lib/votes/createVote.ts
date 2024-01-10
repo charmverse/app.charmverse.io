@@ -10,25 +10,30 @@ import type { ExtendedVote, VoteDTO } from './interfaces';
 import { DEFAULT_THRESHOLD, VOTE_STATUS } from './interfaces';
 
 export async function createVote(vote: VoteDTO & { spaceId: string }): Promise<ExtendedVote> {
-  const { spaceId, createdBy, pageId, postId, title, content, contentText, deadline, type, voteOptions, context } =
-    vote;
+  const {
+    spaceId,
+    createdBy,
+    evaluationId,
+    pageId,
+    postId,
+    title,
+    content,
+    contentText,
+    deadline,
+    type,
+    voteOptions,
+    context
+  } = vote;
 
-  if (pageId) {
-    const page = await prisma.page.findUnique({
+  if (pageId && evaluationId) {
+    const evaluation = await prisma.proposalEvaluation.findUniqueOrThrow({
       where: {
-        id: pageId
-      },
-      select: {
-        votes: true
+        id: evaluationId
       }
     });
 
-    if (!page) {
-      throw new PageNotFoundError(pageId);
-    }
-
-    if (context === 'proposal' && page.votes.some((v) => v.context === 'proposal')) {
-      throw new DuplicateDataError('A proposal vote has already been created for this page.');
+    if (evaluation.voteId) {
+      throw new DuplicateDataError('A vote already exists for this evaluation');
     }
   } else if (postId) {
     const post = await prisma.post.count({ where: { id: postId } });
@@ -55,6 +60,7 @@ export async function createVote(vote: VoteDTO & { spaceId: string }): Promise<E
       type: voteType,
       maxChoices,
       context,
+      evaluation: evaluationId ? { connect: { id: evaluationId } } : undefined,
       page: pageId
         ? {
             connect: {

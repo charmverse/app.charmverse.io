@@ -1,17 +1,19 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import type { ReactNode } from 'react';
-import { createContext, useContext, useMemo } from 'react';
+import { createContext, useContext } from 'react';
 
-import type { BoardProposal } from 'components/proposals/components/ProposalProperties/hooks/useProposalsBoardAdapter';
-import { useProposalsBoardAdapter } from 'components/proposals/components/ProposalProperties/hooks/useProposalsBoardAdapter';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
+import type { ProposalPropertyValue } from 'lib/proposal/blocks/interfaces';
+
+import { useProposalsBoardAdapter } from '../ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter';
+import type { BoardProposal } from '../ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter';
 
 type ProposalsBoardContextType = {
   board: Board;
   boardCustomProperties: Board;
-  card: Card;
+  card: Card<ProposalPropertyValue>;
   cards: Card[];
   cardPages: CardPage[];
   activeView: BoardView;
@@ -35,47 +37,9 @@ export const ProposalsBoardContext = createContext<Readonly<ProposalsBoardContex
 });
 
 export function ProposalsBoardProvider({ children }: { children: ReactNode }) {
-  const {
-    board,
-    boardCustomProperties,
-    card,
-    cards,
-    activeView,
-    views,
-    proposalPage,
-    setBoardProposal,
-    boardProposal,
-    cardPages
-  } = useProposalsBoardAdapter();
+  const boardContext = useProposalsBoardAdapter();
 
-  const value = useMemo(
-    () => ({
-      board,
-      boardCustomProperties,
-      card,
-      cards,
-      activeView,
-      views,
-      proposalPage,
-      setBoardProposal,
-      boardProposal,
-      cardPages
-    }),
-    [
-      board,
-      boardCustomProperties,
-      card,
-      cards,
-      activeView,
-      views,
-      proposalPage,
-      setBoardProposal,
-      boardProposal,
-      cardPages
-    ]
-  );
-
-  return <ProposalsBoardContext.Provider value={value}>{children}</ProposalsBoardContext.Provider>;
+  return <ProposalsBoardContext.Provider value={boardContext}>{children}</ProposalsBoardContext.Provider>;
 }
 
 export const useProposalsBoard = () => useContext(ProposalsBoardContext);

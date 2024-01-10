@@ -11,6 +11,8 @@ import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
+import { Constants } from 'lib/focalboard/constants';
+import { isTruthy } from 'lib/utilities/types';
 
 import type { BlockChange } from '../../mutator';
 import mutator from '../../mutator';
@@ -65,10 +67,12 @@ type Props = {
   intl: IntlShape;
   readOnly: boolean;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
-  addCard: (groupByOptionId?: string, show?: boolean, props?: any, insertLast?: boolean) => Promise<void>;
+  addCard: (groupByOptionId?: string, show?: boolean, props?: any, insertLast?: boolean) => Promise<void> | void;
   showCard: (cardId: string | null) => void;
   disableAddingCards?: boolean;
   readOnlyTitle?: boolean;
+  disableDnd?: boolean;
+  hideLinkedBounty?: boolean;
 };
 
 function Kanban(props: Props) {
@@ -78,7 +82,8 @@ function Kanban(props: Props) {
   Utils.log(`${propertyValues.length} propertyValues`);
   const visiblePropertyTemplates = activeView.fields.visiblePropertyIds
     .map((id) => board.fields.cardProperties.find((t) => t.id === id))
-    .filter((i) => i) as IPropertyTemplate[];
+    .filter((i) => isTruthy(i) && i.id !== Constants.titleColumnId) as IPropertyTemplate[];
+
   const isManualSort = activeView.fields.sortOptions.length === 0;
 
   const propertyNameChanged = useCallback(
@@ -299,6 +304,7 @@ function Kanban(props: Props) {
             onCalculationMenuClose={() => toggleOptions(group.option.id)}
             anchorEl={anchorEl}
             readOnlyTitle={props.readOnlyTitle}
+            disableAddingCards={props.disableAddingCards}
           />
         ))}
 
@@ -343,7 +349,7 @@ function Kanban(props: Props) {
               visiblePropertyTemplates={visiblePropertyTemplates}
               key={group.option.id || 'empty'}
               readOnly={props.readOnly}
-              onDropToCard={onDropToCard}
+              onDropToCard={props.disableDnd ? undefined : onDropToCard}
               isManualSort={isManualSort}
               selectedCardIds={props.selectedCardIds}
               addCard={props.addCard}
@@ -351,6 +357,7 @@ function Kanban(props: Props) {
               onCardClicked={props.onCardClicked}
               showCard={props.showCard}
               disableAddingCards={props.disableAddingCards}
+              hideLinkedBounty={props.hideLinkedBounty}
             />
           ))}
 

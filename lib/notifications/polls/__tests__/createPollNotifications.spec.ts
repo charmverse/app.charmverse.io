@@ -1,17 +1,16 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsUser } from '@charmverse/core/test';
 
 import { createForumPost } from 'lib/forums/posts/createForumPost';
-import { premiumPermissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { assignRole } from 'lib/roles';
-import { createVote } from 'lib/votes';
+import { createVote } from 'lib/votes/createVote';
 import { getSpaceEntity, getVoteEntity } from 'lib/webhookPublisher/entities';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { createPage, generateUserAndSpace } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
 import { createRole } from 'testing/utils/roles';
-import { addUserToSpace } from 'testing/utils/spaces';
-import { generateUser } from 'testing/utils/users';
 
 import { createNotificationsFromEvent } from '../../createNotificationsFromEvent';
 import { createPollNotifications } from '../createPollNotifications';
@@ -19,17 +18,12 @@ import { createPollNotifications } from '../createPollNotifications';
 describe(`Test vote events and notifications`, () => {
   it(`Should create vote notifications for vote.created event in a page`, async () => {
     const { space, user } = await generateUserAndSpace();
-    const user2 = await generateUser();
-    await addUserToSpace({
-      spaceId: space.id,
-      userId: user2.id
+    const user2 = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id
     });
-
     // Doesn't have access to post category
-    const user3 = await generateUser();
-    await addUserToSpace({
-      spaceId: space.id,
-      userId: user3.id
+    const user3 = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id
     });
 
     const page = await createPage({
@@ -68,7 +62,18 @@ describe(`Test vote events and notifications`, () => {
       createdAt: new Date().toISOString()
     });
 
-    const newPageVoteNotification = await prisma.voteNotification.findFirst({
+    const newPageVoteUserNotification = await prisma.voteNotification.findFirst({
+      where: {
+        type: 'new_vote',
+        voteId: pageVote.id,
+        notificationMetadata: {
+          spaceId: space.id,
+          userId: user.id
+        }
+      }
+    });
+
+    const newPageVoteUser3Notification = await prisma.voteNotification.findFirst({
       where: {
         type: 'new_vote',
         voteId: pageVote.id,
@@ -90,23 +95,20 @@ describe(`Test vote events and notifications`, () => {
       }
     });
 
-    expect(newPageVoteNotification).toBeTruthy();
+    expect(newPageVoteUserNotification).toBeFalsy();
+    expect(newPageVoteUser3Notification).toBeTruthy();
     expect(newPageUser2VoteNotification).toBeFalsy();
   });
 
   it(`Should create vote notifications for vote.created event in a post`, async () => {
     const { space, user } = await generateUserAndSpace();
-    const user2 = await generateUser();
-    await addUserToSpace({
-      spaceId: space.id,
-      userId: user2.id
+    const user2 = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id
     });
 
     // Doesn't have access to post category
-    const user3 = await generateUser();
-    await addUserToSpace({
-      spaceId: space.id,
-      userId: user3.id
+    const user3 = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id
     });
 
     const postCategory = await generatePostCategory({ spaceId: space.id });
@@ -125,7 +127,7 @@ describe(`Test vote events and notifications`, () => {
       name: 'Post Moderator'
     });
 
-    await premiumPermissionsApiClient.forum.upsertPostCategoryPermission({
+    await permissionsApiClient.forum.upsertPostCategoryPermission({
       permissionLevel: 'full_access',
       postCategoryId: postCategory.id,
       assignee: {
@@ -201,10 +203,8 @@ describe(`Test vote events and notifications`, () => {
         polls: false
       }
     });
-    const user2 = await generateUser();
-    await addUserToSpace({
-      spaceId: space.id,
-      userId: user2.id
+    const user2 = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id
     });
 
     const page = await createPage({

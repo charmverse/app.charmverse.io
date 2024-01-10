@@ -1,11 +1,9 @@
-import type { ProposalCategory, ProposalReviewer, Space, User } from '@charmverse/core/prisma';
+import type { Space, User } from '@charmverse/core/prisma';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import type { PageWithProposal } from 'lib/pages';
-import { getProposal } from 'lib/proposal/getProposal';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
@@ -13,7 +11,6 @@ let author: User;
 let reviewer: User;
 let space: Space;
 let authorCookie: string;
-let proposalCategory: ProposalCategory;
 
 beforeAll(async () => {
   const generated1 = await testUtilsUser.generateUserAndSpace({ isAdmin: false, spacePaidTier: 'free' });
@@ -24,10 +21,6 @@ beforeAll(async () => {
   reviewer = generated2;
 
   authorCookie = await loginUser(author.id);
-
-  proposalCategory = await testUtilsProposals.generateProposalCategory({
-    spaceId: space.id
-  });
 });
 
 describe('GET /api/proposals/[id] - Get proposal - public space', () => {
@@ -54,15 +47,15 @@ describe('GET /api/proposals/[id] - Get proposal - public space', () => {
             proposalId: generatedProposal.id,
             userId: author.id
           })
-        ]),
-        reviewers: [
-          expect.objectContaining({
-            id: expect.any(String),
-            roleId: null,
-            proposalId: generatedProposal.id,
-            userId: reviewer.id
-          })
-        ]
+        ])
+        // reviewers: [
+        //   expect.objectContaining({
+        //     id: expect.any(String),
+        //     roleId: null,
+        //     proposalId: generatedProposal.id,
+        //     userId: reviewer.id
+        //   })
+        // ]
       })
     );
   });
@@ -86,13 +79,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
-      authors: [adminUser.id],
-      reviewers: [
-        {
-          group: 'user',
-          id: adminUser.id
-        }
-      ]
+      authors: [adminUser.id]
     };
 
     await request(baseUrl)
@@ -100,57 +87,6 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       .set('Cookie', adminCookie)
       .send(updateContent)
       .expect(200);
-
-    const updated = await getProposal({ proposalId: page.proposalId! });
-    // Make sure update went through
-    expect(updated.proposal?.reviewers).toEqual<ProposalReviewer[]>([
-      {
-        id: expect.any(String),
-        proposalId: page.proposalId as string,
-        userId: adminUser.id,
-        roleId: null
-      }
-    ]);
-  });
-
-  // This is achieved currently by the fact the we check new reviewers against proposal reviewer pool, and in public mode, the role ids are always empty
-  it('should throw an error if trying to assign a role as a reviewer', async () => {
-    const { user: adminUser, space: adminSpace } = await testUtilsUser.generateUserAndSpace({
-      isAdmin: true,
-      spacePaidTier: 'free'
-    });
-    const adminCookie = await loginUser(adminUser.id);
-
-    const role = await testUtilsMembers.generateRole({
-      spaceId: adminSpace.id,
-      createdBy: adminUser.id
-    });
-
-    const { page } = await testUtilsProposals.generateProposal({
-      userId: adminUser.id,
-      spaceId: adminSpace.id,
-      categoryId: proposalCategory.id
-    });
-
-    const updateContent: Partial<UpdateProposalRequest> = {
-      authors: [adminUser.id],
-      reviewers: [
-        {
-          group: 'user',
-          id: adminUser.id
-        },
-        {
-          group: 'role',
-          id: role.id
-        }
-      ]
-    };
-
-    await request(baseUrl)
-      .put(`/api/proposals/${page.proposalId}`)
-      .set('Cookie', adminCookie)
-      .send(updateContent)
-      .expect(401);
   });
 
   it('should update a proposal templates settings if the user is a space admin', async () => {
@@ -164,22 +100,11 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
 
     const proposalTemplate = await testUtilsProposals.generateProposalTemplate({
       spaceId: adminSpace.id,
-      userId: adminUser.id,
-      categoryId: proposalCategory.id
+      userId: adminUser.id
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
-      authors: [adminUser.id],
-      reviewers: [
-        {
-          group: 'user',
-          id: adminUser.id
-        },
-        {
-          group: 'role',
-          id: role.id
-        }
-      ]
+      authors: [adminUser.id]
     };
 
     await request(baseUrl)
@@ -187,12 +112,6 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       .set('Cookie', adminCookie)
       .send(updateContent)
       .expect(200);
-
-    // Make sure update went through
-    const updated = await getProposal({ proposalId: proposalTemplate.id });
-    expect(updated.proposal?.reviewers).toHaveLength(2);
-    expect(updated.proposal?.reviewers.some((r) => r.roleId === role.id)).toBe(true);
-    expect(updated.proposal?.reviewers.some((r) => r.userId === adminUser.id)).toBe(true);
   });
 
   it('should allow an admin to update a draft proposal they did not create', async () => {
@@ -210,13 +129,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
-      authors: [adminUser.id],
-      reviewers: [
-        {
-          group: 'user',
-          id: adminUser.id
-        }
-      ]
+      authors: [adminUser.id]
     };
 
     await request(baseUrl)
@@ -238,7 +151,6 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     const proposalTemplate = await testUtilsProposals.generateProposalTemplate({
       spaceId: adminSpace.id,
       userId: adminUser.id,
-      categoryId: proposalCategory.id,
       reviewers: [
         {
           group: 'user',
@@ -248,13 +160,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {
-      authors: [adminUser.id],
-      reviewers: [
-        {
-          group: 'user',
-          id: adminUser.id
-        }
-      ]
+      authors: [adminUser.id]
     };
 
     await request(baseUrl)

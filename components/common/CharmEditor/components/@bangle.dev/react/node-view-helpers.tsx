@@ -1,10 +1,10 @@
-import type { NodeView, RenderHandlers } from '@bangle.dev/core';
-import { saveRenderHandlers } from '@bangle.dev/core';
-import { objectUid } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
 import { useEffect, useState } from 'react';
 import type { RefObject } from 'react';
 import { flushSync } from 'react-dom';
+
+import { saveRenderHandlers } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
+import type { NodeView, RenderHandlers } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 
 export const nodeViewUpdateStore = new WeakMap();
 

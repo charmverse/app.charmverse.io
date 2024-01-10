@@ -1,5 +1,4 @@
-import type { RawSpecs } from '@bangle.dev/core';
-import type { DOMOutputSpec } from '@bangle.dev/pm';
+import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 import { markName } from './inlineComment.constants';
 
@@ -22,16 +21,17 @@ export function spec(): RawSpecs {
           tag: 'span.charm-inline-comment'
         }
       ],
-      toDOM: (mark): DOMOutputSpec =>
-        mark.attrs.id
+      toDOM(mark) {
+        return mark.attrs.id
           ? [
               'span',
               {
-                class: `charm-inline-comment ${mark.attrs.resolved ? 'resolved' : 'active'}`,
+                class: 'charm-inline-comment',
                 id: `inline-comment.${mark.attrs.id}`
               }
             ]
-          : ['span.charm-inline-comment']
+          : ['span.charm-inline-comment'];
+      }
     },
     markdown: {
       // TODO: Fix convert to markdown

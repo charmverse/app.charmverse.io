@@ -3,16 +3,18 @@ import { Edit as EditIcon } from '@mui/icons-material';
 import { Box, Stack, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
-import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
+import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
+import { MemberActions } from 'components/settings/roles/components/MemberActions';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import type { Member } from 'lib/members/interfaces';
 
 import { ProfileTabs } from './components/ProfileTabs';
 import { UserDetailsReadonly } from './components/UserDetailsReadonly';
 
-const ContentContainer = styled(Container)`
+const ContentContainer = styled(PageEditorContainer)`
   width: 100%;
   margin-bottom: 100px;
 `;
@@ -30,7 +32,7 @@ export function MemberProfile({
 }) {
   const theme = useTheme();
   const fullWidth = useMediaQuery(theme.breakpoints.down('md'));
-
+  const isAdmin = useIsAdmin();
   const { openSettings } = useSettingsDialog();
   if (!space) {
     return null;
@@ -46,22 +48,25 @@ export function MemberProfile({
       onClose={onClose}
       fullWidth={fullWidth}
       toolbar={
-        isMine ? (
-          <Box display='flex' justifyContent='space-between'>
-            <Button
-              data-test='open-post-as-page'
-              size='small'
-              color='secondary'
-              variant='text'
-              startIcon={<EditIcon fontSize='small' />}
-              onClick={onClickEdit}
-            >
-              Edit Profile
-            </Button>
-          </Box>
-        ) : (
-          <div />
-        )
+        <Stack flexDirection='row' justifyContent='space-between'>
+          {isMine ? (
+            <Box display='flex' justifyContent='space-between'>
+              <Button
+                data-test='open-post-as-page'
+                size='small'
+                color='secondary'
+                variant='text'
+                startIcon={<EditIcon fontSize='small' />}
+                onClick={onClickEdit}
+              >
+                Edit Profile
+              </Button>
+            </Box>
+          ) : (
+            <div />
+          )}
+          {isAdmin ? <MemberActions member={member} /> : null}
+        </Stack>
       }
     >
       <ContentContainer top={20}>

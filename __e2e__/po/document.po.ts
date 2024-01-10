@@ -24,7 +24,8 @@ export class DocumentPage extends GlobalPage {
     public documentTitle = page.locator(`data-test=editor-page-title`),
     public openAsPageButton = page.locator('data-test=open-as-page'),
     public joinSpaceButton = page.locator('data-test=public-bounty-space-action'),
-    public cardDetailProperties = page.locator('data-test=card-detail-properties')
+    public cardDetailProperties = page.locator('data-test=card-detail-properties'),
+    public addCardPropertyButton = page.locator('data-test=add-custom-property')
   ) {
     super(page);
   }
@@ -54,7 +55,7 @@ export class DocumentPage extends GlobalPage {
   }
 
   getCardCommentContent(commentId: string) {
-    return this.page.locator(`data-test=card-comment-content-${commentId} >> div[contenteditable]`).first();
+    return this.page.locator(`data-test=comment-${commentId} >> div[contenteditable]`).first();
   }
 
   async isPageEditable() {

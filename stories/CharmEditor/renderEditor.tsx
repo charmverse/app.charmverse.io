@@ -9,7 +9,6 @@ export function renderEditorWithContent({ content, title }: { content?: PageCont
       placeholderText='Custom placeholder... start typing / to see commands'
       readOnly={false}
       autoFocus={true}
-      PageSidebar={null}
       pageId='123'
       disablePageSpecificFeatures={false}
       enableSuggestingMode={false}
@@ -34,6 +33,7 @@ export function renderEditorWithContent({ content, title }: { content?: PageCont
         readOnly={false}
         setPage={() => {}}
         readOnlyTitle={false}
+        focusDocumentEditor={() => null}
       />
     </CharmEditorComponent>
   );

@@ -1,27 +1,17 @@
 import type { PageMeta } from '@charmverse/core/pages';
-import { Paper } from '@mui/material';
 import { rest } from 'msw';
-import type { ReactNode } from 'react';
-import { useRef } from 'react';
-import { Provider } from 'react-redux';
 import type { MockStoreEnhanced } from 'redux-mock-store';
+import { GlobalContext } from 'stories/lib/GlobalContext';
 import { v4 as uuid } from 'uuid';
 
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
 import type { RootState } from 'components/common/BoardEditor/focalboard/src/store';
 import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
-import type { ICurrentSpaceContext } from 'hooks/useCurrentSpace';
-import { CurrentSpaceContext } from 'hooks/useCurrentSpace';
-import { MembersProvider } from 'hooks/useMembers';
-import { PagesProvider } from 'hooks/usePages';
-import { UserProvider } from 'hooks/useUser';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { createTableView } from 'lib/focalboard/tableView';
 import { createMockBoard, createMockCard } from 'testing/mocks/block';
 import { createMockPage } from 'testing/mocks/page';
 import { generateSchemasForAllSupportedFieldTypes } from 'testing/publicApi/schemas';
-
-import { spaces } from '../lib/mockData';
 
 export default {
   title: 'Databases/Composites',
@@ -30,8 +20,6 @@ export default {
 
 const firstUserId = uuid();
 const secondUserId = uuid();
-
-const space = spaces[0];
 
 const board = createMockBoard();
 
@@ -61,7 +49,8 @@ const boardPage: PageMeta = {
   type: 'board',
   updatedAt: new Date(),
   updatedBy: uuid(),
-  syncWithPageId: null
+  syncWithPageId: null,
+  sourceTemplateId: null
 };
 
 const view = createTableView({ board });
@@ -131,60 +120,32 @@ const reduxStore = mockStateStore([], {
   }
 }) as MockStoreEnhanced<Pick<RootState, 'boards' | 'views' | 'cards'>>;
 
-function Context({ children }: { children: ReactNode }) {
-  // mock the current space since it usually relies on the URL
-  const spaceContext = useRef<ICurrentSpaceContext>({
-    isLoading: false,
-    refreshCurrentSpace: () => {},
-    space
-  });
-  return (
-    <UserProvider>
-      <CurrentSpaceContext.Provider value={spaceContext.current}>
-        <PagesProvider>
-          <MembersProvider>
-            <Provider store={reduxStore}>{children}</Provider>
-          </MembersProvider>
-        </PagesProvider>
-      </CurrentSpaceContext.Provider>
-    </UserProvider>
-  );
-}
-
 function voidFunction() {
   return Promise.resolve();
 }
 
 export function DatabaseTableView() {
-  // const dispatch = useAppDispatch();
-
-  // useEffect(() => {
-  //   dispatch(initialDatabaseLoad({ pageId: board.id }));
-  // }, []);
-
   return (
-    <Context>
-      <Paper>
-        <div className='focalboard-body'>
-          <Table
-            board={board}
-            showCard={voidFunction}
-            readOnly={false}
-            views={[view]}
-            activeView={view}
-            addCard={voidFunction}
-            cardIdToFocusOnRender=''
-            onCardClicked={voidFunction}
-            selectedCardIds={[]}
-            visibleGroups={[]}
-            cardPages={[
-              { card: card1, page: page1 },
-              { card: card2, page: page2 }
-            ]}
-          />
-        </div>
-      </Paper>
-    </Context>
+    <GlobalContext reduxStore={reduxStore}>
+      <div className='focalboard-body'>
+        <Table
+          board={board}
+          showCard={voidFunction}
+          readOnly={false}
+          views={[view]}
+          activeView={view}
+          addCard={voidFunction}
+          cardIdToFocusOnRender=''
+          onCardClicked={voidFunction}
+          selectedCardIds={[]}
+          visibleGroups={[]}
+          cardPages={[
+            { card: card1, page: page1 },
+            { card: card2, page: page2 }
+          ]}
+        />
+      </div>
+    </GlobalContext>
   );
 }
 

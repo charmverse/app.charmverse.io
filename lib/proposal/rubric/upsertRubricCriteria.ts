@@ -14,11 +14,13 @@ export type RubricDataInput<T extends ProposalRubricCriteriaType = ProposalRubri
   Partial<Pick<ProposalRubricCriteria, 'description' | 'id'>>;
 export type RubricCriteriaUpsert = {
   proposalId: string;
+  evaluationId?: string | null;
   rubricCriteria: RubricDataInput[];
 };
 
 export async function upsertRubricCriteria({
   proposalId,
+  evaluationId,
   rubricCriteria
 }: RubricCriteriaUpsert): Promise<ProposalRubricCriteriaWithTypedParams[]> {
   if (!stringUtils.isUUID(proposalId)) {
@@ -29,7 +31,8 @@ export async function upsertRubricCriteria({
 
   const existingCriteria = await prisma.proposalRubricCriteria.findMany({
     where: {
-      proposalId
+      proposalId,
+      evaluationId
     },
     select: {
       id: true
@@ -68,7 +71,7 @@ export async function upsertRubricCriteria({
 
     // Update existing rubrics
     await Promise.all(
-      rubricCriteria.map((rubric) => {
+      rubricCriteria.map((rubric, index) => {
         // Don't use the ID if this is not already a criteria for this proposal
         const rubricCriteriaId = rubric.id && existingCriteria.some((c) => c.id === rubric.id) ? rubric.id : uuid();
         return tx.proposalRubricCriteria.upsert({
@@ -77,15 +80,18 @@ export async function upsertRubricCriteria({
           },
           create: {
             id: rubricCriteriaId,
+            index,
             title: rubric.title,
             description: rubric.description,
             type: rubric.type,
             parameters: rubric.parameters,
-            proposal: { connect: { id: proposalId } }
+            proposalId,
+            evaluationId
           },
           update: {
             title: rubric.title,
             description: rubric.description,
+            index,
             type: rubric.type,
             parameters: rubric.parameters
           }
@@ -95,7 +101,11 @@ export async function upsertRubricCriteria({
 
     return tx.proposalRubricCriteria.findMany({
       where: {
-        proposalId
+        proposalId,
+        evaluationId
+      },
+      orderBy: {
+        index: 'asc'
       }
     });
   });

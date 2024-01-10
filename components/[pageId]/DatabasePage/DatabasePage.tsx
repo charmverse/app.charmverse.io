@@ -5,7 +5,6 @@ import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 
-import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import CenterPanel from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import {
@@ -20,9 +19,12 @@ import {
 } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
+import { PageDialog } from 'components/common/PageDialog/PageDialog';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
+import { DbViewSettingsProvider } from 'hooks/useLocalDbViewSettings';
+import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 /**
  *
@@ -46,10 +48,10 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   const activeView = boardViews.find((view) => view.id === currentViewId) ?? boardViews[0];
   const dispatch = useAppDispatch();
   const [shownCardId, setShownCardId] = useState<string | null>((router.query.cardId as string) ?? null);
-
+  const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
   const { setFocalboardViewsRecord } = useFocalboardViews();
   const readOnlyBoard = readOnly || !pagePermissions?.edit_content;
-
+  const { pages, refreshPage } = usePages();
   useEffect(() => {
     if (typeof router.query.cardId === 'string') {
       setShownCardId(router.query.cardId);
@@ -64,14 +66,18 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
     const firstBoardView = boardViews.find((view) => view.parentId === boardId);
 
     if (!urlViewId && firstBoardView) {
-      router.replace({
-        pathname: router.pathname,
-        query: {
-          ...router.query,
-          viewId: firstBoardView.id,
-          cardId: router.query.cardId ?? ''
-        }
-      });
+      router.replace(
+        {
+          pathname: router.pathname,
+          query: {
+            ...router.query,
+            viewId: firstBoardView.id,
+            cardId: router.query.cardId ?? ''
+          }
+        },
+        undefined,
+        { shallow: true }
+      );
       return;
     }
 
@@ -116,11 +122,21 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   });
 
   const showCard = useCallback(
-    (cardId: string | null = null) => {
-      setUrlWithoutRerender(router.pathname, { viewId: router.query.viewId as string, cardId });
-      setShownCardId(cardId);
+    async (cardId: string | null, isTemplate?: boolean) => {
+      if (cardId === null) {
+        updateURLQuery({ cardId: null });
+        setShownCardId(null);
+        return;
+      }
+
+      if (activeView.fields.openPageIn === 'center_peek' || isTemplate) {
+        updateURLQuery({ viewId: router.query.viewId as string, cardId });
+        setShownCardId(cardId);
+      } else if (activeView.fields.openPageIn === 'full_page') {
+        navigateToSpacePath(`/${cardId}`);
+      }
     },
-    [router.query]
+    [router.query, activeView, pages]
   );
 
   const showView = useCallback(
@@ -141,28 +157,30 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
     return (
       <>
         <div data-test='database-page' className='focalboard-body full-page'>
-          <CenterPanel
-            currentRootPageId={page.id}
-            readOnly={Boolean(readOnlyBoard)}
-            board={board}
-            setPage={setPage}
-            pageIcon={page.icon}
-            showCard={showCard}
-            showView={showView}
-            activeView={activeView || undefined}
-            views={boardViews}
-            page={page}
-          />
-          {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
-            <CardDialog
-              key={shownCardId}
-              cardId={shownCardId}
-              onClose={() => {
-                showCard(null);
-              }}
-              readOnly={readOnly}
+          <DbViewSettingsProvider>
+            <CenterPanel
+              currentRootPageId={page.id}
+              readOnly={Boolean(readOnlyBoard)}
+              board={board}
+              setPage={setPage}
+              pageIcon={page.icon}
+              showCard={showCard}
+              showView={showView}
+              activeView={activeView || undefined}
+              views={boardViews}
+              page={page}
             />
-          )}
+            {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
+              <PageDialog
+                key={shownCardId}
+                pageId={shownCardId}
+                onClose={() => {
+                  showCard(null);
+                }}
+                readOnly={readOnly}
+              />
+            )}
+          </DbViewSettingsProvider>
         </div>
         {/** include the root portal for focalboard's popup */}
         <FocalBoardPortal />

@@ -1,4 +1,4 @@
-import { testUtilsProposals } from '@charmverse/core/test';
+import { testUtilsSpaces } from '@charmverse/core/test';
 import { test, expect } from '@playwright/test';
 import { ProposalPage } from '__e2e__/po/proposalPage.po';
 import { ProposalsListPage } from '__e2e__/po/proposalsList.po';
@@ -7,7 +7,7 @@ import { generateProposal } from 'testing/setupDatabase';
 
 import { generateUserAndSpace, loginBrowserUser } from '../utils/mocks';
 
-test.describe.serial('Proposal templates', () => {
+test.describe('Proposal templates', () => {
   // create reusable pages we can reuse between tests
   let proposalListPage: ProposalsListPage;
   let proposalPage: ProposalPage;
@@ -23,7 +23,11 @@ test.describe.serial('Proposal templates', () => {
   test('A user can create a proposal from a template', async () => {
     // Initial setup
     const { space, user } = await generateUserAndSpace();
-
+    await testUtilsSpaces.addSpaceOperations({
+      forSpaceId: space.id,
+      spaceId: space.id,
+      operations: ['createProposals']
+    });
     userId = user.id;
 
     await loginBrowserUser({
@@ -31,20 +35,8 @@ test.describe.serial('Proposal templates', () => {
       userId
     });
 
-    const category = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id,
-      title: 'General',
-      proposalCategoryPermissions: [
-        {
-          permissionLevel: 'full_access',
-          assignee: { group: 'space', id: space.id }
-        }
-      ]
-    });
-
     const template = await generateProposal({
       userId,
-      categoryId: category.id,
       spaceId: space.id,
       title: 'Proposal template',
       pageType: 'proposal_template',
@@ -59,7 +51,6 @@ test.describe.serial('Proposal templates', () => {
     await proposalListPage.proposalTemplateSelect.click();
     await proposalListPage.getTemplateOptionLocator(template.id).click();
 
-    await proposalPage.waitForDialog();
     await expect(proposalPage.saveDraftButton).toBeVisible();
   });
 });

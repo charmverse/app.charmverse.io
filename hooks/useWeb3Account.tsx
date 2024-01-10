@@ -1,14 +1,13 @@
 import { log } from '@charmverse/core/log';
 import type { UserWallet } from '@charmverse/core/prisma';
 import type { Web3Provider } from '@ethersproject/providers';
-import { verifyMessage } from '@ethersproject/wallet';
 import type { Signer } from 'ethers';
-import { getAddress } from 'ethers/lib/utils';
 import { SiweMessage } from 'lit-siwe';
 import type { ReactNode } from 'react';
 import { useCallback, createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { mutate } from 'swr';
 import useSWRMutation from 'swr/mutation';
+import { recoverMessageAddress, getAddress } from 'viem';
 import { useAccount, useConnect, useNetwork, useSignMessage } from 'wagmi';
 
 import charmClient from 'charmClient';
@@ -28,7 +27,7 @@ type IContext = {
   account?: string | null;
   walletAuthSignature?: AuthSig | null;
   chainId: any;
-  sign: () => Promise<AuthSig>;
+  requestSignature: () => Promise<AuthSig>;
   getStoredSignature: (account: string) => AuthSig | null;
   logoutWallet: () => void;
   disconnectWallet: (address: UserWallet['address']) => Promise<void>;
@@ -45,7 +44,7 @@ type IContext = {
 export const Web3Context = createContext<Readonly<IContext>>({
   account: null,
   walletAuthSignature: null,
-  sign: () => Promise.resolve({} as AuthSig),
+  requestSignature: () => Promise.resolve({} as AuthSig),
   getStoredSignature: () => null,
   logoutWallet: () => null,
   disconnectWallet: async () => {},
@@ -98,7 +97,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
     [setLitAuthSignature, setLitProvider]
   );
 
-  const sign = useCallback(async (): Promise<AuthSig> => {
+  const requestSignature = useCallback(async (): Promise<AuthSig> => {
     if (!account || !chainId) {
       throw new MissingWeb3AccountError();
     }
@@ -120,7 +119,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       const newSignature = await signMessageAsync({
         message: body
       });
-      const signatureAddress = verifyMessage(body, newSignature).toLowerCase();
+      const signatureAddress = await recoverMessageAddress({ message: body, signature: newSignature });
 
       if (!lowerCaseEqual(signatureAddress, account)) {
         throw new Error('Signature address does not match account');
@@ -155,7 +154,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       let signature = authSig ?? (account ? getStoredSignature(account) : null);
 
       if (!signature) {
-        signature = await sign();
+        signature = await requestSignature();
       }
 
       try {
@@ -177,7 +176,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
         return newProfile;
       }
     },
-    [account, setSignature, setUser, sign, verifiableWalletDetected]
+    [account, setSignature, setUser, requestSignature, verifiableWalletDetected]
   );
 
   // Only expose account if current user and account match up
@@ -294,7 +293,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
     () => ({
       account: storedAccount,
       walletAuthSignature,
-      sign,
+      requestSignature,
       getStoredSignature,
       disconnectWallet,
       logoutWallet,
@@ -317,7 +316,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       isDisconnectingWallet,
       loginFromWeb3Account,
       logoutWallet,
-      sign,
+      requestSignature,
       verifiableWalletDetected,
       signer,
       provider

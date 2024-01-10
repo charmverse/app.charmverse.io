@@ -16,6 +16,7 @@ export type TextInputProps = EditableProps & {
   fullWidth?: boolean;
   wrapColumn?: boolean;
   columnRef?: React.RefObject<HTMLDivElement>;
+  disablePopup?: boolean;
   inputProps?: any;
   sx?: any;
 };
@@ -58,6 +59,7 @@ function Editable(
     sx,
     inputProps = {},
     readOnlyMessage,
+    disablePopup,
     ..._props
   }: TextInputProps,
   ref: React.Ref<Focusable>
@@ -122,6 +124,7 @@ function Editable(
           multiline
         />
       }
+      disablePopup={disablePopup}
     >
       <StyledInput
         inputProps={{

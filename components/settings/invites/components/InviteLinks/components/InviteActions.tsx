@@ -5,9 +5,7 @@ import type { MenuProps } from '@mui/material/Menu';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { styled } from '@mui/material/styles';
-import { bindTrigger } from 'material-ui-popup-state/hooks';
-import type { PopupState } from 'material-ui-popup-state/hooks';
-import type { MouseEvent, SyntheticEvent } from 'react';
+import type { MouseEvent } from 'react';
 import { memo, useState } from 'react';
 
 import { Button } from 'components/common/Button';
@@ -51,23 +49,13 @@ const StyledMenu = styled((props: MenuProps) => (
   }
 }));
 
-export type popupStateTrigger = Omit<ReturnType<typeof bindTrigger>, 'onClick'>;
-
 interface InviteActionsProps {
   isAdmin: boolean;
-  invitePopupState: PopupState;
-  tokenGatePopupState: PopupState;
-  onOpenInvitesClick: (e: SyntheticEvent<any, Event>) => void;
-  onOpenTokenGateClick: (e: SyntheticEvent<any, Event>) => void;
+  onOpenInvitesClick: () => void;
+  onOpenTokenGateClick: () => void;
 }
 
-function InviteActions({
-  isAdmin,
-  invitePopupState,
-  tokenGatePopupState,
-  onOpenInvitesClick,
-  onOpenTokenGateClick
-}: InviteActionsProps) {
+function InviteActions({ isAdmin, onOpenInvitesClick, onOpenTokenGateClick }: InviteActionsProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -78,24 +66,14 @@ function InviteActions({
     setAnchorEl(null);
   };
 
-  const handleInvites = (e: SyntheticEvent<any, Event>) => {
-    onOpenInvitesClick(e);
-    handleClose();
-  };
-
-  const handleTokenGate = (e: SyntheticEvent<any, Event>) => {
-    onOpenTokenGateClick(e);
-    handleClose();
-  };
-
   return (
     <>
       <Tooltip title={!isAdmin ? 'Only space admins can create invite links' : ''} arrow>
         {/* Tooltip on disabled button requires one block element below wrapper */}
         <span>
           <Button
-            id='add-invites-menu'
-            aria-controls={open ? 'demo-customized-menu' : undefined}
+            id='add-invites-button'
+            aria-controls={open ? 'add-invites-menu' : undefined}
             aria-haspopup='true'
             aria-expanded={open ? 'true' : undefined}
             disableElevation
@@ -108,15 +86,16 @@ function InviteActions({
         </span>
       </Tooltip>
       <StyledMenu
-        id='demo-customized-menu'
+        id='add-invites-menu'
         MenuListProps={{
-          'aria-labelledby': 'add-invites-menu'
+          'aria-labelledby': 'add-invites-button'
         }}
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
+        onClick={handleClose}
       >
-        <MenuItem {...bindTrigger(invitePopupState)} onClick={handleInvites} disableRipple dense>
+        <MenuItem onClick={onOpenInvitesClick} disableRipple dense>
           <AddIcon fontSize='small' />
           <Box>
             <ListItemText
@@ -127,7 +106,7 @@ function InviteActions({
             />
           </Box>
         </MenuItem>
-        <MenuItem {...bindTrigger(tokenGatePopupState)} onClick={handleTokenGate} disableRipple dense>
+        <MenuItem onClick={onOpenTokenGateClick} disableRipple dense>
           <AddIcon fontSize='small' />
           <Box>
             <ListItemText

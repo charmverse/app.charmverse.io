@@ -32,6 +32,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { webhookEndpoint } from 'config/constants';
 import { useApiPageKeys } from 'hooks/useApiPageKeys';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
 import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
@@ -42,7 +43,6 @@ import type { Card, CardPage } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
 
-import { Constants } from '../constants';
 import mutator from '../mutator';
 import { addCard as _addCard, addTemplate } from '../store/cards';
 import { updateView } from '../store/views';
@@ -72,7 +72,7 @@ type Props = WrappedComponentProps &
     pageIcon?: string | null;
     setPage: (p: Partial<Page>) => void;
     updateView: (view: BoardView) => void;
-    showCard: (cardId: string | null) => void;
+    showCard: (cardId: string | null, isTemplate?: boolean) => void;
     showView: (viewId: string) => void;
     disableUpdatingUrl?: boolean;
     maxTabsShown?: number;
@@ -88,6 +88,7 @@ type State = {
 
 function CenterPanel(props: Props) {
   const { activeView, board, currentRootPageId, pageIcon, showView, views, page: boardPage } = props;
+  const [checkedIds, setCheckedIds] = useState<string[]>([]);
 
   const [state, setState] = useState<State>({
     cardIdToFocusOnRender: '',
@@ -100,11 +101,11 @@ function CenterPanel(props: Props) {
   const router = useRouter();
   const { space } = useCurrentSpace();
   const { pages, refreshPage } = usePages();
-  const { members } = useMembers();
+  const { membersRecord } = useMembers();
+  const localViewSettings = useLocalDbViewSettings(activeView?.id);
 
   const isEmbedded = !!props.embeddedBoardPath;
   const boardPageType = boardPage?.type;
-
   // for 'linked' boards, each view has its own board which we use to determine the cards to show
   let activeBoardId: string | undefined = board.id;
   if (activeView?.fields.linkedSourceId) {
@@ -121,12 +122,12 @@ function CenterPanel(props: Props) {
   const _dateDisplayProperty = activeBoard?.fields.cardProperties.find(
     (o) => o.id === activeView?.fields.dateDisplayPropertyId
   );
-
   const selectViewCardsSortedFilteredAndGrouped = useMemo(makeSelectViewCardsSortedFilteredAndGrouped, []);
   const _cards = useAppSelector((state) =>
     selectViewCardsSortedFilteredAndGrouped(state, {
       boardId: activeBoard?.id || '',
-      viewId: activeView?.id || ''
+      viewId: activeView?.id || '',
+      localFilters: localViewSettings?.localFilters
     })
   );
   const isActiveView = !!(activeView && activeBoard);
@@ -143,36 +144,40 @@ function CenterPanel(props: Props) {
   }, [activeView?.id, views.length, isActiveView]);
 
   // filter cards by whats accessible
-  const cardPages: CardPage[] = useMemo(() => {
+  const { cardPages, cardPageIds } = useMemo(() => {
     const result = _cards
-      // TODO: dont recreate the card objects, this causes re-rendering on all cards when any card/page is updated
-      // we need to figure another way to grab the page titles probably down-stream
       .map((card) => ({
-        card: {
-          ...card,
-          fields: {
-            ...card.fields,
-            properties: {
-              ...card.fields.properties,
-              [Constants.titleColumnId]: pages[card.id]?.title ?? ''
-            }
-          }
-        },
+        card,
         page: pages[card.id]!
       }))
       .filter(({ page }) => !!page && !page.deletedAt);
 
-    return isActiveView ? sortCards(result, activeBoard, activeView, members) : [];
-  }, [isActiveView, _cards, pages]);
+    const _cardPages = isActiveView
+      ? sortCards(result, activeBoard, activeView, membersRecord, localViewSettings?.localSort)
+      : [];
+
+    const _cardPageIds = new Set<string>();
+    _cardPages.forEach((cardPage) => _cardPageIds.add(cardPage.card.id));
+
+    return {
+      cardPages: _cardPages,
+      cardPageIds: _cardPageIds
+    };
+  }, [isActiveView, _cards, pages, localViewSettings?.localSort]);
 
   const cards = cardPages.map(({ card }) => card);
+
+  // Make sure the checkedIds are still cards that exist
+  useEffect(() => {
+    setCheckedIds((checkedIds) => checkedIds.filter((id) => cardPageIds.has(id)));
+  }, [cardPageIds.size]);
 
   let groupByProperty = _groupByProperty;
   if (
     (!groupByProperty ||
       (_groupByProperty?.type !== 'select' &&
-        _groupByProperty?.type !== 'proposalCategory' &&
-        _groupByProperty?.type !== 'proposalStatus')) &&
+        _groupByProperty?.type !== 'proposalStatus' &&
+        _groupByProperty?.type !== 'proposalStep')) &&
     activeView?.fields.viewType === 'board'
   ) {
     groupByProperty = activeBoard?.fields.cardProperties.find((o: any) => o.type === 'select');
@@ -226,12 +231,12 @@ function CenterPanel(props: Props) {
     }
   }
 
-  const showCard = React.useCallback(
-    (cardId: string | null) => {
+  const showCard = useCallback(
+    (cardId: string | null, isTemplate?: boolean) => {
       if (state.selectedCardIds.length > 0) {
         setState({ ...state, selectedCardIds: [] });
       }
-      props.showCard(cardId);
+      props.showCard(cardId, isTemplate);
     },
     [props.showCard, state.selectedCardIds]
   );
@@ -240,13 +245,19 @@ function CenterPanel(props: Props) {
   const _updateView = props.updateView;
 
   const addCard = useCallback(
-    async (
-      groupByOptionId?: string,
+    async ({
+      groupByOptionId,
       show = false,
-      properties: Record<string, string> = {},
+      properties = {},
       insertLast = true,
       isTemplate = false
-    ) => {
+    }: {
+      groupByOptionId?: string;
+      show?: boolean;
+      properties?: Record<string, string>;
+      insertLast?: boolean;
+      isTemplate?: boolean;
+    }) => {
       if (!activeBoard) {
         throw new Error('No active board');
       }
@@ -292,7 +303,7 @@ function CenterPanel(props: Props) {
             }
 
             if (isTemplate) {
-              showCard(block.id);
+              showCard(block.id, true);
             } else if (show) {
               __addCard(createCard(block));
               _updateView({ ...activeView, fields: { ...activeView.fields, cardOrder: newCardOrder } });
@@ -362,7 +373,48 @@ function CenterPanel(props: Props) {
 
   const calendarAddCard = useCallback(
     (properties: Record<string, string>) => {
-      addCard('', true, properties);
+      addCard({
+        groupByOptionId: '',
+        show: true,
+        properties
+      });
+    },
+    [addCard]
+  );
+
+  const viewHeaderAddCard = useCallback(() => {
+    addCard({
+      groupByOptionId: '',
+      show: true
+    });
+  }, [addCard]);
+
+  const viewHeaderAddCardTemplate = useCallback(() => {
+    addCard({
+      groupByOptionId: '',
+      show: true,
+      isTemplate: true,
+      insertLast: false,
+      properties: {}
+    });
+  }, [addCard]);
+
+  const kanbanAddCard = useCallback(
+    (groupByOptionId?: string) => {
+      addCard({
+        groupByOptionId,
+        show: true
+      });
+    },
+    [addCard]
+  );
+
+  const galleryAddCard = useCallback(
+    (show: boolean) => {
+      addCard({
+        groupByOptionId: '',
+        show
+      });
     },
     [addCard]
   );
@@ -389,30 +441,6 @@ function CenterPanel(props: Props) {
 
     setState({ ...state, selectedCardIds: [] });
   }
-
-  function getVisibleAndHiddenGroups(
-    __cardPages: CardPage[],
-    visibleOptionIds: string[],
-    hiddenOptionIds: string[],
-    groupByProperty?: IPropertyTemplate
-  ): { visible: BoardGroup[]; hidden: BoardGroup[] } {
-    let unassignedOptionIds: string[] = [];
-    if (groupByProperty) {
-      unassignedOptionIds = (groupByProperty.options ?? [])
-        .filter((o: IPropertyOption) => !visibleOptionIds.includes(o.id) && !hiddenOptionIds.includes(o.id))
-        .map((o: IPropertyOption) => o.id);
-    }
-    const allVisibleOptionIds = [...visibleOptionIds, ...unassignedOptionIds];
-
-    // If the empty group position is not explicitly specified, make it the first visible column
-    if (!allVisibleOptionIds.includes('') && !hiddenOptionIds.includes('')) {
-      allVisibleOptionIds.unshift('');
-    }
-
-    const _visibleGroups = groupCardsByOptions(__cardPages, allVisibleOptionIds, groupByProperty);
-    const _hiddenGroups = groupCardsByOptions(__cardPages, hiddenOptionIds, groupByProperty);
-    return { visible: _visibleGroups, hidden: _hiddenGroups };
-  }
   function addNewLinkedView() {
     // delay the sidebar opening so that we dont trigger it to close right away
     setTimeout(() => {
@@ -435,10 +463,18 @@ function CenterPanel(props: Props) {
 
   // close settings once a view has been added
   useEffect(() => {
+    setCheckedIds([]);
     if (activeView) {
       closeSettings();
     }
   }, [activeView?.id]);
+
+  useEffect(() => {
+    const viewType = activeView?.fields.viewType;
+    if (viewType !== 'table') {
+      setCheckedIds([]);
+    }
+  }, [activeView?.fields.viewType]);
 
   // refresh google forms data whenever source changes
   useEffect(() => {
@@ -536,13 +572,15 @@ function CenterPanel(props: Props) {
               cards={cards}
               views={views}
               dateDisplayProperty={dateDisplayProperty}
-              addCard={() => addCard('', true)}
+              addCard={viewHeaderAddCard}
               showCard={showCard}
               // addCardFromTemplate={addCardFromTemplate}
-              addCardTemplate={() => addCard('', true, {}, false, true)}
+              addCardTemplate={viewHeaderAddCardTemplate}
               editCardTemplate={editCardTemplate}
               readOnly={props.readOnly}
               embeddedBoardPath={props.embeddedBoardPath}
+              checkedIds={checkedIds}
+              setCheckedIds={setCheckedIds}
             />
           )}
         </div>
@@ -609,7 +647,7 @@ function CenterPanel(props: Props) {
                     selectedCardIds={state.selectedCardIds}
                     readOnly={props.readOnly}
                     onCardClicked={cardClicked}
-                    addCard={addCard}
+                    addCard={kanbanAddCard}
                     showCard={showCard}
                     disableAddingCards={disableAddingNewCards}
                     readOnlyTitle={readOnlyTitle}
@@ -626,11 +664,13 @@ function CenterPanel(props: Props) {
                     selectedCardIds={state.selectedCardIds}
                     readOnly={props.readOnly}
                     cardIdToFocusOnRender={state.cardIdToFocusOnRender}
-                    showCard={showCard}
-                    addCard={addCard}
+                    showCard={(cardId) => showCard(cardId)}
+                    addCard={kanbanAddCard}
                     onCardClicked={cardClicked}
                     disableAddingCards={disableAddingNewCards}
                     readOnlyTitle={readOnlyTitle}
+                    checkedIds={checkedIds}
+                    setCheckedIds={setCheckedIds}
                   />
                 )}
                 {activeBoard && activeView?.fields.viewType === 'calendar' && (
@@ -653,7 +693,7 @@ function CenterPanel(props: Props) {
                     readOnly={props.readOnly}
                     onCardClicked={cardClicked}
                     selectedCardIds={state.selectedCardIds}
-                    addCard={(show) => addCard('', show)}
+                    addCard={galleryAddCard}
                     disableAddingCards={disableAddingNewCards}
                   />
                 )}
@@ -714,6 +754,30 @@ export function groupCardsByOptions(
     }
   }
   return groups;
+}
+
+export function getVisibleAndHiddenGroups(
+  __cardPages: CardPage[],
+  visibleOptionIds: string[],
+  hiddenOptionIds: string[],
+  groupByProperty?: IPropertyTemplate
+): { visible: BoardGroup[]; hidden: BoardGroup[] } {
+  let unassignedOptionIds: string[] = [];
+  if (groupByProperty) {
+    unassignedOptionIds = (groupByProperty.options ?? [])
+      .filter((o: IPropertyOption) => !visibleOptionIds.includes(o.id) && !hiddenOptionIds.includes(o.id))
+      .map((o: IPropertyOption) => o.id);
+  }
+  const allVisibleOptionIds = [...visibleOptionIds, ...unassignedOptionIds];
+
+  // If the empty group position is not explicitly specified, make it the first visible column
+  if (!allVisibleOptionIds.includes('') && !hiddenOptionIds.includes('')) {
+    allVisibleOptionIds.unshift('');
+  }
+
+  const _visibleGroups = groupCardsByOptions(__cardPages, allVisibleOptionIds, groupByProperty);
+  const _hiddenGroups = groupCardsByOptions(__cardPages, hiddenOptionIds, groupByProperty);
+  return { visible: _visibleGroups, hidden: _hiddenGroups };
 }
 
 const connector = connect(undefined, { addCard: _addCard, addTemplate, updateView });

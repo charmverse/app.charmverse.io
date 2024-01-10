@@ -7,42 +7,49 @@ export type GettingStartedPage = Pick<
 
 export const gettingStartedPage: GettingStartedPage = {
   title: 'Getting Started',
-  hasContent: true,
-  headerImage:
-    'https://s3.amazonaws.com/charm.public/user-content/e5dba747-be62-49be-a7ba-71cf27b17174/425d95c8-59c9-48bb-9970-3a21ef43efdc/home_banner.jpg',
-  icon: '🧑‍🚀',
-  type: 'page',
-  index: 0,
-  version: 1,
   content: {
     type: 'doc',
     content: [
       {
         type: 'heading',
         attrs: {
+          id: null,
           level: 1,
-          track: [],
-          collapseContent: null
+          track: []
         },
         content: [
           {
             type: 'emoji',
             attrs: {
               emoji: '👋'
-            }
+            },
+            marks: [
+              {
+                type: 'insertion',
+                attrs: {
+                  date: '2023-12-03T19:50:00.000Z',
+                  user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                  approved: true,
+                  username: 'Drea | CharmVerse'
+                }
+              },
+              {
+                type: 'text-color',
+                attrs: {
+                  color: 'blue',
+                  bgColor: ''
+                }
+              }
+            ]
           },
           {
-            text: ' ',
-            type: 'text'
-          },
-          {
-            text: 'Welcome to CharmVerse!',
+            text: ' Welcome to CharmVerse!',
             type: 'text',
             marks: [
               {
                 type: 'insertion',
                 attrs: {
-                  date: '2022-12-21T14:50:00.000Z',
+                  date: '2023-12-03T19:50:00.000Z',
                   user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
                   approved: true,
                   username: 'Drea | CharmVerse'
@@ -66,7 +73,7 @@ export const gettingStartedPage: GettingStartedPage = {
         },
         content: [
           {
-            text: 'A web3 community platform. ',
+            text: 'A community ',
             type: 'text',
             marks: [
               {
@@ -75,7 +82,7 @@ export const gettingStartedPage: GettingStartedPage = {
               {
                 type: 'insertion',
                 attrs: {
-                  date: '2022-12-22T16:00:00.000Z',
+                  date: '2023-12-03T19:50:00.000Z',
                   user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
                   approved: true,
                   username: 'Drea | CharmVerse'
@@ -84,7 +91,7 @@ export const gettingStartedPage: GettingStartedPage = {
             ]
           },
           {
-            text: 'Powering the Future of Work through Web3. The solution for token communities to build relationships, work together and vote.',
+            text: 'operations ',
             type: 'text',
             marks: [
               {
@@ -93,7 +100,111 @@ export const gettingStartedPage: GettingStartedPage = {
               {
                 type: 'insertion',
                 attrs: {
-                  date: '2022-12-22T16:00:00.000Z',
+                  date: '2023-12-03T20:20:00.000Z',
+                  user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                  approved: true,
+                  username: 'Drea | CharmVerse'
+                }
+              }
+            ]
+          },
+          {
+            text: 'platform',
+            type: 'text',
+            marks: [
+              {
+                type: 'italic'
+              },
+              {
+                type: 'insertion',
+                attrs: {
+                  date: '2023-12-03T19:50:00.000Z',
+                  user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                  approved: true,
+                  username: 'Drea | CharmVerse'
+                }
+              }
+            ]
+          },
+          {
+            text: ' designed specifically for w',
+            type: 'text',
+            marks: [
+              {
+                type: 'italic'
+              },
+              {
+                type: 'insertion',
+                attrs: {
+                  date: '2023-12-03T20:20:00.000Z',
+                  user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                  approved: true,
+                  username: 'Drea | CharmVerse'
+                }
+              }
+            ]
+          },
+          {
+            text: 'eb3',
+            type: 'text',
+            marks: [
+              {
+                type: 'italic'
+              },
+              {
+                type: 'insertion',
+                attrs: {
+                  date: '2023-12-03T19:50:00.000Z',
+                  user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                  approved: true,
+                  username: 'Drea | CharmVerse'
+                }
+              },
+              {
+                type: 'text-color',
+                attrs: {
+                  color: null,
+                  bgColor: null
+                }
+              }
+            ]
+          },
+          {
+            text: ' communities -',
+            type: 'text',
+            marks: [
+              {
+                type: 'italic'
+              },
+              {
+                type: 'insertion',
+                attrs: {
+                  date: '2023-12-03T20:20:00.000Z',
+                  user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                  approved: true,
+                  username: 'Drea | CharmVerse'
+                }
+              },
+              {
+                type: 'text-color',
+                attrs: {
+                  color: null,
+                  bgColor: null
+                }
+              }
+            ]
+          },
+          {
+            text: ' build relationships, work together and vote.',
+            type: 'text',
+            marks: [
+              {
+                type: 'italic'
+              },
+              {
+                type: 'insertion',
+                attrs: {
+                  date: '2023-12-03T19:50:00.000Z',
                   user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
                   approved: true,
                   username: 'Drea | CharmVerse'
@@ -111,12 +222,6 @@ export const gettingStartedPage: GettingStartedPage = {
         ]
       },
       {
-        type: 'paragraph',
-        attrs: {
-          track: []
-        }
-      },
-      {
         type: 'horizontalRule',
         attrs: {
           track: []
@@ -130,13 +235,15 @@ export const gettingStartedPage: GettingStartedPage = {
         },
         content: [
           {
-            type: 'paragraph',
+            type: 'heading',
             attrs: {
+              id: null,
+              level: 2,
               track: []
             },
             content: [
               {
-                text: 'Here are the basics:',
+                text: 'Supercharge your community with',
                 type: 'text',
                 marks: [
                   {
@@ -145,7 +252,7 @@ export const gettingStartedPage: GettingStartedPage = {
                   {
                     type: 'insertion',
                     attrs: {
-                      date: '2022-12-21T15:20:00.000Z',
+                      date: '2023-12-03T20:20:00.000Z',
                       user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
                       approved: true,
                       username: 'Drea | CharmVerse'
@@ -154,7 +261,32 @@ export const gettingStartedPage: GettingStartedPage = {
                   {
                     type: 'text-color',
                     attrs: {
-                      color: 'teal',
+                      color: 'blue',
+                      bgColor: ''
+                    }
+                  }
+                ]
+              },
+              {
+                text: ' CharmVerse',
+                type: 'text',
+                marks: [
+                  {
+                    type: 'bold'
+                  },
+                  {
+                    type: 'insertion',
+                    attrs: {
+                      date: '2023-12-03T19:50:00.000Z',
+                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                      approved: true,
+                      username: 'Drea | CharmVerse'
+                    }
+                  },
+                  {
+                    type: 'text-color',
+                    attrs: {
+                      color: 'blue',
                       bgColor: ''
                     }
                   }
@@ -165,412 +297,34 @@ export const gettingStartedPage: GettingStartedPage = {
         ]
       },
       {
-        type: 'bulletList',
-        attrs: {
-          tight: false
-        },
-        content: [
-          {
-            type: 'listItem',
-            attrs: {
-              track: [],
-              todoChecked: false
-            },
-            content: [
-              {
-                type: 'paragraph',
-                attrs: {
-                  track: []
-                },
-                content: [
-                  {
-                    text: 'Click anywhere and just start typing',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2022-12-21T15:20:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        type: 'bulletList',
-        attrs: {
-          tight: false
-        },
-        content: [
-          {
-            type: 'listItem',
-            attrs: {
-              track: [],
-              todoChecked: false
-            },
-            content: [
-              {
-                type: 'paragraph',
-                attrs: {
-                  track: []
-                },
-                content: [
-                  {
-                    text: 'Hit ',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2022-12-21T15:20:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: '/',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'code'
-                      }
-                    ]
-                  },
-                  {
-                    text: ' to see all the types of content you can add - head',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2022-12-21T15:20:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: 'ings',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2022-12-21T15:30:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: ', videos, ',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2022-12-21T15:20:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: 'tweets, ',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2022-12-21T16:20:00.000Z',
-                          user: 'd5b4e5db-868d-47b0-bc78-ebe9b5b2c835',
-                          approved: true,
-                          username: '0x3B60…a43F'
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: 'sub pages, etc.',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2022-12-21T15:20:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        type: 'paragraph',
+        type: 'columnLayout',
         attrs: {
           track: []
         },
         content: [
           {
-            type: 'tabIndent',
-            marks: [
-              {
-                type: 'insertion',
-                attrs: {
-                  date: '2022-12-22T16:20:00.000Z',
-                  user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                  approved: true,
-                  username: 'Drea | CharmVerse'
-                }
-              }
-            ]
-          },
-          {
-            text: 'Give it a go. Hit ',
-            type: 'text',
-            marks: [
-              {
-                type: 'insertion',
-                attrs: {
-                  date: '2022-12-22T16:20:00.000Z',
-                  user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                  approved: true,
-                  username: 'Drea | CharmVerse'
-                }
-              },
-              {
-                type: 'text-color',
-                attrs: {
-                  color: 'default',
-                  bgColor: ''
-                }
-              }
-            ]
-          },
-          {
-            text: '/',
-            type: 'text',
-            marks: [
-              {
-                type: 'code'
-              }
-            ]
-          },
-          {
-            text: ' and insert a new ',
-            type: 'text',
-            marks: [
-              {
-                type: 'text-color',
-                attrs: {
-                  color: 'default',
-                  bgColor: ''
-                }
-              }
-            ]
-          },
-          {
-            text: 'sub ',
-            type: 'text',
-            marks: [
-              {
-                type: 'insertion',
-                attrs: {
-                  date: '2022-12-22T16:20:00.000Z',
-                  user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                  approved: true,
-                  username: 'Drea | CharmVerse'
-                }
-              },
-              {
-                type: 'text-color',
-                attrs: {
-                  color: 'default',
-                  bgColor: ''
-                }
-              }
-            ]
-          },
-          {
-            text: 'page here',
-            type: 'text',
-            marks: [
-              {
-                type: 'text-color',
-                attrs: {
-                  color: 'default',
-                  bgColor: ''
-                }
-              }
-            ]
-          },
-          {
-            text: ' ',
-            type: 'text',
-            marks: [
-              {
-                type: 'insertion',
-                attrs: {
-                  date: '2022-12-22T16:20:00.000Z',
-                  user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                  approved: true,
-                  username: 'Drea | CharmVerse'
-                }
-              },
-              {
-                type: 'text-color',
-                attrs: {
-                  color: 'default',
-                  bgColor: ''
-                }
-              }
-            ]
-          },
-          {
-            type: 'emoji',
+            type: 'columnBlock',
             attrs: {
-              emoji: '➡️'
-            },
-            marks: [
-              {
-                type: 'text-color',
-                attrs: {
-                  color: 'default',
-                  bgColor: ''
-                }
-              }
-            ]
-          },
-          {
-            text: ' ',
-            type: 'text',
-            marks: [
-              {
-                type: 'insertion',
-                attrs: {
-                  date: '2022-12-22T16:30:00.000Z',
-                  user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                  approved: true,
-                  username: 'Drea | CharmVerse'
-                }
-              },
-              {
-                type: 'text-color',
-                attrs: {
-                  color: 'default',
-                  bgColor: ''
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
-        type: 'bulletList',
-        attrs: {
-          tight: false
-        },
-        content: [
-          {
-            type: 'listItem',
-            attrs: {
-              track: [],
-              todoChecked: false
+              size: 319,
+              track: []
             },
             content: [
               {
-                type: 'paragraph',
+                type: 'heading',
                 attrs: {
+                  id: null,
+                  level: 2,
                   track: []
                 },
                 content: [
                   {
-                    text: 'Hit ',
+                    text: 'Member Directory',
                     type: 'text',
                     marks: [
                       {
                         type: 'insertion',
                         attrs: {
-                          date: '2022-12-22T16:20:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: ':',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'code'
-                      }
-                    ]
-                  },
-                  {
-                    text: ' to add an emoji. ',
-                    type: 'text'
-                  },
-                  {
-                    text: 'Go ahead and add your favorite emoji here ',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'text-color',
-                        attrs: {
-                          color: 'default',
-                          bgColor: ''
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    type: 'emoji',
-                    attrs: {
-                      emoji: '➡️'
-                    },
-                    marks: [
-                      {
-                        type: 'text-color',
-                        attrs: {
-                          color: 'default',
-                          bgColor: ''
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: ' ',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2022-12-22T16:30:00.000Z',
+                          date: '2023-12-03T19:50:00.000Z',
                           user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
                           approved: true,
                           username: 'Drea | CharmVerse'
@@ -579,23 +333,14 @@ export const gettingStartedPage: GettingStartedPage = {
                       {
                         type: 'text-color',
                         attrs: {
-                          color: 'default',
+                          color: 'blue',
                           bgColor: ''
                         }
                       }
                     ]
                   }
                 ]
-              }
-            ]
-          },
-          {
-            type: 'listItem',
-            attrs: {
-              track: [],
-              todoChecked: false
-            },
-            content: [
+              },
               {
                 type: 'paragraph',
                 attrs: {
@@ -603,22 +348,131 @@ export const gettingStartedPage: GettingStartedPage = {
                 },
                 content: [
                   {
-                    text: 'Highlight any text, and use the menu that pops up to ',
+                    text: 'CharmVerse automatically builds a directory as members join your space.',
                     type: 'text',
                     marks: [
                       {
                         type: 'insertion',
                         attrs: {
-                          date: '2022-12-21T15:20:00.000Z',
+                          date: '2023-12-03T19:50:00.000Z',
                           user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
                           approved: true,
                           username: 'Drea | CharmVerse'
                         }
                       }
                     ]
+                  }
+                ]
+              },
+              {
+                type: 'paragraph',
+                attrs: {
+                  track: []
+                }
+              },
+              {
+                type: 'iframe',
+                attrs: {
+                  src: 'https://tiny.charmverse.io/member-directory',
+                  type: 'embed',
+                  track: [],
+                  width: 700,
+                  height: 200
+                }
+              }
+            ]
+          },
+          {
+            type: 'columnBlock',
+            attrs: {
+              size: 331,
+              track: []
+            },
+            content: [
+              {
+                type: 'heading',
+                attrs: {
+                  id: null,
+                  level: 2,
+                  track: []
+                },
+                content: [
+                  {
+                    text: 'Proposals',
+                    type: 'text',
+                    marks: [
+                      {
+                        type: 'insertion',
+                        attrs: {
+                          date: '2023-12-03T19:50:00.000Z',
+                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                          approved: true,
+                          username: 'Drea | CharmVerse'
+                        }
+                      },
+                      {
+                        type: 'text-color',
+                        attrs: {
+                          color: 'blue',
+                          bgColor: ''
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                type: 'paragraph',
+                attrs: {
+                  track: []
+                },
+                content: [
+                  {
+                    text: 'A',
+                    type: 'text',
+                    marks: [
+                      {
+                        type: 'insertion',
+                        attrs: {
+                          date: '2023-12-03T20:20:00.000Z',
+                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                          approved: true,
+                          username: 'Drea | CharmVerse'
+                        }
+                      },
+                      {
+                        type: 'text-color',
+                        attrs: {
+                          color: null,
+                          bgColor: null
+                        }
+                      }
+                    ]
                   },
                   {
-                    text: 'style',
+                    text: 'll-in-one governance solution for web3',
+                    type: 'text',
+                    marks: [
+                      {
+                        type: 'insertion',
+                        attrs: {
+                          date: '2023-12-03T19:50:00.000Z',
+                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                          approved: true,
+                          username: 'Drea | CharmVerse'
+                        }
+                      },
+                      {
+                        type: 'text-color',
+                        attrs: {
+                          color: null,
+                          bgColor: null
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    text: ' ',
                     type: 'text',
                     marks: [
                       {
@@ -627,975 +481,233 @@ export const gettingStartedPage: GettingStartedPage = {
                       {
                         type: 'insertion',
                         attrs: {
-                          date: '2022-12-21T15:20:00.000Z',
+                          date: '2023-12-03T19:50:00.000Z',
                           user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
                           approved: true,
                           username: 'Drea | CharmVerse'
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: ' ',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2022-12-21T15:20:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: 'your',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'italic'
-                      },
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2022-12-21T15:20:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: ' ',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2022-12-21T15:20:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: 'writing',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'strike'
-                      },
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2022-12-21T15:20:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: ' ',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2022-12-21T15:20:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: 'however',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'code'
-                      }
-                    ]
-                  },
-                  {
-                    text: ' ',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2022-12-21T15:20:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: 'you',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'link',
-                        attrs: {
-                          href: 'https://www.notion.so/product'
                         }
                       },
                       {
-                        type: 'insertion',
+                        type: 'text-color',
                         attrs: {
-                          date: '2022-12-21T15:20:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
+                          color: null,
+                          bgColor: null
                         }
                       }
                     ]
                   },
                   {
-                    text: ' like',
+                    text: 'grant programs, token communities, and DAOs',
                     type: 'text',
                     marks: [
                       {
                         type: 'insertion',
                         attrs: {
-                          date: '2022-12-21T15:20:00.000Z',
+                          date: '2023-12-03T19:50:00.000Z',
                           user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
                           approved: true,
                           username: 'Drea | CharmVerse'
+                        }
+                      },
+                      {
+                        type: 'text-color',
+                        attrs: {
+                          color: null,
+                          bgColor: null
                         }
                       }
                     ]
                   }
                 ]
+              },
+              {
+                type: 'iframe',
+                attrs: {
+                  src: 'https://tiny.charmverse.io/proposal-builder',
+                  type: 'embed',
+                  track: [],
+                  width: 700,
+                  height: 200
+                }
               }
             ]
           }
         ]
       },
       {
-        type: 'paragraph',
+        type: 'columnLayout',
         attrs: {
           track: []
         },
         content: [
           {
-            type: 'tabIndent',
-            marks: [
-              {
-                type: 'insertion',
-                attrs: {
-                  date: '2022-12-22T16:20:00.000Z',
-                  user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                  approved: true,
-                  username: 'Drea | CharmVerse'
-                }
-              }
-            ]
-          },
-          {
-            text: 'Highlight this text and turn it into a Callout with a fire emoji.',
-            type: 'text',
-            marks: [
-              {
-                type: 'insertion',
-                attrs: {
-                  date: '2022-12-22T16:20:00.000Z',
-                  user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                  approved: true,
-                  username: 'Drea | CharmVerse'
-                }
-              },
-              {
-                type: 'text-color',
-                attrs: {
-                  color: 'default',
-                  bgColor: ''
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
-        type: 'bulletList',
-        attrs: {
-          tight: false
-        },
-        content: [
-          {
-            type: 'listItem',
-            attrs: {
-              track: [],
-              todoChecked: false
-            },
-            content: [
-              {
-                type: 'paragraph',
-                attrs: {
-                  track: []
-                },
-                content: [
-                  {
-                    text: 'See the ',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2022-12-21T15:20:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: '⋮⋮',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'code'
-                      }
-                    ]
-                  },
-                  {
-                    text: ' to the left of this checkbox on hover?',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2022-12-21T15:20:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: ' ',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'inline-comment',
-                        attrs: {
-                          id: '3ca23b78-4859-4366-8cf8-66cebfff9d36',
-                          resolved: true
-                        }
-                      },
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2022-12-21T15:20:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: 'Click and drag to move this line',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'inline-comment',
-                        attrs: {
-                          id: '3ca23b78-4859-4366-8cf8-66cebfff9d36',
-                          resolved: true
-                        }
-                      },
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2022-12-21T15:20:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      },
-                      {
-                        type: 'text-color',
-                        attrs: {
-                          color: 'default',
-                          bgColor: ''
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: '.',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2022-12-22T16:20:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      },
-                      {
-                        type: 'text-color',
-                        attrs: {
-                          color: 'default',
-                          bgColor: ''
-                        }
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        type: 'bulletList',
-        attrs: {
-          tight: false
-        },
-        content: [
-          {
-            type: 'listItem',
-            attrs: {
-              track: [],
-              todoChecked: false
-            },
-            content: [
-              {
-                type: 'paragraph',
-                attrs: {
-                  track: []
-                },
-                content: [
-                  {
-                    text: 'Hover over ',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2022-12-22T15:30:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      },
-                      {
-                        type: 'text-color',
-                        attrs: {
-                          color: 'default',
-                          bgColor: ''
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: 'SPACE',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'bold'
-                      },
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2022-12-22T15:30:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      },
-                      {
-                        type: 'text-color',
-                        attrs: {
-                          color: '',
-                          bgColor: 'gray'
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: ' in your sidebar and c',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2022-12-22T15:30:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      },
-                      {
-                        type: 'text-color',
-                        attrs: {
-                          color: 'default',
-                          bgColor: ''
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: 'lick the ',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2022-12-21T15:20:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      },
-                      {
-                        type: 'text-color',
-                        attrs: {
-                          color: 'default',
-                          bgColor: ''
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: '+',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'code'
-                      }
-                    ]
-                  },
-                  {
-                    text: ' ',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'bold'
-                      },
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2022-12-21T15:20:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      },
-                      {
-                        type: 'text-color',
-                        attrs: {
-                          color: 'default',
-                          bgColor: ''
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: 'button to add a new page',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2022-12-21T15:20:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      },
-                      {
-                        type: 'text-color',
-                        attrs: {
-                          color: 'default',
-                          bgColor: ''
-                        }
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        type: 'disclosureDetails',
-        content: [
-          {
-            type: 'disclosureSummary',
-            content: [
-              {
-                type: 'paragraph',
-                attrs: {
-                  track: []
-                },
-                content: [
-                  {
-                    text: 'This is a toggle block. ',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2022-12-21T15:30:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: 'Click the little triangle to see more useful tips!',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2022-12-21T15:30:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      },
-                      {
-                        type: 'text-color',
-                        attrs: {
-                          color: 'default',
-                          bgColor: ''
-                        }
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            type: 'bulletList',
-            attrs: {
-              tight: false
-            },
-            content: [
-              {
-                type: 'listItem',
-                attrs: {
-                  track: [],
-                  todoChecked: null
-                },
-                content: [
-                  {
-                    type: 'paragraph',
-                    attrs: {
-                      track: []
-                    },
-                    content: [
-                      {
-                        text: 'How it works',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'link',
-                            attrs: {
-                              href: 'https://www.charmverse.io/how-it-works'
-                            }
-                          },
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2022-12-22T15:50:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: ' ',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2022-12-22T15:50:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: ": Learn about CharmVerse's cool web3 features like",
-                        type: 'text'
-                      },
-                      {
-                        text: ' ',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2023-01-27T17:50:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: 'Forum',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'link',
-                            attrs: {
-                              href: 'https://www.charmverse.io/forum'
-                            }
-                          },
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2023-01-27T17:50:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: ',',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2023-01-27T17:50:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: ' ',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2022-12-22T16:40:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: 'Proposal Builder',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'link',
-                            attrs: {
-                              href: 'https://www.charmverse.io/proposal-builder'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: ', Bounties, ',
-                        type: 'text'
-                      },
-                      {
-                        text: 'and ',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2022-12-30T15:40:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: 'Member Directory',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'link',
-                            attrs: {
-                              href: 'https://www.charmverse.io/member-directory'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: '. You will find shortcuts to these features at the top of your sidebar.',
-                        type: 'text'
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                type: 'listItem',
-                attrs: {
-                  track: [],
-                  todoChecked: null
-                },
-                content: [
-                  {
-                    type: 'paragraph',
-                    attrs: {
-                      track: []
-                    },
-                    content: [
-                      {
-                        text: 'Solutions',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'link',
-                            attrs: {
-                              href: 'https://www.charmverse.io/solutions'
-                            }
-                          },
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2022-12-22T15:50:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: ' ',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2022-12-22T15:50:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: ': Find examples of how to use CharmVerse for your web3 community.',
-                        type: 'text'
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                type: 'listItem',
-                attrs: {
-                  track: [],
-                  todoChecked: null
-                },
-                content: [
-                  {
-                    type: 'paragraph',
-                    attrs: {
-                      track: []
-                    },
-                    content: [
-                      {
-                        text: 'FAQ',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'link',
-                            attrs: {
-                              href: 'https://www.charmverse.io/faq'
-                            }
-                          },
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2022-12-22T16:00:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: ' ',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2022-12-22T16:00:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: ': Any questions? Maybe we already answered them here ',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2022-12-22T16:00:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          },
-                          {
-                            type: 'text-color',
-                            attrs: {
-                              color: null,
-                              bgColor: null
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        type: 'emoji',
-                        attrs: {
-                          emoji: '😉'
-                        },
-                        marks: [
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2022-12-22T16:00:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: ' ',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2022-12-22T16:00:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                type: 'listItem',
-                attrs: {
-                  track: [],
-                  todoChecked: null
-                },
-                content: [
-                  {
-                    type: 'paragraph',
-                    attrs: {
-                      track: []
-                    },
-                    content: [
-                      {
-                        text: 'User Manual',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'link',
-                            attrs: {
-                              href: 'https://app.charmverse.io/charmverse-community/page-649263016636265'
-                            }
-                          },
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2023-02-12T14:50:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: ' : Our User Manual is under construction. We will be adding content and updating regularly!',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2023-02-12T14:50:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            type: 'paragraph',
+            type: 'columnBlock',
             attrs: {
               track: []
-            }
+            },
+            content: [
+              {
+                type: 'heading',
+                attrs: {
+                  id: null,
+                  level: 2,
+                  track: []
+                },
+                content: [
+                  {
+                    text: 'Forum',
+                    type: 'text',
+                    marks: [
+                      {
+                        type: 'insertion',
+                        attrs: {
+                          date: '2023-12-03T20:00:00.000Z',
+                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                          approved: true,
+                          username: 'Drea | CharmVerse'
+                        }
+                      },
+                      {
+                        type: 'text-color',
+                        attrs: {
+                          color: 'blue',
+                          bgColor: ''
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                type: 'paragraph',
+                attrs: {
+                  track: []
+                },
+                content: [
+                  {
+                    text: 'C',
+                    type: 'text',
+                    marks: [
+                      {
+                        type: 'insertion',
+                        attrs: {
+                          date: '2023-12-03T20:20:00.000Z',
+                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                          approved: true,
+                          username: 'Drea | CharmVerse'
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    text: 'entral source for conversations that matter.',
+                    type: 'text',
+                    marks: [
+                      {
+                        type: 'insertion',
+                        attrs: {
+                          date: '2023-12-03T20:00:00.000Z',
+                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                          approved: true,
+                          username: 'Drea | CharmVerse'
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                type: 'paragraph',
+                attrs: {
+                  track: []
+                }
+              },
+              {
+                type: 'iframe',
+                attrs: {
+                  src: 'https://tiny.charmverse.io/forum',
+                  type: 'embed',
+                  track: [],
+                  width: 700,
+                  height: 200
+                }
+              }
+            ]
+          },
+          {
+            type: 'columnBlock',
+            attrs: {
+              track: []
+            },
+            content: [
+              {
+                type: 'heading',
+                attrs: {
+                  id: null,
+                  level: 2,
+                  track: []
+                },
+                content: [
+                  {
+                    text: 'Rewards',
+                    type: 'text',
+                    marks: [
+                      {
+                        type: 'insertion',
+                        attrs: {
+                          date: '2023-12-03T20:00:00.000Z',
+                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                          approved: true,
+                          username: 'Drea | CharmVerse'
+                        }
+                      },
+                      {
+                        type: 'text-color',
+                        attrs: {
+                          color: 'blue',
+                          bgColor: ''
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                type: 'paragraph',
+                attrs: {
+                  track: []
+                },
+                content: [
+                  {
+                    text: 'Incentivize community contribution and collaboration.',
+                    type: 'text',
+                    marks: [
+                      {
+                        type: 'insertion',
+                        attrs: {
+                          date: '2023-12-03T20:00:00.000Z',
+                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                          approved: true,
+                          username: 'Drea | CharmVerse'
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                type: 'iframe',
+                attrs: {
+                  src: 'https://tiny.charmverse.io/rewards',
+                  type: 'embed',
+                  track: [],
+                  width: 700,
+                  height: 200
+                }
+              }
+            ]
           }
         ]
-      },
-      {
-        type: 'paragraph',
-        attrs: {
-          track: []
-        }
       },
       {
         type: 'horizontalRule',
@@ -1611,8 +723,10 @@ export const gettingStartedPage: GettingStartedPage = {
         },
         content: [
           {
-            type: 'paragraph',
+            type: 'heading',
             attrs: {
+              id: null,
+              level: 2,
               track: []
             },
             content: [
@@ -1626,7 +740,7 @@ export const gettingStartedPage: GettingStartedPage = {
                   {
                     type: 'insertion',
                     attrs: {
-                      date: '2022-12-29T20:30:00.000Z',
+                      date: '2023-12-03T19:50:00.000Z',
                       user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
                       approved: true,
                       username: 'Drea | CharmVerse'
@@ -1635,7 +749,7 @@ export const gettingStartedPage: GettingStartedPage = {
                   {
                     type: 'text-color',
                     attrs: {
-                      color: 'red',
+                      color: 'blue',
                       bgColor: ''
                     }
                   }
@@ -1656,7 +770,7 @@ export const gettingStartedPage: GettingStartedPage = {
                   {
                     type: 'insertion',
                     attrs: {
-                      date: '2022-12-29T20:40:00.000Z',
+                      date: '2023-12-03T19:50:00.000Z',
                       user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
                       approved: true,
                       username: 'Drea | CharmVerse'
@@ -1668,720 +782,30 @@ export const gettingStartedPage: GettingStartedPage = {
                 type: 'emoji',
                 attrs: {
                   emoji: '🥳'
-                }
-              },
-              {
-                text: ' ',
-                type: 'text'
-              },
-              {
-                text: ' ',
-                type: 'text',
-                marks: [
-                  {
-                    type: 'insertion',
-                    attrs: {
-                      date: '2023-02-11T13:00:00.000Z',
-                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                      approved: true,
-                      username: 'Drea | CharmVerse'
-                    }
-                  }
-                ]
-              },
-              {
-                text: 'C',
-                type: 'text',
-                marks: [
-                  {
-                    type: 'insertion',
-                    attrs: {
-                      date: '2023-02-11T13:10:00.000Z',
-                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                      approved: true,
-                      username: 'Drea | CharmVerse'
-                    }
-                  }
-                ]
-              },
-              {
-                text: 'ustomize the permission settings to create the',
-                type: 'text',
-                marks: [
-                  {
-                    type: 'insertion',
-                    attrs: {
-                      date: '2023-02-11T13:00:00.000Z',
-                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                      approved: true,
-                      username: 'Drea | CharmVerse'
-                    }
-                  }
-                ]
-              },
-              {
-                text: ' perfect space for your community.',
-                type: 'text',
-                marks: [
-                  {
-                    type: 'insertion',
-                    attrs: {
-                      date: '2023-02-11T13:10:00.000Z',
-                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                      approved: true,
-                      username: 'Drea | CharmVerse'
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            type: 'disclosureDetails',
-            content: [
-              {
-                type: 'disclosureSummary',
-                content: [
-                  {
-                    type: 'paragraph',
-                    attrs: {
-                      track: []
-                    },
-                    content: [
-                      {
-                        text: 'Set space permissions',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2023-02-11T13:10:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          },
-                          {
-                            type: 'text-color',
-                            attrs: {
-                              color: 'red',
-                              bgColor: ''
-                            }
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                type: 'paragraph',
-                attrs: {
-                  track: []
                 },
-                content: [
+                marks: [
                   {
-                    text: 'Space admins may manage space permissions. Access space permissions by clicking ',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2023-02-11T13:10:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: 'Settings',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2023-02-11T13:10:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      },
-                      {
-                        type: 'text-color',
-                        attrs: {
-                          color: '',
-                          bgColor: 'gray'
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: ' in the left side bar and selecting ',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2023-02-11T13:10:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: 'Roles & Permissions',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2023-02-11T13:10:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      },
-                      {
-                        type: 'text-color',
-                        attrs: {
-                          color: '',
-                          bgColor: 'gray'
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: '.',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2023-02-11T13:10:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      }
-                    ]
+                    type: 'insertion',
+                    attrs: {
+                      date: '2023-12-03T19:50:00.000Z',
+                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                      approved: true,
+                      username: 'Drea | CharmVerse'
+                    }
                   }
                 ]
               },
               {
-                type: 'paragraph',
-                attrs: {
-                  track: []
-                },
-                content: [
+                text: '  ',
+                type: 'text',
+                marks: [
                   {
-                    type: 'emoji',
+                    type: 'insertion',
                     attrs: {
-                      emoji: '❗'
-                    }
-                  },
-                  {
-                    text: ' ',
-                    type: 'text'
-                  },
-                  {
-                    text: 'Default permissions for the starting pages in a new space are ',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2023-02-11T13:10:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: 'full access',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'bold'
-                      },
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2023-02-11T14:00:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: '.',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2023-02-11T13:10:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: ' ',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2023-02-11T14:00:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: 'Members may create pages, view, edit and share ',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2023-02-11T13:10:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: 'all',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2023-02-11T14:00:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    text: ' top-level pages.',
-                    type: 'text',
-                    marks: [
-                      {
-                        type: 'insertion',
-                        attrs: {
-                          date: '2023-02-11T13:10:00.000Z',
-                          user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                          approved: true,
-                          username: 'Drea | CharmVerse'
-                        }
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        type: 'columnLayout',
-        attrs: {
-          track: []
-        },
-        content: [
-          {
-            type: 'columnBlock',
-            content: [
-              {
-                type: 'disclosureDetails',
-                content: [
-                  {
-                    type: 'disclosureSummary',
-                    content: [
-                      {
-                        type: 'paragraph',
-                        attrs: {
-                          track: []
-                        },
-                        content: [
-                          {
-                            text: 'Add a teammate',
-                            type: 'text',
-                            marks: [
-                              {
-                                type: 'insertion',
-                                attrs: {
-                                  date: '2022-12-29T20:30:00.000Z',
-                                  user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                                  approved: true,
-                                  username: 'Drea | CharmVerse'
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    type: 'bulletList',
-                    attrs: {
-                      tight: false
-                    },
-                    content: [
-                      {
-                        type: 'listItem',
-                        attrs: {
-                          track: [],
-                          todoChecked: false
-                        },
-                        content: [
-                          {
-                            type: 'paragraph',
-                            attrs: {
-                              track: []
-                            },
-                            content: [
-                              {
-                                text: 'Create a private link',
-                                type: 'text',
-                                marks: [
-                                  {
-                                    type: 'insertion',
-                                    attrs: {
-                                      date: '2022-12-29T20:30:00.000Z',
-                                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                                      approved: true,
-                                      username: 'Drea | CharmVerse'
-                                    }
-                                  }
-                                ]
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      {
-                        type: 'listItem',
-                        attrs: {
-                          track: [],
-                          todoChecked: false
-                        },
-                        content: [
-                          {
-                            type: 'paragraph',
-                            attrs: {
-                              track: []
-                            },
-                            content: [
-                              {
-                                text: 'Add a token gate',
-                                type: 'text',
-                                marks: [
-                                  {
-                                    type: 'insertion',
-                                    attrs: {
-                                      date: '2022-12-29T20:30:00.000Z',
-                                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                                      approved: true,
-                                      username: 'Drea | CharmVerse'
-                                    }
-                                  }
-                                ]
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    type: 'paragraph',
-                    attrs: {
-                      track: []
-                    }
-                  },
-                  {
-                    type: 'video',
-                    attrs: {
-                      src: 'https://tiny.charmverse.io/invites',
-                      track: [],
-                      width: 197,
-                      height: 395.48022598870057,
-                      muxAssetId: '',
-                      muxPlaybackId: ''
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            type: 'columnBlock',
-            content: [
-              {
-                type: 'disclosureDetails',
-                content: [
-                  {
-                    type: 'disclosureSummary',
-                    content: [
-                      {
-                        type: 'paragraph',
-                        attrs: {
-                          track: []
-                        },
-                        content: [
-                          {
-                            text: 'Checkout the Member Directory',
-                            type: 'text',
-                            marks: [
-                              {
-                                type: 'insertion',
-                                attrs: {
-                                  date: '2022-12-29T20:30:00.000Z',
-                                  user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                                  approved: true,
-                                  username: 'Drea | CharmVerse'
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    type: 'bulletList',
-                    attrs: {
-                      tight: false
-                    },
-                    content: [
-                      {
-                        type: 'listItem',
-                        attrs: {
-                          track: [],
-                          todoChecked: false
-                        },
-                        content: [
-                          {
-                            type: 'paragraph',
-                            attrs: {
-                              track: []
-                            },
-                            content: [
-                              {
-                                text: 'Add a custom property',
-                                type: 'text',
-                                marks: [
-                                  {
-                                    type: 'insertion',
-                                    attrs: {
-                                      date: '2022-12-29T20:30:00.000Z',
-                                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                                      approved: true,
-                                      username: 'Drea | CharmVerse'
-                                    }
-                                  }
-                                ]
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      {
-                        type: 'listItem',
-                        attrs: {
-                          track: [],
-                          todoChecked: false
-                        },
-                        content: [
-                          {
-                            type: 'paragraph',
-                            attrs: {
-                              track: []
-                            },
-                            content: [
-                              {
-                                text: 'Complete your workspace profile',
-                                type: 'text',
-                                marks: [
-                                  {
-                                    type: 'insertion',
-                                    attrs: {
-                                      date: '2022-12-29T20:30:00.000Z',
-                                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                                      approved: true,
-                                      username: 'Drea | CharmVerse'
-                                    }
-                                  }
-                                ]
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    type: 'paragraph',
-                    attrs: {
-                      track: []
-                    }
-                  },
-                  {
-                    type: 'video',
-                    attrs: {
-                      src: 'https://tiny.charmverse.io/member-directory',
-                      track: [],
-                      width: 197,
-                      height: 395.48022598870057,
-                      muxAssetId: '',
-                      muxPlaybackId: ''
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            type: 'columnBlock',
-            content: [
-              {
-                type: 'disclosureDetails',
-                content: [
-                  {
-                    type: 'disclosureSummary',
-                    content: [
-                      {
-                        type: 'paragraph',
-                        attrs: {
-                          track: []
-                        },
-                        content: [
-                          {
-                            text: 'Try creating a proposal',
-                            type: 'text',
-                            marks: [
-                              {
-                                type: 'insertion',
-                                attrs: {
-                                  date: '2022-12-29T20:30:00.000Z',
-                                  user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                                  approved: true,
-                                  username: 'Drea | CharmVerse'
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    type: 'bulletList',
-                    attrs: {
-                      tight: false
-                    },
-                    content: [
-                      {
-                        type: 'listItem',
-                        attrs: {
-                          track: [],
-                          todoChecked: false
-                        },
-                        content: [
-                          {
-                            type: 'paragraph',
-                            attrs: {
-                              track: []
-                            },
-                            content: [
-                              {
-                                text: 'Build a proposal template',
-                                type: 'text',
-                                marks: [
-                                  {
-                                    type: 'insertion',
-                                    attrs: {
-                                      date: '2022-12-29T20:30:00.000Z',
-                                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                                      approved: true,
-                                      username: 'Drea | CharmVerse'
-                                    }
-                                  }
-                                ]
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      {
-                        type: 'listItem',
-                        attrs: {
-                          track: [],
-                          todoChecked: false
-                        },
-                        content: [
-                          {
-                            type: 'paragraph',
-                            attrs: {
-                              track: []
-                            },
-                            content: [
-                              {
-                                text: 'Start your first proposal',
-                                type: 'text',
-                                marks: [
-                                  {
-                                    type: 'insertion',
-                                    attrs: {
-                                      date: '2022-12-29T20:30:00.000Z',
-                                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                                      approved: true,
-                                      username: 'Drea | CharmVerse'
-                                    }
-                                  }
-                                ]
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    type: 'paragraph',
-                    attrs: {
-                      track: []
-                    }
-                  },
-                  {
-                    type: 'video',
-                    attrs: {
-                      src: 'https://tiny.charmverse.io/proposal-builder',
-                      track: [],
-                      width: 197,
-                      height: 395.48022598870057,
-                      muxAssetId: '',
-                      muxPlaybackId: ''
+                      date: '2023-12-03T19:50:00.000Z',
+                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
+                      approved: true,
+                      username: 'Drea | CharmVerse'
                     }
                   }
                 ]
@@ -2391,568 +815,28 @@ export const gettingStartedPage: GettingStartedPage = {
         ]
       },
       {
-        type: 'columnLayout',
+        type: 'iframe',
         attrs: {
-          track: []
-        },
-        content: [
-          {
-            type: 'columnBlock'
-          }
-        ]
-      },
-      {
-        type: 'paragraph',
-        attrs: {
-          track: []
+          src: 'https://tiny.charmverse.io/invites',
+          type: 'embed',
+          track: [],
+          width: 700,
+          height: 395.4802259887006
         }
       },
       {
-        type: 'blockquote',
+        type: 'columnLayout',
         attrs: {
-          emoji: '🔗',
           track: []
         },
         content: [
           {
-            type: 'paragraph',
+            type: 'columnBlock',
             attrs: {
               track: []
-            },
-            content: [
-              {
-                text: 'Useful',
-                type: 'text',
-                marks: [
-                  {
-                    type: 'bold'
-                  },
-                  {
-                    type: 'insertion',
-                    attrs: {
-                      date: '2022-12-29T21:00:00.000Z',
-                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                      approved: true,
-                      username: 'Drea | CharmVerse'
-                    }
-                  },
-                  {
-                    type: 'text-color',
-                    attrs: {
-                      color: 'orange',
-                      bgColor: ''
-                    }
-                  }
-                ]
-              },
-              {
-                text: ' Links',
-                type: 'text',
-                marks: [
-                  {
-                    type: 'bold'
-                  },
-                  {
-                    type: 'insertion',
-                    attrs: {
-                      date: '2022-12-29T15:00:00.000Z',
-                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                      approved: true,
-                      username: 'Drea | CharmVerse'
-                    }
-                  },
-                  {
-                    type: 'text-color',
-                    attrs: {
-                      color: 'orange',
-                      bgColor: ''
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            type: 'bulletList',
-            attrs: {
-              tight: false
-            },
-            content: [
-              {
-                type: 'listItem',
-                attrs: {
-                  track: [],
-                  todoChecked: null
-                },
-                content: [
-                  {
-                    type: 'paragraph',
-                    attrs: {
-                      track: []
-                    },
-                    content: [
-                      {
-                        text: 'How it works',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'link',
-                            attrs: {
-                              href: 'https://www.charmverse.io/how-it-works'
-                            }
-                          },
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2022-12-29T15:00:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: " : Learn about CharmVerse's cool web3 features like",
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2022-12-29T15:00:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: ' ',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2023-01-27T17:50:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: 'Forum',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'link',
-                            attrs: {
-                              href: 'https://www.charmverse.io/forum'
-                            }
-                          },
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2023-01-27T17:50:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: ',',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2023-01-27T17:50:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: ' ',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2022-12-29T15:00:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: 'Proposal Builder',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'link',
-                            attrs: {
-                              href: 'https://www.charmverse.io/proposal-builder'
-                            }
-                          },
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2022-12-29T15:00:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: ', ',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2022-12-29T15:00:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: 'Bounties',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'link',
-                            attrs: {
-                              href: 'https://tiny.charmverse.io/bounties'
-                            }
-                          },
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2022-12-29T15:00:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: ', ',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2022-12-29T15:00:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: 'and ',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2022-12-30T15:40:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: 'Member Directory',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'link',
-                            attrs: {
-                              href: 'https://www.charmverse.io/member-directory'
-                            }
-                          },
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2022-12-29T15:00:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: '. You will find shortcuts to these features at the top of your sidebar.',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2022-12-29T15:00:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                type: 'listItem',
-                attrs: {
-                  track: [],
-                  todoChecked: null
-                },
-                content: [
-                  {
-                    type: 'paragraph',
-                    attrs: {
-                      track: []
-                    },
-                    content: [
-                      {
-                        text: 'Solutions',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'link',
-                            attrs: {
-                              href: 'https://www.charmverse.io/solutions'
-                            }
-                          },
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2022-12-29T15:00:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: ' : Find examples of how to use CharmVerse for your web3 community.',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2022-12-29T15:00:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                type: 'listItem',
-                attrs: {
-                  track: [],
-                  todoChecked: null
-                },
-                content: [
-                  {
-                    type: 'paragraph',
-                    attrs: {
-                      track: []
-                    },
-                    content: [
-                      {
-                        text: 'FAQ',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'link',
-                            attrs: {
-                              href: 'https://www.charmverse.io/faq'
-                            }
-                          },
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2022-12-29T15:00:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: ' ',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2022-12-29T15:00:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: ': Any questions? Maybe we already answered them here ',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2022-12-29T15:00:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          },
-                          {
-                            type: 'text-color',
-                            attrs: {
-                              color: null,
-                              bgColor: null
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        type: 'emoji',
-                        attrs: {
-                          emoji: '😉'
-                        },
-                        marks: [
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2022-12-29T15:00:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: ' ',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2022-12-29T15:00:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                type: 'listItem',
-                attrs: {
-                  track: [],
-                  todoChecked: null
-                },
-                content: [
-                  {
-                    type: 'paragraph',
-                    attrs: {
-                      track: []
-                    },
-                    content: [
-                      {
-                        text: 'User Manual',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'link',
-                            attrs: {
-                              href: 'https://app.charmverse.io/charmverse-community/page-649263016636265'
-                            }
-                          },
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2023-02-12T14:40:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        text: ' : Our User Manual is under construction. We will be adding content and updating regularly!',
-                        type: 'text',
-                        marks: [
-                          {
-                            type: 'insertion',
-                            attrs: {
-                              date: '2023-02-12T14:40:00.000Z',
-                              user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                              approved: true,
-                              username: 'Drea | CharmVerse'
-                            }
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
+            }
           }
         ]
-      },
-      {
-        type: 'columnLayout',
-        attrs: {
-          track: []
-        },
-        content: [
-          {
-            type: 'columnBlock'
-          }
-        ]
-      },
-      {
-        type: 'paragraph',
-        attrs: {
-          track: []
-        }
       },
       {
         type: 'horizontalRule',
@@ -2961,178 +845,34 @@ export const gettingStartedPage: GettingStartedPage = {
         }
       },
       {
-        type: 'blockquote',
+        type: 'bookmark',
         attrs: {
-          emoji: '👇',
+          url: 'https://app.charmverse.io/charmverse-community/page-649263016636265',
           track: []
-        },
-        content: [
-          {
-            type: 'paragraph',
-            attrs: {
-              track: []
-            },
-            content: [
-              {
-                text: 'Need more information',
-                type: 'text',
-                marks: [
-                  {
-                    type: 'bold'
-                  },
-                  {
-                    type: 'insertion',
-                    attrs: {
-                      date: '2022-12-22T16:00:00.000Z',
-                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                      approved: true,
-                      username: 'Drea | CharmVerse'
-                    }
-                  },
-                  {
-                    type: 'text-color',
-                    attrs: {
-                      color: 'purple',
-                      bgColor: ''
-                    }
-                  }
-                ]
-              },
-              {
-                text: '?',
-                type: 'text',
-                marks: [
-                  {
-                    type: 'bold'
-                  },
-                  {
-                    type: 'insertion',
-                    attrs: {
-                      date: '2022-12-21T15:20:00.000Z',
-                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                      approved: true,
-                      username: 'Drea | CharmVerse'
-                    }
-                  },
-                  {
-                    type: 'text-color',
-                    attrs: {
-                      color: 'purple',
-                      bgColor: ''
-                    }
-                  }
-                ]
-              },
-              {
-                text: ' ',
-                type: 'text',
-                marks: [
-                  {
-                    type: 'insertion',
-                    attrs: {
-                      date: '2022-12-21T15:20:00.000Z',
-                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                      approved: true,
-                      username: 'Drea | CharmVerse'
-                    }
-                  }
-                ]
-              },
-              {
-                text: ' ',
-                type: 'text',
-                marks: [
-                  {
-                    type: 'insertion',
-                    attrs: {
-                      date: '2022-12-21T16:20:00.000Z',
-                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                      approved: true,
-                      username: 'Drea | CharmVerse'
-                    }
-                  }
-                ]
-              },
-              {
-                text: 'J',
-                type: 'text',
-                marks: [
-                  {
-                    type: 'insertion',
-                    attrs: {
-                      date: '2023-02-12T15:00:00.000Z',
-                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                      approved: true,
-                      username: 'Drea | CharmVerse'
-                    }
-                  }
-                ]
-              },
-              {
-                text: 'oin our Discord and chat with us',
-                type: 'text',
-                marks: [
-                  {
-                    type: 'insertion',
-                    attrs: {
-                      date: '2022-12-21T16:20:00.000Z',
-                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                      approved: true,
-                      username: 'Drea | CharmVerse'
-                    }
-                  }
-                ]
-              },
-              {
-                text: '.',
-                type: 'text',
-                marks: [
-                  {
-                    type: 'insertion',
-                    attrs: {
-                      date: '2022-12-21T15:20:00.000Z',
-                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                      approved: true,
-                      username: 'Drea | CharmVerse'
-                    }
-                  }
-                ]
-              },
-              {
-                text: ' We are a friendly bunch!',
-                type: 'text',
-                marks: [
-                  {
-                    type: 'insertion',
-                    attrs: {
-                      date: '2023-02-12T15:00:00.000Z',
-                      user: 'e5dba747-be62-49be-a7ba-71cf27b17174',
-                      approved: true,
-                      username: 'Drea | CharmVerse'
-                    }
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        type: 'columnLayout',
-        attrs: {
-          track: []
-        },
-        content: [
-          {
-            type: 'columnBlock'
-          }
-        ]
+        }
       },
       {
         type: 'bookmark',
         attrs: {
           url: 'https://discord.gg/ACYCzBGC2M',
           track: []
+        }
+      },
+      {
+        type: 'bookmark',
+        attrs: {
+          url: 'https://embeds.beehiiv.com/c66f66bc-09b6-4e40-b69a-243f5ce75c3c',
+          track: []
+        }
+      },
+      {
+        type: 'iframe',
+        attrs: {
+          src: 'https://embeds.beehiiv.com/c66f66bc-09b6-4e40-b69a-243f5ce75c3c',
+          type: 'embed',
+          track: [],
+          width: 700,
+          height: 200
         }
       },
       {
@@ -3144,5 +884,12 @@ export const gettingStartedPage: GettingStartedPage = {
     ]
   },
   contentText:
-    " Welcome to CharmVerse!A web3 community platform. Powering the Future of Work through Web3. The solution for token communities to build relationships, work together and vote.Here are the basics:Click anywhere and just start typingHit / to see all the types of content you can add - headings, videos, tweets, sub pages, etc.Give it a go. Hit / and insert a new sub page here  Hit : to add an emoji. Go ahead and add your favorite emoji here  Highlight any text, and use the menu that pops up to style your writing however you likeHighlight this text and turn it into a Callout with a fire emoji.See the ⋮⋮ to the left of this checkbox on hover? Click and drag to move this line.Hover over SPACE in your sidebar and click the + button to add a new pageThis is a toggle block. Click the little triangle to see more useful tips!How it works : Learn about CharmVerse's cool web3 features like Forum, Proposal Builder, Bounties, and Member Directory. You will find shortcuts to these features at the top of your sidebar.Solutions : Find examples of how to use CharmVerse for your web3 community.FAQ : Any questions? Maybe we already answered them here  User Manual : Our User Manual is under construction. We will be adding content and updating regularly!Collaborate in CharmVerseCharmVerse is better with friends, teammates, and collaborators   Customize the permission settings to create the perfect space for your community.Set space permissionsSpace admins may manage space permissions. Access space permissions by clicking Settings in the left side bar and selecting Roles & Permissions. Default permissions for the starting pages in a new space are full access. Members may create pages, view, edit and share all top-level pages.Add a teammateCreate a private linkAdd a token gateCheckout the Member DirectoryAdd a custom propertyComplete your workspace profileTry creating a proposalBuild a proposal templateStart your first proposalUseful LinksHow it works : Learn about CharmVerse's cool web3 features like Forum, Proposal Builder, Bounties, and Member Directory. You will find shortcuts to these features at the top of your sidebar.Solutions : Find examples of how to use CharmVerse for your web3 community.FAQ : Any questions? Maybe we already answered them here  User Manual : Our User Manual is under construction. We will be adding content and updating regularly!Need more information?  Join our Discord and chat with us. We are a friendly bunch!"
+    '👋 Welcome to CharmVerse!A community operations platform designed specifically for web3 communities - build relationships, work together and vote.Supercharge your community with CharmVerseMember DirectoryCharmVerse automatically builds a directory as members join your space.ProposalsAll-in-one governance solution for web3 grant programs, token communities, and DAOsForumCentral source for conversations that matter.RewardsIncentivize community contribution and collaboration.Collaborate in CharmVerseCharmVerse is better with friends, teammates, and collaborators 🥳  ',
+  hasContent: true,
+  headerImage:
+    'https://s3.amazonaws.com/charm.public/user-content/e5dba747-be62-49be-a7ba-71cf27b17174/2964a494-0aaf-4547-aaff-7b1ebfb540ae/home_banner.jpg',
+  icon: '🧑‍🚀',
+  type: 'page',
+  index: 8,
+  version: 660
 };

@@ -113,10 +113,14 @@ function scrollIntoViewIfNeededPolyfill(element: HTMLElement, centerIfNeeded?: b
 }
 
 // @source: https://stackoverflow.com/questions/5999118/how-can-i-add-or-update-a-query-string-parameter
-export function getNewUrl(params: Record<string, string | null>, currentUrl = window.location.href) {
+export function getNewUrl(
+  params: Record<string, string | null>,
+  currentUrl = window.location.href,
+  urlBase = window.location.origin
+) {
   return addQueryToUrl({
     url: currentUrl || window.location.href,
-    urlBase: window.location.origin,
+    urlBase: urlBase || window.location.origin,
     query: params,
     replace: true
   });
@@ -125,8 +129,9 @@ export function getNewUrl(params: Record<string, string | null>, currentUrl = wi
 /**
  * update URL without Next.js re-rendering the page
  * source: https://github.com/vercel/next.js/discussions/18072
- *
  * To remove a param from the query, set it as null
+ *
+ * @deprecated - use useCharmRouter instead to update query params
  */
 export function setUrlWithoutRerender(
   pathname: string,
@@ -167,17 +172,21 @@ export function getCookie(name: string): string | undefined {
 export function setCookie({
   name,
   value,
-  expiresInDays = 10 * 365
+  expiresInDays = 10 * 365,
+  expiresAfterSession
 }: {
   name: string;
   value: string;
-  expiresInDays: number;
+  expiresInDays?: number;
+  expiresAfterSession?: boolean;
 }) {
   const expires = new Date();
   const secure = typeof baseUrl === 'string' && baseUrl.includes('https') ? 'secure;' : '';
 
   expires.setDate(expires.getDate() + expiresInDays);
-  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires.toUTCString()}; path=/; ${secure}}`;
+  document.cookie = `${name}=${encodeURIComponent(value)};${
+    expiresAfterSession ? '' : ` expires=${expires.toUTCString()};`
+  } path=/; ${secure}}`;
 }
 
 export function deleteCookie(name: string) {

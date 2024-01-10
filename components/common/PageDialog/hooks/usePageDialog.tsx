@@ -1,12 +1,16 @@
 import type { ReactNode } from 'react';
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
-interface PageDialogContext {
+import { useCharmRouter } from 'hooks/useCharmRouter';
+
+export interface PageDialogContext {
   bountyId?: string;
   pageId?: string | null;
   readOnly?: boolean;
   hideToolsMenu?: boolean;
   onClose?: () => void;
+  applicationId?: string;
+  isNewApplication?: boolean;
 }
 
 interface Context {

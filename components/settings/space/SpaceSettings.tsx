@@ -1,24 +1,26 @@
-import type { Prisma, Space } from '@charmverse/core/prisma';
+import type { IdentityType, Prisma, Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
+import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import {
   Box,
-  Grid,
-  Stack,
-  Typography,
-  TextField,
   FormHelperText,
-  MenuItem,
-  ListItem,
+  Grid,
   List,
+  ListItem,
+  ListItemIcon,
   ListItemText,
-  ListItemIcon
+  MenuItem,
+  Select,
+  Stack,
+  TextField,
+  Typography
 } from '@mui/material';
 import isEqual from 'lodash/isEqual';
 import PopupState from 'material-ui-popup-state';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
@@ -26,39 +28,44 @@ import * as yup from 'yup';
 import charmClient from 'charmClient';
 import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
+import { DraggableListItem } from 'components/common/DraggableListItem';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
-import DraggableListItem from 'components/common/PageLayout/components/DraggableListItem';
-import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
-import type { Feature } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
+import { PageIcon } from 'components/common/PageIcon';
 import Legend from 'components/settings/Legend';
 import { SetupCustomDomain } from 'components/settings/space/components/SetupCustomDomain';
 import { SpaceIntegrations } from 'components/settings/space/components/SpaceIntegrations';
-import { useFeaturesAndMembers } from 'hooks/useFeaturesAndMemberProfiles';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useMemberProfileTypes } from 'hooks/useMemberProfileTypes';
 import { usePreventReload } from 'hooks/usePreventReload';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useSpaces } from 'hooks/useSpaces';
+import type { Feature } from 'lib/features/constants';
 import type { NotificationToggleOption, NotificationToggles } from 'lib/notifications/notificationToggles';
 import type { MemberProfileName } from 'lib/profile/memberProfiles';
 import { getSpaceUrl, getSubdomainPath } from 'lib/utilities/browser';
 import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFromHost';
 
+import { IdentityIcon } from '../profile/components/IdentityIcon';
+
 import Avatar from './components/LargeAvatar';
 import { NotificationTogglesInput } from './components/NotificationToggles';
-import SettingsItem from './components/SettingsItem';
+import { SettingsItem } from './components/SettingsItem';
 
 export type FormValues = {
   name: string;
   spaceImage?: string | null;
+  spaceArtwork?: string | null;
   domain: string;
   notificationToggles: NotificationToggles;
 };
 
-const schema: yup.SchemaOf<FormValues> = yup.object({
+const schema: yup.Schema<FormValues> = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
-  spaceImage: yup.string().nullable(true),
+  spaceImage: yup.string().nullable(),
+  spaceArtwork: yup.string().nullable(),
   notificationToggles: yup.object(),
   domain: yup
     .string()
@@ -79,13 +86,15 @@ export function SpaceSettings({
   const router = useRouter();
   const { spaces, setSpace, setSpaces } = useSpaces();
   const isAdmin = useIsAdmin();
-  const { features: allFeatures, memberProfiles: allMemberProfiles } = useFeaturesAndMembers();
+  const { memberProfileTypes: currentMemberProfileTypes } = useMemberProfileTypes();
+  const { features: currentFeatures } = useSpaceFeatures();
   const workspaceRemoveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-remove' });
   const workspaceLeaveModalState = usePopupState({ variant: 'popover', popupId: 'workspace-leave' });
   const unsavedChangesModalState = usePopupState({ variant: 'popover', popupId: 'unsaved-changes' });
   const memberProfilesPopupState = usePopupState({ variant: 'popover', popupId: 'member-profiles' });
-  const [features, setFeatures] = useState(allFeatures);
-  const [memberProfiles, setMemberProfiles] = useState(allMemberProfiles);
+  const [featuresInput, setFeatures] = useState(currentFeatures);
+  const [primaryMemberIdentity, setPrimaryMemberIdentity] = useState<IdentityType | null>(space.primaryMemberIdentity);
+  const [memberProfileTypesInput, setMemberProfileProperties] = useState(currentMemberProfileTypes);
   const {
     register,
     handleSubmit,
@@ -129,6 +138,7 @@ export function SpaceSettings({
 
   const watchName = watch('name');
   const watchSpaceImage = watch('spaceImage');
+  const watchSpaceArtwork = watch('spaceArtwork');
 
   async function onSubmit(values: FormValues) {
     if (!isAdmin || !values.domain) return;
@@ -146,11 +156,13 @@ export function SpaceSettings({
     await updateSpace({
       id: space.id,
       notificationToggles: notificationToggles as Prisma.InputJsonValue,
-      features,
-      memberProfiles,
+      features: featuresInput,
+      memberProfiles: memberProfileTypesInput,
       name: values.name,
       domain: values.domain,
-      spaceImage: values.spaceImage
+      primaryMemberIdentity,
+      spaceImage: values.spaceImage,
+      spaceArtwork: values.spaceArtwork
     });
 
     if (newDomain) {
@@ -175,7 +187,7 @@ export function SpaceSettings({
   }
 
   async function changeOptionsOrder(draggedProperty: Feature, droppedOnProperty: Feature) {
-    const newOrder = [...features];
+    const newOrder = [...featuresInput];
     const propIndex = newOrder.findIndex((_feat) => _feat.id === draggedProperty); // find the property that was dragged
     const deletedElements = newOrder.splice(propIndex, 1); // remove the dragged property from the array
     const droppedOnIndex = newOrder.findIndex((_feat) => _feat.id === droppedOnProperty); // find the index of the space that was dropped on
@@ -184,17 +196,19 @@ export function SpaceSettings({
   }
 
   async function changeMembersOrder(draggedProperty: MemberProfileName, droppedOnProperty: MemberProfileName) {
-    const newOrder = [...memberProfiles];
+    const newOrder = [...memberProfileTypesInput];
     const propIndex = newOrder.findIndex((_feat) => _feat.id === draggedProperty); // find the property that was dragged
     const deletedElements = newOrder.splice(propIndex, 1); // remove the dragged property from the array
     const droppedOnIndex = newOrder.findIndex((_feat) => _feat.id === droppedOnProperty); // find the index of the space that was dropped on
     newOrder.splice(droppedOnIndex, 0, deletedElements[0]); // add the property to the new index
-    setMemberProfiles(newOrder);
+    setMemberProfileProperties(newOrder);
   }
 
-  const dataChanged = useMemo(() => {
-    return !isEqual(allFeatures, features) || !isEqual(allMemberProfiles, memberProfiles) || isDirty;
-  }, [allFeatures, features, allMemberProfiles, memberProfiles, isDirty]);
+  const dataChanged =
+    !isEqual(currentFeatures, featuresInput) ||
+    !isEqual(currentMemberProfileTypes, memberProfileTypesInput) ||
+    isDirty ||
+    space.primaryMemberIdentity !== primaryMemberIdentity;
 
   useEffect(() => {
     setUnsavedChanges(dataChanged);
@@ -266,13 +280,59 @@ export function SpaceSettings({
             />
           </Grid>
           <Grid item>
+            <FieldLabel>Primary Identity</FieldLabel>
+            <Typography variant='caption' mb={1} component='p'>
+              Choose the primary identity for your space. This will be the required identity that your members will have
+              to provide when they first join and it will be used to display the member.
+            </Typography>
+            <Box display='flex' alignItems='center' gap={1}>
+              <Select
+                value={primaryMemberIdentity ?? 'none'}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setPrimaryMemberIdentity(value === 'none' ? null : (value as IdentityType));
+                }}
+                disabled={!isAdmin}
+              >
+                <MenuItem value='none'>
+                  <Stack flexDirection='row' alignItems='center' gap={1}>
+                    <PersonOutlinedIcon style={{ width: 18, height: 18 }} />
+                    <Typography variant='body2'>Member's choice</Typography>
+                  </Stack>
+                </MenuItem>
+                {(['Discord', 'Google', 'Telegram', 'Wallet'] as IdentityType[]).map((identity) => (
+                  <MenuItem key={identity} value={identity}>
+                    <Stack flexDirection='row' alignItems='center' gap={1}>
+                      <IdentityIcon size='xSmall' type={identity} />
+                      <Typography variant='body2'>{identity}</Typography>
+                    </Stack>
+                  </MenuItem>
+                ))}
+              </Select>
+            </Box>
+          </Grid>
+          <Grid item>
+            <FieldLabel>Custom Artwork</FieldLabel>
+            <Typography variant='caption' mb={2} component='p'>
+              Show your artwork for onboarding users.
+            </Typography>
+            <Avatar
+              name={watchName}
+              variant='rounded'
+              image={watchSpaceArtwork}
+              updateImage={(url: string) => setValue('spaceArtwork', url, { shouldDirty: true })}
+              editable={isAdmin}
+            />
+            <TextField {...register('spaceArtwork')} sx={{ visibility: 'hidden', width: '0px', height: '0px' }} />
+          </Grid>
+          <Grid item>
             <FieldLabel>Sidebar Options</FieldLabel>
             <Typography mb={1} variant='caption' component='p'>
               Turn on and off the visibility of the following modules in the sidebar. The functionality will still
               exist, but it won't be visible in the sidebar.
             </Typography>
             <Stack>
-              {features.map(({ id, isHidden, title, path }) => {
+              {featuresInput.map(({ id, isHidden, title, path }) => {
                 return (
                   <DraggableListItem
                     key={id}
@@ -355,7 +415,7 @@ export function SpaceSettings({
               Set the order and turn on and off the visibility of certain onchain profiles for your members.
             </Typography>
             <Stack gap={1}>
-              {memberProfiles
+              {memberProfileTypesInput
                 .filter((mp) => !mp.isHidden)
                 .map(({ id, title }) => (
                   <DraggableListItem
@@ -375,7 +435,7 @@ export function SpaceSettings({
                           key='1'
                           data-test='settings-profiles-option-hide'
                           onClick={() => {
-                            setMemberProfiles((prevState) => {
+                            setMemberProfileProperties((prevState) => {
                               const newState = [...prevState];
                               const index = newState.findIndex((prevMp) => prevMp.id === id);
                               newState[index] = { id, title, isHidden: true };
@@ -397,7 +457,7 @@ export function SpaceSettings({
                   </DraggableListItem>
                 ))}
             </Stack>
-            {isAdmin && memberProfiles.filter((mp) => mp.isHidden).length > 0 && (
+            {isAdmin && memberProfileTypesInput.filter((mp) => mp.isHidden).length > 0 && (
               <Button
                 sx={{ flexGrow: 0 }}
                 {...bindTrigger(memberProfilesPopupState)}
@@ -416,6 +476,7 @@ export function SpaceSettings({
                 data-test='submit-space-update'
                 disabled={isMutating || !dataChanged}
                 type='submit'
+                loading={isMutating}
               >
                 Save
               </Button>
@@ -481,7 +542,7 @@ export function SpaceSettings({
         data-test='add-profiles-modal'
       >
         <List>
-          {memberProfiles
+          {memberProfileTypesInput
             .filter((mp) => mp.isHidden)
             .map(({ id, title }) => (
               <ListItem
@@ -490,7 +551,7 @@ export function SpaceSettings({
                   <Button
                     data-test={`add-profile-button-${id}`}
                     onClick={() => {
-                      setMemberProfiles((prevState) => {
+                      setMemberProfileProperties((prevState) => {
                         const prevMemberProfiles = [...prevState];
                         const targetedMemberProfileIndex = prevMemberProfiles.findIndex((_mp) => _mp.id === id);
                         prevMemberProfiles[targetedMemberProfileIndex] = {
@@ -525,7 +586,7 @@ function getProfileWidgetLogo(name: MemberProfileName) {
     case 'charmverse':
       return '/images/logos/charmverse_black.png';
     case 'collection':
-      return '/images/template_icons/nft_community_icon.svg';
+      return '/images/template_icons/nft_ape_icon.svg';
     case 'ens':
       return '/images/logos/ens_logo.svg';
     case 'lens':
@@ -548,6 +609,7 @@ function _getFormValues(space: Space): FormValues {
   return {
     name: space.name,
     spaceImage: space.spaceImage,
+    spaceArtwork: space.spaceArtwork,
     domain: space.domain,
     notificationToggles
   };

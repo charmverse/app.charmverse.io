@@ -1,20 +1,25 @@
 import { useTheme } from '@emotion/react';
 import AddIcon from '@mui/icons-material/Add';
+import CheckBoxOutlineBlankOutlinedIcon from '@mui/icons-material/CheckBoxOutlineBlankOutlined';
+import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
+import IndeterminateCheckBoxOutlinedIcon from '@mui/icons-material/IndeterminateCheckBoxOutlined';
 import { Box, Menu } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import type { Dispatch, SetStateAction } from 'react';
 import React, { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useSmallScreen } from 'hooks/useMediaScreens';
+import { useViewSortOptions } from 'hooks/useViewSortOptions';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
+import { Constants } from 'lib/focalboard/constants';
 
 import { filterPropertyTemplates } from '../../../../utils/updateVisibilePropertyIds';
-import { Constants } from '../../constants';
 import mutator from '../../mutator';
 import { OctoUtils } from '../../octoUtils';
 import { IDType, Utils } from '../../utils';
@@ -23,6 +28,7 @@ import { PropertyTypes } from '../../widgets/propertyTypes';
 import { typeDisplayName } from '../../widgets/typeDisplayName';
 
 import TableHeader from './tableHeader';
+import { StyledCheckbox } from './tableRow';
 
 type Props = {
   board: Board;
@@ -33,15 +39,29 @@ type Props = {
   resizingColumn: string;
   offset: number;
   columnRefs: Map<string, React.RefObject<HTMLDivElement>>;
+  checkedIds?: string[];
+  setCheckedIds?: Dispatch<SetStateAction<string[]>>;
 };
 
 function TableHeaders(props: Props): JSX.Element {
-  const { board, cards, activeView, resizingColumn, views, offset, columnRefs } = props;
+  const {
+    board,
+    cards,
+    activeView,
+    resizingColumn,
+    views,
+    offset,
+    columnRefs,
+    setCheckedIds,
+    readOnly,
+    checkedIds = []
+  } = props;
   const intl = useIntl();
   const { formatDateTime, formatDate } = useDateFormatter();
   const addPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-property' });
   const isSmallScreen = useSmallScreen();
   const theme = useTheme();
+  const sortOptions = useViewSortOptions(activeView);
   const onAutoSizeColumn = useCallback(
     (columnID: string, headerWidth: number) => {
       let longestSize = headerWidth;
@@ -152,7 +172,7 @@ function TableHeaders(props: Props): JSX.Element {
     );
   };
 
-  const titleSortOption = activeView.fields.sortOptions?.find((o) => o.propertyId === Constants.titleColumnId);
+  const titleSortOption = sortOptions?.find((o) => o.propertyId === Constants.titleColumnId);
   let titleSorted: 'up' | 'down' | 'none' = 'none';
   if (titleSortOption) {
     titleSorted = titleSortOption.reversed ? 'down' : 'up';
@@ -180,9 +200,39 @@ function TableHeaders(props: Props): JSX.Element {
 
   return (
     <div className='octo-table-header TableHeaders' id='mainBoardHeader'>
+      {setCheckedIds && !readOnly && cards.length !== 0 && (
+        <StyledCheckbox
+          checked={checkedIds.length === cards.length}
+          onChange={() => {
+            if (checkedIds.length === cards.length) {
+              setCheckedIds([]);
+            } else {
+              setCheckedIds(cards.map((card) => card.id));
+            }
+          }}
+          icon={
+            checkedIds.length === cards.length ? (
+              <CheckBoxOutlinedIcon fontSize='small' />
+            ) : checkedIds.length === 0 ? (
+              <CheckBoxOutlineBlankOutlinedIcon fontSize='small' />
+            ) : (
+              <IndeterminateCheckBoxOutlinedIcon fontSize='small' />
+            )
+          }
+          show={checkedIds.length !== 0}
+          size='small'
+          disableFocusRipple
+          disableRipple
+          disableTouchRipple
+          sx={{
+            alignSelf: 'center'
+          }}
+        />
+      )}
+
       {visiblePropertyTemplates.map((template) => {
         let sorted: 'up' | 'down' | 'none' = 'none';
-        const sortOption = activeView.fields.sortOptions.find((o: ISortOption) => o.propertyId === template.id);
+        const sortOption = sortOptions.find((o: ISortOption) => o.propertyId === template.id);
         if (sortOption) {
           sorted = sortOption.reversed ? 'down' : 'up';
         }

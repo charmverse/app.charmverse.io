@@ -184,7 +184,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
             class="octo-board-column"
           >
             <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1mu6lya-MuiTypography-root-MuiLink-root"
+              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-uufjfw-MuiTypography-root-MuiLink-root"
               draggable="false"
               href="/test-space/id1"
             >
@@ -220,7 +220,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
                 >
                   <div>
                     <div
-                      class="css-emwlh8"
+                      class="css-jm1ma0"
                     >
                       <img
                         src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -234,12 +234,12 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
                   </div>
                 </div>
                 <div
-                  class="css-1qh2y1i-MuiStack-root"
+                  class="MuiStack-root css-1qh2y1i-MuiStack-root"
                 />
               </div>
             </a>
             <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1mu6lya-MuiTypography-root-MuiLink-root"
+              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-uufjfw-MuiTypography-root-MuiLink-root"
               draggable="false"
               href="/test-space/id2"
             >
@@ -275,7 +275,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
                 >
                   <div>
                     <div
-                      class="css-emwlh8"
+                      class="css-jm1ma0"
                     >
                       <img
                         src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -289,7 +289,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
                   </div>
                 </div>
                 <div
-                  class="css-1qh2y1i-MuiStack-root"
+                  class="MuiStack-root css-1qh2y1i-MuiStack-root"
                 />
               </div>
             </a>
@@ -324,7 +324,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
             class="octo-board-column"
           >
             <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1mu6lya-MuiTypography-root-MuiLink-root"
+              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-uufjfw-MuiTypography-root-MuiLink-root"
               draggable="false"
               href="/test-space/undefined"
             >
@@ -366,7 +366,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
                   </div>
                 </div>
                 <div
-                  class="css-1qh2y1i-MuiStack-root"
+                  class="MuiStack-root css-1qh2y1i-MuiStack-root"
                 />
               </div>
             </a>
@@ -616,7 +616,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
             class="octo-board-column"
           >
             <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1mu6lya-MuiTypography-root-MuiLink-root"
+              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-uufjfw-MuiTypography-root-MuiLink-root"
               draggable="false"
               href="/test-space/id1"
             >
@@ -652,7 +652,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
                 >
                   <div>
                     <div
-                      class="css-emwlh8"
+                      class="css-jm1ma0"
                     >
                       <img
                         src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -666,12 +666,12 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
                   </div>
                 </div>
                 <div
-                  class="css-1qh2y1i-MuiStack-root"
+                  class="MuiStack-root css-1qh2y1i-MuiStack-root"
                 />
               </div>
             </a>
             <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1mu6lya-MuiTypography-root-MuiLink-root"
+              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-uufjfw-MuiTypography-root-MuiLink-root"
               draggable="false"
               href="/test-space/id2"
             >
@@ -707,7 +707,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
                 >
                   <div>
                     <div
-                      class="css-emwlh8"
+                      class="css-jm1ma0"
                     >
                       <img
                         src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -721,7 +721,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
                   </div>
                 </div>
                 <div
-                  class="css-1qh2y1i-MuiStack-root"
+                  class="MuiStack-root css-1qh2y1i-MuiStack-root"
                 />
               </div>
             </a>
@@ -756,7 +756,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
             class="octo-board-column"
           >
             <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1mu6lya-MuiTypography-root-MuiLink-root"
+              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-uufjfw-MuiTypography-root-MuiLink-root"
               draggable="false"
               href="/test-space/id3"
             >
@@ -792,7 +792,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
                 >
                   <div>
                     <div
-                      class="css-emwlh8"
+                      class="css-jm1ma0"
                     >
                       <img
                         src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -806,7 +806,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
                   </div>
                 </div>
                 <div
-                  class="css-1qh2y1i-MuiStack-root"
+                  class="MuiStack-root css-1qh2y1i-MuiStack-root"
                 />
               </div>
             </a>

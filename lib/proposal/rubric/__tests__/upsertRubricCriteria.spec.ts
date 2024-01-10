@@ -1,5 +1,5 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import type { ProposalCategory, Space, User } from '@charmverse/core/prisma-client';
+import type { Space, User } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 
 import type { ProposalRubricCriteriaWithTypedParams } from '../interfaces';
@@ -8,20 +8,17 @@ import { upsertRubricCriteria } from '../upsertRubricCriteria';
 describe('upsertRubricCriteria', () => {
   let user: User;
   let space: Space;
-  let proposalCategory: ProposalCategory;
 
   beforeAll(async () => {
     const generated = await testUtilsUser.generateUserAndSpace();
     user = generated.user;
     space = generated.space;
-    proposalCategory = await testUtilsProposals.generateProposalCategory({ spaceId: space.id });
   });
 
   it('should upsert new rubric criteria', async () => {
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
-      userId: user.id,
-      categoryId: proposalCategory.id
+      userId: user.id
     });
 
     const rubrics = await upsertRubricCriteria({
@@ -30,8 +27,9 @@ describe('upsertRubricCriteria', () => {
     });
 
     expect(rubrics).toEqual<ProposalRubricCriteriaWithTypedParams<'range'>[]>([
-      {
+      expect.objectContaining({
         id: expect.any(String),
+        index: 0,
         description: null,
         parameters: {
           max: 5,
@@ -40,7 +38,7 @@ describe('upsertRubricCriteria', () => {
         proposalId: proposal.id,
         title: 'Score',
         type: 'range'
-      }
+      })
     ]);
 
     const newRubrics = await upsertRubricCriteria({
@@ -50,8 +48,9 @@ describe('upsertRubricCriteria', () => {
 
     expect(newRubrics).toEqual<ProposalRubricCriteriaWithTypedParams<'range'>[]>([
       rubrics[0],
-      {
+      expect.objectContaining({
         id: expect.any(String),
+        index: 1,
         description: null,
         parameters: {
           max: 7,
@@ -60,18 +59,18 @@ describe('upsertRubricCriteria', () => {
         proposalId: proposal.id,
         title: 'Second score',
         type: 'range'
-      }
+      })
     ]);
   });
   it('should update existing criteria', async () => {
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
-      userId: user.id,
-      categoryId: proposalCategory.id
+      userId: user.id
     });
 
     const rubrics = await upsertRubricCriteria({
       proposalId: proposal.id,
+      evaluationId: null,
       rubricCriteria: [{ type: 'range', title: 'Score', parameters: { max: 5, min: 1 } }]
     });
 
@@ -93,8 +92,7 @@ describe('upsertRubricCriteria', () => {
   it('should delete criteria which were not provided', async () => {
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
-      userId: user.id,
-      categoryId: proposalCategory.id
+      userId: user.id
     });
 
     const rubrics = await upsertRubricCriteria({
@@ -122,8 +120,7 @@ describe('upsertRubricCriteria', () => {
   it('should throw an error if min and max parameters are invalid', async () => {
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
-      userId: user.id,
-      categoryId: proposalCategory.id
+      userId: user.id
     });
 
     // Missing property
@@ -154,8 +151,7 @@ describe('upsertRubricCriteria', () => {
   it('should create a new rubric property if the ID of the rubric corresponds to a rubric on a different proposal', async () => {
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
-      userId: user.id,
-      categoryId: proposalCategory.id
+      userId: user.id
     });
 
     const proposalRubric = await upsertRubricCriteria({
@@ -165,8 +161,7 @@ describe('upsertRubricCriteria', () => {
 
     const secondProposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
-      userId: user.id,
-      categoryId: proposalCategory.id
+      userId: user.id
     });
 
     const secondProposalRubric = await upsertRubricCriteria({

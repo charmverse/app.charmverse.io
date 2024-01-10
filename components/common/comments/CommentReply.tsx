@@ -1,12 +1,14 @@
+import type { PageType } from '@charmverse/core/prisma-client';
 import { Stack, Box, Typography, Switch } from '@mui/material';
 import { useState } from 'react';
 
 import { Button } from 'components/common/Button';
+import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
-import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import type { CreateCommentPayload } from 'components/common/comments/interfaces';
 import UserDisplay from 'components/common/UserDisplay';
 import { useUser } from 'hooks/useUser';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 
 import { LoadingIcon } from '../LoadingComponent';
 
@@ -25,16 +27,14 @@ export function CommentReply({
   onCancelComment,
   setPublishToLens,
   publishToLens,
-  showPublishToLens,
-  lensCommentLink
+  showPublishToLens
 }: {
   isPublishingComments?: boolean;
-  lensCommentLink?: string | null;
   showPublishToLens?: boolean;
   publishToLens?: boolean;
   setPublishToLens?: (publishToLens: boolean) => void;
   onCancelComment: () => void;
-  handleCreateComment: (comment: CreateCommentPayload, lensCommentLink?: string | null) => Promise<void>;
+  handleCreateComment: (comment: CreateCommentPayload) => Promise<void>;
   commentId: string;
 }) {
   const { user } = useUser();
@@ -48,14 +48,11 @@ export function CommentReply({
   }
 
   async function createCommentReply() {
-    await handleCreateComment(
-      {
-        content: postContent.doc,
-        contentText: postContent.rawText,
-        parentId: commentId
-      },
-      publishToLens ? lensCommentLink : undefined
-    );
+    await handleCreateComment({
+      content: postContent.doc,
+      contentText: postContent.rawText,
+      parentId: commentId
+    });
 
     setPostContent({ ...defaultCharmEditorOutput });
     setEditorKey((key) => key + 1);
@@ -69,17 +66,20 @@ export function CommentReply({
   return (
     <Stack gap={1}>
       <Box display='flex' gap={1} flexDirection='row' alignItems='flex-start'>
-        <UserDisplay user={user} hideName={true} />
+        <UserDisplay userId={user.id} hideName={true} />
         <Stack gap={1} width='100%'>
-          <InlineCharmEditor
+          <CharmEditor
             colorMode='dark'
             style={{
-              minHeight: 100
+              minHeight: 100,
+              left: 0
             }}
             key={editorKey}
             content={postContent.doc}
             onContentChange={updateCommentContent}
             placeholderText='What are your thoughts?'
+            disableNestedPages
+            disableRowHandles
           />
 
           <Stack flexDirection='row' justifyContent='flex-end' alignItems='center'>
@@ -104,7 +104,7 @@ export function CommentReply({
               <Button variant='outlined' color='secondary' onClick={onCancelComment}>
                 Cancel
               </Button>
-              <Button disabled={!postContent.rawText} onClick={createCommentReply}>
+              <Button disabled={checkIsContentEmpty(postContent.doc)} onClick={createCommentReply}>
                 Reply
               </Button>
             </Stack>

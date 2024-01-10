@@ -8,13 +8,13 @@ export function PageDialogGlobal() {
   function closeDialog() {
     hidePage();
   }
-
   return (
     <PageDialog
       hideToolsMenu={hideToolsMenu}
       readOnly={readOnly}
       pageId={bountyId || (pageId as string)}
       onClose={closeDialog}
+      applicationContext={props}
     />
   );
 }

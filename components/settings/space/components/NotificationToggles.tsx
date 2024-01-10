@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import type { Control, UseFormRegister } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { NotificationGroup } from 'lib/notifications/interfaces';
 import type { NotificationToggleOption } from 'lib/notifications/notificationToggles';
 
@@ -15,16 +16,15 @@ type ConfigurableGroups = Extract<NotificationGroup, 'rewards' | 'proposals' | '
 
 const notifications: Record<ConfigurableGroups, { title: string; types: NotificationType[][] }> = {
   rewards: {
-    title: 'Bounties',
+    title: 'Rewards',
     types: [
       [
-        { label: 'Bounty suggested (Admins only)' },
         { label: 'Application submitted (Reviewers only)' },
         { label: 'Application accepted (Applicants only)' },
-        { label: 'Application rejected (Applicants only)' }
+        { label: 'Application rejected (Applicants only)' },
+        { label: 'Work submitted (Reviewers only)' }
       ],
       [
-        { label: 'Work submitted (Reviewers only)' },
         { label: 'Submission approved (Applicants only)' },
         { label: 'Payment needed (Reviewers only)' },
         { label: 'Payment completed (Applicants only)' }
@@ -65,6 +65,7 @@ export function NotificationTogglesInput({
   register: UseFormRegister<FormValues>;
   setValue: (name: `notificationToggles.${NotificationToggleOption}`, value: any) => void;
 }) {
+  const { getFeatureTitle } = useSpaceFeatures();
   const formValues = watch();
   // console.log(formValues);
   return (
@@ -76,7 +77,7 @@ export function NotificationTogglesInput({
             control={control}
             disabled={!isAdmin}
             enabled={formValues.notificationToggles?.rewards}
-            title={notifications.rewards.title}
+            title={getFeatureTitle('Rewards')}
             types={notifications.rewards.types}
           />
         }
@@ -91,7 +92,7 @@ export function NotificationTogglesInput({
             control={control}
             disabled={!isAdmin}
             enabled={formValues.notificationToggles?.proposals}
-            title={notifications.proposals.title}
+            title={getFeatureTitle('Proposals')}
             types={notifications.proposals.types}
           />
         }

@@ -58,7 +58,7 @@ jobs:
             sed -i 's/production/staging/g' $conf_file
           done
 
-          # modifying cloudformation alarm to send alerts to test sns topic. 
+          # modifying cloudformation alarm to send alerts to test sns topic.
           #  leaving it in even if we're deleting the config before deploying
           #  Useful to avoid accidental triggering to system-status channel.
           for conf_file in .ebextensions*/06_cloudwatch_alarm.config; do
@@ -68,7 +68,7 @@ jobs:
           rm .ebextensions*/06_cloudwatch_alarm.config
 
           # substituting the websocket domain name
-          sed -i 's/REACT_APP_WEBSOCKETS_HOST=.*/REACT_APP_WEBSOCKETS_HOST=https:\/\/${{env.STAGE}}.charmverse.co:3002/g' .ebstalk.apps.env/webapp.env 
+          sed -i 's/REACT_APP_WEBSOCKETS_HOST=.*/REACT_APP_WEBSOCKETS_HOST=https:\/\/${{env.STAGE}}.charmverse.co:3002/g' .ebstalk.apps.env/webapp.env
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
@@ -115,15 +115,14 @@ jobs:
           fi
 
       - name: Create a github deployment
-        uses: bobheadxi/deployments@v0.5.2
+        uses: bobheadxi/deployments@v1
         id: deployment
         with:
           step: start
           token: ${{ secrets.GITHUB_TOKEN }}
           env: ${{ env.STAGE }}
           ref: ${{ github.head_ref }}
-          no_override: false
-          transient: true
+          override: true
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -137,17 +136,19 @@ jobs:
           cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
           aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
-      - name: Deploy to staging
+      - name: Deploy to stagings
         id: cdk_deploy
         run: |
           npm install aws-cdk aws-cdk-lib --no-audit --no-fund
           npm run deploy:staging
 
       - name: update the github deployment status
-        uses: bobheadxi/deployments@v0.5.2
+        uses: bobheadxi/deployments@v1
         if: always()
         with:
+          env: ${{ steps.deployment.outputs.env }}
           step: finish
+          override: false
           token: ${{ secrets.GITHUB_TOKEN }}
           status: ${{ job.status }}
           deployment_id: ${{ steps.deployment.outputs.deployment_id }}
@@ -182,4 +183,3 @@ jobs:
             --service=webapp                             \
             --release-version=${{ steps.docker_build_push.outputs.img_tag }}  \
             --minified-path-prefix=${{ steps.cdk_deploy.outputs.env_url }}_next/static
-

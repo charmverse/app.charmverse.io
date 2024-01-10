@@ -49,8 +49,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -151,8 +150,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -220,8 +218,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -274,8 +271,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -325,8 +321,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -376,8 +371,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -476,15 +470,7 @@
         "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
         "status": "draft",
         "reviewedBy": null,
-        "reviewedAt": null,
-        "categoryId": "8478fcad-3d1f-43d2-9080-76acedffea84",
-        "snapshotProposalExpiry": null,
-        "category": {
-          "id": "8478fcad-3d1f-43d2-9080-76acedffea84",
-          "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-          "title": "Treasury",
-          "color": "gray"
-        }
+        "reviewedAt": null
       }
     },
     {
@@ -536,8 +522,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -623,8 +608,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -710,8 +694,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -797,8 +780,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -848,8 +830,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -917,8 +898,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -1004,8 +984,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -1295,8 +1274,7 @@
             "type": "heading",
             "attrs": {
               "level": 2,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -1418,8 +1396,7 @@
             "type": "heading",
             "attrs": {
               "level": 2,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -1625,15 +1602,7 @@
         "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
         "status": "draft",
         "reviewedBy": null,
-        "reviewedAt": null,
-        "categoryId": "8478fcad-3d1f-43d2-9080-76acedffea84",
-        "snapshotProposalExpiry": null,
-        "category": {
-          "id": "8478fcad-3d1f-43d2-9080-76acedffea84",
-          "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-          "title": "Treasury",
-          "color": "gray"
-        }
+        "reviewedAt": null
       }
     },
     {
@@ -1685,8 +1654,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -1736,8 +1704,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -1787,8 +1754,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -1838,8 +1804,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -1907,8 +1872,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -1958,8 +1922,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -2051,15 +2014,7 @@
         "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
         "status": "draft",
         "reviewedBy": null,
-        "reviewedAt": null,
-        "categoryId": "8478fcad-3d1f-43d2-9080-76acedffea84",
-        "snapshotProposalExpiry": null,
-        "category": {
-          "id": "8478fcad-3d1f-43d2-9080-76acedffea84",
-          "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-          "title": "Treasury",
-          "color": "gray"
-        }
+        "reviewedAt": null
       }
     },
     {
@@ -2111,8 +2066,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -2172,8 +2126,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -2233,8 +2186,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -2294,8 +2246,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -2403,15 +2354,7 @@
         "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
         "status": "draft",
         "reviewedBy": null,
-        "reviewedAt": null,
-        "categoryId": "fbece9d6-ea51-4626-a459-6b572556c302",
-        "snapshotProposalExpiry": null,
-        "category": {
-          "id": "fbece9d6-ea51-4626-a459-6b572556c302",
-          "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-          "title": "Protocol",
-          "color": "pink"
-        }
+        "reviewedAt": null
       }
     },
     {
@@ -2513,8 +2456,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -2624,8 +2566,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -2685,8 +2626,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -2846,8 +2786,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -2907,8 +2846,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -2990,8 +2928,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -3099,15 +3036,7 @@
         "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
         "status": "draft",
         "reviewedBy": null,
-        "reviewedAt": null,
-        "categoryId": "7ae5cdce-882c-4b4a-854c-e4bc5b2a99f7",
-        "snapshotProposalExpiry": null,
-        "category": {
-          "id": "7ae5cdce-882c-4b4a-854c-e4bc5b2a99f7",
-          "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-          "title": "Metagoverance",
-          "color": "pink"
-        }
+        "reviewedAt": null
       }
     },
     {
@@ -3259,8 +3188,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -3320,8 +3248,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -3381,8 +3308,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -3442,8 +3368,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -3503,8 +3428,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -3564,8 +3488,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -3625,8 +3548,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -3686,8 +3608,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -3795,15 +3716,7 @@
         "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
         "status": "draft",
         "reviewedBy": null,
-        "reviewedAt": null,
-        "categoryId": "7ae5cdce-882c-4b4a-854c-e4bc5b2a99f7",
-        "snapshotProposalExpiry": null,
-        "category": {
-          "id": "7ae5cdce-882c-4b4a-854c-e4bc5b2a99f7",
-          "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-          "title": "Metagoverance",
-          "color": "pink"
-        }
+        "reviewedAt": null
       }
     },
     {
@@ -3855,8 +3768,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -3957,8 +3869,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -4026,8 +3937,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -4080,8 +3990,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -4131,8 +4040,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -4182,8 +4090,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -4282,15 +4189,7 @@
         "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
         "status": "draft",
         "reviewedBy": null,
-        "reviewedAt": null,
-        "categoryId": "8478fcad-3d1f-43d2-9080-76acedffea84",
-        "snapshotProposalExpiry": null,
-        "category": {
-          "id": "8478fcad-3d1f-43d2-9080-76acedffea84",
-          "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-          "title": "Treasury",
-          "color": "gray"
-        }
+        "reviewedAt": null
       }
     },
     {
@@ -4392,8 +4291,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -4503,8 +4401,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -4564,8 +4461,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -4725,8 +4621,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -4786,8 +4681,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -4869,8 +4763,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -4978,15 +4871,7 @@
         "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
         "status": "draft",
         "reviewedBy": null,
-        "reviewedAt": null,
-        "categoryId": "7ae5cdce-882c-4b4a-854c-e4bc5b2a99f7",
-        "snapshotProposalExpiry": null,
-        "category": {
-          "id": "7ae5cdce-882c-4b4a-854c-e4bc5b2a99f7",
-          "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-          "title": "Metagoverance",
-          "color": "pink"
-        }
+        "reviewedAt": null
       }
     },
     {
@@ -5038,8 +4923,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -5125,8 +5009,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -5212,8 +5095,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -5299,8 +5181,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -5350,8 +5231,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -5419,8 +5299,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -5506,8 +5385,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -5797,8 +5675,7 @@
             "type": "heading",
             "attrs": {
               "level": 2,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -5920,8 +5797,7 @@
             "type": "heading",
             "attrs": {
               "level": 2,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -6127,15 +6003,7 @@
         "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
         "status": "draft",
         "reviewedBy": null,
-        "reviewedAt": null,
-        "categoryId": "8478fcad-3d1f-43d2-9080-76acedffea84",
-        "snapshotProposalExpiry": null,
-        "category": {
-          "id": "8478fcad-3d1f-43d2-9080-76acedffea84",
-          "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-          "title": "Treasury",
-          "color": "gray"
-        }
+        "reviewedAt": null
       }
     },
     {
@@ -6187,8 +6055,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -6238,8 +6105,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -6289,8 +6155,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -6340,8 +6205,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -6409,8 +6273,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -6460,8 +6323,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -6553,15 +6415,7 @@
         "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
         "status": "draft",
         "reviewedBy": null,
-        "reviewedAt": null,
-        "categoryId": "8478fcad-3d1f-43d2-9080-76acedffea84",
-        "snapshotProposalExpiry": null,
-        "category": {
-          "id": "8478fcad-3d1f-43d2-9080-76acedffea84",
-          "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-          "title": "Treasury",
-          "color": "gray"
-        }
+        "reviewedAt": null
       }
     },
     {
@@ -6613,8 +6467,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -6674,8 +6527,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -6735,8 +6587,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -6796,8 +6647,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -6905,15 +6755,7 @@
         "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
         "status": "draft",
         "reviewedBy": null,
-        "reviewedAt": null,
-        "categoryId": "fbece9d6-ea51-4626-a459-6b572556c302",
-        "snapshotProposalExpiry": null,
-        "category": {
-          "id": "fbece9d6-ea51-4626-a459-6b572556c302",
-          "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-          "title": "Protocol",
-          "color": "pink"
-        }
+        "reviewedAt": null
       }
     },
     {
@@ -7065,8 +6907,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -7126,8 +6967,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -7187,8 +7027,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -7248,8 +7087,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -7309,8 +7147,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -7370,8 +7207,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -7431,8 +7267,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -7492,8 +7327,7 @@
             "type": "heading",
             "attrs": {
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -7601,15 +7435,7 @@
         "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
         "status": "draft",
         "reviewedBy": null,
-        "reviewedAt": null,
-        "categoryId": "7ae5cdce-882c-4b4a-854c-e4bc5b2a99f7",
-        "snapshotProposalExpiry": null,
-        "category": {
-          "id": "7ae5cdce-882c-4b4a-854c-e4bc5b2a99f7",
-          "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-          "title": "Metagoverance",
-          "color": "pink"
-        }
+        "reviewedAt": null
       }
     },
     {
@@ -7766,8 +7592,7 @@
             "attrs": {
               "id": null,
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -7919,8 +7744,7 @@
             "attrs": {
               "id": null,
               "level": 1,
-              "track": [],
-              "collapseContent": null
+              "track": []
             },
             "content": [
               {
@@ -8538,7 +8362,7 @@
                     ]
                   },
                   {
-                    "text": ", including joining its guilds, participating in events, contributing to bounties, and assuming roles such as a DAO Member or Community Member. Discover the various opportunities available to you and how to get started.",
+                    "text": ", including joining its guilds, participating in events, contributing to rewards, and assuming roles such as a DAO Member or Community Member. Discover the various opportunities available to you and how to get started.",
                     "type": "text",
                     "marks": [
                       {
@@ -8572,8 +8396,7 @@
                     "attrs": {
                       "id": null,
                       "level": 3,
-                      "track": [],
-                      "collapseContent": null
+                      "track": []
                     },
                     "content": [
                       {
@@ -8929,8 +8752,7 @@
                     "attrs": {
                       "id": null,
                       "level": 3,
-                      "track": [],
-                      "collapseContent": null
+                      "track": []
                     },
                     "content": [
                       {
@@ -9106,8 +8928,7 @@
                     "attrs": {
                       "id": null,
                       "level": 3,
-                      "track": [],
-                      "collapseContent": null
+                      "track": []
                     },
                     "content": [
                       {
@@ -9423,7 +9244,7 @@
               }
             ]
           },
-          "contentText": "Create an onboarding experience for your members. Customize the callouts below with your onboarding information.  Add a new callout by typing /callout.  You can also make use of 4 list types to better organize your info: /bullet, /ordered, /todo, or /toggleThe information hub serves as a guide for individuals interested in becoming part of [Our Community], including joining its guilds, participating in events, contributing to bounties, and assuming roles such as a DAO Member or Community Member. Discover the various opportunities available to you and how to get started.Types of Members: Ways to Join [Our Community]Voting Members = Holders of Voting SharesLiquidity Members = Holders of Loot [non-voting shares]DAO Team Members = Members who work for the DAO on a full-time basis [may hold non-voting shares or loot]Contributors = Members who work for the DAO on a project-by-project basis [may hold non-voting shares or loot]Stakeholders Onboarding FlowHow to use DAO DashboardHow to navigate DiscordHow to use DAO Member private discord channelsMonthly DAO Member Community CallOnboarding FunnelA web3 onboarding funnel is a series of steps or stages that help introduce people to the concept of web3 and decentralized finance. Such a funnel would provide people with the necessary knowledge and tools to navigate the world of web3 and decentralized finance safely and effectively while avoiding common pitfalls such as scams and misinformation.One potential approach to creating a web3 onboarding funnel might involve the following steps:Start by explaining the basics of web3 and decentralized finance, including key concepts such as blockchain technology, decentralization, and the use of smart contracts.Next, provide guidance on how to securely store and manage cryptocurrencies, emphasizing the importance of keeping one's private keys safe and never sharing them with others.Introduce people to the concept of decentralized autonomous organizations (DAOs), and explain how they can be used to govern and coordinate decentralized networks in a transparent and democratic manner.Provide resources and information on how to identify and avoid common scams and other forms of fraud in the web3 and decentralized finance space.Finally, direct people to resources and tools that can help them find and join regenerative DAOs that align with their values and goals.Overall, the key to creating an effective web3 onboarding funnel is to provide clear, concise, and accessible information that helps people understand the basics of web3 and decentralized finance, while also equipping them with the knowledge and tools they need to navigate this complex and rapidly evolving space safely and confidently.",
+          "contentText": "Create an onboarding experience for your members. Customize the callouts below with your onboarding information.  Add a new callout by typing /callout.  You can also make use of 4 list types to better organize your info: /bullet, /ordered, /todo, or /toggleThe information hub serves as a guide for individuals interested in becoming part of [Our Community], including joining its guilds, participating in events, contributing to rewards, and assuming roles such as a DAO Member or Community Member. Discover the various opportunities available to you and how to get started.Types of Members: Ways to Join [Our Community]Voting Members = Holders of Voting SharesLiquidity Members = Holders of Loot [non-voting shares]DAO Team Members = Members who work for the DAO on a full-time basis [may hold non-voting shares or loot]Contributors = Members who work for the DAO on a project-by-project basis [may hold non-voting shares or loot]Stakeholders Onboarding FlowHow to use DAO DashboardHow to navigate DiscordHow to use DAO Member private discord channelsMonthly DAO Member Community CallOnboarding FunnelA web3 onboarding funnel is a series of steps or stages that help introduce people to the concept of web3 and decentralized finance. Such a funnel would provide people with the necessary knowledge and tools to navigate the world of web3 and decentralized finance safely and effectively while avoiding common pitfalls such as scams and misinformation.One potential approach to creating a web3 onboarding funnel might involve the following steps:Start by explaining the basics of web3 and decentralized finance, including key concepts such as blockchain technology, decentralization, and the use of smart contracts.Next, provide guidance on how to securely store and manage cryptocurrencies, emphasizing the importance of keeping one's private keys safe and never sharing them with others.Introduce people to the concept of decentralized autonomous organizations (DAOs), and explain how they can be used to govern and coordinate decentralized networks in a transparent and democratic manner.Provide resources and information on how to identify and avoid common scams and other forms of fraud in the web3 and decentralized finance space.Finally, direct people to resources and tools that can help them find and join regenerative DAOs that align with their values and goals.Overall, the key to creating an effective web3 onboarding funnel is to provide clear, concise, and accessible information that helps people understand the basics of web3 and decentralized finance, while also equipping them with the knowledge and tools they need to navigate this complex and rapidly evolving space safely and confidently.",
           "galleryImage": "",
           "hasContent": true,
           "headerImage": "https://s3.amazonaws.com/charm.public/user-content/b3f5d420-abe6-4c82-9d70-b5294cfcb890/35c612e1-763e-4316-9f68-ad8cf0c31fe0/3.png",
@@ -9636,7 +9457,7 @@
                     ]
                   },
                   {
-                    "text": "DAO. As a member, they have full access to the workspace, including the ability to view and comment on every page, create bounties, proposals, and suggestions for editing existing content, as well as unrestricted access to create unlimited pages, sub-pages, texts, and any other form of content they desire.",
+                    "text": "DAO. As a member, they have full access to the workspace, including the ability to view and comment on every page, create rewards, proposals, and suggestions for editing existing content, as well as unrestricted access to create unlimited pages, sub-pages, texts, and any other form of content they desire.",
                     "type": "text",
                     "marks": [
                       {
@@ -9824,7 +9645,7 @@
                 },
                 "content": [
                   {
-                    "text": "Individuals, Multi-Sigs, or entities that complete any form of onboarding process are granted the role of a Community Member. This may include earning POAPs, participating in Discord chats, engaging on Twitter, earning NFT badges, attending events and receiving event tokens, earning ERC-20 tokens, winning limited edition NFTs, or participating in raffles. Community Members have access to the bounties section, information hub, and the ability to create proposals for DAO Members to review and consider.",
+                    "text": "Individuals, Multi-Sigs, or entities that complete any form of onboarding process are granted the role of a Community Member. This may include earning POAPs, participating in Discord chats, engaging on Twitter, earning NFT badges, attending events and receiving event tokens, earning ERC-20 tokens, winning limited edition NFTs, or participating in raffles. Community Members have access to the rewards section, information hub, and the ability to create proposals for DAO Members to review and consider.",
                     "type": "text",
                     "marks": [
                       {
@@ -9842,7 +9663,7 @@
               }
             ]
           },
-          "contentText": "What are the different ways to contribute to your community? Let your members know how they fit in.DAO MemberDAO Member is a person, organization, multi-signature entity, or any other entity that holds at least one full share of the DAO. As a member, they have full access to the workspace, including the ability to view and comment on every page, create bounties, proposals, and suggestions for editing existing content, as well as unrestricted access to create unlimited pages, sub-pages, texts, and any other form of content they desire.DAO TeamThe DAO Team has a simple yet crucial mandate, which is to uphold the DAO Constitution and act in a responsible and ethical manner in the execution of its duties within the DAO. Their specific roles, obligations, and responsibilities are clearly outlined in the DAO Constitution.Community MemberIndividuals, Multi-Sigs, or entities that complete any form of onboarding process are granted the role of a Community Member. This may include earning POAPs, participating in Discord chats, engaging on Twitter, earning NFT badges, attending events and receiving event tokens, earning ERC-20 tokens, winning limited edition NFTs, or participating in raffles. Community Members have access to the bounties section, information hub, and the ability to create proposals for DAO Members to review and consider.",
+          "contentText": "What are the different ways to contribute to your community? Let your members know how they fit in.DAO MemberDAO Member is a person, organization, multi-signature entity, or any other entity that holds at least one full share of the DAO. As a member, they have full access to the workspace, including the ability to view and comment on every page, create rewards, proposals, and suggestions for editing existing content, as well as unrestricted access to create unlimited pages, sub-pages, texts, and any other form of content they desire.DAO TeamThe DAO Team has a simple yet crucial mandate, which is to uphold the DAO Constitution and act in a responsible and ethical manner in the execution of its duties within the DAO. Their specific roles, obligations, and responsibilities are clearly outlined in the DAO Constitution.Community MemberIndividuals, Multi-Sigs, or entities that complete any form of onboarding process are granted the role of a Community Member. This may include earning POAPs, participating in Discord chats, engaging on Twitter, earning NFT badges, attending events and receiving event tokens, earning ERC-20 tokens, winning limited edition NFTs, or participating in raffles. Community Members have access to the rewards section, information hub, and the ability to create proposals for DAO Members to review and consider.",
           "galleryImage": "",
           "hasContent": true,
           "headerImage": null,
@@ -12408,8 +12229,7 @@
                     "type": "heading",
                     "attrs": {
                       "level": 3,
-                      "track": [],
-                      "collapseContent": null
+                      "track": []
                     },
                     "content": [
                       {
@@ -12930,8 +12750,7 @@
                     "type": "heading",
                     "attrs": {
                       "level": 3,
-                      "track": [],
-                      "collapseContent": null
+                      "track": []
                     },
                     "content": [
                       {
@@ -13109,8 +12928,7 @@
                     "type": "heading",
                     "attrs": {
                       "level": 3,
-                      "track": [],
-                      "collapseContent": null
+                      "track": []
                     },
                     "content": [
                       {
@@ -15410,8 +15228,7 @@
                     "type": "heading",
                     "attrs": {
                       "level": 3,
-                      "track": [],
-                      "collapseContent": null
+                      "track": []
                     },
                     "content": [
                       {
@@ -15533,8 +15350,7 @@
                     "type": "heading",
                     "attrs": {
                       "level": 3,
-                      "track": [],
-                      "collapseContent": null
+                      "track": []
                     },
                     "content": [
                       {
@@ -17830,7 +17646,7 @@
                       "03b9c79d-12f0-4856-92b1-79708b3d555d": "{\"from\":1692964800000}",
                       "1f637407-b7cf-4808-805c-25ab2edf19a7": "5367fe26-4bf3-4e4e-8bf1-668e2dc5a1d6",
                       "4173c349-a459-43c9-9b5d-bd9d4590417e": "Loom recording, screenshots",
-                      "5ace4e89-3d0c-49d8-a09f-76728803e345": "In the production environment, users can pay bounties/grants with OP tokens.",
+                      "5ace4e89-3d0c-49d8-a09f-76728803e345": "In the production environment, users can pay rewards/grants with OP tokens.",
                       "a290d993-d44b-4424-83ea-c490e15ded3f": "3faf9dcd-7da8-4efb-8419-64328d35acc0",
                       "b9c507c1-04b7-4fda-9265-7fdd5cea9a2f": "f1d6c0ff-0cc7-4349-b95e-1c473c8c2616"
                     },
@@ -18134,8 +17950,7 @@
                 "attrs": {
                   "id": "heading-1",
                   "level": 2,
-                  "track": [],
-                  "collapseContent": null
+                  "track": []
                 },
                 "content": [
                   {
@@ -18312,8 +18127,7 @@
                 "attrs": {
                   "id": "heading-2",
                   "level": 2,
-                  "track": [],
-                  "collapseContent": null
+                  "track": []
                 },
                 "content": [
                   {
@@ -18350,8 +18164,7 @@
                 "attrs": {
                   "id": "heading-3",
                   "level": 2,
-                  "track": [],
-                  "collapseContent": null
+                  "track": []
                 },
                 "content": [
                   {
@@ -20171,8 +19984,7 @@
                         "type": "heading",
                         "attrs": {
                           "level": 3,
-                          "track": [],
-                          "collapseContent": null
+                          "track": []
                         },
                         "content": [
                           {
@@ -20512,8 +20324,7 @@
                         "type": "heading",
                         "attrs": {
                           "level": 3,
-                          "track": [],
-                          "collapseContent": null
+                          "track": []
                         },
                         "content": [
                           {
@@ -20566,8 +20377,7 @@
                         "type": "heading",
                         "attrs": {
                           "level": 3,
-                          "track": [],
-                          "collapseContent": null
+                          "track": []
                         },
                         "content": [
                           {
@@ -20641,8 +20451,7 @@
                         "type": "heading",
                         "attrs": {
                           "level": 3,
-                          "track": [],
-                          "collapseContent": null
+                          "track": []
                         },
                         "content": [
                           {
@@ -22059,8 +21868,7 @@
                         "type": "heading",
                         "attrs": {
                           "level": 3,
-                          "track": [],
-                          "collapseContent": null
+                          "track": []
                         },
                         "content": [
                           {
@@ -23647,8 +23455,7 @@
                         "type": "heading",
                         "attrs": {
                           "level": 3,
-                          "track": [],
-                          "collapseContent": null
+                          "track": []
                         },
                         "content": [
                           {
@@ -23838,8 +23645,7 @@
                         "type": "heading",
                         "attrs": {
                           "level": 3,
-                          "track": [],
-                          "collapseContent": null
+                          "track": []
                         },
                         "content": [
                           {
@@ -23955,7 +23761,7 @@
                             },
                             "content": [
                               {
-                                "text": "Twitter",
+                                "text": "X",
                                 "type": "text",
                                 "marks": [
                                   {
@@ -24014,8 +23820,7 @@
                         "type": "heading",
                         "attrs": {
                           "level": 3,
-                          "track": [],
-                          "collapseContent": null
+                          "track": []
                         },
                         "content": [
                           {
@@ -24162,8 +23967,7 @@
                         "type": "heading",
                         "attrs": {
                           "level": 3,
-                          "track": [],
-                          "collapseContent": null
+                          "track": []
                         },
                         "content": [
                           {

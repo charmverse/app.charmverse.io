@@ -19,6 +19,8 @@ export async function transformResponse(response: Response) {
 
   if (contentType?.includes('application/json')) {
     return response.json();
+  } else if (contentType?.includes('application/octet-stream')) {
+    return response.blob();
   }
   return response.text().then((_response) => {
     // since we expect JSON, dont return the true value for 200 response

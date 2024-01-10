@@ -24,7 +24,10 @@ export function PollNodeView({
   deleteNode
 }: CharmNodeViewProps) {
   const { pollId } = node.attrs as { pollId: string | null };
-  const { votes, cancelVote, castVote, deleteVote, isLoading, updateDeadline } = useVotes({ pageId, postId });
+  const { votes, cancelVote, castVote, deleteVote, isLoading, updateDeadline } = useVotes({
+    pageId,
+    postId
+  });
 
   const autoOpen = node.marks.some((mark) => mark.type.name === 'tooltip-marker');
 
@@ -40,17 +43,12 @@ export function PollNodeView({
     });
     setShowModal(false);
   }
-  if (!pollId || !votes[pollId]) {
-    if (isLoading) {
-      return (
-        <VotesWrapper>
-          <LoadingComponent />
-        </VotesWrapper>
-      );
-    }
+
+  if (!pollId) {
     if (readOnly) {
       return <div />;
     }
+
     return (
       <>
         <CreateVoteModal
@@ -64,9 +62,7 @@ export function PollNodeView({
           snapshotProposalId={snapshotProposalId || null}
         />
         <div
-          onClick={(e) => {
-            // e.stopPropagation();
-            // e.preventDefault();
+          onClick={() => {
             setShowModal(true);
           }}
         >
@@ -79,18 +75,31 @@ export function PollNodeView({
         </div>
       </>
     );
+  } else if (isLoading) {
+    if (readOnly) {
+      return <div />;
+    }
+
+    return (
+      <VotesWrapper>
+        <LoadingComponent />
+      </VotesWrapper>
+    );
+  } else if (votes[pollId]) {
+    return (
+      <VoteDetail
+        cancelVote={cancelVote}
+        castVote={castVote}
+        deleteVote={deleteVote}
+        detailed={false}
+        // This makes sure that if something goes wrong in loading state, we won't stop users who should be able to vote from voting
+        disableVote={(pagePermissions && !pagePermissions.comment) || (postPermissions && !postPermissions.add_comment)}
+        vote={votes[pollId]}
+        updateDeadline={updateDeadline}
+      />
+    );
   }
 
-  return (
-    <VoteDetail
-      cancelVote={cancelVote}
-      castVote={castVote}
-      deleteVote={deleteVote}
-      detailed={false}
-      // This makes sure that if something goes wrong in loading state, we won't stop users who should be able to vote from voting
-      disableVote={(pagePermissions && !pagePermissions.comment) || (postPermissions && !postPermissions.add_comment)}
-      vote={votes[pollId]}
-      updateDeadline={updateDeadline}
-    />
-  );
+  // If the poll id in the node attribute doesn't point to any vote, return an empty div
+  return <div />;
 }

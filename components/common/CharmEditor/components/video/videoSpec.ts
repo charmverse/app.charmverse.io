@@ -1,5 +1,6 @@
-import type { RawSpecs } from '@bangle.dev/core';
-import type { Node } from '@bangle.dev/pm';
+import type { Node } from 'prosemirror-model';
+
+import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 import { embeddedNodeSpec } from '../../specs/embeddedNodeSpec';
 import { MAX_EMBED_WIDTH } from '../iframe/config';

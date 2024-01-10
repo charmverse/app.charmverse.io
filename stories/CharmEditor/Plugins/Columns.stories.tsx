@@ -1,7 +1,7 @@
 import { Paper } from '@mui/material';
 import { Provider } from 'react-redux';
 
-import { Container } from 'components/[pageId]/DocumentPage/DocumentPage';
+import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
 import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 
@@ -190,7 +190,7 @@ const contentWithColumnsAndTables = {
           content: [
             {
               type: 'heading',
-              attrs: { id: null, level: 2, track: [], collapseContent: null },
+              attrs: { id: null, level: 2, track: [] },
               content: [
                 {
                   text: 'Column 1',
@@ -239,7 +239,7 @@ const contentWithColumnsAndTables = {
           content: [
             {
               type: 'heading',
-              attrs: { id: null, level: 2, track: [], collapseContent: null },
+              attrs: { id: null, level: 2, track: [] },
               content: [
                 {
                   text: 'Column 2',
@@ -294,9 +294,9 @@ export default {
     (Story: any) => (
       <Provider store={store}>
         <Paper sx={{ p: 4 }}>
-          <Container>
+          <PageEditorContainer>
             <Story />
-          </Container>
+          </PageEditorContainer>
         </Paper>
       </Provider>
     )

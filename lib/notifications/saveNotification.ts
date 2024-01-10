@@ -3,6 +3,7 @@ import { Prisma, prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import type {
+  ApplicationCommentNotification,
   BountyNotificationType,
   CommentNotification,
   DocumentNotificationType,
@@ -54,13 +55,14 @@ export async function savePostNotification({
       }
     }
   });
-  log.info('Created post notification', { postId, notificationId: record.id, spaceId, userId: createdBy, type });
+  log.info('Created post notification', { postId, notificationId: record.id, spaceId, userId, createdBy, type });
   return record;
 }
 
 type ProposalNotificationInput = NotificationInput & {
   type: ProposalNotificationType;
   proposalId: string;
+  evaluationId?: string | null;
 };
 
 export async function saveProposalNotification({
@@ -69,7 +71,8 @@ export async function saveProposalNotification({
   createdBy,
   spaceId,
   userId,
-  proposalId
+  proposalId,
+  evaluationId
 }: ProposalNotificationInput) {
   const notificationId = v4();
   const record = await prisma.proposalNotification.create({
@@ -85,6 +88,13 @@ export async function saveProposalNotification({
           userId
         }
       },
+      evaluation: evaluationId
+        ? {
+            connect: {
+              id: evaluationId
+            }
+          }
+        : undefined,
       proposal: {
         connect: {
           id: proposalId
@@ -96,7 +106,8 @@ export async function saveProposalNotification({
     proposalId,
     notificationId: record.id,
     spaceId,
-    userId: createdBy,
+    userId,
+    createdBy,
     type
   });
   return record;
@@ -109,9 +120,10 @@ type DocumentNotificationInput = NotificationInput & {
   inlineCommentId?: string;
   postCommentId?: string;
   pageCommentId?: string;
+  applicationCommentId?: string;
   type: DocumentNotificationType;
   content: Prisma.JsonValue | null;
-} & (CommentNotification | MentionNotification | InlineCommentNotification);
+} & (CommentNotification | MentionNotification | InlineCommentNotification | ApplicationCommentNotification);
 
 export async function saveDocumentNotification({
   createdAt,
@@ -125,7 +137,8 @@ export async function saveDocumentNotification({
   content,
   type,
   pageCommentId,
-  postCommentId
+  postCommentId,
+  applicationCommentId
 }: DocumentNotificationInput) {
   const notificationId = v4();
   const record = await prisma.documentNotification.create({
@@ -164,6 +177,13 @@ export async function saveDocumentNotification({
             }
           }
         : undefined,
+      applicationComment: applicationCommentId
+        ? {
+            connect: {
+              id: applicationCommentId
+            }
+          }
+        : undefined,
       post: postId
         ? {
             connect: {
@@ -184,7 +204,8 @@ export async function saveDocumentNotification({
     pageId,
     notificationId: record.id,
     spaceId,
-    userId: createdBy,
+    userId,
+    createdBy,
     type
   });
   return record;
@@ -228,7 +249,8 @@ export async function saveCardNotification({
     personPropertyId,
     notificationId: record.id,
     spaceId,
-    userId: createdBy,
+    userId,
+    createdBy,
     type
   });
   return record;
@@ -272,7 +294,8 @@ export async function savePollNotification({
     voteId,
     notificationId: record.id,
     spaceId,
-    userId: createdBy,
+    userId,
+    createdBy,
     type
   });
   return record;
@@ -334,7 +357,8 @@ export async function saveRewardNotification({
     applicationId,
     notificationId: record.id,
     spaceId,
-    userId: createdBy,
+    userId,
+    createdBy,
     type
   });
   return record;

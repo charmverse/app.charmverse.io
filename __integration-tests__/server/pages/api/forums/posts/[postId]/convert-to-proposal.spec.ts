@@ -1,9 +1,9 @@
-import { testUtilsForum, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsForum, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
 import { convertPostToProposal } from 'lib/forums/posts/convertPostToProposal';
-import { upsertProposalCategoryPermission } from 'lib/permissions/proposals/upsertProposalCategoryPermission';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 describe('POST /api/forums/posts/[postId]/convert-to-proposal - Convert post to proposal', () => {
@@ -15,17 +15,12 @@ describe('POST /api/forums/posts/[postId]/convert-to-proposal - Convert post to 
       userId: nonAdminUser1.id
     });
 
-    const proposalCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id
-    });
-
-    await upsertProposalCategoryPermission({
-      assignee: {
-        group: 'space',
-        id: space.id
-      },
-      permissionLevel: 'full_access',
-      proposalCategoryId: proposalCategory.id
+    await prisma.spacePermission.create({
+      data: {
+        forSpace: { connect: { id: space.id } },
+        space: { connect: { id: space.id } },
+        operations: ['createProposals']
+      }
     });
 
     const nonAdminCookie = await loginUser(nonAdminUser1.id);
@@ -33,9 +28,6 @@ describe('POST /api/forums/posts/[postId]/convert-to-proposal - Convert post to 
     await request(baseUrl)
       .post(`/api/forums/posts/${post.id}/convert-to-proposal`)
       .set('Cookie', nonAdminCookie)
-      .send({
-        categoryId: proposalCategory.id
-      })
       .expect(200);
   });
 
@@ -49,9 +41,7 @@ describe('POST /api/forums/posts/[postId]/convert-to-proposal - Convert post to 
     await request(baseUrl)
       .post(`/api/forums/posts/${v4()}/convert-to-proposal`)
       .set('Cookie', nonAdminCookie)
-      .send({
-        categoryId: v4()
-      })
+
       .expect(404);
   });
 
@@ -67,22 +57,14 @@ describe('POST /api/forums/posts/[postId]/convert-to-proposal - Convert post to 
       userId: nonAdminUser1.id
     });
 
-    const proposalCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id
-    });
-
     await convertPostToProposal({
       post,
-      userId: nonAdminUser1.id,
-      categoryId: proposalCategory.id
+      userId: nonAdminUser1.id
     });
 
     await request(baseUrl)
       .post(`/api/forums/posts/${post.id}/convert-to-proposal`)
       .set('Cookie', nonAdminCookie)
-      .send({
-        categoryId: proposalCategory.id
-      })
       .expect(401);
   });
 
@@ -98,20 +80,13 @@ describe('POST /api/forums/posts/[postId]/convert-to-proposal - Convert post to 
       userId: nonAdminUser1.id
     });
 
-    const proposalCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id
-    });
-
     await request(baseUrl)
       .post(`/api/forums/posts/${post.id}/convert-to-proposal`)
       .set('Cookie', nonAdminCookie)
-      .send({
-        categoryId: proposalCategory.id
-      })
       .expect(401);
   });
 
-  it('should fail if the user does not have permission to create proposals in this category, and respond 401', async () => {
+  it('should fail if the user does not have permission to create proposals in the space, and respond 401', async () => {
     const { space, user: nonAdminUser1 } = await testUtilsUser.generateUserAndSpace({
       isAdmin: false
     });
@@ -123,16 +98,9 @@ describe('POST /api/forums/posts/[postId]/convert-to-proposal - Convert post to 
       userId: nonAdminUser1.id
     });
 
-    const proposalCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id
-    });
-
     await request(baseUrl)
       .post(`/api/forums/posts/${post.id}/convert-to-proposal`)
       .set('Cookie', nonAdminCookie)
-      .send({
-        categoryId: proposalCategory.id
-      })
       .expect(401);
   });
 });

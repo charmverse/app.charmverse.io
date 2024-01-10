@@ -1,6 +1,8 @@
 import { GET } from '@charmverse/core/http';
 
-import { loopApiUrl } from 'lib/subscription/constants';
+import { loopApiUrl } from '../subscription/constants';
+
+// Loop manages web3 subscription payments for CharmVerse
 
 export interface LoopItem {
   itemId: string;
@@ -25,7 +27,7 @@ const DEFAULT_HEADERS = {
 };
 
 export async function getLoopProducts(productId?: string) {
-  return GET<LoopItem[]>(`${loopApiUrl}/api/v1/items${productId ? `?id=${productId}` : ''}`, null, {
+  return GET<{ items: LoopItem[] }>(`${loopApiUrl}/api/v1/items${productId ? `?id=${productId}` : ''}`, null, {
     headers: DEFAULT_HEADERS
-  });
+  }).then((d) => d.items);
 }

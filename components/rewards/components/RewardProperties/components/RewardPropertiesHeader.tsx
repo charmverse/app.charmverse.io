@@ -2,18 +2,17 @@ import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
+import { ExpandableSectionTitle } from 'components/common/ExpandableSectionTitle';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { Reward } from 'lib/rewards/interfaces';
 
 import { RewardStatusBadge } from '../../RewardStatusBadge';
-
 /**
  * Permissions left optional so this component can initialise without them
  */
@@ -21,18 +20,20 @@ interface Props {
   reward: Reward;
   pageId: string;
   readOnly?: boolean;
-  refreshPermissions: () => void;
+  isExpanded: boolean;
+  toggleExpanded: () => void;
 }
 
-export function RewardPropertiesHeader({ readOnly = false, reward, pageId, refreshPermissions }: Props) {
+export function RewardPropertiesHeader({ readOnly = false, reward, isExpanded, pageId, toggleExpanded }: Props) {
   const { showMessage } = useSnackbar();
 
   const [updatingPermissions, setUpdatingPermissions] = useState(false);
 
   const { isFreeSpace } = useIsFreeSpace();
 
-  const { data: editableCheck } = useSWR(!isFreeSpace ? `bounty-editable-${reward.id}` : null, () =>
-    charmClient.rewards.isRewardEditable(reward.id)
+  const { data: editableCheck, mutate: refreshEditable } = useSWR(
+    !isFreeSpace && reward.id ? `bounty-editable-${reward.id}` : null,
+    () => charmClient.rewards.isRewardEditable(reward.id)
   );
   function restrictPermissions() {
     setUpdatingPermissions(true);
@@ -41,7 +42,7 @@ export function RewardPropertiesHeader({ readOnly = false, reward, pageId, refre
         pageId
       })
       .then(() => {
-        refreshPermissions();
+        refreshEditable();
         showMessage('Page permissions updated. Only the bounty creator can edit this page.', 'success');
       })
       .finally(() => setUpdatingPermissions(false));
@@ -49,10 +50,10 @@ export function RewardPropertiesHeader({ readOnly = false, reward, pageId, refre
 
   return (
     <>
-      {/* Bounty price and status  */}
-      <Grid container mb={2}>
+      {/* Reward price and status  */}
+      <Grid container mb={1}>
         <Grid item xs={6}>
-          <Typography fontWeight='bold'>Reward information</Typography>
+          <ExpandableSectionTitle title='Details' isExpanded={isExpanded} toggleExpanded={toggleExpanded} />
         </Grid>
         <Grid item xs={6}>
           <Box
@@ -63,28 +64,28 @@ export function RewardPropertiesHeader({ readOnly = false, reward, pageId, refre
               alignItems: 'center'
             }}
           >
-            {/* Provide the bounty menu options */}
+            {/* Provide the reward menu options */}
             <Box data-test='bounty-header-amount' display='flex'>
-              <RewardStatusBadge reward={reward} truncate />
+              <RewardStatusBadge reward={reward} truncate showEmptyStatus />
             </Box>
           </Box>
         </Grid>
       </Grid>
 
-      {/* Warning for applicants */}
+      {/* Warning for reward creator */}
       {!!editableCheck?.editable && !isFreeSpace && !readOnly && (
         <Alert
           severity='info'
           sx={{ mb: 2 }}
           action={
-            <Tooltip title={"Update this bounty's page permissions to view-only (except for the bounty creator)."}>
+            <Tooltip title={"Update this reward's page permissions to view-only (except for the reward creator)."}>
               <Button size='small' variant='outlined' onClick={restrictPermissions} loading={updatingPermissions}>
                 Restrict editing
               </Button>
             </Tooltip>
           }
         >
-          The current permissions allow some applicants to edit the details of this bounty.
+          The current permissions allow some applicants to edit the details of this reward.
         </Alert>
       )}
     </>

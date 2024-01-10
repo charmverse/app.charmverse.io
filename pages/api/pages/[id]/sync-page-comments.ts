@@ -4,29 +4,20 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
-import { syncPageComments } from 'lib/pages/comments/syncPageComments';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { syncPageCommentsWithLensPost } from 'lib/pages/comments/syncPageCommentsWithLensPost';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(
-    providePermissionClients({
-      key: 'id',
-      location: 'query',
-      resourceIdType: 'page'
-    })
-  )
-  .use(requireUser)
-  .post(syncProposalCommentsHandler);
+handler.use(requireUser).post(syncProposalCommentsHandler);
 
 async function syncProposalCommentsHandler(req: NextApiRequest, res: NextApiResponse<PageCommentWithVote[]>) {
   const { id: pageId } = req.query as any as { id: string };
 
   const userId = req.session.user?.id;
 
-  const permissions = await req.basePermissionsClient.pages.computePagePermissions({
+  const permissions = await permissionsApiClient.pages.computePagePermissions({
     resourceId: pageId,
     userId
   });
@@ -54,7 +45,12 @@ async function syncProposalCommentsHandler(req: NextApiRequest, res: NextApiResp
     throw new Error("Proposal not found or it hasn't been posted in Lens yet");
   }
 
-  const pageCommentsWithVotes = await syncPageComments({ spaceId: page.spaceId, pageId, lensPostLink, userId });
+  const pageCommentsWithVotes = await syncPageCommentsWithLensPost({
+    spaceId: page.spaceId,
+    pageId,
+    lensPostLink,
+    userId
+  });
 
   res.status(200).json(pageCommentsWithVotes);
 }

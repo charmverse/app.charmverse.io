@@ -1,13 +1,13 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable camelcase */
 import fs from 'node:fs/promises';
 
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
-import { Block, prismaToBlock } from 'lib/focalboard/block';
+import { prismaToBlock } from 'lib/focalboard/block';
 import type { Board } from 'lib/focalboard/board';
 import { createPage, generateBoard, generateUserAndSpace } from 'testing/setupDatabase';
 
@@ -22,6 +22,7 @@ let root_1: PageWithPermissions;
 let page_1_1: PageWithPermissions;
 let page_1_1_1: PageWithPermissions;
 let boardPage: Page;
+let cardPages: Page[];
 let totalSourcePages = 0;
 let totalSourceBlocks = 0;
 
@@ -57,7 +58,15 @@ beforeAll(async () => {
 
   boardPage = await generateBoard({
     spaceId: space.id,
-    createdBy: user.id
+    createdBy: user.id,
+    cardCount: 2
+  });
+
+  cardPages = await prisma.page.findMany({
+    where: {
+      parentId: boardPage.id,
+      type: 'card'
+    }
   });
 
   totalSourcePages = await prisma.page.count({
@@ -106,10 +115,32 @@ describe('importWorkspacePages', () => {
     expect(blocks.length).toBe(totalSourceBlocks);
   });
 
+  it('should return a hashmap of the source page ids and the page ids for their new versions', async () => {
+    const { space: targetSpace } = await generateUserAndSpace();
+
+    const data = await exportWorkspacePages({
+      sourceSpaceIdOrDomain: space.domain
+    });
+
+    const importResult = await importWorkspacePages({
+      targetSpaceIdOrDomain: targetSpace.domain,
+      exportData: data
+    });
+
+    expect(importResult.oldNewRecordIdHashMap).toMatchObject({
+      [root_1.id]: expect.any(String),
+      [page_1_1.id]: expect.any(String),
+      [page_1_1_1.id]: expect.any(String),
+      [boardPage.id]: expect.any(String),
+      [cardPages[0].id]: expect.any(String),
+      [cardPages[1].id]: expect.any(String)
+    });
+  });
+
   it('should accept a filename as the source data input', async () => {
     const { space: targetSpace } = await generateUserAndSpace();
 
-    const exportName = `test-${v4()}`;
+    const exportName = `test-${v4()}.json`;
 
     const { data, path } = await exportWorkspacePagesToDisk({
       sourceSpaceIdOrDomain: space.domain,

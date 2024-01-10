@@ -1,9 +1,9 @@
-import { useEditorViewContext } from '@bangle.dev/react';
 import { Check, Close } from '@mui/icons-material';
 import { Box, IconButton, Paper, Stack, Tooltip, Typography } from '@mui/material';
 import { memo, useMemo } from 'react';
 
 import charmClient from 'charmClient';
+import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
@@ -12,7 +12,7 @@ import type { Member } from 'lib/members/interfaces';
 import { accept } from '../fiduswriter/track/accept';
 import type { TrackType } from '../fiduswriter/track/interfaces';
 import { reject } from '../fiduswriter/track/reject';
-import { RelativeDate } from '../PageThread';
+import { RelativeDate } from '../thread/PageThread';
 
 import type { TrackedEvent } from './getEvents';
 
@@ -211,5 +211,7 @@ function FormatChangeDisplay({ before, after }: { before: string[]; after: strin
 
 function SidebarUser({ user }: { user?: Member }) {
   if (!user) return null;
-  return <UserDisplay showMiniProfile component='div' user={user} avatarSize='small' fontSize={14} fontWeight={500} />;
+  return (
+    <UserDisplay showMiniProfile component='div' userId={user.id} avatarSize='small' fontSize={14} fontWeight={500} />
+  );
 }

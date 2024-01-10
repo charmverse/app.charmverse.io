@@ -6,13 +6,13 @@ import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { debounce } from 'lodash';
-import { useRouter } from 'next/router';
 import type { ChangeEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { usePageTitle } from 'hooks/usePageTitle';
@@ -29,12 +29,12 @@ import { usePostCategoryPermissions } from './hooks/usePostCategoryPermissions';
 
 export function ForumPage() {
   const [search, setSearch] = useState('');
-  const router = useRouter();
+  const { navigateToSpacePath, router } = useCharmRouter();
   const { space: currentSpace } = useCurrentSpace();
   const sort = router.query.sort as PostSortOption | undefined;
-  const { createPost, showPost } = usePostDialog();
+  const { createPost, hidePost, showPost } = usePostDialog();
   const { categories, isLoading: isCategoriesLoading, getPostableCategories } = useForumCategories();
-  const [, setTitle] = usePageTitle();
+  const [, setPageTitle] = usePageTitle();
   const [currentCategory, setCurrentCategory] = useState<PostCategory | null>(null);
 
   const { permissions: currentCategoryPermissions } = usePostCategoryPermissions(currentCategory?.id ?? null);
@@ -50,15 +50,6 @@ export function ForumPage() {
     disabledCreatePostTooltip = `You do not have permission to create posts in the ${currentCategory.name} category`;
   }
 
-  useEffect(() => {
-    if (currentCategory?.name) {
-      setTitle(currentCategory.name);
-    }
-  }, [currentCategory?.name]);
-
-  useEffect(() => {
-    setCategoryFromPath();
-  }, [categories, router.query]);
   function setCategoryFromPath() {
     const categoryPath = router.query.categoryPath as string | undefined;
     const category = !categoryPath
@@ -68,42 +59,11 @@ export function ForumPage() {
 
     // User tried to navigate to a category they cannot access or does not exist, redirect them to forum home
     if (category === undefined && !isCategoriesLoading && currentSpace) {
-      router.push(`/${currentSpace.domain}/forum`);
+      navigateToSpacePath(`/forum`);
     } else if (category && currentSpace) {
       charmClient.track.trackAction('main_feed_filtered', {
         categoryName: category.name,
         spaceId: currentSpace.id
-      });
-    }
-  }
-
-  function handleSortUpdate(sortName?: PostSortOption) {
-    const pathname = `/${currentSpace?.domain}/forum`;
-
-    if (sortName) {
-      router.push({
-        pathname,
-        query: { sort: sortName }
-      });
-    } else {
-      router.push({
-        pathname
-      });
-    }
-  }
-
-  function handleCategoryUpdate(newCategoryId?: string) {
-    const pathname = `/${currentSpace?.domain}/forum`;
-
-    const newCategory = newCategoryId ? categories.find((category) => category.id === newCategoryId) : null;
-
-    if (newCategory) {
-      router.push({
-        pathname: `${pathname}/${newCategory.path ?? newCategory.name}`
-      });
-    } else {
-      router.push({
-        pathname
       });
     }
   }
@@ -117,13 +77,18 @@ export function ForumPage() {
     }
   }
   useEffect(() => {
-    if (router.isReady && typeof router.query.postId === 'string') {
+    if (!router.isReady) {
+      return;
+    }
+    if (typeof router.query.postId === 'string') {
       showPost({
         postId: router.query.postId,
         onClose() {
           setUrlWithoutRerender(router.pathname, { postId: null });
         }
       });
+    } else if (!router.query.postId) {
+      hidePost();
     }
   }, [router.isReady, router.query.postId]);
 
@@ -134,6 +99,16 @@ export function ForumPage() {
       debounceSearch.cancel();
     };
   }, [debounceSearch]);
+
+  useEffect(() => {
+    if (currentCategory?.name) {
+      setPageTitle(currentCategory.name);
+    }
+  }, [currentCategory?.name]);
+
+  useEffect(() => {
+    setCategoryFromPath();
+  }, [categories, router.query]);
 
   return (
     <CenteredPageContent style={{ width: 1100 }}>
@@ -174,12 +149,7 @@ export function ForumPage() {
           }}
         >
           <Box display={{ md: 'none' }}>
-            <CategorySelect
-              selectedCategoryId={currentCategory?.id}
-              selectedSort={sort}
-              handleCategory={handleCategoryUpdate}
-              handleSort={handleSortUpdate}
-            />
+            <CategorySelect selectedCategoryId={currentCategory?.id} selectedSort={sort} />
           </Box>
           <CreateForumPost
             disabled={disableCreatePost}
@@ -193,12 +163,7 @@ export function ForumPage() {
           )}
         </Box>
         <Box flexGrow={1} display={{ xs: 'none', md: 'initial' }}>
-          <CategoryMenu
-            handleCategory={handleCategoryUpdate}
-            handleSort={handleSortUpdate}
-            selectedSort={sort}
-            selectedCategoryId={currentCategory?.id}
-          />
+          <CategoryMenu selectedSort={sort} selectedCategoryId={currentCategory?.id} />
         </Box>
       </Box>
     </CenteredPageContent>

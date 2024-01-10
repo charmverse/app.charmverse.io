@@ -1,4 +1,4 @@
-import { link } from '@bangle.dev/base-components';
+/* eslint-disable max-len */
 import type { Mark, PluginKey } from '@bangle.dev/pm';
 import { Plugin } from '@bangle.dev/pm';
 
@@ -10,12 +10,14 @@ import {
 } from '../@bangle.dev/tooltip/suggest-tooltip';
 
 import { getLinkElement } from './getLinkElement';
+import { linkPlugins } from './link';
 
 export type LinkPluginState = {
   show: boolean;
   href: string | null;
   tooltipContentDOM: HTMLElement;
   ref?: HTMLElement | null;
+  pages: Record<string, string>; // pagePath -> pageId
 };
 
 export function plugins({ key }: { key: PluginKey }) {
@@ -23,7 +25,7 @@ export function plugins({ key }: { key: PluginKey }) {
   let tooltipTimer: ReturnType<typeof setTimeout> | null = null;
 
   return [
-    link.plugins(),
+    linkPlugins({ key }),
     new Plugin<LinkPluginState>({
       key,
       state: {
@@ -31,7 +33,8 @@ export function plugins({ key }: { key: PluginKey }) {
           return {
             show: false,
             href: null,
-            tooltipContentDOM: tooltipDOMSpec.contentDOM
+            tooltipContentDOM: tooltipDOMSpec.contentDOM,
+            pages: {}
           };
         },
         apply(tr, pluginState) {
@@ -55,6 +58,13 @@ export function plugins({ key }: { key: PluginKey }) {
               href: null,
               ref: null,
               show: false
+            };
+          }
+          // update page context
+          if (meta.pages) {
+            return {
+              ...pluginState,
+              pages: meta.pages
             };
           }
           throw new Error('Unknown type');

@@ -9,7 +9,7 @@ import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { KanbanPageActionsMenuButton } from 'components/common/PageActions/KanbanPageActionButton';
-import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
+import { PageIcon } from 'components/common/PageIcon';
 import { RewardStatusBadge } from 'components/rewards/components/RewardStatusBadge';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -29,10 +29,11 @@ type Props = {
   isSelected: boolean;
   onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
   readOnly: boolean;
-  onDrop: (srcCard: Card, dstCard: Card) => void;
+  onDrop?: (srcCard: Card, dstCard: Card) => void;
   // eslint-disable-next-line
   showCard: (cardId: string | null) => void;
   isManualSort: boolean;
+  hideLinkedBounty?: boolean;
 };
 
 const BountyFooter = styled.div`
@@ -48,10 +49,30 @@ const StyledBox = styled(Box)`
   ${hoverIconsStyle({ absolutePositioning: true })}
 `;
 
+function RewardMetadata({ bountyId }: { bountyId: string }) {
+  const { rewards } = useRewards();
+  const linkedBounty = rewards?.find((r) => r?.id === bountyId);
+
+  if (!linkedBounty) {
+    return null;
+  }
+
+  return (
+    <BountyFooter>
+      <RewardStatusBadge reward={linkedBounty} truncate />
+    </BountyFooter>
+  );
+}
+
 const KanbanCard = React.memo((props: Props) => {
-  const { card, board } = props;
+  const { card, board, onDrop } = props;
   const intl = useIntl();
-  const [isDragging, isOver, cardRef] = useSortable('card', card, !props.readOnly && !isTouchScreen(), props.onDrop);
+  const [isDragging, isOver, cardRef] = useSortable(
+    'card',
+    card,
+    !props.readOnly && !isTouchScreen() && !!onDrop,
+    onDrop || (() => {})
+  );
   const visiblePropertyTemplates = props.visiblePropertyTemplates || [];
   let className = props.isSelected ? 'KanbanCard selected' : 'KanbanCard';
   if (props.isManualSort && isOver) {
@@ -59,11 +80,9 @@ const KanbanCard = React.memo((props: Props) => {
   }
   const { space } = useCurrentSpace();
 
-  const { rewards } = useRewards();
   const router = useRouter();
   const { pages } = usePages();
   const cardPage = pages[card.id];
-  const linkedBounty = rewards?.find((r) => r?.id === cardPage?.bountyId);
   const domain = router.query.domain || /^\/share\/(.*)\//.exec(router.asPath)?.[1];
   const fullPageUrl = `/${domain}/${cardPage?.path}`;
 
@@ -136,7 +155,7 @@ const KanbanCard = React.memo((props: Props) => {
               <PropertyValueElement
                 key={template.id}
                 board={board}
-                readOnly={true}
+                readOnly
                 card={card}
                 syncWithPageId={cardPage?.syncWithPageId}
                 updatedAt={cardPage?.updatedAt.toString() || ''}
@@ -148,11 +167,7 @@ const KanbanCard = React.memo((props: Props) => {
               />
             ))}
           </Stack>
-          {linkedBounty && (
-            <BountyFooter>
-              <RewardStatusBadge reward={linkedBounty} truncate />
-            </BountyFooter>
-          )}
+          {!props.hideLinkedBounty && cardPage?.bountyId && <RewardMetadata bountyId={cardPage?.bountyId} />}
         </StyledBox>
       </Link>
       {showConfirmationDialogBox && (

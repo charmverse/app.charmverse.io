@@ -1,48 +1,56 @@
+import { UserIsNotSpaceMemberError } from '@charmverse/core/errors';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
-import { createBlocks } from 'lib/proposal/blocks/createBlocks';
+import { NotFoundError, onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { deleteBlocks } from 'lib/proposal/blocks/deleteBlocks';
 import { getBlocks } from 'lib/proposal/blocks/getBlocks';
-import type {
-  ProposalBlockInput,
-  ProposalBlockUpdateInput,
-  ProposalBlockWithTypedFields
-} from 'lib/proposal/blocks/interfaces';
-import { updateBlocks } from 'lib/proposal/blocks/updateBlocks';
+import type { ProposalBlockUpdateInput, ProposalBlockWithTypedFields } from 'lib/proposal/blocks/interfaces';
+import { upsertBlocks } from 'lib/proposal/blocks/upsertBlocks';
 import { withSessionRoute } from 'lib/session/withSession';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
-  .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' }))
   .get(getProposalBlocksHandler)
-  .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
-  .post(createProposalBlocksHandler)
+  .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' }))
   .put(updateProposalBlocksHandler)
+  .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
   .delete(deleteProposalBlocksHandler);
 
 async function getProposalBlocksHandler(req: NextApiRequest, res: NextApiResponse<ProposalBlockWithTypedFields[]>) {
   const spaceId = req.query.id as string;
   const blockId = req.query.blockId as string;
+  const userId = req.session.user?.id;
+
+  if (userId) {
+    const { error } = await hasAccessToSpace({
+      spaceId,
+      userId
+    });
+    if (error) {
+      throw new UserIsNotSpaceMemberError();
+    }
+  } else {
+    const space = await prisma.space.findUniqueOrThrow({
+      where: {
+        id: spaceId
+      },
+      select: {
+        publicProposals: true
+      }
+    });
+
+    if (!space.publicProposals) {
+      throw new NotFoundError();
+    }
+  }
 
   const proposalBlocks = await getBlocks({
     spaceId,
     ids: blockId ? [blockId] : undefined
-  });
-
-  return res.status(200).json(proposalBlocks);
-}
-
-async function createProposalBlocksHandler(req: NextApiRequest, res: NextApiResponse<ProposalBlockWithTypedFields[]>) {
-  const userId = req.session.user.id;
-  const data = req.body as ProposalBlockInput[];
-
-  const proposalBlocks = await createBlocks({
-    blocksData: data,
-    userId,
-    spaceId: req.query.id as string
   });
 
   return res.status(200).json(proposalBlocks);
@@ -53,7 +61,7 @@ async function updateProposalBlocksHandler(req: NextApiRequest, res: NextApiResp
   const data = req.body as ProposalBlockUpdateInput[];
   const spaceId = req.query.id as string;
 
-  const proposalBlocks = await updateBlocks({
+  const proposalBlocks = await upsertBlocks({
     blocksData: data,
     userId,
     spaceId

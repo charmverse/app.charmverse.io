@@ -14,6 +14,7 @@ export function createMemberProperty(
     updatedAt: createdAt,
     enabledViews: ['gallery', 'table', 'profile'],
     options: null,
+    required: false,
     ...memberProperty
   };
 }
@@ -22,8 +23,6 @@ export function createMemberPropertyValue(member: Member, memberPropertyType: Me
   switch (memberPropertyType) {
     case 'profile_pic':
       return member.avatar;
-    case 'name':
-      return member.username;
     case 'role':
       return member.roles;
     case 'bio':

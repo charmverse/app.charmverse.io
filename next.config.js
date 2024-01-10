@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const BundleAnalyzer = require('@next/bundle-analyzer');
-const next = require('next/dist/lib/is-serializable-props');
 
 const esmModules = require('./next.base').esmModules;
 
@@ -20,12 +19,12 @@ const config = {
     styledComponents: true
   },
   experimental: {
-    esmExternals: false
-    //    externalDir: true
+    esmExternals: false,
+    webpackBuildWorker: true
   },
-
   images: {
-    domains: ['cdn.charmverse.io']
+    // next image is broken in staging/production as of 14.0.1
+    unoptimized: true
   },
   transpilePackages: esmModules,
   modularizeImports: {
@@ -56,16 +55,6 @@ const config = {
         destination: '/:domain',
         permanent: true
       },
-      // {
-      //   source: '/:domain/bounties',
-      //   destination: '/:domain/rewards',
-      //   permanent: true
-      // },
-      // {
-      //   source: '/:domain(^(?!.*\bapi\b).*$)/bounties/:id',
-      //   destination: '/:domain/bounties?bountyId=:id',
-      //   permanent: false
-      // },
       {
         source: '/nexus',
         destination: '/',
@@ -103,53 +92,18 @@ const config = {
         source: '/signup',
         destination: '/createSpace',
         permanent: true
+      },
+      // added 11/2023 to redirect old /bounties route to /rewards
+      {
+        source: '/:domain/bounties',
+        destination: '/:domain/rewards',
+        permanent: true // change this to true once we confirm success :)
       }
     ];
   },
-  webpack(_config, { buildId, nextRuntime }) {
+  webpack(_config, { buildId, nextRuntime, webpack }) {
     // Fix for: "Module not found: Can't resolve 'canvas'"
     _config.resolve.alias.canvas = false;
-
-    // Fix for: "Module not found: Can't resolve X" when using moduleResolution, nodeNext
-    // https://github.com/vercel/next.js/discussions/41189#discussioncomment-4488386
-    // _config.resolve.extensionAlias = {
-    //   '.js': ['.js', '.ts'],
-    //   '.jsx': ['.jsx', '.tsx']
-    // };
-
-    // const externalDir = path.resolve(__dirname, '..', 'core', 'node_modules');
-
-    // _config.resolve.modules.push(externalDir);
-
-    // // _config.module.rules.push({ include: [path.resolve(__dirname), path.resolve(__dirname, '../core/node_modules')] });
-
-    // _config.resolve.alias['@prisma/client'] = path.resolve(__dirname, '../core/node_modules/@prisma/client');
-
-    // _config.resolve.symlinks = true;
-
-    //   console.log('ALIAS', _config.resolve.alias);
-
-    //    console.log('Module', _config.module);
-
-    // _config.resolve.modules = [
-    //   ...(_config.resolve.modules ?? []),
-    //   path.resolve(__dirname, 'node_modules'),
-    //   path.resolve(__dirname, '../charmverse-common/node_modules')
-    // ];
-
-    // //    _config.resolve.symlinks = false;
-
-    // const aliasUrl = fs.realpathSync(
-    //   path.resolve(path.join(__dirname, '../charmverse-common/node_modules/@prisma/client'))
-    // );
-
-    // console.log(`Alias URL:`, aliasUrl);
-
-    // _config.resolve.alias['@prisma/client'] = aliasUrl;
-    // );
-    // _config.resolve.modules['@prisma/client'] = path.resolve(
-    //   'node_modules/@charmverse/core/node_modules/@prisma/client'
-    // );
 
     _config.module.rules.push({
       test: /\.svg$/,
@@ -172,20 +126,20 @@ const config = {
         }
       ]
     });
-    // check for nodejs runtime. see https://github.com/vercel/next.js/issues/36237#issuecomment-1117694528
-    if (nextRuntime === 'nodejs') {
-      const entry = _config.entry;
-      _config.entry = () => {
-        return entry().then((_entry) => {
-          return {
-            ..._entry,
-            cron: './background/cron.ts',
-            websockets: './background/initWebsockets.ts'
-            // countSpaceData: './scripts/countSpaceData.ts',
-            // importFromDiscourse: './scripts/importFromDiscourse.ts',
-          };
-        });
-      };
+    if (nextRuntime !== 'nodejs') {
+      /**
+       * Add support for the `node:` scheme available since Node.js 16.
+       *
+       * `@lit-protocol/lit-node-client` imports from `node:buffer`
+       *
+       * @see https://github.com/webpack/webpack/issues/13290
+       */
+      _config.plugins = _config.plugins ?? [];
+      _config.plugins.push(
+        new webpack.NormalModuleReplacementPlugin(/^node:/, (resource) => {
+          resource.request = resource.request.replace(/^node:/, '');
+        })
+      );
     }
 
     return _config;
@@ -202,12 +156,6 @@ const removeUndefined = (obj) => {
     else if (obj[key] !== undefined) newObj[key] = obj[key];
   });
   return newObj;
-};
-
-// eslint-disable-next-line prefer-destructuring
-const isSerializableProps = next.isSerializableProps;
-next.isSerializableProps = function _isSerializableProps(page, method, input) {
-  return isSerializableProps(page, method, removeUndefined(input));
 };
 
 const withBundleAnalyzer = BundleAnalyzer({

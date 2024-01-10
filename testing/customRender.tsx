@@ -4,7 +4,7 @@ import { render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { SWRConfig } from 'swr';
 
-import { PageSidebarContext } from 'hooks/usePageSidebar';
+import { PageSidebarContext } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { SnackbarContext } from 'hooks/useSnackbar';
 import { SpacesContext } from 'hooks/useSpaces';
 import type { IContext } from 'hooks/useUser';
@@ -62,10 +62,6 @@ export const customRenderWithContext = (
                 showMessage: () => {},
                 actions: [],
                 message: null,
-                origin: {
-                  vertical: 'bottom',
-                  horizontal: 'left'
-                },
                 severity: 'info',
                 setActions: () => {},
                 setSeverity: () => {},
@@ -73,7 +69,13 @@ export const customRenderWithContext = (
                 setMessage: () => {}
               }}
             >
-              <PageSidebarContext.Provider value={{ activeView: null, setActiveView: () => {} }}>
+              <PageSidebarContext.Provider
+                value={{
+                  activeView: null,
+                  setActiveView: () => {},
+                  closeSidebar: () => {}
+                }}
+              >
                 {ui}
               </PageSidebarContext.Provider>
             </SnackbarContext.Provider>

@@ -67,7 +67,7 @@ export async function work({
     );
 
     // Don't allow users to create new apps
-  } else if (reward.status !== 'open' && reward.status !== 'inProgress' && !applicationId) {
+  } else if (reward.status !== 'open' && !applicationId) {
     throw new WrongStateError('Cannot create new applicaton on a closed reward');
   }
 
@@ -84,7 +84,7 @@ export async function work({
 
   const rewardCreateInput: Prisma.ApplicationCreateInput = {
     ...(updateableFields as any),
-    status: reward.approveSubmitters ? 'applied' : 'inProgress',
+    status: reward.approveSubmitters ? 'applied' : 'review',
     applicant: {
       connect: {
         id: userId
@@ -105,11 +105,17 @@ export async function work({
       data: rewardCreateInput
     });
   } else {
+    const existingApp = reward.applications.find((app) => app.id === applicationId);
+
     applicationOrSubmission = await prisma.application.update({
       where: {
         id: applicationId
       },
-      data: updateableFields
+      data: {
+        ...updateableFields,
+        // If the reward requires applications, user will be moved to "in progress" when application is approved. Once they are submitting content, they will be moved to "review"
+        status: updateableFields.submissionNodes && existingApp?.status === 'inProgress' ? 'review' : undefined
+      }
     });
   }
 

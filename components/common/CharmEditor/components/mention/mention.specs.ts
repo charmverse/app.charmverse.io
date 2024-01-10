@@ -1,6 +1,6 @@
-import type { RawSpecs } from '@bangle.dev/core';
 import type { DOMOutputSpec } from '@bangle.dev/pm';
 
+import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import type { Member } from 'lib/members/interfaces';
 
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
@@ -9,7 +9,7 @@ import { mentionNodeName, mentionSuggestMarkName, mentionTrigger } from './menti
 
 export interface MentionSpecSchemaAttrs {
   value: string;
-  type: 'user' | 'page';
+  type: 'user' | 'page' | 'role';
   id: string;
   createdAt: Date;
   createdBy: string;

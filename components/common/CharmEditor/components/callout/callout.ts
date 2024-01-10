@@ -1,6 +1,9 @@
-import { NodeView, type BaseRawNodeSpec, type RawPlugins } from '@bangle.dev/core';
 import type { DOMOutputSpec, Node } from '@bangle.dev/pm';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
+
+import { NodeView } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
+import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
+import type { BaseRawNodeSpec } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 const name = 'blockquote';
 

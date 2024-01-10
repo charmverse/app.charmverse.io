@@ -1,5 +1,3 @@
-import type { Block } from '@charmverse/core/prisma';
-
 import type { BoardFields, DatabaseProposalPropertyType, IPropertyTemplate } from 'lib/focalboard/board';
 
 export type ExtractedDatabaseProposalProperties = Partial<Record<DatabaseProposalPropertyType, IPropertyTemplate>>;
@@ -13,11 +11,11 @@ export function extractDatabaseProposalProperties({
   boardBlock: { fields: any };
 }): Partial<ExtractedDatabaseProposalProperties> {
   return {
-    proposalCategory: (boardBlock.fields as BoardFields).cardProperties.find(
-      (prop: IPropertyTemplate) => prop.type === 'proposalCategory'
-    ),
     proposalUrl: (boardBlock.fields as BoardFields).cardProperties.find(
       (prop: IPropertyTemplate) => prop.type === 'proposalUrl'
+    ),
+    proposalStep: (boardBlock.fields as BoardFields).cardProperties.find(
+      (prop: IPropertyTemplate) => prop.type === 'proposalStep'
     ),
     proposalStatus: (boardBlock.fields as BoardFields).cardProperties.find(
       (prop: IPropertyTemplate) => prop.type === 'proposalStatus'
@@ -30,6 +28,9 @@ export function extractDatabaseProposalProperties({
     ),
     proposalEvaluationTotal: (boardBlock.fields as BoardFields).cardProperties.find(
       (prop: IPropertyTemplate) => prop.type === 'proposalEvaluationTotal'
+    ),
+    proposalEvaluationType: (boardBlock.fields as BoardFields).cardProperties.find(
+      (prop: IPropertyTemplate) => prop.type === 'proposalEvaluationType'
     )
   };
 }

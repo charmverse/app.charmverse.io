@@ -1,5 +1,4 @@
 /* eslint-disable max-lines */
-import type { ProposalStatus } from '@charmverse/core/prisma-client';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
@@ -13,9 +12,10 @@ import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
-import { PROPOSAL_STATUS_LABELS_WITH_ARCHIVED } from 'lib/proposal/proposalStatusTransition';
+import { Constants } from 'lib/focalboard/constants';
+import { EVALUATION_STATUS_LABELS } from 'lib/focalboard/proposalDbProperties';
+import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
 
-import { Constants } from '../../constants';
 import mutator from '../../mutator';
 import IconButton from '../../widgets/buttons/iconButton';
 import Editable from '../../widgets/editable';
@@ -32,7 +32,7 @@ type Props = {
   groupByProperty?: IPropertyTemplate;
   intl: IntlShape;
   readOnly: boolean;
-  addCard: (groupByOptionId?: string, show?: boolean) => Promise<void>;
+  addCard: (groupByOptionId?: string, show?: boolean) => Promise<void> | void;
   propertyNameChanged: (option: IPropertyOption, text: string) => Promise<void>;
   onDropToColumn: (srcOption: IPropertyOption, card?: Card, dstOption?: IPropertyOption) => void;
   calculationMenuOpen: boolean;
@@ -40,6 +40,7 @@ type Props = {
   onCalculationMenuClose: () => void;
   anchorEl: HTMLElement | null;
   readOnlyTitle?: boolean;
+  disableAddingCards?: boolean;
 };
 
 const defaultCalculation = 'count';
@@ -92,7 +93,7 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
 
   const formattedGroupTitle =
     groupByProperty?.type === 'proposalStatus'
-      ? PROPOSAL_STATUS_LABELS_WITH_ARCHIVED[group.option.value as ProposalStatus]
+      ? EVALUATION_STATUS_LABELS[group.option.value as ProposalEvaluationStatus]
       : groupTitle;
 
   return (
@@ -184,7 +185,7 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
                 name={intl.formatMessage({ id: 'BoardComponent.hide', defaultMessage: 'Hide' })}
                 onClick={() => mutator.hideViewColumn(activeView, group.option.id || '')}
               />
-              {group.option.id && (
+              {group.option.id && !props.readOnlyTitle && (
                 <>
                   {!proposalPropertyTypesList.includes((groupByProperty?.type || '') as any) && (
                     <Menu.Text
@@ -208,7 +209,7 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
               )}
             </Menu>
           </MenuWrapper>
-          {!proposalPropertyTypesList.includes((groupByProperty?.type || '') as any) && (
+          {!props.disableAddingCards && !proposalPropertyTypesList.includes((groupByProperty?.type || '') as any) && (
             <IconButton
               icon={<AddIcon fontSize='small' />}
               onClick={() => {

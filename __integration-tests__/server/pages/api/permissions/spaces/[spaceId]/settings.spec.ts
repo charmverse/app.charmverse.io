@@ -21,7 +21,8 @@ describe('POST /api/permissions/space/{spaceId}/settings - Saving space permissi
             moderateForums: false,
             deleteAnyBounty: false,
             deleteAnyPage: false,
-            deleteAnyProposal: false
+            deleteAnyProposal: false,
+            createProposals: false
           },
           assignee: {
             id: space.id,
@@ -29,7 +30,6 @@ describe('POST /api/permissions/space/{spaceId}/settings - Saving space permissi
           }
         }
       ],
-      proposalCategories: [],
       forumCategories: []
     };
 

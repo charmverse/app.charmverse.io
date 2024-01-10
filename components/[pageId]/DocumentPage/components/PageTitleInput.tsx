@@ -1,12 +1,10 @@
-import { EditorViewContext } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import { TextField, Typography } from '@mui/material';
 import type { TextFieldProps } from '@mui/material';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ChangeEvent } from 'react';
 
 import { useIMEComposition } from 'hooks/useIMEComposition';
-import { insertAndFocusFirstLine } from 'lib/prosemirror/insertAndFocusFirstLine';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 const StyledPageTitle = styled(TextField)`
@@ -53,6 +51,7 @@ interface PageTitleProps {
   onChange: (page: { title: string; updatedAt: string }) => void;
   readOnly?: boolean;
   placeholder?: string;
+  focusDocumentEditor: VoidFunction;
 }
 
 export function PageTitleInput({
@@ -60,9 +59,10 @@ export function PageTitleInput({
   updatedAt: updatedAtExternal,
   onChange,
   readOnly,
-  placeholder
+  placeholder,
+  focusDocumentEditor
 }: PageTitleProps) {
-  const view = useContext(EditorViewContext);
+  // const view = useContext(EditorViewContext);
   const [title, setTitle] = useState(value);
   const [updatedAt, setUpdatedAt] = useState(updatedAtExternal);
   const titleInput = useRef<HTMLTextAreaElement>(null);
@@ -88,7 +88,7 @@ export function PageTitleInput({
     const pressedEnter = event.key === 'Enter';
     if (pressedEnter) {
       event.preventDefault();
-      insertAndFocusFirstLine(view);
+      focusDocumentEditor();
     }
   };
 

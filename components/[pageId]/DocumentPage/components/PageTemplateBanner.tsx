@@ -9,8 +9,11 @@ import { DocumentPageIcon } from 'components/common/Icons/DocumentPageIcon';
 import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
-const StyledPageTemplateBanner = styled(Box)<{ card?: boolean }>`
+const StyledPageTemplateBanner = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'card'
+})<{ card?: boolean }>`
   top: ${({ card }) => (card ? '50px' : '55px')};
   width: '100%';
   z-index: var(--z-index-appBar);
@@ -22,22 +25,36 @@ const StyledPageTemplateBanner = styled(Box)<{ card?: boolean }>`
 `;
 
 type Props = {
+  isNewPage?: boolean;
   parentId?: string | null;
-  pageType: PageMeta['type'];
+  pageType?: PageMeta['type'];
+  customTitle?: string;
+  proposalType?: 'free_form' | 'structured';
 };
 
-export function PageTemplateBanner({ pageType, parentId }: Props) {
+export function PageTemplateBanner({ proposalType, isNewPage, pageType, parentId, customTitle }: Props) {
   const { space } = useCurrentSpace();
+  const { getFeatureTitle } = useSpaceFeatures();
   const theme = useTheme();
   const { pages } = usePages();
   const parentPage = parentId ? pages[parentId] : undefined;
 
-  const isShowingCard = pageType.match('card') !== null;
+  const isShowingCard = pageType?.match('card') !== null;
   const board = isShowingCard ? parentPage : undefined;
 
   const boardPath = board ? `/${space?.domain}/${board?.path}` : undefined;
 
-  if (!pageType.match('template')) {
+  if (customTitle) {
+    return (
+      <StyledPageTemplateBanner card={isShowingCard}>
+        <Grid item xs={8} display='flex' justifyContent='center'>
+          <span>{customTitle}</span>
+        </Grid>
+      </StyledPageTemplateBanner>
+    );
+  }
+
+  if (!pageType?.match('template')) {
     return null;
   }
 
@@ -53,7 +70,11 @@ export function PageTemplateBanner({ pageType, parentId }: Props) {
         </Grid>
         <Grid item xs={8} display='flex' justifyContent='center'>
           {!isShowingCard ? (
-            <span>You're editing a {pageType.split('_template')[0]} template</span>
+            <span>
+              You're {isNewPage ? 'creating' : 'editing'} a{' '}
+              {proposalType ? `${proposalType === 'free_form' ? 'free-form' : 'structured'} ` : ''}
+              {getFeatureTitle(pageType === 'bounty_template' ? 'reward' : 'proposal')} template
+            </span>
           ) : (
             <>
               <span>You're editing a template in</span>

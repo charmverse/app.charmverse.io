@@ -1,6 +1,6 @@
 import { POST } from '@charmverse/core/http';
 
-import { getAlchemyBaseUrl } from 'lib/blockchain/provider/alchemy';
+import { getAlchemyBaseUrl } from 'lib/blockchain/provider/alchemy/client';
 
 import type { ITokenMetadata, ITokenMetadataRequest } from './tokenData';
 /**

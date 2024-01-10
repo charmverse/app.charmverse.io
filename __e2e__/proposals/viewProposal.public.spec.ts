@@ -42,29 +42,16 @@ test.describe.serial('View proposal - public space', () => {
     space = generated.space;
     proposalAuthor = generated.user;
 
-    proposalCategory = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id,
-      title: 'Proposals',
-      proposalCategoryPermissions: [
-        {
-          permissionLevel: 'full_access',
-          assignee: { group: 'space', id: space.id }
-        }
-      ]
-    });
-
     draftProposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: proposalAuthor.id,
-      proposalStatus: 'draft',
-      categoryId: proposalCategory.id
+      proposalStatus: 'draft'
     });
 
     discussionProposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: proposalAuthor.id,
-      proposalStatus: 'discussion',
-      categoryId: proposalCategory.id
+      proposalStatus: 'discussion'
     });
 
     // Finish setup start interacting with the app

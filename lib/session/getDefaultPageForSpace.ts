@@ -6,13 +6,13 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import type { StaticPageType, PageEventMap } from 'lib/metrics/mixpanel/interfaces/PageEvent';
 import { filterVisiblePages } from 'lib/pages/filterVisiblePages';
-import { getPermissionsClient } from 'lib/permissions/api/routers';
+import { getPermissionsClient, permissionsApiClient } from 'lib/permissions/api/client';
 import { getSubdomainPath, getSpaceUrl, fullyDecodeURI } from 'lib/utilities/browser';
 
 type ViewMeta = PageEventMap['page_view']['meta'];
 
 const staticPagesToDirect: { [key in StaticPageType]?: string } = {
-  bounties_list: '/bounties',
+  bounties_list: '/rewards',
   forum_posts_list: '/forum',
   members_list: '/members',
   proposals_list: '/proposals'
@@ -47,24 +47,31 @@ async function getDefaultPageForSpaceRaw({
 }) {
   const { id: spaceId } = space;
   const lastPageView = await getLastPageView({ userId, spaceId });
-
   const defaultSpaceUrl = getSpaceUrl(space, host);
   if (lastPageView) {
+    // grab the original path a user was on to include query params like filters, etc.
     const pathname = (lastPageView.meta as ViewMeta)?.pathname;
-    if (pathname) {
-      return getSubdomainPath(pathname, space, host);
-    }
-    // reconstruct the URL if no pathname is saved (should not be an issue a few weeks after the release of this code on Sep 12 2023)
+    const fullPathname = pathname && getSubdomainPath(pathname, space, host);
     // handle forum posts
     if (lastPageView.post) {
-      return `${defaultSpaceUrl}/forum?postId=${lastPageView.post.id}`;
+      // use the original path if it was the actual post page
+      if (fullPathname?.includes(lastPageView.post.path)) {
+        return fullPathname;
+      }
+      return `${defaultSpaceUrl}/forum/post/${lastPageView.post.path}`;
     }
     // handle pages
     else if (lastPageView.page) {
+      // use the original path if it was the actual post page
+      if (fullPathname?.includes(lastPageView.page.path)) {
+        return fullPathname;
+      }
       return `${defaultSpaceUrl}/${lastPageView.page.path}`;
-    }
-    // handle static pages
-    else {
+    } else {
+      if (fullPathname) {
+        return fullPathname;
+      }
+      // handle static pages - this is probably not necessary since pathname is always defined now
       const staticPath = staticPagesToDirect[lastPageView.pageType as StaticPageType];
       if (staticPath) {
         return `${defaultSpaceUrl}${staticPath}`;
@@ -72,12 +79,7 @@ async function getDefaultPageForSpaceRaw({
     }
   }
 
-  const { client } = await getPermissionsClient({
-    resourceId: spaceId,
-    resourceIdType: 'space'
-  });
-
-  const accessiblePageIds = await client.pages.getAccessiblePageIds({
+  const accessiblePageIds = await permissionsApiClient.pages.getAccessiblePageIds({
     spaceId,
     userId,
     archived: false

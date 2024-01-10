@@ -1,5 +1,6 @@
-import type { NodeView, NodeViewProps } from '@bangle.dev/core';
 import React from 'react';
+
+import type { NodeView, NodeViewProps } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 
 export type RenderNodeViewsFunction = (props: NodeViewProps & { children: React.ReactNode }) => React.ReactNode;
 

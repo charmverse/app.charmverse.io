@@ -37,7 +37,7 @@ html {
 }
 
 /* https://css-tricks.com/numbering-in-style/ */
-.ProseMirror ul li > span > p::before {
+.ProseMirror ul li > span > p:first-child::before {
   color: var(--czi-list-style-color);
 
   /* content: '\2022'; */
@@ -74,7 +74,7 @@ html {
   counter-reset: none;
 }
 
-.ProseMirror ol > li > span > p::before {
+.ProseMirror ol > li > span > p:first-child::before {
   /*
    * Note that this CSS Rule will not work in MS-Edge 15:
    * - MS-Edge 15 does not supported using CSS variable isnide pseudo element
@@ -98,20 +98,20 @@ html {
 }
 
 
-.ProseMirror ul[data-indent='7'] li > span > p::before,
-.ProseMirror ul[data-indent='4'] li > span > p::before,
-.ProseMirror ul[data-indent='1'] li > span > p::before {
+.ProseMirror ul[data-indent='7'] li > span > p:first-child::before,
+.ProseMirror ul[data-indent='4'] li > span > p:first-child::before,
+.ProseMirror ul[data-indent='1'] li > span > p:first-child::before {
   content: '◦'; /* circle */
 }
 
-.ProseMirror ul[data-indent='5'] li > span > p::before,
-.ProseMirror ul[data-indent='2'] li > span > p::before {
+.ProseMirror ul[data-indent='5'] li > span > p:first-child::before,
+.ProseMirror ul[data-indent='2'] li > span > p:first-child::before {
   content: '▪'; /* square */
 }
 
-.ProseMirror ul[data-indent='6'] li > span > p::before,
-.ProseMirror ul[data-indent='3'] li > span > p::before,
-.ProseMirror ul[data-indent='0'] li > span > p::before {
+.ProseMirror ul[data-indent='6'] li > span > p:first-child::before,
+.ProseMirror ul[data-indent='3'] li > span > p:first-child::before,
+.ProseMirror ul[data-indent='0'] li > span > p:first-child::before {
   content: '•'; /* circle */
 }
 
@@ -128,7 +128,7 @@ html {
       outline: none;
       position: absolute;
     }
-    & > span > p::before {
+    & > span > p:first-child::before {
       display: none;
     }
   }

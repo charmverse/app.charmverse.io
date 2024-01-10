@@ -1,4 +1,4 @@
-import { deleteDaylightAbility, getAllAbilities } from 'lib/token-gates/daylight';
+import { deleteDaylightAbility, getAllAbilities } from 'lib/tokenGates/daylight';
 
 /**
  * Use this script for testing Daylight abilities

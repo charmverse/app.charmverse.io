@@ -1,6 +1,5 @@
 /* eslint-disable max-lines */
 
-import type { ProposalStatus } from '@charmverse/core/prisma-client';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowDropDownOutlinedIcon from '@mui/icons-material/ArrowDropDownOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
@@ -12,9 +11,10 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
-import { PROPOSAL_STATUS_LABELS_WITH_ARCHIVED } from 'lib/proposal/proposalStatusTransition';
+import { Constants } from 'lib/focalboard/constants';
+import { EVALUATION_STATUS_LABELS, PROPOSAL_STEP_LABELS } from 'lib/focalboard/proposalDbProperties';
+import type { ProposalEvaluationStatus, ProposalEvaluationStep } from 'lib/proposal/interface';
 
-import { Constants } from '../../constants';
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import Button from '../../widgets/buttons/button';
@@ -31,7 +31,7 @@ type Props = {
   groupByProperty?: IPropertyTemplate;
   readOnly: boolean;
   hideGroup: (groupByOptionId: string) => void;
-  addCard: (groupByOptionId?: string) => Promise<void>;
+  addCard: (groupByOptionId?: string) => Promise<void> | void;
   propertyNameChanged: (option: IPropertyOption, text: string) => Promise<void>;
   onDrop: (srcOption: IPropertyOption, dstOption?: IPropertyOption) => void;
   disableAddingCards?: boolean;
@@ -46,8 +46,10 @@ const TableGroupHeaderRow = React.memo((props: Props): JSX.Element => {
   const intl = useIntl();
 
   const formattedGroupTitle =
-    groupByProperty?.type === 'proposalStatus'
-      ? PROPOSAL_STATUS_LABELS_WITH_ARCHIVED[group.option.value as ProposalStatus]
+    groupByProperty?.type === 'proposalEvaluationType'
+      ? PROPOSAL_STEP_LABELS[group.option.value as ProposalEvaluationStep]
+      : groupByProperty?.type === 'proposalStatus'
+      ? EVALUATION_STATUS_LABELS[group.option.value as ProposalEvaluationStatus]
       : groupTitle;
 
   const preventPropertyDeletion =

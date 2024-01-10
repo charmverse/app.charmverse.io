@@ -5,10 +5,11 @@ import { FormattedMessage } from 'react-intl';
 
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import { KanbanPageActionsMenuButton } from 'components/common/PageActions/KanbanPageActionButton';
-import { PageIcon } from 'components/common/PageLayout/components/PageIcon';
+import { PageIcon } from 'components/common/PageIcon';
 import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
+import { Constants } from 'lib/focalboard/constants';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 import { useSortable } from '../../hooks/sortable';
@@ -42,7 +43,9 @@ const GalleryCard = React.memo((props: Props) => {
   );
   const cardPage = pages[card.id];
 
-  const visiblePropertyTemplates = props.visiblePropertyTemplates || [];
+  const visiblePropertyTemplates = (props.visiblePropertyTemplates || []).filter(
+    (property) => property.id !== Constants.titleColumnId
+  );
 
   let className = props.isSelected ? 'GalleryCard selected' : 'GalleryCard';
   if (isOver) {
@@ -69,7 +72,6 @@ const GalleryCard = React.memo((props: Props) => {
           <img className='ImageElement' src={galleryImageUrl} alt='Gallery item' />
         </div>
       )}
-      {!galleryImageUrl && <div className='gallery-item' />}
       {props.visibleTitle && (
         <div className='gallery-title'>
           {cardPage?.icon ? (
@@ -89,7 +91,7 @@ const GalleryCard = React.memo((props: Props) => {
               updatedBy={cardPage?.updatedBy || ''}
               syncWithPageId={cardPage.syncWithPageId}
               board={board}
-              readOnly={true}
+              readOnly
               card={card}
               propertyTemplate={template}
               showEmptyPlaceholder={false}

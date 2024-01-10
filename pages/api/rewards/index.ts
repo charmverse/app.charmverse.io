@@ -6,7 +6,10 @@ import nc from 'next-connect';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { logUserFirstBountyEvents, logWorkspaceFirstBountyEvents } from 'lib/metrics/postToDiscord';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
+import { upsertDefaultRewardsBoard } from 'lib/rewards/blocks/upsertDefaultRewardsBoard';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import { createReward } from 'lib/rewards/createReward';
 import { rewardWithUsersInclude } from 'lib/rewards/getReward';
@@ -18,24 +21,7 @@ import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .get(
-    providePermissionClients({
-      key: 'spaceId',
-      location: 'query',
-      resourceIdType: 'space'
-    }),
-    getRewards
-  )
-  .use(requireUser)
-  .post(
-    providePermissionClients({
-      key: 'spaceId',
-      location: 'body',
-      resourceIdType: 'space'
-    }),
-    createRewardController
-  );
+handler.get(getRewards).use(requireUser).post(createRewardController);
 
 async function getRewards(req: NextApiRequest, res: NextApiResponse<RewardWithUsers[]>) {
   const spaceId = req.query.spaceId as string;
@@ -61,7 +47,7 @@ async function getRewards(req: NextApiRequest, res: NextApiResponse<RewardWithUs
     throw new ActionNotPermittedError(`You cannot access the rewards list`);
   }
 
-  const accessiblePageIds = await req.basePermissionsClient.pages.getAccessiblePageIds({
+  const accessiblePageIds = await permissionsApiClient.pages.getAccessiblePageIds({
     spaceId,
     userId
   });
@@ -72,6 +58,10 @@ async function getRewards(req: NextApiRequest, res: NextApiResponse<RewardWithUs
         page: {
           id: {
             in: accessiblePageIds
+          },
+          // bounty templates have separate endpoint
+          type: {
+            notIn: ['bounty_template']
           }
         }
       },
@@ -87,15 +77,15 @@ async function createRewardController(req: NextApiRequest, res: NextApiResponse<
 
   const { id: userId } = req.session.user;
 
-  const userPermissions = await req.basePermissionsClient.spaces.computeSpacePermissions({
+  const userPermissions = await permissionsApiClient.spaces.computeSpacePermissions({
     resourceId: spaceId as string,
     userId
   });
   if (!userPermissions.createBounty) {
-    throw new UnauthorisedActionError('You do not have permissions to create a bounty.');
+    throw new UnauthorisedActionError('You do not have permissions to create a reward.');
   }
 
-  const createdReward = await createReward({
+  const { reward: createdReward, createdPageId } = await createReward({
     ...req.body,
     userId: req.session.user.id
   });
@@ -108,25 +98,37 @@ async function createRewardController(req: NextApiRequest, res: NextApiResponse<
       },
       createdReward.spaceId
     );
+  } else if (createdPageId) {
+    const pages = await getPageMetaList([createdPageId]);
+    relay.broadcast(
+      {
+        type: 'pages_created',
+        payload: pages
+      },
+      createdReward.spaceId
+    );
   }
 
-  // add a little delay to capture the full bounty title after user has edited it
-  setTimeout(() => {
-    const { id, rewardAmount, rewardToken, customReward } = createdReward;
+  const { id, rewardAmount, rewardToken, customReward } = createdReward;
 
-    trackUserAction('bounty_created', {
-      userId,
-      spaceId,
-      resourceId: id,
-      rewardToken,
-      rewardAmount,
-      pageId: createdReward.id,
-      customReward
-    });
-  }, 60 * 1000);
+  trackUserAction('bounty_created', {
+    userId,
+    spaceId,
+    resourceId: id,
+    rewardToken,
+    rewardAmount,
+    pageId: createdReward.id,
+    customReward
+  });
 
   logWorkspaceFirstBountyEvents(createdReward);
   logUserFirstBountyEvents(createdReward);
+
+  // Upsert reward board blocks when 1st bounty is created
+  const numberOfBounties = await prisma.bounty.count({ where: { spaceId } });
+  if (numberOfBounties === 1) {
+    await upsertDefaultRewardsBoard({ spaceId, userId });
+  }
 
   return res.status(201).json(createdReward);
 }

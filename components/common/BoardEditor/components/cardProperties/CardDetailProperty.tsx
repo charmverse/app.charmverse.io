@@ -44,7 +44,8 @@ export function CardDetailProperty({
   deleteDisabledMessage,
   onDrop,
   syncWithPageId,
-  mutator
+  mutator,
+  disableEditPropertyOption
 }: {
   syncWithPageId?: string | null;
   readOnly: boolean;
@@ -57,6 +58,7 @@ export function CardDetailProperty({
   pageUpdatedBy: string;
   deleteDisabledMessage?: string;
   mutator: Mutator;
+  disableEditPropertyOption?: boolean;
   onDrop: (template: IPropertyTemplate, container: IPropertyTemplate) => void;
 }) {
   const [isDragging, isOver, columnRef] = useSortable('column', property, !readOnly, onDrop);
@@ -77,11 +79,12 @@ export function CardDetailProperty({
       }}
       className='octo-propertyrow'
     >
-      {readOnly && <PropertyLabel readOnly>{property.name}</PropertyLabel>}
-      {!readOnly && (
+      {(readOnly || disableEditPropertyOption) && <PropertyLabel readOnly>{property.name}</PropertyLabel>}
+      {!readOnly && !disableEditPropertyOption && (
         <Box>
           <PropertyNameContainer
             className='octo-propertyname'
+            {...bindTrigger(changePropertyPopupState)}
             sx={{
               opacity: isDragging ? 0.5 : 1,
               transition: `background-color 150ms ease-in-out`,
@@ -89,7 +92,7 @@ export function CardDetailProperty({
             }}
           >
             <DragIndicatorIcon className='icons' fontSize='small' color='secondary' />
-            <Button {...bindTrigger(changePropertyPopupState)}>{property.name}</Button>
+            <Button>{property.name}</Button>
           </PropertyNameContainer>
           <Menu {...bindMenu(changePropertyPopupState)}>
             <PropertyMenu
@@ -112,7 +115,7 @@ export function CardDetailProperty({
         updatedAt={pageUpdatedAt}
         updatedBy={pageUpdatedBy}
         propertyTemplate={property}
-        showEmptyPlaceholder={true}
+        showEmptyPlaceholder
         displayType='details'
         mutator={mutator}
       />

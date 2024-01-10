@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { getPermissionsClient } from 'lib/permissions/api';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
 import type { ApplicationWithTransactions } from 'lib/rewards/interfaces';
@@ -53,15 +53,19 @@ async function getApplicationController(req: NextApiRequest, res: NextApiRespons
     }
   });
 
-  const pagePermissions = await getPermissionsClient({
-    resourceId: application.bountyId,
-    resourceIdType: 'bounty'
-  }).then(({ client }) =>
-    client.pages.computePagePermissions({
-      resourceId: application.bountyId,
-      userId: req.session.user?.id
-    })
-  );
+  const rewardPage = await prisma.page.findUniqueOrThrow({
+    where: {
+      bountyId: application.bountyId
+    },
+    select: {
+      id: true
+    }
+  });
+
+  const pagePermissions = await permissionsApiClient.pages.computePagePermissions({
+    resourceId: rewardPage.id,
+    userId: req.session.user?.id
+  });
 
   if (!pagePermissions.read) {
     throw new ActionNotPermittedError(`You cannot access this application`);

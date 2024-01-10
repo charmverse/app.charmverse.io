@@ -70,11 +70,19 @@ test('Drag and drop one paragraph over another in the CharmEditor', async ({ doc
 
   const rowActionsHandleLocator = documentPage.page.locator('.bangle-editor-core .charm-drag-handle');
   await expect(rowActionsHandleLocator).toBeVisible();
+  await documentPage.page.waitForFunction(
+    () => document.querySelector('.bangle-editor')?.textContent === 'Item 1Item 2',
+    {},
+    {
+      timeout: 2500
+    }
+  );
+
   await rowActionsHandleLocator.dragTo(paragraph1Locator, {
     force: true,
     targetPosition: {
       x: 0,
-      y: 0
+      y: -5
     },
     sourcePosition: {
       x: 0,
@@ -82,7 +90,13 @@ test('Drag and drop one paragraph over another in the CharmEditor', async ({ doc
     }
   });
 
-  await documentPage.page.waitForTimeout(150);
+  await documentPage.page.waitForFunction(
+    () => document.querySelector('.bangle-editor')?.textContent === 'Item 2Item 1',
+    {},
+    {
+      timeout: 2500
+    }
+  );
 
   const page = await prisma.page.findUniqueOrThrow({
     where: {

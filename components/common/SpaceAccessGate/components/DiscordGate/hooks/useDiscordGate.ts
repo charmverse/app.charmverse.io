@@ -7,7 +7,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import type { CheckDiscordGateResult } from 'lib/discord/interface';
-import type { TokenGateJoinType } from 'lib/token-gates/interfaces';
+import type { TokenGateJoinType } from 'lib/tokenGates/interfaces';
 
 type Props = {
   joinType?: TokenGateJoinType;
@@ -21,7 +21,7 @@ export type DiscordGateState = {
   isVerified: boolean;
   isConnectedToDiscord: boolean;
   discordGate?: CheckDiscordGateResult;
-  joinSpace: () => Promise<void>;
+  joinSpace: (onError: (error: any) => void) => Promise<void>;
   joiningSpace: boolean;
 };
 
@@ -36,7 +36,7 @@ export function useDiscordGate({ joinType, spaceDomain, onSuccess }: Props): Dis
     charmClient.discord.checkDiscordGate(spaceDomain)
   );
 
-  async function joinSpace() {
+  async function joinSpace(onError: (error: any) => void) {
     setJoiningSpace(true);
 
     try {
@@ -53,7 +53,7 @@ export function useDiscordGate({ joinType, spaceDomain, onSuccess }: Props): Dis
 
       onSuccess();
     } catch (err: any) {
-      showMessage(err?.message ?? err ?? 'An unknown error occurred', 'error');
+      onError(err);
     }
 
     setJoiningSpace(false);

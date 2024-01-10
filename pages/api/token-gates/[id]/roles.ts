@@ -8,7 +8,7 @@ import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPermissionsSubscription';
 import { requireSpaceMembership } from 'lib/middleware/requireSpaceMembership';
 import { withSessionRoute } from 'lib/session/withSession';
-import { updateTokenGateRoles } from 'lib/token-gates/updateTokenGateRoles';
+import { updateTokenGateRoles } from 'lib/tokenGates/updateTokenGateRoles';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

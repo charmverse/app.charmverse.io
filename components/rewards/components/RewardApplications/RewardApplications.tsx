@@ -1,55 +1,224 @@
-import type { BountyStatus } from '@charmverse/core/prisma-client';
-import { Box, Divider, Tooltip } from '@mui/material';
+import type { ApplicationStatus } from '@charmverse/core/prisma';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import { Box, Divider, Grid, IconButton, Stack, Tooltip } from '@mui/material';
+import Typography from '@mui/material/Typography';
+import { useMemo } from 'react';
 
-import charmClient from 'charmClient';
-import { Button } from 'components/common/Button';
+import { useGetReward } from 'charmClient/hooks/rewards';
+import UserDisplay from 'components/common/UserDisplay';
+import { NewWorkButton } from 'components/rewards/components/RewardApplications/NewWorkButton';
+import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
-import type { BountyPermissionFlags } from 'lib/permissions/bounties/interfaces';
-import type { RewardWithUsers } from 'lib/rewards/interfaces';
-import { statusesAcceptingNewWork } from 'lib/rewards/shared';
+import type { ApplicationMeta } from 'lib/rewards/interfaces';
+import { formatDate, formatDateTime } from 'lib/utilities/dates';
+import type { LoggedInUser } from 'models';
 
-import { RewardSubmissionsTable } from './RewardSubmissionsTable';
+import { RewardApplicationStatusChip } from '../RewardApplicationStatusChip';
 
 type Props = {
-  reward: RewardWithUsers;
-  refreshReward: (rewardId: string) => void;
-  permissions?: BountyPermissionFlags;
-  openApplication: (applicationId: string) => void;
+  rewardId: string;
+  applicationRequired: boolean;
 };
 
-export function RewardApplications({ reward, refreshReward, permissions, openApplication }: Props) {
-  const { user } = useUser();
-  const hasApplication = !!user && reward.applications.some((app) => app.createdBy === user.id);
+function sortApplications(user: LoggedInUser | null) {
+  return (appA: ApplicationMeta, appB: ApplicationMeta) => {
+    const isApplication1CreatedByUser = appA.createdBy === user?.id;
+    const isApplication2CreatedByUser = appB.createdBy === user?.id;
+    const application1CreatedAt = typeof appA.createdAt === 'string' ? new Date(appA.createdAt) : appA.createdAt;
+    const application2CreatedAt = typeof appB.createdAt === 'string' ? new Date(appB.createdAt) : appB.createdAt;
 
-  async function newApplication() {
-    const application = await charmClient.rewards.work({ rewardId: reward.id, message: '' });
-    refreshReward(reward.id);
-    openApplication(application.id);
+    if (isApplication1CreatedByUser && isApplication2CreatedByUser) {
+      return application2CreatedAt.getTime() - application1CreatedAt.getTime();
+    }
+
+    if (isApplication1CreatedByUser) {
+      return -1;
+    } else if (isApplication2CreatedByUser) {
+      return 1;
+    }
+
+    return application2CreatedAt.getTime() - application1CreatedAt.getTime();
+  };
+}
+
+function ApplicationRows({
+  applications,
+  openApplication,
+  isApplication
+}: {
+  isApplication: boolean;
+  openApplication: (applicationId: string) => void;
+  applications: ApplicationMeta[];
+}) {
+  const { getMemberById } = useMembers();
+
+  return (
+    <Stack>
+      <Typography fontWeight='bold' my={1}>
+        {isApplication ? 'Applications' : 'Submissions'}
+      </Typography>
+      <Stack sx={{ width: '100%', overflow: 'auto' }} gap={2} my={1}>
+        {applications.map((application) => {
+          const member = getMemberById(application.createdBy);
+
+          if (!member) {
+            return null;
+          }
+          return (
+            <Grid container display='flex' gap={2} key={application.id} alignItems='center' minWidth={500}>
+              <Grid item xs={4} md={5} display='flex' flexDirection='row' gap={1}>
+                <UserDisplay avatarSize='small' userId={member.id} fontSize='small' hideName showMiniProfile />
+                <Typography
+                  sx={{
+                    whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis',
+                    overflow: 'hidden'
+                  }}
+                >
+                  {member.username}
+                </Typography>
+              </Grid>
+
+              <Grid item xs={2}>
+                <Tooltip title={`Updated at ${formatDateTime(application.updatedAt)}`}>
+                  <Typography whiteSpace='nowrap' variant='subtitle2' width='fit-content'>
+                    {formatDate(application.updatedAt, { withYear: true })}
+                  </Typography>
+                </Tooltip>
+              </Grid>
+
+              <Grid item xs={3}>
+                <RewardApplicationStatusChip
+                  sx={{
+                    width: 'fit-content'
+                  }}
+                  status={application.status}
+                />
+              </Grid>
+
+              <Grid item xs={1}>
+                <Tooltip title={`View ${isApplication ? 'application' : 'submission'} details`}>
+                  <IconButton size='small' onClick={() => openApplication(application.id)}>
+                    <ArrowForwardIosIcon fontSize='small' color='secondary' />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+            </Grid>
+          );
+        })}
+
+        {applications.length === 0 && (
+          <Box
+            display='flex'
+            justifyContent='center'
+            my={3}
+            sx={{
+              opacity: 0.5,
+              mb: 2
+            }}
+          >
+            <Typography variant='subtitle1'>No {isApplication ? 'application' : 'submission'} to display</Typography>
+          </Box>
+        )}
+      </Stack>
+    </Stack>
+  );
+}
+
+export function RewardApplications({ rewardId, applicationRequired }: Props) {
+  const { updateURLQuery } = useCharmRouter();
+
+  const { user } = useUser();
+
+  const { data: reward } = useGetReward({ rewardId });
+
+  const { applications, submissions } = useMemo(() => {
+    if (!reward) {
+      return {
+        applications: [],
+        submissions: []
+      };
+    }
+
+    const submissionStatuses: ApplicationStatus[] = [
+      'submission_rejected',
+      'review',
+      'processing',
+      'paid',
+      'complete',
+      'cancelled'
+    ];
+
+    if (applicationRequired) {
+      return {
+        applications: reward.applications
+          .filter((app) => !submissionStatuses.includes(app.status))
+          .sort(sortApplications(user)),
+        submissions: reward.applications
+          .filter((app) => submissionStatuses.includes(app.status))
+          .sort(sortApplications(user))
+      };
+    }
+
+    return {
+      applications: [],
+      submissions: reward.applications.sort(sortApplications(user))
+    };
+  }, [applicationRequired, reward, user]);
+
+  if (!reward) {
+    return null;
+  }
+
+  const openApplication = (applicationId: string) => {
+    updateURLQuery({ applicationId });
+  };
+
+  if (reward.applications.length === 0) {
+    return (
+      <Stack my={1}>
+        <Stack direction='row' alignItems='center' justifyContent='space-between'>
+          <Typography fontWeight='bold'>{applicationRequired ? 'Applications' : 'Submissions'}</Typography>
+        </Stack>
+        <Stack justifyContent='center' alignItems='center' gap={1}>
+          <Typography
+            variant='subtitle1'
+            sx={{
+              opacity: 0.5
+            }}
+          >
+            There are no {applicationRequired ? 'applications' : 'submissions'} yet.
+          </Typography>
+          <NewWorkButton rewardId={rewardId} />
+        </Stack>
+      </Stack>
+    );
+  }
+
+  if (applicationRequired) {
+    return (
+      <>
+        <Stack flex={1} direction='row' my={1}>
+          <NewWorkButton rewardId={rewardId} />
+        </Stack>
+        <ApplicationRows isApplication={false} openApplication={openApplication} applications={submissions} />
+        <Divider
+          sx={{
+            my: 1
+          }}
+        />
+        <ApplicationRows isApplication openApplication={openApplication} applications={applications} />
+      </>
+    );
   }
 
   return (
-    <Box>
-      {(!hasApplication || (hasApplication && reward.allowMultipleApplications)) &&
-        statusesAcceptingNewWork.includes(reward.status) && (
-          <>
-            <Tooltip title={!permissions?.work ? 'You do not have permission to work on this reward' : ''}>
-              <Box
-                alignItems='center'
-                display='flex'
-                flexDirection='column'
-                justifyContent='center'
-                sx={{ height: '100px' }}
-              >
-                <Button disabled={!permissions?.work} onClick={newApplication}>
-                  {reward.approveSubmitters ? 'New Application' : 'New Submission'}
-                </Button>
-              </Box>
-            </Tooltip>
-
-            <Divider />
-          </>
-        )}
-      <RewardSubmissionsTable rewardId={reward.id} openApplication={openApplication} />
-    </Box>
+    <>
+      <Stack flex={1} direction='row' my={1}>
+        <NewWorkButton rewardId={rewardId} />
+      </Stack>
+      <ApplicationRows isApplication={false} openApplication={openApplication} applications={submissions} />
+    </>
   );
 }

@@ -1,17 +1,18 @@
 import { bold, code, italic, paragraph, strike, underline } from '@bangle.dev/base-components';
-import { Plugin, SpecRegistry } from '@bangle.dev/core';
 import type { EditorView } from '@bangle.dev/pm';
 import { Node, PluginKey } from '@bangle.dev/pm';
-import { useEditorState } from '@bangle.dev/react';
 import styled from '@emotion/styled';
 import debounce from 'lodash/debounce';
+import { Plugin } from 'prosemirror-state';
 import type { CSSProperties, ReactNode } from 'react';
 
+import { SpecRegistry } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { BangleEditor as ReactBangleEditor } from './components/@bangle.dev/react/ReactEditor';
+import { useEditorState } from './components/@bangle.dev/react/useEditorState';
 import { userDataPlugin } from './components/charm/charm.plugins';
 import EmojiSuggest from './components/emojiSuggest/EmojiSuggest.component';
 import { pluginKeyName as emojiSuggestKeyName } from './components/emojiSuggest/emojiSuggest.constants';
@@ -22,7 +23,8 @@ import FloatingMenu from './components/floatingMenu/FloatingMenu';
 import { plugins as linkPlugins } from './components/link/link.plugins';
 import { spec as linkSpec } from './components/link/link.specs';
 import { LinksPopup } from './components/link/LinksPopup';
-import Mention, { mentionPlugins, mentionSpecs, MentionSuggest, mentionPluginKeyName } from './components/mention';
+import { mentionPlugins, mentionSpecs, mentionPluginKeyName } from './components/mention';
+import { Mention, MentionSuggest } from './components/mention/components';
 import { placeholderPlugin } from './components/placeholder/placeholder';
 import * as tabIndent from './components/tabIndent';
 
@@ -118,7 +120,8 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{ colorMode?: 'dark'; 
   ${({ colorMode }) =>
     colorMode === 'dark'
       ? `
-          background-color: var(--background-light);
+          background-color: var(--input-bg);
+          border: 1px solid var(--input-border);
           .ProseMirror[data-placeholder]::before {
             color: var(--primary-text);
             opacity: 0.5;
@@ -220,6 +223,8 @@ export default function CharmEditor({
         width: '100%',
         height: '100%'
       }}
+      inline
+      linksPluginKey={linksPluginKey}
       readOnly={readOnly}
       noPadding={noPadding}
       pmViewOpts={{

@@ -1,16 +1,17 @@
-import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
+
+import type { ProposalReviewerInput } from './interface';
 
 export type ProposalUsersToValidate = {
   spaceId: string;
   authors: string[];
-  reviewers: TargetPermissionGroup<'role' | 'user'>[];
+  reviewers: ProposalReviewerInput[];
 };
 
 export type ProposalUsersValidationResult = {
   valid: boolean;
   invalidAuthors: string[];
-  invalidReviewers: TargetPermissionGroup<'role' | 'user'>[];
+  invalidReviewers: ProposalReviewerInput[];
 };
 
 export async function validateProposalAuthorsAndReviewers({
@@ -19,7 +20,7 @@ export async function validateProposalAuthorsAndReviewers({
   spaceId
 }: ProposalUsersToValidate): Promise<ProposalUsersValidationResult> {
   const invalidAuthors: string[] = [];
-  const invalidReviewers: TargetPermissionGroup<'role' | 'user'>[] = [];
+  const invalidReviewers: ProposalReviewerInput[] = [];
 
   // Validate input for security purposes
   const spaceRoles = await prisma.spaceRole.findMany({

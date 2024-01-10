@@ -1,16 +1,20 @@
 import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 import useSWRMutation from 'swr/mutation';
 
 import * as http from 'adapters/http';
 
-export function useGET<T = unknown>(path: string | undefined | null, query: any = {}) {
-  // map optional query inputs into the url
-  const queryStr = Object.keys(query)
-    .filter((key) => !!query[key])
-    .map((key) => `${key}=${encodeURIComponent(query[key])}`)
-    .join('&');
-  const requestUrl = path ? path + (queryStr ? `?${queryStr}` : '') : null;
-  return useSWR<T>(requestUrl, http.GET);
+export type MaybeString = string | null | undefined;
+
+// eslint-disable-next-line default-param-last
+export function useGET<T = unknown>(path: string | undefined | null, query: any = {}, swrOptions?: any) {
+  const requestUrl = path ? path + getQueryString(query) : null;
+  return useSWR<T>(requestUrl, http.GET, swrOptions);
+}
+
+export function useGETImmutable<T = unknown>(path: string | undefined | null, query: any = {}) {
+  const requestUrl = path ? path + getQueryString(query) : null;
+  return useSWRImmutable<T>(requestUrl, http.GET);
 }
 
 export function useDELETE<T>(path: string) {
@@ -29,4 +33,21 @@ export function usePUT<T, U = unknown>(path: string) {
   return useSWRMutation<U, Error, string, T>(path, (url: string, { arg }: { arg: any }) => {
     return http.PUT<U>(url, arg);
   });
+}
+
+// To be used when you need to trigger a get request on demand
+export function useGETtrigger<T, U = unknown>(path: string) {
+  return useSWRMutation<U, Error, string, T>(path, (url: string, { arg }: { arg: any }) => {
+    const requestUrl = url + getQueryString(arg);
+    return http.GET<U>(requestUrl);
+  });
+}
+
+function getQueryString(query: any = {}) {
+  // map optional query inputs into the url
+  const queryStr = Object.keys(query)
+    .filter((key) => !!query[key])
+    .map((key) => `${key}=${encodeURIComponent(query[key])}`)
+    .join('&');
+  return queryStr ? `?${queryStr}` : '';
 }

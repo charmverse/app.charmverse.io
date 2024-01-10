@@ -5,12 +5,14 @@ import { useRouter } from 'next/router';
 import type { ClipboardEvent, KeyboardEvent, MouseEvent } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import CardDialog from 'components/common/BoardEditor/focalboard/src/components/cardDialog';
 import { getBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { makeSelectSortedViews, makeSelectView } from 'components/common/BoardEditor/focalboard/src/store/views';
 import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
+import { PageDialog } from 'components/common/PageDialog/PageDialog';
+import { useCharmRouter } from 'hooks/useCharmRouter';
+import { DbViewSettingsProvider } from 'hooks/useLocalDbViewSettings';
 import { usePage } from 'hooks/usePage';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import debouncePromise from 'lib/utilities/debouncePromise';
@@ -91,9 +93,8 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
   const views = useAppSelector((state) => selectSortedViews(state, pageId));
   const router = useRouter();
   const dispatch = useAppDispatch();
-
+  const { navigateToSpacePath } = useCharmRouter();
   const [currentViewId, setCurrentViewId] = useState<string | null>(views[0]?.id || null);
-
   useEffect(() => {
     if (!currentViewId && views.length > 0) {
       setCurrentViewId(views[0].id);
@@ -122,6 +123,22 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
     }, 500);
   }, [updatePage]);
 
+  const showCard = useCallback(
+    async (cardId: string | null, isTemplate?: boolean) => {
+      if (cardId === null) {
+        setShownCardId(null);
+        return;
+      }
+
+      if (currentView.fields.openPageIn === 'center_peek' || isTemplate) {
+        setShownCardId(cardId);
+      } else if (currentView.fields.openPageIn === 'full_page') {
+        navigateToSpacePath(`/${cardId}`);
+      }
+    },
+    [currentView?.fields.openPageIn, navigateToSpacePath, setShownCardId]
+  );
+
   function stopPropagation(e: KeyboardEvent | MouseEvent | ClipboardEvent) {
     e.stopPropagation();
   }
@@ -142,34 +159,36 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
 
   return (
     <>
-      <StylesContainer
-        className='focalboard-body'
-        containerWidth={containerWidth}
-        onKeyPress={stopPropagation}
-        onKeyDown={stopPropagation}
-        onPaste={stopPropagation}
-      >
-        <CenterPanel
-          currentRootPageId={pageId}
-          disableUpdatingUrl
-          showView={setCurrentViewId}
-          onDeleteView={deleteView}
-          hideBanner
-          readOnly={readOnly}
-          board={board}
-          embeddedBoardPath={boardPage.path}
-          setPage={debouncedPageUpdate}
-          showCard={setShownCardId}
-          activeView={currentView}
-          views={views}
-          page={boardPage}
-          // Show more tabs on shared inline database as the space gets increased
-          maxTabsShown={router.pathname.startsWith('/share') ? 5 : 3}
-        />
-      </StylesContainer>
-      {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
-        <CardDialog key={shownCardId} cardId={shownCardId} onClose={() => setShownCardId(null)} readOnly={readOnly} />
-      )}
+      <DbViewSettingsProvider>
+        <StylesContainer
+          className='focalboard-body'
+          containerWidth={containerWidth}
+          onKeyPress={stopPropagation}
+          onKeyDown={stopPropagation}
+          onPaste={stopPropagation}
+        >
+          <CenterPanel
+            currentRootPageId={pageId}
+            disableUpdatingUrl
+            showView={setCurrentViewId}
+            onDeleteView={deleteView}
+            hideBanner
+            readOnly={readOnly}
+            board={board}
+            embeddedBoardPath={boardPage.path}
+            setPage={debouncedPageUpdate}
+            showCard={showCard}
+            activeView={currentView}
+            views={views}
+            page={boardPage}
+            // Show more tabs on shared inline database as the space gets increased
+            maxTabsShown={router.pathname.startsWith('/share') ? 5 : 3}
+          />
+        </StylesContainer>
+        {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
+          <PageDialog key={shownCardId} pageId={shownCardId} onClose={() => setShownCardId(null)} readOnly={readOnly} />
+        )}
+      </DbViewSettingsProvider>
       <FocalBoardPortal />
     </>
   );

@@ -14,7 +14,6 @@ import {
 } from '@mui/material';
 import { DateTime } from 'luxon';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import type { MouseEvent } from 'react';
 import { memo, useMemo, useState } from 'react';
 import useSWR, { mutate } from 'swr';
@@ -24,6 +23,7 @@ import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/sr
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ScrollableModal as Modal } from 'components/common/Modal';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePageIdFromPath } from 'hooks/usePageFromPath';
 import { usePages } from 'hooks/usePages';
@@ -32,7 +32,7 @@ import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { PagesMap } from 'lib/pages';
 import { fancyTrim } from 'lib/utilities/strings';
 
-import { PageIcon } from './PageIcon';
+import { PageIcon } from '../../PageIcon';
 
 const PageArchivedDate = memo<{ date: Date; title: string }>(({ date, title }) => {
   return (
@@ -86,7 +86,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
   const { space } = useCurrentSpace();
   const currentPagePath = usePageIdFromPath();
   const { mutatePagesRemove, pages, getPageByPath } = usePages();
-  const router = useRouter();
+  const { navigateToSpacePath } = useCharmRouter();
   const { showMessage } = useSnackbar();
   const { sendMessage } = useWebSocketClient();
   const dispatch = useAppDispatch();
@@ -154,7 +154,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
     // If the current page has been deleted permanently route to the first alive page
     if (currentPage && deletePageIds.includes(currentPage.id)) {
       const firstPage = Object.values(pages).find((page) => page?.type !== 'card' && !page?.deletedAt)?.path;
-      router.push(`/${router.query.domain}/${firstPage}`);
+      navigateToSpacePath(`/${firstPage}`);
     }
   }
 

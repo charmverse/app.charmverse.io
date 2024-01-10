@@ -83,8 +83,8 @@ export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
     conditions: BooleanDataTypeConditions
   },
   createdBy: {
-    datatype: 'date',
-    conditions: DateDataTypeConditions
+    datatype: 'multi_select',
+    conditions: MultiSelectDataTypeConditions
   },
   createdTime: {
     datatype: 'date',
@@ -134,13 +134,9 @@ export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
     datatype: 'text',
     conditions: TextDataTypeConditions
   },
-  proposalCategory: {
-    datatype: 'select',
-    conditions: SelectDataTypeConditions
-  },
   proposalStatus: {
-    datatype: 'select',
-    conditions: SelectDataTypeConditions
+    datatype: 'multi_select',
+    conditions: MultiSelectDataTypeConditions
   },
   proposalEvaluatedBy: {
     datatype: 'multi_select',
@@ -163,6 +159,18 @@ export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
     conditions: MultiSelectDataTypeConditions
   },
   proposalEvaluationType: {
+    datatype: 'select',
+    conditions: SelectDataTypeConditions
+  },
+  tokenAmount: {
+    datatype: 'number',
+    conditions: NumberDataTypeConditions
+  },
+  tokenChain: {
+    datatype: 'multi_select',
+    conditions: MultiSelectDataTypeConditions
+  },
+  proposalStep: {
     datatype: 'select',
     conditions: SelectDataTypeConditions
   }

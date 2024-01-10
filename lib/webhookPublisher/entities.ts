@@ -13,7 +13,8 @@ import type {
   ProposalEntity,
   SpaceEntity,
   UserEntity,
-  VoteEntity
+  VoteEntity,
+  ApplicationCommentEntity
 } from './interfaces';
 
 export async function getRewardEntity(id: string): Promise<RewardEntity> {
@@ -22,8 +23,17 @@ export async function getRewardEntity(id: string): Promise<RewardEntity> {
       id
     },
     include: {
-      page: true,
-      space: true
+      page: {
+        select: {
+          title: true,
+          path: true
+        }
+      },
+      space: {
+        select: {
+          domain: true
+        }
+      }
     }
   });
   return {
@@ -33,7 +43,7 @@ export async function getRewardEntity(id: string): Promise<RewardEntity> {
     rewardToken: bounty.rewardToken,
     rewardChain: bounty.chainId,
     rewardAmount: bounty.rewardAmount,
-    url: `${baseUrl}/${bounty.space.domain}/bounties/${bounty.id}`,
+    url: `${baseUrl}/${bounty.space.domain}/${bounty.page?.path}`,
     customReward: bounty.customReward,
     author: await getUserEntity(bounty.createdBy)
   };
@@ -97,7 +107,12 @@ export async function getPostEntity(id: string): Promise<PostEntity> {
       id
     },
     include: {
-      category: true,
+      category: {
+        select: {
+          id: true,
+          name: true
+        }
+      },
       space: {
         select: {
           domain: true
@@ -122,9 +137,23 @@ export async function getProposalEntity(id: string): Promise<ProposalEntity> {
       id
     },
     include: {
-      authors: true,
-      page: true,
-      space: true
+      authors: {
+        select: {
+          userId: true
+        }
+      },
+      page: {
+        select: {
+          title: true,
+          path: true,
+          createdAt: true
+        }
+      },
+      space: {
+        select: {
+          domain: true
+        }
+      }
     }
   });
   const authors = await Promise.all(proposal.authors.map(({ userId }) => getUserEntity(userId)));
@@ -194,9 +223,21 @@ export async function getUserEntity(id: string): Promise<UserEntity> {
       id
     },
     include: {
-      wallets: true,
-      googleAccounts: true,
-      discordUser: true
+      wallets: {
+        select: {
+          address: true
+        }
+      },
+      googleAccounts: {
+        select: {
+          email: true
+        }
+      },
+      discordUser: {
+        select: {
+          discordId: true
+        }
+      }
     }
   });
   return {
@@ -267,5 +308,25 @@ export async function getDocumentEntity(id: string): Promise<DocumentEntity> {
     url: `${baseUrl}/${document.space.domain}/${document.path}`,
     type: document.type,
     authors
+  };
+}
+
+export async function getApplicationCommentEntity(id: string): Promise<ApplicationCommentEntity> {
+  const applicationComment = await prisma.applicationComment.findUniqueOrThrow({
+    where: {
+      id
+    },
+    select: {
+      createdAt: true,
+      createdBy: true,
+      applicationId: true
+    }
+  });
+
+  return {
+    applicationId: applicationComment.applicationId,
+    id,
+    author: await getUserEntity(applicationComment.createdBy),
+    createdAt: applicationComment.createdAt.toISOString()
   };
 }

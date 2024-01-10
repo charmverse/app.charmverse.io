@@ -13,16 +13,15 @@ import type { IntlShape } from 'react-intl';
 import { injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
-import charmClient from 'charmClient';
 import { publishIncrementalUpdate } from 'components/common/BoardEditor/publisher';
 import { Button } from 'components/common/Button';
 import type { Block } from 'lib/focalboard/block';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
+import type { BoardView, IViewType } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
+import { Constants } from 'lib/focalboard/constants';
 import { createTableView } from 'lib/focalboard/tableView';
 
-import { Constants } from '../constants';
 import mutator from '../mutator';
 import { IDType, Utils } from '../utils';
 import IconButton from '../widgets/buttons/iconButton';
@@ -31,7 +30,6 @@ import CalendarIcon from '../widgets/icons/calendar';
 import GalleryIcon from '../widgets/icons/gallery';
 import TableIcon from '../widgets/icons/table';
 import { typeDisplayName } from '../widgets/typeDisplayName';
-
 /**
  * @onClick // Default behaviour is to show a dropdown with views. If this provided, then onClick will be handled externally
  */
@@ -45,11 +43,13 @@ type AddViewProps = {
   sx?: SxProps<Theme>;
   onClick?: () => void; // override the icon click
   onClose?: () => void;
+  supportedViewTypes?: IViewType[];
 };
 
 function AddViewMenu(props: AddViewProps) {
   const intl = props.intl;
   const showView = props.showView;
+  const { supportedViewTypes } = props;
 
   const views = props.views.filter((view) => !view.fields.inline);
 
@@ -99,11 +99,7 @@ function AddViewMenu(props: AddViewProps) {
       }
     );
 
-    await charmClient.patchBlock(
-      board.id,
-      { updatedFields: { viewIds: [...viewIds, view.id] } },
-      publishIncrementalUpdate
-    );
+    await mutator.patchBlock(board.id, { updatedFields: { viewIds: [...viewIds, view.id] } }, publishIncrementalUpdate);
     closePopup();
   }, [viewIds, props.activeView, props.board, props.intl, showView]);
 
@@ -132,11 +128,7 @@ function AddViewMenu(props: AddViewProps) {
       }
     );
 
-    await charmClient.patchBlock(
-      board.id,
-      { updatedFields: { viewIds: [...viewIds, view.id] } },
-      publishIncrementalUpdate
-    );
+    await mutator.patchBlock(board.id, { updatedFields: { viewIds: [...viewIds, view.id] } }, publishIncrementalUpdate);
 
     closePopup();
   }, [viewIds, props.activeView, props.board, props.intl, showView]);
@@ -169,11 +161,7 @@ function AddViewMenu(props: AddViewProps) {
         oldViewId && showView(oldViewId);
       }
     );
-    await charmClient.patchBlock(
-      board.id,
-      { updatedFields: { viewIds: [...viewIds, view.id] } },
-      publishIncrementalUpdate
-    );
+    await mutator.patchBlock(board.id, { updatedFields: { viewIds: [...viewIds, view.id] } }, publishIncrementalUpdate);
     closePopup();
   }, [viewIds, props.board, props.activeView, props.intl, showView]);
 
@@ -223,11 +211,7 @@ function AddViewMenu(props: AddViewProps) {
       }
     );
 
-    await charmClient.patchBlock(
-      board.id,
-      { updatedFields: { viewIds: [...viewIds, view.id] } },
-      publishIncrementalUpdate
-    );
+    await mutator.patchBlock(board.id, { updatedFields: { viewIds: [...viewIds, view.id] } }, publishIncrementalUpdate);
 
     closePopup();
   }, [viewIds, props.board, props.activeView, props.intl, showView]);
@@ -260,32 +244,48 @@ function AddViewMenu(props: AddViewProps) {
         />
       )}
       <Menu {...bindMenu(popupState)}>
-        <MenuItem dense onClick={handleAddViewBoard}>
-          <ListItemIcon>
-            <BoardIcon fontSize='small' />
-          </ListItemIcon>
-          <ListItemText>{boardText}</ListItemText>
-        </MenuItem>
-        <MenuItem dense onClick={handleAddViewTable}>
-          <ListItemIcon>
-            <TableIcon fontSize='small' />
-          </ListItemIcon>
-          <ListItemText>{tableText}</ListItemText>
-        </MenuItem>
-        <MenuItem dense onClick={handleAddViewGallery}>
-          <ListItemIcon>
-            <GalleryIcon fontSize='small' />
-          </ListItemIcon>
-          <ListItemText>{galleryText}</ListItemText>
-        </MenuItem>
-        <MenuItem dense onClick={handleAddViewCalendar}>
-          <ListItemIcon>
-            <CalendarIcon fontSize='small' />
-          </ListItemIcon>
-          <ListItemText>Calendar</ListItemText>
-        </MenuItem>
+        {isSupportedViewType('board', supportedViewTypes) && (
+          <MenuItem dense onClick={handleAddViewBoard}>
+            <ListItemIcon>
+              <BoardIcon fontSize='small' />
+            </ListItemIcon>
+            <ListItemText>{boardText}</ListItemText>
+          </MenuItem>
+        )}
+        {isSupportedViewType('table', supportedViewTypes) && (
+          <MenuItem dense onClick={handleAddViewTable}>
+            <ListItemIcon>
+              <TableIcon fontSize='small' />
+            </ListItemIcon>
+            <ListItemText>{tableText}</ListItemText>
+          </MenuItem>
+        )}
+        {isSupportedViewType('gallery', supportedViewTypes) && (
+          <MenuItem dense onClick={handleAddViewGallery}>
+            <ListItemIcon>
+              <GalleryIcon fontSize='small' />
+            </ListItemIcon>
+            <ListItemText>{galleryText}</ListItemText>
+          </MenuItem>
+        )}
+        {isSupportedViewType('calendar', supportedViewTypes) && (
+          <MenuItem dense onClick={handleAddViewCalendar}>
+            <ListItemIcon>
+              <CalendarIcon fontSize='small' />
+            </ListItemIcon>
+            <ListItemText>Calendar</ListItemText>
+          </MenuItem>
+        )}
       </Menu>
     </>
   );
 }
 export default injectIntl(AddViewMenu);
+
+export function isSupportedViewType(viewType: IViewType, supportedViewTypes?: IViewType[]) {
+  if (!supportedViewTypes) {
+    return true;
+  }
+
+  return supportedViewTypes.includes(viewType);
+}

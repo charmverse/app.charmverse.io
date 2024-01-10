@@ -1,12 +1,12 @@
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { Wallet } from '@ethersproject/wallet';
 import type { Page as BrowserPage } from '@playwright/test';
-import { Wallet } from 'ethers';
-import { v4 } from 'uuid';
+import { v4 as uuid } from 'uuid';
 
-import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/utils/staticPages';
 import { baseUrl } from 'config/constants';
+import { STATIC_PAGES } from 'lib/features/constants';
 import { memberProfileNames } from 'lib/profile/memberProfiles';
 import { createUserFromWallet } from 'lib/users/createUser';
 import type { LoggedInUser } from 'models';
@@ -173,12 +173,18 @@ export async function createUserAndSpace({
   };
 }
 
-export async function generateUser({ walletAddress = Wallet.createRandom().address }: { walletAddress?: string } = {}) {
+export async function generateUser({
+  walletAddress = Wallet.createRandom().address,
+  space
+}: {
+  walletAddress?: string;
+  space?: { id: string; isAdmin?: boolean };
+} = {}) {
   const user = await prisma.user.create({
     data: {
       identityType: 'Wallet',
-      username: v4(),
-      path: v4(),
+      username: uuid(),
+      path: uuid(),
       wallets: {
         create: {
           address: walletAddress
@@ -186,20 +192,70 @@ export async function generateUser({ walletAddress = Wallet.createRandom().addre
       }
     }
   });
+  if (space) {
+    await prisma.spaceRole.create({
+      data: {
+        space: { connect: { id: space.id } },
+        user: { connect: { id: user.id } },
+        isAdmin: space.isAdmin,
+        onboarded: true
+      }
+    });
+  }
 
   return user;
+}
+
+export async function grantForumModeratorAccess({
+  userId,
+  spaceId,
+  categoryId
+}: {
+  userId: string;
+  spaceId: string;
+  categoryId: string;
+}) {
+  // Create a moderation role and assign it to the moderator
+  const moderationRole = await prisma.role.create({
+    data: {
+      space: { connect: { id: spaceId } },
+      name: 'Forum Moderator',
+      createdBy: userId,
+      spaceRolesToRole: {
+        create: {
+          spaceRole: {
+            connect: {
+              spaceUser: {
+                spaceId,
+                userId
+              }
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // Allow the moderation role to moderate posts in this category
+  await prisma.postCategoryPermission.create({
+    data: {
+      permissionLevel: 'moderator',
+      postCategory: { connect: { id: categoryId } },
+      role: { connect: { id: moderationRole.id } }
+    }
+  });
 }
 
 export async function generateDiscordUser() {
   const user = await prisma.user.create({
     data: {
       identityType: 'Wallet',
-      username: v4(),
-      path: v4(),
+      username: uuid(),
+      path: uuid(),
       discordUser: {
         create: {
           account: {},
-          discordId: v4()
+          discordId: uuid()
         }
       }
     }
@@ -234,6 +290,7 @@ type UserAndSpaceInput = {
   isAdmin?: boolean;
   onboarded?: boolean;
   spaceName?: string;
+  spaceDomain?: string;
   publicBountyBoard?: boolean;
   skipOnboarding?: boolean;
   email?: string;
@@ -242,9 +299,10 @@ type UserAndSpaceInput = {
 export async function generateUserAndSpace({
   isAdmin,
   spaceName = 'Example Space',
+  spaceDomain = `domain-${uuid()}`,
   publicBountyBoard,
   skipOnboarding = true,
-  email = `${v4()}@gmail.com`
+  email = `${uuid()}@gmail.com`
 }: UserAndSpaceInput = {}) {
   const wallet = Wallet.createRandom();
   const address = wallet.address;
@@ -254,7 +312,7 @@ export async function generateUserAndSpace({
   const existingSpaceId = user.spaceRoles?.[0]?.spaceId;
 
   let space: Space;
-  const spaceId = v4();
+  const spaceId = uuid();
 
   if (existingSpaceId) {
     space = await prisma.space.findUniqueOrThrow({
@@ -267,7 +325,7 @@ export async function generateUserAndSpace({
         id: spaceId,
         name: spaceName,
         // Adding prefix avoids this being evaluated as uuid
-        domain: `domain-${v4()}`,
+        domain: spaceDomain,
         author: {
           connect: {
             id: user.id

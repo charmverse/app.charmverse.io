@@ -1,4 +1,5 @@
-import type { ProposalStatus } from '@charmverse/core/prisma';
+import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
+import { getChainById } from 'connectors/chains';
 import { DateUtils } from 'react-day-picker';
 
 import type { Block } from 'lib/focalboard/block';
@@ -9,12 +10,12 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
-import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
+import { PROPOSAL_RESULT_LABELS, PROPOSAL_STEP_LABELS } from 'lib/focalboard/proposalDbProperties';
+import type { ProposalEvaluationStep } from 'lib/proposal/interface';
 import { getAbsolutePath } from 'lib/utilities/browser';
 import { isTruthy } from 'lib/utilities/types';
 
 import { createCheckboxBlock } from './blocks/checkboxBlock';
-import { createCommentBlock } from './blocks/commentBlock';
 import { createImageBlock } from './blocks/imageBlock';
 import { createTextBlock } from './blocks/textBlock';
 import { Utils } from './utils';
@@ -26,7 +27,6 @@ export type Formatters = {
 
 export type PropertyContext = {
   users: { [key: string]: { username: string } };
-  proposalCategories: { [key: string]: string };
   spaceDomain: string;
 };
 
@@ -62,13 +62,18 @@ class OctoUtils {
         }
         break;
       }
-      case 'proposalCategory': {
-        displayValue = typeof propertyValue === 'string' ? context?.proposalCategories[propertyValue] : propertyValue;
+      case 'proposalStatus': {
+        displayValue = propertyValue
+          ? PROPOSAL_RESULT_LABELS[propertyValue as ProposalEvaluationResult]
+          : 'In Progress';
         break;
       }
-      case 'proposalStatus': {
-        const proposalStatus = propertyTemplate.options.find((o) => propertyValue === o.id)?.value;
-        displayValue = proposalStatus ? PROPOSAL_STATUS_LABELS[proposalStatus as ProposalStatus] : propertyValue;
+      case 'proposalStep': {
+        displayValue = propertyValue;
+        break;
+      }
+      case 'proposalEvaluationType': {
+        displayValue = PROPOSAL_STEP_LABELS[propertyValue as ProposalEvaluationStep];
         break;
       }
       case 'person':
@@ -92,6 +97,11 @@ class OctoUtils {
       }
       case 'updatedTime': {
         displayValue = formatDateTime(new Date(block.updatedAt));
+        break;
+      }
+      case 'tokenChain': {
+        const chain = typeof propertyValue === 'number' ? getChainById(propertyValue) : null;
+        displayValue = chain ? chain.chainName : '';
         break;
       }
       case 'date': {
@@ -139,9 +149,6 @@ class OctoUtils {
       }
       case 'image': {
         return createImageBlock(block);
-      }
-      case 'comment': {
-        return createCommentBlock(block);
       }
       case 'checkbox': {
         return createCheckboxBlock(block);
