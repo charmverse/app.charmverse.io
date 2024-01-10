@@ -173,8 +173,7 @@ describe('getCSVColumns()', () => {
     const board = createMockBoard();
     board.fields.cardProperties = [];
     const boardProperties = getBoardProperties({
-      boardBlock: board,
-      spaceUsesRubrics: true
+      boardBlock: board
     });
 
     board.fields.cardProperties = boardProperties;
@@ -193,11 +192,19 @@ describe('getCSVColumns()', () => {
       id: uuid()
     };
     const { fields } = generateResyncedProposalEvaluationForCard({
-      proposalEvaluationType: 'rubric',
+      currentStep: { id: 'step_1', type: 'rubric' },
       cardProps: { fields: { properties } },
       databaseProperties,
       rubricCriteria: [criteria],
-      rubricAnswers: [{ userId: 'user_1', rubricCriteriaId: criteria.id, response: { score: 10 }, comment: '' }]
+      rubricAnswers: [
+        {
+          userId: 'user_1',
+          rubricCriteriaId: criteria.id,
+          response: { score: 10 },
+          comment: '',
+          evaluationId: 'step_1'
+        }
+      ]
     });
 
     Object.assign(card.fields, fields);

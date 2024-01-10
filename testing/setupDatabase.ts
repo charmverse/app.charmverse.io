@@ -21,7 +21,7 @@ import type {
   Vote
 } from '@charmverse/core/prisma';
 import { Prisma } from '@charmverse/core/prisma';
-import type { Application, PageType } from '@charmverse/core/prisma-client';
+import type { Application, PagePermission, PageType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
@@ -1057,7 +1057,8 @@ export async function generateBoard({
   boardPageType,
   linkedSourceId,
   customProps,
-  deletedAt
+  deletedAt,
+  permissions
 }: {
   createdBy: string;
   spaceId: string;
@@ -1070,8 +1071,10 @@ export async function generateBoard({
   addPageContent?: boolean;
   boardPageType?: Extract<PageType, 'board' | 'inline_board' | 'inline_linked_board' | 'linked_board'>;
   linkedSourceId?: string;
-  customProps?: CustomBoardProps;
+  customProps?: Partial<CustomBoardProps>;
   deletedAt?: null | Date;
+  permissions?: (Pick<PagePermission, 'permissionLevel'> &
+    Partial<Pick<PagePermission, 'roleId' | 'userId' | 'spaceId' | 'public' | 'allowDiscovery'>>)[];
 }): Promise<Page> {
   const { pageArgs, blockArgs } = boardWithCardsArgs({
     createdBy,
@@ -1089,16 +1092,38 @@ export async function generateBoard({
     deletedAt
   });
 
-  const pagePermissions = pageArgs.map((createArg) => ({
-    pageId: createArg.data.id as string,
-    permissionLevel: 'full_access' as const,
-    userId: createdBy
-  }));
-  const permissions = prisma.pagePermission.createMany({
-    data: pagePermissions
+  const permissionCreateArgs: Prisma.PagePermissionCreateManyInput[] = [];
+
+  pageArgs.forEach((createArg) => {
+    if (permissions) {
+      permissionCreateArgs.push(
+        ...permissions.map(
+          (p) =>
+            ({
+              pageId: createArg.data.id as string,
+              permissionLevel: p.permissionLevel,
+              allowDiscovery: p.allowDiscovery,
+              public: p.public,
+              roleId: p.roleId,
+              spaceId: p.spaceId,
+              userId: p.userId
+            } as Prisma.PagePermissionCreateManyInput)
+        )
+      );
+    } else {
+      permissionCreateArgs.push({
+        pageId: createArg.data.id as string,
+        permissionLevel: 'full_access' as const,
+        userId: createdBy
+      });
+    }
+  });
+
+  const permissionsToCreate = prisma.pagePermission.createMany({
+    data: permissionCreateArgs as any
   });
   return prisma
-    .$transaction([...pageArgs.map((p) => createPageDb(p)), prisma.block.createMany(blockArgs), permissions])
+    .$transaction([...pageArgs.map((p) => createPageDb(p)), prisma.block.createMany(blockArgs), permissionsToCreate])
     .then((result) => result[0] as Page);
 }
 

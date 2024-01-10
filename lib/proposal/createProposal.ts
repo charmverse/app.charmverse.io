@@ -1,7 +1,6 @@
-import { InsecureOperationError } from '@charmverse/core/errors';
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page, ProposalReviewer, ProposalStatus } from '@charmverse/core/prisma';
-import type { Prisma, ProposalEvaluation, ProposalEvaluationType } from '@charmverse/core/prisma-client';
+import type { Prisma, ProposalEvaluation } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWithUsers, ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { arrayUtils } from '@charmverse/core/utilities';
@@ -16,10 +15,9 @@ import type { ProposalFields } from 'lib/proposal/interface';
 
 import { getPagePath } from '../pages';
 
-import type { ProposalReviewerInput, VoteSettings } from './interface';
+import type { VoteSettings } from './interface';
 import type { RubricDataInput } from './rubric/upsertRubricCriteria';
 import { upsertRubricCriteria } from './rubric/upsertRubricCriteria';
-import { validateProposalAuthorsAndReviewers } from './validateProposalAuthorsAndReviewers';
 
 type PageProps = Partial<
   Pick<
@@ -39,13 +37,10 @@ export type CreateProposalInput = {
   pageId?: string;
   pageProps?: PageProps;
   proposalTemplateId?: string | null;
-  reviewers?: ProposalReviewerInput[];
   authors?: string[];
   userId: string;
   spaceId: string;
-  evaluationType?: ProposalEvaluationType;
-  rubricCriteria?: RubricDataInput[];
-  evaluations?: ProposalEvaluationInput[];
+  evaluations: ProposalEvaluationInput[];
   publishToLens?: boolean;
   fields?: ProposalFields | null;
   workflowId?: string;
@@ -65,13 +60,9 @@ export async function createProposal({
   spaceId,
   pageProps,
   authors,
-  reviewers,
   evaluations = [],
-  evaluationType,
-  rubricCriteria,
   publishToLens,
   fields,
-  proposalTemplateId,
   workflowId,
   formId,
   formFields,
@@ -91,15 +82,6 @@ export async function createProposal({
       })) as ProposalWorkflowTyped | null)
     : null;
 
-  const validation = await validateProposalAuthorsAndReviewers({
-    authors: authorsList,
-    reviewers: reviewers ?? [],
-    spaceId
-  });
-
-  if (!validation.valid) {
-    throw new InsecureOperationError(`You cannot create a proposal with authors or reviewers outside the space`);
-  }
   const evaluationIds = evaluations.map(() => uuid());
 
   const evaluationPermissionsToCreate: Prisma.ProposalEvaluationPermissionCreateManyInput[] = [];
@@ -137,7 +119,8 @@ export async function createProposal({
   }
 
   let proposalFormId = formId;
-  if (!proposalFormId && formFields?.length && pageProps?.type === 'proposal_template') {
+  // Always create new form for proposal templates
+  if (formFields?.length && pageProps?.type === 'proposal_template') {
     proposalFormId = await createForm(formFields);
   }
 
@@ -156,7 +139,6 @@ export async function createProposal({
         id: proposalId,
         space: { connect: { id: spaceId } },
         status: proposalStatus,
-        evaluationType,
         publishToLens,
         authors: {
           createMany: {
@@ -220,14 +202,6 @@ export async function createProposal({
 
   trackUserAction('new_proposal_created', { userId, pageId: page.id, resourceId: proposal.id, spaceId });
 
-  const upsertedCriteria = rubricCriteria
-    ? await upsertRubricCriteria({
-        proposalId: proposal.id,
-        evaluationId: null,
-        rubricCriteria
-      })
-    : [];
-
   await Promise.all(
     evaluations.map(async (evaluation, index) => {
       if (evaluation.rubricCriteria?.length > 0) {
@@ -254,7 +228,6 @@ export async function createProposal({
     proposal: {
       ...proposal,
       reviewers: createdReviewers,
-      rubricCriteria: upsertedCriteria,
       draftRubricAnswers: [],
       rubricAnswers: [],
       formFields: proposalFormFields,

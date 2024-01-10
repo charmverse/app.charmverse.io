@@ -1,7 +1,9 @@
 import { rest } from 'msw';
 
+import { ProposalsProvider } from 'components/proposals/hooks/useProposals';
+import { ProposalsBoardProvider } from 'components/proposals/hooks/useProposalsBoard';
 import { ProposalsPage } from 'components/proposals/ProposalsPage';
-import { ProposalsPageProviders } from 'components/proposals/ProposalsPageProviders';
+import { ProposalBlocksProvider } from 'hooks/useProposalBlocks';
 import { createMockPage } from 'testing/mocks/page';
 import { createMockProposal } from 'testing/mocks/proposal';
 import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
@@ -10,9 +12,13 @@ import { members, userProfile } from '../lib/mockData';
 
 export function ProposalsPageStory() {
   return (
-    <ProposalsPageProviders>
-      <ProposalsPage title='Proposals' />
-    </ProposalsPageProviders>
+    <ProposalsProvider>
+      <ProposalBlocksProvider>
+        <ProposalsBoardProvider>
+          <ProposalsPage title='Proposals' />
+        </ProposalsBoardProvider>
+      </ProposalBlocksProvider>
+    </ProposalsProvider>
   );
 }
 

@@ -5,7 +5,6 @@ import nc from 'next-connect';
 
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { getPage } from 'lib/pages/server';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getSnapshotProposal } from 'lib/snapshot/getProposal';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
@@ -16,13 +15,6 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .use(
-    providePermissionClients({
-      key: 'id',
-      location: 'query',
-      resourceIdType: 'page'
-    })
-  )
   .use(requireKeys(['snapshotProposalId', 'evaluationId'], 'body'))
   .put(recordSnapshotInfo);
 

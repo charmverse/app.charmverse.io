@@ -28,6 +28,7 @@ import ReactDndProvider from 'components/common/ReactDndProvider';
 import RouteGuard from 'components/common/RouteGuard';
 import Snackbar from 'components/common/Snackbar';
 import { UserProfileProvider } from 'components/members/hooks/useMemberDialog';
+import { ProposalsProvider } from 'components/proposals/hooks/useProposals';
 import { RewardsProvider } from 'components/rewards/hooks/useRewards';
 import { isDevEnv, isProdEnv } from 'config/constants';
 import { CurrentSpaceProvider } from 'hooks/useCurrentSpace';
@@ -227,21 +228,23 @@ function DataProviders({ children }: { children: ReactNode }) {
                       <IsSpaceMemberProvider>
                         <WebSocketClientProvider>
                           <MembersProvider>
-                            <RewardsProvider>
-                              <PaymentMethodsProvider>
-                                <FocalBoardProvider>
-                                  <PagesProvider>
-                                    <MemberPropertiesProvider>
-                                      <LensProvider config={lensConfig}>
-                                        <UserProfileProvider>
-                                          <PageTitleProvider>{children}</PageTitleProvider>
-                                        </UserProfileProvider>
-                                      </LensProvider>
-                                    </MemberPropertiesProvider>
-                                  </PagesProvider>
-                                </FocalBoardProvider>
-                              </PaymentMethodsProvider>
-                            </RewardsProvider>
+                            <PaymentMethodsProvider>
+                              <FocalBoardProvider>
+                                <PagesProvider>
+                                  <RewardsProvider>
+                                    <ProposalsProvider>
+                                      <MemberPropertiesProvider>
+                                        <LensProvider config={lensConfig}>
+                                          <UserProfileProvider>
+                                            <PageTitleProvider>{children}</PageTitleProvider>
+                                          </UserProfileProvider>
+                                        </LensProvider>
+                                      </MemberPropertiesProvider>
+                                    </ProposalsProvider>
+                                  </RewardsProvider>
+                                </PagesProvider>
+                              </FocalBoardProvider>
+                            </PaymentMethodsProvider>
                           </MembersProvider>
                         </WebSocketClientProvider>
                       </IsSpaceMemberProvider>

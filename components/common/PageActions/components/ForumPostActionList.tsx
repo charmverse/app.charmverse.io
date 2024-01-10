@@ -84,7 +84,7 @@ export function ForumPostActionList({
       <Divider />
       <ExportMarkdownAction onClick={exportMarkdownPage} />
       <ExportToPDFAction pdfTitle={post?.title} onComplete={onComplete} />
-      <Tooltip
+      {/* <Tooltip
         title={
           post?.isDraft
             ? 'Draft post cannot be converted proposal'
@@ -108,7 +108,7 @@ export function ForumPostActionList({
             <ListItemText primary='Convert to proposal' />
           </ListItemButton>
         </div>
-      </Tooltip>
+      </Tooltip> */}
       {post && postCreator ? (
         <>
           <Divider />
