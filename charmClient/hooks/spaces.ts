@@ -1,13 +1,11 @@
-import type { PaymentMethod } from '@charmverse/core/prisma';
+import type { PaymentMethod, Space } from '@charmverse/core/prisma';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
-
-import type { SpaceWithGates } from 'lib/spaces/interfaces';
 
 import type { MaybeString } from './helpers';
 import { useDELETE, useGETImmutable, useGET, usePOST } from './helpers';
 
 export function useSearchByDomain(domain: MaybeString) {
-  return useGETImmutable<SpaceWithGates>(domain ? `/api/spaces/search-domain` : null, {
+  return useGETImmutable<Space | null>(domain ? `/api/spaces/search-domain` : null, {
     search: stripUrlParts(domain || '')
   });
 }
