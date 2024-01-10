@@ -38,6 +38,7 @@ export function ProposalsPage({ title }: { title: string }) {
   const { proposals, mutateProposals } = useProposals();
   const loadingData = !proposals;
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
+
   const canSeeProposals = hasAccess || isFreeSpace || currentSpace?.publicProposals === true;
   const { navigateToSpacePath, updateURLQuery } = useCharmRouter();
   const isAdmin = useIsAdmin();

@@ -269,13 +269,13 @@ export async function createCardsFromProposals({
       proposalId: pageProposal.proposal!.id
     });
 
-    if (pageProposal?.proposal?.evaluationType === 'rubric') {
+    if (currentStep?.step === 'rubric') {
       const criteria = mappedRubricCriteriaByProposal[pageProposal.id] ?? [];
       const answers = mappedRubricAnswersByProposal[pageProposal.id] ?? [];
 
       const updatedCardShape = generateResyncedProposalEvaluationForCard({
-        proposalEvaluationType: pageProposal.proposal.evaluationType,
         cardProps: { fields: properties },
+        currentStep: { id: currentStep.id, type: currentStep.step },
         databaseProperties: databaseProposalProps,
         rubricCriteria: criteria as ProposalRubricCriteriaWithTypedParams[],
         rubricAnswers: answers as ProposalRubricCriteriaAnswerWithTypedResponse[]

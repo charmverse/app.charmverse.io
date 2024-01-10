@@ -36,9 +36,6 @@ export function mapDbProposalToProposal({
         draftRubricAnswers: any[];
       })[];
       rewards: { id: string }[];
-      reviewers: ProposalReviewer[];
-      rubricAnswers: any[];
-      draftRubricAnswers: any[];
     };
   permissions?: ProposalPermissionFlags;
   canAccessPrivateFormFields?: boolean;
@@ -55,9 +52,9 @@ export function mapDbProposalToProposal({
     evaluationType: currentEvaluation?.type || proposal.evaluationType,
     status: getOldProposalStatus(proposal),
     // Support old model: filter out evaluation-specific reviewers and rubric answers
-    rubricAnswers: currentEvaluation?.rubricAnswers || proposal.rubricAnswers,
-    draftRubricAnswers: currentEvaluation?.draftRubricAnswers || proposal.draftRubricAnswers,
-    reviewers: currentEvaluation?.reviewers || proposal.reviewers,
+    rubricAnswers: currentEvaluation?.rubricAnswers || [],
+    draftRubricAnswers: currentEvaluation?.draftRubricAnswers || [],
+    reviewers: currentEvaluation?.reviewers || [],
     rewardIds: rewards.map((r) => r.id) || null,
     form: form
       ? {

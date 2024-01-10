@@ -23,7 +23,7 @@ type RewardsBoardContextType = {
   setBoardReward: (boardReward: BoardReward | null) => void;
 };
 
-export const RewardsBoardContext = createContext<Readonly<RewardsBoardContextType>>({
+const RewardsBoardContext = createContext<Readonly<RewardsBoardContextType>>({
   board: {} as Board,
   boardCustomProperties: {} as Board,
   card: {} as RewardCard,

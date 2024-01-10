@@ -14,7 +14,13 @@ import { prisma } from '@charmverse/core/prisma-client';
  */
 
 async function search() {
-  const acc = await prisma.proposalWorkflow.deleteMany({});
+  const acc = await prisma.block.findMany({
+    where: {
+      space: {
+        domain: 'example-domain'
+      }
+    }
+  });
 
   console.log(acc);
 }

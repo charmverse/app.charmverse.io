@@ -23,7 +23,6 @@ import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import { EvaluationSidebar } from 'components/proposals/ProposalPage/components/EvaluationSidebar/EvaluationSidebar';
 import { ProposalFormFieldInputs } from 'components/proposals/ProposalPage/components/ProposalFormFieldInputs';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
-import { ProposalsPageProviders } from 'components/proposals/ProposalsPageProviders';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmEditor } from 'hooks/useCharmEditor';
@@ -275,19 +274,17 @@ function DocumentPage({
         </>
       )}
       {proposalId && (
-        <ProposalsPageProviders>
-          <ProposalProperties
-            enableSidebar={enableSidebar}
-            pageId={page.id}
-            proposalId={proposalId}
-            pagePermissions={pagePermissions}
-            readOnly={readonlyProposalProperties}
-            proposalPage={page}
-            openEvaluation={openEvaluation}
-            proposal={proposal}
-            refreshProposal={refreshProposal}
-          />
-        </ProposalsPageProviders>
+        <ProposalProperties
+          enableSidebar={enableSidebar}
+          pageId={page.id}
+          proposalId={proposalId}
+          pagePermissions={pagePermissions}
+          readOnly={readonlyProposalProperties}
+          proposalPage={page}
+          openEvaluation={openEvaluation}
+          proposal={proposal}
+          refreshProposal={refreshProposal}
+        />
       )}
       {reward && (
         <RewardProperties
@@ -353,7 +350,7 @@ function DocumentPage({
       <PrimaryColumn id='file-drop-container' ref={containerRef} showPageActionSidebar={showPageActionSidebar}>
         <Box
           ref={printRef}
-          className={`document-print-container ${fontClassName}`}
+          className={`document-print-container ${fontClassName} drag-area-container`}
           display='flex'
           flexDirection='column'
           flexGrow={1}
