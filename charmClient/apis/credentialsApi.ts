@@ -4,10 +4,18 @@ import type { PublishedSignedCredential } from 'lib/credentials/config/queriesAn
 
 export class CredentialsApi {
   attest(data: CharmVerseCredentialInput): Promise<PublishedSignedCredential> {
-    return http.POST(`/api/credentials/attest`, data);
+    return http.POST(`/api/credentials`, data);
   }
 
   getUserCredentials(data: { account: string }): Promise<PublishedSignedCredential[]> {
-    return http.GET<PublishedSignedCredential[]>(`/api/credentials/attest`, data);
+    return http.GET<PublishedSignedCredential[]>(`/api/credentials`, data);
+  }
+
+  createCredentialTemplate() {
+    return http.POST(`/api/credentials`, data);
+  }
+
+  getTemplates() {
+    return http.GET<PublishedSignedCredential[]>(`/api/credentials`, data);
   }
 }
