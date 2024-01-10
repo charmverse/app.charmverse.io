@@ -102,6 +102,7 @@ describe('PUT /api/pages/{id} - update page', () => {
     const template = await createProposal({
       spaceId: space.id,
       userId: adminUser.id,
+      evaluations: [],
       pageProps: {
         type: 'proposal_template'
       }
@@ -122,6 +123,7 @@ describe('PUT /api/pages/{id} - update page', () => {
     const template = await createProposal({
       spaceId: space.id,
       userId: adminUser.id,
+      evaluations: [],
       pageProps: {
         type: 'proposal_template'
       }

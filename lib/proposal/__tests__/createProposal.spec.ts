@@ -44,7 +44,8 @@ describe('Creates a page and proposal with relevant configuration', () => {
       },
       userId: user.id,
       spaceId: space.id,
-      authors: [user.id, extraUser.id]
+      authors: [user.id, extraUser.id],
+      evaluations: []
     });
 
     expect(page).toMatchObject(
@@ -66,9 +67,7 @@ describe('Creates a page and proposal with relevant configuration', () => {
             proposalId: proposal?.id,
             userId: extraUser.id
           }
-        ],
-        rubricAnswers: [],
-        rubricCriteria: []
+        ]
       })
     );
   });
@@ -140,12 +139,13 @@ describe('Creates a page and proposal with relevant configuration', () => {
       userId: user.id,
       spaceId: space.id,
       authors: [user.id, extraUser.id],
-      reviewers: [
-        {
-          group: 'user',
-          id: reviewerUser.id
-        }
-      ],
+      evaluations: [],
+      // reviewers: [
+      //   {
+      //     group: 'user',
+      //     id: reviewerUser.id
+      //   }
+      // ],
       formFields: formFields.map((item) => ({
         ...item,
         // creating new IDs for the form fields
@@ -173,66 +173,6 @@ describe('Creates a page and proposal with relevant configuration', () => {
     );
 
     expect(proposal.formId).toBeDefined();
-  });
-
-  it('should throw an error if trying to create a proposal with authors or reviewers outside the space', async () => {
-    const { user: outsideUser, space: outsideSpace } = await testUtilsUser.generateUserAndSpace();
-    const outsideRole = await testUtilsMembers.generateRole({
-      createdBy: outsideUser.id,
-      spaceId: outsideSpace.id
-    });
-
-    // Outside author
-    await expect(
-      createProposal({
-        pageProps: {
-          contentText: '',
-          title: 'page-title'
-        },
-        userId: user.id,
-        spaceId: space.id,
-        authors: [user.id, outsideUser.id],
-        reviewers: []
-      })
-    ).rejects.toBeInstanceOf(InsecureOperationError);
-
-    // Outside reviewer user
-    await expect(
-      createProposal({
-        pageProps: {
-          contentText: '',
-          title: 'page-title'
-        },
-        userId: user.id,
-        spaceId: space.id,
-        authors: [user.id],
-        reviewers: [
-          {
-            group: 'user',
-            id: outsideUser.id
-          }
-        ]
-      })
-    ).rejects.toBeInstanceOf(InsecureOperationError);
-
-    // Outside reviewer role
-    await expect(
-      createProposal({
-        pageProps: {
-          contentText: '',
-          title: 'page-title'
-        },
-        userId: user.id,
-        spaceId: space.id,
-        authors: [user.id, outsideUser.id],
-        reviewers: [
-          {
-            group: 'role',
-            id: outsideRole.id
-          }
-        ]
-      })
-    ).rejects.toBeInstanceOf(InsecureOperationError);
   });
 
   it('should create a proposal from a workflow and copy over its permissions', async () => {

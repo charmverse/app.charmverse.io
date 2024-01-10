@@ -18,15 +18,15 @@ handler.use(requireUser).post(createProposalController);
 async function createProposalController(req: NextApiRequest, res: NextApiResponse<{ id: string }>) {
   const proposalCreateProps = req.body as CreateProposalInput;
 
-  if (proposalCreateProps.pageProps?.type === 'proposal_template') {
-    const adminRole = await prisma.spaceRole.findFirst({
-      where: {
-        isAdmin: true,
-        userId: req.session.user.id,
-        spaceId: proposalCreateProps.spaceId
-      }
-    });
+  const adminRole = await prisma.spaceRole.findFirst({
+    where: {
+      isAdmin: true,
+      userId: req.session.user.id,
+      spaceId: proposalCreateProps.spaceId
+    }
+  });
 
+  if (proposalCreateProps.pageProps?.type === 'proposal_template') {
     if (!adminRole) {
       throw new AdministratorOnlyError();
     }
@@ -38,6 +38,58 @@ async function createProposalController(req: NextApiRequest, res: NextApiRespons
 
     if (!permissions.createProposals) {
       throw new ActionNotPermittedError('You cannot create new proposals');
+    }
+    const space = await prisma.space.findUnique({
+      where: {
+        id: proposalCreateProps.spaceId
+      }
+    });
+    if (space?.requireProposalTemplate && !proposalCreateProps.pageProps?.sourceTemplateId) {
+      throw new ActionNotPermittedError('You must use a template to create new proposals');
+    }
+  }
+
+  const proposalTemplate = proposalCreateProps.pageProps?.sourceTemplateId
+    ? await prisma.page.findUnique({
+        where: {
+          id: proposalCreateProps.pageProps.sourceTemplateId
+        },
+        include: {
+          proposal: {
+            include: {
+              evaluations: {
+                include: { reviewers: true }
+              }
+            }
+          }
+        }
+      })
+    : null;
+
+  // verify the input matches the template if not an admin
+  if (!adminRole && proposalTemplate?.proposal) {
+    const isValidEvaluationSteps = proposalTemplate.proposal.evaluations.every((evaluation, index) => {
+      const matchingEvaluation = proposalCreateProps.evaluations[index];
+      if (!matchingEvaluation) {
+        return false;
+      }
+      if (matchingEvaluation.type !== evaluation.type) {
+        return false;
+      }
+      if (matchingEvaluation.reviewers.length !== evaluation.reviewers.length) {
+        return false;
+      }
+      return evaluation.reviewers.every((reviewer) =>
+        matchingEvaluation.reviewers.some(
+          (evaluationReviewer) =>
+            evaluationReviewer.userId === reviewer.userId ||
+            evaluationReviewer.systemRole === reviewer.systemRole ||
+            evaluationReviewer.roleId === reviewer.roleId
+        )
+      );
+    });
+    if (!isValidEvaluationSteps) {
+      throw new ActionNotPermittedError('Inputs do not match the template');
     }
   }
   // TODO: fix tests

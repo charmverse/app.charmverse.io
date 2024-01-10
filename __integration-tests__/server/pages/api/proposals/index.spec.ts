@@ -1,8 +1,8 @@
-import type { Space, User, ProposalCategory, Role } from '@charmverse/core/prisma';
+import type { Space, User, ProposalWorkflow, Role } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
+import { v4 as uuid } from 'uuid';
 
 import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import { emptyDocument } from 'lib/prosemirror/constants';
@@ -14,6 +14,7 @@ let space: Space;
 let proposalCreator: User;
 let spaceMember: User;
 let proposalCreatorRole: Role;
+let workflow: ProposalWorkflow;
 
 beforeAll(async () => {
   const generated = await testUtilsUser.generateUserAndSpace({ isAdmin: false });
@@ -32,33 +33,62 @@ beforeAll(async () => {
     roleId: proposalCreatorRole.id,
     userId: proposalCreator.id
   });
+
+  await prisma.spacePermission.create({
+    data: {
+      forSpace: { connect: { id: space.id } },
+      operations: ['createProposals'],
+      role: { connect: { id: proposalCreatorRole.id } }
+    }
+  });
+
+  workflow = await prisma.proposalWorkflow.create({
+    data: {
+      index: 0,
+      title: 'Default flow',
+      spaceId: space.id,
+      evaluations: [
+        {
+          title: 'Pass/fail',
+          permissions: [
+            { systemRole: 'all_reviewers', operation: 'comment' },
+            { operation: 'view', systemRole: 'space_member' }
+          ],
+          type: 'pass_fail'
+        }
+      ]
+    }
+  });
 });
 
 describe('POST /api/proposals - Create a proposal', () => {
-  it('should allow a user to create a proposal in a specific category, with page content, reviewers and authors configured and respond with 201', async () => {
+  it('should allow a user to create a proposal and respond with 201', async () => {
     const userCookie = await loginUser(proposalCreator.id);
     const otherUser = await testUtilsUser.generateSpaceUser({
       spaceId: space.id
-    });
-
-    await prisma.spacePermission.create({
-      data: {
-        forSpace: { connect: { id: space.id } },
-        operations: ['createProposals'],
-        role: { connect: { id: proposalCreatorRole.id } }
-      }
     });
 
     const input: CreateProposalInput = {
       spaceId: space.id,
       userId: proposalCreator.id,
       authors: [proposalCreator.id, otherUser.id],
-      reviewers: [{ group: 'user', id: proposalCreator.id }],
       pageProps: {
         title: 'Proposal title',
         content: { ...emptyDocument },
         contentText: 'Empty proposal'
-      }
+      },
+      workflowId: workflow.id,
+      evaluations: [
+        {
+          id: uuid(),
+          type: 'feedback',
+          reviewers: [{ userId: proposalCreator.id }],
+          title: 'Feedback',
+          permissions: [],
+          index: 0,
+          rubricCriteria: []
+        }
+      ]
     };
 
     await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(201);
@@ -71,7 +101,18 @@ describe('POST /api/proposals - Create a proposal', () => {
       spaceId: space.id,
       userId: spaceMember.id,
       authors: [spaceMember.id],
-      reviewers: [{ group: 'user', id: spaceMember.id }],
+      evaluations: [
+        {
+          id: uuid(),
+          type: 'feedback',
+          reviewers: [{ userId: spaceMember.id }],
+          title: 'Feedback',
+          permissions: [],
+          index: 0,
+          rubricCriteria: []
+        }
+      ],
+      workflowId: workflow.id,
       pageProps: {
         title: 'Proposal title',
         content: { ...emptyDocument },
@@ -91,7 +132,18 @@ describe('POST /api/proposals - Create a proposal', () => {
       spaceId: space.id,
       userId: proposalCreator.id,
       authors: [proposalCreator.id, otherUser.id],
-      reviewers: [{ group: 'user', id: proposalCreator.id }],
+      evaluations: [
+        {
+          id: uuid(),
+          type: 'feedback',
+          reviewers: [{ userId: proposalCreator.id }],
+          title: 'Feedback',
+          permissions: [],
+          index: 0,
+          rubricCriteria: []
+        }
+      ],
+      workflowId: workflow.id,
       pageProps: {
         title: 'Proposal title',
         content: { ...emptyDocument },
@@ -100,5 +152,135 @@ describe('POST /api/proposals - Create a proposal', () => {
       }
     };
     await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(401);
+  });
+
+  it('should succeed if the proposal matches the template and respond with 201', async () => {
+    const template = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: proposalCreator.id,
+      authors: [proposalCreator.id],
+      proposalStatus: 'draft',
+      evaluationInputs: [
+        {
+          evaluationType: 'pass_fail',
+          reviewers: [{ group: 'user', id: proposalCreator.id }, { group: 'space_member' }],
+          permissions: [],
+          title: 'Feedback'
+        }
+      ]
+    });
+    const userCookie = await loginUser(proposalCreator.id);
+
+    const input: CreateProposalInput = {
+      spaceId: space.id,
+      userId: spaceMember.id,
+      authors: [spaceMember.id],
+      pageProps: {
+        sourceTemplateId: template.id,
+        title: 'Proposal title',
+        content: { ...emptyDocument },
+        contentText: 'Empty proposal'
+      },
+      evaluations: [
+        {
+          id: template.evaluations[0].id,
+          type: 'pass_fail',
+          reviewers: [{ userId: proposalCreator.id }, { systemRole: 'space_member' }],
+          title: 'Feedback',
+          permissions: [],
+          index: 0,
+          rubricCriteria: []
+        }
+      ]
+    };
+    await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(201);
+  });
+
+  it('should fail if the proposal does not match the template and respond with 401', async () => {
+    const template = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: proposalCreator.id,
+      authors: [proposalCreator.id],
+      proposalStatus: 'draft',
+      evaluationInputs: [
+        {
+          evaluationType: 'pass_fail',
+          reviewers: [{ group: 'user', id: proposalCreator.id }],
+          permissions: [],
+          title: 'Feedback'
+        }
+      ]
+    });
+    const userCookie = await loginUser(proposalCreator.id);
+
+    const input: CreateProposalInput = {
+      spaceId: space.id,
+      userId: spaceMember.id,
+      authors: [spaceMember.id],
+      pageProps: {
+        sourceTemplateId: template.id,
+        title: 'Proposal title',
+        content: { ...emptyDocument },
+        contentText: 'Empty proposal'
+      },
+      evaluations: [
+        {
+          id: template.evaluations[0].id,
+          type: 'feedback',
+          reviewers: [{ userId: spaceMember.id }],
+          title: 'Feedback',
+          permissions: [],
+          index: 0,
+          rubricCriteria: []
+        }
+      ]
+    };
+    await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(401);
+  });
+
+  it('should pass if the proposal does not match the template and respond with 201', async () => {
+    const admin = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id,
+      isAdmin: true
+    });
+    const template = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: proposalCreator.id,
+      authors: [proposalCreator.id],
+      proposalStatus: 'draft',
+      evaluationInputs: [
+        {
+          evaluationType: 'pass_fail',
+          reviewers: [{ group: 'user', id: proposalCreator.id }],
+          permissions: [],
+          title: 'Feedback'
+        }
+      ]
+    });
+    const userCookie = await loginUser(admin.id);
+
+    const input: CreateProposalInput = {
+      spaceId: space.id,
+      userId: spaceMember.id,
+      authors: [spaceMember.id],
+      pageProps: {
+        sourceTemplateId: template.id,
+        title: 'Proposal title',
+        content: { ...emptyDocument },
+        contentText: 'Empty proposal'
+      },
+      evaluations: [
+        {
+          id: template.evaluations[0].id,
+          type: 'feedback',
+          reviewers: [{ userId: spaceMember.id }],
+          title: 'Feedback',
+          permissions: [],
+          index: 0,
+          rubricCriteria: []
+        }
+      ]
+    };
+    await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(201);
   });
 });
