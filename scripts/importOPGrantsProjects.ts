@@ -115,7 +115,7 @@ async function importProjects() {
         const space = await createWorkspace({
           spaceData,
           userId: adminUserId,
-          extraAdmins: [botUser.id, ...owners, 'd05a99ba-95c9-43cc-bd85-2888b05c38ef'],
+          extraAdmins: [botUser.id, ...owners],
           spaceTemplate: 'templateOPGrant'
         });
 
