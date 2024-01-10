@@ -9,21 +9,18 @@ async function removeDuplicateNotifications() {
     }
   })
 
-  const userIdCreatedAtNotificationsRecord: Record<string, typeof notificationsMetadata[0][]> = {};
+  const userIdCreatedAtNotificationsSet: Set<string> = new Set();
+  const notificationMetadataIds: string[] = [];
   notificationsMetadata.forEach(notificationMetadata => {
     const { userId, createdAt } = notificationMetadata;
     const key = `${userId}.${createdAt}`
-    if (!userIdCreatedAtNotificationsRecord[key]) {
-      userIdCreatedAtNotificationsRecord[key] = [];
+
+    if (userIdCreatedAtNotificationsSet.has(key)) {
+      notificationMetadataIds.push(notificationMetadata.id);
+    } else {
+      userIdCreatedAtNotificationsSet.add(key);
     }
-
-    userIdCreatedAtNotificationsRecord[key].push(notificationMetadata);
   })
-
-  const notificationMetadataIds = Object.values(userIdCreatedAtNotificationsRecord)
-    .filter(notifications => notifications.length > 1)
-    .map(notifications => notifications.slice(1).map(notification => notification.id).flat())
-    .flat();
 
   await prisma.userNotificationMetadata.deleteMany({
     where: {
