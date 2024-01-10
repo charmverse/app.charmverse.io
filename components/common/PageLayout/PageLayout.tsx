@@ -186,7 +186,7 @@ function PageLayout({ children }: PageLayoutProps) {
       <Head>
         <CurrentPageFavicon />
       </Head>
-      <LayoutContainer data-test='space-page-layout'>
+      <LayoutContainer data-test='space-page-layout' className='app-content'>
         <FocalboardViewsProvider>
           <ProposalBlocksProvider>
             <RewardBlocksProvider>

@@ -284,7 +284,7 @@ export function ViewHeaderRowsMenu({
   }
 
   return (
-    <StyledStack>
+    <StyledStack className='disable-drag-selection'>
       <StyledMenuItem
         sx={{
           borderRadius: `4px 0 0 4px`
@@ -294,6 +294,7 @@ export function ViewHeaderRowsMenu({
           {checkedIds.length} selected
         </Typography>
       </StyledMenuItem>
+
       {cards.length !== 0
         ? filteredPropertyTemplates.map((propertyTemplate) => (
             <PropertyTemplateMenu

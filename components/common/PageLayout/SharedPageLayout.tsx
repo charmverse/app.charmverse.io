@@ -84,7 +84,7 @@ export function SharedPageLayout({ children, basePageId, basePageType }: Props) 
             <Head>
               <CurrentPageFavicon />
             </Head>
-            <LayoutContainer data-test='public-page-layout'>
+            <LayoutContainer data-test='public-page-layout' className='app-content'>
               <AppBar sidebarWidth={0} position='fixed' open={false}>
                 <StyledToolbar variant='dense'>
                   <Box
