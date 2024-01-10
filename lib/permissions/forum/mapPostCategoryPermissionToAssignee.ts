@@ -15,10 +15,15 @@ export function mapPostCategoryPermissionToAssignee(
   };
 }
 
-export function getPermissionAssignee(
-  permission: PostCategoryPermission
+function getPermissionAssignee(
+  permission: Partial<Pick<PostCategoryPermission, 'public' | 'roleId' | 'spaceId'>>
 ): TargetPermissionGroup<'public' | 'role' | 'space'> {
-  if (permission.roleId) {
+  // Make sure we always have a single assignee
+  if (permission.public && !permission.roleId && !permission.spaceId) {
+    return {
+      group: 'public'
+    };
+  } else if (permission.roleId && !permission.spaceId) {
     return {
       group: 'role',
       id: permission.roleId
@@ -28,7 +33,6 @@ export function getPermissionAssignee(
       group: 'space',
       id: permission.spaceId
     };
-  } else {
-    throw new InvalidPermissionGranteeError();
   }
+  throw new InvalidPermissionGranteeError();
 }
