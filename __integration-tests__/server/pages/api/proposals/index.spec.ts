@@ -237,4 +237,50 @@ describe('POST /api/proposals - Create a proposal', () => {
     };
     await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(401);
   });
+
+  it('should pass if the proposal does not match the template and respond with 201', async () => {
+    const admin = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id,
+      isAdmin: true
+    });
+    const template = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: proposalCreator.id,
+      authors: [proposalCreator.id],
+      proposalStatus: 'draft',
+      evaluationInputs: [
+        {
+          evaluationType: 'pass_fail',
+          reviewers: [{ group: 'user', id: proposalCreator.id }],
+          permissions: [],
+          title: 'Feedback'
+        }
+      ]
+    });
+    const userCookie = await loginUser(admin.id);
+
+    const input: CreateProposalInput = {
+      spaceId: space.id,
+      userId: spaceMember.id,
+      authors: [spaceMember.id],
+      pageProps: {
+        sourceTemplateId: template.id,
+        title: 'Proposal title',
+        content: { ...emptyDocument },
+        contentText: 'Empty proposal'
+      },
+      evaluations: [
+        {
+          id: template.evaluations[0].id,
+          type: 'feedback',
+          reviewers: [{ userId: spaceMember.id }],
+          title: 'Feedback',
+          permissions: [],
+          index: 0,
+          rubricCriteria: []
+        }
+      ]
+    };
+    await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(201);
+  });
 });
