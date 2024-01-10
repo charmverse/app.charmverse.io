@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -54,7 +55,8 @@ async function updateEvaluationResultEndpoint(req: NextApiRequest, res: NextApiR
   }
 
   if (evaluation.result === result) {
-    throw new ActionNotPermittedError(`You already submitted this result.`);
+    log.debug('Evaluation result is the same', { proposalId, evaluationId, result });
+    return res.status(200).end();
   }
 
   await submitEvaluationResult({
