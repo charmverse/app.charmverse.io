@@ -4,6 +4,7 @@ import { createForm } from 'lib/form/createForm';
 import { v4 } from 'uuid';
 
 async function splitStructuredProposalForms() {
+  // Get all structured proposal templates
   const proposalTemplates = await prisma.proposal.findMany({
     where: {
       page: {
@@ -44,12 +45,14 @@ async function splitStructuredProposalForms() {
       }
       if (existingFormIds.has(proposalTemplate.formId)) {
         const newFormFieldIds = proposalTemplate.form.formFields.map(() => v4())
+        // Create new form with new form field ids
         const newFormId = await createForm(proposalTemplate.form.formFields.map((formField, index) => ({
           ...formField,
           id: newFormFieldIds[index],
           options: formField.options as SelectOptionType[]
         })));
-  
+        
+        // Get all the proposals that use this template
         const proposals = await prisma.proposal.findMany({
           where: {
             page: {
@@ -74,6 +77,7 @@ async function splitStructuredProposalForms() {
               formId: newFormId
             }
           }),
+          // Update the form id for all proposals that use this template
           prisma.proposal.updateMany({
             where: {
               page: {
@@ -84,6 +88,7 @@ async function splitStructuredProposalForms() {
               formId: newFormId
             }
           }),
+          // Update the form field ids for all form answers for all proposals that use this template
           ...proposals.map(proposal => proposal.formAnswers.map((formAnswer, index) => (
             prisma.formFieldAnswer.update({
               where: {
@@ -95,11 +100,8 @@ async function splitStructuredProposalForms() {
             })
           ))).flat()
         ])
-  
-        existingFormIds.add(newFormId)
-      } else {
-        existingFormIds.add(proposalTemplate.formId)
       }
+      existingFormIds.add(proposalTemplate.formId)
     } catch (err) {
       console.log(`Failed to split proposal template ${proposalTemplate.id}`)
     } finally {
