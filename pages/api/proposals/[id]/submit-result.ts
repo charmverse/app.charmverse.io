@@ -4,17 +4,13 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import type { ReviewEvaluationRequest } from 'lib/proposal/submitEvaluationResult';
 import { submitEvaluationResult } from 'lib/proposal/submitEvaluationResult';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(providePermissionClients({ key: 'id', location: 'query', resourceIdType: 'proposal' }))
-  .use(requireKeys(['evaluationId', 'result'], 'body'))
-  .put(updateEvaluationResultEndpoint);
+handler.use(requireKeys(['evaluationId', 'result'], 'body')).put(updateEvaluationResultEndpoint);
 
 // for submitting a review or removing a previous one
 async function updateEvaluationResultEndpoint(req: NextApiRequest, res: NextApiResponse) {
