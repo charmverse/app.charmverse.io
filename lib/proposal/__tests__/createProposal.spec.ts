@@ -44,7 +44,8 @@ describe('Creates a page and proposal with relevant configuration', () => {
       },
       userId: user.id,
       spaceId: space.id,
-      authors: [user.id, extraUser.id]
+      authors: [user.id, extraUser.id],
+      evaluations: []
     });
 
     expect(page).toMatchObject(
@@ -66,9 +67,7 @@ describe('Creates a page and proposal with relevant configuration', () => {
             proposalId: proposal?.id,
             userId: extraUser.id
           }
-        ],
-        rubricAnswers: [],
-        rubricCriteria: []
+        ]
       })
     );
   });
@@ -140,12 +139,13 @@ describe('Creates a page and proposal with relevant configuration', () => {
       userId: user.id,
       spaceId: space.id,
       authors: [user.id, extraUser.id],
-      reviewers: [
-        {
-          group: 'user',
-          id: reviewerUser.id
-        }
-      ],
+      evaluations: [],
+      // reviewers: [
+      //   {
+      //     group: 'user',
+      //     id: reviewerUser.id
+      //   }
+      // ],
       formFields: formFields.map((item) => ({
         ...item,
         // creating new IDs for the form fields
@@ -192,7 +192,8 @@ describe('Creates a page and proposal with relevant configuration', () => {
         userId: user.id,
         spaceId: space.id,
         authors: [user.id, outsideUser.id],
-        reviewers: []
+        evaluations: []
+        // reviewers: []
       })
     ).rejects.toBeInstanceOf(InsecureOperationError);
 
@@ -206,12 +207,13 @@ describe('Creates a page and proposal with relevant configuration', () => {
         userId: user.id,
         spaceId: space.id,
         authors: [user.id],
-        reviewers: [
-          {
-            group: 'user',
-            id: outsideUser.id
-          }
-        ]
+        evaluations: []
+        // reviewers: [
+        //   {
+        //     group: 'user',
+        //     id: outsideUser.id
+        //   }
+        // ]
       })
     ).rejects.toBeInstanceOf(InsecureOperationError);
 
@@ -222,15 +224,16 @@ describe('Creates a page and proposal with relevant configuration', () => {
           contentText: '',
           title: 'page-title'
         },
+        evaluations: [],
         userId: user.id,
         spaceId: space.id,
-        authors: [user.id, outsideUser.id],
-        reviewers: [
-          {
-            group: 'role',
-            id: outsideRole.id
-          }
-        ]
+        authors: [user.id, outsideUser.id]
+        // reviewers: [
+        //   {
+        //     group: 'role',
+        //     id: outsideRole.id
+        //   }
+        // ]
       })
     ).rejects.toBeInstanceOf(InsecureOperationError);
   });

@@ -13,6 +13,7 @@ export async function convertPageToProposal({
   const { page: proposalPage } = await createProposal({
     userId,
     spaceId: page.spaceId,
+    evaluations: [],
     pageProps: {
       content: page.content,
       contentText: page.contentText,

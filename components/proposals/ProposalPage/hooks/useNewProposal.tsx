@@ -60,8 +60,6 @@ export function useNewProposal({ newProposal }: Props) {
         },
         formFields: formInputs.formFields,
         evaluations: formInputs.evaluations,
-        evaluationType: formInputs.evaluationType,
-        reviewers: formInputs.reviewers,
         spaceId: currentSpace.id,
         publishToLens: formInputs.publishToLens,
         fields: formInputs.fields,
