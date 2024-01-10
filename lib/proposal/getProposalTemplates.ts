@@ -53,7 +53,11 @@ export async function getProposalTemplates({ spaceId, userId }: SpaceResourcesRe
         include: {
           permissions: true,
           reviewers: true,
-          rubricCriteria: true,
+          rubricCriteria: {
+            orderBy: {
+              index: 'asc'
+            }
+          },
           rubricAnswers: true,
           draftRubricAnswers: true,
           vote: true
