@@ -526,7 +526,6 @@ export async function updateCardsFromProposals({
       newCards.push(_card);
     }
   }
-  prettyPrint({ updatedCards });
 
   if (updatedCards.length > 0) {
     relay.broadcast(
