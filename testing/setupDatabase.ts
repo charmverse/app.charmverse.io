@@ -1084,7 +1084,7 @@ export async function generateBoard({
   addPageContent?: boolean;
   boardPageType?: Extract<PageType, 'board' | 'inline_board' | 'inline_linked_board' | 'linked_board'>;
   linkedSourceId?: string;
-  customProps?: CustomBoardProps;
+  customProps?: Partial<CustomBoardProps>;
   deletedAt?: null | Date;
 }): Promise<Page> {
   const { pageArgs, blockArgs } = boardWithCardsArgs({

@@ -20,6 +20,7 @@ import { useEffect, useState } from 'react';
 import { Button } from 'components/common/Button';
 import UserDisplay from 'components/common/UserDisplay';
 import type { PopulatedEvaluation } from 'lib/proposal/interface';
+import { aggregateResults } from 'lib/proposal/rubric/aggregateResults';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import { isNumber } from 'lib/utilities/numbers';
 
@@ -112,9 +113,13 @@ export function RubricResults({
     };
   });
 
-  const allCriteriaScores = populatedCriteria.filter((c) => c.answers.length).map((criteria) => criteria.totalResult);
-  const allCriteriaAverage = roundNumber(mean(allCriteriaScores));
-  const allCriteriaTotal = sum(allCriteriaScores);
+  const { allScores, criteriaSummary } = aggregateResults({
+    answers: allAnswers,
+    criteria: evaluation?.rubricCriteria || []
+  });
+
+  const allCriteriaScores = Object.values(criteriaSummary).map((v) => v.sum);
+
   const allCriteriaTotalDenominator = sum(populatedCriteria.map((criteria) => criteria.totalDenominator));
 
   function expandCriteria(criteriaId: string) {
@@ -207,10 +212,10 @@ export function RubricResults({
         </Menu>
         {allCriteriaScores.length ? (
           criteriaSummaryType === 'average' ? (
-            <strong>{allCriteriaAverage}</strong>
+            <strong>{allScores.average}</strong>
           ) : (
             <span>
-              <strong>{allCriteriaTotal}</strong>
+              <strong>{allScores.sum}</strong>
               <Typography color='secondary' component='span'>
                 {' '}
                 / {allCriteriaTotalDenominator}

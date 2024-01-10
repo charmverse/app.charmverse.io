@@ -96,7 +96,7 @@ async function deleteProposalComment(req: NextApiRequest, res: NextApiResponse<P
  *                 type: string
  *                 description: User ID of the user who is creating the comment
  *                 example: "69a54a56-50d6-4f7b-b350-2d9c312f81f3"
- *               content:
+ *               contentMarkdown:
  *                 type: string
  *                 description: Content of the comment
  *                 example: "This is a comment."
