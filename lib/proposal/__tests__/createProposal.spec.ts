@@ -2,8 +2,8 @@ import { InsecureOperationError } from '@charmverse/core/errors';
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
-import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
-import { v4 as uuid } from 'uuid';
+import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { v4 as uuid, v4 } from 'uuid';
 
 import type { FormFieldInput } from 'components/common/form/interfaces';
 import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
@@ -45,12 +45,6 @@ describe('Creates a page and proposal with relevant configuration', () => {
       userId: user.id,
       spaceId: space.id,
       authors: [user.id, extraUser.id]
-      // reviewers: [
-      //   {
-      //     group: 'user',
-      //     id: reviewerUser.id
-      //   }
-      // ]
     });
 
     expect(page).toMatchObject(
@@ -75,18 +69,11 @@ describe('Creates a page and proposal with relevant configuration', () => {
         ],
         rubricAnswers: [],
         rubricCriteria: []
-        // reviewers: [
-        //   expect.objectContaining({
-        //     id: expect.any(String),
-        //     proposalId: proposal?.id as string,
-        //     userId: reviewerUser.id
-        //   })
-        // ]
       })
     );
   });
 
-  it('Create proposal template with form', async () => {
+  it('Create proposal template with existing form', async () => {
     const reviewerUser = await generateSpaceUser({
       isAdmin: false,
       spaceId: space.id
@@ -121,6 +108,29 @@ describe('Creates a page and proposal with relevant configuration', () => {
       }
     ];
 
+    const proposalTemplate = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: user.id
+    });
+
+    const proposalTemplateForm = await prisma.form.create({
+      data: {
+        proposal: {
+          connect: {
+            id: proposalTemplate.id
+          }
+        }
+      }
+    });
+
+    await prisma.formField.createMany({
+      data: formFields.map((item) => ({
+        ...item,
+        description: item.description ?? '',
+        formId: proposalTemplateForm.id
+      }))
+    });
+
     const { page, proposal } = await createProposal({
       pageProps: {
         contentText: '',
@@ -136,8 +146,24 @@ describe('Creates a page and proposal with relevant configuration', () => {
           id: reviewerUser.id
         }
       ],
-      formFields
+      formFields: formFields.map((item) => ({
+        ...item,
+        // creating new IDs for the form fields
+        id: v4()
+      }))
     });
+
+    const newProposalTemplateForm = await prisma.form.findUniqueOrThrow({
+      where: {
+        id: proposal.formId as string
+      },
+      select: {
+        id: true
+      }
+    });
+
+    // New form should be created since we are duplicating a proposal template
+    expect(newProposalTemplateForm.id).not.toEqual(proposalTemplateForm.id);
 
     expect(page).toMatchObject(
       expect.objectContaining({

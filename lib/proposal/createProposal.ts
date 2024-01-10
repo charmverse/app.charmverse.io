@@ -71,7 +71,6 @@ export async function createProposal({
   rubricCriteria,
   publishToLens,
   fields,
-  proposalTemplateId,
   workflowId,
   formId,
   formFields,
@@ -137,7 +136,8 @@ export async function createProposal({
   }
 
   let proposalFormId = formId;
-  if (!proposalFormId && formFields?.length && pageProps?.type === 'proposal_template') {
+  // Always create new form for proposal templates
+  if (formFields?.length && pageProps?.type === 'proposal_template') {
     proposalFormId = await createForm(formFields);
   }
 

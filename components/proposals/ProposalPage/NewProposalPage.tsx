@@ -4,7 +4,7 @@ import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { Box, Divider, useMediaQuery } from '@mui/material';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 import { v4 as uuid } from 'uuid';
 
@@ -104,21 +104,33 @@ export function NewProposalPage({
 
   const sourceTemplate = proposalTemplates?.find((template) => template.page.id === formInputs.proposalTemplateId);
   const isStructured = formInputs.proposalType === 'structured' || !!sourceTemplate?.formId;
-  const proposalFormFields = isStructured
-    ? formInputs.formFields ??
-      sourceTemplate?.form?.formFields ?? [
-        {
-          type: 'short_text',
-          name: '',
-          description: emptyDocument,
-          index: 0,
-          options: [],
-          private: false,
-          required: true,
-          id: uuid()
-        } as FormFieldInput
-      ]
-    : [];
+  const proposalFormFields = useMemo(() => {
+    return (
+      isStructured
+        ? formInputs.formFields ??
+          sourceTemplate?.form?.formFields ?? [
+            {
+              type: 'short_text',
+              name: '',
+              description: emptyDocument,
+              index: 0,
+              options: [],
+              private: false,
+              required: true,
+              id: uuid()
+            } as FormFieldInput
+          ]
+        : []
+    ).map((formField) => {
+      // if its an existing template, then we need to generate new ids for the form fields
+      return isTemplate
+        ? {
+            ...formField,
+            id: uuid()
+          }
+        : formField;
+    });
+  }, [isStructured, formInputs.formFields, sourceTemplate?.form?.formFields, isTemplate]);
 
   const {
     control: proposalFormFieldControl,
