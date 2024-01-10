@@ -1,5 +1,6 @@
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
 import { uniqBy } from 'lodash';
+import { ProjectInputRow } from 'scripts/importOPGrantsProjects';
 
 const client = new ApolloClient({ uri: 'https://vote.optimism.io/graphql', cache: new InMemoryCache({}) });
 
@@ -16,6 +17,11 @@ export type OPProjectData = {
     profileImageUrl: string;
     bannerImageUrl: string;
   };
+  applicant: {
+    address: {
+      address: string;
+    };
+  }
   websiteUrl: string;
   contributionLinks: ContributionLink[];
 }
@@ -23,9 +29,9 @@ export type OPProjectData = {
 const getProjects = async (after: string) => {
     const { data } = await client.query({
       query: gql`
-        query Round3Projects($after: String, $first: Int!, $orderBy: ProjectOrder!) {
+        query Retro3PGF($after: String, $first: Int!, $orderBy: ProjectOrder!) {
           retroPGF {
-            projects(after: $after, first: $first, orderBy: $orderBy) {
+            projects(after:$after, first: $first, orderBy: $orderBy) {
               edges {
                 cursor
                 node {
@@ -41,6 +47,12 @@ const getProjects = async (after: string) => {
                     url
                   }
                   websiteUrl
+                  applicant {
+                    address {
+                      address
+                      isContract
+                    }
+                  }
                 }
               }
             }
@@ -78,6 +90,7 @@ const getAllProjects = async () => {
 
     const updatedProjects = uniqBy([...projects, ...edges], 'cursor');
     projects = updatedProjects;
+    console.log('🔥 partial loaded:', projects.length);
   }
 
   const projectsData = projects.map((edge: any) => edge.node);
@@ -94,4 +107,33 @@ function getTwitterHandle(links: ContributionLink[]) {
   }
 
   return handle;
+}
+
+export async function getProjectsImportData(): Promise<ProjectInputRow[]> {
+  console.log('🔥', 'Loading projects data from OP api...');
+  const opProjectsData = await getAllProjects();
+
+  const importInputData = opProjectsData.map((project) => {
+    const twitterHandle = getTwitterHandle(project.contributionLinks) || '';
+
+    return {
+      // title is used for projects imported out of CV propsoals
+      Title: '',
+      SpaceName: project.displayName,
+      username: '',
+      createdBy: '',
+      adminAddress: project.applicant.address.address,
+      'Project Twitter': twitterHandle ? `https://twitter.com/${twitterHandle}` : '',
+      status: '',
+      createdAt: '',
+      'Author Twitter': twitterHandle ? `https://twitter.com/${twitterHandle}` : '',
+      twitterUsername: twitterHandle,
+      avatarUrl: project.profile.profileImageUrl,
+      website: project.websiteUrl
+    }
+  });
+
+  console.log('🔥', `Loaded data for ${opProjectsData.length} projects`);
+
+  return importInputData;
 }
