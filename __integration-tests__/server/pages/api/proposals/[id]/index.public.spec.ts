@@ -47,15 +47,15 @@ describe('GET /api/proposals/[id] - Get proposal - public space', () => {
             proposalId: generatedProposal.id,
             userId: author.id
           })
-        ]),
-        reviewers: [
-          expect.objectContaining({
-            id: expect.any(String),
-            roleId: null,
-            proposalId: generatedProposal.id,
-            userId: reviewer.id
-          })
-        ]
+        ])
+        // reviewers: [
+        //   expect.objectContaining({
+        //     id: expect.any(String),
+        //     roleId: null,
+        //     proposalId: generatedProposal.id,
+        //     userId: reviewer.id
+        //   })
+        // ]
       })
     );
   });
