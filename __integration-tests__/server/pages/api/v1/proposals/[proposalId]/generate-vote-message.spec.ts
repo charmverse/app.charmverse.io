@@ -165,7 +165,15 @@ describe('POST /api/v1/proposals/{proposalId}/generate-vote-message', () => {
       userId: proposalAuthor.id,
       proposalStatus: 'published',
       authors: [proposalAuthor.id],
-      snapshotProposalId
+      evaluationInputs: [
+        {
+          evaluationType: 'vote',
+          reviewers: [],
+          permissions: [],
+          id: v4(),
+          snapshotId: snapshotProposalId
+        }
+      ]
     });
 
     const { listen, router } = createServer();
@@ -207,8 +215,9 @@ describe('POST /api/v1/proposals/{proposalId}/generate-vote-message', () => {
         choice: 'Yes',
         address: walletAddress
       })
-      .set('Authorization', `Bearer ${apiKey.token}`);
-    expect(response.statusCode).toBe(200);
+      .set('Authorization', `Bearer ${apiKey.token}`)
+      .expect(200);
+
     expect(response.body.message).toMatchObject(
       expect.objectContaining({
         space: generated.space.snapshotDomain,
