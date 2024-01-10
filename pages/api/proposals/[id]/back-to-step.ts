@@ -33,7 +33,8 @@ async function updateEvaluationResultEndpoint(req: NextApiRequest, res: NextApiR
   }
   await goBackToStep({
     proposalId,
-    evaluationId
+    evaluationId,
+    userId
   });
 
   return res.status(200).end();

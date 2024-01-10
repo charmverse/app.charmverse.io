@@ -1,4 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import { fetchToken } from '@wagmi/core';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -18,9 +19,27 @@ const schema = yup.object({
     is: (val: 'token' | 'customToken') => val === 'customToken',
     then: () =>
       yup
-        .string()
+        .string<`0x${string}`>()
         .required('Contract is required')
-        .test('isAddress', 'Invalid address', (value) => isValidChainAddress(value)),
+        .test('isAddress', 'Invalid address', (value) => isValidChainAddress(value))
+        .test('isContract', 'Invalid contract or chain', async (value, context) => {
+          const chain = context.parent.chain;
+          const check = context.parent.check;
+
+          if (chain && check === 'customToken') {
+            try {
+              await fetchToken({
+                address: value,
+                chainId: Number(chain)
+              });
+              return true;
+            } catch (err) {
+              return false;
+            }
+          }
+
+          return true;
+        }),
     otherwise: () => yup.string()
   }),
   quantity: yup

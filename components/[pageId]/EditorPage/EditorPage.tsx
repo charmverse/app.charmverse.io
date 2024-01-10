@@ -5,7 +5,6 @@ import { useCallback, useEffect } from 'react';
 
 import { trackPageView } from 'charmClient/hooks/track';
 import ErrorPage from 'components/common/errors/ErrorPage';
-import { PageDialogGlobal } from 'components/common/PageDialog/PageDialogGlobal';
 import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
@@ -126,9 +125,6 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
       return (
         <Box flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
           <DocumentPage page={page} refreshPage={refreshPage} readOnly={readOnly} savePage={savePage} enableSidebar />
-
-          {/* needed to handle applications for rewards */}
-          <PageDialogGlobal />
         </Box>
       );
     }

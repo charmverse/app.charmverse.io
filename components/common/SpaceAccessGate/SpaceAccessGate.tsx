@@ -1,3 +1,4 @@
+import type { Space } from '@charmverse/core/prisma-client';
 import { Alert, Box, Card, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -9,7 +10,6 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
-import type { SpaceWithGates } from 'lib/spaces/interfaces';
 import type { TokenGateJoinType } from 'lib/tokenGates/interfaces';
 import { getSpaceUrl } from 'lib/utilities/browser';
 
@@ -26,7 +26,7 @@ export function SpaceAccessGate({
   onSuccess,
   joinType
 }: {
-  space: SpaceWithGates;
+  space: Space;
   joinType?: TokenGateJoinType;
   onSuccess?: () => void;
 }) {
@@ -102,7 +102,8 @@ export function SpaceAccessGate({
   const isVerified = summonGate.isVerified || tokenGate.isVerified || discordGate.isVerified;
   const isJoiningSpace = summonGate.joiningSpace || tokenGate.joiningSpace || discordGate.joiningSpace;
 
-  const noGateConditions = !discordGate.isEnabled && !summonGate.isEnabled && !tokenGate.isEnabled;
+  const noGateConditions =
+    !discordGate.isEnabled && !summonGate.isEnabled && !tokenGate.isEnabled && tokenGate.tokenGates?.length === 0;
 
   const hasRoles = tokenGate.tokenGateResult?.eligibleGates
     ?.map((gate) => gate.tokenGateId)

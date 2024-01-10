@@ -254,13 +254,16 @@ function CardDetailProperties(props: Props) {
   return (
     <div className='octo-propertylist' data-test='card-detail-properties'>
       {board.fields?.cardProperties.map((propertyTemplate) => {
+        const cardProperty = (board.fields?.cardProperties ?? []).find(
+          (_cardProperty) => _cardProperty.id === propertyTemplate.id
+        );
         const readOnly = props.readOnly || props.readOnlyProperties?.includes(propertyTemplate.id) || false;
         const isReadonlyTemplateProperty =
           readOnly ||
           proposalPropertyTypesList.includes(propertyTemplate.type as any) ||
           defaultRewardPropertyIds.includes(propertyTemplate.id) ||
-          !!(board.fields?.cardProperties ?? []).find((cardProperty) => cardProperty.id === propertyTemplate.id)
-            ?.formFieldId;
+          !!cardProperty?.formFieldId ||
+          !!cardProperty?.proposalFieldId;
 
         if (propertyTemplate.id === Constants.titleColumnId) {
           return null;

@@ -30,13 +30,6 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
       id: proposalId
     },
     include: {
-      draftRubricAnswers: true,
-      rubricAnswers: true,
-      rubricCriteria: {
-        orderBy: {
-          index: 'asc'
-        }
-      },
       evaluations: {
         orderBy: {
           index: 'asc'
@@ -44,7 +37,11 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
         include: {
           permissions: true,
           reviewers: true,
-          rubricCriteria: true,
+          rubricCriteria: {
+            orderBy: {
+              index: 'asc'
+            }
+          },
           rubricAnswers: true,
           draftRubricAnswers: true,
           vote: true
@@ -86,8 +83,6 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
 
   const canSeeAnswers = spaceRole?.isAdmin || proposalPermissions.evaluate || proposalPermissions.review;
   if (!canSeeAnswers) {
-    proposal.draftRubricAnswers = [];
-    proposal.rubricAnswers = [];
     proposal.evaluations.forEach((evaluation) => {
       evaluation.draftRubricAnswers = [];
       evaluation.rubricAnswers = [];

@@ -51,7 +51,7 @@ export function boardWithCardsArgs({
   boardPageType?: Extract<PageType, 'board' | 'inline_board' | 'inline_linked_board' | 'linked_board'>;
   boardTitle?: string;
   linkedSourceId?: string;
-  customProps?: CustomBoardProps;
+  customProps?: Partial<CustomBoardProps>;
   deletedAt?: null | Date;
 }): { pageArgs: Prisma.PageCreateArgs[]; blockArgs: Prisma.BlockCreateManyArgs } {
   const boardId = v4();
@@ -89,14 +89,14 @@ export function boardWithCardsArgs({
       {
         id: cardIds[0],
         deletedAt,
-        createdAt: '2022-08-25T17:19:05.413Z',
+        createdAt: '2022-08-25T17:19:00.413Z',
         createdBy,
         updatedAt: '2022-08-26T09:56:33.994Z',
         updatedBy: createdBy,
         title:
           (Array.isArray(customProps?.cardPropertyValues)
             ? customProps?.cardPropertyValues[0]?.[Constants.titleColumnId]
-            : customProps?.cardPropertyValues[Constants.titleColumnId]) ?? 'Beer to Web3',
+            : customProps?.cardPropertyValues?.[Constants.titleColumnId]) ?? 'Beer to Web3',
         content: {
           type: 'doc',
           content: [
@@ -161,7 +161,7 @@ export function boardWithCardsArgs({
         title:
           (Array.isArray(customProps?.cardPropertyValues)
             ? customProps?.cardPropertyValues[1]?.[Constants.titleColumnId]
-            : customProps?.cardPropertyValues[Constants.titleColumnId]) ?? 'How to web3 in Uni?',
+            : customProps?.cardPropertyValues?.[Constants.titleColumnId]) ?? 'How to web3 in Uni?',
         content: {
           type: 'doc',
           content: [
@@ -299,9 +299,9 @@ export function boardWithCardsArgs({
         : customProps?.cardPropertyValues?.[Constants.titleColumnId]) ?? cardPages[i % 2 === 0 ? 0 : 1].title;
 
     if (i % 2 === 0) {
-      cardPages.push({ ...cardPages[0], id: cardIds[i] || v4(), title });
+      cardPages.push({ ...cardPages[0], createdAt: new Date().toISOString(), id: cardIds[i] || v4(), title });
     } else {
-      cardPages.push({ ...cardPages[1], id: cardIds[i] || v4(), title });
+      cardPages.push({ ...cardPages[1], createdAt: new Date().toISOString(), id: cardIds[i] || v4(), title });
     }
   }
 

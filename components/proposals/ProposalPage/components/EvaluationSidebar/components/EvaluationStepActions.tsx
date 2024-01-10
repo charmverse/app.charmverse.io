@@ -37,7 +37,7 @@ export function EvaluationStepActions({
         />
       )}
 
-      {evaluation?.type !== 'feedback' && (
+      {evaluation?.type !== 'feedback' && evaluation && (
         <Tooltip
           disableInteractive
           title={!permissions?.edit ? 'You do not have permission to edit this evaluation' : 'Edit'}
