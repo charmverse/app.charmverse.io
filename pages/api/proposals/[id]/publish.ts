@@ -7,6 +7,7 @@ import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/mi
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { publishProposal } from 'lib/proposal/publishProposal';
 import { withSessionRoute } from 'lib/session/withSession';
+import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -36,9 +37,31 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
     },
     select: {
       id: true,
+      proposal: {
+        select: {
+          evaluations: {
+            select: {
+              id: true
+            },
+            orderBy: {
+              index: 'asc'
+            }
+          }
+        }
+      },
       spaceId: true
     }
   });
+
+  const currentEvaluationId = proposalPage?.proposal?.evaluations[0]?.id || null;
+  if (proposalPage && currentEvaluationId) {
+    await publishProposalEvent({
+      proposalId,
+      spaceId: proposalPage.spaceId,
+      userId,
+      currentEvaluationId
+    });
+  }
 
   trackUserAction('new_proposal_stage', {
     userId,

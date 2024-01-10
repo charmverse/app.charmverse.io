@@ -13,16 +13,12 @@ export function RewardsPageWithProviders() {
   useStaticPageTitle(rewardsTitle);
 
   return (
-    <PageDialogProvider>
-      <RewardsProvider>
-        <RewardBlocksProvider>
-          <RewardsBoardProvider>
-            <RewardsPage title={rewardsTitle} />
-
-            <PageDialogGlobal />
-          </RewardsBoardProvider>
-        </RewardBlocksProvider>
-      </RewardsProvider>
-    </PageDialogProvider>
+    <RewardsProvider>
+      <RewardBlocksProvider>
+        <RewardsBoardProvider>
+          <RewardsPage title={rewardsTitle} />
+        </RewardsBoardProvider>
+      </RewardBlocksProvider>
+    </RewardsProvider>
   );
 }

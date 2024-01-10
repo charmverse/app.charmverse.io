@@ -9,19 +9,6 @@ import { ProposalsBoardProvider } from './hooks/useProposalsBoard';
 
 export function ProposalsPageProviders({ children }: { children: ReactNode }) {
   return (
-    <PageDialogProvider>
-      <ProposalsProvider>
-        <DbViewSettingsProvider>
-          <ProposalBlocksProvider>
-            <ProposalsBoardProvider>{children}</ProposalsBoardProvider>
-          </ProposalBlocksProvider>
-        </DbViewSettingsProvider>
-      </ProposalsProvider>
-    </PageDialogProvider>
-  );
-}
-export function ProposalDataProvider({ children }: { children: ReactNode }) {
-  return (
     <ProposalsProvider>
       <DbViewSettingsProvider>
         <ProposalBlocksProvider>

@@ -86,7 +86,8 @@ function TableHeader(props: Props): JSX.Element {
     proposalPropertyTypesList.includes(type as any) ||
     DEFAULT_BLOCK_IDS.includes(templateId) ||
     defaultRewardPropertyIds.includes(templateId) ||
-    !!template.formFieldId;
+    !!template.formFieldId ||
+    !!template.proposalFieldId;
 
   const [tempName, setTempName] = useState(props.name || '');
 
@@ -171,7 +172,8 @@ function TableHeader(props: Props): JSX.Element {
   const isDisabled =
     proposalPropertyTypesList.includes(type as any) ||
     defaultRewardPropertyIds.includes(templateId) ||
-    !!template.formFieldId;
+    !!template.formFieldId ||
+    !!template.proposalFieldId;
 
   const popupContent = (
     <Stack>
