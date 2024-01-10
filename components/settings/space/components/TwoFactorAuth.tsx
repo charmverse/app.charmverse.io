@@ -6,10 +6,13 @@ import Typography from '@mui/material/Typography';
 
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 
-export function TwoFactorAuth(props: Omit<FormControlLabelProps, 'label' | 'control'>) {
+export function TwoFactorAuth({
+  isAdmin,
+  ...props
+}: Omit<FormControlLabelProps, 'label' | 'control'> & { isAdmin: boolean }) {
   const isCharmverse = useIsCharmverseSpace();
 
-  if (!isCharmverse) {
+  if (!isCharmverse || !isAdmin) {
     return null;
   }
 
