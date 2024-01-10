@@ -340,8 +340,6 @@ export async function updateCardsFromProposals({
   for (const pageWithProposal of pageProposals) {
     const card = existingSyncedCardsWithBlocks[pageWithProposal.id];
 
-    prettyPrint({ card });
-
     const accessPrivateFields = await canAccessPrivateFields({
       // Use the board creator to check if private fields are accessible
       userId: boardBlock.createdBy,
