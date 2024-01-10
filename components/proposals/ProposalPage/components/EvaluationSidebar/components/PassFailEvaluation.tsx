@@ -27,7 +27,7 @@ export function PassFailEvaluation({
   isCurrent,
   refreshProposal
 }: Props) {
-  const { trigger } = useSubmitEvaluationResult({ proposalId });
+  const { trigger, isMutating } = useSubmitEvaluationResult({ proposalId });
 
   const reviewerOptions = evaluation.reviewers.map((reviewer) => ({
     group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
@@ -40,6 +40,8 @@ export function PassFailEvaluation({
     ? 'This evaluation step is not active'
     : !isReviewer
     ? 'You are not a reviewer'
+    : isMutating
+    ? 'Submitting review'
     : null;
 
   async function onSubmitReview(result: NonNullable<PopulatedEvaluation['result']>) {

@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -44,8 +45,14 @@ async function updateEvaluationResultEndpoint(req: NextApiRequest, res: NextApiR
   } else if (!proposalPermissions.evaluate) {
     throw new ActionNotPermittedError(`You don't have permission to review this proposal.`);
   }
+
   if (!result) {
     throw new ActionNotPermittedError(`You must provide a result.`);
+  }
+
+  if (evaluation.result === result) {
+    log.debug('Evaluation result is the same', { proposalId, evaluationId, result });
+    return res.status(200).end();
   }
 
   await submitEvaluationResult({

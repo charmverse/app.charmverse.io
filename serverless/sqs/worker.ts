@@ -50,15 +50,15 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
           return;
         }
 
-        // Create and save notifications
-        const notifications = await createNotificationsFromEvent(webhookData);
-
         await prisma.sQSMessage.create({
           data: {
             id: webhookMessageHash,
             payload: webhookData as Prisma.InputJsonObject
           }
         });
+
+        // Create and save notifications
+        const notifications = await createNotificationsFromEvent(webhookData);
 
         log.debug('Saved record of SQS message', {
           id: webhookMessageHash,
