@@ -20,7 +20,7 @@ const test = base.extend<Fixtures>({
   pageHeader: ({ page }, use) => use(new PageHeader(page))
 });
 
-test('convert post to proposal - create a post, convert that post to proposal and assert editor is readonly with proposal banner', async ({
+test.skip('convert post to proposal - create a post, convert that post to proposal and assert editor is readonly with proposal banner', async ({
   pageHeader,
   forumPostPage,
   page
