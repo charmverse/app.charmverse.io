@@ -103,34 +103,22 @@ export function NewProposalPage({
   const isAdmin = useIsAdmin();
 
   const sourceTemplate = proposalTemplates?.find((template) => template.page.id === formInputs.proposalTemplateId);
-  const isStructured = formInputs.proposalType === 'structured' || !!sourceTemplate?.formId;
-  const proposalFormFields = useMemo(() => {
-    return (
-      isStructured
-        ? formInputs.formFields ??
-          sourceTemplate?.form?.formFields ?? [
-            {
-              type: 'short_text',
-              name: '',
-              description: emptyDocument,
-              index: 0,
-              options: [],
-              private: false,
-              required: true,
-              id: uuid()
-            } as FormFieldInput
-          ]
-        : []
-    ).map((formField) => {
-      // if its an existing template, then we need to generate new ids for the form fields
-      return isTemplate
-        ? {
-            ...formField,
-            id: uuid()
-          }
-        : formField;
-    });
-  }, [isStructured, formInputs.formFields, sourceTemplate?.form?.formFields, isTemplate]);
+
+  const isStructured = formInputs.proposalType === 'structured' || !!formInputs.formId;
+  const proposalFormFields = isStructured
+    ? formInputs.formFields ?? [
+        {
+          type: 'short_text',
+          name: '',
+          description: emptyDocument,
+          index: 0,
+          options: [],
+          private: false,
+          required: true,
+          id: uuid()
+        } as FormFieldInput
+      ]
+    : [];
 
   const {
     control: proposalFormFieldControl,
@@ -184,6 +172,7 @@ export function NewProposalPage({
   function applyTemplate(_templateId: string) {
     const template = proposalTemplates?.find((t) => t.id === _templateId);
     if (template) {
+      const formFields = template.form?.formFields ?? [];
       setFormInputs({
         content: template.page.content as PageContent,
         contentText: template.page.contentText,
@@ -199,6 +188,7 @@ export function NewProposalPage({
         fields: template.fields || {},
         type: proposalPageType,
         formId: template.formId ?? undefined,
+        formFields: isTemplate ? formFields.map((formField) => ({ ...formField, id: uuid() })) : formFields,
         formAnswers: (template?.form?.formFields ?? [])
           .filter((formField) => formField.type !== 'label')
           .map((proposalFormField) => ({
