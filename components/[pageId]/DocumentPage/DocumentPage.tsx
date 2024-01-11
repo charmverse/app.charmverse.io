@@ -446,6 +446,7 @@ function DocumentPage({
                 proposal={proposal}
                 onChangeEvaluation={onChangeEvaluation}
                 refreshProposal={refreshProposal}
+                templateId={page.sourceTemplateId}
               />
             )}
 
