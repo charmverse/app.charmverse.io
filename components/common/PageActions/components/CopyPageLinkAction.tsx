@@ -6,12 +6,20 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { getAbsolutePath } from 'lib/utilities/browser';
 
-export function CopyPageLinkAction({ path, onComplete }: { path: string; onComplete?: VoidFunction }) {
+export function CopyPageLinkAction({
+  path,
+  onComplete,
+  message
+}: {
+  path: string;
+  onComplete?: VoidFunction;
+  message?: string;
+}) {
   const { showMessage } = useSnackbar();
   const router = useRouter();
 
   function onClick() {
-    showMessage('Link copied to clipboard');
+    showMessage(message || 'Link copied to clipboard');
     onComplete?.();
   }
 
