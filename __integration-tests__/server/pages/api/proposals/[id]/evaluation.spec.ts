@@ -1,14 +1,13 @@
-import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
 import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposal/rubric/interfaces';
-import type { RubricCriteriaUpsert } from 'lib/proposal/rubric/upsertRubricCriteria';
+import type { UpdateEvaluationRequest } from 'lib/proposal/updateProposalEvaluation';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
-describe('PUT /api/proposals/[id]/rubric-criteria - Update proposal rubric criteria', () => {
-  it('should allow a user with permissions to update proposal rubric criteria, and respond with 200', async () => {
+describe('PUT /api/proposals/[id]/evaluation - Update proposal evaluation', () => {
+  it('should allow a user with permissions to update proposal reviewers, and respond with 200', async () => {
     const { space, user: author } = await testUtilsUser.generateUserAndSpace({ isAdmin: false, spacePaidTier: 'free' });
     const authorCookie = await loginUser(author.id);
 
@@ -17,20 +16,20 @@ describe('PUT /api/proposals/[id]/rubric-criteria - Update proposal rubric crite
       userId: author.id
     });
 
-    const updateContent: RubricCriteriaUpsert = {
+    const updateContent: UpdateEvaluationRequest = {
       proposalId: proposal.id,
       evaluationId: proposal.evaluations[0].id,
-      rubricCriteria: [{ title: 'demo', type: 'range', parameters: { max: 4, min: 1 } }]
+      reviewers: []
     };
 
     await request(baseUrl)
-      .put(`/api/proposals/${proposal.id}/rubric-criteria`)
+      .put(`/api/proposals/${proposal.id}/evaluation`)
       .set('Cookie', authorCookie)
       .send(updateContent)
       .expect(200);
   });
 
-  it('should prevent a user without permissions from updating the criteria, and respond with 401', async () => {
+  it('should prevent a user without permissions from updating the reviewers, and respond with 401', async () => {
     const { space, user: author } = await testUtilsUser.generateUserAndSpace({ isAdmin: false, spacePaidTier: 'free' });
     const proposal = await rubricProposal({
       spaceId: space.id,
@@ -41,14 +40,14 @@ describe('PUT /api/proposals/[id]/rubric-criteria - Update proposal rubric crite
 
     const memberCookie = await loginUser(spaceMember.id);
 
-    const updateContent: RubricCriteriaUpsert = {
+    const updateContent: UpdateEvaluationRequest = {
       proposalId: proposal.id,
       evaluationId: proposal.evaluations[0].id,
-      rubricCriteria: [{ title: 'demo', type: 'range', parameters: { max: 4, min: 1 } }]
+      reviewers: []
     };
 
     await request(baseUrl)
-      .put(`/api/proposals/${proposal.id}/rubric-criteria`)
+      .put(`/api/proposals/${proposal.id}/evaluation`)
       .set('Cookie', memberCookie)
       .send(updateContent)
       .expect(401);
@@ -87,15 +86,15 @@ describe('PUT /api/proposals/[id]/rubric-criteria - Update proposal rubric crite
       }
     });
 
-    const updateContent: RubricCriteriaUpsert = {
+    const updateContent: UpdateEvaluationRequest = {
       proposalId: proposalFromTemplate.id,
       evaluationId: proposalFromTemplate.evaluations[0].id,
-      rubricCriteria: [{ title: 'demo', type: 'range', parameters: { max: 4, min: 1 } }]
+      reviewers: []
     };
 
     const memberCookie = await loginUser(generated.user.id);
     await request(baseUrl)
-      .put(`/api/proposals/${proposalFromTemplate.id}/rubric-criteria`)
+      .put(`/api/proposals/${proposalFromTemplate.id}/evaluation`)
       .set('Cookie', memberCookie)
       .send(updateContent)
       .expect(401);

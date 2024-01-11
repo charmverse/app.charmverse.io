@@ -28,7 +28,8 @@ export function LinkCharmVerseDatabase(props: Props) {
     return Object.values(pages)
       .filter(
         (p) =>
-          allowedSourceDatabasePageTypes.includes(p?.type || '') && p?.title.toLowerCase().includes(lowerCaseSearchTerm)
+          allowedSourceDatabasePageTypes.includes(p?.type || '') &&
+          p?.title?.toLowerCase().includes(lowerCaseSearchTerm)
       )
       .filter(isTruthy)
       .sort((pageA, pageB) => ((pageA.title || 'Untitled') > (pageB.title || 'Untitled') ? 1 : -1));

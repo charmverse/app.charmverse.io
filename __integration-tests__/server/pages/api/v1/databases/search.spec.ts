@@ -174,11 +174,11 @@ describe('POST /databases/{id}/search', () => {
     );
 
     const createdPagesWithMatchingTitle = createdPageList.filter(
-      (item) => item.title.toLowerCase().match('title') !== null
+      (item) => item.title && item.title.toLowerCase().match('title') !== null
     ).length;
 
     const foundPagesWithMatchingTitle = (response.body.data as ApiPage[]).map(
-      (item) => item.title.toLowerCase().match('title') !== null
+      (item) => item.title && item.title.toLowerCase().match('title') !== null
     ).length;
 
     expect(foundPagesWithMatchingTitle).toEqual(createdPagesWithMatchingTitle);

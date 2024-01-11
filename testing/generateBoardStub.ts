@@ -1,4 +1,4 @@
-import type { Block, Page, PageType, Prisma } from '@charmverse/core/prisma';
+import type { Block, Page, PagePermission, PageType, Prisma } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import type { BoardFields, DataSourceType, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
@@ -130,7 +130,7 @@ export function boardWithCardsArgs({
           card: {
             id: cardIds[0],
             deletedAt,
-            createdAt: '2022-08-25T17:19:05.413Z',
+            createdAt: '2022-08-25T17:19:00.413Z',
             createdBy,
             updatedAt: '2022-08-25T17:31:37.646Z',
             updatedBy: createdBy,
@@ -419,7 +419,7 @@ export function boardWithCardsArgs({
       };
 
       cardBlock.title = page.title;
-
+      cardBlock.createdAt = new Date(page.createdAt);
       (cardBlock.fields as CardFields) = {
         ...(cardBlock.fields as CardFields),
         properties: cardPropertyValue
