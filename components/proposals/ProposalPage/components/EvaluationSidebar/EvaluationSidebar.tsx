@@ -15,7 +15,7 @@ import { FeedbackEvaluation } from './components/FeedbackEvaluation';
 import { PassFailEvaluation } from './components/PassFailEvaluation';
 import { PublishRewardsButton } from './components/PublishRewardsButton';
 import { RubricEvaluation } from './components/RubricEvaluation/RubricEvaluation';
-import { VoteEvaluation } from './components/VoteEvaluation';
+import { VoteEvaluation } from './components/VoteEvaluation/VoteEvaluation';
 
 export type Props = {
   pageId?: string;
@@ -170,7 +170,6 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
                 proposal={proposal}
                 isCurrent={isCurrent}
                 evaluation={evaluation}
-                addVote={() => setEvaluationInput({ ...evaluation })}
               />
             )}
           </EvaluationStepRow>

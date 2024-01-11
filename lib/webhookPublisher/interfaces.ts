@@ -1,4 +1,4 @@
-import type { PageType, ProposalStatus } from '@charmverse/core/prisma';
+import type { PageType } from '@charmverse/core/prisma';
 
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
 
@@ -196,8 +196,7 @@ export type WebhookEvent = WebhookEventSharedProps &
     | {
         scope: WebhookEventNames.ProposalStatusChanged;
         proposal: ProposalEntity;
-        newStatus: ProposalStatus;
-        oldStatus: ProposalStatus | null;
+        currentEvaluationId: string | null;
         user: UserEntity;
       }
     | {

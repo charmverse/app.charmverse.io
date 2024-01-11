@@ -17,6 +17,7 @@ type ProposalsContextType = {
   archiveProposal: (input: ArchiveProposalRequest) => Promise<void>;
   updateProposal: (proposal: UpdateProposalRequest) => Promise<void>;
   refreshProposal: (proposalId: string) => Promise<void>;
+  proposalsMap: Record<string, ProposalWithUsersLite | undefined>;
 };
 
 export const ProposalsContext = createContext<Readonly<ProposalsContextType>>({
@@ -27,7 +28,8 @@ export const ProposalsContext = createContext<Readonly<ProposalsContextType>>({
   isLoading: false,
   archiveProposal: () => Promise.resolve(),
   updateProposal: () => Promise.resolve(),
-  refreshProposal: () => Promise.resolve()
+  refreshProposal: () => Promise.resolve(),
+  proposalsMap: {}
 });
 
 export function ProposalsProvider({ children }: { children: ReactNode }) {
@@ -79,6 +81,14 @@ export function ProposalsProvider({ children }: { children: ReactNode }) {
     [mutateProposals]
   );
 
+  const proposalsMap = useMemo(() => {
+    const map: Record<string, ProposalWithUsersLite> = {};
+    proposals?.forEach((proposal) => {
+      map[proposal.id] = proposal;
+    });
+    return map;
+  }, [proposals]);
+
   const value = useMemo(
     () => ({
       proposals,
@@ -86,7 +96,8 @@ export function ProposalsProvider({ children }: { children: ReactNode }) {
       isLoading: isLoading || loadingPages,
       archiveProposal,
       updateProposal,
-      refreshProposal
+      refreshProposal,
+      proposalsMap
     }),
     [archiveProposal, isLoading, loadingPages, mutateProposals, proposals, updateProposal, refreshProposal]
   );

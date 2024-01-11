@@ -98,7 +98,7 @@ export function PublishRewardsButton({ proposalId, pendingRewards, rewardIds, di
             // wrap the function so it does not return a promise to the confirmation modal
             onConfirm={() => createRewards()}
           >
-            <Typography>This action cannot be done</Typography>
+            <Typography>This action cannot be undone</Typography>
           </ModalWithButtons>
         </Box>
       )}

@@ -22,7 +22,7 @@ export function RewardSignupButton({ pagePath }: Props) {
   const { account, walletAuthSignature, loginFromWeb3Account } = useWeb3Account();
   const { user, setUser, isLoaded: isUserLoaded } = useUser();
   const { space } = useCurrentSpace();
-  const { data: spaceWithGates } = useSearchByDomain(space?.domain);
+  const { data: spaceFromPath } = useSearchByDomain(space?.domain);
   const loginViaTokenGateModal = usePopupState({ variant: 'popover', popupId: 'login-via-token-gate' });
   const [loggingIn, setLoggingIn] = useState(false);
 
@@ -73,12 +73,12 @@ export function RewardSignupButton({ pagePath }: Props) {
             <WalletSign signSuccess={loginFromWeb3Account} />
           </Box>
         ) : (
-          spaceWithGates && (
+          spaceFromPath && (
             <SpaceAccessGate
               onSuccess={() => {
                 window.location.href = `${window.location.origin}/${space?.domain}/${pagePath}`;
               }}
-              space={spaceWithGates}
+              space={spaceFromPath}
               joinType='public_bounty_token_gate'
             />
           )

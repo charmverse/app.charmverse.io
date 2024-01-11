@@ -2,12 +2,11 @@ import { FormGroup, Stack } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import { Button } from 'components/common/Button';
-import { DisplayChoiceScore } from 'components/proposals/components/SnapshotVoting/DisplayChoiceScore';
-import { DraggableRankedItem } from 'components/proposals/components/SnapshotVoting/DraggableRankedItem';
-import type {
-  SnapshotVotingProps,
-  VoteChoiceFormProps
-} from 'components/proposals/components/SnapshotVoting/SnapshotVotingForm';
+
+import type { SnapshotVotingProps, VoteChoiceFormProps } from '../SnapshotVotingForm';
+
+import { DisplayChoiceScore } from './DisplayChoiceScore';
+import { DraggableRankedItem } from './DraggableRankedItem';
 
 export function RankedVoting({
   snapshotProposal,

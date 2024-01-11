@@ -1,9 +1,13 @@
+import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
+
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
+import { ControlledProposalStatusSelect } from 'components/proposals/components/ProposalStatusSelect';
+import { ControlledProposalStepSelect } from 'components/proposals/components/ProposalStepSelect';
 import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
-import { Constants } from 'lib/focalboard/constants';
+import type { ProposalWithUsersLite } from 'lib/proposal/interface';
 
 import mutator from '../../../mutator';
 
@@ -11,7 +15,6 @@ import { DatePropertyTemplateMenu } from './DatePropertyTemplateMenu';
 import { PersonPropertyTemplateMenu } from './PersonPropertyTemplateMenu';
 import { PropertyMenu, StyledMenuItem } from './PropertyMenu';
 import { SelectPropertyTemplateMenu } from './SelectPropertyTemplateMenu';
-import { TextPropertyTemplateMenu } from './TextPropertyTemplateMenu';
 
 export function PropertyTemplateMenu({
   propertyTemplate,
@@ -21,7 +24,11 @@ export function PropertyTemplateMenu({
   onChange,
   isAdmin,
   onProposalAuthorSelect,
-  onProposalReviewerSelect
+  onProposalReviewerSelect,
+  onProposalStepUpdate,
+  onProposalStatusUpdate,
+  firstCheckedProposal,
+  disabledTooltip
 }: {
   board: Board;
   checkedIds: string[];
@@ -31,26 +38,11 @@ export function PropertyTemplateMenu({
   isAdmin: boolean;
   onProposalAuthorSelect: (pageIds: string[], userIds: string[]) => Promise<void>;
   onProposalReviewerSelect: (pageIds: string[], options: SelectOption[]) => Promise<void>;
+  onProposalStepUpdate(pageIds: string[], evaluationId: string, moveForward: boolean): Promise<void>;
+  onProposalStatusUpdate(pageIds: string[], result: ProposalEvaluationResult | null): Promise<void>;
+  firstCheckedProposal?: ProposalWithUsersLite;
+  disabledTooltip?: string;
 }) {
-  const isValidType = [
-    'checkbox',
-    'text',
-    'number',
-    'date',
-    'multiSelect',
-    'select',
-    'url',
-    'email',
-    'phone',
-    'person',
-    'proposalAuthor',
-    'proposalReviewer'
-  ].includes(propertyTemplate.type);
-
-  if (!isValidType || propertyTemplate.id === Constants.titleColumnId) {
-    return null;
-  }
-
   const checkedCards = cards.filter((card) => checkedIds.includes(card.id));
 
   if (checkedCards.length === 0) {
@@ -124,7 +116,7 @@ export function PropertyTemplateMenu({
       }
 
       return (
-        <PropertyMenu cards={cards} propertyTemplate={propertyTemplate}>
+        <PropertyMenu disabledTooltip={disabledTooltip} cards={cards} propertyTemplate={propertyTemplate}>
           {({ isPropertyOpen }) =>
             isPropertyOpen ? (
               <UserAndRoleSelect
@@ -156,8 +148,44 @@ export function PropertyTemplateMenu({
       return <DatePropertyTemplateMenu onChange={onChange} cards={checkedCards} propertyTemplate={propertyTemplate} />;
     }
 
+    case 'proposalStatus': {
+      if (firstCheckedProposal) {
+        return (
+          <PropertyMenu cards={cards} disabledTooltip={disabledTooltip} propertyTemplate={propertyTemplate}>
+            <ControlledProposalStatusSelect
+              onChange={(result) => onProposalStatusUpdate(checkedIds, result)}
+              proposal={firstCheckedProposal}
+            />
+          </PropertyMenu>
+        );
+      }
+      return null;
+    }
+
+    case 'proposalStep': {
+      if (firstCheckedProposal) {
+        return (
+          <PropertyMenu disabledTooltip={disabledTooltip} cards={cards} propertyTemplate={propertyTemplate}>
+            <ControlledProposalStepSelect
+              onChange={({ evaluationId, moveForward }) => onProposalStepUpdate(checkedIds, evaluationId, moveForward)}
+              proposal={{
+                currentStep: firstCheckedProposal.currentStep,
+                id: firstCheckedProposal.id,
+                evaluations: firstCheckedProposal.evaluations,
+                currentEvaluationId: firstCheckedProposal.currentEvaluationId,
+                hasRewards:
+                  (firstCheckedProposal.rewardIds ?? []).length > 0 ||
+                  (firstCheckedProposal.fields?.pendingRewards ?? []).length > 0
+              }}
+            />
+          </PropertyMenu>
+        );
+      }
+      return null;
+    }
+
     default: {
-      return <TextPropertyTemplateMenu onChange={onChange} cards={checkedCards} propertyTemplate={propertyTemplate} />;
+      return null;
     }
   }
 }

@@ -3,7 +3,7 @@ import type { Space, Prisma } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { CreateSpaceProps } from 'lib/spaces/createSpace';
-import type { CustomDomainVerification, SpaceWithGates } from 'lib/spaces/interfaces';
+import type { CustomDomainVerification } from 'lib/spaces/interfaces';
 import type { SpaceRequireProposalTemplateToggle } from 'lib/spaces/toggleRequireProposalTemplate';
 import type { SpacePublicProposalToggle } from 'lib/spaces/toggleSpacePublicProposals';
 import type { UpdateCustomDomainResponse } from 'lib/spaces/updateSpaceCustomDomain';
@@ -17,7 +17,7 @@ export class SpacesApi {
   }
 
   searchByName(search: string) {
-    return http.GET<SpaceWithGates[]>('/api/spaces/search-name', { search });
+    return http.GET<Space[]>('/api/spaces/search-name', { search });
   }
 
   setPublicProposals({ publicProposals, spaceId }: SpacePublicProposalToggle): Promise<Space> {

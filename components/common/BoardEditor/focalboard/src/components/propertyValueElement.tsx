@@ -33,7 +33,7 @@ import type { Board, DatabaseProposalPropertyType, IPropertyTemplate, PropertyTy
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import {
-  PROPOSAL_STATUS_LABELS,
+  EVALUATION_STATUS_LABELS,
   PROPOSAL_STEP_LABELS,
   proposalStatusColors
 } from 'lib/focalboard/proposalDbProperties';
@@ -158,8 +158,8 @@ function PropertyValueElement(props: Props) {
   const intl = useIntl();
   const propertyValue = card.fields.properties[propertyTemplate.id];
   const cardProperties = board.fields.cardProperties;
-  const readOnly =
-    props.readOnly || !!cardProperties.find((cardProperty) => cardProperty.id === propertyTemplate.id)?.formFieldId;
+  const cardProperty = cardProperties.find((_cardProperty) => _cardProperty.id === propertyTemplate.id);
+  const readOnly = props.readOnly || !!cardProperty?.formFieldId || !!cardProperty?.proposalFieldId;
 
   const displayValue = OctoUtils.propertyDisplayValue({
     block: card,
@@ -198,11 +198,11 @@ function PropertyValueElement(props: Props) {
   // We should migrate over the proposals as datasource blocks to the same format as proposals table
   else if (propertyTemplate.type === 'proposalStatus' || propertyTemplate.id === PROPOSAL_STATUS_BLOCK_ID) {
     if (proposal) {
-      return <ProposalStatusSelect proposal={proposal} spaceId={card.spaceId} readOnly={!isAdmin} />;
+      return <ProposalStatusSelect proposal={proposal} readOnly={!isAdmin} />;
     }
 
     const evaluationTypeProperty = board.fields.cardProperties.find(
-      (cardProperty) => cardProperty.type === 'proposalEvaluationType'
+      (_cardProperty) => _cardProperty.type === 'proposalEvaluationType'
     );
     const evaluationType = card.fields.properties[evaluationTypeProperty?.id ?? ''] as ProposalEvaluationStep;
     const proposalEvaluationStatus = getProposalEvaluationStatus({
@@ -218,7 +218,7 @@ function PropertyValueElement(props: Props) {
           {
             color: proposalStatusColors[proposalEvaluationStatus],
             id: proposalEvaluationStatus,
-            value: PROPOSAL_STATUS_LABELS[proposalEvaluationStatus]
+            value: EVALUATION_STATUS_LABELS[proposalEvaluationStatus]
           }
         ]}
         propertyValue={proposalEvaluationStatus}
@@ -238,8 +238,7 @@ function PropertyValueElement(props: Props) {
         />
       );
     }
-    return <ProposalStepSelect readOnly={!isAdmin} proposal={proposal} spaceId={card.spaceId} />;
-    // return <ProposalStepChipTextOnly label={proposal?.currentStep?.title ?? (propertyValue as string)} />;
+    return <ProposalStepSelect readOnly={!isAdmin} proposal={proposal} />;
   } else if (propertyTemplate.type === 'proposalEvaluationType') {
     return (
       <TagSelect

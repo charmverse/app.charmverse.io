@@ -530,7 +530,7 @@ function CenterPanel(props: Props) {
       <div
         data-test={`database-container-${props.board.id}`}
         // remount components between pages
-        className={`BoardComponent ${isEmbedded ? 'embedded-board' : ''}`}
+        className={`BoardComponent drag-area-container ${isEmbedded ? 'embedded-board' : ''}`}
         ref={backgroundRef}
         onClick={(e) => {
           backgroundClicked(e);

@@ -1,96 +1,117 @@
+import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
 import { useMemo } from 'react';
-import { mutate } from 'swr';
 
-import { useCreateProposalRewards, useSubmitEvaluationResult, usePublishProposal } from 'charmClient/hooks/proposals';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
-import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPropertyOption } from 'lib/focalboard/board';
-import type { CardPageProposal } from 'lib/focalboard/card';
 import {
-  PROPOSAL_STATUS_LABELS,
-  PROPOSAL_STATUS_VERB_LABELS,
+  EVALUATION_STATUS_LABELS,
+  EVALUATION_STATUS_VERB_LABELS,
   proposalStatusColors
 } from 'lib/focalboard/proposalDbProperties';
 import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
-import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
+import type { ProposalEvaluationStatus, ProposalEvaluationStep, ProposalWithUsersLite } from 'lib/proposal/interface';
 
-export function ProposalStatusSelect({
+import { useBatchUpdateProposalStatusOrStep } from '../hooks/useBatchUpdateProposalStatusOrStep';
+
+type ProposalProp = Pick<ProposalWithUsersLite, 'currentStep' | 'currentEvaluationId' | 'evaluations' | 'id'>;
+
+export function ControlledProposalStatusSelect({
   proposal,
-  spaceId,
+  onChange,
   readOnly
 }: {
-  proposal: CardPageProposal;
-  spaceId: string;
+  readOnly?: boolean;
+  proposal: ProposalProp;
+  onChange: (result: ProposalEvaluationResult | null) => void;
+}) {
+  return <ProposalStatusSelectBase readOnly={readOnly} proposal={proposal} onChange={onChange} />;
+}
+
+export function ProposalStatusSelect({ proposal, readOnly }: { proposal: ProposalProp; readOnly?: boolean }) {
+  const currentEvaluationStep = proposal.currentStep.step;
+  const currentEvaluationId = proposal.currentStep.id;
+  const { updateStatuses } = useBatchUpdateProposalStatusOrStep();
+
+  async function onChange(result: ProposalEvaluationResult | null) {
+    updateStatuses({
+      proposalsData: [
+        {
+          proposalId: proposal.id,
+          evaluationId: currentEvaluationId
+        }
+      ],
+      result,
+      currentEvaluationStep
+    });
+  }
+
+  return <ProposalStatusSelectBase proposal={proposal} onChange={onChange} readOnly={readOnly} />;
+}
+
+function ProposalStatusSelectBase({
+  proposal,
+  onChange,
+  readOnly
+}: {
+  proposal: ProposalProp;
+  onChange: (result: ProposalEvaluationResult | null) => void;
   readOnly?: boolean;
 }) {
-  const { trigger: submitEvaluationResult } = useSubmitEvaluationResult({ proposalId: proposal.id });
   const currentEvaluationStep = proposal.currentStep.step;
   const currentEvaluationResult = proposal.currentStep.result;
-  const currentEvaluationId = proposal.currentEvaluationId;
-  const { trigger: publishProposal } = usePublishProposal({ proposalId: proposal.id });
-  const { trigger: createProposalRewards } = useCreateProposalRewards(proposal.id);
-  const { showMessage } = useSnackbar();
+  const hasPublishedRewards = currentEvaluationStep === 'rewards' && currentEvaluationResult === 'pass';
+  const lastEvaluation = proposal.evaluations[proposal.evaluations.length - 1];
 
   const statusOptions: ProposalEvaluationStatus[] = useMemo(() => {
-    if (currentEvaluationStep === 'draft') {
+    const evaluationStep = lastEvaluation && hasPublishedRewards ? lastEvaluation.type : currentEvaluationStep;
+
+    if (evaluationStep === 'draft') {
       return ['published', 'unpublished'];
-    } else if (currentEvaluationStep === 'rewards') {
+    } else if (evaluationStep === 'rewards') {
       return ['published', 'unpublished'];
-    } else if (currentEvaluationStep === 'feedback') {
+    } else if (evaluationStep === 'feedback') {
       return ['complete', 'in_progress'];
     } else {
       // for vote, rubric, pass_fail, etc
       return ['passed', 'declined', 'in_progress'];
     }
-  }, [currentEvaluationStep]);
-
-  async function onChange(status: ProposalEvaluationStatus) {
-    try {
-      if (currentEvaluationStep === 'rewards') {
-        await createProposalRewards();
-        await mutate(`/api/spaces/${spaceId}/proposals`);
-      } else if (currentEvaluationStep === 'draft' && status === 'published') {
-        await publishProposal();
-        await mutate(`/api/spaces/${spaceId}/proposals`);
-      } else if (currentEvaluationId) {
-        await submitEvaluationResult({
-          evaluationId: currentEvaluationId,
-          result: status === 'complete' || status === 'passed' ? 'pass' : 'fail'
-        });
-        await mutate(`/api/spaces/${spaceId}/proposals`);
-      }
-    } catch (err: any) {
-      showMessage(err.message, 'error');
-    }
-  }
+  }, [currentEvaluationStep, lastEvaluation, hasPublishedRewards]);
 
   const options: IPropertyOption[] = statusOptions.map((status) => ({
     id: status,
-    value: PROPOSAL_STATUS_LABELS[status],
-    dropdownValue: PROPOSAL_STATUS_VERB_LABELS[status as ProposalEvaluationStatus],
-    color: proposalStatusColors[status],
-    disabled: status === 'in_progress'
+    value: EVALUATION_STATUS_LABELS[status],
+    dropdownValue: EVALUATION_STATUS_VERB_LABELS[status as ProposalEvaluationStatus],
+    color: proposalStatusColors[status]
   }));
 
   return (
     <TagSelect
       wrapColumn
-      readOnly={
-        readOnly ||
-        currentEvaluationStep === 'vote' ||
-        (currentEvaluationResult === 'pass' && currentEvaluationStep === 'rewards')
-      }
+      readOnly={readOnly || currentEvaluationStep === 'vote' || hasPublishedRewards}
       options={options}
       propertyValue={
-        proposal
+        hasPublishedRewards && lastEvaluation
+          ? getProposalEvaluationStatus({
+              result: 'pass',
+              step: lastEvaluation.type as ProposalEvaluationStep
+            })
+          : proposal
           ? getProposalEvaluationStatus({
               result: proposal.currentStep.result ?? 'in_progress',
               step: proposal.currentStep.step
             })
-          : ''
+          : 'in_progress'
       }
       disableClearable
-      onChange={(newValue) => onChange(newValue as ProposalEvaluationStatus)}
+      onChange={(status) => {
+        onChange(
+          status === 'complete' || status === 'passed' || status === 'published'
+            ? 'pass'
+            : status === 'declined' || status === 'unpublished'
+            ? 'fail'
+            : null
+        );
+      }}
     />
   );
 }
