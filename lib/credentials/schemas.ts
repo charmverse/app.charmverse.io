@@ -1,4 +1,5 @@
 // 1. Loan Officer Schema used by Financial Institution for verifying a loan officer
+import type { CredentialType } from '@charmverse/core/prisma';
 import type { SchemaItem } from '@ethereum-attestation-service/eas-sdk';
 import { SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
 
@@ -40,10 +41,6 @@ export function decodeProposalCredential(rawData: string): ProposalCredential {
 
   return values as ProposalCredential;
 }
-export const supportedCredentialTypes = ['proposal'] as const;
-
-export type CredentialType = (typeof supportedCredentialTypes)[number];
-
 export const credentialLabels: Record<CredentialType, string> = {
   proposal: 'Proposal'
 };
