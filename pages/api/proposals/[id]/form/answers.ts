@@ -9,18 +9,13 @@ import type { FieldAnswerInput } from 'components/common/form/interfaces';
 import { upsertProposalFormAnswers } from 'lib/form/upsertProposalFormAnswers';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { getProposalFormAnswers } from 'lib/proposal/form/getProposalFormAnswers';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .get(getProposalFormAnswersHandler)
-  .use(requireUser)
-  .use(providePermissionClients({ key: 'id', location: 'query', resourceIdType: 'proposal' }))
-  .put(upsertProposalFormAnswersHandler);
+handler.get(getProposalFormAnswersHandler).use(requireUser).put(upsertProposalFormAnswersHandler);
 
 async function getProposalFormAnswersHandler(req: NextApiRequest, res: NextApiResponse<FormFieldAnswer[]>) {
   const proposalId = req.query.id as string;

@@ -1,7 +1,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { FormField, Page, Prisma, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import isEqual from 'lodash/isEqual';
 import { v4 } from 'uuid';
 
@@ -37,7 +37,10 @@ describe('createCardsFromProposals', () => {
     await prisma.$transaction([
       prisma.page.deleteMany({
         where: {
-          spaceId: space.id
+          spaceId: space.id,
+          id: {
+            not: board.id
+          }
         }
       }),
       prisma.proposal.deleteMany({
@@ -51,7 +54,7 @@ describe('createCardsFromProposals', () => {
   it('should create cards from proposals', async () => {
     const newProposal = await generateProposal({
       authors: [user.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [
         {
           group: 'user',
@@ -136,7 +139,7 @@ describe('createCardsFromProposals', () => {
 
     const proposal = await testUtilsProposals.generateProposal({
       authors: [proposalAuthor.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [
         {
           group: 'user',
@@ -294,7 +297,7 @@ describe('createCardsFromProposals', () => {
 
     const proposal = await generateProposal({
       authors: [proposalAuthor.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [
         {
           group: 'user',
@@ -478,7 +481,7 @@ describe('createCardsFromProposals', () => {
 
     const visibleProposal = await testUtilsProposals.generateProposal({
       authors: [],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [],
       spaceId: testSpace.id,
       userId: testUser.id
@@ -487,7 +490,7 @@ describe('createCardsFromProposals', () => {
     const ignoredProposal = await testUtilsProposals.generateProposal({
       authors: [],
       archived: true,
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [],
       spaceId: testSpace.id,
       userId: testUser.id
@@ -498,5 +501,78 @@ describe('createCardsFromProposals', () => {
     expect(cards.length).toBe(1);
 
     expect(cards[0].syncWithPageId).toBe(visibleProposal.id);
+  });
+
+  it('should create cards with permissions matching the parent', async () => {
+    const { space: testSpace, user: testUser } = await testUtilsUser.generateUserAndSpace();
+
+    const role = await testUtilsMembers.generateRole({
+      createdBy: testUser.id,
+      spaceId: testSpace.id
+    });
+
+    const testBoard = await generateBoard({
+      createdBy: testUser.id,
+      spaceId: testSpace.id,
+      viewDataSource: 'proposals',
+      cardCount: 0,
+      permissions: [
+        {
+          permissionLevel: 'editor',
+          userId: testUser.id
+        },
+        {
+          permissionLevel: 'full_access',
+          roleId: role.id
+        }
+      ]
+    });
+
+    const rootBoardPermissions = await prisma.pagePermission.findMany({
+      where: {
+        pageId: testBoard.id
+      }
+    });
+
+    expect(rootBoardPermissions).toMatchObject(
+      expect.arrayContaining([
+        expect.objectContaining({ userId: testUser.id, permissionLevel: 'editor' }),
+        expect.objectContaining({ roleId: role.id, permissionLevel: 'full_access' })
+      ])
+    );
+
+    const visibleProposal = await testUtilsProposals.generateProposal({
+      authors: [],
+      proposalStatus: 'published',
+      reviewers: [],
+      spaceId: testSpace.id,
+      userId: testUser.id
+    });
+
+    await createCardsFromProposals({ boardId: testBoard.id, spaceId: testSpace.id, userId: testUser.id });
+
+    const pages = await prisma.page.findMany({
+      where: {
+        parentId: testBoard.id
+      },
+      include: {
+        permissions: true
+      }
+    });
+
+    expect(pages).toHaveLength(1);
+
+    const cardPermissions = pages[0].permissions;
+
+    expect(cardPermissions).toMatchObject(
+      expect.arrayContaining(
+        rootBoardPermissions.map((p) => ({
+          ...p,
+          id: expect.any(String),
+          inheritedFromPermission: p.id,
+          pageId: pages[0].id
+        }))
+      )
+    );
   });
 });
