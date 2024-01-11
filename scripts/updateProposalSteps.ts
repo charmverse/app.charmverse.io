@@ -134,6 +134,5 @@ export async function updateProposalSteps({ spaceDomain }: { spaceDomain: string
 }
 
 updateProposalSteps({
-  spaceDomain: 'taiko',
-  validateOnly: true
+  spaceDomain: 'taiko'
 }).catch(console.error);
