@@ -13,6 +13,7 @@ export type Props = {
   hasMovePermission: boolean;
   nextStep?: { title: string };
   onSubmit?: VoidFunction;
+  archived?: boolean;
 };
 
 export function FeedbackEvaluation({
@@ -21,7 +22,8 @@ export function FeedbackEvaluation({
   evaluation,
   isCurrent,
   nextStep,
-  onSubmit
+  onSubmit,
+  archived
 }: Props) {
   const { showMessage } = useSnackbar();
   const { trigger, isMutating } = useSubmitEvaluationResult({ proposalId });
@@ -31,7 +33,9 @@ export function FeedbackEvaluation({
     ? 'This evaluation step is not active'
     : !hasMovePermission
     ? 'You do not have permission to move this proposal'
-    : undefined;
+    : archived
+    ? 'You cannot move an archived proposal'
+    : null;
 
   async function onMoveForward() {
     try {

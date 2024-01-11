@@ -21,6 +21,7 @@ export type Props = {
   pageId?: string;
   proposal?: Pick<
     ProposalWithUsersAndRubric,
+    | 'archived'
     | 'id'
     | 'authors'
     | 'evaluations'
@@ -106,6 +107,7 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
             permissions={proposal?.permissions}
             proposalId={proposal?.id}
             refreshProposal={refreshProposal}
+            archived={proposal?.archived ?? false}
           />
         }
       />
@@ -123,6 +125,7 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
             title={evaluation.title}
             actions={
               <EvaluationStepActions
+                archived={proposal?.archived ?? false}
                 isPreviousStep={previousStepIndex === index + 1}
                 permissions={proposal?.permissions}
                 proposalId={proposal?.id}
@@ -134,6 +137,7 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
           >
             {evaluation.type === 'feedback' && (
               <FeedbackEvaluation
+                archived={proposal?.archived ?? false}
                 key={evaluation.id}
                 evaluation={evaluation}
                 proposalId={proposal?.id}
@@ -145,6 +149,7 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
             )}
             {evaluation.type === 'pass_fail' && (
               <PassFailEvaluation
+                archived={proposal?.archived ?? false}
                 key={evaluation.id}
                 evaluation={evaluation}
                 proposalId={proposal?.id}
@@ -185,7 +190,7 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
           title={rewardsTitle}
         >
           <PublishRewardsButton
-            disabled={!(proposal?.permissions.evaluate && isRewardsActive && !isRewardsComplete)}
+            disabled={!(proposal?.permissions.evaluate && isRewardsActive && !isRewardsComplete) || !!proposal.archived}
             proposalId={proposal?.id}
             pendingRewards={pendingRewards}
             rewardIds={proposal?.rewardIds}

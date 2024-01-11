@@ -1,4 +1,4 @@
-import { Box, Stack } from '@mui/material';
+import { Stack } from '@mui/material';
 import { v4 } from 'uuid';
 
 import { AddAPropertyButton } from 'components/common/BoardEditor/components/properties/AddAProperty';
