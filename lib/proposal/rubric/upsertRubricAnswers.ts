@@ -19,7 +19,7 @@ export type RubricAnswerUpsert = {
   isDraft?: boolean;
   userId: string;
   proposalId: string;
-  evaluationId?: string | null;
+  evaluationId: string;
   answers: RubricAnswerData[];
 };
 

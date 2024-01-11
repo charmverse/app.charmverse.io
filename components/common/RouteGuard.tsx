@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useRef, useEffect, useState } from 'react';
 
+import { useCustomJoinSpace } from 'hooks/useCustomJoinSpace';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
@@ -23,7 +24,8 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
   const [authorized, setAuthorized] = useState(true);
   const { user, isLoaded } = useUser();
   const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
-  const isLoading = !isLoaded || !isSpacesLoaded || !accessChecked;
+  const { accessChecked: customJoinAccessChecked } = useCustomJoinSpace();
+  const isLoading = !isLoaded || !isSpacesLoaded || !accessChecked || !customJoinAccessChecked;
   const authorizedSpaceDomainRef = useRef('');
   const spaceDomain = (router.query.domain as string) || '';
 

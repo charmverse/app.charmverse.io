@@ -4,7 +4,7 @@ import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { Box, Divider, useMediaQuery } from '@mui/material';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 import { v4 as uuid } from 'uuid';
 
@@ -103,10 +103,10 @@ export function NewProposalPage({
   const isAdmin = useIsAdmin();
 
   const sourceTemplate = proposalTemplates?.find((template) => template.page.id === formInputs.proposalTemplateId);
-  const isStructured = formInputs.proposalType === 'structured' || !!sourceTemplate?.formId;
+
+  const isStructured = formInputs.proposalType === 'structured' || !!formInputs.formId;
   const proposalFormFields = isStructured
-    ? formInputs.formFields ??
-      sourceTemplate?.form?.formFields ?? [
+    ? formInputs.formFields ?? [
         {
           type: 'short_text',
           name: '',
@@ -172,6 +172,7 @@ export function NewProposalPage({
   function applyTemplate(_templateId: string) {
     const template = proposalTemplates?.find((t) => t.id === _templateId);
     if (template) {
+      const formFields = template.form?.formFields ?? [];
       setFormInputs({
         content: template.page.content as PageContent,
         contentText: template.page.contentText,
@@ -187,6 +188,7 @@ export function NewProposalPage({
         fields: template.fields || {},
         type: proposalPageType,
         formId: template.formId ?? undefined,
+        formFields: isTemplate ? formFields.map((formField) => ({ ...formField, id: uuid() })) : formFields,
         formAnswers: (template?.form?.formFields ?? [])
           .filter((formField) => formField.type !== 'label')
           .map((proposalFormField) => ({

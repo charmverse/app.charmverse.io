@@ -34,9 +34,7 @@ export async function createDefaultProposal({ spaceId, userId }: { spaceId: stri
     spaceId,
     userId,
     authors: [userId],
-    evaluationType: 'vote',
     publishToLens: false,
-    rubricCriteria: [],
     workflowId: workflow.id,
     evaluations: workflow.evaluations.map(
       (evaluation: any, index) =>
@@ -83,12 +81,6 @@ export async function createDefaultProposal({ spaceId, userId }: { spaceId: stri
         ],
         [Constants.titleColumnId]: 'Getting Started'
       }
-    },
-    reviewers: [
-      {
-        group: 'user',
-        id: userId
-      }
-    ]
+    }
   });
 }

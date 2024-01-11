@@ -6,30 +6,30 @@ import { v4 as uuid } from 'uuid';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import {
-  PROPOSAL_RESULT_LABELS,
+  EVALUATION_STATUS_LABELS,
   PROPOSAL_STEP_LABELS,
   proposalDbProperties,
-  proposalResultBoardColors
+  proposalStatusColors
 } from 'lib/focalboard/proposalDbProperties';
 import { InvalidStateError } from 'lib/middleware/errors';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-export async function setDatabaseProposalProperties({ boardId }: { boardId: string }): Promise<Board> {
+export async function setDatabaseProposalProperties({
+  boardId,
+  cardProperties
+}: {
+  boardId: string;
+  cardProperties: IPropertyTemplate[];
+}): Promise<Board> {
   const boardBlock = (await prisma.block.findUniqueOrThrow({
     where: {
       id: boardId
     }
   })) as any as Board;
+
   if (boardBlock.fields.sourceType !== 'proposals') {
     throw new InvalidStateError(`Cannot add proposal cards to a database which does not have proposals as its source`);
   }
-
-  const rubricProposals = await prisma.proposal.count({
-    where: {
-      spaceId: boardBlock.spaceId,
-      evaluationType: 'rubric'
-    }
-  });
 
   const forms = await prisma.form.findMany({
     where: {
@@ -70,12 +70,11 @@ export async function setDatabaseProposalProperties({ boardId }: { boardId: stri
     });
   });
 
-  const spaceUsesRubrics = rubricProposals > 0;
   const boardProperties = getBoardProperties({
     evaluationStepTitles: Array.from(evaluationStepTitles),
     formFields,
     boardBlock,
-    spaceUsesRubrics
+    cardProperties
   });
 
   return prisma.block.update({
@@ -93,13 +92,13 @@ export async function setDatabaseProposalProperties({ boardId }: { boardId: stri
 
 export function getBoardProperties({
   boardBlock,
-  spaceUsesRubrics,
   formFields = [],
-  evaluationStepTitles = []
+  evaluationStepTitles = [],
+  cardProperties = []
 }: {
+  cardProperties?: IPropertyTemplate[];
   evaluationStepTitles?: string[];
   boardBlock: Board;
-  spaceUsesRubrics: boolean;
   formFields?: FormField[];
 }) {
   const boardProperties = boardBlock.fields.cardProperties ?? [];
@@ -140,34 +139,45 @@ export function getBoardProperties({
     boardProperties.push(stepProp);
   }
 
-  if (spaceUsesRubrics) {
-    const evaluatedByProp = generateUpdatedProposalEvaluatedByProperty({ boardProperties });
-    const evaluationTotalProp = generateUpdatedProposalEvaluationTotalProperty({ boardProperties });
-    const evaluationAverageProp = generateUpdatedProposalEvaluationAverageProperty({ boardProperties });
+  const evaluatedByProp = generateUpdatedProposalEvaluatedByProperty({ boardProperties });
+  const evaluationTotalProp = generateUpdatedProposalEvaluationTotalProperty({ boardProperties });
+  const evaluationAverageProp = generateUpdatedProposalEvaluationAverageProperty({ boardProperties });
 
-    const existingEvaluatedByPropPropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluatedBy');
+  cardProperties.forEach((cardProp) => {
+    const existingPropIndex = boardProperties.findIndex((p) => p.id === cardProp.id);
 
-    if (existingEvaluatedByPropPropIndex > -1) {
-      boardProperties[existingEvaluatedByPropPropIndex] = evaluatedByProp;
+    if (existingPropIndex > -1) {
+      boardProperties[existingPropIndex] = { ...cardProp, proposalFieldId: cardProp.id };
     } else {
-      boardProperties.push(evaluatedByProp);
+      boardProperties.push({
+        ...cardProp,
+        proposalFieldId: cardProp.id
+      });
     }
+  });
 
-    const existingEvaluationTotalPropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluationTotal');
+  const existingEvaluatedByPropPropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluatedBy');
 
-    if (existingEvaluationTotalPropIndex > -1) {
-      boardProperties[existingEvaluationTotalPropIndex] = evaluationTotalProp;
-    } else {
-      boardProperties.push(evaluationTotalProp);
-    }
+  if (existingEvaluatedByPropPropIndex > -1) {
+    boardProperties[existingEvaluatedByPropPropIndex] = evaluatedByProp;
+  } else {
+    boardProperties.push(evaluatedByProp);
+  }
 
-    const existingEvaluationAveragePropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluationAverage');
+  const existingEvaluationTotalPropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluationTotal');
 
-    if (existingEvaluationAveragePropIndex > -1) {
-      boardProperties[existingEvaluationAveragePropIndex] = evaluationAverageProp;
-    } else {
-      boardProperties.push(evaluationAverageProp);
-    }
+  if (existingEvaluationTotalPropIndex > -1) {
+    boardProperties[existingEvaluationTotalPropIndex] = evaluationTotalProp;
+  } else {
+    boardProperties.push(evaluationTotalProp);
+  }
+
+  const existingEvaluationAveragePropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluationAverage');
+
+  if (existingEvaluationAveragePropIndex > -1) {
+    boardProperties[existingEvaluationAveragePropIndex] = evaluationAverageProp;
+  } else {
+    boardProperties.push(evaluationAverageProp);
   }
 
   formFields.forEach((formField) => {
@@ -292,11 +302,11 @@ function generateUpdatedProposalStatusProperty({ boardProperties }: { boardPrope
   };
 
   if (proposalStatusProp) {
-    [...objectUtils.typedKeys(PROPOSAL_RESULT_LABELS)].forEach((status) => {
+    [...objectUtils.typedKeys(EVALUATION_STATUS_LABELS)].forEach((status) => {
       const existingOption = proposalStatusProp.options.find((opt) => opt.value === status);
       if (!existingOption) {
         proposalStatusProp.options.push({
-          color: proposalResultBoardColors[status],
+          color: proposalStatusColors[status],
           id: status,
           value: status
         });

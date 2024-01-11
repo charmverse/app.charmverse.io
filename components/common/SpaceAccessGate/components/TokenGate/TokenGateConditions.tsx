@@ -10,7 +10,6 @@ import Avatar from 'components/common/Avatar';
 import { Button } from 'components/common/Button';
 import type { HumanizeConditionsContent, HumanizeCondition } from 'lib/tokenGates/humanizeConditions';
 import { isTruthy } from 'lib/utilities/types';
-import HypersubIcon from 'public/images/logos/fabric-xyz.svg';
 
 const StyledOperator = styled(Box)`
   &:after,
@@ -94,9 +93,7 @@ function Condition({
             }}
             name='Token Gate condition'
             isNft={['POAP', 'ERC721', 'ERC1155'].includes(contractType) && isExternalImage}
-          >
-            {contractType === 'HYPERSUB' ? <HypersubIcon /> : undefined}
-          </Avatar>
+          />
         </Box>
       )}
       <Box width='100%'>{text}</Box>

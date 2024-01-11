@@ -62,8 +62,8 @@ export function PagesList({
           <ListItemIcon>
             <PageIcon icon={page.icon} isEditorEmpty={!page.hasContent} pageType={page.type} />
           </ListItemIcon>
-          <PageTitle hasContent={page.title.length === 0} sx={{ fontWeight: 'bold' }}>
-            {page.title.length > 0 ? page.title : 'Untitled'}
+          <PageTitle hasContent={!page.title} sx={{ fontWeight: 'bold' }}>
+            {page.title ? page.title : 'Untitled'}
           </PageTitle>
         </MenuItem>
       ))}

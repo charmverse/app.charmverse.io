@@ -18,7 +18,7 @@ export type FormInput = { answers: ProposalRubricCriteriaAnswer[] };
 
 type Props = {
   proposalId: string;
-  evaluationId?: string;
+  evaluationId: string;
   disabled: boolean; // for non-reviewers
   answers?: ProposalRubricCriteriaAnswer[];
   draftAnswers?: ProposalRubricCriteriaAnswer[];

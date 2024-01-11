@@ -24,7 +24,9 @@ export function TokenGateTokenFields() {
       <TokenGateBlockchainSelect
         error={!!errors.chain?.message}
         helperMessage={errors.chain?.message}
-        {...register('chain')}
+        {...register('chain', {
+          deps: ['contract']
+        })}
       />
       <FieldWrapper label='Which group should be able to access this asset'>
         <Select<FormValues['check']>
@@ -45,7 +47,9 @@ export function TokenGateTokenFields() {
           label='Contract Address'
           error={errors.contract?.message}
           helperText={errors.contract?.message}
-          {...register('contract')}
+          {...register('contract', {
+            deps: ['chain']
+          })}
         />
       )}
       <NumberInputField

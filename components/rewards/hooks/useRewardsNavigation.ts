@@ -20,12 +20,10 @@ export function useRewardsNavigation(idKey = 'id') {
       query.applicationId && isUUID(query.applicationId as string) ? (query.applicationId as string) : undefined;
     const isNewApplication = query.applicationId === 'new';
     const pageId = query[idKey] && isUUID(query[idKey] as string) ? (query[idKey] as string) : undefined;
-
     if (!applicationId && !isNewApplication && !pageId) {
       hidePage();
       return;
     }
-
     showPage({
       // application props based on router query rather than explicit showing / hiding dialog
       applicationId,

@@ -68,7 +68,7 @@ export function useDragDrop<Item extends { id: string }>({
     style: {
       opacity: isDragging ? 0.5 : 1,
       cursor: enabled ? 'move' : 'default',
-      'box-shadow':
+      boxShadow:
         dragDirection === 'top'
           ? `0px -2px 0px ${theme.palette.primary.main}`
           : dragDirection === 'bottom'

@@ -34,7 +34,6 @@ import { DuplicatePageAction } from './DuplicatePageAction';
 import { ExportMarkdownAction } from './ExportMarkdownAction';
 import { ExportToPDFAction } from './ExportToPDFAction';
 import { RewardActions } from './RewardActions';
-import { PublishToSnapshot } from './SnapshotAction/PublishToSnapshot';
 import { UndoAction } from './UndoAction';
 
 export type PageActionMeta = Pick<
@@ -292,7 +291,7 @@ export function DocumentPageActionList({
       <CopyPageLinkAction path={`/${page.path}`} onComplete={onComplete} />
 
       <Divider sx={{ my: '0 !important' }} />
-      {(page.type === 'card' || page.type === 'card_synced' || page.type === 'page') && (
+      {/* {(page.type === 'card' || page.type === 'card_synced' || page.type === 'page') && (
         <>
           <Tooltip title={!canCreateProposal ? 'You do not have the permission to convert to proposal' : ''}>
             <div>
@@ -313,7 +312,7 @@ export function DocumentPageActionList({
           </Tooltip>
           <Divider />
         </>
-      )}
+      )} */}
 
       <DeleteMenuItem onClick={onDeletePage} disabled={!pagePermissions?.delete || page.deletedAt !== null} />
       {pageType === 'proposal' && pageId && <ArchiveProposalAction proposalId={pageId} refreshPageOnChange />}
@@ -326,16 +325,6 @@ export function DocumentPageActionList({
         />
       )}
       <Divider />
-      <PublishToSnapshot
-        pageId={pageId}
-        snapshotProposalId={page.snapshotProposalId}
-        renderContent={({ label, onClick, icon }) => (
-          <ListItemButton onClick={onClick}>
-            {icon}
-            <ListItemText primary={label} />
-          </ListItemButton>
-        )}
-      />
       <ExportMarkdownAction disabled={!isExportablePage} onClick={exportMarkdownPage} />
       <ExportToPDFAction pdfTitle={page.title} onComplete={onComplete} />
       {pageType === 'bounty' && basePageBounty && (

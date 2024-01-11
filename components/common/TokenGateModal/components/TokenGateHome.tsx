@@ -1,5 +1,4 @@
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import WaterDropIcon from '@mui/icons-material/WaterDrop';
 import Box from '@mui/material/Box';
 import SvgIcon, { type SvgIconProps } from '@mui/material/SvgIcon';
 import type { ElementType } from 'react';
@@ -8,6 +7,7 @@ import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import GrantorIcon from 'public/images/template_icons/grantor_icon.svg';
 import NFTCommunityIcon from 'public/images/template_icons/nft_community_icon.svg';
+import DAOIcon from 'public/images/template_icons/nounish_icon.svg';
 
 import { useTokenGateModal, type DisplayedPage } from '../hooks/useTokenGateModalContext';
 
@@ -39,8 +39,8 @@ const requirementButton: ButtonProps[] = [
   },
   {
     name: 'dao',
-    title: 'MolochDAOv2.1',
-    icon: WaterDropIcon,
+    title: 'DAO Membership',
+    icon: DAOIcon,
     iconColor: 'error'
   }
 ];

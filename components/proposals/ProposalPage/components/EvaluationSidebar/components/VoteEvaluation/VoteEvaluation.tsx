@@ -1,4 +1,4 @@
-import HowToVoteIcon from '@mui/icons-material/HowToVote';
+import HowToVoteIcon from '@mui/icons-material/HowToVoteOutlined';
 import { Stack, Tooltip, Typography } from '@mui/material';
 import { useEffect } from 'react';
 
@@ -8,19 +8,20 @@ import { NoCommentsMessage } from 'components/[pageId]/DocumentPage/components/S
 import { Button } from 'components/common/Button';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { PublishToSnapshot } from 'components/common/PageActions/components/SnapshotAction/PublishToSnapshot';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposal/interface';
+
+import { PublishToSnapshot } from './components/PublishToSnapshot/PublishToSnapshot';
+import { SnapshotVoteDetails } from './components/SnapshotVoteDetails';
 
 export type Props = {
   isCurrent: boolean;
   pageId: string;
   proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'permissions'>;
   evaluation: PopulatedEvaluation;
-  addVote?: () => void;
 };
 
-export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation, addVote }: Props) {
+export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation }: Props) {
   const { data: votes, mutate: refreshVotes, isLoading } = useGetVotesForPage(pageId ? { pageId } : undefined);
   const { showMessage } = useSnackbar();
   const isReviewer = isCurrent && proposal?.permissions.evaluate;
@@ -95,19 +96,31 @@ export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation, addVot
           />
         }
         message='Vote has not been initiated yet'
-      >
-        <Tooltip
-          title={!isReviewer ? 'Only proposal authors and space admins can publish this proposal to snapshot' : ''}
-        >
-          <Button disabled={!isReviewer} onClick={addVote} sx={{ width: 'fit-content', mt: 2 }}>
-            Create Vote
-          </Button>
-        </Tooltip>
-      </NoCommentsMessage>
+      />
     );
   }
 
   vote.title = evaluation.title;
+
+  if (evaluation.voteSettings?.publishToSnapshot) {
+    return evaluation.snapshotId ? (
+      <SnapshotVoteDetails snapshotProposalId={evaluation.snapshotId} />
+    ) : (
+      <NoCommentsMessage
+        icon={
+          <HowToVoteIcon
+            fontSize='large'
+            color='secondary'
+            sx={{
+              height: '2em',
+              width: '100%'
+            }}
+          />
+        }
+        message='Waiting for Snapshot vote...'
+      />
+    );
+  }
 
   return (
     <VoteDetail

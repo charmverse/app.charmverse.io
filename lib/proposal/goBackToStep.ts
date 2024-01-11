@@ -3,6 +3,7 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { isTruthy } from 'lib/utilities/types';
+import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 export type GoBackToStepRequest = {
   proposalId: string;
@@ -10,7 +11,13 @@ export type GoBackToStepRequest = {
 };
 
 // clear the result of a proposal evaluation and all evaluations after it
-export async function goBackToStep({ evaluationId: maybeEvaluationId, proposalId }: GoBackToStepRequest) {
+export async function goBackToStep({
+  userId,
+  evaluationId: maybeEvaluationId,
+  proposalId
+}: GoBackToStepRequest & {
+  userId: string;
+}) {
   const evaluationId = maybeEvaluationId === 'draft' ? null : maybeEvaluationId;
   const backToDraft = !evaluationId;
 
@@ -18,7 +25,8 @@ export async function goBackToStep({ evaluationId: maybeEvaluationId, proposalId
     where: {
       id: proposalId
     },
-    include: {
+    select: {
+      spaceId: true,
       evaluations: {
         orderBy: {
           index: 'asc'
@@ -97,6 +105,13 @@ export async function goBackToStep({ evaluationId: maybeEvaluationId, proposalId
       data: {
         status: 'draft'
       }
+    });
+  } else {
+    await publishProposalEvent({
+      currentEvaluationId: maybeEvaluationId,
+      proposalId,
+      spaceId: proposal.spaceId,
+      userId
     });
   }
 }

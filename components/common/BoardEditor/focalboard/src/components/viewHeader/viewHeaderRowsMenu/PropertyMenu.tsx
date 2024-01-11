@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Box, Menu, MenuItem } from '@mui/material';
+import { Box, Menu, MenuItem, Tooltip } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { useRef, useState } from 'react';
@@ -22,25 +22,18 @@ export const StyledMenuItem = styled(MenuItem)`
     background: ${({ theme }) => theme.palette.action.hover};
     transition: background 0.2s ease-in-out;
   }
-
-  &:first-child {
-    border-radius: 4px 0 0 4px;
-  }
-
-  &:last-child {
-    border-right: 1px solid ${({ theme }) => theme.palette.divider};
-    border-radius: 0 4px 4px 0;
-  }
 `;
 
 export function PropertyMenu({
   cards,
+  disabledTooltip,
   propertyTemplate,
   children
 }: {
+  disabledTooltip?: string;
   cards: Card[];
   propertyTemplate: IPropertyTemplate<PropertyType>;
-  children: (option: { isPropertyOpen: boolean; closeMenu: VoidFunction }) => ReactNode;
+  children: ReactNode | ((option: { isPropertyOpen: boolean; closeMenu: VoidFunction }) => ReactNode);
 }) {
   const popupState = usePopupState({ variant: 'popover' });
   // Without this state, the options menu list is not placed in the correct position
@@ -52,17 +45,22 @@ export function PropertyMenu({
 
   return (
     <>
-      <StyledMenuItem
-        ref={ref}
-        onClick={() => {
-          popupState.open();
-          setTimeout(() => {
-            setIsPropertyOpen(true);
-          }, 150);
-        }}
-      >
-        {propertyTemplate.name}
-      </StyledMenuItem>
+      <Tooltip title={disabledTooltip ?? ''}>
+        <div>
+          <StyledMenuItem
+            disabled={!!disabledTooltip}
+            ref={ref}
+            onClick={() => {
+              popupState.open();
+              setTimeout(() => {
+                setIsPropertyOpen(true);
+              }, 150);
+            }}
+          >
+            {propertyTemplate.name}
+          </StyledMenuItem>
+        </div>
+      </Tooltip>
 
       <Menu
         anchorEl={ref.current}
@@ -80,10 +78,11 @@ export function PropertyMenu({
       >
         <Box
           sx={{
-            padding: '2px 4px'
+            padding: '2px 4px',
+            display: 'flex'
           }}
         >
-          {children({ isPropertyOpen, closeMenu: popupState.close })}
+          {typeof children === 'function' ? children({ isPropertyOpen, closeMenu: popupState.close }) : children}
         </Box>
       </Menu>
     </>

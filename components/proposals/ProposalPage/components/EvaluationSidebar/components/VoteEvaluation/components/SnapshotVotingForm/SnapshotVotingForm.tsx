@@ -3,14 +3,16 @@ import { Divider, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 
 import { Button } from 'components/common/Button';
-import type { CastVote } from 'components/proposals/components/SnapshotVoting/hooks/useSnapshotVoting';
-import { MultiChoiceVoting } from 'components/proposals/components/SnapshotVoting/MultiChoiceVoting';
-import { RankedVoting } from 'components/proposals/components/SnapshotVoting/RankedVoting';
-import { SingleChoiceVoting } from 'components/proposals/components/SnapshotVoting/SingleChoiceVoting';
-import { WeightedVoting } from 'components/proposals/components/SnapshotVoting/WeightedVoting';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { SnapshotVote } from 'lib/snapshot/getVotes';
 import type { SnapshotProposal, VoteChoice } from 'lib/snapshot/interfaces';
+
+import type { CastVote } from '../../hooks/useSnapshotVoting';
+
+import { MultiChoiceVoting } from './components/MultiChoiceVoting';
+import { RankedVoting } from './components/RankedVoting';
+import { SingleChoiceVoting } from './components/SingleChoiceVoting';
+import { WeightedVoting } from './components/WeightedVoting';
 
 export type SnapshotVotingProps = {
   snapshotProposal: SnapshotProposal;
