@@ -15,6 +15,7 @@ import { DatePropertyTemplateMenu } from './DatePropertyTemplateMenu';
 import { PersonPropertyTemplateMenu } from './PersonPropertyTemplateMenu';
 import { PropertyMenu, StyledMenuItem } from './PropertyMenu';
 import { SelectPropertyTemplateMenu } from './SelectPropertyTemplateMenu';
+import { TextPropertyTemplateMenu } from './TextPropertyTemplateMenu';
 
 export function PropertyTemplateMenu({
   propertyTemplate,
@@ -185,7 +186,7 @@ export function PropertyTemplateMenu({
     }
 
     default: {
-      return null;
+      return <TextPropertyTemplateMenu onChange={onChange} cards={checkedCards} propertyTemplate={propertyTemplate} />;
     }
   }
 }

@@ -118,12 +118,7 @@ export function ViewHeaderRowsMenu({
     const firstProposal = proposalsMap[checkedPages[0]?.proposalId ?? ''];
     const _isReviewerDisabled = checkedPages.some((checkedPage) => {
       const proposal = proposalsMap[checkedPage.proposalId ?? ''];
-      return (
-        !proposal ||
-        proposal.currentStep.step === 'draft' ||
-        proposal.currentStep.step === 'feedback' ||
-        checkedPage.sourceTemplateId
-      );
+      return !proposal || proposal.currentStep.step === 'draft' || proposal.currentStep.step === 'feedback';
     });
 
     const _isStatusDisabled =
@@ -316,7 +311,7 @@ export function ViewHeaderRowsMenu({
                   : propertyTemplate.type === 'proposalStatus' && isStatusDisabled
                   ? 'To change multiple proposals, they must be in the same step'
                   : propertyTemplate.type === 'proposalReviewer' && isReviewersDisabled
-                  ? 'To change multiple proposals, they must not be in draft or feedback step and must not have a source template'
+                  ? `To change multiple proposal's reviewers, they must not be in draft or feedback step`
                   : undefined
               }
             />
