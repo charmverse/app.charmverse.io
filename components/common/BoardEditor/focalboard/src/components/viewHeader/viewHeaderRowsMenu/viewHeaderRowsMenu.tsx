@@ -100,7 +100,8 @@ export function ViewHeaderRowsMenu({
   async function onProposalAuthorSelect(pageIds: string[], authorIds: string[]) {
     for (const pageId of pageIds) {
       const proposalId = pages[pageId]?.proposalId;
-      if (proposalId) {
+      const proposal = proposalId ? proposalsMap[proposalId] : null;
+      if (proposalId && !proposal?.archived) {
         try {
           await charmClient.proposals.updateProposal({
             authors: authorIds,
@@ -120,6 +121,7 @@ export function ViewHeaderRowsMenu({
       const proposal = proposalsMap[checkedPage.proposalId ?? ''];
       return (
         !proposal ||
+        proposal.archived ||
         proposal.currentStep.step === 'draft' ||
         proposal.currentStep.step === 'feedback' ||
         checkedPage.sourceTemplateId
@@ -130,7 +132,7 @@ export function ViewHeaderRowsMenu({
       !firstProposal ||
       checkedPages.some((checkedPage) => {
         const proposal = proposalsMap[checkedPage.proposalId ?? ''];
-        return !proposal || proposal.currentStep.step !== firstProposal.currentStep.step;
+        return !proposal || proposal.archived || proposal.currentStep.step !== firstProposal.currentStep.step;
       });
 
     const _isStepDisabled =
@@ -139,6 +141,7 @@ export function ViewHeaderRowsMenu({
         const proposal = proposalsMap[checkedPage.proposalId ?? ''];
         return (
           !proposal ||
+          proposal.archived ||
           proposal.evaluations.length !== firstProposal.evaluations.length ||
           // Check if all evaluations are in the same workflow
           proposal.evaluations.some((evaluation, index) => {
@@ -164,7 +167,7 @@ export function ViewHeaderRowsMenu({
       const proposalId = page?.proposalId;
       const proposal = proposalId ? proposalsMap[proposalId] : null;
       const proposalWithEvaluationId = proposal?.currentEvaluationId;
-      if (proposal && proposalWithEvaluationId) {
+      if (proposal && proposalWithEvaluationId && !proposal.archived) {
         await charmClient.proposals.updateProposalEvaluation({
           reviewers: reviewers.map((reviewer) => ({
             roleId: reviewer.group === 'role' ? reviewer.id : null,
@@ -200,7 +203,7 @@ export function ViewHeaderRowsMenu({
 
     pageIds.forEach((pageId) => {
       const proposal = proposalsMap[pages[pageId]?.proposalId ?? ''];
-      if (proposal?.currentStep.step === firstProposal.currentStep.step) {
+      if (proposal?.currentStep.step === firstProposal.currentStep.step && !proposal.archived) {
         proposalsData.push({
           proposalId: proposal.id,
           evaluationId: proposal.currentEvaluationId
@@ -238,7 +241,7 @@ export function ViewHeaderRowsMenu({
 
     pageIds.forEach((pageId) => {
       const proposal = proposalsMap[pages[pageId]?.proposalId ?? ''];
-      if (proposal) {
+      if (proposal && !proposal.archived) {
         if (
           (evaluationId === 'rewards' &&
             ((proposal.fields?.pendingRewards ?? []).length > 0 || (proposal.rewardIds ?? [])?.length > 0)) ||
