@@ -60,8 +60,6 @@ export function useNewProposal({ newProposal }: Props) {
         },
         formFields: formInputs.formFields,
         evaluations: formInputs.evaluations,
-        evaluationType: formInputs.evaluationType,
-        reviewers: formInputs.reviewers,
         spaceId: currentSpace.id,
         publishToLens: formInputs.publishToLens,
         fields: formInputs.fields,
@@ -133,7 +131,9 @@ export function getEvaluationFormError(evaluation: ProposalEvaluationValues): st
     case 'feedback':
       return false;
     case 'rubric':
-      return evaluation.reviewers.length === 0
+      return !evaluation.title
+        ? 'Title is required for rubric criteria'
+        : evaluation.reviewers.length === 0
         ? `Reviewers are required for the "${evaluation.title}" step`
         : evaluation.rubricCriteria.length === 0
         ? `At least one rubric criteria is required for the "${evaluation.title}" step`

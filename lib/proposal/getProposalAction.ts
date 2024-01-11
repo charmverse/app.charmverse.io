@@ -1,42 +1,70 @@
-import type { ProposalStatus } from '@charmverse/core/prisma';
+import type { Proposal, ProposalEvaluation } from '@charmverse/core/prisma-client';
+import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
-export type ProposalTaskAction =
-  | 'reviewed'
-  | 'needs_review'
-  | 'start_discussion'
-  | 'vote'
-  | 'start_review'
-  | 'evaluation_active'
-  | 'evaluation_closed';
+import type { ProposalNotificationType } from 'lib/notifications/interfaces';
+import type { Reward } from 'lib/rewards/interfaces';
+
+export type ProposalWithEvaluation = Pick<Proposal, 'status'> & {
+  evaluations: Pick<ProposalEvaluation, 'index' | 'result' | 'type' | 'id'>[];
+  rewards: Pick<Reward, 'id'>[];
+};
 
 export function getProposalAction({
   isAuthor,
-  currentStatus,
-  isReviewer
+  isReviewer,
+  isVoter,
+  proposal,
+  canComment
 }: {
-  currentStatus: ProposalStatus;
+  proposal: ProposalWithEvaluation;
+  isVoter: boolean;
   isAuthor: boolean;
   isReviewer: boolean;
-}): ProposalTaskAction | null {
-  if (currentStatus === 'discussion') {
-    if (isAuthor) {
-      return 'start_review';
-    }
-    return 'start_discussion';
-  } else if (currentStatus === 'reviewed') {
-    if (isAuthor) {
-      return 'reviewed';
-    }
-  } else if (currentStatus === 'vote_active') {
-    return 'vote';
-  } else if (currentStatus === 'review') {
-    if (isReviewer) {
-      return 'needs_review';
-    }
-  } else if (currentStatus === 'evaluation_active' && isReviewer) {
-    return 'evaluation_active';
-  } else if (currentStatus === 'evaluation_closed' && isAuthor) {
-    return 'evaluation_closed';
+  canComment: boolean;
+}): ProposalNotificationType | null {
+  const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
+  if (!currentEvaluation || proposal.status === 'draft') {
+    return null;
   }
+
+  if (currentEvaluation.index === proposal.evaluations.length - 1 && isAuthor) {
+    if (currentEvaluation.result === 'pass') {
+      return proposal.rewards.length > 0 ? 'reward_published' : 'proposal_passed';
+    } else if (currentEvaluation.result === 'fail') {
+      return 'proposal_failed';
+    }
+  }
+
+  if (currentEvaluation.type === 'feedback' && canComment) {
+    return 'start_discussion';
+  }
+
+  if (currentEvaluation.type === 'vote') {
+    if (currentEvaluation.result === null && isVoter) {
+      return 'vote';
+    }
+  }
+
+  if (currentEvaluation.type === 'pass_fail' || currentEvaluation.type === 'rubric') {
+    if (currentEvaluation.result === null && isReviewer) {
+      return 'review_required';
+    }
+
+    if (isAuthor && currentEvaluation.result === 'fail') {
+      return 'proposal_failed';
+    }
+  }
+
+  const previousEvaluation = currentEvaluation.index > 0 ? proposal.evaluations[currentEvaluation.index - 1] : null;
+
+  if (currentEvaluation.result === null && previousEvaluation && previousEvaluation.result === 'pass') {
+    if (previousEvaluation.type === 'vote' && (isAuthor || isVoter)) {
+      return 'vote_passed';
+    }
+    if (isAuthor) {
+      return 'step_passed';
+    }
+  }
+
   return null;
 }

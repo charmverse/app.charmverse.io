@@ -1,15 +1,18 @@
-import type { FormField, Page, Space, User } from '@charmverse/core/prisma-client';
+import type { FormField, Page, Prisma, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
+import { getDefaultBoard } from 'components/proposals/components/ProposalsBoard/utils/boardData';
 import { InvalidStateError } from 'lib/middleware';
+import type { ProposalFields } from 'lib/proposal/interface';
 import { randomETHWalletAddress } from 'lib/utilities/blockchain';
 import { generateBoard, generateProposal, generateUserAndSpace } from 'testing/setupDatabase';
 import { addUserToSpace } from 'testing/utils/spaces';
 import { generateUser } from 'testing/utils/users';
 
 import type { BoardFields, IPropertyTemplate } from '../board';
+import type { BoardViewFields } from '../boardView';
 import type { CardFields } from '../card';
 import { createCardsFromProposals } from '../createCardsFromProposals';
 import { updateCardsFromProposals } from '../updateCardsFromProposals';
@@ -34,7 +37,10 @@ describe('updateCardsFromProposals()', () => {
     await prisma.$transaction([
       prisma.page.deleteMany({
         where: {
-          spaceId: space.id
+          spaceId: space.id,
+          id: {
+            not: board.id
+          }
         }
       }),
       prisma.proposal.deleteMany({
@@ -48,7 +54,7 @@ describe('updateCardsFromProposals()', () => {
   it('should update cards from proposals', async () => {
     const pageProposal = await testUtilsProposals.generateProposal({
       authors: [user.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [
         {
           group: 'user',
@@ -98,7 +104,7 @@ describe('updateCardsFromProposals()', () => {
   it('should create cards from proposals if there are new proposals added', async () => {
     await testUtilsProposals.generateProposal({
       authors: [user.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [
         {
           group: 'user',
@@ -113,7 +119,7 @@ describe('updateCardsFromProposals()', () => {
 
     const pageProposal2 = await testUtilsProposals.generateProposal({
       authors: [user.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [
         {
           group: 'user',
@@ -173,7 +179,7 @@ describe('updateCardsFromProposals()', () => {
 
     const pageProposal2 = await testUtilsProposals.generateProposal({
       authors: [],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [],
       spaceId: space.id,
       userId: user.id,
@@ -196,6 +202,276 @@ describe('updateCardsFromProposals()', () => {
     expect(newCreatedCard).toBeNull();
   });
 
+  it(`should update the card properties values based on the custom properties values, add/edit/delete properties to boards, cards and views`, async () => {
+    const { user: proposalAuthor, space: testSpace } = await generateUserAndSpace({
+      isAdmin: true
+    });
+
+    const proposal = await testUtilsProposals.generateProposal({
+      authors: [proposalAuthor.id],
+      proposalStatus: 'published',
+      reviewers: [
+        {
+          group: 'user',
+          id: proposalAuthor.id
+        }
+      ],
+      spaceId: testSpace.id,
+      userId: proposalAuthor.id
+    });
+
+    const defaultBoard = getDefaultBoard({
+      evaluationStepTitles: []
+    });
+
+    const customProperties: IPropertyTemplate[] = [
+      {
+        id: v4(),
+        name: 'Text',
+        type: 'text',
+        options: []
+      },
+      {
+        id: v4(),
+        name: 'Select',
+        type: 'select',
+        options: [
+          {
+            id: v4(),
+            value: 'Option 1',
+            color: 'propColorGray'
+          },
+          {
+            id: v4(),
+            value: 'Option 2',
+            color: 'propColorGray'
+          }
+        ]
+      }
+    ];
+
+    await prisma.proposalBlock.create({
+      data: {
+        fields: {
+          ...defaultBoard.fields,
+          cardProperties: [
+            ...defaultBoard.fields.cardProperties,
+            ...customProperties
+          ] as unknown as Prisma.InputJsonArray
+        },
+        id: defaultBoard.id,
+        spaceId: testSpace.id,
+        createdBy: proposalAuthor.id,
+        rootId: testSpace.id,
+        updatedBy: proposalAuthor.id,
+        type: 'board',
+        title: 'Proposals',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: null,
+        parentId: testSpace.id,
+        schema: 1
+      }
+    });
+
+    const proposalFields = (proposal.fields as ProposalFields) ?? {};
+
+    await prisma.proposal.update({
+      where: {
+        id: proposal.id
+      },
+      data: {
+        fields: {
+          ...proposalFields,
+          properties: {
+            ...proposalFields.properties,
+            [customProperties[0].id]: 'Text',
+            [customProperties[1].id]: customProperties[1].options[0].id
+          }
+        }
+      }
+    });
+
+    const databaseBoard = await generateBoard({
+      createdBy: proposalAuthor.id,
+      spaceId: testSpace.id,
+      views: 1,
+      viewDataSource: 'proposals'
+    });
+
+    // Delete existing cards
+    await prisma.block.deleteMany({
+      where: {
+        parentId: databaseBoard.id,
+        type: 'card'
+      }
+    });
+
+    await createCardsFromProposals({
+      boardId: databaseBoard.id,
+      spaceId: testSpace.id,
+      userId: proposalAuthor.id
+    });
+
+    const databaseBlock = await prisma.block.findUniqueOrThrow({
+      where: {
+        id: databaseBoard.boardId!
+      },
+      select: {
+        fields: true
+      }
+    });
+
+    const boardCardProperties = (databaseBlock?.fields as unknown as BoardFields)?.cardProperties ?? [];
+
+    const textProperty = boardCardProperties.find(
+      (prop) => prop.id === customProperties[0].id && prop.proposalFieldId === customProperties[0].id
+    ) as IPropertyTemplate;
+
+    // Rename the first custom property
+    customProperties[0].name = 'Text Column Updated';
+
+    // Add a new custom property
+    customProperties.push({
+      id: v4(),
+      name: 'Number',
+      type: 'number',
+      options: []
+    });
+
+    // Add a new proposal
+    const proposal2 = await testUtilsProposals.generateProposal({
+      authors: [proposalAuthor.id],
+      proposalStatus: 'published',
+      reviewers: [
+        {
+          group: 'user',
+          id: proposalAuthor.id
+        }
+      ],
+      spaceId: testSpace.id,
+      userId: proposalAuthor.id
+    });
+
+    const proposal2Fields = (proposal2.fields as ProposalFields) ?? {};
+
+    await prisma.proposal.update({
+      where: {
+        id: proposal2.id
+      },
+      data: {
+        fields: {
+          ...proposal2Fields,
+          properties: {
+            ...proposal2Fields.properties,
+            [customProperties[0].id]: 'Text 2',
+            [customProperties[1].id]: customProperties[1].options[1].id,
+            [customProperties[2].id]: 10
+          }
+        }
+      }
+    });
+
+    // Delete a custom property
+    await prisma.proposalBlock.update({
+      where: {
+        id_spaceId: {
+          id: defaultBoard.id,
+          spaceId: testSpace.id
+        }
+      },
+      data: {
+        fields: {
+          ...defaultBoard.fields,
+          // Remove the select property
+          cardProperties: [customProperties[0], customProperties[2]] as unknown as Prisma.InputJsonArray
+        }
+      }
+    });
+
+    // Update the value of existing proposal custom property
+    await prisma.proposal.update({
+      where: {
+        id: proposal.id
+      },
+      data: {
+        fields: {
+          ...proposalFields,
+          properties: {
+            ...proposalFields.properties,
+            [customProperties[0].id]: 'Text Updated'
+          }
+        }
+      }
+    });
+
+    await updateCardsFromProposals({
+      boardId: databaseBoard.id,
+      spaceId: testSpace.id,
+      userId: proposalAuthor.id
+    });
+
+    const updatedCardBlocks = await prisma.block.findMany({
+      where: {
+        parentId: databaseBoard.id,
+        spaceId: testSpace.id,
+        type: 'card'
+      },
+      select: {
+        fields: true
+      },
+      orderBy: {
+        createdAt: 'asc'
+      }
+    });
+
+    const updatedBoardBlock = await prisma.block.findUniqueOrThrow({
+      where: {
+        id: databaseBoard.boardId!
+      },
+      select: {
+        fields: true
+      }
+    });
+
+    const updatedBoardCardProperties = (updatedBoardBlock?.fields as unknown as BoardFields)?.cardProperties ?? [];
+
+    const cardBlock1Fields = updatedCardBlocks[0]?.fields as unknown as CardFields;
+    const cardBlock2Fields = updatedCardBlocks[1]?.fields as unknown as CardFields;
+
+    const numberProperty = updatedBoardCardProperties.find(
+      (prop) => prop.id === customProperties[2].id && prop.proposalFieldId === customProperties[2].id
+    ) as IPropertyTemplate;
+    const updatedTextProperty = updatedBoardCardProperties.find(
+      (prop) => prop.id === textProperty.id && prop.proposalFieldId === textProperty.id
+    ) as IPropertyTemplate;
+    const updatedSelectProperty = updatedBoardCardProperties.find(
+      (prop) => prop.id === customProperties[1].id && prop.proposalFieldId === customProperties[1].id
+    ) as IPropertyTemplate;
+
+    expect(cardBlock1Fields.properties[textProperty.id]).toBe('Text Updated');
+    expect(cardBlock2Fields.properties[textProperty.id]).toBe('Text 2');
+    expect(cardBlock2Fields.properties[numberProperty.id]).toBe(10);
+    expect(numberProperty).toBeDefined();
+    expect(updatedTextProperty).toBeDefined();
+    expect(updatedTextProperty.name).toBe('Text Column Updated');
+    expect(updatedSelectProperty).toBeUndefined();
+
+    const updatedViews = await prisma.block.findMany({
+      where: {
+        parentId: databaseBoard.id,
+        type: 'view'
+      },
+      select: {
+        fields: true
+      }
+    });
+
+    const updatedViewFields = updatedViews[0]?.fields as unknown as BoardViewFields;
+    expect(updatedViewFields.visiblePropertyIds.includes(updatedTextProperty.id)).toBeTruthy();
+    expect(updatedViewFields.visiblePropertyIds.includes(numberProperty.id)).toBeTruthy();
+  });
+
   it('should update the card properties values based on proposal form field answers, add new properties to board and new cards', async () => {
     const { user: proposalAuthor, space: testSpace } = await generateUserAndSpace();
     const spaceMember = await generateUser();
@@ -206,7 +482,7 @@ describe('updateCardsFromProposals()', () => {
 
     const proposal = await generateProposal({
       authors: [proposalAuthor.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [
         {
           group: 'user',
@@ -269,7 +545,7 @@ describe('updateCardsFromProposals()', () => {
 
     const proposal2 = await generateProposal({
       authors: [proposalAuthor.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [
         {
           group: 'user',
@@ -405,7 +681,7 @@ describe('updateCardsFromProposals()', () => {
   it('should delete cards from proposals', async () => {
     const pageProposal = await testUtilsProposals.generateProposal({
       authors: [user.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [
         {
           group: 'user',
@@ -447,7 +723,7 @@ describe('updateCardsFromProposals()', () => {
   it('should permanently delete cards from proposals', async () => {
     const pageProposal = await testUtilsProposals.generateProposal({
       authors: [user.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [
         {
           group: 'user',
@@ -512,5 +788,82 @@ describe('updateCardsFromProposals()', () => {
     await expect(
       updateCardsFromProposals({ boardId: board.id, spaceId: v4(), userId: user.id })
     ).rejects.toThrowError();
+  });
+
+  it('should create cards with permissions matching the parent', async () => {
+    const { space: testSpace, user: testUser } = await testUtilsUser.generateUserAndSpace();
+
+    const role = await testUtilsMembers.generateRole({
+      createdBy: testUser.id,
+      spaceId: testSpace.id
+    });
+
+    const testBoard = await generateBoard({
+      createdBy: testUser.id,
+      spaceId: testSpace.id,
+      viewDataSource: 'proposals',
+      cardCount: 0,
+      permissions: [
+        {
+          permissionLevel: 'editor',
+          userId: testUser.id
+        },
+        {
+          permissionLevel: 'full_access',
+          roleId: role.id
+        }
+      ]
+    });
+
+    const rootBoardPermissions = await prisma.pagePermission.findMany({
+      where: {
+        pageId: testBoard.id
+      }
+    });
+
+    expect(rootBoardPermissions).toMatchObject(
+      expect.arrayContaining([
+        expect.objectContaining({ userId: testUser.id, permissionLevel: 'editor' }),
+        expect.objectContaining({ roleId: role.id, permissionLevel: 'full_access' })
+      ])
+    );
+
+    // This sets up the board
+    await createCardsFromProposals({ boardId: testBoard.id, spaceId: testSpace.id, userId: testUser.id });
+
+    // This proposal was created after the datasource was created
+    const visibleProposal = await testUtilsProposals.generateProposal({
+      authors: [],
+      proposalStatus: 'published',
+      reviewers: [],
+      spaceId: testSpace.id,
+      userId: testUser.id
+    });
+
+    // This calls the update method we are testing
+    await updateCardsFromProposals({ boardId: testBoard.id, spaceId: testSpace.id, userId: testUser.id });
+    const pages = await prisma.page.findMany({
+      where: {
+        parentId: testBoard.id
+      },
+      include: {
+        permissions: true
+      }
+    });
+
+    expect(pages).toHaveLength(1);
+
+    const cardPermissions = pages[0].permissions;
+
+    expect(cardPermissions).toMatchObject(
+      expect.arrayContaining(
+        rootBoardPermissions.map((p) => ({
+          ...p,
+          id: expect.any(String),
+          inheritedFromPermission: p.id,
+          pageId: pages[0].id
+        }))
+      )
+    );
   });
 });

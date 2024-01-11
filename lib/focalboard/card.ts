@@ -19,7 +19,7 @@ export type Card<V = CardPropertyValue> = Block & {
 };
 
 export type CardPageProposal = {
-  currentEvaluationId: string | null;
+  currentEvaluationId?: string;
   id: string;
   status: ProposalEvaluationStatus;
   currentStep: ProposalWithUsersLite['currentStep'];

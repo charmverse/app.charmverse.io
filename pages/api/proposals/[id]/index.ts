@@ -1,11 +1,9 @@
-import { InsecureOperationError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { canAccessPrivateFields } from 'lib/proposal/form/canAccessPrivateFields';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import { mapDbProposalToProposal } from 'lib/proposal/mapDbProposalToProposal';
@@ -17,9 +15,7 @@ import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .put(providePermissionClients({ key: 'id', location: 'query', resourceIdType: 'proposal' }), updateProposalController)
-  .get(getProposalController);
+handler.put(updateProposalController).get(getProposalController);
 
 async function getProposalController(req: NextApiRequest, res: NextApiResponse<ProposalWithUsersAndRubric>) {
   const proposalId = req.query.id as string;
@@ -30,13 +26,6 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
       id: proposalId
     },
     include: {
-      draftRubricAnswers: true,
-      rubricAnswers: true,
-      rubricCriteria: {
-        orderBy: {
-          index: 'asc'
-        }
-      },
       evaluations: {
         orderBy: {
           index: 'asc'
@@ -44,7 +33,11 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
         include: {
           permissions: true,
           reviewers: true,
-          rubricCriteria: true,
+          rubricCriteria: {
+            orderBy: {
+              index: 'asc'
+            }
+          },
           rubricAnswers: true,
           draftRubricAnswers: true,
           vote: true
@@ -86,8 +79,6 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
 
   const canSeeAnswers = spaceRole?.isAdmin || proposalPermissions.evaluate || proposalPermissions.review;
   if (!canSeeAnswers) {
-    proposal.draftRubricAnswers = [];
-    proposal.rubricAnswers = [];
     proposal.evaluations.forEach((evaluation) => {
       evaluation.draftRubricAnswers = [];
       evaluation.rubricAnswers = [];

@@ -1,4 +1,10 @@
-import type { Block, Page, ProposalRubricCriteria, ProposalRubricCriteriaAnswer } from '@charmverse/core/prisma-client';
+import type {
+  Block,
+  Page,
+  ProposalEvaluationType,
+  ProposalRubricCriteria,
+  ProposalRubricCriteriaAnswer
+} from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { prismaToBlock } from 'lib/focalboard/block';
@@ -13,11 +19,16 @@ import type {
   ProposalRubricCriteriaWithTypedParams
 } from 'lib/proposal/rubric/interfaces';
 import type { BoardPropertyValue } from 'lib/public-api';
+import { prettyPrint } from 'lib/utilities/strings';
 import { relay } from 'lib/websockets/relay';
 
 import { createCardPage } from '../pages/createCardPage';
 
-import type { BoardFields } from './board';
+import { proposalPropertyTypesList } from './board';
+import type { IPropertyTemplate, BoardFields } from './board';
+import type { BoardViewFields } from './boardView';
+import type { CardFields, CardPropertyValue } from './card';
+import { DEFAULT_BOARD_BLOCK_ID } from './customBlocks/constants';
 import { generateResyncedProposalEvaluationForCard } from './generateResyncedProposalEvaluationForCard';
 import { setDatabaseProposalProperties } from './setDatabaseProposalProperties';
 import { updateCardFormFieldPropertiesValue } from './updateCardFormFieldPropertiesValue';
@@ -40,9 +51,143 @@ export async function updateCardsFromProposals({
     });
   }
 
-  const boardBlock = await setDatabaseProposalProperties({
-    boardId
+  const rootPagePermissions = await prisma.page.findFirstOrThrow({
+    where: {
+      id: boardId
+    },
+    select: {
+      permissions: true
+    }
   });
+
+  const proposalBoardBlock = (await prisma.proposalBlock.findUnique({
+    where: {
+      id_spaceId: {
+        id: DEFAULT_BOARD_BLOCK_ID,
+        spaceId
+      }
+    },
+    select: {
+      fields: true
+    }
+  })) as null | { fields: BoardFields };
+
+  const boardBlock = await setDatabaseProposalProperties({
+    boardId,
+    cardProperties: []
+  });
+
+  const boardBlockCardPropertiesRecord: Record<string, IPropertyTemplate> = {};
+
+  boardBlock.fields.cardProperties.forEach((prop) => {
+    boardBlockCardPropertiesRecord[prop.id] = prop;
+  });
+
+  // Get the newly added proposal properties
+  const newlyAddedProposalProperties =
+    proposalBoardBlock?.fields.cardProperties.filter((prop) => !boardBlockCardPropertiesRecord[prop.id]) ?? [];
+
+  // Looping through proposal board block properties since its the source of truth for the properties
+  const proposalBoardPropertiesUpdated =
+    (newlyAddedProposalProperties.length > 0 ||
+      proposalBoardBlock?.fields.cardProperties.some((cardProperty) => {
+        const boardBlockCardProperty = boardBlockCardPropertiesRecord[cardProperty.id];
+        // If a new property was added to the proposal board block, we need to update the board block
+        if (!boardBlockCardProperty) {
+          return true;
+        }
+
+        // If a property was renamed in the proposal board block, we need to update the board block
+        if (boardBlockCardProperty.name !== cardProperty.name) {
+          return true;
+        }
+
+        // If a property type changed in the proposal board block, we need to update the board block
+        if (boardBlockCardProperty.type !== cardProperty.type) {
+          return true;
+        }
+
+        // Check if the options changed
+        if (JSON.stringify(boardBlockCardProperty.options) !== JSON.stringify(cardProperty.options)) {
+          return true;
+        }
+
+        return false;
+      })) ??
+    false;
+
+  if (proposalBoardPropertiesUpdated) {
+    // Existing custom properties that are not proposal properties
+    const nonProposalCustomProperties = boardBlock.fields.cardProperties.filter((prop) => !prop.proposalFieldId);
+    // Add the new proposal properties
+    proposalBoardBlock?.fields.cardProperties.forEach((cardProperty) => {
+      nonProposalCustomProperties.push({
+        ...cardProperty,
+        proposalFieldId: cardProperty.id
+      });
+    });
+
+    await prisma.block.update({
+      where: {
+        id: boardId
+      },
+      data: {
+        fields: {
+          ...boardBlock.fields,
+          cardProperties: nonProposalCustomProperties as any
+        }
+      }
+    });
+  }
+
+  // Add the newly added proposal properties to all the view blocks visiblePropertyIds
+  if (newlyAddedProposalProperties.length) {
+    const views = await prisma.block.findMany({
+      select: {
+        fields: true,
+        id: true
+      },
+      where: {
+        type: 'view',
+        parentId: boardId
+      }
+    });
+
+    await prisma.$transaction(
+      views.map((block) => {
+        return prisma.block.update({
+          where: { id: block.id },
+          data: {
+            fields: {
+              ...(block.fields as BoardViewFields),
+              // Hide the proposal evaluation type property from the view
+              visiblePropertyIds: [
+                ...new Set([
+                  ...(block.fields as BoardViewFields).visiblePropertyIds,
+                  ...newlyAddedProposalProperties.map((p) => p.id)
+                ])
+              ]
+            },
+            updatedAt: new Date(),
+            updatedBy: userId
+          }
+        });
+      })
+    );
+  }
+
+  const updatedBoardBlock = await prisma.block.findFirstOrThrow({
+    where: {
+      id: boardId,
+      spaceId
+    },
+    select: {
+      fields: true
+    }
+  });
+
+  const boardBlockCardProperties = (updatedBoardBlock.fields as unknown as BoardFields)?.cardProperties ?? [];
+
   // Ideally all the views should have sourceType proposal when created, but there are views which doesn't have sourceType proposal even though they are created from proposal source
   if ((boardBlock.fields as any as BoardFields).sourceType !== 'proposals') {
     throw new InvalidStateError('Database not configured to use proposals as a source');
@@ -222,9 +367,20 @@ export async function updateCardsFromProposals({
           databaseProperties: databaseProposalProps
         });
 
+      let hasCustomPropertyValueChanged = false;
+      const cardProperties = (card.block.fields as CardFields).properties;
+      boardBlockCardProperties.forEach((prop) => {
+        const proposalFieldValue = (pageWithProposal.proposal?.fields as ProposalFields)?.properties?.[prop.id];
+        const cardFieldValue = cardProperties[prop.id];
+        if (proposalFieldValue && proposalFieldValue !== cardFieldValue) {
+          hasCustomPropertyValueChanged = true;
+          cardProperties[prop.id] = proposalFieldValue as CardPropertyValue;
+        }
+      });
+
       if (
         // For now, always recalculate rubrics. We can optimise further later
-        pageWithProposal.proposal?.evaluationType === 'rubric' ||
+        currentStep?.step === 'rubric' ||
         card.title !== pageWithProposal.title ||
         card.hasContent !== pageWithProposal.hasContent ||
         card.content?.toString() !== pageWithProposal.content?.toString() ||
@@ -240,7 +396,8 @@ export async function updateCardsFromProposals({
               ?.id) ||
         (!pageWithProposal.proposal?.archived &&
           cardProposalStep?.optionId !==
-            databaseProposalProps.proposalStep?.options.find((opt) => opt.value === proposalEvaluationStep)?.id)
+            databaseProposalProps.proposalStep?.options.find((opt) => opt.value === proposalEvaluationStep)?.id) ||
+        hasCustomPropertyValueChanged
       ) {
         const newProps = {
           ...(card.block.fields as any).properties,
@@ -255,16 +412,17 @@ export async function updateCardsFromProposals({
           properties: newProps
         };
 
-        if (pageWithProposal.proposal?.evaluationType) {
+        if (currentStep?.step === 'rubric') {
           const criteria = mappedRubricCriteriaByProposal[pageWithProposal.id] ?? [];
+
           const answers = mappedRubricAnswersByProposal[pageWithProposal.id] ?? [];
 
           const updatedCardShape = generateResyncedProposalEvaluationForCard({
-            proposalEvaluationType: pageWithProposal.proposal.evaluationType,
             cardProps: { fields: newCardBlockFields },
             databaseProperties: databaseProposalProps,
-            rubricCriteria: criteria as ProposalRubricCriteriaWithTypedParams[],
-            rubricAnswers: answers as ProposalRubricCriteriaAnswerWithTypedResponse[]
+            rubricCriteria: criteria,
+            rubricAnswers: answers as ProposalRubricCriteriaAnswerWithTypedResponse[],
+            currentStep: { id: currentStep.id, type: currentStep.step }
           });
 
           newCardBlockFields = updatedCardShape.fields;
@@ -321,24 +479,34 @@ export async function updateCardsFromProposals({
         properties[databaseProposalProps.proposalStep.id] = proposalEvaluationStep ?? '';
       }
 
+      boardBlockCardProperties.forEach((cardProperty) => {
+        if (!proposalPropertyTypesList.includes(cardProperty.type as any) && cardProperty.proposalFieldId) {
+          const proposalFieldValue = (pageWithProposal.proposal?.fields as ProposalFields)?.properties?.[
+            cardProperty.id
+          ];
+          if (proposalFieldValue !== null && proposalFieldValue !== undefined) {
+            properties[cardProperty.id] = proposalFieldValue as BoardPropertyValue;
+          }
+        }
+      });
+
       const createdAt = pageWithProposal.createdAt;
-      if (pageWithProposal.proposal?.evaluationType) {
+
+      if (currentStep) {
         const criteria = mappedRubricCriteriaByProposal[pageWithProposal.id] ?? [];
         const answers = mappedRubricAnswersByProposal[pageWithProposal.id] ?? [];
 
         const updatedCardShape = generateResyncedProposalEvaluationForCard({
-          proposalEvaluationType: pageWithProposal.proposal.evaluationType,
           cardProps: { fields: properties },
           databaseProperties: databaseProposalProps,
           rubricCriteria: criteria as ProposalRubricCriteriaWithTypedParams[],
-          rubricAnswers: answers as ProposalRubricCriteriaAnswerWithTypedResponse[]
+          rubricAnswers: answers as ProposalRubricCriteriaAnswerWithTypedResponse[],
+          currentStep: { id: currentStep.id, type: currentStep.step as ProposalEvaluationType }
         });
 
         properties = updatedCardShape.fields;
       }
-
       const formFields = pageWithProposal.proposal?.form?.formFields ?? [];
-      const boardBlockCardProperties = boardBlock.fields.cardProperties ?? [];
 
       const formFieldProperties = await updateCardFormFieldPropertiesValue({
         accessPrivateFields,
@@ -360,7 +528,16 @@ export async function updateCardsFromProposals({
         hasContent: pageWithProposal.hasContent,
         content: pageWithProposal.content,
         contentText: pageWithProposal.contentText,
-        syncWithPageId: pageWithProposal.id
+        syncWithPageId: pageWithProposal.id,
+        permissions: rootPagePermissions.permissions.map((permission) => ({
+          permissionLevel: permission.permissionLevel,
+          allowDiscovery: permission.allowDiscovery,
+          inheritedFromPermission: permission.id,
+          public: permission.public,
+          roleId: permission.roleId,
+          spaceId: permission.spaceId,
+          userId: permission.userId
+        }))
       });
       newCards.push(_card);
     }

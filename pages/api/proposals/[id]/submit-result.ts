@@ -1,23 +1,20 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import type { ReviewEvaluationRequest } from 'lib/proposal/submitEvaluationResult';
 import { submitEvaluationResult } from 'lib/proposal/submitEvaluationResult';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(providePermissionClients({ key: 'id', location: 'query', resourceIdType: 'proposal' }))
-  .use(requireKeys(['evaluationId', 'result'], 'body'))
-  .put(updateEvaluationResultndpoint);
+handler.use(requireKeys(['evaluationId', 'result'], 'body')).put(updateEvaluationResultEndpoint);
 
 // for submitting a review or removing a previous one
-async function updateEvaluationResultndpoint(req: NextApiRequest, res: NextApiResponse) {
+async function updateEvaluationResultEndpoint(req: NextApiRequest, res: NextApiResponse) {
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
@@ -31,6 +28,13 @@ async function updateEvaluationResultndpoint(req: NextApiRequest, res: NextApiRe
   const evaluation = await prisma.proposalEvaluation.findUniqueOrThrow({
     where: {
       id: evaluationId
+    },
+    include: {
+      proposal: {
+        select: {
+          spaceId: true
+        }
+      }
     }
   });
 
@@ -41,14 +45,22 @@ async function updateEvaluationResultndpoint(req: NextApiRequest, res: NextApiRe
   } else if (!proposalPermissions.evaluate) {
     throw new ActionNotPermittedError(`You don't have permission to review this proposal.`);
   }
+
   if (!result) {
     throw new ActionNotPermittedError(`You must provide a result.`);
   }
+
+  if (evaluation.result === result) {
+    log.debug('Evaluation result is the same', { proposalId, evaluationId, result });
+    return res.status(200).end();
+  }
+
   await submitEvaluationResult({
     proposalId,
     evaluationId,
     result,
-    decidedBy: userId
+    decidedBy: userId,
+    spaceId: evaluation.proposal.spaceId
   });
 
   return res.status(200).end();

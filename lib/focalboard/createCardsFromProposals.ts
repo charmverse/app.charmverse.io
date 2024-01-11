@@ -5,9 +5,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
 import { prismaToBlock } from 'lib/focalboard/block';
+import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposal/blocks/constants';
 import { canAccessPrivateFields } from 'lib/proposal/form/canAccessPrivateFields';
 import { getCurrentStep } from 'lib/proposal/getCurrentStep';
-import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
 import type { ProposalFields } from 'lib/proposal/interface';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
@@ -18,7 +18,7 @@ import { relay } from 'lib/websockets/relay';
 
 import { createCardPage } from '../pages/createCardPage';
 
-import type { BoardFields } from './board';
+import { proposalPropertyTypesList, type BoardFields } from './board';
 import type { BoardViewFields } from './boardView';
 import { extractDatabaseProposalProperties } from './extractDatabaseProposalProperties';
 import { generateResyncedProposalEvaluationForCard } from './generateResyncedProposalEvaluationForCard';
@@ -39,6 +39,28 @@ export async function createCardsFromProposals({
   } else if (!stringUtils.isUUID(boardId)) {
     throw new InvalidInputError('Invalid boardId');
   }
+
+  const rootPagePermissions = await prisma.page.findFirstOrThrow({
+    where: {
+      id: boardId
+    },
+    select: {
+      permissions: true
+    }
+  });
+
+  const proposalBoardBlock = (await prisma.proposalBlock.findUnique({
+    where: {
+      id_spaceId: {
+        id: DEFAULT_BOARD_BLOCK_ID,
+        spaceId
+      }
+    },
+    select: {
+      fields: true
+    }
+  })) as null | { fields: BoardFields };
+
   await prisma.space.findUniqueOrThrow({
     where: {
       id: spaceId
@@ -110,7 +132,8 @@ export async function createCardsFromProposals({
   });
 
   const boardBlock = await setDatabaseProposalProperties({
-    boardId
+    boardId,
+    cardProperties: proposalBoardBlock?.fields.cardProperties ?? []
   });
 
   const views = await prisma.block.findMany({
@@ -208,6 +231,16 @@ export async function createCardsFromProposals({
     if (proposalProps.proposalUrl) {
       properties[proposalProps.proposalUrl.id] = pageProposal.path;
     }
+
+    boardBlock.fields.cardProperties.forEach((cardProperty) => {
+      if (!proposalPropertyTypesList.includes(cardProperty.type as any)) {
+        const proposalFieldValue = (pageProposal.proposal?.fields as ProposalFields)?.properties?.[cardProperty.id];
+        if (proposalFieldValue) {
+          properties[cardProperty.id] = proposalFieldValue as BoardPropertyValue;
+        }
+      }
+    });
+
     const currentStep = pageProposal.proposal
       ? getCurrentStep({
           evaluations: pageProposal.proposal.evaluations,
@@ -245,13 +278,13 @@ export async function createCardsFromProposals({
       proposalId: pageProposal.proposal!.id
     });
 
-    if (pageProposal?.proposal?.evaluationType === 'rubric') {
+    if (currentStep?.step === 'rubric') {
       const criteria = mappedRubricCriteriaByProposal[pageProposal.id] ?? [];
       const answers = mappedRubricAnswersByProposal[pageProposal.id] ?? [];
 
       const updatedCardShape = generateResyncedProposalEvaluationForCard({
-        proposalEvaluationType: pageProposal.proposal.evaluationType,
         cardProps: { fields: properties },
+        currentStep: { id: currentStep.id, type: currentStep.step },
         databaseProperties: databaseProposalProps,
         rubricCriteria: criteria as ProposalRubricCriteriaWithTypedParams[],
         rubricAnswers: answers as ProposalRubricCriteriaAnswerWithTypedResponse[]
@@ -273,7 +306,16 @@ export async function createCardsFromProposals({
       hasContent: pageProposal.hasContent,
       content: pageProposal.content,
       contentText: pageProposal.contentText,
-      syncWithPageId: pageProposal.id
+      syncWithPageId: pageProposal.id,
+      permissions: rootPagePermissions.permissions.map((permission) => ({
+        permissionLevel: permission.permissionLevel,
+        allowDiscovery: permission.allowDiscovery,
+        inheritedFromPermission: permission.id,
+        public: permission.public,
+        roleId: permission.roleId,
+        spaceId: permission.spaceId,
+        userId: permission.userId
+      }))
     });
     cards.push(_card);
   }

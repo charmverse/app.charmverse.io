@@ -1,8 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals } from '@charmverse/core/test';
+import { v4 } from 'uuid';
 
-import { createProposal } from 'lib/proposal/createProposal';
-import { updateProposalStatusOnly } from 'lib/proposal/updateProposalStatusOnly';
 import { assignRole } from 'lib/roles';
 import { getProposalEntity, getSpaceEntity, getUserEntity } from 'lib/webhookPublisher/entities';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
@@ -12,330 +11,10 @@ import { addUserToSpace } from 'testing/utils/spaces';
 import { generateUser } from 'testing/utils/users';
 
 import { createNotificationsFromEvent } from '../../createNotificationsFromEvent';
-import { createProposalNotifications } from '../createProposalNotifications';
 
-describe.skip(`Test proposal events and notifications`, () => {
-  it(`Should create proposal notifications for proposal.status_changed event`, async () => {
-    const { space } = await generateUserAndSpace();
-    const author1 = await generateUser();
-    await addUserToSpace({
-      spaceId: space.id,
-      userId: author1.id
-    });
-    const author2 = await generateUser();
-    await addUserToSpace({
-      spaceId: space.id,
-      userId: author2.id
-    });
-    const reviewer = await generateUser();
-    await addUserToSpace({
-      spaceId: space.id,
-      userId: reviewer.id
-    });
-    const member1 = await generateUser();
-    await addUserToSpace({
-      spaceId: space.id,
-      userId: member1.id
-    });
-    // Member 2 doesn't have any access to proposal category, so notifications shouldn't be created for them
-    const member2 = await generateUser();
-    await addUserToSpace({
-      spaceId: space.id,
-      userId: member2.id
-    });
-    const role = await createRole({
-      spaceId: space.id,
-      name: 'Post Moderators'
-    });
-    await Promise.all(
-      [author1.id, author2.id, reviewer.id, member1.id].map((userId) =>
-        assignRole({
-          roleId: role.id,
-          userId
-        })
-      )
-    );
-
-    const proposal = await testUtilsProposals.generateProposal({
-      proposalStatus: 'draft',
-      spaceId: space.id,
-      userId: author1.id,
-      authors: [author1.id, author2.id],
-      evaluationInputs: [
-        {
-          evaluationType: 'feedback',
-          permissions: [],
-          reviewers: [
-            {
-              group: 'user',
-              id: reviewer.id
-            },
-            {
-              group: 'user',
-              id: author1.id
-            }
-          ]
-        },
-        {
-          evaluationType: 'feedback',
-          permissions: [],
-          reviewers: []
-        }
-      ]
-    });
-    const spaceEntity = await getSpaceEntity(space.id);
-    const proposalEntity = await getProposalEntity(proposal.id);
-    // Move to discussion status
-    await prisma.proposal.update({
-      where: {
-        id: proposal.id
-      },
-      data: {
-        status: 'published'
-      }
-    });
-    await createProposalNotifications({
-      event: {
-        scope: WebhookEventNames.ProposalStatusChanged,
-        proposal: proposalEntity,
-        newStatus: 'published',
-        oldStatus: 'draft',
-        space: spaceEntity,
-        user: await getUserEntity(author1.id)
-      },
-      spaceId: space.id,
-      createdAt: new Date().toISOString()
-    });
-    const proposalDiscussionStatusChangedAuthorNotification = await prisma.proposalNotification.findFirst({
-      where: {
-        type: 'start_review',
-        proposalId: proposal.id,
-        notificationMetadata: {
-          userId: author2.id,
-          spaceId: space.id
-        }
-      }
-    });
-    const proposalDiscussionStatusChangedReviewerNotification = await prisma.proposalNotification.findFirst({
-      where: {
-        type: 'start_discussion',
-        proposalId: proposal.id,
-        notificationMetadata: {
-          userId: reviewer.id,
-          spaceId: space.id
-        }
-      }
-    });
-    const proposalDiscussionStatusChangedMember1Notification = await prisma.proposalNotification.findFirst({
-      where: {
-        type: 'start_discussion',
-        proposalId: proposal.id,
-        notificationMetadata: {
-          userId: member1.id,
-          spaceId: space.id
-        }
-      }
-    });
-    const proposalDiscussionStatusChangedMember2Notification = await prisma.proposalNotification.findFirst({
-      where: {
-        type: 'start_discussion',
-        proposalId: proposal.id,
-        notificationMetadata: {
-          userId: member2.id,
-          spaceId: space.id
-        }
-      }
-    });
-    expect(proposalDiscussionStatusChangedAuthorNotification).toBeTruthy();
-    expect(proposalDiscussionStatusChangedReviewerNotification).toBeTruthy();
-    expect(proposalDiscussionStatusChangedMember1Notification).toBeTruthy();
-    expect(proposalDiscussionStatusChangedMember2Notification).toBeTruthy();
-    // Move to review status
-    await updateProposalStatusOnly({
-      newStatus: 'published',
-      proposalId: proposal.id
-    });
-    await createProposalNotifications({
-      event: {
-        scope: WebhookEventNames.ProposalStatusChanged,
-        proposal: proposalEntity,
-        newStatus: 'review',
-        oldStatus: 'discussion',
-        space: spaceEntity,
-        user: await getUserEntity(author1.id)
-      },
-      spaceId: space.id,
-      createdAt: new Date().toISOString()
-    });
-    const proposalReviewStatusChangedAuthorNotification = await prisma.proposalNotification.findFirst({
-      where: {
-        type: 'needs_review',
-        proposalId: proposal.id,
-        notificationMetadata: {
-          userId: author2.id,
-          spaceId: space.id
-        }
-      }
-    });
-    const proposalReviewStatusChangedReviewerNotification = await prisma.proposalNotification.findFirst({
-      where: {
-        type: 'needs_review',
-        proposalId: proposal.id,
-        notificationMetadata: {
-          userId: reviewer.id,
-          spaceId: space.id
-        }
-      }
-    });
-    const proposalReviewStatusChangedMember1Notification = await prisma.proposalNotification.findFirst({
-      where: {
-        type: 'needs_review',
-        proposalId: proposal.id,
-        notificationMetadata: {
-          userId: member1.id,
-          spaceId: space.id
-        }
-      }
-    });
-    const proposalReviewStatusChangedMember2Notification = await prisma.proposalNotification.findFirst({
-      where: {
-        type: 'needs_review',
-        proposalId: proposal.id,
-        notificationMetadata: {
-          userId: member2.id,
-          spaceId: space.id
-        }
-      }
-    });
-    expect(proposalReviewStatusChangedAuthorNotification).toBeFalsy();
-    expect(proposalReviewStatusChangedReviewerNotification).toBeTruthy();
-    expect(proposalReviewStatusChangedMember1Notification).toBeFalsy();
-    expect(proposalReviewStatusChangedMember2Notification).toBeFalsy();
-    // Move to reviewed status
-    await updateProposalStatusOnly({
-      newStatus: 'published',
-      proposalId: proposal.id
-    });
-    await createProposalNotifications({
-      event: {
-        scope: WebhookEventNames.ProposalStatusChanged,
-        proposal: proposalEntity,
-        newStatus: 'reviewed',
-        oldStatus: 'review',
-        space: spaceEntity,
-        user: await getUserEntity(author1.id)
-      },
-      spaceId: space.id,
-      createdAt: new Date().toISOString()
-    });
-    const proposalReviewedStatusChangedAuthorNotification = await prisma.proposalNotification.findFirst({
-      where: {
-        type: 'reviewed',
-        proposalId: proposal.id,
-        notificationMetadata: {
-          userId: author2.id,
-          spaceId: space.id
-        }
-      }
-    });
-    const proposalReviewedStatusChangedReviewerNotification = await prisma.proposalNotification.findFirst({
-      where: {
-        type: 'reviewed',
-        proposalId: proposal.id,
-        notificationMetadata: {
-          userId: reviewer.id,
-          spaceId: space.id
-        }
-      }
-    });
-    const proposalReviewedStatusChangedMember1Notification = await prisma.proposalNotification.findFirst({
-      where: {
-        type: 'reviewed',
-        proposalId: proposal.id,
-        notificationMetadata: {
-          userId: member1.id,
-          spaceId: space.id
-        }
-      }
-    });
-    const proposalReviewedStatusChangedMember2Notification = await prisma.proposalNotification.findFirst({
-      where: {
-        type: 'reviewed',
-        proposalId: proposal.id,
-        notificationMetadata: {
-          userId: member2.id,
-          spaceId: space.id
-        }
-      }
-    });
-    expect(proposalReviewedStatusChangedAuthorNotification).toBeTruthy();
-    expect(proposalReviewedStatusChangedReviewerNotification).toBeFalsy();
-    expect(proposalReviewedStatusChangedMember1Notification).toBeFalsy();
-    expect(proposalReviewedStatusChangedMember2Notification).toBeFalsy();
-    // Move to vote_active status
-    await updateProposalStatusOnly({
-      newStatus: 'published',
-      proposalId: proposal.id
-    });
-    await createProposalNotifications({
-      event: {
-        scope: WebhookEventNames.ProposalStatusChanged,
-        proposal: proposalEntity,
-        newStatus: 'vote_active',
-        oldStatus: 'reviewed',
-        space: spaceEntity,
-        user: await getUserEntity(author1.id)
-      },
-      spaceId: space.id,
-      createdAt: new Date().toISOString()
-    });
-    const proposalVoteActiveStatusChangedAuthorNotification = await prisma.proposalNotification.findFirst({
-      where: {
-        type: 'vote',
-        proposalId: proposal.id,
-        notificationMetadata: {
-          userId: author2.id,
-          spaceId: space.id
-        }
-      }
-    });
-    const proposalVoteActiveStatusChangedReviewerNotification = await prisma.proposalNotification.findFirst({
-      where: {
-        type: 'vote',
-        proposalId: proposal.id,
-        notificationMetadata: {
-          userId: reviewer.id,
-          spaceId: space.id
-        }
-      }
-    });
-    const proposalVoteActiveStatusChangedMember1Notification = await prisma.proposalNotification.findFirst({
-      where: {
-        type: 'vote',
-        proposalId: proposal.id,
-        notificationMetadata: {
-          userId: member1.id,
-          spaceId: space.id
-        }
-      }
-    });
-    const proposalVoteActiveStatusChangedMember2Notification = await prisma.proposalNotification.findFirst({
-      where: {
-        type: 'vote',
-        proposalId: proposal.id,
-        notificationMetadata: {
-          userId: member2.id,
-          spaceId: space.id
-        }
-      }
-    });
-    expect(proposalVoteActiveStatusChangedAuthorNotification).toBeTruthy();
-    expect(proposalVoteActiveStatusChangedReviewerNotification).toBeTruthy();
-    expect(proposalVoteActiveStatusChangedMember1Notification).toBeTruthy();
-    expect(proposalVoteActiveStatusChangedMember2Notification).toBeTruthy();
-  });
+describe(`Test proposal events and notifications`, () => {
   it('Should not create notifications when they are disabled', async () => {
-    const { space } = await createDiscussionNotifications({
+    const { space } = await createProposalStatusChangeNotification({
       spaceNotificationToggles: {
         proposals: false
       }
@@ -350,7 +29,7 @@ describe.skip(`Test proposal events and notifications`, () => {
     expect(notifications).toHaveLength(0);
   });
   it('Should not create new notifications when they are disabled', async () => {
-    const { space } = await createDiscussionNotifications({
+    const { space } = await createProposalStatusChangeNotification({
       spaceNotificationToggles: {
         proposals__start_discussion: false
       }
@@ -366,7 +45,7 @@ describe.skip(`Test proposal events and notifications`, () => {
   });
 });
 
-async function createDiscussionNotifications(input: Parameters<typeof generateUserAndSpace>[0]) {
+async function createProposalStatusChangeNotification(input: Parameters<typeof generateUserAndSpace>[0]) {
   const { space } = await generateUserAndSpace(input);
   const author1 = await generateUser();
   await addUserToSpace({
@@ -390,31 +69,38 @@ async function createDiscussionNotifications(input: Parameters<typeof generateUs
       })
     )
   );
-  const { proposal } = await createProposal({
+  const proposalEvaluationId = v4();
+  const proposal = await testUtilsProposals.generateProposal({
     spaceId: space.id,
     userId: author1.id,
     authors: [author1.id],
-    isDraft: true,
-    reviewers: [
+    proposalStatus: 'published',
+    evaluationInputs: [
       {
-        group: 'user',
-        id: reviewer.id
+        id: proposalEvaluationId,
+        reviewers: [],
+        evaluationType: 'feedback',
+        title: 'Feedback',
+        rubricCriteria: [],
+        permissions: [
+          {
+            operation: 'comment',
+            assignee: {
+              group: 'space_member'
+            }
+          }
+        ]
       }
     ]
   });
+
   const spaceEntity = await getSpaceEntity(space.id);
   const proposalEntity = await getProposalEntity(proposal.id);
-  // Move to discussion status
-  await updateProposalStatusOnly({
-    newStatus: 'published',
-    proposalId: proposal.id
-  });
   await createNotificationsFromEvent({
     event: {
       scope: WebhookEventNames.ProposalStatusChanged,
       proposal: proposalEntity,
-      newStatus: 'discussion',
-      oldStatus: 'draft',
+      currentEvaluationId: proposalEvaluationId,
       space: spaceEntity,
       user: await getUserEntity(author1.id)
     },

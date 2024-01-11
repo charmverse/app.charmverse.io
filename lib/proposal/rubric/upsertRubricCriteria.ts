@@ -14,7 +14,7 @@ export type RubricDataInput<T extends ProposalRubricCriteriaType = ProposalRubri
   Partial<Pick<ProposalRubricCriteria, 'description' | 'id'>>;
 export type RubricCriteriaUpsert = {
   proposalId: string;
-  evaluationId?: string | null;
+  evaluationId: string;
   rubricCriteria: RubricDataInput[];
 };
 

@@ -1,11 +1,6 @@
 import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalReviewer } from '@charmverse/core/prisma';
-import {
-  ProposalEvaluationResult,
-  type FormField,
-  type Proposal,
-  type ProposalEvaluation
-} from '@charmverse/core/prisma-client';
+import { type FormField, type Proposal, type ProposalEvaluation } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { sortBy } from 'lodash';
@@ -41,9 +36,6 @@ export function mapDbProposalToProposal({
         draftRubricAnswers: any[];
       })[];
       rewards: { id: string }[];
-      reviewers: ProposalReviewer[];
-      rubricAnswers: any[];
-      draftRubricAnswers: any[];
     };
   permissions?: ProposalPermissionFlags;
   canAccessPrivateFormFields?: boolean;
@@ -60,9 +52,9 @@ export function mapDbProposalToProposal({
     evaluationType: currentEvaluation?.type || proposal.evaluationType,
     status: getOldProposalStatus(proposal),
     // Support old model: filter out evaluation-specific reviewers and rubric answers
-    rubricAnswers: currentEvaluation?.rubricAnswers || proposal.rubricAnswers,
-    draftRubricAnswers: currentEvaluation?.draftRubricAnswers || proposal.draftRubricAnswers,
-    reviewers: currentEvaluation?.reviewers || proposal.reviewers,
+    rubricAnswers: currentEvaluation?.rubricAnswers || [],
+    draftRubricAnswers: currentEvaluation?.draftRubricAnswers || [],
+    reviewers: currentEvaluation?.reviewers || [],
     rewardIds: rewards.map((r) => r.id) || null,
     form: form
       ? {
