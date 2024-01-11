@@ -90,6 +90,7 @@ export function useProposalsBoardAdapter() {
             ...mapProposalToCardPage({ proposal: p, proposalPage: page, spaceId: space?.id }),
             isStructuredProposal,
             proposal: {
+              archived: p.archived,
               currentEvaluationId: p.currentEvaluationId,
               id: p.id,
               status: p.status,
@@ -195,7 +196,7 @@ function mapProposalToCardPage({
       proposalPage && 'createdAt' in proposalPage && proposalPage.createdAt
         ? new Date(proposalPage?.createdAt).getTime()
         : '',
-    [PROPOSAL_STATUS_BLOCK_ID]: proposal?.currentStep?.result ?? 'in_progress',
+    [PROPOSAL_STATUS_BLOCK_ID]: proposal?.archived ? 'archived' : proposal?.currentStep?.result ?? 'in_progress',
     [AUTHORS_BLOCK_ID]: (proposal && 'authors' in proposal && proposal.authors?.map((a) => a.userId)) || '',
     [PROPOSAL_STEP_BLOCK_ID]: proposal?.currentStep?.title ?? 'Draft',
     [PROPOSAL_EVALUATION_TYPE_ID]: proposal?.currentStep?.step ?? 'draft',

@@ -12,6 +12,7 @@ type ProposalProp = {
   evaluations: ProposalWithUsersLite['evaluations'];
   hasRewards: boolean;
   id: string;
+  archived: boolean;
 };
 
 export function ControlledProposalStepSelect({
@@ -111,7 +112,10 @@ export function ProposalStepSelectBase({
       wrapColumn
       includeSelectedOptions
       readOnly={
-        readOnly || hasPublishedRewards || (currentEvaluationStep === 'vote' && currentEvaluationResult === 'fail')
+        proposal.archived ||
+        readOnly ||
+        hasPublishedRewards ||
+        (currentEvaluationStep === 'vote' && currentEvaluationResult === 'fail')
       }
       options={options}
       propertyValue={
