@@ -37,7 +37,8 @@ export async function getHypersubDetails(values: GetHypersubPayload): Promise<Hy
     const hypersubMetadata: Hypersub = {
       name,
       contract,
-      chainId
+      chainId,
+      image: '/images/logos/fabric-xyz.svg'
     };
 
     if (initialWalletAddress) {
