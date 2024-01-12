@@ -152,7 +152,7 @@ function DocumentPage({
   const isStructuredProposal = proposal && proposal.formId;
 
   // create a key that updates when edit mode changes - default to 'editing' so we dont close sockets immediately
-  const editorKey = page.id + (editMode || 'editing') + pagePermissions.edit_content;
+  const editorKey = page.id + (editMode || 'editing') + pagePermissions.edit_content + !!proposal?.archived;
 
   function onParticipantUpdate(participants: FrontendParticipant[]) {
     setPageProps({ participants });

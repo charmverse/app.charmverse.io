@@ -2,6 +2,7 @@ import type { PageMeta } from '@charmverse/core/pages';
 import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import { objectUtils } from '@charmverse/core/utilities';
 import { useMemo, useState } from 'react';
+import { v4 } from 'uuid';
 
 import { sortCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
@@ -57,27 +58,46 @@ export function useProposalsBoardAdapter() {
   }, [proposals]);
 
   // board with all proposal properties and default properties
-  const board: Board = getDefaultBoard({
-    storedBoard: proposalBoardBlock,
-    evaluationStepTitles
-  });
 
-  const activeView = useMemo(() => {
+  const { board, boardView: activeView } = useMemo(() => {
     // use saved default block or build on the fly
     const viewBlock = proposalBlocks?.find((b) => b.id === DEFAULT_VIEW_BLOCK_ID);
 
-    if (!viewBlock) {
-      return getDefaultTableView({ evaluationStepTitles, storedBoard: proposalBoardBlock });
-    }
+    const _board: Board = getDefaultBoard({
+      storedBoard: proposalBoardBlock,
+      evaluationStepTitles
+    });
 
-    const boardView = blockToFBBlock(viewBlock) as BoardView;
+    const boardView = viewBlock
+      ? (blockToFBBlock(viewBlock) as BoardView)
+      : getDefaultTableView({ evaluationStepTitles, storedBoard: proposalBoardBlock });
 
     // sort by created at desc by default
     if (!boardView.fields.sortOptions?.length) {
       boardView.fields.sortOptions = [{ propertyId: CREATED_AT_ID, reversed: true }];
     }
 
-    return boardView;
+    const statusProperty = _board?.fields?.cardProperties.find(
+      (cardProperty) => cardProperty.id === PROPOSAL_STATUS_BLOCK_ID
+    );
+
+    const archivedStatus = statusProperty?.options.find((o) => o.id === 'archived');
+
+    // TODO: Run a migration to add a default filter to the default view
+    // Temporary fix to hide archived proposals from the default view
+    if (!boardView.fields.filter.filters.length && statusProperty && archivedStatus) {
+      boardView.fields.filter.filters = [
+        {
+          condition: 'does_not_contain',
+          filterId: v4(),
+          operation: 'and',
+          propertyId: statusProperty.id,
+          values: [archivedStatus.id]
+        }
+      ];
+    }
+
+    return { boardView, board: _board };
   }, [evaluationStepTitles, proposalBoardBlock, proposalBlocks]);
 
   const cardPages: CardPage[] = useMemo(() => {
