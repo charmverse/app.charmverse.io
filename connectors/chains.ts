@@ -405,7 +405,7 @@ const RPC: Record<string, IChainDetails> = {
     ...EVM_DEFAULT,
     chainId: taikoTestnetSepolia.id,
     viem: taikoTestnetSepolia,
-    chainName: 'Taiko Jolnir - Testnet',
+    chainName: 'Taiko Sepolia - Testnet',
     rpcUrls: taikoTestnetSepolia.rpcUrls.public.http,
     blockExplorerUrls: [taikoTestnetSepolia.blockExplorers.default.url],
     iconUrl: '/images/cryptoLogos/taiko-logo.svg',
