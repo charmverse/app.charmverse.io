@@ -8,12 +8,10 @@ type Props = {
   onClick: (e: React.MouseEvent) => void;
 };
 
-const ViewHeaderActionsMenu = React.memo((props: Props) => {
+export function ToggleViewSidebarButton(props: Props) {
   return (
     <Box ml={0} mr={1} data-test='view-header-actions-menu'>
       <IconButton icon={<MoreHorizOutlinedIcon fontSize='small' />} onClick={props.onClick} style={{ width: '32px' }} />
     </Box>
   );
-});
-
-export default ViewHeaderActionsMenu;
+}
