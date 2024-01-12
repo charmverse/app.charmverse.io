@@ -23,7 +23,7 @@ import IconButton from '../../widgets/buttons/iconButton';
 import AddViewMenu from '../addViewMenu';
 
 import NewCardButton from './newCardButton';
-import ViewHeaderActionsMenu from './viewHeaderActionsMenu';
+import { ToggleViewSidebarButton } from './ToggleViewSidebarButton';
 import ViewHeaderDisplayByMenu from './viewHeaderDisplayByMenu';
 import { ViewHeaderRowsMenu } from './viewHeaderRowsMenu/viewHeaderRowsMenu';
 import ViewTabs from './viewTabs';
@@ -214,7 +214,7 @@ function ViewHeader(props: Props) {
 
           {!props.readOnly && activeView && (
             <>
-              <ViewHeaderActionsMenu onClick={() => toggleViewOptions()} />
+              <ToggleViewSidebarButton onClick={() => toggleViewOptions()} />
 
               {/* New card button */}
 
