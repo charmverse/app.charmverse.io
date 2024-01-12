@@ -49,7 +49,7 @@ export function ProposalInEvaluation() {
   return (
     <GlobalContext>
       <Box sx={{ overflowY: 'auto' }}>
-        <DocumentPage page={page} refreshPage={async () => {}} readOnly={true} savePage={() => {}} />
+        <DocumentPage page={page} readOnly={true} savePage={() => {}} />
       </Box>
     </GlobalContext>
   );
