@@ -21,7 +21,8 @@ import {
   sepolia,
   zkSync,
   zkSyncTestnet,
-  zora
+  zora,
+  taikoJolnir
 } from 'viem/chains';
 
 import { isProdEnv } from 'config/constants';
@@ -388,6 +389,16 @@ const RPC: Record<string, IChainDetails> = {
     iconUrl: '/images/cryptoLogos/harmony-one-logo.svg',
     shortName: 'hmy-ps-s0',
     testnet: true
+  },
+  TAIKO: {
+    ...EVM_DEFAULT,
+    chainId: taikoJolnir.id,
+    viem: taikoJolnir,
+    chainName: 'Taiko Jolnir',
+    rpcUrls: taikoJolnir.rpcUrls.public.http,
+    blockExplorerUrls: [taikoJolnir.blockExplorers.default.url],
+    iconUrl: '/images/cryptoLogos/taiko-logo.svg',
+    shortName: taikoJolnir.network
   },
   ZKSYNC: {
     ...EVM_DEFAULT,
