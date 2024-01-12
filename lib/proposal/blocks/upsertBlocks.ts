@@ -32,7 +32,8 @@ export async function upsertBlocks({
           properties: filterInternalProperties<ProposalPropertiesField>(
             (proposal.fields as ProposalPropertyValues).properties
           )
-        }
+        },
+        actorId: userId
       })
     );
 

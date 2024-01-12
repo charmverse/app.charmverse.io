@@ -2,10 +2,26 @@ import { Divider, ListItemIcon, MenuItem, Typography, Stack } from '@mui/materia
 import { useIntl } from 'react-intl';
 
 import type { PropertyType } from 'lib/focalboard/board';
-import { proposalPropertyTypesList, propertyTypesList } from 'lib/focalboard/board';
 
 import { iconForPropertyType } from './iconForPropertyType';
 import { typeDisplayName } from './typeDisplayName';
+
+const propertyTypesList: PropertyType[] = [
+  'text',
+  'number',
+  'email',
+  'phone',
+  'url',
+  'select',
+  'multiSelect',
+  'date',
+  'person',
+  'checkbox',
+  'createdTime',
+  'createdBy',
+  'updatedTime',
+  'updatedBy'
+];
 
 export function PropertyTypes({ onClick, isMobile }: { onClick: (type: PropertyType) => void; isMobile?: boolean }) {
   const intl = useIntl();
@@ -19,14 +35,12 @@ export function PropertyTypes({ onClick, isMobile }: { onClick: (type: PropertyT
           <Divider />
         </>
       )}
-      {propertyTypesList
-        .filter((type) => !proposalPropertyTypesList.includes(type as any))
-        .map((type) => (
-          <MenuItem data-test={`select-property-${type}`} onClick={() => onClick(type)} key={type}>
-            <ListItemIcon>{iconForPropertyType(type)}</ListItemIcon>
-            <Typography>{typeDisplayName(intl, type)}</Typography>
-          </MenuItem>
-        ))}
+      {propertyTypesList.map((type) => (
+        <MenuItem data-test={`select-property-${type}`} onClick={() => onClick(type)} key={type}>
+          <ListItemIcon>{iconForPropertyType(type)}</ListItemIcon>
+          <Typography>{typeDisplayName(intl, type)}</Typography>
+        </MenuItem>
+      ))}
     </Stack>
   );
 }

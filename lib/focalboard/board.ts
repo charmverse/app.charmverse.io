@@ -41,24 +41,6 @@ export type PropertyType =
   | 'tokenChain'
   | DatabaseProposalPropertyType;
 
-export const propertyTypesList: PropertyType[] = [
-  'text',
-  'number',
-  'email',
-  'phone',
-  'url',
-  'select',
-  'multiSelect',
-  'date',
-  'person',
-  'checkbox',
-  'createdTime',
-  'createdBy',
-  'updatedTime',
-  'updatedBy',
-  ...proposalPropertyTypesList
-];
-
 interface IPropertyOption<T = string> {
   id: T;
   value: string;

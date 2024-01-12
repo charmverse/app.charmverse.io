@@ -32,7 +32,8 @@ async function archiveProposalController(req: NextApiRequest, res: NextApiRespon
 
   const updatedProposal = await archiveProposal({
     archived,
-    proposalId
+    proposalId,
+    actorId: userId
   });
 
   return res.status(200).send(updatedProposal);
