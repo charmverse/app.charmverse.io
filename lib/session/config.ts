@@ -61,6 +61,11 @@ export const sessionUserRelations = {
       domain: true
     }
   },
+  userOTP: {
+    select: {
+      activatedAt: true
+    }
+  },
   googleAccounts: {
     select: {
       email: true,

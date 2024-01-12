@@ -5,6 +5,7 @@ import Legend from 'components/settings/Legend';
 import { IdentityProviders } from './components/IdentityProviders';
 import { LensPublication } from './components/LensPublication';
 import { MultiSigList } from './components/MultiSigList';
+import { TwoFactorAuthUser } from './components/TwoFactorAuthUser';
 
 export function AccountSettings() {
   useTrackPageView({ type: 'settings/my-account' });
@@ -14,6 +15,7 @@ export function AccountSettings() {
       <Legend>My Account</Legend>
       <IdentityProviders />
       <AccountPreferences />
+      <TwoFactorAuthUser />
       <LensPublication />
       <MultiSigList />
     </>

@@ -271,7 +271,7 @@ export function SpaceSettings({
             </Stack>
           </Grid>
           <Grid item>
-            <TwoFactorAuth {...register('requireMembersTwoFactorAuth')} isAdmin={isAdmin} />
+            <TwoFactorAuth register={register} isAdmin={isAdmin} />
           </Grid>
           <Grid item>
             <FieldLabel>Notifications</FieldLabel>
