@@ -412,7 +412,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="CreatedAt octo-propertyvalue readonly"
+                class="octo-propertyvalue readonly MuiBox-root css-azx95j"
               >
                 6/15/21, 4:22 PM
               </div>
@@ -555,7 +555,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="CreatedAt octo-propertyvalue readonly"
+                class="octo-propertyvalue readonly MuiBox-root css-azx95j"
               >
                 6/15/21, 4:22 PM
               </div>
@@ -1783,7 +1783,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="LastModifiedAt octo-propertyvalue readonly"
+                class="octo-propertyvalue readonly MuiBox-root css-azx95j"
               >
                 9/14/22, 2:13 PM
               </div>
@@ -1926,7 +1926,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="LastModifiedAt octo-propertyvalue readonly"
+                class="octo-propertyvalue readonly MuiBox-root css-azx95j"
               >
                 9/14/22, 2:13 PM
               </div>
