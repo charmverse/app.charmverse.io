@@ -55,7 +55,8 @@ export function NewProposalButton() {
   const canCreateProposal = spacePermissions?.createProposals;
   // grab page data from context so that title is always up-to-date
   const proposalTemplatePages = proposalTemplates
-    ?.map(
+    ?.filter((template) => !!pages[template.page.id])
+    .map(
       (template) =>
         ({ ...pages[template.page.id], isStructuredProposal: !!template.formId } as PageMeta & {
           isStructuredProposal: boolean;
