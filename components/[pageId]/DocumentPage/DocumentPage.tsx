@@ -393,7 +393,7 @@ function DocumentPage({
               <PageHeader
                 headerImage={page.headerImage}
                 // Commented for now, as we need to preserve cursor position between re-renders caused by updating this
-                // key={page.title}
+                key={page.id}
                 icon={page.icon}
                 title={page.title}
                 updatedAt={page.updatedAt.toString()}
@@ -407,8 +407,7 @@ function DocumentPage({
               />
             ) : (
               <PageTitleInput
-                // Commented for now, as we need to preserve cursor position between re-renders caused by updating this
-                // key={page.title}
+                key={page.id}
                 value={page.title}
                 focusDocumentEditor={focusDocumentEditor}
                 updatedAt={page.updatedAt.toString()}
@@ -446,6 +445,7 @@ function DocumentPage({
                 proposal={proposal}
                 onChangeEvaluation={onChangeEvaluation}
                 refreshProposal={refreshProposal}
+                templateId={page.sourceTemplateId}
               />
             )}
 

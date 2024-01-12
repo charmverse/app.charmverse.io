@@ -36,7 +36,7 @@ export type Props = {
   >;
   onChangeEvaluation?: (evaluationId: string, updated: Partial<ProposalEvaluationValues>) => void;
   refreshProposal?: VoidFunction;
-  templateId?: string | null;
+  templateId: string | null | undefined;
 };
 
 export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refreshProposal, templateId }: Props) {
