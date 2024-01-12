@@ -13,7 +13,10 @@ import type { ProposalEvaluationStatus, ProposalEvaluationStep, ProposalWithUser
 
 import { useBatchUpdateProposalStatusOrStep } from '../hooks/useBatchUpdateProposalStatusOrStep';
 
-type ProposalProp = Pick<ProposalWithUsersLite, 'currentStep' | 'currentEvaluationId' | 'evaluations' | 'id'>;
+type ProposalProp = Pick<
+  ProposalWithUsersLite,
+  'currentStep' | 'currentEvaluationId' | 'evaluations' | 'id' | 'archived'
+>;
 
 export function ControlledProposalStatusSelect({
   proposal,
@@ -87,10 +90,23 @@ function ProposalStatusSelectBase({
   return (
     <TagSelect
       wrapColumn
-      readOnly={readOnly || currentEvaluationStep === 'vote' || hasPublishedRewards}
-      options={options}
+      readOnly={proposal.archived || readOnly || currentEvaluationStep === 'vote' || hasPublishedRewards}
+      options={
+        proposal.archived
+          ? [
+              {
+                id: 'archived',
+                value: 'Archived',
+                dropdownValue: 'Archived',
+                color: 'gray'
+              }
+            ]
+          : options
+      }
       propertyValue={
-        hasPublishedRewards && lastEvaluation
+        proposal.archived
+          ? 'archived'
+          : hasPublishedRewards && lastEvaluation
           ? getProposalEvaluationStatus({
               result: 'pass',
               step: lastEvaluation.type as ProposalEvaluationStep
