@@ -67,7 +67,7 @@ function getDefaultProperties({ evaluationStepTitles }: { evaluationStepTitles: 
     proposalDbProperties.proposalReviewer(PROPOSAL_REVIEWERS_BLOCK_ID, 'Reviewers'),
     proposalDbProperties.proposalCreatedAt(CREATED_AT_ID),
     {
-      id: `__${uuid()}`, // __ is required to hide property from UI
+      id: `__createdTime`, // these properties are always re-generated so use a static id
       name: 'Last updated time',
       options: [],
       type: 'updatedTime'

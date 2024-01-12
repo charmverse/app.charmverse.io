@@ -194,10 +194,10 @@ function mapProposalToCardPage({
     ...proposalFields.properties,
     [Constants.titleColumnId]: proposalPage?.title || '',
     // add default field values on the fly
-    [CREATED_AT_ID]:
-      proposalPage && 'createdAt' in proposalPage && proposalPage.createdAt
-        ? new Date(proposalPage?.createdAt).getTime()
-        : '',
+    // [CREATED_AT_ID]:
+    //   proposalPage && 'createdAt' in proposalPage && proposalPage.createdAt
+    //     ? new Date(proposalPage?.createdAt).getTime()
+    //     : '',
     [PROPOSAL_STATUS_BLOCK_ID]: proposal?.currentStep?.result ?? 'in_progress',
     [AUTHORS_BLOCK_ID]: (proposal && 'authors' in proposal && proposal.authors?.map((a) => a.userId)) || '',
     [PROPOSAL_STEP_BLOCK_ID]: proposal?.currentStep?.title ?? 'Draft',
