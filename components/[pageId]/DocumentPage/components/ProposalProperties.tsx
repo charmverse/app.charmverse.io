@@ -18,23 +18,19 @@ import { CreateLensPublication } from './CreateLensPublication';
 
 interface ProposalPropertiesProps {
   readOnly?: boolean;
-  enableSidebar?: boolean;
   pageId: string;
   proposalId: string;
   pagePermissions?: PagePermissionFlags;
-  openEvaluation?: (evaluationId?: string) => void;
   proposalPage: PageWithContent;
   proposal?: ProposalWithUsersAndRubric;
   refreshProposal: VoidFunction;
 }
 
 export function ProposalProperties({
-  enableSidebar,
   pagePermissions,
   pageId,
   proposalId,
   readOnly,
-  openEvaluation,
   proposalPage,
   proposal,
   refreshProposal
@@ -44,7 +40,6 @@ export function ProposalProperties({
   const [isPublishingToLens, setIsPublishingToLens] = useState(false);
   const { mutateProposals } = useProposals();
 
-  const isMdScreen = useMdScreen();
   const sourceTemplate = useProposalTemplateById(proposal?.page?.sourceTemplateId);
 
   const { data: isReviewer } = useGetIsReviewer(pageId || undefined);
