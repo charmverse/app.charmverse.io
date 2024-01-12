@@ -5,6 +5,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { isTruthy } from 'lib/utilities/types';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
+import { setPageUpdatedAt } from './setPageUpdatedAt';
+
 export type GoBackToStepRequest = {
   proposalId: string;
   evaluationId: string | 'draft';
@@ -119,4 +121,6 @@ export async function goBackToStep({
       userId
     });
   }
+
+  await setPageUpdatedAt({ proposalId, userId });
 }

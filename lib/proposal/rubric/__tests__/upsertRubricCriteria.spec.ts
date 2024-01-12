@@ -24,7 +24,8 @@ describe('upsertRubricCriteria', () => {
     const rubrics = await upsertRubricCriteria({
       proposalId: proposal.id,
       evaluationId: proposal.evaluations[0].id,
-      rubricCriteria: [{ type: 'range', title: 'Score', parameters: { max: 5, min: 1 } }]
+      rubricCriteria: [{ type: 'range', title: 'Score', parameters: { max: 5, min: 1 } }],
+      actorId: user.id
     });
 
     expect(rubrics).toEqual<ProposalRubricCriteriaWithTypedParams<'range'>[]>([
@@ -45,7 +46,8 @@ describe('upsertRubricCriteria', () => {
     const newRubrics = await upsertRubricCriteria({
       proposalId: proposal.id,
       evaluationId: proposal.evaluations[0].id,
-      rubricCriteria: [...rubrics, { type: 'range', title: 'Second score', parameters: { max: 7, min: 1 } }]
+      rubricCriteria: [...rubrics, { type: 'range', title: 'Second score', parameters: { max: 7, min: 1 } }],
+      actorId: user.id
     });
 
     expect(newRubrics).toEqual<ProposalRubricCriteriaWithTypedParams<'range'>[]>([
@@ -73,13 +75,15 @@ describe('upsertRubricCriteria', () => {
     const rubrics = await upsertRubricCriteria({
       proposalId: proposal.id,
       evaluationId: proposal.evaluations[0].id,
-      rubricCriteria: [{ type: 'range', title: 'Score', parameters: { max: 5, min: 1 } }]
+      rubricCriteria: [{ type: 'range', title: 'Score', parameters: { max: 5, min: 1 } }],
+      actorId: user.id
     });
 
     const rubricsAfterUpdate = await upsertRubricCriteria({
       proposalId: proposal.id,
       evaluationId: proposal.evaluations[0].id,
-      rubricCriteria: [{ ...rubrics[0], parameters: { max: 10, min: 1 } }]
+      rubricCriteria: [{ ...rubrics[0], parameters: { max: 10, min: 1 } }],
+      actorId: user.id
     });
 
     expect(rubricsAfterUpdate.length).toBe(1);
@@ -101,13 +105,15 @@ describe('upsertRubricCriteria', () => {
     const rubrics = await upsertRubricCriteria({
       proposalId: proposal.id,
       evaluationId: proposal.evaluations[0].id,
-      rubricCriteria: [{ type: 'range', title: 'Score', parameters: { max: 5, min: 1 } }]
+      rubricCriteria: [{ type: 'range', title: 'Score', parameters: { max: 5, min: 1 } }],
+      actorId: user.id
     });
 
     const rubricsAfterUpdate = await upsertRubricCriteria({
       proposalId: proposal.id,
       evaluationId: proposal.evaluations[0].id,
-      rubricCriteria: [{ type: 'range', title: 'Other Score', parameters: { max: 10, min: 1 } }]
+      rubricCriteria: [{ type: 'range', title: 'Other Score', parameters: { max: 10, min: 1 } }],
+      actorId: user.id
     });
 
     expect(rubricsAfterUpdate.length).toBe(1);
@@ -119,7 +125,8 @@ describe('upsertRubricCriteria', () => {
       upsertRubricCriteria({
         proposalId: undefined as any,
         evaluationId: undefined as any,
-        rubricCriteria: []
+        rubricCriteria: [],
+        actorId: user.id
       })
     ).rejects.toBeInstanceOf(InvalidInputError);
   });
@@ -135,7 +142,8 @@ describe('upsertRubricCriteria', () => {
       upsertRubricCriteria({
         proposalId: proposal.id,
         evaluationId: proposal.evaluations[0].id,
-        rubricCriteria: [{ type: 'range', title: 'Score', parameters: { max: 5, min: null as any } }]
+        rubricCriteria: [{ type: 'range', title: 'Score', parameters: { max: 5, min: null as any } }],
+        actorId: user.id
       })
     ).rejects.toBeInstanceOf(InvalidInputError);
 
@@ -144,7 +152,8 @@ describe('upsertRubricCriteria', () => {
       upsertRubricCriteria({
         proposalId: proposal.id,
         evaluationId: proposal.evaluations[0].id,
-        rubricCriteria: [{ type: 'range', title: 'Score', parameters: { max: 5, min: 5 } }]
+        rubricCriteria: [{ type: 'range', title: 'Score', parameters: { max: 5, min: 5 } }],
+        actorId: user.id
       })
     ).rejects.toBeInstanceOf(InvalidInputError);
 
@@ -153,7 +162,8 @@ describe('upsertRubricCriteria', () => {
       upsertRubricCriteria({
         proposalId: proposal.id,
         evaluationId: proposal.evaluations[0].id,
-        rubricCriteria: [{ type: 'range', title: 'Score', parameters: { max: 1, min: 5 } }]
+        rubricCriteria: [{ type: 'range', title: 'Score', parameters: { max: 1, min: 5 } }],
+        actorId: user.id
       })
     ).rejects.toBeInstanceOf(InvalidInputError);
   });
@@ -167,7 +177,8 @@ describe('upsertRubricCriteria', () => {
     const proposalRubric = await upsertRubricCriteria({
       proposalId: proposal.id,
       evaluationId: proposal.evaluations[0].id,
-      rubricCriteria: [{ type: 'range', title: 'Score', parameters: { max: 10, min: 1 } }]
+      rubricCriteria: [{ type: 'range', title: 'Score', parameters: { max: 10, min: 1 } }],
+      actorId: user.id
     });
 
     const secondProposal = await rubricProposal({
@@ -178,13 +189,15 @@ describe('upsertRubricCriteria', () => {
     const secondProposalRubric = await upsertRubricCriteria({
       proposalId: secondProposal.id,
       evaluationId: proposal.evaluations[0].id,
-      rubricCriteria: [{ type: 'range', title: 'Score', parameters: { max: 10, min: 1 } }]
+      rubricCriteria: [{ type: 'range', title: 'Score', parameters: { max: 10, min: 1 } }],
+      actorId: user.id
     });
 
     const secondProposalRubricAfterUpsert = await upsertRubricCriteria({
       proposalId: secondProposal.id,
       evaluationId: proposal.evaluations[0].id,
-      rubricCriteria: [proposalRubric[0], secondProposalRubric[0]]
+      rubricCriteria: [proposalRubric[0], secondProposalRubric[0]],
+      actorId: user.id
     });
 
     expect(secondProposalRubricAfterUpsert).toHaveLength(2);

@@ -152,7 +152,8 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
     proposalId: proposal.id,
     authors,
     publishToLens,
-    fields
+    fields,
+    actorId: userId
   });
 
   return res.status(200).end();

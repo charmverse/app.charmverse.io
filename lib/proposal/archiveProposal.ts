@@ -3,12 +3,18 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { stringUtils } from '@charmverse/core/utilities';
 
+import { setPageUpdatedAt } from './setPageUpdatedAt';
+
 export type ArchiveProposalRequest = {
   archived: boolean;
   proposalId: string;
 };
 
-export async function archiveProposal({ archived, proposalId }: ArchiveProposalRequest): Promise<ProposalWithUsers> {
+export async function archiveProposal({
+  archived,
+  proposalId,
+  actorId
+}: ArchiveProposalRequest & { actorId: string }): Promise<ProposalWithUsers> {
   if (typeof archived !== 'boolean') {
     throw new InvalidInputError(`Property "archived" must be true or false`);
   } else if (!stringUtils.isUUID(proposalId)) {
@@ -28,6 +34,8 @@ export async function archiveProposal({ archived, proposalId }: ArchiveProposalR
       reviewers: true
     }
   });
+
+  await setPageUpdatedAt({ proposalId, userId: actorId });
 
   return updatedProposal;
 }
