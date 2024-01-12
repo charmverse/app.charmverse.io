@@ -37,7 +37,8 @@ describe('Update proposal specific data', () => {
     await expect(
       updateProposal({
         proposalId: result.id,
-        authors: []
+        authors: [],
+        actorId: author1.id
       })
     ).rejects.toBeInstanceOf(InvalidStateError);
   });

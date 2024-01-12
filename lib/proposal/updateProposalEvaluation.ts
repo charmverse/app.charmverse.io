@@ -2,6 +2,7 @@ import type { ProposalReviewer } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { VoteSettings } from './interface';
+import { setPageUpdatedAt } from './setPageUpdatedAt';
 
 export type UpdateEvaluationRequest = {
   proposalId: string;
@@ -14,8 +15,9 @@ export async function updateProposalEvaluation({
   proposalId,
   evaluationId,
   voteSettings,
-  reviewers
-}: UpdateEvaluationRequest) {
+  reviewers,
+  actorId
+}: UpdateEvaluationRequest & { actorId: string }) {
   await prisma.$transaction(async (tx) => {
     // updatereviewers only when it is present in request payload
     if (reviewers) {
@@ -44,4 +46,6 @@ export async function updateProposalEvaluation({
       });
     }
   });
+
+  await setPageUpdatedAt({ proposalId, userId: actorId });
 }

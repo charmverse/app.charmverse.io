@@ -57,19 +57,22 @@ export function useProposalsBoardAdapter() {
   }, [proposals]);
 
   // board with all proposal properties and default properties
-  const board: Board = getDefaultBoard({
-    storedBoard: proposalBoardBlock,
-    evaluationStepTitles
-  });
+  const board: Board = useMemo(
+    () =>
+      getDefaultBoard({
+        storedBoard: proposalBoardBlock,
+        evaluationStepTitles
+      }),
+    [evaluationStepTitles, proposalBoardBlock]
+  );
 
   const activeView = useMemo(() => {
     // use saved default block or build on the fly
     const viewBlock = proposalBlocks?.find((b) => b.id === DEFAULT_VIEW_BLOCK_ID);
 
     if (!viewBlock) {
-      return getDefaultTableView({ evaluationStepTitles, storedBoard: proposalBoardBlock });
+      return getDefaultTableView({ board });
     }
-
     const boardView = blockToFBBlock(viewBlock) as BoardView;
 
     // sort by created at desc by default
@@ -78,7 +81,7 @@ export function useProposalsBoardAdapter() {
     }
 
     return boardView;
-  }, [evaluationStepTitles, proposalBoardBlock, proposalBlocks]);
+  }, [board, proposalBlocks]);
 
   const cardPages: CardPage[] = useMemo(() => {
     let cards =

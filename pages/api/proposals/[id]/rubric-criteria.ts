@@ -69,7 +69,8 @@ async function upsertProposalCriteriaController(
   await upsertRubricCriteria({
     proposalId,
     evaluationId,
-    rubricCriteria
+    rubricCriteria,
+    actorId: userId
   });
 
   res.status(200).end();
