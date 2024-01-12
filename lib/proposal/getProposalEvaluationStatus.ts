@@ -34,9 +34,11 @@ export function getProposalEvaluationStatus({
   result
 }: {
   step: ProposalEvaluationStep;
-  result: ProposalEvaluationResultExtended;
+  result: ProposalEvaluationResultExtended | 'archived';
 }): ProposalEvaluationStatus {
-  if (step === 'draft') {
+  if (result === 'archived') {
+    return 'archived';
+  } else if (step === 'draft') {
     return 'unpublished';
   } else if (step === 'feedback') {
     return result === 'in_progress' ? 'in_progress' : 'complete';

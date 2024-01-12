@@ -185,6 +185,7 @@ export function PropertyTemplateMenu({
             <ControlledProposalStepSelect
               onChange={({ evaluationId, moveForward }) => onProposalStepUpdate(checkedIds, evaluationId, moveForward)}
               proposal={{
+                archived: firstCheckedProposal.archived ?? false,
                 currentStep: firstCheckedProposal.currentStep,
                 id: firstCheckedProposal.id,
                 evaluations: firstCheckedProposal.evaluations,

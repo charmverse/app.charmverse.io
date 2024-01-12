@@ -80,7 +80,8 @@ export const EVALUATION_STATUS_LABELS: Record<ProposalEvaluationStatus, string> 
   in_progress: 'In Progress',
   passed: 'Passed',
   published: 'Published',
-  unpublished: 'Unpublished'
+  unpublished: 'Unpublished',
+  archived: 'Archived'
 };
 
 export const EVALUATION_STATUS_VERB_LABELS: Record<ProposalEvaluationStatus, string> = {
@@ -89,7 +90,8 @@ export const EVALUATION_STATUS_VERB_LABELS: Record<ProposalEvaluationStatus, str
   in_progress: 'In Progress',
   passed: 'Pass',
   published: 'Publish',
-  unpublished: 'Unpublish'
+  unpublished: 'Unpublish',
+  archived: 'Archive'
 };
 
 export const PROPOSAL_STEP_LABELS: Record<ProposalEvaluationStep, string> = {
@@ -122,5 +124,6 @@ export const proposalStatusColors: Record<ProposalEvaluationStatus, BrandColor> 
   in_progress: 'yellow',
   passed: 'green',
   published: 'green',
-  unpublished: 'gray'
+  unpublished: 'gray',
+  archived: 'gray'
 };

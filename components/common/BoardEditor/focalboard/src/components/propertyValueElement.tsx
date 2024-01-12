@@ -159,7 +159,8 @@ function PropertyValueElement(props: Props) {
   const propertyValue = card.fields.properties[propertyTemplate.id];
   const cardProperties = board.fields.cardProperties;
   const cardProperty = cardProperties.find((_cardProperty) => _cardProperty.id === propertyTemplate.id);
-  const readOnly = props.readOnly || !!cardProperty?.formFieldId || !!cardProperty?.proposalFieldId;
+  const readOnly =
+    proposal?.archived || props.readOnly || !!cardProperty?.formFieldId || !!cardProperty?.proposalFieldId;
 
   const displayValue = OctoUtils.propertyDisplayValue({
     block: card,

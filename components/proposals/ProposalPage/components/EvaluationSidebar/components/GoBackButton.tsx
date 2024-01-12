@@ -12,8 +12,10 @@ export function GoBackButton({
   hasMovePermission,
   proposalId,
   previousStep,
-  onSubmit
+  onSubmit,
+  archived
 }: {
+  archived?: boolean;
   hasMovePermission: boolean;
   proposalId: string;
   previousStep?: Pick<ProposalEvaluationValues, 'id' | 'type' | 'title'>;
@@ -28,6 +30,8 @@ export function GoBackButton({
     ? 'You do not have permission to move this proposal'
     : previousStep?.type === 'vote'
     ? 'You cannot revert the results of a vote'
+    : archived
+    ? 'You cannot move an archived proposal'
     : '';
 
   async function goToPreviousStep() {

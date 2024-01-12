@@ -17,6 +17,7 @@ export type Props = {
   evaluation: Pick<PopulatedEvaluation, 'id' | 'completedAt' | 'reviewers' | 'result'>;
   refreshProposal?: VoidFunction;
   isCurrent: boolean;
+  archived?: boolean;
 };
 
 export function PassFailEvaluation({
@@ -25,7 +26,8 @@ export function PassFailEvaluation({
   isReviewer,
   evaluation,
   isCurrent,
-  refreshProposal
+  refreshProposal,
+  archived
 }: Props) {
   const { trigger, isMutating } = useSubmitEvaluationResult({ proposalId });
 
@@ -42,6 +44,8 @@ export function PassFailEvaluation({
     ? 'You are not a reviewer'
     : isMutating
     ? 'Submitting review'
+    : archived
+    ? 'You cannot move an archived proposal'
     : null;
 
   async function onSubmitReview(result: NonNullable<PopulatedEvaluation['result']>) {
