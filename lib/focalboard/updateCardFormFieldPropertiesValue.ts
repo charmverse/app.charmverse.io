@@ -6,7 +6,7 @@ import type { BoardPropertyValue } from 'lib/public-api/interfaces';
 
 import type { IPropertyTemplate } from './board';
 
-export async function updateCardFormFieldPropertiesValue({
+export function updateCardFormFieldPropertiesValue({
   accessPrivateFields,
   formFields,
   cardProperties,
