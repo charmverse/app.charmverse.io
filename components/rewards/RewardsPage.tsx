@@ -11,7 +11,7 @@ import AddViewMenu from 'components/common/BoardEditor/focalboard/src/components
 import { getVisibleAndHiddenGroups } from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
 import Kanban from 'components/common/BoardEditor/focalboard/src/components/kanban/kanban';
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
-import ViewHeaderActionsMenu from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderActionsMenu';
+import { ToggleViewSidebarButton } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ToggleViewSidebarButton';
 import ViewHeaderDisplayByMenu from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderDisplayByMenu';
 import ViewTabs from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewTabs';
 import ViewSidebar from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
@@ -210,7 +210,7 @@ export function RewardsPage({ title }: { title: string }) {
               />
 
               {isAdmin && (
-                <ViewHeaderActionsMenu
+                <ToggleViewSidebarButton
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
