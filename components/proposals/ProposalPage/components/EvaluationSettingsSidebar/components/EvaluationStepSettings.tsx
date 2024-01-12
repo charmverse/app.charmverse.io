@@ -23,9 +23,17 @@ type Props = {
   onChange: (criteria: Partial<ProposalEvaluationValues>) => void;
   readOnly: boolean;
   isReviewer?: boolean;
+  isPublishedProposal?: boolean;
 };
 
-export function EvaluationStepSettings({ evaluation, evaluationTemplate, isReviewer, onChange, readOnly }: Props) {
+export function EvaluationStepSettings({
+  evaluation,
+  evaluationTemplate,
+  isReviewer,
+  isPublishedProposal,
+  onChange,
+  readOnly
+}: Props) {
   const isAdmin = useIsAdmin();
   // reviewers are also readOnly when using a template with reviewers pre-selected
   const readOnlyReviewers = readOnly || (!isAdmin && !!evaluationTemplate?.reviewers?.length);
@@ -77,6 +85,7 @@ export function EvaluationStepSettings({ evaluation, evaluationTemplate, isRevie
           <Box display='flex' flex={1} flexDirection='column'>
             <RubricCriteriaSettings
               readOnly={readOnlyRubricCriteria}
+              showDeleteConfirmation={!!isPublishedProposal}
               value={evaluation.rubricCriteria as RangeProposalCriteria[]}
               onChange={(rubricCriteria) =>
                 onChange({

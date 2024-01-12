@@ -59,7 +59,6 @@ export function PollNodeView({
           onCreateVote={onCreateVote}
           pageId={pageId}
           postId={postId}
-          snapshotProposalId={snapshotProposalId || null}
         />
         <div
           onClick={() => {

@@ -1,4 +1,4 @@
-import type { Page, Proposal, ProposalCategory, Space, User } from '@charmverse/core/prisma';
+import type { Page, Proposal, Space, User } from '@charmverse/core/prisma';
 import { testUtilsProposals } from '@charmverse/core/test';
 import { test as base, expect } from '@playwright/test';
 import { DocumentPage } from '__e2e__/po/document.po';
@@ -21,7 +21,6 @@ const test = base.extend<Fixtures>({
 
 let space: Space;
 let proposalAuthor: User;
-let proposalCategory: ProposalCategory;
 let draftProposal: Proposal & { page: Page };
 let discussionProposal: Proposal & { page: Page };
 
@@ -51,7 +50,7 @@ test.describe.serial('View proposal - public space', () => {
     discussionProposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: proposalAuthor.id,
-      proposalStatus: 'discussion'
+      proposalStatus: 'published'
     });
 
     // Finish setup start interacting with the app

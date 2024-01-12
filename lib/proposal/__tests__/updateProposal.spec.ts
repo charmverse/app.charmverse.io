@@ -1,7 +1,8 @@
 import type { Space, User } from '@charmverse/core/prisma';
+import { testUtilsProposals } from '@charmverse/core/test';
 
 import { InvalidStateError } from 'lib/middleware';
-import { createProposalWithUsers, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { updateProposal } from '../updateProposal';
 
@@ -27,11 +28,9 @@ beforeAll(async () => {
 describe('Update proposal specific data', () => {
   it('Should throw error if at least one author is not selected for a proposal', async () => {
     // Create a test proposal first
-    const result = await createProposalWithUsers({
+    const result = await testUtilsProposals.generateProposal({
       spaceId: space.id,
-      userId: author1.id,
-      authors: [],
-      reviewers: [reviewer2.id]
+      userId: author1.id
     });
 
     await expect(

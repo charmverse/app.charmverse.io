@@ -157,7 +157,6 @@ type Props<T> = {
   inputPlaceholder?: string; // placeholder for the editable input of outlined variant
   displayType?: PropertyValueDisplayType;
   onChange: (value: SelectOptionPopulated[]) => void;
-  proposalCategoryId?: string | null;
   readOnly?: boolean;
   readOnlyMessage?: string;
   showEmptyPlaceholder?: boolean;
@@ -174,7 +173,6 @@ type Props<T> = {
 export function UserAndRoleSelect<T extends { id: string; group: string } = SelectOption>({
   displayType = 'details',
   onChange,
-  proposalCategoryId,
   readOnly,
   readOnlyMessage,
   inputPlaceholder,
@@ -221,7 +219,7 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
       }
     }
     return _filteredOptions;
-  }, [systemRoles, isFreeSpace, filteredMembers, roles, proposalCategoryId, type]);
+  }, [systemRoles, isFreeSpace, filteredMembers, roles, type]);
 
   const allOptions = useMemo(() => {
     if (isFreeSpace) {

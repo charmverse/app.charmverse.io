@@ -1,11 +1,4 @@
-import type {
-  ProposalCategory,
-  ProposalSystemRole,
-  ProposalWorkflow,
-  Role,
-  Space,
-  User
-} from '@charmverse/core/prisma-client';
+import type { ProposalSystemRole, ProposalWorkflow, Role, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsSpaces } from '@charmverse/core/test';

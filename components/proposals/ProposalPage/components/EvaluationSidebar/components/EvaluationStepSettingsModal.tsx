@@ -32,6 +32,7 @@ export function EvaluationStepSettingsModal({
           evaluation={evaluationInput}
           evaluationTemplate={matchingTemplateStep}
           readOnly={false}
+          isPublishedProposal
           onChange={updateEvaluation}
         />
       </Box>
