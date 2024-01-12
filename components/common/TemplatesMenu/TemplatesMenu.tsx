@@ -7,7 +7,6 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { bindMenu } from 'material-ui-popup-state/hooks';
-import type { ReactNode } from 'react';
 
 import { AddIcon } from 'components/common/Icons/AddIcon';
 import { fancyTrim } from 'lib/utilities/strings';

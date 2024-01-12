@@ -14,10 +14,12 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
-import type { Card } from 'lib/focalboard/card';
+import type { Card, CardPropertyValue } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
+import type { CreateEventPayload } from 'lib/notifications/interfaces';
 import type { ProposalEvaluationStep } from 'lib/proposal/interface';
 import { isTruthy } from 'lib/utilities/types';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import mutator from '../../../mutator';
 
@@ -118,12 +120,7 @@ export function ViewHeaderRowsMenu({
     const firstProposal = proposalsMap[checkedPages[0]?.proposalId ?? ''];
     const _isReviewerDisabled = checkedPages.some((checkedPage) => {
       const proposal = proposalsMap[checkedPage.proposalId ?? ''];
-      return (
-        !proposal ||
-        proposal.currentStep.step === 'draft' ||
-        proposal.currentStep.step === 'feedback' ||
-        checkedPage.sourceTemplateId
-      );
+      return !proposal || proposal.currentStep.step === 'draft' || proposal.currentStep.step === 'feedback';
     });
 
     const _isStatusDisabled =
@@ -258,6 +255,45 @@ export function ViewHeaderRowsMenu({
     }
   }
 
+  async function onPersonPropertyChange({
+    checkedCards,
+    userIds,
+    propertyTemplate,
+    propertyValue
+  }: {
+    checkedCards: Card[];
+    propertyTemplate: IPropertyTemplate;
+    userIds: string[];
+    propertyValue: CardPropertyValue;
+  }) {
+    await mutator.changePropertyValues(checkedCards, propertyTemplate.id, userIds);
+    const previousValue = propertyValue
+      ? typeof propertyValue === 'string'
+        ? [propertyValue]
+        : (propertyValue as string[])
+      : [];
+    const newUserIds = userIds.filter((id) => !previousValue.includes(id));
+    charmClient.createEvents({
+      spaceId: board.spaceId,
+      payload: newUserIds
+        .map((userId) =>
+          checkedCards.map(
+            (card) =>
+              ({
+                cardId: card.id,
+                cardProperty: {
+                  id: propertyTemplate.id,
+                  name: propertyTemplate.name,
+                  value: userId
+                },
+                scope: WebhookEventNames.CardPersonPropertyAssigned
+              } as CreateEventPayload)
+          )
+        )
+        .flat()
+    });
+  }
+
   const filteredPropertyTemplates = useMemo(() => {
     return propertyTemplates.filter(
       (propertyTemplate) =>
@@ -310,13 +346,14 @@ export function ViewHeaderRowsMenu({
               onProposalReviewerSelect={onProposalReviewerSelect}
               onProposalStatusUpdate={onProposalStatusUpdate}
               onProposalStepUpdate={onProposalStepUpdate}
+              onPersonPropertyChange={onPersonPropertyChange}
               disabledTooltip={
                 propertyTemplate.type === 'proposalStep' && isStepDisabled
                   ? 'To change multiple proposals, they must use the same workflow and be in the same step'
                   : propertyTemplate.type === 'proposalStatus' && isStatusDisabled
                   ? 'To change multiple proposals, they must be in the same step'
                   : propertyTemplate.type === 'proposalReviewer' && isReviewersDisabled
-                  ? 'To change multiple proposals, they must not be in draft or feedback step and must not have a source template'
+                  ? `To change multiple proposal's reviewers, they must not be in draft or feedback step`
                   : undefined
               }
             />

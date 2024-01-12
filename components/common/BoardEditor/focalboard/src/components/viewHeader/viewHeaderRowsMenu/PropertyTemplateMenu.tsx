@@ -6,7 +6,7 @@ import { ControlledProposalStatusSelect } from 'components/proposals/components/
 import { ControlledProposalStepSelect } from 'components/proposals/components/ProposalStepSelect';
 import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
-import type { Card } from 'lib/focalboard/card';
+import type { Card, CardPropertyValue } from 'lib/focalboard/card';
 import type { ProposalWithUsersLite } from 'lib/proposal/interface';
 
 import mutator from '../../../mutator';
@@ -15,6 +15,7 @@ import { DatePropertyTemplateMenu } from './DatePropertyTemplateMenu';
 import { PersonPropertyTemplateMenu } from './PersonPropertyTemplateMenu';
 import { PropertyMenu, StyledMenuItem } from './PropertyMenu';
 import { SelectPropertyTemplateMenu } from './SelectPropertyTemplateMenu';
+import { TextPropertyTemplateMenu } from './TextPropertyTemplateMenu';
 
 export function PropertyTemplateMenu({
   propertyTemplate,
@@ -27,6 +28,7 @@ export function PropertyTemplateMenu({
   onProposalReviewerSelect,
   onProposalStepUpdate,
   onProposalStatusUpdate,
+  onPersonPropertyChange,
   firstCheckedProposal,
   disabledTooltip
 }: {
@@ -40,6 +42,12 @@ export function PropertyTemplateMenu({
   onProposalReviewerSelect: (pageIds: string[], options: SelectOption[]) => Promise<void>;
   onProposalStepUpdate(pageIds: string[], evaluationId: string, moveForward: boolean): Promise<void>;
   onProposalStatusUpdate(pageIds: string[], result: ProposalEvaluationResult | null): Promise<void>;
+  onPersonPropertyChange: (a: {
+    checkedCards: Card[];
+    propertyTemplate: IPropertyTemplate;
+    userIds: string[];
+    propertyValue: CardPropertyValue;
+  }) => Promise<void>;
   firstCheckedProposal?: ProposalWithUsersLite;
   disabledTooltip?: string;
 }) {
@@ -83,8 +91,17 @@ export function PropertyTemplateMenu({
     case 'person': {
       return (
         <PersonPropertyTemplateMenu
-          onChange={onChange}
-          board={board}
+          onChange={async (userIds) => {
+            await onPersonPropertyChange({
+              checkedCards,
+              propertyTemplate,
+              propertyValue,
+              userIds
+            });
+            if (onChange) {
+              onChange();
+            }
+          }}
           cards={checkedCards}
           propertyTemplate={propertyTemplate}
         />
@@ -103,7 +120,6 @@ export function PropertyTemplateMenu({
               onChange();
             }
           }}
-          board={board}
           cards={checkedCards}
           propertyTemplate={propertyTemplate}
         />
@@ -185,7 +201,7 @@ export function PropertyTemplateMenu({
     }
 
     default: {
-      return null;
+      return <TextPropertyTemplateMenu onChange={onChange} cards={checkedCards} propertyTemplate={propertyTemplate} />;
     }
   }
 }
