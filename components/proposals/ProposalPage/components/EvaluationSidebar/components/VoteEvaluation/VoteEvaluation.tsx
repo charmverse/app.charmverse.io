@@ -17,7 +17,7 @@ import { SnapshotVoteDetails } from './components/SnapshotVoteDetails';
 export type Props = {
   isCurrent: boolean;
   pageId: string;
-  proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'permissions'>;
+  proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'permissions' | 'archived'>;
   evaluation: PopulatedEvaluation;
 };
 
@@ -129,7 +129,7 @@ export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation }: Prop
       vote={vote}
       detailed={false}
       isProposal={true}
-      disableVote={!isReviewer}
+      disableVote={!isReviewer || !!proposal?.archived}
     />
   );
 }

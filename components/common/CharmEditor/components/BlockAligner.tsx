@@ -40,7 +40,7 @@ const Controls = styled.div`
   transition: opacity 250ms ease-in-out;
 `;
 
-const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props) => {
+const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props, ref) => {
   const { children, onDelete, onEdit, readOnly, onDragStart } = props;
   const theme = useTheme();
 
@@ -55,7 +55,7 @@ const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props) => {
   }
 
   return (
-    <StyledBlockAligner onDragStart={onDragStart}>
+    <StyledBlockAligner onDragStart={onDragStart} ref={ref}>
       {children}
       {!readOnly && (
         <Controls className='controls'>

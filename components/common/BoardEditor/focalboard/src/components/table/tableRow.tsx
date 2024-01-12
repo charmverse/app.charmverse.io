@@ -72,7 +72,11 @@ type Props = {
   proposal?: CardPage['proposal'];
 };
 
-export const StyledCheckbox = styled(Checkbox)<{ show?: boolean }>`
+export const StyledCheckbox = styled(Checkbox, {
+  shouldForwardProp(propName) {
+    return propName !== 'show';
+  }
+})<{ show?: boolean }>`
   ${({ show }) => (!show ? `opacity: 0;` : '')}
   transition: opacity 250ms ease-in-out;
 

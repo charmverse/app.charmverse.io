@@ -30,6 +30,7 @@ export type ProposalPropertiesInput = {
   publishToLens?: boolean;
   fields: ProposalFields | null;
   type: PageType;
+  archived?: boolean;
 };
 
 type ProposalPropertiesProps = {
@@ -200,7 +201,7 @@ export function ProposalPropertiesBase({
           reviewers={proposalReviewers}
           assignedSubmitters={proposalAuthorIds}
           rewardIds={rewardIds || []}
-          readOnly={!isReviewer && !isAuthor}
+          readOnly={(!isReviewer && !isAuthor) || !!proposalFormInputs?.archived}
           onSave={(pendingReward) => {
             const isExisting = pendingRewards.find((reward) => reward.draftId === pendingReward.draftId);
             if (!isExisting) {

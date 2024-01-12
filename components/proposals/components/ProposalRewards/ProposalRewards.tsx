@@ -150,7 +150,7 @@ export function ProposalRewards({
   if (!pendingRewards?.length) {
     return (
       <AttachRewardButton
-        readOnly={false}
+        readOnly={readOnly}
         onSave={onSave}
         reviewers={reviewers}
         assignedSubmitters={assignedSubmitters}
@@ -208,10 +208,14 @@ export function ProposalRewards({
 
                         <Grid item xs={4} lg={2}>
                           <Stack className='icons' sx={{ opacity: 0, transition: 'opacity 0.2s ease' }} direction='row'>
-                            <IconButton size='small' onClick={() => editReward({ reward, page, draftId })}>
+                            <IconButton
+                              size='small'
+                              onClick={() => editReward({ reward, page, draftId })}
+                              disabled={readOnly}
+                            >
                               <Edit color='secondary' fontSize='small' />
                             </IconButton>
-                            <IconButton size='small' onClick={() => onDelete(draftId)}>
+                            <IconButton size='small' onClick={() => onDelete(draftId)} disabled={readOnly}>
                               <Delete color='secondary' fontSize='small' />
                             </IconButton>
                           </Stack>

@@ -97,7 +97,7 @@ function DocumentPage({
   });
 
   // We can only edit the proposal from the top level
-  const readonlyProposalProperties = !page.proposalId || readOnly;
+  const readonlyProposalProperties = !page.proposalId || readOnly || !!proposal?.archived;
 
   const card = useAppSelector((state) => {
     if (page?.type !== 'card' && page?.type !== 'card_template') {
@@ -152,7 +152,7 @@ function DocumentPage({
   const isStructuredProposal = proposal && proposal.formId;
 
   // create a key that updates when edit mode changes - default to 'editing' so we dont close sockets immediately
-  const editorKey = page.id + (editMode || 'editing') + pagePermissions.edit_content;
+  const editorKey = page.id + (editMode || 'editing') + pagePermissions.edit_content + !!proposal?.archived;
 
   function onParticipantUpdate(participants: FrontendParticipant[]) {
     setPageProps({ participants });
@@ -412,7 +412,7 @@ function DocumentPage({
                 focusDocumentEditor={focusDocumentEditor}
                 updatedAt={page.updatedAt.toString()}
                 onChange={(updates) => savePage(updates as { title: string; updatedAt: any })}
-                readOnly={readOnly || !!enableSuggestingMode || !!page.syncWithPageId}
+                readOnly={readOnly || !!enableSuggestingMode || !!page.syncWithPageId || !!proposal?.archived}
               />
             )}
             {proposalId && !isMdScreen && (
@@ -457,7 +457,7 @@ function DocumentPage({
                     <Box mb={10}>
                       {page.type === 'proposal_template' ? (
                         <FormFieldsEditor
-                          readOnly={!isAdmin && (!user || !proposalAuthors.includes(user.id))}
+                          readOnly={(!isAdmin && (!user || !proposalAuthors.includes(user.id))) || !!proposal?.archived}
                           proposalId={proposal.id}
                           formFields={proposal?.form.formFields ?? []}
                           refreshProposal={refreshProposal}
@@ -466,7 +466,7 @@ function DocumentPage({
                         <ProposalFormFieldInputs
                           proposalId={proposal.id}
                           formFields={proposal?.form.formFields ?? []}
-                          readOnly={!user || !pagePermissions.edit_content}
+                          readOnly={!user || !pagePermissions.edit_content || !!proposal?.archived}
                         />
                       )}
                     </Box>
@@ -480,7 +480,7 @@ function DocumentPage({
                     }
                     key={editorKey}
                     content={page.content as PageContent}
-                    readOnly={readOnly || !!page.syncWithPageId}
+                    readOnly={readOnly || !!page.syncWithPageId || !!proposal?.archived}
                     autoFocus={false}
                     sidebarView={sidebarView}
                     setSidebarView={setActiveView}
@@ -511,7 +511,7 @@ function DocumentPage({
                 {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') && (
                   <Box mt='-100px'>
                     {/* add negative margin to offset height of .charm-empty-footer */}
-                    <PageComments page={page} canCreateComments={pagePermissions.comment} />
+                    <PageComments page={page} canCreateComments={pagePermissions.comment && !proposal?.archived} />
                   </Box>
                 )}
               </>

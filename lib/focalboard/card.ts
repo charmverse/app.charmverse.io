@@ -26,6 +26,7 @@ export type CardPageProposal = {
   sourceTemplateId?: string;
   evaluations: ProposalWithUsersLite['evaluations'];
   hasRewards: boolean;
+  archived: boolean;
 };
 
 export type CardPage<V = CardPropertyValue> = {
