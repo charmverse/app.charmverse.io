@@ -331,9 +331,9 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
           <ProposalBanner type='page' proposalId={page.convertedProposalId} />
         </AlertContainer>
       )}
-      {page?.syncWithPageId && (
+      {board?.fields.sourceType && (
         <AlertContainer showPageActionSidebar={showPageActionSidebar}>
-          <SyncedPageBanner />
+          <SyncedPageBanner pageId={page.syncWithPageId} source={board.fields.sourceType} />
         </AlertContainer>
       )}
 
