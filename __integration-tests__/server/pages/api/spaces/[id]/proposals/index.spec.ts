@@ -80,7 +80,7 @@ describe('GET /api/spaces/[id]/proposals - Get proposals in a space', () => {
       spaceId: space.id,
       userId: adminUser.id,
       authors: [adminUser.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [{ group: 'user', id: adminUser.id }]
     });
   });

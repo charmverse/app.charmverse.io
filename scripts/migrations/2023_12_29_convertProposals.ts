@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Proposal } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getDefaultWorkflows } from 'lib/proposal/workflows/defaultWorkflows';
@@ -87,6 +88,7 @@ async function convertProposals({ offset = 0 }: { offset?: number } = {}) {
               workflowId: workflow?.id
             }
           });
+          // @ts-ignore
           const feedbackComplete = p.status !== 'draft' && p.status !== 'discussion';
           await tx.proposalEvaluation.create({
             data: {
@@ -172,6 +174,7 @@ async function convertProposals({ offset = 0 }: { offset?: number } = {}) {
               workflowId: workflow?.id
             }
           });
+          // @ts-ignore
           const feedbackComplete = p.status !== 'draft' && p.status !== 'discussion';
           await tx.proposalEvaluation.create({
             data: {

@@ -1,7 +1,6 @@
 import type {
   Page,
   Proposal,
-  ProposalCategory,
   ProposalEvaluation,
   ProposalEvaluationPermission,
   ProposalReviewer,
@@ -24,7 +23,6 @@ test.describe.serial('Proposal Evaluation', () => {
   let space: Space;
   let admin: User;
   let member: User;
-  let proposalCategory: ProposalCategory;
   let role: Role;
 
   let templateId: string;

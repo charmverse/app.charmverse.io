@@ -60,17 +60,6 @@ const updateVoteStatus = async () => {
         status: 'Rejected'
       }
     }),
-    // update proposals
-    prisma.proposal.updateMany({
-      where: {
-        id: {
-          in: proposalPageIds
-        }
-      },
-      data: {
-        status: 'vote_closed'
-      }
-    }),
     prisma.proposalEvaluation.updateMany({
       where: {
         id: {
