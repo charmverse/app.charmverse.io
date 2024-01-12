@@ -67,6 +67,7 @@ export function ProposalProperties({
       : [];
 
   const proposalFormInputs: ProposalPropertiesInput = {
+    archived: proposal?.archived ?? false,
     evaluationType: proposal?.evaluationType || 'vote',
     authors: proposal?.authors.map((author) => author.userId) ?? [],
     evaluations: proposal?.evaluations ?? [],
