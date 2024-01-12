@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { InvalidStateError } from 'lib/middleware';
@@ -125,6 +126,8 @@ async function getProposal(req: NextApiRequest, res: NextApiResponse<PublicApiPr
   const markdownText = await generateMarkdown({
     content: proposal.page?.content as any
   });
+  const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
+  const isActiveVote = currentEvaluation?.result === null && currentEvaluation?.type === 'vote';
   const apiProposal: PublicApiProposal = {
     id: proposal.id,
     createdAt: proposal.page?.createdAt as any,
@@ -134,7 +137,7 @@ async function getProposal(req: NextApiRequest, res: NextApiResponse<PublicApiPr
       text: proposal.page?.contentText ?? '',
       markdown: markdownText
     },
-    status: proposal.status,
+    status: isActiveVote ? 'vote_active' : proposal.status,
     authors: proposal.authors.map((author) => ({
       userId: author.author?.id,
       address: author.author?.wallets[0]?.address,
