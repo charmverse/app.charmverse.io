@@ -119,7 +119,8 @@ async function getProposal(req: NextApiRequest, res: NextApiResponse<PublicApiPr
             }
           }
         }
-      }
+      },
+      evaluations: true
     }
   });
 
