@@ -3,7 +3,7 @@ import type { Theme } from '@mui/material';
 import { Box, Tab, Tabs, useMediaQuery } from '@mui/material';
 import dynamic from 'next/dynamic';
 import type { EditorState } from 'prosemirror-state';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
 import { useGetReward } from 'charmClient/hooks/rewards';
@@ -47,6 +47,7 @@ import { PrimaryColumn } from './components/PrimaryColumn';
 import { ProposalBanner } from './components/ProposalBanner';
 import { ProposalProperties } from './components/ProposalProperties';
 import { PageSidebar } from './components/Sidebar/PageSidebar';
+import { SyncedPageBanner } from './components/SyncedPageBanner';
 import { usePageSidebar } from './hooks/usePageSidebar';
 import { useProposal } from './hooks/useProposal';
 
@@ -59,23 +60,13 @@ const RewardProperties = dynamic(
 
 export interface DocumentPageProps {
   page: PageWithContent;
-  refreshPage: () => Promise<any>;
   savePage: (p: Partial<Page>) => void;
   readOnly?: boolean;
-  close?: VoidFunction;
   insideModal?: boolean;
   enableSidebar?: boolean;
 }
 
-function DocumentPage({
-  insideModal = false,
-  page,
-  refreshPage,
-  savePage,
-  readOnly = false,
-  close,
-  enableSidebar
-}: DocumentPageProps) {
+function DocumentPage({ insideModal = false, page, savePage, readOnly = false, enableSidebar }: DocumentPageProps) {
   const { user } = useUser();
   const { router } = useCharmRouter();
   const { activeView: sidebarView, setActiveView, closeSidebar } = usePageSidebar();
@@ -166,10 +157,6 @@ function DocumentPage({
       setConnectionError(null);
     }
   }
-
-  const openEvaluation = useCallback(() => {
-    setActiveView('proposal_evaluation');
-  }, [setActiveView]);
 
   useEffect(() => {
     if (page?.type === 'card') {
@@ -275,13 +262,11 @@ function DocumentPage({
       )}
       {proposalId && (
         <ProposalProperties
-          enableSidebar={enableSidebar}
           pageId={page.id}
           proposalId={proposalId}
           pagePermissions={pagePermissions}
           readOnly={readonlyProposalProperties}
           proposalPage={page}
-          openEvaluation={openEvaluation}
           proposal={proposal}
           refreshProposal={refreshProposal}
         />
@@ -344,6 +329,11 @@ function DocumentPage({
       {page?.convertedProposalId && (
         <AlertContainer showPageActionSidebar={showPageActionSidebar}>
           <ProposalBanner type='page' proposalId={page.convertedProposalId} />
+        </AlertContainer>
+      )}
+      {page?.syncWithPageId && (
+        <AlertContainer showPageActionSidebar={showPageActionSidebar}>
+          <SyncedPageBanner />
         </AlertContainer>
       )}
 
