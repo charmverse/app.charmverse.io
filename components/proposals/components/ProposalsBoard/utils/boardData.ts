@@ -1,5 +1,3 @@
-import { v4 as uuid } from 'uuid';
-
 import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
 import type { Block } from 'lib/focalboard/block';
 import type { Board } from 'lib/focalboard/board';

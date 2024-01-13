@@ -72,32 +72,25 @@ export function useProposalsBoardAdapter() {
     const viewBlock = proposalBlocks?.find((b) => b.id === DEFAULT_VIEW_BLOCK_ID);
 
     if (!viewBlock) {
-      return getDefaultTableView({ board });
+      const defaultTableView = getDefaultTableView({ board });
+
+      if (!defaultTableView.fields.filter.filters.length) {
+        defaultTableView.fields.filter.filters = [
+          {
+            condition: 'does_not_contain',
+            filterId: v4(),
+            operation: 'and',
+            propertyId: PROPOSAL_STATUS_BLOCK_ID,
+            values: ['archived']
+          }
+        ];
+      }
+      return defaultTableView;
     }
     const boardView = blockToFBBlock(viewBlock) as BoardView;
     // sort by created at desc by default
     if (!boardView.fields.sortOptions?.length) {
       boardView.fields.sortOptions = [{ propertyId: CREATED_AT_ID, reversed: true }];
-    }
-
-    const statusProperty = board.fields?.cardProperties.find(
-      (cardProperty) => cardProperty.id === PROPOSAL_STATUS_BLOCK_ID
-    );
-
-    const archivedStatus = statusProperty?.options.find((o) => o.id === 'archived');
-
-    // TODO: Run a migration to add a default filter to the default view
-    // Temporary fix to hide archived proposals from the default view
-    if (!boardView.fields.filter.filters.length && statusProperty && archivedStatus) {
-      boardView.fields.filter.filters = [
-        {
-          condition: 'does_not_contain',
-          filterId: v4(),
-          operation: 'and',
-          propertyId: statusProperty.id,
-          values: [archivedStatus.id]
-        }
-      ];
     }
 
     return boardView;
