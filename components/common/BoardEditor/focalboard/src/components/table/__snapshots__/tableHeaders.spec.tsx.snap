@@ -10,7 +10,7 @@ exports[`components/table/TableHeaders should match snapshot 1`] = `
       id="mainBoardHeader"
     >
       <div
-        class="octo-table-cell header-cell"
+        class="octo-table-cell header-cell disable-drag-selection"
         draggable="true"
         style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
       >
@@ -62,7 +62,7 @@ exports[`components/table/TableHeaders should match snapshot 1`] = `
         />
       </div>
       <div
-        class="octo-table-cell header-cell"
+        class="octo-table-cell header-cell disable-drag-selection"
         style="flex-grow: 1;"
       >
         <button
