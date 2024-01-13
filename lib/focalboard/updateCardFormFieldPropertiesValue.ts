@@ -2,9 +2,9 @@ import type { FormField, FormFieldAnswer } from '@charmverse/core/prisma-client'
 
 import type { FormFieldValue } from 'components/common/form/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import type { BoardPropertyValue } from 'lib/public-api/interfaces';
 
 import type { IPropertyTemplate } from './board';
+import type { CardPropertyValue } from './card';
 
 export async function updateCardFormFieldPropertiesValue({
   accessPrivateFields,
@@ -19,7 +19,7 @@ export async function updateCardFormFieldPropertiesValue({
   })[];
   proposalId: string;
 }) {
-  const properties: Record<string, BoardPropertyValue> = {};
+  const properties: Record<string, CardPropertyValue> = {};
 
   const filteredFormFields = accessPrivateFields ? formFields : formFields.filter((formField) => !formField.private);
 
@@ -36,7 +36,7 @@ export async function updateCardFormFieldPropertiesValue({
             }
           )?.contentText ?? '';
       } else {
-        properties[cardProperty.id] = answerValue ?? '';
+        properties[cardProperty.id] = (answerValue ?? '') as CardPropertyValue;
       }
     }
   }

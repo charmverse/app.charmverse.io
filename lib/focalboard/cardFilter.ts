@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
-import type { Card } from 'lib/focalboard/card';
+import type { Card, CardPropertyValue } from 'lib/focalboard/card';
 import { propertyConfigs } from 'lib/focalboard/filterClause';
 import type {
   NumberDataTypeConditions,
@@ -91,7 +91,7 @@ class CardFilter {
       }
     }
     const filterValue = filter.values[0]?.toString()?.toLowerCase() ?? '';
-    const valueArray = (Array.isArray(value) ? value : [value]).map((v: string | number | Record<'id', string>) => {
+    const valueArray = (Array.isArray(value) ? value : [value]).map((v: CardPropertyValue) => {
       // In some cases we get an object with an id as value
       if (typeof v === 'object' && 'id' in v) {
         return v.id as string;

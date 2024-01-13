@@ -8,7 +8,7 @@ import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { createBoard } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
-import type { Card } from 'lib/focalboard/card';
+import type { Card, CardPropertyValue } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import { PROPOSAL_RESULT_LABELS, PROPOSAL_STEP_LABELS } from 'lib/focalboard/proposalDbProperties';
 import type { ProposalEvaluationStep } from 'lib/proposal/interface';
@@ -39,13 +39,13 @@ class OctoUtils {
     context
   }: {
     block: Block;
-    propertyValue: string | string[] | undefined | number;
+    propertyValue: CardPropertyValue;
     propertyTemplate: IPropertyTemplate;
     formatters: Formatters;
     context?: PropertyContext;
   }) {
     const { date: formatDate, dateTime: formatDateTime } = formatters;
-    let displayValue: string | string[] | undefined | number;
+    let displayValue: CardPropertyValue | undefined;
     switch (propertyTemplate.type) {
       case 'select': {
         // The property value is the id of the template

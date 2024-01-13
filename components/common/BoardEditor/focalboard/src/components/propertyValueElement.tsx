@@ -19,7 +19,6 @@ import type { PropertyValueDisplayType } from 'components/common/BoardEditor/int
 import { BreadcrumbPageTitle } from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
 import { ProposalStatusSelect } from 'components/proposals/components/ProposalStatusSelect';
 import { ProposalStepSelect } from 'components/proposals/components/ProposalStepSelect';
-import { useProposalsWhereUserIsEvaluator } from 'components/proposals/hooks/useProposalsWhereUserIsEvaluator';
 import {
   REWARD_APPLICATION_STATUS_LABELS,
   RewardApplicationStatusChip
@@ -52,6 +51,7 @@ import {
 } from 'lib/rewards/blocks/constants';
 import type { RewardStatus } from 'lib/rewards/interfaces';
 import { getAbsolutePath } from 'lib/utilities/browser';
+import { isTruthy } from 'lib/utilities/types';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import { TextInput } from '../../../components/properties/TextInput';
@@ -115,15 +115,6 @@ export const validatePropertyValue = (propType: string, val: string): boolean =>
   }
 };
 
-/**
- * Hide these values if user is not an evalutor for the proposal
- */
-const hiddenProposalEvaluatorPropertyValues: DatabaseProposalPropertyType[] = [
-  'proposalEvaluationAverage',
-  'proposalEvaluatedBy',
-  'proposalEvaluationTotal'
-];
-
 const editableFields: PropertyType[] = ['text', 'number', 'email', 'url', 'phone'];
 
 function PropertyValueElement(props: Props) {
@@ -132,7 +123,6 @@ function PropertyValueElement(props: Props) {
   const { formatDateTime, formatDate } = useDateFormatter();
   const {
     card,
-    syncWithPageId,
     propertyTemplate,
     showEmptyPlaceholder,
     board,
@@ -145,14 +135,6 @@ function PropertyValueElement(props: Props) {
   } = props;
   const { trigger } = useUpdateProposalEvaluation({ proposalId: proposal?.id });
   const { showMessage } = useSnackbar();
-  const { rubricProposalIdsWhereUserIsEvaluator, rubricProposalIdsWhereUserIsNotEvaluator } =
-    useProposalsWhereUserIsEvaluator({
-      spaceId:
-        !!board && hiddenProposalEvaluatorPropertyValues.includes(propertyTemplate?.type as any)
-          ? board.spaceId
-          : undefined
-    });
-
   const isAdmin = useIsAdmin();
 
   const intl = useIntl();
@@ -193,6 +175,28 @@ function PropertyValueElement(props: Props) {
       return <RewardApplicationStatusChip status={propertyValue as ApplicationStatus} />;
     }
     return <RewardStatusChip status={propertyValue as RewardStatus} showIcon={false} />;
+  } else if (
+    propertyTemplate.type === 'proposalEvaluationTotal' ||
+    propertyTemplate.type === 'proposalEvaluationAverage'
+  ) {
+    const evaluationValues = propertyValue as string[];
+    return <Box>{evaluationValues.filter(isTruthy).join(',')}</Box>;
+  } else if (propertyTemplate.type === 'proposalEvaluatedBy') {
+    const evaluationsReviewers = propertyValue as unknown as string[][];
+    return (
+      <Stack>
+        {evaluationsReviewers.map((evaluationReviewers) => (
+          <UserSelect
+            displayType='table'
+            key={evaluationReviewers.join(',')}
+            onChange={() => {}}
+            memberIds={evaluationReviewers ?? []}
+            readOnly
+            showEmptyPlaceholder={showEmptyPlaceholder}
+          />
+        ))}
+      </Stack>
+    );
   }
   // Proposals as datasource use proposalStatus column, whereas the actual proposals table uses STATUS_BLOCK_ID
   // We should migrate over the proposals as datasource blocks to the same format as proposals table
@@ -317,11 +321,7 @@ function PropertyValueElement(props: Props) {
     !card.fields.isAssigned
   ) {
     propertyValueElement = null;
-  } else if (
-    propertyTemplate.type === 'person' ||
-    propertyTemplate.type === 'proposalEvaluatedBy' ||
-    propertyTemplate.id === REWARDS_APPLICANTS_BLOCK_ID
-  ) {
+  } else if (propertyTemplate.type === 'person' || propertyTemplate.id === REWARDS_APPLICANTS_BLOCK_ID) {
     propertyValueElement = (
       <UserSelect
         displayType={displayType}
@@ -543,21 +543,6 @@ function PropertyValueElement(props: Props) {
     ) : (
       subRowsEmptyValueContent ?? null
     );
-  }
-
-  // Explicitly hide the value for this proposal
-  if (hiddenProposalEvaluatorPropertyValues.includes(propertyTemplate?.type as any)) {
-    if (syncWithPageId && !!rubricProposalIdsWhereUserIsNotEvaluator[syncWithPageId] && !isAdmin) {
-      return <EmptyPlaceholder>Hidden</EmptyPlaceholder>;
-    } else if (syncWithPageId && (!!rubricProposalIdsWhereUserIsEvaluator[syncWithPageId] || isAdmin)) {
-      return propertyValueElement;
-    } else {
-      return typeof subRowsEmptyValueContent === 'string' ? (
-        <span>{subRowsEmptyValueContent}</span>
-      ) : (
-        subRowsEmptyValueContent ?? null
-      );
-    }
   }
 
   if (props.showTooltip) {

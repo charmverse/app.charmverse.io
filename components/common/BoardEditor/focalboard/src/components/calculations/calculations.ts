@@ -2,7 +2,7 @@ import { Duration } from 'luxon';
 import type { IntlShape } from 'react-intl';
 
 import type { IPropertyTemplate } from 'lib/focalboard/board';
-import type { Card } from 'lib/focalboard/card';
+import type { Card, CardPropertyValue } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
 
 import { Utils } from '../../utils';
@@ -10,7 +10,7 @@ import type { DateProperty } from '../properties/dateRange/dateRange';
 
 const ROUNDED_DECIMAL_PLACES = 2;
 
-function getCardProperty(card: Card, property: IPropertyTemplate): string | string[] | number {
+function getCardProperty(card: Card, property: IPropertyTemplate): CardPropertyValue {
   if (property.id === Constants.titleColumnId) {
     return card.title;
   }
@@ -258,7 +258,7 @@ function latestEpoch(cards: readonly Card[], property: IPropertyTemplate): numbe
   return result;
 }
 
-function getTimestampsFromPropertyValue(value: number | string | string[]): number[] {
+function getTimestampsFromPropertyValue(value: CardPropertyValue): number[] {
   if (typeof value === 'number') {
     return [value];
   }

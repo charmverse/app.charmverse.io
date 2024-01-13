@@ -3,13 +3,13 @@ import type { Page, Block, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
+import type { CardPropertyValue } from 'lib/focalboard/card';
 import { createPage } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
-import type { BoardPropertyValue } from 'lib/public-api';
 
 export async function createCardPage(
   pageInfo: Record<keyof Pick<Page, 'title' | 'boardId' | 'createdBy' | 'spaceId'>, string> & {
-    properties: Record<string, BoardPropertyValue>;
+    properties: Record<string, CardPropertyValue>;
   } & Partial<Pick<Page, 'content' | 'hasContent' | 'contentText' | 'syncWithPageId' | 'createdAt'>> & {
       permissions?: Prisma.PagePermissionUncheckedCreateWithoutPageInput[];
     }

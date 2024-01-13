@@ -1,10 +1,4 @@
-import type {
-  Block,
-  Page,
-  ProposalEvaluationType,
-  ProposalRubricCriteria,
-  ProposalRubricCriteriaAnswer
-} from '@charmverse/core/prisma-client';
+import type { Block, Page, ProposalRubricCriteria, ProposalRubricCriteriaAnswer } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { prismaToBlock } from 'lib/focalboard/block';
@@ -14,18 +8,13 @@ import { InvalidStateError } from 'lib/middleware';
 import { canAccessPrivateFields } from 'lib/proposal/form/canAccessPrivateFields';
 import { getCurrentStep } from 'lib/proposal/getCurrentStep';
 import type { ProposalFields } from 'lib/proposal/interface';
-import type {
-  ProposalRubricCriteriaAnswerWithTypedResponse,
-  ProposalRubricCriteriaWithTypedParams
-} from 'lib/proposal/rubric/interfaces';
-import type { BoardPropertyValue } from 'lib/public-api';
-import { prettyPrint } from 'lib/utilities/strings';
+import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import { relay } from 'lib/websockets/relay';
 
 import { createCardPage } from '../pages/createCardPage';
 
+import type { BoardFields, IPropertyTemplate } from './board';
 import { proposalPropertyTypesList } from './board';
-import type { IPropertyTemplate, BoardFields } from './board';
 import type { BoardViewFields } from './boardView';
 import type { CardFields, CardPropertyValue } from './card';
 import { DEFAULT_BOARD_BLOCK_ID } from './customBlocks/constants';
@@ -407,25 +396,26 @@ export async function updateCardsFromProposals({
           [cardProposalStep?.propertyId ?? '']: proposalEvaluationStep
         };
 
-        let newCardBlockFields = {
+        const newCardBlockFields = {
           ...(card.block.fields as any),
           properties: newProps
         };
 
-        if (currentStep?.step === 'rubric') {
-          const criteria = mappedRubricCriteriaByProposal[pageWithProposal.id] ?? [];
+        if (pageWithProposal.proposal) {
+          const proposalRubricEvaluationSteps =
+            pageWithProposal.proposal.evaluations.filter((evaluation) => evaluation.type === 'rubric') ?? [];
+          const proposalRubricCriterias = mappedRubricCriteriaByProposal[pageWithProposal.proposal.id] ?? [];
+          const proposalRubricAnswers = mappedRubricAnswersByProposal[pageWithProposal.proposal.id] ?? [];
 
-          const answers = mappedRubricAnswersByProposal[pageWithProposal.id] ?? [];
-
-          const updatedCardShape = generateResyncedProposalEvaluationForCard({
-            cardProps: { fields: newCardBlockFields },
-            databaseProperties: databaseProposalProps,
-            rubricCriteria: criteria,
-            rubricAnswers: answers as ProposalRubricCriteriaAnswerWithTypedResponse[],
-            currentStep: { id: currentStep.id, type: currentStep.step }
-          });
-
-          newCardBlockFields = updatedCardShape.fields;
+          for (const proposalRubricEvaluationStep of proposalRubricEvaluationSteps) {
+            newCardBlockFields.properties = generateResyncedProposalEvaluationForCard({
+              currentStep: proposalRubricEvaluationStep,
+              databaseProperties: databaseProposalProps,
+              properties: newCardBlockFields.properties,
+              rubricAnswers: proposalRubricAnswers as ProposalRubricCriteriaAnswerWithTypedResponse[],
+              rubricCriteria: proposalRubricCriterias
+            });
+          }
         }
 
         const { updatedCardPage, updatedCardBlock } = await prisma.$transaction(async (tx) => {
@@ -461,7 +451,7 @@ export async function updateCardsFromProposals({
 
       // Don't create new cards from archived cards
     } else if (!card && !pageWithProposal.proposal?.archived) {
-      let properties: Record<string, BoardPropertyValue> = {};
+      let properties: Record<string, CardPropertyValue> = {};
 
       if (databaseProposalProps.proposalUrl) {
         properties[databaseProposalProps.proposalUrl.id] = pageWithProposal.path;
@@ -485,27 +475,30 @@ export async function updateCardsFromProposals({
             cardProperty.id
           ];
           if (proposalFieldValue !== null && proposalFieldValue !== undefined) {
-            properties[cardProperty.id] = proposalFieldValue as BoardPropertyValue;
+            properties[cardProperty.id] = proposalFieldValue as CardPropertyValue;
           }
         }
       });
 
       const createdAt = pageWithProposal.createdAt;
 
-      if (currentStep) {
-        const criteria = mappedRubricCriteriaByProposal[pageWithProposal.id] ?? [];
-        const answers = mappedRubricAnswersByProposal[pageWithProposal.id] ?? [];
+      if (pageWithProposal.proposal) {
+        const proposalRubricEvaluationSteps =
+          pageWithProposal.proposal.evaluations.filter((evaluation) => evaluation.type === 'rubric') ?? [];
+        const proposalRubricCriterias = mappedRubricCriteriaByProposal[pageWithProposal.proposal.id] ?? [];
+        const proposalRubricAnswers = mappedRubricAnswersByProposal[pageWithProposal.proposal.id] ?? [];
 
-        const updatedCardShape = generateResyncedProposalEvaluationForCard({
-          cardProps: { fields: properties },
-          databaseProperties: databaseProposalProps,
-          rubricCriteria: criteria as ProposalRubricCriteriaWithTypedParams[],
-          rubricAnswers: answers as ProposalRubricCriteriaAnswerWithTypedResponse[],
-          currentStep: { id: currentStep.id, type: currentStep.step as ProposalEvaluationType }
-        });
-
-        properties = updatedCardShape.fields;
+        for (const proposalRubricEvaluationStep of proposalRubricEvaluationSteps) {
+          properties = generateResyncedProposalEvaluationForCard({
+            currentStep: proposalRubricEvaluationStep,
+            databaseProperties: databaseProposalProps,
+            properties,
+            rubricAnswers: proposalRubricAnswers as ProposalRubricCriteriaAnswerWithTypedResponse[],
+            rubricCriteria: proposalRubricCriterias
+          });
+        }
       }
+
       const formFields = pageWithProposal.proposal?.form?.formFields ?? [];
 
       const formFieldProperties = await updateCardFormFieldPropertiesValue({

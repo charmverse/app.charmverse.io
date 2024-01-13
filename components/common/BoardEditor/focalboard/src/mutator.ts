@@ -8,7 +8,7 @@ import type { Board, IPropertyOption, IPropertyTemplate, PropertyType } from 'li
 import { createBoard } from 'lib/focalboard/board';
 import type { BoardView, ISortOption, KanbanCalculationFields } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
-import type { Card } from 'lib/focalboard/card';
+import type { Card, CardPropertyValue } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
 import type { FilterClause } from 'lib/focalboard/filterClause';
@@ -593,7 +593,7 @@ export class Mutator {
   changePropertyValue(
     card: Card,
     propertyId: string,
-    value?: string | string[] | number,
+    value?: CardPropertyValue,
     description = 'change property',
     mutate = true
   ) {
@@ -621,12 +621,7 @@ export class Mutator {
     }
   }
 
-  changePropertyValues(
-    cards: Card[],
-    propertyId: string,
-    value?: string | string[] | number,
-    description = 'change property'
-  ) {
+  changePropertyValues(cards: Card[], propertyId: string, value?: CardPropertyValue, description = 'change property') {
     const oldBlocks: Block[] = [];
     const newBlocks: Block[] = [];
 

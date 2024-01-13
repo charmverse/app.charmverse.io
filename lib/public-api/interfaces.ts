@@ -3,9 +3,10 @@ import type { ProposalType } from '@snapshot-labs/snapshot.js/dist/sign/types';
 import type { TypedDataField } from 'ethers/lib/ethers';
 
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { CardPropertyValue } from 'lib/focalboard/card';
 import type { APISpaceTemplateType } from 'lib/spaces/config';
 
-export type BoardPropertyValue = string | string[] | number | null | boolean | Record<string, unknown>;
+export type BoardPropertyValue = CardPropertyValue | null | boolean | Record<string, unknown>;
 
 /**
  * @swagger
