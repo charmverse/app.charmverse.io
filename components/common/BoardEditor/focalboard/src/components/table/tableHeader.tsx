@@ -150,7 +150,7 @@ function TableHeader(props: Props): JSX.Element {
     props.onAutoSizeColumn(_templateId, width);
   }, []);
 
-  let className = 'octo-table-cell header-cell';
+  let className = 'octo-table-cell header-cell disable-drag-selection';
   if (isOver) {
     className += ' dragover';
   }
