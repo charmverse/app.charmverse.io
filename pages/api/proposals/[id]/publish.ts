@@ -26,11 +26,6 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
     throw new ActionNotPermittedError(`You do not have permission to publish this proposal`);
   }
 
-  await publishProposal({
-    proposalId,
-    userId
-  });
-
   const proposalPage = await prisma.page.findUnique({
     where: {
       proposalId
@@ -39,6 +34,7 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
       id: true,
       proposal: {
         select: {
+          archived: true,
           evaluations: {
             select: {
               id: true
@@ -53,7 +49,18 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
     }
   });
 
+  const isProposalArchived = proposalPage?.proposal?.archived || false;
+  if (isProposalArchived) {
+    throw new ActionNotPermittedError(`You cannot publish an archived proposal`);
+  }
+
   const currentEvaluationId = proposalPage?.proposal?.evaluations[0]?.id || null;
+
+  await publishProposal({
+    proposalId,
+    userId
+  });
+
   if (proposalPage && currentEvaluationId) {
     await publishProposalEvent({
       proposalId,

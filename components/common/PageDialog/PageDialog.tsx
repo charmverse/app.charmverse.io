@@ -49,7 +49,7 @@ function PageDialogBase(props: Props) {
   const { editMode, resetPageProps, setPageProps } = useCharmEditor();
 
   const { updatePage } = usePages();
-  const { page, refreshPage } = usePage({ pageIdOrPath: pageId });
+  const { page } = usePage({ pageIdOrPath: pageId });
   const pagePermissions = page?.permissionFlags || new AvailablePagePermissions().full;
   const domain = router.query.domain as string;
   const fullPageUrl = page?.path
@@ -175,14 +175,7 @@ function PageDialogBase(props: Props) {
       onClose={close}
     >
       {page && contentType === 'page' && (
-        <DocumentPage
-          insideModal
-          page={page}
-          savePage={savePage}
-          refreshPage={refreshPage}
-          readOnly={readOnlyPage}
-          close={close}
-        />
+        <DocumentPage insideModal page={page} savePage={savePage} readOnly={readOnlyPage} />
       )}
       {contentType === 'application' && applicationContext && (
         <RewardApplicationPage

@@ -2,7 +2,7 @@ import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import { ListItemIcon, Menu, MenuItem, TextField, Typography, Stack } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';

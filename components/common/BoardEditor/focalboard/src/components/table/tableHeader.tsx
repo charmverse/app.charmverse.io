@@ -172,6 +172,7 @@ function TableHeader(props: Props): JSX.Element {
   const isDisabled =
     proposalPropertyTypesList.includes(type as any) ||
     defaultRewardPropertyIds.includes(templateId) ||
+    template.id.startsWith('__') ||
     !!template.formFieldId ||
     !!template.proposalFieldId;
 

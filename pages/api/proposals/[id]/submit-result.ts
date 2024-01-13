@@ -32,11 +32,16 @@ async function updateEvaluationResultEndpoint(req: NextApiRequest, res: NextApiR
     include: {
       proposal: {
         select: {
+          archived: true,
           spaceId: true
         }
       }
     }
   });
+
+  if (evaluation.proposal.archived) {
+    throw new ActionNotPermittedError(`You cannot move an archived proposal to a different step.`);
+  }
 
   if (evaluation.type === 'feedback') {
     if (!proposalPermissions.move) {

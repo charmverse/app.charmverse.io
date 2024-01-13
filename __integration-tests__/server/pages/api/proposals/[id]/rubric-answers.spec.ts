@@ -42,7 +42,8 @@ describe('PUT /api/proposals/[id]/rubric-answers - Update proposal rubric criter
     const criteria = await upsertRubricCriteria({
       proposalId: proposal.id,
       evaluationId,
-      rubricCriteria: [{ parameters: { max: 10, min: 1 }, title: 'score', type: 'range' }]
+      rubricCriteria: [{ parameters: { max: 10, min: 1 }, title: 'score', type: 'range' }],
+      actorId: author.id
     });
 
     rubricCriteria = criteria[0];
@@ -127,7 +128,8 @@ describe('DELETE /api/proposals/[id]/rubric-answers - Delete proposal rubric cri
     const criteria = await upsertRubricCriteria({
       proposalId: proposal.id,
       evaluationId,
-      rubricCriteria: [{ parameters: { max: 10, min: 1 }, title: 'score', type: 'range' }]
+      rubricCriteria: [{ parameters: { max: 10, min: 1 }, title: 'score', type: 'range' }],
+      actorId: author.id
     });
 
     rubricCriteria = criteria[0];

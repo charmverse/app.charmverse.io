@@ -63,7 +63,8 @@ async function updateEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
     proposalId: proposal.id,
     evaluationId,
     voteSettings: req.body.voteSettings,
-    reviewers
+    reviewers,
+    actorId: userId
   });
 
   return res.status(200).end();

@@ -776,78 +776,6 @@ export async function createVote({
   });
 }
 
-export async function createProposalWithUsers({
-  proposalStatus = 'draft',
-  authors,
-  reviewers,
-  userId,
-  spaceId,
-  ...pageCreateInput
-}: {
-  authors: string[];
-  reviewers: (string | { type: 'role'; roleId: string })[];
-  spaceId: string;
-  userId: string;
-  proposalStatus?: ProposalStatus;
-} & Partial<Prisma.PageCreateInput>): Promise<{ id: string; pageId: string }> {
-  const proposalId = v4();
-  const proposalPage = await createPageDb({
-    data: {
-      ...pageCreateInput,
-      id: proposalId,
-      author: {
-        connect: {
-          id: userId
-        }
-      },
-      space: {
-        connect: {
-          id: spaceId
-        }
-      },
-      updatedBy: userId,
-      title: 'Page Title',
-      path: 'page-path',
-      contentText: '',
-      type: 'proposal',
-      proposal: {
-        create: {
-          id: proposalId,
-          space: {
-            connect: {
-              id: spaceId
-            }
-          },
-          createdBy: userId,
-          status: proposalStatus,
-          authors: {
-            createMany: {
-              data: [
-                {
-                  userId
-                },
-                ...authors.map((author) => ({ userId: author }))
-              ]
-            }
-          },
-          reviewers: {
-            createMany: {
-              data: reviewers.map((reviewer) =>
-                typeof reviewer === 'string' ? { userId: reviewer } : { roleId: reviewer.roleId }
-              )
-            }
-          }
-        }
-      }
-    }
-  });
-
-  return {
-    id: proposalPage.proposalId!,
-    pageId: proposalPage.id
-  };
-}
-
 export async function generateCommentWithThreadAndPage({
   userId,
   spaceId,
@@ -973,20 +901,6 @@ export async function generateProposal({
   const proposalId = v4();
 
   const colors = ['gray', 'orange', 'yellow', 'green', 'teal', 'blue', 'turquoise', 'purple', 'pink', 'red'];
-
-  const randomColor = colors[Math.floor(Math.random() * colors.length)];
-
-  const categoryIdToLink =
-    categoryId ??
-    (
-      await prisma.proposalCategory.create({
-        data: {
-          title: `Category - ${v4()}`,
-          color: randomColor,
-          space: { connect: { id: spaceId } }
-        }
-      })
-    ).id;
 
   const result = await createPageDb({
     data: {

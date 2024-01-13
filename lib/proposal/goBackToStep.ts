@@ -5,6 +5,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { isTruthy } from 'lib/utilities/types';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
+import { setPageUpdatedAt } from './setPageUpdatedAt';
+
 export type GoBackToStepRequest = {
   proposalId: string;
   evaluationId: string | 'draft';
@@ -26,6 +28,7 @@ export async function goBackToStep({
       id: proposalId
     },
     select: {
+      archived: true,
       spaceId: true,
       evaluations: {
         orderBy: {
@@ -35,6 +38,10 @@ export async function goBackToStep({
       rewards: true
     }
   });
+
+  if (proposal.archived) {
+    throw new InvalidInputError('Cannot clear the results of an archived proposal');
+  }
 
   if (proposal.rewards.length > 0) {
     throw new InvalidInputError('Cannot clear the results of a proposal with rewards');
@@ -114,4 +121,6 @@ export async function goBackToStep({
       userId
     });
   }
+
+  await setPageUpdatedAt({ proposalId, userId });
 }

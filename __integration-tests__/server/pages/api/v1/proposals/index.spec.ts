@@ -101,7 +101,7 @@ beforeAll(async () => {
   proposal = (await prisma.proposal.create({
     data: {
       createdBy: proposalAuthor.id,
-      status: 'vote_active',
+      status: 'published',
       space: { connect: { id: space.id } },
       page: {
         create: {
@@ -363,7 +363,7 @@ describe('GET /api/v1/proposals', () => {
     const deletedProposal = await prisma.proposal.create({
       data: {
         createdBy: space2User.id,
-        status: 'discussion',
+        status: 'published',
         space: { connect: { id: space2.id } },
         page: {
           create: {
@@ -416,7 +416,7 @@ describe('GET /api/v1/proposals', () => {
       spaceId: secondSpace.id,
       userId: secondSpaceUser.id,
       authors: [secondSpaceUser.id],
-      proposalStatus: 'discussion'
+      proposalStatus: 'published'
     });
 
     const otherSuperApiKey = await generateSuperApiKey({ spaceId: secondSpace.id });
