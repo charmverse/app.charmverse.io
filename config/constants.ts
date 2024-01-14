@@ -52,4 +52,4 @@ export const ceramicHost = process.env.CERAMIC_HOST as string;
 export const ceramicSeed = process.env.CERAMIC_SEED as string;
 export const ceramicDid = process.env.CERAMIC_DID as string;
 
-export const graphQlServerEndpoint = process.env.GRAPHQL_SERVER_ENDPOINT as string;
+export const graphQlServerEndpoint = process.env.CERAMIC_GRAPHQL_SERVER as string;
