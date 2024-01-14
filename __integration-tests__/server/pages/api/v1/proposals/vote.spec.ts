@@ -1,11 +1,12 @@
 import type { Space, User, Vote } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsProposals } from '@charmverse/core/test';
 import request from 'supertest';
-import { v4 } from 'uuid';
+import { v4 as uuid } from 'uuid';
 
 import type { PublicApiProposal } from 'pages/api/v1/proposals';
 import { baseUrl } from 'testing/mockApiCall';
-import { createProposalWithUsers, createVote, generateUserAndSpace } from 'testing/setupDatabase';
+import { createVote, generateUserAndSpace } from 'testing/setupDatabase';
 
 let user: User;
 let space: Space;
@@ -24,12 +25,19 @@ describe('POST /api/v1/proposals/vote', () => {
     user = generated.user;
     space = generated.space;
 
-    const proposal = await createProposalWithUsers({
+    const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: user.id,
       authors: [],
-      reviewers: [user.id],
-      proposalStatus: 'vote_active'
+      proposalStatus: 'published',
+      evaluationInputs: [
+        {
+          evaluationType: 'vote',
+          reviewers: [],
+          permissions: [],
+          id: uuid()
+        }
+      ]
     });
     proposalId = proposal.id;
 
@@ -44,7 +52,7 @@ describe('POST /api/v1/proposals/vote', () => {
   it('should cast a vote and return user vote data to the user when called with API key', async () => {
     const normalApiToken = await prisma.spaceApiToken.create({
       data: {
-        token: v4(),
+        token: uuid(),
         space: { connect: { id: space.id } }
       }
     });
@@ -80,8 +88,8 @@ describe('POST /api/v1/proposals/vote', () => {
   it('should cast a vote and return user vote data to the user when called with a super API key', async () => {
     const superApiKey = await prisma.superApiToken.create({
       data: {
-        token: v4(),
-        name: `test-super-api-key-${v4()}`,
+        token: uuid(),
+        name: `test-super-api-key-${uuid()}`,
         spaces: { connect: { id: space.id } }
       }
     });
@@ -118,8 +126,8 @@ describe('POST /api/v1/proposals/vote', () => {
   it('should fail if the requester super API key is not linked to this space', async () => {
     const otherSuperApiKey = await prisma.superApiToken.create({
       data: {
-        token: v4(),
-        name: `test-super-api-key-${v4()}`
+        token: uuid(),
+        name: `test-super-api-key-${uuid()}`
       }
     });
 
@@ -137,8 +145,8 @@ describe('POST /api/v1/proposals/vote', () => {
   it('should fail if incomplete or incorrect vote data is provided', async () => {
     const superApiKey = await prisma.superApiToken.create({
       data: {
-        token: v4(),
-        name: `test-super-api-key-${v4()}`,
+        token: uuid(),
+        name: `test-super-api-key-${uuid()}`,
         spaces: { connect: { id: space.id } }
       }
     });
@@ -147,7 +155,7 @@ describe('POST /api/v1/proposals/vote', () => {
       .post(`/api/v1/proposals/vote?spaceId=${space.id}`)
       .set({ authorization: `Bearer ${superApiKey.token}` })
       .send({
-        proposalId: v4(),
+        proposalId: uuid(),
         userId: user.id,
         choice: '1'
       })
@@ -158,7 +166,7 @@ describe('POST /api/v1/proposals/vote', () => {
       .set({ authorization: `Bearer ${superApiKey.token}` })
       .send({
         proposalId,
-        userId: v4(),
+        userId: uuid(),
         choice: '1'
       })
       .expect(401);

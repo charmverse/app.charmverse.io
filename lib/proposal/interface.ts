@@ -22,7 +22,14 @@ import type {
   ProposalRubricCriteriaWithTypedParams
 } from './rubric/interfaces';
 
-export type ProposalEvaluationStatus = 'in_progress' | 'complete' | 'passed' | 'declined' | 'unpublished' | 'published';
+export type ProposalEvaluationStatus =
+  | 'in_progress'
+  | 'complete'
+  | 'passed'
+  | 'declined'
+  | 'unpublished'
+  | 'published'
+  | 'archived';
 export type ProposalEvaluationStep = ProposalEvaluationType | 'rewards' | 'draft';
 export type ProposalEvaluationResultExtended = ProposalEvaluationResult | 'in_progress';
 

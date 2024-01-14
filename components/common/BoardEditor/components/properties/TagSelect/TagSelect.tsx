@@ -114,6 +114,7 @@ export type TagSelectProps = {
   'data-test'?: string;
   fluidWidth?: boolean;
   emptyMessage?: string;
+  showEmpty?: boolean;
 };
 
 export function TagSelect({
@@ -134,6 +135,7 @@ export function TagSelect({
   defaultOpened = false,
   disableClearable = false,
   fluidWidth,
+  showEmpty,
   ...props
 }: TagSelectProps) {
   const [isOpened, setIsOpened] = useState(defaultOpened);
@@ -201,8 +203,8 @@ export function TagSelect({
           value={selectValue}
           options={selectOptions}
           size='small'
-          showEmpty={displayType === 'details'}
           emptyMessage={props.emptyMessage}
+          showEmpty={showEmpty ?? displayType === 'details'}
         />
       </SelectPreviewContainer>
     );

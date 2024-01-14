@@ -56,12 +56,7 @@ function resetPageNodeDropPluginState(view: EditorView) {
   }
 }
 
-export default function NestedPage({
-  isLinkedPage,
-  node,
-  currentPageId,
-  getPos
-}: NodeViewProps & { isLinkedPage?: boolean; currentPageId?: string }) {
+export default function NestedPage({ isLinkedPage = false, node, getPos }: NodeViewProps & { isLinkedPage?: boolean }) {
   const { space } = useCurrentSpace();
   const view = useEditorViewContext();
   const { pages, loadingPages } = usePages();
@@ -77,7 +72,6 @@ export default function NestedPage({
   const documentPage = pages[node.attrs.id];
   const staticPage = STATIC_PAGES.find((c) => c.path === node.attrs.path && node.attrs.type === c.path);
   const forumCategoryPage = categories.find((c) => c.id === node.attrs.id && node.attrs.type === 'forum_category');
-  const parentPage = documentPage?.parentId ? pages[documentPage.parentId] : null;
   let pageTitle = '';
   if (documentPage || staticPage) {
     pageTitle =
@@ -98,8 +92,6 @@ export default function NestedPage({
   const appPath = pagePath || staticPath || categoryPath;
 
   const fullPath = `${window.location.origin}/${appPath}`;
-
-  const _isLinkedPage = isLinkedPage ?? (currentPageId ? parentPage?.id !== currentPageId : false);
 
   return (
     <NestedPageContainer
@@ -131,7 +123,7 @@ export default function NestedPage({
     >
       <div>
         <LinkIcon
-          isLinkedPage={_isLinkedPage}
+          isLinkedPage={isLinkedPage}
           documentPage={documentPage}
           staticPage={staticPage}
           isCategoryPage={!!forumCategoryPage}

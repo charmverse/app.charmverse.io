@@ -63,7 +63,8 @@ async function updateWorkflowEndpoint(req: NextApiRequest, res: NextApiResponse)
 
   await updateProposalWorkflow({
     proposalId: proposal.id,
-    workflowId
+    workflowId,
+    actorId: userId
   });
 
   return res.status(200).end();

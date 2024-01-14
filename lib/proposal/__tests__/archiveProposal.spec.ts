@@ -15,14 +15,16 @@ describe('archiveProposal()', () => {
     });
     const archived = await archiveProposal({
       archived: true,
-      proposalId: proposal.id
+      proposalId: proposal.id,
+      actorId: user.id
     });
 
     expect(archived.archived).toBe(true);
 
     const unarchived = await archiveProposal({
       archived: false,
-      proposalId: proposal.id
+      proposalId: proposal.id,
+      actorId: user.id
     });
 
     expect(unarchived.archived).toBe(false);

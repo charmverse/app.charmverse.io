@@ -24,8 +24,7 @@ export type RangeProposalCriteria = {
 
 type Props = {
   readOnly?: boolean;
-  readOnlyMessage?: string;
-  proposalStatus?: ProposalStatus;
+  showDeleteConfirmation?: boolean;
   value: RangeProposalCriteria[];
   onChange: (criteria: RangeProposalCriteria[]) => void;
   answers: ProposalRubricCriteriaAnswer[];
@@ -83,7 +82,7 @@ export function getNewCriteria({ parameters }: Partial<RangeProposalCriteria> = 
   };
 }
 
-export function RubricCriteriaSettings({ readOnly, readOnlyMessage, value, onChange, proposalStatus, answers }: Props) {
+export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value, onChange, answers }: Props) {
   const [criteriaList, setCriteriaList] = useState<RangeProposalCriteria[]>(value);
   const [rubricCriteriaIdToDelete, setRubricCriteriaIdToDelete] = useState<string | null>(null);
 
@@ -127,7 +126,7 @@ export function RubricCriteriaSettings({ readOnly, readOnlyMessage, value, onCha
   }, [value]);
 
   function handleClickDelete(criteriaId: string) {
-    if (proposalStatus === 'evaluation_active') {
+    if (showDeleteConfirmation) {
       setRubricCriteriaIdToDelete(criteriaId);
     } else {
       deleteCriteria(criteriaId);

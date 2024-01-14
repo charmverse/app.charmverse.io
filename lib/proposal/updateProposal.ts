@@ -3,6 +3,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { InvalidStateError } from 'lib/middleware';
 import type { ProposalFields } from 'lib/proposal/interface';
 
+import { setPageUpdatedAt } from './setPageUpdatedAt';
+
 export type UpdateProposalRequest = {
   proposalId: string;
   authors?: string[];
@@ -16,8 +18,9 @@ export async function updateProposal({
   authors,
   publishToLens,
   fields,
-  credentialTemplateId
-}: UpdateProposalRequest) {
+  credentialTemplateId,
+  actorId
+}: UpdateProposalRequest & { actorId: string }) {
   if (authors && authors.length === 0) {
     throw new InvalidStateError('Proposal must have at least 1 author');
   }
@@ -74,4 +77,6 @@ export async function updateProposal({
       });
     }
   });
+
+  await setPageUpdatedAt({ proposalId, userId: actorId });
 }

@@ -34,7 +34,8 @@ describe('upsertRubricAnswers', () => {
       rubricCriteria: [
         { title: 'score', type: 'range', parameters: { max: 10, min: 1 } },
         { title: 'vibe', type: 'range', parameters: { max: 10, min: 1 } }
-      ]
+      ],
+      actorId: user.id
     });
 
     vibeCriteria = criteria.find((c) => c.title === 'vibe') as ProposalRubricCriteriaWithTypedParams;

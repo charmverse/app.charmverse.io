@@ -2,7 +2,6 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { IconButton, ListItemIcon, ListItemText } from '@mui/material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import Typography from '@mui/material/Typography';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useMemo } from 'react';
 import type { ReactNode } from 'react';
@@ -38,7 +37,8 @@ export function TemplatePageActionMenu(props: Props) {
           closeParentPopup();
         }}
       >
-        {pageActionsMemo || <TemplatePageMenuActionsDefaultContent {...props} />}
+        {/** Wrapping in div so that warning "Menu doesn't accept fragment as a child doesn't appear" */}
+        <div>{pageActionsMemo || <TemplatePageMenuActionsDefaultContent {...props} />}</div>
       </Menu>
     </>
   );

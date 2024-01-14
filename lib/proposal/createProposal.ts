@@ -210,7 +210,8 @@ export async function createProposal({
         await upsertRubricCriteria({
           evaluationId: evaluationIds[index],
           proposalId: proposal.id,
-          rubricCriteria: evaluation.rubricCriteria
+          rubricCriteria: evaluation.rubricCriteria,
+          actorId: userId
         });
       }
     })

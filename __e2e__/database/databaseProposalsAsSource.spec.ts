@@ -44,19 +44,19 @@ test.beforeAll(async () => {
   firstProposal = await testUtilsProposals.generateProposal({
     spaceId: space.id,
     userId: spaceUser.id,
-    proposalStatus: 'discussion'
+    proposalStatus: 'published'
   });
 
   secondProposal = await testUtilsProposals.generateProposal({
     spaceId: space.id,
     userId: spaceUser.id,
-    proposalStatus: 'discussion'
+    proposalStatus: 'published'
   });
 
   thirdProposal = await testUtilsProposals.generateProposal({
     spaceId: space.id,
     userId: spaceUser.id,
-    proposalStatus: 'discussion'
+    proposalStatus: 'published'
   });
 
   draftProposal = await testUtilsProposals.generateProposal({

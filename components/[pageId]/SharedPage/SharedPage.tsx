@@ -88,13 +88,7 @@ export function SharedPage({ publicPage }: Props) {
     <DatabasePage page={currentPage} setPage={() => null} readOnly />
   ) : (
     <Box sx={{ overflowY: 'auto' }}>
-      <DocumentPage
-        page={publicPage.page}
-        refreshPage={() => Promise.resolve()}
-        savePage={() => null}
-        readOnly
-        enableSidebar
-      />
+      <DocumentPage page={publicPage.page} savePage={() => null} readOnly enableSidebar />
     </Box>
   );
 }

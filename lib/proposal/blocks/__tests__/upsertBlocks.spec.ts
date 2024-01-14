@@ -53,7 +53,7 @@ describe('proposal blocks - updateBlocks', () => {
     const { page, ...proposal1 } = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: adminUser.id,
-      proposalStatus: 'discussion'
+      proposalStatus: 'published'
     });
 
     const propertiesUpdateData = {

@@ -49,7 +49,7 @@ export function ProposalInEvaluation() {
   return (
     <GlobalContext>
       <Box sx={{ overflowY: 'auto' }}>
-        <DocumentPage page={page} refreshPage={async () => {}} readOnly={true} savePage={() => {}} />
+        <DocumentPage page={page} readOnly={true} savePage={() => {}} />
       </Box>
     </GlobalContext>
   );
@@ -182,7 +182,7 @@ ProposalInEvaluation.parameters = {
             { evaluationId: null, id: '3', proposalId: '', roleId: null, userId: members[1].id, systemRole: null }
           ],
           evaluationType: 'rubric',
-          status: 'evaluation_active',
+          status: 'published',
           rubricCriteria,
           rubricAnswers
         });
