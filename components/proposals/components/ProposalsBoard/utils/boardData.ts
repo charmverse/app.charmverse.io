@@ -1,3 +1,5 @@
+import { v4 } from 'uuid';
+
 import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
 import type { Block } from 'lib/focalboard/block';
 import type { Board } from 'lib/focalboard/board';
@@ -116,6 +118,19 @@ export function getDefaultTableView({ board }: { board: Board }) {
   view.fields.visiblePropertyIds = view.fields.visiblePropertyIds.filter((id) => id !== CREATED_AT_ID);
 
   view.fields.openPageIn = 'full_page';
+
+  // Add default filter to hide archived proposals
+  if (!view.fields.filter.filters.length) {
+    view.fields.filter.filters = [
+      {
+        condition: 'does_not_contain',
+        filterId: v4(),
+        operation: 'and',
+        propertyId: PROPOSAL_STATUS_BLOCK_ID,
+        values: ['archived']
+      }
+    ];
+  }
 
   return view;
 }

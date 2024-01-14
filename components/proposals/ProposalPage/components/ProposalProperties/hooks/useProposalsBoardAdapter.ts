@@ -2,7 +2,6 @@ import type { PageMeta } from '@charmverse/core/pages';
 import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import { objectUtils } from '@charmverse/core/utilities';
 import { useMemo, useState } from 'react';
-import { v4 } from 'uuid';
 
 import { sortCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
@@ -72,20 +71,7 @@ export function useProposalsBoardAdapter() {
     const viewBlock = proposalBlocks?.find((b) => b.id === DEFAULT_VIEW_BLOCK_ID);
 
     if (!viewBlock) {
-      const defaultTableView = getDefaultTableView({ board });
-
-      if (!defaultTableView.fields.filter.filters.length) {
-        defaultTableView.fields.filter.filters = [
-          {
-            condition: 'does_not_contain',
-            filterId: v4(),
-            operation: 'and',
-            propertyId: PROPOSAL_STATUS_BLOCK_ID,
-            values: ['archived']
-          }
-        ];
-      }
-      return defaultTableView;
+      return getDefaultTableView({ board });
     }
     const boardView = blockToFBBlock(viewBlock) as BoardView;
     // sort by created at desc by default
