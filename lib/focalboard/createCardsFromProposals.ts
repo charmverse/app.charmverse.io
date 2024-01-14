@@ -281,15 +281,16 @@ export async function createCardsFromProposals({
     const proposalRubricCriterias = mappedRubricCriteriaByProposal[pageProposal.id] ?? [];
     const proposalRubricAnswers = mappedRubricAnswersByProposal[pageProposal.id] ?? [];
 
-    for (const proposalRubricEvaluationStep of proposalRubricEvaluationSteps) {
+    proposalRubricEvaluationSteps.forEach((proposalRubricEvaluationStep, index) => {
       properties = generateResyncedProposalEvaluationForCard({
         currentStep: proposalRubricEvaluationStep,
+        stepIndex: index,
         databaseProperties: databaseProposalProps,
         properties,
         rubricAnswers: proposalRubricAnswers as ProposalRubricCriteriaAnswerWithTypedResponse[],
         rubricCriterias: proposalRubricCriterias
       });
-    }
+    });
 
     const _card = await createCardPage({
       title: pageProposal.title,

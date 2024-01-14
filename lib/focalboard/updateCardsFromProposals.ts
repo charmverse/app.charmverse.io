@@ -407,15 +407,16 @@ export async function updateCardsFromProposals({
           const proposalRubricCriterias = mappedRubricCriteriaByProposal[pageWithProposal.proposal.id] ?? [];
           const proposalRubricAnswers = mappedRubricAnswersByProposal[pageWithProposal.proposal.id] ?? [];
 
-          for (const proposalRubricEvaluationStep of proposalRubricEvaluationSteps) {
+          proposalRubricEvaluationSteps.forEach((proposalRubricEvaluationStep, index) => {
             newCardBlockFields.properties = generateResyncedProposalEvaluationForCard({
               currentStep: proposalRubricEvaluationStep,
               databaseProperties: databaseProposalProps,
               properties: newCardBlockFields.properties,
               rubricAnswers: proposalRubricAnswers as ProposalRubricCriteriaAnswerWithTypedResponse[],
-              rubricCriterias: proposalRubricCriterias
+              rubricCriterias: proposalRubricCriterias,
+              stepIndex: index
             });
-          }
+          });
         }
 
         const { updatedCardPage, updatedCardBlock } = await prisma.$transaction(async (tx) => {
@@ -487,16 +488,16 @@ export async function updateCardsFromProposals({
           pageWithProposal.proposal.evaluations.filter((evaluation) => evaluation.type === 'rubric') ?? [];
         const proposalRubricCriterias = mappedRubricCriteriaByProposal[pageWithProposal.proposal.id] ?? [];
         const proposalRubricAnswers = mappedRubricAnswersByProposal[pageWithProposal.proposal.id] ?? [];
-
-        for (const proposalRubricEvaluationStep of proposalRubricEvaluationSteps) {
+        proposalRubricEvaluationSteps.forEach((proposalRubricEvaluationStep, index) => {
           properties = generateResyncedProposalEvaluationForCard({
             currentStep: proposalRubricEvaluationStep,
             databaseProperties: databaseProposalProps,
             properties,
             rubricAnswers: proposalRubricAnswers as ProposalRubricCriteriaAnswerWithTypedResponse[],
-            rubricCriterias: proposalRubricCriterias
+            rubricCriterias: proposalRubricCriterias,
+            stepIndex: index
           });
-        }
+        });
       }
 
       const formFields = pageWithProposal.proposal?.form?.formFields ?? [];
