@@ -1,11 +1,9 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
 import { Constants } from 'lib/focalboard/constants';
 
-import Mutator from '../mutator';
 import { TestBlockFactory } from '../test/testBlockFactory';
 import { mockDOM, mockStateStore, wrapDNDIntl, wrapPagesProvider } from '../testUtils';
 import { Utils } from '../utils';

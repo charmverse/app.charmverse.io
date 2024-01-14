@@ -203,6 +203,7 @@ function TableHeaders(props: Props): JSX.Element {
       {setCheckedIds && !readOnly && cards.length !== 0 && (
         <StyledCheckbox
           checked={checkedIds.length === cards.length}
+          className='disable-drag-selection'
           onChange={() => {
             if (checkedIds.length === cards.length) {
               setCheckedIds([]);
@@ -256,7 +257,10 @@ function TableHeaders(props: Props): JSX.Element {
         );
       })}
       {/* empty column for actions */}
-      <div className='octo-table-cell header-cell' style={{ flexGrow: 1, borderRight: '0 none' }}>
+      <div
+        className='octo-table-cell header-cell disable-drag-selection'
+        style={{ flexGrow: 1, borderRight: '0 none' }}
+      >
         {!props.readOnly && (
           <>
             <Button {...bindTrigger(addPropertyPopupState)}>
