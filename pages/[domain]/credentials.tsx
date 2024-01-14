@@ -13,8 +13,6 @@ import { useWeb3Account } from 'hooks/useWeb3Account';
 
 export default function CredentialsPage() {
   const [makeNewCredential, setMakeNewCredential] = useState(false);
-  const { account } = useWeb3Account();
-
   const { user } = useUser();
 
   return (

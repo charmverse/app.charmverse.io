@@ -1,15 +1,17 @@
+import type { CredentialTemplate } from '@charmverse/core/dist/cjs/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { useState, type ChangeEvent } from 'react';
+import { useState, type ChangeEvent, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
+import { useGetCredentialTemplates } from 'components/settings/credentials/hooks/credentialHooks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
@@ -18,6 +20,8 @@ import type { SignedCredential } from 'lib/credentials/attest';
 import type { PublishedSignedCredential } from 'lib/credentials/config/queriesAndMutations';
 import type { ProposalCredential } from 'lib/credentials/schemas';
 import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
+
+import { CredentialSelect } from '../CredentialsSelect';
 
 import { ProposalCredentialCard } from './ProposalCredentialCard';
 
@@ -38,6 +42,10 @@ export function ProposalCredentialForm() {
   const [isAttesting, setIsAttesting] = useState(false);
   const { account } = useWeb3Account();
   const { showMessage } = useSnackbar();
+
+  const { data: credentialTemplates } = useGetCredentialTemplates({ spaceId: space?.id });
+
+  const [selectedCredentialTemplate, setSelectedCredentialTemplate] = useState<string | null>(null);
 
   const [signedAttestation, setSignedAttestation] = useState<PublishedSignedCredential | null>(null);
 
@@ -85,6 +93,18 @@ export function ProposalCredentialForm() {
     resolver: yupResolver(schema)
   });
 
+  const template = selectedCredentialTemplate
+    ? credentialTemplates?.find((t) => t.id === selectedCredentialTemplate)
+    : undefined;
+
+  useEffect(() => {
+    if (template) {
+      setValue('name', template.name);
+      setValue('description', template.description ?? '');
+      setValue('organization', template.organization);
+    }
+  }, [selectedCredentialTemplate]);
+
   const onChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setValue(event.target.name as keyof FormValues, value);
@@ -92,66 +112,74 @@ export function ProposalCredentialForm() {
   };
 
   return (
-    <>
-      <form onSubmit={handleSubmit(attest)}>
-        <Stack gap={2}>
-          <Typography>Create a credential</Typography>
-          <TextField
-            {...register('recipient')}
-            autoFocus
-            error={!!errors.name}
-            helperText={errors.name?.message}
-            onChange={onChange}
-          />
-          <TextField
-            {...register('name')}
-            autoFocus
-            error={!!errors.name}
-            helperText={errors.name?.message}
-            onChange={onChange}
-          />
-          <TextField
-            {...register('description')}
-            autoFocus
-            error={!!errors.description}
-            helperText={errors.description?.message}
-            onChange={onChange}
-          />
-          <TextField
-            {...register('organization')}
-            autoFocus
-            error={!!errors.name}
-            helperText={errors.name?.message}
-            onChange={onChange}
-          />
-          <TextField
-            {...register('url')}
-            autoFocus
-            error={!!errors.name}
-            helperText={errors.name?.message}
-            onChange={onChange}
-          />
-          <TextField
-            {...register('status')}
-            autoFocus
-            error={!!errors.name}
-            helperText={errors.name?.message}
-            placeholder='me@gmail.com'
-            onChange={onChange}
-          />
-          <Stack flexDirection='row' gap={1} justifyContent='flex-start'>
-            <Button loading={isAttesting} size='large' type='submit' disabled={Object.keys(errors).length !== 0}>
-              Attest
-            </Button>
+    <div>
+      <CredentialSelect
+        onChange={setSelectedCredentialTemplate}
+        selectedCredentialId={selectedCredentialTemplate as string}
+      />
+
+      {selectedCredentialTemplate && (
+        <form onSubmit={handleSubmit(attest)}>
+          <Stack gap={2}>
+            <Typography>Create a credential</Typography>
+
+            <TextField
+              {...register('recipient')}
+              autoFocus
+              error={!!errors.name}
+              helperText={errors.name?.message}
+              onChange={onChange}
+            />
+            <TextField
+              {...register('name')}
+              autoFocus
+              error={!!errors.name}
+              helperText={errors.name?.message}
+              onChange={onChange}
+            />
+            <TextField
+              {...register('description')}
+              autoFocus
+              error={!!errors.description}
+              helperText={errors.description?.message}
+              onChange={onChange}
+            />
+            <TextField
+              {...register('organization')}
+              autoFocus
+              error={!!errors.name}
+              helperText={errors.name?.message}
+              onChange={onChange}
+            />
+            <TextField
+              {...register('url')}
+              autoFocus
+              error={!!errors.name}
+              helperText={errors.name?.message}
+              onChange={onChange}
+            />
+            <TextField
+              {...register('status')}
+              autoFocus
+              error={!!errors.name}
+              helperText={errors.name?.message}
+              placeholder='me@gmail.com'
+              onChange={onChange}
+            />
+            <Stack flexDirection='row' gap={1} justifyContent='flex-start'>
+              <Button loading={isAttesting} size='large' type='submit' disabled={Object.keys(errors).length !== 0}>
+                Attest
+              </Button>
+            </Stack>
           </Stack>
-        </Stack>
-      </form>
+        </form>
+      )}
       <Divider />
       {signedAttestation && (
         <Box sx={{ maxWidth: '400px' }}>
           <ProposalCredentialCard credential={signedAttestation} />
         </Box>
       )}
-    </>
+    </div>
   );
 }

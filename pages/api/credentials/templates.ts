@@ -47,7 +47,8 @@ async function updateCredentialController(req: NextApiRequest, res: NextApiRespo
   });
 
   const { spaceRole } = await hasAccessToSpace({
-    spaceId: credentialTemplate.spaceId
+    spaceId: credentialTemplate.spaceId,
+    userId: req.session.user.id
   });
 
   if (!spaceRole?.isAdmin) {
@@ -70,7 +71,8 @@ async function deleteCredentialController(req: NextApiRequest, res: NextApiRespo
   });
 
   const { spaceRole } = await hasAccessToSpace({
-    spaceId: credentialTemplate.spaceId
+    spaceId: credentialTemplate.spaceId,
+    userId: req.session.user.id
   });
 
   if (!spaceRole?.isAdmin) {

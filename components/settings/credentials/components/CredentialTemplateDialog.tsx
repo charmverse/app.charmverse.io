@@ -30,10 +30,12 @@ type FormValues = yup.InferType<typeof schema>;
 
 function CredentialTemplateForm({
   credentialTemplate,
-  refreshTemplates
+  refreshTemplates,
+  close
 }: {
   credentialTemplate?: CredentialTemplate | null;
   refreshTemplates: VoidFunction;
+  close: () => void;
 }) {
   const { space } = useCurrentSpace();
   const [isSaving, setIsSaving] = useState(false);
@@ -82,6 +84,7 @@ function CredentialTemplateForm({
         });
       }
       refreshTemplates();
+      close?.();
     } catch (err: any) {
       showMessage(err.message ?? 'Error saving credential template');
     }
@@ -154,7 +157,11 @@ export function CredentialTemplateDialog({
       onClose={onClose}
       title={!credentialTemplate ? 'Create a Credential' : 'Update an existing credential'}
     >
-      <CredentialTemplateForm credentialTemplate={credentialTemplate} refreshTemplates={refreshTemplates} />
+      <CredentialTemplateForm
+        close={onClose}
+        credentialTemplate={credentialTemplate}
+        refreshTemplates={refreshTemplates}
+      />
     </Dialog>
   );
 }
