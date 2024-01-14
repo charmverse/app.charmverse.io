@@ -31,18 +31,18 @@ export type AnswerData = Pick<
 > & { evaluationId?: string | null };
 
 export function aggregateResults({
-  criteria,
+  criterias,
   answers
 }: {
   answers: AnswerData[];
-  criteria: { id: string }[];
+  criterias: { id: string }[];
 }): AggregateResults {
-  const criteriaScores: Record<string, number[]> = criteria.reduce((criteriaRecord, _criteria) => {
+  const criteriaScores: Record<string, number[]> = criterias.reduce((criteriaRecord, _criteria) => {
     criteriaRecord[_criteria.id] = [];
     return criteriaRecord;
   }, {} as Record<string, number[]>);
 
-  const criteriaComments: Record<string, string[]> = criteria.reduce((criteriaRecord, _criteria) => {
+  const criteriaComments: Record<string, string[]> = criterias.reduce((criteriaRecord, _criteria) => {
     criteriaRecord[_criteria.id] = [];
     return criteriaRecord;
   }, {} as Record<string, string[]>);

@@ -28,7 +28,7 @@ import { allMembersSystemRole } from 'components/settings/proposals/components/E
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { Board, DatabaseProposalPropertyType, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import {
@@ -51,7 +51,6 @@ import {
 } from 'lib/rewards/blocks/constants';
 import type { RewardStatus } from 'lib/rewards/interfaces';
 import { getAbsolutePath } from 'lib/utilities/browser';
-import { isTruthy } from 'lib/utilities/types';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import { TextInput } from '../../../components/properties/TextInput';
@@ -180,18 +179,25 @@ function PropertyValueElement(props: Props) {
     propertyTemplate.type === 'proposalEvaluationTotal' ||
     propertyTemplate.type === 'proposalEvaluationAverage'
   ) {
-    const evaluationValues = propertyValue as string[];
-    return <Box>{evaluationValues.filter(isTruthy).join(',')}</Box>;
+    const evaluationValues = propertyValue as unknown as { title: string; value: number }[];
+    return (
+      <Box>
+        {evaluationValues
+          .filter(({ value: evaluationValue }) => evaluationValue !== undefined && evaluationValue !== null)
+          .map(({ value: evaluationValue }) => evaluationValue)
+          .join(',')}
+      </Box>
+    );
   } else if (propertyTemplate.type === 'proposalEvaluatedBy') {
-    const evaluationsReviewers = propertyValue as unknown as string[][];
+    const evaluationsReviewers = propertyValue as unknown as { title: string; value: string[] }[];
     return (
       <Stack>
-        {evaluationsReviewers.map((evaluationReviewers) => (
+        {evaluationsReviewers.map(({ value: reviewers }) => (
           <UserSelect
             displayType='table'
-            key={evaluationReviewers.join(',')}
+            key={reviewers.join(',')}
             onChange={() => {}}
-            memberIds={evaluationReviewers ?? []}
+            memberIds={reviewers ?? []}
             readOnly
             showEmptyPlaceholder={showEmptyPlaceholder}
           />
@@ -202,6 +208,7 @@ function PropertyValueElement(props: Props) {
   // Proposals as datasource use proposalStatus column, whereas the actual proposals table uses STATUS_BLOCK_ID
   // We should migrate over the proposals as datasource blocks to the same format as proposals table
   else if (propertyTemplate.type === 'proposalStatus' || propertyTemplate.id === PROPOSAL_STATUS_BLOCK_ID) {
+    // Proposal will exist if its in the proposals table page
     if (proposal) {
       return <ProposalStatusSelect proposal={proposal} readOnly={!isAdmin} />;
     }

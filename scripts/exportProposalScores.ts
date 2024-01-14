@@ -84,7 +84,7 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
   const aggregatedResultsByProposal = proposals.reduce((acc, proposal) => {
     const results = aggregateResults({
       answers: proposal.rubricAnswers as ProposalRubricCriteriaAnswerWithTypedResponse[],
-      criteria: proposal.rubricCriteria
+      criterias: proposal.rubricCriteria
     });
     acc[proposal.id] = results;
     return acc;

@@ -117,7 +117,7 @@ export function RubricResults({
 
   const { allScores, criteriaSummary } = aggregateResults({
     answers: allAnswers,
-    criteria: evaluation?.rubricCriteria || []
+    criterias: evaluation?.rubricCriteria || []
   });
 
   const allCriteriaScores = Object.values(criteriaSummary).map((v) => v.sum);

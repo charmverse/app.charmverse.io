@@ -34,7 +34,7 @@ describe('aggregateResults', () => {
           userId: secondUserId
         }
       ],
-      criteria: [
+      criterias: [
         {
           id: firstRubricId
         },
@@ -121,7 +121,7 @@ describe('aggregateResults', () => {
           userId: secondUserId
         }
       ],
-      criteria: [
+      criterias: [
         {
           id: firstRubricId
         },
@@ -190,7 +190,7 @@ describe('aggregateResults', () => {
           userId: firstUserId
         }
       ],
-      criteria: [
+      criterias: [
         {
           id: firstRubricId
         },
@@ -218,7 +218,7 @@ describe('aggregateResults', () => {
     expect(
       aggregateResults({
         answers: [],
-        criteria: []
+        criterias: []
       })
     ).toMatchObject<AggregateResults>({
       allScores: { average: null, sum: null },
@@ -229,7 +229,7 @@ describe('aggregateResults', () => {
     expect(
       aggregateResults({
         answers: [],
-        criteria: [
+        criterias: [
           {
             id: '1'
           }

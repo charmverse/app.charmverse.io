@@ -287,7 +287,7 @@ export async function createCardsFromProposals({
         databaseProperties: databaseProposalProps,
         properties,
         rubricAnswers: proposalRubricAnswers as ProposalRubricCriteriaAnswerWithTypedResponse[],
-        rubricCriteria: proposalRubricCriterias
+        rubricCriterias: proposalRubricCriterias
       });
     }
 

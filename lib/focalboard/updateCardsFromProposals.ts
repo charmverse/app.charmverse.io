@@ -291,7 +291,7 @@ export async function updateCardsFromProposals({
 
   const mappedPageIds = pageProposals.map((p) => p.id);
 
-  const [rubricCriteria, rubricAnswers] = await Promise.all([
+  const [rubricCriterias, rubricAnswers] = await Promise.all([
     prisma.proposalRubricCriteria.findMany({
       where: {
         proposalId: {
@@ -308,7 +308,7 @@ export async function updateCardsFromProposals({
     })
   ]);
 
-  const mappedRubricCriteriaByProposal = rubricCriteria.reduce((acc, val) => {
+  const mappedRubricCriteriaByProposal = rubricCriterias.reduce((acc, val) => {
     if (!acc[val.proposalId]) {
       acc[val.proposalId] = [];
     }
@@ -413,7 +413,7 @@ export async function updateCardsFromProposals({
               databaseProperties: databaseProposalProps,
               properties: newCardBlockFields.properties,
               rubricAnswers: proposalRubricAnswers as ProposalRubricCriteriaAnswerWithTypedResponse[],
-              rubricCriteria: proposalRubricCriterias
+              rubricCriterias: proposalRubricCriterias
             });
           }
         }
@@ -494,7 +494,7 @@ export async function updateCardsFromProposals({
             databaseProperties: databaseProposalProps,
             properties,
             rubricAnswers: proposalRubricAnswers as ProposalRubricCriteriaAnswerWithTypedResponse[],
-            rubricCriteria: proposalRubricCriterias
+            rubricCriterias: proposalRubricCriterias
           });
         }
       }
