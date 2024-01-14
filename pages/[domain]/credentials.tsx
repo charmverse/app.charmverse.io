@@ -1,3 +1,4 @@
+import { Box, Divider } from '@mui/material';
 import Switch from '@mui/material/Switch';
 import { useState } from 'react';
 
@@ -12,17 +13,15 @@ import { useWeb3Account } from 'hooks/useWeb3Account';
 // https://optimism.easscan.org/schema/view/0x20770d8c0a19668aa843240ddf6d57025334b346171c28dfed1a7ddb16928b89
 
 export default function CredentialsPage() {
-  const [makeNewCredential, setMakeNewCredential] = useState(false);
   const { user } = useUser();
 
   return (
-    <div>
+    <Box overflow='scroll'>
       <Typography variant='h2'>Credentials</Typography>
-      <Switch onChange={() => setMakeNewCredential(!makeNewCredential)} value={makeNewCredential} />
-
-      {makeNewCredential && <ProposalCredentialForm />}
-      {!makeNewCredential && <UserCredentials account={user?.wallets[0].address as string} />}
-    </div>
+      <ProposalCredentialForm />
+      <Divider sx={{ my: 4 }} />
+      <UserCredentials account={user?.wallets[0].address as string} />
+    </Box>
   );
 }
 

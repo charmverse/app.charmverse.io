@@ -1,8 +1,9 @@
+import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 
-import { TextInput } from 'components/common/BoardEditor/components/properties/TextInput';
 import { useGetUserCredentials } from 'components/settings/credentials/hooks/credentialHooks';
+import { shortWalletAddress } from 'lib/utilities/blockchain';
 
 import { ProposalCredentialCard } from './ProposalCredentialCard';
 
@@ -13,12 +14,17 @@ export function UserCredentials({ account }: { account: string }) {
 
   return (
     <div>
-      <Typography variant='h3'>Received Credentials</Typography>
-
-      <TextInput onChange={setSelectedAccount} />
+      <TextField
+        variant='outlined'
+        fullWidth
+        label='Recipient address'
+        defaultValue={account}
+        onChange={(ev) => setSelectedAccount(ev.target.value)}
+      />
 
       {isLoading && <Typography>Loading...</Typography>}
 
+      <Typography variant='h4'>Credentials for {shortWalletAddress(selectedAccount)}</Typography>
       {credentials?.map((credential) => (
         <ProposalCredentialCard key={credential.id} credential={credential} />
       ))}

@@ -131,35 +131,35 @@ export function ProposalCredentialForm() {
               onChange={onChange}
             />
             <TextField
-              {...register('name')}
+              {...register('name', { disabled: true })}
               autoFocus
               error={!!errors.name}
               helperText={errors.name?.message}
               onChange={onChange}
             />
             <TextField
-              {...register('description')}
+              {...register('description', { disabled: true })}
               autoFocus
               error={!!errors.description}
               helperText={errors.description?.message}
               onChange={onChange}
             />
             <TextField
-              {...register('organization')}
+              {...register('organization', { disabled: true })}
               autoFocus
               error={!!errors.name}
               helperText={errors.name?.message}
               onChange={onChange}
             />
             <TextField
-              {...register('url')}
+              {...register('url', { disabled: true })}
               autoFocus
               error={!!errors.name}
               helperText={errors.name?.message}
               onChange={onChange}
             />
             <TextField
-              {...register('status')}
+              {...register('status', { disabled: true })}
               autoFocus
               error={!!errors.name}
               helperText={errors.name?.message}
