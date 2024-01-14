@@ -3,8 +3,8 @@ import { useState } from 'react';
 
 import getPageLayout from 'components/common/PageLayout/getLayout';
 import { Typography } from 'components/common/Typography';
-import { ProposalCredentialForm } from 'components/credentials/ProposalCredentialForm';
-import { UserCredentials } from 'components/credentials/UserCredentials';
+import { ProposalCredentialForm } from 'components/credentials/TestComponents/ProposalCredentialForm';
+import { UserCredentials } from 'components/credentials/TestComponents/UserCredentials';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 

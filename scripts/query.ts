@@ -14,10 +14,15 @@ import { prisma } from '@charmverse/core/prisma-client';
  */
 
 async function search() {
-  const acc = await prisma.block.findMany({
+  const acc = await prisma.page.findFirst({
     where: {
-      space: {
-        domain: 'example-domain'
+      title: 'First proposal with credential'
+    },
+    select: {
+      proposal: {
+        select: {
+          credentialTemplate: true,
+        }
       }
     }
   });

@@ -8,9 +8,16 @@ export type UpdateProposalRequest = {
   authors?: string[];
   publishToLens?: boolean;
   fields?: ProposalFields | null;
+  credentialTemplateId?: string;
 };
 
-export async function updateProposal({ proposalId, authors, publishToLens, fields }: UpdateProposalRequest) {
+export async function updateProposal({
+  proposalId,
+  authors,
+  publishToLens,
+  fields,
+  credentialTemplateId
+}: UpdateProposalRequest) {
   if (authors && authors.length === 0) {
     throw new InvalidStateError('Proposal must have at least 1 author');
   }
@@ -23,6 +30,22 @@ export async function updateProposal({ proposalId, authors, publishToLens, field
         },
         data: {
           publishToLens
+        }
+      });
+    }
+
+    const updatingCredentialTemplate = typeof credentialTemplateId === 'string' || credentialTemplateId === null;
+
+    if (updatingCredentialTemplate) {
+      await tx.proposal.update({
+        where: {
+          id: proposalId
+        },
+        data: {
+          credentialTemplate:
+            credentialTemplateId === '' || credentialTemplateId === null
+              ? { disconnect: {} }
+              : { connect: { id: credentialTemplateId } }
         }
       });
     }
