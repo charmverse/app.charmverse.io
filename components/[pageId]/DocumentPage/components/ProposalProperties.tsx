@@ -77,7 +77,8 @@ export function ProposalProperties({
         id: reviewer.roleId ?? (reviewer.userId as string)
       })) ?? [],
     type: proposalPage.type,
-    fields: typeof proposal?.fields === 'object' && !!proposal?.fields ? proposal.fields : { properties: {} }
+    fields: typeof proposal?.fields === 'object' && !!proposal?.fields ? proposal.fields : { properties: {} },
+    credentialTemplateId: proposal?.credentialTemplateId
   };
 
   async function onChangeProperties(values: Partial<ProposalPropertiesInput>) {

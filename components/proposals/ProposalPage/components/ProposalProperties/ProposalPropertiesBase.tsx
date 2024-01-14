@@ -7,6 +7,7 @@ import { PropertyLabel } from 'components/common/BoardEditor/components/properti
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import Link from 'components/common/Link';
 import { LoadingIcon } from 'components/common/LoadingComponent';
+import { CredentialSelect } from 'components/credentials/CredentialsSelect';
 import { ProposalRewards } from 'components/proposals/components/ProposalRewards/ProposalRewards';
 import { CustomPropertiesAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/CustomPropertiesAdapter';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
@@ -30,6 +31,7 @@ export type ProposalPropertiesInput = {
   publishToLens?: boolean;
   fields: ProposalFields | null;
   type: PageType;
+  credentialTemplateId?: string | null;
 };
 
 type ProposalPropertiesProps = {
@@ -124,6 +126,14 @@ export function ProposalPropertiesBase({
                 }}
                 wrapColumn
                 showEmptyPlaceholder
+              />
+              <CredentialSelect
+                selectedCredentialId={proposalFormInputs.credentialTemplateId as string}
+                onChange={(credentialTemplateId) =>
+                  setProposalFormInputs({
+                    credentialTemplateId
+                  })
+                }
               />
             </Box>
           </div>

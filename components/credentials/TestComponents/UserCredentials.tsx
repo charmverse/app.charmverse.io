@@ -2,13 +2,12 @@ import Typography from '@mui/material/Typography';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { useGetUserCredentials } from 'components/settings/credentials/hooks/credentialHooks';
 
 import { ProposalCredentialCard } from './ProposalCredentialCard';
 
 export function UserCredentials({ account }: { account: string }) {
-  const { data: credentials, isLoading } = useSWR(`credentials-${account}`, () =>
-    charmClient.credentials.getUserCredentials({ account })
-  );
+  const { data: credentials, isLoading } = useGetUserCredentials({ account });
 
   return (
     <div>
