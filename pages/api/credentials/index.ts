@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { isProdEnv } from 'config/constants';
 import type { CharmVerseCredentialInput } from 'lib/credentials/attest';
 import { signAndPublishCharmverseCredential } from 'lib/credentials/attest';
 import { getCredentialsByRecipient } from 'lib/credentials/config/queriesAndMutations';
@@ -16,7 +17,12 @@ async function getCredentialsController(req: NextApiRequest, res: NextApiRespons
   return res.status(200).json(credentials);
 }
 
+// TODO Test endpoint for generating a credential - remove later
 async function attestController(req: NextApiRequest, res: NextApiResponse) {
+  if (isProdEnv) {
+    throw new Error('This endpoint is only available in test environments');
+  }
+
   const signed = await signAndPublishCharmverseCredential(req.body as CharmVerseCredentialInput);
   return res.status(201).json(signed);
 }

@@ -1,20 +1,21 @@
 import type { CredentialTemplate } from '@charmverse/core/dist/cjs/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { FormLabel, InputLabel } from '@mui/material';
+import { InputLabel } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
 import { useState, type ChangeEvent } from 'react';
 import { useForm } from 'react-hook-form';
+import { optimism } from 'viem/chains';
 import * as yup from 'yup';
 
+import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useUser } from 'hooks/useUser';
+import { getAttestationSchemaId } from 'lib/credentials/schemas';
 
 import type { ProposalCredentialToPreview } from './ProposalCredentialPreview';
 import { ProposalCredentialPreview } from './ProposalCredentialPreview';
@@ -27,10 +28,15 @@ const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>;
 
-function CredentialTemplateForm({ credentialTemplate }: { credentialTemplate?: CredentialTemplate }) {
-  const { user } = useUser();
+function CredentialTemplateForm({
+  credentialTemplate,
+  refreshTemplates
+}: {
+  credentialTemplate?: CredentialTemplate | null;
+  refreshTemplates: VoidFunction;
+}) {
   const { space } = useCurrentSpace();
-  const [isAttesting, setIsAttesting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const { showMessage } = useSnackbar();
 
   const {
@@ -43,7 +49,7 @@ function CredentialTemplateForm({ credentialTemplate }: { credentialTemplate?: C
     formState: { errors, isValid }
   } = useForm<FormValues>({
     defaultValues: {
-      organization: credentialTemplate?.name ?? space?.name,
+      organization: credentialTemplate?.organization ?? space?.name,
       name: credentialTemplate?.name ?? 'Season 5',
       description: credentialTemplate?.description ?? 'Participated in season 5 of our RFG scheme'
     },
@@ -57,8 +63,29 @@ function CredentialTemplateForm({ credentialTemplate }: { credentialTemplate?: C
     return trigger();
   };
 
-  function handleSave(formValues: FormValues) {
-    console.log('FORM', formValues);
+  async function handleSave(formValues: FormValues) {
+    setIsSaving(true);
+    try {
+      if (!credentialTemplate) {
+        const schemaId = getAttestationSchemaId({ chainId: optimism.id, credentialType: 'proposal' });
+        await charmClient.credentials.createCredentialTemplate({
+          ...formValues,
+          description: formValues.description ?? '',
+          schemaType: 'proposal',
+          spaceId: space?.id as string,
+          schemaAddress: schemaId
+        });
+      } else {
+        await charmClient.credentials.updateCredentialTemplate({
+          templateId: credentialTemplate?.id as string,
+          fields: formValues
+        });
+      }
+      refreshTemplates();
+    } catch (err: any) {
+      showMessage(err.message ?? 'Error saving credential template');
+    }
+    setIsSaving(false);
   }
 
   return (
@@ -100,7 +127,7 @@ function CredentialTemplateForm({ credentialTemplate }: { credentialTemplate?: C
           </Box>
           {isValid && <ProposalCredentialPreview credential={getValues() as ProposalCredentialToPreview} />}
           <Stack flexDirection='row' gap={1} justifyContent='flex-start'>
-            <Button loading={isAttesting} size='large' type='submit' disabled={Object.keys(errors).length !== 0}>
+            <Button loading={isSaving} size='large' type='submit' disabled={Object.keys(errors).length !== 0}>
               Save
             </Button>
           </Stack>
@@ -113,11 +140,13 @@ function CredentialTemplateForm({ credentialTemplate }: { credentialTemplate?: C
 export function CredentialTemplateDialog({
   isOpen,
   onClose,
-  credentialTemplate
+  credentialTemplate,
+  refreshTemplates
 }: {
   isOpen: boolean;
   onClose: () => void;
-  credentialTemplate?: CredentialTemplate;
+  credentialTemplate?: CredentialTemplate | null;
+  refreshTemplates: VoidFunction;
 }) {
   return (
     <Dialog
@@ -125,7 +154,7 @@ export function CredentialTemplateDialog({
       onClose={onClose}
       title={!credentialTemplate ? 'Create a Credential' : 'Update an existing credential'}
     >
-      <CredentialTemplateForm credentialTemplate={credentialTemplate} />
+      <CredentialTemplateForm credentialTemplate={credentialTemplate} refreshTemplates={refreshTemplates} />
     </Dialog>
   );
 }

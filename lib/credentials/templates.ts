@@ -22,13 +22,15 @@ export async function getCredentialTemplates({ spaceId }: { spaceId: string }): 
 
 type CredentialTemplateUpdateableFields = Partial<Pick<CredentialTemplate, 'name' | 'description' | 'organization'>>;
 
+export type CredentialTemplateUpdate = {
+  templateId: string;
+  fields: CredentialTemplateUpdateableFields;
+};
+
 export async function updateCredentialTemplate({
   templateId,
   fields
-}: {
-  templateId: string;
-  fields: CredentialTemplateUpdateableFields;
-}): Promise<CredentialTemplate> {
+}: CredentialTemplateUpdate): Promise<CredentialTemplate> {
   return prisma.credentialTemplate.update({
     where: {
       id: templateId
@@ -37,6 +39,31 @@ export async function updateCredentialTemplate({
       name: fields.name,
       description: fields.description,
       organization: fields.organization
+    }
+  });
+}
+
+export type CreateCredentialTemplateInput = Pick<
+  CredentialTemplate,
+  'name' | 'description' | 'organization' | 'spaceId' | 'schemaType' | 'schemaAddress'
+>;
+
+export async function createCredentialTemplate({
+  description,
+  name,
+  organization,
+  schemaAddress,
+  schemaType,
+  spaceId
+}: CreateCredentialTemplateInput): Promise<CredentialTemplate> {
+  return prisma.credentialTemplate.create({
+    data: {
+      name,
+      description,
+      organization,
+      schemaAddress,
+      schemaType,
+      space: { connect: { id: spaceId } }
     }
   });
 }
