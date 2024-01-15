@@ -14,15 +14,70 @@ import { prisma } from '@charmverse/core/prisma-client';
  */
 
 async function search() {
-  const acc = await prisma.block.findMany({
-    where: {
-      space: {
-        domain: 'example-domain'
+  const results = await Promise.all([
+    prisma.proposalReviewer.findMany({
+      where: {
+        evaluationId: null
+      },
+      include: {
+        proposal: {
+          select: {
+            page: {
+              select: {
+                createdAt: true
+              }
+            }
+          }
+        }
       }
-    }
-  });
+    }),
+    prisma.proposalRubricCriteria.findMany({
+      where: {
+        evaluationId: null
+      },
+      include: {
+        proposal: {
+          select: {
+            page: {
+              include: {
+                space: {
+                  select: {
+                    name: true
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }),
+    prisma.proposalRubricCriteriaAnswer.findMany({
+      where: {
+        evaluationId: null
+      },
+      include: {
+        proposal: {
+          select: {
+            page: {
+              select: {
+                createdAt: true
+              }
+            }
+          }
+        }
+      }
+    }),
+    prisma.draftProposalRubricCriteriaAnswer.findMany({
+      where: {
+        evaluationId: null
+      }
+    })
+  ]);
 
-  console.log(acc);
+  results.forEach((count, i) => {
+    console.log(count.length);
+    console.log(count.map((c) => c.proposal?.page.space?.name));
+  });
 }
 
 search().then(() => console.log('Done'));
