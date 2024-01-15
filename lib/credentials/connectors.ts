@@ -14,7 +14,7 @@ type EASConnector = {
 };
 
 export const easConnectors: Record<EasSchemaChain, EASConnector> = {
-  10: {
+  [optimism.id]: {
     attestationContract: '0x4200000000000000000000000000000000000021',
     schemaRegistryContract: '0x4200000000000000000000000000000000000020',
     attestationExplorerUrl: 'https://optimism.easscan.org'

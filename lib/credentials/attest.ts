@@ -151,8 +151,6 @@ export async function signAndPublishCharmverseCredential({
     sig: JSON.stringify(signedCredential.sig)
   };
 
-  prettyPrint(contentToPublish);
-
   const published = await publishSignedCredential(contentToPublish);
 
   return published;
