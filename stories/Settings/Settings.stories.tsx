@@ -88,15 +88,22 @@ API.parameters = {
       spaces: rest.get(`/api/spaces`, (req, res, ctx) => {
         return res(ctx.json(spaces));
       })
-      // userProfile: rest.get('/api/profile', (req, res, ctx) => {
-      //   const clone = { ...userProfile };
-      //   clone.notificationToggles = [
-      //     {
-      //       exclude: 'forum'
-      //     }
-      //   ];
-      //   return res(ctx.json(clone));
-      // })
+    }
+  }
+};
+
+MyAccount.parameters = {
+  msw: {
+    handlers: {
+      otp: rest.post(`/api/profile/otp`, (_req, res, ctx) => {
+        return res(ctx.json({ code: '123456', uri: 'tot//', recoveryCode: '1233546546' }));
+      }),
+      otpVerify: rest.put(`/api/profile/otp/verify`, (_req, res, ctx) => {
+        return res(ctx.json({ code: '123456' }));
+      }),
+      otpActivate: rest.put(`/api/profile/otp/activate`, (_req, res, ctx) => {
+        return res(ctx.json({}));
+      })
     }
   }
 };
