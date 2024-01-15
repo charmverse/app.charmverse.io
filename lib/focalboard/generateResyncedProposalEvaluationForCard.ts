@@ -18,7 +18,7 @@ export function generateResyncedProposalEvaluationForCard({
   databaseProperties: Partial<ExtractedDatabaseProposalProperties>;
   rubricCriterias: { id: string }[];
   rubricAnswers: AnswerData[];
-  currentStep: Pick<ProposalEvaluation, 'id' | 'type' | 'title'>;
+  currentStep: Pick<ProposalEvaluation, 'id' | 'title'>;
   stepIndex: number;
 }) {
   const cardProperties = JSON.parse(JSON.stringify(properties)) as Record<string, CardPropertyValue>;

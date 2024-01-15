@@ -96,14 +96,163 @@ describe('createCardsFromProposals', () => {
   });
 
   it('should initialise the database with all proposal properties visible', async () => {
+    const generated = await testUtilsUser.generateUserAndSpace();
+    const admin = generated.user;
+    const proposalReviewer = await testUtilsUser.generateSpaceUser({
+      spaceId: generated.space.id
+    });
+
+    const generatedProposal = await testUtilsProposals.generateProposal({
+      authors: [admin.id],
+      evaluationInputs: [
+        {
+          rubricCriteria: [
+            {
+              description: 'Rubric criteria 1',
+              parameters: {
+                min: 0,
+                max: 5
+              },
+              title: 'Rubric criteria 1'
+            },
+            {
+              description: 'Rubric criteria 2',
+              parameters: {
+                min: 0,
+                max: 10
+              },
+              title: 'Rubric criteria 2'
+            }
+          ],
+          evaluationType: 'rubric',
+          title: 'Rubric evaluation 1',
+          reviewers: [
+            {
+              group: 'user',
+              id: proposalReviewer.id
+            },
+            {
+              group: 'user',
+              id: admin.id
+            }
+          ],
+          permissions: []
+        },
+        {
+          rubricCriteria: [
+            {
+              description: 'Rubric criteria 1',
+              parameters: {
+                min: 0,
+                max: 10
+              },
+              title: 'Rubric criteria 1'
+            }
+          ],
+          evaluationType: 'rubric',
+          title: 'Rubric evaluation 2',
+          reviewers: [
+            {
+              group: 'user',
+              id: admin.id
+            }
+          ],
+          permissions: []
+        }
+      ],
+      proposalStatus: 'published',
+      spaceId: generated.space.id,
+      userId: admin.id
+    });
+
+    const proposalRubricCriterias = await prisma.proposalRubricCriteria.findMany({
+      where: {
+        proposalId: generatedProposal.id
+      },
+      select: {
+        id: true,
+        evaluationId: true
+      }
+    });
+
+    const proposalEvaluationIdRubricCriteriasRecord: Record<string, string[]> = {};
+    generatedProposal.evaluations.forEach((evaluation) => {
+      const rubricCriterias = proposalRubricCriterias.filter((criteria) => criteria.evaluationId === evaluation.id);
+      proposalEvaluationIdRubricCriteriasRecord[evaluation.id] = rubricCriterias.map((criteria) => criteria.id);
+    });
+
+    // Admin first evaluation first rubric criteria answer
+    await prisma.proposalRubricCriteriaAnswer.create({
+      data: {
+        response: { score: 5 },
+        userId: admin.id,
+        comment: null,
+        proposalId: generatedProposal.id,
+        rubricCriteriaId: proposalEvaluationIdRubricCriteriasRecord[generatedProposal.evaluations[0].id][0],
+        evaluationId: generatedProposal.evaluations[0].id
+      }
+    });
+
+    // Admin first evaluation 2nd rubric criteria answer
+    await prisma.proposalRubricCriteriaAnswer.create({
+      data: {
+        response: { score: 8 },
+        userId: admin.id,
+        comment: null,
+        proposalId: generatedProposal.id,
+        rubricCriteriaId: proposalEvaluationIdRubricCriteriasRecord[generatedProposal.evaluations[0].id][1],
+        evaluationId: generatedProposal.evaluations[0].id
+      }
+    });
+
+    // Proposal reviewer first evaluation first rubric criteria answer
+    await prisma.proposalRubricCriteriaAnswer.create({
+      data: {
+        response: { score: 3 },
+        userId: proposalReviewer.id,
+        comment: null,
+        proposalId: generatedProposal.id,
+        rubricCriteriaId: proposalEvaluationIdRubricCriteriasRecord[generatedProposal.evaluations[0].id][0],
+        evaluationId: generatedProposal.evaluations[0].id
+      }
+    });
+
+    // Proposal reviewer first evaluation 2nd rubric criteria answer
+    await prisma.proposalRubricCriteriaAnswer.create({
+      data: {
+        response: { score: 7 },
+        userId: proposalReviewer.id,
+        comment: null,
+        proposalId: generatedProposal.id,
+        rubricCriteriaId: proposalEvaluationIdRubricCriteriasRecord[generatedProposal.evaluations[0].id][1],
+        evaluationId: generatedProposal.evaluations[0].id
+      }
+    });
+
+    // Proposal reviewer second evaluation 1st rubric criteria answer
+    await prisma.proposalRubricCriteriaAnswer.create({
+      data: {
+        response: { score: 4 },
+        userId: proposalReviewer.id,
+        comment: null,
+        proposalId: generatedProposal.id,
+        rubricCriteriaId: proposalEvaluationIdRubricCriteriasRecord[generatedProposal.evaluations[1].id][0],
+        evaluationId: generatedProposal.evaluations[1].id
+      }
+    });
+
     const database = await generateBoard({
-      createdBy: user.id,
-      spaceId: space.id,
+      createdBy: admin.id,
+      spaceId: generated.space.id,
       views: 1,
       viewDataSource: 'proposals'
     });
 
-    await createCardsFromProposals({ boardId: database.id, spaceId: space.id, userId: user.id });
+    const cards = await createCardsFromProposals({
+      boardId: database.id,
+      spaceId: generated.space.id,
+      userId: user.id
+    });
 
     const databaseAfterUpdate = await prisma.block.findUnique({
       where: {
@@ -114,9 +263,19 @@ describe('createCardsFromProposals', () => {
     const properties = (databaseAfterUpdate?.fields as any).cardProperties as IPropertyTemplate[];
     const proposalUrlProp = properties.find((prop) => prop.type === 'proposalUrl');
     const proposalStatusProp = properties.find((prop) => prop.type === 'proposalStatus');
+    const proposalEvaluationAverageProp = properties.find(
+      (prop) => prop.type === 'proposalEvaluationAverage'
+    ) as IPropertyTemplate;
+    const proposalEvaluationTotalProp = properties.find(
+      (prop) => prop.type === 'proposalEvaluationTotal'
+    ) as IPropertyTemplate;
+    const proposalEvaluatedByProp = properties.find((prop) => prop.type === 'proposalEvaluatedBy') as IPropertyTemplate;
 
     expect(proposalUrlProp).toBeDefined();
     expect(proposalStatusProp).toBeDefined();
+    expect(proposalEvaluationAverageProp).toBeDefined();
+    expect(proposalEvaluationTotalProp).toBeDefined();
+    expect(proposalEvaluatedByProp).toBeDefined();
 
     const view = await prisma.block.findFirstOrThrow({
       where: {
@@ -130,6 +289,59 @@ describe('createCardsFromProposals', () => {
     ['__title', proposalUrlProp?.id, proposalStatusProp?.id].forEach((propertyKey) => {
       expect(visibleProperties.includes(propertyKey as string)).toBe(true);
     });
+
+    const card = await prisma.block.findFirstOrThrow({
+      where: {
+        id: cards[0].cardId as string
+      },
+      select: {
+        fields: true
+      }
+    });
+
+    const cardFieldProperties = (card.fields as CardFields).properties;
+    expect(cardFieldProperties[proposalEvaluationAverageProp.id]).toStrictEqual([
+      {
+        title: generatedProposal.evaluations[0].title,
+        value: 5.75
+      },
+      {
+        title: generatedProposal.evaluations[1].title,
+        value: 4
+      }
+    ]);
+
+    expect(cardFieldProperties[proposalEvaluationTotalProp.id]).toStrictEqual([
+      {
+        title: generatedProposal.evaluations[0].title,
+        value: 5 + 8 + 3 + 7
+      },
+      {
+        title: generatedProposal.evaluations[1].title,
+        value: 4
+      }
+    ]);
+
+    expect(
+      (
+        cardFieldProperties[proposalEvaluatedByProp.id] as unknown as {
+          title: string;
+          value: string[];
+        }[]
+      ).map((prop) => ({
+        title: prop.title,
+        value: prop.value.sort()
+      }))
+    ).toStrictEqual([
+      {
+        title: generatedProposal.evaluations[0].title,
+        value: [proposalReviewer.id, admin.id].sort()
+      },
+      {
+        title: generatedProposal.evaluations[1].title,
+        value: [proposalReviewer.id].sort()
+      }
+    ]);
   });
 
   it(`should add custom proposal properties as card properties and add them to visible properties for all views as an admin`, async () => {
