@@ -154,7 +154,7 @@ export function ProposalsPage({ title }: { title: string }) {
             <Box className='view-actions'>
               <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
               <ViewSortControl
-                activeBoard={activeBoard}
+                cardProperties={activeBoard?.fields.cardProperties ?? []}
                 activeView={activeView}
                 cards={cards}
                 viewSortPopup={viewSortPopup}

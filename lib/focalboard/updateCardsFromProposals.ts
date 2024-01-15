@@ -348,7 +348,6 @@ export async function updateCardsFromProposals({
     const proposalEvaluationStatus = currentStep?.result ?? 'in_progress';
     const proposalEvaluationStep = currentStep?.title ?? 'Draft';
     const proposalEvaluationType = currentStep?.step ?? 'draft';
-
     if (card) {
       const { cardProposalStatus, cardEvaluationType, cardProposalStep, cardProposalUrl } =
         extractCardProposalProperties({

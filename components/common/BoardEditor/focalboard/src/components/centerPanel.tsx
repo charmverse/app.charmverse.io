@@ -38,6 +38,7 @@ import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
 import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
+import { addProposalEvaluationProperties } from 'lib/focalboard/addProposalEvaluationProperties';
 import type { Block } from 'lib/focalboard/block';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
@@ -134,6 +135,7 @@ function CenterPanel(props: Props) {
     })
   );
   const isActiveView = !!(activeView && activeBoard);
+  const boardSourceType = activeView?.fields.sourceType ?? activeBoard?.fields.sourceType;
 
   useEffect(() => {
     if (!isActiveView) {
@@ -146,6 +148,15 @@ function CenterPanel(props: Props) {
     }
   }, [activeView?.id, views.length, isActiveView]);
 
+  const rubricEvaluationTitles = useMemo(() => {
+    const titles = getProposalRubricEvaluationTitles({
+      cards: currentBoardCards,
+      board: activeBoard,
+      boardSourceType
+    });
+    return titles;
+  }, [boardSourceType, currentBoardCards, activeBoard]);
+
   // filter cards by whats accessible
   const { cardPages, cardPageIds } = useMemo(() => {
     const result = _cards
@@ -155,8 +166,20 @@ function CenterPanel(props: Props) {
       }))
       .filter(({ page }) => !!page && !page.deletedAt);
 
+    const cardPropertiesWithEvaluationProperties = addProposalEvaluationProperties({
+      properties: activeBoard?.fields.cardProperties ?? [],
+      rubricEvaluationTitles,
+      filterEvaluationProperties: false
+    });
+
     const _cardPages = isActiveView
-      ? sortCards(result, activeBoard, activeView, membersRecord, localViewSettings?.localSort)
+      ? sortCards(
+          result,
+          cardPropertiesWithEvaluationProperties,
+          activeView,
+          membersRecord,
+          localViewSettings?.localSort
+        )
       : [];
 
     const _cardPageIds = new Set<string>();
@@ -166,7 +189,7 @@ function CenterPanel(props: Props) {
       cardPages: _cardPages,
       cardPageIds: _cardPageIds
     };
-  }, [isActiveView, _cards, pages, localViewSettings?.localSort]);
+  }, [isActiveView, _cards, activeBoard, rubricEvaluationTitles, pages, localViewSettings?.localSort]);
 
   const cards = cardPages.map(({ card }) => card);
 
@@ -506,20 +529,9 @@ function CenterPanel(props: Props) {
   const isLoadingSourceData = !activeBoard && (!views || views.length === 0);
   const readOnlyTitle = activeBoard?.fields.sourceType === 'proposals';
 
-  const boardSourceType = activeView?.fields.sourceType ?? activeBoard?.fields.sourceType;
-
   const disableAddingNewCards = boardSourceType === 'proposals';
   const noBoardViewsYet = !isLoadingSourceData && views.length === 0;
   const showNewLinkedBoardView = state.openSettings === 'create-linked-view' || noBoardViewsYet;
-
-  const rubricEvaluationTitles = useMemo(() => {
-    const titles = getProposalRubricEvaluationTitles({
-      cards: currentBoardCards,
-      board: activeBoard,
-      boardSourceType
-    });
-    return titles;
-  }, [boardSourceType, currentBoardCards, activeBoard]);
 
   return (
     <>

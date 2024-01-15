@@ -12,6 +12,7 @@ import { ViewSettingsRow } from 'components/common/BoardEditor/components/ViewSe
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
 import Link from 'components/common/Link';
 import { usePages } from 'hooks/usePages';
+import { addProposalEvaluationProperties } from 'lib/focalboard/addProposalEvaluationProperties';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
@@ -189,8 +190,10 @@ function ViewHeader(props: Props) {
               {/* Sort */}
               {withSortBy && (
                 <ViewSortControl
-                  rubricEvaluationTitles={rubricEvaluationTitles}
-                  activeBoard={activeBoard}
+                  cardProperties={addProposalEvaluationProperties({
+                    properties: activeBoard?.fields.cardProperties ?? [],
+                    rubricEvaluationTitles
+                  })}
                   activeView={activeView}
                   cards={cards}
                   viewSortPopup={viewSortPopup}

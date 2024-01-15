@@ -141,7 +141,7 @@ export function useRewardsBoardAdapter() {
       cards = cards.filter((cp) => filteredCardsIds.includes(cp.card.id));
     }
     const sortedCardPages = activeView
-      ? sortCards(cards, board, activeView, membersRecord, localViewSettings?.localSort)
+      ? sortCards(cards, board.fields.cardProperties, activeView, membersRecord, localViewSettings?.localSort)
       : [];
 
     return sortedCardPages;

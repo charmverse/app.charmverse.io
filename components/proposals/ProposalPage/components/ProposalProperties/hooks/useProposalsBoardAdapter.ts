@@ -131,7 +131,7 @@ export function useProposalsBoardAdapter() {
     }
 
     const sortedCardPages = activeView
-      ? sortCards(cards, board, activeView, membersRecord, localViewSettings?.localSort)
+      ? sortCards(cards, board.fields.cardProperties, activeView, membersRecord, localViewSettings?.localSort)
       : [];
 
     return sortedCardPages;

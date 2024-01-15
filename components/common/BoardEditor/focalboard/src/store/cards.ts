@@ -4,7 +4,7 @@ import { createSelector, createSlice } from '@reduxjs/toolkit';
 
 import { tokenChainOptions } from 'components/rewards/components/RewardsBoard/utils/boardData';
 import { addProposalEvaluationProperties } from 'lib/focalboard/addProposalEvaluationProperties';
-import type { Board } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
@@ -183,7 +183,7 @@ function manualOrder(activeView: BoardView, cardA: CardPage, cardB: CardPage) {
 
 export function sortCards(
   cardPages: CardPage[],
-  board: Board,
+  cardProperties: IPropertyTemplate[],
   activeView: BoardView,
   members: Record<string, Member>,
   localSort?: ISortOption[] | null
@@ -209,7 +209,18 @@ export function sortCards(
       });
     } else {
       const sortPropertyId = sortOption.propertyId;
-      const template = board.fields.cardProperties.find((o) => o.id === sortPropertyId);
+      const template = cardProperties.find((o) => o.id === sortPropertyId);
+      // id that starts with __ are not real properties, they were injected manually and are dynamic based on the proposal rubric evaluations
+      const proposalEvaluationTotalProperty = cardProperties.find(
+        (o) => o.type === 'proposalEvaluationTotal' && !o.id.startsWith('__')
+      );
+      const proposalEvaluationAverageProperty = cardProperties.find(
+        (o) => o.type === 'proposalEvaluationAverage' && !o.id.startsWith('__')
+      );
+      const proposalEvaluationReviewersProperty = cardProperties.find(
+        (o) => o.type === 'proposalEvaluatedBy' && !o.id.startsWith('__')
+      );
+
       if (!template) {
         Utils.logError(`Missing template for property id: ${sortPropertyId}`);
         return sortedCards;
@@ -232,16 +243,70 @@ export function sortCards(
           if (typeof bValue !== 'number') {
             bValue = bValue === '' ? '' : JSON.parse(bValue as string).from;
           }
+        } else if (template.type === 'proposalEvaluationAverage' && proposalEvaluationAverageProperty) {
+          const filterPropertyRubricTitle = template.id.split('__proposalEvaluationAverage_')[1];
+          const cardAProposalEvaluationAverageValue = (
+            (a.card.fields.properties[proposalEvaluationAverageProperty.id] as unknown as {
+              title: string;
+              value: number;
+            }[]) ?? []
+          ).find((val) => val.title === filterPropertyRubricTitle);
+
+          const cardBProposalEvaluationAverageValue = (
+            (b.card.fields.properties[proposalEvaluationAverageProperty.id] as unknown as {
+              title: string;
+              value: number;
+            }[]) ?? []
+          ).find((val) => val.title === filterPropertyRubricTitle);
+
+          aValue = cardAProposalEvaluationAverageValue?.value || 0;
+          bValue = cardBProposalEvaluationAverageValue?.value || 0;
+        } else if (template.type === 'proposalEvaluationTotal' && proposalEvaluationTotalProperty) {
+          const filterPropertyRubricTitle = template.id.split('__proposalEvaluationTotal_')[1];
+          const cardAProposalEvaluationTotalValue = (
+            (a.card.fields.properties[proposalEvaluationTotalProperty.id] as unknown as {
+              title: string;
+              value: number;
+            }[]) ?? []
+          ).find((val) => val.title === filterPropertyRubricTitle);
+
+          const cardBProposalEvaluationTotalValue = (
+            (b.card.fields.properties[proposalEvaluationTotalProperty.id] as unknown as {
+              title: string;
+              value: number;
+            }[]) ?? []
+          ).find((val) => val.title === filterPropertyRubricTitle);
+
+          aValue = cardAProposalEvaluationTotalValue?.value || 0;
+          bValue = cardBProposalEvaluationTotalValue?.value || 0;
+        } else if (template.type === 'proposalEvaluatedBy' && proposalEvaluationReviewersProperty) {
+          const filterPropertyRubricTitle = template.id.split('__proposalEvaluatedBy_')[1];
+          const cardAProposalEvaluationReviewersValue = (
+            (a.card.fields.properties[proposalEvaluationReviewersProperty.id] as unknown as {
+              title: string;
+              value: string[];
+            }[]) ?? []
+          ).find((val) => val.title === filterPropertyRubricTitle);
+
+          const cardBProposalEvaluationReviewersValue = (
+            (b.card.fields.properties[proposalEvaluationReviewersProperty.id] as unknown as {
+              title: string;
+              value: string[];
+            }[]) ?? []
+          ).find((val) => val.title === filterPropertyRubricTitle);
+
+          aValue = cardAProposalEvaluationReviewersValue?.value || '';
+          bValue = cardBProposalEvaluationReviewersValue?.value || '';
         }
 
         let result = 0;
         if (template.type === 'number' || template.type === 'date' || template.type === 'tokenAmount') {
           // Always put empty values at the bottom
           if (aValue && !bValue) {
-            return -1;
+            result = -1;
           }
           if (bValue && !aValue) {
-            return 1;
+            result = 1;
           }
           if (!aValue && !bValue) {
             result = titleOrCreatedOrder(a.page, b.page);
@@ -271,16 +336,12 @@ export function sortCards(
           // Text-based sort
 
           if (typeof aValue === 'number' || typeof bValue === 'number') {
-            return a > b ? -1 : 1;
-          }
-
-          if (aValue.length > 0 && bValue.length <= 0) {
-            return -1;
-          }
-          if (bValue.length > 0 && aValue.length <= 0) {
-            return 1;
-          }
-          if (aValue.length <= 0 && bValue.length <= 0) {
+            result = aValue > bValue ? 1 : -1;
+          } else if (aValue.length > 0 && bValue.length <= 0) {
+            result = -1;
+          } else if (bValue.length > 0 && aValue.length <= 0) {
+            result = 1;
+          } else if (aValue.length <= 0 && bValue.length <= 0) {
             result = titleOrCreatedOrder(a.page, b.page);
           }
 
@@ -295,8 +356,8 @@ export function sortCards(
           }
 
           if (result === 0) {
-            const aValueString = aValue instanceof Array ? aValue[0] || '' : aValue;
-            const bValueString = bValue instanceof Array ? bValue[0] || '' : bValue;
+            const aValueString = (aValue instanceof Array ? aValue[0] || '' : aValue).toString();
+            const bValueString = (bValue instanceof Array ? bValue[0] || '' : bValue).toString();
             result = aValueString.localeCompare(bValueString);
           }
         }

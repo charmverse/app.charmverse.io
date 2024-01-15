@@ -17,6 +17,7 @@ type Props = {
   activeView: BoardView;
   orderedCards: Card[];
 };
+
 const ViewHeaderSortMenu = React.memo((props: Props) => {
   const { properties, activeView, orderedCards } = props;
   const sortDisplayOptions = properties?.map((o) => ({ id: o.id, name: o.name }));

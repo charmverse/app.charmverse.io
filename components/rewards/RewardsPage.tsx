@@ -203,7 +203,7 @@ export function RewardsPage({ title }: { title: string }) {
               <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
 
               <ViewSortControl
-                activeBoard={activeBoard}
+                cardProperties={activeBoard?.fields.cardProperties ?? []}
                 activeView={activeView}
                 cards={cards as Card[]}
                 viewSortPopup={viewSortPopup}

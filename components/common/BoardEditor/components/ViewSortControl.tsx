@@ -5,19 +5,19 @@ import { FormattedMessage } from 'react-intl';
 import ViewHeaderSortMenu from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderSortMenu';
 import { Button } from 'components/common/Button';
 import { useViewSortOptions } from 'hooks/useViewSortOptions';
-import type { Board } from 'lib/focalboard/board';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 
 type Props = {
   viewSortPopup: PopupState;
   activeView: BoardView;
-  activeBoard?: Board;
   cards: Card[];
   rubricEvaluationTitles?: string[];
+  cardProperties: IPropertyTemplate[];
 };
 
-export function ViewSortControl({ viewSortPopup, activeView, activeBoard, cards }: Props) {
+export function ViewSortControl({ cardProperties, viewSortPopup, activeView, cards }: Props) {
   const sortOptions = useViewSortOptions(activeView);
 
   return (
@@ -48,11 +48,7 @@ export function ViewSortControl({ viewSortPopup, activeView, activeBoard, cards 
         }}
         onClick={() => viewSortPopup.close()}
       >
-        <ViewHeaderSortMenu
-          properties={activeBoard?.fields.cardProperties ?? []}
-          activeView={activeView}
-          orderedCards={cards}
-        />
+        <ViewHeaderSortMenu properties={cardProperties} activeView={activeView} orderedCards={cards} />
       </Menu>
     </>
   );
