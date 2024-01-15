@@ -10,6 +10,9 @@ import type {
   Page,
   PagePermission,
   Proposal,
+  ProposalEvaluation,
+  ProposalReviewer,
+  ProposalRubricCriteria,
   Vote,
   VoteOptions
 } from '@charmverse/core/prisma';
@@ -20,16 +23,23 @@ import { isBoardPageType } from 'lib/pages/isBoardPageType';
 import type { PageContent, TextContent } from 'lib/prosemirror/interfaces';
 import { DataNotFoundError } from 'lib/utilities/errors';
 
-export interface PageWithBlocks {
+export type PageWithBlocks = {
   blocks: {
     board?: Block;
     views?: Block[];
     card?: Block;
   };
   votes?: (Vote & { voteOptions: VoteOptions[] })[];
-  proposal?: Omit<Proposal, 'categoryId'> | null;
+  proposal?:
+    | (Omit<Proposal, 'categoryId'> & {
+        evaluations: (ProposalEvaluation & {
+          reviewers: ProposalReviewer[];
+          rubricCriteria: ProposalRubricCriteria[];
+        })[];
+      })
+    | null;
   bounty?: (Bounty & { permissions: BountyPermission[] }) | null;
-}
+};
 
 function recurse(node: PageContent, cb: (node: PageContent | TextContent) => void) {
   if (node?.content) {
@@ -158,6 +168,14 @@ export async function exportWorkspacePages({
       node.proposal = await prisma.proposal.findUnique({
         where: {
           id: node.proposalId
+        },
+        include: {
+          evaluations: {
+            include: {
+              reviewers: true,
+              rubricCriteria: true
+            }
+          }
         }
       });
     }

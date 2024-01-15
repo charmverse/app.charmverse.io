@@ -444,6 +444,7 @@ describe('importSpaceData', () => {
         notificationToggles: sourceSpace.notificationToggles,
         features: sourceSpace.features,
         memberProfiles: sourceSpace.memberProfiles,
+        proposalWorkflows: sourceSpace.proposalWorkflows,
         defaultPagePermissionGroup: sourceSpace.defaultPagePermissionGroup,
         defaultPublicPages: sourceSpace.defaultPublicPages,
         hiddenFeatures: sourceSpace.hiddenFeatures,

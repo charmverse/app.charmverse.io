@@ -142,19 +142,22 @@ export async function generateImportWorkspacePages({
     bountyArgs: Prisma.BountyCreateManyArgs;
     bountyPermissionArgs: Prisma.BountyPermissionCreateManyArgs;
     proposalArgs: Prisma.ProposalCreateManyArgs;
+    proposalReviewerArgs: Prisma.ProposalReviewerCreateManyArgs;
+    proposalWorkflowArgs: Prisma.ProposalWorkflowCreateManyArgs;
   } & OldNewIdHashMap
 > {
   const isUuid = validate(targetSpaceIdOrDomain);
 
   const space = await prisma.space.findUniqueOrThrow({
-    where: isUuid ? { id: targetSpaceIdOrDomain } : { domain: targetSpaceIdOrDomain }
+    where: isUuid ? { id: targetSpaceIdOrDomain } : { domain: targetSpaceIdOrDomain },
+    include: { proposalWorkflows: true }
   });
 
-  const dataToImport = await getImportData({ exportData, exportName });
+  const { pages } = await getImportData({ exportData, exportName });
 
   const pageArgs: Prisma.PageCreateArgs[] = [];
 
-  const sourcePagesMap = (dataToImport.pages ?? []).reduce((acc, page) => {
+  const sourcePagesMap = (pages ?? []).reduce((acc, page) => {
     acc[page.id] = page;
     if (page.bountyId) {
       acc[page.bountyId] = page;
@@ -168,6 +171,8 @@ export async function generateImportWorkspacePages({
   const bountyArgs: Prisma.BountyCreateManyInput[] = [];
   const bountyPermissionArgs: Prisma.BountyPermissionCreateManyInput[] = [];
   const proposalArgs: Prisma.ProposalCreateManyInput[] = [];
+  const proposalReviewerArgs: Prisma.ProposalReviewerCreateManyInput[] = [];
+  const proposalWorkflowArgs: Prisma.ProposalWorkflowCreateManyInput[] = [];
 
   // 2 way hashmap to find link between new and old page ids
   const oldNewRecordIdHashMap: Record<string, string> = {};
@@ -484,7 +489,7 @@ export async function generateImportWorkspacePages({
     }
   }
 
-  dataToImport.pages?.forEach((page) => {
+  pages?.forEach((page) => {
     recursivePagePrep({ node: page, newParentId: null, oldNewPermissionMap: {} });
   });
 
@@ -507,6 +512,12 @@ export async function generateImportWorkspacePages({
     },
     proposalArgs: {
       data: proposalArgs
+    },
+    proposalReviewerArgs: {
+      data: proposalReviewerArgs
+    },
+    proposalWorkflowArgs: {
+      data: proposalWorkflowArgs
     },
     oldNewRecordIdHashMap
   };
