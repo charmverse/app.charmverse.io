@@ -8,7 +8,6 @@ import { createRecoveryCode } from './createRecoveryCode';
 export type OtpResponse = {
   code: string;
   uri: string;
-  encryptedCode: string;
   recoveryCode: string;
 };
 
@@ -66,7 +65,8 @@ export async function createUserOtp(userId: string): Promise<OtpResponse> {
   });
 
   return {
-    ...createdOtp,
+    code: createdOtp.code,
+    uri: createdOtp.uri,
     recoveryCode: createdRecoveryCode.otp
   };
 }
