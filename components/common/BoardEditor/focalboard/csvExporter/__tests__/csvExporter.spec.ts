@@ -2,12 +2,15 @@ import type { Block, ProposalEvaluation } from '@charmverse/core/prisma';
 import { v4 as uuid, v4 } from 'uuid';
 
 import type { Formatters, PropertyContext } from 'components/common/BoardEditor/focalboard/src/octoUtils';
+import { addProposalEvaluationProperties } from 'lib/focalboard/addProposalEvaluationProperties';
 import { prismaToBlock } from 'lib/focalboard/block';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { createBoard } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
 import type { CardPropertyValue } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
+import { Constants } from 'lib/focalboard/constants';
 import { extractDatabaseProposalProperties } from 'lib/focalboard/extractDatabaseProposalProperties';
 import { generateResyncedProposalEvaluationForCard } from 'lib/focalboard/generateResyncedProposalEvaluationForCard';
 import { getBoardProperties } from 'lib/focalboard/setDatabaseProposalProperties';
@@ -152,7 +155,7 @@ describe('getCSVColumns()', () => {
       },
       {
         id: 'property_id_2',
-        name: 'MockStatus',
+        name: 'MockStatus 2',
         type: 'number',
         options: []
       }
@@ -165,8 +168,15 @@ describe('getCSVColumns()', () => {
       card,
       context: emptyContext,
       formatters,
-      hasTitleProperty: false,
-      visibleProperties: board.fields.cardProperties
+      visibleProperties: [
+        {
+          id: Constants.titleColumnId,
+          type: 'text',
+          name: 'Title',
+          options: []
+        },
+        ...board.fields.cardProperties
+      ]
     });
     expect(rowColumns).toEqual(['"title"', '10', '20']);
   });
@@ -190,6 +200,7 @@ describe('getCSVColumns()', () => {
       [databaseProperties.proposalStep!.id]: 'Rubric evaluation'
     };
     const card = createMockCard(board);
+
     const criteria = {
       id: uuid()
     };
@@ -246,23 +257,35 @@ describe('getCSVColumns()', () => {
       users: { user_1: { username: 'Mo' }, user_2: { username: 'John Doe' } },
       spaceDomain: 'test-space'
     };
+
+    const visiblePropertiesExtended = [
+      { id: Constants.titleColumnId, type: 'text', name: 'Title', options: [] } as IPropertyTemplate,
+      ...board.fields.cardProperties
+    ];
+
     const rowColumns = getCSVColumns({
       card,
       context,
       formatters,
-      hasTitleProperty: false,
-      visibleProperties: board.fields.cardProperties
+      visibleProperties: visiblePropertiesExtended,
+      evaluationTitles: ['Rubric evaluation', 'Rubric evaluation 1', 'Rubric evaluation 2']
     });
 
-    expect(rowColumns).toEqual([
+    expect(rowColumns).toStrictEqual([
       '"title"',
       '"In Progress"',
       '"http://localhost/test-space/path-123"',
       '"Rubric"',
       '"Rubric evaluation"',
-      'Mo|John Doe-Mo',
-      '5|3',
-      '2.5|3'
+      'Mo|John Doe',
+      '2.5',
+      '5',
+      '',
+      '',
+      '',
+      'Mo',
+      '3',
+      '3'
     ]);
   });
 });

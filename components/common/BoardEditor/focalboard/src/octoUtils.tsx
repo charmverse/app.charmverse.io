@@ -85,16 +85,6 @@ class OctoUtils {
           .filter(isTruthy);
         break;
       }
-      case 'proposalEvaluatedBy': {
-        const valueArray = (propertyValue as unknown as { title: string; value: string[] }[]) ?? [];
-        displayValue = valueArray.map(({ value }) =>
-          value
-            .map((reviewerId) => context?.users[reviewerId]?.username)
-            .filter(isTruthy)
-            .join('|')
-        );
-        break;
-      }
       case 'proposalUrl': {
         displayValue =
           typeof propertyValue === 'string' ? getAbsolutePath(`/${propertyValue}`, context?.spaceDomain) : '';

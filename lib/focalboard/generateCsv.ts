@@ -2,16 +2,15 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { resolvePageTree } from '@charmverse/core/pages';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { getCSVColumns } from 'components/common/BoardEditor/focalboard/csvExporter/csvExporter';
+import { generateTableArray } from 'components/common/BoardEditor/focalboard/csvExporter/csvExporter';
 import type { Formatters, PropertyContext } from 'components/common/BoardEditor/focalboard/src/octoUtils';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { formatDate, formatDateTime } from 'lib/utilities/dates';
 
-import type { Board, IPropertyTemplate, PropertyType } from './board';
+import type { Board } from './board';
 import type { BoardView, BoardViewFields } from './boardView';
 import type { Card } from './card';
-import { Constants } from './constants';
 
 export async function loadAndGenerateCsv({
   databaseId,
@@ -170,53 +169,4 @@ export function generateCSV(
     filename,
     csvContent
   };
-}
-
-function encodeText(text: string): string {
-  return text.replace(/"/g, '""');
-}
-
-function generateTableArray(
-  board: Pick<Board, 'fields'>,
-  cards: Card[],
-  viewToExport: BoardView,
-  formatters: Formatters,
-  context: PropertyContext
-): string[][] {
-  const rows: string[][] = [];
-  const cardProperties = board.fields.cardProperties as IPropertyTemplate[];
-
-  if (
-    viewToExport.fields.viewType === 'calendar' &&
-    viewToExport.fields.dateDisplayPropertyId &&
-    !viewToExport.fields.visiblePropertyIds.includes(viewToExport.fields.dateDisplayPropertyId)
-  ) {
-    const dateDisplay = board.fields.cardProperties.find(
-      (template: IPropertyTemplate) => viewToExport.fields.dateDisplayPropertyId === template.id
-    );
-    if (dateDisplay) {
-      cardProperties.push(dateDisplay);
-    }
-  }
-
-  const titleProperty = cardProperties.find((prop) => prop.id === Constants.titleColumnId);
-  // Header row
-  const row: string[] = titleProperty ? [] : ['Title'];
-  cardProperties.forEach((template: IPropertyTemplate) => {
-    row.push(template.name);
-  });
-  rows.push(row);
-
-  cards.forEach((card) => {
-    const rowColumns = getCSVColumns({
-      card,
-      context,
-      formatters,
-      hasTitleProperty: !!titleProperty,
-      visibleProperties: cardProperties
-    });
-    rows.push(rowColumns);
-  });
-
-  return rows;
 }
