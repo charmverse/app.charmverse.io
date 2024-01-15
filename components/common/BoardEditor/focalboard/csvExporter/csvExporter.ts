@@ -135,21 +135,26 @@ export function getCSVColumns({
 
     if (propertyTemplate.id === Constants.titleColumnId) {
       columns.push(`"${encodeText(card.title)}"`);
-    } else if (
-      propertyTemplate.type === 'number' ||
-      propertyTemplate.type === 'proposalEvaluationAverage' ||
-      propertyTemplate.type === 'proposalEvaluationTotal'
-    ) {
+    } else if (propertyTemplate.type === 'number') {
       const numericValue = propertyValue ? Number(propertyValue).toString() : '';
       columns.push(numericValue);
     } else if (
       propertyTemplate.type === 'multiSelect' ||
       propertyTemplate.type === 'person' ||
-      propertyTemplate.type === 'proposalEvaluatedBy' ||
       propertyTemplate.type === 'proposalAuthor' ||
       propertyTemplate.type === 'proposalReviewer'
     ) {
       const multiSelectValue = (((displayValue as unknown) || []) as string[]).join('|');
+      columns.push(multiSelectValue);
+    } else if (
+      propertyTemplate.type === 'proposalEvaluationAverage' ||
+      propertyTemplate.type === 'proposalEvaluationTotal'
+    ) {
+      const value = propertyValue ? (propertyValue as unknown as { title: string; value: number }[]) : [];
+      const numericValue = value.map((v) => v.value).join('|');
+      columns.push(numericValue);
+    } else if (propertyTemplate.type === 'proposalEvaluatedBy') {
+      const multiSelectValue = (((displayValue as unknown) || []) as string[]).join('-');
       columns.push(multiSelectValue);
     } else {
       // Export as string

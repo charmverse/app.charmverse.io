@@ -77,13 +77,22 @@ class OctoUtils {
         break;
       }
       case 'person':
-      case 'proposalEvaluatedBy':
       case 'proposalAuthor':
       case 'proposalReviewer': {
         const valueArray = Array.isArray(propertyValue) ? propertyValue : [propertyValue];
         displayValue = valueArray
           .map((value) => (typeof value === 'string' ? context?.users[value]?.username : null))
           .filter(isTruthy);
+        break;
+      }
+      case 'proposalEvaluatedBy': {
+        const valueArray = propertyValue as unknown as { title: string; value: string[] }[];
+        displayValue = valueArray.map(({ value }) =>
+          value
+            .map((reviewerId) => context?.users[reviewerId]?.username)
+            .filter(isTruthy)
+            .join('|')
+        );
         break;
       }
       case 'proposalUrl': {

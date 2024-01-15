@@ -1,15 +1,17 @@
-import type { Block } from '@charmverse/core/prisma';
-import { v4 as uuid } from 'uuid';
+import type { Block, ProposalEvaluation } from '@charmverse/core/prisma';
+import { v4 as uuid, v4 } from 'uuid';
 
 import type { Formatters, PropertyContext } from 'components/common/BoardEditor/focalboard/src/octoUtils';
 import { prismaToBlock } from 'lib/focalboard/block';
 import { createBoard } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
+import type { CardPropertyValue } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import { extractDatabaseProposalProperties } from 'lib/focalboard/extractDatabaseProposalProperties';
 import { generateResyncedProposalEvaluationForCard } from 'lib/focalboard/generateResyncedProposalEvaluationForCard';
 import { getBoardProperties } from 'lib/focalboard/setDatabaseProposalProperties';
+import type { AnswerData } from 'lib/proposal/rubric/aggregateResults';
 import { formatDate, formatDateTime } from 'lib/utilities/dates';
 import { createMockBoard, createMockCard } from 'testing/mocks/block';
 
@@ -180,7 +182,7 @@ describe('getCSVColumns()', () => {
     const databaseProperties = extractDatabaseProposalProperties({
       boardBlock: board
     });
-    const properties = {
+    let properties: Record<string, CardPropertyValue> = {
       [databaseProperties.proposalUrl!.id]: 'path-123',
       [databaseProperties.proposalStatus!.id]: 'in_progress',
       [databaseProperties.proposalEvaluatedBy!.id]: 'user_1',
@@ -191,26 +193,57 @@ describe('getCSVColumns()', () => {
     const criteria = {
       id: uuid()
     };
-    const { fields } = generateResyncedProposalEvaluationForCard({
-      currentStep: { id: 'step_1', type: 'rubric' },
-      cardProps: { fields: { properties } },
-      databaseProperties,
-      rubricCriteria: [criteria],
-      rubricAnswers: [
-        {
-          userId: 'user_1',
-          rubricCriteriaId: criteria.id,
-          response: { score: 10 },
-          comment: '',
-          evaluationId: 'step_1'
-        }
-      ]
+
+    const rubricSteps: Pick<ProposalEvaluation, 'id' | 'title'>[] = [
+      {
+        id: v4(),
+        title: 'Rubric evaluation'
+      },
+      {
+        id: v4(),
+        title: 'Rubric evaluation 2'
+      }
+    ];
+
+    const rubricAnswers: AnswerData[] = [
+      {
+        comment: null,
+        response: { score: 4 },
+        rubricCriteriaId: criteria.id,
+        userId: 'user_1',
+        evaluationId: rubricSteps[0].id
+      },
+      {
+        comment: null,
+        response: { score: 1 },
+        rubricCriteriaId: criteria.id,
+        userId: 'user_2',
+        evaluationId: rubricSteps[0].id
+      },
+      {
+        comment: null,
+        response: { score: 3 },
+        rubricCriteriaId: criteria.id,
+        userId: 'user_1',
+        evaluationId: rubricSteps[1].id
+      }
+    ];
+
+    rubricSteps.forEach((rubricStep, index) => {
+      properties = generateResyncedProposalEvaluationForCard({
+        currentStep: rubricStep,
+        databaseProperties,
+        properties,
+        rubricAnswers,
+        rubricCriterias: [criteria],
+        stepIndex: index
+      });
     });
 
-    Object.assign(card.fields, fields);
+    Object.assign(card.fields.properties, properties);
 
     const context: PropertyContext = {
-      users: { user_1: { username: 'Mo' } },
+      users: { user_1: { username: 'Mo' }, user_2: { username: 'John Doe' } },
       spaceDomain: 'test-space'
     };
     const rowColumns = getCSVColumns({
@@ -227,9 +260,9 @@ describe('getCSVColumns()', () => {
       '"http://localhost/test-space/path-123"',
       '"Rubric"',
       '"Rubric evaluation"',
-      'Mo',
-      '10',
-      '10'
+      'Mo|John Doe-Mo',
+      '5|3',
+      '2.5|3'
     ]);
   });
 });

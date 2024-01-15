@@ -2,8 +2,8 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { resolvePageTree } from '@charmverse/core/pages';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { getCSVColumns } from 'components/common/BoardEditor/focalboard/csvExporter/csvExporter';
 import type { Formatters, PropertyContext } from 'components/common/BoardEditor/focalboard/src/octoUtils';
-import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtils';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { formatDate, formatDateTime } from 'lib/utilities/dates';
@@ -219,51 +219,4 @@ function generateTableArray(
   });
 
   return rows;
-}
-
-export function getCSVColumns({
-  card,
-  context,
-  formatters,
-  hasTitleProperty,
-  visibleProperties
-}: {
-  card: Card;
-  context: PropertyContext;
-  formatters: Formatters;
-  hasTitleProperty: boolean;
-  visibleProperties: IPropertyTemplate<PropertyType>[];
-}) {
-  const columns: string[] = [];
-  if (!hasTitleProperty) {
-    columns.push(`"${encodeText(card.title)}"`);
-  }
-  visibleProperties.forEach((propertyTemplate: IPropertyTemplate) => {
-    const propertyValue = card.fields.properties[propertyTemplate.id];
-    const displayValue =
-      OctoUtils.propertyDisplayValue({ block: card, context, propertyValue, propertyTemplate, formatters }) || '';
-    if (propertyTemplate.id === Constants.titleColumnId) {
-      columns.push(`"${encodeText(card.title)}"`);
-    } else if (
-      propertyTemplate.type === 'number' ||
-      propertyTemplate.type === 'proposalEvaluationAverage' ||
-      propertyTemplate.type === 'proposalEvaluationTotal'
-    ) {
-      const numericValue = propertyValue ? Number(propertyValue).toString() : '';
-      columns.push(numericValue);
-    } else if (
-      propertyTemplate.type === 'multiSelect' ||
-      propertyTemplate.type === 'person' ||
-      propertyTemplate.type === 'proposalEvaluatedBy' ||
-      propertyTemplate.type === 'proposalAuthor' ||
-      propertyTemplate.type === 'proposalReviewer'
-    ) {
-      const multiSelectValue = (((displayValue as unknown) || []) as string[]).join('|');
-      columns.push(multiSelectValue);
-    } else {
-      // Export as string
-      columns.push(`"${encodeText(displayValue as string)}"`);
-    }
-  });
-  return columns;
 }
