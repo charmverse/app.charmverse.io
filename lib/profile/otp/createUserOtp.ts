@@ -1,5 +1,6 @@
 import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { v4 as uuid } from 'uuid';
 
 import { createOtp } from './createOtp';
 import { createRecoveryCode } from './createRecoveryCode';
@@ -7,13 +8,14 @@ import { createRecoveryCode } from './createRecoveryCode';
 export type OtpResponse = {
   code: string;
   uri: string;
+  encryptedCode: string;
   recoveryCode: string;
 };
 
 /**
  * Create a user OTP only if user doesn't have one already or it's not activated
  * @param userId string
- * @returns Contains the otp code, uri and recovery code
+ * @returns The otp code, uri and recovery code
  */
 export async function createUserOtp(userId: string): Promise<OtpResponse> {
   const user = await prisma.user.findUnique({
@@ -35,36 +37,36 @@ export async function createUserOtp(userId: string): Promise<OtpResponse> {
 
   const createdOtp = createOtp(user);
 
-  const generatedRecoveryCode = createRecoveryCode();
+  const createdRecoveryCode = createRecoveryCode();
 
   const recoveryCode = await prisma.recoveryCode.upsert({
     where: {
-      id: user.userOTP?.recoveryCodeId
+      id: user.userOTP?.recoveryCodeId || uuid()
     },
     create: {
-      code: generatedRecoveryCode.hashedOtp
+      code: createdRecoveryCode.hashedOtp
     },
     update: {
-      code: generatedRecoveryCode.hashedOtp
+      code: createdRecoveryCode.hashedOtp
     }
   });
 
   await prisma.userOTP.upsert({
     where: {
-      id: user.userOTP?.id
+      id: user.userOTP?.id || uuid()
     },
     create: {
       userId: user.id,
-      secret: createdOtp.code,
+      secret: createdOtp.encryptedCode,
       recoveryCodeId: recoveryCode.id
     },
     update: {
-      secret: createdOtp.code
+      recoveryCodeId: recoveryCode.id
     }
   });
 
   return {
     ...createdOtp,
-    recoveryCode: generatedRecoveryCode.otp
+    recoveryCode: createdRecoveryCode.otp
   };
 }
