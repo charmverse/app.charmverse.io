@@ -145,7 +145,7 @@ function PropertyValueElement(props: Props) {
   } = props;
   const { trigger } = useUpdateProposalEvaluation({ proposalId: proposal?.id });
   const { showMessage } = useSnackbar();
-  const { rubricProposalIdsWhereUserIsEvaluator, rubricProposalIdsWhereUserIsNotEvaluator } =
+  const { rubricProposalIdsWhereUserIsEvaluator, isLoading: isLoadingReviewerStatus } =
     useProposalsWhereUserIsEvaluator({
       spaceId:
         !!board && hiddenProposalEvaluatorPropertyValues.includes(propertyTemplate?.type as any)
@@ -548,7 +548,7 @@ function PropertyValueElement(props: Props) {
 
   // Explicitly hide the value for this proposal
   if (hiddenProposalEvaluatorPropertyValues.includes(propertyTemplate?.type as any)) {
-    if (syncWithPageId && !!rubricProposalIdsWhereUserIsNotEvaluator[syncWithPageId] && !isAdmin) {
+    if (syncWithPageId && !isLoadingReviewerStatus && !isAdmin) {
       return <EmptyPlaceholder>Hidden</EmptyPlaceholder>;
     } else if (syncWithPageId && (!!rubricProposalIdsWhereUserIsEvaluator[syncWithPageId] || isAdmin)) {
       return propertyValueElement;

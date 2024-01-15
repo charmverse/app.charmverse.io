@@ -27,7 +27,6 @@ export type Props = {
     | 'evaluations'
     | 'permissions'
     | 'status'
-    | 'evaluationType'
     | 'fields'
     | 'rewardIds'
     | 'workflowId'

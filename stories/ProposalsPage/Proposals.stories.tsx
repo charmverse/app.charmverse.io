@@ -181,7 +181,6 @@ ProposalInEvaluation.parameters = {
             { evaluationId: null, id: '2', proposalId: '', roleId: null, userId: members[0].id, systemRole: null },
             { evaluationId: null, id: '3', proposalId: '', roleId: null, userId: members[1].id, systemRole: null }
           ],
-          evaluationType: 'rubric',
           status: 'published',
           rubricCriteria,
           rubricAnswers
