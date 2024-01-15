@@ -10,7 +10,7 @@ export type UpdateProposalRequest = {
   authors?: string[];
   publishToLens?: boolean;
   fields?: ProposalFields | null;
-  credentialTemplateId?: string;
+  credentialTemplateId?: string | null;
 };
 
 export async function updateProposal({

@@ -1,6 +1,6 @@
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import { Box } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { useGetIsReviewer, useUpdateProposal } from 'charmClient/hooks/proposals';
 import { useProposals } from 'components/proposals/hooks/useProposals';
@@ -8,7 +8,6 @@ import { useProposalTemplateById } from 'components/proposals/hooks/useProposalT
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { ProposalPropertiesBase } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useMdScreen } from 'hooks/useMediaScreens';
 import { useUser } from 'hooks/useUser';
 import type { PageWithContent } from 'lib/pages';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';

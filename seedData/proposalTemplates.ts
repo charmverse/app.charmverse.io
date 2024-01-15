@@ -488,6 +488,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
     ],
     children: [],
     proposal: {
+      credentialTemplateId: null,
       lensPostLink: null,
       publishToLens: null,
       id: 'ab2fde3d-2a3c-420a-a460-cd106a0c289f',
@@ -1613,6 +1614,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
     sourceTemplateId: null,
     children: [],
     proposal: {
+      credentialTemplateId: null,
       lensPostLink: null,
       publishToLens: null,
       id: '648cd168-771a-40d9-a5c7-44699b8f1337',
@@ -2026,6 +2028,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
     sourceTemplateId: null,
     children: [],
     proposal: {
+      credentialTemplateId: null,
       lensPostLink: null,
       publishToLens: null,
       id: 'e4cad114-c6a4-4516-82a7-6eca8208f31e',
@@ -2367,6 +2370,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
     children: [],
     sourceTemplateId: null,
     proposal: {
+      credentialTemplateId: null,
       lensPostLink: null,
       publishToLens: null,
       id: 'a36b0073-7ebc-4c55-8d22-3918b5226e0a',
@@ -3050,6 +3054,7 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
     children: [],
     sourceTemplateId: null,
     proposal: {
+      credentialTemplateId: null,
       lensPostLink: null,
       publishToLens: null,
       id: '17fafdb0-6030-43b3-8a0c-c2f64b240810',
@@ -3743,7 +3748,8 @@ const templates: Omit<ExportedPage, StandardFields>[] = [
       archived: false,
       fields: null,
       workflowId: null,
-      formId: null
+      formId: null,
+      credentialTemplateId: null
     }
   }
 ];
