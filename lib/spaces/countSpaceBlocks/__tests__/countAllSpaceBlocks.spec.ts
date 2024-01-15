@@ -339,31 +339,6 @@ describe('countSpaceBlocks - count blocks', () => {
     expect(details.memberProperties.total).toBe(6);
   });
 
-  // it('should count each proposal category and proposal as 1 block', async () => {
-  //   const { space, user } = await testUtilsUser.generateUserAndSpace();
-
-  //   const proposalCategory = await testUtilsProposals.generateProposalCategory({
-  //     spaceId: space.id
-  //   });
-
-  //   const proposal = await testUtilsProposals.generateProposal({
-  //     spaceId: space.id,
-  //     userId: user.id,
-  //     categoryId: proposalCategory.id,
-  //     content: {}
-  //   });
-
-  //   const { total } = await countSpaceBlocks({
-  //     spaceId: space.id
-  //   });
-
-  //   expect(counts.proposalCategories).toBe(1);
-  //   expect(counts.proposals).toBe(1);
-  //   expect(counts.documentBlocks).toBe(0);
-
-  //   expect(total).toBe(2);
-  // });
-
   it('should count each reward as 1 block', async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace();
 
@@ -492,29 +467,6 @@ describe('countSpaceBlocks - count content', () => {
     expect(details.forum.details.postContentBlocks).toBeGreaterThan(3);
     expect(details.editorContent).toBe(0);
   });
-
-  // it('should count the content inside each proposal', async () => {
-  //   const { space, user } = await testUtilsUser.generateUserAndSpace();
-
-  //   const proposalCategory = await testUtilsProposals.generateProposalCategory({
-  //     spaceId: space.id
-  //   });
-
-  //   const proposal = await testUtilsProposals.generateProposal({
-  //     spaceId: space.id,
-  //     userId: user.id,
-  //     categoryId: proposalCategory.id,
-  //     content: pageContent
-  //   });
-
-  //   const { details } = await countSpaceBlocks({
-  //     spaceId: space.id
-  //   });
-
-  //   expect(counts.proposalCategories).toBe(1);
-  //   expect(counts.proposals).toBe(1);
-  //   expect(counts.documentBlocks).toBeGreaterThan(1);
-  // });
 
   it('should count the content inside each reward page', async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace();

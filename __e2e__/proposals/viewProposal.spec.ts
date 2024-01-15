@@ -96,7 +96,7 @@ test.beforeAll(async () => {
   hiddenProposal = await testUtilsProposals.generateProposal({
     spaceId: space.id,
     userId: spaceAdmin.id,
-    proposalStatus: 'discussion'
+    proposalStatus: 'published'
   });
 });
 

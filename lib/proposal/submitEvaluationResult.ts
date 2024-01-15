@@ -4,6 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 import { createVoteIfNecessary } from './createVoteIfNecessary';
+import { setPageUpdatedAt } from './setPageUpdatedAt';
 
 export type ReviewEvaluationRequest = {
   decidedBy: string;
@@ -31,6 +32,8 @@ export async function submitEvaluationResult({
       completedAt: new Date()
     }
   });
+
+  await setPageUpdatedAt({ proposalId, userId: decidedBy });
 
   // determine if we should create vote for the next stage
   if (result === 'pass') {

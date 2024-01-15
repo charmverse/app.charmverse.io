@@ -1,12 +1,18 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 
+import { setPageUpdatedAt } from './setPageUpdatedAt';
+
 export type UpdateWorkflowRequest = {
   proposalId: string;
   workflowId: string;
 };
 
-export async function updateProposalWorkflow({ proposalId, workflowId }: UpdateWorkflowRequest) {
+export async function updateProposalWorkflow({
+  actorId,
+  proposalId,
+  workflowId
+}: UpdateWorkflowRequest & { actorId: string }) {
   const workflow = await prisma.proposalWorkflow.findUniqueOrThrow({
     where: {
       id: workflowId
@@ -46,4 +52,5 @@ export async function updateProposalWorkflow({ proposalId, workflowId }: UpdateW
       });
     }
   });
+  await setPageUpdatedAt({ proposalId, userId: actorId });
 }

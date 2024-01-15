@@ -1,5 +1,6 @@
 import { DataNotFoundError, UndesirableOperationError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { isTestEnv } from 'config/constants';
@@ -99,7 +100,8 @@ async function generateSnapshotVoteMessageHandler(
         select: {
           snapshotDomain: true
         }
-      }
+      },
+      evaluations: true
     }
   });
 
@@ -107,11 +109,13 @@ async function generateSnapshotVoteMessageHandler(
     throw new DataNotFoundError(`Proposal with id ${proposalId} was not found.`);
   }
 
-  if (proposal.status !== 'vote_active') {
+  const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
+  const isActiveVote = currentEvaluation?.result === null && currentEvaluation?.type === 'vote';
+  if (!isActiveVote) {
     throw new UndesirableOperationError(`Proposal with id ${proposalId} is not in vote_active status.`);
   }
 
-  const snapshotProposalId = proposal?.page?.snapshotProposalId;
+  const snapshotProposalId = currentEvaluation.snapshotId;
   if (!snapshotProposalId) {
     throw new DataNotFoundError(`Proposal with id ${proposalId} was not published to snapshot.`);
   }

@@ -3,8 +3,9 @@ import type { ProposalRubricCriteriaType } from '@charmverse/core/prisma-client'
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
-import { getAnswersTable } from 'lib/proposal/rubric/getAnswersTable';
+import { setPageUpdatedAt } from '../setPageUpdatedAt';
 
+import { getAnswersTable } from './getAnswersTable';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   ProposalRubricCriteriaWithTypedParams
@@ -78,6 +79,7 @@ export async function upsertRubricAnswers({ answers, userId, proposalId, evaluat
         comment: a.comment,
         rubricCriteriaId: a.rubricCriteriaId
       }))
-    })
+    }),
+    setPageUpdatedAt({ proposalId, userId })
   ]);
 }
