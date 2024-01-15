@@ -86,7 +86,7 @@ class OctoUtils {
         break;
       }
       case 'proposalEvaluatedBy': {
-        const valueArray = propertyValue as unknown as { title: string; value: string[] }[];
+        const valueArray = (propertyValue as unknown as { title: string; value: string[] }[]) ?? [];
         displayValue = valueArray.map(({ value }) =>
           value
             .map((reviewerId) => context?.users[reviewerId]?.username)

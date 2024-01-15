@@ -179,7 +179,7 @@ function PropertyValueElement(props: Props) {
     propertyTemplate.type === 'proposalEvaluationTotal' ||
     propertyTemplate.type === 'proposalEvaluationAverage'
   ) {
-    const evaluationValues = propertyValue as unknown as { title: string; value: number }[];
+    const evaluationValues = (propertyValue as unknown as { title: string; value: number }[]) ?? [];
     return (
       <Box>
         {evaluationValues
@@ -189,7 +189,7 @@ function PropertyValueElement(props: Props) {
       </Box>
     );
   } else if (propertyTemplate.type === 'proposalEvaluatedBy') {
-    const evaluationsReviewers = propertyValue as unknown as { title: string; value: string[] }[];
+    const evaluationsReviewers = (propertyValue as unknown as { title: string; value: string[] }[]) ?? [];
     return (
       <Stack>
         {evaluationsReviewers.map(({ value: reviewers }) => (
