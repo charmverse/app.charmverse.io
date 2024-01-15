@@ -25,6 +25,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
+import { addProposalEvaluationProperties } from 'lib/focalboard/addProposalEvaluationProperties';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { Constants } from 'lib/focalboard/constants';
 import type { FilterClause, FilterCondition } from 'lib/focalboard/filterClause';
@@ -44,6 +45,7 @@ type Props = {
   filter: FilterClause;
   changeViewFilter: (filterGroup: FilterGroup) => void;
   currentFilter: FilterGroup;
+  rubricEvaluationTitles?: string[];
 };
 
 function formatCondition(condition: string) {
@@ -91,11 +93,10 @@ function FilterPropertyValue({
   }, {});
   const { members } = useMembers();
   const isPropertyTypePerson =
-    propertyRecord[filter.propertyId].type.match(/person|createdBy|updatedBy/) ||
+    propertyRecord[filter.propertyId].type.match(/person|createdBy|updatedBy|proposalEvaluatedBy/) ||
     filter.propertyId === PROPOSAL_REVIEWERS_BLOCK_ID ||
     filter.propertyId === AUTHORS_BLOCK_ID;
   const isPropertyTypeEvaluationType = propertyRecord[filter.propertyId].type === 'proposalEvaluationType';
-  const isPropertyTypeMultiSelect = propertyRecord[filter.propertyId].type === 'multiSelect';
   const isPropertyTypeTokenChain = propertyRecord[filter.propertyId].type === 'tokenChain';
   const property = propertyRecord[filter.propertyId];
 
@@ -389,19 +390,24 @@ function FilterPropertyValue({
 
 function FilterEntry(props: Props) {
   const deleteFilterClausePopupState = usePopupState({ variant: 'popover' });
-  const { properties: viewProperties, filter, changeViewFilter, currentFilter } = props;
+  const { rubricEvaluationTitles = [], properties: viewProperties, filter, changeViewFilter, currentFilter } = props;
   const containsTitleProperty = viewProperties.find((property) => property.id === Constants.titleColumnId);
-  const properties: IPropertyTemplate[] = containsTitleProperty
-    ? viewProperties
-    : [
-        {
-          id: Constants.titleColumnId,
-          name: 'Title',
-          type: 'text',
-          options: []
-        },
-        ...viewProperties
-      ];
+  const properties = useMemo(() => {
+    return addProposalEvaluationProperties({
+      properties: containsTitleProperty
+        ? viewProperties
+        : [
+            {
+              id: Constants.titleColumnId,
+              name: 'Title',
+              type: 'text',
+              options: []
+            },
+            ...viewProperties
+          ],
+      rubricEvaluationTitles
+    });
+  }, [viewProperties, containsTitleProperty, rubricEvaluationTitles]);
 
   const template = properties.find((o: IPropertyTemplate) => o.id === filter.propertyId);
 

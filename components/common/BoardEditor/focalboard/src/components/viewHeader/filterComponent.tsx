@@ -25,6 +25,7 @@ import FilterEntry from './filterEntry';
 type Props = {
   properties: IPropertyTemplate[];
   activeView: BoardView;
+  rubricEvaluationTitles?: string[];
 };
 
 const StyledFilterComponent = styled(Box)`
@@ -122,6 +123,7 @@ const FilterComponent = React.memo((props: Props) => {
                 )}
               </Stack>
               <FilterEntry
+                rubricEvaluationTitles={props.rubricEvaluationTitles}
                 changeViewFilter={changeViewFilter}
                 properties={properties}
                 conditionClicked={conditionClicked}

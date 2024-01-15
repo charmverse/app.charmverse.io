@@ -3,12 +3,14 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 
 import { tokenChainOptions } from 'components/rewards/components/RewardsBoard/utils/boardData';
+import { addProposalEvaluationProperties } from 'lib/focalboard/addProposalEvaluationProperties';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
 import { Constants } from 'lib/focalboard/constants';
 import type { FilterGroup } from 'lib/focalboard/filterGroup';
+import { getProposalRubricEvaluationTitles } from 'lib/focalboard/getProposalRubricEvaluationTitles';
 import type { Member } from 'lib/members/interfaces';
 import { PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposal/blocks/constants';
 
@@ -361,7 +363,6 @@ export const makeSelectViewCardsSortedFilteredAndGrouped = () =>
       const board = state.boards.boards[props.boardId];
       const view = state.views.views[props.viewId];
       const filter = props.localFilters || view?.fields.filter;
-
       return {
         cards,
         board,
@@ -373,9 +374,24 @@ export const makeSelectViewCardsSortedFilteredAndGrouped = () =>
       if (!view || !board || !cards) {
         return [];
       }
+
+      const rubricEvaluationTitles: string[] = getProposalRubricEvaluationTitles({
+        cards: Object.values(cards) as Card[],
+        board,
+        boardSourceType: view?.fields.sourceType ?? board?.fields.sourceType
+      });
+
       const result = Object.values(cards).filter((c) => c.parentId === board.id) as Card[];
       if (view.fields.filter) {
-        return CardFilter.applyFilterGroup(filter, board.fields.cardProperties, result);
+        return CardFilter.applyFilterGroup(
+          filter,
+          addProposalEvaluationProperties({
+            properties: board.fields.cardProperties,
+            rubricEvaluationTitles,
+            filterEvaluationProperties: false
+          }),
+          result
+        );
       }
       return result;
     }

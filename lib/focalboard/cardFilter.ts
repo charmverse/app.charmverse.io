@@ -24,9 +24,11 @@ import { Constants } from './constants';
 class CardFilter {
   static applyFilterGroup(filterGroup: FilterGroup, templates: readonly IPropertyTemplate[], cards: Card[]): Card[] {
     const hasTitleProperty = templates.find((o) => o.id === Constants.titleColumnId);
+
     const cardProperties: readonly IPropertyTemplate[] = hasTitleProperty
       ? templates
       : [...templates, { id: Constants.titleColumnId, name: 'Title', options: [], type: 'text' }];
+
     return cards.filter((card) => this.isFilterGroupMet(filterGroup, cardProperties, card));
   }
 
@@ -65,10 +67,22 @@ class CardFilter {
   static isClauseMet(filter: FilterClause, templates: readonly IPropertyTemplate[], card: Card): boolean {
     const filterProperty = templates.find((o) => o.id === filter.propertyId);
     const proposalEvaluationTypeProperty = templates.find((o) => o.id === PROPOSAL_EVALUATION_TYPE_ID);
+    // id that starts with __ are not real properties, they were injected manually and are dynamic based on the proposal rubric evaluations
+    const proposalEvaluationTotalProperty = templates.find(
+      (o) => o.type === 'proposalEvaluationTotal' && !o.id.startsWith('__')
+    );
+    const proposalEvaluationAverageProperty = templates.find(
+      (o) => o.type === 'proposalEvaluationAverage' && !o.id.startsWith('__')
+    );
+    const proposalEvaluationReviewersProperty = templates.find(
+      (o) => o.type === 'proposalEvaluatedBy' && !o.id.startsWith('__')
+    );
+
     const proposalEvaluationType = proposalEvaluationTypeProperty
       ? (card.fields.properties[proposalEvaluationTypeProperty.id] as ProposalEvaluationStep)
       : null;
     let value = card.fields.properties[filter.propertyId] ?? [];
+
     switch (filterProperty?.type) {
       case 'updatedBy': {
         value = card.updatedBy;
@@ -90,6 +104,7 @@ class CardFilter {
         break;
       }
     }
+
     const filterValue = filter.values[0]?.toString()?.toLowerCase() ?? '';
     const valueArray = (Array.isArray(value) ? value : [value]).map((v: CardPropertyValue) => {
       // In some cases we get an object with an id as value
@@ -155,7 +170,30 @@ class CardFilter {
         }
       } else if (filterPropertyDataType === 'number') {
         const condition = filter.condition as (typeof NumberDataTypeConditions)[number];
-        const sourceValue = valueArray[0]?.toLowerCase() ?? '';
+        let sourceValue = valueArray[0]?.toLowerCase() ?? '';
+        if (filterProperty.type === 'proposalEvaluationTotal' && proposalEvaluationTotalProperty) {
+          const proposalEvaluationsTotalValues =
+            (card.fields.properties[proposalEvaluationTotalProperty.id] as unknown as {
+              title: string;
+              value: number;
+            }[]) ?? [];
+          const filterPropertyRubricTitle = filterProperty.id.split('__proposalEvaluationTotal_')[1];
+          sourceValue =
+            proposalEvaluationsTotalValues.find((val) => val.title === filterPropertyRubricTitle)?.value?.toString() ??
+            '';
+        } else if (filterProperty.type === 'proposalEvaluationAverage' && proposalEvaluationAverageProperty) {
+          const proposalEvaluationsAverageValues =
+            (card.fields.properties[proposalEvaluationAverageProperty.id] as unknown as {
+              title: string;
+              value: number;
+            }[]) ?? [];
+          const filterPropertyRubricTitle = filterProperty.id.split('__proposalEvaluationAverage_')[1];
+          sourceValue =
+            proposalEvaluationsAverageValues
+              ?.find((val) => val.title === filterPropertyRubricTitle)
+              ?.value?.toString() ?? '';
+        }
+
         switch (condition) {
           case 'equal': {
             return sourceValue.length === 0 ? false : Number(sourceValue) === Number(filterValue);
@@ -203,6 +241,18 @@ class CardFilter {
                     })
                   );
                 });
+            } else if (filterProperty.type === 'proposalEvaluatedBy' && proposalEvaluationReviewersProperty) {
+              const proposalEvaluationsReviewersValues =
+                (card.fields.properties[proposalEvaluationReviewersProperty.id] as unknown as {
+                  title: string;
+                  value: string[];
+                }[]) ?? [];
+              const filterPropertyRubricTitle = filterProperty.id.split('__proposalEvaluatedBy_')[1];
+              const filteredRubricValues =
+                proposalEvaluationsReviewersValues?.find((val) => val.title === filterPropertyRubricTitle)?.value ?? [];
+              contains =
+                filteredRubricValues.length !== 0 &&
+                filteredRubricValues.some((sourceValue) => filter.values.includes(sourceValue));
             } else {
               contains =
                 valueArray.length !== 0 && valueArray.some((sourceValue) => filter.values.includes(sourceValue));

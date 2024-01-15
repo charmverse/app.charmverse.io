@@ -51,6 +51,7 @@ type Props = {
   toggleViewOptions: (open?: boolean) => void;
   checkedIds?: string[];
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
+  rubricEvaluationTitles?: string[];
 };
 
 function ViewHeader(props: Props) {
@@ -72,7 +73,8 @@ function ViewHeader(props: Props) {
     cards,
     dateDisplayProperty,
     checkedIds = [],
-    setCheckedIds
+    setCheckedIds,
+    rubricEvaluationTitles = []
   } = props;
 
   const withDisplayBy = activeView?.fields.viewType === 'calendar';
@@ -178,11 +180,16 @@ function ViewHeader(props: Props) {
               )}
 
               {/* Filter */}
-              <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
+              <ViewFilterControl
+                rubricEvaluationTitles={rubricEvaluationTitles}
+                activeBoard={activeBoard}
+                activeView={activeView}
+              />
 
               {/* Sort */}
               {withSortBy && (
                 <ViewSortControl
+                  rubricEvaluationTitles={rubricEvaluationTitles}
                   activeBoard={activeBoard}
                   activeView={activeView}
                   cards={cards}

@@ -14,6 +14,7 @@ type Props = {
   activeView: BoardView;
   activeBoard?: Board;
   cards: Card[];
+  rubricEvaluationTitles?: string[];
 };
 
 export function ViewSortControl({ viewSortPopup, activeView, activeBoard, cards }: Props) {

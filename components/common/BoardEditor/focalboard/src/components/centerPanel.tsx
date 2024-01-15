@@ -23,6 +23,8 @@ import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDe
 import { PageWebhookBanner } from 'components/common/BoardEditor/components/PageWebhookBanner';
 import { makeSelectBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import {
+  getCards,
+  getCurrentBoardCards,
   makeSelectViewCardsSortedFilteredAndGrouped,
   sortCards
 } from 'components/common/BoardEditor/focalboard/src/store/cards';
@@ -42,6 +44,7 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
+import { getProposalRubricEvaluationTitles } from 'lib/focalboard/getProposalRubricEvaluationTitles';
 
 import mutator from '../mutator';
 import { addCard as _addCard, addTemplate } from '../store/cards';
@@ -114,7 +117,7 @@ function CenterPanel(props: Props) {
     activeBoardId = activeView?.fields.sourceData?.boardId;
   }
   const { page: activePage } = usePage({ pageIdOrPath: activeBoardId, spaceId: space?.id });
-
+  const currentBoardCards = useAppSelector(getCurrentBoardCards);
   const { keys } = useApiPageKeys(props.page?.id);
   const selectBoard = useMemo(makeSelectBoard, []);
   const activeBoard = useAppSelector((state) => selectBoard(state, activeBoardId ?? ''));
@@ -509,6 +512,15 @@ function CenterPanel(props: Props) {
   const noBoardViewsYet = !isLoadingSourceData && views.length === 0;
   const showNewLinkedBoardView = state.openSettings === 'create-linked-view' || noBoardViewsYet;
 
+  const rubricEvaluationTitles = useMemo(() => {
+    const titles = getProposalRubricEvaluationTitles({
+      cards: currentBoardCards,
+      board: activeBoard,
+      boardSourceType
+    });
+    return titles;
+  }, [boardSourceType, currentBoardCards, activeBoard]);
+
   return (
     <>
       {!!boardPage?.deletedAt && <PageDeleteBanner pageType={boardPage.type} pageId={boardPage.id} />}
@@ -581,6 +593,7 @@ function CenterPanel(props: Props) {
               embeddedBoardPath={props.embeddedBoardPath}
               checkedIds={checkedIds}
               setCheckedIds={setCheckedIds}
+              rubricEvaluationTitles={rubricEvaluationTitles}
             />
           )}
         </div>

@@ -1,5 +1,5 @@
 import { Popover } from '@mui/material';
-import { bindPopover, bindTrigger, usePopupState, type PopupState } from 'material-ui-popup-state/hooks';
+import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { FormattedMessage } from 'react-intl';
 
 import FilterComponent from 'components/common/BoardEditor/focalboard/src/components/viewHeader/filterComponent';
@@ -11,9 +11,10 @@ import type { BoardView } from 'lib/focalboard/boardView';
 type Props = {
   activeBoard: Board | undefined;
   activeView: BoardView;
+  rubricEvaluationTitles?: string[];
 };
 
-export function ViewFilterControl({ activeBoard, activeView }: Props) {
+export function ViewFilterControl({ rubricEvaluationTitles = [], activeBoard, activeView }: Props) {
   const filter = useViewFilter(activeView);
   const hasFilter = filter && filter.filters?.length > 0;
   const viewFilterPopup = usePopupState({ variant: 'popover', popupId: 'view-filter' });
@@ -39,7 +40,11 @@ export function ViewFilterControl({ activeBoard, activeView }: Props) {
           overflow: 'auto'
         }}
       >
-        <FilterComponent properties={activeBoard?.fields.cardProperties ?? []} activeView={activeView} />
+        <FilterComponent
+          rubricEvaluationTitles={rubricEvaluationTitles}
+          properties={activeBoard?.fields.cardProperties ?? []}
+          activeView={activeView}
+        />
       </Popover>
     </>
   );

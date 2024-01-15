@@ -40,7 +40,7 @@ export function ProposalsPage({ title }: { title: string }) {
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
 
   const canSeeProposals = hasAccess || isFreeSpace || currentSpace?.publicProposals === true;
-  const { navigateToSpacePath, updateURLQuery } = useCharmRouter();
+  const { navigateToSpacePath } = useCharmRouter();
   const isAdmin = useIsAdmin();
   const { user } = useUser();
   const { board: activeBoard, views, cardPages, activeView, cards } = useProposalsBoard();
