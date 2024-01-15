@@ -17,7 +17,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { SignedCredential } from 'lib/credentials/attest';
-import type { PublishedSignedCredential } from 'lib/credentials/config/queriesAndMutations';
+import type { PublishedSignedCredential } from 'lib/credentials/queriesAndMutations';
 import type { ProposalCredential } from 'lib/credentials/schemas';
 import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
 

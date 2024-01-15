@@ -2,7 +2,7 @@ import type { CredentialTemplate } from '@charmverse/core/prisma-client';
 
 import type { MaybeString } from 'charmClient/hooks/helpers';
 import { useGET } from 'charmClient/hooks/helpers';
-import type { PublishedSignedCredential } from 'lib/credentials/config/queriesAndMutations';
+import type { PublishedSignedCredential } from 'lib/credentials/queriesAndMutations';
 
 export function useGetUserCredentials(data: { account: MaybeString }) {
   return useGET<PublishedSignedCredential[]>(data.account ? '/api/credentials' : null, data);

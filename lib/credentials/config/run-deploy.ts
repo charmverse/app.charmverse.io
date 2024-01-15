@@ -1,15 +1,16 @@
-/* eslint-disable no-console */
+/* eslint-disable import/no-extraneous-dependencies */
+import { log } from '@charmverse/core/log';
 import { serveEncodedDefinition } from '@composedb/devtools-node';
 
-import { ceramicHost } from 'config/constants';
-
-import { getCeramicClient } from './authenticate';
+import { ceramicHost, getCeramicClient } from './authenticate';
 import { compositeDefinitionFile, writeComposite } from './deploy-composites';
 
 async function bootstrapGqlServer() {
   const ceramic = await getCeramicClient();
 
   await writeComposite();
+
+  log.info(`GraphQL Composedb server started`);
 
   return serveEncodedDefinition({
     ceramicURL: ceramicHost,
@@ -21,9 +22,8 @@ async function bootstrapGqlServer() {
 }
 
 const server = bootstrapGqlServer();
-console.log(`Server started`);
 
 process.on('SIGTERM', async () => {
   (await server).stop();
-  console.log('Server stopped');
+  log.info('GraphQL Composedb server stopped');
 });

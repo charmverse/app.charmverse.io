@@ -8,7 +8,7 @@ import { useMemo } from 'react';
 
 import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
-import type { PublishedSignedCredential } from 'lib/credentials/config/queriesAndMutations';
+import type { PublishedSignedCredential } from 'lib/credentials/queriesAndMutations';
 import type { ProposalCredential } from 'lib/credentials/schemas';
 import { shortWalletAddress } from 'lib/utilities/blockchain';
 

@@ -1,9 +1,11 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import { CeramicClient } from '@ceramicnetwork/http-client';
 import { DID } from 'dids';
 import { Ed25519Provider } from 'key-did-provider-ed25519';
 import { getResolver } from 'key-did-resolver';
 
-import { ceramicHost, ceramicSeed } from 'config/constants';
+export const ceramicHost = process.env.CERAMIC_HOST as string;
+export const ceramicSeed = process.env.CERAMIC_SEED as string;
 
 // Create the Ceramic object
 export const ceramic = new CeramicClient(ceramicHost);

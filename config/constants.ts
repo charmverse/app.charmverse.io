@@ -48,8 +48,4 @@ export const credentialsWalletPrivateKey = process.env.CREDENTIAL_WALLET_KEY as 
 export const awsS3Bucket = process.env.S3_UPLOAD_BUCKET as string;
 
 // Ceramic Node
-export const ceramicHost = process.env.CERAMIC_HOST as string;
-export const ceramicSeed = process.env.CERAMIC_SEED as string;
-export const ceramicDid = process.env.CERAMIC_DID as string;
-
 export const graphQlServerEndpoint = process.env.CERAMIC_GRAPHQL_SERVER as string;

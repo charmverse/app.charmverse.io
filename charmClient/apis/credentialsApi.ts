@@ -2,7 +2,7 @@ import type { Space } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { CharmVerseCredentialInput } from 'lib/credentials/attest';
-import type { PublishedSignedCredential } from 'lib/credentials/config/queriesAndMutations';
+import type { PublishedSignedCredential } from 'lib/credentials/queriesAndMutations';
 import type {
   CreateCredentialTemplateInput,
   CredentialTemplateUpdate,

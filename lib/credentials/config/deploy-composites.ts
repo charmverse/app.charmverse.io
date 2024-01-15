@@ -1,4 +1,4 @@
-import { write } from 'node:fs';
+/* eslint-disable import/no-extraneous-dependencies */
 import fs from 'node:fs/promises';
 
 import {
@@ -9,8 +9,6 @@ import {
 } from '@composedb/devtools-node';
 import type { Ora as OraSpinner } from 'ora';
 import ora from 'ora';
-
-import { ceramicHost } from 'config/constants';
 
 import { getCeramicClient } from './authenticate';
 

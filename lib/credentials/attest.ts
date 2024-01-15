@@ -1,4 +1,5 @@
 import { InvalidInputError } from '@charmverse/core/errors';
+import type { CredentialType } from '@charmverse/core/prisma-client';
 import type {
   AttestationShareablePackageObject,
   SignedOffchainAttestation
@@ -12,11 +13,11 @@ import { getENSName } from 'lib/blockchain';
 import { isValidChainAddress } from 'lib/tokens/validation';
 import { prettyPrint } from 'lib/utilities/strings';
 
-import type { PublishedSignedCredential } from './config/queriesAndMutations';
-import { publishSignedCredential } from './config/queriesAndMutations';
 import type { EasSchemaChain } from './connectors';
 import { easSchemaChains, getEasConnector, getEasInstance } from './connectors';
-import { encodeAttestion, getAttestationSchemaId, type CredentialData, type CredentialType } from './schemas';
+import type { PublishedSignedCredential } from './queriesAndMutations';
+import { publishSignedCredential } from './queriesAndMutations';
+import { encodeAttestion, getAttestationSchemaId, type CredentialData } from './schemas';
 
 type AttestationInput<T extends CredentialType = CredentialType> = {
   recipient: string;

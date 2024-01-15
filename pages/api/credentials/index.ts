@@ -4,7 +4,7 @@ import nc from 'next-connect';
 import { isProdEnv } from 'config/constants';
 import type { CharmVerseCredentialInput } from 'lib/credentials/attest';
 import { signAndPublishCharmverseCredential } from 'lib/credentials/attest';
-import { getCredentialsByRecipient } from 'lib/credentials/config/queriesAndMutations';
+import { getCredentialsByRecipient } from 'lib/credentials/queriesAndMutations';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
