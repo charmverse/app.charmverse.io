@@ -64,7 +64,11 @@ class CardFilter {
     return true;
   }
 
-  static isClauseMet(filter: FilterClause, templates: readonly IPropertyTemplate[], card: Card): boolean {
+  static isClauseMet(
+    filter: FilterClause,
+    templates: readonly IPropertyTemplate[],
+    card: Pick<Card, 'createdAt' | 'createdBy' | 'updatedBy' | 'updatedAt' | 'fields'>
+  ): boolean {
     const filterProperty = templates.find((o) => o.id === filter.propertyId);
     const proposalEvaluationTypeProperty = templates.find((o) => o.id === PROPOSAL_EVALUATION_TYPE_ID);
     // id that starts with __ are not real properties, they were injected manually and are dynamic based on the proposal rubric evaluations
@@ -114,6 +118,7 @@ class CardFilter {
 
       return v.toString();
     });
+
     if (filterProperty) {
       const filterPropertyDataType = propertyConfigs[filterProperty.type].datatype;
       if (filterPropertyDataType === 'text') {

@@ -29,6 +29,224 @@ describe('src/cardFilter', () => {
   card1.fields.properties[Constants.titleColumnId] = 'Page Title';
 
   describe('verify isClauseMet method', () => {
+    test('should be true if there is an equal clause for the proposalEvaluationAverage field', () => {
+      const rubricTitles = ['Rubric 1', 'Rubric 2'];
+      const filterClauseIsNotEmpty = createFilterClause({
+        propertyId: `__proposalEvaluationAverage_${rubricTitles[1]}`,
+        condition: 'equal',
+        values: ['3'],
+        filterId: v4()
+      });
+      const evaluationAveragePropertyId = v4();
+      const result = CardFilter.isClauseMet(
+        filterClauseIsNotEmpty,
+        [
+          ...board.fields.cardProperties,
+          {
+            id: evaluationAveragePropertyId,
+            type: 'proposalEvaluationAverage',
+            name: 'Proposal Evaluation Average',
+            options: []
+          },
+          {
+            id: `__proposalEvaluationAverage_${rubricTitles[0]}`,
+            type: 'proposalEvaluationAverage',
+            name: `${rubricTitles[0]} (Evaluation average)`,
+            options: []
+          },
+          {
+            id: `__proposalEvaluationAverage_${rubricTitles[1]}`,
+            type: 'proposalEvaluationAverage',
+            name: `${rubricTitles[1]} (Evaluation average)`,
+            options: []
+          }
+        ],
+        {
+          ...card1,
+          fields: {
+            ...card1.fields,
+            properties: {
+              [evaluationAveragePropertyId]: [
+                {
+                  title: rubricTitles[0],
+                  value: 5
+                },
+                {
+                  title: rubricTitles[1],
+                  value: 3
+                }
+              ] as any
+            }
+          }
+        }
+      );
+      expect(result).toBeTruthy();
+    });
+
+    test('should be false if there is not equal clause for the proposalEvaluationAverage field', () => {
+      const rubricTitles = ['Rubric 1', 'Rubric 2'];
+      const filterClauseIsNotEmpty = createFilterClause({
+        propertyId: `__proposalEvaluationAverage_${rubricTitles[0]}`,
+        condition: 'equal',
+        values: ['7'],
+        filterId: v4()
+      });
+      const evaluationAveragePropertyId = v4();
+      const result = CardFilter.isClauseMet(
+        filterClauseIsNotEmpty,
+        [
+          ...board.fields.cardProperties,
+          {
+            id: evaluationAveragePropertyId,
+            type: 'proposalEvaluationAverage',
+            name: 'Proposal Evaluation Average',
+            options: []
+          },
+          {
+            id: `__proposalEvaluationAverage_${rubricTitles[0]}`,
+            type: 'proposalEvaluationAverage',
+            name: `${rubricTitles[0]} (Evaluation average)`,
+            options: []
+          },
+          {
+            id: `__proposalEvaluationAverage_${rubricTitles[1]}`,
+            type: 'proposalEvaluationAverage',
+            name: `${rubricTitles[1]} (Evaluation average)`,
+            options: []
+          }
+        ],
+        {
+          ...card1,
+          fields: {
+            ...card1.fields,
+            properties: {
+              [evaluationAveragePropertyId]: [
+                {
+                  title: rubricTitles[0],
+                  value: 8
+                },
+                {
+                  title: rubricTitles[1],
+                  value: 3
+                }
+              ] as any
+            }
+          }
+        }
+      );
+      expect(result).toBeFalsy();
+    });
+
+    test('should be true if there is a contains clause for the proposalEvaluatedBy field', () => {
+      const rubricTitles = ['Rubric 1', 'Rubric 2'];
+      const users = ['user1', 'user2', 'user3'];
+      const filterClauseIsNotEmpty = createFilterClause({
+        propertyId: `__proposalEvaluatedBy_${rubricTitles[0]}`,
+        condition: 'contains',
+        values: [users[0], users[1]],
+        filterId: v4()
+      });
+      const evaluationReviewedByPropertyId = v4();
+      const result = CardFilter.isClauseMet(
+        filterClauseIsNotEmpty,
+        [
+          ...board.fields.cardProperties,
+          {
+            id: evaluationReviewedByPropertyId,
+            type: 'proposalEvaluatedBy',
+            name: 'Proposal Evaluation Reviewers',
+            options: []
+          },
+          {
+            id: `__proposalEvaluatedBy_${rubricTitles[0]}`,
+            type: 'proposalEvaluatedBy',
+            name: `${rubricTitles[0]} (Evaluation reviewers)`,
+            options: []
+          },
+          {
+            id: `__proposalEvaluatedBy_${rubricTitles[1]}`,
+            type: 'proposalEvaluatedBy',
+            name: `${rubricTitles[1]} (Evaluation reviewers)`,
+            options: []
+          }
+        ],
+        {
+          ...card1,
+          fields: {
+            ...card1.fields,
+            properties: {
+              [evaluationReviewedByPropertyId]: [
+                {
+                  title: rubricTitles[0],
+                  value: [users[0]]
+                },
+                {
+                  title: rubricTitles[1],
+                  value: [users[2]]
+                }
+              ] as any
+            }
+          }
+        }
+      );
+      expect(result).toBeTruthy();
+    });
+
+    test('should be true if there is a contains clause for the proposalEvaluatedBy field', () => {
+      const rubricTitles = ['Rubric 1', 'Rubric 2'];
+      const users = ['user1', 'user2', 'user3'];
+      const filterClauseIsNotEmpty = createFilterClause({
+        propertyId: `__proposalEvaluatedBy_${rubricTitles[1]}`,
+        condition: 'contains',
+        values: [users[0], users[1]],
+        filterId: v4()
+      });
+      const evaluationReviewedByPropertyId = v4();
+      const result = CardFilter.isClauseMet(
+        filterClauseIsNotEmpty,
+        [
+          ...board.fields.cardProperties,
+          {
+            id: evaluationReviewedByPropertyId,
+            type: 'proposalEvaluatedBy',
+            name: 'Proposal Evaluation Reviewers',
+            options: []
+          },
+          {
+            id: `__proposalEvaluatedBy_${rubricTitles[0]}`,
+            type: 'proposalEvaluatedBy',
+            name: `${rubricTitles[0]} (Evaluation reviewers)`,
+            options: []
+          },
+          {
+            id: `__proposalEvaluatedBy_${rubricTitles[1]}`,
+            type: 'proposalEvaluatedBy',
+            name: `${rubricTitles[1]} (Evaluation reviewers)`,
+            options: []
+          }
+        ],
+        {
+          ...card1,
+          fields: {
+            ...card1.fields,
+            properties: {
+              [evaluationReviewedByPropertyId]: [
+                {
+                  title: rubricTitles[0],
+                  value: [users[1]]
+                },
+                {
+                  title: rubricTitles[1],
+                  value: [users[2]]
+                }
+              ] as any
+            }
+          }
+        }
+      );
+      expect(result).toBeFalsy();
+    });
+
     test('should be true with is_not_empty clause', () => {
       const filterClauseIsNotEmpty = createFilterClause({
         propertyId: 'propertyId',
