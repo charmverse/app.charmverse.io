@@ -10,7 +10,7 @@ import { createUserOtp } from '../createUserOtp';
 describe('createUserOtp', () => {
   it('Should create a user otp', async () => {
     const { user } = await generateUserAndSpace();
-    expect(user.userOTP).toBeNull();
+    expect(user.userOTP).toBeUndefined();
 
     await createUserOtp(user.id);
     expect(await getUserOtp(user.id)).not.toBeNull();
