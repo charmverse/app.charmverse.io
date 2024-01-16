@@ -11,6 +11,7 @@ import type {
   PagePermission,
   Proposal,
   ProposalEvaluation,
+  ProposalEvaluationPermission,
   ProposalReviewer,
   ProposalRubricCriteria,
   Vote,
@@ -35,6 +36,7 @@ export type PageWithBlocks = {
         evaluations: (ProposalEvaluation & {
           reviewers: ProposalReviewer[];
           rubricCriteria: ProposalRubricCriteria[];
+          permissions: ProposalEvaluationPermission[];
         })[];
       })
     | null;
@@ -173,7 +175,8 @@ export async function exportWorkspacePages({
           evaluations: {
             include: {
               reviewers: true,
-              rubricCriteria: true
+              rubricCriteria: true,
+              permissions: true
             }
           }
         }
