@@ -8,6 +8,24 @@ import type { OtpResponse } from '../createUserOtp';
 import { createUserOtp } from '../createUserOtp';
 
 describe('createUserOtp', () => {
+  const originalEnv = process.env || {};
+
+  beforeEach(() => {
+    jest.resetModules();
+  });
+
+  beforeAll(() => {
+    process.env = {
+      ...originalEnv,
+      RECOVERY_CODE_SECRET_KEY: '1234567890'
+    };
+  });
+
+  afterAll(() => {
+    jest.resetModules();
+    process.env = originalEnv;
+  });
+
   it('Should create a user otp', async () => {
     const { user } = await generateUserAndSpace();
     expect(user.userOTP).toBeUndefined();
