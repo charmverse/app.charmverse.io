@@ -19,6 +19,7 @@ import { getDefaultWorkflows } from 'lib/proposal/workflows/defaultWorkflows';
 import { upsertDefaultRewardsBoard } from 'lib/rewards/blocks/upsertDefaultRewardsBoard';
 import { createDefaultReward } from 'lib/rewards/createDefaultReward';
 import { defaultFreeBlockQuota } from 'lib/subscription/constants';
+import { getImportData } from 'lib/templates/getImportData';
 import { importSpaceData } from 'lib/templates/importSpaceData';
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
 import { createSigningSecret, subscribeToAllEvents } from 'lib/webhookPublisher/subscribeToEvents';
@@ -234,11 +235,14 @@ export async function createWorkspace({
       });
     }
 
+    const importData = await getImportData({ exportName: spaceTemplate });
+
     await importWorkspacePages({
       targetSpaceIdOrDomain: space.id,
-      exportName: spaceTemplate,
+      exportData: importData,
       includePermissions: false,
-      resetPaths: true
+      resetPaths: true,
+      importingToDifferentSpace: true
     });
 
     await updateSpacePermissionConfigurationMode({
