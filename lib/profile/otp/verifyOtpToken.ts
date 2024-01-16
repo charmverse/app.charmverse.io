@@ -29,6 +29,8 @@ export async function verifyOtpToken(userId: string, token: string) {
   if (delta === null) {
     throw new InvalidInputError('Invalid token');
   }
+
+  return delta;
 }
 
 function validateToken(secret: string, token: string, username: string) {

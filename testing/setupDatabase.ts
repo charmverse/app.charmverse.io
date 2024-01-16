@@ -159,7 +159,6 @@ type CreateUserAndSpaceInput = {
   spaceNotificationToggles?: NotificationToggles;
   xpsEngineId?: string;
   snapshotDomain?: string;
-  userOTP?: boolean;
 };
 
 export async function generateUserAndSpace({
@@ -175,8 +174,7 @@ export async function generateUserAndSpace({
   paidTier,
   spaceNotificationToggles,
   xpsEngineId,
-  snapshotDomain,
-  userOTP = false
+  snapshotDomain
 }: CreateUserAndSpaceInput = {}) {
   const userId = v4();
   const newUser = await prisma.user.create({
@@ -224,7 +222,6 @@ export async function generateUserAndSpace({
       ...user
     },
     include: {
-      userOTP,
       spaceRoles: {
         include: {
           space: true

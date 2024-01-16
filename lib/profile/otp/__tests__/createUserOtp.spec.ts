@@ -2,7 +2,7 @@ import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
 import { v4 as uuid } from 'uuid';
 
 import { generateUserAndSpace } from 'testing/setupDatabase';
-import { getUserOtp, updateUserOtp } from 'testing/userOtp';
+import { getTestUserOtp, updateTestUserOtp } from 'testing/userOtp';
 
 import type { CreateOtpResponse } from '../createUserOtp';
 import { createUserOtp } from '../createUserOtp';
@@ -10,10 +10,9 @@ import { createUserOtp } from '../createUserOtp';
 describe('createUserOtp', () => {
   it('Should create a user otp', async () => {
     const { user } = await generateUserAndSpace();
-    expect(user.userOTP).toBeUndefined();
-
     await createUserOtp(user.id);
-    expect(await getUserOtp(user.id)).not.toBeNull();
+
+    expect(await getTestUserOtp(user.id)).not.toBeNull();
   });
 
   it('Should create the same userOtp and a new recoveryPhrase if userOtp is defined but not activated', async () => {
@@ -38,7 +37,7 @@ describe('createUserOtp', () => {
   it('Should throw an error if user already has an otp', async () => {
     const { user } = await generateUserAndSpace();
     await createUserOtp(user.id);
-    await updateUserOtp(user.id, { activatedAt: new Date() });
+    await updateTestUserOtp(user.id, { activatedAt: new Date() });
 
     await expect(createUserOtp(user.id)).rejects.toBeInstanceOf(InvalidInputError);
   });
