@@ -244,6 +244,7 @@ export function RubricResults({
               isReviewer={isReviewer}
               evaluation={evaluation}
               proposalId={proposalId}
+              requireConfirmation
               refreshProposal={refreshProposal}
             />
           </Box>
