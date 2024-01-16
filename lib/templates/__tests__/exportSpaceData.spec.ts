@@ -144,7 +144,8 @@ describe('exportSpaceData', () => {
                 evaluations: {
                   include: {
                     reviewers: true,
-                    rubricCriteria: true
+                    rubricCriteria: true,
+                    permissions: true
                   }
                 }
               }
@@ -172,7 +173,8 @@ describe('exportSpaceData', () => {
                 evaluations: {
                   include: {
                     reviewers: true,
-                    rubricCriteria: true
+                    rubricCriteria: true,
+                    permissions: true
                   }
                 }
               }
@@ -197,7 +199,8 @@ describe('exportSpaceData', () => {
                 evaluations: {
                   include: {
                     reviewers: true,
-                    rubricCriteria: true
+                    rubricCriteria: true,
+                    permissions: true
                   }
                 }
               }
