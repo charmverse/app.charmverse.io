@@ -1,26 +1,8 @@
-import type { User, UserOTP } from '@charmverse/core/dist/cjs/prisma-client';
+import type { User, UserOTP } from '@charmverse/core/prisma-client';
 
 import { createOtp } from '../createOtp';
 
 describe('createOtp', () => {
-  const originalEnv = process.env || {};
-
-  beforeEach(() => {
-    jest.resetModules();
-  });
-
-  beforeAll(() => {
-    process.env = {
-      ...originalEnv,
-      RECOVERY_CODE_SECRET_KEY: '1234567890'
-    };
-  });
-
-  afterAll(() => {
-    jest.resetModules();
-    process.env = originalEnv;
-  });
-
   it(`Should generate a new secret code and uri.`, async () => {
     const user = { username: 'Test user' } as User;
 

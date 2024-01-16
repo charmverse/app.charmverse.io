@@ -1,7 +1,7 @@
 import type { User, UserOTP } from '@charmverse/core/prisma-client';
 import * as OTPAuth from 'otpauth';
 
-import { decryptString, encryptString } from './stringEncryption';
+import { decryptRecoveryCode, encryptRecoveryCode } from './recoveryCodeEncryption';
 
 /**
  * Create an otp for the user to scan a QR code or enter the code manually
@@ -10,7 +10,7 @@ import { decryptString, encryptString } from './stringEncryption';
  */
 export function createOtp(user: User & { userOTP?: UserOTP | null }) {
   const secret = new OTPAuth.Secret({ size: 10 });
-  const userSecret = user.userOTP?.secret ? decryptString(user.userOTP?.secret) : secret.base32;
+  const userSecret = user.userOTP?.secret ? decryptRecoveryCode(user.userOTP?.secret) : secret.base32;
 
   const totp = new OTPAuth.TOTP({
     issuer: 'Charmverse',
@@ -25,7 +25,7 @@ export function createOtp(user: User & { userOTP?: UserOTP | null }) {
 
   const code = OTPAuth.URI.parse(uri).secret.base32;
 
-  const encryptedCode = user.userOTP?.secret || encryptString(code);
+  const encryptedCode = user.userOTP?.secret || encryptRecoveryCode(code);
 
   return {
     encryptedCode,

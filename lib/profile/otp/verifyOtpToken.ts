@@ -2,7 +2,7 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import * as OTPAuth from 'otpauth';
 
-import { decryptString } from './stringEncryption';
+import { decryptRecoveryCode } from './recoveryCodeEncryption';
 
 export async function verifyOtpToken(userId: string, token: string) {
   const user = await prisma.user.findUnique({
@@ -22,7 +22,7 @@ export async function verifyOtpToken(userId: string, token: string) {
     throw new InvalidInputError('User OTP does not exist');
   }
 
-  const decryptedSecret = decryptString(user.userOTP.secret);
+  const decryptedSecret = decryptRecoveryCode(user.userOTP.secret);
 
   const delta = validateToken(decryptedSecret, token, user.username);
 
