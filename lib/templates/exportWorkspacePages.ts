@@ -185,10 +185,6 @@ export async function exportWorkspacePages({
       if (proposal?.categoryId) {
         proposal.categoryId = null;
       }
-      // remove user-specific reviewers
-      proposal?.evaluations.forEach((evaluation) => {
-        evaluation.reviewers = evaluation.reviewers.filter((reviewer) => !reviewer.userId);
-      });
       node.proposal = proposal;
     }
 
