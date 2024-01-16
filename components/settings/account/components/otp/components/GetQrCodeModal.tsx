@@ -8,16 +8,27 @@ import { CodeDetails } from './CodeDetails';
 import { ConfirmAuthCode } from './ConfirmAuthCode';
 
 export function CustomModal({ onClose, ...props }: Omit<ModalProps, 'children'>) {
-  const { data: otpData, trigger: getOtp, error: getOtpError, isMutating: isOtpLoading } = useGetUserOtp();
+  const {
+    data: otpData,
+    trigger: getOtp,
+    error: getOtpError,
+    isMutating: isOtpLoading,
+    reset: resetOtpData
+  } = useGetUserOtp();
 
   const onSubmit = async (authCode: string) => {
     await getOtp({ authCode });
   };
 
+  const handleClose = () => {
+    resetOtpData();
+    onClose?.();
+  };
+
   return (
     <Modal title='Two factor authentication' size='medium' onClose={onClose} {...props}>
       {otpData ? (
-        <CodeDetails onSubmit={() => onClose?.()} uri={otpData.uri} code={otpData.code} btnText='Close' />
+        <CodeDetails onSubmit={handleClose} uri={otpData.uri} code={otpData.code} btnText='Close' />
       ) : (
         <ConfirmAuthCode errorMessage={getOtpError?.message} loading={isOtpLoading} onSubmit={onSubmit} />
       )}
