@@ -55,7 +55,17 @@ function PropertyMenuItem({
       <MenuItem dense className={isOver ? 'dragover' : ''} sx={{ width: '100%' }}>
         <DragIndicatorIcon color='secondary' fontSize='small' sx={{ mr: 1 }} />
         <ListItemIcon>{iconForPropertyType(property.type)}</ListItemIcon>
-        <ListItemText>{property.name}</ListItemText>
+        <ListItemText
+          sx={{
+            '& .MuiTypography-root': {
+              textOverflow: 'ellipsis',
+              overflow: 'hidden',
+              whiteSpace: 'nowrap'
+            }
+          }}
+        >
+          {property.name}
+        </ListItemText>
         <IconButton
           disabled={visibilityToggleDisabled}
           size='small'
