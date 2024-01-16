@@ -11,10 +11,6 @@ export function useCreateUserOtp() {
   return usePOST<undefined, { code: string; uri: string; recoveryCode: string }>(`/api/profile/otp`);
 }
 
-export function useDeleteUserOtp() {
-  return useDELETE<undefined>(`/api/profile/otp`);
-}
-
 export function useGetUserOtp() {
   return useGETtrigger<{ authCode: string }, { code: string; uri: string }>(`/api/profile/otp`);
 }
@@ -25,4 +21,10 @@ export function useVerifyOtp() {
 
 export function useActivateOtp() {
   return usePUT<undefined, void>(`/api/profile/otp/activate`);
+}
+
+export function useResetRecoveryCode() {
+  return usePUT<{ authCode: string }, { code: string; uri: string; recoveryCode: string }>(
+    `/api/profile/otp/recovery-code`
+  );
 }

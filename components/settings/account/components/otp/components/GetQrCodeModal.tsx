@@ -26,7 +26,7 @@ export function CustomModal({ onClose, ...props }: Omit<ModalProps, 'children'>)
   };
 
   return (
-    <Modal title='Two factor authentication' size='medium' onClose={onClose} {...props}>
+    <Modal title='Two factor authentication' size='medium' onClose={handleClose} {...props}>
       {otpData ? (
         <CodeDetails onSubmit={handleClose} uri={otpData.uri} code={otpData.code} btnText='Close' />
       ) : (

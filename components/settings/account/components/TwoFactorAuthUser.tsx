@@ -1,40 +1,28 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { bindPopover } from 'material-ui-popup-state';
-import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { bindPopper, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 
-import { useDeleteUserOtp } from 'charmClient/hooks/profile';
 import { Button } from 'components/common/Button';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { TwoFactorAuthSetupModal } from 'components/settings/account/components/otp/components/TwoFactorAuthSetupModal';
 import { TwoFactorAuthProvider } from 'components/settings/account/components/otp/hooks/useTwoFactorAuth';
 import Legend from 'components/settings/Legend';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useUser } from 'hooks/useUser';
 
 import { GetQrCodeModal } from './otp/components/GetQrCodeModal';
+import { ResetRecoveryCodeModal } from './otp/components/ResetRecoveryCodeModal';
 
 export function TwoFactorAuthUser() {
   const otpSetupModal = usePopupState({ variant: 'popover', popupId: 'otp-setup' });
   const getQrCodeModal = usePopupState({ variant: 'popover', popupId: 'qr-code' });
-  const deleteOtpModal = usePopupState({ variant: 'popover', popupId: 'delete-otp' });
-  const { space } = useCurrentSpace();
+  const resetRecoveryCodeModal = usePopupState({ variant: 'popover', popupId: 'reset-recovery-code' });
+  const confirmResetRecoveryCodeModal = usePopupState({ variant: 'popover', popupId: 'confirm-reset-recovery-code' });
   const { user, refreshUser } = useUser();
   const activeOtp = !!user?.userOTP?.activatedAt;
-  const { trigger: deleteOtp, isMutating: isDeleteOtpLoading } = useDeleteUserOtp();
 
   const isCharmverseSpace = useIsCharmverseSpace();
-
-  const onDelete = async () => {
-    await deleteOtp();
-    await refreshUser();
-    otpSetupModal.close();
-
-    if (space?.requireMembersTwoFactorAuth) {
-      otpSetupModal.open();
-    }
-  };
 
   if (!isCharmverseSpace) {
     return null;
@@ -63,9 +51,9 @@ export function TwoFactorAuthUser() {
             <Button
               variant='text'
               sx={{ px: 0, display: 'block', '&:hover': { background: 'transparent' } }}
-              {...bindTrigger(deleteOtpModal)}
+              {...bindTrigger(confirmResetRecoveryCodeModal)}
             >
-              Delete 2fa
+              Reset recovery code
             </Button>
           </>
         ) : (
@@ -75,14 +63,14 @@ export function TwoFactorAuthUser() {
         )}
         <TwoFactorAuthSetupModal {...bindPopover(otpSetupModal)} />
         <GetQrCodeModal {...bindPopover(getQrCodeModal)} />
+        <ResetRecoveryCodeModal {...bindPopover(resetRecoveryCodeModal)} />
         <ConfirmDeleteModal
-          title='Delete 2fa configuration'
-          buttonText='Delete'
-          secondaryButtonText='Cancel'
-          question='Are you sure you want delete your 2fa configuration? If your space requires 2fa you will need to configure it again.'
-          disabled={isDeleteOtpLoading}
-          onConfirm={onDelete}
-          {...bindPopover(deleteOtpModal)}
+          title='Reset backup code'
+          buttonText='Reset'
+          question='This action will replace your existing recovery code. Continue?'
+          onConfirm={resetRecoveryCodeModal.open}
+          onClose={confirmResetRecoveryCodeModal.close}
+          {...bindPopper(confirmResetRecoveryCodeModal)}
         />
       </Box>
     </TwoFactorAuthProvider>

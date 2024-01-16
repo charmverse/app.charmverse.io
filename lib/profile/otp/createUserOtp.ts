@@ -1,4 +1,4 @@
-import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
+import { DataNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
@@ -30,22 +30,23 @@ export async function createUserOtp(userId: string): Promise<CreateOtpResponse> 
     throw new DataNotFoundError('User not found');
   }
 
-  if (user.userOTP && user.userOTP.activatedAt) {
-    throw new InvalidInputError('User has an OTP created');
-  }
-
   const createdOtp = createOtp(user);
 
   const createdRecoveryCode = createRecoveryCode();
 
-  const recoveryCode = await prisma.recoveryCode.upsert({
-    where: {
-      id: user.userOTP?.recoveryCodeId || uuid()
-    },
-    create: {
-      code: createdRecoveryCode.hashedOtp
-    },
-    update: {
+  if (user.userOTP?.recoveryCodeId) {
+    await prisma.recoveryCode.update({
+      where: {
+        id: user.userOTP.recoveryCodeId
+      },
+      data: {
+        deletedAt: new Date()
+      }
+    });
+  }
+
+  const recoveryCode = await prisma.recoveryCode.create({
+    data: {
       code: createdRecoveryCode.hashedOtp
     }
   });
