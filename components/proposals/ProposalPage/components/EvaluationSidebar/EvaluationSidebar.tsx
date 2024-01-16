@@ -1,4 +1,4 @@
-import { Tooltip } from '@mui/material';
+import { Divider, Tooltip } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -13,6 +13,7 @@ import { EvaluationStepRow } from './components/EvaluationStepRow';
 import { EvaluationStepSettingsModal } from './components/EvaluationStepSettingsModal';
 import { FeedbackEvaluation } from './components/FeedbackEvaluation';
 import { PassFailEvaluation } from './components/PassFailEvaluation';
+import { ProposalSocialShare } from './components/ProposalSocialShare';
 import { PublishRewardsButton } from './components/PublishRewardsButton';
 import { RubricEvaluation } from './components/RubricEvaluation/RubricEvaluation';
 import { VoteEvaluation } from './components/VoteEvaluation/VoteEvaluation';
@@ -36,9 +37,19 @@ export type Props = {
   onChangeEvaluation?: (evaluationId: string, updated: Partial<ProposalEvaluationValues>) => void;
   refreshProposal?: VoidFunction;
   templateId: string | null | undefined;
+  pagePath?: string;
+  pageTitle?: string;
 };
 
-export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refreshProposal, templateId }: Props) {
+export function EvaluationSidebar({
+  pagePath,
+  pageTitle,
+  pageId,
+  proposal,
+  onChangeEvaluation,
+  refreshProposal,
+  templateId
+}: Props) {
   const [activeEvaluationId, setActiveEvaluationId] = useState<string | undefined>(proposal?.currentEvaluationId);
   const { mappedFeatures } = useSpaceFeatures();
   const { showMessage } = useSnackbar();
@@ -206,6 +217,8 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
           updateEvaluation={updateEvaluation}
         />
       )}
+      <Divider />
+      {pagePath && pageTitle && <ProposalSocialShare proposalPath={pagePath} proposalTitle={pageTitle} />}
     </div>
   );
 }

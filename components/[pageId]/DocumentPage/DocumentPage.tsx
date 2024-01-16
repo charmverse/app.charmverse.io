@@ -286,6 +286,8 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
       {/** Structured proposal isn't inside a CharmEditor context, thus useViewContext used in PageSidebar would throw error for undefined view */}
       {(enableComments || enableSuggestingMode || page.type === 'proposal' || page.type === 'proposal_template') && (
         <PageSidebar
+          pagePath={page.path}
+          pageTitle={page.title}
           id='page-action-sidebar'
           pageId={page.id}
           spaceId={page.spaceId}
@@ -425,6 +427,8 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
           )}
           {currentTab === 1 && (
             <EvaluationSidebar
+              pagePath={page.path}
+              pageTitle={page.title}
               pageId={page.id}
               proposal={proposal}
               onChangeEvaluation={onChangeEvaluation}

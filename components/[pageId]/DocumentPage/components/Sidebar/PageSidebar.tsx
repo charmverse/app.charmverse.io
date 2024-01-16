@@ -57,6 +57,8 @@ type SidebarProps = {
   isReviewer?: boolean; // TODO: we need to know the reviewer for each step instead
   // eslint-disable-next-line react/no-unused-prop-types
   disabledViews?: PageSidebarView[];
+  pagePath?: string;
+  pageTitle?: string;
   proposalTemplateId?: string | null;
 };
 
@@ -201,6 +203,8 @@ function SidebarContents({
   refreshProposal,
   isUnpublishedProposal,
   isReviewer,
+  pagePath,
+  pageTitle,
   proposalTemplateId
 }: SidebarProps) {
   const isNotNewProposal = !!proposal;
@@ -219,6 +223,8 @@ function SidebarContents({
           />
         ) : (
           <EvaluationSidebar
+            pagePath={pagePath}
+            pageTitle={pageTitle}
             pageId={pageId}
             proposal={proposal}
             onChangeEvaluation={onChangeEvaluation}

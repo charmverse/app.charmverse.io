@@ -33,7 +33,7 @@ export function LensProfileWidget({ lensProfile }: { lensProfile: ProfileFragmen
     <ProfileWidget
       link={`https://www.lensfrens.xyz/${lensProfile.handle?.localName}`}
       title='Lens Protocol'
-      avatarSrc='/images/logos/lens_logo.svg'
+      avatarSrc='/images/logos/lens_logo.png'
     >
       <Stack spacing={1}>
         <Stack direction='row' spacing={1}>
