@@ -55,7 +55,8 @@ export function PassFailEvaluation({
   async function onSubmitReview(result: NonNullable<PopulatedEvaluation['result']>) {
     if (requireConfirmation) {
       const { confirmed } = await showConfirmation({
-        message: 'This will submit the final review. Are you sure?',
+        message:
+          'Please verify that all reviewers have submitted a response. This will submit the final review for this step.',
         confirmButton: result === 'pass' ? 'Approve' : 'Decline'
       });
       if (!confirmed) {
