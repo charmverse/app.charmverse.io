@@ -14305,16 +14305,7 @@
             "voteSettings": null,
             "voteId": null,
             "result": null,
-            "reviewers": [
-              {
-                "id": "fcaabea6-5c63-42e9-8ae9-3f1f9bce3456",
-                "proposalId": "34d15a32-db25-4115-a1dd-22b5fd0d50b7",
-                "roleId": null,
-                "userId": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                "systemRole": null,
-                "evaluationId": "24704bfb-3558-461c-b7d2-c566f8d2e499"
-              }
-            ],
+            "reviewers": [],
             "rubricCriteria": [
               {
                 "id": "5fcfe8f5-3f7b-49ab-aa5f-150878edc92c",

@@ -44,7 +44,6 @@ export async function importSpaceSettings({
     memberProfiles,
     memberProperties,
     proposalBlocks,
-    proposalWorkflows,
     rewardBlocks,
     notificationToggles,
     defaultPagePermissionGroup,

@@ -3320,16 +3320,7 @@
             "voteSettings": null,
             "voteId": null,
             "result": null,
-            "reviewers": [
-              {
-                "id": "5cdbbaee-2402-491c-afd5-ed85661484cf",
-                "proposalId": "1b430557-a248-4249-84d4-d313d1aa6877",
-                "roleId": null,
-                "userId": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                "systemRole": null,
-                "evaluationId": "ee1de00d-c60d-4dbe-94ef-036d2ad0083a"
-              }
-            ],
+            "reviewers": [],
             "rubricCriteria": []
           },
           {
