@@ -82,7 +82,7 @@ export async function importSpaceSettings({
       .filter((perm) => !!perm.roleId);
   });
 
-  const [existingProposalBlocks, existingRewardBlocks, existingProposalWorkflows] = await Promise.all([
+  const [existingProposalBlocks, existingRewardBlocks] = await Promise.all([
     prisma.proposalBlock.findMany({
       where: {
         spaceId: targetSpace.id
