@@ -268,10 +268,11 @@ function generateUpdatedProposalStepProperty({
 }: {
   evaluationStepTitles: string[];
   boardProperties: IPropertyTemplate[];
-}) {
-  // We will mutate and return this property
-  const proposalStepProp = {
-    ...(boardProperties.find((p) => p.type === 'proposalStep') ?? {
+}): IPropertyTemplate {
+  const existingProposalStepProperty = boardProperties.find((p) => p.type === 'proposalStep');
+
+  if (!existingProposalStepProperty) {
+    return {
       ...proposalDbProperties.proposalStep(),
       id: uuid(),
       options: ['Draft', 'Rewards', ...evaluationStepTitles].map((title) => ({
@@ -279,10 +280,22 @@ function generateUpdatedProposalStepProperty({
         id: title,
         value: title
       }))
-    })
-  };
-
-  return proposalStepProp;
+    };
+  } else {
+    const existingOptions = existingProposalStepProperty.options.map((opt) => opt.value);
+    const newOptions = evaluationStepTitles.filter((title) => !existingOptions.includes(title));
+    return {
+      ...existingProposalStepProperty,
+      options: [
+        ...existingProposalStepProperty.options,
+        ...newOptions.map((title) => ({
+          color: 'propColorGray',
+          id: title,
+          value: title
+        }))
+      ]
+    };
+  }
 }
 
 function generateUpdatedProposalEvaluationTypeProperty({ boardProperties }: { boardProperties: IPropertyTemplate[] }) {

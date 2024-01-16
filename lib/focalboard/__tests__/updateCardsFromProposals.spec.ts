@@ -384,6 +384,9 @@ describe('updateCardsFromProposals()', () => {
     const databaseAfterUpdate = await prisma.block.findUnique({
       where: {
         id: database.id
+      },
+      select: {
+        fields: true
       }
     });
 
@@ -483,6 +486,12 @@ describe('updateCardsFromProposals()', () => {
     expect(card2Properties[proposalEvaluationStatusProp.id]).toBe('fail');
     expect(card2Properties[proposalEvaluationStepProp.id]).toBe('Rubric Evaluation 1');
     expect(card2Properties[proposalEvaluationTypeProp.id]).toBe('rubric');
+    // Make sure all the evaluation steps are added to the step property's options
+    expect(
+      ['Rubric Evaluation 1', 'Rubric Evaluation 2', 'Rubric Evaluation 3'].every((stepTitle) =>
+        proposalEvaluationStepProp.options.some((option) => option.value === stepTitle)
+      )
+    ).toBeTruthy();
   });
 
   it('should not create cards from draft proposals', async () => {
