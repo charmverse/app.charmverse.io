@@ -1,15 +1,15 @@
 import Cryptr from 'cryptr';
 
-const SECRET_KEY = 'myTotallySecretKey'; // This will be stored in a .env file or userOTP
+const RECOVERY_CODE_SECRET_KEY = process.env.RECOVERY_CODE_SECRET_KEY as string;
 
 export function encryptString(text: string) {
-  const cryptr = new Cryptr(SECRET_KEY);
+  const cryptr = new Cryptr(RECOVERY_CODE_SECRET_KEY);
 
   return cryptr.encrypt(text);
 }
 
 export function decryptString(encryptedString: string) {
-  const cryptr = new Cryptr(SECRET_KEY);
+  const cryptr = new Cryptr(RECOVERY_CODE_SECRET_KEY);
 
   return cryptr.decrypt(encryptedString);
 }
