@@ -44,7 +44,6 @@ export function mapDbProposalToProposal({
     ...rest,
     permissions,
     currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
-    evaluationType: currentEvaluation?.type || proposal.evaluationType,
     status: proposal.status,
     // Support old model: filter out evaluation-specific reviewers and rubric answers
     rubricAnswers: currentEvaluation?.rubricAnswers || [],
@@ -100,7 +99,6 @@ export function mapDbProposalToProposalLite({
       hasPublishedRewards: rewards.length > 0
     }),
     currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
-    evaluationType: currentEvaluation?.type || proposal.evaluationType,
     status: proposal.status,
     reviewers: currentEvaluation?.reviewers || proposal.reviewers,
     rewardIds: rewards.map((r) => r.id) || null,

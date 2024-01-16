@@ -483,7 +483,6 @@
         "reviewedAt": null,
         "publishToLens": null,
         "lensPostLink": null,
-        "evaluationType": "vote",
         "fields": null
       }
     },
@@ -909,7 +908,6 @@
         "reviewedAt": null,
         "publishToLens": null,
         "lensPostLink": null,
-        "evaluationType": "vote",
         "fields": null
       }
     },
@@ -1261,7 +1259,6 @@
         "reviewedAt": null,
         "publishToLens": null,
         "lensPostLink": null,
-        "evaluationType": "vote",
         "fields": null
       }
     },
@@ -1957,7 +1954,6 @@
         "reviewedAt": null,
         "publishToLens": null,
         "lensPostLink": null,
-        "evaluationType": "vote",
         "fields": null
       }
     },
@@ -2653,7 +2649,6 @@
         "reviewedAt": null,
         "publishToLens": null,
         "lensPostLink": null,
-        "evaluationType": "vote",
         "fields": null
       }
     },
@@ -9268,9 +9263,7 @@
                             "operation": "and"
                           },
                           "viewType": "table",
-                          "cardOrder": [
-                            "028bcd52-ded9-4bae-bc8e-a27d5be1c9b1"
-                          ],
+                          "cardOrder": ["028bcd52-ded9-4bae-bc8e-a27d5be1c9b1"],
                           "sortOptions": [],
                           "columnWidths": {
                             "__title": 128,
@@ -9533,9 +9526,7 @@
                             "operation": "and"
                           },
                           "viewType": "table",
-                          "cardOrder": [
-                            "a3cdb69f-ea43-4fc2-a557-76e79529a838"
-                          ],
+                          "cardOrder": ["a3cdb69f-ea43-4fc2-a557-76e79529a838"],
                           "sortOptions": [],
                           "columnWidths": {
                             "__title": 172,
@@ -10290,9 +10281,7 @@
                         "operation": "and"
                       },
                       "viewType": "board",
-                      "cardOrder": [
-                        "54312bc7-278e-4686-a15d-e159756eadb8"
-                      ],
+                      "cardOrder": ["54312bc7-278e-4686-a15d-e159756eadb8"],
                       "sortOptions": [],
                       "columnWidths": {},
                       "hiddenOptionIds": [],
@@ -19505,9 +19494,7 @@
                         "f0286a21-c9ac-496c-8d5f-cfe0bfb824bd",
                         "6c00b28c-5239-482b-b44e-6f5b3a9d1298"
                       ],
-                      "89157343-d00a-490b-92ae-263f260b6eb3": [
-                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
-                      ],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "557fad80-82bf-43eb-806a-2b8859b38e09",
                         "89f01ff1-29d9-4027-8daf-cff3e606c159"
@@ -30546,9 +30533,7 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "68543ecb-d957-4297-a993-4b84cac0b19c",
-                      "57b5b010-2d75-407f-b747-556afb311995": [
-                        "6c00b28c-5239-482b-b44e-6f5b3a9d1298"
-                      ],
+                      "57b5b010-2d75-407f-b747-556afb311995": ["6c00b28c-5239-482b-b44e-6f5b3a9d1298"],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
                         "557fad80-82bf-43eb-806a-2b8859b38e09",
@@ -32098,9 +32083,7 @@
                         "eb8322fb-a751-46fd-9794-bea021a33f65",
                         "50f9ac76-6237-4ddb-8134-b673c712393e"
                       ],
-                      "89157343-d00a-490b-92ae-263f260b6eb3": [
-                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
-                      ],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
                       "be227d08-200f-49db-9b5b-d288f1391f8c": "https://kokonut.network/dao",
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
@@ -32315,9 +32298,7 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "89157343-d00a-490b-92ae-263f260b6eb3": [
-                        "345ab4bb-8381-41eb-8da5-f028d9116458"
-                      ],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": ["345ab4bb-8381-41eb-8da5-f028d9116458"],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "89f01ff1-29d9-4027-8daf-cff3e606c159",
                         "6b692a28-0a9c-4d14-9269-4d3af58ae433"
@@ -32978,9 +32959,7 @@
                     "icon": "",
                     "isTemplate": false,
                     "properties": {
-                      "89157343-d00a-490b-92ae-263f260b6eb3": [
-                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
-                      ],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "651fb707-10e6-4b21-9851-30be77f64061",
                         "89f01ff1-29d9-4027-8daf-cff3e606c159"
@@ -33189,9 +33168,7 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "89157343-d00a-490b-92ae-263f260b6eb3": [
-                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
-                      ],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
                       "9948f88c-4963-4726-ace4-001853672a1f": "{\"from\":1666958400000}",
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "557fad80-82bf-43eb-806a-2b8859b38e09",
@@ -34118,9 +34095,7 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "57b5b010-2d75-407f-b747-556afb311995": [
-                        "f0286a21-c9ac-496c-8d5f-cfe0bfb824bd"
-                      ],
+                      "57b5b010-2d75-407f-b747-556afb311995": ["f0286a21-c9ac-496c-8d5f-cfe0bfb824bd"],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "651fb707-10e6-4b21-9851-30be77f64061",
                         "6b692a28-0a9c-4d14-9269-4d3af58ae433"
@@ -35372,9 +35347,7 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "d5e4afc6-8cff-4289-a725-70e724347c0f": [
-                        "89f01ff1-29d9-4027-8daf-cff3e606c159"
-                      ],
+                      "d5e4afc6-8cff-4289-a725-70e724347c0f": ["89f01ff1-29d9-4027-8daf-cff3e606c159"],
                       "f659e9af-8d72-4e06-ba1f-c18ee0714d05": "72ca2319-e9e7-44c8-90d5-9cddea85adbe"
                     },
                     "headerImage": null,
@@ -36232,9 +36205,7 @@
                   "fields": {
                     "isTemplate": false,
                     "properties": {
-                      "d5e4afc6-8cff-4289-a725-70e724347c0f": [
-                        "2045d6c3-69fa-4397-92d1-1e1b0cefd36a"
-                      ],
+                      "d5e4afc6-8cff-4289-a725-70e724347c0f": ["2045d6c3-69fa-4397-92d1-1e1b0cefd36a"],
                       "f659e9af-8d72-4e06-ba1f-c18ee0714d05": "a3eba456-28d2-4b4d-93a9-b09c985d3b64"
                     },
                     "contentOrder": []
@@ -38364,9 +38335,7 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "89157343-d00a-490b-92ae-263f260b6eb3": [
-                        "345ab4bb-8381-41eb-8da5-f028d9116458"
-                      ],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": ["345ab4bb-8381-41eb-8da5-f028d9116458"],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "89f01ff1-29d9-4027-8daf-cff3e606c159",
                         "557fad80-82bf-43eb-806a-2b8859b38e09"
@@ -40184,9 +40153,7 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "a7126c66-89d2-4f8f-a26b-28c83a7f48ae",
-                      "57b5b010-2d75-407f-b747-556afb311995": [
-                        "39f076f7-b8af-4814-b0de-2f170573751f"
-                      ],
+                      "57b5b010-2d75-407f-b747-556afb311995": ["39f076f7-b8af-4814-b0de-2f170573751f"],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
                         "557fad80-82bf-43eb-806a-2b8859b38e09",
@@ -40281,9 +40248,7 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "68543ecb-d957-4297-a993-4b84cac0b19c",
-                      "57b5b010-2d75-407f-b747-556afb311995": [
-                        "39f076f7-b8af-4814-b0de-2f170573751f"
-                      ],
+                      "57b5b010-2d75-407f-b747-556afb311995": ["39f076f7-b8af-4814-b0de-2f170573751f"],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
                         "6b692a28-0a9c-4d14-9269-4d3af58ae433",
@@ -40847,9 +40812,7 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "57b5b010-2d75-407f-b747-556afb311995": [
-                        "f0286a21-c9ac-496c-8d5f-cfe0bfb824bd"
-                      ],
+                      "57b5b010-2d75-407f-b747-556afb311995": ["f0286a21-c9ac-496c-8d5f-cfe0bfb824bd"],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "557fad80-82bf-43eb-806a-2b8859b38e09",
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a"
@@ -40943,12 +40906,8 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "68543ecb-d957-4297-a993-4b84cac0b19c",
-                      "57b5b010-2d75-407f-b747-556afb311995": [
-                        "39f076f7-b8af-4814-b0de-2f170573751f"
-                      ],
-                      "89157343-d00a-490b-92ae-263f260b6eb3": [
-                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
-                      ],
+                      "57b5b010-2d75-407f-b747-556afb311995": ["39f076f7-b8af-4814-b0de-2f170573751f"],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
                         "557fad80-82bf-43eb-806a-2b8859b38e09",
@@ -42391,12 +42350,8 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "57b5b010-2d75-407f-b747-556afb311995": [
-                        "39f076f7-b8af-4814-b0de-2f170573751f"
-                      ],
-                      "89157343-d00a-490b-92ae-263f260b6eb3": [
-                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
-                      ],
+                      "57b5b010-2d75-407f-b747-556afb311995": ["39f076f7-b8af-4814-b0de-2f170573751f"],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
                       "be227d08-200f-49db-9b5b-d288f1391f8c": "https://www.kuoka.earth/project/kokonut+network/r/recDtigxQUce1Xo05",
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
@@ -42519,9 +42474,7 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "89157343-d00a-490b-92ae-263f260b6eb3": [
-                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
-                      ],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "18c4363d-8d22-40cb-8ee8-3c4054ebdab4",
                         "fb9dc5c3-13d5-47f1-b0bb-7773f5bc0cae"
@@ -42714,12 +42667,8 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "57b5b010-2d75-407f-b747-556afb311995": [
-                        "f0286a21-c9ac-496c-8d5f-cfe0bfb824bd"
-                      ],
-                      "d5e4afc6-8cff-4289-a725-70e724347c0f": [
-                        "651fb707-10e6-4b21-9851-30be77f64061"
-                      ],
+                      "57b5b010-2d75-407f-b747-556afb311995": ["f0286a21-c9ac-496c-8d5f-cfe0bfb824bd"],
+                      "d5e4afc6-8cff-4289-a725-70e724347c0f": ["651fb707-10e6-4b21-9851-30be77f64061"],
                       "f659e9af-8d72-4e06-ba1f-c18ee0714d05": "72ca2319-e9e7-44c8-90d5-9cddea85adbe"
                     },
                     "headerImage": null,
@@ -43060,9 +43009,7 @@
                         "50f9ac76-6237-4ddb-8134-b673c712393e",
                         "f0286a21-c9ac-496c-8d5f-cfe0bfb824bd"
                       ],
-                      "89157343-d00a-490b-92ae-263f260b6eb3": [
-                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
-                      ],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
                         "557fad80-82bf-43eb-806a-2b8859b38e09",
@@ -43407,9 +43354,7 @@
                         "50f9ac76-6237-4ddb-8134-b673c712393e",
                         "f0286a21-c9ac-496c-8d5f-cfe0bfb824bd"
                       ],
-                      "89157343-d00a-490b-92ae-263f260b6eb3": [
-                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
-                      ],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
                       "9948f88c-4963-4726-ace4-001853672a1f": "{\"from\":1673870400000}",
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
@@ -43938,9 +43883,7 @@
                         "f0286a21-c9ac-496c-8d5f-cfe0bfb824bd",
                         "a772c12c-fb39-48a4-b575-1aed2c496161"
                       ],
-                      "89157343-d00a-490b-92ae-263f260b6eb3": [
-                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
-                      ],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
                         "557fad80-82bf-43eb-806a-2b8859b38e09",
@@ -44475,9 +44418,7 @@
                   "filter": {
                     "filters": [
                       {
-                        "values": [
-                          "557fad80-82bf-43eb-806a-2b8859b38e09"
-                        ],
+                        "values": ["557fad80-82bf-43eb-806a-2b8859b38e09"],
                         "condition": "includes",
                         "propertyId": "d5e4afc6-8cff-4289-a725-70e724347c0f"
                       }
@@ -44563,9 +44504,7 @@
                     "__title": 280
                   },
                   "linkedSourceId": null,
-                  "hiddenOptionIds": [
-                    ""
-                  ],
+                  "hiddenOptionIds": [""],
                   "visibleOptionIds": [
                     "a3eba456-28d2-4b4d-93a9-b09c985d3b64",
                     "72ca2319-e9e7-44c8-90d5-9cddea85adbe",
@@ -44576,10 +44515,7 @@
                   "collapsedOptionIds": [],
                   "columnCalculations": {},
                   "kanbanCalculations": {},
-                  "visiblePropertyIds": [
-                    "__title",
-                    "432d6b75-2446-49f0-acde-8b7129c695e3"
-                  ]
+                  "visiblePropertyIds": ["__title", "432d6b75-2446-49f0-acde-8b7129c695e3"]
                 }
               },
               {
@@ -44699,9 +44635,7 @@
                   "collapsedOptionIds": [],
                   "columnCalculations": {},
                   "kanbanCalculations": {},
-                  "visiblePropertyIds": [
-                    "432d6b75-2446-49f0-acde-8b7129c695e3"
-                  ]
+                  "visiblePropertyIds": ["432d6b75-2446-49f0-acde-8b7129c695e3"]
                 }
               }
             ]
@@ -46181,9 +46115,7 @@
                       "track": [],
                       "colspan": 1,
                       "rowspan": 1,
-                      "colwidth": [
-                        228
-                      ]
+                      "colwidth": [228]
                     },
                     "content": [
                       {
@@ -46217,9 +46149,7 @@
                       "track": [],
                       "colspan": 1,
                       "rowspan": 1,
-                      "colwidth": [
-                        208
-                      ]
+                      "colwidth": [208]
                     },
                     "content": [
                       {
@@ -46295,9 +46225,7 @@
                       "track": [],
                       "colspan": 1,
                       "rowspan": 1,
-                      "colwidth": [
-                        228
-                      ]
+                      "colwidth": [228]
                     },
                     "content": [
                       {
@@ -46314,9 +46242,7 @@
                       "track": [],
                       "colspan": 1,
                       "rowspan": 1,
-                      "colwidth": [
-                        208
-                      ]
+                      "colwidth": [208]
                     },
                     "content": [
                       {
@@ -46691,7 +46617,6 @@
         "reviewedAt": null,
         "publishToLens": null,
         "lensPostLink": null,
-        "evaluationType": "vote",
         "fields": null
       }
     },
@@ -49461,11 +49386,7 @@
         "type": "profile_pic",
         "options": null,
         "index": 0,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "permissions": []
       },
       {
@@ -49479,11 +49400,7 @@
         "type": "text",
         "options": null,
         "index": 1,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "permissions": []
       },
       {
@@ -49497,11 +49414,7 @@
         "type": "role",
         "options": null,
         "index": 2,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "permissions": []
       },
       {
@@ -49515,11 +49428,7 @@
         "type": "bio",
         "options": null,
         "index": 3,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "permissions": []
       },
       {
@@ -49533,11 +49442,7 @@
         "type": "discord",
         "options": null,
         "index": 4,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "permissions": []
       },
       {
@@ -49551,11 +49456,7 @@
         "type": "twitter",
         "options": null,
         "index": 5,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "permissions": []
       },
       {
@@ -49569,11 +49470,7 @@
         "type": "linked_in",
         "options": null,
         "index": 6,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "permissions": []
       },
       {
@@ -49587,11 +49484,7 @@
         "type": "github",
         "options": null,
         "index": 7,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "permissions": []
       },
       {
@@ -49605,11 +49498,7 @@
         "type": "timezone",
         "options": null,
         "index": 8,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "permissions": []
       },
       {
