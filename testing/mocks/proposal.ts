@@ -21,7 +21,6 @@ export function createMockProposal(
     createdBy: '',
     id,
     authors: [],
-    evaluationType: 'vote',
     reviewers: [],
     evaluations: [],
     rubricCriteria: [],

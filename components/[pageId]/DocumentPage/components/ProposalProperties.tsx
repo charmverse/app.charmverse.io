@@ -8,7 +8,6 @@ import { useProposalTemplateById } from 'components/proposals/hooks/useProposalT
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { ProposalPropertiesBase } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useMdScreen } from 'hooks/useMediaScreens';
 import { useUser } from 'hooks/useUser';
 import type { PageWithContent } from 'lib/pages';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
@@ -63,7 +62,6 @@ export function ProposalProperties({
 
   const proposalFormInputs: ProposalPropertiesInput = {
     archived: proposal?.archived ?? false,
-    evaluationType: proposal?.evaluationType || 'vote',
     authors: proposal?.authors.map((author) => author.userId) ?? [],
     evaluations: proposal?.evaluations ?? [],
     publishToLens: proposal ? proposal.publishToLens ?? false : !!user?.publishToLensDefault,

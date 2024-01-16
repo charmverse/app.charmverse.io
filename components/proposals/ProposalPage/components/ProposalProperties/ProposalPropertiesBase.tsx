@@ -25,7 +25,6 @@ export type ProposalPropertiesInput = {
   reviewers: ProposalReviewerInput[];
   workflowId?: string | null;
   proposalTemplateId?: string | null;
-  evaluationType: ProposalEvaluationType;
   evaluations: ProposalEvaluationValues[];
   publishToLens?: boolean;
   fields: ProposalFields | null;
