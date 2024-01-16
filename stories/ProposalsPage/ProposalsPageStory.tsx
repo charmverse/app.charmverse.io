@@ -31,7 +31,6 @@ export const proposals = [
       { evaluationId: null, id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null },
       { evaluationId: null, id: '2', proposalId: '', roleId: null, userId: members[0].id, systemRole: null }
     ],
-    evaluationType: 'vote',
     status: 'draft'
   }),
   createMockProposal({
@@ -39,7 +38,6 @@ export const proposals = [
     reviewers: [
       { evaluationId: null, id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null }
     ],
-    evaluationType: 'vote',
     status: 'published'
   }),
   createMockProposal({
@@ -47,7 +45,6 @@ export const proposals = [
     reviewers: [
       { evaluationId: null, id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null }
     ],
-    evaluationType: 'rubric',
     status: 'published'
   })
 ];

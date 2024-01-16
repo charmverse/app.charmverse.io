@@ -42,7 +42,6 @@ export async function getProposalIdsEvaluatedByUser({
     .findMany({
       where: isFreeSpace
         ? {
-            evaluationType: 'rubric',
             reviewers: {
               some: {
                 userId
@@ -50,7 +49,6 @@ export async function getProposalIdsEvaluatedByUser({
             }
           }
         : {
-            evaluationType: 'rubric',
             OR: [
               {
                 reviewers: {
@@ -83,7 +81,6 @@ export async function getProposalIdsEvaluatedByUser({
   const proposalsWhereUserIsNotEvaluator = await prisma.proposal.findMany({
     where: {
       spaceId,
-      evaluationType: 'rubric',
       id: {
         notIn: proposalsWhereUserIsEvaluator
       }

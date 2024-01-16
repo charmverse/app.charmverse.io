@@ -87,7 +87,6 @@ export async function createCardsFromProposals({
     include: {
       proposal: {
         select: {
-          evaluationType: true,
           id: true,
           spaceId: true,
           authors: true,

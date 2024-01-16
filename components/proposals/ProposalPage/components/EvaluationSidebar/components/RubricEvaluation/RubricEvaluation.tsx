@@ -13,10 +13,7 @@ import { RubricAnswersForm } from './RubricAnswersForm';
 import { RubricResults } from './RubricResults';
 
 export type Props = {
-  proposal?: Pick<
-    ProposalWithUsersAndRubric,
-    'id' | 'evaluations' | 'permissions' | 'status' | 'evaluationType' | 'archived'
-  >;
+  proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'evaluations' | 'permissions' | 'status' | 'archived'>;
   permissions?: ProposalWithUsersAndRubric['permissions'];
   evaluation: PopulatedEvaluation;
   isCurrent?: boolean;
