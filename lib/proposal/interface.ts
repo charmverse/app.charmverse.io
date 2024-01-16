@@ -70,7 +70,6 @@ export type ProposalWithUsers = Omit<CoreProposalWithUsers, 'fields'> & {
 
 export type ProposalWithUsersLite = ProposalWithUsers & {
   currentEvaluationId?: string;
-  evaluationType: ProposalEvaluationType;
   permissions?: ProposalPermissionFlags;
   evaluations: {
     title: string;

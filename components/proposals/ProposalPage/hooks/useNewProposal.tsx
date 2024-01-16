@@ -161,7 +161,6 @@ function emptyState({
     contentText: '',
     headerImage: null,
     icon: null,
-    evaluationType: 'vote',
     proposalTemplateId: null,
     reviewers: [],
     evaluations: [],
