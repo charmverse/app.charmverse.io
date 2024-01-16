@@ -10,7 +10,6 @@ import type {
   Page,
   Post,
   PostComment,
-  ProposalEvaluationType,
   ProposalStatus,
   Role,
   RoleSource,
@@ -27,7 +26,6 @@ import { v4 } from 'uuid';
 
 import type { DataSourceType } from 'lib/focalboard/board';
 import type { IViewType } from 'lib/focalboard/boardView';
-import { generateDefaultPropertiesInput } from 'lib/members/generateDefaultPropertiesInput';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import type { NotificationToggles } from 'lib/notifications/notificationToggles';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
@@ -776,78 +774,6 @@ export async function createVote({
   });
 }
 
-export async function createProposalWithUsers({
-  proposalStatus = 'draft',
-  authors,
-  reviewers,
-  userId,
-  spaceId,
-  ...pageCreateInput
-}: {
-  authors: string[];
-  reviewers: (string | { type: 'role'; roleId: string })[];
-  spaceId: string;
-  userId: string;
-  proposalStatus?: ProposalStatus;
-} & Partial<Prisma.PageCreateInput>): Promise<{ id: string; pageId: string }> {
-  const proposalId = v4();
-  const proposalPage = await createPageDb({
-    data: {
-      ...pageCreateInput,
-      id: proposalId,
-      author: {
-        connect: {
-          id: userId
-        }
-      },
-      space: {
-        connect: {
-          id: spaceId
-        }
-      },
-      updatedBy: userId,
-      title: 'Page Title',
-      path: 'page-path',
-      contentText: '',
-      type: 'proposal',
-      proposal: {
-        create: {
-          id: proposalId,
-          space: {
-            connect: {
-              id: spaceId
-            }
-          },
-          createdBy: userId,
-          status: proposalStatus,
-          authors: {
-            createMany: {
-              data: [
-                {
-                  userId
-                },
-                ...authors.map((author) => ({ userId: author }))
-              ]
-            }
-          },
-          reviewers: {
-            createMany: {
-              data: reviewers.map((reviewer) =>
-                typeof reviewer === 'string' ? { userId: reviewer } : { roleId: reviewer.roleId }
-              )
-            }
-          }
-        }
-      }
-    }
-  });
-
-  return {
-    id: proposalPage.proposalId!,
-    pageId: proposalPage.id
-  };
-}
-
 export async function generateCommentWithThreadAndPage({
   userId,
   spaceId,
@@ -948,45 +874,25 @@ type PageWithProposal = Page & { proposal: ProposalWithUsersAndRubric };
  * Creates a proposal with the linked authors and reviewers
  */
 export async function generateProposal({
-  categoryId,
   userId,
   spaceId,
   pageType = 'proposal',
   proposalStatus,
-  evaluationType,
   authors,
   reviewers,
   deletedAt = null,
   title = 'Proposal'
 }: {
   deletedAt?: Page['deletedAt'];
-  categoryId?: string;
   userId: string;
   spaceId: string;
   authors: string[];
   reviewers: ProposalReviewerInput[];
   pageType?: PageType;
   proposalStatus: ProposalStatus;
-  evaluationType?: ProposalEvaluationType;
   title?: string;
 }): Promise<PageWithProposal> {
   const proposalId = v4();
-
-  const colors = ['gray', 'orange', 'yellow', 'green', 'teal', 'blue', 'turquoise', 'purple', 'pink', 'red'];
-
-  const randomColor = colors[Math.floor(Math.random() * colors.length)];
-
-  const categoryIdToLink =
-    categoryId ??
-    (
-      await prisma.proposalCategory.create({
-        data: {
-          title: `Category - ${v4()}`,
-          color: randomColor,
-          space: { connect: { id: spaceId } }
-        }
-      })
-    ).id;
 
   const result = await createPageDb({
     data: {
@@ -1015,7 +921,6 @@ export async function generateProposal({
         create: {
           id: proposalId,
           createdBy: userId,
-          evaluationType,
           status: proposalStatus,
           space: {
             connect: {

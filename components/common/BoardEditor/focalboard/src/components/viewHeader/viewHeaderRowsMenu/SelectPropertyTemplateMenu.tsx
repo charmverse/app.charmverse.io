@@ -1,3 +1,5 @@
+import Box from '@mui/material/Box';
+
 import type { TagSelectProps } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
@@ -43,9 +45,14 @@ export function SelectPropertyTemplateMenu({
 
   return (
     <PropertyMenu cards={cards} propertyTemplate={propertyTemplate}>
-      {({ isPropertyOpen }) =>
-        isPropertyOpen ? <TagSelect defaultOpened {...tagSelectProps} /> : <TagSelect {...tagSelectProps} />
-      }
+      <Box
+        sx={{
+          minWidth: 100,
+          minHeight: 25
+        }}
+      >
+        <TagSelect {...tagSelectProps} showEmpty />
+      </Box>
     </PropertyMenu>
   );
 }

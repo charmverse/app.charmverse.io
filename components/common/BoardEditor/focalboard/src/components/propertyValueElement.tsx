@@ -145,7 +145,7 @@ function PropertyValueElement(props: Props) {
   } = props;
   const { trigger } = useUpdateProposalEvaluation({ proposalId: proposal?.id });
   const { showMessage } = useSnackbar();
-  const { rubricProposalIdsWhereUserIsEvaluator, rubricProposalIdsWhereUserIsNotEvaluator } =
+  const { rubricProposalIdsWhereUserIsEvaluator, isLoading: isLoadingReviewerStatus } =
     useProposalsWhereUserIsEvaluator({
       spaceId:
         !!board && hiddenProposalEvaluatorPropertyValues.includes(propertyTemplate?.type as any)
@@ -159,7 +159,8 @@ function PropertyValueElement(props: Props) {
   const propertyValue = card.fields.properties[propertyTemplate.id];
   const cardProperties = board.fields.cardProperties;
   const cardProperty = cardProperties.find((_cardProperty) => _cardProperty.id === propertyTemplate.id);
-  const readOnly = props.readOnly || !!cardProperty?.formFieldId || !!cardProperty?.proposalFieldId;
+  const readOnly =
+    proposal?.archived || props.readOnly || !!cardProperty?.formFieldId || !!cardProperty?.proposalFieldId;
 
   const displayValue = OctoUtils.propertyDisplayValue({
     block: card,
@@ -547,7 +548,7 @@ function PropertyValueElement(props: Props) {
 
   // Explicitly hide the value for this proposal
   if (hiddenProposalEvaluatorPropertyValues.includes(propertyTemplate?.type as any)) {
-    if (syncWithPageId && !!rubricProposalIdsWhereUserIsNotEvaluator[syncWithPageId] && !isAdmin) {
+    if (syncWithPageId && !isLoadingReviewerStatus && !isAdmin) {
       return <EmptyPlaceholder>Hidden</EmptyPlaceholder>;
     } else if (syncWithPageId && (!!rubricProposalIdsWhereUserIsEvaluator[syncWithPageId] || isAdmin)) {
       return propertyValueElement;

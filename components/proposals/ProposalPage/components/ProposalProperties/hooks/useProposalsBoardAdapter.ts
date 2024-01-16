@@ -57,28 +57,30 @@ export function useProposalsBoardAdapter() {
   }, [proposals]);
 
   // board with all proposal properties and default properties
-  const board: Board = getDefaultBoard({
-    storedBoard: proposalBoardBlock,
-    evaluationStepTitles
-  });
+  const board: Board = useMemo(
+    () =>
+      getDefaultBoard({
+        storedBoard: proposalBoardBlock,
+        evaluationStepTitles
+      }),
+    [evaluationStepTitles, proposalBoardBlock]
+  );
 
   const activeView = useMemo(() => {
     // use saved default block or build on the fly
     const viewBlock = proposalBlocks?.find((b) => b.id === DEFAULT_VIEW_BLOCK_ID);
 
     if (!viewBlock) {
-      return getDefaultTableView({ evaluationStepTitles, storedBoard: proposalBoardBlock });
+      return getDefaultTableView({ board });
     }
-
     const boardView = blockToFBBlock(viewBlock) as BoardView;
-
     // sort by created at desc by default
     if (!boardView.fields.sortOptions?.length) {
       boardView.fields.sortOptions = [{ propertyId: CREATED_AT_ID, reversed: true }];
     }
 
     return boardView;
-  }, [evaluationStepTitles, proposalBoardBlock, proposalBlocks]);
+  }, [board, proposalBlocks]);
 
   const cardPages: CardPage[] = useMemo(() => {
     let cards =
@@ -90,6 +92,7 @@ export function useProposalsBoardAdapter() {
             ...mapProposalToCardPage({ proposal: p, proposalPage: page, spaceId: space?.id }),
             isStructuredProposal,
             proposal: {
+              archived: p.archived,
               currentEvaluationId: p.currentEvaluationId,
               id: p.id,
               status: p.status,
@@ -191,11 +194,7 @@ function mapProposalToCardPage({
     ...proposalFields.properties,
     [Constants.titleColumnId]: proposalPage?.title || '',
     // add default field values on the fly
-    [CREATED_AT_ID]:
-      proposalPage && 'createdAt' in proposalPage && proposalPage.createdAt
-        ? new Date(proposalPage?.createdAt).getTime()
-        : '',
-    [PROPOSAL_STATUS_BLOCK_ID]: proposal?.currentStep?.result ?? 'in_progress',
+    [PROPOSAL_STATUS_BLOCK_ID]: proposal?.archived ? 'archived' : proposal?.currentStep?.result ?? 'in_progress',
     [AUTHORS_BLOCK_ID]: (proposal && 'authors' in proposal && proposal.authors?.map((a) => a.userId)) || '',
     [PROPOSAL_STEP_BLOCK_ID]: proposal?.currentStep?.title ?? 'Draft',
     [PROPOSAL_EVALUATION_TYPE_ID]: proposal?.currentStep?.step ?? 'draft',

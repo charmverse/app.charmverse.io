@@ -1,4 +1,4 @@
-import type { ProposalCategory, Space } from '@charmverse/core/prisma';
+import type { Space } from '@charmverse/core/prisma';
 import request from 'supertest';
 
 import { createProposal } from 'lib/proposal/createProposal';
@@ -9,7 +9,6 @@ import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/set
 let adminUser: LoggedInUser;
 let nonAdminUser: LoggedInUser;
 let space: Space;
-let proposalCategory: ProposalCategory;
 
 beforeAll(async () => {
   const generated = await generateUserAndSpaceWithApiToken(undefined, true);

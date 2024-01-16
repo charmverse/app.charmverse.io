@@ -161,7 +161,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
   const searchTextMatchedPages = useMemo(() => {
     return (
       Object.values(archivedPages ?? {})
-        .filter((archivedPage) => archivedPage!.title.toLowerCase().includes(searchText.toLowerCase()))
+        .filter((archivedPage) => archivedPage!.title?.toLowerCase().includes(searchText.toLowerCase()))
         // sort by deleted date, newest first
         .sort((a, b) => (a!.deletedAt! > b!.deletedAt! ? -1 : 1)) as PageMeta[]
     );

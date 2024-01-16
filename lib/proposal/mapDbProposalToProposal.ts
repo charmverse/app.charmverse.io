@@ -8,13 +8,8 @@ import { sortBy } from 'lodash';
 import { getProposalFormFields } from 'lib/proposal/form/getProposalFormFields';
 
 import { getCurrentStep } from './getCurrentStep';
-import { getOldProposalStatus } from './getProposalEvaluationStatus';
-import type {
-  ProposalEvaluationStep,
-  ProposalFields,
-  ProposalWithUsersAndRubric,
-  ProposalWithUsersLite
-} from './interface';
+// import { getOldProposalStatus } from './getProposalEvaluationStatus';
+import type { ProposalFields, ProposalWithUsersAndRubric, ProposalWithUsersLite } from './interface';
 
 type FormFieldsIncludeType = {
   form: {
@@ -49,8 +44,7 @@ export function mapDbProposalToProposal({
     ...rest,
     permissions,
     currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
-    evaluationType: currentEvaluation?.type || proposal.evaluationType,
-    status: getOldProposalStatus(proposal),
+    status: proposal.status,
     // Support old model: filter out evaluation-specific reviewers and rubric answers
     rubricAnswers: currentEvaluation?.rubricAnswers || [],
     draftRubricAnswers: currentEvaluation?.draftRubricAnswers || [],
@@ -105,8 +99,7 @@ export function mapDbProposalToProposalLite({
       hasPublishedRewards: rewards.length > 0
     }),
     currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
-    evaluationType: currentEvaluation?.type || proposal.evaluationType,
-    status: getOldProposalStatus(proposal),
+    status: proposal.status,
     reviewers: currentEvaluation?.reviewers || proposal.reviewers,
     rewardIds: rewards.map((r) => r.id) || null,
     fields

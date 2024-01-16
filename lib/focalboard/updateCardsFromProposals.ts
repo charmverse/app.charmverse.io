@@ -206,7 +206,6 @@ export async function updateCardsFromProposals({
     include: {
       proposal: {
         select: {
-          evaluationType: true,
           status: true,
           archived: true,
           createdBy: true,

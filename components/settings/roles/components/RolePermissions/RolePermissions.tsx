@@ -267,18 +267,6 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
               }}
               upgradeContext='proposal_permissions'
             />
-            <PermissionToggle
-              data-test='space-operation-reviewProposals'
-              label='Review proposals'
-              defaultChecked={isFreeSpace ? true : rolePermissions?.reviewProposals}
-              memberChecked={targetGroup !== 'space' ? spacePermissions?.reviewProposals : undefined}
-              disabled={disableModifications}
-              onChange={(ev) => {
-                const { checked: nowHasAccess } = ev.target;
-                setSpacePermission('reviewProposals', nowHasAccess);
-              }}
-              upgradeContext='proposal_permissions'
-            />
             {targetGroup !== 'space' && (
               <PermissionToggle
                 data-test='space-operation-deleteAnyProposal'

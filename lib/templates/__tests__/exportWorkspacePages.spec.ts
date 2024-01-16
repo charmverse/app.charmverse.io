@@ -180,7 +180,7 @@ describe('exportWorkspacePages', () => {
     const generatedProposal = await generateProposal({
       authors: [_user.id],
       spaceId: spaceWithDeletedPage.id,
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       userId: _user.id,
       reviewers: []
     });

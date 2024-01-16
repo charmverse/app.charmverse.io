@@ -7,7 +7,7 @@ import { ViewFilterControl } from 'components/common/BoardEditor/components/View
 import { ViewSettingsRow } from 'components/common/BoardEditor/components/ViewSettingsRow';
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
-import ViewHeaderActionsMenu from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderActionsMenu';
+import { ToggleViewSidebarButton } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ToggleViewSidebarButton';
 import { ViewHeaderRowsMenu } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderRowsMenu/viewHeaderRowsMenu';
 import ViewSidebar from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
@@ -160,7 +160,7 @@ export function ProposalsPage({ title }: { title: string }) {
                 viewSortPopup={viewSortPopup}
               />
               {user && (
-                <ViewHeaderActionsMenu
+                <ToggleViewSidebarButton
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();

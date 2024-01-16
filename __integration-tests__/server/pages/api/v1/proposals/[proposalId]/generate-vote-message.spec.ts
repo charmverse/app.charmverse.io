@@ -79,8 +79,16 @@ describe('POST /api/v1/proposals/{proposalId}/generate-vote-message', () => {
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: proposalAuthor.id,
-      proposalStatus: 'vote_active',
-      authors: [proposalAuthor.id]
+      proposalStatus: 'published',
+      authors: [proposalAuthor.id],
+      evaluationInputs: [
+        {
+          evaluationType: 'vote',
+          reviewers: [],
+          permissions: [],
+          id: v4()
+        }
+      ]
     });
     const response = await request(baseUrl)
       .post(`/api/v1/proposals/${proposal.id}/generate-vote-message`)
@@ -97,9 +105,17 @@ describe('POST /api/v1/proposals/{proposalId}/generate-vote-message', () => {
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: proposalAuthor.id,
-      proposalStatus: 'vote_active',
+      proposalStatus: 'published',
       authors: [proposalAuthor.id],
-      snapshotProposalId: v4()
+      evaluationInputs: [
+        {
+          evaluationType: 'vote',
+          reviewers: [],
+          permissions: [],
+          id: v4(),
+          snapshotId: v4()
+        }
+      ]
     });
     const response = await request(baseUrl)
       .post(`/api/v1/proposals/${proposal.id}/generate-vote-message`)
@@ -112,7 +128,7 @@ describe('POST /api/v1/proposals/{proposalId}/generate-vote-message', () => {
     expect(response.body.message).toBe(`No Snapshot domain connected to space yet.`);
   });
 
-  it('should throw 400 error if proposal was not found on snapshot', async () => {
+  it('should throw 404 error if proposal was not found on snapshot', async () => {
     const snapshotProposalId = v4();
 
     const generated = await generateUserAndSpace({
@@ -122,9 +138,17 @@ describe('POST /api/v1/proposals/{proposalId}/generate-vote-message', () => {
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: generated.space.id,
       userId: proposalAuthor.id,
-      proposalStatus: 'vote_active',
+      proposalStatus: 'published',
       authors: [proposalAuthor.id],
-      snapshotProposalId
+      evaluationInputs: [
+        {
+          evaluationType: 'vote',
+          reviewers: [],
+          permissions: [],
+          id: v4(),
+          snapshotId: snapshotProposalId
+        }
+      ]
     });
 
     const { listen, router } = createServer();
@@ -139,19 +163,22 @@ describe('POST /api/v1/proposals/{proposalId}/generate-vote-message', () => {
 
     const server = await listen(8500);
 
-    const response = await request(baseUrl)
-      .post(`/api/v1/proposals/${proposal.id}/generate-vote-message`)
-      .query({ snapshotApiUrl: `http://localhost:${(server.address() as AddressInfo).port}` })
-      .send({
-        choice: 'Yes',
-        address: walletAddress
-      })
-      .set('Authorization', `Bearer ${apiKey.token}`);
-    expect(response.statusCode).toBe(404);
-    expect(response.body.message).toBe(`Proposal was not found on Snapshot.`);
-    await new Promise((done) => {
-      server.close(done);
-    });
+    try {
+      const response = await request(baseUrl)
+        .post(`/api/v1/proposals/${proposal.id}/generate-vote-message`)
+        .query({ snapshotApiUrl: `http://localhost:${(server.address() as AddressInfo).port}` })
+        .send({
+          choice: 'Yes',
+          address: walletAddress
+        })
+        .set('Authorization', `Bearer ${apiKey.token}`);
+      expect(response.statusCode).toBe(404);
+      expect(response.body.message).toBe(`Proposal was not found on Snapshot.`);
+    } finally {
+      await new Promise((done) => {
+        server.close(done);
+      });
+    }
   });
 
   it('should return vote message response with 200 status code', async () => {
@@ -163,9 +190,17 @@ describe('POST /api/v1/proposals/{proposalId}/generate-vote-message', () => {
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: generated.space.id,
       userId: proposalAuthor.id,
-      proposalStatus: 'vote_active',
+      proposalStatus: 'published',
       authors: [proposalAuthor.id],
-      snapshotProposalId
+      evaluationInputs: [
+        {
+          evaluationType: 'vote',
+          reviewers: [],
+          permissions: [],
+          id: v4(),
+          snapshotId: snapshotProposalId
+        }
+      ]
     });
 
     const { listen, router } = createServer();
@@ -199,29 +234,32 @@ describe('POST /api/v1/proposals/{proposalId}/generate-vote-message', () => {
     });
 
     const server = await listen(8500);
+    try {
+      const response = await request(baseUrl)
+        .post(`/api/v1/proposals/${proposal.id}/generate-vote-message`)
+        .query({ snapshotApiUrl: `http://localhost:${(server.address() as AddressInfo).port}` })
+        .send({
+          choice: 'Yes',
+          address: walletAddress
+        })
+        .set('Authorization', `Bearer ${apiKey.token}`)
+        .expect(200);
 
-    const response = await request(baseUrl)
-      .post(`/api/v1/proposals/${proposal.id}/generate-vote-message`)
-      .query({ snapshotApiUrl: `http://localhost:${(server.address() as AddressInfo).port}` })
-      .send({
-        choice: 'Yes',
-        address: walletAddress
-      })
-      .set('Authorization', `Bearer ${apiKey.token}`);
-    expect(response.statusCode).toBe(200);
-    expect(response.body.message).toMatchObject(
-      expect.objectContaining({
-        space: generated.space.snapshotDomain,
-        proposal: snapshotProposalId,
-        choice: 'Yes',
-        reason: '',
-        app: 'my-app',
-        metadata: '{}',
-        from: getAddress(walletAddress)
-      })
-    );
-    await new Promise((done) => {
-      server.close(done);
-    });
+      expect(response.body.message).toMatchObject(
+        expect.objectContaining({
+          space: generated.space.snapshotDomain,
+          proposal: snapshotProposalId,
+          choice: 'Yes',
+          reason: '',
+          app: 'my-app',
+          metadata: '{}',
+          from: getAddress(walletAddress)
+        })
+      );
+    } finally {
+      await new Promise((done) => {
+        server.close(done);
+      });
+    }
   });
 });

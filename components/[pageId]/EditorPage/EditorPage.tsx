@@ -23,12 +23,7 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
   const { space: currentSpace } = useCurrentSpace();
   useRewardsNavigation();
 
-  const {
-    error: pageWithContentError,
-    page,
-    refreshPage,
-    updatePage
-  } = usePage({ pageIdOrPath, spaceId: currentSpace?.id });
+  const { error: pageWithContentError, page, updatePage } = usePage({ pageIdOrPath, spaceId: currentSpace?.id });
 
   const readOnly =
     (page?.permissionFlags.edit_content === false && editMode !== 'suggesting') || editMode === 'viewing';
@@ -124,7 +119,7 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
       // Document page is used in a few places, so it is responsible for retrieving its own permissions
       return (
         <Box flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
-          <DocumentPage page={page} refreshPage={refreshPage} readOnly={readOnly} savePage={savePage} enableSidebar />
+          <DocumentPage page={page} readOnly={readOnly} savePage={savePage} enableSidebar />
         </Box>
       );
     }

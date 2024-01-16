@@ -72,7 +72,7 @@ export async function createDefaultProposal({ spaceId, userId }: { spaceId: stri
     fields: {
       properties: {
         [AUTHORS_BLOCK_ID]: [userId],
-        [CREATED_AT_ID]: '',
+        // [CREATED_AT_ID]: '',
         [PROPOSAL_REVIEWERS_BLOCK_ID]: [
           {
             group: 'user',

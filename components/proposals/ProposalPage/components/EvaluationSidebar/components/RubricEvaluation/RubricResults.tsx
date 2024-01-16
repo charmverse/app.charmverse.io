@@ -34,6 +34,7 @@ type Props = {
   proposalId?: string;
   evaluation?: PopulatedEvaluation;
   refreshProposal?: VoidFunction;
+  archived?: boolean;
 };
 
 type CriteriaSummaryType = 'sum' | 'average';
@@ -68,7 +69,8 @@ export function RubricResults({
   refreshProposal,
   isCurrent,
   isReviewer,
-  proposalId
+  proposalId,
+  archived
 }: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [criteriaSummaryType, setCriteriaSummaryType] = useState<CriteriaSummaryType>('average');
@@ -237,6 +239,7 @@ export function RubricResults({
             <PassFailEvaluation
               isCurrent={isCurrent}
               hideReviewer
+              archived={archived}
               key='results'
               isReviewer={isReviewer}
               evaluation={evaluation}

@@ -237,7 +237,7 @@ const templates = {
       notification: createProposalNotification({
         pageTitle: 'Should Uniswap provide Rage Trade with an additional use grant',
         spaceName: 'Uniswap',
-        status: 'discussion'
+        status: 'published'
       }),
       user,
       spaceFeatures: []

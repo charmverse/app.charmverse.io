@@ -8,7 +8,6 @@ import { useProposalTemplateById } from 'components/proposals/hooks/useProposalT
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { ProposalPropertiesBase } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useMdScreen } from 'hooks/useMediaScreens';
 import { useUser } from 'hooks/useUser';
 import type { PageWithContent } from 'lib/pages';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
@@ -18,23 +17,19 @@ import { CreateLensPublication } from './CreateLensPublication';
 
 interface ProposalPropertiesProps {
   readOnly?: boolean;
-  enableSidebar?: boolean;
   pageId: string;
   proposalId: string;
   pagePermissions?: PagePermissionFlags;
-  openEvaluation?: (evaluationId?: string) => void;
   proposalPage: PageWithContent;
   proposal?: ProposalWithUsersAndRubric;
   refreshProposal: VoidFunction;
 }
 
 export function ProposalProperties({
-  enableSidebar,
   pagePermissions,
   pageId,
   proposalId,
   readOnly,
-  openEvaluation,
   proposalPage,
   proposal,
   refreshProposal
@@ -44,7 +39,6 @@ export function ProposalProperties({
   const [isPublishingToLens, setIsPublishingToLens] = useState(false);
   const { mutateProposals } = useProposals();
 
-  const isMdScreen = useMdScreen();
   const sourceTemplate = useProposalTemplateById(proposal?.page?.sourceTemplateId);
 
   const { data: isReviewer } = useGetIsReviewer(pageId || undefined);
@@ -67,7 +61,7 @@ export function ProposalProperties({
       : [];
 
   const proposalFormInputs: ProposalPropertiesInput = {
-    evaluationType: proposal?.evaluationType || 'vote',
+    archived: proposal?.archived ?? false,
     authors: proposal?.authors.map((author) => author.userId) ?? [],
     evaluations: proposal?.evaluations ?? [],
     publishToLens: proposal ? proposal.publishToLens ?? false : !!user?.publishToLensDefault,
@@ -85,16 +79,6 @@ export function ProposalProperties({
     refreshProposal();
     mutateProposals();
   }
-
-  const canSeeEvaluation =
-    (proposal?.status === 'evaluation_active' || proposal?.status === 'evaluation_closed') && isReviewer;
-
-  // open the rubric sidebar by default
-  useEffect(() => {
-    if (enableSidebar && canSeeEvaluation && !isMdScreen) {
-      openEvaluation?.();
-    }
-  }, [canSeeEvaluation]);
 
   return (
     <Box

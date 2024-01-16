@@ -24,6 +24,7 @@ type Props = {
   draftAnswers?: ProposalRubricCriteriaAnswer[];
   criteriaList: ProposalRubricCriteria[];
   onSubmit: (props: { isDraft: boolean }) => void;
+  archived?: boolean;
 };
 
 const CriteriaRow = styled(Box)`
@@ -108,6 +109,7 @@ export function RubricAnswersForm({
   answers,
   disabled,
   draftAnswers,
+  archived,
   onSubmit
 }: Props) {
   const hasDraft = !!draftAnswers?.length;
@@ -136,7 +138,7 @@ export function RubricAnswersForm({
     register,
     handleSubmit,
     reset,
-    formState: { errors, isDirty, isValid }
+    formState: { isDirty }
   } = useForm<FormInput>({
     // mode: 'onChange',
     defaultValues: {
@@ -281,7 +283,13 @@ export function RubricAnswersForm({
             <Button
               sx={{ alignSelf: 'start' }}
               disabled={disabled || (!isDirty && !showDraftAnswers)}
-              disabledTooltip={disabled ? 'You must be a reviewer to submit an evaluation' : undefined}
+              disabledTooltip={
+                archived
+                  ? 'You cannot evaluate an archived proposal'
+                  : disabled
+                  ? 'You must be a reviewer to submit an evaluation'
+                  : undefined
+              }
               loading={isSaving}
               onClick={handleSubmit(submitAnswers)}
             >

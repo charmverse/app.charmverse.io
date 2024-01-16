@@ -477,10 +477,10 @@ function CharmEditor({
             return !disableMention && <Mention {...props}>{_children}</Mention>;
           }
           case 'page': {
-            return <NestedPage currentPageId={pageId} {...props} />;
+            return <NestedPage {...props} />;
           }
           case 'linkedPage': {
-            return <NestedPage isLinkedPage currentPageId={pageId} {...props} />;
+            return <NestedPage isLinkedPage {...props} />;
           }
           case 'pdf': {
             return <ResizablePDF {...allProps} />;
