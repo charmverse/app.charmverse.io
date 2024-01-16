@@ -5,7 +5,6 @@ import { useState } from 'react';
 import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
-import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
