@@ -27,6 +27,7 @@ export function ConfirmationModalProvider({ children }: { children: ReactNode })
     onConfirm: async () => {}
   });
 
+  // return a promise thar resolves once the user makes a decision
   function showConfirmation(msg: string | Omit<ConfirmationModalProps, 'isOpen'>) {
     return new Promise<ConfirmationModalResult>((resolve) => {
       function onCancel() {
