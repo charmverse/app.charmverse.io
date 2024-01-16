@@ -6,6 +6,7 @@ import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { blockToFBBlock, fbBlockToBlock } from 'components/common/BoardEditor/utils/blockUtils';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
+import { usePages } from 'hooks/usePages';
 import { useRewardBlocks } from 'hooks/useRewardBlocks';
 import type { BlockPatch, Block as FBBlock } from 'lib/focalboard/block';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
@@ -23,6 +24,7 @@ export function useRewardsBoardMutator() {
   } = useRewardBlocks();
   const { activeView } = useRewardsBoard();
   const { rewards, updateReward } = useRewards();
+  const { pages, deletePage } = usePages();
 
   const patchBlock = async (blockId: string, blockPatch: BlockPatch, updater: BlockUpdater): Promise<void> => {
     const rewardToUpdate = rewards?.find((p) => p.id === blockId);
@@ -120,6 +122,11 @@ export function useRewardsBoardMutator() {
   };
 
   const deleteBlock = async (blockId: string, updater: BlockUpdater): Promise<void> => {
+    if (pages[blockId]?.type === 'bounty') {
+      await deletePage({ pageId: blockId });
+      return;
+    }
+
     const rootBlock = await deleteRewardBlock(blockId);
     if (!rootBlock) return;
 
