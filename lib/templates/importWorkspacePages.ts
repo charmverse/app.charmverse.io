@@ -486,7 +486,7 @@ async function generateImportWorkspacePages({
             }
           }
 
-          evaluationPermissions.forEach((perm) => {
+          evaluationPermissions?.forEach((perm) => {
             if (importingToDifferentSpace && !perm.userId) {
               proposalEvaluationPermissionArgs.push({
                 evaluationId: newEvaluationId,
