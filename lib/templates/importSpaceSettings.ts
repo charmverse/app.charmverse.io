@@ -1,3 +1,4 @@
+import type { ProposalWorkflowTyped } from '@charmverse/core/dist/cjs/proposals';
 import { DataNotFoundError } from '@charmverse/core/errors';
 import type {
   MemberProperty,
@@ -5,6 +6,7 @@ import type {
   MemberPropertyPermissionLevel,
   Prisma,
   ProposalBlock,
+  ProposalWorkflow,
   RewardBlock,
   Space
 } from '@charmverse/core/prisma-client';
@@ -12,24 +14,25 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { arrayUtils, stringUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
-import type { Board, BoardFields } from 'lib/focalboard/board';
+import type { BoardFields } from 'lib/focalboard/board';
 import type { BoardViewFields } from 'lib/focalboard/boardView';
 import { getSpace } from 'lib/spaces/getSpace';
 
 import { getImportData } from './getImportData';
-import { importRoles } from './importRoles';
 import type { ImportParams } from './interfaces';
 
 type SpaceImportResult = Space & {
   memberProperties: (MemberProperty & { permissions: MemberPropertyPermission[] })[];
   proposalBlocks: ProposalBlock[];
+  proposalWorkflows: ProposalWorkflow[];
   rewardBlocks: RewardBlock[];
 };
 
 export async function importSpaceSettings({
   targetSpaceIdOrDomain,
+  oldNewRoleIdHashMap,
   ...importParams
-}: ImportParams): Promise<SpaceImportResult> {
+}: ImportParams & { oldNewRoleIdHashMap: Record<string, string> }): Promise<SpaceImportResult> {
   const { space } = await getImportData(importParams);
   if (!space) {
     throw new DataNotFoundError(`No space to import`);
@@ -42,6 +45,7 @@ export async function importSpaceSettings({
     memberProfiles,
     memberProperties,
     proposalBlocks,
+    proposalWorkflows,
     rewardBlocks,
     notificationToggles,
     defaultPagePermissionGroup,
@@ -51,8 +55,6 @@ export async function importSpaceSettings({
     publicProposals,
     defaultPublicPages
   } = space;
-
-  const { oldNewRecordIdHashMap } = await importRoles({ targetSpaceIdOrDomain, ...importParams });
 
   const propertiesToCreate: (Prisma.MemberPropertyCreateManyInput & { permissions: MemberPropertyPermission[] })[] =
     memberProperties.map((prop) => {
@@ -74,10 +76,36 @@ export async function importSpaceSettings({
         return {
           memberPropertyId: prop.id,
           memberPropertyPermissionLevel: perm.memberPropertyPermissionLevel as MemberPropertyPermissionLevel,
-          roleId: perm.roleId ? oldNewRecordIdHashMap[perm.roleId] : undefined
+          roleId: perm.roleId ? oldNewRoleIdHashMap[perm.roleId] : undefined
         } as Prisma.MemberPropertyPermissionCreateManyInput;
       })
       .filter((perm) => !!perm.roleId);
+  });
+
+  const workflowsToCreate: Prisma.ProposalWorkflowCreateManyInput[] = (
+    proposalWorkflows as ProposalWorkflowTyped[]
+  ).map((workflow) => {
+    return {
+      ...workflow,
+      id: uuid(),
+      spaceId: targetSpace.id,
+      createdBy: targetSpace.createdBy,
+      updatedBy: targetSpace.createdBy,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      evaluations: workflow.evaluations.map((evaluation) => ({
+        ...evaluation,
+        permissions: evaluation.permissions
+          .map((perm) => {
+            return {
+              systemRole: perm.systemRole,
+              operation: perm.operation,
+              roleId: perm.roleId ? oldNewRoleIdHashMap[perm.roleId] : undefined
+            };
+          })
+          .filter((p) => p.systemRole || p.roleId)
+      }))
+    };
   });
 
   const [existingProposalBlocks, existingRewardBlocks] = await Promise.all([
@@ -116,6 +144,9 @@ export async function importSpaceSettings({
     }),
     prisma.memberPropertyPermission.createMany({
       data: permissionsToCreate
+    }),
+    prisma.proposalWorkflow.createMany({
+      data: workflowsToCreate
     }),
     ...rewardBlocks.map((b) => {
       const matchingBlock = existingRewardBlocks.find((existingBlock) => existingBlock.id === b.id);
@@ -246,6 +277,7 @@ export async function importSpaceSettings({
         }
       },
       proposalBlocks: true,
+      proposalWorkflows: true,
       rewardBlocks: true
     }
   });

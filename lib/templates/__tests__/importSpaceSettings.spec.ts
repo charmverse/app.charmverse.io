@@ -16,6 +16,7 @@ import type { BoardViewFields } from 'lib/focalboard/boardView';
 
 import type { SpaceDataExport } from '../exportSpaceData';
 import type { SpaceSettingsExport } from '../exportSpaceSettings';
+import { importRoles } from '../importRoles';
 import { importSpaceSettings } from '../importSpaceSettings';
 
 describe('importSpaceSettings', () => {
@@ -259,6 +260,7 @@ describe('importSpaceSettings', () => {
       space: {
         ...sourceSpace,
         proposalBlocks: [customProposalBlockBoard, customProposalBlockView],
+        proposalWorkflows: [],
         rewardBlocks: [customRewardBlockBoard, customRewardBlockView],
         memberProperties: [memberProperty]
       }
@@ -269,7 +271,16 @@ describe('importSpaceSettings', () => {
     // Simulate export data
     const { space: targetSpace } = await testUtilsUser.generateUserAndSpace();
 
-    const updatedSpace = await importSpaceSettings({ targetSpaceIdOrDomain: targetSpace.id, exportData: dataToImport });
+    const { oldNewRecordIdHashMap: oldNewRoleIdHashMap } = await importRoles({
+      targetSpaceIdOrDomain: targetSpace.id,
+      exportData: dataToImport
+    });
+
+    const updatedSpace = await importSpaceSettings({
+      oldNewRoleIdHashMap,
+      targetSpaceIdOrDomain: targetSpace.id,
+      exportData: dataToImport
+    });
 
     const targetSpaceRoles = await prisma.role.findMany({
       where: {
@@ -346,7 +357,8 @@ describe('importSpaceSettings', () => {
               }
             ]
           }
-        ]
+        ],
+        proposalWorkflows: []
       })
     );
   });
@@ -491,7 +503,16 @@ describe('importSpaceSettings', () => {
       })
     ]);
 
-    const updatedSpace = await importSpaceSettings({ targetSpaceIdOrDomain: targetSpace.id, exportData: dataToImport });
+    const { oldNewRecordIdHashMap: oldNewRoleIdHashMap } = await importRoles({
+      targetSpaceIdOrDomain: targetSpace.id,
+      exportData: dataToImport
+    });
+
+    const updatedSpace = await importSpaceSettings({
+      oldNewRoleIdHashMap,
+      targetSpaceIdOrDomain: targetSpace.id,
+      exportData: dataToImport
+    });
 
     const targetSpaceRoles = await prisma.role.findMany({
       where: {
@@ -553,6 +574,7 @@ describe('importSpaceSettings', () => {
             updatedAt: expect.any(Date)
           }
         ]),
+        proposalWorkflows: [],
         rewardBlocks: expect.arrayContaining<RewardBlock>([
           {
             ...customRewardBlockBoard,
@@ -620,6 +642,8 @@ describe('importSpaceSettings', () => {
   });
 
   it('should throw an error for missing space in import data', async () => {
-    await expect(importSpaceSettings({ targetSpaceIdOrDomain: null as any, exportData: {} })).rejects.toThrow();
+    await expect(
+      importSpaceSettings({ oldNewRoleIdHashMap: {}, targetSpaceIdOrDomain: null as any, exportData: {} })
+    ).rejects.toThrow();
   });
 });

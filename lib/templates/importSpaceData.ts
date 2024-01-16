@@ -35,7 +35,7 @@ export async function importSpaceData(importParams: ImportParams): Promise<Space
     importingToDifferentSpace: true
   });
 
-  const importedSpaceSettings = await importSpaceSettings(importParams);
+  const importedSpaceSettings = await importSpaceSettings({ ...importParams, oldNewRoleIdHashMap });
 
   const { posts, postsIdHashmap } = await importForumPosts(importParams);
 
