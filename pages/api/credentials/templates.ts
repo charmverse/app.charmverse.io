@@ -55,8 +55,8 @@ async function updateCredentialController(req: NextApiRequest, res: NextApiRespo
     throw new AdministratorOnlyError();
   }
 
-  const signed = await updateCredentialTemplate({ templateId: credentialTemplate.id, fields: req.body });
-  return res.status(200).json(signed);
+  await updateCredentialTemplate({ templateId: credentialTemplate.id, fields: req.body });
+  return res.status(200).json({ success: true });
 }
 
 async function deleteCredentialController(req: NextApiRequest, res: NextApiResponse) {
