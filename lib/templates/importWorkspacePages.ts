@@ -134,7 +134,7 @@ async function generateImportWorkspacePages({
   resetPaths,
   oldNewRoleIdHashMap,
   importingToDifferentSpace,
-  oldNewProposalWorkflowIdHashMap
+  oldNewProposalWorkflowIdHashMap = {}
 }: WorkspaceImportOptions): Promise<
   {
     pageArgs: Prisma.PageCreateArgs[];
@@ -457,7 +457,9 @@ async function generateImportWorkspacePages({
         createdBy: space.createdBy,
         status: 'draft',
         id: newProposalId,
-        workflowId: importingToDifferentSpace ? oldNewRecordIdHashMap[proposal.workflowId!] : proposal.workflowId,
+        workflowId: importingToDifferentSpace
+          ? oldNewProposalWorkflowIdHashMap[proposal.workflowId!]
+          : proposal.workflowId,
         fields: fields || {}
       });
       proposalEvaluationArgs.push(

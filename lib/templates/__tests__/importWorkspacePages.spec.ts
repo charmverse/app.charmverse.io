@@ -449,35 +449,149 @@ describe('importWorkspacePages - proposal content', () => {
     });
   });
 
+  it('should port over the proposal configuration when importing to a different space, but it should eliminate any individual user permissions, and map over role permissions', async () => {
+    const { space: targetSpace, user: targetSpaceUser } = await testUtilsUser.generateUserAndSpace();
+
+    const targetSpaceWorkflow = await prisma.proposalWorkflow.create({
+      data: {
+        index: 1,
+        title: 'Feedback',
+        space: { connect: { id: targetSpace.id } }
+      }
+    });
+
+    const targetSpaceRole = await testUtilsMembers.generateRole({
+      createdBy: targetSpaceUser.id,
+      spaceId: targetSpace.id
+    });
+
+    await importWorkspacePages({
+      exportData: {
+        pages: importData.pages
+      },
+      oldNewProposalWorkflowIdHashMap: {
+        [sourceWorkflow.id]: targetSpaceWorkflow.id
+      },
+      oldNewRoleIdHashMap: {
+        [sourceSpaceRole.id]: targetSpaceRole.id
+      },
+      targetSpaceIdOrDomain: targetSpace.id,
+      importingToDifferentSpace: true
+    });
+
+    const proposals = await prisma.proposal.findMany({
+      where: {
+        spaceId: targetSpace.id
+      },
+      include: {
+        evaluations: {
+          include: {
+            permissions: true,
+            rubricCriteria: true,
+            reviewers: true
+          },
+          orderBy: {
+            index: 'asc'
+          }
+        }
+      }
+    });
+
+    expect(proposals).toHaveLength(1);
+
+    const copiedProposal = proposals[0];
+
+    const copiedFirstEvaluation = copiedProposal.evaluations[0];
+    const copiedSecondEvaluation = copiedProposal.evaluations[1];
+
+    expect(copiedProposal).toMatchObject<typeof sourceProposal>({
+      ...sourceProposal,
+      id: copiedProposal.id,
+      spaceId: targetSpace.id,
+      createdBy: targetSpaceUser.id,
+      fields: {},
+      workflowId: targetSpaceWorkflow.id,
+      evaluations: [
+        {
+          completedAt: null,
+          decidedBy: null,
+          index: 0,
+          result: null,
+          snapshotExpiry: null,
+          snapshotId: null,
+          voteId: null,
+          voteSettings: null,
+          id: copiedFirstEvaluation.id,
+          title: 'Feedback',
+          type: 'feedback',
+          proposalId: copiedProposal.id,
+          permissions: [],
+          reviewers: [],
+          rubricCriteria: []
+        },
+        {
+          completedAt: null,
+          decidedBy: null,
+          index: 1,
+          result: null,
+          snapshotExpiry: null,
+          snapshotId: null,
+          title: 'Rubric',
+          type: 'rubric',
+          voteId: null,
+          voteSettings: null,
+          id: copiedSecondEvaluation.id,
+          proposalId: copiedProposal.id,
+          permissions: expect.arrayContaining<ProposalEvaluationPermission>([
+            expect.objectContaining({
+              operation: rolePermission.operation as any,
+              roleId: targetSpaceRole.id,
+              systemRole: null,
+              userId: null,
+              evaluationId: copiedSecondEvaluation.id,
+              id: expect.anything()
+            }),
+            expect.objectContaining({
+              operation: systemPermission.operation as any,
+              roleId: null,
+              systemRole: systemPermission.systemRole as ProposalSystemRole,
+              userId: null,
+              evaluationId: copiedSecondEvaluation.id,
+              id: expect.anything()
+            })
+          ]),
+          reviewers: [
+            {
+              roleId: targetSpaceRole.id,
+              systemRole: null,
+              userId: null,
+              proposalId: copiedProposal.id,
+              evaluationId: copiedSecondEvaluation.id,
+              id: expect.any(String)
+            },
+            {
+              roleId: null,
+              systemRole: 'space_member',
+              userId: null,
+              proposalId: copiedProposal.id,
+              evaluationId: copiedSecondEvaluation.id,
+              id: expect.any(String)
+            }
+          ],
+          rubricCriteria: expect.arrayContaining([
+            expect.objectContaining({
+              ...sourceProposal.evaluations[1].rubricCriteria[0],
+              evaluationId: copiedSecondEvaluation.id,
+              proposalId: copiedProposal.id,
+              id: expect.any(String)
+            })
+          ])
+        }
+      ]
+    });
+  });
+
   // it('should port over the proposal configuration when importing to a different space, but it should eliminate any individual user permissions, and map over role permissions', async () => {
-  //   const { space: targetSpace, user: targetSpaceUser } = await testUtilsUser.generateUserAndSpace();
-
-  //   const targetSpaceWorkflow = await prisma.proposalWorkflow.create({
-  //     data: {
-  //       index: 1,
-  //       title: 'Feedback',
-  //       space: { connect: { id: targetSpace.id } }
-  //     }
-  //   });
-
-  //   const targetSpaceRole = await testUtilsMembers.generateRole({
-  //     createdBy: targetSpaceUser.id,
-  //     spaceId: targetSpace.id
-  //   });
-
-  //   await importWorkspacePages({
-  //     exportData: {
-  //       pages: importData.pages
-  //     },
-  //     oldNewProposalWorkflowIdHashMap: {
-  //       [sourceWorkflow.id]: targetSpaceWorkflow.id
-  //     },
-  //     oldNewRoleIdHashMap: {
-  //       [sourceSpaceRole.id]: targetSpaceRole.id
-  //     },
-  //     targetSpaceIdOrDomain: targetSpace.id,
-  //     importingToDifferentSpace: true
-  //   });
 
   //   const proposals = await prisma.proposal.findMany({
   //     where: {
