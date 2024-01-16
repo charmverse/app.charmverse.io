@@ -87,6 +87,8 @@ test.describe.serial('Database with proposals as datasource', async () => {
 
     await pagesSidebar.pagesSidebarSelectAddDatabaseButton.click();
 
+    await databasePage.page.waitForTimeout(500);
+
     await expect(pagesSidebar.databasePage).toBeVisible();
 
     // Initialise the new database
