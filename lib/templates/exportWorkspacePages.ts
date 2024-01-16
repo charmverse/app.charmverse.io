@@ -143,7 +143,7 @@ export async function exportWorkspacePages({
       node.bountyId &&
       ((node.type === 'bounty' && !skipBounties) || (node.type === 'bounty_template' && !skipBountyTemplates))
     ) {
-      node.bounty = await prisma.bounty.findUnique({
+      const bounty = await prisma.bounty.findUnique({
         where: {
           id: node.bountyId
         },
@@ -151,6 +151,12 @@ export async function exportWorkspacePages({
           permissions: true
         }
       });
+
+      if (bounty) {
+        bounty.status = 'open';
+      }
+
+      node.bounty = bounty || null;
     } else if (
       node.proposalId &&
       ((node.type === 'proposal' && !skipProposals) || (node.type === 'proposal_template' && !skipProposalTemplates))
