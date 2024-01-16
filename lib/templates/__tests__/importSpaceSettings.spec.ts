@@ -1,3 +1,4 @@
+import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/dist/cjs/proposals';
 import type {
   MemberProperty,
   MemberPropertyPermission,
@@ -31,6 +32,9 @@ describe('importSpaceSettings', () => {
 
   let customRewardBlockBoard: RewardBlock;
   let customRewardBlockView: RewardBlock;
+
+  let proposalWorkflow: ProposalWorkflowTyped;
+  let proposalWorkflowWithConflictingNameForCurrentSpace: ProposalWorkflowTyped;
 
   beforeAll(async () => {
     ({ user, space: sourceSpace } = await testUtilsUser.generateUserAndSpace({ isAdmin: true }));
@@ -255,12 +259,42 @@ describe('importSpaceSettings', () => {
         })
       ]);
 
+    proposalWorkflow = {
+      createdAt: new Date(),
+      id: uuid(),
+      index: 0,
+      spaceId: sourceSpace.id,
+      title: `Unique - ${uuid()}`,
+      evaluations: [
+        {
+          title: 'Community',
+          id: uuid(),
+          type: 'feedback',
+          permissions: [
+            { operation: 'comment', roleId: role.id },
+            { operation: 'view', userId: user.id },
+            { operation: 'archive', systemRole: 'author' }
+          ]
+        },
+        {
+          title: 'Rubric',
+          id: uuid(),
+          type: 'rubric',
+          permissions: [
+            { operation: 'comment', roleId: role.id },
+            { operation: 'view', userId: user.id },
+            { operation: 'archive', systemRole: 'author' }
+          ]
+        }
+      ]
+    };
+
     dataToImport = {
       roles: [role],
       space: {
         ...sourceSpace,
         proposalBlocks: [customProposalBlockBoard, customProposalBlockView],
-        proposalWorkflows: [],
+        proposalWorkflows: [proposalWorkflow],
         rewardBlocks: [customRewardBlockBoard, customRewardBlockView],
         memberProperties: [memberProperty]
       }
@@ -358,7 +392,8 @@ describe('importSpaceSettings', () => {
             ]
           }
         ],
-        proposalWorkflows: []
+        // This is tested in a sepearate test
+        proposalWorkflows: expect.anything()
       })
     );
   });
@@ -574,7 +609,8 @@ describe('importSpaceSettings', () => {
             updatedAt: expect.any(Date)
           }
         ]),
-        proposalWorkflows: [],
+        // This is tested in a sepearate test
+        proposalWorkflows: expect.anything(),
         rewardBlocks: expect.arrayContaining<RewardBlock>([
           {
             ...customRewardBlockBoard,
@@ -638,6 +674,79 @@ describe('importSpaceSettings', () => {
           }
         ]
       })
+    );
+  });
+
+  it('should import proposal workflows, and replace roleIds for permissions, and dropping permissions with userIds', async () => {
+    const { space: targetSpace } = await testUtilsUser.generateUserAndSpace();
+
+    const existingProposalWorkflow = await prisma.proposalWorkflow.create({
+      data: {
+        index: 0,
+        title: 'Existing workflow',
+        evaluations: [{ id: uuid(), permissions: [], title: 'Feedback', type: 'feedback' }] as WorkflowEvaluationJson[],
+        space: { connect: { id: targetSpace.id } }
+      }
+    });
+    const targetSpaceRoles = await prisma.role.findMany({
+      where: {
+        spaceId: targetSpace.id
+      }
+    });
+
+    const { oldNewRecordIdHashMap } = await importRoles({
+      targetSpaceIdOrDomain: targetSpace.id,
+      exportData: dataToImport
+    });
+
+    const updatedSpace = await importSpaceSettings({
+      oldNewRoleIdHashMap: oldNewRecordIdHashMap,
+      targetSpaceIdOrDomain: targetSpace.id,
+      exportData: dataToImport
+    });
+
+    expect(updatedSpace.oldNewProposalWorkflowIds).toMatchObject({
+      [proposalWorkflow.id]: expect.any(String)
+    });
+
+    expect(updatedSpace.proposalWorkflows).toMatchObject(
+      expect.arrayContaining<ProposalWorkflowTyped>([
+        {
+          id: expect.not.stringMatching(proposalWorkflow.id),
+          index: proposalWorkflow.index,
+          title: proposalWorkflow.title,
+          spaceId: targetSpace.id,
+          // id: expect.stringMatching(existingProposalWorkflow.id),
+          createdAt: expect.any(Date),
+          evaluations: [
+            {
+              title: proposalWorkflow.evaluations[0].title,
+              id: expect.any(String),
+              type: proposalWorkflow.evaluations[0].type,
+              permissions: [
+                {
+                  operation: 'comment',
+                  roleId: expect.not.stringContaining(role.id)
+                  // roleId: expect((val) => targetSpaceRoles.some((r) => r.id === val))
+                },
+                { operation: 'archive', systemRole: 'author' }
+              ]
+            },
+            {
+              title: proposalWorkflow.evaluations[1].title,
+              id: expect.any(String),
+              type: proposalWorkflow.evaluations[1].type,
+              permissions: [
+                { operation: 'comment', roleId: expect.not.stringContaining(role.id) },
+                { operation: 'archive', systemRole: 'author' }
+              ]
+            }
+          ]
+        },
+        {
+          ...existingProposalWorkflow
+        } as ProposalWorkflowTyped
+      ])
     );
   });
 

@@ -10,6 +10,7 @@ import type {
   Space
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { arrayUtils, stringUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
@@ -24,6 +25,7 @@ type SpaceImportResult = Space & {
   memberProperties: (MemberProperty & { permissions: MemberPropertyPermission[] })[];
   proposalBlocks: ProposalBlock[];
   proposalWorkflows: ProposalWorkflow[];
+  oldNewProposalWorkflowIds: Record<string, string>;
   rewardBlocks: RewardBlock[];
 };
 
@@ -80,7 +82,7 @@ export async function importSpaceSettings({
       .filter((perm) => !!perm.roleId);
   });
 
-  const [existingProposalBlocks, existingRewardBlocks] = await Promise.all([
+  const [existingProposalBlocks, existingRewardBlocks, existingProposalWorkflows] = await Promise.all([
     prisma.proposalBlock.findMany({
       where: {
         spaceId: targetSpace.id
@@ -90,8 +92,49 @@ export async function importSpaceSettings({
       where: {
         spaceId: targetSpace.id
       }
+    }),
+    prisma.proposalWorkflow.findMany({
+      where: {
+        spaceId: targetSpace.id
+      }
     })
   ]);
+
+  const oldNewProposalWorkflowIds: Record<string, string> = {};
+
+  const workflowsToCreate = space.proposalWorkflows
+    // Dedupe by title
+    .map((workflow) => {
+      const newId = uuid();
+      oldNewProposalWorkflowIds[workflow.id] = newId;
+      return {
+        ...workflow,
+        spaceId: targetSpace.id,
+        createdAt: new Date(),
+        id: newId,
+        evaluations: workflow.evaluations.map((_eval) => {
+          const typedEval = _eval as WorkflowEvaluationJson;
+          const permissions = typedEval.permissions
+            .map((perm) => {
+              return {
+                operation: perm.operation,
+                roleId: perm.roleId ? oldNewRoleIdHashMap[perm.roleId] : undefined,
+                systemRole: perm.systemRole,
+                // Ignore user ids
+                userId: undefined
+              };
+            })
+            .filter((perm) => !!perm.roleId || perm.systemRole);
+          return {
+            ...typedEval,
+            id: uuid(),
+            permissions,
+            title: typedEval.title,
+            type: typedEval.type
+          };
+        })
+      };
+    });
 
   await prisma.$transaction([
     prisma.space.update({
@@ -116,6 +159,9 @@ export async function importSpaceSettings({
     }),
     prisma.memberPropertyPermission.createMany({
       data: permissionsToCreate
+    }),
+    prisma.proposalWorkflow.createMany({
+      data: workflowsToCreate as Prisma.ProposalWorkflowCreateManyInput[]
     }),
     ...rewardBlocks.map((b) => {
       const matchingBlock = existingRewardBlocks.find((existingBlock) => existingBlock.id === b.id);
@@ -235,21 +281,23 @@ export async function importSpaceSettings({
     })
   ]);
 
-  return prisma.space.findUniqueOrThrow({
-    where: {
-      id: targetSpace.id
-    },
-    include: {
-      memberProperties: {
-        include: {
-          permissions: true
-        }
+  return prisma.space
+    .findUniqueOrThrow({
+      where: {
+        id: targetSpace.id
       },
-      proposalBlocks: true,
-      proposalWorkflows: true,
-      rewardBlocks: true
-    }
-  });
+      include: {
+        memberProperties: {
+          include: {
+            permissions: true
+          }
+        },
+        proposalBlocks: true,
+        proposalWorkflows: true,
+        rewardBlocks: true
+      }
+    })
+    .then((s) => ({ ...s, oldNewProposalWorkflowIds }));
 }
 
 function mergeArrayWithoutDuplicates<T>(arr: T[], key: keyof T): T[] {

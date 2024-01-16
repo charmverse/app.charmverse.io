@@ -26,6 +26,8 @@ export async function importSpaceData(importParams: ImportParams): Promise<Space
 
   const { postCategoryPermissions, spacePermissions } = await importSpacePermissions(importParams);
 
+  const importedSpaceSettings = await importSpaceSettings({ ...importParams, oldNewRoleIdHashMap });
+
   const { pages, oldNewRecordIdHashMap: oldNewPageIdMap } = await importWorkspacePages({
     ...importParams,
     updateTitle: false,
@@ -34,8 +36,6 @@ export async function importSpaceData(importParams: ImportParams): Promise<Space
     oldNewRoleIdHashMap,
     importingToDifferentSpace: true
   });
-
-  const importedSpaceSettings = await importSpaceSettings({ ...importParams, oldNewRoleIdHashMap });
 
   const { posts, postsIdHashmap } = await importForumPosts(importParams);
 
