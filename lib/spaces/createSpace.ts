@@ -212,7 +212,6 @@ export async function createWorkspace({
   } else if (spaceTemplate && !productionReadyTemplates.includes(spaceTemplate)) {
     await prisma.$transaction([
       prisma.memberProperty.createMany({ data: defaultProperties }),
-      prisma.proposalWorkflow.createMany({ data: defaultWorkflows }),
       prisma.postCategory.createMany({ data: defaultPostCategories }),
       prisma.postCategoryPermission.createMany({
         data: defaultPostCategories.map(

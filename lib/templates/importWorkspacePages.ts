@@ -1,3 +1,4 @@
+import type { ProposalWorkflowTyped } from '@charmverse/core/dist/cjs/proposals';
 import { log } from '@charmverse/core/log';
 import type { PageMeta } from '@charmverse/core/pages';
 import type { Page } from '@charmverse/core/prisma';
@@ -123,7 +124,7 @@ type WorkspaceImportResult = {
   blockIds: string[];
 } & OldNewIdHashMap;
 
-export async function generateImportWorkspacePages({
+async function generateImportWorkspacePages({
   targetSpaceIdOrDomain,
   exportData,
   exportName,
@@ -145,16 +146,17 @@ export async function generateImportWorkspacePages({
     proposalReviewerArgs: Prisma.ProposalReviewerCreateManyArgs;
     proposalRubricCriteriaArgs: Prisma.ProposalRubricCriteriaCreateManyArgs;
     proposalEvaluationArgs: Prisma.ProposalEvaluationCreateManyArgs;
+    proposalWorkflowArgs: Prisma.ProposalWorkflowCreateManyArgs;
   } & OldNewIdHashMap
 > {
   const isUuid = validate(targetSpaceIdOrDomain);
 
   const space = await prisma.space.findUniqueOrThrow({
-    where: isUuid ? { id: targetSpaceIdOrDomain } : { domain: targetSpaceIdOrDomain },
-    include: { proposalWorkflows: true }
+    where: isUuid ? { id: targetSpaceIdOrDomain } : { domain: targetSpaceIdOrDomain }
   });
 
-  const { pages } = await getImportData({ exportData, exportName });
+  const { pages, space: spaceTemplate } = await getImportData({ exportData, exportName });
+  const proposalWorkflows = spaceTemplate?.proposalWorkflows ?? [];
 
   const pageArgs: Prisma.PageCreateArgs[] = [];
 
@@ -178,6 +180,31 @@ export async function generateImportWorkspacePages({
 
   // 2 way hashmap to find link between new and old page ids
   const oldNewRecordIdHashMap: Record<string, string> = {};
+
+  const proposalWorkflowArgs: Prisma.ProposalWorkflowCreateManyInput[] = (
+    proposalWorkflows as ProposalWorkflowTyped[]
+  ).map(({ id, ...workflow }) => {
+    const newWorkflowId = uuid();
+    oldNewRecordIdHashMap[id] = newWorkflowId;
+    return {
+      ...workflow,
+      id: newWorkflowId,
+      spaceId: space.id,
+      createdAt: new Date(),
+      evaluations: workflow.evaluations.map((evaluation) => ({
+        ...evaluation,
+        permissions: evaluation.permissions
+          .map((perm) => {
+            return {
+              systemRole: perm.systemRole,
+              operation: perm.operation,
+              roleId: perm.roleId ? oldNewRoleIdHashMap?.[perm.roleId] : undefined
+            };
+          })
+          .filter((p) => p.systemRole || p.roleId)
+      }))
+    };
+  });
 
   /**
    * Mutates the pages, updating their ids
@@ -455,6 +482,7 @@ export async function generateImportWorkspacePages({
         createdBy: space.createdBy,
         status: 'draft',
         id: newProposalId,
+        workflowId: oldNewRecordIdHashMap[proposal.workflowId!],
         fields: fields || {}
       });
       proposalEvaluationArgs.push(
@@ -464,6 +492,7 @@ export async function generateImportWorkspacePages({
             ...reviewers.map(({ id: _id, ...reviewer }) => ({
               ...reviewer,
               id: uuid(),
+              roleId: reviewer.roleId && oldNewRoleIdHashMap?.[reviewer.roleId],
               proposalId: newProposalId,
               evaluationId: newEvaluationId
             }))
@@ -553,6 +582,9 @@ export async function generateImportWorkspacePages({
     proposalEvaluationArgs: {
       data: proposalEvaluationArgs
     },
+    proposalWorkflowArgs: {
+      data: proposalWorkflowArgs
+    },
     oldNewRecordIdHashMap
   };
 }
@@ -577,6 +609,10 @@ export async function importWorkspacePages({
     voteArgs,
     voteOptionsArgs,
     proposalArgs,
+    proposalEvaluationArgs,
+    proposalReviewerArgs,
+    proposalRubricCriteriaArgs,
+    proposalWorkflowArgs,
     bountyPermissionArgs,
     oldNewRecordIdHashMap
   } = await generateImportWorkspacePages({
@@ -600,7 +636,11 @@ export async function importWorkspacePages({
     prisma.block.createMany(blockArgs),
     prisma.bounty.createMany(bountyArgs),
     prisma.bountyPermission.createMany(bountyPermissionArgs),
+    prisma.proposalWorkflow.createMany(proposalWorkflowArgs),
     prisma.proposal.createMany(proposalArgs),
+    prisma.proposalEvaluation.createMany(proposalEvaluationArgs),
+    prisma.proposalReviewer.createMany(proposalReviewerArgs),
+    prisma.proposalRubricCriteria.createMany(proposalRubricCriteriaArgs),
     ...pageArgs.map((p) => {
       totalCreatedPages += 1;
       log.debug(`Creating page ${totalCreatedPages}/${pagesToCreate}: ${p.data.type} // ${p.data.title}`);

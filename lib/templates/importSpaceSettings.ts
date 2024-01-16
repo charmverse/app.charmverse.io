@@ -1,4 +1,3 @@
-import type { ProposalWorkflowTyped } from '@charmverse/core/dist/cjs/proposals';
 import { DataNotFoundError } from '@charmverse/core/errors';
 import type {
   MemberProperty,
@@ -82,32 +81,6 @@ export async function importSpaceSettings({
       .filter((perm) => !!perm.roleId);
   });
 
-  const workflowsToCreate: Prisma.ProposalWorkflowCreateManyInput[] = (
-    proposalWorkflows as ProposalWorkflowTyped[]
-  ).map((workflow) => {
-    return {
-      ...workflow,
-      id: uuid(),
-      spaceId: targetSpace.id,
-      createdBy: targetSpace.createdBy,
-      updatedBy: targetSpace.createdBy,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      evaluations: workflow.evaluations.map((evaluation) => ({
-        ...evaluation,
-        permissions: evaluation.permissions
-          .map((perm) => {
-            return {
-              systemRole: perm.systemRole,
-              operation: perm.operation,
-              roleId: perm.roleId ? oldNewRoleIdHashMap[perm.roleId] : undefined
-            };
-          })
-          .filter((p) => p.systemRole || p.roleId)
-      }))
-    };
-  });
-
   const [existingProposalBlocks, existingRewardBlocks] = await Promise.all([
     prisma.proposalBlock.findMany({
       where: {
@@ -144,9 +117,6 @@ export async function importSpaceSettings({
     }),
     prisma.memberPropertyPermission.createMany({
       data: permissionsToCreate
-    }),
-    prisma.proposalWorkflow.createMany({
-      data: workflowsToCreate
     }),
     ...rewardBlocks.map((b) => {
       const matchingBlock = existingRewardBlocks.find((existingBlock) => existingBlock.id === b.id);
