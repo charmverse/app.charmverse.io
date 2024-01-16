@@ -305,13 +305,34 @@ describe('updateCardsFromProposals()', () => {
             }
           ],
           permissions: []
+        },
+        {
+          rubricCriteria: [
+            {
+              description: 'Rubric evaluation 3 criteria 1',
+              parameters: {
+                min: 0,
+                max: 10
+              },
+              title: 'Rubric evaluation 3 criteria 1'
+            }
+          ],
+          evaluationType: 'rubric',
+          title: 'Rubric Evaluation 3',
+          reviewers: [
+            {
+              group: 'user',
+              id: proposalReviewer.id
+            }
+          ],
+          permissions: []
         }
       ],
       spaceId: generated.space.id,
       userId: proposalReviewer.id
     });
 
-    const proposal2RubricCriteria = await prisma.proposalRubricCriteria.findFirstOrThrow({
+    const proposal2RubricCriterias = await prisma.proposalRubricCriteria.findMany({
       where: {
         proposalId: generatedProposal2.id
       },
@@ -327,8 +348,19 @@ describe('updateCardsFromProposals()', () => {
         userId: proposalReviewer.id,
         comment: null,
         proposalId: generatedProposal2.id,
-        rubricCriteriaId: proposal2RubricCriteria.id,
-        evaluationId: proposal2RubricCriteria.evaluationId
+        rubricCriteriaId: proposal2RubricCriterias[0].id,
+        evaluationId: proposal2RubricCriterias[0].evaluationId
+      }
+    });
+
+    await prisma.proposalRubricCriteriaAnswer.create({
+      data: {
+        response: { score: 9 },
+        userId: proposalReviewer.id,
+        comment: null,
+        proposalId: generatedProposal2.id,
+        rubricCriteriaId: proposal2RubricCriterias[1].id,
+        evaluationId: proposal2RubricCriterias[1].evaluationId
       }
     });
 
@@ -379,6 +411,15 @@ describe('updateCardsFromProposals()', () => {
     const rubricEvaluation2EvaluationEvaluatedByProp = properties.find(
       (prop) => prop.type === 'proposalEvaluatedBy' && prop.name === 'Rubric Evaluation 2 (Evaluation reviewers)'
     ) as IPropertyTemplate;
+    const rubricEvaluation3EvaluationAverageProp = properties.find(
+      (prop) => prop.type === 'proposalEvaluationAverage' && prop.name === 'Rubric Evaluation 3 (Evaluation average)'
+    ) as IPropertyTemplate;
+    const rubricEvaluation3EvaluationTotalProp = properties.find(
+      (prop) => prop.type === 'proposalEvaluationTotal' && prop.name === 'Rubric Evaluation 3 (Evaluation total)'
+    ) as IPropertyTemplate;
+    const rubricEvaluation3EvaluationEvaluatedByProp = properties.find(
+      (prop) => prop.type === 'proposalEvaluatedBy' && prop.name === 'Rubric Evaluation 3 (Evaluation reviewers)'
+    ) as IPropertyTemplate;
 
     const cardBlocks = await prisma.block.findMany({
       where: {
@@ -392,6 +433,18 @@ describe('updateCardsFromProposals()', () => {
         fields: true
       }
     });
+
+    const view = await prisma.block.findFirst({
+      where: {
+        type: 'view',
+        parentId: database.id
+      },
+      select: {
+        fields: true
+      }
+    });
+
+    const viewFields = view?.fields as unknown as BoardViewFields;
 
     const card1Properties = (cardBlocks[0].fields as unknown as CardFields).properties;
     const card2Properties = (cardBlocks[1].fields as unknown as CardFields).properties;
@@ -411,6 +464,18 @@ describe('updateCardsFromProposals()', () => {
     expect(card2Properties[rubricEvaluation2EvaluationTotalProp.id]).toBeUndefined();
     expect(card2Properties[rubricEvaluation1EvaluationEvaluatedByProp.id]).toStrictEqual([proposalReviewer.id]);
     expect(card2Properties[rubricEvaluation2EvaluationEvaluatedByProp.id]).toBeUndefined();
+    expect(card2Properties[rubricEvaluation3EvaluationAverageProp.id]).toStrictEqual(9);
+    expect(card2Properties[rubricEvaluation3EvaluationTotalProp.id]).toStrictEqual(9);
+    expect(card2Properties[rubricEvaluation3EvaluationEvaluatedByProp.id]).toStrictEqual([proposalReviewer.id]);
+
+    // Add the new evaluation properties to the view
+    expect(
+      [
+        rubricEvaluation3EvaluationAverageProp,
+        rubricEvaluation3EvaluationTotalProp,
+        rubricEvaluation3EvaluationEvaluatedByProp
+      ].every((prop) => viewFields.visiblePropertyIds.includes(prop.id))
+    ).toBeTruthy();
 
     expect(card1Properties[proposalEvaluationStatusProp.id]).toBe('pass');
     expect(card1Properties[proposalEvaluationStepProp.id]).toBe('Rubric Evaluation 2');
