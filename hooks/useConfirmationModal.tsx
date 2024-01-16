@@ -43,7 +43,7 @@ export function ConfirmationModalProvider({ children }: { children: ReactNode })
       if (typeof msg === 'string') {
         setProps({ isOpen: true, message: msg, onCancel, onConfirm });
       } else {
-        setProps({ isOpen: true, message: msg.message, onCancel, onConfirm });
+        setProps({ isOpen: true, message: msg.message, title: msg.title, onCancel, onConfirm });
       }
     });
   }

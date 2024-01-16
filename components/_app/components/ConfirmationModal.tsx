@@ -8,6 +8,7 @@ export type ConfirmationModalProps = {
   onCancel?: () => void;
   onConfirm?: () => Promise<void>;
   message: string;
+  title?: string;
   confirmButton?: string;
 };
 // Create a component that will be used to display modal with buttons based on the context
@@ -16,6 +17,7 @@ export function ConfirmationModal() {
   return (
     <ModalWithButtons
       open={props.isOpen}
+      title={props.title}
       onClose={props.onCancel || (() => {})}
       onConfirm={props.onConfirm || (() => {})}
       buttonText={props.confirmButton || 'Confirm'}

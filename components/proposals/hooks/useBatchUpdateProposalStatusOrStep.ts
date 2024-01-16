@@ -2,12 +2,14 @@ import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
 import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
+import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { ProposalEvaluationStep } from 'lib/proposal/interface';
 
 export function useBatchUpdateProposalStatusOrStep() {
   const { space } = useCurrentSpace();
+  const { showConfirmation } = useConfirmationModal();
   const { showMessage } = useSnackbar();
 
   async function updateProposalStatus({
@@ -31,11 +33,14 @@ export function useBatchUpdateProposalStatusOrStep() {
       // the evaluationId is the current evaluation id,
       // technically its not going back to the previous step, but only the result is being unset
       if (result === null) {
-        await charmClient.proposals.goBackToEvaluationStep({
+        await charmClient.proposals.goBackToStep({
           proposalId,
           evaluationId
         });
       } else {
+        const { confirmed } = await showConfirmation({
+          message: 'This action cannot be undone.'
+        });
         await charmClient.proposals.submitEvaluationResult({
           proposalId,
           evaluationId,
@@ -54,6 +59,14 @@ export function useBatchUpdateProposalStatusOrStep() {
     currentEvaluationStep: ProposalEvaluationStep;
     result: ProposalEvaluationResult | null;
   }) {
+    const { confirmed } = await showConfirmation({
+      message: result
+        ? `Approve current evaluation${proposalsData.length > 1 ? 's' : ''}?`
+        : 'Revert evaluation results?'
+    });
+    if (!confirmed) {
+      return;
+    }
     if (space) {
       const { id: spaceId } = space;
       try {
@@ -75,6 +88,14 @@ export function useBatchUpdateProposalStatusOrStep() {
     proposalsData: { evaluationId?: string; proposalId: string; currentEvaluationStep: ProposalEvaluationStep }[],
     moveForward: boolean
   ) {
+    const { confirmed } = await showConfirmation({
+      message: moveForward
+        ? `Approve current evaluation${proposalsData.length > 1 ? 's' : ''}?`
+        : 'Revert evaluation results?'
+    });
+    if (!confirmed) {
+      return;
+    }
     if (space) {
       const { id: spaceId } = space;
       try {
@@ -86,7 +107,7 @@ export function useBatchUpdateProposalStatusOrStep() {
               result: 'pass'
             });
           } else {
-            await charmClient.proposals.goBackToEvaluationStep({
+            await charmClient.proposals.goBackToStep({
               evaluationId,
               proposalId
             });
