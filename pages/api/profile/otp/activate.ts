@@ -4,14 +4,13 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import type { OtpResponse } from 'lib/profile/otp/createUserOtp';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).put(activateOtp);
 
-async function activateOtp(req: NextApiRequest, res: NextApiResponse<OtpResponse>) {
+async function activateOtp(req: NextApiRequest, res: NextApiResponse<void>) {
   const userId = req.session.user.id;
 
   const user = await prisma.user.findUnique({

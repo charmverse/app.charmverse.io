@@ -5,7 +5,7 @@ import { v4 as uuid } from 'uuid';
 import { createOtp } from './createOtp';
 import { createRecoveryCode } from './createRecoveryCode';
 
-export type OtpResponse = {
+export type CreateOtpResponse = {
   code: string;
   uri: string;
   recoveryCode: string;
@@ -16,7 +16,7 @@ export type OtpResponse = {
  * @param userId string
  * @returns The otp code, uri and recovery code
  */
-export async function createUserOtp(userId: string): Promise<OtpResponse> {
+export async function createUserOtp(userId: string): Promise<CreateOtpResponse> {
   const user = await prisma.user.findUnique({
     where: {
       id: userId

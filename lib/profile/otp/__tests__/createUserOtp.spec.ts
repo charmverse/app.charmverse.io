@@ -4,7 +4,7 @@ import { v4 as uuid } from 'uuid';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 import { getUserOtp, updateUserOtp } from 'testing/userOtp';
 
-import type { OtpResponse } from '../createUserOtp';
+import type { CreateOtpResponse } from '../createUserOtp';
 import { createUserOtp } from '../createUserOtp';
 
 describe('createUserOtp', () => {
@@ -39,7 +39,7 @@ describe('createUserOtp', () => {
     const oldUserOtp = await createUserOtp(user.id);
     const newUserOtpRequest = await createUserOtp(user.id);
 
-    (Object.keys(newUserOtpRequest) as (keyof OtpResponse)[]).forEach((key) => {
+    (Object.keys(newUserOtpRequest) as (keyof CreateOtpResponse)[]).forEach((key) => {
       if (key === 'recoveryCode') {
         expect(newUserOtpRequest[key]).not.toEqual(oldUserOtp[key]);
       } else {

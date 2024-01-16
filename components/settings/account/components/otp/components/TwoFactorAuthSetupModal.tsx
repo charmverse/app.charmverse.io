@@ -1,18 +1,18 @@
+import type { EmotionJSX } from '@emotion/react/types/jsx-namespace';
 import { forwardRef } from 'react';
 
 import type { ModalProps } from 'components/common/Modal';
 import Modal from 'components/common/Modal';
 
+import type { Screens } from '../hooks/useTwoFactorAuth';
 import { useTwoFactorAuth } from '../hooks/useTwoFactorAuth';
 
-import { ConfirmationScreen } from './ConfirmationScreen';
-import { FinishScreen } from './FinishScreen';
-import { LinkScreen } from './LinkScreen';
-import { StartScreen } from './StartScreen';
+import { ConfirmationScreen } from './TwoFactorAuthScreens/ConfirmationScreen';
+import { FinishScreen } from './TwoFactorAuthScreens/FinishScreen';
+import { LinkScreen } from './TwoFactorAuthScreens/LinkScreen';
+import { StartScreen } from './TwoFactorAuthScreens/StartScreen';
 
-export type Screens = 'start' | 'link' | 'confirmation' | 'finish';
-
-const modalScreens: Record<Screens, typeof FinishScreen> = {
+const modalScreens: Record<Screens, () => EmotionJSX.Element | null> = {
   start: StartScreen,
   link: LinkScreen,
   confirmation: ConfirmationScreen,

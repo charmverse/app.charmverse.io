@@ -3,7 +3,7 @@ import { createContext, useContext, useMemo, useState } from 'react';
 import type { SWRMutationConfiguration } from 'swr/mutation';
 
 import { useCreateUserOtp } from 'charmClient/hooks/profile';
-import type { OtpResponse } from 'lib/profile/otp/createUserOtp';
+import type { CreateOtpResponse } from 'lib/profile/otp/createUserOtp';
 
 export type Screens = 'start' | 'link' | 'confirmation' | 'finish';
 
@@ -11,11 +11,11 @@ type IContext = {
   setFlow: (flow: Screens) => void;
   trigger: (
     extraArgument?: undefined,
-    options?: SWRMutationConfiguration<OtpResponse, Error, undefined, string> | undefined
-  ) => Promise<OtpResponse | undefined>;
+    options?: SWRMutationConfiguration<CreateOtpResponse, Error, undefined, string> | undefined
+  ) => Promise<CreateOtpResponse | undefined>;
   flow: Screens;
   error?: Error;
-  data?: OtpResponse;
+  data?: CreateOtpResponse;
   isLoading: boolean;
   handleClose: () => void;
 };

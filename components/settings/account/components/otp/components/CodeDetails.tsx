@@ -4,13 +4,17 @@ import { useState } from 'react';
 
 import { Button } from 'components/common/Button';
 
-import { useTwoFactorAuth } from '../hooks/useTwoFactorAuth';
-
 import { CanvasQRCode } from './CanvasQrCode';
 
-export function LinkScreen() {
+type Props = {
+  uri: string;
+  code: string;
+  btnText: string;
+  onSubmit: () => void;
+};
+
+export function CodeDetails({ onSubmit, uri, code, btnText }: Props) {
   const [showCode, setShowCode] = useState(false);
-  const { data, setFlow } = useTwoFactorAuth();
 
   return (
     <Box>
@@ -21,18 +25,16 @@ export function LinkScreen() {
         Use your authentication app to scan this QR code. If you don't have an authentication app on your device, you'll
         need to install one now.
       </Typography>
-      {data && (
-        <Box display='flex' alignItems='center' flexDirection='column'>
-          <CanvasQRCode uri={data.uri} />
-          <Button variant='text' onClick={() => setShowCode(true)}>
-            Can't scan the QR code?
-          </Button>
-          {showCode && <Typography>{data.code}</Typography>}
-          <Button onClick={() => setFlow('confirmation')} sx={{ mt: 2 }}>
-            NEXT
-          </Button>
-        </Box>
-      )}
+      <Box display='flex' alignItems='center' flexDirection='column'>
+        <CanvasQRCode uri={uri} />
+        <Button variant='text' onClick={() => setShowCode(true)}>
+          Can't scan the QR code?
+        </Button>
+        {showCode && <Typography>{code}</Typography>}
+        <Button onClick={onSubmit} sx={{ mt: 2 }}>
+          {btnText}
+        </Button>
+      </Box>
     </Box>
   );
 }

@@ -7,15 +7,13 @@ import Typography from '@mui/material/Typography';
 
 import { Button } from 'components/common/Button';
 
-import { useTwoFactorAuth } from '../hooks/useTwoFactorAuth';
+type Props = {
+  onSubmit: () => void;
+  loading?: boolean;
+  errorMessage?: string;
+};
 
-export function StartScreen() {
-  const { setFlow, trigger, isLoading } = useTwoFactorAuth();
-
-  const onSubmit = async () => {
-    await trigger(undefined, { onSuccess: () => setFlow('link') });
-  };
-
+export function StartSetup({ onSubmit, loading, errorMessage }: Props) {
   return (
     <List sx={{ '.MuiListItemText-root': { mt: 0 }, '.MuiListItem-root': { py: 2 } }}>
       <ListItem>
@@ -63,9 +61,10 @@ export function StartScreen() {
         />
       </ListItem>
       <ListItem sx={{ justifyContent: 'center' }}>
-        <Button onClick={onSubmit} loading={isLoading} disabled={isLoading}>
-          GET STARTED
+        <Button onClick={onSubmit} loading={loading} disabled={loading}>
+          Get started
         </Button>
+        {errorMessage && <Typography color='error'>{errorMessage}</Typography>}
       </ListItem>
     </List>
   );

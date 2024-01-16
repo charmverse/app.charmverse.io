@@ -2,42 +2,30 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { useForm } from 'react-hook-form';
 
-import { useActivateOtp, useVerifyOtp } from 'charmClient/hooks/profile';
 import { Button } from 'components/common/Button';
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
-import { useUser } from 'hooks/useUser';
 
-import { useTwoFactorAuth } from '../hooks/useTwoFactorAuth';
+export type Props = {
+  loading?: boolean;
+  errorMessage?: string;
+  onSubmit: (code: string) => Promise<void>;
+};
 
-export function ConfirmationScreen() {
-  const { trigger: verifyOtp, error: verifyOtpError, isMutating: isValidationLoading } = useVerifyOtp();
-  const { trigger: activateOtp, error: activateOtpError, isMutating: isActivationLoading } = useActivateOtp();
-  const { setFlow } = useTwoFactorAuth();
-  const { refreshUser } = useUser();
-
+export function ConfirmAuthCode({ onSubmit, errorMessage, loading }: Props) {
   const {
     register,
-    watch,
+    getValues,
     handleSubmit,
     formState: { errors }
   } = useForm<{ code: string }>({
     defaultValues: { code: '' }
   });
+  const error = errors.code?.message || errorMessage;
 
-  const code = watch('code');
-
-  const onSubmit = async () => {
-    await verifyOtp({ code });
-    await activateOtp(undefined, {
-      onSuccess: () => {
-        setFlow('finish');
-        refreshUser();
-      }
-    });
+  const onSubmitCode = async () => {
+    const code = getValues('code');
+    await onSubmit(code);
   };
-
-  const isLoading = isValidationLoading || isActivationLoading;
-  const error = verifyOtpError?.message || activateOtpError?.message || errors.code?.message;
 
   return (
     <Box>
@@ -51,7 +39,7 @@ export function ConfirmationScreen() {
       <Box maxWidth={300}>
         <NumberInputField
           error={error}
-          disabled={isLoading}
+          disabled={loading}
           helperText={error}
           {...register('code', {
             required: true,
@@ -59,8 +47,8 @@ export function ConfirmationScreen() {
           })}
         />
       </Box>
-      <Button sx={{ mt: 2 }} onClick={handleSubmit(onSubmit)} loading={isLoading} disabled={isLoading}>
-        CONFIRM
+      <Button sx={{ mt: 2 }} onClick={handleSubmit(onSubmitCode)} loading={loading} disabled={loading}>
+        Confirm
       </Button>
     </Box>
   );
