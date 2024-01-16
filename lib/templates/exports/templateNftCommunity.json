@@ -655,21 +655,105 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
+        "categoryId": "67f004c9-ff0f-459a-a9d0-d02fd563158c",
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {
           "properties": {
             "__status": "",
             "__authors": [],
+            "__category": "67f004c9-ff0f-459a-a9d0-d02fd563158c",
             "__createdAt": "",
             "__reviewers": [
               {
                 "group": "role"
               }
-            ]
+            ],
+            "__evaluationType": "vote",
+            "e25d9676-face-42d6-9994-686e0f76d895": "67f004c9-ff0f-459a-a9d0-d02fd563158c"
           }
         },
-        "workflowId": null
+        "workflowId": "3bad39e8-e560-48f0-9297-acc8b90b5ead",
+        "formId": null,
+        "evaluations": [
+          {
+            "id": "92ec02db-6c43-48f4-bf35-1c84b296bab2",
+            "index": 0,
+            "title": "Feedback",
+            "type": "feedback",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "0ce6c53a-a61d-4ed3-ac7d-8b382a8177ef",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [],
+            "rubricCriteria": []
+          },
+          {
+            "id": "24f2af0a-f80c-4cfe-b6fc-1ac1f1e7ec66",
+            "index": 1,
+            "title": "Review",
+            "type": "pass_fail",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "0ce6c53a-a61d-4ed3-ac7d-8b382a8177ef",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [
+              {
+                "id": "010864b2-a25f-4a52-a22f-89e67f81375e",
+                "proposalId": "0ce6c53a-a61d-4ed3-ac7d-8b382a8177ef",
+                "roleId": "fab61a44-bc2c-4e89-a8c7-7b2eb0e97b3a",
+                "userId": null,
+                "systemRole": null,
+                "evaluationId": "24f2af0a-f80c-4cfe-b6fc-1ac1f1e7ec66"
+              }
+            ],
+            "rubricCriteria": []
+          },
+          {
+            "id": "83505c14-363d-4a21-9e67-6270b068a7e8",
+            "index": 1,
+            "title": "Vote",
+            "type": "vote",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "0ce6c53a-a61d-4ed3-ac7d-8b382a8177ef",
+            "voteSettings": {
+              "type": "Approval",
+              "options": [
+                "Yes",
+                "No",
+                "Abstain"
+              ],
+              "threshold": 50,
+              "maxChoices": 1,
+              "durationDays": 5,
+              "publishToSnapshot": false
+            },
+            "voteId": null,
+            "result": null,
+            "reviewers": [
+              {
+                "id": "e7f8e2ed-7377-430b-9fe1-09ad9c1618fa",
+                "proposalId": "0ce6c53a-a61d-4ed3-ac7d-8b382a8177ef",
+                "roleId": null,
+                "userId": null,
+                "systemRole": "space_member",
+                "evaluationId": "83505c14-363d-4a21-9e67-6270b068a7e8"
+              }
+            ],
+            "rubricCriteria": []
+          }
+        ]
       }
     },
     {
@@ -1444,21 +1528,105 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
+        "categoryId": "e826b6ff-ea89-47aa-9bda-83234bff9491",
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {
           "properties": {
             "__status": "",
             "__authors": [],
+            "__category": "e826b6ff-ea89-47aa-9bda-83234bff9491",
             "__createdAt": "",
             "__reviewers": [
               {
                 "group": "role"
               }
-            ]
+            ],
+            "__evaluationType": "vote",
+            "e25d9676-face-42d6-9994-686e0f76d895": "e826b6ff-ea89-47aa-9bda-83234bff9491"
           }
         },
-        "workflowId": null
+        "workflowId": "3bad39e8-e560-48f0-9297-acc8b90b5ead",
+        "formId": null,
+        "evaluations": [
+          {
+            "id": "99f42698-6434-4f24-b988-206bbf834848",
+            "index": 0,
+            "title": "Feedback",
+            "type": "feedback",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "5e03ee92-1b32-4a3e-83bb-0abf98994c55",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [],
+            "rubricCriteria": []
+          },
+          {
+            "id": "31fc1dea-38a5-4b6e-88af-091306cd89c4",
+            "index": 1,
+            "title": "Review",
+            "type": "pass_fail",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "5e03ee92-1b32-4a3e-83bb-0abf98994c55",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [
+              {
+                "id": "bb052a0d-a6f0-4e3e-8452-bf0782bade18",
+                "proposalId": "5e03ee92-1b32-4a3e-83bb-0abf98994c55",
+                "roleId": "fab61a44-bc2c-4e89-a8c7-7b2eb0e97b3a",
+                "userId": null,
+                "systemRole": null,
+                "evaluationId": "31fc1dea-38a5-4b6e-88af-091306cd89c4"
+              }
+            ],
+            "rubricCriteria": []
+          },
+          {
+            "id": "3ff1c692-6318-4672-85fc-f31dc79eb3cb",
+            "index": 1,
+            "title": "Vote",
+            "type": "vote",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "5e03ee92-1b32-4a3e-83bb-0abf98994c55",
+            "voteSettings": {
+              "type": "Approval",
+              "options": [
+                "Yes",
+                "No",
+                "Abstain"
+              ],
+              "threshold": 50,
+              "maxChoices": 1,
+              "durationDays": 5,
+              "publishToSnapshot": false
+            },
+            "voteId": null,
+            "result": null,
+            "reviewers": [
+              {
+                "id": "2bf8e217-5a9a-49e6-8b24-ef45e047865c",
+                "proposalId": "5e03ee92-1b32-4a3e-83bb-0abf98994c55",
+                "roleId": null,
+                "userId": null,
+                "systemRole": "space_member",
+                "evaluationId": "3ff1c692-6318-4672-85fc-f31dc79eb3cb"
+              }
+            ],
+            "rubricCriteria": []
+          }
+        ]
       }
     },
     {
@@ -2211,22 +2379,1052 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
+        "categoryId": "037cac71-c4c7-4355-83dc-577a4cc30a08",
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {
           "properties": {
             "__status": "",
             "__authors": [],
+            "__category": "037cac71-c4c7-4355-83dc-577a4cc30a08",
             "__createdAt": "",
             "__reviewers": [
               {
                 "group": "role"
               }
-            ]
+            ],
+            "__evaluationType": "vote",
+            "e25d9676-face-42d6-9994-686e0f76d895": "037cac71-c4c7-4355-83dc-577a4cc30a08"
           }
         },
-        "workflowId": null
+        "workflowId": "3bad39e8-e560-48f0-9297-acc8b90b5ead",
+        "formId": null,
+        "evaluations": [
+          {
+            "id": "a16e6a6c-dd8c-4a4a-baf5-31ecceb81d68",
+            "index": 0,
+            "title": "Feedback",
+            "type": "feedback",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "9dff2dad-bdf0-400a-be58-508ed7f30190",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [],
+            "rubricCriteria": []
+          },
+          {
+            "id": "24fd8bac-978a-4ea2-8d76-a050a13c1637",
+            "index": 1,
+            "title": "Review",
+            "type": "pass_fail",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "9dff2dad-bdf0-400a-be58-508ed7f30190",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [
+              {
+                "id": "a4399c4c-ad56-4c1e-90b6-f345ab5234b6",
+                "proposalId": "9dff2dad-bdf0-400a-be58-508ed7f30190",
+                "roleId": "fab61a44-bc2c-4e89-a8c7-7b2eb0e97b3a",
+                "userId": null,
+                "systemRole": null,
+                "evaluationId": "24fd8bac-978a-4ea2-8d76-a050a13c1637"
+              }
+            ],
+            "rubricCriteria": []
+          },
+          {
+            "id": "0807cc4d-9a2e-410a-9ff7-bf194b751699",
+            "index": 1,
+            "title": "Vote",
+            "type": "vote",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "9dff2dad-bdf0-400a-be58-508ed7f30190",
+            "voteSettings": {
+              "type": "Approval",
+              "options": [
+                "Yes",
+                "No",
+                "Abstain"
+              ],
+              "threshold": 50,
+              "maxChoices": 1,
+              "durationDays": 5,
+              "publishToSnapshot": false
+            },
+            "voteId": null,
+            "result": null,
+            "reviewers": [
+              {
+                "id": "8df111c1-ec32-4ba3-a9a5-7ed71528a166",
+                "proposalId": "9dff2dad-bdf0-400a-be58-508ed7f30190",
+                "roleId": null,
+                "userId": null,
+                "systemRole": "space_member",
+                "evaluationId": "0807cc4d-9a2e-410a-9ff7-bf194b751699"
+              }
+            ],
+            "rubricCriteria": []
+          }
+        ]
       }
+    },
+    {
+      "id": "e8892ec0-cc6b-4884-bf38-06a3e18a2876",
+      "deletedAt": null,
+      "createdAt": "2023-12-03T19:49:02.297Z",
+      "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+      "updatedAt": "2023-12-03T21:21:23.964Z",
+      "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+      "deletedBy": null,
+      "title": "Getting Started",
+      "content": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "heading",
+            "attrs": {
+              "id": null,
+              "level": 1,
+              "track": []
+            },
+            "content": [
+              {
+                "type": "emoji",
+                "attrs": {
+                  "emoji": "👋"
+                },
+                "marks": [
+                  {
+                    "type": "insertion",
+                    "attrs": {
+                      "date": "2023-12-03T19:50:00.000Z",
+                      "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                      "approved": true,
+                      "username": "Drea | CharmVerse"
+                    }
+                  },
+                  {
+                    "type": "text-color",
+                    "attrs": {
+                      "color": "blue",
+                      "bgColor": ""
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " Welcome to CharmVerse!",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "insertion",
+                    "attrs": {
+                      "date": "2023-12-03T19:50:00.000Z",
+                      "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                      "approved": true,
+                      "username": "Drea | CharmVerse"
+                    }
+                  },
+                  {
+                    "type": "text-color",
+                    "attrs": {
+                      "color": "blue",
+                      "bgColor": ""
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "track": []
+            },
+            "content": [
+              {
+                "text": "A community ",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "italic"
+                  },
+                  {
+                    "type": "insertion",
+                    "attrs": {
+                      "date": "2023-12-03T19:50:00.000Z",
+                      "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                      "approved": true,
+                      "username": "Drea | CharmVerse"
+                    }
+                  }
+                ]
+              },
+              {
+                "text": "operations ",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "italic"
+                  },
+                  {
+                    "type": "insertion",
+                    "attrs": {
+                      "date": "2023-12-03T20:20:00.000Z",
+                      "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                      "approved": true,
+                      "username": "Drea | CharmVerse"
+                    }
+                  }
+                ]
+              },
+              {
+                "text": "platform",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "italic"
+                  },
+                  {
+                    "type": "insertion",
+                    "attrs": {
+                      "date": "2023-12-03T19:50:00.000Z",
+                      "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                      "approved": true,
+                      "username": "Drea | CharmVerse"
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " designed specifically for w",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "italic"
+                  },
+                  {
+                    "type": "insertion",
+                    "attrs": {
+                      "date": "2023-12-03T20:20:00.000Z",
+                      "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                      "approved": true,
+                      "username": "Drea | CharmVerse"
+                    }
+                  }
+                ]
+              },
+              {
+                "text": "eb3",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "italic"
+                  },
+                  {
+                    "type": "insertion",
+                    "attrs": {
+                      "date": "2023-12-03T19:50:00.000Z",
+                      "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                      "approved": true,
+                      "username": "Drea | CharmVerse"
+                    }
+                  },
+                  {
+                    "type": "text-color",
+                    "attrs": {
+                      "color": null,
+                      "bgColor": null
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " communities -",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "italic"
+                  },
+                  {
+                    "type": "insertion",
+                    "attrs": {
+                      "date": "2023-12-03T20:20:00.000Z",
+                      "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                      "approved": true,
+                      "username": "Drea | CharmVerse"
+                    }
+                  },
+                  {
+                    "type": "text-color",
+                    "attrs": {
+                      "color": null,
+                      "bgColor": null
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " build relationships, work together and vote.",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "italic"
+                  },
+                  {
+                    "type": "insertion",
+                    "attrs": {
+                      "date": "2023-12-03T19:50:00.000Z",
+                      "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                      "approved": true,
+                      "username": "Drea | CharmVerse"
+                    }
+                  },
+                  {
+                    "type": "text-color",
+                    "attrs": {
+                      "color": null,
+                      "bgColor": null
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "horizontalRule",
+            "attrs": {
+              "track": []
+            }
+          },
+          {
+            "type": "blockquote",
+            "attrs": {
+              "emoji": "👇",
+              "track": []
+            },
+            "content": [
+              {
+                "type": "heading",
+                "attrs": {
+                  "id": null,
+                  "level": 2,
+                  "track": []
+                },
+                "content": [
+                  {
+                    "text": "Supercharge your community with",
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "bold"
+                      },
+                      {
+                        "type": "insertion",
+                        "attrs": {
+                          "date": "2023-12-03T20:20:00.000Z",
+                          "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                          "approved": true,
+                          "username": "Drea | CharmVerse"
+                        }
+                      },
+                      {
+                        "type": "text-color",
+                        "attrs": {
+                          "color": "blue",
+                          "bgColor": ""
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "text": " CharmVerse",
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "bold"
+                      },
+                      {
+                        "type": "insertion",
+                        "attrs": {
+                          "date": "2023-12-03T19:50:00.000Z",
+                          "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                          "approved": true,
+                          "username": "Drea | CharmVerse"
+                        }
+                      },
+                      {
+                        "type": "text-color",
+                        "attrs": {
+                          "color": "blue",
+                          "bgColor": ""
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "columnLayout",
+            "attrs": {
+              "track": []
+            },
+            "content": [
+              {
+                "type": "columnBlock",
+                "attrs": {
+                  "size": 319,
+                  "track": []
+                },
+                "content": [
+                  {
+                    "type": "heading",
+                    "attrs": {
+                      "id": null,
+                      "level": 2,
+                      "track": []
+                    },
+                    "content": [
+                      {
+                        "text": "Member Directory",
+                        "type": "text",
+                        "marks": [
+                          {
+                            "type": "insertion",
+                            "attrs": {
+                              "date": "2023-12-03T19:50:00.000Z",
+                              "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                              "approved": true,
+                              "username": "Drea | CharmVerse"
+                            }
+                          },
+                          {
+                            "type": "text-color",
+                            "attrs": {
+                              "color": "blue",
+                              "bgColor": ""
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "paragraph",
+                    "attrs": {
+                      "track": []
+                    },
+                    "content": [
+                      {
+                        "text": "CharmVerse automatically builds a directory as members join your space.",
+                        "type": "text",
+                        "marks": [
+                          {
+                            "type": "insertion",
+                            "attrs": {
+                              "date": "2023-12-03T19:50:00.000Z",
+                              "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                              "approved": true,
+                              "username": "Drea | CharmVerse"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "paragraph",
+                    "attrs": {
+                      "track": []
+                    }
+                  },
+                  {
+                    "type": "iframe",
+                    "attrs": {
+                      "src": "https://tiny.charmverse.io/member-directory",
+                      "type": "embed",
+                      "track": [],
+                      "width": 700,
+                      "height": 200
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "columnBlock",
+                "attrs": {
+                  "size": 331,
+                  "track": []
+                },
+                "content": [
+                  {
+                    "type": "heading",
+                    "attrs": {
+                      "id": null,
+                      "level": 2,
+                      "track": []
+                    },
+                    "content": [
+                      {
+                        "text": "Proposals",
+                        "type": "text",
+                        "marks": [
+                          {
+                            "type": "insertion",
+                            "attrs": {
+                              "date": "2023-12-03T19:50:00.000Z",
+                              "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                              "approved": true,
+                              "username": "Drea | CharmVerse"
+                            }
+                          },
+                          {
+                            "type": "text-color",
+                            "attrs": {
+                              "color": "blue",
+                              "bgColor": ""
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "paragraph",
+                    "attrs": {
+                      "track": []
+                    },
+                    "content": [
+                      {
+                        "text": "A",
+                        "type": "text",
+                        "marks": [
+                          {
+                            "type": "insertion",
+                            "attrs": {
+                              "date": "2023-12-03T20:20:00.000Z",
+                              "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                              "approved": true,
+                              "username": "Drea | CharmVerse"
+                            }
+                          },
+                          {
+                            "type": "text-color",
+                            "attrs": {
+                              "color": null,
+                              "bgColor": null
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "text": "ll-in-one governance solution for web3",
+                        "type": "text",
+                        "marks": [
+                          {
+                            "type": "insertion",
+                            "attrs": {
+                              "date": "2023-12-03T19:50:00.000Z",
+                              "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                              "approved": true,
+                              "username": "Drea | CharmVerse"
+                            }
+                          },
+                          {
+                            "type": "text-color",
+                            "attrs": {
+                              "color": null,
+                              "bgColor": null
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "text": " ",
+                        "type": "text",
+                        "marks": [
+                          {
+                            "type": "bold"
+                          },
+                          {
+                            "type": "insertion",
+                            "attrs": {
+                              "date": "2023-12-03T19:50:00.000Z",
+                              "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                              "approved": true,
+                              "username": "Drea | CharmVerse"
+                            }
+                          },
+                          {
+                            "type": "text-color",
+                            "attrs": {
+                              "color": null,
+                              "bgColor": null
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "text": "grant programs, token communities, and DAOs",
+                        "type": "text",
+                        "marks": [
+                          {
+                            "type": "insertion",
+                            "attrs": {
+                              "date": "2023-12-03T19:50:00.000Z",
+                              "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                              "approved": true,
+                              "username": "Drea | CharmVerse"
+                            }
+                          },
+                          {
+                            "type": "text-color",
+                            "attrs": {
+                              "color": null,
+                              "bgColor": null
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "iframe",
+                    "attrs": {
+                      "src": "https://tiny.charmverse.io/proposal-builder",
+                      "type": "embed",
+                      "track": [],
+                      "width": 700,
+                      "height": 200
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "columnLayout",
+            "attrs": {
+              "track": []
+            },
+            "content": [
+              {
+                "type": "columnBlock",
+                "attrs": {
+                  "track": []
+                },
+                "content": [
+                  {
+                    "type": "heading",
+                    "attrs": {
+                      "id": null,
+                      "level": 2,
+                      "track": []
+                    },
+                    "content": [
+                      {
+                        "text": "Forum",
+                        "type": "text",
+                        "marks": [
+                          {
+                            "type": "insertion",
+                            "attrs": {
+                              "date": "2023-12-03T20:00:00.000Z",
+                              "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                              "approved": true,
+                              "username": "Drea | CharmVerse"
+                            }
+                          },
+                          {
+                            "type": "text-color",
+                            "attrs": {
+                              "color": "blue",
+                              "bgColor": ""
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "paragraph",
+                    "attrs": {
+                      "track": []
+                    },
+                    "content": [
+                      {
+                        "text": "C",
+                        "type": "text",
+                        "marks": [
+                          {
+                            "type": "insertion",
+                            "attrs": {
+                              "date": "2023-12-03T20:20:00.000Z",
+                              "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                              "approved": true,
+                              "username": "Drea | CharmVerse"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "text": "entral source for conversations that matter.",
+                        "type": "text",
+                        "marks": [
+                          {
+                            "type": "insertion",
+                            "attrs": {
+                              "date": "2023-12-03T20:00:00.000Z",
+                              "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                              "approved": true,
+                              "username": "Drea | CharmVerse"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "paragraph",
+                    "attrs": {
+                      "track": []
+                    }
+                  },
+                  {
+                    "type": "iframe",
+                    "attrs": {
+                      "src": "https://tiny.charmverse.io/forum",
+                      "type": "embed",
+                      "track": [],
+                      "width": 700,
+                      "height": 200
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "columnBlock",
+                "attrs": {
+                  "track": []
+                },
+                "content": [
+                  {
+                    "type": "heading",
+                    "attrs": {
+                      "id": null,
+                      "level": 2,
+                      "track": []
+                    },
+                    "content": [
+                      {
+                        "text": "Rewards",
+                        "type": "text",
+                        "marks": [
+                          {
+                            "type": "insertion",
+                            "attrs": {
+                              "date": "2023-12-03T20:00:00.000Z",
+                              "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                              "approved": true,
+                              "username": "Drea | CharmVerse"
+                            }
+                          },
+                          {
+                            "type": "text-color",
+                            "attrs": {
+                              "color": "blue",
+                              "bgColor": ""
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "paragraph",
+                    "attrs": {
+                      "track": []
+                    },
+                    "content": [
+                      {
+                        "text": "Incentivize community contribution and collaboration.",
+                        "type": "text",
+                        "marks": [
+                          {
+                            "type": "insertion",
+                            "attrs": {
+                              "date": "2023-12-03T20:00:00.000Z",
+                              "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                              "approved": true,
+                              "username": "Drea | CharmVerse"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "iframe",
+                    "attrs": {
+                      "src": "https://tiny.charmverse.io/rewards",
+                      "type": "embed",
+                      "track": [],
+                      "width": 700,
+                      "height": 200
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "horizontalRule",
+            "attrs": {
+              "track": []
+            }
+          },
+          {
+            "type": "blockquote",
+            "attrs": {
+              "emoji": "🤝",
+              "track": []
+            },
+            "content": [
+              {
+                "type": "heading",
+                "attrs": {
+                  "id": null,
+                  "level": 2,
+                  "track": []
+                },
+                "content": [
+                  {
+                    "text": "Collaborate in CharmVerse",
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "bold"
+                      },
+                      {
+                        "type": "insertion",
+                        "attrs": {
+                          "date": "2023-12-03T19:50:00.000Z",
+                          "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                          "approved": true,
+                          "username": "Drea | CharmVerse"
+                        }
+                      },
+                      {
+                        "type": "text-color",
+                        "attrs": {
+                          "color": "blue",
+                          "bgColor": ""
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "track": []
+                },
+                "content": [
+                  {
+                    "text": "CharmVerse is better with friends, teammates, and collaborators ",
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "insertion",
+                        "attrs": {
+                          "date": "2023-12-03T19:50:00.000Z",
+                          "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                          "approved": true,
+                          "username": "Drea | CharmVerse"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "emoji",
+                    "attrs": {
+                      "emoji": "🥳"
+                    },
+                    "marks": [
+                      {
+                        "type": "insertion",
+                        "attrs": {
+                          "date": "2023-12-03T19:50:00.000Z",
+                          "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                          "approved": true,
+                          "username": "Drea | CharmVerse"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "text": "  ",
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "insertion",
+                        "attrs": {
+                          "date": "2023-12-03T19:50:00.000Z",
+                          "user": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                          "approved": true,
+                          "username": "Drea | CharmVerse"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "iframe",
+            "attrs": {
+              "src": "https://tiny.charmverse.io/invites",
+              "type": "embed",
+              "track": [],
+              "width": 700,
+              "height": 395.4802259887006
+            }
+          },
+          {
+            "type": "columnLayout",
+            "attrs": {
+              "track": []
+            },
+            "content": [
+              {
+                "type": "columnBlock",
+                "attrs": {
+                  "track": []
+                }
+              }
+            ]
+          },
+          {
+            "type": "horizontalRule",
+            "attrs": {
+              "track": []
+            }
+          },
+          {
+            "type": "bookmark",
+            "attrs": {
+              "url": "https://app.charmverse.io/charmverse-community/page-649263016636265",
+              "track": []
+            }
+          },
+          {
+            "type": "bookmark",
+            "attrs": {
+              "url": "https://discord.gg/ACYCzBGC2M",
+              "track": []
+            }
+          },
+          {
+            "type": "bookmark",
+            "attrs": {
+              "url": "https://embeds.beehiiv.com/c66f66bc-09b6-4e40-b69a-243f5ce75c3c",
+              "track": []
+            }
+          },
+          {
+            "type": "iframe",
+            "attrs": {
+              "src": "https://embeds.beehiiv.com/c66f66bc-09b6-4e40-b69a-243f5ce75c3c",
+              "type": "embed",
+              "track": [],
+              "width": 700,
+              "height": 200
+            }
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "track": []
+            }
+          }
+        ]
+      },
+      "contentText": "👋 Welcome to CharmVerse!A community operations platform designed specifically for web3 communities - build relationships, work together and vote.Supercharge your community with CharmVerseMember DirectoryCharmVerse automatically builds a directory as members join your space.ProposalsAll-in-one governance solution for web3 grant programs, token communities, and DAOsForumCentral source for conversations that matter.RewardsIncentivize community contribution and collaboration.Collaborate in CharmVerseCharmVerse is better with friends, teammates, and collaborators 🥳  ",
+      "galleryImage": null,
+      "hasContent": true,
+      "headerImage": "https://s3.amazonaws.com/charm.public/user-content/e5dba747-be62-49be-a7ba-71cf27b17174/2964a494-0aaf-4547-aaff-7b1ebfb540ae/home_banner.jpg",
+      "icon": "🧑‍🚀",
+      "path": "getting-started-3818695842119486",
+      "isTemplate": false,
+      "parentId": null,
+      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
+      "additionalPaths": [
+        "getting-tarted-3818695842119486",
+        "getting-started-3818695842119486",
+        "getting-3818695842119486",
+        "gett-3818695842119486",
+        "page-3818695842119486"
+      ],
+      "type": "page",
+      "boardId": null,
+      "autoGenerated": false,
+      "index": 8,
+      "cardId": null,
+      "proposalId": null,
+      "snapshotProposalId": null,
+      "fullWidth": false,
+      "fontFamily": "default",
+      "fontSizeSmall": false,
+      "version": 660,
+      "bountyId": null,
+      "syncWithPageId": null,
+      "convertedProposalId": null,
+      "sourceTemplateId": null,
+      "permissions": [
+        {
+          "pageId": "e8892ec0-cc6b-4884-bf38-06a3e18a2876",
+          "userId": null,
+          "id": "0d1425f4-4fe8-4966-9d1f-cafbbb7a634a",
+          "permissionLevel": "view",
+          "permissions": [],
+          "roleId": null,
+          "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
+          "inheritedFromPermission": null,
+          "public": null,
+          "allowDiscovery": false,
+          "sourcePermission": null
+        },
+        {
+          "pageId": "e8892ec0-cc6b-4884-bf38-06a3e18a2876",
+          "userId": "e5dba747-be62-49be-a7ba-71cf27b17174",
+          "id": "da24e5d9-4287-4734-a49c-ecdd71aaf61b",
+          "permissionLevel": "full_access",
+          "permissions": [],
+          "roleId": null,
+          "spaceId": null,
+          "inheritedFromPermission": null,
+          "public": null,
+          "allowDiscovery": false,
+          "sourcePermission": null
+        }
+      ],
+      "children": []
     },
     {
       "id": "8ff1d875-b00a-4666-8e2a-d747bab7099f",
@@ -2713,21 +3911,105 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
+        "categoryId": "9d39b289-e4a9-4817-bfe6-4ea83f9094c9",
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {
           "properties": {
             "__status": "",
             "__authors": [],
+            "__category": "9d39b289-e4a9-4817-bfe6-4ea83f9094c9",
             "__createdAt": "",
             "__reviewers": [
               {
                 "group": "role"
               }
-            ]
+            ],
+            "__evaluationType": "vote",
+            "e25d9676-face-42d6-9994-686e0f76d895": "9d39b289-e4a9-4817-bfe6-4ea83f9094c9"
           }
         },
-        "workflowId": null
+        "workflowId": "3bad39e8-e560-48f0-9297-acc8b90b5ead",
+        "formId": null,
+        "evaluations": [
+          {
+            "id": "eaafe63f-58d9-469f-8293-350caf325e45",
+            "index": 0,
+            "title": "Feedback",
+            "type": "feedback",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "8ff1d875-b00a-4666-8e2a-d747bab7099f",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [],
+            "rubricCriteria": []
+          },
+          {
+            "id": "e39253e2-c4a6-44f5-ac21-46ea7c7fa890",
+            "index": 1,
+            "title": "Review",
+            "type": "pass_fail",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "8ff1d875-b00a-4666-8e2a-d747bab7099f",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [
+              {
+                "id": "e5854377-b2ac-410a-877e-1a07081068c6",
+                "proposalId": "8ff1d875-b00a-4666-8e2a-d747bab7099f",
+                "roleId": "fab61a44-bc2c-4e89-a8c7-7b2eb0e97b3a",
+                "userId": null,
+                "systemRole": null,
+                "evaluationId": "e39253e2-c4a6-44f5-ac21-46ea7c7fa890"
+              }
+            ],
+            "rubricCriteria": []
+          },
+          {
+            "id": "2fc95cae-5e91-4f94-9a84-605367ac34c9",
+            "index": 1,
+            "title": "Vote",
+            "type": "vote",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "8ff1d875-b00a-4666-8e2a-d747bab7099f",
+            "voteSettings": {
+              "type": "Approval",
+              "options": [
+                "Yes",
+                "No",
+                "Abstain"
+              ],
+              "threshold": 50,
+              "maxChoices": 1,
+              "durationDays": 5,
+              "publishToSnapshot": false
+            },
+            "voteId": null,
+            "result": null,
+            "reviewers": [
+              {
+                "id": "b94f6094-e5aa-44c8-a387-127eab834ba3",
+                "proposalId": "8ff1d875-b00a-4666-8e2a-d747bab7099f",
+                "roleId": null,
+                "userId": null,
+                "systemRole": "space_member",
+                "evaluationId": "2fc95cae-5e91-4f94-9a84-605367ac34c9"
+              }
+            ],
+            "rubricCriteria": []
+          }
+        ]
       }
     },
     {
@@ -3413,21 +4695,105 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
+        "categoryId": "3b721d2f-d5af-4119-a11f-a43419266146",
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {
           "properties": {
             "__status": "",
             "__authors": [],
+            "__category": "3b721d2f-d5af-4119-a11f-a43419266146",
             "__createdAt": "",
             "__reviewers": [
               {
                 "group": "role"
               }
-            ]
+            ],
+            "__evaluationType": "vote",
+            "e25d9676-face-42d6-9994-686e0f76d895": "3b721d2f-d5af-4119-a11f-a43419266146"
           }
         },
-        "workflowId": null
+        "workflowId": "3bad39e8-e560-48f0-9297-acc8b90b5ead",
+        "formId": null,
+        "evaluations": [
+          {
+            "id": "b50d4da5-b095-46b6-929e-945fd5738ad7",
+            "index": 0,
+            "title": "Feedback",
+            "type": "feedback",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "227414b8-ea58-4dce-9fd7-ed7e29628113",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [],
+            "rubricCriteria": []
+          },
+          {
+            "id": "f29309f7-caef-4e24-abdb-91b297aa3cb0",
+            "index": 1,
+            "title": "Review",
+            "type": "pass_fail",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "227414b8-ea58-4dce-9fd7-ed7e29628113",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [
+              {
+                "id": "6c58d03f-9bee-467b-8a38-415b58eebdb4",
+                "proposalId": "227414b8-ea58-4dce-9fd7-ed7e29628113",
+                "roleId": "fab61a44-bc2c-4e89-a8c7-7b2eb0e97b3a",
+                "userId": null,
+                "systemRole": null,
+                "evaluationId": "f29309f7-caef-4e24-abdb-91b297aa3cb0"
+              }
+            ],
+            "rubricCriteria": []
+          },
+          {
+            "id": "efb8ceca-9c56-4aa6-83d5-03133b404404",
+            "index": 1,
+            "title": "Vote",
+            "type": "vote",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "227414b8-ea58-4dce-9fd7-ed7e29628113",
+            "voteSettings": {
+              "type": "Approval",
+              "options": [
+                "Yes",
+                "No",
+                "Abstain"
+              ],
+              "threshold": 50,
+              "maxChoices": 1,
+              "durationDays": 5,
+              "publishToSnapshot": false
+            },
+            "voteId": null,
+            "result": null,
+            "reviewers": [
+              {
+                "id": "2d279b18-ba29-4118-b6cd-5a167ea9f4e9",
+                "proposalId": "227414b8-ea58-4dce-9fd7-ed7e29628113",
+                "roleId": null,
+                "userId": null,
+                "systemRole": "space_member",
+                "evaluationId": "efb8ceca-9c56-4aa6-83d5-03133b404404"
+              }
+            ],
+            "rubricCriteria": []
+          }
+        ]
       }
     },
     {
@@ -4310,21 +5676,105 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
+        "categoryId": "f7a37418-ffb8-483c-a260-c6162ae88155",
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {
           "properties": {
             "__status": "",
             "__authors": [],
+            "__category": "f7a37418-ffb8-483c-a260-c6162ae88155",
             "__createdAt": "",
             "__reviewers": [
               {
                 "group": "role"
               }
-            ]
+            ],
+            "__evaluationType": "vote",
+            "e25d9676-face-42d6-9994-686e0f76d895": "f7a37418-ffb8-483c-a260-c6162ae88155"
           }
         },
-        "workflowId": null
+        "workflowId": "3bad39e8-e560-48f0-9297-acc8b90b5ead",
+        "formId": null,
+        "evaluations": [
+          {
+            "id": "9a8b7326-2a60-4960-a169-8ed34c7b7d0b",
+            "index": 0,
+            "title": "Feedback",
+            "type": "feedback",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "423917d8-ebbb-415c-9d71-6ce90450f184",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [],
+            "rubricCriteria": []
+          },
+          {
+            "id": "afc2c6eb-a73a-4ebb-b53a-863a201cc350",
+            "index": 1,
+            "title": "Review",
+            "type": "pass_fail",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "423917d8-ebbb-415c-9d71-6ce90450f184",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [
+              {
+                "id": "712f102b-02e8-4462-a48c-656f0f803052",
+                "proposalId": "423917d8-ebbb-415c-9d71-6ce90450f184",
+                "roleId": "fab61a44-bc2c-4e89-a8c7-7b2eb0e97b3a",
+                "userId": null,
+                "systemRole": null,
+                "evaluationId": "afc2c6eb-a73a-4ebb-b53a-863a201cc350"
+              }
+            ],
+            "rubricCriteria": []
+          },
+          {
+            "id": "d6e34fdb-2296-4b2e-9972-e0542aaa3f68",
+            "index": 1,
+            "title": "Vote",
+            "type": "vote",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "423917d8-ebbb-415c-9d71-6ce90450f184",
+            "voteSettings": {
+              "type": "Approval",
+              "options": [
+                "Yes",
+                "No",
+                "Abstain"
+              ],
+              "threshold": 50,
+              "maxChoices": 1,
+              "durationDays": 5,
+              "publishToSnapshot": false
+            },
+            "voteId": null,
+            "result": null,
+            "reviewers": [
+              {
+                "id": "6c6cff83-fa4f-44d3-b97c-eb780c01b809",
+                "proposalId": "423917d8-ebbb-415c-9d71-6ce90450f184",
+                "roleId": null,
+                "userId": null,
+                "systemRole": "space_member",
+                "evaluationId": "d6e34fdb-2296-4b2e-9972-e0542aaa3f68"
+              }
+            ],
+            "rubricCriteria": []
+          }
+        ]
       }
     },
     {
@@ -4943,21 +6393,105 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
+        "categoryId": "53726def-5070-4911-a095-681c85aeacaa",
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {
           "properties": {
             "__status": "",
             "__authors": [],
+            "__category": "53726def-5070-4911-a095-681c85aeacaa",
             "__createdAt": "",
             "__reviewers": [
               {
                 "group": "role"
               }
-            ]
+            ],
+            "__evaluationType": "vote",
+            "e25d9676-face-42d6-9994-686e0f76d895": "53726def-5070-4911-a095-681c85aeacaa"
           }
         },
-        "workflowId": null
+        "workflowId": "3bad39e8-e560-48f0-9297-acc8b90b5ead",
+        "formId": null,
+        "evaluations": [
+          {
+            "id": "7525e29c-e19d-4950-a350-4e56368fb9e2",
+            "index": 0,
+            "title": "Feedback",
+            "type": "feedback",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "53b3910d-9e72-48cb-aa16-664bfbbd428b",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [],
+            "rubricCriteria": []
+          },
+          {
+            "id": "6b428d1a-e70f-42be-9d72-57bf8925e82a",
+            "index": 1,
+            "title": "Review",
+            "type": "pass_fail",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "53b3910d-9e72-48cb-aa16-664bfbbd428b",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [
+              {
+                "id": "4648887a-d31b-41ba-90bd-c93843d138a5",
+                "proposalId": "53b3910d-9e72-48cb-aa16-664bfbbd428b",
+                "roleId": "fab61a44-bc2c-4e89-a8c7-7b2eb0e97b3a",
+                "userId": null,
+                "systemRole": null,
+                "evaluationId": "6b428d1a-e70f-42be-9d72-57bf8925e82a"
+              }
+            ],
+            "rubricCriteria": []
+          },
+          {
+            "id": "0c7a18a7-4d89-404b-81aa-c0bf0b1d3118",
+            "index": 1,
+            "title": "Vote",
+            "type": "vote",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "53b3910d-9e72-48cb-aa16-664bfbbd428b",
+            "voteSettings": {
+              "type": "Approval",
+              "options": [
+                "Yes",
+                "No",
+                "Abstain"
+              ],
+              "threshold": 50,
+              "maxChoices": 1,
+              "durationDays": 5,
+              "publishToSnapshot": false
+            },
+            "voteId": null,
+            "result": null,
+            "reviewers": [
+              {
+                "id": "cec6ac2f-a4fa-4196-ac10-76dfca158d1a",
+                "proposalId": "53b3910d-9e72-48cb-aa16-664bfbbd428b",
+                "roleId": null,
+                "userId": null,
+                "systemRole": "space_member",
+                "evaluationId": "0c7a18a7-4d89-404b-81aa-c0bf0b1d3118"
+              }
+            ],
+            "rubricCriteria": []
+          }
+        ]
       }
     },
     {
@@ -5710,21 +7244,105 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
+        "categoryId": "8e80fb13-ce4b-45e9-abcf-fe01aea62ddd",
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {
           "properties": {
             "__status": "",
             "__authors": [],
+            "__category": "8e80fb13-ce4b-45e9-abcf-fe01aea62ddd",
             "__createdAt": "",
             "__reviewers": [
               {
                 "group": "role"
               }
-            ]
+            ],
+            "__evaluationType": "vote",
+            "e25d9676-face-42d6-9994-686e0f76d895": "8e80fb13-ce4b-45e9-abcf-fe01aea62ddd"
           }
         },
-        "workflowId": null
+        "workflowId": "3bad39e8-e560-48f0-9297-acc8b90b5ead",
+        "formId": null,
+        "evaluations": [
+          {
+            "id": "53faddbc-4770-4d41-899c-762c2294c906",
+            "index": 0,
+            "title": "Feedback",
+            "type": "feedback",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "9187e2ae-3c11-4dc7-b87d-c3e3f6a16d06",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [],
+            "rubricCriteria": []
+          },
+          {
+            "id": "10f5da5c-00d8-4a59-bc84-7fc0d3a8b36a",
+            "index": 1,
+            "title": "Review",
+            "type": "pass_fail",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "9187e2ae-3c11-4dc7-b87d-c3e3f6a16d06",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [
+              {
+                "id": "3fbb848d-414e-40c2-94ca-c77d3f3ea1f3",
+                "proposalId": "9187e2ae-3c11-4dc7-b87d-c3e3f6a16d06",
+                "roleId": "fab61a44-bc2c-4e89-a8c7-7b2eb0e97b3a",
+                "userId": null,
+                "systemRole": null,
+                "evaluationId": "10f5da5c-00d8-4a59-bc84-7fc0d3a8b36a"
+              }
+            ],
+            "rubricCriteria": []
+          },
+          {
+            "id": "6725cff8-d9bc-4a7f-b2d1-a39b76fecc03",
+            "index": 1,
+            "title": "Vote",
+            "type": "vote",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "9187e2ae-3c11-4dc7-b87d-c3e3f6a16d06",
+            "voteSettings": {
+              "type": "Approval",
+              "options": [
+                "Yes",
+                "No",
+                "Abstain"
+              ],
+              "threshold": 50,
+              "maxChoices": 1,
+              "durationDays": 5,
+              "publishToSnapshot": false
+            },
+            "voteId": null,
+            "result": null,
+            "reviewers": [
+              {
+                "id": "152e583d-f3a6-4e35-9038-0b86f30828dc",
+                "proposalId": "9187e2ae-3c11-4dc7-b87d-c3e3f6a16d06",
+                "roleId": null,
+                "userId": null,
+                "systemRole": "space_member",
+                "evaluationId": "6725cff8-d9bc-4a7f-b2d1-a39b76fecc03"
+              }
+            ],
+            "rubricCriteria": []
+          }
+        ]
       }
     },
     {
@@ -12392,7 +14010,10 @@
                   "collapsedOptionIds": [],
                   "columnCalculations": {},
                   "kanbanCalculations": {},
-                  "visiblePropertyIds": ["__title", "11eefd10-f082-40d6-abc0-0a8cec44fb90"]
+                  "visiblePropertyIds": [
+                    "__title",
+                    "11eefd10-f082-40d6-abc0-0a8cec44fb90"
+                  ]
                 }
               }
             ]
@@ -13643,7 +15264,9 @@
                         "isTemplate": false,
                         "properties": {
                           "47b1aee8-dd7c-42e4-bd1e-9b14dd850015": "35bbea47-5c02-431b-89cd-ee7b796aba04",
-                          "c55a109e-a5b5-4cdd-9902-483ec65d58ee": ["d5b4e5db-868d-47b0-bc78-ebe9b5b2c835"]
+                          "c55a109e-a5b5-4cdd-9902-483ec65d58ee": [
+                            "d5b4e5db-868d-47b0-bc78-ebe9b5b2c835"
+                          ]
                         },
                         "headerImage": null,
                         "contentOrder": []
@@ -13742,7 +15365,9 @@
                         "isTemplate": false,
                         "properties": {
                           "47b1aee8-dd7c-42e4-bd1e-9b14dd850015": "35bbea47-5c02-431b-89cd-ee7b796aba04",
-                          "c55a109e-a5b5-4cdd-9902-483ec65d58ee": ["f7d47848-f993-4d16-8008-e1f5b23b8ad3"]
+                          "c55a109e-a5b5-4cdd-9902-483ec65d58ee": [
+                            "f7d47848-f993-4d16-8008-e1f5b23b8ad3"
+                          ]
                         },
                         "headerImage": null,
                         "contentOrder": []
@@ -13831,7 +15456,9 @@
                         "isTemplate": false,
                         "properties": {
                           "47b1aee8-dd7c-42e4-bd1e-9b14dd850015": "181ec031-6afc-4414-b1b8-87d2ecc74b82",
-                          "c55a109e-a5b5-4cdd-9902-483ec65d58ee": ["e5dba747-be62-49be-a7ba-71cf27b17174"]
+                          "c55a109e-a5b5-4cdd-9902-483ec65d58ee": [
+                            "e5dba747-be62-49be-a7ba-71cf27b17174"
+                          ]
                         },
                         "headerImage": null,
                         "contentOrder": []
@@ -13946,7 +15573,9 @@
                       "sortOptions": [],
                       "columnWidths": {},
                       "linkedSourceId": null,
-                      "hiddenOptionIds": [""],
+                      "hiddenOptionIds": [
+                        ""
+                      ],
                       "visibleOptionIds": [
                         "35bbea47-5c02-431b-89cd-ee7b796aba04",
                         "181ec031-6afc-4414-b1b8-87d2ecc74b82",
@@ -13956,7 +15585,9 @@
                       "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
-                      "visiblePropertyIds": ["c55a109e-a5b5-4cdd-9902-483ec65d58ee"]
+                      "visiblePropertyIds": [
+                        "c55a109e-a5b5-4cdd-9902-483ec65d58ee"
+                      ]
                     }
                   }
                 ]
@@ -16663,7 +18294,8 @@
           "reviewProposals": true,
           "deleteAnyPage": false,
           "deleteAnyBounty": false,
-          "deleteAnyProposal": false
+          "deleteAnyProposal": false,
+          "createProposals": true
         }
       },
       {
@@ -16679,7 +18311,8 @@
           "reviewProposals": true,
           "deleteAnyPage": false,
           "deleteAnyBounty": false,
-          "deleteAnyProposal": false
+          "deleteAnyProposal": false,
+          "createProposals": false
         }
       },
       {
@@ -16695,7 +18328,8 @@
           "reviewProposals": true,
           "deleteAnyPage": true,
           "deleteAnyBounty": true,
-          "deleteAnyProposal": true
+          "deleteAnyProposal": true,
+          "createProposals": false
         }
       }
     ]
@@ -16745,2317 +18379,6 @@
     }
   ],
   "posts": [
-    {
-      "createdAt": "2023-01-13T14:23:39.393Z",
-      "updatedAt": "2023-11-16T19:31:50.237Z",
-      "deletedAt": "2023-11-16T19:31:50.237Z",
-      "id": "58b9f29c-be77-4317-9b50-6f4edff3685c",
-      "title": "Our Team is heading to ETH Denver!",
-      "content": {
-        "type": "doc",
-        "content": [
-          {
-            "type": "image",
-            "attrs": {
-              "alt": null,
-              "src": "https://cryptoevents.global/wp-content/uploads/ETHDenver-2023-1.jpg",
-              "size": 700,
-              "track": [],
-              "caption": null
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "Please share your itinerary, events you plan on attending etc. here!",
-                "type": "text"
-              }
-            ]
-          }
-        ]
-      },
-      "contentText": "Please share your itinerary, events you plan on attending etc. here!",
-      "path": "our_team_is_heading_to_eth_denver!_lcum11j1",
-      "categoryId": "af2df4bf-0ce2-45e9-b34f-87c290f286dc",
-      "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-      "pinned": false,
-      "locked": false,
-      "proposalId": null,
-      "isDraft": false
-    },
-    {
-      "createdAt": "2023-01-13T14:40:23.346Z",
-      "updatedAt": "2023-11-16T19:31:31.738Z",
-      "deletedAt": "2023-11-16T19:31:31.737Z",
-      "id": "f2c49d2f-22dc-43ce-a477-7d2a72f8c229",
-      "title": "Have a cute pet?",
-      "content": {
-        "type": "doc",
-        "content": [
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "I need cute pet pics to stare at! Please share an image of your adorable fur baby ",
-                "type": "text"
-              },
-              {
-                "type": "emoji",
-                "attrs": {
-                  "emoji": "😍"
-                }
-              },
-              {
-                "text": " ",
-                "type": "text"
-              }
-            ]
-          },
-          {
-            "type": "image",
-            "attrs": {
-              "alt": null,
-              "src": "https://i5.walmartimages.com/asr/005ba43f-9e63-4abc-ae53-c377896e6147_1.a9c3ce70c537c3427a508c2b72ad6094.jpeg?odnHeight=612&odnWidth=612&odnBg=FFFFFF",
-              "size": 425,
-              "track": [],
-              "caption": null
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          }
-        ]
-      },
-      "contentText": "I need cute pet pics to stare at! Please share an image of your adorable fur baby  ",
-      "path": "have_a_cute_pet_lcummkow",
-      "categoryId": "9c2627c3-b730-4bf2-90de-ee47d799cb55",
-      "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-      "pinned": false,
-      "locked": false,
-      "proposalId": null,
-      "isDraft": false
-    },
-    {
-      "createdAt": "2023-01-19T14:06:50.541Z",
-      "updatedAt": "2023-11-16T19:31:11.213Z",
-      "deletedAt": "2023-11-16T19:31:11.213Z",
-      "id": "2a72da33-2d2f-4987-9300-2954c5ef2698",
-      "title": "Kokonut Network: Cofounder of an agricultural DAO talks DAO tooling",
-      "content": {
-        "type": "doc",
-        "content": [
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "image",
-            "attrs": {
-              "alt": "CharmVerse's Xandra Dozet had the pleasure of chatting with Alejandro of Kokonut Network.",
-              "src": "https://static.wixstatic.com/media/1d6dff_184b9bda4aa448b29f00daa52c3f5493~mv2.png/v1/fill/w_740,h_416,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/1d6dff_184b9bda4aa448b29f00daa52c3f5493~mv2.png",
-              "size": 700,
-              "track": [],
-              "caption": null
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "CharmVerse's Xandra Dozet had the pleasure of chatting with Alejandro of Kokonut Network.",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "type": "hardBreak",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "CharmVerse's ",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": "Xandra Dozet",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "link",
-                    "attrs": {
-                      "href": "https://twitter.com/XandraDozet"
-                    }
-                  },
-                  {
-                    "type": "underline"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " had the pleasure of chatting with ",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": "Alejandro",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "link",
-                    "attrs": {
-                      "href": "https://twitter.com/WasabiNetwork"
-                    }
-                  },
-                  {
-                    "type": "underline"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " of ",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": "Kokonut Network",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "link",
-                    "attrs": {
-                      "href": "https://kokonut.network/"
-                    }
-                  },
-                  {
-                    "type": "underline"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " about bringing agriculture to web3 and using ",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": "CharmVerse",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "link",
-                    "attrs": {
-                      "href": "https://www.charmverse.io/"
-                    }
-                  },
-                  {
-                    "type": "underline"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " to empower and engage their community. Read on to learn some surprising facts about coconuts and maybe CharmVerse, too!",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "Or you can listen to the entire Twitter Space ",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": "here",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "link",
-                    "attrs": {
-                      "href": "https://www.youtube.com/watch?v=OnjA59F3fl4"
-                    }
-                  },
-                  {
-                    "type": "underline"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": ".",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "video",
-            "attrs": {
-              "src": "https://www.youtube.com/watch?v=OnjA59F3fl4",
-              "track": [],
-              "width": 700,
-              "height": 395.48022598870057,
-              "muxAssetId": "",
-              "muxPlaybackId": ""
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": " ",
-                "type": "text"
-              }
-            ]
-          },
-          {
-            "type": "horizontalRule",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "tweet",
-            "attrs": {
-              "id": "1612848420296822792",
-              "track": [],
-              "screenName": "KokonutNetwork"
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "horizontalRule",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "ChamVerse:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": "teal",
-                      "bgColor": ""
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " ",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": "teal",
-                      "bgColor": ""
-                    }
-                  }
-                ]
-              },
-              {
-                "text": "So today I am talking with Alejandro (aka Wasabi), cofounder of Kokonut Network, and we'll be talking about the mission behind this DAO, his role there. And then we'll get into the meat of the discussion and dig into his opinions on CharmVerse.",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "Wasabi:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": "yellow",
-                      "bgColor": ""
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " Kokonut Network. We are trying to build a bridge between web3 and agriculture through a network of coconut farms. This is why we launched a DAO, so we can coordinate and we can use the DAO to fundraise and for rewards, distributions and governance. That's what we're doing.",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "type": "hardBreak",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "CharmVerse:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": "teal",
-                      "bgColor": ""
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " And it's an agricultural DAO, correct?",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "type": "hardBreak",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "Wasabi:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": "yellow",
-                      "bgColor": ""
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " Yeah, that's what we're working on, connecting the agriculture to web3 by creating a network of coconut farms. we have a first [farm] that is going to host 16,000 coconut trees.",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "CharmVerse:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": "teal",
-                      "bgColor": ""
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " Cool. And when I was digging into the website, I didn't realize how much that specific type of palm tree was used in so many products around the world.",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "Wasabi:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": "yellow",
-                      "bgColor": ""
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " Yes, it is a very versatile fruit. It is the most useful fruit out there because you can use coconut for pretty much everything. Like, you can use them for the health industry. You can use it for cosmetics, you can use it for food. For example, coconut sugar, coconut milk. You can use it even for cars. Automakers use coconut oil. It's like the coconut hair. They create something like fiber glass with these derivatives from the coconut. So it is very useful. [The coconut] is a circular fruit by default. Sometimes people want to build a circular economy, but a coconut is circular by default because nothing goes to waste. You can use even the shells. You can create plates and spoons and forks with the shells.\"",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "CharmVerse:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " I love it. And not only that. But also these coconut farms are a refuge for animals, right?",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "Wasabi:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " Yeah. Basically we are preserving and creating new habitats by doing this Kokonut project. Because you can take land that is sitting there collecting dust, doing nothing and you can create these coconut farms. The first cycle of a coconut tree can last up to 20 years, before peak fruit bearing. That means that for up to 20 years at least, you cannot use this land for anything other than coconut farming. So you are creating a habitat for animals, a source of pollen for bees, you know how pollination works and how critical is for everyone to have a bunch of bees running around.",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "CharmVerse:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " What's your role at Kokonut DAO? I know you said you're a cofounder but what's your day to day over there?",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "Wasabi:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " I handle everything from partnerships to this type of public event. I do pretty much a little bit of everything. That's why my title is Secretary of Kokonut Estate. I have to make sure that everything is going according to the plan....And I'm literally the bridge between the landowners, the Kokonut DAO members,... and I'm in the center of everything.",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "CharmVerse:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " How large is the community of Kokonut Network?",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "Wasabi:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " So right now we have 43 DAO members. And the goal for this month is to partner with at least 50 projects from the last Gitcoin solution round. Because we created a lot of new friends and synergies with them, we plan to expand the community in that vertical. We've been working on a paper called \"How to Regenerate Diversity Using Coconuts.\" So in this case we are going to target organizations that are aligned with us with the same values that want to be basically the founding members of Kokonut DAO. Because right now. the members that are getting shares and the people that are joining the project are basically the founding members. Sometimes people ask about NFTs, blah blah blah, and I tell people all the time, it is up to you to make these types of decisions within Kokonut DAO. DAO members have 99% of voting power. We as core team, we don't even have 1% voting power. So it's like I always tell people, it is up to you to use this natural asset however the community sees fit. That's the point of the DAO, right? It's for the community to come together and take initiative and do what needs to be done.",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "CharmVerse:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " So you are taking on new members? How would someone become a part of the community?",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "type": "hardBreak",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "Wasabi:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " They just have to join in the ",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": "discord",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "link",
-                    "attrs": {
-                      "href": "https://discord.gg/P6Jj5btpv7"
-                    }
-                  },
-                  {
-                    "type": "underline"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": ". We have the DAO lounge and ",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": "DAOhaus",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "link",
-                    "attrs": {
-                      "href": "https://daohaus.club/"
-                    }
-                  },
-                  {
-                    "type": "underline"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " on the ",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": "Gnosis Chain",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "link",
-                    "attrs": {
-                      "href": "https://blockscout.com/xdai/mainnet/address/0xFfe8A8ec2477390c6b97074f44326fac24D7f6DD"
-                    }
-                  },
-                  {
-                    "type": "underline"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": ". So it is a pretty straightforward process. Like you just have to contribute $20 per share. Each share is going to be always backed by one plant, by one coconut tree forever. Like once this coconut tree stops bearing fruit, we're going to replant the tree. And the same share that you bought, let's say, 20 years ago, is going to be still backed by one coconut tree.",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "CharmVerse:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " Now I want to get into the dirt and your experience and don't hold back. I want to hear what you have to say about CharmVerse. So how did you first discover CharmVerse?",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "Wasabi:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " I was doing research. I'm looking for DAO tooling. Because at first, since the beginning, we just wanted to create Kokonut and give complete power to the community. So we were looking for a tool that allows us to provide access and sort of privacy for the DAO members. So that's how I first found out about ",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": "CharmVerse",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "link",
-                    "attrs": {
-                      "href": "https://www.charmverse.io/"
-                    }
-                  },
-                  {
-                    "type": "underline"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": ".",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "CharmVerse: ",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": "And why CharmVerse? What made you go that route?",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "Wasabi:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " The list of features. Every tool that I have stumbled upon, they were missing something. Like. Some have the docs, some have the tasks, some have the boards, but none of them have all of the things. Like docs, tasks, boards, bounties, proposals - none of them had them all. At first, I was just talking on the ",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": "CharmVerse Discord",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "link",
-                    "attrs": {
-                      "href": "https://discord.gg/charmverse"
-                    }
-                  },
-                  {
-                    "type": "underline"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": ", looking at okay, let's see what's up. Because I consider myself a power user for tools. I love to be trying tools, but I believe I have used every tool out there. Once I saw CharmVerse and the flexibility, I just was waiting on the product to become a little more mature. And that happened, like, one month ago. I saw all of the updates coming together and I was like, okay, I need to migrate and we need to change [now].",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "CharmVerse: ",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": "I love to hear that. Our team has been working nonstop to ship a lot of great features since the summer. So it's great to hear that. Did you use Notion or do you use Notion? Did you use Notion before?",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "Wasabi:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " Yeah, Literally. I'm done with Notion. I love it. But it is for very small teams. Once it got strong, let's say three plus members, you got a lot of headaches. With the permissions, with the monthly plans and everything. You start getting the growing pains once you reach three plus members.",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "CharmVerse:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " That's good to hear. So how are you currently using the platform?",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "Wasabi:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " Right now I'm using the platform for information for the DAO members while we set up the Bounties section. Right now I'm updating all of the tasks with the proper properties and assigning tasks to people. Right now I use the platform as an information hub. I have a landing page that's going to be the first page a members see when they go inside and the rest of them is going to be gated to DAO members. And this information hub is going to be available for bounty hunters for and everyone within the community, pretty much, that is already what is listed with some type of role from Discord or using Google. This information page is going to be public, but the rest of the workspace is going to be view and comment only for DAO members and using an NFT batch to provide roles for the team. So we set up a token gate with an NFT. So automatically all of the Kokonut team members going to have a full access to the entire workspace. But for the DAO members, we just provide review and comment only access. They request something because they want to be part of some guild or any team or committee.",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "CharmVerse:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " You're able to have your own landing page. So it looks like your own personal space, right?",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "Wasabi:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " Customized space, yeah. And the price chart for crypto is very useful for calculating bounties. Having these price charts inside the workspaces is something else.",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "type": "hardBreak",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "CharmVerse:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " So let's see. So for Bounties, how are you using this function? What are you paying out for currently?",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "Wasabi:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " We're just paying out the bounty hunters right now. We use the bounty function to pay for tasks that are out of the area of expertise of the core team. For example, we run a bounty for the treasury management research so we can create new vouchers, we can create stable coins based on coconuts. And this was one of the first bounties that we ran on the platform. And I love the process within the Bounties. It is a bridge and very organized.",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "CharmVerse:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " And you can do batch payments. Do you ever use that?",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "Wasabi:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " Yeah, No, we haven't because we have the DAOhaus, we don't have Gnosis Safe yet. We're going to be using this later on with custom tokens. We are planning to create a custom token that you can exchange after for shares or for stables. We are planning to play a bit with these bounties and custom tokens.",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "CharmVerse:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " Fantastic. I look forward to seeing that and hearing more about it. So I think a lot of people, when we talk about DAOs, people get super curious about the governance within DAOs. So how do you create do you use CharmVerse to create proposals?",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "Wasabi: ",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": "Not yet, because like I said, we are DAOhaus, so we can just submit a proposal on chain. But starting next week, we are going to start using the proposal builder that I love so much. The first proposal that we're going to use this for is for the Kokonut DAO constitution. I believe that it is a very important piece for the project and what a better tool to create this constitution than the ",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": "proposal builder",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "link",
-                    "attrs": {
-                      "href": "https://www.charmverse.io/proposal-builder"
-                    }
-                  },
-                  {
-                    "type": "underline"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": ". We want to be able to do so much reviewing and drafting before going to vote. And it's crazy how much overhead we take off the plate.",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "CharmVerse:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " So other than the proposal builder, what are the future plans and objectives relative to CharmVerse for Kokonut network?",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "type": "hardBreak",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "Wasabi:",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " CharmVerse is going to be like the key to unlock the Kokonut Network, and Kokonut DAO growth as a whole. When you have a web3 enabled workspace, the possibility just becomes limitless because you are basically automatically connected to everything. You can have an NFT launch and you can program this NFT to have access to certain pages within the workspace and you can run new programs and create new mechanics for community participation. So I believe that this migration to CharmVerse is going to be the key to really scale the whole Kokonut mission and the work we're doing because right now we're going to be able to have more contributors, more people helping and shaping the project. ",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": "So we have big plans for CharmVerse as a hub of operations for our DAO.",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "CharmVerse: ",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "bold"
-                  },
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              },
-              {
-                "text": "Well, we are very happy to be able to facilitate that.",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": null,
-                      "bgColor": null
-                    }
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      "contentText": "CharmVerse's Xandra Dozet had the pleasure of chatting with Alejandro of Kokonut Network.CharmVerse's Xandra Dozet had the pleasure of chatting with Alejandro of Kokonut Network about bringing agriculture to web3 and using CharmVerse to empower and engage their community. Read on to learn some surprising facts about coconuts and maybe CharmVerse, too!Or you can listen to the entire Twitter Space here. ChamVerse: So today I am talking with Alejandro (aka Wasabi), cofounder of Kokonut Network, and we'll be talking about the mission behind this DAO, his role there. And then we'll get into the meat of the discussion and dig into his opinions on CharmVerse.Wasabi: Kokonut Network. We are trying to build a bridge between web3 and agriculture through a network of coconut farms. This is why we launched a DAO, so we can coordinate and we can use the DAO to fundraise and for rewards, distributions and governance. That's what we're doing.CharmVerse: And it's an agricultural DAO, correct?Wasabi: Yeah, that's what we're working on, connecting the agriculture to web3 by creating a network of coconut farms. we have a first [farm] that is going to host 16,000 coconut trees.CharmVerse: Cool. And when I was digging into the website, I didn't realize how much that specific type of palm tree was used in so many products around the world.Wasabi: Yes, it is a very versatile fruit. It is the most useful fruit out there because you can use coconut for pretty much everything. Like, you can use them for the health industry. You can use it for cosmetics, you can use it for food. For example, coconut sugar, coconut milk. You can use it even for cars. Automakers use coconut oil. It's like the coconut hair. They create something like fiber glass with these derivatives from the coconut. So it is very useful. [The coconut] is a circular fruit by default. Sometimes people want to build a circular economy, but a coconut is circular by default because nothing goes to waste. You can use even the shells. You can create plates and spoons and forks with the shells.\"CharmVerse: I love it. And not only that. But also these coconut farms are a refuge for animals, right?Wasabi: Yeah. Basically we are preserving and creating new habitats by doing this Kokonut project. Because you can take land that is sitting there collecting dust, doing nothing and you can create these coconut farms. The first cycle of a coconut tree can last up to 20 years, before peak fruit bearing. That means that for up to 20 years at least, you cannot use this land for anything other than coconut farming. So you are creating a habitat for animals, a source of pollen for bees, you know how pollination works and how critical is for everyone to have a bunch of bees running around.CharmVerse: What's your role at Kokonut DAO? I know you said you're a cofounder but what's your day to day over there?Wasabi: I handle everything from partnerships to this type of public event. I do pretty much a little bit of everything. That's why my title is Secretary of Kokonut Estate. I have to make sure that everything is going according to the plan....And I'm literally the bridge between the landowners, the Kokonut DAO members,... and I'm in the center of everything.CharmVerse: How large is the community of Kokonut Network?Wasabi: So right now we have 43 DAO members. And the goal for this month is to partner with at least 50 projects from the last Gitcoin solution round. Because we created a lot of new friends and synergies with them, we plan to expand the community in that vertical. We've been working on a paper called \"How to Regenerate Diversity Using Coconuts.\" So in this case we are going to target organizations that are aligned with us with the same values that want to be basically the founding members of Kokonut DAO. Because right now. the members that are getting shares and the people that are joining the project are basically the founding members. Sometimes people ask about NFTs, blah blah blah, and I tell people all the time, it is up to you to make these types of decisions within Kokonut DAO. DAO members have 99% of voting power. We as core team, we don't even have 1% voting power. So it's like I always tell people, it is up to you to use this natural asset however the community sees fit. That's the point of the DAO, right? It's for the community to come together and take initiative and do what needs to be done.CharmVerse: So you are taking on new members? How would someone become a part of the community?Wasabi: They just have to join in the discord. We have the DAO lounge and DAOhaus on the Gnosis Chain. So it is a pretty straightforward process. Like you just have to contribute $20 per share. Each share is going to be always backed by one plant, by one coconut tree forever. Like once this coconut tree stops bearing fruit, we're going to replant the tree. And the same share that you bought, let's say, 20 years ago, is going to be still backed by one coconut tree.CharmVerse: Now I want to get into the dirt and your experience and don't hold back. I want to hear what you have to say about CharmVerse. So how did you first discover CharmVerse?Wasabi: I was doing research. I'm looking for DAO tooling. Because at first, since the beginning, we just wanted to create Kokonut and give complete power to the community. So we were looking for a tool that allows us to provide access and sort of privacy for the DAO members. So that's how I first found out about CharmVerse.CharmVerse: And why CharmVerse? What made you go that route?Wasabi: The list of features. Every tool that I have stumbled upon, they were missing something. Like. Some have the docs, some have the tasks, some have the boards, but none of them have all of the things. Like docs, tasks, boards, bounties, proposals - none of them had them all. At first, I was just talking on the CharmVerse Discord, looking at okay, let's see what's up. Because I consider myself a power user for tools. I love to be trying tools, but I believe I have used every tool out there. Once I saw CharmVerse and the flexibility, I just was waiting on the product to become a little more mature. And that happened, like, one month ago. I saw all of the updates coming together and I was like, okay, I need to migrate and we need to change [now].CharmVerse: I love to hear that. Our team has been working nonstop to ship a lot of great features since the summer. So it's great to hear that. Did you use Notion or do you use Notion? Did you use Notion before?Wasabi: Yeah, Literally. I'm done with Notion. I love it. But it is for very small teams. Once it got strong, let's say three plus members, you got a lot of headaches. With the permissions, with the monthly plans and everything. You start getting the growing pains once you reach three plus members.CharmVerse: That's good to hear. So how are you currently using the platform?Wasabi: Right now I'm using the platform for information for the DAO members while we set up the Bounties section. Right now I'm updating all of the tasks with the proper properties and assigning tasks to people. Right now I use the platform as an information hub. I have a landing page that's going to be the first page a members see when they go inside and the rest of them is going to be gated to DAO members. And this information hub is going to be available for bounty hunters for and everyone within the community, pretty much, that is already what is listed with some type of role from Discord or using Google. This information page is going to be public, but the rest of the workspace is going to be view and comment only for DAO members and using an NFT batch to provide roles for the team. So we set up a token gate with an NFT. So automatically all of the Kokonut team members going to have a full access to the entire workspace. But for the DAO members, we just provide review and comment only access. They request something because they want to be part of some guild or any team or committee.CharmVerse: You're able to have your own landing page. So it looks like your own personal space, right?Wasabi: Customized space, yeah. And the price chart for crypto is very useful for calculating bounties. Having these price charts inside the workspaces is something else.CharmVerse: So let's see. So for Bounties, how are you using this function? What are you paying out for currently?Wasabi: We're just paying out the bounty hunters right now. We use the bounty function to pay for tasks that are out of the area of expertise of the core team. For example, we run a bounty for the treasury management research so we can create new vouchers, we can create stable coins based on coconuts. And this was one of the first bounties that we ran on the platform. And I love the process within the Bounties. It is a bridge and very organized.CharmVerse: And you can do batch payments. Do you ever use that?Wasabi: Yeah, No, we haven't because we have the DAOhaus, we don't have Gnosis Safe yet. We're going to be using this later on with custom tokens. We are planning to create a custom token that you can exchange after for shares or for stables. We are planning to play a bit with these bounties and custom tokens.CharmVerse: Fantastic. I look forward to seeing that and hearing more about it. So I think a lot of people, when we talk about DAOs, people get super curious about the governance within DAOs. So how do you create do you use CharmVerse to create proposals?Wasabi: Not yet, because like I said, we are DAOhaus, so we can just submit a proposal on chain. But starting next week, we are going to start using the proposal builder that I love so much. The first proposal that we're going to use this for is for the Kokonut DAO constitution. I believe that it is a very important piece for the project and what a better tool to create this constitution than the proposal builder. We want to be able to do so much reviewing and drafting before going to vote. And it's crazy how much overhead we take off the plate.CharmVerse: So other than the proposal builder, what are the future plans and objectives relative to CharmVerse for Kokonut network?Wasabi: CharmVerse is going to be like the key to unlock the Kokonut Network, and Kokonut DAO growth as a whole. When you have a web3 enabled workspace, the possibility just becomes limitless because you are basically automatically connected to everything. You can have an NFT launch and you can program this NFT to have access to certain pages within the workspace and you can run new programs and create new mechanics for community participation. So I believe that this migration to CharmVerse is going to be the key to really scale the whole Kokonut mission and the work we're doing because right now we're going to be able to have more contributors, more people helping and shaping the project. So we have big plans for CharmVerse as a hub of operations for our DAO.CharmVerse: Well, we are very happy to be able to facilitate that.",
-      "path": "kokonut_network:_cofounder_of_an_agricultural_dao__ld362j1x",
-      "categoryId": "7731f270-b619-45ff-a3d5-1c542d30f647",
-      "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-      "pinned": false,
-      "locked": false,
-      "proposalId": null,
-      "isDraft": false
-    },
-    {
-      "createdAt": "2023-01-24T18:18:05.091Z",
-      "updatedAt": "2023-11-16T19:31:04.297Z",
-      "deletedAt": "2023-11-16T19:31:04.296Z",
-      "id": "64fc17c2-a116-4592-895c-47e4744c5b32",
-      "title": "Product Update",
-      "content": {
-        "type": "doc",
-        "content": [
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "CharmVerse",
-                "type": "text",
-                "marks": [
-                  {
-                    "type": "text-color",
-                    "attrs": {
-                      "color": "red",
-                      "bgColor": ""
-                    }
-                  }
-                ]
-              },
-              {
-                "text": " just launched their Forum feature!!!",
-                "type": "text"
-              },
-              {
-                "type": "emoji",
-                "attrs": {
-                  "emoji": "👍"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      "contentText": "CharmVerse just launched their Forum feature!!!",
-      "path": "product_update_ldak8w66",
-      "categoryId": "b53e85ca-67aa-47af-b0cb-e602db12ece9",
-      "createdBy": "dc521ceb-495e-40cc-940e-3b1cafc7a2e1",
-      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-      "pinned": false,
-      "locked": false,
-      "proposalId": null,
-      "isDraft": false
-    },
-    {
-      "createdAt": "2023-01-13T14:32:47.522Z",
-      "updatedAt": "2023-11-16T19:31:39.892Z",
-      "deletedAt": "2023-11-16T19:31:39.891Z",
-      "id": "6e35f2ea-d71b-4eec-aafc-802d8d3800a9",
-      "title": "Going to NFT NYC?",
-      "content": {
-        "type": "doc",
-        "content": [
-          {
-            "type": "image",
-            "attrs": {
-              "alt": null,
-              "src": "https://cryptoevents.global/wp-content/uploads/NFT-NYC-2023.jpg",
-              "size": 700,
-              "track": [],
-              "caption": null
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          }
-        ]
-      },
-      "contentText": "",
-      "path": "going_to_nft_nyc?_lcumcso8",
-      "categoryId": "af2df4bf-0ce2-45e9-b34f-87c290f286dc",
-      "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-      "pinned": false,
-      "locked": false,
-      "proposalId": null,
-      "isDraft": false
-    },
-    {
-      "createdAt": "2023-01-17T17:03:03.772Z",
-      "updatedAt": "2023-11-16T19:31:23.508Z",
-      "deletedAt": "2023-11-16T19:31:23.507Z",
-      "id": "374c3fd5-ddad-4601-9cb2-21b14b69670c",
-      "title": "DAO activity growing in the bear market",
-      "content": {
-        "type": "doc",
-        "content": [
-          {
-            "type": "tweet",
-            "attrs": {
-              "id": "1609651696292057088",
-              "track": [],
-              "screenName": "jonathanhillis"
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          }
-        ]
-      },
-      "contentText": "",
-      "path": "dao_activity_growing_in_the_bear_market_ld0hhg70",
-      "categoryId": "7731f270-b619-45ff-a3d5-1c542d30f647",
-      "createdBy": "c4421d10-3765-4c58-9f46-b8648ffea350",
-      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-      "pinned": false,
-      "locked": false,
-      "proposalId": null,
-      "isDraft": false
-    },
-    {
-      "createdAt": "2023-01-13T14:29:08.419Z",
-      "updatedAt": "2023-11-16T19:31:44.828Z",
-      "deletedAt": "2023-11-16T19:31:44.828Z",
-      "id": "292c6b54-e328-4627-b788-9468735fb1ed",
-      "title": "ETHGlobal Tokyo",
-      "content": {
-        "type": "doc",
-        "content": [
-          {
-            "type": "image",
-            "attrs": {
-              "alt": null,
-              "src": "https://pbs.twimg.com/media/FkeY6MfacAA_HWT?format=jpg&name=4096x4096",
-              "size": 700,
-              "track": [],
-              "caption": null
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            }
-          },
-          {
-            "type": "paragraph",
-            "attrs": {
-              "track": []
-            },
-            "content": [
-              {
-                "text": "Is anyone planning on attending? Anybody have knowledge about cool events happening here?",
-                "type": "text"
-              }
-            ]
-          }
-        ]
-      },
-      "contentText": "Is anyone planning on attending? Anybody have knowledge about cool events happening here?",
-      "path": "ethglobal_tokyo_lcum83el",
-      "categoryId": "af2df4bf-0ce2-45e9-b34f-87c290f286dc",
-      "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-      "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-      "pinned": false,
-      "locked": false,
-      "proposalId": null,
-      "isDraft": false
-    },
     {
       "createdAt": "2023-11-29T17:14:46.703Z",
       "updatedAt": "2023-11-29T20:32:50.170Z",
@@ -19396,21 +18719,6 @@
     "defaultPublicPages": false,
     "memberProperties": [
       {
-        "id": "6194454d-7ad6-43f7-ab1b-d3888db24cc4",
-        "createdAt": "2022-11-02T14:38:27.633Z",
-        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-        "updatedAt": "2023-11-16T22:07:51.772Z",
-        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-        "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
-        "name": "Roles",
-        "type": "role",
-        "options": [],
-        "index": 2,
-        "enabledViews": ["table", "profile", "gallery"],
-        "required": false,
-        "permissions": []
-      },
-      {
         "id": "fa43cc47-66db-4bdb-b933-faaac0686afc",
         "createdAt": "2022-11-02T14:38:27.633Z",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
@@ -19421,7 +18729,30 @@
         "type": "timezone",
         "options": null,
         "index": 8,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "6194454d-7ad6-43f7-ab1b-d3888db24cc4",
+        "createdAt": "2022-11-02T14:38:27.633Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2023-11-16T22:07:51.772Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
+        "name": "Roles",
+        "type": "role",
+        "options": [],
+        "index": 2,
+        "enabledViews": [
+          "table",
+          "profile",
+          "gallery"
+        ],
         "required": false,
         "permissions": []
       },
@@ -19436,7 +18767,9 @@
         "type": "bio",
         "options": null,
         "index": 3,
-        "enabledViews": ["profile"],
+        "enabledViews": [
+          "profile"
+        ],
         "required": false,
         "permissions": []
       },
@@ -19451,7 +18784,10 @@
         "type": "discord",
         "options": null,
         "index": 4,
-        "enabledViews": ["gallery", "profile"],
+        "enabledViews": [
+          "gallery",
+          "profile"
+        ],
         "required": false,
         "permissions": []
       },
@@ -19466,7 +18802,11 @@
         "type": "linked_in",
         "options": null,
         "index": 6,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
         "required": false,
         "permissions": []
       },
@@ -19481,7 +18821,11 @@
         "type": "profile_pic",
         "options": [],
         "index": 0,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
         "required": false,
         "permissions": []
       },
@@ -19489,14 +18833,18 @@
         "id": "6cce1282-7c21-4f4f-92b9-2351c29edfd5",
         "createdAt": "2022-11-02T14:38:27.633Z",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-        "updatedAt": "2023-11-16T22:07:44.308Z",
+        "updatedAt": "2023-12-14T13:58:29.328Z",
         "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
         "name": "Name",
         "type": "text",
         "options": null,
         "index": 1,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
         "required": false,
         "permissions": []
       },
@@ -19526,7 +18874,11 @@
         "type": "github",
         "options": null,
         "index": 7,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
         "required": false,
         "permissions": []
       },
@@ -19541,7 +18893,11 @@
         "type": "text_multiline",
         "options": [],
         "index": 12,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
         "required": false,
         "permissions": []
       },
@@ -19641,7 +18997,11 @@
           }
         ],
         "index": 13,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
         "required": false,
         "permissions": []
       },
@@ -19656,12 +19016,448 @@
         "type": "twitter",
         "options": null,
         "index": 5,
-        "enabledViews": ["gallery", "profile"],
+        "enabledViews": [
+          "gallery",
+          "profile"
+        ],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "1de21240-1b9c-4e8a-87a1-33d3a4d33739",
+        "createdAt": "2023-12-13T07:55:31.968Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2023-12-13T08:08:13.483Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
+        "name": "Google",
+        "type": "google",
+        "options": null,
+        "index": 15,
+        "enabledViews": [],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "ab732293-d241-446c-90e3-b9ce460668c8",
+        "createdAt": "2023-12-13T07:55:31.968Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2023-12-13T08:08:13.483Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
+        "name": "Wallet",
+        "type": "wallet",
+        "options": null,
+        "index": 17,
+        "enabledViews": [],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "36767dc3-f157-4b03-9970-a544b788bf40",
+        "createdAt": "2023-12-13T07:55:31.968Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2023-12-13T08:08:13.483Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
+        "name": "Telegram",
+        "type": "telegram",
+        "options": null,
+        "index": 16,
+        "enabledViews": [],
         "required": false,
         "permissions": []
       }
     ],
     "rewardBlocks": [],
-    "proposalBlocks": []
+    "proposalBlocks": [
+      {
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
+        "rootId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
+        "id": "__defaultBoard",
+        "deletedAt": null,
+        "createdAt": "2024-01-03T20:22:37.774Z",
+        "updatedAt": "2024-01-03T20:22:37.774Z",
+        "parentId": "",
+        "schema": 1,
+        "type": "board",
+        "title": "",
+        "fields": {
+          "icon": "",
+          "viewIds": [],
+          "isTemplate": false,
+          "description": "",
+          "headerImage": null,
+          "cardProperties": [
+            {
+              "id": "e25d9676-face-42d6-9994-686e0f76d895",
+              "name": "Category",
+              "type": "select",
+              "options": [
+                {
+                  "id": "67f004c9-ff0f-459a-a9d0-d02fd563158c",
+                  "color": "pink",
+                  "value": "Grants"
+                },
+                {
+                  "id": "8e80fb13-ce4b-45e9-abcf-fe01aea62ddd",
+                  "color": "yellow",
+                  "value": "Tech"
+                },
+                {
+                  "id": "037cac71-c4c7-4355-83dc-577a4cc30a08",
+                  "color": "blue",
+                  "value": "Partnerships"
+                },
+                {
+                  "id": "9d39b289-e4a9-4817-bfe6-4ea83f9094c9",
+                  "color": "orange",
+                  "value": "Education"
+                },
+                {
+                  "id": "53726def-5070-4911-a095-681c85aeacaa",
+                  "color": "turquoise",
+                  "value": "Tokenomics"
+                },
+                {
+                  "id": "f7a37418-ffb8-483c-a260-c6162ae88155",
+                  "color": "green",
+                  "value": "Community"
+                },
+                {
+                  "id": "3b721d2f-d5af-4119-a11f-a43419266146",
+                  "color": "purple",
+                  "value": "Art Direction"
+                },
+                {
+                  "id": "e826b6ff-ea89-47aa-9bda-83234bff9491",
+                  "color": "red",
+                  "value": "Governance"
+                }
+              ]
+            }
+          ],
+          "showDescription": false,
+          "columnCalculations": []
+        }
+      }
+    ],
+    "proposalWorkflows": [
+      {
+        "id": "3bad39e8-e560-48f0-9297-acc8b90b5ead",
+        "createdAt": "2023-12-29T23:54:21.915Z",
+        "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
+        "index": 0,
+        "title": "Community Proposals",
+        "evaluations": [
+          {
+            "id": "f9f195e3-ec4a-480a-bc0b-6211a3588ba6",
+            "type": "feedback",
+            "title": "Feedback",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          },
+          {
+            "id": "3daae9c8-e6f9-4b47-8438-c33583648a5b",
+            "type": "pass_fail",
+            "title": "Review",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "move",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "view",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          },
+          {
+            "id": "e5855aa2-b92a-42bd-af91-094a86d3b466",
+            "type": "vote",
+            "title": "Community vote",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "move",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "view",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "d1c16be9-63a3-4791-b606-717918dde8f2",
+        "createdAt": "2023-12-29T23:54:21.915Z",
+        "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
+        "index": 2,
+        "title": "Grant Applications",
+        "evaluations": [
+          {
+            "id": "5078fdb7-6795-43d3-8c40-d4e037aea1b9",
+            "type": "rubric",
+            "title": "Rubric evaluation",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "move",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "view",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "3b4a0fab-f999-47ae-8789-6069e76eef12",
+        "createdAt": "2023-12-29T23:54:21.915Z",
+        "spaceId": "fabf2e24-fc13-41d6-b321-ba16dffcf882",
+        "index": 1,
+        "title": "Decision Matrix",
+        "evaluations": [
+          {
+            "id": "9fa9a08a-7f88-40ce-a1fe-5a7ecd06c65c",
+            "type": "feedback",
+            "title": "Feedback",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "move",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "view",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          },
+          {
+            "id": "93cb3941-f52b-48e3-beee-8db19cdbcbfc",
+            "type": "rubric",
+            "title": "Rubric evaluation",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "move",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "view",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          }
+        ]
+      }
+    ]
   }
 }

@@ -257,6 +257,7 @@ describe('exportSpaceSettings', () => {
     expect(exportedSettings).toMatchObject<{ space: SpaceSettingsExport }>({
       space: {
         proposalBlocks: expect.arrayContaining<ProposalBlock>([customProposalBlockBoard, customProposalBlockView]),
+        proposalWorkflows: [],
         rewardBlocks: expect.arrayContaining<RewardBlock>([customRewardBlockBoard, customRewardBlockView]),
         notificationToggles: space.notificationToggles,
         features: space.features,

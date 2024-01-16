@@ -2340,7 +2340,7 @@
                     },
                     "content": [
                       {
-                        "text": "Climate rewards ",
+                        "text": "Climate bounties ",
                         "type": "text",
                         "marks": [
                           {
@@ -2479,7 +2479,7 @@
                     },
                     "content": [
                       {
-                        "text": "Public Goods rewards ",
+                        "text": "Public Goods bounties ",
                         "type": "text",
                         "marks": [
                           {
@@ -2651,7 +2651,7 @@
               }
             ]
           },
-          "contentText": "Feb 9-17 ONLINE | Feb 9-12 IRL @ at Verci (17 John St, New York, NY)SUBMISSIONSOn February 12, hackers can submit completed projects, design studies, and proofs-of-concept for public consideration. The best projects will be offered further grants, mentoring, investments, and/or partnerships.**Final projects must be submitted by Sunday, February 12th at 12pm EST TRACKSClimate - Sponsored by GreenNFT in partnership with BSICHacker’s eligible for this track, must submit a coherent and actionable project concept demonstrating a capacity to make a material impact on the climate climate crisis.Ideas to explore: Innovation around carbon credits pricing, trade, and verification.Financial mechanisms for funding climate projectsClimate impact and project information access  Judging criteria:Innovative approach deploying Blockchain tech (extra consideration for project that utilize NFT or related technologies)Potential for material impact on the climate crisesTechnical feasibility Economic & business viability Public Goods - Sponsored by MantleDecentralized \"money legos\" have a massive potential in driving real-world impact. Build a project that contributes to a positive sum future for all. Ideas to explore:Crowdfunding dApp (web3 version of GoFundMe, Kickstarter, Patreon, etc.)Gamification: leaderboard, reputation score, etc.Funding mechanisms: NFT auction, Nouns fork, quadratic funding, etc.Judging criteria:Innovative approaches to leveraging web3 tooling for public goodsRelevance and impactPotential for adoptionTechnical feasibilityBonus: can be built on MantlePRIZESClimate rewards - $7,000 (Sponsored by GreenNFT in partnership with BSIC)1st prize $25002nd prize $15003rd prize $1000Online: 2 x $1000Public Goods rewards - $8,000 (Sponsored by Mantle)1st prize $30002nd prize $20003rd prize $1000Online: 2x $2000",
+          "contentText": "Feb 9-17 ONLINE | Feb 9-12 IRL @ at Verci (17 John St, New York, NY)SUBMISSIONSOn February 12, hackers can submit completed projects, design studies, and proofs-of-concept for public consideration. The best projects will be offered further grants, mentoring, investments, and/or partnerships.**Final projects must be submitted by Sunday, February 12th at 12pm EST TRACKSClimate - Sponsored by GreenNFT in partnership with BSICHacker’s eligible for this track, must submit a coherent and actionable project concept demonstrating a capacity to make a material impact on the climate climate crisis.Ideas to explore: Innovation around carbon credits pricing, trade, and verification.Financial mechanisms for funding climate projectsClimate impact and project information access  Judging criteria:Innovative approach deploying Blockchain tech (extra consideration for project that utilize NFT or related technologies)Potential for material impact on the climate crisesTechnical feasibility Economic & business viability Public Goods - Sponsored by MantleDecentralized \"money legos\" have a massive potential in driving real-world impact. Build a project that contributes to a positive sum future for all. Ideas to explore:Crowdfunding dApp (web3 version of GoFundMe, Kickstarter, Patreon, etc.)Gamification: leaderboard, reputation score, etc.Funding mechanisms: NFT auction, Nouns fork, quadratic funding, etc.Judging criteria:Innovative approaches to leveraging web3 tooling for public goodsRelevance and impactPotential for adoptionTechnical feasibilityBonus: can be built on MantlePRIZESClimate bounties - $7,000 (Sponsored by GreenNFT in partnership with BSIC)1st prize $25002nd prize $15003rd prize $1000Online: 2 x $1000Public Goods bounties - $8,000 (Sponsored by Mantle)1st prize $30002nd prize $20003rd prize $1000Online: 2x $2000",
           "galleryImage": null,
           "hasContent": true,
           "headerImage": null,
@@ -4958,7 +4958,10 @@
                   "title": "SPEAKERS",
                   "fields": {
                     "icon": "",
-                    "viewIds": ["b9c35257-b076-44e3-b677-ba472ffce00c", "1a45707e-abce-4902-84e7-601cd74b63c8"],
+                    "viewIds": [
+                      "b9c35257-b076-44e3-b677-ba472ffce00c",
+                      "1a45707e-abce-4902-84e7-601cd74b63c8"
+                    ],
                     "isTemplate": false,
                     "description": "",
                     "headerImage": null,
@@ -5014,7 +5017,9 @@
                       "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
-                      "visiblePropertyIds": ["__title"]
+                      "visiblePropertyIds": [
+                        "__title"
+                      ]
                     }
                   },
                   {
@@ -5053,7 +5058,10 @@
                       "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
-                      "visiblePropertyIds": ["__title", "2a2f8e47-1389-406d-ba4b-22b035219f79"]
+                      "visiblePropertyIds": [
+                        "__title",
+                        "2a2f8e47-1389-406d-ba4b-22b035219f79"
+                      ]
                     }
                   }
                 ]
@@ -5750,660 +5758,9 @@
                       "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
-                      "visiblePropertyIds": ["__title"]
-                    }
-                  }
-                ]
-              }
-            },
-            {
-              "id": "64d99cf8-24b9-416d-97e1-35bdc955e536",
-              "deletedAt": null,
-              "createdAt": "2023-02-07T23:52:19.046Z",
-              "createdBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
-              "updatedAt": "2023-02-08T00:41:34.659Z",
-              "updatedBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
-              "deletedBy": null,
-              "title": "SPEAKERS",
-              "content": null,
-              "contentText": "",
-              "galleryImage": "",
-              "hasContent": false,
-              "headerImage": null,
-              "icon": "🗣️",
-              "path": "page-9486239254109439",
-              "isTemplate": false,
-              "parentId": "a3f48f41-daa8-4dd0-954e-a712a1d4a8c1",
-              "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
-              "type": "inline_board",
-              "boardId": "64d99cf8-24b9-416d-97e1-35bdc955e536",
-              "autoGenerated": true,
-              "index": -1,
-              "cardId": null,
-              "proposalId": null,
-              "snapshotProposalId": null,
-              "fullWidth": false,
-              "fontFamily": "default",
-              "fontSizeSmall": false,
-              "version": 1,
-              "bountyId": null,
-              "convertedProposalId": null,
-              "permissions": [
-                {
-                  "pageId": "64d99cf8-24b9-416d-97e1-35bdc955e536",
-                  "userId": null,
-                  "id": "8ec62aa4-db49-4347-8e12-0b8048ebcd87",
-                  "permissionLevel": "full_access",
-                  "permissions": [],
-                  "roleId": null,
-                  "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
-                  "inheritedFromPermission": null,
-                  "public": null,
-                  "sourcePermission": null
-                }
-              ],
-              "children": [
-                {
-                  "id": "75208dbc-b7ee-4714-ab97-0d99ee8b7b4e",
-                  "deletedAt": null,
-                  "createdAt": "2023-02-07T23:52:39.467Z",
-                  "createdBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
-                  "updatedAt": "2023-03-08T19:46:41.661Z",
-                  "updatedBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
-                  "deletedBy": null,
-                  "title": "Phil",
-                  "content": {
-                    "type": "doc",
-                    "content": [
-                      {
-                        "type": "paragraph",
-                        "attrs": {
-                          "track": []
-                        },
-                        "content": [
-                          {
-                            "text": "Web3 enthusiast now selling real-estate in the Metaverse.",
-                            "type": "text",
-                            "marks": [
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2023-03-08T19:40:00.000Z",
-                                  "user": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
-                                  "approved": true,
-                                  "username": "xandradozet.eth"
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  "contentText": "Web3 enthusiast now selling real-estate in the Metaverse.",
-                  "galleryImage": null,
-                  "hasContent": true,
-                  "headerImage": "https://s3.amazonaws.com/charm.public/user-content/5456438a-8f49-4ad1-bbb2-4a9ef884e323/640fa32b-1d3d-4ca2-ad51-6ec0f24524d0/Phil.webp",
-                  "icon": "",
-                  "path": "page-15380290071704894",
-                  "isTemplate": false,
-                  "parentId": "64d99cf8-24b9-416d-97e1-35bdc955e536",
-                  "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
-                  "type": "card",
-                  "boardId": null,
-                  "autoGenerated": true,
-                  "index": -1,
-                  "cardId": "75208dbc-b7ee-4714-ab97-0d99ee8b7b4e",
-                  "proposalId": null,
-                  "snapshotProposalId": null,
-                  "fullWidth": false,
-                  "fontFamily": "default",
-                  "fontSizeSmall": false,
-                  "version": 279,
-                  "bountyId": null,
-                  "convertedProposalId": null,
-                  "permissions": [
-                    {
-                      "pageId": "75208dbc-b7ee-4714-ab97-0d99ee8b7b4e",
-                      "userId": null,
-                      "id": "efc537e8-b15b-4bd1-b5c6-ace1bc4f4cca",
-                      "permissionLevel": "full_access",
-                      "permissions": [],
-                      "roleId": null,
-                      "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
-                      "inheritedFromPermission": "8ec62aa4-db49-4347-8e12-0b8048ebcd87",
-                      "public": null,
-                      "sourcePermission": {
-                        "pageId": "64d99cf8-24b9-416d-97e1-35bdc955e536",
-                        "userId": null,
-                        "id": "8ec62aa4-db49-4347-8e12-0b8048ebcd87",
-                        "permissionLevel": "full_access",
-                        "permissions": [],
-                        "roleId": null,
-                        "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
-                        "inheritedFromPermission": null,
-                        "public": null
-                      }
-                    }
-                  ],
-                  "children": [],
-                  "blocks": {
-                    "card": {
-                      "id": "75208dbc-b7ee-4714-ab97-0d99ee8b7b4e",
-                      "deletedAt": null,
-                      "createdAt": "2023-03-08T14:23:38.611Z",
-                      "createdBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
-                      "updatedAt": "2023-03-08T19:45:31.839Z",
-                      "updatedBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
-                      "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
-                      "parentId": "64d99cf8-24b9-416d-97e1-35bdc955e536",
-                      "rootId": "64d99cf8-24b9-416d-97e1-35bdc955e536",
-                      "schema": 1,
-                      "type": "card",
-                      "title": "",
-                      "fields": {
-                        "icon": "",
-                        "isTemplate": false,
-                        "properties": {
-                          "__title": "Web3 Real Estate"
-                        },
-                        "headerImage": null,
-                        "contentOrder": []
-                      }
-                    }
-                  }
-                },
-                {
-                  "id": "6cca830d-c46c-43ad-a272-24eb2af6f56f",
-                  "deletedAt": null,
-                  "createdAt": "2023-02-07T23:56:10.188Z",
-                  "createdBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
-                  "updatedAt": "2023-03-08T19:52:52.649Z",
-                  "updatedBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
-                  "deletedBy": null,
-                  "title": "Beth",
-                  "content": {
-                    "type": "doc",
-                    "content": [
-                      {
-                        "type": "paragraph",
-                        "attrs": {
-                          "track": []
-                        },
-                        "content": [
-                          {
-                            "text": "Steward of the environment. Active in numerous impact DAOs looking to fight climate change, preserve undeveloped land, and provide agricultural jobs in rural locations.",
-                            "type": "text",
-                            "marks": [
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2023-03-08T19:50:00.000Z",
-                                  "user": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
-                                  "approved": true,
-                                  "username": "xandradozet.eth"
-                                }
-                              },
-                              {
-                                "type": "text-color",
-                                "attrs": {
-                                  "color": null,
-                                  "bgColor": null
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  "contentText": "Steward of the environment. Active in numerous impact DAOs looking to fight climate change, preserve undeveloped land, and provide agricultural jobs in rural locations.",
-                  "galleryImage": null,
-                  "hasContent": true,
-                  "headerImage": "https://s3.amazonaws.com/charm.public/user-content/5456438a-8f49-4ad1-bbb2-4a9ef884e323/53ca8f12-f6ca-40f4-9c8d-4b13af7abf66/beth.jpeg",
-                  "icon": "",
-                  "path": "page-016672947331950683",
-                  "isTemplate": false,
-                  "parentId": "64d99cf8-24b9-416d-97e1-35bdc955e536",
-                  "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
-                  "type": "card",
-                  "boardId": null,
-                  "autoGenerated": true,
-                  "index": -1,
-                  "cardId": "6cca830d-c46c-43ad-a272-24eb2af6f56f",
-                  "proposalId": null,
-                  "snapshotProposalId": null,
-                  "fullWidth": false,
-                  "fontFamily": "default",
-                  "fontSizeSmall": false,
-                  "version": 265,
-                  "bountyId": null,
-                  "convertedProposalId": null,
-                  "permissions": [
-                    {
-                      "pageId": "6cca830d-c46c-43ad-a272-24eb2af6f56f",
-                      "userId": null,
-                      "id": "6d56b4ed-8ba6-451f-9ee0-fa9be4e6cdbd",
-                      "permissionLevel": "full_access",
-                      "permissions": [],
-                      "roleId": null,
-                      "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
-                      "inheritedFromPermission": "8ec62aa4-db49-4347-8e12-0b8048ebcd87",
-                      "public": null,
-                      "sourcePermission": {
-                        "pageId": "64d99cf8-24b9-416d-97e1-35bdc955e536",
-                        "userId": null,
-                        "id": "8ec62aa4-db49-4347-8e12-0b8048ebcd87",
-                        "permissionLevel": "full_access",
-                        "permissions": [],
-                        "roleId": null,
-                        "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
-                        "inheritedFromPermission": null,
-                        "public": null
-                      }
-                    }
-                  ],
-                  "children": [],
-                  "blocks": {
-                    "card": {
-                      "id": "6cca830d-c46c-43ad-a272-24eb2af6f56f",
-                      "deletedAt": null,
-                      "createdAt": "2023-03-08T14:23:38.611Z",
-                      "createdBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
-                      "updatedAt": "2023-03-08T19:50:21.474Z",
-                      "updatedBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
-                      "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
-                      "parentId": "64d99cf8-24b9-416d-97e1-35bdc955e536",
-                      "rootId": "64d99cf8-24b9-416d-97e1-35bdc955e536",
-                      "schema": 1,
-                      "type": "card",
-                      "title": "",
-                      "fields": {
-                        "icon": "",
-                        "isTemplate": false,
-                        "properties": {
-                          "__title": "Yellowstone"
-                        },
-                        "headerImage": null,
-                        "contentOrder": []
-                      }
-                    }
-                  }
-                },
-                {
-                  "id": "c6dfea3c-936b-4e82-9a18-0bc1ea208a15",
-                  "deletedAt": null,
-                  "createdAt": "2023-02-09T20:05:08.690Z",
-                  "createdBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
-                  "updatedAt": "2023-03-08T19:01:40.165Z",
-                  "updatedBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
-                  "deletedBy": null,
-                  "title": "Alex",
-                  "content": {
-                    "type": "doc",
-                    "content": [
-                      {
-                        "type": "paragraph",
-                        "attrs": {
-                          "track": []
-                        },
-                        "content": [
-                          {
-                            "text": "Co-founder of CharmVerse, web3 operations platform. 2 VC-backed exits. ex: Visual Revenue + X.AI",
-                            "type": "text",
-                            "marks": [
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2023-03-08T19:00:00.000Z",
-                                  "user": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
-                                  "approved": true,
-                                  "username": "xandradozet.eth"
-                                }
-                              },
-                              {
-                                "type": "text-color",
-                                "attrs": {
-                                  "color": null,
-                                  "bgColor": null
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      {
-                        "type": "paragraph",
-                        "attrs": {
-                          "track": []
-                        }
-                      },
-                      {
-                        "type": "paragraph",
-                        "attrs": {
-                          "track": []
-                        },
-                        "content": [
-                          {
-                            "text": " AllianceDAO ALL7 cohort",
-                            "type": "text",
-                            "marks": [
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2023-03-08T19:00:00.000Z",
-                                  "user": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
-                                  "approved": true,
-                                  "username": "xandradozet.eth"
-                                }
-                              },
-                              {
-                                "type": "text-color",
-                                "attrs": {
-                                  "color": null,
-                                  "bgColor": null
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  "contentText": "Co-founder of CharmVerse, web3 operations platform. 2 VC-backed exits. ex: Visual Revenue + X.AI AllianceDAO ALL7 cohort",
-                  "galleryImage": "",
-                  "hasContent": true,
-                  "headerImage": "https://s3.amazonaws.com/charm.public/user-content/5456438a-8f49-4ad1-bbb2-4a9ef884e323/d22569ec-c6cf-45e6-8872-e502d2190ced/AP.jpeg",
-                  "icon": "",
-                  "path": "page-7282518863024405",
-                  "isTemplate": false,
-                  "parentId": "64d99cf8-24b9-416d-97e1-35bdc955e536",
-                  "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
-                  "type": "card",
-                  "boardId": null,
-                  "autoGenerated": true,
-                  "index": -1,
-                  "cardId": "c6dfea3c-936b-4e82-9a18-0bc1ea208a15",
-                  "proposalId": null,
-                  "snapshotProposalId": null,
-                  "fullWidth": false,
-                  "fontFamily": "default",
-                  "fontSizeSmall": false,
-                  "version": 2,
-                  "bountyId": null,
-                  "convertedProposalId": null,
-                  "permissions": [
-                    {
-                      "pageId": "c6dfea3c-936b-4e82-9a18-0bc1ea208a15",
-                      "userId": null,
-                      "id": "d74ec154-4ef1-4723-bfd5-b980bcad26a6",
-                      "permissionLevel": "full_access",
-                      "permissions": [],
-                      "roleId": null,
-                      "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
-                      "inheritedFromPermission": "8ec62aa4-db49-4347-8e12-0b8048ebcd87",
-                      "public": null,
-                      "sourcePermission": {
-                        "pageId": "64d99cf8-24b9-416d-97e1-35bdc955e536",
-                        "userId": null,
-                        "id": "8ec62aa4-db49-4347-8e12-0b8048ebcd87",
-                        "permissionLevel": "full_access",
-                        "permissions": [],
-                        "roleId": null,
-                        "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
-                        "inheritedFromPermission": null,
-                        "public": null
-                      }
-                    }
-                  ],
-                  "children": [],
-                  "blocks": {
-                    "card": {
-                      "id": "c6dfea3c-936b-4e82-9a18-0bc1ea208a15",
-                      "deletedAt": null,
-                      "createdAt": "2023-03-08T14:23:38.611Z",
-                      "createdBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
-                      "updatedAt": "2023-03-08T19:00:41.213Z",
-                      "updatedBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
-                      "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
-                      "parentId": "64d99cf8-24b9-416d-97e1-35bdc955e536",
-                      "rootId": "64d99cf8-24b9-416d-97e1-35bdc955e536",
-                      "schema": 1,
-                      "type": "card",
-                      "title": "",
-                      "fields": {
-                        "icon": "",
-                        "isTemplate": false,
-                        "properties": {
-                          "__title": "CharmVerse",
-                          "2a2f8e47-1389-406d-ba4b-22b035219f79": "https://twitter.com/alexpoon_hk"
-                        },
-                        "headerImage": null,
-                        "contentOrder": []
-                      }
-                    }
-                  }
-                },
-                {
-                  "id": "106c27c1-c816-42da-ad61-b9f7b27f8e48",
-                  "deletedAt": null,
-                  "createdAt": "2023-02-09T20:10:44.588Z",
-                  "createdBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
-                  "updatedAt": "2023-03-08T20:00:22.090Z",
-                  "updatedBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
-                  "deletedBy": null,
-                  "title": "June",
-                  "content": {
-                    "type": "doc",
-                    "content": [
-                      {
-                        "type": "paragraph",
-                        "attrs": {
-                          "track": []
-                        },
-                        "content": [
-                          {
-                            "text": "June ",
-                            "type": "text",
-                            "marks": [
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2023-03-08T19:50:00.000Z",
-                                  "user": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
-                                  "approved": true,
-                                  "username": "xandradozet.eth"
-                                }
-                              }
-                            ]
-                          },
-                          {
-                            "text": "founded ",
-                            "type": "text",
-                            "marks": [
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2023-03-08T20:00:00.000Z",
-                                  "user": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
-                                  "approved": true,
-                                  "username": "xandradozet.eth"
-                                }
-                              }
-                            ]
-                          },
-                          {
-                            "text": "a global community of volunteer activists and Web3 enthusiasts here to fund and engage in the fight for reproductive rights.",
-                            "type": "text",
-                            "marks": [
-                              {
-                                "type": "insertion",
-                                "attrs": {
-                                  "date": "2023-03-08T20:00:00.000Z",
-                                  "user": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
-                                  "approved": true,
-                                  "username": "xandradozet.eth"
-                                }
-                              },
-                              {
-                                "type": "text-color",
-                                "attrs": {
-                                  "color": null,
-                                  "bgColor": null
-                                }
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  "contentText": "June founded a global community of volunteer activists and Web3 enthusiasts here to fund and engage in the fight for reproductive rights.",
-                  "galleryImage": "",
-                  "hasContent": true,
-                  "headerImage": "https://s3.amazonaws.com/charm.public/user-content/5456438a-8f49-4ad1-bbb2-4a9ef884e323/dc34138e-5bd9-432f-bc13-acbf4aca7442/The-Handmaids-Tale_-Vertical-Key-Art-1.webp",
-                  "icon": "",
-                  "path": "page-27824699555904675",
-                  "isTemplate": false,
-                  "parentId": "64d99cf8-24b9-416d-97e1-35bdc955e536",
-                  "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
-                  "type": "card",
-                  "boardId": null,
-                  "autoGenerated": true,
-                  "index": -1,
-                  "cardId": "106c27c1-c816-42da-ad61-b9f7b27f8e48",
-                  "proposalId": null,
-                  "snapshotProposalId": null,
-                  "fullWidth": false,
-                  "fontFamily": "default",
-                  "fontSizeSmall": false,
-                  "version": 188,
-                  "bountyId": null,
-                  "convertedProposalId": null,
-                  "permissions": [
-                    {
-                      "pageId": "106c27c1-c816-42da-ad61-b9f7b27f8e48",
-                      "userId": null,
-                      "id": "8ce759d6-c308-4b6b-b90c-275d167d8b5f",
-                      "permissionLevel": "full_access",
-                      "permissions": [],
-                      "roleId": null,
-                      "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
-                      "inheritedFromPermission": "8ec62aa4-db49-4347-8e12-0b8048ebcd87",
-                      "public": null,
-                      "sourcePermission": {
-                        "pageId": "64d99cf8-24b9-416d-97e1-35bdc955e536",
-                        "userId": null,
-                        "id": "8ec62aa4-db49-4347-8e12-0b8048ebcd87",
-                        "permissionLevel": "full_access",
-                        "permissions": [],
-                        "roleId": null,
-                        "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
-                        "inheritedFromPermission": null,
-                        "public": null
-                      }
-                    }
-                  ],
-                  "children": [],
-                  "blocks": {
-                    "card": {
-                      "id": "106c27c1-c816-42da-ad61-b9f7b27f8e48",
-                      "deletedAt": null,
-                      "createdAt": "2023-03-08T14:23:38.611Z",
-                      "createdBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
-                      "updatedAt": "2023-03-08T19:58:08.926Z",
-                      "updatedBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
-                      "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
-                      "parentId": "64d99cf8-24b9-416d-97e1-35bdc955e536",
-                      "rootId": "64d99cf8-24b9-416d-97e1-35bdc955e536",
-                      "schema": 1,
-                      "type": "card",
-                      "title": "",
-                      "fields": {
-                        "icon": "",
-                        "isTemplate": false,
-                        "properties": {
-                          "__title": "Handmaids Tale"
-                        },
-                        "headerImage": null,
-                        "contentOrder": []
-                      }
-                    }
-                  }
-                }
-              ],
-              "blocks": {
-                "board": {
-                  "id": "64d99cf8-24b9-416d-97e1-35bdc955e536",
-                  "deletedAt": null,
-                  "createdAt": "2023-03-08T14:23:38.611Z",
-                  "createdBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
-                  "updatedAt": "2023-03-10T18:55:17.510Z",
-                  "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-                  "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
-                  "parentId": "",
-                  "rootId": "64d99cf8-24b9-416d-97e1-35bdc955e536",
-                  "schema": 1,
-                  "type": "board",
-                  "title": "SPEAKERS",
-                  "fields": {
-                    "icon": "",
-                    "isTemplate": false,
-                    "description": "",
-                    "headerImage": null,
-                    "cardProperties": [
-                      {
-                        "id": "__title",
-                        "name": "Project",
-                        "type": "text",
-                        "options": []
-                      },
-                      {
-                        "id": "2a2f8e47-1389-406d-ba4b-22b035219f79",
-                        "name": "URL",
-                        "type": "url",
-                        "options": []
-                      }
-                    ],
-                    "showDescription": false,
-                    "columnCalculations": []
-                  }
-                },
-                "views": [
-                  {
-                    "id": "b9c35257-b076-44e3-b677-ba472ffce00c",
-                    "deletedAt": null,
-                    "createdAt": "2023-03-08T14:23:38.611Z",
-                    "createdBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
-                    "updatedAt": "2023-03-08T14:23:38.611Z",
-                    "updatedBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
-                    "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
-                    "parentId": "64d99cf8-24b9-416d-97e1-35bdc955e536",
-                    "rootId": "64d99cf8-24b9-416d-97e1-35bdc955e536",
-                    "schema": 1,
-                    "type": "view",
-                    "title": "",
-                    "fields": {
-                      "filter": {
-                        "filters": [],
-                        "operation": "and"
-                      },
-                      "viewType": "gallery",
-                      "cardOrder": [
-                        "5c61e193-3970-4b01-b855-2924be42a761",
-                        "482214e4-860e-4c18-9caa-e97ab22803d1",
-                        "bab35e6b-eb6c-4a9b-af06-b68c5e1afffb",
-                        "c9b614bb-40db-4e07-a2b4-1ebd3f3d449c"
-                      ],
-                      "sortOptions": [],
-                      "columnWidths": {},
-                      "hiddenOptionIds": [],
-                      "visibleOptionIds": [],
-                      "defaultTemplateId": "",
-                      "collapsedOptionIds": [],
-                      "columnCalculations": {},
-                      "kanbanCalculations": {},
-                      "visiblePropertyIds": ["__title"]
+                      "visiblePropertyIds": [
+                        "__title"
+                      ]
                     }
                   }
                 ]
@@ -7613,7 +6970,7 @@
                       },
                       {
                         "id": "481944f9-d3b8-4a68-adae-3989d7494312",
-                        "name": "X",
+                        "name": "Twitter",
                         "type": "url",
                         "options": []
                       }
@@ -7659,7 +7016,9 @@
                       "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
-                      "visiblePropertyIds": ["__title"]
+                      "visiblePropertyIds": [
+                        "__title"
+                      ]
                     }
                   }
                 ]
@@ -8608,7 +7967,7 @@
                       },
                       {
                         "id": "481944f9-d3b8-4a68-adae-3989d7494312",
-                        "name": "X",
+                        "name": "Twitter",
                         "type": "url",
                         "options": []
                       }
@@ -8654,7 +8013,9 @@
                       "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
-                      "visiblePropertyIds": ["__title"]
+                      "visiblePropertyIds": [
+                        "__title"
+                      ]
                     }
                   }
                 ]
@@ -9038,7 +8399,10 @@
                     "icon": "",
                     "isTemplate": false,
                     "properties": {
-                      "__title": ["e56af877-edfc-4a6c-878c-56a894981fb4", "083ae264-62d7-4de0-8170-dfefae763667"],
+                      "__title": [
+                        "e56af877-edfc-4a6c-878c-56a894981fb4",
+                        "083ae264-62d7-4de0-8170-dfefae763667"
+                      ],
                       "42f851d4-5db2-482a-b6df-a8f50ae5915f": "6ebd1311-7854-4d4d-bed8-fc8dd57fdfdd",
                       "a42c9a70-7e98-4dcb-84f3-6d0051cee41a": "www.digtix.global"
                     },
@@ -9259,7 +8623,10 @@
                     "icon": "",
                     "isTemplate": false,
                     "properties": {
-                      "__title": ["e56af877-edfc-4a6c-878c-56a894981fb4", "083ae264-62d7-4de0-8170-dfefae763667"],
+                      "__title": [
+                        "e56af877-edfc-4a6c-878c-56a894981fb4",
+                        "083ae264-62d7-4de0-8170-dfefae763667"
+                      ],
                       "42f851d4-5db2-482a-b6df-a8f50ae5915f": "c639c952-a08a-496c-ac12-b47cb9b52485",
                       "a42c9a70-7e98-4dcb-84f3-6d0051cee41a": "www.fractal-i.xyz"
                     },
@@ -9581,7 +8948,9 @@
                     "icon": "",
                     "isTemplate": false,
                     "properties": {
-                      "__title": ["083ae264-62d7-4de0-8170-dfefae763667"],
+                      "__title": [
+                        "083ae264-62d7-4de0-8170-dfefae763667"
+                      ],
                       "42f851d4-5db2-482a-b6df-a8f50ae5915f": "6ebd1311-7854-4d4d-bed8-fc8dd57fdfdd",
                       "a42c9a70-7e98-4dcb-84f3-6d0051cee41a": "www.convocase.xyz",
                       "f8c41428-4385-49bd-82ef-dcecf200b2c5": [
@@ -10820,7 +10189,9 @@
                     "isTemplate": false,
                     "properties": {
                       "203f700e-15a1-4ce7-aefe-3cea868cf26c": "11529a7a-e533-45a0-84c9-b7f1d2afe7c9",
-                      "cee129aa-6f0c-4347-b634-fbe699448504": ["419f57e4-aa82-49ea-9637-bbad33f19f6d"]
+                      "cee129aa-6f0c-4347-b634-fbe699448504": [
+                        "419f57e4-aa82-49ea-9637-bbad33f19f6d"
+                      ]
                     },
                     "contentOrder": []
                   }
@@ -10982,7 +10353,9 @@
                     "isTemplate": false,
                     "properties": {
                       "203f700e-15a1-4ce7-aefe-3cea868cf26c": "862a3932-b6e8-45b3-ab8b-5b5bce83cf51",
-                      "cee129aa-6f0c-4347-b634-fbe699448504": ["419f57e4-aa82-49ea-9637-bbad33f19f6d"]
+                      "cee129aa-6f0c-4347-b634-fbe699448504": [
+                        "419f57e4-aa82-49ea-9637-bbad33f19f6d"
+                      ]
                     },
                     "contentOrder": []
                   }
@@ -11155,7 +10528,9 @@
                     "isTemplate": false,
                     "properties": {
                       "203f700e-15a1-4ce7-aefe-3cea868cf26c": "2d9e6902-c4ab-4907-867e-8e503b8d864c",
-                      "cee129aa-6f0c-4347-b634-fbe699448504": ["419f57e4-aa82-49ea-9637-bbad33f19f6d"]
+                      "cee129aa-6f0c-4347-b634-fbe699448504": [
+                        "419f57e4-aa82-49ea-9637-bbad33f19f6d"
+                      ]
                     },
                     "headerImage": null,
                     "contentOrder": []
@@ -11297,7 +10672,9 @@
                       "203f700e-15a1-4ce7-aefe-3cea868cf26c": "74737ad4-016f-4f4f-ac45-11a66f172d72",
                       "a37645c5-84cc-4a9d-b919-52d0c7121ab1": "Team Bunny Rockets",
                       "c4073658-39b7-4a7e-a886-08c23d0f3475": "true",
-                      "cee129aa-6f0c-4347-b634-fbe699448504": ["419f57e4-aa82-49ea-9637-bbad33f19f6d"]
+                      "cee129aa-6f0c-4347-b634-fbe699448504": [
+                        "419f57e4-aa82-49ea-9637-bbad33f19f6d"
+                      ]
                     },
                     "headerImage": null,
                     "contentOrder": []
@@ -11322,7 +10699,10 @@
               "title": "",
               "fields": {
                 "icon": "",
-                "viewIds": ["3215ec40-6edc-4713-9c1a-eccb53c05a0d", "9b01aca3-8575-4db9-bddd-691e00f31f44"],
+                "viewIds": [
+                  "3215ec40-6edc-4713-9c1a-eccb53c05a0d",
+                  "9b01aca3-8575-4db9-bddd-691e00f31f44"
+                ],
                 "isTemplate": false,
                 "description": {
                   "type": "doc",
@@ -13746,7 +13126,9 @@
                     "isTemplate": false,
                     "properties": {
                       "0a286876-371d-47d4-98bb-cee117949048": "0731cd9e-c4d3-4c60-b55c-dff4d6ecd4e0",
-                      "0c3e1c0c-c81d-4e15-b0d7-b4d1785eafbb": ["6eddf525-fd3f-447e-aa7d-0289c3965f50"],
+                      "0c3e1c0c-c81d-4e15-b0d7-b4d1785eafbb": [
+                        "6eddf525-fd3f-447e-aa7d-0289c3965f50"
+                      ],
                       "6d7f0697-20b7-48c5-b970-006a3395a274": "www.convocase.xyz",
                       "839513de-888f-4843-9f04-a7084d5867d9": "Marcus Marvin\nLeidianne Rosalie\nSarah Tuku\nPedro Manus"
                     },
@@ -14883,10 +14265,875 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
+        "categoryId": "c4cffeb1-9270-4544-aa22-0b2822f11531",
         "publishToLens": null,
         "lensPostLink": null,
-        "fields": null
+        "fields": {
+          "properties": {
+            "187b8ec5-1b31-4731-937b-c4c9b4cb7e5e": "c4cffeb1-9270-4544-aa22-0b2822f11531"
+          }
+        },
+        "workflowId": "a3616847-68fa-431d-9609-621c44e34589",
+        "formId": null,
+        "evaluations": [
+          {
+            "id": "8960ea3f-3d58-4d29-b72e-9afe04384c6b",
+            "index": 0,
+            "title": "Feedback",
+            "type": "feedback",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "34d15a32-db25-4115-a1dd-22b5fd0d50b7",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [],
+            "rubricCriteria": []
+          },
+          {
+            "id": "24704bfb-3558-461c-b7d2-c566f8d2e499",
+            "index": 1,
+            "title": "Rubric evaluation",
+            "type": "rubric",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "34d15a32-db25-4115-a1dd-22b5fd0d50b7",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [
+              {
+                "id": "fcaabea6-5c63-42e9-8ae9-3f1f9bce3456",
+                "proposalId": "34d15a32-db25-4115-a1dd-22b5fd0d50b7",
+                "roleId": null,
+                "userId": "e5dba747-be62-49be-a7ba-71cf27b17174",
+                "systemRole": null,
+                "evaluationId": "24704bfb-3558-461c-b7d2-c566f8d2e499"
+              }
+            ],
+            "rubricCriteria": [
+              {
+                "id": "5fcfe8f5-3f7b-49ab-aa5f-150878edc92c",
+                "index": -1,
+                "title": "Technical Innovation",
+                "description": "",
+                "proposalId": "34d15a32-db25-4115-a1dd-22b5fd0d50b7",
+                "type": "range",
+                "parameters": {
+                  "max": 5,
+                  "min": 1
+                },
+                "evaluationId": "24704bfb-3558-461c-b7d2-c566f8d2e499"
+              }
+            ]
+          }
+        ]
       }
     }
-  ]
+  ],
+  "roles": [],
+  "permissions": {
+    "postCategoryPermissions": [
+      {
+        "id": "c5ca6d22-ac13-49f3-a467-b1ba23a6aa1e",
+        "permissionLevel": "full_access",
+        "postCategoryId": "4c1ea4ae-1be9-45e6-8af0-ae0980bdc09e",
+        "assignee": {
+          "group": "space",
+          "id": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7"
+        }
+      },
+      {
+        "id": "2999ca8f-c55e-4c07-90ef-3af3938a0083",
+        "permissionLevel": "full_access",
+        "postCategoryId": "53bc7dc5-7586-4c77-8914-ca6e5100b40b",
+        "assignee": {
+          "group": "space",
+          "id": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7"
+        }
+      },
+      {
+        "id": "8ec16276-1be1-4962-8631-1d6644e57dcd",
+        "permissionLevel": "full_access",
+        "postCategoryId": "1795a3a7-b6d1-47e7-80c3-2a23be7d89ba",
+        "assignee": {
+          "group": "space",
+          "id": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7"
+        }
+      },
+      {
+        "id": "df3ea655-c0a1-47ad-b7b8-98ae69daebb8",
+        "permissionLevel": "full_access",
+        "postCategoryId": "39252f43-9a41-4c3c-a749-20fea6b94e2e",
+        "assignee": {
+          "group": "space",
+          "id": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7"
+        }
+      },
+      {
+        "id": "5ddd62ab-b5d7-4541-9805-d792deb67fa9",
+        "permissionLevel": "full_access",
+        "postCategoryId": "6c526b73-0bdf-40d8-8d3b-005b48c63eef",
+        "assignee": {
+          "group": "space",
+          "id": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7"
+        }
+      },
+      {
+        "id": "7efef452-8b3a-438b-8e06-7e39f69d7b81",
+        "permissionLevel": "full_access",
+        "postCategoryId": "2ee55e75-5389-436a-b8ed-c12d7b818a8f",
+        "assignee": {
+          "group": "space",
+          "id": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7"
+        }
+      },
+      {
+        "id": "a48f1582-dc7b-4f62-8be4-6b71babf4f02",
+        "permissionLevel": "full_access",
+        "postCategoryId": "29eb872b-057d-4f0f-881b-808d850223ab",
+        "assignee": {
+          "group": "space",
+          "id": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7"
+        }
+      }
+    ],
+    "spacePermissions": [
+      {
+        "assignee": {
+          "group": "space",
+          "id": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7"
+        },
+        "operations": {
+          "createPage": true,
+          "createBounty": true,
+          "createForumCategory": false,
+          "moderateForums": false,
+          "reviewProposals": true,
+          "deleteAnyPage": false,
+          "deleteAnyBounty": false,
+          "deleteAnyProposal": false,
+          "createProposals": true
+        }
+      }
+    ]
+  },
+  "postCategories": [
+    {
+      "id": "4c1ea4ae-1be9-45e6-8af0-ae0980bdc09e",
+      "name": "General",
+      "description": null,
+      "path": "general",
+      "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7"
+    },
+    {
+      "id": "53bc7dc5-7586-4c77-8914-ca6e5100b40b",
+      "name": "Announcements",
+      "description": null,
+      "path": "announcements",
+      "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7"
+    },
+    {
+      "id": "1795a3a7-b6d1-47e7-80c3-2a23be7d89ba",
+      "name": "Governance",
+      "description": null,
+      "path": "governance",
+      "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7"
+    },
+    {
+      "id": "39252f43-9a41-4c3c-a749-20fea6b94e2e",
+      "name": "Random",
+      "description": null,
+      "path": "random",
+      "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7"
+    },
+    {
+      "id": "6c526b73-0bdf-40d8-8d3b-005b48c63eef",
+      "name": "Introductions",
+      "description": null,
+      "path": "introductions",
+      "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7"
+    },
+    {
+      "id": "2ee55e75-5389-436a-b8ed-c12d7b818a8f",
+      "name": "Questions & Support",
+      "description": null,
+      "path": "questions_support",
+      "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7"
+    },
+    {
+      "id": "29eb872b-057d-4f0f-881b-808d850223ab",
+      "name": "Team Rocket Bunnies",
+      "description": null,
+      "path": "team_rocket_bunnies",
+      "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7"
+    }
+  ],
+  "posts": [],
+  "space": {
+    "features": [
+      {
+        "id": "member_directory",
+        "isHidden": false
+      },
+      {
+        "id": "proposals",
+        "isHidden": false
+      },
+      {
+        "id": "bounties",
+        "isHidden": false
+      },
+      {
+        "id": "forum",
+        "isHidden": false
+      }
+    ],
+    "memberProfiles": [
+      {
+        "id": "charmverse",
+        "isHidden": false
+      },
+      {
+        "id": "collection",
+        "isHidden": false
+      },
+      {
+        "id": "ens",
+        "isHidden": false
+      },
+      {
+        "id": "lens",
+        "isHidden": false
+      },
+      {
+        "id": "summon",
+        "isHidden": false
+      }
+    ],
+    "notificationToggles": {},
+    "defaultPagePermissionGroup": "full_access",
+    "hiddenFeatures": [],
+    "requireProposalTemplate": false,
+    "publicBountyBoard": false,
+    "publicProposals": false,
+    "defaultPublicPages": false,
+    "memberProperties": [
+      {
+        "id": "1d86e321-9cee-467c-93bb-a19781e535a5",
+        "createdAt": "2023-02-20T14:50:00.103Z",
+        "createdBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
+        "updatedAt": "2023-02-20T14:50:00.103Z",
+        "updatedBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
+        "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
+        "name": "Join date",
+        "type": "join_date",
+        "options": null,
+        "index": 9,
+        "enabledViews": [],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "72c49183-fdbf-4b17-a7b0-b9df288828cb",
+        "createdAt": "2023-02-20T14:50:00.103Z",
+        "createdBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
+        "updatedAt": "2023-02-20T14:50:00.103Z",
+        "updatedBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
+        "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
+        "name": "Avatar",
+        "type": "profile_pic",
+        "options": null,
+        "index": 0,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "5b7be77a-fe3f-452a-aa1a-a30e997ffab8",
+        "createdAt": "2023-02-20T14:50:00.103Z",
+        "createdBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
+        "updatedAt": "2023-02-20T14:50:00.103Z",
+        "updatedBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
+        "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
+        "name": "Roles",
+        "type": "role",
+        "options": null,
+        "index": 2,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "0266042a-aff7-4ece-8b74-11bfec32290d",
+        "createdAt": "2023-02-20T14:50:00.103Z",
+        "createdBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
+        "updatedAt": "2023-02-20T14:50:00.103Z",
+        "updatedBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
+        "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
+        "name": "Bio",
+        "type": "bio",
+        "options": null,
+        "index": 3,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "a44f7ca3-2114-4fb9-94b8-72100e2efd01",
+        "createdAt": "2023-02-20T14:50:00.103Z",
+        "createdBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
+        "updatedAt": "2023-02-20T14:50:00.103Z",
+        "updatedBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
+        "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
+        "name": "Discord",
+        "type": "discord",
+        "options": null,
+        "index": 4,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "9ba66c27-d225-46db-b47b-a8b159e7c276",
+        "createdAt": "2023-02-20T14:50:00.103Z",
+        "createdBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
+        "updatedAt": "2023-02-20T14:50:00.103Z",
+        "updatedBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
+        "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
+        "name": "LinkedIn",
+        "type": "linked_in",
+        "options": null,
+        "index": 6,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "87f91b74-a9e2-4d37-abab-3a72a5bf1b94",
+        "createdAt": "2023-02-20T14:50:00.103Z",
+        "createdBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
+        "updatedAt": "2023-02-20T14:50:00.103Z",
+        "updatedBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
+        "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
+        "name": "GitHub",
+        "type": "github",
+        "options": null,
+        "index": 7,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "c73de8f4-3409-4433-9896-e2b393b0cfed",
+        "createdAt": "2023-02-20T14:50:00.103Z",
+        "createdBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
+        "updatedAt": "2023-02-20T14:50:00.103Z",
+        "updatedBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
+        "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
+        "name": "Timezone",
+        "type": "timezone",
+        "options": null,
+        "index": 8,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "939918ee-acb1-4aa5-be13-718dc3b70563",
+        "createdAt": "2023-02-20T14:50:00.103Z",
+        "createdBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
+        "updatedAt": "2023-11-28T06:22:15.639Z",
+        "updatedBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
+        "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
+        "name": "X",
+        "type": "twitter",
+        "options": null,
+        "index": 5,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "37cbb583-440f-471a-8a39-817d8f97d16c",
+        "createdAt": "2023-12-13T07:55:19.776Z",
+        "createdBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
+        "updatedAt": "2023-12-13T08:08:02.730Z",
+        "updatedBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
+        "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
+        "name": "Wallet",
+        "type": "wallet",
+        "options": null,
+        "index": 15,
+        "enabledViews": [],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "8a1cef62-45b8-449b-93de-fd1de8a7a6b9",
+        "createdAt": "2023-12-13T07:55:19.776Z",
+        "createdBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
+        "updatedAt": "2023-12-13T08:08:02.730Z",
+        "updatedBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
+        "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
+        "name": "Google",
+        "type": "google",
+        "options": null,
+        "index": 13,
+        "enabledViews": [],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "cd499944-834b-4356-b856-edde3365b309",
+        "createdAt": "2023-12-13T07:55:19.776Z",
+        "createdBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
+        "updatedAt": "2023-12-13T08:08:02.730Z",
+        "updatedBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
+        "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
+        "name": "Telegram",
+        "type": "telegram",
+        "options": null,
+        "index": 14,
+        "enabledViews": [],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "33a014e3-8f50-4626-9b77-8ceb314c762d",
+        "createdAt": "2023-02-20T14:50:00.103Z",
+        "createdBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
+        "updatedAt": "2023-12-14T13:58:29.328Z",
+        "updatedBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
+        "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
+        "name": "Name",
+        "type": "text",
+        "options": null,
+        "index": 1,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "required": false,
+        "permissions": []
+      }
+    ],
+    "rewardBlocks": [],
+    "proposalBlocks": [
+      {
+        "createdBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
+        "updatedBy": "5456438a-8f49-4ad1-bbb2-4a9ef884e323",
+        "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
+        "rootId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
+        "id": "__defaultBoard",
+        "deletedAt": null,
+        "createdAt": "2024-01-03T19:56:14.766Z",
+        "updatedAt": "2024-01-03T19:56:14.766Z",
+        "parentId": "",
+        "schema": 1,
+        "type": "board",
+        "title": "",
+        "fields": {
+          "icon": "",
+          "viewIds": [],
+          "isTemplate": false,
+          "description": "",
+          "headerImage": null,
+          "cardProperties": [
+            {
+              "id": "187b8ec5-1b31-4731-937b-c4c9b4cb7e5e",
+              "name": "Category",
+              "type": "select",
+              "options": [
+                {
+                  "id": "9681d61e-2d20-4772-923f-bffdbc631fae",
+                  "color": "pink",
+                  "value": "Operational Budget"
+                },
+                {
+                  "id": "09b59f01-0bbe-4096-84be-457ccd8412d1",
+                  "color": "red",
+                  "value": "Grants"
+                },
+                {
+                  "id": "b5914485-198b-44f9-b4e6-25c644912eb1",
+                  "color": "yellow",
+                  "value": "Investment"
+                },
+                {
+                  "id": "dc1651ac-2a28-4140-912e-cf4cb0183577",
+                  "color": "teal",
+                  "value": "Elections"
+                },
+                {
+                  "id": "248d5eb9-793e-47f8-a3d3-269e9d4ecb30",
+                  "color": "gray",
+                  "value": "Governance"
+                },
+                {
+                  "id": "c4cffeb1-9270-4544-aa22-0b2822f11531",
+                  "color": "gray",
+                  "value": "General"
+                }
+              ]
+            }
+          ],
+          "showDescription": false,
+          "columnCalculations": []
+        }
+      }
+    ],
+    "proposalWorkflows": [
+      {
+        "id": "d08f6e23-ba91-4720-894e-25f11807251e",
+        "createdAt": "2023-12-29T23:53:44.911Z",
+        "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
+        "index": 0,
+        "title": "Community Proposals",
+        "evaluations": [
+          {
+            "id": "a6a9ab88-5a7c-4f46-bc68-6a92ef64c7da",
+            "type": "feedback",
+            "title": "Feedback",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          },
+          {
+            "id": "2927ab3c-d915-456f-a581-6c12b348d572",
+            "type": "pass_fail",
+            "title": "Review",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "move",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "view",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          },
+          {
+            "id": "18853318-5209-4075-92b1-4661867072c9",
+            "type": "vote",
+            "title": "Community vote",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "move",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "view",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "21d8052b-1bf0-4759-b660-e098013dc921",
+        "createdAt": "2023-12-29T23:53:44.911Z",
+        "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
+        "index": 2,
+        "title": "Grant Applications",
+        "evaluations": [
+          {
+            "id": "aaa7bbc2-3054-489c-8e7f-6f37e29173ce",
+            "type": "rubric",
+            "title": "Rubric evaluation",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "move",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "view",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "a3616847-68fa-431d-9609-621c44e34589",
+        "createdAt": "2023-12-29T23:53:44.911Z",
+        "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
+        "index": 1,
+        "title": "Decision Matrix",
+        "evaluations": [
+          {
+            "id": "9fa9a08a-7f88-40ce-a1fe-5a7ecd06c65c",
+            "type": "feedback",
+            "title": "Feedback",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "move",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "view",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          },
+          {
+            "id": "93cb3941-f52b-48e3-beee-8db19cdbcbfc",
+            "type": "rubric",
+            "title": "Rubric evaluation",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "move",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "view",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
 }

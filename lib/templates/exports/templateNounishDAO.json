@@ -12716,7 +12716,8 @@
           "reviewProposals": true,
           "deleteAnyPage": false,
           "deleteAnyBounty": false,
-          "deleteAnyProposal": false
+          "deleteAnyProposal": false,
+          "createProposals": true
         }
       }
     ]
@@ -12808,6 +12809,12 @@
       }
     ],
     "notificationToggles": {},
+    "defaultPagePermissionGroup": "view_comment",
+    "hiddenFeatures": [],
+    "requireProposalTemplate": false,
+    "publicBountyBoard": false,
+    "publicProposals": false,
+    "defaultPublicPages": false,
     "memberProperties": [
       {
         "id": "e2d9131d-8339-4bc4-9f6f-261f42920c65",
@@ -12825,24 +12832,7 @@
           "table",
           "profile"
         ],
-        "permissions": []
-      },
-      {
-        "id": "d50d1faa-6ffd-4f0a-b94b-b4445befa3f9",
-        "createdAt": "2023-02-07T16:12:47.223Z",
-        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-        "updatedAt": "2023-02-07T16:12:47.223Z",
-        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-        "spaceId": "278a443d-e0eb-49ea-ad39-411dea8164b9",
-        "name": "Name",
-        "type": "text",
-        "options": null,
-        "index": 1,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "required": false,
         "permissions": []
       },
       {
@@ -12861,6 +12851,7 @@
           "table",
           "profile"
         ],
+        "required": false,
         "permissions": []
       },
       {
@@ -12879,6 +12870,7 @@
           "table",
           "profile"
         ],
+        "required": false,
         "permissions": []
       },
       {
@@ -12897,24 +12889,7 @@
           "table",
           "profile"
         ],
-        "permissions": []
-      },
-      {
-        "id": "360d73f1-8138-4d12-bf19-996b837327cf",
-        "createdAt": "2023-02-07T16:12:47.223Z",
-        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-        "updatedAt": "2023-02-07T16:12:47.223Z",
-        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-        "spaceId": "278a443d-e0eb-49ea-ad39-411dea8164b9",
-        "name": "X",
-        "type": "twitter",
-        "options": null,
-        "index": 5,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "required": false,
         "permissions": []
       },
       {
@@ -12933,6 +12908,7 @@
           "table",
           "profile"
         ],
+        "required": false,
         "permissions": []
       },
       {
@@ -12951,6 +12927,7 @@
           "table",
           "profile"
         ],
+        "required": false,
         "permissions": []
       },
       {
@@ -12969,6 +12946,7 @@
           "table",
           "profile"
         ],
+        "required": false,
         "permissions": []
       },
       {
@@ -12983,10 +12961,409 @@
         "options": null,
         "index": 9,
         "enabledViews": [],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "360d73f1-8138-4d12-bf19-996b837327cf",
+        "createdAt": "2023-02-07T16:12:47.223Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2023-11-28T06:22:15.639Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "278a443d-e0eb-49ea-ad39-411dea8164b9",
+        "name": "X",
+        "type": "twitter",
+        "options": null,
+        "index": 5,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "2982aa5c-58b2-4786-bff7-93ff02d11fa4",
+        "createdAt": "2023-12-13T07:55:19.060Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2023-12-13T08:08:01.973Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "278a443d-e0eb-49ea-ad39-411dea8164b9",
+        "name": "Google",
+        "type": "google",
+        "options": null,
+        "index": 13,
+        "enabledViews": [],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "ea07258b-6804-4461-9be2-3e0b9d2d43f3",
+        "createdAt": "2023-12-13T07:55:19.060Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2023-12-13T08:08:01.973Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "278a443d-e0eb-49ea-ad39-411dea8164b9",
+        "name": "Wallet",
+        "type": "wallet",
+        "options": null,
+        "index": 15,
+        "enabledViews": [],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "f0951a5b-81bf-42cd-a266-08ce0b6bbfaa",
+        "createdAt": "2023-12-13T07:55:19.060Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2023-12-13T08:08:01.973Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "278a443d-e0eb-49ea-ad39-411dea8164b9",
+        "name": "Telegram",
+        "type": "telegram",
+        "options": null,
+        "index": 14,
+        "enabledViews": [],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "d50d1faa-6ffd-4f0a-b94b-b4445befa3f9",
+        "createdAt": "2023-02-07T16:12:47.223Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2023-12-14T13:58:29.328Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "278a443d-e0eb-49ea-ad39-411dea8164b9",
+        "name": "Name",
+        "type": "text",
+        "options": null,
+        "index": 1,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "required": false,
         "permissions": []
       }
     ],
     "rewardBlocks": [],
-    "proposalBlocks": []
+    "proposalBlocks": [],
+    "proposalWorkflows": [
+      {
+        "id": "c029d2a9-6f67-4b8d-8f00-f6ac2cba5b82",
+        "createdAt": "2023-12-29T23:51:54.452Z",
+        "spaceId": "278a443d-e0eb-49ea-ad39-411dea8164b9",
+        "index": 0,
+        "title": "Community Proposals",
+        "evaluations": [
+          {
+            "id": "e440face-e77a-4bca-ab94-1eb055cb8073",
+            "type": "feedback",
+            "title": "Feedback",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          },
+          {
+            "id": "2fec4777-ca09-4138-87c2-d4251a7aafef",
+            "type": "pass_fail",
+            "title": "Review",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "move",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "view",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          },
+          {
+            "id": "a54096d7-d83a-4d3e-ba42-ac42e32f65b4",
+            "type": "vote",
+            "title": "Community vote",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "move",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "view",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "03c1aa3a-3c2b-4d9f-b006-c7eb03d160ee",
+        "createdAt": "2023-12-29T23:51:54.452Z",
+        "spaceId": "278a443d-e0eb-49ea-ad39-411dea8164b9",
+        "index": 2,
+        "title": "Grant Applications",
+        "evaluations": [
+          {
+            "id": "f8e755dd-2fdb-4b8f-9cbd-0f4d7883d101",
+            "type": "rubric",
+            "title": "Rubric evaluation",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "move",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "view",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "0c9e4b68-0307-4e0d-8d4a-98f2a7ba54c7",
+        "createdAt": "2023-12-29T23:51:54.452Z",
+        "spaceId": "278a443d-e0eb-49ea-ad39-411dea8164b9",
+        "index": 1,
+        "title": "Decision Matrix",
+        "evaluations": [
+          {
+            "id": "9fa9a08a-7f88-40ce-a1fe-5a7ecd06c65c",
+            "type": "feedback",
+            "title": "Feedback",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "move",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "view",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          },
+          {
+            "id": "93cb3941-f52b-48e3-beee-8db19cdbcbfc",
+            "type": "rubric",
+            "title": "Rubric evaluation",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "move",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "view",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          }
+        ]
+      }
+    ]
   }
 }

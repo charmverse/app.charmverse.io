@@ -481,9 +481,86 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
+        "categoryId": "506bd977-75a1-47e6-8936-74b18ce3be49",
         "publishToLens": null,
         "lensPostLink": null,
-        "fields": null
+        "fields": {
+          "properties": {
+            "64939755-a8d3-4856-8082-fb689ad66f5e": "506bd977-75a1-47e6-8936-74b18ce3be49"
+          }
+        },
+        "workflowId": "68994576-6369-44bd-98db-393abbae398b",
+        "formId": null,
+        "evaluations": [
+          {
+            "id": "081cb037-30db-4b29-901f-856cde36a54b",
+            "index": 0,
+            "title": "Feedback",
+            "type": "feedback",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "0f0d9678-ceea-4572-ac3c-1c849a485598",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [],
+            "rubricCriteria": []
+          },
+          {
+            "id": "4feaedbe-5705-40fa-9d2e-f6affea0d484",
+            "index": 1,
+            "title": "Review",
+            "type": "pass_fail",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "0f0d9678-ceea-4572-ac3c-1c849a485598",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [],
+            "rubricCriteria": []
+          },
+          {
+            "id": "bcd66b9f-77c9-427a-af78-c9cde887c8be",
+            "index": 1,
+            "title": "Vote",
+            "type": "vote",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "0f0d9678-ceea-4572-ac3c-1c849a485598",
+            "voteSettings": {
+              "type": "Approval",
+              "options": [
+                "Yes",
+                "No",
+                "Abstain"
+              ],
+              "threshold": 50,
+              "maxChoices": 1,
+              "durationDays": 5,
+              "publishToSnapshot": false
+            },
+            "voteId": null,
+            "result": null,
+            "reviewers": [
+              {
+                "id": "22b536d1-3455-45ba-a913-ef8b2f22c201",
+                "proposalId": "0f0d9678-ceea-4572-ac3c-1c849a485598",
+                "roleId": null,
+                "userId": null,
+                "systemRole": "space_member",
+                "evaluationId": "bcd66b9f-77c9-427a-af78-c9cde887c8be"
+              }
+            ],
+            "rubricCriteria": []
+          }
+        ]
       }
     },
     {
@@ -906,9 +983,86 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
+        "categoryId": "506bd977-75a1-47e6-8936-74b18ce3be49",
         "publishToLens": null,
         "lensPostLink": null,
-        "fields": null
+        "fields": {
+          "properties": {
+            "64939755-a8d3-4856-8082-fb689ad66f5e": "506bd977-75a1-47e6-8936-74b18ce3be49"
+          }
+        },
+        "workflowId": "68994576-6369-44bd-98db-393abbae398b",
+        "formId": null,
+        "evaluations": [
+          {
+            "id": "ac36ac69-b149-48d5-b7b6-5758cd0ea319",
+            "index": 0,
+            "title": "Feedback",
+            "type": "feedback",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "a6b0a11a-55dc-4b32-a9d9-a983bb172df2",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [],
+            "rubricCriteria": []
+          },
+          {
+            "id": "7af45a04-0a78-4000-afa7-98c6c07ff76a",
+            "index": 1,
+            "title": "Review",
+            "type": "pass_fail",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "a6b0a11a-55dc-4b32-a9d9-a983bb172df2",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [],
+            "rubricCriteria": []
+          },
+          {
+            "id": "3e71c19b-f10c-4f12-8662-c0bde8d16422",
+            "index": 1,
+            "title": "Vote",
+            "type": "vote",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "a6b0a11a-55dc-4b32-a9d9-a983bb172df2",
+            "voteSettings": {
+              "type": "Approval",
+              "options": [
+                "Yes",
+                "No",
+                "Abstain"
+              ],
+              "threshold": 50,
+              "maxChoices": 1,
+              "durationDays": 5,
+              "publishToSnapshot": false
+            },
+            "voteId": null,
+            "result": null,
+            "reviewers": [
+              {
+                "id": "c6ddb457-8a9d-43a7-8b34-11d320f0e094",
+                "proposalId": "a6b0a11a-55dc-4b32-a9d9-a983bb172df2",
+                "roleId": null,
+                "userId": null,
+                "systemRole": "space_member",
+                "evaluationId": "3e71c19b-f10c-4f12-8662-c0bde8d16422"
+              }
+            ],
+            "rubricCriteria": []
+          }
+        ]
       }
     },
     {
@@ -1257,9 +1411,86 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
+        "categoryId": "598ae8e5-7fc5-42b3-95cd-380a84c666fb",
         "publishToLens": null,
         "lensPostLink": null,
-        "fields": null
+        "fields": {
+          "properties": {
+            "64939755-a8d3-4856-8082-fb689ad66f5e": "598ae8e5-7fc5-42b3-95cd-380a84c666fb"
+          }
+        },
+        "workflowId": "68994576-6369-44bd-98db-393abbae398b",
+        "formId": null,
+        "evaluations": [
+          {
+            "id": "60b47009-7047-4706-a9b6-00abc522a45f",
+            "index": 0,
+            "title": "Feedback",
+            "type": "feedback",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "58e80db0-f652-4646-a863-8746ff6cce5f",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [],
+            "rubricCriteria": []
+          },
+          {
+            "id": "3d1cfb67-0a5e-426f-837c-ecaa3ce8b1fc",
+            "index": 1,
+            "title": "Review",
+            "type": "pass_fail",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "58e80db0-f652-4646-a863-8746ff6cce5f",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [],
+            "rubricCriteria": []
+          },
+          {
+            "id": "26413578-8dee-426f-92d5-0243c01551e0",
+            "index": 1,
+            "title": "Vote",
+            "type": "vote",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "58e80db0-f652-4646-a863-8746ff6cce5f",
+            "voteSettings": {
+              "type": "Approval",
+              "options": [
+                "Yes",
+                "No",
+                "Abstain"
+              ],
+              "threshold": 50,
+              "maxChoices": 1,
+              "durationDays": 5,
+              "publishToSnapshot": false
+            },
+            "voteId": null,
+            "result": null,
+            "reviewers": [
+              {
+                "id": "846f0b13-9820-4ecb-aa1b-dffa9c9b0c91",
+                "proposalId": "58e80db0-f652-4646-a863-8746ff6cce5f",
+                "roleId": null,
+                "userId": null,
+                "systemRole": "space_member",
+                "evaluationId": "26413578-8dee-426f-92d5-0243c01551e0"
+              }
+            ],
+            "rubricCriteria": []
+          }
+        ]
       }
     },
     {
@@ -1952,9 +2183,86 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
+        "categoryId": "11a463b0-859d-49e2-894e-bd9c5e5574b0",
         "publishToLens": null,
         "lensPostLink": null,
-        "fields": null
+        "fields": {
+          "properties": {
+            "64939755-a8d3-4856-8082-fb689ad66f5e": "11a463b0-859d-49e2-894e-bd9c5e5574b0"
+          }
+        },
+        "workflowId": "68994576-6369-44bd-98db-393abbae398b",
+        "formId": null,
+        "evaluations": [
+          {
+            "id": "2f2a0825-473f-4bcc-8a28-0474e9639798",
+            "index": 0,
+            "title": "Feedback",
+            "type": "feedback",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "bd19b04e-f43a-486c-9f41-1fd9cebcbe8b",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [],
+            "rubricCriteria": []
+          },
+          {
+            "id": "ef5aaa58-664b-4560-8c1c-36c51cda33e2",
+            "index": 1,
+            "title": "Review",
+            "type": "pass_fail",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "bd19b04e-f43a-486c-9f41-1fd9cebcbe8b",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [],
+            "rubricCriteria": []
+          },
+          {
+            "id": "57557eb9-62bd-463a-b6ef-cf893ec65792",
+            "index": 1,
+            "title": "Vote",
+            "type": "vote",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "bd19b04e-f43a-486c-9f41-1fd9cebcbe8b",
+            "voteSettings": {
+              "type": "Approval",
+              "options": [
+                "Yes",
+                "No",
+                "Abstain"
+              ],
+              "threshold": 50,
+              "maxChoices": 1,
+              "durationDays": 5,
+              "publishToSnapshot": false
+            },
+            "voteId": null,
+            "result": null,
+            "reviewers": [
+              {
+                "id": "af59ac12-bc51-4c76-a3d6-3e310f2fa2fd",
+                "proposalId": "bd19b04e-f43a-486c-9f41-1fd9cebcbe8b",
+                "roleId": null,
+                "userId": null,
+                "systemRole": "space_member",
+                "evaluationId": "57557eb9-62bd-463a-b6ef-cf893ec65792"
+              }
+            ],
+            "rubricCriteria": []
+          }
+        ]
       }
     },
     {
@@ -2647,9 +2955,86 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
+        "categoryId": "11a463b0-859d-49e2-894e-bd9c5e5574b0",
         "publishToLens": null,
         "lensPostLink": null,
-        "fields": null
+        "fields": {
+          "properties": {
+            "64939755-a8d3-4856-8082-fb689ad66f5e": "11a463b0-859d-49e2-894e-bd9c5e5574b0"
+          }
+        },
+        "workflowId": "68994576-6369-44bd-98db-393abbae398b",
+        "formId": null,
+        "evaluations": [
+          {
+            "id": "117da55f-a920-4663-b2dd-6ddc3bb4f7de",
+            "index": 0,
+            "title": "Feedback",
+            "type": "feedback",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "369d3e45-2631-477e-9d59-9e91dc37730f",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [],
+            "rubricCriteria": []
+          },
+          {
+            "id": "41606f1b-645b-41f6-af16-64516edf391e",
+            "index": 1,
+            "title": "Review",
+            "type": "pass_fail",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "369d3e45-2631-477e-9d59-9e91dc37730f",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [],
+            "rubricCriteria": []
+          },
+          {
+            "id": "2af7faa5-cc16-4ea1-8a46-c3debd6e6076",
+            "index": 1,
+            "title": "Vote",
+            "type": "vote",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "369d3e45-2631-477e-9d59-9e91dc37730f",
+            "voteSettings": {
+              "type": "Approval",
+              "options": [
+                "Yes",
+                "No",
+                "Abstain"
+              ],
+              "threshold": 50,
+              "maxChoices": 1,
+              "durationDays": 5,
+              "publishToSnapshot": false
+            },
+            "voteId": null,
+            "result": null,
+            "reviewers": [
+              {
+                "id": "b4f70ca5-4ef4-4f72-ae3b-341be3a7d66e",
+                "proposalId": "369d3e45-2631-477e-9d59-9e91dc37730f",
+                "roleId": null,
+                "userId": null,
+                "systemRole": "space_member",
+                "evaluationId": "2af7faa5-cc16-4ea1-8a46-c3debd6e6076"
+              }
+            ],
+            "rubricCriteria": []
+          }
+        ]
       }
     },
     {
@@ -3264,7 +3649,7 @@
                             ]
                           },
                           {
-                            "text": "guilds, participate in events and rewards, become a member of the ",
+                            "text": "guilds, participate in events and bounties, become a member of the ",
                             "type": "text",
                             "marks": [
                               {
@@ -3515,7 +3900,7 @@
           }
         ]
       },
-      "contentText": "Welcome your members! Add your own images by clicking on the prompts below or typing /image. Delete example images by hovering over the image and clicking the trash can that appears in the upper right-hand corner. You may delete any block by clicking the  ⋮⋮ to the left on hover.Welcome to [Our Community's] Information Hub!This space encompasses a series of initiatives aimed at guiding [Our Community] towards a positive and impactful trajectory for the world.This space serves as the hub for all things related to [Our Community], including its archive, deliverables, documents, in-real-life operations, and more.A hub for accessing information and resources to join [Our Community's] guilds, participate in events and rewards, become a member of the DAO, join the community, or explore other opportunities to get involved.Help your members easily navigate your space. Add links to new pages below by typing /link to page. ",
+      "contentText": "Welcome your members! Add your own images by clicking on the prompts below or typing /image. Delete example images by hovering over the image and clicking the trash can that appears in the upper right-hand corner. You may delete any block by clicking the  ⋮⋮ to the left on hover.Welcome to [Our Community's] Information Hub!This space encompasses a series of initiatives aimed at guiding [Our Community] towards a positive and impactful trajectory for the world.This space serves as the hub for all things related to [Our Community], including its archive, deliverables, documents, in-real-life operations, and more.A hub for accessing information and resources to join [Our Community's] guilds, participate in events and bounties, become a member of the DAO, join the community, or explore other opportunities to get involved.Help your members easily navigate your space. Add links to new pages below by typing /link to page. ",
       "galleryImage": null,
       "hasContent": true,
       "headerImage": "https://s3.amazonaws.com/charm.public/user-content/e5dba747-be62-49be-a7ba-71cf27b17174/12e750b5-e503-4fc2-928b-2c1bfad7663c/treegens_banner.jpeg",
@@ -3891,7 +4276,7 @@
                     ]
                   },
                   {
-                    "text": ", including joining its guilds, participating in events, contributing to rewards, and assuming roles such as a DAO Member or Community Member. Discover the various opportunities available to you and how to get started.",
+                    "text": ", including joining its guilds, participating in events, contributing to bounties, and assuming roles such as a DAO Member or Community Member. Discover the various opportunities available to you and how to get started.",
                     "type": "text",
                     "marks": [
                       {
@@ -4779,7 +5164,7 @@
               }
             ]
           },
-          "contentText": "Create an onboarding experience for your members. Customize the callouts below with your onboarding information.  Add a new callout by typing /callout.  You can also make use of 4 list types to better organize your info: /bullet, /ordered, /todo, or /toggleThe information hub serves as a guide for individuals interested in becoming part of [Our Community], including joining its guilds, participating in events, contributing to rewards, and assuming roles such as a DAO Member or Community Member. Discover the various opportunities available to you and how to get started.Types of Members: Ways to Join [Our Community]Voting Members = Holders of Voting SharesLiquidity Members = Holders of Loot [non-voting shares]DAO Team Members = Members who work for the DAO on a full-time basis [may hold non-voting shares or loot]Contributors = Members who work for the DAO on a project-by-project basis [may hold non-voting shares or loot]Stakeholders Onboarding FlowHow to use DAO DashboardHow to navigate DiscordHow to use DAO Member private discord channelsMonthly DAO Member Community CallOnboarding FunnelA web3 onboarding funnel is a series of steps or stages that help introduce people to the concept of web3 and decentralized finance. Such a funnel would provide people with the necessary knowledge and tools to navigate the world of web3 and decentralized finance safely and effectively while avoiding common pitfalls such as scams and misinformation.One potential approach to creating a web3 onboarding funnel might involve the following steps:Start by explaining the basics of web3 and decentralized finance, including key concepts such as blockchain technology, decentralization, and the use of smart contracts.Next, provide guidance on how to securely store and manage cryptocurrencies, emphasizing the importance of keeping one's private keys safe and never sharing them with others.Introduce people to the concept of decentralized autonomous organizations (DAOs), and explain how they can be used to govern and coordinate decentralized networks in a transparent and democratic manner.Provide resources and information on how to identify and avoid common scams and other forms of fraud in the web3 and decentralized finance space.Finally, direct people to resources and tools that can help them find and join regenerative DAOs that align with their values and goals.Overall, the key to creating an effective web3 onboarding funnel is to provide clear, concise, and accessible information that helps people understand the basics of web3 and decentralized finance, while also equipping them with the knowledge and tools they need to navigate this complex and rapidly evolving space safely and confidently.",
+          "contentText": "Create an onboarding experience for your members. Customize the callouts below with your onboarding information.  Add a new callout by typing /callout.  You can also make use of 4 list types to better organize your info: /bullet, /ordered, /todo, or /toggleThe information hub serves as a guide for individuals interested in becoming part of [Our Community], including joining its guilds, participating in events, contributing to bounties, and assuming roles such as a DAO Member or Community Member. Discover the various opportunities available to you and how to get started.Types of Members: Ways to Join [Our Community]Voting Members = Holders of Voting SharesLiquidity Members = Holders of Loot [non-voting shares]DAO Team Members = Members who work for the DAO on a full-time basis [may hold non-voting shares or loot]Contributors = Members who work for the DAO on a project-by-project basis [may hold non-voting shares or loot]Stakeholders Onboarding FlowHow to use DAO DashboardHow to navigate DiscordHow to use DAO Member private discord channelsMonthly DAO Member Community CallOnboarding FunnelA web3 onboarding funnel is a series of steps or stages that help introduce people to the concept of web3 and decentralized finance. Such a funnel would provide people with the necessary knowledge and tools to navigate the world of web3 and decentralized finance safely and effectively while avoiding common pitfalls such as scams and misinformation.One potential approach to creating a web3 onboarding funnel might involve the following steps:Start by explaining the basics of web3 and decentralized finance, including key concepts such as blockchain technology, decentralization, and the use of smart contracts.Next, provide guidance on how to securely store and manage cryptocurrencies, emphasizing the importance of keeping one's private keys safe and never sharing them with others.Introduce people to the concept of decentralized autonomous organizations (DAOs), and explain how they can be used to govern and coordinate decentralized networks in a transparent and democratic manner.Provide resources and information on how to identify and avoid common scams and other forms of fraud in the web3 and decentralized finance space.Finally, direct people to resources and tools that can help them find and join regenerative DAOs that align with their values and goals.Overall, the key to creating an effective web3 onboarding funnel is to provide clear, concise, and accessible information that helps people understand the basics of web3 and decentralized finance, while also equipping them with the knowledge and tools they need to navigate this complex and rapidly evolving space safely and confidently.",
           "galleryImage": "",
           "hasContent": true,
           "headerImage": "https://s3.amazonaws.com/charm.public/user-content/b3f5d420-abe6-4c82-9d70-b5294cfcb890/35c612e1-763e-4316-9f68-ad8cf0c31fe0/3.png",
@@ -4996,7 +5381,7 @@
                     ]
                   },
                   {
-                    "text": "DAO. As a member, they have full access to the workspace, including the ability to view and comment on every page, create rewards, proposals, and suggestions for editing existing content, as well as unrestricted access to create unlimited pages, sub-pages, texts, and any other form of content they desire.",
+                    "text": "DAO. As a member, they have full access to the workspace, including the ability to view and comment on every page, create bounties, proposals, and suggestions for editing existing content, as well as unrestricted access to create unlimited pages, sub-pages, texts, and any other form of content they desire.",
                     "type": "text",
                     "marks": [
                       {
@@ -5184,7 +5569,7 @@
                 },
                 "content": [
                   {
-                    "text": "Individuals, Multi-Sigs, or entities that complete any form of onboarding process are granted the role of a Community Member. This may include earning POAPs, participating in Discord chats, engaging on Twitter, earning NFT badges, attending events and receiving event tokens, earning ERC-20 tokens, winning limited edition NFTs, or participating in raffles. Community Members have access to the rewards section, information hub, and the ability to create proposals for DAO Members to review and consider.",
+                    "text": "Individuals, Multi-Sigs, or entities that complete any form of onboarding process are granted the role of a Community Member. This may include earning POAPs, participating in Discord chats, engaging on Twitter, earning NFT badges, attending events and receiving event tokens, earning ERC-20 tokens, winning limited edition NFTs, or participating in raffles. Community Members have access to the bounties section, information hub, and the ability to create proposals for DAO Members to review and consider.",
                     "type": "text",
                     "marks": [
                       {
@@ -5202,7 +5587,7 @@
               }
             ]
           },
-          "contentText": "What are the different ways to contribute to your community? Let your members know how they fit in.DAO MemberDAO Member is a person, organization, multi-signature entity, or any other entity that holds at least one full share of the DAO. As a member, they have full access to the workspace, including the ability to view and comment on every page, create rewards, proposals, and suggestions for editing existing content, as well as unrestricted access to create unlimited pages, sub-pages, texts, and any other form of content they desire.DAO TeamThe DAO Team has a simple yet crucial mandate, which is to uphold the DAO Constitution and act in a responsible and ethical manner in the execution of its duties within the DAO. Their specific roles, obligations, and responsibilities are clearly outlined in the DAO Constitution.Community MemberIndividuals, Multi-Sigs, or entities that complete any form of onboarding process are granted the role of a Community Member. This may include earning POAPs, participating in Discord chats, engaging on Twitter, earning NFT badges, attending events and receiving event tokens, earning ERC-20 tokens, winning limited edition NFTs, or participating in raffles. Community Members have access to the rewards section, information hub, and the ability to create proposals for DAO Members to review and consider.",
+          "contentText": "What are the different ways to contribute to your community? Let your members know how they fit in.DAO MemberDAO Member is a person, organization, multi-signature entity, or any other entity that holds at least one full share of the DAO. As a member, they have full access to the workspace, including the ability to view and comment on every page, create bounties, proposals, and suggestions for editing existing content, as well as unrestricted access to create unlimited pages, sub-pages, texts, and any other form of content they desire.DAO TeamThe DAO Team has a simple yet crucial mandate, which is to uphold the DAO Constitution and act in a responsible and ethical manner in the execution of its duties within the DAO. Their specific roles, obligations, and responsibilities are clearly outlined in the DAO Constitution.Community MemberIndividuals, Multi-Sigs, or entities that complete any form of onboarding process are granted the role of a Community Member. This may include earning POAPs, participating in Discord chats, engaging on Twitter, earning NFT badges, attending events and receiving event tokens, earning ERC-20 tokens, winning limited edition NFTs, or participating in raffles. Community Members have access to the bounties section, information hub, and the ability to create proposals for DAO Members to review and consider.",
           "galleryImage": "",
           "hasContent": true,
           "headerImage": null,
@@ -9263,7 +9648,9 @@
                             "operation": "and"
                           },
                           "viewType": "table",
-                          "cardOrder": ["028bcd52-ded9-4bae-bc8e-a27d5be1c9b1"],
+                          "cardOrder": [
+                            "028bcd52-ded9-4bae-bc8e-a27d5be1c9b1"
+                          ],
                           "sortOptions": [],
                           "columnWidths": {
                             "__title": 128,
@@ -9526,7 +9913,9 @@
                             "operation": "and"
                           },
                           "viewType": "table",
-                          "cardOrder": ["a3cdb69f-ea43-4fc2-a557-76e79529a838"],
+                          "cardOrder": [
+                            "a3cdb69f-ea43-4fc2-a557-76e79529a838"
+                          ],
                           "sortOptions": [],
                           "columnWidths": {
                             "__title": 172,
@@ -10281,7 +10670,9 @@
                         "operation": "and"
                       },
                       "viewType": "board",
-                      "cardOrder": ["54312bc7-278e-4686-a15d-e159756eadb8"],
+                      "cardOrder": [
+                        "54312bc7-278e-4686-a15d-e159756eadb8"
+                      ],
                       "sortOptions": [],
                       "columnWidths": {},
                       "hiddenOptionIds": [],
@@ -19494,7 +19885,9 @@
                         "f0286a21-c9ac-496c-8d5f-cfe0bfb824bd",
                         "6c00b28c-5239-482b-b44e-6f5b3a9d1298"
                       ],
-                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": [
+                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
+                      ],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "557fad80-82bf-43eb-806a-2b8859b38e09",
                         "89f01ff1-29d9-4027-8daf-cff3e606c159"
@@ -30533,7 +30926,9 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "68543ecb-d957-4297-a993-4b84cac0b19c",
-                      "57b5b010-2d75-407f-b747-556afb311995": ["6c00b28c-5239-482b-b44e-6f5b3a9d1298"],
+                      "57b5b010-2d75-407f-b747-556afb311995": [
+                        "6c00b28c-5239-482b-b44e-6f5b3a9d1298"
+                      ],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
                         "557fad80-82bf-43eb-806a-2b8859b38e09",
@@ -32083,7 +32478,9 @@
                         "eb8322fb-a751-46fd-9794-bea021a33f65",
                         "50f9ac76-6237-4ddb-8134-b673c712393e"
                       ],
-                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": [
+                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
+                      ],
                       "be227d08-200f-49db-9b5b-d288f1391f8c": "https://kokonut.network/dao",
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
@@ -32298,7 +32695,9 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "89157343-d00a-490b-92ae-263f260b6eb3": ["345ab4bb-8381-41eb-8da5-f028d9116458"],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": [
+                        "345ab4bb-8381-41eb-8da5-f028d9116458"
+                      ],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "89f01ff1-29d9-4027-8daf-cff3e606c159",
                         "6b692a28-0a9c-4d14-9269-4d3af58ae433"
@@ -32959,7 +33358,9 @@
                     "icon": "",
                     "isTemplate": false,
                     "properties": {
-                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": [
+                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
+                      ],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "651fb707-10e6-4b21-9851-30be77f64061",
                         "89f01ff1-29d9-4027-8daf-cff3e606c159"
@@ -33168,7 +33569,9 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": [
+                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
+                      ],
                       "9948f88c-4963-4726-ace4-001853672a1f": "{\"from\":1666958400000}",
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "557fad80-82bf-43eb-806a-2b8859b38e09",
@@ -34095,7 +34498,9 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "57b5b010-2d75-407f-b747-556afb311995": ["f0286a21-c9ac-496c-8d5f-cfe0bfb824bd"],
+                      "57b5b010-2d75-407f-b747-556afb311995": [
+                        "f0286a21-c9ac-496c-8d5f-cfe0bfb824bd"
+                      ],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "651fb707-10e6-4b21-9851-30be77f64061",
                         "6b692a28-0a9c-4d14-9269-4d3af58ae433"
@@ -35347,7 +35752,9 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "d5e4afc6-8cff-4289-a725-70e724347c0f": ["89f01ff1-29d9-4027-8daf-cff3e606c159"],
+                      "d5e4afc6-8cff-4289-a725-70e724347c0f": [
+                        "89f01ff1-29d9-4027-8daf-cff3e606c159"
+                      ],
                       "f659e9af-8d72-4e06-ba1f-c18ee0714d05": "72ca2319-e9e7-44c8-90d5-9cddea85adbe"
                     },
                     "headerImage": null,
@@ -36205,7 +36612,9 @@
                   "fields": {
                     "isTemplate": false,
                     "properties": {
-                      "d5e4afc6-8cff-4289-a725-70e724347c0f": ["2045d6c3-69fa-4397-92d1-1e1b0cefd36a"],
+                      "d5e4afc6-8cff-4289-a725-70e724347c0f": [
+                        "2045d6c3-69fa-4397-92d1-1e1b0cefd36a"
+                      ],
                       "f659e9af-8d72-4e06-ba1f-c18ee0714d05": "a3eba456-28d2-4b4d-93a9-b09c985d3b64"
                     },
                     "contentOrder": []
@@ -38335,7 +38744,9 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "89157343-d00a-490b-92ae-263f260b6eb3": ["345ab4bb-8381-41eb-8da5-f028d9116458"],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": [
+                        "345ab4bb-8381-41eb-8da5-f028d9116458"
+                      ],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "89f01ff1-29d9-4027-8daf-cff3e606c159",
                         "557fad80-82bf-43eb-806a-2b8859b38e09"
@@ -40153,7 +40564,9 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "a7126c66-89d2-4f8f-a26b-28c83a7f48ae",
-                      "57b5b010-2d75-407f-b747-556afb311995": ["39f076f7-b8af-4814-b0de-2f170573751f"],
+                      "57b5b010-2d75-407f-b747-556afb311995": [
+                        "39f076f7-b8af-4814-b0de-2f170573751f"
+                      ],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
                         "557fad80-82bf-43eb-806a-2b8859b38e09",
@@ -40248,7 +40661,9 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "68543ecb-d957-4297-a993-4b84cac0b19c",
-                      "57b5b010-2d75-407f-b747-556afb311995": ["39f076f7-b8af-4814-b0de-2f170573751f"],
+                      "57b5b010-2d75-407f-b747-556afb311995": [
+                        "39f076f7-b8af-4814-b0de-2f170573751f"
+                      ],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
                         "6b692a28-0a9c-4d14-9269-4d3af58ae433",
@@ -40812,7 +41227,9 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "57b5b010-2d75-407f-b747-556afb311995": ["f0286a21-c9ac-496c-8d5f-cfe0bfb824bd"],
+                      "57b5b010-2d75-407f-b747-556afb311995": [
+                        "f0286a21-c9ac-496c-8d5f-cfe0bfb824bd"
+                      ],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "557fad80-82bf-43eb-806a-2b8859b38e09",
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a"
@@ -40906,8 +41323,12 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "68543ecb-d957-4297-a993-4b84cac0b19c",
-                      "57b5b010-2d75-407f-b747-556afb311995": ["39f076f7-b8af-4814-b0de-2f170573751f"],
-                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
+                      "57b5b010-2d75-407f-b747-556afb311995": [
+                        "39f076f7-b8af-4814-b0de-2f170573751f"
+                      ],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": [
+                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
+                      ],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
                         "557fad80-82bf-43eb-806a-2b8859b38e09",
@@ -42350,8 +42771,12 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "57b5b010-2d75-407f-b747-556afb311995": ["39f076f7-b8af-4814-b0de-2f170573751f"],
-                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
+                      "57b5b010-2d75-407f-b747-556afb311995": [
+                        "39f076f7-b8af-4814-b0de-2f170573751f"
+                      ],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": [
+                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
+                      ],
                       "be227d08-200f-49db-9b5b-d288f1391f8c": "https://www.kuoka.earth/project/kokonut+network/r/recDtigxQUce1Xo05",
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
@@ -42474,7 +42899,9 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": [
+                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
+                      ],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "18c4363d-8d22-40cb-8ee8-3c4054ebdab4",
                         "fb9dc5c3-13d5-47f1-b0bb-7773f5bc0cae"
@@ -42667,8 +43094,12 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "57b5b010-2d75-407f-b747-556afb311995": ["f0286a21-c9ac-496c-8d5f-cfe0bfb824bd"],
-                      "d5e4afc6-8cff-4289-a725-70e724347c0f": ["651fb707-10e6-4b21-9851-30be77f64061"],
+                      "57b5b010-2d75-407f-b747-556afb311995": [
+                        "f0286a21-c9ac-496c-8d5f-cfe0bfb824bd"
+                      ],
+                      "d5e4afc6-8cff-4289-a725-70e724347c0f": [
+                        "651fb707-10e6-4b21-9851-30be77f64061"
+                      ],
                       "f659e9af-8d72-4e06-ba1f-c18ee0714d05": "72ca2319-e9e7-44c8-90d5-9cddea85adbe"
                     },
                     "headerImage": null,
@@ -43009,7 +43440,9 @@
                         "50f9ac76-6237-4ddb-8134-b673c712393e",
                         "f0286a21-c9ac-496c-8d5f-cfe0bfb824bd"
                       ],
-                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": [
+                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
+                      ],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
                         "557fad80-82bf-43eb-806a-2b8859b38e09",
@@ -43354,7 +43787,9 @@
                         "50f9ac76-6237-4ddb-8134-b673c712393e",
                         "f0286a21-c9ac-496c-8d5f-cfe0bfb824bd"
                       ],
-                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": [
+                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
+                      ],
                       "9948f88c-4963-4726-ace4-001853672a1f": "{\"from\":1673870400000}",
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
@@ -43883,7 +44318,9 @@
                         "f0286a21-c9ac-496c-8d5f-cfe0bfb824bd",
                         "a772c12c-fb39-48a4-b575-1aed2c496161"
                       ],
-                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": [
+                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
+                      ],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
                         "557fad80-82bf-43eb-806a-2b8859b38e09",
@@ -44418,7 +44855,9 @@
                   "filter": {
                     "filters": [
                       {
-                        "values": ["557fad80-82bf-43eb-806a-2b8859b38e09"],
+                        "values": [
+                          "557fad80-82bf-43eb-806a-2b8859b38e09"
+                        ],
                         "condition": "includes",
                         "propertyId": "d5e4afc6-8cff-4289-a725-70e724347c0f"
                       }
@@ -44504,7 +44943,9 @@
                     "__title": 280
                   },
                   "linkedSourceId": null,
-                  "hiddenOptionIds": [""],
+                  "hiddenOptionIds": [
+                    ""
+                  ],
                   "visibleOptionIds": [
                     "a3eba456-28d2-4b4d-93a9-b09c985d3b64",
                     "72ca2319-e9e7-44c8-90d5-9cddea85adbe",
@@ -44515,7 +44956,10 @@
                   "collapsedOptionIds": [],
                   "columnCalculations": {},
                   "kanbanCalculations": {},
-                  "visiblePropertyIds": ["__title", "432d6b75-2446-49f0-acde-8b7129c695e3"]
+                  "visiblePropertyIds": [
+                    "__title",
+                    "432d6b75-2446-49f0-acde-8b7129c695e3"
+                  ]
                 }
               },
               {
@@ -44635,7 +45079,9 @@
                   "collapsedOptionIds": [],
                   "columnCalculations": {},
                   "kanbanCalculations": {},
-                  "visiblePropertyIds": ["432d6b75-2446-49f0-acde-8b7129c695e3"]
+                  "visiblePropertyIds": [
+                    "432d6b75-2446-49f0-acde-8b7129c695e3"
+                  ]
                 }
               }
             ]
@@ -45056,7 +45502,7 @@
                             },
                             "content": [
                               {
-                                "text": "X",
+                                "text": "Twitter",
                                 "type": "text",
                                 "marks": [
                                   {
@@ -46115,7 +46561,9 @@
                       "track": [],
                       "colspan": 1,
                       "rowspan": 1,
-                      "colwidth": [228]
+                      "colwidth": [
+                        228
+                      ]
                     },
                     "content": [
                       {
@@ -46149,7 +46597,9 @@
                       "track": [],
                       "colspan": 1,
                       "rowspan": 1,
-                      "colwidth": [208]
+                      "colwidth": [
+                        208
+                      ]
                     },
                     "content": [
                       {
@@ -46225,7 +46675,9 @@
                       "track": [],
                       "colspan": 1,
                       "rowspan": 1,
-                      "colwidth": [228]
+                      "colwidth": [
+                        228
+                      ]
                     },
                     "content": [
                       {
@@ -46242,7 +46694,9 @@
                       "track": [],
                       "colspan": 1,
                       "rowspan": 1,
-                      "colwidth": [208]
+                      "colwidth": [
+                        208
+                      ]
                     },
                     "content": [
                       {
@@ -46615,9 +47069,86 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
+        "categoryId": "506bd977-75a1-47e6-8936-74b18ce3be49",
         "publishToLens": null,
         "lensPostLink": null,
-        "fields": null
+        "fields": {
+          "properties": {
+            "64939755-a8d3-4856-8082-fb689ad66f5e": "506bd977-75a1-47e6-8936-74b18ce3be49"
+          }
+        },
+        "workflowId": "68994576-6369-44bd-98db-393abbae398b",
+        "formId": null,
+        "evaluations": [
+          {
+            "id": "7010dfd5-6a6e-44eb-8af4-5531ea0337b4",
+            "index": 0,
+            "title": "Feedback",
+            "type": "feedback",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "fb14e697-3d01-48ce-9577-8904f7f68cd4",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [],
+            "rubricCriteria": []
+          },
+          {
+            "id": "21e993b1-471c-4126-94d6-da1b8c9d75bd",
+            "index": 1,
+            "title": "Review",
+            "type": "pass_fail",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "fb14e697-3d01-48ce-9577-8904f7f68cd4",
+            "voteSettings": null,
+            "voteId": null,
+            "result": null,
+            "reviewers": [],
+            "rubricCriteria": []
+          },
+          {
+            "id": "b0cf26be-00bc-44d1-9451-081fb1fe6fbc",
+            "index": 1,
+            "title": "Vote",
+            "type": "vote",
+            "completedAt": null,
+            "snapshotId": null,
+            "snapshotExpiry": null,
+            "decidedBy": null,
+            "proposalId": "fb14e697-3d01-48ce-9577-8904f7f68cd4",
+            "voteSettings": {
+              "type": "Approval",
+              "options": [
+                "Yes",
+                "No",
+                "Abstain"
+              ],
+              "threshold": 50,
+              "maxChoices": 1,
+              "durationDays": 5,
+              "publishToSnapshot": false
+            },
+            "voteId": null,
+            "result": null,
+            "reviewers": [
+              {
+                "id": "a78b43e0-3d7b-4d88-97b0-a14f7aeb377e",
+                "proposalId": "fb14e697-3d01-48ce-9577-8904f7f68cd4",
+                "roleId": null,
+                "userId": null,
+                "systemRole": "space_member",
+                "evaluationId": "b0cf26be-00bc-44d1-9451-081fb1fe6fbc"
+              }
+            ],
+            "rubricCriteria": []
+          }
+        ]
       }
     },
     {
@@ -49282,7 +49813,8 @@
           "reviewProposals": true,
           "deleteAnyPage": false,
           "deleteAnyBounty": false,
-          "deleteAnyProposal": false
+          "deleteAnyProposal": false,
+          "createProposals": true
         }
       }
     ]
@@ -49374,6 +49906,12 @@
       }
     ],
     "notificationToggles": {},
+    "defaultPagePermissionGroup": "full_access",
+    "hiddenFeatures": [],
+    "requireProposalTemplate": false,
+    "publicBountyBoard": false,
+    "publicProposals": false,
+    "defaultPublicPages": false,
     "memberProperties": [
       {
         "id": "f5cedab6-a480-4ea2-b569-fc20bc7bddb3",
@@ -49386,21 +49924,12 @@
         "type": "profile_pic",
         "options": null,
         "index": 0,
-        "enabledViews": ["gallery", "table", "profile"],
-        "permissions": []
-      },
-      {
-        "id": "8565a39f-1d76-4198-a3ae-030f361835e5",
-        "createdAt": "2023-04-21T11:27:10.697Z",
-        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-        "updatedAt": "2023-04-21T11:27:10.697Z",
-        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-        "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-        "name": "Name",
-        "type": "text",
-        "options": null,
-        "index": 1,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "required": false,
         "permissions": []
       },
       {
@@ -49414,7 +49943,12 @@
         "type": "role",
         "options": null,
         "index": 2,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "required": false,
         "permissions": []
       },
       {
@@ -49428,7 +49962,12 @@
         "type": "bio",
         "options": null,
         "index": 3,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "required": false,
         "permissions": []
       },
       {
@@ -49442,21 +49981,12 @@
         "type": "discord",
         "options": null,
         "index": 4,
-        "enabledViews": ["gallery", "table", "profile"],
-        "permissions": []
-      },
-      {
-        "id": "e3081651-2d27-4e8e-94d3-d22d16607dd5",
-        "createdAt": "2023-04-21T11:27:10.697Z",
-        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-        "updatedAt": "2023-04-21T11:27:10.697Z",
-        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
-        "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-        "name": "X",
-        "type": "twitter",
-        "options": null,
-        "index": 5,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "required": false,
         "permissions": []
       },
       {
@@ -49470,7 +50000,12 @@
         "type": "linked_in",
         "options": null,
         "index": 6,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "required": false,
         "permissions": []
       },
       {
@@ -49484,7 +50019,12 @@
         "type": "github",
         "options": null,
         "index": 7,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "required": false,
         "permissions": []
       },
       {
@@ -49498,7 +50038,12 @@
         "type": "timezone",
         "options": null,
         "index": 8,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "required": false,
         "permissions": []
       },
       {
@@ -49513,10 +50058,487 @@
         "options": null,
         "index": 9,
         "enabledViews": [],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "e3081651-2d27-4e8e-94d3-d22d16607dd5",
+        "createdAt": "2023-04-21T11:27:10.697Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2023-11-28T06:22:15.639Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
+        "name": "X",
+        "type": "twitter",
+        "options": null,
+        "index": 5,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "3e49c8f9-af66-4f74-8cb9-1eab72bb425a",
+        "createdAt": "2023-12-13T07:55:22.873Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2023-12-13T08:08:05.573Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
+        "name": "Wallet",
+        "type": "wallet",
+        "options": null,
+        "index": 15,
+        "enabledViews": [],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "11b4ee37-33c0-4196-8076-f1fcec325a87",
+        "createdAt": "2023-12-13T07:55:22.873Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2023-12-13T08:08:05.573Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
+        "name": "Google",
+        "type": "google",
+        "options": null,
+        "index": 13,
+        "enabledViews": [],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "05f4ac81-77e6-45f5-a16a-ee67bcdd10db",
+        "createdAt": "2023-12-13T07:55:22.873Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2023-12-13T08:08:05.573Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
+        "name": "Telegram",
+        "type": "telegram",
+        "options": null,
+        "index": 14,
+        "enabledViews": [],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "8565a39f-1d76-4198-a3ae-030f361835e5",
+        "createdAt": "2023-04-21T11:27:10.697Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2023-12-14T13:58:29.328Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
+        "name": "Name",
+        "type": "text",
+        "options": null,
+        "index": 1,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "required": false,
         "permissions": []
       }
     ],
     "rewardBlocks": [],
-    "proposalBlocks": []
+    "proposalBlocks": [
+      {
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
+        "rootId": "3055a63c-b535-41fb-a178-281db8170bfe",
+        "id": "__defaultBoard",
+        "deletedAt": null,
+        "createdAt": "2024-01-03T20:01:22.587Z",
+        "updatedAt": "2024-01-03T20:01:22.587Z",
+        "parentId": "",
+        "schema": 1,
+        "type": "board",
+        "title": "",
+        "fields": {
+          "icon": "",
+          "viewIds": [],
+          "isTemplate": false,
+          "description": "",
+          "headerImage": null,
+          "cardProperties": [
+            {
+              "id": "64939755-a8d3-4856-8082-fb689ad66f5e",
+              "name": "Category",
+              "type": "select",
+              "options": [
+                {
+                  "id": "c004d136-fea9-4381-bf0d-5c93f514dd8a",
+                  "color": "pink",
+                  "value": "General"
+                },
+                {
+                  "id": "68b88fa3-5db1-44d6-914f-ed10247d8fee",
+                  "color": "teal",
+                  "value": "Operational Budget"
+                },
+                {
+                  "id": "6a4d83dc-f3f1-4325-96e5-830e64724ab9",
+                  "color": "yellow",
+                  "value": "Grants"
+                },
+                {
+                  "id": "56532016-471f-42d9-a8bd-78877b78d00a",
+                  "color": "purple",
+                  "value": "Investment"
+                },
+                {
+                  "id": "a2996f2f-af07-470a-b22d-a56c921950e6",
+                  "color": "purple",
+                  "value": "Elections"
+                },
+                {
+                  "id": "9821c563-96de-4956-b027-170b904c6018",
+                  "color": "purple",
+                  "value": "Governance"
+                },
+                {
+                  "id": "506bd977-75a1-47e6-8936-74b18ce3be49",
+                  "color": "gray",
+                  "value": "Treasury"
+                },
+                {
+                  "id": "598ae8e5-7fc5-42b3-95cd-380a84c666fb",
+                  "color": "pink",
+                  "value": "Protocol"
+                },
+                {
+                  "id": "11a463b0-859d-49e2-894e-bd9c5e5574b0",
+                  "color": "pink",
+                  "value": "Metagoverance"
+                }
+              ]
+            }
+          ],
+          "showDescription": false,
+          "columnCalculations": []
+        }
+      }
+    ],
+    "proposalWorkflows": [
+      {
+        "id": "68994576-6369-44bd-98db-393abbae398b",
+        "createdAt": "2023-12-29T23:52:01.011Z",
+        "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
+        "index": 0,
+        "title": "Community Proposals",
+        "evaluations": [
+          {
+            "id": "42a855da-4708-41eb-aa50-ac54d7e8c42d",
+            "type": "feedback",
+            "title": "Feedback",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          },
+          {
+            "id": "4bd73301-9235-4fb1-bc10-a2f3f712cd4f",
+            "type": "pass_fail",
+            "title": "Review",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "move",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "view",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          },
+          {
+            "id": "45389d22-b0d1-4ba8-a0bd-7a67542372df",
+            "type": "vote",
+            "title": "Community vote",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "move",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "view",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "40c13af1-a073-47ce-8684-b904a48788d5",
+        "createdAt": "2023-12-29T23:52:01.011Z",
+        "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
+        "index": 2,
+        "title": "Grant Applications",
+        "evaluations": [
+          {
+            "id": "4d9c8c40-5a43-4e8c-aab5-0d644a31ef6b",
+            "type": "rubric",
+            "title": "Rubric evaluation",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "move",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "view",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "58141f33-3c6e-42ed-bea3-0c7904c1aff1",
+        "createdAt": "2023-12-29T23:52:01.011Z",
+        "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
+        "index": 1,
+        "title": "Decision Matrix",
+        "evaluations": [
+          {
+            "id": "9fa9a08a-7f88-40ce-a1fe-5a7ecd06c65c",
+            "type": "feedback",
+            "title": "Feedback",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "move",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "view",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          },
+          {
+            "id": "93cb3941-f52b-48e3-beee-8db19cdbcbfc",
+            "type": "rubric",
+            "title": "Rubric evaluation",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "move",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "view",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          }
+        ]
+      }
+    ]
   }
 }
