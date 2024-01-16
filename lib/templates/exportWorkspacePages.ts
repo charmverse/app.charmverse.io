@@ -165,7 +165,7 @@ export async function exportWorkspacePages({
       node.proposalId &&
       ((node.type === 'proposal' && !skipProposals) || (node.type === 'proposal_template' && !skipProposalTemplates))
     ) {
-      node.proposal = await prisma.proposal.findUnique({
+      const proposal = await prisma.proposal.findUnique({
         where: {
           id: node.proposalId
         },
@@ -178,6 +178,11 @@ export async function exportWorkspacePages({
           }
         }
       });
+      // unset categoryId until its removed from the db
+      if (proposal?.categoryId) {
+        proposal.categoryId = null;
+      }
+      node.proposal = proposal;
     }
 
     // node.children = node.children?.filter((child) => !excludedPageTypes.includes(child.type)) ?? [];

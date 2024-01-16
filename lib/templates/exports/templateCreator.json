@@ -3268,7 +3268,7 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "511a1415-4d5c-4abc-8606-241801fe966d",
+        "categoryId": null,
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {
@@ -4026,7 +4026,7 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "03c19185-9b4e-4e8f-9740-98d7b7c18cdb",
+        "categoryId": null,
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {

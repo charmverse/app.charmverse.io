@@ -143,7 +143,8 @@ export async function generateImportWorkspacePages({
     bountyPermissionArgs: Prisma.BountyPermissionCreateManyArgs;
     proposalArgs: Prisma.ProposalCreateManyArgs;
     proposalReviewerArgs: Prisma.ProposalReviewerCreateManyArgs;
-    proposalWorkflowArgs: Prisma.ProposalWorkflowCreateManyArgs;
+    proposalRubricCriteriaArgs: Prisma.ProposalRubricCriteriaCreateManyArgs;
+    proposalEvaluationArgs: Prisma.ProposalEvaluationCreateManyArgs;
   } & OldNewIdHashMap
 > {
   const isUuid = validate(targetSpaceIdOrDomain);
@@ -172,7 +173,8 @@ export async function generateImportWorkspacePages({
   const bountyPermissionArgs: Prisma.BountyPermissionCreateManyInput[] = [];
   const proposalArgs: Prisma.ProposalCreateManyInput[] = [];
   const proposalReviewerArgs: Prisma.ProposalReviewerCreateManyInput[] = [];
-  const proposalWorkflowArgs: Prisma.ProposalWorkflowCreateManyInput[] = [];
+  const proposalEvaluationArgs: Prisma.ProposalEvaluationCreateManyInput[] = [];
+  const proposalRubricCriteriaArgs: Prisma.ProposalRubricCriteriaCreateManyInput[] = [];
 
   // 2 way hashmap to find link between new and old page ids
   const oldNewRecordIdHashMap: Record<string, string> = {};
@@ -444,16 +446,45 @@ export async function generateImportWorkspacePages({
       });
     } else if ((node.type === 'proposal' || node.type === 'proposal_template') && node.proposal) {
       // TODO: Handle cross space reviewers and authors
-      const proposal = node.proposal;
+      const { evaluations, fields, ...proposal } = node.proposal;
+      const newProposalId = oldNewRecordIdHashMap[node.id];
       proposalArgs.push({
         ...proposal,
         reviewedBy: undefined,
         spaceId: space.id,
         createdBy: space.createdBy,
         status: 'draft',
-        id: oldNewRecordIdHashMap[node.id],
-        fields: proposal.fields || {}
+        id: newProposalId,
+        fields: fields || {}
       });
+      proposalEvaluationArgs.push(
+        ...evaluations.map(({ id, rubricCriteria, reviewers, ...evaluation }) => {
+          const newEvaluationId = uuid();
+          proposalReviewerArgs.push(
+            ...reviewers.map(({ id: _id, ...reviewer }) => ({
+              ...reviewer,
+              id: uuid(),
+              proposalId: newProposalId,
+              evaluationId: newEvaluationId
+            }))
+          );
+          proposalRubricCriteriaArgs.push(
+            ...rubricCriteria.map(({ id: _id, ...criteria }) => ({
+              ...criteria,
+              id: uuid(),
+              proposalId: newProposalId,
+              evaluationId: newEvaluationId,
+              parameters: criteria.parameters as any
+            }))
+          );
+          return {
+            ...evaluation,
+            id: newEvaluationId,
+            voteSettings: evaluation.voteSettings as any,
+            proposalId: newProposalId
+          };
+        })
+      );
       pageArgs.push(newPageContent);
     }
 
@@ -516,8 +547,11 @@ export async function generateImportWorkspacePages({
     proposalReviewerArgs: {
       data: proposalReviewerArgs
     },
-    proposalWorkflowArgs: {
-      data: proposalWorkflowArgs
+    proposalRubricCriteriaArgs: {
+      data: proposalRubricCriteriaArgs
+    },
+    proposalEvaluationArgs: {
+      data: proposalEvaluationArgs
     },
     oldNewRecordIdHashMap
   };

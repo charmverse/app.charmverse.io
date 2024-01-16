@@ -655,7 +655,7 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "67f004c9-ff0f-459a-a9d0-d02fd563158c",
+        "categoryId": null,
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {
@@ -1528,7 +1528,7 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "e826b6ff-ea89-47aa-9bda-83234bff9491",
+        "categoryId": null,
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {
@@ -2379,7 +2379,7 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "037cac71-c4c7-4355-83dc-577a4cc30a08",
+        "categoryId": null,
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {
@@ -3911,7 +3911,7 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "9d39b289-e4a9-4817-bfe6-4ea83f9094c9",
+        "categoryId": null,
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {
@@ -4695,7 +4695,7 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "3b721d2f-d5af-4119-a11f-a43419266146",
+        "categoryId": null,
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {
@@ -5676,7 +5676,7 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "f7a37418-ffb8-483c-a260-c6162ae88155",
+        "categoryId": null,
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {
@@ -6393,7 +6393,7 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "53726def-5070-4911-a095-681c85aeacaa",
+        "categoryId": null,
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {
@@ -7244,7 +7244,7 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "8e80fb13-ce4b-45e9-abcf-fe01aea62ddd",
+        "categoryId": null,
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {

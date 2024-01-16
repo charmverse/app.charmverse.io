@@ -481,7 +481,7 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "506bd977-75a1-47e6-8936-74b18ce3be49",
+        "categoryId": null,
         "publishToLens": null,
         "lensPostLink": null,
         "fields": {
@@ -983,7 +983,7 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "506bd977-75a1-47e6-8936-74b18ce3be49",
+        "categoryId": null,
         "publishToLens": null,
         "lensPostLink": null,
         "fields": {
@@ -1411,7 +1411,7 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "598ae8e5-7fc5-42b3-95cd-380a84c666fb",
+        "categoryId": null,
         "publishToLens": null,
         "lensPostLink": null,
         "fields": {
@@ -2183,7 +2183,7 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "11a463b0-859d-49e2-894e-bd9c5e5574b0",
+        "categoryId": null,
         "publishToLens": null,
         "lensPostLink": null,
         "fields": {
@@ -2955,7 +2955,7 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "11a463b0-859d-49e2-894e-bd9c5e5574b0",
+        "categoryId": null,
         "publishToLens": null,
         "lensPostLink": null,
         "fields": {
@@ -47069,7 +47069,7 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": "506bd977-75a1-47e6-8936-74b18ce3be49",
+        "categoryId": null,
         "publishToLens": null,
         "lensPostLink": null,
         "fields": {
