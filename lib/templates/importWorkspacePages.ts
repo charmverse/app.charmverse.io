@@ -457,32 +457,40 @@ async function generateImportWorkspacePages({
         createdBy: space.createdBy,
         status: 'draft',
         id: newProposalId,
-        workflowId: oldNewRecordIdHashMap[proposal.workflowId!],
+        workflowId: importingToDifferentSpace ? oldNewRecordIdHashMap[proposal.workflowId!] : proposal.workflowId,
         fields: fields || {}
       });
       proposalEvaluationArgs.push(
-        ...evaluations.map(({ id, rubricCriteria, reviewers, ...evaluation }) => {
+        ...evaluations.map(({ id, rubricCriteria, reviewers, permissions: evaluationPermissions, ...evaluation }) => {
           const newEvaluationId = uuid();
-          proposalReviewerArgs.push(
-            ...reviewers.map(({ id: _id, ...reviewer }) => ({
-              ...reviewer,
-              id: uuid(),
-              roleId:
-                reviewer.roleId && importingToDifferentSpace ? oldNewRoleIdHashMap?.[reviewer.roleId] : reviewer.roleId,
-              userId: importingToDifferentSpace ? undefined : reviewer.userId,
-              systemRole: reviewer.systemRole,
-              proposalId: newProposalId,
-              evaluationId: newEvaluationId
-            }))
-          );
 
-          evaluation.permissions.forEach((perm) => {
+          for (const reviewer of reviewers) {
+            if (importingToDifferentSpace && !reviewer.userId) {
+              proposalReviewerArgs.push({
+                ...reviewer,
+                id: uuid(),
+                roleId: reviewer.roleId ? oldNewRoleIdHashMap?.[reviewer.roleId] : undefined,
+                systemRole: reviewer.systemRole,
+                proposalId: newProposalId,
+                evaluationId: newEvaluationId
+              });
+            } else if (!importingToDifferentSpace) {
+              proposalReviewerArgs.push({
+                ...reviewer,
+                id: uuid(),
+                proposalId: newProposalId,
+                evaluationId: newEvaluationId
+              });
+            }
+          }
+
+          evaluationPermissions.forEach((perm) => {
             if (importingToDifferentSpace && !perm.userId) {
               proposalEvaluationPermissionArgs.push({
                 evaluationId: newEvaluationId,
                 operation: perm.operation,
                 id: uuid(),
-                roleId: perm.roleId ? oldNewRoleIdHashMap?.[perm.roleId] : perm.roleId,
+                roleId: perm.roleId ? oldNewRoleIdHashMap?.[perm.roleId] : undefined,
                 systemRole: perm.systemRole
               });
             } else if (!importingToDifferentSpace) {
@@ -508,6 +516,7 @@ async function generateImportWorkspacePages({
           );
           return {
             ...evaluation,
+            decidedBy: importingToDifferentSpace ? undefined : evaluation.decidedBy,
             id: newEvaluationId,
             voteSettings: evaluation.voteSettings as any,
             proposalId: newProposalId
