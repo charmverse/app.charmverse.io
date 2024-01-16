@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useGoBackToStep } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
+import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useSnackbar } from 'hooks/useSnackbar';
 
 import type { ProposalEvaluationValues } from '../../EvaluationSettingsSidebar/components/EvaluationStepSettings';
@@ -21,8 +22,9 @@ export function GoBackButton({
   previousStep?: Pick<ProposalEvaluationValues, 'id' | 'type' | 'title'>;
   onSubmit: () => void;
 }) {
+  const { showConfirmation } = useConfirmationModal();
   const { showMessage } = useSnackbar();
-  const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
+  // const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const { trigger: goBackToStep, isMutating: isSavingEvaluation } = useGoBackToStep({
     proposalId
   });
@@ -43,39 +45,35 @@ export function GoBackButton({
     onSubmit?.();
   }
 
-  function onClick() {
+  async function onClick() {
     // no confirmation needed for draft or feedback
     if (!previousStep) {
       goToPreviousStep();
     } else {
-      setShowConfirmation(true);
+      const { confirmed } = await showConfirmation({
+        message: 'Moving back will clear the result of the current and previous steps and cannot be undone.',
+        confirmButton: 'Continue'
+      });
+
+      if (confirmed) {
+        goToPreviousStep();
+      }
     }
   }
 
-  function onCancel() {
-    setShowConfirmation(false);
-  }
-
   return (
-    <>
-      <Tooltip title={`Move back to ${previousStep?.title || 'Draft'}`}>
-        <Button
-          color='secondary'
-          loading={isSavingEvaluation}
-          size='small'
-          variant='outlined'
-          disabled={!!disabledTooltip}
-          disabledTooltip={disabledTooltip}
-          onClick={onClick}
-        >
-          Back
-        </Button>
-      </Tooltip>
-      <ModalWithButtons open={showConfirmation} buttonText='Continue' onClose={onCancel} onConfirm={goToPreviousStep}>
-        <Typography>
-          Moving back will clear the result of the current and previous steps and cannot be undone.
-        </Typography>
-      </ModalWithButtons>
-    </>
+    <Tooltip title={`Move back to ${previousStep?.title || 'Draft'}`}>
+      <Button
+        color='secondary'
+        loading={isSavingEvaluation}
+        size='small'
+        variant='outlined'
+        disabled={!!disabledTooltip}
+        disabledTooltip={disabledTooltip}
+        onClick={onClick}
+      >
+        Back
+      </Button>
+    </Tooltip>
   );
 }
