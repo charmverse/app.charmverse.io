@@ -3,7 +3,6 @@ import { useState } from 'react';
 
 import { useGoBackToStep } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
-import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useSnackbar } from 'hooks/useSnackbar';
 

@@ -7,7 +7,7 @@ type ConfirmationModalResult = { confirmed?: true; cancelled?: true };
 
 type IContext = {
   props: ConfirmationModalProps;
-  showConfirmation: (msg: string | ConfirmationModalProps) => Promise<ConfirmationModalResult>;
+  showConfirmation: (msg: string | Omit<ConfirmationModalProps, 'isOpen'>) => Promise<ConfirmationModalResult>;
 };
 export const ConfirmationModalContext = createContext<Readonly<IContext>>({
   props: {
@@ -27,7 +27,7 @@ export function ConfirmationModalProvider({ children }: { children: ReactNode })
     onConfirm: async () => {}
   });
 
-  function showConfirmation(msg: string | ConfirmationModalProps) {
+  function showConfirmation(msg: string | Omit<ConfirmationModalProps, 'isOpen'>) {
     return new Promise<ConfirmationModalResult>((resolve) => {
       function onCancel() {
         if (typeof msg !== 'string') msg?.onCancel?.();
