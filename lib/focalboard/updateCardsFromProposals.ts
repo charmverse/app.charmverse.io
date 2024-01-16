@@ -34,14 +34,12 @@ export async function updateCardsFromProposals({
   spaceId: string;
   userId: string;
 }) {
-  if (boardId && spaceId) {
-    await prisma.block.findFirstOrThrow({
-      where: {
-        id: boardId,
-        spaceId
-      }
-    });
-  }
+  const board = await prisma.block.findFirstOrThrow({
+    where: {
+      id: boardId,
+      spaceId
+    }
+  });
 
   const rootPagePermissions = await prisma.page.findFirstOrThrow({
     where: {
@@ -76,12 +74,12 @@ export async function updateCardsFromProposals({
   });
 
   // Get the newly added proposal properties
-  const newlyAddedProposalProperties =
+  const newBoardProposalCustomProperties =
     proposalBoardBlock?.fields.cardProperties.filter((prop) => !boardBlockCardPropertiesRecord[prop.id]) ?? [];
 
   // Looping through proposal board block properties since its the source of truth for the properties
   const proposalBoardPropertiesUpdated =
-    (newlyAddedProposalProperties.length > 0 ||
+    (newBoardProposalCustomProperties.length > 0 ||
       proposalBoardBlock?.fields.cardProperties.some((cardProperty) => {
         const boardBlockCardProperty = boardBlockCardPropertiesRecord[cardProperty.id];
         // If a new property was added to the proposal board block, we need to update the board block
@@ -132,41 +130,16 @@ export async function updateCardsFromProposals({
     });
   }
 
-  // Add the newly added proposal properties to all the view blocks visiblePropertyIds
-  if (newlyAddedProposalProperties.length) {
-    const views = await prisma.block.findMany({
-      select: {
-        fields: true,
-        id: true
-      },
-      where: {
-        type: 'view',
-        parentId: boardId
-      }
-    });
-
-    await prisma.$transaction(
-      views.map((block) => {
-        return prisma.block.update({
-          where: { id: block.id },
-          data: {
-            fields: {
-              ...(block.fields as BoardViewFields),
-              // Hide the proposal evaluation type property from the view
-              visiblePropertyIds: [
-                ...new Set([
-                  ...(block.fields as BoardViewFields).visiblePropertyIds,
-                  ...newlyAddedProposalProperties.map((p) => p.id)
-                ])
-              ]
-            },
-            updatedAt: new Date(),
-            updatedBy: userId
-          }
-        });
-      })
-    );
-  }
+  const views = await prisma.block.findMany({
+    select: {
+      fields: true,
+      id: true
+    },
+    where: {
+      type: 'view',
+      parentId: boardId
+    }
+  });
 
   const updatedBoardBlock = await prisma.block.findFirstOrThrow({
     where: {
@@ -177,6 +150,45 @@ export async function updateCardsFromProposals({
       fields: true
     }
   });
+
+  const boardFieldsProperties = (board.fields as unknown as BoardFields)?.cardProperties ?? [];
+  const newBoardProposalEvaluationPropertyIds = (
+    ((updatedBoardBlock.fields as unknown as BoardFields)?.cardProperties ?? []).filter((property) => {
+      return (
+        (property.type === 'proposalEvaluatedBy' ||
+          property.type === 'proposalEvaluationAverage' ||
+          property.type === 'proposalEvaluationTotal') &&
+        !boardFieldsProperties.find((boardProperty) => boardProperty.id === property.id)
+      );
+    }) ?? []
+  ).map((property) => property.id);
+
+  const newlyAddedProposalProperties = [
+    ...newBoardProposalEvaluationPropertyIds,
+    ...newBoardProposalCustomProperties.map((p) => p.id)
+  ];
+
+  // Add the newly added proposal properties to all the view blocks visiblePropertyIds
+  if (newlyAddedProposalProperties.length) {
+    await prisma.$transaction(
+      views.map((block) => {
+        return prisma.block.update({
+          where: { id: block.id },
+          data: {
+            fields: {
+              ...(block.fields as BoardViewFields),
+              // Hide the proposal evaluation type property from the view
+              visiblePropertyIds: [
+                ...new Set([...(block.fields as BoardViewFields).visiblePropertyIds, ...newlyAddedProposalProperties])
+              ]
+            },
+            updatedAt: new Date(),
+            updatedBy: userId
+          }
+        });
+      })
+    );
+  }
 
   const boardBlockCardProperties = (updatedBoardBlock.fields as unknown as BoardFields)?.cardProperties ?? [];
 
