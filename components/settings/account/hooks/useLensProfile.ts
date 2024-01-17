@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { CredentialsExpiredError, NotAuthenticatedError } from '@lens-protocol/client';
 import type {
   BroadcastingError,
+  InsufficientGasError,
   PendingSigningRequestError,
   ProfileId,
   TransactionError,
@@ -26,6 +27,7 @@ export function useHandleLensError() {
       | TransactionError
       | CredentialsExpiredError
       | NotAuthenticatedError
+      | InsufficientGasError
   ) => {
     let errorMessage = '';
     switch (error.name) {
@@ -61,6 +63,11 @@ export function useHandleLensError() {
 
       case 'TransactionError': {
         errorMessage = 'There was an error with the transaction';
+        break;
+      }
+
+      case 'InsufficientGasError': {
+        errorMessage = 'There is not enough gas to complete the transaction';
         break;
       }
 

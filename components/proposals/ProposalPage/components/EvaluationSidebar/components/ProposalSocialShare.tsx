@@ -3,6 +3,7 @@ import { Box, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import { useState } from 'react';
 import { useCopyToClipboard } from 'usehooks-ts';
 
+import { useProposal } from 'components/[pageId]/DocumentPage/hooks/useProposal';
 import { Button } from 'components/common/Button';
 import { InlineCharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
@@ -13,6 +14,7 @@ import { isProdEnv } from 'config/constants';
 import { useCreateLensPublication } from 'hooks/useCreateLensPublication';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { getPagePath } from 'lib/utilities/domains/getPagePath';
 
@@ -30,7 +32,10 @@ function ProposalLensSocialShare({
   const { lensProfile } = useLensProfile();
   const [isPublishToLensModalOpen, setIsPublishToLensModalOpen] = useState(false);
   const { space } = useCurrentSpace();
-  const { createLensPublication } = useCreateLensPublication({
+  const { refreshProposal } = useProposal({
+    proposalId
+  });
+  const { createLensPublication, isPublishingToLens } = useCreateLensPublication({
     publicationType: 'post',
     proposalId,
     proposalLink,
@@ -38,6 +43,7 @@ function ProposalLensSocialShare({
       setIsPublishToLensModalOpen(false);
     },
     onSuccess: () => {
+      refreshProposal();
       setIsPublishToLensModalOpen(false);
     }
   });
@@ -92,10 +98,20 @@ function ProposalLensSocialShare({
 
   return (
     <>
-      <Tooltip title={lensProfile ? 'Publish to Lens' : 'Please create a Lens profile first'}>
-        {lensPostLink ? (
+      <Tooltip
+        title={lensPostLink ? 'View on lens' : lensProfile ? 'Publish to Lens' : 'Please create a Lens profile first'}
+      >
+        <div>
           <Link
-            href={`https://${!isProdEnv ? 'testnet.' : ''}hey.xyz/posts/${lensPostLink}`}
+            onClick={() => {
+              if (lensProfile) {
+                setIsPublishToLensModalOpen(true);
+              }
+            }}
+            style={{
+              display: 'flex'
+            }}
+            href={lensPostLink ? `https://${!isProdEnv ? 'testnet.' : ''}hey.xyz/posts/${lensPostLink}` : ''}
             target='_blank'
             rel='noopener noreferrer'
           >
@@ -109,22 +125,7 @@ function ProposalLensSocialShare({
               }}
             />
           </Link>
-        ) : (
-          <img
-            onClick={() => {
-              if (lensProfile) {
-                setIsPublishToLensModalOpen(true);
-              }
-            }}
-            src='/images/logos/lens_logo.png'
-            style={{
-              borderRadius: '50%',
-              width: 35,
-              height: 35,
-              cursor: lensProfile ? 'pointer' : 'default'
-            }}
-          />
-        )}
+        </div>
       </Tooltip>
       <Modal
         open={isPublishToLensModalOpen}
@@ -140,6 +141,8 @@ function ProposalLensSocialShare({
           style={{
             minHeight: 100
           }}
+          key={`${isPublishingToLens}`}
+          readOnly={isPublishingToLens}
         />
         <Box
           sx={{
@@ -154,6 +157,8 @@ function ProposalLensSocialShare({
                 content: lensContent.doc
               });
             }}
+            loading={isPublishingToLens}
+            disabled={checkIsContentEmpty(lensContent.doc)}
             primary
           >
             Share

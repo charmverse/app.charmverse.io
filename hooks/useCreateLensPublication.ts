@@ -1,10 +1,11 @@
 import { log } from '@charmverse/core/log';
 import { textOnly } from '@lens-protocol/metadata';
 import { useCreateComment, useCreatePost } from '@lens-protocol/react-web';
+import { useState } from 'react';
 
 import { useUpdateProposalLensProperties } from 'charmClient/hooks/proposals';
 import { usePageComments } from 'components/[pageId]/DocumentPage/components/CommentsFooter/usePageComments';
-import { useHandleLensError } from 'components/settings/account/hooks/useLensProfile';
+import { useHandleLensError, useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
@@ -18,7 +19,7 @@ async function switchNetwork() {
   return switchActiveNetwork(LensChain);
 }
 
-const LENS_PROPOSAL_PUBLICATION_LENGTH = 50;
+const LENS_PROPOSAL_PUBLICATION_LENGTH = 150;
 
 export type CreateLensPublicationParams = {
   onError: VoidFunction;
@@ -39,6 +40,7 @@ export type CreateLensPublicationParams = {
 export function useCreateLensPublication(params: CreateLensPublicationParams) {
   const { onError, onSuccess, proposalId, publicationType, proposalLink } = params;
   const { execute: createPost } = useCreatePost();
+  const { setupLensProfile } = useLensProfile();
   const { updateComment } = usePageComments(proposalId);
   const { execute: createComment } = useCreateComment();
   const { chainId } = useWeb3Account();
@@ -46,15 +48,24 @@ export function useCreateLensPublication(params: CreateLensPublicationParams) {
   const { space } = useCurrentSpace();
   const { handlerLensError } = useHandleLensError();
   const { showMessage } = useSnackbar();
+  const [isPublishingToLens, setIsPublishingToLens] = useState(false);
 
   async function createLensPublication({ content }: { content: PageContent }) {
     try {
+      setIsPublishingToLens(true);
       if (!space) {
         return null;
       }
 
       if (chainId !== LensChain) {
         await switchNetwork();
+      }
+
+      const authenticated = await setupLensProfile();
+
+      if (!authenticated) {
+        onError();
+        return null;
       }
 
       const markdownContent = await generateMarkdown({
@@ -75,6 +86,7 @@ export function useCreateLensPublication(params: CreateLensPublicationParams) {
       const uri = await uploadToArweave(metadata);
       const capitalizedPublicationType = publicationType.charAt(0).toUpperCase() + publicationType.slice(1);
       if (!uri) {
+        onError();
         return null;
       }
 
@@ -131,10 +143,13 @@ export function useCreateLensPublication(params: CreateLensPublicationParams) {
       });
       showMessage('There was an error publishing to Lens', 'error');
       return null;
+    } finally {
+      setIsPublishingToLens(false);
     }
   }
 
   return {
+    isPublishingToLens,
     createLensPublication
   };
 }
