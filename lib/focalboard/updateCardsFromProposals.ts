@@ -198,12 +198,7 @@ export async function updateCardsFromProposals({
     prisma.page.findMany({
       where: {
         spaceId,
-        type: 'proposal',
-        proposal: {
-          status: {
-            not: 'draft'
-          }
-        }
+        type: 'proposal'
       },
       include: {
         proposal: {
@@ -449,7 +444,7 @@ export async function updateCardsFromProposals({
       }
 
       // Don't create new cards from archived cards
-    } else if (!card && !pageWithProposal.proposal?.archived) {
+    } else if (!card && !pageWithProposal.proposal?.archived && pageWithProposal.proposal?.status !== 'draft') {
       let properties: Record<string, BoardPropertyValue> = {};
 
       if (databaseProposalProps.proposalUrl) {
