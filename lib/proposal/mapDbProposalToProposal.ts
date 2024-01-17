@@ -59,10 +59,7 @@ export function mapDbProposalToProposal({
     permissions,
     currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
     status: proposal.status,
-    // Support old model: filter out evaluation-specific reviewers and rubric answers
-    rubricAnswers: currentEvaluation?.rubricAnswers || [],
-    draftRubricAnswers: currentEvaluation?.draftRubricAnswers || [],
-    reviewers: currentEvaluation?.reviewers || [],
+    // reviewers: currentEvaluation?.reviewers || [],
     rewardIds: rewards.map((r) => r.id) || null,
     form: form
       ? {
@@ -70,12 +67,6 @@ export function mapDbProposalToProposal({
           id: form?.id || null
         }
       : null
-    // currentStep: getCurrentStep({
-    //   evaluations: proposal.evaluations,
-    //   hasPendingRewards: (fields?.pendingRewards ?? []).length > 0,
-    //   proposalStatus: proposal.status,
-    //   hasPublishedRewards: rewards.length > 0
-    // })
   };
 
   return proposalWithUsers as ProposalWithUsersAndRubric;
