@@ -603,6 +603,13 @@ export async function updateCardsFromProposals({
         }
       }
     });
+    await prisma.block.deleteMany({
+      where: {
+        id: {
+          in: orphanPageIds
+        }
+      }
+    });
   }
 
   if (orphanPageIds.length > 0) {
