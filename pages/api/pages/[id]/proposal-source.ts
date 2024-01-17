@@ -81,9 +81,14 @@ async function updateProposalSource(req: NextApiRequest, res: NextApiResponse<Pa
 
   log.debug('Refresh cards for proposal-as-a-source board (started)', { pageId, spaceId: boardPage.spaceId, userId });
 
-  await updateCardsFromProposals({ boardId: pageId, spaceId: boardPage.spaceId, userId });
+  const result = await updateCardsFromProposals({ boardId: pageId, spaceId: boardPage.spaceId, userId });
 
-  log.debug('Refresh cards for proposal-as-a-source board (complete)', { pageId, spaceId: boardPage.spaceId, userId });
+  log.debug('Refresh cards for proposal-as-a-source board (complete)', {
+    pageId,
+    spaceId: boardPage.spaceId,
+    userId,
+    result
+  });
 
   return res.status(200).end();
 }

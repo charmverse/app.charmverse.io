@@ -629,4 +629,9 @@ export async function updateCardsFromProposals({
       spaceId
     );
   }
+  return {
+    created: newCards.length,
+    deleted: nonExistingProposalPagesIds.length,
+    updated: updatedCards.length
+  };
 }
