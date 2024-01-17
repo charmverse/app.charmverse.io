@@ -196,12 +196,7 @@ export async function updateCardsFromProposals({
   const pageProposals = await prisma.page.findMany({
     where: {
       spaceId,
-      type: 'proposal',
-      proposal: {
-        status: {
-          not: 'draft'
-        }
-      }
+      type: 'proposal'
     },
     include: {
       proposal: {
