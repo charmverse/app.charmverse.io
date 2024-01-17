@@ -17,7 +17,7 @@ export type Props = {
   isReviewer?: boolean;
   evaluation: Pick<PopulatedEvaluation, 'id' | 'completedAt' | 'reviewers' | 'result'>;
   refreshProposal?: VoidFunction;
-  requireConfirmation?: boolean;
+  confirmationMessage?: string;
   isCurrent: boolean;
   archived?: boolean;
 };
@@ -29,7 +29,7 @@ export function PassFailEvaluation({
   evaluation,
   isCurrent,
   refreshProposal,
-  requireConfirmation,
+  confirmationMessage,
   archived
 }: Props) {
   const { trigger, isMutating } = useSubmitEvaluationResult({ proposalId });
@@ -53,10 +53,9 @@ export function PassFailEvaluation({
     : null;
 
   async function onSubmitReview(result: NonNullable<PopulatedEvaluation['result']>) {
-    if (requireConfirmation) {
+    if (confirmationMessage) {
       const { confirmed } = await showConfirmation({
-        message:
-          'Please verify that all reviewers have submitted a response. This will submit the final review for this step.',
+        message: confirmationMessage,
         confirmButton: result === 'pass' ? 'Approve' : 'Decline'
       });
       if (!confirmed) {
