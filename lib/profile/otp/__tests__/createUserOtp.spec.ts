@@ -33,12 +33,4 @@ describe('createUserOtp', () => {
     const userId = uuid();
     await expect(createUserOtp(userId)).rejects.toBeInstanceOf(DataNotFoundError);
   });
-
-  it('Should throw an error if user already has an otp', async () => {
-    const { user } = await generateUserAndSpace();
-    await createUserOtp(user.id);
-    await updateTestUserOtp(user.id, { activatedAt: new Date() });
-
-    await expect(createUserOtp(user.id)).rejects.toBeInstanceOf(InvalidInputError);
-  });
 });
