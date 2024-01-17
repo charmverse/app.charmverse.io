@@ -9,7 +9,8 @@ export const uploadToArweave = async (data: any): Promise<string | null> => {
     data,
     {
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Referer: isProdEnv ? 'https://hey.xyz' : 'https://testnet.hey.xyz'
       },
       // remove credentials to bypass CORS error
       credentials: 'omit'

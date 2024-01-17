@@ -3,6 +3,7 @@ import { textOnly } from '@lens-protocol/metadata';
 import { useCreateComment, useCreatePost } from '@lens-protocol/react-web';
 import { useState } from 'react';
 
+import { useUploadToArweave } from 'charmClient/hooks/lens';
 import { useUpdateProposalLensProperties } from 'charmClient/hooks/proposals';
 import { usePageComments } from 'components/[pageId]/DocumentPage/components/CommentsFooter/usePageComments';
 import { useHandleLensError, useLensProfile } from 'components/settings/account/hooks/useLensProfile';
@@ -11,15 +12,12 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import { LensChain } from 'lib/lens/lensClient';
-import { uploadToArweave } from 'lib/lens/uploadToArweave';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 
 async function switchNetwork() {
   return switchActiveNetwork(LensChain);
 }
-
-const LENS_PROPOSAL_PUBLICATION_LENGTH = 150;
 
 export type CreateLensPublicationParams = {
   onError: VoidFunction;
@@ -49,7 +47,7 @@ export function useCreateLensPublication(params: CreateLensPublicationParams) {
   const { handlerLensError } = useHandleLensError();
   const { showMessage } = useSnackbar();
   const [isPublishingToLens, setIsPublishingToLens] = useState(false);
-
+  const { trigger } = useUploadToArweave();
   async function createLensPublication({ content }: { content: PageContent }) {
     try {
       setIsPublishingToLens(true);
@@ -72,18 +70,16 @@ export function useCreateLensPublication(params: CreateLensPublicationParams) {
         content
       });
 
-      const trimmedMarkdownContent =
-        markdownContent.length > LENS_PROPOSAL_PUBLICATION_LENGTH
-          ? `${markdownContent.slice(0, LENS_PROPOSAL_PUBLICATION_LENGTH)}...`
-          : markdownContent;
-
-      const finalMarkdownContent = `${trimmedMarkdownContent}${
+      const finalMarkdownContent = `${markdownContent}${
         publicationType === 'comment' ? `\n\nView on CharmVerse ${proposalLink}?commentId=${params.commentId}` : ''
       }`;
 
       const metadata = textOnly({ content: finalMarkdownContent });
 
-      const uri = await uploadToArweave(metadata);
+      const uri = await trigger({
+        metadata
+      });
+
       const capitalizedPublicationType = publicationType.charAt(0).toUpperCase() + publicationType.slice(1);
       if (!uri) {
         onError();

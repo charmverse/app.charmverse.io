@@ -5,8 +5,8 @@ import { useCopyToClipboard } from 'usehooks-ts';
 
 import { useProposal } from 'components/[pageId]/DocumentPage/hooks/useProposal';
 import { Button } from 'components/common/Button';
-import { InlineCharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
+import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
@@ -101,21 +101,33 @@ function ProposalLensSocialShare({
       <Tooltip
         title={lensPostLink ? 'View on lens' : lensProfile ? 'Publish to Lens' : 'Please create a Lens profile first'}
       >
-        <div>
-          <Link
-            onClick={() => {
-              if (lensProfile) {
-                setIsPublishToLensModalOpen(true);
-              }
-            }}
-            style={{
-              display: 'flex'
-            }}
-            href={lensPostLink ? `https://${!isProdEnv ? 'testnet.' : ''}hey.xyz/posts/${lensPostLink}` : ''}
-            target='_blank'
-            rel='noopener noreferrer'
-          >
+        <div style={{ display: 'flex' }}>
+          {lensPostLink ? (
+            <Link
+              style={{
+                display: 'flex'
+              }}
+              href={`https://${!isProdEnv ? 'testnet.' : ''}hey.xyz/posts/${lensPostLink}`}
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              <img
+                src='/images/logos/lens_logo.png'
+                style={{
+                  borderRadius: '50%',
+                  width: 35,
+                  height: 35,
+                  cursor: lensProfile ? 'pointer' : 'default'
+                }}
+              />
+            </Link>
+          ) : (
             <img
+              onClick={() => {
+                if (lensProfile) {
+                  setIsPublishToLensModalOpen(true);
+                }
+              }}
               src='/images/logos/lens_logo.png'
               style={{
                 borderRadius: '50%',
@@ -124,7 +136,7 @@ function ProposalLensSocialShare({
                 cursor: lensProfile ? 'pointer' : 'default'
               }}
             />
-          </Link>
+          )}
         </div>
       </Tooltip>
       <Modal
