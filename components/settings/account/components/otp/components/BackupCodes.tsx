@@ -24,7 +24,7 @@ export function BackupCodes({ recoveryCode, errorMessage, loading, onSubmit }: P
       <Typography mb={2}>
         The backup code lets you log in to CharmVerse if you don't have access to your authenticator app.
       </Typography>
-      <Button onClick={onSubmit} loading={loading} disabled={loading}>
+      <Button onClick={onSubmit} loading={loading} disabled={loading} data-test='two-factor-auth-next'>
         Confirm
       </Button>
     </Box>

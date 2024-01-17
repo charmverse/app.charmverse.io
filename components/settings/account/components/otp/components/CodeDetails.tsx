@@ -27,11 +27,11 @@ export function CodeDetails({ onSubmit, uri, code, btnText }: Props) {
       </Typography>
       <Box display='flex' alignItems='center' flexDirection='column'>
         <CanvasQRCode uri={uri} />
-        <Button variant='text' onClick={() => setShowCode(true)}>
+        <Button variant='text' onClick={() => setShowCode(true)} data-test='see-auth-confirmation-code'>
           Can't scan the QR code?
         </Button>
-        {showCode && <Typography>{code}</Typography>}
-        <Button onClick={onSubmit} sx={{ mt: 2 }}>
+        {showCode && <Typography data-test='auth-confirmation-code'>{code}</Typography>}
+        <Button onClick={onSubmit} sx={{ mt: 2 }} data-test='two-factor-auth-next'>
           {btnText}
         </Button>
       </Box>

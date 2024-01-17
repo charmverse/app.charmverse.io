@@ -54,12 +54,12 @@ export async function createTestUserOtp(userId: string) {
   return userOtp;
 }
 
-export function generateTestOtpToken(user: User & { userOTP: UserOTP }) {
-  const userSecret = decryptRecoveryCode(user.userOTP.secret);
+export function generateTestOtpToken(label: string, secret: string, decrypted?: boolean) {
+  const userSecret = decrypted ? secret : decryptRecoveryCode(secret);
 
   const totp = new OTPAuth.TOTP({
     issuer: 'Charmverse',
-    label: user.username,
+    label,
     algorithm: 'SHA1',
     digits: 6,
     period: 30,

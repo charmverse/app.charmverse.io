@@ -61,7 +61,7 @@ export function StartSetup({ onSubmit, loading, errorMessage }: Props) {
         />
       </ListItem>
       <ListItem sx={{ justifyContent: 'center' }}>
-        <Button onClick={onSubmit} loading={loading} disabled={loading}>
+        <Button onClick={onSubmit} loading={loading} disabled={loading} data-test='two-factor-auth-next'>
           Get started
         </Button>
         {errorMessage && <Typography color='error'>{errorMessage}</Typography>}

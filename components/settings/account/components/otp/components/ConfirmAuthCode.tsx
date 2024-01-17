@@ -41,13 +41,20 @@ export function ConfirmAuthCode({ onSubmit, errorMessage, loading }: Props) {
           error={error}
           disabled={loading}
           helperText={error}
+          data-test='confirm-auth-code-input'
           {...register('code', {
             required: true,
             validate: (val) => String(val).length === 6 || 'Must be exactly 6 characters'
           })}
         />
       </Box>
-      <Button sx={{ mt: 2 }} onClick={handleSubmit(onSubmitCode)} loading={loading} disabled={loading}>
+      <Button
+        sx={{ mt: 2 }}
+        onClick={handleSubmit(onSubmitCode)}
+        loading={loading}
+        disabled={loading}
+        data-test='two-factor-auth-next'
+      >
         Confirm
       </Button>
     </Box>

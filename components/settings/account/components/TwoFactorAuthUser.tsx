@@ -44,6 +44,7 @@ export function TwoFactorAuthUser() {
             <Button
               variant='text'
               sx={{ px: 0, display: 'block', '&:hover': { background: 'transparent' } }}
+              data-test='account-get-qr-code-btn'
               {...bindTrigger(getQrCodeModal)}
             >
               Scan your QR code
@@ -51,13 +52,14 @@ export function TwoFactorAuthUser() {
             <Button
               variant='text'
               sx={{ px: 0, display: 'block', '&:hover': { background: 'transparent' } }}
+              data-test='account-reset-recovery-code-btn'
               {...bindTrigger(confirmResetRecoveryCodeModal)}
             >
               Reset recovery code
             </Button>
           </>
         ) : (
-          <Button sx={{ mt: 1, display: 'block' }} {...bindTrigger(otpSetupModal)}>
+          <Button sx={{ mt: 1, display: 'block' }} {...bindTrigger(otpSetupModal)} data-test='account-config-twofa-btn'>
             Click here to configure 2fa
           </Button>
         )}

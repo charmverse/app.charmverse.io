@@ -33,3 +33,4 @@ export const ACCOUNT_TABS = [
 ] as const;
 
 export type UserSettingsTab = (typeof ACCOUNT_TABS)[number];
+export type AccountSettingsSection = UserSettingsTab['path'];
