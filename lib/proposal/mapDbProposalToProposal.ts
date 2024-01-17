@@ -21,6 +21,7 @@ type FormFieldsIncludeType = {
 export function mapDbProposalToProposal({
   proposal,
   permissions,
+  permissionsByStep,
   canAccessPrivateFormFields
 }: {
   proposal: Proposal &
@@ -33,15 +34,28 @@ export function mapDbProposalToProposal({
       rewards: { id: string }[];
     };
   permissions?: ProposalPermissionFlags;
+  permissionsByStep?: Record<string, ProposalPermissionFlags>;
   canAccessPrivateFormFields?: boolean;
 }): ProposalWithUsersAndRubric {
-  const { rewards, form, ...rest } = proposal;
+  const { rewards, form, evaluations, ...rest } = proposal;
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
   const formFields = getProposalFormFields(form?.formFields, !!canAccessPrivateFormFields);
-  const fields = (rest.fields as ProposalFields) ?? null;
+  //   const fields = (rest.fields as ProposalFields) ?? null;
+  const mappedEvaluations = proposal.evaluations.map((evaluation) => {
+    const stepPermissions = permissionsByStep?.[evaluation.id];
+    if (!stepPermissions?.evaluate) {
+      evaluation.draftRubricAnswers = [];
+      evaluation.rubricAnswers = [];
+    }
+    return {
+      ...evaluation,
+      isReviewer: !!stepPermissions?.evaluate
+    };
+  });
 
   const proposalWithUsers = {
     ...rest,
+    evaluations: mappedEvaluations,
     permissions,
     currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
     status: proposal.status,
@@ -55,13 +69,13 @@ export function mapDbProposalToProposal({
           formFields: formFields || null,
           id: form?.id || null
         }
-      : null,
-    currentStep: getCurrentStep({
-      evaluations: proposal.evaluations,
-      hasPendingRewards: (fields?.pendingRewards ?? []).length > 0,
-      proposalStatus: proposal.status,
-      hasPublishedRewards: rewards.length > 0
-    })
+      : null
+    // currentStep: getCurrentStep({
+    //   evaluations: proposal.evaluations,
+    //   hasPendingRewards: (fields?.pendingRewards ?? []).length > 0,
+    //   proposalStatus: proposal.status,
+    //   hasPublishedRewards: rewards.length > 0
+    // })
   };
 
   return proposalWithUsers as ProposalWithUsersAndRubric;

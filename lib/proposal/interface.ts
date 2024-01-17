@@ -86,12 +86,13 @@ export type PopulatedEvaluation = ProposalRubricData &
     permissions: ProposalEvaluationPermission[];
     reviewers: ProposalWithUsers['reviewers'];
     voteSettings: VoteSettings | null;
+    isReviewer?: boolean; // added by the webapp api
   };
 
 export type ProposalWithUsersAndRubric = ProposalWithUsers &
   ProposalRubricData &
   ProposalFormData & {
-    currentStep: ProposalStep;
+    // currentStep: ProposalStep;
     evaluations: PopulatedEvaluation[];
     fields: ProposalFields | null;
     page?: { sourceTemplateId: string | null } | null;

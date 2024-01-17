@@ -16,7 +16,7 @@ type ProposalsContextType = {
   isLoading: boolean;
   archiveProposal: (input: ArchiveProposalRequest) => Promise<void>;
   updateProposal: (proposal: UpdateProposalRequest) => Promise<void>;
-  refreshProposal: (proposalId: string) => Promise<void>;
+  // refreshProposal: (proposalId: string) => Promise<void>;
   proposalsMap: Record<string, ProposalWithUsersLite | undefined>;
 };
 
@@ -28,7 +28,7 @@ export const ProposalsContext = createContext<Readonly<ProposalsContextType>>({
   isLoading: false,
   archiveProposal: () => Promise.resolve(),
   updateProposal: () => Promise.resolve(),
-  refreshProposal: () => Promise.resolve(),
+  // refreshProposal: () => Promise.resolve(),
   proposalsMap: {}
 });
 
@@ -59,27 +59,27 @@ export function ProposalsProvider({ children }: { children: ReactNode }) {
     [mutateProposals]
   );
 
-  const refreshProposal = useCallback(
-    async (proposalId: string) => {
-      const proposal = await charmClient.proposals.getProposal(proposalId);
-      mutateProposals((data) => {
-        const proposalList = data ?? [];
-        const proposalIndex = proposalList.findIndex((p) => p.id === proposalId);
+  // const refreshProposal = useCallback(
+  //   async (proposalId: string) => {
+  //     const proposal = await charmClient.proposals.getProposal(proposalId);
+  //     mutateProposals((data) => {
+  //       const proposalList = data ?? [];
+  //       const proposalIndex = proposalList.findIndex((p) => p.id === proposalId);
 
-        if (proposalIndex >= 0) {
-          const existingProposal = proposalList[proposalIndex];
-          proposalList[proposalIndex] = {
-            ...existingProposal,
-            ...proposal
-          };
-        } else {
-          proposalList.push(proposal);
-        }
-        return proposalList;
-      });
-    },
-    [mutateProposals]
-  );
+  //       if (proposalIndex >= 0) {
+  //         const existingProposal = proposalList[proposalIndex];
+  //         proposalList[proposalIndex] = {
+  //           ...existingProposal,
+  //           ...proposal
+  //         };
+  //       } else {
+  //         proposalList.push(proposal);
+  //       }
+  //       return proposalList;
+  //     });
+  //   },
+  //   [mutateProposals]
+  // );
 
   const proposalsMap = useMemo(() => {
     const map: Record<string, ProposalWithUsersLite> = {};
@@ -96,10 +96,10 @@ export function ProposalsProvider({ children }: { children: ReactNode }) {
       isLoading: isLoading || loadingPages,
       archiveProposal,
       updateProposal,
-      refreshProposal,
+      // refreshProposal,
       proposalsMap
     }),
-    [archiveProposal, isLoading, loadingPages, mutateProposals, proposals, updateProposal, refreshProposal]
+    [archiveProposal, isLoading, loadingPages, mutateProposals, proposals, updateProposal]
   );
 
   return <ProposalsContext.Provider value={value}>{children}</ProposalsContext.Provider>;

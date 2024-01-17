@@ -8,13 +8,6 @@ export function createMockProposal(
 ): OptionalNullable<ProposalWithUsersAndRubric> {
   const id = uuid();
   return {
-    currentStep: {
-      step: 'draft',
-      result: 'in_progress',
-      title: 'Draft',
-      id: 'draft',
-      index: 0
-    },
     lensPostLink: null,
     publishToLens: null,
     archived: false,

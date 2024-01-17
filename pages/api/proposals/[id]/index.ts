@@ -79,25 +79,17 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
     throw new NotFoundError();
   }
 
-  const { spaceRole } = await hasAccessToSpace({
-    spaceId: proposal.spaceId,
-    userId
-  });
-
-  proposal.evaluations.forEach((evaluation) => {
-    const permissions = permissionsByStep[evaluation.id];
-    if (!spaceRole?.isAdmin && !permissions.evaluate) {
-      evaluation.draftRubricAnswers = [];
-      evaluation.rubricAnswers = [];
-    }
-  });
-
   // If we are viewing a proposal template, we can see all private fields since the user might be creating a proposal
   const canAccessPrivateFormFields = await canAccessPrivateFields({ proposal, userId, proposalId: proposal.id });
 
-  return res
-    .status(200)
-    .json(mapDbProposalToProposal({ proposal, permissions: currentPermissions, canAccessPrivateFormFields }));
+  return res.status(200).json(
+    mapDbProposalToProposal({
+      proposal,
+      permissions: currentPermissions,
+      permissionsByStep,
+      canAccessPrivateFormFields
+    })
+  );
 }
 
 async function updateProposalController(req: NextApiRequest, res: NextApiResponse) {
