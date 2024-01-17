@@ -3,7 +3,7 @@ import type { AlertColor, AlertProps } from '@mui/material/Alert';
 import MuiAlert from '@mui/material/Alert';
 import IconButton from '@mui/material/IconButton';
 import type { SnackbarOrigin, SnackbarProps } from '@mui/material/Snackbar';
-import Snackbar from '@mui/material/Snackbar';
+import MuiSnackbar from '@mui/material/Snackbar';
 import Stack from '@mui/material/Stack';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
@@ -25,7 +25,7 @@ interface CustomizedSnackbarProps {
   isOpen?: boolean;
 }
 
-export default function CustomizedSnackbar(props: CustomizedSnackbarProps) {
+export function Snackbar(props: CustomizedSnackbarProps) {
   const {
     setIsOpen,
     severity,
@@ -56,7 +56,7 @@ export default function CustomizedSnackbar(props: CustomizedSnackbarProps) {
 
   return (
     <Stack spacing={2} sx={{ width: '100%', position: 'fixed', zIndex: 5000 }}>
-      <Snackbar
+      <MuiSnackbar
         open={isOpenProp ?? isOpen}
         autoHideDuration={autoHideDuration}
         anchorOrigin={originProp ?? origin}
@@ -80,7 +80,7 @@ export default function CustomizedSnackbar(props: CustomizedSnackbarProps) {
         >
           {messageProp ?? message}
         </Alert>
-      </Snackbar>
+      </MuiSnackbar>
     </Stack>
   );
 }
