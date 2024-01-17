@@ -33,6 +33,7 @@ export type Props = {
     | 'workflowId'
     | 'currentEvaluationId'
     | 'page'
+    | 'lensPostLink'
   >;
   onChangeEvaluation?: (evaluationId: string, updated: Partial<ProposalEvaluationValues>) => void;
   refreshProposal?: VoidFunction;
@@ -218,7 +219,14 @@ export function EvaluationSidebar({
         />
       )}
       <Divider />
-      {pagePath && pageTitle && <ProposalSocialShare proposalPath={pagePath} proposalTitle={pageTitle} />}
+      {pagePath && pageTitle && proposal && (
+        <ProposalSocialShare
+          lensPostLink={proposal.lensPostLink}
+          proposalId={proposal.id}
+          proposalPath={pagePath}
+          proposalTitle={pageTitle}
+        />
+      )}
     </div>
   );
 }

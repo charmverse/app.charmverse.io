@@ -10,6 +10,7 @@ import { CommentForm } from 'components/common/comments/CommentForm';
 import { CommentSort } from 'components/common/comments/CommentSort';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import type { CommentContent, CommentPermissions } from 'lib/comments';
@@ -17,6 +18,7 @@ import type { PageWithContent } from 'lib/pages';
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
+import { getPagePath } from 'lib/utilities/domains/getPagePath';
 
 import { CreateLensPublication } from '../CreateLensPublication';
 
@@ -28,6 +30,7 @@ type Props = {
 export function PageComments({ page, canCreateComments }: Props) {
   const { user } = useUser();
   const { lensProfile, setupLensProfile } = useLensProfile();
+  const { space } = useCurrentSpace();
   const router = useRouter();
   const {
     nonNestedComments,
@@ -53,6 +56,12 @@ export function PageComments({ page, canCreateComments }: Props) {
     downvote: canCreateComments ?? false,
     delete_comments: isAdmin
   };
+
+  const proposalLink = `${window.location.host}${getPagePath({
+    path: page.path,
+    spaceDomain: space?.domain ?? '',
+    hostName: window.location.hostname
+  })}`;
 
   async function createComment(comment: CommentContent) {
     const _createdComment = await addComment(comment);
@@ -168,8 +177,7 @@ export function PageComments({ page, canCreateComments }: Props) {
             setCreatedComment(null);
           }}
           proposalId={page.proposalId}
-          proposalPath={page.path}
-          proposalTitle={page.title}
+          proposalLink={proposalLink}
         />
       )}
     </>

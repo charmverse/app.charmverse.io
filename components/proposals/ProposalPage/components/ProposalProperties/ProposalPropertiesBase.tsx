@@ -1,18 +1,13 @@
-import type { PageType, ProposalEvaluationType, ProposalStatus } from '@charmverse/core/prisma';
+import type { PageType, ProposalStatus } from '@charmverse/core/prisma';
 import { KeyboardArrowDown } from '@mui/icons-material';
-import { Box, Collapse, Divider, IconButton, Stack, Switch, Typography } from '@mui/material';
+import { Box, Collapse, Divider, IconButton, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
-import Link from 'components/common/Link';
-import { LoadingIcon } from 'components/common/LoadingComponent';
 import { ProposalRewards } from 'components/proposals/components/ProposalRewards/ProposalRewards';
 import { CustomPropertiesAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/CustomPropertiesAdapter';
-import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
-import { isProdEnv } from 'config/constants';
 import { useUser } from 'hooks/useUser';
-import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { ProposalFields, ProposalReviewerInput } from 'lib/proposal/interface';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
@@ -33,8 +28,6 @@ export type ProposalPropertiesInput = {
 };
 
 type ProposalPropertiesProps = {
-  isPublishingToLens?: boolean;
-  proposalLensLink?: string;
   pageId?: string;
   proposalFormInputs: ProposalPropertiesInput;
   proposalStatus?: ProposalStatus;
@@ -47,13 +40,11 @@ type ProposalPropertiesProps = {
 };
 
 export function ProposalPropertiesBase({
-  proposalLensLink,
   proposalFormInputs,
   pageId,
   proposalStatus,
   readOnlyAuthors,
   setProposalFormInputs,
-  isPublishingToLens,
   readOnlyCustomProperties,
   isReviewer,
   rewardIds,
@@ -61,8 +52,6 @@ export function ProposalPropertiesBase({
 }: ProposalPropertiesProps) {
   const { user } = useUser();
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
-  const { lensProfile } = useLensProfile();
-  const { account } = useWeb3Account();
 
   const isAuthor = proposalFormInputs.authors.includes(user?.id ?? '');
   const proposalAuthorIds = proposalFormInputs.authors;
@@ -72,13 +61,6 @@ export function ProposalPropertiesBase({
   useEffect(() => {
     setDetailsExpanded(proposalStatus === 'draft');
   }, [setDetailsExpanded, proposalStatus]);
-
-  let lensProposalPropertyState: 'hide' | 'show_link' | 'show_toggle' = 'hide';
-  if (proposalLensLink) {
-    lensProposalPropertyState = 'show_link';
-  } else {
-    lensProposalPropertyState = lensProfile && account ? 'show_toggle' : 'hide';
-  }
 
   return (
     <>
@@ -129,61 +111,6 @@ export function ProposalPropertiesBase({
           </div>
         </Box>
 
-        {lensProposalPropertyState !== 'hide' && (
-          <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
-            <Box
-              display='flex'
-              height='fit-content'
-              flex={1}
-              className='octo-propertyrow'
-              // override align-items flex-start with inline style
-              style={{
-                alignItems: 'center'
-              }}
-            >
-              {lensProposalPropertyState === 'show_link' ? (
-                <>
-                  <PropertyLabel readOnly highlighted>
-                    Lens Post
-                  </PropertyLabel>
-                  <Link
-                    href={`https://${!isProdEnv ? 'testnet.' : ''}hey.xyz/posts/${proposalLensLink}`}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                  >
-                    <Typography variant='body2' color='primary'>
-                      View on lens
-                    </Typography>
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <PropertyLabel readOnly highlighted>
-                    Publish to Lens
-                  </PropertyLabel>
-                  {isPublishingToLens ? (
-                    <LoadingIcon size={16} />
-                  ) : (
-                    <Switch
-                      disabled={proposalStatus !== 'draft'}
-                      checked={proposalFormInputs.publishToLens ?? false}
-                      onChange={(e) => {
-                        setProposalFormInputs({
-                          publishToLens: e.target.checked
-                        });
-                      }}
-                    />
-                  )}
-                  {proposalFormInputs.publishToLens && proposalStatus !== 'draft' && !isPublishingToLens && (
-                    <Typography variant='body2' color='error'>
-                      Failed publishing to Lens
-                    </Typography>
-                  )}
-                </>
-              )}
-            </Box>
-          </Box>
-        )}
         <CustomPropertiesAdapter
           readOnly={readOnlyAuthors}
           readOnlyProperties={readOnlyCustomProperties}
