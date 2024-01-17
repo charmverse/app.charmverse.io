@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { useUploadToArweave } from 'charmClient/hooks/lens';
 import { useUpdateProposalLensProperties } from 'charmClient/hooks/proposals';
 import { usePageComments } from 'components/[pageId]/DocumentPage/components/CommentsFooter/usePageComments';
-import { useHandleLensError, useLensProfile } from 'components/settings/account/hooks/useLensProfile';
+import { useHandleLensError } from 'components/settings/account/hooks/useLensProfile';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
@@ -38,7 +38,6 @@ export type CreateLensPublicationParams = {
 export function useCreateLensPublication(params: CreateLensPublicationParams) {
   const { onError, onSuccess, proposalId, publicationType, proposalLink } = params;
   const { execute: createPost } = useCreatePost();
-  const { setupLensProfile } = useLensProfile();
   const { updateComment } = usePageComments(proposalId);
   const { execute: createComment } = useCreateComment();
   const { chainId } = useWeb3Account();
@@ -57,13 +56,6 @@ export function useCreateLensPublication(params: CreateLensPublicationParams) {
 
       if (chainId !== LensChain) {
         await switchNetwork();
-      }
-
-      const authenticated = await setupLensProfile();
-
-      if (!authenticated) {
-        onError();
-        return null;
       }
 
       const markdownContent = await generateMarkdown({

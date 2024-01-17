@@ -3,6 +3,7 @@ import { Box, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import { useState } from 'react';
 import { useCopyToClipboard } from 'usehooks-ts';
 
+import { CreateLensPublication } from 'components/[pageId]/DocumentPage/components/CreateLensPublication';
 import { useProposal } from 'components/[pageId]/DocumentPage/hooks/useProposal';
 import { Button } from 'components/common/Button';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
@@ -11,7 +12,6 @@ import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { isProdEnv } from 'config/constants';
-import { useCreateLensPublication } from 'hooks/useCreateLensPublication';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
@@ -32,20 +32,9 @@ function ProposalLensSocialShare({
   const { lensProfile } = useLensProfile();
   const [isPublishToLensModalOpen, setIsPublishToLensModalOpen] = useState(false);
   const { space } = useCurrentSpace();
+  const [isPublishingToLens, setIsPublishingToLens] = useState(false);
   const { refreshProposal } = useProposal({
     proposalId
-  });
-  const { createLensPublication, isPublishingToLens } = useCreateLensPublication({
-    publicationType: 'post',
-    proposalId,
-    proposalLink,
-    onError: () => {
-      setIsPublishToLensModalOpen(false);
-    },
-    onSuccess: () => {
-      refreshProposal();
-      setIsPublishToLensModalOpen(false);
-    }
   });
 
   const [lensContent, setLensContent] = useState<ICharmEditorOutput>({
@@ -165,9 +154,7 @@ function ProposalLensSocialShare({
         >
           <Button
             onClick={() => {
-              createLensPublication({
-                content: lensContent.doc
-              });
+              setIsPublishingToLens(true);
             }}
             loading={isPublishingToLens}
             disabled={checkIsContentEmpty(lensContent.doc)}
@@ -177,6 +164,23 @@ function ProposalLensSocialShare({
           </Button>
         </Box>
       </Modal>
+      {isPublishingToLens && (
+        <CreateLensPublication
+          publicationType='post'
+          content={lensContent.doc}
+          onError={() => {
+            setIsPublishingToLens(false);
+            setIsPublishToLensModalOpen(false);
+          }}
+          onSuccess={() => {
+            refreshProposal();
+            setIsPublishingToLens(false);
+            setIsPublishToLensModalOpen(false);
+          }}
+          proposalId={proposalId}
+          proposalLink={proposalLink}
+        />
+      )}
     </>
   );
 }
