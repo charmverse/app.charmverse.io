@@ -1,5 +1,3 @@
-import { InvalidInputError } from '@charmverse/core/errors';
-import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -21,31 +19,6 @@ async function updateRecoveryCodeOtp(req: NextApiRequest, res: NextApiResponse<C
   const authCode = String(req.body.authCode);
 
   await verifyOtpToken(userId, authCode);
-
-  const user = await prisma.user.findUnique({
-    where: {
-      id: userId
-    },
-    include: {
-      userOTP: {
-        include: {
-          recoveryCode: true
-        }
-      }
-    }
-  });
-
-  if (!user) {
-    throw new InvalidInputError('User not found');
-  }
-
-  if (!user.userOTP) {
-    throw new InvalidInputError('OTP not found');
-  }
-
-  if (!user.userOTP.recoveryCode) {
-    throw new InvalidInputError('User does not have a recovery code');
-  }
 
   const otp = await createUserOtp(userId);
 
