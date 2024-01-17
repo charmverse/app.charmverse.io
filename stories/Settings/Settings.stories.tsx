@@ -101,11 +101,8 @@ MyAccount.parameters = {
       otpGet: rest.get(`/api/profile/otp`, (_req, res, ctx) => {
         return res(ctx.json({ code: '12345678', uri: 'tot//' }));
       }),
-      otpVerify: rest.put(`/api/profile/otp/verify`, (_req, res, ctx) => {
-        return res(ctx.json(undefined));
-      }),
       otpActivate: rest.put(`/api/profile/otp/activate`, (_req, res, ctx) => {
-        return res(ctx.json(undefined));
+        return res(ctx.json({}));
       }),
       otpRecoveryCode: rest.put(`/api/profile/otp/recovery-code`, (_req, res, ctx) => {
         return res(ctx.json({ code: '1233546546' }));

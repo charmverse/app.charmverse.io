@@ -82,9 +82,6 @@ TwoFactorAuthSetupModalStory.parameters = {
       otpCreate: rest.post(`/api/profile/otp`, (_req, res, ctx) => {
         return res(ctx.json({ code: '12345678', uri: 'tot//', recoveryCode: '1233546546' }));
       }),
-      otpVerify: rest.put(`/api/profile/otp/verify`, (_req, res, ctx) => {
-        return res(ctx.json({}));
-      }),
       otpActivate: rest.put(`/api/profile/otp/activate`, (_req, res, ctx) => {
         return res(ctx.json({}));
       })
