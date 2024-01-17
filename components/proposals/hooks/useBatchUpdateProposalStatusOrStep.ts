@@ -38,9 +38,6 @@ export function useBatchUpdateProposalStatusOrStep() {
           evaluationId
         });
       } else {
-        const { confirmed } = await showConfirmation({
-          message: 'This action cannot be undone.'
-        });
         await charmClient.proposals.submitEvaluationResult({
           proposalId,
           evaluationId,
@@ -61,7 +58,7 @@ export function useBatchUpdateProposalStatusOrStep() {
   }) {
     const { confirmed } = await showConfirmation({
       message: result
-        ? `Approve current evaluation${proposalsData.length > 1 ? 's' : ''}?`
+        ? `${result === 'pass' ? 'Approve' : 'Decline'} current evaluation${proposalsData.length > 1 ? 's' : ''}?`
         : 'Revert evaluation results?'
     });
     if (!confirmed) {
@@ -91,7 +88,7 @@ export function useBatchUpdateProposalStatusOrStep() {
     const { confirmed } = await showConfirmation({
       message: moveForward
         ? `Approve current evaluation${proposalsData.length > 1 ? 's' : ''}?`
-        : 'Revert evaluation results?'
+        : 'Moving back will clear the result of the current and previous steps and cannot be undone.'
     });
     if (!confirmed) {
       return;
