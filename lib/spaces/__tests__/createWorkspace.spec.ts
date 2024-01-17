@@ -219,11 +219,6 @@ describe('createWorkspace', () => {
 
   it('should always include the getting started page when creating a space', async () => {
     for (const template of staticSpaceTemplates) {
-      if (template.id !== 'templateCreator') {
-        continue;
-      }
-
-      console.log('TEMPLATE3344', template.id);
       const newSpace = await createWorkspace({
         userId: user.id,
         spaceTemplate: template.id,
