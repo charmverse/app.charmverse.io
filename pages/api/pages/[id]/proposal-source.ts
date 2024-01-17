@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { PageMeta } from '@charmverse/core/pages';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -78,7 +79,11 @@ async function updateProposalSource(req: NextApiRequest, res: NextApiResponse<Pa
     throw new ActionNotPermittedError('You do not have permission to update this page');
   }
 
+  log.debug('Refresh cards for proposal-as-a-source board (started)', { pageId, spaceId: boardPage.spaceId, userId });
+
   await updateCardsFromProposals({ boardId: pageId, spaceId: boardPage.spaceId, userId });
+
+  log.debug('Refresh cards for proposal-as-a-source board (complete)', { pageId, spaceId: boardPage.spaceId, userId });
 
   return res.status(200).end();
 }
