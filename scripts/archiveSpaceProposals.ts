@@ -3,7 +3,7 @@ import { archiveProposal } from 'lib/proposal/archiveProposal';
 import { createBotUser } from 'lib/spaces/createBotUser';
 
 
-const spaceDomain = 'op-grants';
+const spaceDomain = '';
 
 async function archiveSpaceProposals() {
   if (!spaceDomain) {
