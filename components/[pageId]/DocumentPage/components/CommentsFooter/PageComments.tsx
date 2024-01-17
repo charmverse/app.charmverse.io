@@ -10,6 +10,7 @@ import { CommentForm } from 'components/common/comments/CommentForm';
 import { CommentSort } from 'components/common/comments/CommentSort';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
+import { isProdEnv } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
@@ -57,7 +58,7 @@ export function PageComments({ page, canCreateComments }: Props) {
     delete_comments: isAdmin
   };
 
-  const proposalLink = `${window.location.host}${getPagePath({
+  const proposalLink = `${isProdEnv ? 'https://' : 'http://'}${window.location.host}${getPagePath({
     path: page.path,
     spaceDomain: space?.domain ?? '',
     hostName: window.location.hostname

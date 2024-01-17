@@ -195,10 +195,10 @@ export function ProposalSocialShare({
   const { showMessage } = useSnackbar();
   const { space } = useCurrentSpace();
   const [, copyFn] = useCopyToClipboard();
-  const proposalLink = `${window.location.host}${getPagePath({
+  const proposalLink = `${isProdEnv ? 'https://' : 'http://'}${window.location.host}${getPagePath({
     path: proposalPath,
     spaceDomain: space?.domain ?? '',
-    hostName: window.location.hostname
+    hostName: 'app.charmverse.io'
   })}`;
 
   function copyProposalLink() {
