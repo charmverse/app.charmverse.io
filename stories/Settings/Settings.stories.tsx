@@ -95,14 +95,20 @@ API.parameters = {
 MyAccount.parameters = {
   msw: {
     handlers: {
-      otp: rest.post(`/api/profile/otp`, (_req, res, ctx) => {
-        return res(ctx.json({ code: '123456', uri: 'tot//', recoveryCode: '1233546546' }));
+      otpCreate: rest.post(`/api/profile/otp`, (_req, res, ctx) => {
+        return res(ctx.json({ code: '12345678', uri: 'tot//', recoveryCode: '1233546546' }));
+      }),
+      otpGet: rest.get(`/api/profile/otp`, (_req, res, ctx) => {
+        return res(ctx.json({ code: '12345678', uri: 'tot//' }));
       }),
       otpVerify: rest.put(`/api/profile/otp/verify`, (_req, res, ctx) => {
-        return res(ctx.json({ code: '123456' }));
+        return res(ctx.json(undefined));
       }),
       otpActivate: rest.put(`/api/profile/otp/activate`, (_req, res, ctx) => {
-        return res(ctx.json({}));
+        return res(ctx.json(undefined));
+      }),
+      otpRecoveryCode: rest.put(`/api/profile/otp/recovery-code`, (_req, res, ctx) => {
+        return res(ctx.json({ code: '1233546546' }));
       })
     }
   }
