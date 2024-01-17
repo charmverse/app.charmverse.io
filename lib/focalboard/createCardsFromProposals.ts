@@ -99,6 +99,9 @@ export async function createCardsFromProposals({
               index: true,
               result: true,
               type: true
+            },
+            orderBy: {
+              index: 'asc'
             }
           },
           rewards: {
@@ -129,16 +132,6 @@ export async function createCardsFromProposals({
       }
     }
   });
-
-  const rubricEvaluationTitles: string[] = [];
-
-  for (const pageProposal of pageProposals) {
-    pageProposal.proposal?.evaluations.forEach((evaluation) => {
-      if (evaluation.type === 'rubric') {
-        rubricEvaluationTitles.push(evaluation.title);
-      }
-    });
-  }
 
   const boardBlock = await setDatabaseProposalProperties({
     boardId,

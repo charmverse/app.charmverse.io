@@ -494,21 +494,14 @@ function CenterPanel(props: Props) {
     (_url, { arg }: Readonly<{ arg: { pageId: string } }>) => charmClient.updateProposalSource(arg)
   );
 
-  // refresh proposals as a source
-  const pageId = props.page?.id;
   useEffect(() => {
-    if (
-      pageId &&
-      currentRootPageId &&
-      activeBoard?.fields.sourceType === 'proposals' &&
-      activeBoard?.id === currentRootPageId
-    ) {
+    if (currentRootPageId && activeBoard?.fields.sourceType === 'proposals' && activeBoard?.id === currentRootPageId) {
       updateProposalSource({ pageId: currentRootPageId }).then(() => {
         // Refetch database after updating proposal source board, otherwise the UI will be out of sync
-        dispatch(initialDatabaseLoad({ pageId }));
+        dispatch(initialDatabaseLoad({ pageId: currentRootPageId }));
       });
     }
-  }, [currentRootPageId, activeBoard?.id, pageId]);
+  }, [currentRootPageId, activeBoard?.id]);
 
   const isLoadingSourceData = !activeBoard && (!views || views.length === 0);
   const readOnlyTitle = activeBoard?.fields.sourceType === 'proposals';

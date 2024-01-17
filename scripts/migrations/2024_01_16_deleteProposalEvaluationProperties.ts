@@ -27,7 +27,16 @@ async function deleteProposalEvaluationProperties() {
         data: {
           fields: {
             ...proposalBoardBlock.fields as unknown as BoardFields,
-            cardProperties: ((proposalBoardBlock.fields as unknown as BoardFields).cardProperties ?? []).filter(boardCardProperty => boardCardProperty.type !== "proposalEvaluatedBy" && boardCardProperty.type !== "proposalEvaluationAverage" && boardCardProperty.type !== "proposalEvaluationTotal")
+            cardProperties: ((proposalBoardBlock.fields as unknown as BoardFields).cardProperties ?? []).filter(boardCardProperty => {
+              if (boardCardProperty.type === "proposalEvaluatedBy" && boardCardProperty.name === "Proposal Evaluated By") {
+                return false 
+              } else if (boardCardProperty.type === "proposalEvaluationAverage" && boardCardProperty.name === "Proposal Evaluation Average") {
+                return false
+              } else if (boardCardProperty.type === "proposalEvaluationTotal" && boardCardProperty.name === "Proposal Evaluation Total") {
+                return false
+              }
+              return true;
+            })
           } as any
         }
       })

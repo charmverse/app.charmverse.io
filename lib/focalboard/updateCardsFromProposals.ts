@@ -224,6 +224,9 @@ export async function updateCardsFromProposals({
               index: true,
               result: true,
               type: true
+            },
+            orderBy: {
+              index: 'asc'
             }
           },
           rewards: {

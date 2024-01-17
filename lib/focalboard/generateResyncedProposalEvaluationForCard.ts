@@ -17,8 +17,6 @@ export function generateResyncedProposalEvaluationForCard({
   rubricAnswers: AnswerData[];
   step: { id: string; title: string };
 }): Record<string, CardPropertyValue> {
-  const cardProperties = JSON.parse(JSON.stringify(properties)) as Record<string, CardPropertyValue>;
-
   const { allScores, reviewersResults } = aggregateResults({
     answers: rubricAnswers.filter((a) => a.evaluationId === step.id),
     criteria: rubricCriteria.filter((c) => c.id !== step.id)
@@ -37,16 +35,16 @@ export function generateResyncedProposalEvaluationForCard({
   );
 
   if (proposalEvaluatedByProp) {
-    cardProperties[proposalEvaluatedByProp.id] = uniqueReviewers;
+    properties[proposalEvaluatedByProp.id] = uniqueReviewers;
   }
 
   if (proposalEvaluationTotalProp) {
-    cardProperties[proposalEvaluationTotalProp.id] = allScores.sum ?? '';
+    properties[proposalEvaluationTotalProp.id] = allScores.sum ?? '';
   }
 
   if (proposalEvaluationAverageProp) {
-    cardProperties[proposalEvaluationAverageProp.id] = allScores.average ?? '';
+    properties[proposalEvaluationAverageProp.id] = allScores.average ?? '';
   }
 
-  return cardProperties;
+  return properties;
 }

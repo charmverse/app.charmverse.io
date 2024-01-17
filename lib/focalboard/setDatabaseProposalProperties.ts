@@ -58,6 +58,9 @@ export async function setDatabaseProposalProperties({
         select: {
           type: true,
           title: true
+        },
+        orderBy: {
+          index: 'asc'
         }
       }
     }
@@ -147,44 +150,10 @@ export function getBoardProperties({
     boardProperties.push(stepProp);
   }
 
-  for (const rubricStepTitle of rubricStepTitles) {
-    const evaluatedByProp = boardProperties.find(
-      (p) => p.type === 'proposalEvaluatedBy' && p.name === `${rubricStepTitle} (Evaluation reviewers)`
-    );
-    const evaluationTotalProp = boardProperties.find(
-      (p) => p.type === 'proposalEvaluationTotal' && p.name === `${rubricStepTitle} (Evaluation total)`
-    );
-    const evaluationAverageProp = boardProperties.find(
-      (p) => p.type === 'proposalEvaluationAverage' && p.name === `${rubricStepTitle} (Evaluation average)`
-    );
-
-    if (!evaluatedByProp) {
-      boardProperties.push({
-        id: uuid(),
-        type: 'proposalEvaluatedBy',
-        name: `${rubricStepTitle} (Evaluation reviewers)`,
-        options: []
-      });
-    }
-
-    if (!evaluationTotalProp) {
-      boardProperties.push({
-        id: uuid(),
-        type: 'proposalEvaluationTotal',
-        name: `${rubricStepTitle} (Evaluation total)`,
-        options: []
-      });
-    }
-
-    if (!evaluationAverageProp) {
-      boardProperties.push({
-        id: uuid(),
-        type: 'proposalEvaluationAverage',
-        name: `${rubricStepTitle} (Evaluation average)`,
-        options: []
-      });
-    }
-  }
+  addProposalEvaluationProperties({
+    boardProperties,
+    rubricStepTitles
+  });
 
   cardProperties.forEach((cardProp) => {
     const existingPropIndex = boardProperties.findIndex((p) => p.id === cardProp.id);
@@ -262,6 +231,53 @@ export function getBoardProperties({
   return boardProperties;
 }
 
+function addProposalEvaluationProperties({
+  rubricStepTitles,
+  boardProperties
+}: {
+  rubricStepTitles: string[];
+  boardProperties: IPropertyTemplate[];
+}) {
+  for (const rubricStepTitle of rubricStepTitles) {
+    const evaluatedByProp = boardProperties.find(
+      (p) => p.type === 'proposalEvaluatedBy' && p.name === `${rubricStepTitle} (Evaluation reviewers)`
+    );
+    const evaluationTotalProp = boardProperties.find(
+      (p) => p.type === 'proposalEvaluationTotal' && p.name === `${rubricStepTitle} (Evaluation total)`
+    );
+    const evaluationAverageProp = boardProperties.find(
+      (p) => p.type === 'proposalEvaluationAverage' && p.name === `${rubricStepTitle} (Evaluation average)`
+    );
+
+    if (!evaluatedByProp) {
+      boardProperties.push({
+        id: uuid(),
+        type: 'proposalEvaluatedBy',
+        name: `${rubricStepTitle} (Evaluation reviewers)`,
+        options: []
+      });
+    }
+
+    if (!evaluationTotalProp) {
+      boardProperties.push({
+        id: uuid(),
+        type: 'proposalEvaluationTotal',
+        name: `${rubricStepTitle} (Evaluation total)`,
+        options: []
+      });
+    }
+
+    if (!evaluationAverageProp) {
+      boardProperties.push({
+        id: uuid(),
+        type: 'proposalEvaluationAverage',
+        name: `${rubricStepTitle} (Evaluation average)`,
+        options: []
+      });
+    }
+  }
+}
+
 function generateUpdatedProposalStepProperty({
   boardProperties,
   evaluationStepTitles
@@ -271,31 +287,17 @@ function generateUpdatedProposalStepProperty({
 }): IPropertyTemplate {
   const existingProposalStepProperty = boardProperties.find((p) => p.type === 'proposalStep');
 
-  if (!existingProposalStepProperty) {
-    return {
+  return {
+    ...(existingProposalStepProperty ?? {
       ...proposalDbProperties.proposalStep(),
-      id: uuid(),
-      options: ['Draft', 'Rewards', ...evaluationStepTitles].map((title) => ({
-        color: 'propColorGray',
-        id: title,
-        value: title
-      }))
-    };
-  } else {
-    const existingOptions = existingProposalStepProperty.options.map((opt) => opt.value);
-    const newOptions = evaluationStepTitles.filter((title) => !existingOptions.includes(title));
-    return {
-      ...existingProposalStepProperty,
-      options: [
-        ...existingProposalStepProperty.options,
-        ...newOptions.map((title) => ({
-          color: 'propColorGray',
-          id: title,
-          value: title
-        }))
-      ]
-    };
-  }
+      id: uuid()
+    }),
+    options: ['Draft', 'Rewards', ...evaluationStepTitles].map((title) => ({
+      color: 'propColorGray',
+      id: title,
+      value: title
+    }))
+  };
 }
 
 function generateUpdatedProposalEvaluationTypeProperty({ boardProperties }: { boardProperties: IPropertyTemplate[] }) {
