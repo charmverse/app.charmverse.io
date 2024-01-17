@@ -2,7 +2,6 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { createOtp } from './createOtp';
-import { verifyOtpToken } from './verifyOtpToken';
 
 export type GetOtpResponse = {
   code: string;

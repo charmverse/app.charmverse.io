@@ -1,42 +1,23 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { verifyOtpToken } from 'lib/profile/otp/verifyOtpToken';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).put(activateOtp);
+handler
+  .use(requireUser)
+  .use(requireKeys(['authCode'], 'body'))
+  .put(activateOtp);
 
 async function activateOtp(req: NextApiRequest, res: NextApiResponse<void>) {
   const userId = req.session.user.id;
+  const authCode = String(req.body.authCode);
 
-  const user = await prisma.user.findUnique({
-    where: {
-      id: userId
-    },
-    include: {
-      userOTP: {
-        select: {
-          activatedAt: true
-        }
-      }
-    }
-  });
-
-  if (!user) {
-    throw new InvalidInputError('User not found');
-  }
-
-  if (!user.userOTP) {
-    throw new InvalidInputError('OTP not found');
-  }
-
-  if (user.userOTP?.activatedAt) {
-    throw new InvalidInputError('OTP already activated');
-  }
+  await verifyOtpToken(userId, authCode);
 
   await prisma.userOTP.update({
     where: {
