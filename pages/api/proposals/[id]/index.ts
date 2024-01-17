@@ -70,6 +70,7 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
   });
 
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
+
   const currentPermissions =
     proposal.status === 'draft'
       ? permissionsByStep.draft
