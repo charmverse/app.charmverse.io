@@ -225,6 +225,7 @@ export function EvaluationSidebar({
           proposalId={proposal.id}
           proposalPath={pagePath}
           proposalTitle={pageTitle}
+          proposalAuthors={proposal.authors.map((a) => a.userId)}
         />
       )}
     </div>

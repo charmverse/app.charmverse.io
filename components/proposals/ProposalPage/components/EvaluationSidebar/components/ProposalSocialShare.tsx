@@ -13,7 +13,9 @@ import Modal from 'components/common/Modal';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { isProdEnv } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useUser } from 'hooks/useUser';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { getPagePath } from 'lib/utilities/domains/getPagePath';
@@ -22,8 +24,10 @@ function ProposalLensSocialShare({
   proposalLink,
   proposalTitle,
   proposalId,
-  lensPostLink
+  lensPostLink,
+  canPublishToLens
 }: {
+  canPublishToLens: boolean;
   proposalTitle: string;
   proposalLink: string;
   proposalId: string;
@@ -88,7 +92,15 @@ function ProposalLensSocialShare({
   return (
     <>
       <Tooltip
-        title={lensPostLink ? 'View on lens' : lensProfile ? 'Publish to Lens' : 'Please create a Lens profile first'}
+        title={
+          canPublishToLens
+            ? lensPostLink
+              ? 'View on lens'
+              : lensProfile
+              ? 'Publish to Lens'
+              : 'Please create a Lens profile first'
+            : 'You do not have permission to publish to Lens'
+        }
       >
         <div style={{ display: 'flex' }}>
           {lensPostLink ? (
@@ -106,14 +118,14 @@ function ProposalLensSocialShare({
                   borderRadius: '50%',
                   width: 35,
                   height: 35,
-                  cursor: lensProfile ? 'pointer' : 'default'
+                  cursor: 'pointer'
                 }}
               />
             </Link>
           ) : (
             <img
               onClick={() => {
-                if (lensProfile) {
+                if (lensProfile && canPublishToLens) {
                   setIsPublishToLensModalOpen(true);
                 }
               }}
@@ -189,13 +201,18 @@ export function ProposalSocialShare({
   proposalId,
   proposalPath,
   proposalTitle,
-  lensPostLink
+  lensPostLink,
+  proposalAuthors
 }: {
+  proposalAuthors: string[];
   proposalId: string;
   proposalPath: string;
   proposalTitle: string;
   lensPostLink?: string | null;
 }) {
+  const isAdmin = useIsAdmin();
+  const { user } = useUser();
+  const isProposalAuthor = user ? proposalAuthors.includes(user.id) : false;
   const { showMessage } = useSnackbar();
   const { space } = useCurrentSpace();
   const [, copyFn] = useCopyToClipboard();
@@ -221,6 +238,7 @@ export function ProposalSocialShare({
         proposalId={proposalId}
         proposalLink={proposalLink}
         proposalTitle={proposalTitle}
+        canPublishToLens={isAdmin || isProposalAuthor}
       />
       <Tooltip title='Copy proposal link'>
         <IconButton
