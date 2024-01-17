@@ -101,9 +101,8 @@ export async function createProposal({
       }
       evaluationPermissionsToCreate.push(
         ...permissions.map((permission) => ({
-          evaluationId: evaluationIds[index],
-          operation: permission.operation,
-          systemRole: permission.systemRole
+          ...permission,
+          evaluationId: evaluationIds[index]
         }))
       );
       reviewersInput.push(
