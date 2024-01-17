@@ -162,8 +162,6 @@ export async function createWorkspace({
 
   await upsertDefaultRewardsBoard({ spaceId: space.id, userId: space.createdBy });
 
-  const productionReadyTemplates: SpaceTemplateType[] = ['templateNftCommunity', 'templateGrantor'];
-
   // Provision default space data
   if (spaceTemplate === 'default') {
     const sourceDataPath = path.resolve(
@@ -208,48 +206,7 @@ export async function createWorkspace({
       permissionConfigurationMode: spaceData.permissionConfigurationMode ?? 'collaborative',
       spaceId: space.id
     });
-    // Interim codepath until all spaces are migrated to the new template
-    // I copied over most of the code from the default space template path with some small adjustments
-  } else if (spaceTemplate && !productionReadyTemplates.includes(spaceTemplate)) {
-    await prisma.$transaction([
-      prisma.memberProperty.createMany({ data: defaultProperties }),
-      prisma.postCategory.createMany({ data: defaultPostCategories }),
-      prisma.postCategoryPermission.createMany({
-        data: defaultPostCategories.map(
-          (category) =>
-            ({
-              permissionLevel: 'full_access',
-              postCategoryId: category.id,
-              spaceId: space.id
-            } as Prisma.PostCategoryPermissionCreateManyInput)
-        )
-      })
-    ]);
-
-    const defaultGeneralPostCategory = defaultPostCategories.find((category) => category.name === 'General');
-
-    if (defaultGeneralPostCategory?.id) {
-      await setDefaultPostCategory({
-        postCategoryId: defaultGeneralPostCategory.id as string,
-        spaceId: space.id
-      });
-    }
-
-    const importData = await getImportData({ exportName: spaceTemplate });
-
-    await importWorkspacePages({
-      targetSpaceIdOrDomain: space.id,
-      exportData: importData,
-      includePermissions: false,
-      resetPaths: true,
-      importingToDifferentSpace: true
-    });
-
-    await updateSpacePermissionConfigurationMode({
-      permissionConfigurationMode: spaceData.permissionConfigurationMode ?? 'collaborative',
-      spaceId: space.id
-    });
-  } else if (spaceTemplate) {
+  } else {
     await importSpaceData({
       targetSpaceIdOrDomain: space.id,
       exportName: spaceTemplate
