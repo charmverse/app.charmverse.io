@@ -1,5 +1,5 @@
 // 1. Loan Officer Schema used by Financial Institution for verifying a loan officer
-import type { CredentialType } from '@charmverse/core/prisma';
+import type { AttestationType } from '@charmverse/core/prisma';
 import type { SchemaItem } from '@ethereum-attestation-service/eas-sdk';
 import { SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
 
@@ -41,17 +41,17 @@ export function decodeProposalCredential(rawData: string): ProposalCredential {
 
   return values as ProposalCredential;
 }
-export const credentialLabels: Record<CredentialType, string> = {
+export const credentialLabels: Record<AttestationType, string> = {
   proposal: 'Proposal'
 };
 
-export const attestationSchemaIds: Record<CredentialType, { [key in EasSchemaChain]: string }> = {
+export const attestationSchemaIds: Record<AttestationType, { [key in EasSchemaChain]: string }> = {
   proposal: {
     10: '0x20770d8c0a19668aa843240ddf6d57025334b346171c28dfed1a7ddb16928b89'
   }
 };
 
-export type CredentialData<T extends CredentialType = CredentialType> = {
+export type CredentialData<T extends AttestationType = AttestationType> = {
   type: T;
   data: T extends 'proposal' ? ProposalCredential : never;
 };
@@ -61,12 +61,12 @@ export function getAttestationSchemaId({
   credentialType
 }: {
   chainId: EasSchemaChain;
-  credentialType: CredentialType;
+  credentialType: AttestationType;
 }) {
   return attestationSchemaIds[credentialType][chainId];
 }
 
-export function encodeAttestion<T extends CredentialType = CredentialType>({ type, data }: CredentialData<T>) {
+export function encodeAttestion<T extends AttestationType = AttestationType>({ type, data }: CredentialData<T>) {
   if (type === 'proposal') {
     return encodeProposalCredential(data as ProposalCredential);
   }

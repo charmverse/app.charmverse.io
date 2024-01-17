@@ -1,5 +1,5 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import type { CredentialType } from '@charmverse/core/prisma-client';
+import type { AttestationType } from '@charmverse/core/prisma-client';
 import type {
   AttestationShareablePackageObject,
   SignedOffchainAttestation
@@ -11,7 +11,6 @@ import { Wallet, providers } from 'ethers';
 import { credentialsWalletPrivateKey } from 'config/constants';
 import { getENSName } from 'lib/blockchain';
 import { isValidChainAddress } from 'lib/tokens/validation';
-import { prettyPrint } from 'lib/utilities/strings';
 
 import type { EasSchemaChain } from './connectors';
 import { easSchemaChains, getEasConnector, getEasInstance } from './connectors';
@@ -19,7 +18,7 @@ import type { PublishedSignedCredential } from './queriesAndMutations';
 import { publishSignedCredential } from './queriesAndMutations';
 import { encodeAttestion, getAttestationSchemaId, type CredentialData } from './schemas';
 
-type AttestationInput<T extends CredentialType = CredentialType> = {
+type AttestationInput<T extends AttestationType = AttestationType> = {
   recipient: string;
   credential: CredentialData<T>;
   signer: Wallet;
@@ -82,7 +81,7 @@ export type CharmVerseCredentialInput = {
   recipient: string;
 };
 
-export type SignedCredential = {
+export type SignedAttestation = {
   sig: SignedOffchainAttestation;
   signer: {
     wallet: string;
@@ -94,11 +93,11 @@ export type SignedCredential = {
   timestamp: number;
 };
 
-export async function signCharmverseCredential({
+export async function signCharmverseAttestation({
   chainId,
   credential,
   recipient
-}: CharmVerseCredentialInput): Promise<SignedCredential> {
+}: CharmVerseCredentialInput): Promise<SignedAttestation> {
   const provider = new providers.JsonRpcProvider(getChainById(chainId)?.rpcUrls[0] as string, chainId);
 
   const wallet = new Wallet(credentialsWalletPrivateKey, provider);
@@ -118,7 +117,7 @@ export async function signCharmverseCredential({
 
   const signerEnsName = await getENSName(wallet.address);
 
-  const signedCredential: SignedCredential = {
+  const signedCredential: SignedAttestation = {
     sig: signature,
     signer: {
       wallet: wallet.address,
@@ -137,7 +136,7 @@ export async function signAndPublishCharmverseCredential({
   credential,
   recipient
 }: CharmVerseCredentialInput) {
-  const signedCredential = await signCharmverseCredential({ chainId, credential, recipient });
+  const signedCredential = await signCharmverseAttestation({ chainId, credential, recipient });
 
   const contentToPublish: Omit<PublishedSignedCredential, 'author' | 'id'> = {
     chainId,

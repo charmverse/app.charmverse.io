@@ -14,7 +14,7 @@ import { redirectToAppLogin, shouldRedirectToAppLogin } from 'lib/utilities/brow
 import { getCustomDomainFromHost } from 'lib/utilities/domains/getCustomDomainFromHost';
 // Pages shared to the public that don't require user login
 // When adding a page here or any new top-level pages, please also add this page to DOMAIN_BLACKLIST in lib/spaces/config.ts
-const publicPages = ['/', 'share', 'api-docs', 'u', 'join', 'invite', 'authenticate', 'test'];
+const publicPages = ['/', 'share', 'api-docs', 'u', 'join', 'invite', 'authenticate', 'test', 'permalink'];
 // pages that should be always available to logged in users
 const publicLoggedInPages = ['createSpace'];
 

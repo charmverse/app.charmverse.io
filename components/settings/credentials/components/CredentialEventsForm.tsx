@@ -1,4 +1,4 @@
-import type { IssueCredentialEvent } from '@charmverse/core/prisma-client';
+import type { CredentialEventType } from '@charmverse/core/prisma-client';
 import { Box } from '@mui/material';
 import { useState } from 'react';
 
@@ -12,7 +12,7 @@ import { useSpaces } from 'hooks/useSpaces';
 import type { CredentialToggled } from './CredentialEventToggle';
 import { CredentialEventToggle } from './CredentialEventToggle';
 
-const availableCredentialEvents: IssueCredentialEvent[] = ['proposal_approved', 'proposal_created'];
+const availableCredentialEvents: CredentialEventType[] = ['proposal_approved', 'proposal_created'];
 
 export function CredentialEventsForm() {
   const { space } = useCurrentSpace();

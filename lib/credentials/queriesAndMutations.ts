@@ -2,9 +2,9 @@ import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
 
 import { graphQlServerEndpoint } from 'config/constants';
 
-// Assuming DID and CredentialType are defined elsewhere in your TypeScript code.
+// Assuming DID and AttestationType are defined elsewhere in your TypeScript code.
 type DID = string; // or whatever the actual type is
-type CredentialType = 'proposal'; // Extend this based on actual enum values
+type AttestationType = 'proposal'; // Extend this based on actual enum values
 
 const apolloClient = new ApolloClient({
   cache: new InMemoryCache(),
@@ -20,7 +20,7 @@ export type PublishedSignedCredential = {
   recipient: string;
   content: string;
   sig: string;
-  type: CredentialType;
+  type: AttestationType;
   verificationUrl: string;
   chainId: number;
   schemaId: string;
@@ -28,8 +28,8 @@ export type PublishedSignedCredential = {
 };
 
 const CREATE_SIGNED_CREDENTIAL_MUTATION = gql`
-  mutation CreateCredentials($i: CreateSignedCredentialThreeInput!) {
-    createSignedCredentialThree(input: $i) {
+  mutation CreateCredentials($i: CreateSignedCredentialFourInput!) {
+    createSignedCredentialFour(input: $i) {
       document {
         id
         sig
@@ -48,7 +48,7 @@ const CREATE_SIGNED_CREDENTIAL_MUTATION = gql`
 
 export type CredentialToPublish = Omit<PublishedSignedCredential, 'author' | 'id'>;
 
-export async function publishSignedCredential(input: CredentialToPublish) {
+export async function publishSignedCredential(input: CredentialToPublish): Promise<PublishedSignedCredential> {
   const response = await apolloClient.mutate({
     mutation: CREATE_SIGNED_CREDENTIAL_MUTATION,
     variables: {
@@ -62,12 +62,12 @@ export async function publishSignedCredential(input: CredentialToPublish) {
       }
     }
   });
-  return response.data.createSignedCredentialThree.document;
+  return response.data.createSignedCredentialFour.document;
 }
 
 const GET_CREDENTIALS = gql`
-  query GetCredentials($filter: SignedCredentialThreeFiltersInput!) {
-    signedCredentialThreeIndex(filters: $filter, first: 1000) {
+  query GetCredentials($filter: SignedCredentialFourFiltersInput!) {
+    signedCredentialFourIndex(filters: $filter, first: 1000) {
       edges {
         node {
           id
@@ -96,5 +96,5 @@ export async function getCredentialsByRecipient({
       query: GET_CREDENTIALS,
       variables: { filter: { where: { recipient: { equalTo: recipient.toLowerCase() } } } }
     })
-    .then(({ data }) => data.signedCredentialThreeIndex.edges.map((e: any) => e.node));
+    .then(({ data }) => data.signedCredentialFourIndex.edges.map((e: any) => e.node));
 }

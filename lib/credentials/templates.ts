@@ -1,4 +1,4 @@
-import type { CredentialTemplate, IssueCredentialEvent, Space } from '@charmverse/core/prisma-client';
+import type { CredentialTemplate, CredentialEventType, Space } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
@@ -70,7 +70,7 @@ export async function createCredentialTemplate({
 
 export type SpaceCredentialEventUpdate = {
   spaceId: string;
-  credentialEvents: IssueCredentialEvent[];
+  credentialEvents: CredentialEventType[];
 };
 
 export async function updateSpaceCredentialEvents({

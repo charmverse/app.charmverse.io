@@ -1,10 +1,10 @@
-import type { IssueCredentialEvent } from '@charmverse/core/prisma';
+import type { CredentialEventType } from '@charmverse/core/prisma';
 import { Box, FormControlLabel, Switch } from '@mui/material';
 
 import { Typography } from 'components/common/Typography';
 
 export type CredentialToggled = {
-  credentialEvent: IssueCredentialEvent;
+  credentialEvent: CredentialEventType;
   selected: boolean;
 };
 
@@ -12,15 +12,15 @@ type ToggleProps = {
   onChange: (ev: CredentialToggled) => void;
   checked: boolean;
   disabled?: boolean;
-  credentialEvent: IssueCredentialEvent;
+  credentialEvent: CredentialEventType;
 };
 
-const labelMap: Record<IssueCredentialEvent, string> = {
+const labelMap: Record<CredentialEventType, string> = {
   proposal_created: 'Applied',
   proposal_approved: 'Approved'
 };
 
-const descriptionMap: Record<IssueCredentialEvent, string> = {
+const descriptionMap: Record<CredentialEventType, string> = {
   proposal_created: 'Issue when a proposal is published',
   proposal_approved: 'Issue when a proposal is approved'
 };
