@@ -1,12 +1,11 @@
 import { Box, Card, Stack, Typography } from '@mui/material';
-import { useState } from 'react';
 
 import { useCreateProposalRewards } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
-import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import { RewardTokenInfo } from 'components/rewards/components/RewardProperties/components/RewardTokenInfo';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
+import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalPendingReward } from 'lib/proposal/interface';
@@ -22,12 +21,12 @@ export type Props = {
 };
 
 export function PublishRewardsButton({ proposalId, pendingRewards, rewardIds, disabled, onSubmit }: Props) {
-  const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const { trigger, isMutating } = useCreateProposalRewards(proposalId);
   const { showMessage } = useSnackbar();
   const { mappedFeatures } = useSpaceFeatures();
   const { rewards: allRewards } = useRewards();
   const { getRewardPage } = useRewardPage();
+  const { showConfirmation } = useConfirmationModal();
   const rewardsTitle = mappedFeatures.rewards.title;
   const rewards = rewardIds?.map((rId) => allRewards?.find((r) => r.id === rId)).filter(isTruthy) || [];
 
@@ -50,6 +49,16 @@ export function PublishRewardsButton({ proposalId, pendingRewards, rewardIds, di
         page: getRewardPage(reward.id),
         draftId: reward.id
       }));
+
+  async function handlePublish() {
+    const { confirmed } = await showConfirmation({
+      message: 'This action cannot be undone.',
+      confirmButton: 'Publish'
+    });
+    if (confirmed) {
+      createRewards();
+    }
+  }
 
   return (
     <>
@@ -86,20 +95,10 @@ export function PublishRewardsButton({ proposalId, pendingRewards, rewardIds, di
             disabled={disabled}
             disabledTooltip={`Only reviewers can publish ${rewardsTitle}`}
             loading={isMutating}
-            onClick={() => setShowConfirmation(true)}
+            onClick={handlePublish}
           >
             Publish {rewardsTitle}
           </Button>
-          <ModalWithButtons
-            open={showConfirmation}
-            title={`Publish ${rewardsTitle}?`}
-            buttonText='Publish'
-            onClose={() => setShowConfirmation(false)}
-            // wrap the function so it does not return a promise to the confirmation modal
-            onConfirm={() => createRewards()}
-          >
-            <Typography>This action cannot be undone</Typography>
-          </ModalWithButtons>
         </Box>
       )}
     </>
