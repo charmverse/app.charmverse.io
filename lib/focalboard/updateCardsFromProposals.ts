@@ -198,10 +198,14 @@ export async function updateCardsFromProposals({
       spaceId,
       type: 'proposal',
       proposal: {
+        archived: {
+          not: true
+        },
         status: {
           not: 'draft'
         }
-      }
+      },
+      deletedAt: null
     },
     include: {
       proposal: {
