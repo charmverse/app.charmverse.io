@@ -147,9 +147,7 @@
                 "isTemplate": false,
                 "properties": {
                   "62f77e4f-4943-4e4f-9244-a6a1eecceb6a": "a7e4e16b-f903-43bc-9713-13d02c0aad1e",
-                  "704dd58f-53fb-4c73-b16b-ffd3dc218796": [
-                    "4e1d4522-6437-4393-8ed1-9c56e53235f4"
-                  ],
+                  "704dd58f-53fb-4c73-b16b-ffd3dc218796": ["4e1d4522-6437-4393-8ed1-9c56e53235f4"],
                   "b03bae38-2cae-4365-b8b6-69a98522cc87": "394c7c7a-64f8-47c3-bcd9-240dbfd753fd"
                 },
                 "headerImage": null,
@@ -228,9 +226,7 @@
                 "isTemplate": false,
                 "properties": {
                   "62f77e4f-4943-4e4f-9244-a6a1eecceb6a": "9277e1bd-e5a3-4251-b70c-1f21d2561ad7",
-                  "704dd58f-53fb-4c73-b16b-ffd3dc218796": [
-                    "dc521ceb-495e-40cc-940e-3b1cafc7a2e1"
-                  ],
+                  "704dd58f-53fb-4c73-b16b-ffd3dc218796": ["dc521ceb-495e-40cc-940e-3b1cafc7a2e1"],
                   "b03bae38-2cae-4365-b8b6-69a98522cc87": "394c7c7a-64f8-47c3-bcd9-240dbfd753fd"
                 },
                 "headerImage": null,
@@ -309,9 +305,7 @@
                 "isTemplate": false,
                 "properties": {
                   "62f77e4f-4943-4e4f-9244-a6a1eecceb6a": "a7e4e16b-f903-43bc-9713-13d02c0aad1e",
-                  "704dd58f-53fb-4c73-b16b-ffd3dc218796": [
-                    "e5dba747-be62-49be-a7ba-71cf27b17174"
-                  ],
+                  "704dd58f-53fb-4c73-b16b-ffd3dc218796": ["e5dba747-be62-49be-a7ba-71cf27b17174"],
                   "b03bae38-2cae-4365-b8b6-69a98522cc87": "5de23500-9058-4e0e-b89f-7a8669bdc95e"
                 },
                 "headerImage": null,
@@ -423,9 +417,7 @@
               ],
               "sortOptions": [],
               "columnWidths": {},
-              "hiddenOptionIds": [
-                ""
-              ],
+              "hiddenOptionIds": [""],
               "visibleOptionIds": [
                 "9277e1bd-e5a3-4251-b70c-1f21d2561ad7",
                 "a7e4e16b-f903-43bc-9713-13d02c0aad1e",
@@ -436,10 +428,7 @@
               "collapsedOptionIds": [],
               "columnCalculations": {},
               "kanbanCalculations": {},
-              "visiblePropertyIds": [
-                "704dd58f-53fb-4c73-b16b-ffd3dc218796",
-                "b03bae38-2cae-4365-b8b6-69a98522cc87"
-              ]
+              "visiblePropertyIds": ["704dd58f-53fb-4c73-b16b-ffd3dc218796", "b03bae38-2cae-4365-b8b6-69a98522cc87"]
             }
           }
         ]
@@ -902,7 +891,6 @@
         "reviewedAt": "2022-09-08T11:46:55.784Z",
         "publishToLens": null,
         "lensPostLink": null,
-        "evaluationType": "vote",
         "fields": null
       }
     },
@@ -2830,7 +2818,6 @@
         "reviewedAt": "2022-09-19T18:22:07.761Z",
         "publishToLens": null,
         "lensPostLink": null,
-        "evaluationType": "vote",
         "fields": null
       }
     },
@@ -2902,7 +2889,6 @@
         "reviewedAt": "2022-10-28T15:30:53.157Z",
         "publishToLens": null,
         "lensPostLink": null,
-        "evaluationType": "vote",
         "fields": null
       }
     },
@@ -3002,7 +2988,6 @@
         "reviewedAt": "2022-09-08T13:44:05.265Z",
         "publishToLens": null,
         "lensPostLink": null,
-        "evaluationType": "vote",
         "fields": null
       }
     },
@@ -3325,7 +3310,6 @@
         "reviewedAt": "2022-11-08T19:38:40.135Z",
         "publishToLens": null,
         "lensPostLink": null,
-        "evaluationType": "vote",
         "fields": null
       }
     },
@@ -4169,7 +4153,6 @@
         "reviewedAt": null,
         "publishToLens": null,
         "lensPostLink": null,
-        "evaluationType": "rubric",
         "fields": null
       }
     },
@@ -4595,7 +4578,6 @@
         "reviewedAt": null,
         "publishToLens": null,
         "lensPostLink": null,
-        "evaluationType": "vote",
         "fields": null
       }
     },
@@ -5240,7 +5222,6 @@
         "reviewedAt": "2022-09-08T11:41:37.559Z",
         "publishToLens": null,
         "lensPostLink": null,
-        "evaluationType": "vote",
         "fields": null
       }
     },
@@ -5856,7 +5837,6 @@
         "reviewedAt": null,
         "publishToLens": null,
         "lensPostLink": null,
-        "evaluationType": "vote",
         "fields": null
       }
     },
@@ -6552,7 +6532,6 @@
         "reviewedAt": null,
         "publishToLens": null,
         "lensPostLink": null,
-        "evaluationType": "vote",
         "fields": null
       }
     },
@@ -9923,7 +9902,6 @@
         "reviewedAt": null,
         "publishToLens": null,
         "lensPostLink": null,
-        "evaluationType": "vote",
         "fields": null
       }
     },
@@ -14469,14 +14447,10 @@
                     "properties": {
                       "1e0b017a-77c4-419e-a32e-4d913414fd48": "https://twitter.com/ANagarsheth",
                       "5af4d69a-c28d-4af0-b747-551662604f32": "4c5228fe-1141-4cdf-9ffc-8b1988dffbb0",
-                      "a45676dc-eb7f-4e50-a1c1-2835705c1948": [
-                        "57cb90f1-cad1-425e-acfd-802da1c6fdb8"
-                      ]
+                      "a45676dc-eb7f-4e50-a1c1-2835705c1948": ["57cb90f1-cad1-425e-acfd-802da1c6fdb8"]
                     },
                     "headerImage": null,
-                    "contentOrder": [
-                      "9130d980-cf30-42c7-878c-168ddf2d4ac8"
-                    ]
+                    "contentOrder": ["9130d980-cf30-42c7-878c-168ddf2d4ac8"]
                   }
                 }
               }
@@ -14599,9 +14573,7 @@
                       "5af4d69a-c28d-4af0-b747-551662604f32": "4c5228fe-1141-4cdf-9ffc-8b1988dffbb0"
                     },
                     "headerImage": null,
-                    "contentOrder": [
-                      "64488db6-a18a-4244-9b74-a307d1d7860d"
-                    ]
+                    "contentOrder": ["64488db6-a18a-4244-9b74-a307d1d7860d"]
                   }
                 }
               }
@@ -14721,9 +14693,7 @@
                       "5af4d69a-c28d-4af0-b747-551662604f32": "4c5228fe-1141-4cdf-9ffc-8b1988dffbb0"
                     },
                     "headerImage": null,
-                    "contentOrder": [
-                      "777afc8c-bbf8-4a06-ab8f-a5b3ad339d0a"
-                    ]
+                    "contentOrder": ["777afc8c-bbf8-4a06-ab8f-a5b3ad339d0a"]
                   }
                 }
               }
@@ -14854,9 +14824,7 @@
                       "55e23b4f-08a5-454b-a458-cc5e7c23b721": "VC3"
                     },
                     "headerImage": null,
-                    "contentOrder": [
-                      "c0bd4b30-695c-46e0-bb33-92a05ca5384c"
-                    ]
+                    "contentOrder": ["c0bd4b30-695c-46e0-bb33-92a05ca5384c"]
                   }
                 }
               }
@@ -14992,9 +14960,7 @@
                     "operation": "and"
                   },
                   "viewType": "gallery",
-                  "cardOrder": [
-                    "97134ce1-e5ea-4d59-9a4c-bf40d8b7e3bc"
-                  ],
+                  "cardOrder": ["97134ce1-e5ea-4d59-9a4c-bf40d8b7e3bc"],
                   "sortOptions": [],
                   "columnWidths": {},
                   "hiddenOptionIds": [],
@@ -15873,9 +15839,7 @@
                   "filter": {
                     "filters": [
                       {
-                        "values": [
-                          "16352a37-2ef8-4dff-b15d-7750f8b88146"
-                        ],
+                        "values": ["16352a37-2ef8-4dff-b15d-7750f8b88146"],
                         "filterId": "d0d02ed5-9d3e-461a-9683-37f66a5b79ab",
                         "condition": "contains",
                         "propertyId": "b839d037-4230-4619-9976-a4fbded83568"
@@ -17275,7 +17239,6 @@
         "reviewedAt": "2023-08-31T15:32:05.631Z",
         "publishToLens": true,
         "lensPostLink": "0x01c83b-0x02-DA-7666e5ec",
-        "evaluationType": "vote",
         "fields": {}
       }
     },
@@ -17470,7 +17433,6 @@
         "reviewedAt": null,
         "publishToLens": null,
         "lensPostLink": null,
-        "evaluationType": "rubric",
         "fields": null
       }
     },
@@ -17493,10 +17455,7 @@
       "isTemplate": false,
       "parentId": null,
       "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-      "additionalPaths": [
-        "my-bounty-820672216911368",
-        "page-820672216911368"
-      ],
+      "additionalPaths": ["my-bounty-820672216911368", "page-820672216911368"],
       "type": "bounty",
       "boardId": null,
       "autoGenerated": false,
@@ -20716,10 +20675,7 @@
       "isTemplate": false,
       "parentId": null,
       "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-      "additionalPaths": [
-        "grant-application-builder-9013517403690317",
-        "page-9013517403690317"
-      ],
+      "additionalPaths": ["grant-application-builder-9013517403690317", "page-9013517403690317"],
       "type": "proposal_template",
       "boardId": null,
       "autoGenerated": false,
@@ -20747,7 +20703,6 @@
         "reviewedAt": null,
         "publishToLens": null,
         "lensPostLink": null,
-        "evaluationType": "rubric",
         "fields": null
       }
     },
@@ -20952,10 +20907,7 @@
       "isTemplate": false,
       "parentId": null,
       "spaceId": "30bfda0c-19a6-463d-bef7-daccbf433a04",
-      "additionalPaths": [
-        "tweet-about-sony-dao-2981659488463928",
-        "page-2981659488463928"
-      ],
+      "additionalPaths": ["tweet-about-sony-dao-2981659488463928", "page-2981659488463928"],
       "type": "bounty",
       "boardId": null,
       "autoGenerated": false,
@@ -21118,15 +21070,11 @@
         "reviewedAt": "2023-11-02T07:25:09.430Z",
         "publishToLens": false,
         "lensPostLink": null,
-        "evaluationType": "vote",
         "fields": {
           "properties": {
             "__status": "",
-            "__authors": [
-              null
-            ],
-            "__reviewers": [],
-            "__evaluationType": "vote"
+            "__authors": [null],
+            "__reviewers": []
           }
         }
       }
@@ -22386,9 +22334,7 @@
                       "b839d037-4230-4619-9976-a4fbded83568": "8e39101a-03c3-4445-851e-0bd3d6297615"
                     },
                     "headerImage": null,
-                    "contentOrder": [
-                      "ce1f7250-2140-4a80-ba97-f2476a5f0cf1"
-                    ]
+                    "contentOrder": ["ce1f7250-2140-4a80-ba97-f2476a5f0cf1"]
                   }
                 }
               }
@@ -22475,9 +22421,7 @@
                     "properties": {
                       "b839d037-4230-4619-9976-a4fbded83568": "719a6fff-d110-4a42-8f27-c1196d263596"
                     },
-                    "contentOrder": [
-                      "c8bd5fe0-7e08-4de0-b0a3-1fde2dd1adf1"
-                    ]
+                    "contentOrder": ["c8bd5fe0-7e08-4de0-b0a3-1fde2dd1adf1"]
                   }
                 }
               }
@@ -22582,9 +22526,7 @@
                       "b839d037-4230-4619-9976-a4fbded83568": "719a6fff-d110-4a42-8f27-c1196d263596"
                     },
                     "headerImage": null,
-                    "contentOrder": [
-                      "b37fd3ed-5124-4e04-8672-871159298d3c"
-                    ]
+                    "contentOrder": ["b37fd3ed-5124-4e04-8672-871159298d3c"]
                   }
                 }
               }
@@ -22702,9 +22644,7 @@
                       "b839d037-4230-4619-9976-a4fbded83568": "719a6fff-d110-4a42-8f27-c1196d263596"
                     },
                     "headerImage": null,
-                    "contentOrder": [
-                      "9b556453-0bb9-49c8-88d2-5938fbe3c2c5"
-                    ]
+                    "contentOrder": ["9b556453-0bb9-49c8-88d2-5938fbe3c2c5"]
                   }
                 }
               }
@@ -22885,9 +22825,7 @@
                       "b839d037-4230-4619-9976-a4fbded83568": "16352a37-2ef8-4dff-b15d-7750f8b88146"
                     },
                     "headerImage": null,
-                    "contentOrder": [
-                      "bdf56e69-16d0-4789-9df3-29f68c2e70fb"
-                    ]
+                    "contentOrder": ["bdf56e69-16d0-4789-9df3-29f68c2e70fb"]
                   }
                 }
               }
@@ -22986,9 +22924,7 @@
                       "edf57549-e67d-4e7d-a248-21e369e20e1d": "This is a story of bob. Bob is great. Bob is great. Bob is great. Bob is great. Bob is great. Bob is great. Bob is great. Bob is great. Bob is great. Bob is great. "
                     },
                     "headerImage": null,
-                    "contentOrder": [
-                      "62ec5f86-3880-4620-b4b5-4027ff4ff88a"
-                    ]
+                    "contentOrder": ["62ec5f86-3880-4620-b4b5-4027ff4ff88a"]
                   }
                 }
               }
@@ -23112,14 +23048,10 @@
                     "isTemplate": false,
                     "properties": {
                       "b839d037-4230-4619-9976-a4fbded83568": "16352a37-2ef8-4dff-b15d-7750f8b88146",
-                      "f4b7bd22-0b97-41ed-a9e3-7d5ccc238567": [
-                        "dc521ceb-495e-40cc-940e-3b1cafc7a2e1"
-                      ]
+                      "f4b7bd22-0b97-41ed-a9e3-7d5ccc238567": ["dc521ceb-495e-40cc-940e-3b1cafc7a2e1"]
                     },
                     "headerImage": null,
-                    "contentOrder": [
-                      "6a3fff2b-3322-49cb-ac77-43c7679e9792"
-                    ]
+                    "contentOrder": ["6a3fff2b-3322-49cb-ac77-43c7679e9792"]
                   }
                 }
               }
@@ -23207,9 +23139,7 @@
                       "b839d037-4230-4619-9976-a4fbded83568": "16352a37-2ef8-4dff-b15d-7750f8b88146"
                     },
                     "headerImage": null,
-                    "contentOrder": [
-                      "570b82ee-0803-4e39-a09d-15ef411f40be"
-                    ]
+                    "contentOrder": ["570b82ee-0803-4e39-a09d-15ef411f40be"]
                   }
                 }
               }
@@ -23313,9 +23243,7 @@
                       "b839d037-4230-4619-9976-a4fbded83568": "719a6fff-d110-4a42-8f27-c1196d263596"
                     },
                     "headerImage": null,
-                    "contentOrder": [
-                      "2ef08584-5f81-44f8-bc45-7ea0264e85b2"
-                    ]
+                    "contentOrder": ["2ef08584-5f81-44f8-bc45-7ea0264e85b2"]
                   }
                 }
               }
@@ -23656,9 +23584,7 @@
                     "isTemplate": false,
                     "properties": {
                       "b839d037-4230-4619-9976-a4fbded83568": "16352a37-2ef8-4dff-b15d-7750f8b88146",
-                      "f4b7bd22-0b97-41ed-a9e3-7d5ccc238567": [
-                        "f7d47848-f993-4d16-8008-e1f5b23b8ad3"
-                      ]
+                      "f4b7bd22-0b97-41ed-a9e3-7d5ccc238567": ["f7d47848-f993-4d16-8008-e1f5b23b8ad3"]
                     },
                     "headerImage": null,
                     "contentOrder": []
@@ -24007,9 +23933,7 @@
                   "collapsedOptionIds": [],
                   "columnCalculations": {},
                   "kanbanCalculations": {},
-                  "visiblePropertyIds": [
-                    "__title"
-                  ]
+                  "visiblePropertyIds": ["__title"]
                 }
               },
               {
@@ -24044,10 +23968,7 @@
                   "collapsedOptionIds": [],
                   "columnCalculations": {},
                   "kanbanCalculations": {},
-                  "visiblePropertyIds": [
-                    "b839d037-4230-4619-9976-a4fbded83568",
-                    "16aa70a6-6947-4106-8ee6-37b0b4d4a46c"
-                  ]
+                  "visiblePropertyIds": ["b839d037-4230-4619-9976-a4fbded83568", "16aa70a6-6947-4106-8ee6-37b0b4d4a46c"]
                 }
               },
               {
@@ -24100,9 +24021,7 @@
                   "sortOptions": [],
                   "columnWidths": {},
                   "linkedSourceId": null,
-                  "hiddenOptionIds": [
-                    ""
-                  ],
+                  "hiddenOptionIds": [""],
                   "columnWrappedIds": [],
                   "visibleOptionIds": [
                     "16352a37-2ef8-4dff-b15d-7750f8b88146",
@@ -24113,9 +24032,7 @@
                   "collapsedOptionIds": [],
                   "columnCalculations": {},
                   "kanbanCalculations": {},
-                  "visiblePropertyIds": [
-                    "f4b7bd22-0b97-41ed-a9e3-7d5ccc238567"
-                  ]
+                  "visiblePropertyIds": ["f4b7bd22-0b97-41ed-a9e3-7d5ccc238567"]
                 }
               }
             ]
@@ -25027,9 +24944,7 @@
                       "c8962674-b0d0-48b4-aa7b-2540ec88c21c": "5fe04c2f-91c3-400c-9b2b-502fe0a3eb75"
                     },
                     "headerImage": null,
-                    "contentOrder": [
-                      "0c161f51-c21d-4933-be67-c4248b9c3070"
-                    ]
+                    "contentOrder": ["0c161f51-c21d-4933-be67-c4248b9c3070"]
                   }
                 }
               }
@@ -25115,9 +25030,7 @@
                     "isTemplate": false,
                     "properties": {},
                     "headerImage": null,
-                    "contentOrder": [
-                      "26b8125f-2067-4216-8df8-95025637f9a7"
-                    ]
+                    "contentOrder": ["26b8125f-2067-4216-8df8-95025637f9a7"]
                   }
                 }
               }
@@ -25212,9 +25125,7 @@
                       "c8962674-b0d0-48b4-aa7b-2540ec88c21c": "5fe04c2f-91c3-400c-9b2b-502fe0a3eb75"
                     },
                     "headerImage": null,
-                    "contentOrder": [
-                      "d94fc837-bc04-463b-af47-9ceccd41207b"
-                    ]
+                    "contentOrder": ["d94fc837-bc04-463b-af47-9ceccd41207b"]
                   }
                 }
               }
@@ -25337,9 +25248,7 @@
                   "collapsedOptionIds": [],
                   "columnCalculations": {},
                   "kanbanCalculations": {},
-                  "visiblePropertyIds": [
-                    "c8962674-b0d0-48b4-aa7b-2540ec88c21c"
-                  ]
+                  "visiblePropertyIds": ["c8962674-b0d0-48b4-aa7b-2540ec88c21c"]
                 }
               }
             ]

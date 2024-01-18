@@ -206,7 +206,6 @@ export async function updateCardsFromProposals({
     include: {
       proposal: {
         select: {
-          evaluationType: true,
           status: true,
           archived: true,
           createdBy: true,
@@ -630,4 +629,9 @@ export async function updateCardsFromProposals({
       spaceId
     );
   }
+  return {
+    created: newCards.length,
+    deleted: nonExistingProposalPagesIds.length,
+    updated: updatedCards.length
+  };
 }

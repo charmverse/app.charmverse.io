@@ -3,7 +3,6 @@ import { useEffect } from 'react';
 import { mutate } from 'swr';
 
 import HexagonalAvatarMask from 'components/common/HexagonalAvatarMask';
-import Snackbar from 'components/common/Snackbar';
 import { MemberProfileDialogGlobal } from 'components/members/components/MemberProfileDialogGlobal';
 import { useImportDiscordRoles } from 'components/settings/roles/hooks/useImportDiscordRoles';
 import { useAppLoadedEvent } from 'hooks/useAppLoadedEvent';
@@ -14,6 +13,8 @@ import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
+import { ConfirmationModal } from './components/ConfirmationModal';
+import { Snackbar } from './components/Snackbar';
 import { UserOnboardingDialogGlobal } from './components/UserOnboardingDialog';
 import useDatadogLogger from './hooks/useDatadogLogger';
 
@@ -81,6 +82,7 @@ export function GlobalComponents() {
       <HexagonalAvatarMask id='hexagon-avatar' />
       <MemberProfileDialogGlobal />
       <UserOnboardingDialogGlobal />
+      <ConfirmationModal />
       <Snackbar />
     </>
   );

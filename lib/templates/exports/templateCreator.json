@@ -657,7 +657,6 @@
         "reviewedAt": null,
         "publishToLens": false,
         "lensPostLink": null,
-        "evaluationType": "vote",
         "fields": {
           "properties": {
             "__status": "",
@@ -667,8 +666,7 @@
               {
                 "group": "role"
               }
-            ],
-            "__evaluationType": "vote"
+            ]
           }
         }
       }
@@ -6138,11 +6136,7 @@
         "type": "profile_pic",
         "options": null,
         "index": 0,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "permissions": []
       },
       {
@@ -6156,11 +6150,7 @@
         "type": "text",
         "options": null,
         "index": 1,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "permissions": []
       },
       {
@@ -6174,11 +6164,7 @@
         "type": "role",
         "options": null,
         "index": 2,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "permissions": []
       },
       {
@@ -6192,11 +6178,7 @@
         "type": "bio",
         "options": null,
         "index": 3,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "permissions": []
       },
       {
@@ -6210,11 +6192,7 @@
         "type": "discord",
         "options": null,
         "index": 4,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "permissions": []
       },
       {
@@ -6228,11 +6206,7 @@
         "type": "twitter",
         "options": null,
         "index": 5,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "permissions": []
       },
       {
@@ -6246,11 +6220,7 @@
         "type": "linked_in",
         "options": null,
         "index": 6,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "permissions": []
       },
       {
@@ -6264,11 +6234,7 @@
         "type": "github",
         "options": null,
         "index": 7,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "permissions": []
       },
       {
@@ -6282,11 +6248,7 @@
         "type": "timezone",
         "options": null,
         "index": 8,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "permissions": []
       },
       {

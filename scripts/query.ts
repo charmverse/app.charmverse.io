@@ -1,6 +1,7 @@
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 /**
 
   userId: cb9a5ede-6ff7-4eaa-9c23-91e684e23aed
@@ -21,13 +22,12 @@ async function search() {
     select: {
       proposal: {
         select: {
-          credentialTemplate: true,
+          selectedCredentialTemplates: true,
         }
       }
     }
   });
 
-  console.log(acc);
 }
 
 search().then(() => console.log('Done'));

@@ -15,6 +15,7 @@ import { SWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
 import { BaseAuthenticateProviders } from 'components/_app/BaseAuthenticateProviders';
+import { Snackbar } from 'components/_app/components/Snackbar';
 import { GlobalComponents } from 'components/_app/GlobalComponents';
 import { LocalizationProvider } from 'components/_app/LocalizationProvider';
 import type { OpenGraphProps } from 'components/_app/OpenGraphData';
@@ -26,11 +27,11 @@ import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import IntlProvider from 'components/common/IntlProvider';
 import ReactDndProvider from 'components/common/ReactDndProvider';
 import RouteGuard from 'components/common/RouteGuard';
-import Snackbar from 'components/common/Snackbar';
 import { UserProfileProvider } from 'components/members/hooks/useMemberDialog';
 import { ProposalsProvider } from 'components/proposals/hooks/useProposals';
 import { RewardsProvider } from 'components/rewards/hooks/useRewards';
 import { isDevEnv, isProdEnv } from 'config/constants';
+import { ConfirmationModalProvider } from 'hooks/useConfirmationModal';
 import { CurrentSpaceProvider } from 'hooks/useCurrentSpace';
 import { DiscordProvider } from 'hooks/useDiscordConnection';
 import { PostCategoriesProvider } from 'hooks/useForumCategories';
@@ -159,42 +160,44 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
   return (
     <AppThemeProvider>
       <SnackbarProvider>
-        <ReactDndProvider>
-          <DataProviders>
-            <SettingsDialogProvider>
-              <LocalizationProvider>
-                <NotionProvider>
-                  <IntlProvider>
-                    <DbViewSettingsProvider>
-                      <PageHead {...pageProps} />
+        <ConfirmationModalProvider>
+          <ReactDndProvider>
+            <DataProviders>
+              <SettingsDialogProvider>
+                <LocalizationProvider>
+                  <NotionProvider>
+                    <IntlProvider>
+                      <DbViewSettingsProvider>
+                        <PageHead {...pageProps} />
 
-                      <RouteGuard>
-                        <ErrorBoundary>
-                          <Snackbar
-                            isOpen={isOldBuild}
-                            message='New CharmVerse platform update available. Please refresh.'
-                            actions={[
-                              <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                <RefreshIcon fontSize='small' />
-                              </IconButton>
-                            ]}
-                            origin={{ vertical: 'top', horizontal: 'center' }}
-                            severity='warning'
-                            handleClose={() => setIsOldBuild(false)}
-                          />
+                        <RouteGuard>
+                          <ErrorBoundary>
+                            <Snackbar
+                              isOpen={isOldBuild}
+                              message='New CharmVerse platform update available. Please refresh.'
+                              actions={[
+                                <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                  <RefreshIcon fontSize='small' />
+                                </IconButton>
+                              ]}
+                              origin={{ vertical: 'top', horizontal: 'center' }}
+                              severity='warning'
+                              handleClose={() => setIsOldBuild(false)}
+                            />
 
-                          {getLayout(<Component {...pageProps} />)}
+                            {getLayout(<Component {...pageProps} />)}
 
-                          <GlobalComponents />
-                        </ErrorBoundary>
-                      </RouteGuard>
-                    </DbViewSettingsProvider>
-                  </IntlProvider>
-                </NotionProvider>
-              </LocalizationProvider>
-            </SettingsDialogProvider>
-          </DataProviders>
-        </ReactDndProvider>
+                            <GlobalComponents />
+                          </ErrorBoundary>
+                        </RouteGuard>
+                      </DbViewSettingsProvider>
+                    </IntlProvider>
+                  </NotionProvider>
+                </LocalizationProvider>
+              </SettingsDialogProvider>
+            </DataProviders>
+          </ReactDndProvider>
+        </ConfirmationModalProvider>
       </SnackbarProvider>
     </AppThemeProvider>
   );

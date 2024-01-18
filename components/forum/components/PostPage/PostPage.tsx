@@ -193,7 +193,7 @@ export function PostPage({
         isDraft: false
       });
       setIsPublishingDraftPost(false);
-      navigateToSpacePath(`/[domain]/forum/post/${draftPost.path}`);
+      navigateToSpacePath(`/forum/post/${draftPost.path}`);
     }
   }
 

@@ -657,7 +657,6 @@
         "reviewedAt": null,
         "publishToLens": false,
         "lensPostLink": null,
-        "evaluationType": "vote",
         "fields": {
           "properties": {
             "__status": "",
@@ -667,8 +666,7 @@
               {
                 "group": "role"
               }
-            ],
-            "__evaluationType": "vote"
+            ]
           }
         },
         "workflowId": null
@@ -1448,7 +1446,6 @@
         "reviewedAt": null,
         "publishToLens": false,
         "lensPostLink": null,
-        "evaluationType": "vote",
         "fields": {
           "properties": {
             "__status": "",
@@ -1458,8 +1455,7 @@
               {
                 "group": "role"
               }
-            ],
-            "__evaluationType": "vote"
+            ]
           }
         },
         "workflowId": null
@@ -2217,7 +2213,6 @@
         "reviewedAt": null,
         "publishToLens": false,
         "lensPostLink": null,
-        "evaluationType": "vote",
         "fields": {
           "properties": {
             "__status": "",
@@ -2227,8 +2222,7 @@
               {
                 "group": "role"
               }
-            ],
-            "__evaluationType": "vote"
+            ]
           }
         },
         "workflowId": null
@@ -2721,7 +2715,6 @@
         "reviewedAt": null,
         "publishToLens": false,
         "lensPostLink": null,
-        "evaluationType": "vote",
         "fields": {
           "properties": {
             "__status": "",
@@ -2731,8 +2724,7 @@
               {
                 "group": "role"
               }
-            ],
-            "__evaluationType": "vote"
+            ]
           }
         },
         "workflowId": null
@@ -3423,7 +3415,6 @@
         "reviewedAt": null,
         "publishToLens": false,
         "lensPostLink": null,
-        "evaluationType": "vote",
         "fields": {
           "properties": {
             "__status": "",
@@ -3433,8 +3424,7 @@
               {
                 "group": "role"
               }
-            ],
-            "__evaluationType": "vote"
+            ]
           }
         },
         "workflowId": null
@@ -4322,7 +4312,6 @@
         "reviewedAt": null,
         "publishToLens": false,
         "lensPostLink": null,
-        "evaluationType": "vote",
         "fields": {
           "properties": {
             "__status": "",
@@ -4332,8 +4321,7 @@
               {
                 "group": "role"
               }
-            ],
-            "__evaluationType": "vote"
+            ]
           }
         },
         "workflowId": null
@@ -4957,7 +4945,6 @@
         "reviewedAt": null,
         "publishToLens": false,
         "lensPostLink": null,
-        "evaluationType": "vote",
         "fields": {
           "properties": {
             "__status": "",
@@ -4967,8 +4954,7 @@
               {
                 "group": "role"
               }
-            ],
-            "__evaluationType": "vote"
+            ]
           }
         },
         "workflowId": null
@@ -5726,7 +5712,6 @@
         "reviewedAt": null,
         "publishToLens": false,
         "lensPostLink": null,
-        "evaluationType": "vote",
         "fields": {
           "properties": {
             "__status": "",
@@ -5736,8 +5721,7 @@
               {
                 "group": "role"
               }
-            ],
-            "__evaluationType": "vote"
+            ]
           }
         },
         "workflowId": null
@@ -12408,10 +12392,7 @@
                   "collapsedOptionIds": [],
                   "columnCalculations": {},
                   "kanbanCalculations": {},
-                  "visiblePropertyIds": [
-                    "__title",
-                    "11eefd10-f082-40d6-abc0-0a8cec44fb90"
-                  ]
+                  "visiblePropertyIds": ["__title", "11eefd10-f082-40d6-abc0-0a8cec44fb90"]
                 }
               }
             ]
@@ -13662,9 +13643,7 @@
                         "isTemplate": false,
                         "properties": {
                           "47b1aee8-dd7c-42e4-bd1e-9b14dd850015": "35bbea47-5c02-431b-89cd-ee7b796aba04",
-                          "c55a109e-a5b5-4cdd-9902-483ec65d58ee": [
-                            "d5b4e5db-868d-47b0-bc78-ebe9b5b2c835"
-                          ]
+                          "c55a109e-a5b5-4cdd-9902-483ec65d58ee": ["d5b4e5db-868d-47b0-bc78-ebe9b5b2c835"]
                         },
                         "headerImage": null,
                         "contentOrder": []
@@ -13763,9 +13742,7 @@
                         "isTemplate": false,
                         "properties": {
                           "47b1aee8-dd7c-42e4-bd1e-9b14dd850015": "35bbea47-5c02-431b-89cd-ee7b796aba04",
-                          "c55a109e-a5b5-4cdd-9902-483ec65d58ee": [
-                            "f7d47848-f993-4d16-8008-e1f5b23b8ad3"
-                          ]
+                          "c55a109e-a5b5-4cdd-9902-483ec65d58ee": ["f7d47848-f993-4d16-8008-e1f5b23b8ad3"]
                         },
                         "headerImage": null,
                         "contentOrder": []
@@ -13854,9 +13831,7 @@
                         "isTemplate": false,
                         "properties": {
                           "47b1aee8-dd7c-42e4-bd1e-9b14dd850015": "181ec031-6afc-4414-b1b8-87d2ecc74b82",
-                          "c55a109e-a5b5-4cdd-9902-483ec65d58ee": [
-                            "e5dba747-be62-49be-a7ba-71cf27b17174"
-                          ]
+                          "c55a109e-a5b5-4cdd-9902-483ec65d58ee": ["e5dba747-be62-49be-a7ba-71cf27b17174"]
                         },
                         "headerImage": null,
                         "contentOrder": []
@@ -13971,9 +13946,7 @@
                       "sortOptions": [],
                       "columnWidths": {},
                       "linkedSourceId": null,
-                      "hiddenOptionIds": [
-                        ""
-                      ],
+                      "hiddenOptionIds": [""],
                       "visibleOptionIds": [
                         "35bbea47-5c02-431b-89cd-ee7b796aba04",
                         "181ec031-6afc-4414-b1b8-87d2ecc74b82",
@@ -13983,9 +13956,7 @@
                       "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
-                      "visiblePropertyIds": [
-                        "c55a109e-a5b5-4cdd-9902-483ec65d58ee"
-                      ]
+                      "visiblePropertyIds": ["c55a109e-a5b5-4cdd-9902-483ec65d58ee"]
                     }
                   }
                 ]
@@ -19435,11 +19406,7 @@
         "type": "role",
         "options": [],
         "index": 2,
-        "enabledViews": [
-          "table",
-          "profile",
-          "gallery"
-        ],
+        "enabledViews": ["table", "profile", "gallery"],
         "required": false,
         "permissions": []
       },
@@ -19454,11 +19421,7 @@
         "type": "timezone",
         "options": null,
         "index": 8,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "required": false,
         "permissions": []
       },
@@ -19473,9 +19436,7 @@
         "type": "bio",
         "options": null,
         "index": 3,
-        "enabledViews": [
-          "profile"
-        ],
+        "enabledViews": ["profile"],
         "required": false,
         "permissions": []
       },
@@ -19490,10 +19451,7 @@
         "type": "discord",
         "options": null,
         "index": 4,
-        "enabledViews": [
-          "gallery",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "profile"],
         "required": false,
         "permissions": []
       },
@@ -19508,11 +19466,7 @@
         "type": "linked_in",
         "options": null,
         "index": 6,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "required": false,
         "permissions": []
       },
@@ -19527,11 +19481,7 @@
         "type": "profile_pic",
         "options": [],
         "index": 0,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "required": false,
         "permissions": []
       },
@@ -19546,11 +19496,7 @@
         "type": "text",
         "options": null,
         "index": 1,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "required": false,
         "permissions": []
       },
@@ -19580,11 +19526,7 @@
         "type": "github",
         "options": null,
         "index": 7,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "required": false,
         "permissions": []
       },
@@ -19599,11 +19541,7 @@
         "type": "text_multiline",
         "options": [],
         "index": 12,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "required": false,
         "permissions": []
       },
@@ -19703,11 +19641,7 @@
           }
         ],
         "index": 13,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "required": false,
         "permissions": []
       },
@@ -19722,10 +19656,7 @@
         "type": "twitter",
         "options": null,
         "index": 5,
-        "enabledViews": [
-          "gallery",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "profile"],
         "required": false,
         "permissions": []
       }
