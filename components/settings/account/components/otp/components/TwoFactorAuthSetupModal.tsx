@@ -39,7 +39,7 @@ function CustomModal({ onClose, ...props }: Omit<ModalProps, 'children'>) {
 
 const TwoFactorAuthSetupModalComponent = forwardRef(CustomModal);
 
-export function CustomModalContainer(props: Omit<ModalProps, 'children'>) {
+function CustomModalContainer(props: Omit<ModalProps, 'children'>) {
   return (
     <TwoFactorAuthProvider>
       <TwoFactorAuthSetupModalComponent {...props} />

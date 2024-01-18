@@ -37,8 +37,7 @@ export function TwoFactorAuthUser() {
       </Legend>
       {activeOtp ? (
         <>
-          <Typography mb={1}>You have configured 2fa.</Typography>
-          <Typography mb={1}>Available actions:</Typography>
+          <Typography mb={1}>Two-factor authentication is On.</Typography>
           <Button
             variant='text'
             sx={{ px: 0, display: 'block', '&:hover': { background: 'transparent' } }}
@@ -58,7 +57,7 @@ export function TwoFactorAuthUser() {
         </>
       ) : (
         <Button sx={{ mt: 1, display: 'block' }} {...bindTrigger(otpSetupModal)} data-test='account-config-twofa-btn'>
-          Click here to configure 2fa
+          Get Started
         </Button>
       )}
       <TwoFactorAuthSetupModal {...bindPopover(otpSetupModal)} />

@@ -15,10 +15,10 @@ type Props = {
 
 export function StartSetup({ onSubmit, loading, errorMessage }: Props) {
   return (
-    <List sx={{ '.MuiListItemText-root': { mt: 0 }, '.MuiListItem-root': { py: 2 } }}>
+    <List sx={{ '.MuiListItemText-root': { mt: 0 }, '.MuiListItem-root': { py: 1 } }}>
       <ListItem>
         <ListItemIcon>
-          <LockIcon />
+          <LockIcon sx={{ fontSize: 35, mr: 2 }} />
         </ListItemIcon>
         <ListItemText primary='Protect your account in just two steps' />
       </ListItem>
@@ -26,11 +26,15 @@ export function StartSetup({ onSubmit, loading, errorMessage }: Props) {
         <ListItemIcon>
           <Typography
             component='span'
+            mr={2}
+            display='flex'
             border={(theme) => `3px solid ${theme.palette.secondary.dark}`}
             borderRadius='50%'
-            width='25px'
-            height='25px'
+            width='35px'
+            height='35px'
             textAlign='center'
+            alignItems='center'
+            justifyContent='center'
             variant='body2'
           >
             1
@@ -45,11 +49,15 @@ export function StartSetup({ onSubmit, loading, errorMessage }: Props) {
         <ListItemIcon>
           <Typography
             component='span'
+            mr={2}
+            display='flex'
             border={(theme) => `3px solid ${theme.palette.secondary.dark}`}
             borderRadius='50%'
-            width='25px'
-            height='25px'
+            width='35px'
+            height='35px'
             textAlign='center'
+            alignItems='center'
+            justifyContent='center'
             variant='body2'
           >
             2
