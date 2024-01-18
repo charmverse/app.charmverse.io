@@ -41,7 +41,7 @@ export function StartSetup({ onSubmit, loading, errorMessage }: Props) {
           </Typography>
         </ListItemIcon>
         <ListItemText
-          primary='Link your authentication account to CharmVerse'
+          primary='Link your authentication app'
           secondary='Use a compatible authentication app (like Google Authenticator, Authy, Duo Mobile, 1Password, etc). We’ll generate a QR Code for you to scan.'
         />
       </ListItem>
