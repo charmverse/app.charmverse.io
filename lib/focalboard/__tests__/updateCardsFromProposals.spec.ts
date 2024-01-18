@@ -102,48 +102,396 @@ describe('updateCardsFromProposals()', () => {
   });
 
   it('should create cards from proposals if there are new proposals added', async () => {
-    await testUtilsProposals.generateProposal({
-      authors: [user.id],
+    const generated = await testUtilsUser.generateUserAndSpace();
+    const admin = generated.user;
+    const proposalReviewer = await testUtilsUser.generateSpaceUser({
+      spaceId: generated.space.id
+    });
+
+    const generatedProposal1 = await testUtilsProposals.generateProposal({
+      authors: [admin.id],
       proposalStatus: 'published',
-      reviewers: [
+      evaluationInputs: [
         {
-          group: 'user',
-          id: user.id
+          rubricCriteria: [
+            {
+              description: 'Rubric criteria 1',
+              parameters: {
+                min: 0,
+                max: 5
+              },
+              title: 'Rubric criteria 1'
+            },
+            {
+              description: 'Rubric criteria 2',
+              parameters: {
+                min: 0,
+                max: 10
+              },
+              title: 'Rubric criteria 2'
+            }
+          ],
+          evaluationType: 'rubric',
+          title: 'Rubric Evaluation 1',
+          reviewers: [
+            {
+              group: 'user',
+              id: proposalReviewer.id
+            },
+            {
+              group: 'user',
+              id: admin.id
+            }
+          ],
+          permissions: []
+        },
+        {
+          rubricCriteria: [
+            {
+              description: 'Rubric criteria 1',
+              parameters: {
+                min: 0,
+                max: 10
+              },
+              title: 'Rubric criteria 1'
+            }
+          ],
+          evaluationType: 'rubric',
+          title: 'Rubric Evaluation 2',
+          reviewers: [
+            {
+              group: 'user',
+              id: admin.id
+            }
+          ],
+          permissions: []
         }
       ],
-      spaceId: space.id,
-      userId: user.id
+      spaceId: generated.space.id,
+      userId: admin.id
     });
 
-    await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
-
-    const pageProposal2 = await testUtilsProposals.generateProposal({
-      authors: [user.id],
-      proposalStatus: 'published',
-      reviewers: [
-        {
-          group: 'user',
-          id: user.id
-        }
-      ],
-      spaceId: space.id,
-      userId: user.id
-    });
-
-    await updateCardsFromProposals({
-      boardId: board.id,
-      spaceId: space.id,
-      userId: user.id
-    });
-
-    const newCreatedCard = await prisma.page.findFirst({
+    const proposal1RubricCriterias = await prisma.proposalRubricCriteria.findMany({
       where: {
-        type: 'card',
-        syncWithPageId: pageProposal2.id
+        proposalId: generatedProposal1.id
+      },
+      select: {
+        id: true,
+        evaluationId: true
       }
     });
 
-    expect(newCreatedCard?.syncWithPageId).toBe(pageProposal2.id);
+    const proposal1EvaluationIdRubricCriteriasRecord: Record<string, string[]> = {};
+    generatedProposal1.evaluations.forEach((Evaluation) => {
+      const rubricCriterias = proposal1RubricCriterias.filter((criteria) => criteria.evaluationId === Evaluation.id);
+      proposal1EvaluationIdRubricCriteriasRecord[Evaluation.id] = rubricCriterias.map((criteria) => criteria.id);
+    });
+
+    // Admin first Evaluation first rubric criteria answer
+    await prisma.proposalRubricCriteriaAnswer.create({
+      data: {
+        response: { score: 5 },
+        userId: admin.id,
+        comment: null,
+        proposalId: generatedProposal1.id,
+        rubricCriteriaId: proposal1EvaluationIdRubricCriteriasRecord[generatedProposal1.evaluations[0].id][0],
+        evaluationId: generatedProposal1.evaluations[0].id
+      }
+    });
+
+    // Admin first Evaluation 2nd rubric criteria answer
+    await prisma.proposalRubricCriteriaAnswer.create({
+      data: {
+        response: { score: 8 },
+        userId: admin.id,
+        comment: null,
+        proposalId: generatedProposal1.id,
+        rubricCriteriaId: proposal1EvaluationIdRubricCriteriasRecord[generatedProposal1.evaluations[0].id][1],
+        evaluationId: generatedProposal1.evaluations[0].id
+      }
+    });
+
+    const database = await generateBoard({
+      createdBy: admin.id,
+      spaceId: generated.space.id,
+      views: 1,
+      viewDataSource: 'proposals'
+    });
+
+    // Delete the test card blocks
+    await prisma.block.deleteMany({
+      where: {
+        type: 'card',
+        parentId: database.id
+      }
+    });
+
+    await createCardsFromProposals({
+      boardId: database.id,
+      spaceId: generated.space.id,
+      userId: admin.id
+    });
+
+    // After creating the initial proposal cards, update the proposal rubric Evaluation by submitting reviews by proposal reviewer
+
+    // Proposal reviewer first Evaluation first rubric criteria answer
+    await prisma.proposalRubricCriteriaAnswer.create({
+      data: {
+        response: { score: 3 },
+        userId: proposalReviewer.id,
+        comment: null,
+        proposalId: generatedProposal1.id,
+        rubricCriteriaId: proposal1EvaluationIdRubricCriteriasRecord[generatedProposal1.evaluations[0].id][0],
+        evaluationId: generatedProposal1.evaluations[0].id
+      }
+    });
+
+    // Proposal reviewer first Evaluation 2nd rubric criteria answer
+    await prisma.proposalRubricCriteriaAnswer.create({
+      data: {
+        response: { score: 7 },
+        userId: proposalReviewer.id,
+        comment: null,
+        proposalId: generatedProposal1.id,
+        rubricCriteriaId: proposal1EvaluationIdRubricCriteriasRecord[generatedProposal1.evaluations[0].id][1],
+        evaluationId: generatedProposal1.evaluations[0].id
+      }
+    });
+
+    // Proposal reviewer second Evaluation 1st rubric criteria answer
+    await prisma.proposalRubricCriteriaAnswer.create({
+      data: {
+        response: { score: 4 },
+        userId: proposalReviewer.id,
+        comment: null,
+        proposalId: generatedProposal1.id,
+        rubricCriteriaId: proposal1EvaluationIdRubricCriteriasRecord[generatedProposal1.evaluations[1].id][0],
+        evaluationId: generatedProposal1.evaluations[1].id
+      }
+    });
+
+    await prisma.proposalEvaluation.updateMany({
+      where: {
+        id: {
+          in: generatedProposal1.evaluations.map((Evaluation) => Evaluation.id)
+        }
+      },
+      data: {
+        result: 'pass'
+      }
+    });
+
+    const generatedProposal2 = await testUtilsProposals.generateProposal({
+      authors: [proposalReviewer.id],
+      proposalStatus: 'published',
+      evaluationInputs: [
+        {
+          rubricCriteria: [
+            {
+              description: 'Rubric criteria 1',
+              parameters: {
+                min: 0,
+                max: 5
+              },
+              title: 'Rubric criteria 1'
+            }
+          ],
+          evaluationType: 'rubric',
+          title: 'Rubric Evaluation 1',
+          reviewers: [
+            {
+              group: 'user',
+              id: proposalReviewer.id
+            }
+          ],
+          permissions: []
+        },
+        {
+          rubricCriteria: [
+            {
+              description: 'Rubric evaluation 3 criteria 1',
+              parameters: {
+                min: 0,
+                max: 10
+              },
+              title: 'Rubric evaluation 3 criteria 1'
+            }
+          ],
+          evaluationType: 'rubric',
+          title: 'Rubric Evaluation 3',
+          reviewers: [
+            {
+              group: 'user',
+              id: proposalReviewer.id
+            }
+          ],
+          permissions: []
+        }
+      ],
+      spaceId: generated.space.id,
+      userId: proposalReviewer.id
+    });
+
+    const proposal2RubricCriterias = await prisma.proposalRubricCriteria.findMany({
+      where: {
+        proposalId: generatedProposal2.id
+      },
+      select: {
+        id: true,
+        evaluationId: true
+      }
+    });
+
+    await prisma.proposalRubricCriteriaAnswer.create({
+      data: {
+        response: { score: 4 },
+        userId: proposalReviewer.id,
+        comment: null,
+        proposalId: generatedProposal2.id,
+        rubricCriteriaId: proposal2RubricCriterias[0].id,
+        evaluationId: proposal2RubricCriterias[0].evaluationId
+      }
+    });
+
+    await prisma.proposalRubricCriteriaAnswer.create({
+      data: {
+        response: { score: 9 },
+        userId: proposalReviewer.id,
+        comment: null,
+        proposalId: generatedProposal2.id,
+        rubricCriteriaId: proposal2RubricCriterias[1].id,
+        evaluationId: proposal2RubricCriterias[1].evaluationId
+      }
+    });
+
+    await prisma.proposalEvaluation.updateMany({
+      where: {
+        id: {
+          in: generatedProposal2.evaluations.map((Evaluation) => Evaluation.id)
+        }
+      },
+      data: {
+        result: 'fail'
+      }
+    });
+
+    await updateCardsFromProposals({
+      boardId: database.id,
+      spaceId: generated.space.id,
+      userId: admin.id
+    });
+
+    const databaseAfterUpdate = await prisma.block.findUnique({
+      where: {
+        id: database.id
+      },
+      select: {
+        fields: true
+      }
+    });
+
+    const properties = (databaseAfterUpdate?.fields as any).cardProperties as IPropertyTemplate[];
+    const proposalEvaluationStatusProp = properties.find((prop) => prop.type === 'proposalStatus') as IPropertyTemplate;
+    const proposalEvaluationStepProp = properties.find((prop) => prop.type === 'proposalStep') as IPropertyTemplate;
+    const proposalEvaluationTypeProp = properties.find(
+      (prop) => prop.type === 'proposalEvaluationType'
+    ) as IPropertyTemplate;
+    const rubricEvaluation1EvaluationAverageProp = properties.find(
+      (prop) => prop.type === 'proposalEvaluationAverage' && prop.name === 'Rubric Evaluation 1'
+    ) as IPropertyTemplate;
+    const rubricEvaluation2EvaluationAverageProp = properties.find(
+      (prop) => prop.type === 'proposalEvaluationAverage' && prop.name === 'Rubric Evaluation 2'
+    ) as IPropertyTemplate;
+    const rubricEvaluation1EvaluationTotalProp = properties.find(
+      (prop) => prop.type === 'proposalEvaluationTotal' && prop.name === 'Rubric Evaluation 1'
+    ) as IPropertyTemplate;
+    const rubricEvaluation2EvaluationTotalProp = properties.find(
+      (prop) => prop.type === 'proposalEvaluationTotal' && prop.name === 'Rubric Evaluation 2'
+    ) as IPropertyTemplate;
+    const rubricEvaluation1EvaluationEvaluatedByProp = properties.find(
+      (prop) => prop.type === 'proposalEvaluatedBy' && prop.name === 'Rubric Evaluation 1'
+    ) as IPropertyTemplate;
+    const rubricEvaluation2EvaluationEvaluatedByProp = properties.find(
+      (prop) => prop.type === 'proposalEvaluatedBy' && prop.name === 'Rubric Evaluation 2'
+    ) as IPropertyTemplate;
+    const rubricEvaluation3EvaluationAverageProp = properties.find(
+      (prop) => prop.type === 'proposalEvaluationAverage' && prop.name === 'Rubric Evaluation 3'
+    ) as IPropertyTemplate;
+    const rubricEvaluation3EvaluationTotalProp = properties.find(
+      (prop) => prop.type === 'proposalEvaluationTotal' && prop.name === 'Rubric Evaluation 3'
+    ) as IPropertyTemplate;
+    const rubricEvaluation3EvaluationEvaluatedByProp = properties.find(
+      (prop) => prop.type === 'proposalEvaluatedBy' && prop.name === 'Rubric Evaluation 3'
+    ) as IPropertyTemplate;
+
+    const cardBlocks = await prisma.block.findMany({
+      where: {
+        parentId: database.id,
+        type: 'card'
+      },
+      orderBy: {
+        createdAt: 'asc'
+      },
+      select: {
+        fields: true
+      }
+    });
+
+    const view = await prisma.block.findFirst({
+      where: {
+        type: 'view',
+        parentId: database.id
+      },
+      select: {
+        fields: true
+      }
+    });
+
+    const viewFields = view?.fields as unknown as BoardViewFields;
+
+    const card1Properties = (cardBlocks[0].fields as unknown as CardFields).properties;
+    const card2Properties = (cardBlocks[1].fields as unknown as CardFields).properties;
+
+    expect(card1Properties[rubricEvaluation1EvaluationAverageProp.id]).toStrictEqual(5.75);
+    expect(card1Properties[rubricEvaluation2EvaluationAverageProp.id]).toStrictEqual(4);
+    expect(card1Properties[rubricEvaluation1EvaluationTotalProp.id]).toStrictEqual(23);
+    expect(card1Properties[rubricEvaluation2EvaluationTotalProp.id]).toStrictEqual(4);
+    expect((card1Properties[rubricEvaluation1EvaluationEvaluatedByProp.id] as string[]).sort()).toStrictEqual(
+      [proposalReviewer.id, admin.id].sort()
+    );
+    expect(card1Properties[rubricEvaluation2EvaluationEvaluatedByProp.id]).toStrictEqual([proposalReviewer.id]);
+
+    expect(card2Properties[rubricEvaluation1EvaluationAverageProp.id]).toStrictEqual(4);
+    expect(card2Properties[rubricEvaluation2EvaluationAverageProp.id]).toBeUndefined();
+    expect(card2Properties[rubricEvaluation1EvaluationTotalProp.id]).toStrictEqual(4);
+    expect(card2Properties[rubricEvaluation2EvaluationTotalProp.id]).toBeUndefined();
+    expect(card2Properties[rubricEvaluation1EvaluationEvaluatedByProp.id]).toStrictEqual([proposalReviewer.id]);
+    expect(card2Properties[rubricEvaluation2EvaluationEvaluatedByProp.id]).toBeUndefined();
+    expect(card2Properties[rubricEvaluation3EvaluationAverageProp.id]).toStrictEqual(9);
+    expect(card2Properties[rubricEvaluation3EvaluationTotalProp.id]).toStrictEqual(9);
+    expect(card2Properties[rubricEvaluation3EvaluationEvaluatedByProp.id]).toStrictEqual([proposalReviewer.id]);
+
+    // Add the new evaluation properties to the view
+    expect(
+      [
+        rubricEvaluation3EvaluationAverageProp,
+        rubricEvaluation3EvaluationTotalProp,
+        rubricEvaluation3EvaluationEvaluatedByProp
+      ].every((prop) => viewFields.visiblePropertyIds.includes(prop.id))
+    ).toBeTruthy();
+
+    expect(card1Properties[proposalEvaluationStatusProp.id]).toBe('pass');
+    expect(card1Properties[proposalEvaluationStepProp.id]).toBe('Rubric Evaluation 2');
+    expect(card1Properties[proposalEvaluationTypeProp.id]).toBe('rubric');
+    expect(card2Properties[proposalEvaluationStatusProp.id]).toBe('fail');
+    expect(card2Properties[proposalEvaluationStepProp.id]).toBe('Rubric Evaluation 1');
+    expect(card2Properties[proposalEvaluationTypeProp.id]).toBe('rubric');
+    // Make sure all the evaluation steps are added to the step property's options
+    expect(
+      ['Rubric Evaluation 1', 'Rubric Evaluation 2', 'Rubric Evaluation 3'].every((stepTitle) =>
+        proposalEvaluationStepProp.options.some((option) => option.value === stepTitle)
+      )
+    ).toBeTruthy();
   });
 
   it('should not create cards from draft proposals', async () => {

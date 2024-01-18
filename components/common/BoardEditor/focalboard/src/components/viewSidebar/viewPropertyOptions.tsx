@@ -8,6 +8,7 @@ import { Button } from 'components/common/Button';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { Constants } from 'lib/focalboard/constants';
+import { getPropertyName } from 'lib/focalboard/getPropertyName';
 
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
@@ -55,7 +56,17 @@ function PropertyMenuItem({
       <MenuItem dense className={isOver ? 'dragover' : ''} sx={{ width: '100%' }}>
         <DragIndicatorIcon color='secondary' fontSize='small' sx={{ mr: 1 }} />
         <ListItemIcon>{iconForPropertyType(property.type)}</ListItemIcon>
-        <ListItemText>{property.name}</ListItemText>
+        <ListItemText
+          sx={{
+            '& .MuiTypography-root': {
+              textOverflow: 'ellipsis',
+              overflow: 'hidden',
+              whiteSpace: 'nowrap'
+            }
+          }}
+        >
+          {getPropertyName(property)}
+        </ListItemText>
         <IconButton
           disabled={visibilityToggleDisabled}
           size='small'
