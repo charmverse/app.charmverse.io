@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
+import { useTrashPages } from 'charmClient/hooks/pages';
 import { StyledBanner } from 'components/common/Banners/Banner';
 import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
@@ -23,6 +24,7 @@ export default function PageDeleteBanner({ pageType, pageId }: { pageType: PageT
   const dispatch = useAppDispatch();
   const { showMessage } = useSnackbar();
   const { permissions } = usePagePermissions({ pageIdOrPath: pageId });
+  const { trigger: trashPages } = useTrashPages();
 
   const canDeleteOrRestore = !!permissions?.delete;
   const disabledButtonTooltip = !canDeleteOrRestore ? 'You do not have permission to delete or restore this page' : '';
@@ -39,7 +41,7 @@ export default function PageDeleteBanner({ pageType, pageId }: { pageType: PageT
             type: 'page_restored'
           });
         } else {
-          await charmClient.restorePage(pageId);
+          await trashPages({ pageIds: [pageId], trash: false });
           await mutate(`pages/${space.id}`);
           dispatch(initialDatabaseLoad({ pageId }));
         }

@@ -3,7 +3,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import dynamic from 'next/dynamic';
 import { useCallback, useMemo, useState } from 'react';
 
-import charmClient from 'charmClient';
+import { useTrashPages } from 'charmClient/hooks/pages';
 import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFilterControl';
 import { ViewSettingsRow } from 'components/common/BoardEditor/components/ViewSettingsRow';
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
@@ -87,6 +87,7 @@ export function RewardsPage({ title }: { title: string }) {
   const openPageIn = activeView?.fields.openPageIn ?? 'center_peek';
   const withDisplayBy = activeView?.fields.viewType === 'calendar';
 
+  const { trigger: trashPages } = useTrashPages();
   const dateDisplayProperty = useMemo(
     () =>
       activeBoard?.fields.cardProperties.find((o) => {
@@ -109,7 +110,7 @@ export function RewardsPage({ title }: { title: string }) {
   }
 
   const onDelete = useCallback(async (rewardId: string) => {
-    await charmClient.archivePage(rewardId);
+    await trashPages({ pageIds: [rewardId], trash: true });
   }, []);
 
   const showRewardOrApplication = (id: string | null, rewardId?: string) => {

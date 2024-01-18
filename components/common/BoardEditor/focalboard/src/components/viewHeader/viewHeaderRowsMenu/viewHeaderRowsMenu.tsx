@@ -7,6 +7,7 @@ import { useMemo, useState } from 'react';
 import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
+import { useTrashPages } from 'charmClient/hooks/pages';
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { useBatchUpdateProposalStatusOrStep } from 'components/proposals/hooks/useBatchUpdateProposalStatusOrStep';
 import { useProposals } from 'components/proposals/hooks/useProposals';
@@ -84,6 +85,7 @@ export function ViewHeaderRowsMenu({
   const { space } = useCurrentSpace();
   const [isDeleting, setIsDeleting] = useState(false);
   const { updateStatuses, updateSteps } = useBatchUpdateProposalStatusOrStep();
+  const { trigger: trashPages } = useTrashPages();
   const { showConfirmation } = useConfirmationModal();
   const { showError } = useSnackbar();
 
@@ -104,7 +106,7 @@ export function ViewHeaderRowsMenu({
       if (onDelete) {
         await onDelete(checkedIds);
       } else {
-        await mutator.deleteBlocks(checkedIds, 'delete cards');
+        await trashPages({ pageIds: checkedIds, trash: true });
       }
     } catch (error) {
       showError(error, 'There was an error deleting cards');

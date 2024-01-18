@@ -177,14 +177,6 @@ class CharmClient {
     return http.POST<PageWithPermissions>('/api/pages', pageOpts);
   }
 
-  archivePage(pageId: string) {
-    return http.PUT<ModifyChildPagesResponse>(`/api/pages/${pageId}/archive`, { archive: true });
-  }
-
-  restorePage(pageId: string) {
-    return http.PUT<ModifyChildPagesResponse>(`/api/pages/${pageId}/archive`, { archive: false });
-  }
-
   deletePageForever(pageId: string) {
     return http.DELETE<ModifyChildPagesResponse>(`/api/pages/${pageId}`);
   }

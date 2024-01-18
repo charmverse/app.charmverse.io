@@ -19,6 +19,7 @@ import { memo, useMemo, useState } from 'react';
 import useSWR, { mutate } from 'swr';
 
 import charmClient from 'charmClient';
+import { useTrashPages } from 'charmClient/hooks/pages';
 import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -90,6 +91,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
   const { showMessage } = useSnackbar();
   const { sendMessage } = useWebSocketClient();
   const dispatch = useAppDispatch();
+  const { trigger: trashPages } = useTrashPages();
 
   const { data: archivedPages = {}, mutate: setArchivedPages } = useSWR<PagesMap>(
     !space ? null : `archived-pages-${space?.id}`,
@@ -114,7 +116,11 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
           type: 'page_restored'
         });
       } else {
-        const { pageIds: restoredPageIds } = await charmClient.restorePage(pageId);
+        const result = await trashPages({ pageIds: [pageId], trash: false });
+        if (!result) {
+          return;
+        }
+        const restoredPageIds = result.pageIds;
         setArchivedPages((_archivedPages) => {
           if (!_archivedPages) {
             return {};

@@ -5,15 +5,15 @@ import type { AbstractWebsocketBroadcaster } from 'lib/websockets/interfaces';
 
 import { modifyChildPages } from './modifyChildPages';
 
-export async function archivePages({
-  archive,
+export async function trashPages({
+  trash,
   pageIds,
   userId,
   spaceId,
   emitPageStatusEvent = true,
   relay
 }: {
-  archive: boolean;
+  trash: boolean;
   pageIds: string[];
   userId: string;
   spaceId: string;
@@ -23,17 +23,17 @@ export async function archivePages({
   const modifiedChildPageIds: string[] = [];
 
   for (const pageId of pageIds) {
-    modifiedChildPageIds.push(...(await modifyChildPages(pageId, userId, archive ? 'archive' : 'restore')));
-    trackUserAction(archive ? 'archive_page' : 'restore_page', { userId, spaceId, pageId });
-    log.info(`User ${archive ? 'archived' : 'restored'} a page`, {
+    modifiedChildPageIds.push(...(await modifyChildPages(pageId, userId, trash ? 'trash' : 'restore')));
+    trackUserAction(trash ? 'archive_page' : 'restore_page', { userId, spaceId, pageId });
+    log.info(`User ${trash ? 'trashed' : 'restored'} a page`, {
       pageIds: modifiedChildPageIds,
       spaceId,
       userId
     });
   }
 
-  const deletedAt = archive ? new Date() : null;
-  const deletedBy = archive ? userId : null;
+  const deletedAt = trash ? new Date() : null;
+  const deletedBy = trash ? userId : null;
 
   relay.broadcast(
     {
@@ -46,7 +46,7 @@ export async function archivePages({
   if (emitPageStatusEvent) {
     relay.broadcast(
       {
-        type: archive ? 'pages_deleted' : 'pages_restored',
+        type: trash ? 'pages_deleted' : 'pages_restored',
         payload: modifiedChildPageIds.map((id) => ({ id }))
       },
       spaceId

@@ -8,7 +8,7 @@ import { Box, ButtonGroup, MenuItem, Stack, Tooltip, Typography, ListItemIcon, L
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef } from 'react';
 
-import charmClient from 'charmClient';
+import { useTrashPages } from 'charmClient/hooks/pages';
 import { Button } from 'components/common/Button';
 import { DeleteIcon } from 'components/common/Icons/DeleteIcon';
 import { EditIcon } from 'components/common/Icons/EditIcon';
@@ -51,6 +51,7 @@ export function NewProposalButton() {
   const buttonRef = useRef<HTMLDivElement>(null);
   const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
   const { proposalTemplates, isLoadingTemplates } = useProposalTemplates();
+  const { trigger: trashPages } = useTrashPages();
 
   const canCreateProposal = spacePermissions?.createProposals;
   // grab page data from context so that title is always up-to-date
@@ -65,7 +66,7 @@ export function NewProposalButton() {
     .filter(isTruthy);
 
   function deleteProposalTemplate(pageId: string) {
-    return charmClient.archivePage(pageId);
+    return trashPages({ pageIds: [pageId], trash: true });
   }
 
   function editTemplate(pageId: string) {

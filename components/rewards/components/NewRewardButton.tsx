@@ -3,7 +3,7 @@ import { ButtonGroup } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef, useState } from 'react';
 
-import charmClient from 'charmClient';
+import { useTrashPages } from 'charmClient/hooks/pages';
 import { Button } from 'components/common/Button';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
@@ -33,8 +33,9 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
   const [currentSpacePermissions] = useCurrentSpacePermissions();
   const { getFeatureTitle } = useSpaceFeatures();
 
+  const { trigger: trashPages } = useTrashPages();
   function deleteTemplate(pageId: string) {
-    return charmClient.archivePage(pageId);
+    return trashPages({ pageIds: [pageId], trash: true });
   }
 
   const isDisabled = !currentSpacePermissions?.createBounty;

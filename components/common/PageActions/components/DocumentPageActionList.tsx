@@ -49,6 +49,7 @@ export type PageActionMeta = Pick<
   | 'parentId'
   | 'path'
   | 'snapshotProposalId'
+  | 'syncWithPageId'
   | 'title'
   | 'type'
   | 'updatedAt'
@@ -314,7 +315,10 @@ export function DocumentPageActionList({
         </>
       )} */}
 
-      <DeleteMenuItem onClick={onDeletePage} disabled={!pagePermissions?.delete || page.deletedAt !== null} />
+      <DeleteMenuItem
+        onClick={onDeletePage}
+        disabled={!pagePermissions?.delete || page.deletedAt !== null || !!page.syncWithPageId}
+      />
       {pageType === 'proposal' && pageId && <ArchiveProposalAction proposalId={pageId} refreshPageOnChange />}
       {undoEditorChanges && (
         <UndoAction

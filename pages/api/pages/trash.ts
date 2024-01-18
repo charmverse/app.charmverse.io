@@ -4,52 +4,50 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import type { ModifyChildPagesResponse } from 'lib/pages';
-import { archivePages } from 'lib/pages/archivePages';
-import { PageNotFoundError } from 'lib/pages/server';
+import { trashPages } from 'lib/pages/trashPages';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
+import { InvalidInputError } from 'lib/utilities/errors';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .use(requireKeys(['archive'], 'body'))
+  .use(requireKeys(['pageIds', 'trash'], 'body'))
   .put(togglePageArchiveStatus);
 
 async function togglePageArchiveStatus(req: NextApiRequest, res: NextApiResponse<ModifyChildPagesResponse>) {
-  const pageId = req.query.id as string;
-  const { archive } = req.body as { archive: boolean };
+  const { trash, pageIds } = req.body as { trash: boolean; pageIds: string[] };
   const userId = req.session.user.id;
 
-  const pageSpaceId = await prisma.page.findUnique({
+  if (!pageIds || !Array.isArray(pageIds) || pageIds.length === 0) {
+    throw new InvalidInputError('pageIds must be an array');
+  }
+
+  for (const resourceId of pageIds) {
+    const permissions = await permissionsApiClient.pages.computePagePermissions({
+      resourceId,
+      userId
+    });
+    if (permissions.delete !== true) {
+      throw new ActionNotPermittedError(`You do not have permissions to ${trash ? 'delete' : 'restore'} this page`);
+    }
+  }
+  const { spaceId } = await prisma.page.findUniqueOrThrow({
     where: {
-      id: pageId
+      id: pageIds[0]
     },
     select: {
       spaceId: true
     }
   });
 
-  if (!pageSpaceId) {
-    throw new PageNotFoundError(pageId);
-  }
-
-  const permissions = await permissionsApiClient.pages.computePagePermissions({
-    resourceId: pageId,
-    userId
-  });
-
-  if (permissions.delete !== true) {
-    throw new ActionNotPermittedError(`You do not have permissions to ${archive ? 'delete' : 'restore'} this page`);
-  }
-
-  const { modifiedChildPageIds } = await archivePages({
-    archive,
-    pageIds: [pageId],
+  const { modifiedChildPageIds } = await trashPages({
+    trash,
+    pageIds,
     userId,
-    spaceId: pageSpaceId.spaceId,
-    emitPageStatusEvent: false,
+    spaceId,
     relay
   });
 
