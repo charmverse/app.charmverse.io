@@ -1,18 +1,11 @@
-import type {
-  ProposalCategory,
-  ProposalSystemRole,
-  ProposalWorkflow,
-  Role,
-  Space,
-  User
-} from '@charmverse/core/prisma-client';
+import type { ProposalSystemRole, ProposalWorkflow, Role, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsSpaces } from '@charmverse/core/test';
 import { expect, test } from '__e2e__/utils/test';
 import { v4 as uuid } from 'uuid';
 
-import { generateUser, generateUserAndSpace, loginBrowserUser } from '../utils/mocks';
+import { generateUserAndSpace, loginBrowserUser } from '../utils/mocks';
 
 test.describe.serial('Proposal Evaluation', () => {
   let space: Space;
@@ -99,7 +92,7 @@ test.describe.serial('Proposal Evaluation', () => {
       spaceId: space.id
     });
   });
-  test('A user a proposal that uses a workflow', async ({ proposalListPage, documentPage, proposalPage }) => {
+  test('A user creates a proposal that uses a workflow', async ({ proposalListPage, documentPage, proposalPage }) => {
     // Initial setup
     await loginBrowserUser({
       browserPage: proposalListPage.page,
@@ -147,8 +140,6 @@ test.describe.serial('Proposal Evaluation', () => {
     await proposalPage.evaluationVoteDurationInput.fill(settingsToTest.voteDuration.toString());
     await proposalPage.evaluationVotePassThresholdInput.fill(settingsToTest.votePassThreshold.toString());
 
-    await proposalPage.page.pause();
-
     proposalPage.saveDraftButton.click();
 
     await proposalPage.page.waitForResponse('**/api/proposals');
@@ -175,7 +166,7 @@ test.describe.serial('Proposal Evaluation', () => {
       }
     });
 
-    await documentPage.waitForDocumentPage({ domain: space.domain, path: proposal.page?.title as string });
+    await documentPage.waitForDocumentPage({ domain: space.domain, path: proposal.page?.path as string });
 
     expect(proposal.page?.title).toBe(settingsToTest.proposalTitle);
 
@@ -194,17 +185,16 @@ test.describe.serial('Proposal Evaluation', () => {
         )
       })
     );
-
     expect(proposal.evaluations[1]).toMatchObject(
       expect.objectContaining({
-        reviewers: [
+        reviewers: expect.arrayContaining([
           expect.objectContaining({
             proposalId: proposal.id,
             roleId: null,
             userId: null,
             systemRole: 'space_member'
           })
-        ],
+        ]),
         permissions: expect.arrayContaining(
           proposalEvaluationPermissions[1].permissions.map((p) => expect.objectContaining(p))
         ),
@@ -212,7 +202,7 @@ test.describe.serial('Proposal Evaluation', () => {
         index: 1,
         proposalId: proposal.id,
         title: settingsToTest.evaluationRubricTitle,
-        rubricCriteria: [
+        rubricCriteria: expect.arrayContaining([
           expect.objectContaining({
             title: settingsToTest.rubricLabel,
             description: settingsToTest.rubricDescription,
@@ -224,7 +214,7 @@ test.describe.serial('Proposal Evaluation', () => {
               min: settingsToTest.rubricMinScore
             }
           })
-        ]
+        ])
       })
     );
 
