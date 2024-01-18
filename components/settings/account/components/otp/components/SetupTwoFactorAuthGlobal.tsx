@@ -1,3 +1,5 @@
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect } from 'react';
 
@@ -32,5 +34,18 @@ export function SetupTwoFactorAuthGlobal() {
 
   const onClose = activeOtp && spaceRequiresOtp ? otpSetupModal.close : undefined;
 
-  return <TwoFactorAuthSetupModal {...bindPopover(otpSetupModal)} onClose={onClose} />;
+  return (
+    <TwoFactorAuthSetupModal
+      {...bindPopover(otpSetupModal)}
+      onClose={onClose}
+      title={
+        <Box>
+          <Typography variant='h5' mb={1}>
+            Secure your account
+          </Typography>
+          <Typography variant='body2'>This space requires two factor authentication</Typography>
+        </Box>
+      }
+    />
+  );
 }
