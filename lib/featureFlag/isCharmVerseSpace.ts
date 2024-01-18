@@ -1,15 +1,17 @@
 import type { Space } from '@charmverse/core/prisma-client';
 
-import { isDevEnv } from 'config/constants';
+import { isDevEnv, isProdEnv, isTestEnv } from 'config/constants';
 
 export const defaultDomains = ['charmverse'];
 
 export function isCharmVerseSpace({
   space,
-  allowedDomains = defaultDomains
+  allowedDomains = defaultDomains,
+  alwaysTrueInTestEnv
 }: {
   space: Pick<Space, 'domain'> | undefined;
   allowedDomains?: string[];
+  alwaysTrueInTestEnv?: boolean;
 }): boolean {
   if (!space) {
     return false;
@@ -20,6 +22,10 @@ export function isCharmVerseSpace({
     return true;
   }
 
+  if (isProdEnv) {
+    return false;
+  }
+
   // enable in dev mode
-  return isDevEnv;
+  return isDevEnv || (!!alwaysTrueInTestEnv && isTestEnv);
 }

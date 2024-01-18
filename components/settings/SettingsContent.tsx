@@ -14,6 +14,7 @@ import Link from 'components/common/Link';
 import { SectionName } from 'components/common/PageLayout/components/Sidebar/components/SectionName';
 import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/components/SidebarButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import type { SettingsPath } from 'hooks/useSettingsDialog';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
@@ -87,6 +88,8 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
   const { memberSpaces } = useSpaces();
   const { mappedFeatures } = useSpaceFeatures();
 
+  const showCredentialsTab = useIsCharmverseSpace();
+
   const isSpaceSettingsVisible = !!memberSpaces.find((s) => s.name === currentSpace?.name);
 
   const { subscriptionEnded, hasPassedBlockQuota } = useSpaceSubscription();
@@ -122,7 +125,7 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
         )}
         {currentSpace &&
           isSpaceSettingsVisible &&
-          SPACE_SETTINGS_TABS.map((tab) => (
+          SPACE_SETTINGS_TABS.filter((tab) => (showCredentialsTab ? true : tab.path !== 'credentials')).map((tab) => (
             <SidebarLink
               data-test={`space-settings-tab-${tab.path}`}
               key={tab.path}
