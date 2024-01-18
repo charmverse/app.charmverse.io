@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { copyAllPagePermissions } from '@charmverse/core/permissions';
 import type { Block, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
@@ -333,6 +334,8 @@ async function deleteBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) 
       }
     }
   });
+
+  log.info('User deleted blocks', { count: blocks.length, spaceId: spaceIds[0], userId });
 
   return res.status(200).json(blocks);
 }
