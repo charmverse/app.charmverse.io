@@ -20,6 +20,43 @@ export async function issueProposalCredentialsIfNecessary({
   proposalId: string;
   event: CredentialEventType;
 }): Promise<void> {
+  const baseProposal = await prisma.proposal.findFirstOrThrow({
+    where: {
+      id: proposalId,
+      page: {
+        type: 'proposal'
+      }
+    },
+    select: {
+      selectedCredentialTemplates: true,
+      status: true,
+      evaluations: {
+        orderBy: {
+          index: 'asc'
+        }
+      }
+    }
+  });
+
+  if (baseProposal.status === 'draft') {
+    return;
+  }
+  if (!baseProposal.selectedCredentialTemplates?.length) {
+    return;
+  }
+  if (event === 'proposal_approved') {
+    const currentEvaluation = getCurrentEvaluation(baseProposal.evaluations);
+
+    if (!currentEvaluation) {
+      return;
+    } else if (
+      currentEvaluation.id !== baseProposal.evaluations[baseProposal.evaluations.length - 1].id ||
+      currentEvaluation.result !== 'pass'
+    ) {
+      return;
+    }
+  }
+
   const proposalWithSpaceConfig = await prisma.proposal.findFirstOrThrow({
     where: {
       id: proposalId,
@@ -35,11 +72,6 @@ export async function issueProposalCredentialsIfNecessary({
           id: true
         }
       },
-      evaluations: {
-        orderBy: {
-          index: 'asc'
-        }
-      },
       authors: true,
       space: {
         select: {
@@ -51,28 +83,8 @@ export async function issueProposalCredentialsIfNecessary({
     }
   });
 
-  if (proposalWithSpaceConfig.status === 'draft') {
-    return;
-  }
-  if (event === 'proposal_approved') {
-    const currentEvaluation = getCurrentEvaluation(proposalWithSpaceConfig.evaluations);
-
-    if (!currentEvaluation) {
-      return;
-    } else if (
-      currentEvaluation.id !== proposalWithSpaceConfig.evaluations[proposalWithSpaceConfig.evaluations.length - 1].id ||
-      currentEvaluation.result !== 'pass'
-    ) {
-      return;
-    }
-  }
-
   if (!proposalWithSpaceConfig.space.credentialEvents.includes(event)) {
     // Space doesn't want to issue credentials for this event
-    return;
-  }
-
-  if (!proposalWithSpaceConfig.selectedCredentialTemplates?.length) {
     return;
   }
 
