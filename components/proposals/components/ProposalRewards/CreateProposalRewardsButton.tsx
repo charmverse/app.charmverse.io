@@ -1,4 +1,4 @@
-import { useCreateProposalRewards, useGetProposalDetails } from 'charmClient/hooks/proposals';
+import { useCreateProposalRewards } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useRewards } from 'components/rewards/hooks/useRewards';
@@ -10,8 +10,7 @@ type Props = {
 
 export function CreateProposalRewardsButton({ proposalId }: Props) {
   const { trigger, isMutating } = useCreateProposalRewards(proposalId);
-  const { refreshProposal } = useProposals();
-  const { mutate } = useGetProposalDetails(proposalId);
+  const { mutateProposals } = useProposals();
   const { showMessage } = useSnackbar();
   const { mutateRewards } = useRewards();
 
@@ -19,8 +18,7 @@ export function CreateProposalRewardsButton({ proposalId }: Props) {
     await trigger();
     showMessage('Rewards created', 'success');
 
-    mutate();
-    refreshProposal(proposalId);
+    mutateProposals();
     mutateRewards();
   };
 

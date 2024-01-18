@@ -512,7 +512,7 @@ export async function updateCardsFromProposals({
 
       const formFields = pageWithProposal.proposal?.form?.formFields ?? [];
 
-      const formFieldProperties = await updateCardFormFieldPropertiesValue({
+      const formFieldProperties = updateCardFormFieldPropertiesValue({
         accessPrivateFields,
         cardProperties: boardBlockCardProperties,
         formFields,
