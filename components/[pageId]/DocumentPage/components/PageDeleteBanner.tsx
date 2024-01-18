@@ -51,10 +51,10 @@ export default function PageDeleteBanner({ pageType, pageId }: { pageType: PageT
     }
   }
 
-  async function deletePage() {
+  async function deletePageForever() {
     try {
       setIsMutating(true);
-      await charmClient.deletePage(pageId);
+      await charmClient.deletePageForever(pageId);
       const path = Object.values(pages).find((page) => page?.type !== 'card' && !page?.deletedAt)?.path;
       if (path) {
         await navigateToSpacePath(`/${path}`);
@@ -94,7 +94,7 @@ export default function PageDeleteBanner({ pageType, pageId }: { pageType: PageT
             data-test='banner--permanently-delete'
             color={'white' as any}
             disabled={isMutating}
-            onClick={canDeleteOrRestore ? deletePage : undefined}
+            onClick={canDeleteOrRestore ? deletePageForever : undefined}
             variant='outlined'
             size='small'
           >

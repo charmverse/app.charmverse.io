@@ -331,22 +331,22 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
         })}
       >
         {!!page?.deletedAt && (
-          <AlertContainer showPageActionSidebar={showPageActionSidebar}>
+          <AlertContainer>
             <PageDeleteBanner pageType={page.type} pageId={page.id} />
           </AlertContainer>
         )}
         {connectionError && (
-          <AlertContainer showPageActionSidebar={showPageActionSidebar}>
+          <AlertContainer>
             <PageConnectionBanner />
           </AlertContainer>
         )}
         {page?.convertedProposalId && (
-          <AlertContainer showPageActionSidebar={showPageActionSidebar}>
+          <AlertContainer>
             <ProposalBanner type='page' proposalId={page.convertedProposalId} />
           </AlertContainer>
         )}
         {board?.fields.sourceType && (
-          <AlertContainer showPageActionSidebar={showPageActionSidebar}>
+          <AlertContainer>
             <SyncedPageBanner pageId={page.syncWithPageId} source={board.fields.sourceType} />
           </AlertContainer>
         )}

@@ -136,7 +136,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
   async function deletePage(pageId: string) {
     const currentPage = currentPagePath ? getPageByPath(currentPagePath) : null;
 
-    const { pageIds: deletePageIds } = await charmClient.deletePage(pageId);
+    const { pageIds: deletePageIds } = await charmClient.deletePageForever(pageId);
     setArchivedPages((_archivedPages) => {
       if (!_archivedPages) {
         return {};

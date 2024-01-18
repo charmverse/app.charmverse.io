@@ -109,7 +109,7 @@ export function RewardsPage({ title }: { title: string }) {
   }
 
   const onDelete = useCallback(async (rewardId: string) => {
-    await charmClient.deletePage(rewardId);
+    await charmClient.archivePage(rewardId);
   }, []);
 
   const showRewardOrApplication = (id: string | null, rewardId?: string) => {

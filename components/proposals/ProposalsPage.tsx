@@ -27,6 +27,7 @@ import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { usePages } from 'hooks/usePages';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 
@@ -42,6 +43,7 @@ export function ProposalsPage({ title }: { title: string }) {
   const canSeeProposals = hasAccess || isFreeSpace || currentSpace?.publicProposals === true;
   const { navigateToSpacePath, updateURLQuery } = useCharmRouter();
   const isAdmin = useIsAdmin();
+  const { showError } = useSnackbar();
   const { user } = useUser();
   const { board: activeBoard, views, cardPages, activeView, cards } = useProposalsBoard();
   const [showSidebar, setShowSidebar] = useState(false);
@@ -68,18 +70,25 @@ export function ProposalsPage({ title }: { title: string }) {
     navigateToSpacePath(`/${pageId}`);
   }
 
-  const onDelete = useCallback(async (proposalId: string) => {
-    await charmClient.deletePage(proposalId);
-  }, []);
+  const onDelete = useCallback(
+    async (proposalId: string) => {
+      try {
+        await charmClient.archivePage(proposalId);
+      } catch (error) {
+        showError(error, 'Could not archive page');
+      }
+    },
+    [showError]
+  );
 
   async function deleteProposals(pageIds: string[]) {
     for (const pageId of pageIds) {
       const proposalId = pages[pageId]?.proposalId;
       if (proposalId) {
         try {
-          await charmClient.deletePage(proposalId);
-        } catch (err) {
-          //
+          await charmClient.archivePage(pageId);
+        } catch (error) {
+          showError(error, 'Could not archive pages');
         }
       }
     }

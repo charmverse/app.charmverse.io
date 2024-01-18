@@ -34,7 +34,7 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
   const { getFeatureTitle } = useSpaceFeatures();
 
   function deleteTemplate(pageId: string) {
-    return charmClient.deletePage(pageId);
+    return charmClient.archivePage(pageId);
   }
 
   const isDisabled = !currentSpacePermissions?.createBounty;

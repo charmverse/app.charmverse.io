@@ -13,12 +13,14 @@ export function SelectPropertyTemplateMenu({
   board,
   cards,
   propertyTemplate,
-  onChange
+  onChange,
+  lastChild
 }: {
   board: Board;
   cards: Card[];
   propertyTemplate: IPropertyTemplate<PropertyType>;
   onChange?: VoidFunction;
+  lastChild: boolean;
 }) {
   const propertyValue = cards[0].fields.properties[propertyTemplate.id];
 
@@ -44,7 +46,7 @@ export function SelectPropertyTemplateMenu({
   };
 
   return (
-    <PropertyMenu cards={cards} propertyTemplate={propertyTemplate}>
+    <PropertyMenu lastChild={lastChild} cards={cards} propertyTemplate={propertyTemplate}>
       <Box
         sx={{
           minWidth: 100,

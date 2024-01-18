@@ -65,7 +65,7 @@ export function NewProposalButton() {
     .filter(isTruthy);
 
   function deleteProposalTemplate(pageId: string) {
-    return charmClient.deletePage(pageId);
+    return charmClient.archivePage(pageId);
   }
 
   function editTemplate(pageId: string) {
