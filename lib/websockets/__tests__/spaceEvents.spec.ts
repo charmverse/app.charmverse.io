@@ -322,14 +322,6 @@ describe('page_restored event handler', () => {
     expect(relayBroadcastMockFn).toHaveBeenNthCalledWith(
       1,
       {
-        type: 'pages_meta_updated',
-        payload: [{ id: childPages[0].id, deletedAt: null, spaceId: parentPage.spaceId, deletedBy: null }]
-      },
-      parentPage.spaceId
-    );
-    expect(relayBroadcastMockFn).toHaveBeenNthCalledWith(
-      2,
-      {
         type: 'pages_restored',
         payload: [{ id: childPages[0].id }]
       },
@@ -383,14 +375,6 @@ describe('page_restored event handler', () => {
     expect(socketEmitMockFn).not.toHaveBeenCalled();
     expect(relayBroadcastMockFn).toHaveBeenNthCalledWith(
       1,
-      {
-        type: 'pages_meta_updated',
-        payload: [{ id: childPages[0].id, deletedAt: null, spaceId: parentPage.spaceId, deletedBy: null }]
-      },
-      parentPage.spaceId
-    );
-    expect(relayBroadcastMockFn).toHaveBeenNthCalledWith(
-      2,
       {
         type: 'pages_restored',
         payload: [{ id: childPages[0].id }]
