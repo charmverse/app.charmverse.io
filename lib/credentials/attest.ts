@@ -83,10 +83,7 @@ export type CharmVerseCredentialInput = {
 
 export type SignedAttestation = {
   sig: SignedOffchainAttestation;
-  signer: {
-    wallet: string;
-    ensname: string | null;
-  };
+  signer: string;
   verificationUrl: string;
   credentialData: CredentialData;
   recipient: string;
@@ -115,14 +112,9 @@ export async function signCharmverseAttestation({
     pkg: { sig: signature, signer: wallet.address }
   });
 
-  const signerEnsName = await getENSName(wallet.address);
-
   const signedCredential: SignedAttestation = {
     sig: signature,
-    signer: {
-      wallet: wallet.address,
-      ensname: signerEnsName
-    },
+    signer: wallet.address,
     verificationUrl: offchainCredentialVerificationUrl,
     credentialData: credential,
     recipient,
@@ -145,7 +137,7 @@ export async function signAndPublishCharmverseCredential({
     timestamp: new Date(signedCredential.timestamp),
     type: credential.type,
     verificationUrl: signedCredential.verificationUrl,
-    issuer: signedCredential.signer.wallet,
+    issuer: signedCredential.signer,
     schemaId: getAttestationSchemaId({ chainId, credentialType: credential.type }),
     sig: JSON.stringify(signedCredential.sig)
   };
