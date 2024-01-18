@@ -3,6 +3,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
 import { Button } from 'components/common/Button';
+import { LabelWithCopy } from 'components/settings/space/components/LabelWithCopy';
 
 type Props = {
   recoveryCode?: string;
@@ -18,9 +19,9 @@ export function BackupCodes({ recoveryCode, errorMessage, loading, onSubmit }: P
 
   return (
     <Box>
-      <Typography>Backup Codes</Typography>
+      <Typography mb={2}>Backup Codes</Typography>
       <Typography mb={2}>Save this single-use backup code in a safe place.</Typography>
-      <Typography mb={2}>{recoveryCode}</Typography>
+      <LabelWithCopy label={recoveryCode} copyText='Copy backup code' variant='body1' mb={2} />
       <Typography mb={2}>
         The backup code lets you log in to CharmVerse if you don't have access to your authenticator app.
       </Typography>
