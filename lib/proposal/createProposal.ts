@@ -48,7 +48,7 @@ export type CreateProposalInput = {
   formAnswers?: FieldAnswerInput[];
   formId?: string;
   isDraft?: boolean;
-  credentialTemplateId?: string;
+  selectedCredentialTemplates?: string[];
 };
 
 export type CreatedProposal = {
@@ -69,7 +69,7 @@ export async function createProposal({
   formFields,
   formAnswers,
   isDraft,
-  credentialTemplateId
+  selectedCredentialTemplates
 }: CreateProposalInput) {
   const proposalId = uuid();
   const proposalStatus: ProposalStatus = isDraft ? 'draft' : 'published';
@@ -141,7 +141,7 @@ export async function createProposal({
         id: proposalId,
         space: { connect: { id: spaceId } },
         status: proposalStatus,
-        credentialTemplate: credentialTemplateId ? { connect: { id: credentialTemplateId } } : undefined,
+        selectedCredentialTemplates,
         authors: {
           createMany: {
             data: authorsList.map((author) => ({ userId: author }))

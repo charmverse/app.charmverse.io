@@ -183,7 +183,6 @@ export function NewProposalPage({
         proposalTemplateId: _templateId,
         headerImage: template.page.headerImage,
         icon: template.page.icon,
-        evaluationType: template.evaluationType,
         evaluations: template.evaluations,
         fields: template.fields || {},
         type: proposalPageType,

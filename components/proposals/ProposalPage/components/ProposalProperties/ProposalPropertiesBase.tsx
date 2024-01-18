@@ -26,12 +26,11 @@ export type ProposalPropertiesInput = {
   reviewers: ProposalReviewerInput[];
   workflowId?: string | null;
   proposalTemplateId?: string | null;
-  evaluationType: ProposalEvaluationType;
   evaluations: ProposalEvaluationValues[];
   publishToLens?: boolean;
   fields: ProposalFields | null;
   type: PageType;
-  credentialTemplateId?: string | null;
+  selectedCredentialTemplates?: string[];
   archived?: boolean;
 };
 
@@ -129,10 +128,10 @@ export function ProposalPropertiesBase({
                 showEmptyPlaceholder
               />
               <CredentialSelect
-                selectedCredentialId={proposalFormInputs.credentialTemplateId as string}
-                onChange={(credentialTemplateId) =>
+                selectedCredentialTemplates={proposalFormInputs.selectedCredentialTemplates}
+                onChange={(selectedCredentialTemplates) =>
                   setProposalFormInputs({
-                    credentialTemplateId
+                    selectedCredentialTemplates
                   })
                 }
               />

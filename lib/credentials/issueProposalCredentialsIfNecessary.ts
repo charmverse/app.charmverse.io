@@ -1,10 +1,11 @@
+import { DataNotFoundError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { CredentialEventType, CredentialTemplate } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { optimism } from 'viem/chains';
 
-import { baseUrl } from 'config/constants';
+import { getPagePermalink } from 'lib/pages/getPagePermalink';
 
 import { signAndPublishCharmverseCredential } from './attest';
 
@@ -83,6 +84,10 @@ export async function issueProposalCredentialsIfNecessary({
     }
   });
 
+  if (!proposalWithSpaceConfig.page) {
+    throw new DataNotFoundError(`Proposal with id ${proposalId} has no matching page`);
+  }
+
   if (!proposalWithSpaceConfig.space.credentialEvents.includes(event)) {
     // Space doesn't want to issue credentials for this event
     return;
@@ -156,7 +161,7 @@ export async function issueProposalCredentialsIfNecessary({
               organization: credentialTemplate.organization,
               // TODO - Add label mapping
               status: labels[event],
-              url: `${baseUrl}/permalink/${proposalWithSpaceConfig.page!.id}`
+              url: getPagePermalink({ pageId: proposalWithSpaceConfig.page.id })
             }
           }
         });

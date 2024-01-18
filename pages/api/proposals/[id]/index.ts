@@ -146,7 +146,7 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
     authors,
     publishToLens,
     fields,
-    credentialTemplateId: req.body.credentialTemplateId,
+    selectedCredentialTemplates: req.body.selectedCredentialTemplates,
     actorId: userId
   });
 

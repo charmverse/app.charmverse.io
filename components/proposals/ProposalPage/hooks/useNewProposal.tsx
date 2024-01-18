@@ -66,7 +66,8 @@ export function useNewProposal({ newProposal }: Props) {
         formId: formInputs.formId,
         formAnswers: formInputs.formAnswers,
         workflowId: formInputs.workflowId || undefined,
-        isDraft
+        isDraft,
+        selectedCredentialTemplates: formInputs.selectedCredentialTemplates ?? []
       }).catch((err: any) => {
         showMessage(err.message ?? 'Something went wrong', 'error');
         throw err;
@@ -161,13 +162,13 @@ function emptyState({
     contentText: '',
     headerImage: null,
     icon: null,
-    evaluationType: 'vote',
     proposalTemplateId: null,
     reviewers: [],
     evaluations: [],
     title: '',
     type: 'proposal',
     publishToLens: false,
+    selectedCredentialTemplates: [],
     fields: { properties: {} },
     ...inputs,
     authors: userId ? [userId] : []

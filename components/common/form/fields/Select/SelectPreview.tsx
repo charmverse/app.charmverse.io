@@ -41,7 +41,7 @@ export function SelectPreview({
           {name}
         </Typography>
       )}
-      <Tooltip title={readOnlyMessage ?? null}>
+      <Tooltip title={readOnly ? readOnlyMessage : null}>
         <Stack
           display='inline-flex'
           width='fit-content'

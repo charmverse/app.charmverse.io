@@ -62,7 +62,6 @@ export function ProposalProperties({
 
   const proposalFormInputs: ProposalPropertiesInput = {
     archived: proposal?.archived ?? false,
-    evaluationType: proposal?.evaluationType || 'vote',
     authors: proposal?.authors.map((author) => author.userId) ?? [],
     evaluations: proposal?.evaluations ?? [],
     publishToLens: proposal ? proposal.publishToLens ?? false : !!user?.publishToLensDefault,
@@ -73,7 +72,7 @@ export function ProposalProperties({
       })) ?? [],
     type: proposalPage.type,
     fields: typeof proposal?.fields === 'object' && !!proposal?.fields ? proposal.fields : { properties: {} },
-    credentialTemplateId: proposal?.credentialTemplateId
+    selectedCredentialTemplates: proposal?.selectedCredentialTemplates
   };
 
   async function onChangeProperties(values: Partial<ProposalPropertiesInput>) {

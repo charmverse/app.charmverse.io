@@ -10,7 +10,7 @@ export type UpdateProposalRequest = {
   authors?: string[];
   publishToLens?: boolean;
   fields?: ProposalFields | null;
-  credentialTemplateId?: string | null;
+  selectedCredentialTemplates?: string[];
 };
 
 export async function updateProposal({
@@ -18,7 +18,7 @@ export async function updateProposal({
   authors,
   publishToLens,
   fields,
-  credentialTemplateId,
+  selectedCredentialTemplates,
   actorId
 }: UpdateProposalRequest & { actorId: string }) {
   if (authors && authors.length === 0) {
@@ -37,18 +37,13 @@ export async function updateProposal({
       });
     }
 
-    const updatingCredentialTemplate = typeof credentialTemplateId === 'string' || credentialTemplateId === null;
-
-    if (updatingCredentialTemplate) {
+    if (selectedCredentialTemplates) {
       await tx.proposal.update({
         where: {
           id: proposalId
         },
         data: {
-          credentialTemplate:
-            credentialTemplateId === '' || credentialTemplateId === null
-              ? { disconnect: {} }
-              : { connect: { id: credentialTemplateId } }
+          selectedCredentialTemplates
         }
       });
     }

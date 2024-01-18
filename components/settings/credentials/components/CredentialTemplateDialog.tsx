@@ -52,8 +52,8 @@ function CredentialTemplateForm({
   } = useForm<FormValues>({
     defaultValues: {
       organization: credentialTemplate?.organization ?? space?.name,
-      name: credentialTemplate?.name ?? 'Season 5',
-      description: credentialTemplate?.description ?? 'Participated in season 5 of our RFG scheme'
+      name: credentialTemplate?.name,
+      description: credentialTemplate?.description
     },
     // mode: 'onChange',
     resolver: yupResolver(schema)
@@ -112,6 +112,7 @@ function CredentialTemplateForm({
               {...register('name')}
               fullWidth
               autoFocus
+              placeholder='Season 5'
               error={!!errors.name}
               helperText={errors.name?.message}
               onChange={onChange}
@@ -121,6 +122,7 @@ function CredentialTemplateForm({
             <InputLabel>Description</InputLabel>
             <TextField
               {...register('description')}
+              placeholder='Participated in RPGF Season 5'
               fullWidth
               autoFocus
               error={!!errors.description}
