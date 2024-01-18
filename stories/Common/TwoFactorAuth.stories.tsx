@@ -51,7 +51,7 @@ export function ResetRecoveryCodeModalStory() {
 
 export function TwoFactorAuthSetupModalStory() {
   return (
-    <TwoFactorAuthProvider onClose={() => {}}>
+    <TwoFactorAuthProvider>
       <ShowModal modal='TwoFactorAuthSetupModal' />
     </TwoFactorAuthProvider>
   );
