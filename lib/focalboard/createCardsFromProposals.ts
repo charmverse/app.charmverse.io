@@ -282,12 +282,12 @@ export async function createCardsFromProposals({
           step: evaluation,
           templates: boardBlock.fields.cardProperties,
           properties,
-          rubricAnswers: mappedRubricAnswersByProposal[
-            pageProposal.proposal!.id
-          ] as ProposalRubricCriteriaAnswerWithTypedResponse[],
-          rubricCriteria: mappedRubricCriteriaByProposal[
-            pageProposal.proposal!.id
-          ] as ProposalRubricCriteriaWithTypedParams[]
+          rubricAnswers:
+            (mappedRubricAnswersByProposal[
+              pageProposal.proposal!.id
+            ] as ProposalRubricCriteriaAnswerWithTypedResponse[]) ?? [],
+          rubricCriteria:
+            (mappedRubricCriteriaByProposal[pageProposal.proposal!.id] as ProposalRubricCriteriaWithTypedParams[]) ?? []
         });
       }
     });

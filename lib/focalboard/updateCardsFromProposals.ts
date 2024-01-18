@@ -130,17 +130,6 @@ export async function updateCardsFromProposals({
     });
   }
 
-  const views = await prisma.block.findMany({
-    select: {
-      fields: true,
-      id: true
-    },
-    where: {
-      type: 'view',
-      parentId: boardId
-    }
-  });
-
   const updatedBoardBlock = await prisma.block.findFirstOrThrow({
     where: {
       id: boardId,
@@ -170,6 +159,16 @@ export async function updateCardsFromProposals({
 
   // Add the newly added proposal properties to all the view blocks visiblePropertyIds
   if (newlyAddedProposalProperties.length) {
+    const views = await prisma.block.findMany({
+      select: {
+        fields: true,
+        id: true
+      },
+      where: {
+        type: 'view',
+        parentId: boardId
+      }
+    });
     await prisma.$transaction(
       views.map((block) => {
         return prisma.block.update({
@@ -419,8 +418,8 @@ export async function updateCardsFromProposals({
             const answers = mappedRubricAnswersByProposal[pageWithProposal.id] ?? [];
             properties = generateResyncedProposalEvaluationForCard({
               properties,
-              rubricAnswers: answers as ProposalRubricCriteriaAnswerWithTypedResponse[],
-              rubricCriteria: criteria as ProposalRubricCriteriaWithTypedParams[],
+              rubricAnswers: (answers as ProposalRubricCriteriaAnswerWithTypedResponse[]) ?? [],
+              rubricCriteria: (criteria as ProposalRubricCriteriaWithTypedParams[]) ?? [],
               step: {
                 id: evaluation.id,
                 title: evaluation.title
