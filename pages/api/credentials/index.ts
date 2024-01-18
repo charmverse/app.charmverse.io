@@ -4,16 +4,19 @@ import nc from 'next-connect';
 import { isProdEnv } from 'config/constants';
 import type { CharmVerseCredentialInput } from 'lib/credentials/attest';
 import { signAndPublishCharmverseCredential } from 'lib/credentials/attest';
-import { getCredentialsByRecipient } from 'lib/credentials/queriesAndMutations';
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { getCredentialsByUserId } from 'lib/credentials/queriesAndMutations';
+import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).get(getCredentialsController).post(attestController);
+handler
+  .use(requireUser)
+  .get(requireKeys(['userId'], 'query'), getCredentialsController)
+  .post(attestController);
 
 async function getCredentialsController(req: NextApiRequest, res: NextApiResponse) {
-  const credentials = await getCredentialsByRecipient({ recipient: req.query.account as string });
+  const credentials = await getCredentialsByUserId({ userId: req.query.userId as string });
   return res.status(200).json(credentials);
 }
 

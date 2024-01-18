@@ -141,7 +141,7 @@ export async function signAndPublishCharmverseCredential({
   const contentToPublish: Omit<PublishedSignedCredential, 'author' | 'id'> = {
     chainId,
     recipient: signedCredential.recipient,
-    content: JSON.stringify(credential.data),
+    content: credential.data,
     timestamp: new Date(signedCredential.timestamp),
     type: credential.type,
     verificationUrl: signedCredential.verificationUrl,

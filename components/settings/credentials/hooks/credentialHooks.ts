@@ -4,9 +4,9 @@ import type { MaybeString } from 'charmClient/hooks/helpers';
 import { useGET } from 'charmClient/hooks/helpers';
 import type { PublishedSignedCredential } from 'lib/credentials/queriesAndMutations';
 
-export function useGetUserCredentials(data: { account: MaybeString }) {
-  return useGET<PublishedSignedCredential[]>(data.account ? '/api/credentials' : null, data);
+export function useGetUserCredentials({ userId }: { userId: MaybeString }) {
+  return useGET<PublishedSignedCredential[]>(userId ? `/api/credentials` : null, { userId });
 }
 export function useGetCredentialTemplates({ spaceId }: { spaceId: MaybeString }) {
-  return useGET<CredentialTemplate[]>(spaceId ? `/api/credentials/templates?spaceId=${spaceId}` : null);
+  return useGET<CredentialTemplate[]>(spaceId ? '/api/credentials/templates' : null, { spaceId });
 }

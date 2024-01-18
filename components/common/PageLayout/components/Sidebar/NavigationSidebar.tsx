@@ -300,15 +300,6 @@ export function NavigationSidebar({ closeSidebar, navAction }: SidebarProps) {
 
                       return null;
                     })}
-                  <SidebarLink
-                    key='credentials'
-                    href={`/${space.domain}/credentials`}
-                    active={router.pathname.startsWith(`/[domain]/credentials`)}
-                    icon={<PageIcon icon={null} />}
-                    label='Credentials'
-                    onClick={navAction}
-                    data-test='sidebar-link-credentials'
-                  />
                 </>
               )}
             </Box>

@@ -7,13 +7,13 @@ import type { Member } from 'lib/members/interfaces';
 import type { LoggedInUser } from 'models';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
 
+import { UserCredentialsList } from './UserCredentials/UserCredentialsList';
 import { UserSpacesList } from './UserSpacesList/UserSpacesList';
 
 export function ProfileTabs(props: { user: Member | PublicUser | LoggedInUser; readOnly?: boolean }) {
   const { readOnly } = props;
 
   const [activeTab, setActiveTab] = useState(0);
-
   return (
     <MultiTabs
       activeTab={activeTab}
@@ -26,7 +26,8 @@ export function ProfileTabs(props: { user: Member | PublicUser | LoggedInUser; r
             <UserSpacesList userId={props.user.id} />
           </Stack>,
           { sx: { px: 0 } }
-        ]
+        ],
+        ['Credentials', <UserCredentialsList key='credentials' userId={props.user.id} />]
       ]}
     />
   );
