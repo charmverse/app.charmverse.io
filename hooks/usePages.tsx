@@ -157,22 +157,6 @@ export function PagesProvider({ children }: { children: ReactNode }) {
           );
         }
 
-        // Delete the page associated with the card
-        _setPages((_pages) => {
-          pageIds.forEach((_pageId) => {
-            _pages[_pageId] = {
-              ..._pages[_pageId],
-              deletedBy: user.id,
-              deletedAt: new Date()
-            } as PageMeta;
-          });
-          // If a new page was created add that to state
-          if (newPage) {
-            _pages[newPage.id] = newPage;
-          }
-          return { ..._pages };
-        });
-
         return newPage;
       }
     }

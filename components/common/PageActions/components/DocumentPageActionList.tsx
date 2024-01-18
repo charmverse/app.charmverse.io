@@ -4,7 +4,6 @@ import styled from '@emotion/styled';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
-import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { List, ListItemButton, ListItemText, Switch } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
@@ -124,8 +123,6 @@ export function DocumentPageActionList({
   const { setActiveView } = usePageSidebar();
   const pageType = page.type;
   const isExportablePage = documentTypes.includes(pageType as PageType);
-  const [spacePermissions] = useCurrentSpacePermissions();
-  const canCreateProposal = spacePermissions?.createProposals;
   const basePageBounty = rewards?.find((r) => r.id === pageId);
   function setPageProperty(prop: Partial<PageUpdates>) {
     updatePage({
