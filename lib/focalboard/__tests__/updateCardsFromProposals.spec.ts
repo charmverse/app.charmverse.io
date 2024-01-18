@@ -173,7 +173,7 @@ describe('updateCardsFromProposals()', () => {
 
     expect(newCreatedCard).toBeNull();
   });
-  it('should not create cards from archived or deleted proposals', async () => {
+  it('should not create cards from archived proposals', async () => {
     // populate board view
     await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
 
