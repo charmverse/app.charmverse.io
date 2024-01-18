@@ -400,7 +400,7 @@ describe('updateCardsFromProposals()', () => {
       (prop) => prop.type === 'proposalEvaluationAverage' && prop.name === 'Rubric Evaluation 1'
     ) as IPropertyTemplate;
     const rubricEvaluation2EvaluationAverageProp = properties.find(
-      (prop) => prop.type === 'proposalEvaluationAverage' && prop.name === 'Rubric Evaluation 2)'
+      (prop) => prop.type === 'proposalEvaluationAverage' && prop.name === 'Rubric Evaluation 2'
     ) as IPropertyTemplate;
     const rubricEvaluation1EvaluationTotalProp = properties.find(
       (prop) => prop.type === 'proposalEvaluationTotal' && prop.name === 'Rubric Evaluation 1'
