@@ -2,13 +2,14 @@ import Box from '@mui/material/Box';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
-import type { UseFormRegister } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
+import type { Control } from 'react-hook-form';
 
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 
 import type { FormValues } from '../SpaceSettings';
 
-export function TwoFactorAuth({ isAdmin, register }: { isAdmin: boolean; register: UseFormRegister<FormValues> }) {
+export function TwoFactorAuth({ isAdmin, control }: { isAdmin: boolean; control: Control<FormValues> }) {
   const isCharmverse = useIsCharmverseSpace();
 
   if (!isCharmverse) {
@@ -21,18 +22,23 @@ export function TwoFactorAuth({ isAdmin, register }: { isAdmin: boolean; registe
 
   return (
     <Box display='flex' flexWrap='wrap' flexDirection='column'>
-      <FormControlLabel
-        control={<Switch />}
-        sx={{ alignItems: 'flex-start' }}
-        label={
-          <Box>
-            <Typography mt={1}>Require two-factor authentication</Typography>
-            <Typography variant='caption'>
-              Require Members of this space to use a two-factor authentication app to log in.
-            </Typography>
-          </Box>
-        }
-        {...register('requireMembersTwoFactorAuth')}
+      <Controller
+        name='requireMembersTwoFactorAuth'
+        control={control}
+        render={({ field }) => (
+          <FormControlLabel
+            control={<Switch {...field} checked={field.value} />}
+            sx={{ alignItems: 'flex-start' }}
+            label={
+              <Box>
+                <Typography mt={1}>Require two-factor authentication</Typography>
+                <Typography variant='caption'>
+                  Require Members of this space to use a two-factor authentication app to log in.
+                </Typography>
+              </Box>
+            }
+          />
+        )}
       />
     </Box>
   );
