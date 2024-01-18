@@ -17,11 +17,8 @@ import { useUser } from 'hooks/useUser';
 import type { CommentContent, CommentPermissions } from 'lib/comments';
 import type { PageWithContent } from 'lib/pages';
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
 import { getPagePath } from 'lib/utilities/domains/getPagePath';
-
-import { CreateLensPublication } from '../CreateLensPublication';
 
 type Props = {
   page: PageWithContent;
@@ -161,25 +158,6 @@ export function PageComments({ page, canCreateComments }: Props) {
             </Stack>
           )}
         </>
-      )}
-      {isPublishingToLens && createdComment && proposal?.lensPostLink && page.proposalId && lensParentPublicationId && (
-        <CreateLensPublication
-          publicationType='comment'
-          commentId={createdComment.id}
-          content={createdComment.content as PageContent}
-          parentPublicationId={lensParentPublicationId}
-          onSuccess={async () => {
-            await syncPageCommentsWithLensPost();
-            setIsPublishingToLens(false);
-            setCreatedComment(null);
-          }}
-          onError={() => {
-            setIsPublishingToLens(false);
-            setCreatedComment(null);
-          }}
-          proposalId={page.proposalId}
-          proposalLink={proposalLink}
-        />
       )}
     </>
   );

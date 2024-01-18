@@ -109,11 +109,11 @@ export function useLensProfile() {
 
   const setupLensProfile = async () => {
     if (!user || !account || !lensProfile) {
-      return false;
+      return null;
     }
 
     if (authenticated) {
-      return true;
+      return lensProfile;
     }
 
     const result = await execute({
@@ -123,10 +123,10 @@ export function useLensProfile() {
 
     if (result.isFailure()) {
       handlerLensError(result.error);
-      return false;
+      return null;
     }
 
-    return true;
+    return result.value;
   };
 
   return {

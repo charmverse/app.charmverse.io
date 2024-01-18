@@ -1,12 +1,13 @@
 import { log } from '@charmverse/core/log';
 import { textOnly } from '@lens-protocol/metadata';
-import { useCreateComment, useCreatePost } from '@lens-protocol/react-web';
+import type { Session } from '@lens-protocol/react-web';
+import { SessionType, useCreateComment, useCreatePost } from '@lens-protocol/react-web';
 import { useState } from 'react';
 
 import { useUploadToArweave } from 'charmClient/hooks/lens';
 import { useUpdateProposalLensProperties } from 'charmClient/hooks/proposals';
 import { usePageComments } from 'components/[pageId]/DocumentPage/components/CommentsFooter/usePageComments';
-import { useHandleLensError } from 'components/settings/account/hooks/useLensProfile';
+import { useHandleLensError, useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
@@ -47,15 +48,24 @@ export function useCreateLensPublication(params: CreateLensPublicationParams) {
   const { showMessage } = useSnackbar();
   const [isPublishingToLens, setIsPublishingToLens] = useState(false);
   const { trigger } = useUploadToArweave();
+  const { setupLensProfile } = useLensProfile();
+  const { account } = useWeb3Account();
   async function createLensPublication({ content }: { content: PageContent }) {
     try {
       setIsPublishingToLens(true);
-      if (!space) {
+      if (!space || !account) {
         return null;
       }
 
       if (chainId !== LensChain) {
         await switchNetwork();
+      }
+
+      const lensProfile = await setupLensProfile();
+
+      if (!lensProfile) {
+        onError();
+        return null;
       }
 
       const markdownContent = await generateMarkdown({
@@ -78,14 +88,23 @@ export function useCreateLensPublication(params: CreateLensPublicationParams) {
         return null;
       }
 
+      const session: Session = {
+        type: SessionType.WithProfile,
+        profile: lensProfile,
+        authenticated: true,
+        address: account
+      };
+
       const createPublicationResult =
         publicationType === 'post'
           ? await createPost({
-              metadata: uri
+              metadata: uri,
+              session
             })
           : await createComment({
               metadata: uri,
-              commentOn: params.parentPublicationId as any
+              commentOn: params.parentPublicationId as any,
+              session
             });
 
       if (createPublicationResult.isFailure()) {
