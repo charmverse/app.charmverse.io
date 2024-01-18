@@ -12,6 +12,7 @@ import { ProposalRewards } from 'components/proposals/components/ProposalRewards
 import { CustomPropertiesAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/CustomPropertiesAdapter';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { isProdEnv } from 'config/constants';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { ProposalFields, ProposalReviewerInput } from 'lib/proposal/interface';
@@ -67,6 +68,8 @@ export function ProposalPropertiesBase({
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
   const { lensProfile } = useLensProfile();
   const { account } = useWeb3Account();
+
+  const showCredentialSelect = useIsCharmverseSpace();
 
   const isAuthor = proposalFormInputs.authors.includes(user?.id ?? '');
   const proposalAuthorIds = proposalFormInputs.authors;
@@ -129,15 +132,17 @@ export function ProposalPropertiesBase({
                 wrapColumn
                 showEmptyPlaceholder
               />
-              <CredentialSelect
-                readOnly={readOnlySelectedCredentialTemplates}
-                selectedCredentialTemplates={proposalFormInputs.selectedCredentialTemplates}
-                onChange={(selectedCredentialTemplates) =>
-                  setProposalFormInputs({
-                    selectedCredentialTemplates
-                  })
-                }
-              />
+              {showCredentialSelect && (
+                <CredentialSelect
+                  readOnly={readOnlySelectedCredentialTemplates}
+                  selectedCredentialTemplates={proposalFormInputs.selectedCredentialTemplates}
+                  onChange={(selectedCredentialTemplates) =>
+                    setProposalFormInputs({
+                      selectedCredentialTemplates
+                    })
+                  }
+                />
+              )}
             </Box>
           </div>
         </Box>
