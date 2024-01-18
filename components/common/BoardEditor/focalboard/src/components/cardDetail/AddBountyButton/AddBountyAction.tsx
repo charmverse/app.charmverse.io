@@ -28,7 +28,6 @@ export default function AddBountyAction({ readOnly, cardId }: Props) {
   const { setCreatingInlineReward, creatingInlineReward } = useRewards();
 
   const hasReward = !!cardPage?.bountyId;
-
   const canAddBounty =
     spacePermissions?.createBounty &&
     !isSharedPage &&

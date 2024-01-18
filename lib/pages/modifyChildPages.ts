@@ -2,7 +2,7 @@ import { resolvePageTree } from '@charmverse/core/pages';
 import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-export type ChildModificationAction = 'delete' | 'restore' | 'archive';
+export type ChildModificationAction = 'delete' | 'restore' | 'trash';
 
 export async function modifyChildPages(parentId: string, userId: string, action: ChildModificationAction) {
   const { flatChildren } = await resolvePageTree({

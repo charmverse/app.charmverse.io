@@ -64,7 +64,7 @@ export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
     }
     function handleDeleteEvent(value: WebSocketPayload<'pages_deleted'>) {
       if (value.some((page) => page.id === pageWithContent?.id)) {
-        log.debug('Page deleted, invalidating cache', { pageId: pageWithContent?.id });
+        log.debug('Page deleted or restored, invalidating cache', { pageId: pageWithContent?.id });
         mutate(undefined, {
           rollbackOnError: false
         });
@@ -72,10 +72,12 @@ export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
     }
     const unsubscribeFromPageUpdates = subscribe('pages_meta_updated', handleUpdateEvent);
     const unsubscribeFromPageDeletes = subscribe('pages_deleted', handleDeleteEvent);
+    const unsubscribeFromPageRestores = subscribe('pages_restored', handleDeleteEvent);
 
     return () => {
       unsubscribeFromPageUpdates();
       unsubscribeFromPageDeletes();
+      unsubscribeFromPageRestores();
     };
   }, [mutate, pageWithContent?.id]);
 

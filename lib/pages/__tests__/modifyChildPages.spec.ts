@@ -123,7 +123,7 @@ describe('modifyChildPages', () => {
 
     const board = await generateBoard({ createdBy: user.id, spaceId: space.id });
 
-    const archivedChildPageIds = await modifyChildPages(board.id, user.id, 'archive');
+    const archivedChildPageIds = await modifyChildPages(board.id, user.id, 'trash');
 
     const archivedPages = await prisma.page.findMany({
       where: {
@@ -154,7 +154,7 @@ describe('modifyChildPages', () => {
 
     const board = await generateBoard({ createdBy: user.id, spaceId: space.id });
 
-    await modifyChildPages(board.id, user.id, 'archive');
+    await modifyChildPages(board.id, user.id, 'trash');
     const restoredChildPageIds = await modifyChildPages(board.id, user.id, 'restore');
 
     const restoredPages = await prisma.page.findMany({

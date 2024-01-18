@@ -7,33 +7,47 @@ import { useRef, useState } from 'react';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 
-export const StyledMenuItem = styled(MenuItem)`
-  border-left: 1px solid ${({ theme }) => theme.palette.divider};
-  border-top: 1px solid ${({ theme }) => theme.palette.divider};
-  border-bottom: 1px solid ${({ theme }) => theme.palette.divider};
-  padding: ${({ theme }) => theme.spacing(0.5, 1)};
+export const StyledMenuItem = styled(MenuItem)<{ firstChild?: boolean; lastChild?: boolean }>(
+  ({ firstChild, lastChild, theme }) => `
+  border-left: 1px solid ${theme.palette.divider};
+  border-top: 1px solid ${theme.palette.divider};
+  border-bottom: 1px solid ${theme.palette.divider};
+  padding: ${theme.spacing(0.5, 1)};
   display: flex;
   align-items: center;
   cursor: pointer;
   transition: background 0.2s ease-in-out;
-  color: ${({ theme }) => theme.palette.text.primary};
+  color: ${theme.palette.text.primary};
 
   &:hover {
-    background: ${({ theme }) => theme.palette.action.hover};
+    background: ${theme.palette.action.hover};
     transition: background 0.2s ease-in-out;
   }
-`;
+
+  ${firstChild ? `border-radius: 4px 0 0 4px;` : ''}
+  ${
+    lastChild
+      ? `
+    border-right: 1px solid ${theme.palette.divider};
+    border-radius: 0 4px 4px 0;
+    `
+      : ''
+  }
+`
+);
 
 export function PropertyMenu({
   cards,
   disabledTooltip,
   propertyTemplate,
-  children
+  children,
+  lastChild
 }: {
   disabledTooltip?: string;
   cards: Card[];
   propertyTemplate: IPropertyTemplate<PropertyType>;
   children: ReactNode | ((option: { isPropertyOpen: boolean; closeMenu: VoidFunction }) => ReactNode);
+  lastChild: boolean;
 }) {
   const popupState = usePopupState({ variant: 'popover' });
   // Without this state, the options menu list is not placed in the correct position
@@ -49,6 +63,7 @@ export function PropertyMenu({
         <div>
           <StyledMenuItem
             disabled={!!disabledTooltip}
+            lastChild={lastChild}
             ref={ref}
             onClick={() => {
               popupState.open();
