@@ -15,10 +15,6 @@ const StyledCallout = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing(1)};
 
-  ${({ theme }) => theme.breakpoints.down('sm')} {
-    flex-wrap: wrap;
-  }
-
   h1,
   h2,
   h3,

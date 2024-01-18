@@ -47,7 +47,7 @@ export class ProposalsApi {
     return http.POST(`/api/proposals/${proposalId}/rewards`);
   }
 
-  goBackToEvaluationStep({ proposalId, ...payload }: { proposalId: string; evaluationId?: string }) {
+  goBackToStep({ proposalId, ...payload }: { proposalId: string; evaluationId?: string }) {
     return http.PUT(`/api/proposals/${proposalId}/back-to-step`, payload);
   }
 }

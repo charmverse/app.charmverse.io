@@ -6,6 +6,7 @@ import type { SelectOption } from 'components/common/BoardEditor/components/prop
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { Button } from 'components/common/Button';
 import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
+import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PopulatedEvaluation } from 'lib/proposal/interface';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
@@ -16,6 +17,7 @@ export type Props = {
   isReviewer?: boolean;
   evaluation: Pick<PopulatedEvaluation, 'id' | 'completedAt' | 'reviewers' | 'result'>;
   refreshProposal?: VoidFunction;
+  confirmationMessage?: string;
   isCurrent: boolean;
   archived?: boolean;
 };
@@ -27,6 +29,7 @@ export function PassFailEvaluation({
   evaluation,
   isCurrent,
   refreshProposal,
+  confirmationMessage,
   archived
 }: Props) {
   const { trigger, isMutating } = useSubmitEvaluationResult({ proposalId });
@@ -35,6 +38,7 @@ export function PassFailEvaluation({
     group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
     id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
   }));
+  const { showConfirmation } = useConfirmationModal();
   const { showMessage } = useSnackbar();
 
   const completedDate = evaluation.completedAt ? getRelativeTimeInThePast(new Date(evaluation.completedAt)) : null;
@@ -49,6 +53,15 @@ export function PassFailEvaluation({
     : null;
 
   async function onSubmitReview(result: NonNullable<PopulatedEvaluation['result']>) {
+    if (confirmationMessage) {
+      const { confirmed } = await showConfirmation({
+        message: confirmationMessage,
+        confirmButton: result === 'pass' ? 'Approve' : 'Decline'
+      });
+      if (!confirmed) {
+        return;
+      }
+    }
     try {
       await trigger({
         evaluationId: evaluation.id,

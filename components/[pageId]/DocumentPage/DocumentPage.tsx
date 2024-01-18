@@ -136,6 +136,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
 
   const enableSuggestingMode = editMode === 'suggesting' && !readOnly && !!pagePermissions.comment;
   const isPageTemplate = page.type.includes('template');
+
   const enableComments = !isSharedPage && !enableSuggestingMode && !isPageTemplate && !!pagePermissions?.comment;
   const showPageActionSidebar =
     !!enableSidebar && sidebarView !== null && (sidebarView !== 'comments' || enableComments);
@@ -499,7 +500,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
               {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') && (
                 <Box mt='-100px'>
                   {/* add negative margin to offset height of .charm-empty-footer */}
-                  <PageComments page={page} canCreateComments={pagePermissions.comment && !proposal?.archived} />
+                  <PageComments page={page} canCreateComments={pagePermissions.comment} />
                 </Box>
               )}
             </>

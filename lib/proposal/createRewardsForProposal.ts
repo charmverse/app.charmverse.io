@@ -27,6 +27,9 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
           index: true,
           result: true,
           id: true
+        },
+        orderBy: {
+          index: 'asc'
         }
       },
       spaceId: true,
