@@ -124,6 +124,9 @@ export async function createCardsFromProposals({
                       value: true
                     }
                   }
+                },
+                orderBy: {
+                  index: 'asc'
                 }
               }
             }
