@@ -361,7 +361,7 @@ export function ViewHeaderRowsMenu({
 
   return (
     <StyledStack className='disable-drag-selection'>
-      <StyledMenuItem firstChild>
+      <StyledMenuItem firstChild lastChild={!showTrashIcon && filteredPropertyTemplates.length === 0}>
         <Typography onClick={() => setCheckedIds([])} color='primary' variant='body2'>
           {checkedIds.length} selected
         </Typography>

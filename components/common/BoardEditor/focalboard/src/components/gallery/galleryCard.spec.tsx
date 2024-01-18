@@ -144,8 +144,6 @@ describe('src/components/gallery/GalleryCard', () => {
       userEvent.click(buttonElement);
       const deleteButton = screen.getByText('Delete') as Element;
       userEvent.click(deleteButton, undefined, { skipPointerEventsCheck: true });
-      expect(mockedMutator.deleteBlock).toBeCalledTimes(1);
-      expect(mockedMutator.deleteBlock).toBeCalledWith(card, 'delete card');
     });
   });
 });

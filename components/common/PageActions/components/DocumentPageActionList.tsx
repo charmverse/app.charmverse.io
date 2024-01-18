@@ -124,6 +124,7 @@ export function DocumentPageActionList({
   const pageType = page.type;
   const isExportablePage = documentTypes.includes(pageType as PageType);
   const basePageBounty = rewards?.find((r) => r.id === pageId);
+
   function setPageProperty(prop: Partial<PageUpdates>) {
     updatePage({
       id: pageId,
