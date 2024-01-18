@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { CredentialEventType, CredentialTemplate } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { optimism } from 'viem/chains';
 
 import { baseUrl } from 'config/constants';
@@ -28,9 +29,15 @@ export async function issueProposalCredentialsIfNecessary({
     },
     select: {
       selectedCredentialTemplates: true,
+      status: true,
       page: {
         select: {
           id: true
+        }
+      },
+      evaluations: {
+        orderBy: {
+          index: 'asc'
         }
       },
       authors: true,
@@ -44,8 +51,25 @@ export async function issueProposalCredentialsIfNecessary({
     }
   });
 
-  // Space doesn't want to issue credentials for this event
+  if (event === 'proposal_created') {
+    if (proposalWithSpaceConfig.status === 'draft') {
+      return;
+    }
+  } else if (event === 'proposal_approved') {
+    const currentEvaluation = getCurrentEvaluation(proposalWithSpaceConfig.evaluations);
+
+    if (!currentEvaluation) {
+      return;
+    } else if (
+      currentEvaluation.id !== proposalWithSpaceConfig.evaluations[proposalWithSpaceConfig.evaluations.length - 1].id ||
+      currentEvaluation.result !== 'pass'
+    ) {
+      return;
+    }
+  }
+
   if (!proposalWithSpaceConfig.space.credentialEvents.includes(event)) {
+    // Space doesn't want to issue credentials for this event
     return;
   }
 

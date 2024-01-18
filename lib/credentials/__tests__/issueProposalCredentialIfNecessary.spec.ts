@@ -47,7 +47,9 @@ describe('issueProposalCredentialIfNecessary', () => {
       spaceId: space.id,
       authors: [author1.id, author2.id],
       userId: author1.id,
-      selectedCredentialTemplateIds: [firstCredentialTemplate.id, secondCredentialTemplate.id]
+      selectedCredentialTemplateIds: [firstCredentialTemplate.id, secondCredentialTemplate.id],
+      proposalStatus: 'published',
+      evaluationInputs: [{ reviewers: [], evaluationType: 'pass_fail', permissions: [], result: 'pass' }]
     });
 
     await issueProposalCredentialsIfNecessary({
@@ -139,7 +141,9 @@ describe('issueProposalCredentialIfNecessary', () => {
       spaceId: space.id,
       authors: [author1.id, author2.id],
       userId: author1.id,
-      selectedCredentialTemplateIds: [firstCredentialTemplate.id, secondCredentialTemplate.id]
+      selectedCredentialTemplateIds: [firstCredentialTemplate.id, secondCredentialTemplate.id],
+      proposalStatus: 'published',
+      evaluationInputs: [{ reviewers: [], evaluationType: 'pass_fail', permissions: [], result: 'pass' }]
     });
 
     await issueProposalCredentialsIfNecessary({
@@ -202,7 +206,9 @@ describe('issueProposalCredentialIfNecessary', () => {
       spaceId: space.id,
       authors: [author1.id, author2.id],
       userId: author1.id,
-      selectedCredentialTemplateIds: [firstCredentialTemplate.id, secondCredentialTemplate.id]
+      selectedCredentialTemplateIds: [firstCredentialTemplate.id, secondCredentialTemplate.id],
+      proposalStatus: 'published',
+      evaluationInputs: [{ reviewers: [], evaluationType: 'pass_fail', permissions: [], result: 'pass' }]
     });
 
     await issueProposalCredentialsIfNecessary({
@@ -266,7 +272,9 @@ describe('issueProposalCredentialIfNecessary', () => {
       spaceId: space.id,
       authors: [author1.id],
       userId: author1.id,
-      selectedCredentialTemplateIds: [firstCredentialTemplate.id, inexistentCredentialId]
+      selectedCredentialTemplateIds: [firstCredentialTemplate.id, inexistentCredentialId],
+      proposalStatus: 'published',
+      evaluationInputs: [{ reviewers: [], evaluationType: 'pass_fail', permissions: [], result: 'pass' }]
     });
 
     await issueProposalCredentialsIfNecessary({
@@ -309,7 +317,9 @@ describe('issueProposalCredentialIfNecessary', () => {
       spaceId: space.id,
       authors: [author1.id],
       userId: author1.id,
-      selectedCredentialTemplateIds: [firstCredentialTemplate.id]
+      selectedCredentialTemplateIds: [firstCredentialTemplate.id],
+      proposalStatus: 'published',
+      evaluationInputs: [{ reviewers: [], evaluationType: 'pass_fail', permissions: [], result: 'pass' }]
     });
 
     await issueProposalCredentialsIfNecessary({
