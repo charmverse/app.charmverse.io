@@ -337,4 +337,106 @@ describe('issueProposalCredentialIfNecessary', () => {
 
     expect(issuedCredentials).toHaveLength(0);
   });
+
+  it('should not issue a proposal_created credential if the proposal status is draft', async () => {
+    const { space, user: author1 } = await testUtilsUser.generateUserAndSpace({
+      spaceCredentialEvents: ['proposal_created'],
+      wallet: randomETHWalletAddress()
+    });
+
+    const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({ spaceId: space.id });
+
+    const proposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      authors: [author1.id],
+      userId: author1.id,
+      selectedCredentialTemplateIds: [firstCredentialTemplate.id],
+      proposalStatus: 'draft',
+      evaluationInputs: [{ reviewers: [], evaluationType: 'pass_fail', permissions: [] }]
+    });
+
+    await issueProposalCredentialsIfNecessary({
+      event: 'proposal_created',
+      proposalId: proposal.id
+    });
+
+    expect(mockedSignAndPublishCharmverseCredential).toHaveBeenCalledTimes(0);
+
+    const issuedCredentials = await prisma.issuedCredential.findMany({
+      where: {
+        proposalId: proposal.id
+      }
+    });
+
+    expect(issuedCredentials).toHaveLength(0);
+  });
+
+  it('should not issue a proposal_approved credential if the proposal evaluation is failed', async () => {
+    const { space, user: author1 } = await testUtilsUser.generateUserAndSpace({
+      spaceCredentialEvents: ['proposal_approved'],
+      wallet: randomETHWalletAddress()
+    });
+
+    const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({ spaceId: space.id });
+
+    const proposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      authors: [author1.id],
+      userId: author1.id,
+      selectedCredentialTemplateIds: [firstCredentialTemplate.id],
+      proposalStatus: 'published',
+      evaluationInputs: [{ reviewers: [], evaluationType: 'pass_fail', result: 'fail', permissions: [] }]
+    });
+
+    await issueProposalCredentialsIfNecessary({
+      event: 'proposal_approved',
+      proposalId: proposal.id
+    });
+
+    expect(mockedSignAndPublishCharmverseCredential).toHaveBeenCalledTimes(0);
+
+    const issuedCredentials = await prisma.issuedCredential.findMany({
+      where: {
+        proposalId: proposal.id
+      }
+    });
+
+    expect(issuedCredentials).toHaveLength(0);
+  });
+
+  it('should not issue a proposal_approved credential if the final proposal evaluation has not been reached', async () => {
+    const { space, user: author1 } = await testUtilsUser.generateUserAndSpace({
+      spaceCredentialEvents: ['proposal_approved'],
+      wallet: randomETHWalletAddress()
+    });
+
+    const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({ spaceId: space.id });
+
+    const proposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      authors: [author1.id],
+      userId: author1.id,
+      selectedCredentialTemplateIds: [firstCredentialTemplate.id],
+      proposalStatus: 'published',
+      evaluationInputs: [
+        { reviewers: [], evaluationType: 'pass_fail', result: 'pass', permissions: [] },
+        { reviewers: [], evaluationType: 'pass_fail', permissions: [] }
+      ]
+    });
+
+    await issueProposalCredentialsIfNecessary({
+      event: 'proposal_approved',
+      proposalId: proposal.id
+    });
+
+    expect(mockedSignAndPublishCharmverseCredential).toHaveBeenCalledTimes(0);
+
+    const issuedCredentials = await prisma.issuedCredential.findMany({
+      where: {
+        proposalId: proposal.id
+      }
+    });
+
+    expect(issuedCredentials).toHaveLength(0);
+  });
 });

@@ -51,11 +51,10 @@ export async function issueProposalCredentialsIfNecessary({
     }
   });
 
-  if (event === 'proposal_created') {
-    if (proposalWithSpaceConfig.status === 'draft') {
-      return;
-    }
-  } else if (event === 'proposal_approved') {
+  if (proposalWithSpaceConfig.status === 'draft') {
+    return;
+  }
+  if (event === 'proposal_approved') {
     const currentEvaluation = getCurrentEvaluation(proposalWithSpaceConfig.evaluations);
 
     if (!currentEvaluation) {
