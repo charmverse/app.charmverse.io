@@ -17,7 +17,6 @@ type IContext = {
   error?: Error;
   data?: CreateOtpResponse;
   isLoading: boolean;
-  handleClose: () => void;
 };
 
 const TwoFactorAuthContext = createContext<Readonly<IContext>>({
@@ -26,18 +25,12 @@ const TwoFactorAuthContext = createContext<Readonly<IContext>>({
   isLoading: false,
   data: undefined,
   setFlow: () => {},
-  trigger: async () => undefined,
-  handleClose: () => {}
+  trigger: async () => undefined
 });
 
-export function TwoFactorAuthProvider({ children, onClose }: { children: ReactNode; onClose: () => void }) {
+export function TwoFactorAuthProvider({ children }: { children: ReactNode }) {
   const [flow, setFlow] = useState<Screens>('start');
   const { data, trigger, error, isMutating: isLoading } = useCreateUserOtp();
-
-  const handleClose = () => {
-    onClose();
-    setFlow('start');
-  };
 
   const value: IContext = useMemo(
     () => ({
@@ -46,8 +39,7 @@ export function TwoFactorAuthProvider({ children, onClose }: { children: ReactNo
       error,
       data,
       isLoading,
-      trigger,
-      handleClose
+      trigger
     }),
     [flow, data, error, trigger, isLoading]
   );

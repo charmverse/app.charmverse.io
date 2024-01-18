@@ -8,7 +8,7 @@ type Props = {
   recoveryCode?: string;
   errorMessage?: string;
   loading?: boolean;
-  onSubmit: () => Promise<void> | void;
+  onSubmit?: () => Promise<void> | void;
 };
 
 export function BackupCodes({ recoveryCode, errorMessage, loading, onSubmit }: Props) {
