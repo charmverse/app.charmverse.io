@@ -31,27 +31,24 @@ export async function trashPages({
       userId
     });
   }
-
-  const deletedAt = trash ? new Date() : null;
-  const deletedBy = trash ? userId : null;
+  // commenting this out, in case we need it - 1/18/2024
+  // const deletedAt = trash ? new Date() : null;
+  // const deletedBy = trash ? userId : null;
+  // relay.broadcast(
+  //   {
+  //     type: 'pages_meta_updated',
+  //     payload: modifiedChildPageIds.map((id) => ({ id, deletedAt, spaceId, deletedBy }))
+  //   },
+  //   spaceId
+  // );
 
   relay.broadcast(
     {
-      type: 'pages_meta_updated',
-      payload: modifiedChildPageIds.map((id) => ({ id, deletedAt, spaceId, deletedBy }))
+      type: trash ? 'pages_deleted' : 'pages_restored',
+      payload: modifiedChildPageIds.map((id) => ({ id }))
     },
     spaceId
   );
-
-  if (emitPageStatusEvent) {
-    relay.broadcast(
-      {
-        type: trash ? 'pages_deleted' : 'pages_restored',
-        payload: modifiedChildPageIds.map((id) => ({ id }))
-      },
-      spaceId
-    );
-  }
 
   return { modifiedChildPageIds };
 }

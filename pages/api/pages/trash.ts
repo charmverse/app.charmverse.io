@@ -25,15 +25,16 @@ async function togglePageArchiveStatus(req: NextApiRequest, res: NextApiResponse
     throw new InvalidInputError('pageIds must be an array');
   }
 
-  for (const resourceId of pageIds) {
-    const permissions = await permissionsApiClient.pages.computePagePermissions({
-      resourceId,
-      userId
-    });
-    if (permissions.delete !== true) {
-      throw new ActionNotPermittedError(`You do not have permissions to ${trash ? 'delete' : 'restore'} this page`);
-    }
+  const permissionsByPage = await permissionsApiClient.pages.bulkComputePagePermissions({
+    pageIds,
+    userId
+  });
+
+  const canDeleteAllPages = Object.values(permissionsByPage).every((permissions) => permissions.delete === true);
+  if (!canDeleteAllPages) {
+    throw new ActionNotPermittedError(`You do not have permissions to ${trash ? 'delete' : 'restore'} this page`);
   }
+
   const { spaceId } = await prisma.page.findUniqueOrThrow({
     where: {
       id: pageIds[0]
