@@ -1,28 +1,55 @@
-import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { prisma } from '@charmverse/core/prisma-client';
-
-/**
-
-  userId: cb9a5ede-6ff7-4eaa-9c23-91e684e23aed
-  spaceId: 33918abc-f753-4a3d-858d-63c3fa36fa15
-
-  kameil userId: f7d47848-f993-4d16-8008-e1f5b23b8ad3 or 356af4f7-cbd1-4350-b046-9f55da500fec
-*/
 
 /**
  * Use this script to perform database searches.
  */
 
 async function search() {
-  const acc = await prisma.block.findMany({
+  const page = await prisma.page.findMany({
     where: {
+      //title: 'Proposal Review - Grants Council Only'
+      title: 'Matt Migration Proposal Review - Grants Council Only (Copy)'
+    }
+  });
+  const boardBlock = await prisma.block.findUniqueOrThrow({
+    where: {
+      id: page[0].boardId!
+    }
+  });
+  const cardBlocks = await prisma.block.findMany({
+    where: {
+      parentId: boardBlock.id
+    },
+    include: {
+      page: {
+        include: {
+          permissions: true
+        }
+      }
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  });
+  const childPages = await prisma.page.findMany({
+    where: {
+      parentId: boardBlock.id
+    }
+  });
+  const proposals = await prisma.page.findMany({
+    where: {
+      type: 'proposal',
       space: {
-        domain: 'example-domain'
+        domain: 'taiko'
       }
     }
   });
-
-  console.log(acc);
+  console.log('proposals', proposals.length);
+  console.log('child pages', childPages.length);
+  //console.log(boardBlock);
+  console.log('child cards', cardBlocks.length);
+  console.log('cards without pages', cardBlocks.filter((c) => !c.page).length);
+  console.log('cards with pages', cardBlocks.filter((c) => !!c.page).length);
 }
 
 search().then(() => console.log('Done'));

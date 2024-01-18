@@ -29,7 +29,8 @@ type PageProps = Partial<
 export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'id' | 'index' | 'title' | 'type'> & {
   reviewers: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[];
   rubricCriteria: RubricDataInput[];
-  permissions?: WorkflowEvaluationJson['permissions']; // pass these in to override workflow defaults
+  // TODO: fix tests that need to pass in permissions
+  permissions?: WorkflowEvaluationJson['permissions'];
   voteSettings?: VoteSettings | null;
 };
 
@@ -89,34 +90,30 @@ export async function createProposal({
   const reviewersInput: Prisma.ProposalReviewerCreateManyInput[] = [];
 
   // retrieve permissions and apply evaluation ids to reviewers
-  if (evaluations.length > 0) {
-    // TODO: fix tests that need to pass in permissions
-    evaluations.forEach(({ id: evaluationId, permissions: providedPermissions, reviewers: evalReviewers }, index) => {
-      const configuredEvaluation = workflow?.evaluations[index];
-      const permissions = configuredEvaluation?.permissions || providedPermissions;
-      if (!permissions) {
-        throw new Error(
-          `Cannot find permissions for evaluation step. Workflow: ${workflowId}. Evaluation: ${evaluationId}`
-        );
-      }
-      evaluationPermissionsToCreate.push(
-        ...permissions.map((permission) => ({
-          evaluationId: evaluationIds[index],
-          operation: permission.operation,
-          systemRole: permission.systemRole
-        }))
+  evaluations.forEach(({ id: evaluationId, permissions: providedPermissions, reviewers: evalReviewers }, index) => {
+    const configuredEvaluation = workflow?.evaluations[index];
+    const permissions = configuredEvaluation?.permissions || providedPermissions;
+    if (!permissions) {
+      throw new Error(
+        `Cannot find permissions for evaluation step. Workflow: ${workflowId}. Evaluation: ${evaluationId}`
       );
-      reviewersInput.push(
-        ...evalReviewers.map((reviewer) => ({
-          roleId: reviewer.roleId,
-          systemRole: reviewer.systemRole,
-          userId: reviewer.userId,
-          proposalId,
-          evaluationId: evaluationIds[index]
-        }))
-      );
-    });
-  }
+    }
+    evaluationPermissionsToCreate.push(
+      ...permissions.map((permission) => ({
+        ...permission,
+        evaluationId: evaluationIds[index]
+      }))
+    );
+    reviewersInput.push(
+      ...evalReviewers.map((reviewer) => ({
+        roleId: reviewer.roleId,
+        systemRole: reviewer.systemRole,
+        userId: reviewer.userId,
+        proposalId,
+        evaluationId: evaluationIds[index]
+      }))
+    );
+  });
 
   let proposalFormId = formId;
   // Always create new form for proposal templates

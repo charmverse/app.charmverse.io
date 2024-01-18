@@ -241,6 +241,7 @@ export function RubricResults({
               key='results'
               evaluation={evaluation}
               proposalId={proposalId}
+              confirmationMessage='Please verify that all reviewers have submitted a response. This will submit the final review for this step.'
               refreshProposal={refreshProposal}
             />
           </Box>

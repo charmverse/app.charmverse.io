@@ -191,6 +191,12 @@ export function VotesProvider({ children }: { children: ReactNode }) {
     }
   }, [data]);
 
+  useEffect(() => {
+    if (!parent) {
+      setIsLoading(false);
+    }
+  }, [parent]);
+
   const value: IContext = useMemo(
     () => ({
       votes,

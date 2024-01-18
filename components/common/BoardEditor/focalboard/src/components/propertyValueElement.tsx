@@ -118,11 +118,6 @@ export const validatePropertyValue = (propType: string, val: string): boolean =>
 /**
  * Hide these values if user is not an evalutor for the proposal
  */
-const hiddenProposalEvaluatorPropertyValues: DatabaseProposalPropertyType[] = [
-  'proposalEvaluationAverage',
-  'proposalEvaluatedBy',
-  'proposalEvaluationTotal'
-];
 
 const editableFields: PropertyType[] = ['text', 'number', 'email', 'url', 'phone'];
 
@@ -132,7 +127,6 @@ function PropertyValueElement(props: Props) {
   const { formatDateTime, formatDate } = useDateFormatter();
   const {
     card,
-    syncWithPageId,
     propertyTemplate,
     showEmptyPlaceholder,
     board,
@@ -145,13 +139,6 @@ function PropertyValueElement(props: Props) {
   } = props;
   const { trigger } = useUpdateProposalEvaluation({ proposalId: proposal?.id });
   const { showMessage } = useSnackbar();
-  const { rubricProposalIdsWhereUserIsEvaluator, isLoading: isLoadingReviewerStatus } =
-    useProposalsWhereUserIsEvaluator({
-      spaceId:
-        !!board && hiddenProposalEvaluatorPropertyValues.includes(propertyTemplate?.type as any)
-          ? board.spaceId
-          : undefined
-    });
 
   const isAdmin = useIsAdmin();
 
@@ -544,21 +531,6 @@ function PropertyValueElement(props: Props) {
     ) : (
       subRowsEmptyValueContent ?? null
     );
-  }
-
-  // Explicitly hide the value for this proposal
-  if (hiddenProposalEvaluatorPropertyValues.includes(propertyTemplate?.type as any)) {
-    if (syncWithPageId && !isLoadingReviewerStatus && !isAdmin) {
-      return <EmptyPlaceholder>Hidden</EmptyPlaceholder>;
-    } else if (syncWithPageId && (!!rubricProposalIdsWhereUserIsEvaluator[syncWithPageId] || isAdmin)) {
-      return propertyValueElement;
-    } else {
-      return typeof subRowsEmptyValueContent === 'string' ? (
-        <span>{subRowsEmptyValueContent}</span>
-      ) : (
-        subRowsEmptyValueContent ?? null
-      );
-    }
   }
 
   if (props.showTooltip) {
