@@ -239,21 +239,19 @@ function addProposalEvaluationProperties({
   boardProperties: IPropertyTemplate[];
 }) {
   for (const rubricStepTitle of rubricStepTitles) {
-    const evaluatedByProp = boardProperties.find(
-      (p) => p.type === 'proposalEvaluatedBy' && p.name === `${rubricStepTitle} (Evaluation reviewers)`
-    );
+    const evaluatedByProp = boardProperties.find((p) => p.type === 'proposalEvaluatedBy' && p.name === rubricStepTitle);
     const evaluationTotalProp = boardProperties.find(
-      (p) => p.type === 'proposalEvaluationTotal' && p.name === `${rubricStepTitle} (Evaluation total)`
+      (p) => p.type === 'proposalEvaluationTotal' && p.name === rubricStepTitle
     );
     const evaluationAverageProp = boardProperties.find(
-      (p) => p.type === 'proposalEvaluationAverage' && p.name === `${rubricStepTitle} (Evaluation average)`
+      (p) => p.type === 'proposalEvaluationAverage' && p.name === rubricStepTitle
     );
 
     if (!evaluatedByProp) {
       boardProperties.push({
         id: uuid(),
         type: 'proposalEvaluatedBy',
-        name: `${rubricStepTitle} (Evaluation reviewers)`,
+        name: rubricStepTitle,
         options: []
       });
     }
@@ -262,7 +260,7 @@ function addProposalEvaluationProperties({
       boardProperties.push({
         id: uuid(),
         type: 'proposalEvaluationTotal',
-        name: `${rubricStepTitle} (Evaluation total)`,
+        name: rubricStepTitle,
         options: []
       });
     }
@@ -271,7 +269,7 @@ function addProposalEvaluationProperties({
       boardProperties.push({
         id: uuid(),
         type: 'proposalEvaluationAverage',
-        name: `${rubricStepTitle} (Evaluation average)`,
+        name: rubricStepTitle,
         options: []
       });
     }

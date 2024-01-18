@@ -24,14 +24,12 @@ export function generateResyncedProposalEvaluationForCard({
 
   const uniqueReviewers = Object.keys(reviewersResults);
 
-  const proposalEvaluatedByProp = templates.find(
-    (p) => p.type === 'proposalEvaluatedBy' && p.name === `${step.title} (Evaluation reviewers)`
-  );
+  const proposalEvaluatedByProp = templates.find((p) => p.type === 'proposalEvaluatedBy' && p.name === step.title);
   const proposalEvaluationTotalProp = templates.find(
-    (p) => p.type === 'proposalEvaluationTotal' && p.name === `${step.title} (Evaluation total)`
+    (p) => p.type === 'proposalEvaluationTotal' && p.name === step.title
   );
   const proposalEvaluationAverageProp = templates.find(
-    (p) => p.type === 'proposalEvaluationAverage' && p.name === `${step.title} (Evaluation average)`
+    (p) => p.type === 'proposalEvaluationAverage' && p.name === step.title
   );
 
   if (proposalEvaluatedByProp) {

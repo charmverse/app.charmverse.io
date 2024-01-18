@@ -279,22 +279,22 @@ describe('createCardsFromProposals', () => {
     ) as IPropertyTemplate;
     const proposalEvaluationStepProp = properties.find((prop) => prop.type === 'proposalStep') as IPropertyTemplate;
     const rubricEvaluation1EvaluatedByProp = properties.find(
-      (prop) => prop.type === 'proposalEvaluatedBy' && prop.name === `Rubric evaluation 1 (Evaluation reviewers)`
+      (prop) => prop.type === 'proposalEvaluatedBy' && prop.name === `Rubric evaluation 1`
     ) as IPropertyTemplate;
     const rubricEvaluation2EvaluatedByProp = properties.find(
-      (prop) => prop.type === 'proposalEvaluatedBy' && prop.name === `Rubric evaluation 2 (Evaluation reviewers)`
+      (prop) => prop.type === 'proposalEvaluatedBy' && prop.name === `Rubric evaluation 2`
     ) as IPropertyTemplate;
     const rubricEvaluation1EvaluationTotalProp = properties.find(
-      (prop) => prop.type === 'proposalEvaluationTotal' && prop.name === `Rubric evaluation 1 (Evaluation total)`
+      (prop) => prop.type === 'proposalEvaluationTotal' && prop.name === `Rubric evaluation 1`
     ) as IPropertyTemplate;
     const rubricEvaluation2EvaluationTotalProp = properties.find(
-      (prop) => prop.type === 'proposalEvaluationTotal' && prop.name === `Rubric evaluation 2 (Evaluation total)`
+      (prop) => prop.type === 'proposalEvaluationTotal' && prop.name === `Rubric evaluation 2`
     ) as IPropertyTemplate;
     const rubricEvaluation1EvaluationAverageProp = properties.find(
-      (prop) => prop.type === 'proposalEvaluationAverage' && prop.name === `Rubric evaluation 1 (Evaluation average)`
+      (prop) => prop.type === 'proposalEvaluationAverage' && prop.name === `Rubric evaluation 1`
     ) as IPropertyTemplate;
     const rubricEvaluation2EvaluationAverageProp = properties.find(
-      (prop) => prop.type === 'proposalEvaluationAverage' && prop.name === `Rubric evaluation 2 (Evaluation average)`
+      (prop) => prop.type === 'proposalEvaluationAverage' && prop.name === `Rubric evaluation 2`
     ) as IPropertyTemplate;
 
     expect(proposalUrlProp).toBeDefined();

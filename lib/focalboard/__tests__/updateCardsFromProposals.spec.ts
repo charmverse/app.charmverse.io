@@ -397,31 +397,31 @@ describe('updateCardsFromProposals()', () => {
       (prop) => prop.type === 'proposalEvaluationType'
     ) as IPropertyTemplate;
     const rubricEvaluation1EvaluationAverageProp = properties.find(
-      (prop) => prop.type === 'proposalEvaluationAverage' && prop.name === 'Rubric Evaluation 1 (Evaluation average)'
+      (prop) => prop.type === 'proposalEvaluationAverage' && prop.name === 'Rubric Evaluation 1'
     ) as IPropertyTemplate;
     const rubricEvaluation2EvaluationAverageProp = properties.find(
-      (prop) => prop.type === 'proposalEvaluationAverage' && prop.name === 'Rubric Evaluation 2 (Evaluation average)'
+      (prop) => prop.type === 'proposalEvaluationAverage' && prop.name === 'Rubric Evaluation 2)'
     ) as IPropertyTemplate;
     const rubricEvaluation1EvaluationTotalProp = properties.find(
-      (prop) => prop.type === 'proposalEvaluationTotal' && prop.name === 'Rubric Evaluation 1 (Evaluation total)'
+      (prop) => prop.type === 'proposalEvaluationTotal' && prop.name === 'Rubric Evaluation 1'
     ) as IPropertyTemplate;
     const rubricEvaluation2EvaluationTotalProp = properties.find(
-      (prop) => prop.type === 'proposalEvaluationTotal' && prop.name === 'Rubric Evaluation 2 (Evaluation total)'
+      (prop) => prop.type === 'proposalEvaluationTotal' && prop.name === 'Rubric Evaluation 2'
     ) as IPropertyTemplate;
     const rubricEvaluation1EvaluationEvaluatedByProp = properties.find(
-      (prop) => prop.type === 'proposalEvaluatedBy' && prop.name === 'Rubric Evaluation 1 (Evaluation reviewers)'
+      (prop) => prop.type === 'proposalEvaluatedBy' && prop.name === 'Rubric Evaluation 1'
     ) as IPropertyTemplate;
     const rubricEvaluation2EvaluationEvaluatedByProp = properties.find(
-      (prop) => prop.type === 'proposalEvaluatedBy' && prop.name === 'Rubric Evaluation 2 (Evaluation reviewers)'
+      (prop) => prop.type === 'proposalEvaluatedBy' && prop.name === 'Rubric Evaluation 2'
     ) as IPropertyTemplate;
     const rubricEvaluation3EvaluationAverageProp = properties.find(
-      (prop) => prop.type === 'proposalEvaluationAverage' && prop.name === 'Rubric Evaluation 3 (Evaluation average)'
+      (prop) => prop.type === 'proposalEvaluationAverage' && prop.name === 'Rubric Evaluation 3'
     ) as IPropertyTemplate;
     const rubricEvaluation3EvaluationTotalProp = properties.find(
-      (prop) => prop.type === 'proposalEvaluationTotal' && prop.name === 'Rubric Evaluation 3 (Evaluation total)'
+      (prop) => prop.type === 'proposalEvaluationTotal' && prop.name === 'Rubric Evaluation 3'
     ) as IPropertyTemplate;
     const rubricEvaluation3EvaluationEvaluatedByProp = properties.find(
-      (prop) => prop.type === 'proposalEvaluatedBy' && prop.name === 'Rubric Evaluation 3 (Evaluation reviewers)'
+      (prop) => prop.type === 'proposalEvaluatedBy' && prop.name === 'Rubric Evaluation 3'
     ) as IPropertyTemplate;
 
     const cardBlocks = await prisma.block.findMany({

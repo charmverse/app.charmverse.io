@@ -8,6 +8,7 @@ import { Button } from 'components/common/Button';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { Constants } from 'lib/focalboard/constants';
+import { getPropertyName } from 'lib/focalboard/getPropertyName';
 
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
@@ -64,7 +65,7 @@ function PropertyMenuItem({
             }
           }}
         >
-          {property.name}
+          {getPropertyName(property)}
         </ListItemText>
         <IconButton
           disabled={visibilityToggleDisabled}
