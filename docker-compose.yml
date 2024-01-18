@@ -59,7 +59,7 @@ services:
       [
         'sh',
         '-c',
-        'npm run prisma:deploy && npx react-env --path .env -- node --max-old-space-size=750 --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000; npm run ceramic:graphql'
+        'npm run prisma:deploy && npx react-env --path .env -- node --max-old-space-size=750 --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000 & npm run ceramic:graphql'
       ]
     environment:
       - REACT_APP_APP_ENV=staging
