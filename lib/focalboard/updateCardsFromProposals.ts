@@ -12,6 +12,7 @@ import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   ProposalRubricCriteriaWithTypedParams
 } from 'lib/proposal/rubric/interfaces';
+import { isTruthy } from 'lib/utilities/types';
 import { relay } from 'lib/websockets/relay';
 
 import { createCardPage } from '../pages/createCardPage';
@@ -196,55 +197,57 @@ export async function updateCardsFromProposals({
     throw new InvalidStateError('Database not configured to use proposals as a source');
   }
 
-  const pageProposals = await prisma.page.findMany({
-    where: {
-      spaceId,
-      type: 'proposal',
-      proposal: {
-        status: {
-          not: 'draft'
+  const [proposalPages, existingCardPages] = await Promise.all([
+    prisma.page.findMany({
+      where: {
+        spaceId,
+        type: 'proposal',
+        proposal: {
+          status: {
+            not: 'draft'
+          }
         }
-      }
-    },
-    include: {
-      proposal: {
-        select: {
-          status: true,
-          archived: true,
-          createdBy: true,
-          formId: true,
-          authors: true,
-          spaceId: true,
-          id: true,
-          evaluations: {
-            select: {
-              id: true,
-              title: true,
-              index: true,
-              result: true,
-              type: true
+      },
+      include: {
+        proposal: {
+          select: {
+            status: true,
+            archived: true,
+            createdBy: true,
+            formId: true,
+            authors: true,
+            spaceId: true,
+            id: true,
+            evaluations: {
+              select: {
+                id: true,
+                title: true,
+                index: true,
+                result: true,
+                type: true
+              },
+              orderBy: {
+                index: 'asc'
+              }
             },
-            orderBy: {
-              index: 'asc'
-            }
-          },
-          rewards: {
-            select: {
-              id: true
-            }
-          },
-          fields: true,
-          form: {
-            select: {
-              formFields: {
-                select: {
-                  id: true,
-                  type: true,
-                  private: true,
-                  answers: {
-                    select: {
-                      proposalId: true,
-                      value: true
+            rewards: {
+              select: {
+                id: true
+              }
+            },
+            fields: true,
+            form: {
+              select: {
+                formFields: {
+                  select: {
+                    id: true,
+                    type: true,
+                    private: true,
+                    answers: {
+                      select: {
+                        proposalId: true,
+                        value: true
+                      }
                     }
                   }
                 }
@@ -253,46 +256,33 @@ export async function updateCardsFromProposals({
           }
         }
       }
-    }
-  });
-
-  const existingCards = await prisma.page.findMany({
-    where: {
-      type: 'card',
-      parentId: boardId,
-      spaceId,
-      syncWithPageId: {
-        not: null
-      }
-    }
-  });
-
-  const existingCardBlocks = await prisma.block
-    .findMany({
+    }),
+    prisma.page.findMany({
       where: {
-        id: {
-          in: existingCards.map((c) => c.id)
+        type: 'card',
+        parentId: boardId,
+        spaceId,
+        syncWithPageId: {
+          not: null
         }
+      },
+      include: {
+        card: true
       }
     })
-    .then((data) =>
-      data.reduce((acc, val) => {
-        acc[val.id] = val;
-        return acc;
-      }, {} as Record<string, Block>)
-    );
+  ]);
 
   // Synced pages with a key referencing the proposal they belong to
-  const existingSyncedCardsWithBlocks = existingCards
-    .filter((card) => !!card.syncWithPageId)
-    .reduce((acc, card) => {
-      const cardPage = card;
-      if (existingCardBlocks[cardPage.id]) {
-        (card as Page & { block: Block }).block = existingCardBlocks[card.id];
-        acc[cardPage.syncWithPageId as string] = card as Page & { block: Block };
-      }
+  const existingSyncedCardsWithBlocks = existingCardPages.reduce<Record<string, Page & { block: Block }>>(
+    (acc, { card, ...cardPage }) => {
+      acc[cardPage.syncWithPageId as string] = {
+        ...cardPage,
+        block: card as Block
+      };
       return acc;
-    }, {} as Record<string, Page & { block: Block }>);
+    },
+    {}
+  );
 
   const databaseProposalProps = extractDatabaseProposalProperties({
     boardBlock
@@ -301,24 +291,24 @@ export async function updateCardsFromProposals({
   /**
    * Case for cards that are linked to a proposal page and need to be updated
    */
-  const updatedCards: Page[] = [];
+  const updatedPages: Page[] = [];
   const updatedBlocks: Block[] = [];
   const newCards: { page: Page; block: Block }[] = [];
 
-  const mappedPageIds = pageProposals.map((p) => p.id);
+  const proposalIds = proposalPages.map((p) => p.proposal?.id).filter(isTruthy);
 
   const [rubricCriteria, rubricAnswers] = await Promise.all([
     prisma.proposalRubricCriteria.findMany({
       where: {
         proposalId: {
-          in: mappedPageIds
+          in: proposalIds
         }
       }
     }),
     prisma.proposalRubricCriteriaAnswer.findMany({
       where: {
         proposalId: {
-          in: mappedPageIds
+          in: proposalIds
         }
       }
     })
@@ -342,7 +332,7 @@ export async function updateCardsFromProposals({
     return acc;
   }, {} as Record<string, ProposalRubricCriteriaAnswer[]>);
 
-  for (const pageWithProposal of pageProposals) {
+  for (const pageWithProposal of proposalPages) {
     const card = existingSyncedCardsWithBlocks[pageWithProposal.id];
 
     const accessPrivateFields = await canAccessPrivateFields({
@@ -459,7 +449,7 @@ export async function updateCardsFromProposals({
 
           return { updatedCardPage: updatedPage, updatedCardBlock: updatedBlock };
         });
-        updatedCards.push(updatedCardPage);
+        updatedPages.push(updatedCardPage);
         updatedBlocks.push(updatedCardBlock);
       }
 
@@ -547,11 +537,11 @@ export async function updateCardsFromProposals({
     }
   }
 
-  if (updatedCards.length > 0) {
+  if (updatedPages.length > 0) {
     relay.broadcast(
       {
         type: 'pages_meta_updated',
-        payload: updatedCards.map(
+        payload: updatedPages.map(
           ({ id, updatedAt, updatedBy, deletedAt, title, hasContent, content, contentText }) => ({
             id,
             spaceId,
@@ -603,40 +593,47 @@ export async function updateCardsFromProposals({
     );
   }
 
-  const reducedPageProposals = pageProposals.reduce((acc, val) => {
+  const reducedproposalPages = proposalPages.reduce((acc, val) => {
     acc[val.id] = val.id;
     return acc;
   }, {} as Record<string, string>);
 
-  const nonExistingProposalPagesIds = existingCards
-    .filter((card) => card.syncWithPageId && !reducedPageProposals[card.syncWithPageId])
+  const orphanPageIds = existingCardPages
+    .filter((card) => card.syncWithPageId && !reducedproposalPages[card.syncWithPageId])
     .map((card) => card.id);
 
   /**
    * Case where a user permanently deleted a proposal page
    */
-  if (nonExistingProposalPagesIds.length > 0) {
+  if (orphanPageIds.length > 0) {
     await prisma.page.deleteMany({
       where: {
         id: {
-          in: nonExistingProposalPagesIds
+          in: orphanPageIds
+        }
+      }
+    });
+    await prisma.block.deleteMany({
+      where: {
+        id: {
+          in: orphanPageIds
         }
       }
     });
   }
 
-  if (nonExistingProposalPagesIds.length > 0) {
+  if (orphanPageIds.length > 0) {
     relay.broadcast(
       {
         type: 'pages_deleted',
-        payload: nonExistingProposalPagesIds.map((id) => ({ id }))
+        payload: orphanPageIds.map((id) => ({ id }))
       },
       spaceId
     );
   }
   return {
     created: newCards.length,
-    deleted: nonExistingProposalPagesIds.length,
-    updated: updatedCards.length
+    deleted: orphanPageIds.length,
+    updated: updatedPages.length
   };
 }
