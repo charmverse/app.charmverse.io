@@ -6,7 +6,6 @@ import { GlobalContext } from 'stories/lib/GlobalContext';
 import { GetQrCodeModal } from 'components/settings/account/components/otp/components/GetQrCodeModal';
 import { ResetRecoveryCodeModal } from 'components/settings/account/components/otp/components/ResetRecoveryCodeModal';
 import { TwoFactorAuthSetupModal } from 'components/settings/account/components/otp/components/TwoFactorAuthSetupModal';
-import { TwoFactorAuthProvider } from 'components/settings/account/components/otp/hooks/useTwoFactorAuth';
 
 import { spaces as _spaces } from '../lib/mockData';
 
@@ -50,11 +49,7 @@ export function ResetRecoveryCodeModalStory() {
 }
 
 export function TwoFactorAuthSetupModalStory() {
-  return (
-    <TwoFactorAuthProvider>
-      <ShowModal modal='TwoFactorAuthSetupModal' />
-    </TwoFactorAuthProvider>
-  );
+  return <ShowModal modal='TwoFactorAuthSetupModal' />;
 }
 
 export function GetQrCodeModalStory() {
