@@ -30,12 +30,12 @@ const TwoFactorAuthContext = createContext<Readonly<IContext>>({
   handleClose: () => {}
 });
 
-export function TwoFactorAuthProvider({ children, onClose }: { children: ReactNode; onClose: () => void }) {
+export function TwoFactorAuthProvider({ children, onClose }: { children: ReactNode; onClose?: () => void }) {
   const [flow, setFlow] = useState<Screens>('start');
   const { data, trigger, error, isMutating: isLoading } = useCreateUserOtp();
 
   const handleClose = () => {
-    onClose();
+    onClose?.();
     setFlow('start');
   };
 
