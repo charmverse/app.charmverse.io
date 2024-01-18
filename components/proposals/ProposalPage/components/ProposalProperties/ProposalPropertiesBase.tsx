@@ -43,6 +43,7 @@ type ProposalPropertiesProps = {
   readOnlyAuthors?: boolean;
   setProposalFormInputs: (values: Partial<ProposalPropertiesInput>) => Promise<void> | void;
   readOnlyCustomProperties?: string[];
+  readOnlySelectedCredentialTemplates?: boolean;
   isReviewer?: boolean;
   rewardIds?: string[] | null;
   proposalId?: string;
@@ -57,6 +58,7 @@ export function ProposalPropertiesBase({
   setProposalFormInputs,
   isPublishingToLens,
   readOnlyCustomProperties,
+  readOnlySelectedCredentialTemplates,
   isReviewer,
   rewardIds,
   proposalId
@@ -128,6 +130,7 @@ export function ProposalPropertiesBase({
                 showEmptyPlaceholder
               />
               <CredentialSelect
+                readOnly={readOnlySelectedCredentialTemplates}
                 selectedCredentialTemplates={proposalFormInputs.selectedCredentialTemplates}
                 onChange={(selectedCredentialTemplates) =>
                   setProposalFormInputs({

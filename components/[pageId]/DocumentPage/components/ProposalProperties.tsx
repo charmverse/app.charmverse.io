@@ -46,6 +46,10 @@ export function ProposalProperties({
 
   // further restrict readOnly if user cannot update proposal properties specifically
   const readOnlyProperties = readOnly || !(pagePermissions?.edit_content || isAdmin);
+  const readOnlySelectedCredentialTemplates =
+    readOnly ||
+    !(pagePermissions?.edit_content || isAdmin) ||
+    (sourceTemplate?.selectedCredentialTemplates && !isAdmin);
 
   // properties with values from templates should be read only
   const readOnlyCustomProperties =
@@ -104,6 +108,7 @@ export function ProposalProperties({
           readOnlyCustomProperties={readOnlyCustomProperties}
           isReviewer={isReviewer}
           rewardIds={proposal?.rewardIds}
+          readOnlySelectedCredentialTemplates={readOnlySelectedCredentialTemplates}
         />
         {isPublishingToLens && (
           <CreateLensPublication

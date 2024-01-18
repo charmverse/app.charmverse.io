@@ -150,6 +150,8 @@ export function NewProposalPage({
 
   const proposalTemplatePage = formInputs.proposalTemplateId ? pages[formInputs.proposalTemplateId] : null;
 
+  const readOnlySelectedCredentialTemplates = sourceTemplate?.selectedCredentialTemplates && !isAdmin;
+
   // properties with values from templates should be read only
   const readOnlyCustomProperties =
     !isAdmin && sourceTemplate?.fields
@@ -180,6 +182,7 @@ export function NewProposalPage({
           group: reviewer.roleId ? 'role' : 'user',
           id: reviewer.roleId ?? (reviewer.userId as string)
         })),
+        selectedCredentialTemplates: template.selectedCredentialTemplates ?? [],
         proposalTemplateId: _templateId,
         headerImage: template.page.headerImage,
         icon: template.page.icon,
@@ -308,6 +311,7 @@ export function NewProposalPage({
               proposalFormInputs={formInputs}
               setProposalFormInputs={setFormInputs}
               readOnlyCustomProperties={readOnlyCustomProperties}
+              readOnlySelectedCredentialTemplates={readOnlySelectedCredentialTemplates}
             />
           </div>
         </div>
