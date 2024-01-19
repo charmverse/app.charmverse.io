@@ -1,4 +1,4 @@
-import type { FormField } from '@charmverse/core/prisma-client';
+import type { FormField, FormFieldAnswer } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { Chip, Stack } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
@@ -7,6 +7,7 @@ import { Controller } from 'react-hook-form';
 
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 
@@ -26,7 +27,7 @@ type FormFieldInputsProps = {
   formFields: (Pick<FormField, 'type' | 'name' | 'required' | 'id' | 'description' | 'private'> & {
     value?: FormFieldValue;
     options?: SelectOptionType[];
-    formFieldAnswerId?: string;
+    formFieldAnswer: FormFieldAnswer | null;
   })[];
   disabled?: boolean;
   errors: FieldErrors<Record<string, FormFieldValue>>;
@@ -108,6 +109,7 @@ function FormFieldInputsBase({
   isReviewer: boolean;
   threads?: Record<string, ThreadWithComments | undefined>;
 }) {
+  const { user } = useUser();
   const [isFormDirty, setIsFormDirty] = useState(false);
   const { showMessage } = useSnackbar();
   const debouncedValues = useDebouncedValue(values, 300);
@@ -162,8 +164,8 @@ function FormFieldInputsBase({
     <Stack gap={1} mb={15}>
       <FormFieldInputsContainer>
         {formFields.map((formField) => {
-          const fieldAnswerThread = formField.formFieldAnswerId
-            ? fieldAnswerIdThreadRecord[formField.formFieldAnswerId]
+          const fieldAnswerThread = formField.formFieldAnswer
+            ? fieldAnswerIdThreadRecord[formField.formFieldAnswer.id]
             : null;
           return (
             <Stack flexDirection='row' alignItems='center' gap={1} key={formField.id}>
@@ -198,9 +200,9 @@ function FormFieldInputsBase({
                   />
                 )}
               />
-              {pageId && formField.type !== 'label' && formField.formFieldAnswerId && (
+              {pageId && formField.type !== 'label' && formField.formFieldAnswer && user && (
                 <FormFieldAnswerComment
-                  fieldAnswerId={formField.formFieldAnswerId}
+                  formFieldAnswer={formField.formFieldAnswer}
                   pageId={pageId}
                   disabled={disabled}
                   isReviewer={isReviewer}

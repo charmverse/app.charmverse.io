@@ -485,12 +485,14 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
                 <ListItemText>{thread.resolved ? 'Un-resolve' : 'Resolve'}</ListItemText>
               </MenuItem>
             )}
-            <MenuItem onClick={onClickEditComment}>
-              <ListItemIcon>
-                <EditIcon />
-              </ListItemIcon>
-              <ListItemText>Edit comment</ListItemText>
-            </MenuItem>
+            {!thread?.resolved && (
+              <MenuItem onClick={onClickEditComment}>
+                <ListItemIcon>
+                  <EditIcon />
+                </ListItemIcon>
+                <ListItemText>Edit comment</ListItemText>
+              </MenuItem>
+            )}
             <MenuItem onClick={onClickDeleteComment}>
               <ListItemIcon>
                 <DeleteOutlinedIcon />
@@ -499,7 +501,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
             </MenuItem>
           </Menu>
         </div>
-        {canCreateComments && (
+        {canCreateComments && !thread.resolved && (
           <AddCommentCharmEditor
             readOnly={Boolean(editedCommentId)}
             key={counter}

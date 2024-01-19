@@ -1,3 +1,4 @@
+import type { FormFieldAnswer } from '@charmverse/core/prisma-client';
 import { MessageOutlined } from '@mui/icons-material';
 import AddCommentOutlinedIcon from '@mui/icons-material/AddCommentOutlined';
 import { Box, IconButton, Tooltip, Typography } from '@mui/material';
@@ -13,19 +14,25 @@ import { ThreadContainer } from '../CharmEditor/components/inlineComment/compone
 import PageThread from '../CharmEditor/components/thread/PageThread';
 import PopperPopup from '../PopperPopup';
 
+import type { FormFieldValue } from './interfaces';
+
 export function FormFieldAnswerComment({
   pageId,
   disabled,
   isReviewer,
-  fieldAnswerId,
-  fieldAnswerThread
+  fieldAnswerThread,
+  formFieldAnswer
 }: {
-  fieldAnswerId: string;
   isReviewer: boolean;
   disabled?: boolean;
   pageId: string;
   fieldAnswerThread?: ThreadWithComments | null;
+  formFieldAnswer: FormFieldAnswer;
 }) {
+  const formFieldAnswerValue = formFieldAnswer.value as FormFieldValue;
+  let value = Array.isArray(formFieldAnswerValue) ? formFieldAnswerValue[0] : formFieldAnswerValue;
+  value = typeof value === 'object' ? value.contentText : value;
+
   const { trigger: createThread } = useCreateThread();
   const { refetchThreads } = useThreads();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -33,13 +40,13 @@ export function FormFieldAnswerComment({
     event.preventDefault();
     await createThread({
       comment: commentContent,
-      context: 'Form field answer context',
+      context: value,
       pageId,
       accessGroups: threadAccessGroups.map((threadAccessGroup) => ({
         id: threadAccessGroup.id,
         group: threadAccessGroup.group
       })),
-      fieldAnswerId
+      fieldAnswerId: formFieldAnswer.id
     });
     await refetchThreads();
     setIsPopoverOpen(false);
@@ -88,14 +95,7 @@ export function FormFieldAnswerComment({
             </Typography>
           </Box>
         ) : (
-          <IconButton
-            sx={{
-              mt: 1
-            }}
-            disabled={!isReviewer || disabled}
-            color='secondary'
-            onClick={() => setIsPopoverOpen(true)}
-          >
+          <IconButton disabled={!isReviewer || disabled} color='secondary' onClick={() => setIsPopoverOpen(true)}>
             <AddCommentOutlinedIcon fontSize='small' />
           </IconButton>
         )}

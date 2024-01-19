@@ -5,6 +5,7 @@ import type { SelectOptionType } from 'components/common/form/fields/Select/inte
 import { FormFieldInputs } from 'components/common/form/FormFieldInputs';
 import type { FormFieldValue } from 'components/common/form/interfaces';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
+import { isTruthy } from 'lib/utilities/types';
 
 export function ProposalFormFieldInputs({
   proposalId,
@@ -46,17 +47,22 @@ export function ProposalFormFieldInputs({
       pageId={pageId}
       disabled={readOnly}
       threads={threads}
-      formFields={formFields.map((formField) => {
-        const proposalFormFieldAnswer = proposalFormFieldAnswers.find(
-          (_proposalFormFieldAnswer) => _proposalFormFieldAnswer.fieldId === formField.id
-        );
-        return {
-          ...formField,
-          formFieldAnswerId: proposalFormFieldAnswer?.id,
-          value: proposalFormFieldAnswer?.value as FormFieldValue,
-          options: (formField.options ?? []) as SelectOptionType[]
-        };
-      })}
+      formFields={formFields
+        .map((formField) => {
+          const proposalFormFieldAnswer = proposalFormFieldAnswers.find(
+            (_proposalFormFieldAnswer) => _proposalFormFieldAnswer.fieldId === formField.id
+          );
+          if (!proposalFormFieldAnswer) {
+            return null;
+          }
+          return {
+            ...formField,
+            formFieldAnswer: proposalFormFieldAnswer,
+            value: proposalFormFieldAnswer?.value as FormFieldValue,
+            options: (formField.options ?? []) as SelectOptionType[]
+          };
+        })
+        .filter(isTruthy)}
     />
   );
 }
