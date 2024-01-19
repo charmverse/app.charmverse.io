@@ -10,7 +10,7 @@ export async function verifyOtpToken(userId: string, token: string) {
       id: userId
     },
     include: {
-      userOTP: {
+      otp: {
         select: {
           secret: true
         }
@@ -18,11 +18,11 @@ export async function verifyOtpToken(userId: string, token: string) {
     }
   });
 
-  if (!user?.userOTP) {
+  if (!user?.otp) {
     throw new InvalidInputError('User OTP does not exist');
   }
 
-  const decryptedSecret = decryptRecoveryCode(user.userOTP.secret);
+  const decryptedSecret = decryptRecoveryCode(user.otp.secret);
 
   const delta = validateToken(decryptedSecret, token, user.username);
 

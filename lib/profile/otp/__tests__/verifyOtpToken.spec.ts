@@ -15,8 +15,8 @@ describe('verifyOtp', () => {
 
   it(`Should succeed with a valid code`, async () => {
     const { user } = await generateUserAndSpace();
-    const userOTP = await createTestUserOtp(user.id);
-    const token = generateTestOtpToken(user.username, userOTP.secret);
+    const otp = await createTestUserOtp(user.id);
+    const token = generateTestOtpToken(user.username, otp.secret);
     const delta = await verifyOtpToken(user.id, token);
 
     expect(delta).toBe(0);

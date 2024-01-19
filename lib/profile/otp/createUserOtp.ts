@@ -22,7 +22,7 @@ export async function createUserOtp(userId: string): Promise<CreateOtpResponse> 
       id: userId
     },
     include: {
-      userOTP: true
+      otp: true
     }
   });
 
@@ -34,10 +34,10 @@ export async function createUserOtp(userId: string): Promise<CreateOtpResponse> 
 
   const createdRecoveryCode = createRecoveryCode();
 
-  if (user.userOTP?.recoveryCodeId) {
+  if (user.otp?.recoveryCodeId) {
     await prisma.recoveryCode.update({
       where: {
-        id: user.userOTP.recoveryCodeId
+        id: user.otp.recoveryCodeId
       },
       data: {
         deletedAt: new Date()
@@ -51,9 +51,9 @@ export async function createUserOtp(userId: string): Promise<CreateOtpResponse> 
     }
   });
 
-  await prisma.userOTP.upsert({
+  await prisma.otp.upsert({
     where: {
-      id: user.userOTP?.id || uuid()
+      id: user.otp?.id || uuid()
     },
     create: {
       userId: user.id,
