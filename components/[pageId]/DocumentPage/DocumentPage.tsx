@@ -309,7 +309,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
           proposalTemplateId={proposal?.page?.sourceTemplateId}
           onChangeEvaluation={onChangeEvaluation}
           refreshProposal={refreshProposal}
-          disabledViews={isStructuredProposal ? ['suggestions', 'comments'] : []}
+          disabledViews={isStructuredProposal ? ['suggestions'] : []}
           onChangeWorkflow={onChangeWorkflow}
         />
       )}

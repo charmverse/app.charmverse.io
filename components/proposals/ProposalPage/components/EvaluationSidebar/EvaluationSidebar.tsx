@@ -34,6 +34,7 @@ export type Props = {
     | 'currentEvaluationId'
     | 'page'
     | 'lensPostLink'
+    | 'formId'
   >;
   onChangeEvaluation?: (evaluationId: string, updated: Partial<ProposalEvaluationValues>) => void;
   refreshProposal?: VoidFunction;

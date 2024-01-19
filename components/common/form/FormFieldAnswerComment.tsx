@@ -17,7 +17,7 @@ import PopperPopup from '../PopperPopup';
 
 import type { FormFieldValue } from './interfaces';
 
-function FormFieldAnswerInput({
+function FormFieldAnswerThreads({
   disabled,
   fieldAnswerThreads = [],
   canCreateComments
@@ -74,7 +74,7 @@ function FormFieldAnswerInput({
   );
 }
 
-export function FormFieldAnswerThreads({
+export function FormFieldAnswerInput({
   pageId,
   disabled,
   formFieldAnswer,
@@ -148,12 +148,12 @@ export function FormFieldAnswerComment({
 }) {
   return (
     <Stack flexDirection='row' gap={1} className='icons' position='relative' top={10} alignItems='center'>
-      <FormFieldAnswerInput
+      <FormFieldAnswerThreads
         disabled={disabled}
         fieldAnswerThreads={fieldAnswerThreads}
         canCreateComments={canCreateComments}
       />
-      <FormFieldAnswerThreads
+      <FormFieldAnswerInput
         disabled={disabled}
         pageId={pageId}
         formFieldAnswer={formFieldAnswer}
