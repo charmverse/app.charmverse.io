@@ -19,11 +19,9 @@ import type { FormFieldValue } from './interfaces';
 export function FormFieldAnswerComment({
   pageId,
   disabled,
-  isReviewer,
   fieldAnswerThread,
   formFieldAnswer
 }: {
-  isReviewer: boolean;
   disabled?: boolean;
   pageId: string;
   fieldAnswerThread?: ThreadWithComments | null;
@@ -65,7 +63,7 @@ export function FormFieldAnswerComment({
               sx={{
                 border: 'none'
               }}
-              canCreateComments={isReviewer && !disabled}
+              canCreateComments={!disabled}
               inline
               threadId={fieldAnswerThread.id}
             />
@@ -81,11 +79,7 @@ export function FormFieldAnswerComment({
       open={isPopoverOpen}
     >
       <Tooltip
-        title={
-          isReviewer && !disabled
-            ? 'Add a comment to the form field answer'
-            : "You don't have permission to add a comment"
-        }
+        title={!disabled ? 'Add a comment to the form field answer' : "You don't have permission to add a comment"}
       >
         {fieldAnswerThread ? (
           <Box display='flex' gap={0.5} alignItems='center' sx={{ cursor: 'pointer' }}>
@@ -95,7 +89,7 @@ export function FormFieldAnswerComment({
             </Typography>
           </Box>
         ) : (
-          <IconButton disabled={!isReviewer || disabled} color='secondary' onClick={() => setIsPopoverOpen(true)}>
+          <IconButton disabled={disabled} color='secondary' onClick={() => setIsPopoverOpen(true)}>
             <AddCommentOutlinedIcon fontSize='small' />
           </IconButton>
         )}

@@ -200,12 +200,11 @@ function FormFieldInputsBase({
                   />
                 )}
               />
-              {pageId && formField.type !== 'label' && formField.formFieldAnswer && user && (
+              {pageId && formField.type !== 'label' && formField.formFieldAnswer && user && isReviewer && (
                 <FormFieldAnswerComment
                   formFieldAnswer={formField.formFieldAnswer}
                   pageId={pageId}
                   disabled={disabled}
-                  isReviewer={isReviewer}
                   fieldAnswerThread={fieldAnswerThread}
                 />
               )}
