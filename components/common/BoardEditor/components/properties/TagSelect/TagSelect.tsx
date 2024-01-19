@@ -113,6 +113,7 @@ export type TagSelectProps = {
   wrapColumn?: boolean;
   'data-test'?: string;
   fluidWidth?: boolean;
+  emptyMessage?: string;
   showEmpty?: boolean;
 };
 
@@ -202,6 +203,7 @@ export function TagSelect({
           value={selectValue}
           options={selectOptions}
           size='small'
+          emptyMessage={props.emptyMessage}
           showEmpty={showEmpty ?? displayType === 'details'}
         />
       </SelectPreviewContainer>

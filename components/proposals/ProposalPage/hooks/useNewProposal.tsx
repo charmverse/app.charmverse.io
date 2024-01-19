@@ -66,7 +66,8 @@ export function useNewProposal({ newProposal }: Props) {
         formId: formInputs.formId,
         formAnswers: formInputs.formAnswers,
         workflowId: formInputs.workflowId || undefined,
-        isDraft
+        isDraft,
+        selectedCredentialTemplates: formInputs.selectedCredentialTemplates ?? []
       }).catch((err: any) => {
         showMessage(err.message ?? 'Something went wrong', 'error');
         throw err;
@@ -170,6 +171,7 @@ function emptyState({
     title: '',
     type: 'proposal',
     publishToLens: false,
+    selectedCredentialTemplates: [],
     fields: { properties: {} },
     ...inputs,
     // leave authors empty for proposals

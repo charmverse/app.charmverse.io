@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { issueProposalCredentialsIfNecessary } from 'lib/credentials/issueProposalCredentialsIfNecessary';
 import { isTruthy } from 'lib/utilities/types';
 import { getVotesByState } from 'lib/votes/getVotesByState';
 import { VOTE_STATUS } from 'lib/votes/interfaces';
@@ -98,6 +99,13 @@ const updateVoteStatus = async () => {
       return Promise.resolve();
     })
   ]);
+
+  for (const passedEval of passedEvaluations) {
+    await issueProposalCredentialsIfNecessary({
+      event: 'proposal_approved',
+      proposalId: passedEval.proposalId
+    });
+  }
 
   return votesPassedDeadline.length;
 };
