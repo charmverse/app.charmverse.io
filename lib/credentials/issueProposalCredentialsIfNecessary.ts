@@ -49,8 +49,7 @@ export async function issueProposalCredentialsIfNecessary({
 
   // TODO - Remove this before releasing
   const issueCredential = isCharmVerseSpace({
-    space: baseProposal.space,
-    alwaysTrueInTestEnv: true
+    space: baseProposal.space
   });
 
   if (!issueCredential) {

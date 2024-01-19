@@ -37,7 +37,8 @@ describe('issueProposalCredentialIfNecessary', () => {
   it('should issue credentials once for a unique combination of user, proposal and credential template', async () => {
     const { space, user: author1 } = await testUtilsUser.generateUserAndSpace({
       spaceCredentialEvents: ['proposal_approved', 'proposal_created'],
-      wallet: randomETHWalletAddress()
+      wallet: randomETHWalletAddress(),
+      domain: `cvt-testing-${uuid()}`
     });
     const author2 = await testUtilsUser.generateSpaceUser({ spaceId: space.id, wallet: randomETHWalletAddress() });
     const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({ spaceId: space.id });
@@ -131,7 +132,8 @@ describe('issueProposalCredentialIfNecessary', () => {
   it('should only issue credentials if the space allows issuing credentials for the event', async () => {
     const { space, user: author1 } = await testUtilsUser.generateUserAndSpace({
       spaceCredentialEvents: ['proposal_approved'],
-      wallet: randomETHWalletAddress()
+      wallet: randomETHWalletAddress(),
+      domain: `cvt-testing-${uuid()}`
     });
     const author2 = await testUtilsUser.generateSpaceUser({ spaceId: space.id, wallet: randomETHWalletAddress() });
     const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({ spaceId: space.id });
@@ -196,7 +198,8 @@ describe('issueProposalCredentialIfNecessary', () => {
   it('should issue credentials for newly added authors', async () => {
     const { space, user: author1 } = await testUtilsUser.generateUserAndSpace({
       spaceCredentialEvents: ['proposal_approved'],
-      wallet: randomETHWalletAddress()
+      wallet: randomETHWalletAddress(),
+      domain: `cvt-testing-${uuid()}`
     });
     const author2 = await testUtilsUser.generateSpaceUser({ spaceId: space.id, wallet: randomETHWalletAddress() });
     const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({ spaceId: space.id });
@@ -261,7 +264,8 @@ describe('issueProposalCredentialIfNecessary', () => {
   it('should ignore inexistent selected credentials', async () => {
     const { space, user: author1 } = await testUtilsUser.generateUserAndSpace({
       spaceCredentialEvents: ['proposal_approved'],
-      wallet: randomETHWalletAddress()
+      wallet: randomETHWalletAddress(),
+      domain: `cvt-testing-${uuid()}`
     });
 
     const inexistentCredentialId = uuid();
@@ -308,7 +312,8 @@ describe('issueProposalCredentialIfNecessary', () => {
     const { space, user: author1 } = await testUtilsUser.generateUserAndSpace({
       spaceCredentialEvents: ['proposal_approved'],
       // Dont' assign a wallet to the user
-      wallet: undefined
+      wallet: undefined,
+      domain: `cvt-testing-${uuid()}`
     });
 
     const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({ spaceId: space.id });
@@ -341,7 +346,8 @@ describe('issueProposalCredentialIfNecessary', () => {
   it('should not issue a proposal_created credential if the proposal status is draft', async () => {
     const { space, user: author1 } = await testUtilsUser.generateUserAndSpace({
       spaceCredentialEvents: ['proposal_created'],
-      wallet: randomETHWalletAddress()
+      wallet: randomETHWalletAddress(),
+      domain: `cvt-testing-${uuid()}`
     });
 
     const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({ spaceId: space.id });
@@ -374,7 +380,8 @@ describe('issueProposalCredentialIfNecessary', () => {
   it('should not issue a proposal_approved credential if the proposal evaluation is failed', async () => {
     const { space, user: author1 } = await testUtilsUser.generateUserAndSpace({
       spaceCredentialEvents: ['proposal_approved'],
-      wallet: randomETHWalletAddress()
+      wallet: randomETHWalletAddress(),
+      domain: `cvt-testing-${uuid()}`
     });
 
     const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({ spaceId: space.id });
@@ -407,7 +414,8 @@ describe('issueProposalCredentialIfNecessary', () => {
   it('should not issue a proposal_approved credential if the final proposal evaluation has not been reached', async () => {
     const { space, user: author1 } = await testUtilsUser.generateUserAndSpace({
       spaceCredentialEvents: ['proposal_approved'],
-      wallet: randomETHWalletAddress()
+      wallet: randomETHWalletAddress(),
+      domain: `cvt-testing-${uuid()}`
     });
 
     const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({ spaceId: space.id });
