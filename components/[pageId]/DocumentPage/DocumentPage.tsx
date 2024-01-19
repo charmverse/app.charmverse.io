@@ -44,6 +44,7 @@ import PageDeleteBanner from './components/PageDeleteBanner';
 import PageHeader, { getPageTop } from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
 import { PrimaryColumn } from './components/PrimaryColumn';
+import { ProposalArchivedBanner } from './components/ProposalArchivedBanner';
 import { ProposalBanner } from './components/ProposalBanner';
 import { ProposalProperties } from './components/ProposalProperties';
 import { PageSidebar } from './components/Sidebar/PageSidebar';
@@ -335,6 +336,11 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
         {!!page?.deletedAt && (
           <AlertContainer>
             <PageDeleteBanner pageType={page.type} pageId={page.id} />
+          </AlertContainer>
+        )}
+        {!!proposal?.archived && (
+          <AlertContainer>
+            <ProposalArchivedBanner proposalId={proposal.id} disabled={!proposal.permissions.delete} />
           </AlertContainer>
         )}
         {connectionError && (

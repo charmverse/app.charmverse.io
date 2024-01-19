@@ -10,14 +10,12 @@ export async function trashPages({
   pageIds,
   userId,
   spaceId,
-  emitPageStatusEvent = true,
   relay
 }: {
   trash: boolean;
   pageIds: string[];
   userId: string;
   spaceId: string;
-  emitPageStatusEvent?: boolean;
   relay: AbstractWebsocketBroadcaster;
 }) {
   const modifiedChildPageIds: string[] = [];

@@ -1,14 +1,15 @@
 import type { ReactNode } from 'react';
-import { createContext, useCallback, useContext, useMemo } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo } from 'react';
 import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import { useGetProposalsBySpace } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
-import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';
+import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { ProposalWithUsersLite } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
+import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 type ProposalsContextType = {
   proposals: ProposalWithUsersLite[] | undefined;
@@ -23,6 +24,7 @@ export const ProposalsContext = createContext<ProposalsContextType | null>(null)
 export function ProposalsProvider({ children }: { children: ReactNode }) {
   const { loadingPages } = usePages();
   const { space } = useCurrentSpace();
+  const { subscribe } = useWebSocketClient();
 
   const { data: proposals, mutate: mutateProposals, isLoading } = useGetProposalsBySpace({ spaceId: space?.id });
 
@@ -44,6 +46,30 @@ export function ProposalsProvider({ children }: { children: ReactNode }) {
     });
     return map;
   }, [proposals]);
+
+  useEffect(() => {
+    function handleArchivedEvent(payload: WebSocketPayload<'proposals_archived'>) {
+      mutateProposals(
+        (list) => {
+          if (!list) return list;
+          return list.map((proposal) => {
+            if (payload.proposalIds.includes(proposal.id)) {
+              return {
+                ...proposal,
+                archived: payload.archived
+              };
+            }
+            return proposal;
+          });
+        },
+        { revalidate: false }
+      );
+    }
+    const unsubscribeFromPageRestores = subscribe('proposals_archived', handleArchivedEvent);
+    return () => {
+      unsubscribeFromPageRestores();
+    };
+  }, [mutateProposals, subscribe]);
 
   const value = useMemo(
     () => ({
