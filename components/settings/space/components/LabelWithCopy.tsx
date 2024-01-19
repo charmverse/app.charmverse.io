@@ -1,5 +1,6 @@
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { Stack, Tooltip, Typography } from '@mui/material';
+import type { TypographyProps } from '@mui/material/Typography';
 import { useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 
@@ -8,7 +9,7 @@ type Props = {
   copyText?: string;
 };
 
-export function LabelWithCopy({ label, copyText }: Props) {
+export function LabelWithCopy({ label, copyText, ...restProps }: Props & TypographyProps) {
   const [copied, setCopied] = useState(false);
 
   function onCopy() {
@@ -24,8 +25,9 @@ export function LabelWithCopy({ label, copyText }: Props) {
             <ContentCopyIcon fontSize='small' sx={{ cursor: 'pointer' }} />
           </Stack>
         </Tooltip>
-
-        <Typography variant='caption'>{label}</Typography>
+        <Typography variant='caption' {...restProps}>
+          {label}
+        </Typography>
       </Stack>
     </CopyToClipboard>
   );

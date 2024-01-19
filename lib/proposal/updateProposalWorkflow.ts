@@ -1,5 +1,5 @@
-import type { ProposalWorkflowTyped } from '@charmverse/core/dist/cjs/proposals';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 
 import { setPageUpdatedAt } from './setPageUpdatedAt';
 

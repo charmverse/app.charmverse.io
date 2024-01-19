@@ -139,17 +139,7 @@ describe('exportSpaceData', () => {
         prisma.page.findUniqueOrThrow({
           where: { id: p.id },
           include: {
-            proposal: {
-              include: {
-                evaluations: {
-                  include: {
-                    reviewers: true,
-                    rubricCriteria: true,
-                    permissions: true
-                  }
-                }
-              }
-            }
+            proposal: true
           }
         })
       )
@@ -168,17 +158,7 @@ describe('exportSpaceData', () => {
         prisma.page.findUniqueOrThrow({
           where: { id: p.id },
           include: {
-            proposal: {
-              include: {
-                evaluations: {
-                  include: {
-                    reviewers: true,
-                    rubricCriteria: true,
-                    permissions: true
-                  }
-                }
-              }
-            }
+            proposal: true
           }
         })
       )
@@ -194,17 +174,7 @@ describe('exportSpaceData', () => {
         prisma.page.findUniqueOrThrow({
           where: { id: p.id },
           include: {
-            proposal: {
-              include: {
-                evaluations: {
-                  include: {
-                    reviewers: true,
-                    rubricCriteria: true,
-                    permissions: true
-                  }
-                }
-              }
-            }
+            proposal: true
           }
         })
       )
@@ -438,7 +408,6 @@ describe('exportSpaceData', () => {
     expect(exportedData).toMatchObject<SpaceDataExport>({
       space: {
         proposalBlocks: expect.arrayContaining([customProposalBlockBoard, customProposalBlockView]),
-        proposalWorkflows: [],
         rewardBlocks: expect.arrayContaining([customRewardBlockBoard, customRewardBlockView]),
         features: space.features,
         memberProfiles: space.memberProfiles,
@@ -470,7 +439,6 @@ describe('exportSpaceData', () => {
     expect(exportedData).toMatchObject<SpaceDataExport>({
       space: {
         proposalBlocks: expect.arrayContaining([customProposalBlockBoard, customProposalBlockView]),
-        proposalWorkflows: [],
         rewardBlocks: expect.arrayContaining([customRewardBlockBoard, customRewardBlockView]),
         features: space.features,
         memberProfiles: space.memberProfiles,
