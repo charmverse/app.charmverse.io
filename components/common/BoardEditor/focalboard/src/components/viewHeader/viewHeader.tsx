@@ -40,7 +40,6 @@ type Props = {
   showCard: (cardId: string | null) => void;
   // addCardFromTemplate: (cardTemplateId: string) => void
   addCardTemplate: () => void;
-  editCardTemplate: (cardTemplateId: string) => void;
   readOnly: boolean;
   dateDisplayProperty?: IPropertyTemplate;
   disableUpdatingUrl?: boolean;
@@ -229,7 +228,6 @@ function ViewHeader(props: Props) {
                   addCard={props.addCard}
                   addCardFromTemplate={addPageFromTemplate}
                   addCardTemplate={props.addCardTemplate}
-                  editCardTemplate={props.editCardTemplate}
                   showCard={props.showCard}
                   deleteCardTemplate={deleteCardTemplate}
                   boardId={viewsBoard.id}

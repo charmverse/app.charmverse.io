@@ -17,7 +17,7 @@ export function ArchiveProposalAction({ proposalId }: { proposalId: string }) {
   const { showError } = useSnackbar();
 
   const permissions = proposal?.permissions;
-  const disabled = proposal?.archived ? !permissions?.unarchive : !permissions?.archive;
+  const disabled = proposal && (proposal.archived ? !permissions?.unarchive : !permissions?.archive);
 
   const label = proposal?.archived ? 'Unarchive' : 'Archive';
 
@@ -38,7 +38,7 @@ export function ArchiveProposalAction({ proposalId }: { proposalId: string }) {
           <ListItemIcon>
             <InventoryIcon fontSize='small' />
           </ListItemIcon>
-          <ListItemText primary={`${label} proposal`} />
+          <ListItemText primary={`${label}`} />
         </MenuItem>
       </div>
     </Tooltip>

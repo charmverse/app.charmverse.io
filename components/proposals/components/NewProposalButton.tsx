@@ -13,8 +13,10 @@ import { Button } from 'components/common/Button';
 import { DeleteIcon } from 'components/common/Icons/DeleteIcon';
 import { EditIcon } from 'components/common/Icons/EditIcon';
 import Modal from 'components/common/Modal';
+import { ArchiveProposalAction } from 'components/common/PageActions/components/ArchiveProposalAction';
 import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
-import { TemplatesMenu } from 'components/common/TemplatesMenu';
+import { TemplatesMenu } from 'components/common/TemplatesMenu/TemplatesMenu';
+import type { TemplateItem } from 'components/common/TemplatesMenu/TemplatesMenu';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -54,16 +56,15 @@ export function NewProposalButton() {
   const { trigger: trashPages } = useTrashPages();
 
   const canCreateProposal = spacePermissions?.createProposals;
-  // grab page data from context so that title is always up-to-date
-  const proposalTemplatePages = proposalTemplates
-    ?.filter((template) => !!pages[template.page.id])
-    .map(
-      (template) =>
-        ({ ...pages[template.page.id], isStructuredProposal: !!template.formId } as PageMeta & {
-          isStructuredProposal: boolean;
-        })
-    )
-    .filter(isTruthy);
+
+  const proposalTemplatePages: TemplateItem[] = (proposalTemplates || []).map((proposal) => ({
+    id: proposal.page.id,
+    // grab page title from pages context so that title is always up-to-date
+    title: pages[proposal.page.id]?.title || proposal.page.title,
+    proposalId: proposal.id,
+    isStructuredProposal: !!proposal.formId,
+    archived: !!proposal.archived
+  }));
 
   function deleteProposalTemplate(pageId: string) {
     return trashPages({ pageIds: [pageId], trash: true });
@@ -108,7 +109,7 @@ export function NewProposalButton() {
         isLoading={isLoadingTemplates}
         addPageFromTemplate={createFromTemplate}
         editTemplate={editTemplate}
-        pages={proposalTemplatePages}
+        templates={proposalTemplatePages}
         createTemplate={proposalTemplateCreateModalState.open}
         deleteTemplate={deleteProposalTemplate}
         anchorEl={buttonRef.current as Element}
@@ -117,7 +118,7 @@ export function NewProposalButton() {
         enableItemOptions={isAdmin}
         enableNewTemplates={isAdmin}
         // eslint-disable-next-line react/no-unstable-nested-components
-        pageActions={({ pageId }) => (
+        pageActions={({ pageId, proposalId }) => (
           <>
             <MenuItem
               data-test={`template-menu-edit-${pageId}`}
@@ -157,6 +158,7 @@ export function NewProposalButton() {
               </ListItemIcon>
               <ListItemText>Delete</ListItemText>
             </MenuItem>
+            <ArchiveProposalAction proposalId={proposalId!} />
           </>
         )}
       />

@@ -13,14 +13,15 @@ export type Props = {
   deleteTemplate: (pageId: string) => void;
   editTemplate: (showPage: string) => void;
   pageId: string;
+  proposalId?: string | null;
   closeParentPopup: () => void;
-  pageActions?: (props: { pageId: string }) => ReactNode;
+  pageActions?: (props: { pageId: string; proposalId?: string | null }) => ReactNode;
 };
 
 export function TemplatePageActionMenu(props: Props) {
-  const { pageId, closeParentPopup, pageActions } = props;
+  const { pageId, proposalId, closeParentPopup, pageActions } = props;
   const popupState = usePopupState({ variant: 'popover', popupId: `template-context-${pageId}` });
-  const pageActionsMemo = useMemo(() => pageActions?.({ pageId }), [pageId]);
+  const pageActionsMemo = useMemo(() => pageActions?.({ pageId, proposalId }), [pageId, proposalId]);
 
   return (
     <>

@@ -65,9 +65,9 @@ export function ProposalsProvider({ children }: { children: ReactNode }) {
         { revalidate: false }
       );
     }
-    const unsubscribeFromPageRestores = subscribe('proposals_archived', handleArchivedEvent);
+    const unsubscribeFromProposalArchived = subscribe('proposals_archived', handleArchivedEvent);
     return () => {
-      unsubscribeFromPageRestores();
+      unsubscribeFromProposalArchived();
     };
   }, [mutateProposals, subscribe]);
 
