@@ -81,7 +81,7 @@ export function IdentityIcon({ type, size = 'medium' }: { type: IdentityType | n
     case 'Lens': {
       return (
         <img
-          src='/images/logos/lens_logo.svg'
+          src='/images/logos/lens_logo.png'
           style={{
             width,
             height

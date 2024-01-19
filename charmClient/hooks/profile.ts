@@ -7,11 +7,11 @@ export function useSaveOnboardingEmail() {
   return usePUT<EmailPreferences, LoggedInUser>('/api/profile/onboarding-email');
 }
 
-export function useCreateUserOtp() {
+export function useCreateOtp() {
   return usePOST<undefined, { code: string; uri: string; recoveryCode: string }>(`/api/profile/otp`);
 }
 
-export function useGetUserOtp() {
+export function useGetOtp() {
   return useGETtrigger<{ authCode: string }, { code: string; uri: string }>(`/api/profile/otp`);
 }
 

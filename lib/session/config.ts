@@ -61,7 +61,7 @@ export const sessionUserRelations = {
       domain: true
     }
   },
-  userOTP: {
+  otp: {
     select: {
       activatedAt: true
     }

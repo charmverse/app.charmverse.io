@@ -5,7 +5,7 @@ import type { Socket } from 'socket.io';
 import { validate } from 'uuid';
 
 import { STATIC_PAGES } from 'lib/features/constants';
-import { archivePages } from 'lib/pages/archivePages';
+import { trashPages } from 'lib/pages/trashPages';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
@@ -504,21 +504,21 @@ export class DocumentEventHandler {
         }
 
         if (deletedPageIds.length && socketEvent !== 'page_reordered') {
-          await archivePages({
+          await trashPages({
             pageIds: deletedPageIds,
             userId: session.user.id,
             spaceId: room.doc.spaceId,
-            archive: true,
+            trash: true,
             relay: this.relay
           });
         }
 
         if (restoredPageIds.length && socketEvent !== 'page_reordered') {
-          await archivePages({
+          await trashPages({
             pageIds: restoredPageIds,
             userId: session.user.id,
             spaceId: room.doc.spaceId,
-            archive: false,
+            trash: false,
             relay: this.relay
           });
         }

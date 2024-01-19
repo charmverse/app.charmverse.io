@@ -3,13 +3,13 @@ import { ButtonGroup } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef, useState } from 'react';
 
-import charmClient from 'charmClient';
+import { useTrashPages } from 'charmClient/hooks/pages';
 import { Button } from 'components/common/Button';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
 import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
-import { TemplatesMenu } from 'components/common/TemplatesMenu';
+import { TemplatesMenu } from 'components/common/TemplatesMenu/TemplatesMenu';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
@@ -33,8 +33,9 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
   const [currentSpacePermissions] = useCurrentSpacePermissions();
   const { getFeatureTitle } = useSpaceFeatures();
 
+  const { trigger: trashPages } = useTrashPages();
   function deleteTemplate(pageId: string) {
-    return charmClient.deletePage(pageId);
+    return trashPages({ pageIds: [pageId], trash: true });
   }
 
   const isDisabled = !currentSpacePermissions?.createBounty;
@@ -129,7 +130,7 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
       </ButtonGroup>
       <TemplatesMenu
         isLoading={isLoading}
-        pages={templates?.map((tpl) => tpl.page) ?? []}
+        templates={templates?.map((tpl) => tpl.page) ?? []}
         addPageFromTemplate={createRewardFromTemplate}
         createTemplate={createTemplate}
         editTemplate={(pageId) => showPage(pageId)}

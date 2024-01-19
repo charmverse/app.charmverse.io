@@ -28,7 +28,7 @@ export interface LoggedInUser extends User {
   telegramUser?: TelegramUser | null;
   notificationState?: UserNotificationState | null;
   isNew?: boolean;
-  userOTP?: {
+  otp?: {
     activatedAt: Date | null;
   } | null;
   profile?: {

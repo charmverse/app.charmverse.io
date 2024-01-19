@@ -118,11 +118,6 @@ export const validatePropertyValue = (propType: string, val: string): boolean =>
 /**
  * Hide these values if user is not an evalutor for the proposal
  */
-const hiddenProposalEvaluatorPropertyValues: DatabaseProposalPropertyType[] = [
-  'proposalEvaluationAverage',
-  'proposalEvaluatedBy',
-  'proposalEvaluationTotal'
-];
 
 const editableFields: PropertyType[] = ['text', 'number', 'email', 'url', 'phone'];
 
@@ -130,9 +125,9 @@ function PropertyValueElement(props: Props) {
   const [value, setValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const [serverValue, setServerValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const { formatDateTime, formatDate } = useDateFormatter();
+  const { showError } = useSnackbar();
   const {
     card,
-    syncWithPageId,
     propertyTemplate,
     showEmptyPlaceholder,
     board,
@@ -144,14 +139,6 @@ function PropertyValueElement(props: Props) {
     proposal
   } = props;
   const { trigger } = useUpdateProposalEvaluation({ proposalId: proposal?.id });
-  const { showMessage } = useSnackbar();
-  const { rubricProposalIdsWhereUserIsEvaluator, isLoading: isLoadingReviewerStatus } =
-    useProposalsWhereUserIsEvaluator({
-      spaceId:
-        !!board && hiddenProposalEvaluatorPropertyValues.includes(propertyTemplate?.type as any)
-          ? board.spaceId
-          : undefined
-    });
 
   const isAdmin = useIsAdmin();
 
@@ -284,6 +271,7 @@ function PropertyValueElement(props: Props) {
         readOnly={readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any)}
         onChange={() => null}
         value={propertyValue as any}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
       />
     );
   } else if (propertyTemplate.type === 'select' || propertyTemplate.type === 'multiSelect') {
@@ -296,17 +284,33 @@ function PropertyValueElement(props: Props) {
         readOnly={readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any)}
         propertyValue={propertyValue as string}
         options={propertyTemplate.options}
-        onChange={(newValue) => {
-          mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+        onChange={async (newValue) => {
+          try {
+            await mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+          } catch (error) {
+            showError(error);
+          }
         }}
-        onUpdateOption={(option) => {
-          mutator.changePropertyOption(board, propertyTemplate, option);
+        onUpdateOption={async (option) => {
+          try {
+            await mutator.changePropertyOption(board, propertyTemplate, option);
+          } catch (error) {
+            showError(error);
+          }
         }}
-        onDeleteOption={(option) => {
-          mutator.deletePropertyOption(board, propertyTemplate, option);
+        onDeleteOption={async (option) => {
+          try {
+            await mutator.deletePropertyOption(board, propertyTemplate, option);
+          } catch (error) {
+            showError(error);
+          }
         }}
-        onCreateOption={(newValue) => {
-          mutator.insertPropertyOption(board, propertyTemplate, newValue, 'add property option');
+        onCreateOption={async (newValue) => {
+          try {
+            await mutator.insertPropertyOption(board, propertyTemplate, newValue, 'add property option');
+          } catch (error) {
+            showError(error);
+          }
         }}
         displayType={displayType}
       />
@@ -332,32 +336,36 @@ function PropertyValueElement(props: Props) {
           (displayType !== 'details' && displayType !== 'table') ||
           proposalPropertyTypesList.includes(propertyTemplate.type as any)
         }
-        onChange={(newValue) => {
-          mutator.changePropertyValue(card, propertyTemplate.id, newValue);
-          const previousValue = propertyValue
-            ? typeof propertyValue === 'string'
-              ? [propertyValue]
-              : (propertyValue as string[])
-            : [];
-          const newUserIds = newValue.filter((id) => !previousValue.includes(id));
-          Promise.all(
-            newUserIds.map((userId) =>
-              charmClient.createEvents({
-                spaceId: board.spaceId,
-                payload: [
-                  {
-                    cardId: card.id,
-                    cardProperty: {
-                      id: propertyTemplate.id,
-                      name: propertyTemplate.name,
-                      value: userId
-                    },
-                    scope: WebhookEventNames.CardPersonPropertyAssigned
-                  }
-                ]
-              })
-            )
-          );
+        onChange={async (newValue) => {
+          try {
+            await mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+            const previousValue = propertyValue
+              ? typeof propertyValue === 'string'
+                ? [propertyValue]
+                : (propertyValue as string[])
+              : [];
+            const newUserIds = newValue.filter((id) => !previousValue.includes(id));
+            Promise.all(
+              newUserIds.map((userId) =>
+                charmClient.createEvents({
+                  spaceId: board.spaceId,
+                  payload: [
+                    {
+                      cardId: card.id,
+                      cardProperty: {
+                        id: propertyTemplate.id,
+                        name: propertyTemplate.name,
+                        value: userId
+                      },
+                      scope: WebhookEventNames.CardPersonPropertyAssigned
+                    }
+                  ]
+                })
+              )
+            );
+          } catch (error) {
+            showError(error);
+          }
         }}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
         showEmptyPlaceholder={showEmptyPlaceholder}
@@ -391,12 +399,13 @@ function PropertyValueElement(props: Props) {
               });
               await mutate(`/api/spaces/${card.spaceId}/proposals`);
             } catch (err) {
-              showMessage('Failed to update proposal reviewers', 'error');
+              showError(err, 'Failed to update proposal reviewers');
             }
           }
         }}
         value={propertyValue as any}
         showEmptyPlaceholder={showEmptyPlaceholder}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
       />
     );
   } else if (propertyTemplate.type === 'proposalAuthor') {
@@ -407,11 +416,15 @@ function PropertyValueElement(props: Props) {
         readOnly={readOnly || (displayType !== 'details' && displayType !== 'table')}
         onChange={async (newValue) => {
           if (proposal) {
-            await charmClient.proposals.updateProposal({
-              proposalId: proposal.id,
-              authors: newValue
-            });
-            await mutate(`/api/spaces/${board.spaceId}/proposals`);
+            try {
+              await charmClient.proposals.updateProposal({
+                proposalId: proposal.id,
+                authors: newValue
+              });
+              await mutate(`/api/spaces/${board.spaceId}/proposals`);
+            } catch (error) {
+              showError(error);
+            }
           }
         }}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
@@ -419,22 +432,32 @@ function PropertyValueElement(props: Props) {
       />
     );
   } else if (propertyTemplate.type === 'date') {
-    if (readOnly) {
+    if (!readOnly) {
       propertyValueElement = (
-        <div className='octo-propertyvalue readonly'>
+        <Box
+          className='octo-propertyvalue readonly'
+          display='flex'
+          alignItems={displayType !== 'table' ? 'center' : 'flex-start'}
+          sx={{ whiteSpace: displayType !== 'table' || props.wrapColumn ? 'break-spaces' : 'nowrap' }}
+        >
           {displayValue || (showEmptyPlaceholder && <EmptyPlaceholder>{emptyDisplayValue}</EmptyPlaceholder>)}
-        </div>
+        </Box>
       );
     } else {
       propertyValueElement = (
         <DateRange
+          centerContent={displayType !== 'table'}
           wrapColumn={props.wrapColumn}
           className='octo-propertyvalue'
           value={value.toString()}
           key={value.toString()}
           showEmptyPlaceholder={showEmptyPlaceholder}
-          onChange={(newValue) => {
-            mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+          onChange={async (newValue) => {
+            try {
+              await mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+            } catch (error) {
+              showError(error);
+            }
           }}
         />
       );
@@ -445,9 +468,13 @@ function PropertyValueElement(props: Props) {
         displayType={displayType}
         label={propertyTemplate.name}
         isOn={propertyValue === 'true'}
-        onChanged={(newBool) => {
+        onChanged={async (newBool) => {
           const newValue = newBool ? 'true' : '';
-          mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+          try {
+            await mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+          } catch (error) {
+            showError(error);
+          }
         }}
         readOnly={readOnly}
       />
@@ -457,10 +484,20 @@ function PropertyValueElement(props: Props) {
   } else if (propertyTemplate.type === 'updatedBy') {
     propertyValueElement = <LastModifiedBy updatedBy={latestUpdated === 'card' ? card.updatedBy : updatedBy} />;
   } else if (propertyTemplate.type === 'createdTime') {
-    propertyValueElement = <CreatedAt createdAt={card.createdAt} />;
+    propertyValueElement = (
+      <CreatedAt
+        createdAt={card.createdAt}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
+        centerContent={displayType !== 'table'}
+      />
+    );
   } else if (propertyTemplate.type === 'updatedTime') {
     propertyValueElement = (
-      <LastModifiedAt updatedAt={new Date(latestUpdated === 'card' ? card.updatedAt : updatedAt).toString()} />
+      <LastModifiedAt
+        updatedAt={new Date(latestUpdated === 'card' ? card.updatedAt : updatedAt).toString()}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
+        centerContent={displayType !== 'table'}
+      />
     );
   } else if (propertyTemplate.type === 'tokenAmount') {
     const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
@@ -496,8 +533,12 @@ function PropertyValueElement(props: Props) {
     onChange: setValue,
     displayType,
     multiline: displayType === 'details' ? true : props.wrapColumn ?? false,
-    onSave: () => {
-      mutator.changePropertyValue(card, propertyTemplate.id, value);
+    onSave: async () => {
+      try {
+        await mutator.changePropertyValue(card, propertyTemplate.id, value);
+      } catch (error) {
+        showError(error);
+      }
     },
     onCancel: () => setValue(propertyValue || ''),
     validator: (newValue: string) => validatePropertyValue(propertyTemplate.type, newValue),
@@ -544,21 +585,6 @@ function PropertyValueElement(props: Props) {
     ) : (
       subRowsEmptyValueContent ?? null
     );
-  }
-
-  // Explicitly hide the value for this proposal
-  if (hiddenProposalEvaluatorPropertyValues.includes(propertyTemplate?.type as any)) {
-    if (syncWithPageId && !isLoadingReviewerStatus && !isAdmin) {
-      return <EmptyPlaceholder>Hidden</EmptyPlaceholder>;
-    } else if (syncWithPageId && (!!rubricProposalIdsWhereUserIsEvaluator[syncWithPageId] || isAdmin)) {
-      return propertyValueElement;
-    } else {
-      return typeof subRowsEmptyValueContent === 'string' ? (
-        <span>{subRowsEmptyValueContent}</span>
-      ) : (
-        subRowsEmptyValueContent ?? null
-      );
-    }
   }
 
   if (props.showTooltip) {

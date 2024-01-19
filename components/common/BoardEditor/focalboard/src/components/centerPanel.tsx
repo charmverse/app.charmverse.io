@@ -26,7 +26,7 @@ import {
   makeSelectViewCardsSortedFilteredAndGrouped,
   sortCards
 } from 'components/common/BoardEditor/focalboard/src/store/cards';
-import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { webhookEndpoint } from 'config/constants';
@@ -45,6 +45,7 @@ import { CardFilter } from 'lib/focalboard/cardFilter';
 
 import mutator from '../mutator';
 import { addCard as _addCard, addTemplate } from '../store/cards';
+import { initialDatabaseLoad } from '../store/databaseBlocksLoad';
 import { updateView } from '../store/views';
 import { Utils } from '../utils';
 
@@ -103,7 +104,7 @@ function CenterPanel(props: Props) {
   const { pages, refreshPage } = usePages();
   const { membersRecord } = useMembers();
   const localViewSettings = useLocalDbViewSettings(activeView?.id);
-
+  const dispatch = useAppDispatch();
   const isEmbedded = !!props.embeddedBoardPath;
   const boardPageType = boardPage?.type;
   // for 'linked' boards, each view has its own board which we use to determine the cards to show
@@ -323,10 +324,6 @@ function CenterPanel(props: Props) {
     [activeBoard, activeView, __addCard, setState, space, groupByProperty, refreshPage, _updateView, showCard]
   );
 
-  const editCardTemplate = (cardTemplateId: string) => {
-    showCard(cardTemplateId);
-  };
-
   const cardClicked = useCallback(
     (e: React.MouseEvent, card: Card): void => {
       if (!activeView) {
@@ -493,10 +490,12 @@ function CenterPanel(props: Props) {
     (_url, { arg }: Readonly<{ arg: { pageId: string } }>) => charmClient.updateProposalSource(arg)
   );
 
-  // refresh proposals as a source
   useEffect(() => {
     if (currentRootPageId && activeBoard?.fields.sourceType === 'proposals' && activeBoard?.id === currentRootPageId) {
-      updateProposalSource({ pageId: currentRootPageId });
+      updateProposalSource({ pageId: currentRootPageId }).then(() => {
+        // Refetch database after updating proposal source board, otherwise the UI will be out of sync
+        dispatch(initialDatabaseLoad({ pageId: currentRootPageId }));
+      });
     }
   }, [currentRootPageId, activeBoard?.id]);
 
@@ -576,7 +575,6 @@ function CenterPanel(props: Props) {
               showCard={showCard}
               // addCardFromTemplate={addCardFromTemplate}
               addCardTemplate={viewHeaderAddCardTemplate}
-              editCardTemplate={editCardTemplate}
               readOnly={props.readOnly}
               embeddedBoardPath={props.embeddedBoardPath}
               checkedIds={checkedIds}

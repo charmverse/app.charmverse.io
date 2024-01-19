@@ -19,11 +19,11 @@ export async function getUserOtp(userId: string): Promise<GetOtpResponse> {
       id: userId
     },
     include: {
-      userOTP: true
+      otp: true
     }
   });
 
-  if (!user?.userOTP?.activatedAt) {
+  if (!user?.otp?.activatedAt) {
     throw new InvalidInputError('User OTP is not activated');
   }
 

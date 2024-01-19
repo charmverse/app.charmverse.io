@@ -1,4 +1,4 @@
-import type { User, UserOTP } from '@charmverse/core/prisma-client';
+import type { User, Otp } from '@charmverse/core/prisma-client';
 
 import { createOtp } from '../createOtp';
 
@@ -17,9 +17,9 @@ describe('createOtp', () => {
 
     const otp = createOtp(user);
 
-    const userWithOtp: User & { userOTP: UserOTP } = {
+    const userWithOtp: User & { otp: Otp } = {
       ...user,
-      userOTP: {
+      otp: {
         id: '1',
         createdAt: new Date(),
         deletedAt: null,

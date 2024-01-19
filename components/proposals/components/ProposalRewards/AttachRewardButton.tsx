@@ -75,7 +75,7 @@ export function AttachRewardButton({
         isSaving={isSavingReward}
       >
         <NewDocumentPage
-          titlePlaceholder='Reward title (required)'
+          titlePlaceholder={`${getFeatureTitle('Reward')} title (required)`}
           values={newPageValues}
           onChange={updateNewPageValues}
         >

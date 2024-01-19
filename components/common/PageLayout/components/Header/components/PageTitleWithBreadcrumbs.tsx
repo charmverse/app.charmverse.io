@@ -1,3 +1,4 @@
+import type { PageMeta } from '@charmverse/core/pages';
 import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { Box, Typography, CircularProgress } from '@mui/material';
@@ -60,16 +61,24 @@ export function BreadcrumbPageTitle({ children, sx = {} }: { children: ReactNode
 }
 
 interface PageBreadCrumb {
-  path: null | string;
+  path?: null | string;
   icon: string | null;
   title: string;
 }
 
-function DocumentPageTitle({ basePath, pageId }: { basePath: string; pageId?: string }) {
+function DocumentPageTitle({
+  basePath,
+  pageId,
+  pageMeta
+}: {
+  basePath: string;
+  pageId?: string;
+  pageMeta?: Pick<PageMeta, 'title' | 'icon' | 'parentId'>;
+}) {
   const { pages } = usePages();
   const { isSaving } = useCharmEditor();
 
-  const currentPage = pageId ? pages[pageId] : undefined;
+  const currentPage = (pageId ? pages[pageId] : undefined) ?? pageMeta;
 
   // find parent pages
   let activePage = currentPage;
@@ -217,12 +226,14 @@ function DefaultPageTitle() {
   return <BreadcrumbPageTitle>{pageTitle}</BreadcrumbPageTitle>;
 }
 
-export default function PageTitleWithBreadcrumbs({
+export function PageTitleWithBreadcrumbs({
   pageId,
+  pageMeta,
   pageType,
   post
 }: {
   pageId?: string;
+  pageMeta?: Pick<PageMeta, 'title' | 'icon' | 'parentId'>; // pass in page meta in case the page is in the trash, in which case it won't be in the pages map
   pageType?: PageType;
   post?: PostWithVotes | null;
 }) {
@@ -248,7 +259,7 @@ export default function PageTitleWithBreadcrumbs({
     const sectionName = mappedFeatures.proposals.title;
     return <ProposalPageTitle basePath={`/${router.query.domain}`} sectionName={sectionName} />;
   } else if (router.route === '/[domain]/[pageId]') {
-    return <DocumentPageTitle basePath={`/${router.query.domain}`} pageId={pageId} />;
+    return <DocumentPageTitle basePath={`/${router.query.domain}`} pageId={pageId} pageMeta={pageMeta} />;
   } else if (router.route.includes('/[domain]/forum')) {
     const sectionName = mappedFeatures.forum.title;
     return (

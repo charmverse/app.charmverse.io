@@ -19,7 +19,7 @@ export function TwoFactorAuthUser() {
   const resetRecoveryCodeModal = usePopupState({ variant: 'popover', popupId: 'reset-recovery-code' });
   const confirmResetRecoveryCodeModal = usePopupState({ variant: 'popover', popupId: 'confirm-reset-recovery-code' });
   const { user } = useUser();
-  const activeOtp = !!user?.userOTP?.activatedAt;
+  const activeOtp = !!user?.otp?.activatedAt;
 
   const isCharmverseSpace = useIsCharmverseSpace();
 

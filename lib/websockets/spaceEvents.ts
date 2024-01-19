@@ -8,8 +8,8 @@ import type { Socket } from 'socket.io';
 
 import { STATIC_PAGES } from 'lib/features/constants';
 import { ActionNotPermittedError } from 'lib/middleware';
-import { archivePages } from 'lib/pages/archivePages';
 import { createPage } from 'lib/pages/server/createPage';
+import { trashPages } from 'lib/pages/trashPages';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
@@ -100,11 +100,11 @@ export class SpaceEventHandler {
           event: 'page_deleted'
         });
       } else {
-        await archivePages({
+        await trashPages({
           pageIds: [pageId],
           userId: this.userId,
           spaceId: this.spaceId,
-          archive: true,
+          trash: true,
           relay: this.relay
         });
       }
@@ -165,11 +165,11 @@ export class SpaceEventHandler {
         }
 
         if (!unarchivedPage) {
-          await archivePages({
+          await trashPages({
             pageIds: [pageId],
             userId: this.userId,
             spaceId: this.spaceId,
-            archive: false,
+            trash: false,
             relay: this.relay
           });
         }
@@ -742,11 +742,11 @@ export class SpaceEventHandler {
 
         // If the user is not in the document or the position of the page node is not found (present in sidebar)
         if (event === 'page_deleted') {
-          await archivePages({
+          await trashPages({
             pageIds: [childPageId],
             userId: this.userId!,
             spaceId: this.spaceId!,
-            archive: true,
+            trash: true,
             relay: this.relay
           });
         }

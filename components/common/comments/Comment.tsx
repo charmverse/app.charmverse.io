@@ -17,7 +17,6 @@ import { CommentVote } from 'components/common/comments/CommentVote';
 import type { CreateCommentPayload, UpdateCommentPayload } from 'components/common/comments/interfaces';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMemberDialog } from 'components/members/hooks/useMemberDialog';
-import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { isProdEnv } from 'config/constants';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useMembers } from 'hooks/useMembers';
@@ -68,8 +67,6 @@ export function Comment({
   isPublishingComments
 }: CommentProps) {
   const { user } = useUser();
-  const { lensProfile } = useLensProfile();
-  const [publishCommentsToLens, setPublishCommentsToLens] = useState(!!user?.publishToLensDefault);
   const router = useRouter();
   const { updateURLQuery } = useCharmRouter();
   const [showCommentReply, setShowCommentReply] = useState(false);
@@ -292,10 +289,6 @@ export function Comment({
           <Box mt={2}>
             {showCommentReply && (
               <CommentReply
-                isPublishingComments={isPublishingComments}
-                publishToLens={publishCommentsToLens}
-                setPublishToLens={setPublishCommentsToLens}
-                showPublishToLens={Boolean(lensPostLink) && Boolean(lensProfile) && Boolean(comment.lensCommentLink)}
                 commentId={comment.id}
                 handleCreateComment={handleCreateComment}
                 onCancelComment={() => setShowCommentReply(false)}

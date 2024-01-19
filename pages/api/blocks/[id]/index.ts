@@ -76,7 +76,7 @@ async function deleteBlock(
       throw new ActionNotPermittedError();
     }
 
-    const deletedChildPageIds = await modifyChildPages(blockId, userId, 'archive');
+    const deletedChildPageIds = await modifyChildPages(blockId, userId, 'trash');
     deletedCount = deletedChildPageIds.length;
     relay.broadcast(
       {

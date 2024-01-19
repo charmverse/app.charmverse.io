@@ -221,23 +221,12 @@ describe('page delete event handler', () => {
     expect(relayBroadcastMockFn).toHaveBeenNthCalledWith(
       1,
       {
-        type: 'pages_meta_updated',
+        type: 'pages_deleted',
         payload: [
           {
-            id: childPages[0].id,
-            deletedAt: expect.any(Date),
-            spaceId: parentPage.spaceId,
-            deletedBy: expect.any(String)
+            id: childPages[0].id
           }
         ]
-      },
-      parentPage.spaceId
-    );
-    expect(relayBroadcastMockFn).toHaveBeenNthCalledWith(
-      2,
-      {
-        type: 'pages_deleted',
-        payload: [{ id: childPages[0].id }]
       },
       parentPage.spaceId
     );
@@ -278,24 +267,9 @@ describe('page delete event handler', () => {
     expect(parentPageWithContent.content).toMatchObject(regularContent);
     expect(childPageDb.deletedAt).toBeTruthy();
     expect(socketEmitMockFn).not.toHaveBeenCalled();
-    expect(relayBroadcastMockFn).toHaveBeenNthCalledWith(
-      1,
-      {
-        type: 'pages_meta_updated',
-        payload: [
-          {
-            id: childPages[0].id,
-            deletedAt: expect.any(Date),
-            spaceId: parentPage.spaceId,
-            deletedBy: expect.any(String)
-          }
-        ]
-      },
-      parentPage.spaceId
-    );
 
     expect(relayBroadcastMockFn).toHaveBeenNthCalledWith(
-      2,
+      1,
       {
         type: 'pages_deleted',
         payload: [{ id: childPages[0].id }]
@@ -347,14 +321,6 @@ describe('page_restored event handler', () => {
     expect(socketEmitMockFn).not.toHaveBeenCalled();
     expect(relayBroadcastMockFn).toHaveBeenNthCalledWith(
       1,
-      {
-        type: 'pages_meta_updated',
-        payload: [{ id: childPages[0].id, deletedAt: null, spaceId: parentPage.spaceId, deletedBy: null }]
-      },
-      parentPage.spaceId
-    );
-    expect(relayBroadcastMockFn).toHaveBeenNthCalledWith(
-      2,
       {
         type: 'pages_restored',
         payload: [{ id: childPages[0].id }]
@@ -409,14 +375,6 @@ describe('page_restored event handler', () => {
     expect(socketEmitMockFn).not.toHaveBeenCalled();
     expect(relayBroadcastMockFn).toHaveBeenNthCalledWith(
       1,
-      {
-        type: 'pages_meta_updated',
-        payload: [{ id: childPages[0].id, deletedAt: null, spaceId: parentPage.spaceId, deletedBy: null }]
-      },
-      parentPage.spaceId
-    );
-    expect(relayBroadcastMockFn).toHaveBeenNthCalledWith(
-      2,
       {
         type: 'pages_restored',
         payload: [{ id: childPages[0].id }]

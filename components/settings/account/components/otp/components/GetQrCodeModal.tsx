@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 
-import { useGetUserOtp } from 'charmClient/hooks/profile';
+import { useGetOtp } from 'charmClient/hooks/profile';
 import type { ModalProps } from 'components/common/Modal';
 import Modal from 'components/common/Modal';
 
@@ -14,7 +14,7 @@ export function CustomModal({ onClose, ...props }: Omit<ModalProps, 'children'>)
     error: getOtpError,
     isMutating: isOtpLoading,
     reset: resetOtpData
-  } = useGetUserOtp();
+  } = useGetOtp();
 
   const onSubmit = async (authCode: string) => {
     await getOtp({ authCode });

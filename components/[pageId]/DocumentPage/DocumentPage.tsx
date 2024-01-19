@@ -44,6 +44,7 @@ import PageDeleteBanner from './components/PageDeleteBanner';
 import PageHeader, { getPageTop } from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
 import { PrimaryColumn } from './components/PrimaryColumn';
+import { ProposalArchivedBanner } from './components/ProposalArchivedBanner';
 import { ProposalBanner } from './components/ProposalBanner';
 import { ProposalProperties } from './components/ProposalProperties';
 import { PageSidebar } from './components/Sidebar/PageSidebar';
@@ -287,6 +288,8 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
       {/** Structured proposal isn't inside a CharmEditor context, thus useViewContext used in PageSidebar would throw error for undefined view */}
       {(enableComments || enableSuggestingMode || page.type === 'proposal' || page.type === 'proposal_template') && (
         <PageSidebar
+          pagePath={page.path}
+          pageTitle={page.title}
           id='page-action-sidebar'
           pageId={page.id}
           spaceId={page.spaceId}
@@ -330,23 +333,30 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
           parentElementId: 'file-drop-container'
         })}
       >
-        {!!page?.deletedAt && (
-          <AlertContainer showPageActionSidebar={showPageActionSidebar}>
+        {/* show either deleted banner or archived, but not both */}
+        {page?.deletedAt ? (
+          <AlertContainer>
             <PageDeleteBanner pageType={page.type} pageId={page.id} />
           </AlertContainer>
+        ) : (
+          !!proposal?.archived && (
+            <AlertContainer>
+              <ProposalArchivedBanner proposalId={proposal.id} disabled={!proposal.permissions.delete} />
+            </AlertContainer>
+          )
         )}
         {connectionError && (
-          <AlertContainer showPageActionSidebar={showPageActionSidebar}>
+          <AlertContainer>
             <PageConnectionBanner />
           </AlertContainer>
         )}
         {page?.convertedProposalId && (
-          <AlertContainer showPageActionSidebar={showPageActionSidebar}>
+          <AlertContainer>
             <ProposalBanner type='page' proposalId={page.convertedProposalId} />
           </AlertContainer>
         )}
         {board?.fields.sourceType && (
-          <AlertContainer showPageActionSidebar={showPageActionSidebar}>
+          <AlertContainer>
             <SyncedPageBanner pageId={page.syncWithPageId} source={board.fields.sourceType} />
           </AlertContainer>
         )}
@@ -426,6 +436,8 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
           )}
           {currentTab === 1 && (
             <EvaluationSidebar
+              pagePath={page.path}
+              pageTitle={page.title}
               pageId={page.id}
               proposal={proposal}
               onChangeEvaluation={onChangeEvaluation}

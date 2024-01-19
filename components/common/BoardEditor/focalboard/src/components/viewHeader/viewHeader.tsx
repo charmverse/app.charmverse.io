@@ -7,11 +7,13 @@ import type { Dispatch, SetStateAction } from 'react';
 import React from 'react';
 import { mutate } from 'swr';
 
+import { useTrashPages } from 'charmClient/hooks/pages';
 import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFilterControl';
 import { ViewSettingsRow } from 'components/common/BoardEditor/components/ViewSettingsRow';
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
 import Link from 'components/common/Link';
 import { usePages } from 'hooks/usePages';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
@@ -38,7 +40,6 @@ type Props = {
   showCard: (cardId: string | null) => void;
   // addCardFromTemplate: (cardTemplateId: string) => void
   addCardTemplate: () => void;
-  editCardTemplate: (cardTemplateId: string) => void;
   readOnly: boolean;
   dateDisplayProperty?: IPropertyTemplate;
   disableUpdatingUrl?: boolean;
@@ -58,7 +59,8 @@ function ViewHeader(props: Props) {
   const { pages, refreshPage } = usePages();
   const cardTemplates: Card[] = useAppSelector(getCurrentBoardTemplates);
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
-
+  const { trigger: trashPages } = useTrashPages();
+  const { showError } = useSnackbar();
   const views = props.views.filter((view) => !view.fields.inline);
 
   const {
@@ -92,8 +94,11 @@ function ViewHeader(props: Props) {
   async function deleteCardTemplate(pageId: string) {
     const card = cardTemplates.find((c) => c.id === pageId);
     if (card) {
-      await mutator.deleteBlock(card, 'delete card');
-      mutate(`pages/${card.spaceId}`);
+      try {
+        await trashPages({ pageIds: [card.id], trash: true });
+      } catch (error) {
+        showError(error);
+      }
     }
   }
 
@@ -223,7 +228,6 @@ function ViewHeader(props: Props) {
                   addCard={props.addCard}
                   addCardFromTemplate={addPageFromTemplate}
                   addCardTemplate={props.addCardTemplate}
-                  editCardTemplate={props.editCardTemplate}
                   showCard={props.showCard}
                   deleteCardTemplate={deleteCardTemplate}
                   boardId={viewsBoard.id}

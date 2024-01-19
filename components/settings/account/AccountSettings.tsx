@@ -3,7 +3,6 @@ import { AccountPreferences } from 'components/settings/account/components/Accou
 import Legend from 'components/settings/Legend';
 
 import { IdentityProviders } from './components/IdentityProviders';
-import { LensPublication } from './components/LensPublication';
 import { MultiSigList } from './components/MultiSigList';
 import { TwoFactorAuthUser } from './components/TwoFactorAuthUser';
 
@@ -16,7 +15,6 @@ export function AccountSettings() {
       <IdentityProviders />
       <AccountPreferences />
       <TwoFactorAuthUser />
-      <LensPublication />
       <MultiSigList />
     </>
   );

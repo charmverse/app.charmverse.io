@@ -19,7 +19,7 @@ async function activateOtp(req: NextApiRequest, res: NextApiResponse<void>) {
 
   await verifyOtpToken(userId, authCode);
 
-  await prisma.userOTP.update({
+  await prisma.otp.update({
     where: {
       userId
     },

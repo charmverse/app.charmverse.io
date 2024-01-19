@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
 import type { SWRMutationConfiguration } from 'swr/mutation';
 
-import { useCreateUserOtp } from 'charmClient/hooks/profile';
+import { useCreateOtp } from 'charmClient/hooks/profile';
 import type { CreateOtpResponse } from 'lib/profile/otp/createUserOtp';
 
 export type Screens = 'start' | 'link' | 'confirmation' | 'finish';
@@ -30,7 +30,7 @@ const TwoFactorAuthContext = createContext<Readonly<IContext>>({
 
 export function TwoFactorAuthProvider({ children }: { children: ReactNode }) {
   const [flow, setFlow] = useState<Screens>('start');
-  const { data, trigger, error, isMutating: isLoading } = useCreateUserOtp();
+  const { data, trigger, error, isMutating: isLoading } = useCreateOtp();
 
   const value: IContext = useMemo(
     () => ({

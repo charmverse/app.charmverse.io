@@ -34,7 +34,8 @@ export function ProposalStickyFooter({
     proposal: {
       type: 'proposal',
       title: page.title,
-      ...proposal
+      ...proposal,
+      authors: proposal.authors.map((a) => a.userId)
     }
   }).join('\n');
 

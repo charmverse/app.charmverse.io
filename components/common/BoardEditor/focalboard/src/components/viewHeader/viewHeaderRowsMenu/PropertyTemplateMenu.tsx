@@ -30,7 +30,8 @@ export function PropertyTemplateMenu({
   onProposalStatusUpdate,
   onPersonPropertyChange,
   firstCheckedProposal,
-  disabledTooltip
+  disabledTooltip,
+  lastChild
 }: {
   board: Board;
   checkedIds: string[];
@@ -50,6 +51,7 @@ export function PropertyTemplateMenu({
   }) => Promise<void>;
   firstCheckedProposal?: ProposalWithUsersLite;
   disabledTooltip?: string;
+  lastChild: boolean;
 }) {
   const checkedCards = cards.filter((card) => checkedIds.includes(card.id));
 
@@ -63,6 +65,7 @@ export function PropertyTemplateMenu({
     case 'checkbox': {
       return (
         <StyledMenuItem
+          lastChild={lastChild}
           onClick={async () => {
             await mutator.changePropertyValues(
               checkedCards,
@@ -80,6 +83,7 @@ export function PropertyTemplateMenu({
     case 'multiSelect': {
       return (
         <SelectPropertyTemplateMenu
+          lastChild={lastChild}
           onChange={onChange}
           board={board}
           cards={checkedCards}
@@ -91,6 +95,7 @@ export function PropertyTemplateMenu({
     case 'person': {
       return (
         <PersonPropertyTemplateMenu
+          lastChild={lastChild}
           onChange={async (userIds) => {
             await onPersonPropertyChange({
               checkedCards,
@@ -114,6 +119,7 @@ export function PropertyTemplateMenu({
       }
       return (
         <PersonPropertyTemplateMenu
+          lastChild={lastChild}
           onChange={async (userIds) => {
             await onProposalAuthorSelect(checkedIds, userIds);
             if (onChange) {
@@ -132,7 +138,12 @@ export function PropertyTemplateMenu({
       }
 
       return (
-        <PropertyMenu disabledTooltip={disabledTooltip} cards={cards} propertyTemplate={propertyTemplate}>
+        <PropertyMenu
+          lastChild={lastChild}
+          disabledTooltip={disabledTooltip}
+          cards={cards}
+          propertyTemplate={propertyTemplate}
+        >
           {({ isPropertyOpen }) =>
             isPropertyOpen ? (
               <UserAndRoleSelect
@@ -161,13 +172,25 @@ export function PropertyTemplateMenu({
     }
 
     case 'date': {
-      return <DatePropertyTemplateMenu onChange={onChange} cards={checkedCards} propertyTemplate={propertyTemplate} />;
+      return (
+        <DatePropertyTemplateMenu
+          lastChild={lastChild}
+          onChange={onChange}
+          cards={checkedCards}
+          propertyTemplate={propertyTemplate}
+        />
+      );
     }
 
     case 'proposalStatus': {
       if (firstCheckedProposal) {
         return (
-          <PropertyMenu cards={cards} disabledTooltip={disabledTooltip} propertyTemplate={propertyTemplate}>
+          <PropertyMenu
+            lastChild={lastChild}
+            cards={cards}
+            disabledTooltip={disabledTooltip}
+            propertyTemplate={propertyTemplate}
+          >
             <ControlledProposalStatusSelect
               onChange={(result) => onProposalStatusUpdate(checkedIds, result)}
               proposal={firstCheckedProposal}
@@ -181,7 +204,12 @@ export function PropertyTemplateMenu({
     case 'proposalStep': {
       if (firstCheckedProposal) {
         return (
-          <PropertyMenu disabledTooltip={disabledTooltip} cards={cards} propertyTemplate={propertyTemplate}>
+          <PropertyMenu
+            lastChild={lastChild}
+            disabledTooltip={disabledTooltip}
+            cards={cards}
+            propertyTemplate={propertyTemplate}
+          >
             <ControlledProposalStepSelect
               onChange={({ evaluationId, moveForward }) => onProposalStepUpdate(checkedIds, evaluationId, moveForward)}
               proposal={{
@@ -202,7 +230,14 @@ export function PropertyTemplateMenu({
     }
 
     default: {
-      return <TextPropertyTemplateMenu onChange={onChange} cards={checkedCards} propertyTemplate={propertyTemplate} />;
+      return (
+        <TextPropertyTemplateMenu
+          lastChild={lastChild}
+          onChange={onChange}
+          cards={checkedCards}
+          propertyTemplate={propertyTemplate}
+        />
+      );
     }
   }
 }
