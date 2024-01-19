@@ -62,9 +62,6 @@ export const sessionUserRelations = {
     }
   },
   otp: {
-    where: {
-      deletedAt: null
-    },
     select: {
       activatedAt: true
     }
