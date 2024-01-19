@@ -171,7 +171,7 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
   const idsThatNeedViewAccess = needViewAccess
     .map((permission) => permission.roleId ?? permission.systemRole ?? permission.userId)
     .filter(isTruthy);
-  const warningStr = needViewAccess.length ? `Some users or roles are missing View access` : '';
+  const warningStr = needViewAccess.length ? `A user or role is missing View access` : '';
 
   return (
     <>
