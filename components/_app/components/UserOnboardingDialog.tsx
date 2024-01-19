@@ -87,7 +87,7 @@ function LoggedInUserOnboardingDialog({ user, space }: { space: Space; user: Log
     );
   }
 
-  if (!user.userOTP?.activatedAt && !!space?.requireMembersTwoFactorAuth) {
+  if (!user.otp?.activatedAt && !!space?.requireMembersTwoFactorAuth) {
     return <SetupTwoFactorAuthGlobal />;
   }
 

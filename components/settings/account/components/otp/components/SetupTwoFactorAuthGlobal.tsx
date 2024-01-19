@@ -13,7 +13,7 @@ export function SetupTwoFactorAuthGlobal() {
   const otpSetupModal = usePopupState({ variant: 'popover', popupId: 'otp-setup' });
   const { user } = useUser();
   const { space } = useCurrentSpace();
-  const activeOtp = !!user?.userOTP?.activatedAt;
+  const activeOtp = !!user?.otp?.activatedAt;
   const spaceRequiresOtp = !!space?.requireMembersTwoFactorAuth;
   const isCharmverseSpace = useIsCharmverseSpace();
 
@@ -27,7 +27,7 @@ export function SetupTwoFactorAuthGlobal() {
     !isCharmverseSpace ||
     !user ||
     !space?.requireMembersTwoFactorAuth ||
-    (user.userOTP?.activatedAt && !otpSetupModal.isOpen)
+    (user.otp?.activatedAt && !otpSetupModal.isOpen)
   ) {
     return null;
   }
