@@ -155,24 +155,6 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
     {}
   );
 
-  const needViewAccess = evaluation.permissions.filter(
-    (permission) =>
-      permission.operation !== 'view' &&
-      !evaluation.permissions.some(
-        (p) =>
-          p.operation === 'view' &&
-          (permission.roleId
-            ? p.roleId === permission.roleId
-            : permission.systemRole
-            ? p.systemRole === permission.systemRole
-            : p.userId === permission.userId)
-      )
-  );
-  const idsThatNeedViewAccess = needViewAccess
-    .map((permission) => permission.roleId ?? permission.systemRole ?? permission.userId)
-    .filter(isTruthy);
-  const warningStr = needViewAccess.length ? `A user or role is missing View access` : '';
-
   return (
     <>
       <Typography variant='body2'>Who can:</Typography>
@@ -191,7 +173,6 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
               }
               return false;
             }}
-            errorValues={operation !== 'view' ? idsThatNeedViewAccess : []}
             value={valuesByOperation[operation] || []}
             systemRoles={extraEvaluationRoles}
             inputPlaceholder={permissionOperationPlaceholders[operation]}
@@ -217,14 +198,6 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
           />
         )}
       </Box>
-      {warningStr && (
-        <Box className='octo-propertyrow'>
-          <PropertyLabel readOnly></PropertyLabel>
-          <Typography color='warning.main' variant='caption'>
-            {warningStr}
-          </Typography>
-        </Box>
-      )}
     </>
   );
 }
