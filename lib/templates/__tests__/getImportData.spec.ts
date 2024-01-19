@@ -28,7 +28,6 @@ describe('getImportData', () => {
         memberProperties: [],
         notificationToggles: [],
         proposalBlocks: [],
-        proposalWorkflows: [],
         rewardBlocks: [],
         defaultPagePermissionGroup: space.defaultPagePermissionGroup,
         defaultPublicPages: space.defaultPublicPages,
