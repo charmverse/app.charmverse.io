@@ -195,7 +195,7 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
             </TabPanel>
           );
         })}
-        {SPACE_SETTINGS_TABS.map((tab) => {
+        {SPACE_SETTINGS_TABS.filter((tab) => (showCredentialsTab ? true : tab.path !== 'credentials')).map((tab) => {
           const TabView = spaceTabs[tab.path];
           return (
             <TabPanel key={tab.path} value={activePath ?? ''} index={tab.path}>
