@@ -112,6 +112,7 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
         {ACCOUNT_TABS.map((tab) => (
           <SidebarLink
             key={tab.path}
+            data-test={`space-settings-tab-${tab.path}`}
             label={tab.label}
             icon={tab.icon}
             onClick={() => onSelectPath(tab.path)}

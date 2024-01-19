@@ -18,6 +18,7 @@ export type UpdateableSpaceFields = Partial<
     | 'memberProfiles'
     | 'notificationToggles'
     | 'primaryMemberIdentity'
+    | 'requireMembersTwoFactorAuth'
   >
 >;
 
@@ -67,7 +68,8 @@ export async function updateSpace(spaceId: string, updates: UpdateableSpaceField
       notificationToggles: updates.notificationToggles as any,
       features: updates.features as any,
       memberProfiles: updates.memberProfiles as any,
-      primaryMemberIdentity: updates.primaryMemberIdentity
+      primaryMemberIdentity: updates.primaryMemberIdentity,
+      requireMembersTwoFactorAuth: updates.requireMembersTwoFactorAuth
     }
   });
 

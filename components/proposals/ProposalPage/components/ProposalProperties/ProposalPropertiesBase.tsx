@@ -99,7 +99,11 @@ export function ProposalPropertiesBase({
               flexGrow: 1
             }}
           >
-            <PropertyLabel readOnly required={isNewProposal} highlighted>
+            <PropertyLabel
+              readOnly
+              required={isNewProposal && proposalFormInputs.type !== 'proposal_template'}
+              highlighted
+            >
               Author
             </PropertyLabel>
             <Box display='flex' flex={1}>

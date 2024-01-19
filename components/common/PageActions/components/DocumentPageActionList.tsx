@@ -4,7 +4,7 @@ import styled from '@emotion/styled';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
-import { List, ListItemButton, ListItemText, Switch } from '@mui/material';
+import { List, ListItemButton, ListItemIcon, ListItemText, Switch } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -16,7 +16,6 @@ import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSi
 import { Button } from 'components/common/Button';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmRouter } from 'hooks/useCharmRouter';
-import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -47,6 +46,7 @@ export type PageActionMeta = Pick<
   | 'id'
   | 'parentId'
   | 'path'
+  | 'proposalId'
   | 'snapshotProposalId'
   | 'syncWithPageId'
   | 'title'
@@ -82,12 +82,9 @@ function DeleteMenuItem({ disabled = false, onClick }: { disabled?: boolean; onC
     <Tooltip title={disabled ? "You don't have permission to delete this page" : ''}>
       <div>
         <ListItemButton data-test='header--delete-current-page' disabled={disabled} onClick={onClick}>
-          <DeleteOutlineOutlinedIcon
-            fontSize='small'
-            sx={{
-              mr: 1
-            }}
-          />
+          <ListItemIcon>
+            <DeleteOutlineOutlinedIcon fontSize='small' />
+          </ListItemIcon>
           <ListItemText primary='Delete' />
         </ListItemButton>
       </div>
@@ -250,12 +247,9 @@ export function DocumentPageActionList({
               onComplete();
             }}
           >
-            <MessageOutlinedIcon
-              fontSize='small'
-              sx={{
-                mr: 1
-              }}
-            />
+            <ListItemIcon>
+              <MessageOutlinedIcon fontSize='small' />
+            </ListItemIcon>
             <ListItemText primary='View comments' />
           </ListItemButton>
           <ListItemButton
@@ -264,12 +258,9 @@ export function DocumentPageActionList({
               onComplete();
             }}
           >
-            <RateReviewOutlinedIcon
-              fontSize='small'
-              sx={{
-                mr: 1
-              }}
-            />
+            <ListItemIcon>
+              <RateReviewOutlinedIcon fontSize='small' />
+            </ListItemIcon>
             <ListItemText primary='View suggestions' />
           </ListItemButton>
         </>
@@ -317,15 +308,8 @@ export function DocumentPageActionList({
         onClick={onDeletePage}
         disabled={!pagePermissions?.delete || page.deletedAt !== null || !!page.syncWithPageId}
       />
-      {pageType === 'proposal' && pageId && <ArchiveProposalAction proposalId={pageId} refreshPageOnChange />}
-      {undoEditorChanges && (
-        <UndoAction
-          onClick={undoEditorChanges}
-          disabled={!pagePermissions?.edit_content}
-          // Ensure alignment of undo icon since internal structure is different
-          listItemStyle={{ mr: '-3px' }}
-        />
-      )}
+      {page.proposalId && <ArchiveProposalAction proposalId={page.proposalId} />}
+      {undoEditorChanges && <UndoAction onClick={undoEditorChanges} disabled={!pagePermissions?.edit_content} />}
       <Divider />
       <ExportMarkdownAction disabled={!isExportablePage} onClick={exportMarkdownPage} />
       <ExportToPDFAction pdfTitle={page.title} onComplete={onComplete} />

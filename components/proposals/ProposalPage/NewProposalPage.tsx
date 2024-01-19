@@ -37,6 +37,7 @@ import { useMdScreen } from 'hooks/useMediaScreens';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
+import { useUser } from 'hooks/useUser';
 import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
 import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposal/rubric/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
@@ -65,7 +66,6 @@ export type ProposalPageAndPropertiesInput = ProposalPropertiesInput & {
 const StyledContainer = styled(PageEditorContainer)`
   margin-bottom: 180px;
 `;
-
 // Note: this component is only used before a page is saved to the DB
 export function NewProposalPage({
   isTemplate,
@@ -78,6 +78,7 @@ export function NewProposalPage({
 }) {
   const { navigateToSpacePath } = useCharmRouter();
   const { space: currentSpace } = useCurrentSpace();
+  const { user } = useUser();
   const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>([]);
   const { activeView: sidebarView, setActiveView } = usePageSidebar();
   const { proposalTemplates, isLoadingTemplates } = useProposalTemplates();
@@ -175,7 +176,9 @@ export function NewProposalPage({
     const template = proposalTemplates?.find((t) => t.id === _templateId);
     if (template) {
       const formFields = template.form?.formFields ?? [];
+      const authors = Array.from(new Set([user!.id].concat(template.authors.map((author) => author.userId))));
       setFormInputs({
+        authors,
         content: template.page.content as PageContent,
         contentText: template.page.contentText,
         reviewers: template.reviewers.map((reviewer) => ({
@@ -310,6 +313,7 @@ export function NewProposalPage({
               proposalStatus='draft'
               proposalFormInputs={formInputs}
               setProposalFormInputs={setFormInputs}
+              readOnlyAuthors={!!sourceTemplate?.authors.length}
               readOnlyCustomProperties={readOnlyCustomProperties}
               readOnlySelectedCredentialTemplates={readOnlySelectedCredentialTemplates}
             />

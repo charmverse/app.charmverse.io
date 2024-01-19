@@ -38,11 +38,30 @@ export function useProposalTemplates({ load = true }: { load?: boolean } = {}) {
       }
     }
 
+    function handleArchivedEvent(payload: WebSocketPayload<'proposals_archived'>) {
+      mutate(
+        (list) => {
+          if (!list) return list;
+          return list.map((proposal) => {
+            if (payload.proposalIds.includes(proposal.id)) {
+              return {
+                ...proposal,
+                archived: payload.archived
+              };
+            }
+            return proposal;
+          });
+        },
+        { revalidate: false }
+      );
+    }
     const unsubscribeFromPageDeletes = subscribe('pages_deleted', handleDeleteEvent);
     const unsubscribeFromPageCreated = subscribe('pages_created', handleCreateEvent);
+    const unsubscribeFromProposalArchived = subscribe('proposals_archived', handleArchivedEvent);
     return () => {
       unsubscribeFromPageDeletes();
       unsubscribeFromPageCreated();
+      unsubscribeFromProposalArchived();
     };
   }, [mutate, subscribe]);
 

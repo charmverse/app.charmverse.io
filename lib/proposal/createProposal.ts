@@ -75,7 +75,8 @@ export async function createProposal({
   const proposalId = uuid();
   const proposalStatus: ProposalStatus = isDraft ? 'draft' : 'published';
 
-  const authorsList = arrayUtils.uniqueValues(authors ? [...authors, userId] : [userId]);
+  const defaultAuthorsList = pageProps?.type !== 'proposal_template' ? [userId] : [];
+  const authorsList = arrayUtils.uniqueValues([...(authors || []), ...defaultAuthorsList]);
 
   const workflow = workflowId
     ? ((await prisma.proposalWorkflow.findUnique({

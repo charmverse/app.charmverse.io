@@ -5,7 +5,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import React from 'react';
 
 import { Button } from 'components/common/Button';
-import { TemplatesMenu } from 'components/common/TemplatesMenu';
+import { TemplatesMenu } from 'components/common/TemplatesMenu/TemplatesMenu';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import type { Card } from 'lib/focalboard/card';
@@ -17,22 +17,13 @@ type Props = {
   addCard: () => void;
   addCardFromTemplate: (cardTemplateId: string) => void;
   addCardTemplate: () => void;
-  editCardTemplate: (cardTemplateId: string) => void;
   deleteCardTemplate: (cardTemplateId: string) => void;
   showCard: (cardId: string) => void;
   boardId: string;
 };
 
 const NewCardButton = React.memo(
-  ({
-    addCard,
-    addCardFromTemplate,
-    addCardTemplate,
-    deleteCardTemplate,
-    editCardTemplate,
-    showCard,
-    boardId
-  }: Props): JSX.Element => {
+  ({ addCard, addCardFromTemplate, addCardTemplate, deleteCardTemplate, showCard, boardId }: Props): JSX.Element => {
     const cardTemplates: Card[] = useAppSelector(getCurrentBoardTemplates);
     const buttonRef = React.useRef<HTMLDivElement>(null);
     const { pages } = usePages();
@@ -63,7 +54,7 @@ const NewCardButton = React.memo(
           createTemplate={addCardTemplate}
           editTemplate={showCard}
           deleteTemplate={deleteCardTemplate}
-          pages={cardTemplatesPages}
+          templates={cardTemplatesPages}
           anchorEl={buttonRef.current as Element}
           popupState={popupState}
           boardTitle={boardTitle}
