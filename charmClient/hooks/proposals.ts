@@ -132,3 +132,7 @@ export function useUpdateSnapshotProposal({ proposalId }: { proposalId: MaybeStr
 export function useUpdateWorkflow({ proposalId }: { proposalId: MaybeString }) {
   return usePUT<{ workflowId: string }>(`/api/proposals/${proposalId}/workflow`);
 }
+
+export function useArchiveProposal({ proposalId }: { proposalId: MaybeString }) {
+  return usePOST<{ archived: boolean }>(`/api/proposals/${proposalId}/archive`);
+}

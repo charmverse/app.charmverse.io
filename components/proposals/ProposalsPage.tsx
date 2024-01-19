@@ -2,7 +2,6 @@ import { Box, Grid, Stack, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useCallback, useMemo, useState } from 'react';
 
-import charmClient from 'charmClient';
 import { useTrashPages } from 'charmClient/hooks/pages';
 import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFilterControl';
 import { ViewSettingsRow } from 'components/common/BoardEditor/components/ViewSettingsRow';
@@ -27,18 +26,13 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
-import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 
-import { useProposals } from './hooks/useProposals';
-
 export function ProposalsPage({ title }: { title: string }) {
   const { space: currentSpace } = useCurrentSpace();
   const { isFreeSpace } = useIsFreeSpace();
-  const { proposals, mutateProposals } = useProposals();
-  const loadingData = !proposals;
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
 
   const canSeeProposals = hasAccess || isFreeSpace || currentSpace?.publicProposals === true;
@@ -46,7 +40,7 @@ export function ProposalsPage({ title }: { title: string }) {
   const isAdmin = useIsAdmin();
   const { showError } = useSnackbar();
   const { user } = useUser();
-  const { board: activeBoard, views, cardPages, activeView, cards } = useProposalsBoard();
+  const { board: activeBoard, views, cardPages, activeView, cards, isLoading, refreshProposals } = useProposalsBoard();
   const [showSidebar, setShowSidebar] = useState(false);
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
@@ -89,7 +83,7 @@ export function ProposalsPage({ title }: { title: string }) {
     } catch (error) {
       showError(error, 'Could not archive pages');
     }
-    await mutateProposals();
+    await refreshProposals();
   }
 
   if (isLoadingAccess) {
@@ -151,7 +145,7 @@ export function ProposalsPage({ title }: { title: string }) {
                 setCheckedIds={setCheckedIds}
                 propertyTemplates={propertyTemplates}
                 onChange={() => {
-                  mutateProposals();
+                  refreshProposals();
                 }}
                 onDelete={deleteProposals}
               />
@@ -180,14 +174,14 @@ export function ProposalsPage({ title }: { title: string }) {
         </Stack>
       </DatabaseStickyHeader>
 
-      {loadingData ? (
+      {isLoading ? (
         <Grid item xs={12} sx={{ mt: 12 }}>
           <LoadingComponent height={500} isLoading size={50} />
         </Grid>
       ) : (
         <Box className={`container-container ${showSidebar ? 'sidebar-visible' : ''}`}>
           <Stack>
-            {proposals?.length > 0 ? (
+            {cardPages.length > 0 ? (
               <Box width='100%'>
                 <Table
                   board={activeBoard}

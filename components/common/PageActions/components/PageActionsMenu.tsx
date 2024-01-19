@@ -2,7 +2,7 @@ import type { PageType } from '@charmverse/core/prisma';
 import { EditOutlined } from '@mui/icons-material';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import LaunchIcon from '@mui/icons-material/Launch';
-import { Divider, ListItemText, Menu, MenuItem, Stack, Typography } from '@mui/material';
+import { Divider, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 
@@ -33,6 +33,7 @@ export function PageActionsMenu({
   anchorEl: HTMLElement | null;
   page: {
     parentId?: string | null;
+    proposalId: string | null;
     createdBy: string;
     type?: PageType;
     id: string;
@@ -79,7 +80,9 @@ export function PageActionsMenu({
     >
       {onClickEdit && !readOnly && (
         <MenuItem dense onClick={onClickEdit}>
-          <EditOutlined fontSize='small' sx={{ mr: 1 }} />
+          <ListItemIcon>
+            <EditOutlined fontSize='small' />
+          </ListItemIcon>
           <ListItemText>Edit</ListItemText>
         </MenuItem>
       )}
@@ -91,14 +94,12 @@ export function PageActionsMenu({
           readOnly || (!pagePermissions?.delete && !postPermissions?.delete_post) || !!page.syncWithPageId
         )}
       >
-        <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
+        <ListItemIcon>
+          <DeleteOutlineIcon fontSize='small' />
+        </ListItemIcon>
         <ListItemText>Delete</ListItemText>
       </MenuItem>
-      {page.type === 'proposal' && (
-        <MenuItem>
-          <ArchiveProposalAction proposalId={page.id} containerStyle={{ ml: -2 }} />
-        </MenuItem>
-      )}
+      {page.proposalId && <ArchiveProposalAction proposalId={page.proposalId} />}
       {!hideDuplicateAction && page.type && (
         <DuplicatePageAction
           onComplete={handleClose}
@@ -109,7 +110,9 @@ export function PageActionsMenu({
       )}
       <CopyPageLinkAction path={`/${page.path}`} />
       <MenuItem dense onClick={onClickOpenInNewTab}>
-        <LaunchIcon fontSize='small' sx={{ mr: 1 }} />
+        <ListItemIcon>
+          <LaunchIcon fontSize='small' />
+        </ListItemIcon>
         <ListItemText>Open in new tab</ListItemText>
       </MenuItem>
       {children}

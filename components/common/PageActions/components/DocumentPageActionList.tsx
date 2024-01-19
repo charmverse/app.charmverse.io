@@ -47,6 +47,7 @@ export type PageActionMeta = Pick<
   | 'id'
   | 'parentId'
   | 'path'
+  | 'proposalId'
   | 'snapshotProposalId'
   | 'syncWithPageId'
   | 'title'
@@ -317,7 +318,7 @@ export function DocumentPageActionList({
         onClick={onDeletePage}
         disabled={!pagePermissions?.delete || page.deletedAt !== null || !!page.syncWithPageId}
       />
-      {pageType === 'proposal' && pageId && <ArchiveProposalAction proposalId={pageId} refreshPageOnChange />}
+      {page.proposalId && <ArchiveProposalAction proposalId={page.proposalId} />}
       {undoEditorChanges && (
         <UndoAction
           onClick={undoEditorChanges}

@@ -62,17 +62,19 @@ export function GoBackButton({
 
   return (
     <Tooltip title={`Move back to ${previousStep?.title || 'Draft'}`}>
-      <Button
-        color='secondary'
-        loading={isSavingEvaluation}
-        size='small'
-        variant='outlined'
-        disabled={!!disabledTooltip}
-        disabledTooltip={disabledTooltip}
-        onClick={onClick}
-      >
-        Back
-      </Button>
+      <span>
+        <Button
+          color='secondary'
+          loading={isSavingEvaluation}
+          size='small'
+          variant='outlined'
+          disabled={!!disabledTooltip}
+          disabledTooltip={disabledTooltip}
+          onClick={onClick}
+        >
+          Back
+        </Button>
+      </span>
     </Tooltip>
   );
 }

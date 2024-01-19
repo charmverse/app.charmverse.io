@@ -32,7 +32,6 @@ export function ProposalProperties({
 }: ProposalPropertiesProps) {
   const { trigger: updateProposal } = useUpdateProposal({ proposalId });
   const { user } = useUser();
-  const { mutateProposals } = useProposals();
 
   const sourceTemplate = useProposalTemplateById(proposal?.page?.sourceTemplateId);
 
@@ -72,7 +71,6 @@ export function ProposalProperties({
   async function onChangeProperties(values: Partial<ProposalPropertiesInput>) {
     await updateProposal(values);
     refreshProposal();
-    mutateProposals();
   }
 
   return (

@@ -1,7 +1,8 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { stringUtils } from '@charmverse/core/utilities';
+
+import { relay } from 'lib/websockets/relay';
 
 import { setPageUpdatedAt } from './setPageUpdatedAt';
 
@@ -10,11 +11,7 @@ export type ArchiveProposalRequest = {
   proposalId: string;
 };
 
-export async function archiveProposal({
-  archived,
-  proposalId,
-  actorId
-}: ArchiveProposalRequest & { actorId: string }): Promise<ProposalWithUsers> {
+export async function archiveProposal({ archived, proposalId, actorId }: ArchiveProposalRequest & { actorId: string }) {
   if (typeof archived !== 'boolean') {
     throw new InvalidInputError(`Property "archived" must be true or false`);
   } else if (!stringUtils.isUUID(proposalId)) {
@@ -27,15 +24,20 @@ export async function archiveProposal({
     },
     data: {
       archived
-    },
-    include: {
-      category: true,
-      authors: true,
-      reviewers: true
     }
   });
 
   await setPageUpdatedAt({ proposalId, userId: actorId });
+  relay.broadcast(
+    {
+      type: 'proposals_archived',
+      payload: {
+        archived,
+        proposalIds: [proposalId]
+      }
+    },
+    updatedProposal.spaceId
+  );
 
   return updatedProposal;
 }

@@ -37,12 +37,13 @@ export function useProposalsBoardAdapter() {
   const [boardProposal, setBoardProposal] = useState<BoardProposal | null>(null);
   const { space } = useCurrentSpace();
   const { membersRecord } = useMembers();
-  const { proposals } = useProposals();
-  const { pages } = usePages();
+  const { proposals, mutateProposals, isLoading: isProposalsLoading } = useProposals();
+  const { pages, loadingPages: isPagesLoading } = usePages();
   const { proposalBoardBlock, proposalBlocks } = useProposalBlocks();
   const proposalPage = pages[boardProposal?.id || ''];
   const proposalData = proposals?.find((p) => p.id === boardProposal?.id);
   const proposal = { ...boardProposal, ...proposalData };
+  const isLoading = isProposalsLoading || isPagesLoading;
 
   const localViewSettings = useLocalDbViewSettings(`proposals-${space?.id}-${DEFAULT_VIEW_BLOCK_ID}`);
 
@@ -160,7 +161,7 @@ export function useProposalsBoardAdapter() {
   }).card;
 
   // each proposal with fields reflects a card
-  const cards: Card[] = cardPages.map((cp) => cp.card) || [];
+  const cards: Card[] = cardPages.map((cp) => cp.card);
 
   const views: BoardView[] = [];
 
@@ -171,6 +172,8 @@ export function useProposalsBoardAdapter() {
     cards,
     cardPages,
     activeView,
+    isLoading,
+    refreshProposals: mutateProposals,
     views,
     proposalPage,
     boardProposal,

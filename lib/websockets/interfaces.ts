@@ -184,6 +184,14 @@ type PagesRestored = {
   payload: Resource[];
 };
 
+type ProposalsArchived = {
+  type: 'proposals_archived';
+  payload: {
+    archived: boolean;
+    proposalIds: string[];
+  };
+};
+
 export type ClientMessage =
   | SubscribeToWorkspace
   | PageDeleted
@@ -210,7 +218,8 @@ export type ServerMessage =
   | ThreadsUpdated
   | SpaceSubscriptionUpdated
   | NotionImportCompleted
-  | PagesRestored;
+  | PagesRestored
+  | ProposalsArchived;
 
 export type WebSocketMessage = ClientMessage | ServerMessage;
 
