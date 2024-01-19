@@ -2,7 +2,6 @@ import type {
   MemberProperty,
   MemberPropertyPermission,
   ProposalBlock,
-  ProposalWorkflow,
   RewardBlock,
   Space
 } from '@charmverse/core/prisma-client';
@@ -24,7 +23,6 @@ export type SpaceSettingsExport = Pick<
   memberProperties: (MemberProperty & { permissions: MemberPropertyPermission[] })[];
   rewardBlocks: RewardBlock[];
   proposalBlocks: ProposalBlock[];
-  proposalWorkflows: ProposalWorkflow[];
 };
 
 export async function exportSpaceSettings({
@@ -59,8 +57,7 @@ export async function exportSpaceSettings({
         }
       },
       rewardBlocks: true,
-      proposalBlocks: true,
-      proposalWorkflows: true
+      proposalBlocks: true
     }
   });
 
