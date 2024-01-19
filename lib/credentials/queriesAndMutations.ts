@@ -1,10 +1,13 @@
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { Wallet } from 'ethers';
 
-import { graphQlServerEndpoint } from 'config/constants';
+import { credentialsWalletPrivateKey, graphQlServerEndpoint } from 'config/constants';
 
 import type { ProposalCredential } from './schemas';
+
+const credentialWalletAddress = new Wallet(credentialsWalletPrivateKey).address.toLowerCase();
 
 // Assuming DID and AttestationType are defined elsewhere in your TypeScript code.
 type DID = string; // or whatever the actual type is
@@ -121,7 +124,14 @@ export async function getCredentialsByRecipient({
   return apolloClient
     .query({
       query: GET_CREDENTIALS,
-      variables: { filter: { where: { recipient: { equalTo: recipient.toLowerCase() } } } }
+      variables: {
+        filter: {
+          where: {
+            recipient: { equalTo: recipient.toLowerCase() },
+            issuer: { equalTo: credentialWalletAddress }
+          }
+        }
+      }
     })
     .then(({ data }) => data.signedCredentialFourIndex.edges.map((e: any) => getParsedCredential(e.node)));
 }
