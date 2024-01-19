@@ -97,7 +97,7 @@ export function getProposalErrors({
 }: {
   proposal: Pick<
     ProposalPageAndPropertiesInput,
-    'title' | 'type' | 'proposalTemplateId' | 'formFields' | 'content' | 'proposalType' | 'evaluations'
+    'authors' | 'title' | 'type' | 'proposalTemplateId' | 'formFields' | 'content' | 'proposalType' | 'evaluations'
   >;
   requireTemplates?: boolean;
 }) {
@@ -108,6 +108,9 @@ export function getProposalErrors({
 
   if (requireTemplates && proposal.type === 'proposal' && !proposal.proposalTemplateId) {
     errors.push('Template is required');
+  }
+  if (proposal.type === 'proposal' && proposal.authors.length === 0) {
+    errors.push('At least one author is required');
   }
 
   if (proposal.proposalType === 'structured') {
@@ -169,6 +172,7 @@ function emptyState({
     publishToLens: false,
     fields: { properties: {} },
     ...inputs,
-    authors: userId ? [userId] : []
+    // leave authors empty for proposals
+    authors: inputs.type !== 'proposal_template' && userId ? [userId] : []
   };
 }

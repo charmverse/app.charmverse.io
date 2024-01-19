@@ -88,7 +88,7 @@ export function ProposalProperties({
           proposalStatus={proposal?.status}
           pageId={pageId}
           proposalId={proposalId}
-          readOnlyAuthors={readOnlyProperties}
+          readOnlyAuthors={readOnlyProperties ?? !!sourceTemplate?.authors.length}
           proposalFormInputs={proposalFormInputs}
           setProposalFormInputs={onChangeProperties}
           readOnlyCustomProperties={readOnlyCustomProperties}
