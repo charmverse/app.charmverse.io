@@ -9,7 +9,8 @@ export async function createThread({
   pageId,
   userId,
   context,
-  accessGroups
+  accessGroups,
+  fieldAnswerId
 }: ThreadCreatePayload): Promise<ThreadWithComments> {
   if (!comment) {
     throw new InvalidInputError('Please provide a valid comment');
@@ -52,6 +53,7 @@ export async function createThread({
           id: userId
         }
       },
+      fieldAnswer: fieldAnswerId ? { connect: { id: fieldAnswerId } } : undefined,
       accessGroups: accessGroups?.map((ag) => ({ ...ag })) ?? [],
       comments: {
         create: {

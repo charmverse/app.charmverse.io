@@ -41,14 +41,15 @@ export function InlineCommentInput({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   return (
-    <Box width='100%'>
+    <Box>
       {pageType === 'proposal' && (
-        <Stack height='fit-content' my={0.5}>
-          <Stack flexDirection='row' gap={0.5} m={0.5} alignItems='center'>
+        <Stack height='fit-content'>
+          <Stack flexDirection='row' gap={0.5} alignItems='center' m={1} mb={0.5}>
             <PersonIcon fontSize='small' color='secondary' />
             <Typography variant='subtitle2'>Viewable by:</Typography>
           </Stack>
           <UserAndRoleSelect
+            readOnly={isSubmitting}
             wrapColumn
             emptyPlaceholderContent='Everyone'
             readOnlyMessage='Everyone'
@@ -63,13 +64,16 @@ export function InlineCommentInput({
           <Divider />
         </Stack>
       )}
-      <Box display='flex' width={{ xs: '100%', sm: '400px' }}>
+      <Box display='flex' width={{ xs: '100%', sm: '400px' }} mx={1} mb={1}>
         <Box flexGrow={1}>
           <InlineCharmEditor
             focusOnInit={true}
             content={commentContent}
+            key={`${isSubmitting}`}
+            readOnly={isSubmitting}
             style={{
               fontSize: '14px',
+              padding: 0,
               minHeight: pageType === 'proposal' ? 100 : 'fit-content'
             }}
             onContentChange={({ doc }) => {

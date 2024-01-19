@@ -1,13 +1,11 @@
 import type { FormField } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
-import AddCommentOutlinedIcon from '@mui/icons-material/AddCommentOutlined';
-import { Chip, IconButton, Stack, Tooltip } from '@mui/material';
+import { Chip, Stack } from '@mui/material';
 import { useEffect, useState } from 'react';
 import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
-import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
@@ -27,6 +25,7 @@ type FormFieldInputsProps = {
   formFields: (Pick<FormField, 'type' | 'name' | 'required' | 'id' | 'description' | 'private'> & {
     value?: FormFieldValue;
     options?: SelectOptionType[];
+    formFieldAnswerId?: string;
   })[];
   disabled?: boolean;
   errors: FieldErrors<Record<string, FormFieldValue>>;
@@ -40,6 +39,7 @@ type FormFieldInputsProps = {
   onSave?: (answers: { id: string; value: FormFieldValue }[]) => Promise<void>;
   values?: Record<string, FormFieldValue>;
   isReviewer: boolean;
+  pageId?: string;
 };
 
 export function ControlledFormFieldInputs({
@@ -65,7 +65,8 @@ export function FormFieldInputs({
   formFields,
   disabled,
   onSave,
-  isReviewer
+  isReviewer,
+  pageId
 }: Omit<FormFieldInputsProps, 'control' | 'errors' | 'onFormChange'> & {
   isReviewer: boolean;
 }) {
@@ -83,6 +84,7 @@ export function FormFieldInputs({
       onSave={onSave}
       values={values}
       isReviewer={isReviewer}
+      pageId={pageId}
     />
   );
 }
@@ -95,7 +97,8 @@ function FormFieldInputsBase({
   control,
   errors,
   onFormChange,
-  isReviewer
+  isReviewer,
+  pageId
 }: FormFieldInputsProps & {
   isReviewer: boolean;
 }) {
@@ -103,7 +106,6 @@ function FormFieldInputsBase({
   const { showMessage } = useSnackbar();
   const debouncedValues = useDebouncedValue(values, 300);
   const hasErrors = Object.keys(errors).length !== 0;
-  const isAdmin = useIsAdmin();
   async function saveFormFieldAnswers() {
     if (hasErrors) {
       showMessage('Your form contains errors and cannot be saved.', 'error');
@@ -131,42 +133,51 @@ function FormFieldInputsBase({
   return (
     <Stack gap={1} mb={15}>
       <FormFieldInputsContainer>
-        {formFields.map((formField) => (
-          <Stack flexDirection='row' alignItems='center' gap={1} key={formField.id}>
-            <Controller
-              name={formField.id}
-              control={control}
-              render={({ field }) => (
-                <FieldTypeRenderer
-                  {...field}
-                  value={(field.value ?? '') as FormFieldValue}
-                  placeholder={fieldTypePlaceholderRecord[formField.type]}
-                  labelEndAdornment={
-                    formField.private ? <Chip sx={{ ml: 1 }} label='Private' size='small' /> : undefined
-                  }
-                  description={formField.description as PageContent}
+        {formFields.map((formField) => {
+          return (
+            <Stack flexDirection='row' alignItems='center' gap={1} key={formField.id}>
+              <Controller
+                name={formField.id}
+                control={control}
+                render={({ field }) => (
+                  <FieldTypeRenderer
+                    {...field}
+                    value={(field.value ?? '') as FormFieldValue}
+                    placeholder={fieldTypePlaceholderRecord[formField.type]}
+                    labelEndAdornment={
+                      formField.private ? <Chip sx={{ ml: 1 }} label='Private' size='small' /> : undefined
+                    }
+                    description={formField.description as PageContent}
+                    disabled={disabled}
+                    type={formField.type}
+                    label={formField.name}
+                    options={formField.options as SelectOptionType[]}
+                    error={errors[formField.id] as any}
+                    required={formField.required}
+                    data-test={`form-field-input-${formField.id}`}
+                    onChange={(e) => {
+                      setIsFormDirty(true);
+                      onFormChange([
+                        {
+                          id: formField.id,
+                          value: typeof e?.target?.value === 'string' ? e.target.value : e
+                        }
+                      ]);
+                    }}
+                  />
+                )}
+              />
+              {pageId && formField.type !== 'label' && formField.formFieldAnswerId && (
+                <FormFieldAnswerComment
+                  fieldAnswerId={formField.formFieldAnswerId}
+                  pageId={pageId}
                   disabled={disabled}
-                  type={formField.type}
-                  label={formField.name}
-                  options={formField.options as SelectOptionType[]}
-                  error={errors[formField.id] as any}
-                  required={formField.required}
-                  data-test={`form-field-input-${formField.id}`}
-                  onChange={(e) => {
-                    setIsFormDirty(true);
-                    onFormChange([
-                      {
-                        id: formField.id,
-                        value: typeof e?.target?.value === 'string' ? e.target.value : e
-                      }
-                    ]);
-                  }}
+                  isReviewer={isReviewer}
                 />
               )}
-            />
-            {formField.type !== 'label' && <FormFieldAnswerComment disabled={disabled} isReviewer={isReviewer} />}
-          </Stack>
-        ))}
+            </Stack>
+          );
+        })}
       </FormFieldInputsContainer>
     </Stack>
   );

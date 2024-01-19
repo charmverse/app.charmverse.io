@@ -461,6 +461,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
                       />
                     ) : (
                       <ProposalFormFieldInputs
+                        pageId={page.id}
                         isReviewer={proposal?.permissions.evaluate ?? false}
                         proposalId={proposal.id}
                         formFields={proposal?.form.formFields ?? []}

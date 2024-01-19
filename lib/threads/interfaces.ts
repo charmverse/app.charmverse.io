@@ -28,6 +28,7 @@ export interface ThreadCreatePayload {
   userId: string;
   context: string;
   accessGroups?: ThreadAccessGroup[];
+  fieldAnswerId?: string;
 }
 
 export interface ThreadWithComments extends Thread {

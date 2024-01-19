@@ -9,12 +9,14 @@ export function ProposalFormFieldInputs({
   proposalId,
   formFields,
   readOnly,
-  isReviewer
+  isReviewer,
+  pageId
 }: {
   readOnly?: boolean;
   proposalId: string;
   formFields: FormField[];
   isReviewer: boolean;
+  pageId: string;
 }) {
   const { data: proposalFormFieldAnswers = [], isLoading } = useGetProposalFormFieldAnswers({ proposalId });
   const { trigger } = useUpdateProposalFormFieldAnswers({ proposalId });
@@ -38,6 +40,7 @@ export function ProposalFormFieldInputs({
     <FormFieldInputs
       isReviewer={isReviewer}
       onSave={onSave}
+      pageId={pageId}
       disabled={readOnly}
       formFields={formFields.map((formField) => {
         const proposalFormFieldAnswer = proposalFormFieldAnswers.find(
@@ -45,6 +48,7 @@ export function ProposalFormFieldInputs({
         );
         return {
           ...formField,
+          formFieldAnswerId: proposalFormFieldAnswer?.id,
           value: proposalFormFieldAnswer?.value as FormFieldValue,
           options: (formField.options ?? []) as SelectOptionType[]
         };
