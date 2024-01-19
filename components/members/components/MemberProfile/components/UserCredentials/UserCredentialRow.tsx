@@ -10,7 +10,7 @@ import type { PublishedSignedCredential } from 'lib/credentials/queriesAndMutati
 export function UserCredentialRow({ credential }: { credential: PublishedSignedCredential }) {
   return (
     <Box display='flex' alignItems='center' justifyContent='space-between'>
-      <Box display='flex' alignItems='center' gap={2}>
+      <Box ml={2} display='flex' alignItems='center' gap={2}>
         <Image src='/images/logo_black_transparent.64.png' alt='charmverse-logo' height={30} width={30} />
         <Box display='flex' flexDirection='column'>
           <Typography variant='body1' fontWeight='bold'>

@@ -32,7 +32,7 @@ export function ProfileTabs(props: { user: Member | PublicUser | LoggedInUser; r
     ];
 
     if (showCredentialsTab) {
-      _tabs.push(['Credentials', <UserCredentialsList key='credentials' userId={props.user.id} />]);
+      _tabs.push(['Credentials', <UserCredentialsList key='credentials' userId={props.user.id} />, { sx: { px: 0 } }]);
     }
     return _tabs as TabConfig[];
   }, [readOnly, props.user.id, showCredentialsTab]);
