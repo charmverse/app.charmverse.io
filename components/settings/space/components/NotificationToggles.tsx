@@ -36,13 +36,14 @@ const notifications: Record<ConfigurableGroups, { title: string; types: Notifica
     types: [
       [
         { label: 'Feedback ready (All members)', type: 'proposals__start_discussion' },
-        { label: 'Review ready (Reviewers only)' },
-        { label: 'Review completed (Authors only)' }
+        { label: 'Review ready (Reviewers)', type: 'proposals__review_required' },
+        { label: 'Review completed (Authors and Reviewers)', type: 'proposals__step_passed' }
       ],
       [
-        { label: 'Vote ready (All members)', type: 'proposals__vote' },
-        { label: 'Evaluation ready (Reviewers only)' },
-        { label: 'Evaluation completed (Authors only)' }
+        { label: 'Vote ready (Authors and Voters)', type: 'proposals__vote' },
+        { label: 'Vote passed (Authors and Voters)', type: 'proposals__vote_passed' },
+        { label: 'Proposal declined (Reviewers only)', type: 'proposals__proposal_failed' },
+        { label: 'Proposal passed (Authors and Reviewers only)', type: 'proposals__proposal_passed' }
       ]
     ]
   },
