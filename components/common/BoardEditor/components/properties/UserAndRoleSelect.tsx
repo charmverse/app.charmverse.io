@@ -111,7 +111,7 @@ function SelectedOptions({
             {option.group === 'role' && (
               <Chip
                 data-test='selected-user-or-role-option'
-                color={errorValues?.includes?.(option.id) ? 'error' : undefined}
+                color={errorValues?.includes?.(option.id) ? 'warning' : undefined}
                 sx={{ px: 0.5, cursor: readOnly || isRequiredValue(option) ? 'text' : 'pointer' }}
                 label={option.name}
                 // color={option.color}
@@ -131,7 +131,7 @@ function SelectedOptions({
             {option.group === 'system_role' && (
               <Chip
                 data-test='selected-user-or-role-option'
-                color={errorValues?.includes?.(option.id) ? 'error' : undefined}
+                color={errorValues?.includes?.(option.id) ? 'warning' : undefined}
                 sx={{ px: 0.5, cursor: readOnly || isRequiredValue(option) ? 'text' : 'pointer' }}
                 label={option.label}
                 key={option.id}

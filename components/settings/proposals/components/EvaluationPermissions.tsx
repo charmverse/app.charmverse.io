@@ -220,7 +220,7 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
       {warningStr && (
         <Box className='octo-propertyrow'>
           <PropertyLabel readOnly></PropertyLabel>
-          <Typography color='error' variant='caption'>
+          <Typography color='warning.main' variant='caption'>
             {warningStr}
           </Typography>
         </Box>
