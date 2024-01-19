@@ -271,6 +271,7 @@ function PropertyValueElement(props: Props) {
         readOnly={readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any)}
         onChange={() => null}
         value={propertyValue as any}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
       />
     );
   } else if (propertyTemplate.type === 'select' || propertyTemplate.type === 'multiSelect') {
@@ -404,6 +405,7 @@ function PropertyValueElement(props: Props) {
         }}
         value={propertyValue as any}
         showEmptyPlaceholder={showEmptyPlaceholder}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
       />
     );
   } else if (propertyTemplate.type === 'proposalAuthor') {
@@ -430,15 +432,21 @@ function PropertyValueElement(props: Props) {
       />
     );
   } else if (propertyTemplate.type === 'date') {
-    if (readOnly) {
+    if (!readOnly) {
       propertyValueElement = (
-        <div className='octo-propertyvalue readonly'>
+        <Box
+          className='octo-propertyvalue readonly'
+          display='flex'
+          alignItems={displayType !== 'table' ? 'center' : 'flex-start'}
+          sx={{ whiteSpace: displayType !== 'table' || props.wrapColumn ? 'break-spaces' : 'nowrap' }}
+        >
           {displayValue || (showEmptyPlaceholder && <EmptyPlaceholder>{emptyDisplayValue}</EmptyPlaceholder>)}
-        </div>
+        </Box>
       );
     } else {
       propertyValueElement = (
         <DateRange
+          centerContent={displayType !== 'table'}
           wrapColumn={props.wrapColumn}
           className='octo-propertyvalue'
           value={value.toString()}
@@ -476,10 +484,20 @@ function PropertyValueElement(props: Props) {
   } else if (propertyTemplate.type === 'updatedBy') {
     propertyValueElement = <LastModifiedBy updatedBy={latestUpdated === 'card' ? card.updatedBy : updatedBy} />;
   } else if (propertyTemplate.type === 'createdTime') {
-    propertyValueElement = <CreatedAt createdAt={card.createdAt} />;
+    propertyValueElement = (
+      <CreatedAt
+        createdAt={card.createdAt}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
+        centerContent={displayType !== 'table'}
+      />
+    );
   } else if (propertyTemplate.type === 'updatedTime') {
     propertyValueElement = (
-      <LastModifiedAt updatedAt={new Date(latestUpdated === 'card' ? card.updatedAt : updatedAt).toString()} />
+      <LastModifiedAt
+        updatedAt={new Date(latestUpdated === 'card' ? card.updatedAt : updatedAt).toString()}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
+        centerContent={displayType !== 'table'}
+      />
     );
   } else if (propertyTemplate.type === 'tokenAmount') {
     const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
