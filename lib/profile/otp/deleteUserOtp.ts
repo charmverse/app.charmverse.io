@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/dist/cjs/lib/log';
 import { DataNotFoundError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
 export type CreateOtpResponse = {
