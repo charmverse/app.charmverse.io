@@ -432,7 +432,7 @@ function PropertyValueElement(props: Props) {
       />
     );
   } else if (propertyTemplate.type === 'date') {
-    if (!readOnly) {
+    if (readOnly) {
       propertyValueElement = (
         <Box
           className='octo-propertyvalue readonly'
