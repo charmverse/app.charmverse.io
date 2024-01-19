@@ -128,7 +128,11 @@ export function TemplatesMenu({
       {!!archivedTemplates?.length && (
         <>
           <Divider />
-          <Typography variant='caption'>Archived</Typography>
+          <Box pl={2}>
+            <Typography color='secondary' variant='caption'>
+              Archived templates
+            </Typography>
+          </Box>
         </>
       )}
       {archivedTemplates?.map((template) => (
