@@ -212,7 +212,7 @@ export function ProposalSocialShare({
   const { showMessage } = useSnackbar();
   const { space } = useCurrentSpace();
   const [, copyFn] = useCopyToClipboard();
-  const proposalLink = `https://app.charmverse.io/${space?.domain}${proposalPath}`;
+  const proposalLink = `https://app.charmverse.io/${space?.domain}/${proposalPath}`;
 
   function copyProposalLink() {
     copyFn(proposalLink).then(() => {
