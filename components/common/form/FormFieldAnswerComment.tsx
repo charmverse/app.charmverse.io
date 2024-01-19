@@ -86,18 +86,17 @@ export function FormFieldAnswerInput({
   canCreateComments?: boolean;
 }) {
   const formFieldAnswerValue = formFieldAnswer.value as FormFieldValue;
-  let value = Array.isArray(formFieldAnswerValue) ? formFieldAnswerValue[0] : formFieldAnswerValue;
-  value = typeof value === 'object' ? value.contentText : value;
-
   const { trigger: createThread } = useCreateThread();
   const { refetchThreads } = useThreads();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleSubmit = async ({ commentContent, event, threadAccessGroups }: InlineCommentInputHandleSubmitParams) => {
     event.preventDefault();
+    const value = Array.isArray(formFieldAnswerValue) ? formFieldAnswerValue[0] : formFieldAnswerValue;
+
     await createThread({
       comment: commentContent,
-      context: value,
+      context: (typeof value === 'object' ? value.contentText : value) as string,
       pageId,
       accessGroups: threadAccessGroups.map((threadAccessGroup) => ({
         id: threadAccessGroup.id,
