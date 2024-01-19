@@ -90,27 +90,20 @@ export function useHandleLensError() {
 export function useLensProfile() {
   const { user } = useUser();
   const { account } = useWeb3Account();
-  // const { data: sessionData } = useSession();
-  // const authenticated = sessionData?.authenticated ?? false;
-  // const sessionProfile = sessionData?.type === SessionType.WithProfile ? sessionData?.profile : null;
-  // const { handlerLensError } = useHandleLensError();
-  // const wallet = user?.wallets[0]?.address;
-  // const { data: profilesData, loading } = useProfiles({
-  //   where: {
-  //     ownedBy: wallet ? [wallet] : account ? [account] : null
-  //   }
-  // });
+  const { data: sessionData } = useSession();
+  const authenticated = sessionData?.authenticated ?? false;
+  const sessionProfile = sessionData?.type === SessionType.WithProfile ? sessionData?.profile : null;
+  const { handlerLensError } = useHandleLensError();
+  const wallet = user?.wallets[0]?.address;
+  const { data: profilesData, loading } = useProfiles({
+    where: {
+      ownedBy: wallet ? [wallet] : account ? [account] : null
+    }
+  });
 
-  // const { data: profilesData, loading: isLoadingProfiles } = useProfiles({
-  //   where: {
-  //     ownedBy: account ? [account] : null
-  //   }
-  // });
+  const { execute } = useLogin();
 
-  // const { execute } = useLogin();
-  const { showMessage } = useSnackbar();
-
-  // const lensProfile = sessionProfile ?? profilesData?.[0] ?? null;
+  const lensProfile = sessionProfile ?? profilesData?.[0] ?? null;
 
   const { space } = useCurrentSpace();
 
@@ -123,10 +116,10 @@ export function useLensProfile() {
       return lensProfile;
     }
 
-    //   const result = await execute({
-    //     address: account,
-    //     profileId: lensProfile.id as ProfileId
-    //   });
+    const result = await execute({
+      address: account,
+      profileId: lensProfile.id as ProfileId
+    });
 
     if (result.isFailure()) {
       handlerLensError(result.error);
@@ -137,10 +130,10 @@ export function useLensProfile() {
   };
 
   return {
-    isAuthenticated: false,
-    lensProfile: { handle: '' } as any,
-    setupLensProfile: () => null,
-    loading: false
+    isAuthenticated: authenticated,
+    lensProfile: !isCyberConnect(space?.domain) ? lensProfile : null,
+    setupLensProfile,
+    loading
   };
 }
 

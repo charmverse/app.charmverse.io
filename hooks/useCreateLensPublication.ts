@@ -40,7 +40,7 @@ export function useCreateLensPublication(params: CreateLensPublicationParams) {
   const { onError, onSuccess, proposalId, publicationType, proposalLink } = params;
   const { execute: createPost } = useCreatePost();
   const { updateComment } = usePageComments(proposalId);
-  // const { execute: createComment } = useCreateComment();
+  const { execute: createComment } = useCreateComment();
   const { chainId } = useWeb3Account();
   const { trigger: updateProposalLensProperties } = useUpdateProposalLensProperties({ proposalId });
   const { space } = useCurrentSpace();
@@ -76,7 +76,7 @@ export function useCreateLensPublication(params: CreateLensPublicationParams) {
         publicationType === 'comment' ? `\n\nView on CharmVerse ${proposalLink}?commentId=${params.commentId}` : ''
       }`;
 
-      const metadata = '';
+      const metadata = textOnly({ content: finalMarkdownContent });
 
       const uri = await trigger({
         metadata
