@@ -142,7 +142,7 @@ function FormFieldInputsBase({
     }
   }
 
-  const fieldAnswerIdThreadRecord: Record<string, ThreadWithComments> = useMemo(() => {
+  const fieldAnswerIdThreadRecord: Record<string, ThreadWithComments[]> = useMemo(() => {
     if (!threads) {
       return {};
     }
@@ -157,11 +157,18 @@ function FormFieldInputsBase({
         return acc;
       }
 
+      if (!acc[fieldAnswerId]) {
+        return {
+          ...acc,
+          [fieldAnswerId]: [thread]
+        };
+      }
+
       return {
         ...acc,
-        [fieldAnswerId]: thread
+        [fieldAnswerId]: [...acc[fieldAnswerId], thread]
       };
-    }, {} as Record<string, ThreadWithComments>);
+    }, {} as Record<string, ThreadWithComments[]>);
   }, [threads]);
 
   useEffect(() => {
@@ -175,9 +182,9 @@ function FormFieldInputsBase({
     <Stack gap={1} mb={15}>
       <FormFieldInputsContainer>
         {formFields.map((formField) => {
-          const fieldAnswerThread = formField.formFieldAnswer
+          const fieldAnswerThreads = formField.formFieldAnswer
             ? fieldAnswerIdThreadRecord[formField.formFieldAnswer.id]
-            : null;
+            : [];
           return (
             <StyledStack key={formField.id}>
               <Controller
@@ -216,7 +223,7 @@ function FormFieldInputsBase({
                   formFieldAnswer={formField.formFieldAnswer}
                   pageId={pageId}
                   disabled={disabled}
-                  fieldAnswerThread={fieldAnswerThread}
+                  fieldAnswerThreads={fieldAnswerThreads}
                   canCreateComments={isAdmin || isReviewer}
                 />
               )}

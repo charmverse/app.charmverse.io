@@ -41,10 +41,10 @@ export function InlineCommentInput({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   return (
-    <Box>
+    <Box p={1}>
       {pageType === 'proposal' && (
         <Stack height='fit-content'>
-          <Stack flexDirection='row' gap={0.5} alignItems='center' m={1} mb={0.5}>
+          <Stack flexDirection='row' gap={0.5} alignItems='center'>
             <PersonIcon fontSize='small' color='secondary' />
             <Typography variant='subtitle2'>Viewable by:</Typography>
           </Stack>
@@ -64,7 +64,7 @@ export function InlineCommentInput({
           <Divider />
         </Stack>
       )}
-      <Box display='flex' width={{ xs: '100%', sm: '400px' }} mx={1} mb={1}>
+      <Box display='flex' width={{ xs: '100%', sm: '400px' }}>
         <Box flexGrow={1}>
           <InlineCharmEditor
             focusOnInit={true}
@@ -100,9 +100,7 @@ export function InlineCommentInput({
           }}
           sx={{
             alignSelf: 'flex-end',
-            marginBottom: '4px',
-            minWidth: ['36px', '64px'],
-            px: ['4px', '10px']
+            minWidth: ['36px', '64px']
           }}
         >
           {isSmallScreen ? <SendIcon /> : 'Start'}

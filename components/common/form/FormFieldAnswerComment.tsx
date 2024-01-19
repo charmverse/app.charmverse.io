@@ -9,6 +9,7 @@ import type { InlineCommentInputHandleSubmitParams } from 'components/[pageId]/D
 import { InlineCommentInput } from 'components/[pageId]/DocumentPage/components/InlineCommentInput';
 import { useThreads } from 'hooks/useThreads';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
+import { isTruthy } from 'lib/utilities/types';
 
 import { ThreadContainer } from '../CharmEditor/components/inlineComment/components/InlineCommentSubMenu';
 import PageThread from '../CharmEditor/components/thread/PageThread';
@@ -16,16 +17,71 @@ import PopperPopup from '../PopperPopup';
 
 import type { FormFieldValue } from './interfaces';
 
-export function FormFieldAnswerComment({
+function FormFieldAnswerInput({
+  disabled,
+  fieldAnswerThreads = [],
+  canCreateComments
+}: {
+  disabled?: boolean;
+  fieldAnswerThreads?: ThreadWithComments[];
+  canCreateComments?: boolean;
+}) {
+  const unResolvedThreads =
+    fieldAnswerThreads
+      .filter((thread) => thread && !thread?.resolved)
+      .filter(isTruthy)
+      .sort((threadA, threadB) =>
+        threadA && threadB ? new Date(threadB.createdAt).getTime() - new Date(threadA.createdAt).getTime() : 0
+      ) ?? [];
+
+  if (fieldAnswerThreads.length === 0 || unResolvedThreads.length === 0) {
+    return null;
+  }
+
+  return (
+    <PopperPopup
+      popupContent={
+        <Box display='flex' flexDirection='column' gap={1}>
+          {unResolvedThreads.map((resolvedThread) => (
+            <ThreadContainer key={resolvedThread.id} elevation={4}>
+              <PageThread
+                canCreateComments={canCreateComments}
+                inline
+                key={resolvedThread.id}
+                threadId={resolvedThread?.id}
+                sx={{
+                  boxShadow: 'none'
+                }}
+              />
+            </ThreadContainer>
+          ))}
+        </Box>
+      }
+      disablePopup={disabled}
+      paperSx={{
+        boxShadow: 'none'
+      }}
+    >
+      <Tooltip title={!disabled ? 'View form field answer threads' : ''}>
+        <Box display='flex' gap={0.5} alignItems='center' sx={{ cursor: 'pointer' }}>
+          <MessageOutlined color='secondary' fontSize='small' />
+          <Typography component='span' variant='subtitle1'>
+            {fieldAnswerThreads.reduce((acc, thread) => acc + thread.comments.length, 0)}
+          </Typography>
+        </Box>
+      </Tooltip>
+    </PopperPopup>
+  );
+}
+
+export function FormFieldAnswerThreads({
   pageId,
   disabled,
-  fieldAnswerThread,
   formFieldAnswer,
   canCreateComments
 }: {
   disabled?: boolean;
   pageId: string;
-  fieldAnswerThread?: ThreadWithComments | null;
   formFieldAnswer: FormFieldAnswer;
   canCreateComments?: boolean;
 }) {
@@ -35,7 +91,8 @@ export function FormFieldAnswerComment({
 
   const { trigger: createThread } = useCreateThread();
   const { refetchThreads } = useThreads();
-  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
   const handleSubmit = async ({ commentContent, event, threadAccessGroups }: InlineCommentInputHandleSubmitParams) => {
     event.preventDefault();
     await createThread({
@@ -49,58 +106,59 @@ export function FormFieldAnswerComment({
       fieldAnswerId: formFieldAnswer.id
     });
     await refetchThreads();
-    setIsPopoverOpen(false);
+    setIsOpen(false);
   };
+
+  if (!canCreateComments) {
+    return null;
+  }
 
   return (
     <PopperPopup
-      popupContent={
-        fieldAnswerThread ? (
-          <ThreadContainer
-            sx={{
-              boxShadow: 'none'
-            }}
-          >
-            <PageThread
-              sx={{
-                border: 'none'
-              }}
-              canCreateComments={!disabled}
-              inline
-              threadId={fieldAnswerThread.id}
-            />
-          </ThreadContainer>
-        ) : (
-          <InlineCommentInput pageType='proposal' handleSubmit={handleSubmit} />
-        )
-      }
+      popupContent={<InlineCommentInput pageType='proposal' handleSubmit={handleSubmit} />}
       disablePopup={disabled}
       paperSx={{
         boxShadow: 'none'
       }}
-      open={isPopoverOpen}
+      open={isOpen}
     >
-      <Stack flexDirection='row' gap={1} className='icons' position='relative' top={10}>
-        {fieldAnswerThread ? (
-          <Box display='flex' gap={0.5} alignItems='center' sx={{ cursor: 'pointer' }}>
-            <MessageOutlined color='secondary' fontSize='small' />
-            <Typography component='span' variant='subtitle1'>
-              {fieldAnswerThread.comments.length}
-            </Typography>
-          </Box>
-        ) : null}
-        <Tooltip
-          title={!disabled ? 'Add a comment to the form field answer' : "You don't have permission to add a comment"}
-        >
-          <div>
-            {canCreateComments ? (
-              <IconButton disabled={disabled} color='secondary' onClick={() => setIsPopoverOpen(true)}>
-                <AddCommentOutlinedIcon fontSize='small' />
-              </IconButton>
-            ) : null}
-          </div>
-        </Tooltip>
-      </Stack>
+      <Tooltip
+        title={!disabled ? 'Add a comment to the form field answer' : "You don't have permission to add a comment"}
+      >
+        <IconButton disabled={disabled} color='secondary' onClick={() => setIsOpen(true)}>
+          <AddCommentOutlinedIcon fontSize='small' />
+        </IconButton>
+      </Tooltip>
     </PopperPopup>
+  );
+}
+
+export function FormFieldAnswerComment({
+  pageId,
+  disabled,
+  fieldAnswerThreads = [],
+  formFieldAnswer,
+  canCreateComments
+}: {
+  disabled?: boolean;
+  pageId: string;
+  fieldAnswerThreads?: ThreadWithComments[];
+  formFieldAnswer: FormFieldAnswer;
+  canCreateComments?: boolean;
+}) {
+  return (
+    <Stack flexDirection='row' gap={1} className='icons' position='relative' top={10} alignItems='center'>
+      <FormFieldAnswerInput
+        disabled={disabled}
+        fieldAnswerThreads={fieldAnswerThreads}
+        canCreateComments={canCreateComments}
+      />
+      <FormFieldAnswerThreads
+        disabled={disabled}
+        pageId={pageId}
+        formFieldAnswer={formFieldAnswer}
+        canCreateComments={canCreateComments}
+      />
+    </Stack>
   );
 }
