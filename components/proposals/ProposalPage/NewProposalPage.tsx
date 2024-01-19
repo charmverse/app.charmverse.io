@@ -310,6 +310,7 @@ export function NewProposalPage({
               proposalStatus='draft'
               proposalFormInputs={formInputs}
               setProposalFormInputs={setFormInputs}
+              readOnlyAuthors={!!sourceTemplate?.authors.length}
               readOnlyCustomProperties={readOnlyCustomProperties}
             />
           </div>
