@@ -70,13 +70,15 @@ function SelectedOptions({
   isRequiredValue = () => false,
   readOnly,
   onRemove,
-  wrapColumn
+  wrapColumn,
+  errorValues
 }: {
   wrapColumn?: boolean;
   readOnly: boolean;
   value: SelectOptionPopulated[];
   isRequiredValue?: (option: SelectOptionPopulated) => boolean;
   onRemove: (reviewerId: string) => void;
+  errorValues?: string[];
 }) {
   return (
     <>
@@ -109,6 +111,7 @@ function SelectedOptions({
             {option.group === 'role' && (
               <Chip
                 data-test='selected-user-or-role-option'
+                color={errorValues?.includes?.(option.id) ? 'error' : undefined}
                 sx={{ px: 0.5, cursor: readOnly || isRequiredValue(option) ? 'text' : 'pointer' }}
                 label={option.name}
                 // color={option.color}
@@ -128,6 +131,7 @@ function SelectedOptions({
             {option.group === 'system_role' && (
               <Chip
                 data-test='selected-user-or-role-option'
+                color={errorValues?.includes?.(option.id) ? 'error' : undefined}
                 sx={{ px: 0.5, cursor: readOnly || isRequiredValue(option) ? 'text' : 'pointer' }}
                 label={option.label}
                 key={option.id}
@@ -168,6 +172,7 @@ type Props<T> = {
   wrapColumn?: boolean;
   type?: 'role' | 'roleAndUser';
   required?: boolean;
+  errorValues?: string[];
 };
 
 export function UserAndRoleSelect<T extends { id: string; group: string } = SelectOption>({
@@ -185,7 +190,8 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
   'data-test': dataTest,
   wrapColumn,
   type = 'roleAndUser',
-  required
+  required,
+  errorValues
 }: Props<T>): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(false);
   const { roles } = useRoles();
@@ -271,7 +277,13 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
             {applicableValues.length === 0 ? (
               showEmptyPlaceholder && <EmptyPlaceholder>{emptyPlaceholderContent}</EmptyPlaceholder>
             ) : (
-              <SelectedOptions wrapColumn={wrapColumn} readOnly value={populatedValue} onRemove={removeOption} />
+              <SelectedOptions
+                wrapColumn={wrapColumn}
+                readOnly
+                value={populatedValue}
+                onRemove={removeOption}
+                errorValues={errorValues}
+              />
             )}
           </Box>
         </Tooltip>
@@ -367,6 +379,7 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
               value={populatedValue}
               isRequiredValue={isRequiredValue}
               onRemove={removeOption}
+              errorValues={errorValues}
             />
           )}
           disabled={!!readOnly}
