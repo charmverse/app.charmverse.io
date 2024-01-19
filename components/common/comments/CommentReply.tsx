@@ -21,18 +21,10 @@ const defaultCharmEditorOutput: ICharmEditorOutput = {
 };
 
 export function CommentReply({
-  isPublishingComments,
   commentId,
   handleCreateComment,
-  onCancelComment,
-  setPublishToLens,
-  publishToLens,
-  showPublishToLens
+  onCancelComment
 }: {
-  isPublishingComments?: boolean;
-  showPublishToLens?: boolean;
-  publishToLens?: boolean;
-  setPublishToLens?: (publishToLens: boolean) => void;
   onCancelComment: () => void;
   handleCreateComment: (comment: CreateCommentPayload) => Promise<void>;
   commentId: string;
@@ -83,23 +75,6 @@ export function CommentReply({
           />
 
           <Stack flexDirection='row' justifyContent='flex-end' alignItems='center'>
-            {showPublishToLens && (
-              <>
-                <Typography variant='body2' color='text.secondary'>
-                  {isPublishingComments ? 'Publishing to Lens...' : 'Publish to Lens'}
-                </Typography>
-                {isPublishingComments ? (
-                  <LoadingIcon size={16} sx={{ mx: 1 }} />
-                ) : (
-                  <Switch
-                    sx={{ mr: 1, top: 2 }}
-                    size='small'
-                    checked={publishToLens}
-                    onChange={(e) => setPublishToLens?.(e.target.checked)}
-                  />
-                )}
-              </>
-            )}
             <Stack gap={1} flexDirection='row' alignSelf='flex-end'>
               <Button variant='outlined' color='secondary' onClick={onCancelComment}>
                 Cancel

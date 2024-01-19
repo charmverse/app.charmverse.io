@@ -87,7 +87,6 @@ export function RubricEvaluation({ proposal, permissions, isCurrent, evaluation,
                     criteriaList={rubricCriteria || []}
                     isCurrent={!!isCurrent}
                     evaluation={evaluation}
-                    isReviewer={proposal?.permissions.evaluate}
                     proposalId={proposal?.id}
                     refreshProposal={refreshProposal}
                   />

@@ -597,7 +597,7 @@ function getProfileWidgetLogo(name: MemberProfileName) {
     case 'ens':
       return '/images/logos/ens_logo.svg';
     case 'lens':
-      return '/images/logos/lens_logo.svg';
+      return '/images/logos/lens_logo.png';
     case 'summon':
       return '/images/logos/summon_dark_mark.svg';
     default:

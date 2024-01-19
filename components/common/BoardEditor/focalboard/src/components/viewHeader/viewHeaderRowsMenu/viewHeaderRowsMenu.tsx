@@ -1,18 +1,21 @@
 import type { ProposalEvaluationResult, ProposalSystemRole } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import { Stack, Typography } from '@mui/material';
+import { Stack, Tooltip, Typography } from '@mui/material';
 import type { Dispatch, SetStateAction } from 'react';
 import { useMemo, useState } from 'react';
 import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
+import { useTrashPages } from 'charmClient/hooks/pages';
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { useBatchUpdateProposalStatusOrStep } from 'components/proposals/hooks/useBatchUpdateProposalStatusOrStep';
 import { useProposals } from 'components/proposals/hooks/useProposals';
+import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card, CardPropertyValue } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
@@ -82,17 +85,31 @@ export function ViewHeaderRowsMenu({
   const { space } = useCurrentSpace();
   const [isDeleting, setIsDeleting] = useState(false);
   const { updateStatuses, updateSteps } = useBatchUpdateProposalStatusOrStep();
+  const { trigger: trashPages } = useTrashPages();
+  const { showConfirmation } = useConfirmationModal();
+  const { showError } = useSnackbar();
+
+  const showTrashIcon = !board.fields.sourceType; // dont allow deleting cards for proposals-as-a-source
 
   async function deleteCheckedCards() {
+    if (checkedIds.length > 1) {
+      const { confirmed } = await showConfirmation({
+        message: `Are you sure you want to delete ${checkedIds.length} cards?`,
+        confirmButton: 'Delete'
+      });
+      if (!confirmed) {
+        return;
+      }
+    }
     setIsDeleting(true);
     try {
       if (onDelete) {
         await onDelete(checkedIds);
       } else {
-        await mutator.deleteBlocks(checkedIds, 'delete cards');
+        await trashPages({ pageIds: checkedIds, trash: true });
       }
-    } catch (_) {
-      //
+    } catch (error) {
+      showError(error, 'There was an error deleting cards');
     } finally {
       setCheckedIds([]);
       setIsDeleting(false);
@@ -109,8 +126,8 @@ export function ViewHeaderRowsMenu({
             authors: authorIds,
             proposalId
           });
-        } catch (err) {
-          //
+        } catch (error) {
+          showError(error, 'There was an error updating authors');
         }
       }
     }
@@ -182,7 +199,11 @@ export function ViewHeaderRowsMenu({
       }
     }
     if (proposalReviewersChanged) {
-      await mutate(`/api/spaces/${board.spaceId}/proposals`);
+      try {
+        await mutate(`/api/spaces/${board.spaceId}/proposals`);
+      } catch (error) {
+        showError(error, 'There was an error updating reviewers');
+      }
     }
   }
 
@@ -213,11 +234,15 @@ export function ViewHeaderRowsMenu({
     });
 
     if (proposalsData.length) {
-      await updateStatuses({
-        proposalsData,
-        result,
-        currentEvaluationStep: firstProposal.currentStep.step
-      });
+      try {
+        await updateStatuses({
+          proposalsData,
+          result,
+          currentEvaluationStep: firstProposal.currentStep.step
+        });
+      } catch (error) {
+        showError(error, 'There was an error updating statuses');
+      }
     }
   }
 
@@ -258,7 +283,11 @@ export function ViewHeaderRowsMenu({
     });
 
     if (proposalsData.length) {
-      await updateSteps(proposalsData, moveForward);
+      try {
+        await updateSteps(proposalsData, moveForward);
+      } catch (error) {
+        showError(error, 'There was an error updating steps');
+      }
     }
   }
 
@@ -273,7 +302,11 @@ export function ViewHeaderRowsMenu({
     userIds: string[];
     propertyValue: CardPropertyValue;
   }) {
-    await mutator.changePropertyValues(checkedCards, propertyTemplate.id, userIds);
+    try {
+      await mutator.changePropertyValues(checkedCards, propertyTemplate.id, userIds);
+    } catch (error) {
+      showError(error, 'There was an error updating properties');
+    }
     const previousValue = propertyValue
       ? typeof propertyValue === 'string'
         ? [propertyValue]
@@ -328,18 +361,14 @@ export function ViewHeaderRowsMenu({
 
   return (
     <StyledStack className='disable-drag-selection'>
-      <StyledMenuItem
-        sx={{
-          borderRadius: `4px 0 0 4px`
-        }}
-      >
+      <StyledMenuItem firstChild lastChild={!showTrashIcon && filteredPropertyTemplates.length === 0}>
         <Typography onClick={() => setCheckedIds([])} color='primary' variant='body2'>
           {checkedIds.length} selected
         </Typography>
       </StyledMenuItem>
 
       {cards.length !== 0
-        ? filteredPropertyTemplates.map((propertyTemplate) => (
+        ? filteredPropertyTemplates.map((propertyTemplate, index) => (
             <PropertyTemplateMenu
               isAdmin={isAdmin}
               board={board}
@@ -354,6 +383,7 @@ export function ViewHeaderRowsMenu({
               onProposalStatusUpdate={onProposalStatusUpdate}
               onProposalStepUpdate={onProposalStepUpdate}
               onPersonPropertyChange={onPersonPropertyChange}
+              lastChild={!showTrashIcon && index === filteredPropertyTemplates.length - 1}
               disabledTooltip={
                 propertyTemplate.type === 'proposalStep' && isStepDisabled
                   ? 'To change multiple proposals, they must use the same workflow and be in the same step'
@@ -366,16 +396,13 @@ export function ViewHeaderRowsMenu({
             />
           ))
         : null}
-      <StyledMenuItem
-        onClick={deleteCheckedCards}
-        disabled={isDeleting}
-        sx={{
-          borderRight: (theme) => `1px solid ${theme.palette.divider}`,
-          borderRadius: '0 4px 4px 0'
-        }}
-      >
-        <DeleteOutlinedIcon fontSize='small' />
-      </StyledMenuItem>
+      {showTrashIcon && (
+        <StyledMenuItem lastChild onClick={deleteCheckedCards} disabled={isDeleting}>
+          <Tooltip title='Delete'>
+            <DeleteOutlinedIcon fontSize='small' />
+          </Tooltip>
+        </StyledMenuItem>
+      )}
     </StyledStack>
   );
 }

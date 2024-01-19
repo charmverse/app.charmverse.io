@@ -9,15 +9,17 @@ import { PropertyMenu } from './PropertyMenu';
 export function DatePropertyTemplateMenu({
   cards,
   propertyTemplate,
-  onChange
+  onChange,
+  lastChild
 }: {
   cards: Card[];
   propertyTemplate: IPropertyTemplate<PropertyType>;
   onChange?: VoidFunction;
+  lastChild: boolean;
 }) {
   const propertyValue = cards[0].fields.properties[propertyTemplate.id] || '';
   return (
-    <PropertyMenu cards={cards} propertyTemplate={propertyTemplate}>
+    <PropertyMenu lastChild={lastChild} cards={cards} propertyTemplate={propertyTemplate}>
       {() => {
         return (
           <DateRange

@@ -10,7 +10,7 @@ import type { ProposalPropertyValue } from 'lib/proposal/blocks/interfaces';
 import { useProposalsBoardAdapter } from '../ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter';
 import type { BoardProposal } from '../ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter';
 
-type ProposalsBoardContextType = {
+export type ProposalsBoardContextType = {
   board: Board;
   boardCustomProperties: Board;
   card: Card<ProposalPropertyValue>;
@@ -20,6 +20,8 @@ type ProposalsBoardContextType = {
   views: BoardView[];
   proposalPage: PageMeta | undefined;
   boardProposal: BoardProposal | null;
+  isLoading: boolean;
+  refreshProposals: VoidFunction;
   setBoardProposal: (boardProposal: BoardProposal | null) => void;
 };
 
@@ -32,6 +34,8 @@ export const ProposalsBoardContext = createContext<Readonly<ProposalsBoardContex
   activeView: {} as BoardView,
   views: [],
   proposalPage: undefined,
+  isLoading: true,
+  refreshProposals: () => {},
   boardProposal: null,
   setBoardProposal: () => {}
 });

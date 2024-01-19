@@ -30,13 +30,13 @@ async function archiveProposalController(req: NextApiRequest, res: NextApiRespon
     throw new UnauthorisedActionError(`You cannot unarchive this proposal`);
   }
 
-  const updatedProposal = await archiveProposal({
+  await archiveProposal({
     archived,
     proposalId,
     actorId: userId
   });
 
-  return res.status(200).send(updatedProposal);
+  return res.status(200).end();
 }
 
 export default withSessionRoute(handler);

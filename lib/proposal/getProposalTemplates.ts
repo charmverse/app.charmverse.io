@@ -25,7 +25,7 @@ export async function getProposalTemplates({ spaceId, userId }: SpaceResourcesRe
     }
   });
 
-  const { spaceRole } = await hasAccessToSpace({
+  const { spaceRole, isAdmin } = await hasAccessToSpace({
     spaceId,
     userId
   });
@@ -85,6 +85,10 @@ export async function getProposalTemplates({ spaceId, userId }: SpaceResourcesRe
   const res = templates.map(
     (proposal) => mapDbProposalToProposal({ proposal, canAccessPrivateFormFields: true }) as ProposalTemplate
   );
+
+  if (!isAdmin) {
+    return res.filter((template) => !template.archived);
+  }
 
   return res;
 }

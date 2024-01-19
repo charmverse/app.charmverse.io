@@ -27,11 +27,12 @@ import React, { useMemo, useRef, useState } from 'react';
 
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useViewSortOptions } from 'hooks/useViewSortOptions';
-import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
+import { getPropertyName } from 'lib/focalboard/getPropertyName';
 import {
   AUTHORS_BLOCK_ID,
   DEFAULT_BOARD_BLOCK_ID,
@@ -53,14 +54,12 @@ import HorizontalGrip from './horizontalGrip';
 type Props = {
   readOnly: boolean;
   sorted: 'up' | 'down' | 'none';
-  name: string;
   board: Board;
   activeView: BoardView;
   cards: Card[];
   views: BoardView[];
   template: IPropertyTemplate;
   offset: number;
-  type: PropertyType;
   onDrop: (template: IPropertyTemplate, container: IPropertyTemplate) => void;
   onAutoSizeColumn: (columnID: string, headerWidth: number) => void;
 };
@@ -75,8 +74,10 @@ const DEFAULT_BLOCK_IDS = [
 ];
 
 function TableHeader(props: Props): JSX.Element {
-  const { activeView, board, views, cards, sorted, name, type, template, readOnly } = props;
+  const { activeView, board, views, cards, sorted, template, readOnly } = props;
+  const { type } = template;
   const { id: templateId } = template;
+  const name = getPropertyName(template);
   const [isDragging, isOver, columnRef] = useSortable('column', props.template, !readOnly, props.onDrop);
   const columnWidth = (_templateId: string): number => {
     return Math.max(Constants.minColumnWidth, (activeView.fields.columnWidths[_templateId] || 0) + props.offset);
@@ -89,7 +90,7 @@ function TableHeader(props: Props): JSX.Element {
     !!template.formFieldId ||
     !!template.proposalFieldId;
 
-  const [tempName, setTempName] = useState(props.name || '');
+  const [tempName, setTempName] = useState(name || '');
 
   const popupState = usePopupState({ variant: 'popper', popupId: 'iframe-selector' });
   const toggleRef = useRef(null);
@@ -132,7 +133,7 @@ function TableHeader(props: Props): JSX.Element {
     mutator.changeViewSortOptions(activeView.id, sortOptions, newSortOptions);
   };
   async function renameColumn() {
-    if (tempName !== template.name) {
+    if (tempName !== name) {
       mutator.changePropertyTypeAndName(board, cards, template, type, tempName, views);
     }
     popupState.close();

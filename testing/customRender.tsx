@@ -66,7 +66,8 @@ export const customRenderWithContext = (
                 setActions: () => {},
                 setSeverity: () => {},
                 setIsOpen: () => {},
-                setMessage: () => {}
+                setMessage: () => {},
+                showError: () => {}
               }}
             >
               <PageSidebarContext.Provider

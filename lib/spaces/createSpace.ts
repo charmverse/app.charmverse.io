@@ -19,6 +19,7 @@ import { getDefaultWorkflows } from 'lib/proposal/workflows/defaultWorkflows';
 import { upsertDefaultRewardsBoard } from 'lib/rewards/blocks/upsertDefaultRewardsBoard';
 import { createDefaultReward } from 'lib/rewards/createDefaultReward';
 import { defaultFreeBlockQuota } from 'lib/subscription/constants';
+import { getImportData } from 'lib/templates/getImportData';
 import { importSpaceData } from 'lib/templates/importSpaceData';
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
 import { createSigningSecret, subscribeToAllEvents } from 'lib/webhookPublisher/subscribeToEvents';
@@ -161,8 +162,6 @@ export async function createWorkspace({
 
   await upsertDefaultRewardsBoard({ spaceId: space.id, userId: space.createdBy });
 
-  const productionReadyTemplates: SpaceTemplateType[] = ['templateNftCommunity', 'templateGrantor'];
-
   // Provision default space data
   if (spaceTemplate === 'default') {
     const sourceDataPath = path.resolve(
@@ -207,51 +206,11 @@ export async function createWorkspace({
       permissionConfigurationMode: spaceData.permissionConfigurationMode ?? 'collaborative',
       spaceId: space.id
     });
-    // Interim codepath until all spaces are migrated to the new template
-    // I copied over most of the code from the default space template path with some small adjustments
-  } else if (spaceTemplate && !productionReadyTemplates.includes(spaceTemplate)) {
-    await prisma.$transaction([
-      prisma.memberProperty.createMany({ data: defaultProperties }),
-      prisma.proposalWorkflow.createMany({ data: defaultWorkflows }),
-      prisma.postCategory.createMany({ data: defaultPostCategories }),
-      prisma.postCategoryPermission.createMany({
-        data: defaultPostCategories.map(
-          (category) =>
-            ({
-              permissionLevel: 'full_access',
-              postCategoryId: category.id,
-              spaceId: space.id
-            } as Prisma.PostCategoryPermissionCreateManyInput)
-        )
-      })
-    ]);
-
-    const defaultGeneralPostCategory = defaultPostCategories.find((category) => category.name === 'General');
-
-    if (defaultGeneralPostCategory?.id) {
-      await setDefaultPostCategory({
-        postCategoryId: defaultGeneralPostCategory.id as string,
-        spaceId: space.id
-      });
-    }
-
-    await importWorkspacePages({
-      targetSpaceIdOrDomain: space.id,
-      exportName: spaceTemplate,
-      includePermissions: false,
-      resetPaths: true
-    });
-
-    await updateSpacePermissionConfigurationMode({
-      permissionConfigurationMode: spaceData.permissionConfigurationMode ?? 'collaborative',
-      spaceId: space.id
-    });
-  } else if (spaceTemplate) {
+  } else {
     await importSpaceData({
       targetSpaceIdOrDomain: space.id,
       exportName: spaceTemplate
     });
-    await prisma.proposalWorkflow.createMany({ data: defaultWorkflows });
   }
 
   // Create a test reward, and the default rewards views

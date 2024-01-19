@@ -1,6 +1,5 @@
 import { log } from '@charmverse/core/log';
 import type { PageMeta } from '@charmverse/core/pages';
-import { useRouter } from 'next/router';
 import { useCallback, useEffect } from 'react';
 import useSWR from 'swr';
 
@@ -9,7 +8,6 @@ import type { PageUpdates } from 'lib/pages';
 import type { PageWithContent } from 'lib/pages/interfaces';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
-import { useCurrentSpace } from './useCurrentSpace';
 import { useWebSocketClient } from './useWebSocketClient';
 
 type Props = {
@@ -64,7 +62,7 @@ export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
     }
     function handleDeleteEvent(value: WebSocketPayload<'pages_deleted'>) {
       if (value.some((page) => page.id === pageWithContent?.id)) {
-        log.debug('Page deleted, invalidating cache', { pageId: pageWithContent?.id });
+        log.debug('Page deleted or restored, invalidating cache', { pageId: pageWithContent?.id });
         mutate(undefined, {
           rollbackOnError: false
         });
@@ -72,10 +70,12 @@ export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
     }
     const unsubscribeFromPageUpdates = subscribe('pages_meta_updated', handleUpdateEvent);
     const unsubscribeFromPageDeletes = subscribe('pages_deleted', handleDeleteEvent);
+    const unsubscribeFromPageRestores = subscribe('pages_restored', handleDeleteEvent);
 
     return () => {
       unsubscribeFromPageUpdates();
       unsubscribeFromPageDeletes();
+      unsubscribeFromPageRestores();
     };
   }, [mutate, pageWithContent?.id]);
 

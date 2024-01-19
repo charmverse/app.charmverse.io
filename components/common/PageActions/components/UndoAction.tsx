@@ -15,7 +15,7 @@ export function UndoAction({
     <Tooltip title={disabled ? "You don't have permission to undo changes" : ''}>
       <div>
         <MenuItem disabled={disabled} onClick={onClick}>
-          <ListItemIcon sx={listItemStyle}>
+          <ListItemIcon>
             <UndoIcon fontSize='small' />
           </ListItemIcon>
           <ListItemText primary='Undo' />
