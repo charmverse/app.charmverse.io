@@ -1,13 +1,14 @@
 import type { FormField } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { Chip, Stack } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import type { ThreadWithComments } from 'lib/threads/interfaces';
 
 import { fieldTypePlaceholderRecord } from './constants';
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
@@ -66,9 +67,11 @@ export function FormFieldInputs({
   disabled,
   onSave,
   isReviewer,
-  pageId
+  pageId,
+  threads
 }: Omit<FormFieldInputsProps, 'control' | 'errors' | 'onFormChange'> & {
   isReviewer: boolean;
+  threads: Record<string, ThreadWithComments | undefined>;
 }) {
   const { control, errors, onFormChange, values } = useFormFields({
     fields: formFields
@@ -85,6 +88,7 @@ export function FormFieldInputs({
       values={values}
       isReviewer={isReviewer}
       pageId={pageId}
+      threads={threads}
     />
   );
 }
@@ -98,9 +102,11 @@ function FormFieldInputsBase({
   errors,
   onFormChange,
   isReviewer,
-  pageId
+  pageId,
+  threads
 }: FormFieldInputsProps & {
   isReviewer: boolean;
+  threads?: Record<string, ThreadWithComments | undefined>;
 }) {
   const [isFormDirty, setIsFormDirty] = useState(false);
   const { showMessage } = useSnackbar();
@@ -123,6 +129,28 @@ function FormFieldInputsBase({
     }
   }
 
+  const fieldAnswerIdThreadRecord: Record<string, ThreadWithComments> = useMemo(() => {
+    if (!threads) {
+      return {};
+    }
+
+    return Object.values(threads).reduce((acc, thread) => {
+      if (!thread) {
+        return acc;
+      }
+
+      const fieldAnswerId = thread.fieldAnswerId;
+      if (!fieldAnswerId) {
+        return acc;
+      }
+
+      return {
+        ...acc,
+        [fieldAnswerId]: thread
+      };
+    }, {} as Record<string, ThreadWithComments>);
+  }, [threads]);
+
   useEffect(() => {
     // auto-save form fields if the form is dirty and there are no errors
     if (debouncedValues) {
@@ -134,6 +162,9 @@ function FormFieldInputsBase({
     <Stack gap={1} mb={15}>
       <FormFieldInputsContainer>
         {formFields.map((formField) => {
+          const fieldAnswerThread = formField.formFieldAnswerId
+            ? fieldAnswerIdThreadRecord[formField.formFieldAnswerId]
+            : null;
           return (
             <Stack flexDirection='row' alignItems='center' gap={1} key={formField.id}>
               <Controller
@@ -173,6 +204,7 @@ function FormFieldInputsBase({
                   pageId={pageId}
                   disabled={disabled}
                   isReviewer={isReviewer}
+                  fieldAnswerThread={fieldAnswerThread}
                 />
               )}
             </Stack>

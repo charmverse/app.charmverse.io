@@ -4,19 +4,22 @@ import { useGetProposalFormFieldAnswers, useUpdateProposalFormFieldAnswers } fro
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { FormFieldInputs } from 'components/common/form/FormFieldInputs';
 import type { FormFieldValue } from 'components/common/form/interfaces';
+import type { ThreadWithComments } from 'lib/threads/interfaces';
 
 export function ProposalFormFieldInputs({
   proposalId,
   formFields,
   readOnly,
   isReviewer,
-  pageId
+  pageId,
+  threads
 }: {
   readOnly?: boolean;
   proposalId: string;
   formFields: FormField[];
   isReviewer: boolean;
   pageId: string;
+  threads: Record<string, ThreadWithComments | undefined>;
 }) {
   const { data: proposalFormFieldAnswers = [], isLoading } = useGetProposalFormFieldAnswers({ proposalId });
   const { trigger } = useUpdateProposalFormFieldAnswers({ proposalId });
@@ -42,6 +45,7 @@ export function ProposalFormFieldInputs({
       onSave={onSave}
       pageId={pageId}
       disabled={readOnly}
+      threads={threads}
       formFields={formFields.map((formField) => {
         const proposalFormFieldAnswer = proposalFormFieldAnswers.find(
           (_proposalFormFieldAnswer) => _proposalFormFieldAnswer.fieldId === formField.id

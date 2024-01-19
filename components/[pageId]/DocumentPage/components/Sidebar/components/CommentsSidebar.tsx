@@ -11,10 +11,12 @@ import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/use
 import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import PageThread from 'components/common/CharmEditor/components/thread/PageThread';
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
+import { useInlineComment } from 'hooks/useInlineComment';
 import type { CommentThreadsMap } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import { extractThreadIdsFromDoc } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
 import { findTotalInlineComments } from 'lib/prosemirror/plugins/inlineComments/findTotalInlineComments';
+import { removeInlineCommentMark } from 'lib/prosemirror/plugins/inlineComments/removeInlineCommentMark';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 import { highlightDomElement, setUrlWithoutRerender } from 'lib/utilities/browser';
 import { isTruthy } from 'lib/utilities/types';
@@ -100,6 +102,7 @@ function CommentsSidebarComponent({
     .filter((inlineThreadsId) => threadListSet.has(inlineThreadsId))
     .map((filteredThreadId) => threads[filteredThreadId])
     .filter(isTruthy);
+  const { updateThreadPluginState } = useInlineComment();
 
   useLayoutEffect(() => {
     // Highlight the comment id when navigation from nexus mentioned tasks list tab
@@ -172,7 +175,21 @@ function CommentsSidebarComponent({
                   canCreateComments={canCreateComments}
                   showFindButton
                   key={resolvedThread.id}
-                  threadId={resolvedThread?.id}
+                  threadId={resolvedThread.id}
+                  onDeleteComment={() => {
+                    removeInlineCommentMark(view, resolvedThread.id, true);
+                    updateThreadPluginState({
+                      remove: true,
+                      threadId: resolvedThread.id
+                    });
+                  }}
+                  onToggleResolve={(_, remove) => {
+                    removeInlineCommentMark(view, resolvedThread.id);
+                    updateThreadPluginState({
+                      remove,
+                      threadId: resolvedThread.id
+                    });
+                  }}
                 />
               )
           )
