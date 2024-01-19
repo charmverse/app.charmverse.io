@@ -1,7 +1,7 @@
 import type { FormFieldAnswer } from '@charmverse/core/prisma-client';
 import { MessageOutlined } from '@mui/icons-material';
 import AddCommentOutlinedIcon from '@mui/icons-material/AddCommentOutlined';
-import { Box, IconButton, Tooltip, Typography } from '@mui/material';
+import { Box, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import { useState } from 'react';
 
 import { useCreateThread } from 'charmClient/hooks/comments';
@@ -20,12 +20,14 @@ export function FormFieldAnswerComment({
   pageId,
   disabled,
   fieldAnswerThread,
-  formFieldAnswer
+  formFieldAnswer,
+  canCreateComments
 }: {
   disabled?: boolean;
   pageId: string;
   fieldAnswerThread?: ThreadWithComments | null;
   formFieldAnswer: FormFieldAnswer;
+  canCreateComments?: boolean;
 }) {
   const formFieldAnswerValue = formFieldAnswer.value as FormFieldValue;
   let value = Array.isArray(formFieldAnswerValue) ? formFieldAnswerValue[0] : formFieldAnswerValue;
@@ -78,9 +80,7 @@ export function FormFieldAnswerComment({
       }}
       open={isPopoverOpen}
     >
-      <Tooltip
-        title={!disabled ? 'Add a comment to the form field answer' : "You don't have permission to add a comment"}
-      >
+      <Stack flexDirection='row' gap={1} className='icons' position='relative' top={10}>
         {fieldAnswerThread ? (
           <Box display='flex' gap={0.5} alignItems='center' sx={{ cursor: 'pointer' }}>
             <MessageOutlined color='secondary' fontSize='small' />
@@ -88,12 +88,19 @@ export function FormFieldAnswerComment({
               {fieldAnswerThread.comments.length}
             </Typography>
           </Box>
-        ) : (
-          <IconButton disabled={disabled} color='secondary' onClick={() => setIsPopoverOpen(true)}>
-            <AddCommentOutlinedIcon fontSize='small' />
-          </IconButton>
-        )}
-      </Tooltip>
+        ) : null}
+        <Tooltip
+          title={!disabled ? 'Add a comment to the form field answer' : "You don't have permission to add a comment"}
+        >
+          <div>
+            {canCreateComments ? (
+              <IconButton disabled={disabled} color='secondary' onClick={() => setIsPopoverOpen(true)}>
+                <AddCommentOutlinedIcon fontSize='small' />
+              </IconButton>
+            ) : null}
+          </div>
+        </Tooltip>
+      </Stack>
     </PopperPopup>
   );
 }

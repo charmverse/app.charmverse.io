@@ -6,10 +6,13 @@ import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
+
+import { hoverIconsStyle } from '../Icons/hoverIconsStyle';
 
 import { fieldTypePlaceholderRecord } from './constants';
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
@@ -27,7 +30,7 @@ type FormFieldInputsProps = {
   formFields: (Pick<FormField, 'type' | 'name' | 'required' | 'id' | 'description' | 'private'> & {
     value?: FormFieldValue;
     options?: SelectOptionType[];
-    formFieldAnswer: FormFieldAnswer | null;
+    formFieldAnswer?: FormFieldAnswer | null;
   })[];
   disabled?: boolean;
   errors: FieldErrors<Record<string, FormFieldValue>>;
@@ -72,7 +75,7 @@ export function FormFieldInputs({
   threads
 }: Omit<FormFieldInputsProps, 'control' | 'errors' | 'onFormChange'> & {
   isReviewer: boolean;
-  threads: Record<string, ThreadWithComments | undefined>;
+  threads?: Record<string, ThreadWithComments | undefined>;
 }) {
   const { control, errors, onFormChange, values } = useFormFields({
     fields: formFields
@@ -94,6 +97,13 @@ export function FormFieldInputs({
   );
 }
 
+const StyledStack = styled(Stack)`
+  ${hoverIconsStyle()};
+  flex-direction: row;
+  align-items: center;
+  gap: ${(props) => props.theme.spacing(1)};
+`;
+
 function FormFieldInputsBase({
   onSave,
   formFields,
@@ -104,11 +114,12 @@ function FormFieldInputsBase({
   onFormChange,
   isReviewer,
   pageId,
-  threads
+  threads = {}
 }: FormFieldInputsProps & {
   isReviewer: boolean;
   threads?: Record<string, ThreadWithComments | undefined>;
 }) {
+  const isAdmin = useIsAdmin();
   const { user } = useUser();
   const [isFormDirty, setIsFormDirty] = useState(false);
   const { showMessage } = useSnackbar();
@@ -168,7 +179,7 @@ function FormFieldInputsBase({
             ? fieldAnswerIdThreadRecord[formField.formFieldAnswer.id]
             : null;
           return (
-            <Stack flexDirection='row' alignItems='center' gap={1} key={formField.id}>
+            <StyledStack key={formField.id}>
               <Controller
                 name={formField.id}
                 control={control}
@@ -200,15 +211,16 @@ function FormFieldInputsBase({
                   />
                 )}
               />
-              {pageId && formField.type !== 'label' && formField.formFieldAnswer && user && isReviewer && (
+              {pageId && formField.type !== 'label' && formField.formFieldAnswer && user && (
                 <FormFieldAnswerComment
                   formFieldAnswer={formField.formFieldAnswer}
                   pageId={pageId}
                   disabled={disabled}
                   fieldAnswerThread={fieldAnswerThread}
+                  canCreateComments={isAdmin || isReviewer}
                 />
               )}
-            </Stack>
+            </StyledStack>
           );
         })}
       </FormFieldInputsContainer>
