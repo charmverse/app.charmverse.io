@@ -181,6 +181,8 @@ async function generateImportWorkspacePages({
 
   // 2 way hashmap to find link between new and old page ids
   const oldNewRecordIdHashMap: Record<string, string> = {};
+  // keep track of what has been processed
+  const processedNodes: Record<string, boolean> = {};
   /**
    * Mutates the pages, updating their ids
    */
@@ -199,9 +201,10 @@ async function generateImportWorkspacePages({
     oldNewPermissionMap: Record<string, string>;
   }) {
     // Don't process duplicate nodes in the export
-    if (oldNewRecordIdHashMap[node.id]) {
+    if (processedNodes[node.id]) {
       return;
     }
+    processedNodes[node.id] = true;
 
     const existingNewPageId =
       node.type === 'page' || isBoardPageType(node.type) ? oldNewRecordIdHashMap[node.id] : undefined;
@@ -277,6 +280,8 @@ async function generateImportWorkspacePages({
     const newPageContent: Prisma.PageCreateArgs = {
       data: {
         ...pageWithoutJoins,
+        // increase index by 1 for root pages so that Getting started appears first
+        index: !currentParentId ? pageWithoutJoins.index + 1 : pageWithoutJoins.index,
         title:
           parentId === rootParentId && updateTitle
             ? `${pageWithoutJoins.title || 'Untitled'} (Copy)`
