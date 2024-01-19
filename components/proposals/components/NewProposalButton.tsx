@@ -158,7 +158,9 @@ export function NewProposalButton() {
               </ListItemIcon>
               <ListItemText>Delete</ListItemText>
             </MenuItem>
-            <ArchiveProposalAction proposalId={proposalId!} />
+            <span onClick={(e) => e.stopPropagation()}>
+              <ArchiveProposalAction proposalId={proposalId!} />
+            </span>
           </>
         )}
       />
