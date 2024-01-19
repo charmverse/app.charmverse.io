@@ -165,7 +165,6 @@ export function EvaluationSidebar({
                 evaluation={evaluation}
                 proposalId={proposal?.id}
                 isCurrent={isCurrent}
-                isReviewer={proposal?.permissions.evaluate}
                 refreshProposal={refreshProposal}
               />
             )}

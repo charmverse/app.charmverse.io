@@ -125,6 +125,7 @@ function PropertyValueElement(props: Props) {
   const [value, setValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const [serverValue, setServerValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const { formatDateTime, formatDate } = useDateFormatter();
+  const { showError } = useSnackbar();
   const {
     card,
     propertyTemplate,
@@ -138,7 +139,6 @@ function PropertyValueElement(props: Props) {
     proposal
   } = props;
   const { trigger } = useUpdateProposalEvaluation({ proposalId: proposal?.id });
-  const { showMessage } = useSnackbar();
 
   const isAdmin = useIsAdmin();
 
@@ -283,17 +283,33 @@ function PropertyValueElement(props: Props) {
         readOnly={readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any)}
         propertyValue={propertyValue as string}
         options={propertyTemplate.options}
-        onChange={(newValue) => {
-          mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+        onChange={async (newValue) => {
+          try {
+            await mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+          } catch (error) {
+            showError(error);
+          }
         }}
-        onUpdateOption={(option) => {
-          mutator.changePropertyOption(board, propertyTemplate, option);
+        onUpdateOption={async (option) => {
+          try {
+            await mutator.changePropertyOption(board, propertyTemplate, option);
+          } catch (error) {
+            showError(error);
+          }
         }}
-        onDeleteOption={(option) => {
-          mutator.deletePropertyOption(board, propertyTemplate, option);
+        onDeleteOption={async (option) => {
+          try {
+            await mutator.deletePropertyOption(board, propertyTemplate, option);
+          } catch (error) {
+            showError(error);
+          }
         }}
-        onCreateOption={(newValue) => {
-          mutator.insertPropertyOption(board, propertyTemplate, newValue, 'add property option');
+        onCreateOption={async (newValue) => {
+          try {
+            await mutator.insertPropertyOption(board, propertyTemplate, newValue, 'add property option');
+          } catch (error) {
+            showError(error);
+          }
         }}
         displayType={displayType}
       />
@@ -319,32 +335,36 @@ function PropertyValueElement(props: Props) {
           (displayType !== 'details' && displayType !== 'table') ||
           proposalPropertyTypesList.includes(propertyTemplate.type as any)
         }
-        onChange={(newValue) => {
-          mutator.changePropertyValue(card, propertyTemplate.id, newValue);
-          const previousValue = propertyValue
-            ? typeof propertyValue === 'string'
-              ? [propertyValue]
-              : (propertyValue as string[])
-            : [];
-          const newUserIds = newValue.filter((id) => !previousValue.includes(id));
-          Promise.all(
-            newUserIds.map((userId) =>
-              charmClient.createEvents({
-                spaceId: board.spaceId,
-                payload: [
-                  {
-                    cardId: card.id,
-                    cardProperty: {
-                      id: propertyTemplate.id,
-                      name: propertyTemplate.name,
-                      value: userId
-                    },
-                    scope: WebhookEventNames.CardPersonPropertyAssigned
-                  }
-                ]
-              })
-            )
-          );
+        onChange={async (newValue) => {
+          try {
+            await mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+            const previousValue = propertyValue
+              ? typeof propertyValue === 'string'
+                ? [propertyValue]
+                : (propertyValue as string[])
+              : [];
+            const newUserIds = newValue.filter((id) => !previousValue.includes(id));
+            Promise.all(
+              newUserIds.map((userId) =>
+                charmClient.createEvents({
+                  spaceId: board.spaceId,
+                  payload: [
+                    {
+                      cardId: card.id,
+                      cardProperty: {
+                        id: propertyTemplate.id,
+                        name: propertyTemplate.name,
+                        value: userId
+                      },
+                      scope: WebhookEventNames.CardPersonPropertyAssigned
+                    }
+                  ]
+                })
+              )
+            );
+          } catch (error) {
+            showError(error);
+          }
         }}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
         showEmptyPlaceholder={showEmptyPlaceholder}
@@ -378,7 +398,7 @@ function PropertyValueElement(props: Props) {
               });
               await mutate(`/api/spaces/${card.spaceId}/proposals`);
             } catch (err) {
-              showMessage('Failed to update proposal reviewers', 'error');
+              showError(err, 'Failed to update proposal reviewers');
             }
           }
         }}
@@ -394,11 +414,15 @@ function PropertyValueElement(props: Props) {
         readOnly={readOnly || (displayType !== 'details' && displayType !== 'table')}
         onChange={async (newValue) => {
           if (proposal) {
-            await charmClient.proposals.updateProposal({
-              proposalId: proposal.id,
-              authors: newValue
-            });
-            await mutate(`/api/spaces/${board.spaceId}/proposals`);
+            try {
+              await charmClient.proposals.updateProposal({
+                proposalId: proposal.id,
+                authors: newValue
+              });
+              await mutate(`/api/spaces/${board.spaceId}/proposals`);
+            } catch (error) {
+              showError(error);
+            }
           }
         }}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
@@ -420,8 +444,12 @@ function PropertyValueElement(props: Props) {
           value={value.toString()}
           key={value.toString()}
           showEmptyPlaceholder={showEmptyPlaceholder}
-          onChange={(newValue) => {
-            mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+          onChange={async (newValue) => {
+            try {
+              await mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+            } catch (error) {
+              showError(error);
+            }
           }}
         />
       );
@@ -432,9 +460,13 @@ function PropertyValueElement(props: Props) {
         displayType={displayType}
         label={propertyTemplate.name}
         isOn={propertyValue === 'true'}
-        onChanged={(newBool) => {
+        onChanged={async (newBool) => {
           const newValue = newBool ? 'true' : '';
-          mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+          try {
+            await mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+          } catch (error) {
+            showError(error);
+          }
         }}
         readOnly={readOnly}
       />
@@ -483,8 +515,12 @@ function PropertyValueElement(props: Props) {
     onChange: setValue,
     displayType,
     multiline: displayType === 'details' ? true : props.wrapColumn ?? false,
-    onSave: () => {
-      mutator.changePropertyValue(card, propertyTemplate.id, value);
+    onSave: async () => {
+      try {
+        await mutator.changePropertyValue(card, propertyTemplate.id, value);
+      } catch (error) {
+        showError(error);
+      }
     },
     onCancel: () => setValue(propertyValue || ''),
     validator: (newValue: string) => validatePropertyValue(propertyTemplate.type, newValue),

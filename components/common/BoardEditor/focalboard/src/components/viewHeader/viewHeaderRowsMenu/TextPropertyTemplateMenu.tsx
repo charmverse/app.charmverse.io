@@ -12,17 +12,19 @@ import { PropertyMenu } from './PropertyMenu';
 export function TextPropertyTemplateMenu({
   cards,
   propertyTemplate,
-  onChange
+  onChange,
+  lastChild
 }: {
   cards: Card[];
   propertyTemplate: IPropertyTemplate<PropertyType>;
   onChange?: VoidFunction;
+  lastChild: boolean;
 }) {
   const propertyValue = cards[0].fields.properties[propertyTemplate.id] || '';
   const [value, setValue] = useState(propertyValue);
 
   return (
-    <PropertyMenu cards={cards} propertyTemplate={propertyTemplate}>
+    <PropertyMenu lastChild={lastChild} cards={cards} propertyTemplate={propertyTemplate}>
       {({ closeMenu }) => {
         return (
           <TextInput

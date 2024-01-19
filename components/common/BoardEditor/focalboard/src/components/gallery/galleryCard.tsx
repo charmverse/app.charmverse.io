@@ -3,10 +3,12 @@ import { Box } from '@mui/material';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
+import { useTrashPages } from 'charmClient/hooks/pages';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import { KanbanPageActionsMenuButton } from 'components/common/PageActions/KanbanPageActionButton';
 import { PageIcon } from 'components/common/PageIcon';
 import { usePages } from 'hooks/usePages';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
@@ -35,6 +37,8 @@ type Props = {
 const GalleryCard = React.memo((props: Props) => {
   const { card, board } = props;
   const { pages } = usePages();
+  const { trigger: trashPages } = useTrashPages();
+  const { showError } = useSnackbar();
   const [isDragging, isOver, cardRef] = useSortable(
     'card',
     card,
@@ -54,8 +58,12 @@ const GalleryCard = React.memo((props: Props) => {
 
   const galleryImageUrl: null | string | undefined = cardPage?.headerImage || cardPage?.galleryImage;
 
-  const deleteCard = () => {
-    mutator.deleteBlock(card, 'delete card');
+  const deleteCard = async () => {
+    try {
+      await trashPages({ pageIds: [card.id], trash: true });
+    } catch (error) {
+      showError(error);
+    }
   };
 
   return cardPage ? (

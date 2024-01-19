@@ -10,6 +10,7 @@ import type { Dispatch, MouseEvent, ReactElement, ReactNode, SetStateAction } fr
 import { FormattedMessage } from 'react-intl';
 import { mutate } from 'swr';
 
+import { useTrashPages } from 'charmClient/hooks/pages';
 import { filterPropertyTemplates } from 'components/common/BoardEditor/utils/updateVisibilePropertyIds';
 import { PageActionsMenu } from 'components/common/PageActions/components/PageActionsMenu';
 import { PageIcon } from 'components/common/PageIcon';
@@ -18,6 +19,7 @@ import { SelectionContext, useSelected } from 'hooks/useAreaSelection';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDragDrop } from 'hooks/useDragDrop';
 import { useSmallScreen } from 'hooks/useMediaScreens';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
@@ -127,7 +129,9 @@ function TableRow(props: Props) {
     setCheckedIds,
     proposal
   } = props;
-  const { space } = useCurrentSpace();
+  const { showError } = useSnackbar();
+
+  const { trigger: trashPages } = useTrashPages();
   const isMobile = useSmallScreen();
   const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
   const [title, setTitle] = useState('');
@@ -151,12 +155,15 @@ function TableRow(props: Props) {
       Utils.assertFailure();
       return;
     }
-    if (onDeleteCard) {
-      await onDeleteCard(card.id);
-    } else {
-      await mutator.deleteBlock(card, 'delete card');
+    try {
+      if (onDeleteCard) {
+        await onDeleteCard(card.id);
+      } else {
+        await trashPages({ pageIds: [card.id], trash: true });
+      }
+    } catch (error) {
+      showError(error);
     }
-    mutate(`pages/${space?.id}`);
   };
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);

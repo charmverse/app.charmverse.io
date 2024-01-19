@@ -3,8 +3,8 @@ import { Box, Stack } from '@mui/material';
 import { useRouter } from 'next/router';
 import React, { useState, useCallback } from 'react';
 import { useIntl } from 'react-intl';
-import { mutate } from 'swr';
 
+import { useTrashPages } from 'charmClient/hooks/pages';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
@@ -19,7 +19,6 @@ import type { Card } from 'lib/focalboard/card';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 import { useSortable } from '../../hooks/sortable';
-import mutator from '../../mutator';
 import PropertyValueElement from '../propertyValueElement';
 
 type Props = {
@@ -85,12 +84,12 @@ const KanbanCard = React.memo((props: Props) => {
   const cardPage = pages[card.id];
   const domain = router.query.domain || /^\/share\/(.*)\//.exec(router.asPath)?.[1];
   const fullPageUrl = `/${domain}/${cardPage?.path}`;
+  const { trigger: trashPages } = useTrashPages();
 
   const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false);
   const handleDeleteCard = useCallback(async () => {
-    await mutator.deleteBlock({ id: card.id, type: card.type }, 'delete card');
-    mutate(`pages/${space?.id}`);
-  }, [card.id, card.type, space?.id]);
+    await trashPages({ pageIds: [card.id], trash: true });
+  }, [card.id, trashPages]);
   const confirmDialogProps: {
     heading: string;
     subText?: string;

@@ -8,13 +8,6 @@ export function createMockProposal(
 ): OptionalNullable<ProposalWithUsersAndRubric> {
   const id = uuid();
   return {
-    currentStep: {
-      step: 'draft',
-      result: 'in_progress',
-      title: 'Draft',
-      id: 'draft',
-      index: 0
-    },
     lensPostLink: null,
     publishToLens: null,
     archived: false,
@@ -23,11 +16,8 @@ export function createMockProposal(
     authors: [],
     reviewers: [],
     evaluations: [],
-    rubricCriteria: [],
     reviewedAt: null,
     reviewedBy: null,
-    draftRubricAnswers: [],
-    rubricAnswers: [],
     spaceId: '',
     status: 'draft',
     fields: null,

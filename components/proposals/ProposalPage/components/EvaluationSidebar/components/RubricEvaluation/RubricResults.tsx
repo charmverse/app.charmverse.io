@@ -30,7 +30,6 @@ type Props = {
   answers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
   criteriaList: ProposalRubricCriteria[];
   isCurrent: boolean;
-  isReviewer?: boolean;
   proposalId?: string;
   evaluation?: PopulatedEvaluation;
   refreshProposal?: VoidFunction;
@@ -68,7 +67,6 @@ export function RubricResults({
   evaluation,
   refreshProposal,
   isCurrent,
-  isReviewer,
   proposalId,
   archived
 }: Props) {
@@ -241,7 +239,6 @@ export function RubricResults({
               hideReviewer
               archived={archived}
               key='results'
-              isReviewer={isReviewer}
               evaluation={evaluation}
               proposalId={proposalId}
               confirmationMessage='Please verify that all reviewers have submitted a response. This will submit the final review for this step.'

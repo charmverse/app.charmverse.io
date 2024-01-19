@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -62,35 +63,34 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
   if (!proposal) {
     throw new NotFoundError();
   }
-  const proposalPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
+  const permissionsByStep = await permissionsApiClient.proposals.computeAllProposalEvaluationPermissions({
     // Proposal id is the same as page
     resourceId: proposal?.id,
     userId
   });
 
-  if (!proposalPermissions?.view) {
+  const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
+
+  const currentPermissions =
+    proposal.status === 'draft'
+      ? permissionsByStep.draft
+      : currentEvaluation && permissionsByStep[currentEvaluation.id];
+
+  if (!currentPermissions?.view) {
     throw new NotFoundError();
-  }
-
-  const { spaceRole } = await hasAccessToSpace({
-    spaceId: proposal.spaceId,
-    userId
-  });
-
-  const canSeeAnswers = spaceRole?.isAdmin || proposalPermissions.evaluate || proposalPermissions.review;
-  if (!canSeeAnswers) {
-    proposal.evaluations.forEach((evaluation) => {
-      evaluation.draftRubricAnswers = [];
-      evaluation.rubricAnswers = [];
-    });
   }
 
   // If we are viewing a proposal template, we can see all private fields since the user might be creating a proposal
   const canAccessPrivateFormFields = await canAccessPrivateFields({ proposal, userId, proposalId: proposal.id });
 
-  return res
-    .status(200)
-    .json(mapDbProposalToProposal({ proposal, permissions: proposalPermissions, canAccessPrivateFormFields }));
+  return res.status(200).json(
+    mapDbProposalToProposal({
+      proposal,
+      permissions: currentPermissions,
+      permissionsByStep,
+      canAccessPrivateFormFields
+    })
+  );
 }
 
 async function updateProposalController(req: NextApiRequest, res: NextApiResponse) {

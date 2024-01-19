@@ -8,11 +8,13 @@ import { PropertyMenu } from './PropertyMenu';
 export function PersonPropertyTemplateMenu({
   cards,
   propertyTemplate,
-  onChange
+  onChange,
+  lastChild
 }: {
   cards: Card[];
   propertyTemplate: IPropertyTemplate<PropertyType>;
   onChange: (userIds: string[]) => void;
+  lastChild: boolean;
 }) {
   const propertyValue = cards[0].fields.properties[propertyTemplate.id];
 
@@ -24,7 +26,7 @@ export function PersonPropertyTemplateMenu({
   };
 
   return (
-    <PropertyMenu cards={cards} propertyTemplate={propertyTemplate}>
+    <PropertyMenu lastChild={lastChild} cards={cards} propertyTemplate={propertyTemplate}>
       {({ isPropertyOpen }) =>
         isPropertyOpen ? <UserSelect defaultOpened {...userSelectProps} /> : <UserSelect {...userSelectProps} />
       }
