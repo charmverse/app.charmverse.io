@@ -40,6 +40,10 @@ export function ProposalProperties({
 
   // further restrict readOnly if user cannot update proposal properties specifically
   const readOnlyProperties = readOnly || !(pagePermissions?.edit_content || isAdmin);
+  const readOnlySelectedCredentialTemplates =
+    readOnly ||
+    !(pagePermissions?.edit_content || isAdmin) ||
+    (sourceTemplate?.selectedCredentialTemplates && !isAdmin);
 
   // properties with values from templates should be read only
   const readOnlyCustomProperties =
@@ -65,7 +69,8 @@ export function ProposalProperties({
         id: reviewer.roleId ?? (reviewer.userId as string)
       })) ?? [],
     type: proposalPage.type,
-    fields: typeof proposal?.fields === 'object' && !!proposal?.fields ? proposal.fields : { properties: {} }
+    fields: typeof proposal?.fields === 'object' && !!proposal?.fields ? proposal.fields : { properties: {} },
+    selectedCredentialTemplates: proposal?.selectedCredentialTemplates
   };
 
   async function onChangeProperties(values: Partial<ProposalPropertiesInput>) {
@@ -94,6 +99,7 @@ export function ProposalProperties({
           readOnlyCustomProperties={readOnlyCustomProperties}
           isReviewer={isReviewer}
           rewardIds={proposal?.rewardIds}
+          readOnlySelectedCredentialTemplates={readOnlySelectedCredentialTemplates}
         />
       </div>
     </Box>

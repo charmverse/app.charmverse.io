@@ -240,3 +240,16 @@ export function prettyPrint(obj: any) {
 
   return prettified;
 }
+
+export function stringToUint8Array(str: string): Uint8Array {
+  // Create a new TextEncoder to encode the string into UTF-8
+  const encoder = new TextEncoder();
+
+  // Encode the string
+  const encoded = encoder.encode(str);
+
+  // Create a Uint8Array from the encoded string
+  const uint8Array = new Uint8Array(encoded);
+
+  return uint8Array;
+}

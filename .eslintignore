@@ -1,2 +1,4 @@
 scripts/
 dist/
+
+lib/credentials/config/generated/

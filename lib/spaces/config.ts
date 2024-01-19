@@ -10,7 +10,8 @@ export const DOMAIN_BLACKLIST = [
   'share',
   'signup',
   'u',
-  'loop'
+  'loop',
+  'permalink'
 ];
 
 export const staticSpaceTemplates = [
