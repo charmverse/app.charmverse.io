@@ -33,6 +33,7 @@ export function PageActionsMenu({
   anchorEl: HTMLElement | null;
   page: {
     parentId?: string | null;
+    proposalId: string | null;
     createdBy: string;
     type?: PageType;
     id: string;
@@ -94,9 +95,9 @@ export function PageActionsMenu({
         <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
         <ListItemText>Delete</ListItemText>
       </MenuItem>
-      {page.type === 'proposal' && (
+      {page.proposalId && (
         <MenuItem>
-          <ArchiveProposalAction proposalId={page.id} containerStyle={{ ml: -2 }} />
+          <ArchiveProposalAction proposalId={page.proposalId} containerStyle={{ ml: -2 }} />
         </MenuItem>
       )}
       {!hideDuplicateAction && page.type && (

@@ -233,15 +233,13 @@ function DataProviders({ children }: { children: ReactNode }) {
                               <FocalBoardProvider>
                                 <PagesProvider>
                                   <RewardsProvider>
-                                    <ProposalsProvider>
-                                      <MemberPropertiesProvider>
-                                        <LensProvider config={lensConfig}>
-                                          <UserProfileProvider>
-                                            <PageTitleProvider>{children}</PageTitleProvider>
-                                          </UserProfileProvider>
-                                        </LensProvider>
-                                      </MemberPropertiesProvider>
-                                    </ProposalsProvider>
+                                    <MemberPropertiesProvider>
+                                      <LensProvider config={lensConfig}>
+                                        <UserProfileProvider>
+                                          <PageTitleProvider>{children}</PageTitleProvider>
+                                        </UserProfileProvider>
+                                      </LensProvider>
+                                    </MemberPropertiesProvider>
                                   </RewardsProvider>
                                 </PagesProvider>
                               </FocalBoardProvider>

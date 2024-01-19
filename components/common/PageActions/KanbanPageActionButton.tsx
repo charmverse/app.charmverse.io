@@ -16,6 +16,7 @@ type Props = {
     deletedAt: Date | null;
     parentId?: string | null;
     title: string | null;
+    proposalId: string | null;
   };
   readOnly?: boolean;
   onClickDelete?: VoidFunction;

@@ -4,7 +4,8 @@ import {
   useUpdateProposalEvaluation,
   useGetProposalDetails,
   useUpsertRubricCriteria,
-  useUpdateWorkflow
+  useUpdateWorkflow,
+  useArchiveProposal
 } from 'charmClient/hooks/proposals';
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationStepSettings';
 

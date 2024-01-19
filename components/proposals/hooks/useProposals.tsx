@@ -14,37 +14,17 @@ type ProposalsContextType = {
   proposals: ProposalWithUsersLite[] | undefined;
   mutateProposals: KeyedMutator<ProposalWithUsersLite[]>;
   isLoading: boolean;
-  archiveProposal: (input: ArchiveProposalRequest) => Promise<void>;
   updateProposal: (proposal: UpdateProposalRequest) => Promise<void>;
   proposalsMap: Record<string, ProposalWithUsersLite | undefined>;
 };
 
-export const ProposalsContext = createContext<Readonly<ProposalsContextType>>({
-  proposals: undefined,
-  mutateProposals: async () => {
-    return undefined;
-  },
-  isLoading: false,
-  archiveProposal: () => Promise.resolve(),
-  updateProposal: () => Promise.resolve(),
-  proposalsMap: {}
-});
+export const ProposalsContext = createContext<ProposalsContextType | null>(null);
 
 export function ProposalsProvider({ children }: { children: ReactNode }) {
   const { loadingPages } = usePages();
   const { space } = useCurrentSpace();
 
   const { data: proposals, mutate: mutateProposals, isLoading } = useGetProposalsBySpace({ spaceId: space?.id });
-
-  const archiveProposal = useCallback(
-    async (input: ArchiveProposalRequest) => {
-      if (space) {
-        await charmClient.proposals.archiveProposal(input);
-        mutateProposals();
-      }
-    },
-    [mutateProposals, space]
-  );
 
   const updateProposal = useCallback(
     async (proposal: UpdateProposalRequest) => {
@@ -70,14 +50,19 @@ export function ProposalsProvider({ children }: { children: ReactNode }) {
       proposals,
       mutateProposals,
       isLoading: isLoading || loadingPages,
-      archiveProposal,
       updateProposal,
       proposalsMap
     }),
-    [archiveProposal, isLoading, loadingPages, mutateProposals, proposals, updateProposal]
+    [isLoading, loadingPages, mutateProposals, proposals, updateProposal]
   );
 
   return <ProposalsContext.Provider value={value}>{children}</ProposalsContext.Provider>;
 }
 
-export const useProposals = () => useContext(ProposalsContext);
+export function useProposals() {
+  const context = useContext(ProposalsContext);
+  if (context === null) {
+    throw new Error('useProposals must be used within a ProposalsProvider');
+  }
+  return context;
+}
