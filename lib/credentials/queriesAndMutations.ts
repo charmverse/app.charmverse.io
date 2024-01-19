@@ -131,7 +131,10 @@ export async function getCredentialsByRecipient({
             issuer: { equalTo: credentialWalletAddress }
           }
         }
-      }
+      },
+      // For now, let's refetch each time and rely on http endpoint-level caching
+      // https://www.apollographql.com/docs/react/data/queries/#supported-fetch-policies
+      fetchPolicy: 'no-cache'
     })
     .then(({ data }) => data.signedCredentialFourIndex.edges.map((e: any) => getParsedCredential(e.node)));
 }
