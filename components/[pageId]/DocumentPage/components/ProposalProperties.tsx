@@ -1,6 +1,5 @@
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import { Box } from '@mui/material';
-import { useEffect, useState } from 'react';
 
 import { useGetIsReviewer, useUpdateProposal } from 'charmClient/hooks/proposals';
 import { useProposals } from 'components/proposals/hooks/useProposals';
@@ -11,9 +10,6 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import type { PageWithContent } from 'lib/pages';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-
-import { CreateLensPublication } from './CreateLensPublication';
 
 interface ProposalPropertiesProps {
   readOnly?: boolean;
@@ -36,7 +32,6 @@ export function ProposalProperties({
 }: ProposalPropertiesProps) {
   const { trigger: updateProposal } = useUpdateProposal({ proposalId });
   const { user } = useUser();
-  const [isPublishingToLens, setIsPublishingToLens] = useState(false);
   const { mutateProposals } = useProposals();
 
   const sourceTemplate = useProposalTemplateById(proposal?.page?.sourceTemplateId);
@@ -92,34 +87,16 @@ export function ProposalProperties({
     >
       <div className='octo-propertylist'>
         <ProposalPropertiesBase
-          proposalLensLink={proposal?.lensPostLink ?? undefined}
           proposalStatus={proposal?.status}
           pageId={pageId}
           proposalId={proposalId}
           readOnlyAuthors={readOnlyProperties}
           proposalFormInputs={proposalFormInputs}
           setProposalFormInputs={onChangeProperties}
-          isPublishingToLens={isPublishingToLens}
           readOnlyCustomProperties={readOnlyCustomProperties}
           isReviewer={isReviewer}
           rewardIds={proposal?.rewardIds}
         />
-        {isPublishingToLens && (
-          <CreateLensPublication
-            onError={() => {
-              setIsPublishingToLens(false);
-            }}
-            publicationType='post'
-            content={proposalPage.content as PageContent}
-            proposalId={proposalId}
-            proposalPath={proposalPage.path}
-            onSuccess={async () => {
-              await refreshProposal();
-              setIsPublishingToLens(false);
-            }}
-            proposalTitle={proposalPage.title}
-          />
-        )}
       </div>
     </Box>
   );

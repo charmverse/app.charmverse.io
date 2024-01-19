@@ -10,15 +10,13 @@ import { CommentForm } from 'components/common/comments/CommentForm';
 import { CommentSort } from 'components/common/comments/CommentSort';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import type { CommentContent, CommentPermissions } from 'lib/comments';
 import type { PageWithContent } from 'lib/pages';
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
-
-import { CreateLensPublication } from '../CreateLensPublication';
 
 type Props = {
   page: PageWithContent;
@@ -28,6 +26,7 @@ type Props = {
 export function PageComments({ page, canCreateComments }: Props) {
   const { user } = useUser();
   const { lensProfile, setupLensProfile } = useLensProfile();
+  const { space } = useCurrentSpace();
   const router = useRouter();
   const {
     nonNestedComments,
@@ -89,10 +88,6 @@ export function PageComments({ page, canCreateComments }: Props) {
   }, [router.query.commentId, isLoadingComments]);
 
   const hideComments = isProposal && (!proposal || proposal.status === 'draft');
-  const lensParentPublicationId =
-    createdComment?.parentId === null
-      ? proposal?.lensPostLink
-      : nonNestedComments.find((comment) => comment.id === createdComment?.parentId)?.lensCommentLink;
 
   if (hideComments) return null;
 
@@ -151,26 +146,6 @@ export function PageComments({ page, canCreateComments }: Props) {
             </Stack>
           )}
         </>
-      )}
-      {isPublishingToLens && createdComment && proposal?.lensPostLink && page.proposalId && lensParentPublicationId && (
-        <CreateLensPublication
-          publicationType='comment'
-          commentId={createdComment.id}
-          content={createdComment.content as PageContent}
-          parentPublicationId={lensParentPublicationId}
-          onSuccess={async () => {
-            await syncPageCommentsWithLensPost();
-            setIsPublishingToLens(false);
-            setCreatedComment(null);
-          }}
-          onError={() => {
-            setIsPublishingToLens(false);
-            setCreatedComment(null);
-          }}
-          proposalId={page.proposalId}
-          proposalPath={page.path}
-          proposalTitle={page.title}
-        />
       )}
     </>
   );
