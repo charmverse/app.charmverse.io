@@ -15,6 +15,8 @@ const labels: Record<CredentialEventType, string> = {
   proposal_created: 'Proposal Created'
 };
 
+const disablePublishedCredentials = process.env.DISABLE_PUBLISHED_CREDENTIALS === 'true';
+
 export async function issueProposalCredentialsIfNecessary({
   proposalId,
   event
@@ -22,6 +24,10 @@ export async function issueProposalCredentialsIfNecessary({
   proposalId: string;
   event: CredentialEventType;
 }): Promise<void> {
+  if (disablePublishedCredentials) {
+    log.info('Published credentials are disabled');
+    return;
+  }
   const baseProposal = await prisma.proposal.findFirstOrThrow({
     where: {
       id: proposalId,
