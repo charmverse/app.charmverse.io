@@ -18,7 +18,6 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { emptyDocument } from 'lib/prosemirror/constants';
-import { getPagePath } from 'lib/utilities/domains/getPagePath';
 
 function ProposalLensSocialShare({
   proposalLink,
@@ -213,11 +212,7 @@ export function ProposalSocialShare({
   const { showMessage } = useSnackbar();
   const { space } = useCurrentSpace();
   const [, copyFn] = useCopyToClipboard();
-  const proposalLink = `${isProdEnv ? 'https://' : 'http://'}${window.location.host}${getPagePath({
-    path: proposalPath,
-    spaceDomain: space?.domain ?? '',
-    hostName: 'app.charmverse.io'
-  })}`;
+  const proposalLink = `https://app.charmverse.io/${space?.domain}${proposalPath}`;
 
   function copyProposalLink() {
     copyFn(proposalLink).then(() => {

@@ -10,7 +10,6 @@ import { CommentForm } from 'components/common/comments/CommentForm';
 import { CommentSort } from 'components/common/comments/CommentSort';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
-import { isProdEnv } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
@@ -18,7 +17,6 @@ import type { CommentContent, CommentPermissions } from 'lib/comments';
 import type { PageWithContent } from 'lib/pages';
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
 import { setUrlWithoutRerender } from 'lib/utilities/browser';
-import { getPagePath } from 'lib/utilities/domains/getPagePath';
 
 type Props = {
   page: PageWithContent;
@@ -55,12 +53,6 @@ export function PageComments({ page, canCreateComments }: Props) {
     delete_comments: isAdmin
   };
 
-  const proposalLink = `${isProdEnv ? 'https://' : 'http://'}${window.location.host}${getPagePath({
-    path: page.path,
-    spaceDomain: space?.domain ?? '',
-    hostName: window.location.hostname
-  })}`;
-
   async function createComment(comment: CommentContent) {
     const _createdComment = await addComment(comment);
     setCreatedComment(_createdComment);
@@ -96,10 +88,6 @@ export function PageComments({ page, canCreateComments }: Props) {
   }, [router.query.commentId, isLoadingComments]);
 
   const hideComments = isProposal && (!proposal || proposal.status === 'draft');
-  const lensParentPublicationId =
-    createdComment?.parentId === null
-      ? proposal?.lensPostLink
-      : nonNestedComments.find((comment) => comment.id === createdComment?.parentId)?.lensCommentLink;
 
   if (hideComments) return null;
 
