@@ -14,6 +14,7 @@ import Link from 'components/common/Link';
 import { SectionName } from 'components/common/PageLayout/components/Sidebar/components/SectionName';
 import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/components/SidebarButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import type { SettingsPath } from 'hooks/useSettingsDialog';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
@@ -25,6 +26,7 @@ import { AccountSettings } from './account/AccountSettings';
 import { ApiSettings } from './api/ApiSettings';
 import type { SpaceSettingsTab, UserSettingsTab } from './config';
 import { ACCOUNT_TABS, SPACE_SETTINGS_TABS } from './config';
+import { SpaceCredentialSettings } from './credentials/SpaceCredentialSettings';
 import { ImportSettings } from './import/ImportSettings';
 import { Invites } from './invites/Invites';
 import ProfileSettings from './profile/ProfileSettings';
@@ -53,7 +55,8 @@ const spaceTabs: Record<SpaceSettingsTab['path'], typeof SpaceSettings> = {
   roles: RoleSettings,
   subscription: SubscriptionSettings,
   space: SpaceSettings,
-  proposals: SpaceProposalSettings
+  proposals: SpaceProposalSettings,
+  credentials: SpaceCredentialSettings
 };
 
 function TabPanel(props: TabPanelProps) {
@@ -84,6 +87,8 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
   const isMobile = useSmallScreen();
   const { memberSpaces } = useSpaces();
   const { mappedFeatures } = useSpaceFeatures();
+
+  const showCredentialsTab = useIsCharmverseSpace();
 
   const isSpaceSettingsVisible = !!memberSpaces.find((s) => s.name === currentSpace?.name);
 
@@ -121,7 +126,7 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
         )}
         {currentSpace &&
           isSpaceSettingsVisible &&
-          SPACE_SETTINGS_TABS.map((tab) => (
+          SPACE_SETTINGS_TABS.filter((tab) => (showCredentialsTab ? true : tab.path !== 'credentials')).map((tab) => (
             <SidebarLink
               data-test={`space-settings-tab-${tab.path}`}
               key={tab.path}
@@ -190,7 +195,7 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
             </TabPanel>
           );
         })}
-        {SPACE_SETTINGS_TABS.map((tab) => {
+        {SPACE_SETTINGS_TABS.filter((tab) => (showCredentialsTab ? true : tab.path !== 'credentials')).map((tab) => {
           const TabView = spaceTabs[tab.path];
           return (
             <TabPanel key={tab.path} value={activePath ?? ''} index={tab.path}>

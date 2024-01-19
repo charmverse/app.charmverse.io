@@ -5,8 +5,12 @@ import { useEffect, useState } from 'react';
 
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
+import { CredentialSelect } from 'components/credentials/CredentialsSelect';
 import { ProposalRewards } from 'components/proposals/components/ProposalRewards/ProposalRewards';
 import { CustomPropertiesAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/CustomPropertiesAdapter';
+import { useGetCredentialTemplates } from 'components/settings/credentials/hooks/credentialHooks';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useUser } from 'hooks/useUser';
 import type { ProposalFields, ProposalReviewerInput } from 'lib/proposal/interface';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -24,6 +28,7 @@ export type ProposalPropertiesInput = {
   publishToLens?: boolean;
   fields: ProposalFields | null;
   type: PageType;
+  selectedCredentialTemplates?: string[];
   archived?: boolean;
 };
 
@@ -34,6 +39,7 @@ type ProposalPropertiesProps = {
   readOnlyAuthors?: boolean;
   setProposalFormInputs: (values: Partial<ProposalPropertiesInput>) => Promise<void> | void;
   readOnlyCustomProperties?: string[];
+  readOnlySelectedCredentialTemplates?: boolean;
   isReviewer?: boolean;
   rewardIds?: string[] | null;
   proposalId?: string;
@@ -46,12 +52,20 @@ export function ProposalPropertiesBase({
   readOnlyAuthors,
   setProposalFormInputs,
   readOnlyCustomProperties,
+  readOnlySelectedCredentialTemplates,
   isReviewer,
   rewardIds,
   proposalId
 }: ProposalPropertiesProps) {
   const { user } = useUser();
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
+  const { space } = useCurrentSpace();
+
+  const { data: credentialTemplates } = useGetCredentialTemplates({ spaceId: space?.id });
+
+  const isCharmverseSpace = useIsCharmverseSpace();
+
+  const showCredentialSelect = isCharmverseSpace && !!credentialTemplates?.length;
 
   const isAuthor = proposalFormInputs.authors.includes(user?.id ?? '');
   const proposalAuthorIds = proposalFormInputs.authors;
@@ -111,6 +125,17 @@ export function ProposalPropertiesBase({
                 wrapColumn
                 showEmptyPlaceholder
               />
+              {showCredentialSelect && (
+                <CredentialSelect
+                  readOnly={readOnlySelectedCredentialTemplates}
+                  selectedCredentialTemplates={proposalFormInputs.selectedCredentialTemplates}
+                  onChange={(selectedCredentialTemplates) =>
+                    setProposalFormInputs({
+                      selectedCredentialTemplates
+                    })
+                  }
+                />
+              )}
             </Box>
           </div>
         </Box>

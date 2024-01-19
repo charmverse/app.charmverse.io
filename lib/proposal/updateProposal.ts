@@ -10,6 +10,7 @@ export type UpdateProposalRequest = {
   authors?: string[];
   publishToLens?: boolean;
   fields?: ProposalFields | null;
+  selectedCredentialTemplates?: string[];
 };
 
 export async function updateProposal({
@@ -17,6 +18,7 @@ export async function updateProposal({
   authors,
   publishToLens,
   fields,
+  selectedCredentialTemplates,
   actorId
 }: UpdateProposalRequest & { actorId: string }) {
   if (authors && authors.length === 0) {
@@ -31,6 +33,17 @@ export async function updateProposal({
         },
         data: {
           publishToLens
+        }
+      });
+    }
+
+    if (selectedCredentialTemplates) {
+      await tx.proposal.update({
+        where: {
+          id: proposalId
+        },
+        data: {
+          selectedCredentialTemplates
         }
       });
     }

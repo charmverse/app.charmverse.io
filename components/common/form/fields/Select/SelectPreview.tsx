@@ -13,6 +13,7 @@ type Props = {
   wrapColumn?: boolean;
   readOnly?: boolean;
   readOnlyMessage?: string;
+  emptyMessage?: string;
   sx?: SxProps;
 };
 
@@ -25,7 +26,8 @@ export function SelectPreview({
   size,
   readOnly,
   readOnlyMessage,
-  showEmpty
+  showEmpty,
+  emptyMessage
 }: Props) {
   const values: string[] = Array.isArray(value) ? value : [value].filter(Boolean);
   const valueOptions = values
@@ -39,7 +41,7 @@ export function SelectPreview({
           {name}
         </Typography>
       )}
-      <Tooltip title={readOnlyMessage ?? null}>
+      <Tooltip title={readOnly ? readOnlyMessage : null}>
         <Stack
           display='inline-flex'
           width='fit-content'
@@ -58,7 +60,7 @@ export function SelectPreview({
                   size='small'
                 />
               ))
-            : showEmpty && <EmptyPlaceholder>Empty</EmptyPlaceholder>}
+            : showEmpty && <EmptyPlaceholder>{emptyMessage ?? 'Empty'}</EmptyPlaceholder>}
         </Stack>
       </Tooltip>
     </Stack>

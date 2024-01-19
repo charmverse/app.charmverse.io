@@ -37,6 +37,7 @@ import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { BlockchainApi } from './apis/blockchainApi';
 import { CommentsApi } from './apis/commentsApi';
+import { CredentialsApi } from './apis/credentialsApi';
 import { DiscordApi } from './apis/discordApi';
 import { FileApi } from './apis/fileApi';
 import { ForumApi } from './apis/forumApi';
@@ -113,6 +114,8 @@ class CharmClient {
   gnosisSafe = new GnosisSafeApi();
 
   rewards = new RewardsApi();
+
+  credentials = new CredentialsApi();
 
   async socket() {
     return http.GET<SocketAuthResponse>('/api/socket');

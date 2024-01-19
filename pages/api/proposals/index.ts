@@ -2,6 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { issueProposalCredentialsIfNecessary } from 'lib/credentials/issueProposalCredentialsIfNecessary';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { permissionsApiClient } from 'lib/permissions/api/client';
@@ -108,6 +109,13 @@ async function createProposalController(req: NextApiRequest, res: NextApiRespons
     },
     proposalPage.page.spaceId
   );
+
+  if (proposalPage.proposal.status === 'published') {
+    await issueProposalCredentialsIfNecessary({
+      event: 'proposal_created',
+      proposalId: proposalPage.proposal.id
+    });
+  }
 
   return res.status(201).json({ id: proposalPage.proposal.id });
 }
