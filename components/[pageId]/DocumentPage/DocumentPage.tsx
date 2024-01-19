@@ -333,15 +333,17 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
           parentElementId: 'file-drop-container'
         })}
       >
-        {!!page?.deletedAt && (
+        {/* show either deleted banner or archived, but not both */}
+        {page?.deletedAt ? (
           <AlertContainer>
             <PageDeleteBanner pageType={page.type} pageId={page.id} />
           </AlertContainer>
-        )}
-        {!!proposal?.archived && (
-          <AlertContainer>
-            <ProposalArchivedBanner proposalId={proposal.id} disabled={!proposal.permissions.delete} />
-          </AlertContainer>
+        ) : (
+          !!proposal?.archived && (
+            <AlertContainer>
+              <ProposalArchivedBanner proposalId={proposal.id} disabled={!proposal.permissions.delete} />
+            </AlertContainer>
+          )
         )}
         {connectionError && (
           <AlertContainer>

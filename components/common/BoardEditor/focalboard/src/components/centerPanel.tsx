@@ -324,10 +324,6 @@ function CenterPanel(props: Props) {
     [activeBoard, activeView, __addCard, setState, space, groupByProperty, refreshPage, _updateView, showCard]
   );
 
-  const editCardTemplate = (cardTemplateId: string) => {
-    showCard(cardTemplateId);
-  };
-
   const cardClicked = useCallback(
     (e: React.MouseEvent, card: Card): void => {
       if (!activeView) {
@@ -579,7 +575,6 @@ function CenterPanel(props: Props) {
               showCard={showCard}
               // addCardFromTemplate={addCardFromTemplate}
               addCardTemplate={viewHeaderAddCardTemplate}
-              editCardTemplate={editCardTemplate}
               readOnly={props.readOnly}
               embeddedBoardPath={props.embeddedBoardPath}
               checkedIds={checkedIds}
