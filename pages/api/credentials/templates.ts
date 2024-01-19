@@ -14,7 +14,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .get(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'spaceId', location: 'query' }), getCredentialsController)
+  .get(getCredentialsController)
   .post(
     requireSpaceMembership({ adminOnly: true, spaceIdKey: 'spaceId', location: 'body' }),
     createCredentialController

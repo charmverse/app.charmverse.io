@@ -8,6 +8,8 @@ import { UserSelect } from 'components/common/BoardEditor/components/properties/
 import { CredentialSelect } from 'components/credentials/CredentialsSelect';
 import { ProposalRewards } from 'components/proposals/components/ProposalRewards/ProposalRewards';
 import { CustomPropertiesAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/CustomPropertiesAdapter';
+import { useGetCredentialTemplates } from 'components/settings/credentials/hooks/credentialHooks';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useUser } from 'hooks/useUser';
 import type { ProposalFields, ProposalReviewerInput } from 'lib/proposal/interface';
@@ -57,8 +59,13 @@ export function ProposalPropertiesBase({
 }: ProposalPropertiesProps) {
   const { user } = useUser();
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
+  const { space } = useCurrentSpace();
 
-  const showCredentialSelect = useIsCharmverseSpace();
+  const { data: credentialTemplates } = useGetCredentialTemplates({ spaceId: space?.id });
+
+  const isCharmverseSpace = useIsCharmverseSpace();
+
+  const showCredentialSelect = isCharmverseSpace && !!credentialTemplates?.length;
 
   const isAuthor = proposalFormInputs.authors.includes(user?.id ?? '');
   const proposalAuthorIds = proposalFormInputs.authors;
