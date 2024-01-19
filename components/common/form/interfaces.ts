@@ -39,7 +39,7 @@ export type FieldProps = {
   required?: boolean;
   helperText?: ReactNode;
   description?: PageContent;
-  endAdornment?: ReactNode;
+  labelEndAdornment?: ReactNode;
 } & SelectFieldProps;
 
 export type FormFieldInput = Pick<

@@ -8,11 +8,13 @@ import type { FormFieldValue } from 'components/common/form/interfaces';
 export function ProposalFormFieldInputs({
   proposalId,
   formFields,
-  readOnly
+  readOnly,
+  isReviewer
 }: {
   readOnly?: boolean;
   proposalId: string;
   formFields: FormField[];
+  isReviewer: boolean;
 }) {
   const { data: proposalFormFieldAnswers = [], isLoading } = useGetProposalFormFieldAnswers({ proposalId });
   const { trigger } = useUpdateProposalFormFieldAnswers({ proposalId });
@@ -34,6 +36,7 @@ export function ProposalFormFieldInputs({
 
   return (
     <FormFieldInputs
+      isReviewer={isReviewer}
       onSave={onSave}
       disabled={readOnly}
       formFields={formFields.map((formField) => {

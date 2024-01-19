@@ -37,13 +37,13 @@ type ContentProps = {
   iconLabel?: ReactNode;
   required?: boolean;
   description?: PageContent;
-  endAdornment?: ReactNode;
+  labelEndAdornment?: ReactNode;
 };
 
 // a wrapper for FieldWrapper with props for label and description
 export function FieldWrapper({
   sx,
-  endAdornment,
+  labelEndAdornment,
   description,
   required,
   children,
@@ -68,7 +68,7 @@ export function FieldWrapper({
                   *
                 </Typography>
               )}
-              {endAdornment}
+              {labelEndAdornment}
             </FieldLabel>
           )}
         </Box>

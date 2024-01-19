@@ -8,12 +8,12 @@ type Props = ControlFieldProps & FieldProps;
 
 export const NumberInputField = forwardRef<HTMLDivElement, Props>(
   (
-    { label, endAdornment, iconLabel, description, inline, error, required, placeholder, ...inputProps }: Props,
+    { label, labelEndAdornment, iconLabel, description, inline, error, required, placeholder, ...inputProps }: Props,
     ref
   ) => {
     return (
       <FieldWrapper
-        endAdornment={endAdornment}
+        labelEndAdornment={labelEndAdornment}
         description={description}
         required={required}
         label={label}
