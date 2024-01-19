@@ -19,7 +19,11 @@ export async function getUserOtp(userId: string): Promise<GetOtpResponse> {
       id: userId
     },
     include: {
-      otp: true
+      otp: {
+        where: {
+          deletedAt: null
+        }
+      }
     }
   });
 
