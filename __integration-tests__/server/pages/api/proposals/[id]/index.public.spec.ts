@@ -29,7 +29,15 @@ describe('GET /api/proposals/[id] - Get proposal - public space', () => {
       spaceId: space.id,
       userId: author.id,
       authors: [author.id],
-      reviewers: [{ group: 'user', id: reviewer.id }],
+      evaluationInputs: [
+        {
+          index: 0,
+          title: 'test',
+          reviewers: [{ group: 'user', id: reviewer.id }],
+          evaluationType: 'pass_fail',
+          permissions: []
+        }
+      ],
       proposalStatus: 'published'
     });
     // Unauthenticated request
@@ -48,14 +56,6 @@ describe('GET /api/proposals/[id] - Get proposal - public space', () => {
             userId: author.id
           })
         ])
-        // reviewers: [
-        //   expect.objectContaining({
-        //     id: expect.any(String),
-        //     roleId: null,
-        //     proposalId: generatedProposal.id,
-        //     userId: reviewer.id
-        //   })
-        // ]
       })
     );
   });
@@ -151,10 +151,13 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     const proposalTemplate = await testUtilsProposals.generateProposalTemplate({
       spaceId: adminSpace.id,
       userId: adminUser.id,
-      reviewers: [
+      evaluationInputs: [
         {
-          group: 'user',
-          id: adminUser.id
+          index: 0,
+          title: 'test',
+          reviewers: [{ group: 'user', id: adminUser.id }],
+          evaluationType: 'pass_fail',
+          permissions: []
         }
       ]
     });

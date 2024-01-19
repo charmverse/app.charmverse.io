@@ -7,10 +7,8 @@ import { v4 } from 'uuid';
 
 import type { FormFieldInput } from 'components/common/form/interfaces';
 import { createForm } from 'lib/form/createForm';
-import { addSpaceOperations } from 'lib/permissions/spaces/addSpaceOperations';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateRole } from 'testing/setupDatabase';
 
 let author: User;
 let reviewer: User;

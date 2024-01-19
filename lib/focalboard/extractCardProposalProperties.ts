@@ -7,9 +7,6 @@ import type { ExtractedDatabaseProposalProperties } from './extractDatabasePropo
 export type ExtractedCardProposalProperties = {
   cardProposalUrl: { propertyId: string; value: string };
   cardProposalStatus: { propertyId: string; optionId: string; value: ProposalEvaluationStatus };
-  cardEvaluatedBy: { propertyId: string; value: string[] };
-  cardEvaluationTotal: { propertyId: string; value: number };
-  cardEvaluationAverage: { propertyId: string; value: number };
   cardEvaluationType: { propertyId: string; value: ProposalEvaluationResultExtended; optionId: string };
   cardProposalStep: { propertyId: string; optionId: string; value: string };
 };
@@ -70,31 +67,6 @@ export function extractCardProposalProperties({
     extractedPropertyValues.cardProposalUrl = {
       propertyId: proposalUrlPropertyId,
       value: proposalUrlValue as string
-    };
-  }
-
-  // Rubric criteria
-  const proposalEvaluatedById = databaseProperties.proposalEvaluatedBy?.id;
-  if (proposalEvaluatedById) {
-    extractedPropertyValues.cardEvaluatedBy = {
-      propertyId: proposalEvaluatedById,
-      value: cardValues[proposalEvaluatedById] as string[]
-    };
-  }
-
-  const proposalEvaluationTotalId = databaseProperties.proposalEvaluationTotal?.id;
-  if (proposalEvaluationTotalId) {
-    extractedPropertyValues.cardEvaluationTotal = {
-      propertyId: proposalEvaluationTotalId,
-      value: cardValues[proposalEvaluationTotalId] as number
-    };
-  }
-
-  const proposalEvaluationAverageId = databaseProperties.proposalEvaluationAverage?.id;
-  if (proposalEvaluationAverageId) {
-    extractedPropertyValues.cardEvaluationAverage = {
-      propertyId: proposalEvaluationAverageId,
-      value: cardValues[proposalEvaluationAverageId] as number
     };
   }
 

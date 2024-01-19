@@ -14,7 +14,7 @@ import { PageDialogProvider } from 'components/common/PageDialog/hooks/usePageDi
 import { PageDialogGlobal } from 'components/common/PageDialog/PageDialogGlobal';
 import { AppBar } from 'components/common/PageLayout/components/AppBar';
 import CurrentPageFavicon from 'components/common/PageLayout/components/CurrentPageFavicon';
-import PageTitleWithBreadcrumbs from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
+import { PageTitleWithBreadcrumbs } from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
 import { HeaderSpacer, StyledToolbar } from 'components/common/PageLayout/components/Header/Header';
 import PageContainer from 'components/common/PageLayout/components/PageContainer';
 import { RewardsBoardProvider } from 'components/rewards/hooks/useRewardsBoard';

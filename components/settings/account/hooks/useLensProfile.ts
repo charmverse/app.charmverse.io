@@ -1,14 +1,15 @@
 import { log } from '@charmverse/core/log';
-// import type { CredentialsExpiredError, NotAuthenticatedError } from '@lens-protocol/client';
-// import type {
-//   BroadcastingError,
-//   PendingSigningRequestError,
-//   ProfileId,
-//   TransactionError,
-//   UserRejectedError,
-//   WalletConnectionError
-// } from '@lens-protocol/react-web';
-// import { SessionType, useLogin, useProfiles, useSession } from '@lens-protocol/react-web';
+import type { CredentialsExpiredError, NotAuthenticatedError } from '@lens-protocol/client';
+import type {
+  BroadcastingError,
+  InsufficientGasError,
+  PendingSigningRequestError,
+  ProfileId,
+  TransactionError,
+  UserRejectedError,
+  WalletConnectionError
+} from '@lens-protocol/react-web';
+import { SessionType, useLogin, useProfiles, useSession } from '@lens-protocol/react-web';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -18,14 +19,15 @@ import { useWeb3Account } from 'hooks/useWeb3Account';
 export function useHandleLensError() {
   const { showMessage } = useSnackbar();
   const handlerLensError = (
-    error: any
-    // | BroadcastingError
-    // | PendingSigningRequestError
-    // | UserRejectedError
-    // | WalletConnectionError
-    // | TransactionError
-    // | CredentialsExpiredError
-    // | NotAuthenticatedError
+    error:
+      | BroadcastingError
+      | PendingSigningRequestError
+      | UserRejectedError
+      | WalletConnectionError
+      | TransactionError
+      | CredentialsExpiredError
+      | NotAuthenticatedError
+      | InsufficientGasError
   ) => {
     let errorMessage = '';
     switch (error.name) {
@@ -61,6 +63,11 @@ export function useHandleLensError() {
 
       case 'TransactionError': {
         errorMessage = 'There was an error with the transaction';
+        break;
+      }
+
+      case 'InsufficientGasError': {
+        errorMessage = 'There is not enough gas to complete the transaction';
         break;
       }
 
@@ -107,27 +114,27 @@ export function useLensProfile() {
 
   const { space } = useCurrentSpace();
 
-  // const setupLensProfile = async () => {
-  //   if (!user || !account || !lensProfile) {
-  //     return false;
-  //   }
+  const setupLensProfile = async () => {
+    if (!user || !account || !lensProfile) {
+      return null;
+    }
 
-  //   if (authenticated) {
-  //     return true;
-  //   }
+    if (authenticated) {
+      return lensProfile;
+    }
 
-  //   const result = await execute({
-  //     address: account,
-  //     profileId: lensProfile.id as ProfileId
-  //   });
+    //   const result = await execute({
+    //     address: account,
+    //     profileId: lensProfile.id as ProfileId
+    //   });
 
-  //   if (result.isFailure()) {
-  //     // handlerLensError(result.error);
-  //     return false;
-  //   }
+    if (result.isFailure()) {
+      handlerLensError(result.error);
+      return null;
+    }
 
-  //   return true;
-  // };
+    return result.value;
+  };
 
   return {
     isAuthenticated: false,

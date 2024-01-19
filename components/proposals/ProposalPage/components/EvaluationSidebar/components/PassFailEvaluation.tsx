@@ -14,8 +14,7 @@ import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 export type Props = {
   hideReviewer?: boolean;
   proposalId?: string;
-  isReviewer?: boolean;
-  evaluation: Pick<PopulatedEvaluation, 'id' | 'completedAt' | 'reviewers' | 'result'>;
+  evaluation: Pick<PopulatedEvaluation, 'id' | 'completedAt' | 'reviewers' | 'result' | 'isReviewer'>;
   refreshProposal?: VoidFunction;
   confirmationMessage?: string;
   isCurrent: boolean;
@@ -25,7 +24,6 @@ export type Props = {
 export function PassFailEvaluation({
   proposalId,
   hideReviewer,
-  isReviewer,
   evaluation,
   isCurrent,
   refreshProposal,
@@ -44,7 +42,7 @@ export function PassFailEvaluation({
   const completedDate = evaluation.completedAt ? getRelativeTimeInThePast(new Date(evaluation.completedAt)) : null;
   const disabledTooltip = !isCurrent
     ? 'This evaluation step is not active'
-    : !isReviewer
+    : !evaluation.isReviewer
     ? 'You are not a reviewer'
     : isMutating
     ? 'Submitting review'

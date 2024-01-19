@@ -39,6 +39,7 @@ export function PageActionsMenu({
     updatedAt: Date;
     path: string;
     deletedAt: Date | null;
+    syncWithPageId?: string | null;
   };
   readOnly?: boolean;
 }) {
@@ -86,7 +87,9 @@ export function PageActionsMenu({
         dense
         data-testid='delete-page-action'
         onClick={onClickDelete}
-        disabled={Boolean(readOnly || (!pagePermissions?.delete && !postPermissions?.delete_post))}
+        disabled={Boolean(
+          readOnly || (!pagePermissions?.delete && !postPermissions?.delete_post) || !!page.syncWithPageId
+        )}
       >
         <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
         <ListItemText>Delete</ListItemText>

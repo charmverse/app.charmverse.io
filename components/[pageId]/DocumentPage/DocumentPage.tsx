@@ -287,6 +287,8 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
       {/** Structured proposal isn't inside a CharmEditor context, thus useViewContext used in PageSidebar would throw error for undefined view */}
       {(enableComments || enableSuggestingMode || page.type === 'proposal' || page.type === 'proposal_template') && (
         <PageSidebar
+          pagePath={page.path}
+          pageTitle={page.title}
           id='page-action-sidebar'
           pageId={page.id}
           spaceId={page.spaceId}
@@ -331,22 +333,22 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
         })}
       >
         {!!page?.deletedAt && (
-          <AlertContainer showPageActionSidebar={showPageActionSidebar}>
+          <AlertContainer>
             <PageDeleteBanner pageType={page.type} pageId={page.id} />
           </AlertContainer>
         )}
         {connectionError && (
-          <AlertContainer showPageActionSidebar={showPageActionSidebar}>
+          <AlertContainer>
             <PageConnectionBanner />
           </AlertContainer>
         )}
         {page?.convertedProposalId && (
-          <AlertContainer showPageActionSidebar={showPageActionSidebar}>
+          <AlertContainer>
             <ProposalBanner type='page' proposalId={page.convertedProposalId} />
           </AlertContainer>
         )}
         {board?.fields.sourceType && (
-          <AlertContainer showPageActionSidebar={showPageActionSidebar}>
+          <AlertContainer>
             <SyncedPageBanner pageId={page.syncWithPageId} source={board.fields.sourceType} />
           </AlertContainer>
         )}
@@ -426,6 +428,8 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
           )}
           {currentTab === 1 && (
             <EvaluationSidebar
+              pagePath={page.path}
+              pageTitle={page.title}
               pageId={page.id}
               proposal={proposal}
               onChangeEvaluation={onChangeEvaluation}

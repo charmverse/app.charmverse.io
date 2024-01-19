@@ -5,7 +5,6 @@ import PersonIcon from '@mui/icons-material/Person';
 import SendIcon from '@mui/icons-material/Send';
 import type { Theme } from '@mui/material';
 import { Box, Divider, Paper, Stack, Typography, useMediaQuery } from '@mui/material';
-import dynamic from 'next/dynamic';
 import type { PluginKey } from 'prosemirror-state';
 import { TextSelection } from 'prosemirror-state';
 import React, { useState } from 'react';
@@ -13,8 +12,8 @@ import React, { useState } from 'react';
 import { useCreateThread } from 'charmClient/hooks/comments';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { Button } from 'components/common/Button';
+import { InlineCharmEditor } from 'components/common/CharmEditor';
 import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
-import FieldLabel from 'components/common/form/FieldLabel';
 import { useInlineComment } from 'hooks/useInlineComment';
 import { useThreads } from 'hooks/useThreads';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
@@ -22,10 +21,6 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ThreadAccessGroup } from 'lib/threads';
 
 import { updateInlineComment } from '../inlineComment.utils';
-
-export const InlineCharmEditor = dynamic(() => import('components/common/CharmEditor/InlineCharmEditor'), {
-  ssr: false
-});
 
 const hideSelectionTooltip = selectionTooltip.hideSelectionTooltip;
 

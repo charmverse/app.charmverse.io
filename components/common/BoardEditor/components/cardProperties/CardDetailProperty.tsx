@@ -11,6 +11,7 @@ import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons
 import PropertyMenu from 'components/common/BoardEditor/focalboard/src/widgets/propertyMenu';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
+import { getPropertyName } from 'lib/focalboard/getPropertyName';
 
 export const PropertyNameContainer = styled(Stack)`
   position: relative;
@@ -79,7 +80,7 @@ export function CardDetailProperty({
       }}
       className='octo-propertyrow'
     >
-      {(readOnly || disableEditPropertyOption) && <PropertyLabel readOnly>{property.name}</PropertyLabel>}
+      {(readOnly || disableEditPropertyOption) && <PropertyLabel readOnly>{getPropertyName(property)}</PropertyLabel>}
       {!readOnly && !disableEditPropertyOption && (
         <Box>
           <PropertyNameContainer
@@ -92,7 +93,7 @@ export function CardDetailProperty({
             }}
           >
             <DragIndicatorIcon className='icons' fontSize='small' color='secondary' />
-            <Button>{property.name}</Button>
+            <Button>{getPropertyName(property)}</Button>
           </PropertyNameContainer>
           <Menu {...bindMenu(changePropertyPopupState)}>
             <PropertyMenu
