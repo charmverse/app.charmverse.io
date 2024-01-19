@@ -444,7 +444,6 @@ describe('importSpaceData', () => {
         notificationToggles: sourceSpace.notificationToggles,
         features: sourceSpace.features,
         memberProfiles: sourceSpace.memberProfiles,
-        proposalWorkflows: [],
         defaultPagePermissionGroup: sourceSpace.defaultPagePermissionGroup,
         defaultPublicPages: sourceSpace.defaultPublicPages,
         hiddenFeatures: sourceSpace.hiddenFeatures,
@@ -632,7 +631,6 @@ describe('importSpaceData', () => {
         publicBountyBoard: sourceSpace.publicBountyBoard,
         publicProposals: sourceSpace.publicProposals,
         requireProposalTemplate: sourceSpace.requireProposalTemplate,
-        proposalWorkflows: [],
         proposalBlocks: expect.arrayContaining<ProposalBlock>([
           {
             ...customProposalBlockBoard,
