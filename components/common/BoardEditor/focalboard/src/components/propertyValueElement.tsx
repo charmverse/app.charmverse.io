@@ -186,7 +186,7 @@ function PropertyValueElement(props: Props) {
   // We should migrate over the proposals as datasource blocks to the same format as proposals table
   else if (propertyTemplate.type === 'proposalStatus' || propertyTemplate.id === PROPOSAL_STATUS_BLOCK_ID) {
     if (proposal) {
-      return <ProposalStatusSelect proposal={proposal} readOnly={!isAdmin} />;
+      return <ProposalStatusSelect proposal={proposal} readOnly={!isAdmin} displayType={displayType} />;
     }
 
     const evaluationTypeProperty = board.fields.cardProperties.find(
@@ -211,6 +211,7 @@ function PropertyValueElement(props: Props) {
         ]}
         propertyValue={proposalEvaluationStatus}
         onChange={() => {}}
+        displayType={displayType}
       />
     );
   } else if (propertyTemplate.type === 'proposalStep' || propertyTemplate.id === PROPOSAL_STEP_BLOCK_ID) {
@@ -223,10 +224,11 @@ function PropertyValueElement(props: Props) {
           options={propertyTemplate.options}
           propertyValue={(propertyValue as string) ?? ''}
           onChange={() => {}}
+          displayType={displayType}
         />
       );
     }
-    return <ProposalStepSelect readOnly={!isAdmin} proposal={proposal} />;
+    return <ProposalStepSelect readOnly={!isAdmin} proposal={proposal} displayType={displayType} />;
   } else if (propertyTemplate.type === 'proposalEvaluationType') {
     return (
       <TagSelect
@@ -242,6 +244,7 @@ function PropertyValueElement(props: Props) {
         ]}
         propertyValue={propertyValue as string}
         onChange={() => {}}
+        displayType={displayType}
       />
     );
   } else if (propertyTemplate.id === REWARD_PROPOSAL_LINK) {
