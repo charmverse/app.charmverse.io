@@ -130,7 +130,7 @@ export function TemplatesMenu({
           <Divider />
           <Box pl={2}>
             <Typography color='secondary' variant='caption'>
-              Archived templates
+              Archive
             </Typography>
           </Box>
         </>
