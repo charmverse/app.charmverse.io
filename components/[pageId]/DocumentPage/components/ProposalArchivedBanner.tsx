@@ -1,6 +1,7 @@
 import { Box } from '@mui/material';
 
 import { useArchiveProposal } from 'charmClient/hooks/proposals';
+import { AlertBanner } from 'components/common/Banners/Alert';
 import { StyledBanner } from 'components/common/Banners/Banner';
 import { Button } from 'components/common/Button';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -21,16 +22,9 @@ export function ProposalArchivedBanner({ proposalId, disabled }: { proposalId: s
   }
 
   return (
-    <StyledBanner errorBackground>
-      <Box display='flex' gap={1} alignItems='center' data-test='archived-page-banner'>
-        <div
-          style={{
-            color: 'white',
-            fontWeight: 600
-          }}
-        >
-          This {getFeatureTitle('proposal')} is archived
-        </div>
+    <AlertBanner
+      severity='error'
+      action={
         <Button
           disabled={disabled}
           disabledTooltip='You do not have permission to restore this page'
@@ -42,7 +36,18 @@ export function ProposalArchivedBanner({ proposalId, disabled }: { proposalId: s
         >
           Unarchive
         </Button>
+      }
+    >
+      <Box display='flex' gap={1} alignItems='center' data-test='archived-page-banner'>
+        <div
+          style={{
+            color: 'white',
+            fontWeight: 600
+          }}
+        >
+          Archived
+        </div>
       </Box>
-    </StyledBanner>
+    </AlertBanner>
   );
 }
