@@ -25,11 +25,11 @@ export const SelectPreviewContainer = styled(Stack, {
     prop !== 'displayType' && prop !== 'isHidden' && prop !== 'readOnly' && prop !== 'fluidWidth'
 })<ContainerProps>`
   border-radius: ${({ theme }) => theme.spacing(0.5)};
-  display: ${({ isHidden }) => (isHidden ? 'none' : 'initial')};
+  ${({ isHidden }) => (isHidden ? 'display: none;' : '')};
   ${({ fluidWidth }) => (!fluidWidth ? 'width: 100%;' : '')}
   height: 100%;
   justify-content: center;
-  padding: ${({ theme }) => theme.spacing(0.25, 0)};
+  padding: ${({ theme, displayType }) => theme.spacing(displayType === 'table' ? 0 : 0.25, 0)};
   transition: background-color 0.2s ease-in-out;
 
   ${({ displayType, theme }) => {

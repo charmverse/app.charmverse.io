@@ -409,6 +409,7 @@ function PropertyValueElement(props: Props) {
         value={propertyValue as any}
         showEmptyPlaceholder={showEmptyPlaceholder}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
+        displayType={displayType}
       />
     );
   } else if (propertyTemplate.type === 'proposalAuthor') {

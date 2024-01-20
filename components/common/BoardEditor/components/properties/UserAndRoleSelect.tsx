@@ -293,7 +293,7 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
 
   return (
     <Tooltip title={readOnlyMessage ?? null}>
-      <StyledUserPropertyContainer displayType='details'>
+      <StyledUserPropertyContainer displayType={displayType}>
         <StyledAutocomplete
           data-test={dataTest}
           autoHighlight
