@@ -5,10 +5,6 @@ import type { EditorState } from 'prosemirror-state';
 import { memo } from 'react';
 
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
-import { EvaluationSettingsSidebar } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/EvaluationSettingsSidebar';
-import type { Props as ProposalSettingsProps } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/EvaluationSettingsSidebar';
-import type { Props as EvaluationSidebarProps } from 'components/proposals/ProposalPage/components/EvaluationSidebar/EvaluationSidebar';
-import { EvaluationSidebar } from 'components/proposals/ProposalPage/components/EvaluationSidebar/EvaluationSidebar';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 
@@ -43,32 +39,17 @@ type SidebarProps = {
   pagePermissions?: PagePermissionFlags | null;
   sidebarView: PageSidebarView | null;
   openSidebar?: (view: PageSidebarView) => void; // leave undefined to hide navigation
-  readOnlyProposalPermissions?: boolean;
   // eslint-disable-next-line react/no-unused-prop-types
   closeSidebar: () => void;
   // eslint-disable-next-line react/no-unused-prop-types
-  proposalId?: string | null;
-  proposal?: EvaluationSidebarProps['proposal'];
-  proposalInput?: ProposalSettingsProps['proposal'];
-  onChangeEvaluation: ProposalSettingsProps['onChangeEvaluation'];
-  onChangeWorkflow: ProposalSettingsProps['onChangeWorkflow'];
-  refreshProposal?: VoidFunction;
-  isUnpublishedProposal?: boolean;
-  isReviewer?: boolean; // TODO: we need to know the reviewer for each step instead
-  // eslint-disable-next-line react/no-unused-prop-types
   disabledViews?: PageSidebarView[];
-  pagePath?: string;
-  pageTitle?: string;
-  proposalTemplateId?: string | null;
 };
 
 function PageSidebarComponent(props: SidebarProps) {
-  const { disabledViews = [], id, sidebarView, openSidebar, closeSidebar, isUnpublishedProposal } = props;
+  const { disabledViews = [], id, sidebarView, openSidebar, closeSidebar } = props;
   const isMdScreen = useMdScreen();
   const isOpen = sidebarView !== null;
   const sidebarTitle = sidebarView && SIDEBAR_VIEWS[sidebarView]?.title;
-  const canHideSidebar = isMdScreen && !props.proposalId; // dont allow closing the sidebar when viewing a proposal
-  const showEvaluationSidebarIcon = !!props.proposalId;
 
   function toggleSidebar() {
     if (sidebarView === null) {
@@ -105,23 +86,19 @@ function PageSidebarComponent(props: SidebarProps) {
             flexDirection: 'column'
           }}
         >
-          {!isUnpublishedProposal && (
-            <Box display='flex' gap={1} alignItems='center'>
-              {canHideSidebar ? <PageSidebarViewToggle onClick={toggleSidebar} /> : <div />}
-              <Typography flexGrow={1} fontWeight={600} fontSize={20}>
-                {sidebarTitle}
-              </Typography>
-              {openSidebar && (
-                <SidebarNavigationIcons
-                  activeView={sidebarView}
-                  showEvaluationSidebarIcon={showEvaluationSidebarIcon}
-                  openSidebar={openSidebar}
-                  isUnpublishedProposal={!!isUnpublishedProposal}
-                  disabledViews={disabledViews}
-                />
-              )}
-            </Box>
-          )}
+          <Box display='flex' gap={1} alignItems='center'>
+            <PageSidebarViewToggle onClick={toggleSidebar} />
+            <Typography flexGrow={1} fontWeight={600} fontSize={20}>
+              {sidebarTitle}
+            </Typography>
+            {openSidebar && (
+              <SidebarNavigationIcons
+                activeView={sidebarView}
+                openSidebar={openSidebar}
+                disabledViews={disabledViews}
+              />
+            )}
+          </Box>
           <SidebarContents {...props} />
         </Box>
       </DesktopContainer>
@@ -133,13 +110,7 @@ function PageSidebarComponent(props: SidebarProps) {
       onClose={closeSidebar}
       rightActions={
         openSidebar && (
-          <SidebarNavigationIcons
-            disabledViews={disabledViews}
-            activeView={sidebarView}
-            showEvaluationSidebarIcon={showEvaluationSidebarIcon}
-            openSidebar={openSidebar}
-            isUnpublishedProposal={!!isUnpublishedProposal}
-          />
+          <SidebarNavigationIcons disabledViews={disabledViews} activeView={sidebarView} openSidebar={openSidebar} />
         )
       }
       contentSx={{ pb: 0, px: 1 }}
@@ -152,37 +123,24 @@ function PageSidebarComponent(props: SidebarProps) {
 }
 
 function SidebarNavigationIcons({
-  showEvaluationSidebarIcon,
   openSidebar,
   activeView,
-  isUnpublishedProposal,
   disabledViews = []
 }: {
-  showEvaluationSidebarIcon: boolean;
   openSidebar: (view: PageSidebarView) => void;
   activeView?: PageSidebarView | null;
-  isUnpublishedProposal: boolean;
   disabledViews?: PageSidebarView[];
 }) {
   return (
     <Box display='flex' alignItems='center' pr={1} justifyContent='flex-end'>
-      {showEvaluationSidebarIcon && !disabledViews.includes('proposal_evaluation') && (
-        <SidebarViewIcon
-          view='proposal_evaluation'
-          isActive={!!activeView?.includes('proposal')}
-          onClick={openSidebar}
-        />
-      )}
-      {!isUnpublishedProposal && (
-        <>
-          {!disabledViews.includes('comments') && (
-            <SidebarViewIcon view='comments' isActive={activeView === 'comments'} onClick={openSidebar} />
-          )}
-          {!disabledViews.includes('suggestions') && (
-            <SidebarViewIcon view='suggestions' isActive={activeView === 'suggestions'} onClick={openSidebar} />
-          )}
-        </>
-      )}
+      <>
+        {!disabledViews.includes('comments') && (
+          <SidebarViewIcon view='comments' isActive={activeView === 'comments'} onClick={openSidebar} />
+        )}
+        {!disabledViews.includes('suggestions') && (
+          <SidebarViewIcon view='suggestions' isActive={activeView === 'suggestions'} onClick={openSidebar} />
+        )}
+      </>
     </Box>
   );
 }
@@ -192,46 +150,12 @@ function SidebarContents({
   pageId,
   spaceId,
   pagePermissions,
-  readOnlyProposalPermissions,
   editorState,
   threads,
-  openSidebar,
-  proposal,
-  proposalInput,
-  onChangeEvaluation,
-  onChangeWorkflow,
-  refreshProposal,
-  isUnpublishedProposal,
-  isReviewer,
-  pagePath,
-  pageTitle,
-  proposalTemplateId
+  openSidebar
 }: SidebarProps) {
-  const isNotNewProposal = !!proposal;
   return (
     <>
-      {sidebarView === 'proposal_evaluation' &&
-        (isUnpublishedProposal ? (
-          <EvaluationSettingsSidebar
-            proposal={proposalInput}
-            readOnly={!!readOnlyProposalPermissions}
-            templateId={proposalTemplateId}
-            onChangeEvaluation={onChangeEvaluation}
-            onChangeWorkflow={onChangeWorkflow}
-            isReviewer={!!isReviewer}
-            requireWorkflowChangeConfirmation={isNotNewProposal}
-          />
-        ) : (
-          <EvaluationSidebar
-            pagePath={pagePath}
-            pageTitle={pageTitle}
-            pageId={pageId}
-            proposal={proposal}
-            onChangeEvaluation={onChangeEvaluation}
-            refreshProposal={refreshProposal}
-            templateId={proposalTemplateId}
-          />
-        ))}
       {sidebarView === 'suggestions' && (
         <SuggestionsSidebar
           pageId={pageId!}
