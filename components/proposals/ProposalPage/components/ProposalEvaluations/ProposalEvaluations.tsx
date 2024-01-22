@@ -18,6 +18,7 @@ export type ProposalEvaluationsProps = {
   pagePath?: string;
   pageTitle?: string;
   templateId?: string | null;
+  expanded?: boolean;
 };
 
 // display evaluation steps or their settings, depending if a proposal is published or not
@@ -33,7 +34,8 @@ export function ProposalEvaluations({
   pagePath,
   pageTitle,
   isUnpublishedProposal,
-  templateId
+  templateId,
+  expanded = true
 }: ProposalEvaluationsProps) {
   if (isUnpublishedProposal) {
     const isNotNewProposal = !!proposal;
@@ -46,6 +48,7 @@ export function ProposalEvaluations({
         onChangeWorkflow={onChangeWorkflow}
         isReviewer={!!isReviewer}
         requireWorkflowChangeConfirmation={isNotNewProposal}
+        expanded={expanded}
       />
     );
   } else {
@@ -58,6 +61,7 @@ export function ProposalEvaluations({
         onChangeEvaluation={onChangeEvaluation}
         refreshProposal={refreshProposal}
         templateId={templateId}
+        expanded={expanded}
       />
     );
   }

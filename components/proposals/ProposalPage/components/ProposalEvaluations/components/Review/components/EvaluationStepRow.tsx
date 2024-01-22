@@ -12,6 +12,7 @@ type Props = {
   index: number;
   isCurrent?: boolean;
   expanded?: boolean;
+  expandedContainer?: boolean;
   onChange?: (e: any, expanded: boolean) => void;
   actions?: ReactNode;
   children?: ReactNode;
@@ -39,16 +40,30 @@ const Accordion = styled((props: AccordionProps) => <MuiAccordion disableGutters
   `
 );
 
-export function EvaluationStepRow({ expanded, onChange, isCurrent, result, index, title, children, actions }: Props) {
+export function EvaluationStepRow({
+  expanded,
+  expandedContainer = true,
+  onChange,
+  isCurrent,
+  result,
+  index,
+  title,
+  children,
+  actions
+}: Props) {
   return (
     <Accordion expanded={expanded} onChange={onChange}>
       <AccordionSummary sx={{ px: 1 }}>
         <Box display='flex' alignItems='center' gap={1} width='100%'>
           <StepperIcon result={result} isCurrent={isCurrent} position={index + 1} />
-          <Typography variant='h6' sx={{ flexGrow: 1 }}>
-            {title}
-          </Typography>
-          {actions}
+          {expandedContainer && (
+            <>
+              <Typography variant='h6' sx={{ flexGrow: 1 }}>
+                {title}
+              </Typography>
+              {actions}
+            </>
+          )}
         </Box>
       </AccordionSummary>
       {children && <AccordionDetails sx={{ px: 1 }}>{children}</AccordionDetails>}

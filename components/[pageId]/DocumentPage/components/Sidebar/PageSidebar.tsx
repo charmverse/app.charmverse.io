@@ -11,8 +11,8 @@ import type { ThreadWithComments } from 'lib/threads/interfaces';
 import type { PageSidebarView } from '../../hooks/usePageSidebar';
 
 import { CommentsSidebar } from './components/CommentsSidebar';
-import { PageSidebarViewToggle } from './components/PageSidebarViewToggle';
 import { SuggestionsSidebar } from './components/SuggestionsSidebar';
+import { TogglePageSidebarButton } from './components/TogglePageButton';
 import { SIDEBAR_VIEWS } from './constants';
 
 const DesktopContainer = styled.div`
@@ -87,7 +87,7 @@ function PageSidebarComponent(props: SidebarProps) {
           }}
         >
           <Box display='flex' gap={1} alignItems='center'>
-            <PageSidebarViewToggle onClick={toggleSidebar} />
+            <TogglePageSidebarButton onClick={toggleSidebar} />
             <Typography flexGrow={1} fontWeight={600} fontSize={20}>
               {sidebarTitle}
             </Typography>

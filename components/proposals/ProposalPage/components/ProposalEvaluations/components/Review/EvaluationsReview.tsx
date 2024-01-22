@@ -40,6 +40,7 @@ export type Props = {
   templateId: string | null | undefined;
   pagePath?: string;
   pageTitle?: string;
+  expanded: boolean;
 };
 
 export function EvaluationsReview({
@@ -49,9 +50,10 @@ export function EvaluationsReview({
   proposal,
   onChangeEvaluation,
   refreshProposal,
+  expanded: expandedContainer,
   templateId
 }: Props) {
-  const [activeEvaluationId, setActiveEvaluationId] = useState<string | undefined>(proposal?.currentEvaluationId);
+  const [_expandedEvaluationId, setExpandedEvaluationId] = useState<string | undefined>(proposal?.currentEvaluationId);
   const { mappedFeatures } = useSpaceFeatures();
   const { showMessage } = useSnackbar();
   const [evaluationInput, setEvaluationInput] = useState<ProposalEvaluationValues | null>(null);
@@ -93,21 +95,26 @@ export function EvaluationsReview({
     // expand the current evaluation
     if (proposal?.currentEvaluationId) {
       if (isRewardsActive) {
-        setActiveEvaluationId('rewards');
+        setExpandedEvaluationId('rewards');
       } else {
-        setActiveEvaluationId(proposal.currentEvaluationId);
+        setExpandedEvaluationId(proposal.currentEvaluationId);
       }
     }
-  }, [proposal?.currentEvaluationId, isRewardsActive, setActiveEvaluationId]);
+  }, [proposal?.currentEvaluationId, isRewardsActive, setExpandedEvaluationId]);
+
+  const expandedEvaluationId = expandedContainer && _expandedEvaluationId;
 
   return (
     <div>
-      <Tooltip title='Workflow can be changed in Draft step'>
-        <span>
-          <WorkflowSelect value={proposal?.workflowId} readOnly />
-        </span>
-      </Tooltip>
+      {expandedContainer && (
+        <Tooltip title='Workflow can be changed in Draft step'>
+          <span>
+            <WorkflowSelect value={proposal?.workflowId} readOnly />
+          </span>
+        </Tooltip>
+      )}
       <EvaluationStepRow
+        expandedContainer={expandedContainer}
         isCurrent={!proposal?.currentEvaluationId}
         index={0}
         result={proposal?.currentEvaluationId ? 'pass' : null}
@@ -128,9 +135,10 @@ export function EvaluationsReview({
         return (
           <EvaluationStepRow
             key={evaluation.id}
-            expanded={evaluation.id === activeEvaluationId}
+            expanded={evaluation.id === expandedEvaluationId}
+            expandedContainer={expandedContainer}
             isCurrent={isCurrent}
-            onChange={(e, expand) => setActiveEvaluationId(expand ? evaluation.id : undefined)}
+            onChange={(e, expand) => setExpandedEvaluationId(expand ? evaluation.id : undefined)}
             index={index + 1}
             result={evaluation.result}
             title={evaluation.title}
@@ -192,9 +200,10 @@ export function EvaluationsReview({
       })}
       {hasRewardsStep && (
         <EvaluationStepRow
-          expanded={activeEvaluationId === 'rewards'}
+          expanded={expandedEvaluationId === 'rewards'}
+          expandedContainer={expandedContainer}
           isCurrent={isRewardsActive}
-          onChange={(e, expand) => setActiveEvaluationId(expand ? 'rewards' : undefined)}
+          onChange={(e, expand) => setExpandedEvaluationId(expand ? 'rewards' : undefined)}
           index={proposal ? proposal.evaluations.length + 1 : 0}
           result={isRewardsComplete ? 'pass' : null}
           title={rewardsTitle}
@@ -208,7 +217,7 @@ export function EvaluationsReview({
           />
         </EvaluationStepRow>
       )}
-      {pagePath && pageTitle && proposal && (
+      {pagePath && pageTitle && proposal && expandedContainer && (
         <>
           <Divider />
           <ProposalSocialShare

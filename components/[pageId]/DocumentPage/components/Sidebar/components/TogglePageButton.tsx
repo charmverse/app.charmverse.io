@@ -2,10 +2,11 @@ import { useTheme } from '@emotion/react';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { IconButton } from '@mui/material';
 
-export function PageSidebarViewToggle({ onClick }: { onClick: VoidFunction }) {
+export function TogglePageSidebarButton({ onClick, className }: { onClick: VoidFunction; className?: string }) {
   const theme = useTheme();
   return (
     <IconButton
+      className={className}
       onClick={onClick}
       size='small'
       sx={{

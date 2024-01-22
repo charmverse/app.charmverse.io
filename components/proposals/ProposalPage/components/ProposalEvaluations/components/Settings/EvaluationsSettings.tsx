@@ -19,6 +19,7 @@ export type Props = {
   onChangeWorkflow: (workflow: ProposalWorkflowTyped) => void;
   templateId?: string | null;
   requireWorkflowChangeConfirmation?: boolean;
+  expanded: boolean;
 };
 
 export function EvaluationsSettings({
@@ -28,7 +29,8 @@ export function EvaluationsSettings({
   onChangeWorkflow,
   isReviewer,
   templateId,
-  requireWorkflowChangeConfirmation
+  requireWorkflowChangeConfirmation,
+  expanded
 }: Props) {
   const proposalTemplate = useProposalTemplateById(templateId);
   const pendingRewards = proposal?.fields?.pendingRewards;
