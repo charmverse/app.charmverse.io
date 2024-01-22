@@ -31,9 +31,15 @@ export async function deleteUserOtp(userId: string): Promise<void> {
     throw new DataNotFoundError('User does not have otp configured');
   }
 
-  await prisma.otp.delete({
+  const otp = await prisma.otp.delete({
     where: {
       userId
+    }
+  });
+
+  await prisma.recoveryCode.delete({
+    where: {
+      id: otp.recoveryCodeId
     }
   });
 
