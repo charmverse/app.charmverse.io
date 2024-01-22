@@ -1,11 +1,11 @@
 import { log } from '@charmverse/core/log';
-import { ethers } from 'ethers';
+import { providers, utils } from 'ethers';
 
 import { isTestEnv } from 'config/constants';
 
 const providerKey = process.env.ALCHEMY_API_KEY;
 const providerUrl = `https://eth-mainnet.alchemyapi.io/v2/${providerKey}`;
-const provider = providerKey ? new ethers.providers.JsonRpcProvider(providerUrl) : null;
+const provider = providerKey ? new providers.JsonRpcProvider(providerUrl) : null;
 
 export function getENSName(address: string) {
   if (!provider) {
@@ -47,7 +47,7 @@ export async function getENSDetails(ensName?: string | null) {
     return null;
   }
 
-  if (!ethers.utils.isValidName(ensName)) {
+  if (!utils.isValidName(ensName)) {
     log.warn(`The ens name ${ensName} you provided is not valid`);
     return null;
   }

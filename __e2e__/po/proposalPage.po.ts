@@ -23,8 +23,8 @@ export class ProposalPage extends DocumentPage {
     public editRubricCriteriaDescription = page
       .locator('data-test=edit-rubric-criteria-description >> textarea')
       .first(),
-    public editRubricCriteriaMinScore = page.locator('data-test=edit-rubric-criteria-min-score >> input'),
-    public editRubricCriteriaMaxScore = page.locator('data-test=edit-rubric-criteria-max-score >> input'),
+    public editRubricCriteriaMinScore = page.locator('data-test=edit-rubric-criteria-min-score >> input').first(),
+    public editRubricCriteriaMaxScore = page.locator('data-test=edit-rubric-criteria-max-score >> input').first(),
     public evaluationVoteDurationInput = page
       .locator('data-test=evaluation-vote-settings')
       .locator('data-test=vote-duration')

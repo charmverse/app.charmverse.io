@@ -18,6 +18,7 @@ export type StaticPageType =
   | 'settings/roles-and-permissions'
   | 'settings/import'
   | 'settings/invites'
+  | 'settings/credentials'
   | 'settings/proposals'
   | 'billing/marketing'
   | 'billing/checkout'

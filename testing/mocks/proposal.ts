@@ -12,6 +12,7 @@ export function createMockProposal(
     publishToLens: null,
     archived: false,
     createdBy: '',
+    selectedCredentialTemplates: [],
     id,
     authors: [],
     reviewers: [],
