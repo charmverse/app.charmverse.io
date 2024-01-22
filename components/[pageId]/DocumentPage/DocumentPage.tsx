@@ -141,7 +141,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
 
   const enableComments = !isSharedPage && !enableSuggestingMode && !isPageTemplate && !!pagePermissions?.comment;
   const showPageActionSidebar =
-    !!enableSidebar && sidebarView !== null && (sidebarView !== 'comments' || enableComments);
+    !!enableSidebar && (sidebarView === 'suggestions' || (sidebarView === 'comments' && enableComments));
 
   const isStructuredProposal = Boolean(proposal && proposal.formId);
   const isUnpublishedProposal = proposal?.status === 'draft' || page.type === 'proposal_template';
@@ -287,25 +287,6 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
         />
       )}
       {creatingInlineReward && !readOnly && <NewInlineReward pageId={page.id} />}
-      {(page.type === 'proposal' || page.type === 'proposal_template') && (
-        <ProposalSidebar
-          isOpen={sidebarView === 'proposal_evaluation'}
-          pagePath={page.path}
-          pageTitle={page.title}
-          pageId={page.id}
-          isUnpublishedProposal={isUnpublishedProposal}
-          readOnlyProposalPermissions={!proposal?.permissions.edit}
-          isReviewer={proposal?.permissions.evaluate}
-          closeSidebar={closeSidebar}
-          openSidebar={() => setActiveView('proposal_evaluation')}
-          proposal={proposal}
-          proposalInput={proposal}
-          templateId={proposal?.page?.sourceTemplateId}
-          onChangeEvaluation={onChangeEvaluation}
-          refreshProposal={refreshProposal}
-          onChangeWorkflow={onChangeWorkflow}
-        />
-      )}
       {(enableComments || enableSuggestingMode) && (
         <PageSidebar
           id='page-action-sidebar'
@@ -527,12 +508,31 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
           )}
         </PageEditorContainer>
       </Box>
-      {proposal?.status === 'draft' && page?.type !== 'proposal_template' && (
+      {page.type === 'proposal' && proposal?.status === 'draft' && (
         <ProposalStickyFooter
           page={page}
           proposal={proposal}
           isStructuredProposal={isStructuredProposal}
           refreshProposal={refreshProposal}
+        />
+      )}
+      {(page.type === 'proposal' || page.type === 'proposal_template') && (
+        <ProposalSidebar
+          isOpen={sidebarView === 'proposal_evaluation'}
+          pagePath={page.path}
+          pageTitle={page.title}
+          pageId={page.id}
+          isUnpublishedProposal={isUnpublishedProposal}
+          readOnlyProposalPermissions={!proposal?.permissions.edit}
+          isReviewer={proposal?.permissions.evaluate}
+          closeSidebar={closeSidebar}
+          openSidebar={() => setActiveView('proposal_evaluation')}
+          proposal={proposal}
+          proposalInput={proposal}
+          templateId={proposal?.page?.sourceTemplateId}
+          onChangeEvaluation={onChangeEvaluation}
+          refreshProposal={refreshProposal}
+          onChangeWorkflow={onChangeWorkflow}
         />
       )}
     </PrimaryColumn>

@@ -6,6 +6,7 @@ export const PrimaryColumn = styled.div<{
   ({ showPageActionSidebar, theme }) => `
   display: flex;
   height: 100%;
+  position: relative;
   flex-direction: column;
   transition: width ease-in 0.25s;
   ${theme.breakpoints.up('md')} {

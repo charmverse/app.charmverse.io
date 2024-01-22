@@ -1,26 +1,28 @@
 import styled from '@emotion/styled';
-import { Box, Slide, Typography } from '@mui/material';
+import { Box, Drawer, Collapse, Typography } from '@mui/material';
 import { memo } from 'react';
 
 import type { ProposalEvaluationsProps } from 'components/proposals/ProposalPage/components/ProposalEvaluations/ProposalEvaluations';
 import { ProposalEvaluations } from 'components/proposals/ProposalPage/components/ProposalEvaluations/ProposalEvaluations';
 import { useMdScreen } from 'hooks/useMediaScreens';
 
+import { PageSidebarViewToggle } from './components/PageSidebarViewToggle';
 import { SIDEBAR_VIEWS } from './constants';
 
-const DesktopContainer = styled.div`
+const SidebarContainer = styled('div', {
+  shouldForwardProp: (prop) => prop !== 'open'
+})<{ open: boolean }>(
+  ({ open, theme }) => `
+  background: ${theme.palette.background.default};
+  border-left: 1px solid var(--input-border);
+  overflow: auto;
+  padding: ${theme.spacing(0, 1)};
   position: fixed;
   right: 0px;
-  width: 430px;
-  max-width: 100%;
-  top: 56px; // height of MUI Toolbar
+  width: ${open ? '430px' : '36px'};
   z-index: var(--z-index-drawer);
-  height: calc(100% - 56px);
-  overflow: auto;
-  padding: ${({ theme }) => theme.spacing(0, 1)};
-  background: ${({ theme }) => theme.palette.background.default};
-  border-left: 1px solid var(--input-border);
-`;
+`
+);
 
 type SidebarProps = ProposalEvaluationsProps & {
   isOpen: boolean;
@@ -39,10 +41,11 @@ function SidebarComponent(props: SidebarProps) {
     return null;
   }
   return (
-    <Slide
+    <Collapse
       appear={false}
-      direction='left'
-      in={props.isOpen}
+      collapsedSize={40}
+      orientation='horizontal'
+      in={isOpen}
       style={{
         transformOrigin: 'left top'
       }}
@@ -52,7 +55,7 @@ function SidebarComponent(props: SidebarProps) {
       }}
       timeout={250}
     >
-      <DesktopContainer id='proposal-action-sidebar'>
+      <SidebarContainer id='proposal-action-sidebar' open={isOpen}>
         <Box
           sx={{
             height: 'calc(100%)',
@@ -62,14 +65,15 @@ function SidebarComponent(props: SidebarProps) {
           }}
         >
           <Box display='flex' gap={1} alignItems='center'>
+            <PageSidebarViewToggle onClick={toggleSidebar} />
             <Typography flexGrow={1} fontWeight={600} fontSize={20}>
               {SIDEBAR_VIEWS.proposal_evaluation.title}
             </Typography>
           </Box>
           <ProposalEvaluations {...props} />
         </Box>
-      </DesktopContainer>
-    </Slide>
+      </SidebarContainer>
+    </Collapse>
   );
 }
 
