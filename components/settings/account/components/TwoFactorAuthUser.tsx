@@ -10,6 +10,7 @@ import Legend from 'components/settings/Legend';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useUser } from 'hooks/useUser';
 
+import { DeleteOtpModal } from './otp/components/DeleteOtpModal';
 import { GetQrCodeModal } from './otp/components/GetQrCodeModal';
 import { ResetRecoveryCodeModal } from './otp/components/ResetRecoveryCodeModal';
 
@@ -18,6 +19,8 @@ export function TwoFactorAuthUser() {
   const getQrCodeModal = usePopupState({ variant: 'popover', popupId: 'qr-code' });
   const resetRecoveryCodeModal = usePopupState({ variant: 'popover', popupId: 'reset-recovery-code' });
   const confirmResetRecoveryCodeModal = usePopupState({ variant: 'popover', popupId: 'confirm-reset-recovery-code' });
+  const confirmDisableOtpModal = usePopupState({ variant: 'popover', popupId: 'confirm-disable-otp' });
+  const deleteOtpModal = usePopupState({ variant: 'popover', popupId: 'delete-otp' });
   const { user } = useUser();
   const activeOtp = !!user?.otp?.activatedAt;
 
@@ -54,6 +57,14 @@ export function TwoFactorAuthUser() {
           >
             Reset recovery code
           </Button>
+          <Button
+            variant='text'
+            sx={{ px: 0, display: 'block', '&:hover': { background: 'transparent' }, textAlign: 'left' }}
+            data-test='account-disable-otp-btn'
+            {...bindTrigger(confirmDisableOtpModal)}
+          >
+            Turn off
+          </Button>
         </>
       ) : (
         <Button sx={{ mt: 1, display: 'block' }} {...bindTrigger(otpSetupModal)} data-test='account-config-twofa-btn'>
@@ -63,6 +74,7 @@ export function TwoFactorAuthUser() {
       <TwoFactorAuthSetupModal {...bindPopover(otpSetupModal)} />
       <GetQrCodeModal {...bindPopover(getQrCodeModal)} />
       <ResetRecoveryCodeModal {...bindPopover(resetRecoveryCodeModal)} />
+      <DeleteOtpModal {...bindPopover(deleteOtpModal)} />
       <ConfirmDeleteModal
         title='Reset backup code'
         buttonText='Reset'
@@ -70,6 +82,14 @@ export function TwoFactorAuthUser() {
         onConfirm={resetRecoveryCodeModal.open}
         onClose={confirmResetRecoveryCodeModal.close}
         {...bindPopper(confirmResetRecoveryCodeModal)}
+      />
+      <ConfirmDeleteModal
+        title='Turn off two factor authentication'
+        buttonText='Confirm'
+        question='This action will remove your current configuration. Continue?'
+        onConfirm={deleteOtpModal.open}
+        onClose={confirmDisableOtpModal.close}
+        {...bindPopper(confirmDisableOtpModal)}
       />
     </Box>
   );

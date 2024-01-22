@@ -32,6 +32,8 @@ export type UserLoginEvent = BaseEventWithoutGroup & {
   identityType: IdentityType;
 };
 
+export type UserOtp = BaseEventWithoutGroup;
+
 export type TokenGateVerificationEvent = BaseEvent & {
   roles?: string[];
   result: 'pass' | 'fail';
@@ -56,4 +58,6 @@ export interface UserEventMap {
   join_a_workspace: SpaceJoined;
   token_gate_verification: TokenGateVerificationEvent;
   app_loaded: AppLoaded;
+  delete_otp: UserOtp;
+  add_otp: UserOtp;
 }

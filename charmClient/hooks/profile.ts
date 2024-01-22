@@ -1,7 +1,7 @@
 import type { LoggedInUser } from 'models';
 import type { EmailPreferences } from 'pages/api/profile/onboarding-email';
 
-import { useGETtrigger, usePOST, usePUT } from './helpers';
+import { useDELETE, useGETtrigger, usePOST, usePUT } from './helpers';
 
 export function useSaveOnboardingEmail() {
   return usePUT<EmailPreferences, LoggedInUser>('/api/profile/onboarding-email');
@@ -13,6 +13,10 @@ export function useCreateOtp() {
 
 export function useGetOtp() {
   return useGETtrigger<{ authCode: string }, { code: string; uri: string }>(`/api/profile/otp`);
+}
+
+export function useDeleteOtp() {
+  return useDELETE<{ authCode: string }>(`/api/profile/otp`);
 }
 
 export function useActivateOtp() {
