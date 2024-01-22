@@ -25,9 +25,9 @@ export function useMagicLink({ error: ssrError }: { error?: 'error_invalid_page_
         if ((error as any)?.code === 'auth/invalid_email') {
           setStatus('error_invalid_email');
         } else {
-          log.error('Error requesting firebase magic link', { error });
           setStatus('error');
         }
+        log.error('Error requesting firebase magic link', { error });
       }
     }
   }

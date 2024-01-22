@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { IdentityType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import EmailIcon from '@mui/icons-material/Email';
@@ -142,6 +143,7 @@ function LoginHandler(props: DialogProps) {
         onClose();
         setLoginMethod(null);
       } catch (err) {
+        log.error(`Error sending magic link in login button.`, { error: err });
         handleLoginError(err);
       } finally {
         sendingMagicLink.current = false;
