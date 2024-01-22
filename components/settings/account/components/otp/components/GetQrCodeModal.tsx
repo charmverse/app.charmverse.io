@@ -1,3 +1,4 @@
+import type { Ref } from 'react';
 import { forwardRef } from 'react';
 
 import { useGetOtp } from 'charmClient/hooks/profile';
@@ -7,7 +8,7 @@ import Modal from 'components/common/Modal';
 import { CodeDetails } from './CodeDetails';
 import { ConfirmAuthCode } from './ConfirmAuthCode';
 
-export function CustomModal({ onClose, ...props }: Omit<ModalProps, 'children'>) {
+export function CustomModal({ onClose, ...props }: Omit<ModalProps, 'children'>, ref: Ref<HTMLDivElement>) {
   const {
     data: otpData,
     trigger: getOtp,
@@ -26,7 +27,7 @@ export function CustomModal({ onClose, ...props }: Omit<ModalProps, 'children'>)
   };
 
   return (
-    <Modal title='Two factor authentication' size='medium' onClose={handleClose} {...props}>
+    <Modal title='Two factor authentication' size='medium' onClose={handleClose} ref={ref} {...props}>
       {otpData ? (
         <CodeDetails onSubmit={handleClose} uri={otpData.uri} code={otpData.code} btnText='Close' />
       ) : (
