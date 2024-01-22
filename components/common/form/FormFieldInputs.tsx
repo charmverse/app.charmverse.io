@@ -1,6 +1,6 @@
 import type { FormField, FormFieldAnswer } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
-import { Chip, Stack } from '@mui/material';
+import { Box, Chip, Stack } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
@@ -102,6 +102,7 @@ const StyledStack = styled(Stack)`
   flex-direction: row;
   align-items: center;
   gap: ${(props) => props.theme.spacing(1)};
+  position: relative;
 `;
 
 function FormFieldInputsBase({
@@ -219,13 +220,21 @@ function FormFieldInputsBase({
                 )}
               />
               {pageId && formField.type !== 'label' && formField.formFieldAnswer && user && (
-                <FormFieldAnswerComment
-                  formFieldAnswer={formField.formFieldAnswer}
-                  pageId={pageId}
-                  disabled={disabled}
-                  fieldAnswerThreads={fieldAnswerThreads}
-                  canCreateComments={isAdmin || isReviewer}
-                />
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    left: '100%',
+                    ml: 1
+                  }}
+                >
+                  <FormFieldAnswerComment
+                    formFieldAnswer={formField.formFieldAnswer}
+                    pageId={pageId}
+                    disabled={disabled}
+                    fieldAnswerThreads={fieldAnswerThreads}
+                    canCreateComments={isAdmin || isReviewer}
+                  />
+                </Box>
               )}
             </StyledStack>
           );

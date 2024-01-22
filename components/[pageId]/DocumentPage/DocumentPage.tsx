@@ -317,7 +317,6 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
   );
 
   const proposalAuthors = proposal ? [proposal.createdBy, ...proposal.authors.map((author) => author.userId)] : [];
-
   return (
     <PrimaryColumn id='file-drop-container' ref={containerRef} showPageActionSidebar={showPageActionSidebar}>
       <Box
@@ -462,7 +461,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
                     ) : (
                       <ProposalFormFieldInputs
                         pageId={page.id}
-                        isReviewer={proposal?.permissions.evaluate ?? false}
+                        isReviewer={(proposal?.permissions.evaluate || proposal?.permissions.review) ?? false}
                         proposalId={proposal.id}
                         formFields={proposal?.form.formFields ?? []}
                         readOnly={!user || !pagePermissions.edit_content || !!proposal?.archived}

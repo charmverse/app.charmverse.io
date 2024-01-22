@@ -31,8 +31,9 @@ export interface ThreadCreatePayload {
   fieldAnswerId?: string;
 }
 
-export interface ThreadWithComments extends Thread {
+export interface ThreadWithComments extends Omit<Thread, 'accessGroups'> {
   comments: Comment[];
+  accessGroups: ThreadAccessGroup[];
 }
 
 export interface MultipleThreadsInput {

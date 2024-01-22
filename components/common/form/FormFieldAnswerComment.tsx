@@ -1,7 +1,7 @@
 import type { FormFieldAnswer } from '@charmverse/core/prisma-client';
 import { MessageOutlined } from '@mui/icons-material';
 import AddCommentOutlinedIcon from '@mui/icons-material/AddCommentOutlined';
-import { Box, IconButton, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, Stack, Tooltip, Typography } from '@mui/material';
 import { useState } from 'react';
 
 import { useCreateThread } from 'charmClient/hooks/comments';
@@ -19,12 +19,10 @@ import type { FormFieldValue } from './interfaces';
 
 function FormFieldAnswerThreads({
   disabled,
-  fieldAnswerThreads = [],
-  canCreateComments
+  fieldAnswerThreads = []
 }: {
   disabled?: boolean;
   fieldAnswerThreads?: ThreadWithComments[];
-  canCreateComments?: boolean;
 }) {
   const unResolvedThreads =
     fieldAnswerThreads
@@ -45,7 +43,7 @@ function FormFieldAnswerThreads({
           {unResolvedThreads.map((resolvedThread) => (
             <ThreadContainer key={resolvedThread.id} elevation={4}>
               <PageThread
-                canCreateComments={canCreateComments}
+                canCreateComments
                 inline
                 key={resolvedThread.id}
                 threadId={resolvedThread?.id}
@@ -65,8 +63,15 @@ function FormFieldAnswerThreads({
       <Tooltip title={!disabled ? 'View form field answer threads' : ''}>
         <Box display='flex' gap={0.5} alignItems='center' sx={{ cursor: 'pointer' }}>
           <MessageOutlined color='secondary' fontSize='small' />
-          <Typography component='span' variant='subtitle1'>
-            {fieldAnswerThreads.reduce((acc, thread) => acc + thread.comments.length, 0)}
+          <Typography
+            component='span'
+            variant='subtitle1'
+            sx={{
+              position: 'relative',
+              top: -2
+            }}
+          >
+            {unResolvedThreads.reduce((acc, thread) => acc + thread.comments.length, 0)}
           </Typography>
         </Box>
       </Tooltip>
@@ -124,9 +129,19 @@ export function FormFieldAnswerInput({
       <Tooltip
         title={!disabled ? 'Add a comment to the form field answer' : "You don't have permission to add a comment"}
       >
-        <IconButton disabled={disabled} color='secondary' onClick={() => setIsOpen(true)}>
-          <AddCommentOutlinedIcon fontSize='small' />
-        </IconButton>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center'
+          }}
+        >
+          <AddCommentOutlinedIcon
+            sx={{ cursor: 'pointer' }}
+            color='secondary'
+            onClick={() => setIsOpen(true)}
+            fontSize='small'
+          />
+        </Box>
       </Tooltip>
     </PopperPopup>
   );
@@ -147,11 +162,7 @@ export function FormFieldAnswerComment({
 }) {
   return (
     <Stack flexDirection='row' gap={1} className='icons' position='relative' top={10} alignItems='center'>
-      <FormFieldAnswerThreads
-        disabled={disabled}
-        fieldAnswerThreads={fieldAnswerThreads}
-        canCreateComments={canCreateComments}
-      />
+      <FormFieldAnswerThreads fieldAnswerThreads={fieldAnswerThreads} />
       <FormFieldAnswerInput
         disabled={disabled}
         pageId={pageId}
