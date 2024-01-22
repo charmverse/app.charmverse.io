@@ -76,7 +76,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
         setIdentityToAdd(null);
       } catch (err) {
         showMessage((err as any).message ?? 'Something went wrong', 'error');
-        log.error(`Error sending magic link in identity modal for user ${user?.id}.`, { error: err });
+        log.error('Error sending magic link in identity modal.', { error: err });
       } finally {
         sendingMagicLink.current = false;
       }

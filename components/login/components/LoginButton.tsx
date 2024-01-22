@@ -143,7 +143,6 @@ function LoginHandler(props: DialogProps) {
         onClose();
         setLoginMethod(null);
       } catch (err) {
-        log.error(`Error sending magic link in login button.`, { error: err });
         handleLoginError(err);
       } finally {
         sendingMagicLink.current = false;
@@ -168,6 +167,7 @@ function LoginHandler(props: DialogProps) {
     if ((err as SystemError)?.errorType === 'Disabled account') {
       setShowLoginError(true);
     }
+    log.error(`Error on login.`, { error: err });
   }
 
   function toggleEmailDialog(position: 'open' | 'close') {
