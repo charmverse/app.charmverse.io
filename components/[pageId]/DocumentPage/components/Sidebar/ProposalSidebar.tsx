@@ -43,24 +43,10 @@ function SidebarComponent(props: SidebarProps) {
     return null;
   }
   return (
-    // <StyledCollapse
-    //   appear={false}
-    //   collapsedSize={40}
-    //   orientation='horizontal'
-    //   in={isOpen}
-    //   // sx={{
-
-    //   // }}
-    //   easing={{
-    //     enter: 'ease-in',
-    //     exit: 'ease-out'
-    //   }}
-    //   timeout={250}
-    // >
     <SidebarContainer id='proposal-action-sidebar' open={isOpen}>
       <Box overflow='hidden' width={sidebarWidth}>
         <Box display='flex' height='100%' flexDirection='column' gap={1} px={1}>
-          <Box display='flex' gap={1} alignItems='center'>
+          <Box display='flex' gap={0.5} alignItems='center'>
             <ToggleProposalSidebarButton isOpen={isOpen} onClick={toggleSidebar} />
             {isOpen && (
               <Typography flexGrow={1} fontWeight={600} fontSize={20}>
@@ -72,7 +58,6 @@ function SidebarComponent(props: SidebarProps) {
         </Box>
       </Box>
     </SidebarContainer>
-    // </StyledCollapse>
   );
 }
 

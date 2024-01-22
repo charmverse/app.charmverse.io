@@ -1,19 +1,7 @@
 import { useTheme } from '@emotion/react';
-import styled from '@emotion/styled';
 import { ChevronRight } from '@mui/icons-material';
-import { Box, Collapse, SvgIcon, IconButton } from '@mui/material';
+import { SvgIcon, IconButton } from '@mui/material';
 import { RiChatCheckLine } from 'react-icons/ri';
-
-const StyledToggleButton = styled(IconButton, {
-  shouldForwardProp: (prop) => prop !== 'open'
-})<{ open: boolean }>(
-  ({ open }) => `
-  // .MuiSvgIcon-root {
-  //   transform: ${open ? 'rotate(0deg)' : 'rotate(180deg)'};
-  //   transition: transform 150ms ease-in-out;
-  // }
-`
-);
 
 export function ToggleProposalSidebarButton({ onClick, isOpen }: { onClick: VoidFunction; isOpen: boolean }) {
   const theme = useTheme();
@@ -22,6 +10,8 @@ export function ToggleProposalSidebarButton({ onClick, isOpen }: { onClick: Void
       onClick={onClick}
       size='small'
       sx={{
+        // add extra margin so it aligns with evaluation icons below
+        ml: '3px',
         '&.MuiIconButton-root': {
           borderRadius: '4px',
           transition: theme.transitions.create('opacity', {

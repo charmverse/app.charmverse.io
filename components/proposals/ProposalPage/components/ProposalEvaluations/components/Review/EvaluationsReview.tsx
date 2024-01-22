@@ -1,4 +1,4 @@
-import { Divider, Tooltip } from '@mui/material';
+import { Collapse, Divider, Tooltip } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -106,13 +106,13 @@ export function EvaluationsReview({
 
   return (
     <div>
-      {expandedContainer && (
+      <Collapse in={expandedContainer}>
         <Tooltip title='Workflow can be changed in Draft step'>
           <span>
             <WorkflowSelect value={proposal?.workflowId} readOnly />
           </span>
         </Tooltip>
-      )}
+      </Collapse>
       <EvaluationStepRow
         expandedContainer={expandedContainer}
         isCurrent={!proposal?.currentEvaluationId}
