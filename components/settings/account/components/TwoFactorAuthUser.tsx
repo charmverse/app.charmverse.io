@@ -59,7 +59,7 @@ export function TwoFactorAuthUser() {
           </Button>
           <Button
             variant='text'
-            sx={{ px: 0, display: 'block', '&:hover': { background: 'transparent' } }}
+            sx={{ px: 0, display: 'block', '&:hover': { background: 'transparent' }, textAlign: 'left' }}
             data-test='account-disable-otp-btn'
             {...bindTrigger(confirmDisableOtpModal)}
           >
@@ -84,7 +84,7 @@ export function TwoFactorAuthUser() {
         {...bindPopper(confirmResetRecoveryCodeModal)}
       />
       <ConfirmDeleteModal
-        title='Turn off two factor authentication code'
+        title='Turn off two factor authentication'
         buttonText='Confirm'
         question='This action will remove your current configuration. Continue?'
         onConfirm={deleteOtpModal.open}
