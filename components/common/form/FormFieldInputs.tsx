@@ -208,7 +208,10 @@ function FormFieldInputsBase({
                           sx={{
                             position: 'absolute',
                             left: '100%',
-                            ml: 1
+                            ml: {
+                              md: 1,
+                              xs: 0.5
+                            }
                           }}
                         >
                           <FormFieldAnswerComment

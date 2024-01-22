@@ -61,14 +61,34 @@ function FormFieldAnswerThreads({
       }}
     >
       <Tooltip title={!disabled ? 'View form field answer threads' : ''}>
-        <Box display='flex' gap={0.5} alignItems='center' sx={{ cursor: 'pointer' }}>
-          <MessageOutlined color='secondary' fontSize='small' />
+        <Box
+          display='flex'
+          gap={{
+            md: 0.5,
+            xs: 0.25
+          }}
+          alignItems='center'
+          sx={{ cursor: 'pointer' }}
+        >
+          <MessageOutlined
+            color='secondary'
+            sx={{
+              fontSize: {
+                md: '1.5rem',
+                xs: '1rem'
+              }
+            }}
+          />
           <Typography
             component='span'
             variant='subtitle1'
             sx={{
               position: 'relative',
-              top: -2
+              top: -2,
+              fontSize: {
+                md: '1rem',
+                xs: '0.75rem'
+              }
             }}
           >
             {unResolvedThreads.reduce((acc, thread) => acc + thread.comments.length, 0)}
@@ -136,10 +156,15 @@ export function FormFieldAnswerInput({
           }}
         >
           <AddCommentOutlinedIcon
-            sx={{ cursor: 'pointer' }}
+            sx={{
+              cursor: 'pointer',
+              fontSize: {
+                md: '1.5rem',
+                xs: '1rem'
+              }
+            }}
             color='secondary'
             onClick={() => setIsOpen(true)}
-            fontSize='small'
           />
         </Box>
       </Tooltip>
@@ -161,7 +186,22 @@ export function FormFieldAnswerComment({
   canCreateComments?: boolean;
 }) {
   return (
-    <Stack flexDirection='row' gap={1} className='icons' position='relative' alignItems='center'>
+    <Stack
+      flexDirection={{
+        md: 'row',
+        xs: 'column-reverse'
+      }}
+      gap={{
+        md: 1,
+        xs: 0.5
+      }}
+      className='icons'
+      position='relative'
+      alignItems={{
+        md: 'center',
+        xs: 'flex-start'
+      }}
+    >
       <FormFieldAnswerThreads fieldAnswerThreads={fieldAnswerThreads} />
       <FormFieldAnswerInput
         disabled={disabled}
