@@ -34,5 +34,5 @@ export async function toggleThreadStatus({ id, status }: ThreadStatusUpdate): Pr
     }
   });
 
-  return updatedThread;
+  return updatedThread as unknown as ThreadWithComments;
 }

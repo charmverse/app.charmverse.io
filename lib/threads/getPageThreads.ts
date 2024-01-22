@@ -74,5 +74,5 @@ export async function getPageThreads({
     }
   });
 
-  return accessibleThreads;
+  return accessibleThreads as unknown as ThreadWithComments[];
 }

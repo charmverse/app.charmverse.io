@@ -75,7 +75,7 @@ async function resolveThread(req: NextApiRequest, res: NextApiResponse<ThreadWit
   }
   // Empty update for now as we are only updating the resolved status
   else {
-    return res.status(200).json(thread);
+    return res.status(200).json(thread as unknown as ThreadWithComments);
   }
 }
 

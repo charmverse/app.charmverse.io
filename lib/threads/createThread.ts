@@ -81,5 +81,5 @@ export async function createThread({
     }
   });
 
-  return thread;
+  return thread as unknown as ThreadWithComments;
 }
