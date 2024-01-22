@@ -1,3 +1,4 @@
+import type { Ref } from 'react';
 import { forwardRef } from 'react';
 
 import { useDeleteOtp } from 'charmClient/hooks/profile';
@@ -7,7 +8,7 @@ import { useUser } from 'hooks/useUser';
 
 import { ConfirmAuthCode } from './ConfirmAuthCode';
 
-export function CustomModal({ onClose, ...props }: Omit<ModalProps, 'children'>) {
+export function CustomModal({ onClose, ...props }: Omit<ModalProps, 'children'>, ref: Ref<HTMLDivElement>) {
   const { trigger: deleteOtp, error: deleteOtpError, isMutating: isLoadingDeleteOtp } = useDeleteOtp();
   const { refreshUser } = useUser();
 
@@ -18,7 +19,7 @@ export function CustomModal({ onClose, ...props }: Omit<ModalProps, 'children'>)
   };
 
   return (
-    <Modal title='Two factor authentication' size='medium' onClose={onClose} {...props}>
+    <Modal title='Two factor authentication' size='medium' onClose={onClose} ref={ref} {...props}>
       <ConfirmAuthCode errorMessage={deleteOtpError?.message} loading={isLoadingDeleteOtp} onSubmit={onSubmit} />
     </Modal>
   );

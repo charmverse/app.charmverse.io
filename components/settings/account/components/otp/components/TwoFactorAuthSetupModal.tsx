@@ -1,4 +1,5 @@
 import type { EmotionJSX } from '@emotion/react/types/jsx-namespace';
+import type { Ref } from 'react';
 import { forwardRef } from 'react';
 
 import type { ModalProps } from 'components/common/Modal';
@@ -19,7 +20,7 @@ const modalScreens: Record<Screens, (props: { onClose?: () => void }) => Emotion
   finish: FinishScreen
 };
 
-function CustomModal({ onClose, ...props }: Omit<ModalProps, 'children'>) {
+function CustomModal({ onClose, ...props }: Omit<ModalProps, 'children'>, ref: Ref<HTMLDivElement>) {
   const { flow, setFlow } = useTwoFactorAuth();
   const FlowElement = modalScreens[flow];
 
@@ -31,7 +32,7 @@ function CustomModal({ onClose, ...props }: Omit<ModalProps, 'children'>) {
     : undefined;
 
   return (
-    <Modal title='Two factor authentication' size='medium' onClose={handleClose} {...props}>
+    <Modal title='Two factor authentication' size='medium' onClose={handleClose} ref={ref} {...props}>
       <FlowElement onClose={handleClose} />
     </Modal>
   );
@@ -39,10 +40,10 @@ function CustomModal({ onClose, ...props }: Omit<ModalProps, 'children'>) {
 
 const TwoFactorAuthSetupModalComponent = forwardRef(CustomModal);
 
-function CustomModalContainer(props: Omit<ModalProps, 'children'>) {
+function CustomModalContainer(props: Omit<ModalProps, 'children'>, ref: Ref<HTMLDivElement>) {
   return (
     <TwoFactorAuthProvider>
-      <TwoFactorAuthSetupModalComponent {...props} />
+      <TwoFactorAuthSetupModalComponent {...props} ref={ref} />
     </TwoFactorAuthProvider>
   );
 }
