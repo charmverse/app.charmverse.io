@@ -20,7 +20,7 @@ import type { FrontendParticipant } from 'components/common/CharmEditor/componen
 import type { ConnectionEvent } from 'components/common/CharmEditor/components/fiduswriter/ws';
 import { focusEventName } from 'components/common/CharmEditor/constants';
 import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
-import { EvaluationSidebar } from 'components/proposals/ProposalPage/components/EvaluationSidebar/EvaluationSidebar';
+import { ProposalEvaluations } from 'components/proposals/ProposalPage/components/ProposalEvaluations/ProposalEvaluations';
 import { ProposalFormFieldInputs } from 'components/proposals/ProposalPage/components/ProposalFormFieldInputs';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
@@ -48,6 +48,7 @@ import { ProposalArchivedBanner } from './components/ProposalArchivedBanner';
 import { ProposalBanner } from './components/ProposalBanner';
 import { ProposalProperties } from './components/ProposalProperties';
 import { PageSidebar } from './components/Sidebar/PageSidebar';
+import { ProposalSidebar } from './components/Sidebar/ProposalSidebar';
 import { SyncedPageBanner } from './components/SyncedPageBanner';
 import { usePageSidebar } from './hooks/usePageSidebar';
 import { useProposal } from './hooks/useProposal';
@@ -142,7 +143,8 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
   const showPageActionSidebar =
     !!enableSidebar && sidebarView !== null && (sidebarView !== 'comments' || enableComments);
 
-  const isStructuredProposal = proposal && proposal.formId;
+  const isStructuredProposal = Boolean(proposal && proposal.formId);
+  const isUnpublishedProposal = proposal?.status === 'draft' || page.type === 'proposal_template';
 
   // create a key that updates when edit mode changes - default to 'editing' so we dont close sockets immediately
   const editorKey = page.id + (editMode || 'editing') + pagePermissions.edit_content + !!proposal?.archived;
@@ -285,32 +287,37 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
         />
       )}
       {creatingInlineReward && !readOnly && <NewInlineReward pageId={page.id} />}
-      {/** Structured proposal isn't inside a CharmEditor context, thus useViewContext used in PageSidebar would throw error for undefined view */}
-      {(enableComments || enableSuggestingMode || page.type === 'proposal' || page.type === 'proposal_template') && (
-        <PageSidebar
+      {(page.type === 'proposal' || page.type === 'proposal_template') && (
+        <ProposalSidebar
+          isOpen={sidebarView === 'proposal_evaluation'}
           pagePath={page.path}
           pageTitle={page.title}
+          pageId={page.id}
+          isUnpublishedProposal={isUnpublishedProposal}
+          readOnlyProposalPermissions={!proposal?.permissions.edit}
+          isReviewer={proposal?.permissions.evaluate}
+          closeSidebar={closeSidebar}
+          openSidebar={() => setActiveView('proposal_evaluation')}
+          proposal={proposal}
+          proposalInput={proposal}
+          templateId={proposal?.page?.sourceTemplateId}
+          onChangeEvaluation={onChangeEvaluation}
+          refreshProposal={refreshProposal}
+          onChangeWorkflow={onChangeWorkflow}
+        />
+      )}
+      {(enableComments || enableSuggestingMode) && (
+        <PageSidebar
           id='page-action-sidebar'
           pageId={page.id}
           spaceId={page.spaceId}
-          proposalId={proposalId}
-          isUnpublishedProposal={proposal?.status === 'draft' || page.type === 'proposal_template'}
-          readOnlyProposalPermissions={!proposal?.permissions.edit}
-          isReviewer={proposal?.permissions.evaluate}
           pagePermissions={pagePermissions}
           editorState={editorState}
           sidebarView={sidebarView}
-          // dont let users collapse sidebar when looking at a proposal
           closeSidebar={closeSidebar}
           openSidebar={setActiveView}
           threads={threads}
-          proposal={proposal}
-          proposalInput={proposal}
-          proposalTemplateId={proposal?.page?.sourceTemplateId}
-          onChangeEvaluation={onChangeEvaluation}
-          refreshProposal={refreshProposal}
           disabledViews={isStructuredProposal ? ['suggestions', 'comments'] : []}
-          onChangeWorkflow={onChangeWorkflow}
         />
       )}
     </CardPropertiesWrapper>
@@ -435,14 +442,19 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
             </Tabs>
           )}
           {currentTab === 1 && (
-            <EvaluationSidebar
+            <ProposalEvaluations
               pagePath={page.path}
               pageTitle={page.title}
               pageId={page.id}
+              isUnpublishedProposal={isUnpublishedProposal}
+              readOnlyProposalPermissions={!proposal?.permissions.edit}
+              isReviewer={proposal?.permissions.evaluate}
               proposal={proposal}
+              proposalInput={proposal}
+              templateId={proposal?.page?.sourceTemplateId}
               onChangeEvaluation={onChangeEvaluation}
               refreshProposal={refreshProposal}
-              templateId={page.sourceTemplateId}
+              onChangeWorkflow={onChangeWorkflow}
             />
           )}
 
@@ -516,7 +528,12 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
         </PageEditorContainer>
       </Box>
       {proposal?.status === 'draft' && page?.type !== 'proposal_template' && (
-        <ProposalStickyFooter page={page} proposal={proposal} refreshProposal={refreshProposal} />
+        <ProposalStickyFooter
+          page={page}
+          proposal={proposal}
+          isStructuredProposal={isStructuredProposal}
+          refreshProposal={refreshProposal}
+        />
       )}
     </PrimaryColumn>
   );

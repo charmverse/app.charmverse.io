@@ -6,7 +6,7 @@ import {
   useUpsertRubricCriteria,
   useUpdateWorkflow
 } from 'charmClient/hooks/proposals';
-import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationStepSettings';
+import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/ProposalEvaluations/components/Settings/components/EvaluationStepSettings';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 

@@ -36,9 +36,9 @@ export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'id' | 'index' | 
 
 export type CreateProposalInput = {
   pageId?: string;
-  pageProps?: PageProps;
+  pageProps: PageProps;
   proposalTemplateId?: string | null;
-  authors?: string[];
+  authors: string[];
   userId: string;
   spaceId: string;
   evaluations: ProposalEvaluationInput[];

@@ -5,8 +5,8 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 
-import type { ProposalEvaluationValues } from '../EvaluationSettingsSidebar/components/EvaluationStepSettings';
-import { WorkflowSelect } from '../WorkflowSelect';
+import { WorkflowSelect } from '../../../WorkflowSelect';
+import type { ProposalEvaluationValues } from '../Settings/components/EvaluationStepSettings';
 
 import { EvaluationStepActions } from './components/EvaluationStepActions';
 import { EvaluationStepRow } from './components/EvaluationStepRow';
@@ -42,7 +42,7 @@ export type Props = {
   pageTitle?: string;
 };
 
-export function EvaluationSidebar({
+export function EvaluationsReview({
   pagePath,
   pageTitle,
   pageId,

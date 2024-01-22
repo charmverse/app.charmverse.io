@@ -2,13 +2,10 @@ import { log } from '@charmverse/core/log';
 import { useCallback, useEffect, useState } from 'react';
 
 import { useCreateProposal } from 'charmClient/hooks/proposals';
-import { checkFormFieldErrors } from 'components/common/form/checkFormFieldErrors';
-import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationStepSettings';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
-import { isTruthy } from 'lib/utilities/types';
+import { getProposalErrors } from 'lib/proposal/getProposalErrors';
 
 import type { ProposalPageAndPropertiesInput } from '../NewProposalPage';
 
@@ -90,69 +87,6 @@ export function useNewProposal({ newProposal }: Props) {
     isCreatingProposal,
     contentUpdated
   };
-}
-
-export function getProposalErrors({
-  proposal,
-  requireTemplates
-}: {
-  proposal: Pick<
-    ProposalPageAndPropertiesInput,
-    'authors' | 'title' | 'type' | 'proposalTemplateId' | 'formFields' | 'content' | 'proposalType' | 'evaluations'
-  >;
-  requireTemplates?: boolean;
-}) {
-  const errors = [];
-  if (!proposal.title) {
-    errors.push('Title is required');
-  }
-
-  if (requireTemplates && proposal.type === 'proposal' && !proposal.proposalTemplateId) {
-    errors.push('Template is required');
-  }
-  if (proposal.type === 'proposal' && proposal.authors.length === 0) {
-    errors.push('At least one author is required');
-  }
-
-  if (proposal.proposalType === 'structured') {
-    errors.push(checkFormFieldErrors(proposal.formFields ?? []));
-  } else if (
-    proposal.proposalType === 'free_form' &&
-    proposal.type === 'proposal_template' &&
-    checkIsContentEmpty(proposal.content)
-  ) {
-    errors.push('Content is required for free-form proposals');
-  }
-
-  // get the first validation error from the evaluations
-  errors.push(...proposal.evaluations.map(getEvaluationFormError).filter(isTruthy));
-
-  return errors.filter(isTruthy);
-}
-
-export function getEvaluationFormError(evaluation: ProposalEvaluationValues): string | false {
-  switch (evaluation.type) {
-    case 'feedback':
-      return false;
-    case 'rubric':
-      return !evaluation.title
-        ? 'Title is required for rubric criteria'
-        : evaluation.reviewers.length === 0
-        ? `Reviewers are required for the "${evaluation.title}" step`
-        : evaluation.rubricCriteria.length === 0
-        ? `At least one rubric criteria is required for the "${evaluation.title}" step`
-        : false;
-    case 'pass_fail':
-      return evaluation.reviewers.length === 0 ? `Reviewers are required for the "${evaluation.title}" step` : false;
-    case 'vote':
-      return evaluation.reviewers.length === 0
-        ? `Voters are required for the "${evaluation.title}" step`
-        : !evaluation.voteSettings
-        ? `Vote details are required for the "${evaluation.title}" step`
-        : false;
-    default:
-      return false;
-  }
 }
 
 function emptyState({

@@ -4,20 +4,21 @@ import { usePublishProposal } from 'charmClient/hooks/proposals';
 import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/components/StickyFooterContainer';
 import { Button } from 'components/common/Button';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { getProposalErrors } from 'lib/proposal/getProposalErrors';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
-
-import { getProposalErrors } from '../../hooks/useNewProposal';
 
 import { CompleteDraftButton } from './components/CompleteDraftButton';
 
 export function ProposalStickyFooter({
   proposal,
   page,
-  refreshProposal
+  refreshProposal,
+  isStructuredProposal
 }: {
   proposal: ProposalWithUsersAndRubric;
   page: { title: string };
   refreshProposal: VoidFunction;
+  isStructuredProposal: boolean;
 }) {
   const { showMessage } = useSnackbar();
   const { trigger: publishProposal, isMutating } = usePublishProposal({ proposalId: proposal.id });
@@ -33,6 +34,7 @@ export function ProposalStickyFooter({
   const disabledTooltip = getProposalErrors({
     proposal: {
       type: 'proposal',
+      proposalType: isStructuredProposal ? 'structured' : 'free_form',
       title: page.title,
       ...proposal,
       authors: proposal.authors.map((a) => a.userId)

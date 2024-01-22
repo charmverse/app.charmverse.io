@@ -1,13 +1,13 @@
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 
 import { useProposalTemplateById } from 'components/proposals/hooks/useProposalTemplates';
-import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationStepSettings';
+import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/ProposalEvaluations/components/Settings/components/EvaluationStepSettings';
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
-import { EvaluationStepRow } from '../EvaluationSidebar/components/EvaluationStepRow';
-import { WorkflowSelect } from '../WorkflowSelect';
+import { WorkflowSelect } from '../../../WorkflowSelect';
+import { EvaluationStepRow } from '../Review/components/EvaluationStepRow';
 
 import { EvaluationStepSettings } from './components/EvaluationStepSettings';
 
@@ -21,7 +21,7 @@ export type Props = {
   requireWorkflowChangeConfirmation?: boolean;
 };
 
-export function EvaluationSettingsSidebar({
+export function EvaluationsSettings({
   proposal,
   onChangeEvaluation,
   readOnly,

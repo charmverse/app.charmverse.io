@@ -14,6 +14,7 @@ export async function convertPageToProposal({
     userId,
     spaceId: page.spaceId,
     evaluations: [],
+    authors: [userId],
     pageProps: {
       content: page.content,
       contentText: page.contentText,

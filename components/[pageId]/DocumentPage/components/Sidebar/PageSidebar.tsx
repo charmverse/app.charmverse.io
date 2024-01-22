@@ -48,7 +48,7 @@ type SidebarProps = {
 function PageSidebarComponent(props: SidebarProps) {
   const { disabledViews = [], id, sidebarView, openSidebar, closeSidebar } = props;
   const isMdScreen = useMdScreen();
-  const isOpen = sidebarView !== null;
+  const isOpen = sidebarView === 'comments' || sidebarView === 'suggestions';
   const sidebarTitle = sidebarView && SIDEBAR_VIEWS[sidebarView]?.title;
 
   function toggleSidebar() {

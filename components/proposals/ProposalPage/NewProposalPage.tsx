@@ -14,7 +14,7 @@ import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components
 import { PageTemplateBanner } from 'components/[pageId]/DocumentPage/components/PageTemplateBanner';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
 import { PrimaryColumn } from 'components/[pageId]/DocumentPage/components/PrimaryColumn';
-import { PageSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/PageSidebar';
+import { ProposalSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/ProposalSidebar';
 import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/components/StickyFooterContainer';
 import { defaultPageTop } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
@@ -44,7 +44,7 @@ import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
-import { getNewCriteria } from './components/EvaluationSettingsSidebar/components/RubricCriteriaSettings';
+import { getNewCriteria } from './components/ProposalEvaluations/components/Settings/components/RubricCriteriaSettings';
 import type { ProposalPropertiesInput } from './components/ProposalProperties/ProposalPropertiesBase';
 import { ProposalPropertiesBase } from './components/ProposalProperties/ProposalPropertiesBase';
 import { TemplateSelect } from './components/TemplateSelect';
@@ -57,7 +57,7 @@ export type ProposalPageAndPropertiesInput = ProposalPropertiesInput & {
   headerImage: string | null;
   icon: string | null;
   type: PageType;
-  proposalType?: 'structured' | 'free_form';
+  proposalType: 'structured' | 'free_form';
   formFields?: FormFieldInput[];
   formAnswers?: FieldAnswerInput[];
   formId?: string;
@@ -321,15 +321,13 @@ export function NewProposalPage({
         </div>
       </div>
       {currentSpace && (
-        <PageSidebar
+        <ProposalSidebar
           isUnpublishedProposal
-          id='page-action-sidebar'
-          spaceId={currentSpace.id}
-          sidebarView={internalSidebarView || null}
-          closeSidebar={() => {}}
-          openSidebar={setActiveView}
+          isOpen={internalSidebarView === 'proposal_evaluation'}
+          closeSidebar={() => setActiveView(null)}
+          openSidebar={() => setActiveView('proposal_evaluation')}
           proposalInput={formInputs}
-          proposalTemplateId={formInputs.proposalTemplateId}
+          templateId={formInputs.proposalTemplateId}
           onChangeEvaluation={(evaluationId, updates) => {
             const evaluations = formInputs.evaluations.map((e) => (e.id === evaluationId ? { ...e, ...updates } : e));
             setFormInputs({

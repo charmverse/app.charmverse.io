@@ -15,7 +15,7 @@ import { useUser } from 'hooks/useUser';
 import type { ProposalFields, ProposalReviewerInput } from 'lib/proposal/interface';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-import type { ProposalEvaluationValues } from '../EvaluationSettingsSidebar/components/EvaluationStepSettings';
+import type { ProposalEvaluationValues } from '../ProposalEvaluations/components/Settings/components/EvaluationStepSettings';
 
 export type ProposalPropertiesInput = {
   content?: PageContent | null;

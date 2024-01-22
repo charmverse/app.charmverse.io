@@ -15,6 +15,7 @@ export async function convertPostToProposal({
   const { page: proposalPage } = await createProposal({
     userId,
     spaceId: post.spaceId,
+    authors: [userId],
     evaluations: [],
     pageProps: {
       content: content ?? undefined,
