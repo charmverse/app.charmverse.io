@@ -7,7 +7,7 @@ export const PrimaryColumn = styled.div<{
   display: flex;
   height: 100%;
   position: relative;
-  flex-direction: column;
+  flex-direction: row;
   transition: width ease-in 0.25s;
   ${theme.breakpoints.up('md')} {
     width: ${showPageActionSidebar ? 'calc(100% - 430px)' : '100%'};
@@ -18,7 +18,6 @@ export const PrimaryColumn = styled.div<{
     flex-grow: 1;
     min-height: 1px;
     overflow: auto;
-    // overflow: ${showPageActionSidebar ? 'auto' : 'inherit'};
   }
 `
 );

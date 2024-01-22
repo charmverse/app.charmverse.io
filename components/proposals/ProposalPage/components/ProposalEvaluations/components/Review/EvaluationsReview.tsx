@@ -208,6 +208,18 @@ export function EvaluationsReview({
           />
         </EvaluationStepRow>
       )}
+      {pagePath && pageTitle && proposal && (
+        <>
+          <Divider />
+          <ProposalSocialShare
+            lensPostLink={proposal.lensPostLink}
+            proposalId={proposal.id}
+            proposalPath={pagePath}
+            proposalTitle={pageTitle}
+            proposalAuthors={proposal.authors.map((a) => a.userId)}
+          />
+        </>
+      )}
       {evaluationInput && (
         <EvaluationStepSettingsModal
           close={closeSettings}
@@ -215,16 +227,6 @@ export function EvaluationsReview({
           templateId={templateId}
           saveEvaluation={saveEvaluation}
           updateEvaluation={updateEvaluation}
-        />
-      )}
-      <Divider />
-      {pagePath && pageTitle && proposal && (
-        <ProposalSocialShare
-          lensPostLink={proposal.lensPostLink}
-          proposalId={proposal.id}
-          proposalPath={pagePath}
-          proposalTitle={pageTitle}
-          proposalAuthors={proposal.authors.map((a) => a.userId)}
         />
       )}
     </div>

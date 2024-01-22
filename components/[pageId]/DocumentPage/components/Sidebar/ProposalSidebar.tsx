@@ -9,18 +9,19 @@ import { useMdScreen } from 'hooks/useMediaScreens';
 import { PageSidebarViewToggle } from './components/PageSidebarViewToggle';
 import { SIDEBAR_VIEWS } from './constants';
 
+const sidebarWidth = '430px';
+
 const SidebarContainer = styled('div', {
   shouldForwardProp: (prop) => prop !== 'open'
 })<{ open: boolean }>(
   ({ open, theme }) => `
   background: ${theme.palette.background.default};
   border-left: 1px solid var(--input-border);
-  overflow: auto;
-  padding: ${theme.spacing(0, 1)};
-  position: fixed;
-  right: 0px;
-  width: ${open ? '430px' : '36px'};
-  z-index: var(--z-index-drawer);
+  overflow: hidden;
+  max-width: ${open ? sidebarWidth : '50px'};
+  width: 100%;
+  transition: max-width ease-in 0.25s;
+  height: 100%;
 `
 );
 
@@ -41,29 +42,23 @@ function SidebarComponent(props: SidebarProps) {
     return null;
   }
   return (
-    <Collapse
-      appear={false}
-      collapsedSize={40}
-      orientation='horizontal'
-      in={isOpen}
-      style={{
-        transformOrigin: 'left top'
-      }}
-      easing={{
-        enter: 'ease-in',
-        exit: 'ease-out'
-      }}
-      timeout={250}
-    >
-      <SidebarContainer id='proposal-action-sidebar' open={isOpen}>
-        <Box
-          sx={{
-            height: 'calc(100%)',
-            gap: 1,
-            display: 'flex',
-            flexDirection: 'column'
-          }}
-        >
+    // <StyledCollapse
+    //   appear={false}
+    //   collapsedSize={40}
+    //   orientation='horizontal'
+    //   in={isOpen}
+    //   // sx={{
+
+    //   // }}
+    //   easing={{
+    //     enter: 'ease-in',
+    //     exit: 'ease-out'
+    //   }}
+    //   timeout={250}
+    // >
+    <SidebarContainer id='proposal-action-sidebar' open={isOpen}>
+      <Box overflow='hidden' width={sidebarWidth}>
+        <Box display='flex' height='100%' flexDirection='column' gap={1} px={1}>
           <Box display='flex' gap={1} alignItems='center'>
             <PageSidebarViewToggle onClick={toggleSidebar} />
             <Typography flexGrow={1} fontWeight={600} fontSize={20}>
@@ -72,8 +67,9 @@ function SidebarComponent(props: SidebarProps) {
           </Box>
           <ProposalEvaluations {...props} />
         </Box>
-      </SidebarContainer>
-    </Collapse>
+      </Box>
+    </SidebarContainer>
+    // </StyledCollapse>
   );
 }
 

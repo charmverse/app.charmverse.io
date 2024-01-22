@@ -118,7 +118,7 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
     } else {
       // Document page is used in a few places, so it is responsible for retrieving its own permissions
       return (
-        <Box flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
+        <Box display='flex' flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
           <DocumentPage page={page} readOnly={readOnly} savePage={savePage} enableSidebar />
         </Box>
       );
