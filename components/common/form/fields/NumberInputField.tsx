@@ -1,3 +1,4 @@
+import type { SxProps, Theme } from '@mui/material';
 import { TextField } from '@mui/material';
 import { forwardRef } from 'react';
 
@@ -6,17 +7,14 @@ import type { ControlFieldProps, FieldProps } from 'components/common/form/inter
 
 type Props = ControlFieldProps & FieldProps & { disableArrows?: boolean };
 
-const disabledArrows = {
+const disabledArrows: SxProps<Theme> = {
+  '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
+    WebkitAppearance: 'none',
+    margin: 0
+  },
   '& input[type=number]': {
-    '-moz-appearance': 'textfield'
-  },
-  '& input[type=number]::-webkit-outer-spin-button': {
-    '-webkit-appearance': 'none',
-    margin: 0
-  },
-  '& input[type=number]::-webkit-inner-spin-button': {
-    '-webkit-appearance': 'none',
-    margin: 0
+    MozAppearance: 'textfield',
+    coco: '2'
   }
 };
 
