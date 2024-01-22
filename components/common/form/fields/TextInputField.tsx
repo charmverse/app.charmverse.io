@@ -8,12 +8,25 @@ type Props = ControlFieldProps & FieldProps & { multiline?: boolean; rows?: numb
 
 export const TextInputField = forwardRef<HTMLDivElement, Props>(
   (
-    { label, labelEndAdornment, iconLabel, inline, error, description, multiline = false, required, ...inputProps },
+    {
+      label,
+      labelEndAdornment,
+      inputEndAdornment,
+      iconLabel,
+      inline,
+      error,
+      description,
+      multiline = false,
+      required,
+      ...inputProps
+    },
     ref
   ) => {
     return (
       <FieldWrapper
+        inputEndAdornmentAlignItems={multiline ? 'flex-start' : 'center'}
         labelEndAdornment={labelEndAdornment}
+        inputEndAdornment={inputEndAdornment}
         description={description}
         required={required}
         label={label}

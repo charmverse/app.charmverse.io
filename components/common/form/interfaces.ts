@@ -1,6 +1,5 @@
-import type { MemberPropertyType, FormFieldType } from '@charmverse/core/prisma';
-import type { FormField, Prisma } from '@charmverse/core/prisma-client';
-import type { SxProps } from '@mui/material';
+import type { FormFieldType, MemberPropertyType } from '@charmverse/core/prisma';
+import type { FormField } from '@charmverse/core/prisma-client';
 import type { ReactNode } from 'react';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
@@ -40,6 +39,8 @@ export type FieldProps = {
   helperText?: ReactNode;
   description?: PageContent;
   labelEndAdornment?: ReactNode;
+  inputEndAdornment?: ReactNode;
+  inputEndAdornmentAlignItems?: React.CSSProperties['alignItems'];
 } & SelectFieldProps;
 
 export type FormFieldInput = Pick<

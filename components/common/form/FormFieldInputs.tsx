@@ -199,6 +199,28 @@ function FormFieldInputsBase({
                     labelEndAdornment={
                       formField.private ? <Chip sx={{ ml: 1 }} label='Private' size='small' /> : undefined
                     }
+                    inputEndAdornment={
+                      pageId &&
+                      formField.type !== 'label' &&
+                      formField.formFieldAnswer &&
+                      user && (
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            left: '100%',
+                            ml: 1
+                          }}
+                        >
+                          <FormFieldAnswerComment
+                            formFieldAnswer={formField.formFieldAnswer}
+                            pageId={pageId}
+                            disabled={disabled}
+                            fieldAnswerThreads={fieldAnswerThreads}
+                            canCreateComments={isAdmin || isReviewer}
+                          />
+                        </Box>
+                      )
+                    }
                     description={formField.description as PageContent}
                     disabled={disabled}
                     type={formField.type}
@@ -219,23 +241,6 @@ function FormFieldInputsBase({
                   />
                 )}
               />
-              {pageId && formField.type !== 'label' && formField.formFieldAnswer && user && (
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    left: '100%',
-                    ml: 1
-                  }}
-                >
-                  <FormFieldAnswerComment
-                    formFieldAnswer={formField.formFieldAnswer}
-                    pageId={pageId}
-                    disabled={disabled}
-                    fieldAnswerThreads={fieldAnswerThreads}
-                    canCreateComments={isAdmin || isReviewer}
-                  />
-                </Box>
-              )}
             </StyledStack>
           );
         })}

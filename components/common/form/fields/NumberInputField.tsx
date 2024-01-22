@@ -30,12 +30,14 @@ export const NumberInputField = forwardRef<HTMLDivElement, Props>(
       required,
       placeholder,
       disableArrows = false,
+      inputEndAdornment,
       ...inputProps
     }: Props,
     ref
   ) => {
     return (
       <FieldWrapper
+        inputEndAdornment={inputEndAdornment}
         labelEndAdornment={labelEndAdornment}
         description={description}
         required={required}

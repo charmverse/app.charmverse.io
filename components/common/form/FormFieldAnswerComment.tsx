@@ -161,7 +161,7 @@ export function FormFieldAnswerComment({
   canCreateComments?: boolean;
 }) {
   return (
-    <Stack flexDirection='row' gap={1} className='icons' position='relative' top={10} alignItems='center'>
+    <Stack flexDirection='row' gap={1} className='icons' position='relative' alignItems='center'>
       <FormFieldAnswerThreads fieldAnswerThreads={fieldAnswerThreads} />
       <FormFieldAnswerInput
         disabled={disabled}
