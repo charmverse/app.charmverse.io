@@ -90,7 +90,7 @@ type State = {
 function CenterPanel(props: Props) {
   const { activeView, board, currentRootPageId, pageIcon, showView, views, page: boardPage } = props;
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
-  const [selectedProperty, setSelectedProperty] = useState<null | IPropertyTemplate>(null);
+  const [selectedPropertyId, setSelectedPropertyId] = useState<null | string>(null);
 
   const [state, setState] = useState<State>({
     cardIdToFocusOnRender: '',
@@ -125,6 +125,7 @@ function CenterPanel(props: Props) {
   const _dateDisplayProperty = activeBoard?.fields.cardProperties.find(
     (o) => o.id === activeView?.fields.dateDisplayPropertyId
   );
+
   const selectViewCardsSortedFilteredAndGrouped = useMemo(makeSelectViewCardsSortedFilteredAndGrouped, []);
   const _cards = useAppSelector((state) =>
     selectViewCardsSortedFilteredAndGrouped(state, {
@@ -139,14 +140,14 @@ function CenterPanel(props: Props) {
     if (!isActiveView) {
       return;
     }
-    if (selectedProperty) {
+    if (selectedPropertyId) {
       setState((s) => ({ ...s, openSettings: 'view-options' }));
     } else if (views.length === 0) {
       setState((s) => ({ ...s, openSettings: 'create-linked-view' }));
     } else if (activeView) {
       setState((s) => ({ ...s, openSettings: null }));
     }
-  }, [activeView?.id, views.length, isActiveView, selectedProperty]);
+  }, [activeView?.id, views.length, isActiveView, selectedPropertyId]);
 
   // filter cards by whats accessible
   const { cardPages, cardPageIds } = useMemo(() => {
@@ -657,7 +658,7 @@ function CenterPanel(props: Props) {
                 )}
                 {activeBoard && activeView?.fields.viewType === 'table' && (
                   <Table
-                    setSelectedProperty={setSelectedProperty}
+                    setSelectedPropertyId={setSelectedPropertyId}
                     board={activeBoard}
                     activeView={activeView}
                     cardPages={cardPages}
@@ -705,10 +706,10 @@ function CenterPanel(props: Props) {
             )}
 
             <ViewSidebar
-              selectedProperty={selectedProperty}
-              sidebarView={selectedProperty ? 'card-property' : undefined}
-              setSelectedProperty={(_selectedProperty) => {
-                setSelectedProperty(_selectedProperty);
+              selectedPropertyId={selectedPropertyId}
+              sidebarView={selectedPropertyId ? 'card-property' : undefined}
+              setSelectedPropertyId={(_selectedPropertyId) => {
+                setSelectedPropertyId(_selectedPropertyId);
               }}
               cards={cards}
               views={views}

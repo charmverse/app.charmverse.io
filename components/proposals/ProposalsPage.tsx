@@ -34,7 +34,7 @@ export function ProposalsPage({ title }: { title: string }) {
   const { space: currentSpace } = useCurrentSpace();
   const { isFreeSpace } = useIsFreeSpace();
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
-  const [selectedProperty, setSelectedProperty] = useState<null | IPropertyTemplate>(null);
+  const [selectedPropertyId, setSelectedPropertyId] = useState<null | string>(null);
 
   const canSeeProposals = hasAccess || isFreeSpace || currentSpace?.publicProposals === true;
   const { navigateToSpacePath } = useCharmRouter();
@@ -185,8 +185,8 @@ export function ProposalsPage({ title }: { title: string }) {
             {cardPages.length > 0 ? (
               <Box width='100%'>
                 <Table
-                  setSelectedProperty={(_selectedProperty) => {
-                    setSelectedProperty(_selectedProperty);
+                  setSelectedPropertyId={(_setSelectedPropertyId) => {
+                    setSelectedPropertyId(_setSelectedPropertyId);
                     setShowSidebar(true);
                   }}
                   board={activeBoard}
@@ -219,9 +219,9 @@ export function ProposalsPage({ title }: { title: string }) {
             )}
 
             <ViewSidebar
-              selectedProperty={selectedProperty}
-              setSelectedProperty={setSelectedProperty}
-              sidebarView={selectedProperty && showSidebar ? 'card-property' : undefined}
+              selectedPropertyId={selectedPropertyId}
+              setSelectedPropertyId={setSelectedPropertyId}
+              sidebarView={selectedPropertyId && showSidebar ? 'card-property' : undefined}
               cards={cards}
               views={views}
               board={activeBoard}

@@ -41,7 +41,7 @@ type Props = {
   columnRefs: Map<string, React.RefObject<HTMLDivElement>>;
   checkedIds?: string[];
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
-  setSelectedProperty: Dispatch<SetStateAction<IPropertyTemplate | null>>;
+  setSelectedPropertyId: Dispatch<SetStateAction<string | null>>;
 };
 
 function TableHeaders(props: Props): JSX.Element {
@@ -254,7 +254,7 @@ function TableHeaders(props: Props): JSX.Element {
             offset={resizingColumn === template.id ? offset : 0}
             onDrop={onDropToColumn}
             onAutoSizeColumn={onAutoSizeColumn}
-            setSelectedProperty={props.setSelectedProperty}
+            setSelectedPropertyId={props.setSelectedPropertyId}
           />
         );
       })}

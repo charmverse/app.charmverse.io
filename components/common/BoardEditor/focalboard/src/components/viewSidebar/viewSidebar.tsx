@@ -35,8 +35,8 @@ interface Props {
   hidePropertiesRow?: boolean;
   supportedViewTypes?: IViewType[];
   cards: Card[];
-  selectedProperty: IPropertyTemplate | null;
-  setSelectedProperty: Dispatch<SetStateAction<IPropertyTemplate | null>>;
+  selectedPropertyId: string | null;
+  setSelectedPropertyId: Dispatch<SetStateAction<string | null>>;
   sidebarView?: SidebarView;
 }
 
@@ -60,8 +60,10 @@ function ViewSidebar(props: Props) {
 
   const onClose = () => {
     props.closeSidebar();
-    props.setSelectedProperty(null);
+    props.setSelectedPropertyId(null);
   };
+
+  const selectedProperty = props.board?.fields.cardProperties.find((p) => p.id === props.selectedPropertyId);
 
   return (
     <ClickAwayListener mouseEvent={props.isOpen ? 'onMouseDown' : false} onClickAway={onClose}>
@@ -91,7 +93,7 @@ function ViewSidebar(props: Props) {
                   <DatabaseSidebarHeader goBack={goToSidebarHome} title='Properties' onClose={onClose} />
                   <ViewPropertyOptions
                     setSelectedProperty={(property) => {
-                      props.setSelectedProperty(property);
+                      props.setSelectedPropertyId(property.id);
                       setSidebarView('card-property');
                     }}
                     properties={props.board?.fields.cardProperties ?? []}
@@ -109,7 +111,7 @@ function ViewSidebar(props: Props) {
                   />
                 </>
               )}
-              {sidebarView === 'card-property' && props.selectedProperty && props.board && props.view && (
+              {sidebarView === 'card-property' && selectedProperty && props.board && props.view && (
                 <>
                   <DatabaseSidebarHeader
                     goBack={() => {
@@ -126,7 +128,7 @@ function ViewSidebar(props: Props) {
                     board={props.board}
                     view={props.view}
                     cards={props.cards}
-                    property={props.selectedProperty}
+                    property={selectedProperty}
                   />
                 </>
               )}

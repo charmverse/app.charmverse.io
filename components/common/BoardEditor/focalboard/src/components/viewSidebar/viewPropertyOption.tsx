@@ -14,6 +14,7 @@ import { getPropertyName } from 'lib/focalboard/getPropertyName';
 import { defaultRewardPropertyIds } from 'lib/rewards/blocks/constants';
 
 import mutator from '../../mutator';
+import { RelationProperty } from '../../widgets/menu/RelationPropertyMenu';
 import { DEFAULT_BLOCK_IDS } from '../table/tableHeader';
 
 const StyledMenuItem = styled(MenuItem)`
@@ -102,6 +103,20 @@ function ViewPropertyOption({
           mt: 2
         }}
       />
+      {property.type === 'relation' && (
+        <>
+          <RelationProperty
+            onChange={(relationData) => {
+              mutator.updateProperty(board, property.id, {
+                ...property,
+                relationData
+              });
+            }}
+            relationData={property.relationData}
+          />
+          <Divider sx={{ mt: 1 }} />
+        </>
+      )}
       <StyledMenuItem disabled={disabled || isTitleProperty} onClick={toggleVisibility}>
         {isVisible ? <VisibilityOffOutlinedIcon fontSize='small' /> : <VisibilityOutlinedIcon fontSize='small' />}
         <Typography variant='body2'>{isVisible ? 'Hide in view' : 'Show in view'}</Typography>

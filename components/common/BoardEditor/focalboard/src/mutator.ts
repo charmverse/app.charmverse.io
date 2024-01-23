@@ -651,19 +651,17 @@ export class Mutator {
     return this.updateBlocks(newBlocks, oldBlocks, description);
   }
 
-  async updateRelationProperty(board: Board, relationPropertyId: string, updatedRelationProperty: IPropertyTemplate) {
+  async updateProperty(board: Board, propertyId: string, updatedProperty: IPropertyTemplate) {
     const newBoard = createBoard({ block: board });
-    const cardPropertyIndex = board.fields.cardProperties.findIndex(
-      (o: IPropertyTemplate) => o.id === relationPropertyId
-    );
+    const cardPropertyIndex = board.fields.cardProperties.findIndex((o: IPropertyTemplate) => o.id === propertyId);
 
     if (cardPropertyIndex === -1) {
       return;
     }
 
-    newBoard.fields.cardProperties[cardPropertyIndex] = updatedRelationProperty;
+    newBoard.fields.cardProperties[cardPropertyIndex] = updatedProperty;
 
-    await this.updateBlock(newBoard, board, 'change relation property');
+    await this.updateBlock(newBoard, board, 'changed property');
   }
 
   async changePropertyTypeAndName(

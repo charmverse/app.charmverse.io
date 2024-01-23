@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import type { SxProps } from '@mui/material';
 import { Box, Menu, MenuItem, MenuList, Stack, Switch, Typography } from '@mui/material';
 import { bindMenu } from 'material-ui-popup-state';
 import type { PopupState } from 'material-ui-popup-state/hooks';
@@ -24,21 +25,17 @@ const StyledMenuItem = styled(MenuItem)`
 export function RelationPropertyMenu({
   onClick,
   popupState,
-  buttonText = 'Add relation',
   relationData
 }: {
-  buttonText?: string;
   popupState: PopupState;
   onClick: (type: PropertyType, relationData?: IPropertyTemplate['relationData']) => void;
   relationData?: IPropertyTemplate['relationData'];
 }) {
   const bindMenuProps = bindMenu(popupState);
-  const { pages } = usePages();
   const [relationPropertyData, setRelationPropertyData] = useState<IPropertyTemplate['relationData'] | null>(
     relationData ?? null
   );
   const [showSelectDatabaseMenu, setShowSelectDatabaseMenu] = useState(true);
-  const selectedPage = relationPropertyData ? pages[relationPropertyData.boardId] : null;
 
   function onClose() {
     bindMenuProps.onClose();
@@ -77,97 +74,127 @@ export function RelationPropertyMenu({
             setShowSelectDatabaseMenu(false);
           }}
         />
-      ) : selectedPage && relationPropertyData ? (
-        <Box minWidth={200} sx={{ px: 1 }}>
-          <StyledMenuItem
-            onClick={() => {
-              setShowSelectDatabaseMenu(true);
-            }}
-          >
-            <Typography mr={3}>Related to</Typography>
-            <Stack
-              sx={{
-                flexDirection: 'row',
-                alignItems: 'center'
-              }}
-            >
-              <PageIcon isEditorEmpty={selectedPage.hasContent === false} pageType={selectedPage.type} />
-              <Typography variant='subtitle1' color='secondary'>
-                {selectedPage.title ?? 'Untitled'}
-              </Typography>
-              <KeyboardArrowRightIcon color='secondary' fontSize='small' />
-            </Stack>
-          </StyledMenuItem>
-          <StyledMenuItem>
-            <Typography mr={3}>Limit</Typography>
-            <PopperPopup
-              closeOnClick
-              popupContent={
-                <MenuList>
-                  <MenuItem
-                    selected={relationPropertyData.limit === 'single_page'}
-                    onClick={() => {
-                      setRelationPropertyData({
-                        ...relationPropertyData,
-                        limit: 'single_page'
-                      });
-                    }}
-                  >
-                    1 page
-                  </MenuItem>
-                  <MenuItem
-                    selected={relationPropertyData.limit === 'multiple_page'}
-                    onClick={() => {
-                      setRelationPropertyData({
-                        ...relationPropertyData,
-                        limit: 'multiple_page'
-                      });
-                    }}
-                  >
-                    No limit
-                  </MenuItem>
-                </MenuList>
-              }
-            >
-              <Stack
-                sx={{
-                  flexDirection: 'row',
-                  alignItems: 'center'
-                }}
-              >
-                <Typography variant='subtitle1' color='secondary'>
-                  {relationPropertyData.limit === 'single_page' ? '1 page' : 'No limit'}
-                </Typography>
-                <KeyboardArrowRightIcon color='secondary' fontSize='small' />
-              </Stack>
-            </PopperPopup>
-          </StyledMenuItem>
-          <StyledMenuItem
-            onClick={() => {
-              setRelationPropertyData({
-                ...relationPropertyData,
-                showOnRelatedBoard: !relationPropertyData.showOnRelatedBoard
-              });
-            }}
-          >
-            <Typography mr={3}>Show on {selectedPage.title ?? 'Untitled'}</Typography>
-            <Switch size='small' checked={relationPropertyData.showOnRelatedBoard} />
-          </StyledMenuItem>
-          <Button
-            onClick={() => {
-              onClick('relation', relationPropertyData);
-              onClose();
-            }}
-            primary
-            fullWidth
-            sx={{
-              mt: 1
-            }}
-          >
-            {buttonText}
-          </Button>
-        </Box>
+      ) : relationPropertyData ? (
+        <RelationProperty
+          sx={{
+            minWidth: 200,
+            px: 1
+          }}
+          onChange={setRelationPropertyData}
+          relationData={relationPropertyData}
+          onButtonClick={() => {
+            onClick('relation', relationPropertyData);
+            onClose();
+          }}
+          setShowSelectDatabaseMenu={setShowSelectDatabaseMenu}
+        />
       ) : null}
     </Menu>
+  );
+}
+
+export function RelationProperty({
+  setShowSelectDatabaseMenu,
+  relationData,
+  onChange,
+  onButtonClick,
+  sx
+}: {
+  relationData: IPropertyTemplate['relationData'];
+  setShowSelectDatabaseMenu?: (show: boolean) => void;
+  onChange: (relationData?: IPropertyTemplate['relationData']) => void;
+  onButtonClick?: () => void;
+  sx?: SxProps;
+}) {
+  const { pages } = usePages();
+  const selectedPage = relationData ? pages[relationData.boardId] : null;
+
+  if (!selectedPage || !relationData) {
+    return null;
+  }
+
+  return (
+    <Box sx={sx}>
+      <StyledMenuItem
+        onClick={() => {
+          setShowSelectDatabaseMenu?.(true);
+        }}
+        disabled={!setShowSelectDatabaseMenu}
+      >
+        <Typography color={setShowSelectDatabaseMenu ? '' : 'secondary'} mr={3}>
+          Related to
+        </Typography>
+        <Stack
+          sx={{
+            flexDirection: 'row',
+            alignItems: 'center'
+          }}
+        >
+          <PageIcon isEditorEmpty={selectedPage.hasContent === false} pageType={selectedPage.type} />
+          <Typography variant='subtitle1' color='secondary'>
+            {selectedPage.title ?? 'Untitled'}
+          </Typography>
+          <KeyboardArrowRightIcon color='secondary' fontSize='small' />
+        </Stack>
+      </StyledMenuItem>
+      <StyledMenuItem>
+        <Typography mr={3}>Limit</Typography>
+        <PopperPopup
+          closeOnClick
+          popupContent={
+            <MenuList>
+              <MenuItem
+                selected={relationData.limit === 'single_page'}
+                onClick={() => {
+                  onChange({
+                    ...relationData,
+                    limit: 'single_page'
+                  });
+                }}
+              >
+                1 page
+              </MenuItem>
+              <MenuItem
+                selected={relationData.limit === 'multiple_page'}
+                onClick={() => {
+                  onChange({
+                    ...relationData,
+                    limit: 'multiple_page'
+                  });
+                }}
+              >
+                No limit
+              </MenuItem>
+            </MenuList>
+          }
+        >
+          <Stack
+            sx={{
+              flexDirection: 'row',
+              alignItems: 'center'
+            }}
+          >
+            <Typography variant='subtitle1' color='secondary'>
+              {relationData.limit === 'single_page' ? '1 page' : 'No limit'}
+            </Typography>
+            <KeyboardArrowRightIcon color='secondary' fontSize='small' />
+          </Stack>
+        </PopperPopup>
+      </StyledMenuItem>
+      {onButtonClick && (
+        <Button
+          onClick={() => {
+            onButtonClick();
+          }}
+          primary
+          fullWidth
+          sx={{
+            mt: 1
+          }}
+        >
+          Add relation
+        </Button>
+      )}
+    </Box>
   );
 }

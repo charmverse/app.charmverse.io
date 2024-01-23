@@ -64,7 +64,7 @@ type Props = {
   offset: number;
   onDrop: (template: IPropertyTemplate, container: IPropertyTemplate) => void;
   onAutoSizeColumn: (columnID: string, headerWidth: number) => void;
-  setSelectedProperty: Dispatch<SetStateAction<IPropertyTemplate | null>>;
+  setSelectedPropertyId: Dispatch<SetStateAction<string | null>>;
 };
 
 export const DEFAULT_BLOCK_IDS = [
@@ -208,7 +208,7 @@ function TableHeader(props: Props): JSX.Element {
         <MenuItem
           {...bindTriggerProps}
           onClick={() => {
-            props.setSelectedProperty?.(template);
+            props.setSelectedPropertyId?.(template.id);
           }}
         >
           <ListItemIcon>
