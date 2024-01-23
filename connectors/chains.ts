@@ -478,7 +478,7 @@ export interface IPairQuote extends ICurrencyPair {
 }
 
 export function getChainById(chainId: number): IChainDetails | undefined {
-  return RPCList.find((rpc) => rpc.chainId === chainId);
+  return RPCList.find((rpc) => rpc.chainId.toString() === chainId.toString());
 }
 
 export function getChainBySymbol(tokenSymbol: string): IChainDetails | undefined {

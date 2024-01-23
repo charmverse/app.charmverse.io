@@ -63,7 +63,7 @@ export function ProposalCredentialPreview({ credential }: Props) {
           </Grid>
           <Grid item xs>
             <Typography variant='body2'>
-              <b>Proposal URL:</b> {getPagePermalink({ pageId: exampleId })}
+              <b>URL:</b> {getPagePermalink({ pageId: exampleId })}
             </Typography>
           </Grid>
         </Grid>

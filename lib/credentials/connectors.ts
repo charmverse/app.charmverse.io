@@ -23,8 +23,8 @@ export const easConnectors: Record<EasSchemaChain | ExternalCredentialChain, EAS
     attestationExplorerUrl: 'https://optimism.easscan.org'
   },
   [arbitrum.id]: {
-    attestationContract: '0x4200000000000000000000000000000000000021',
-    schemaRegistryContract: '0x4200000000000000000000000000000000000020',
+    attestationContract: '0xbd75f629a22dc1ced33dda0b68c546a1c035c458',
+    schemaRegistryContract: '0xa310da9c5b885e7fb3fba9d66e9ba6df512b78eb',
     attestationExplorerUrl: 'https://arbitrum.easscan.org'
   },
   [base.id]: {
@@ -42,6 +42,16 @@ export function getOnChainAttestationUrl({
   attestationId: string;
 }) {
   return `${easConnectors[chainId].attestationExplorerUrl}/attestation/view/${attestationId}`;
+}
+
+export function getOnChainSchemaUrl({
+  chainId,
+  schemaId
+}: {
+  chainId: EasSchemaChain | ExternalCredentialChain;
+  schemaId: string;
+}) {
+  return `${easConnectors[chainId].attestationExplorerUrl}/schema/view/${schemaId}`;
 }
 
 export function getEasConnector(chainId: EasSchemaChain) {
