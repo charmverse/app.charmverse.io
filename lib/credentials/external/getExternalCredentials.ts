@@ -87,6 +87,7 @@ function getTrackedOnChainCredentials({
         (attestation: any) =>
           ({
             ...attestation,
+            chainId,
             content: JSON.parse(attestation.decodedDataJson),
             timeCreated: attestation.timeCreated * 1000,
             verificationUrl: getOnChainAttestationUrl({ chainId, attestationId: attestation.id })
