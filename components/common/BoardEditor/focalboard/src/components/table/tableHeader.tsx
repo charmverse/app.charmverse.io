@@ -6,6 +6,7 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import TuneIcon from '@mui/icons-material/Tune';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import type { PopoverProps } from '@mui/material';
 import {
@@ -22,7 +23,8 @@ import {
   Typography,
   Switch
 } from '@mui/material';
-import { bindPopover, bindToggle, usePopupState } from 'material-ui-popup-state/hooks';
+import { bindPopover, bindToggle, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import type { Dispatch, SetStateAction } from 'react';
 import React, { useMemo, useRef, useState } from 'react';
 
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
@@ -62,6 +64,7 @@ type Props = {
   offset: number;
   onDrop: (template: IPropertyTemplate, container: IPropertyTemplate) => void;
   onAutoSizeColumn: (columnID: string, headerWidth: number) => void;
+  setSelectedProperty: Dispatch<SetStateAction<IPropertyTemplate | null>>;
 };
 
 const DEFAULT_BLOCK_IDS = [
@@ -91,6 +94,8 @@ function TableHeader(props: Props): JSX.Element {
     !!template.proposalFieldId;
 
   const [tempName, setTempName] = useState(name || '');
+  const addRelationPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-relation-property' });
+  const bindTriggerProps = bindTrigger(addRelationPropertyPopupState);
 
   const popupState = usePopupState({ variant: 'popper', popupId: 'iframe-selector' });
   const toggleRef = useRef(null);
@@ -200,6 +205,18 @@ function TableHeader(props: Props): JSX.Element {
             }}
           />
         </Stack>
+        <MenuItem
+          {...bindTriggerProps}
+          onClick={() => {
+            props.setSelectedProperty?.(template);
+          }}
+        >
+          <ListItemIcon>
+            <TuneIcon fontSize='small' />
+          </ListItemIcon>
+          <Typography variant='subtitle1'>Edit property</Typography>
+        </MenuItem>
+        <Divider />
         <MenuItem
           onClick={() => {
             changeViewSortOptions([{ propertyId: templateId, reversed: false }]);

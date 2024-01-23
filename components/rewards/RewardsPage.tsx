@@ -33,6 +33,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { viewTypeToBlockId } from 'lib/focalboard/customBlocks/constants';
 import { DUE_DATE_ID } from 'lib/rewards/blocks/constants';
@@ -55,6 +56,7 @@ export function RewardsPage({ title }: { title: string }) {
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
   const canSeeRewards = hasAccess || isFreeSpace || currentSpace?.publicBountyBoard === true;
   const { getRewardPage } = useRewardPage();
+  const [selectedProperty, setSelectedProperty] = useState<null | IPropertyTemplate>(null);
 
   const isAdmin = useIsAdmin();
 
@@ -238,6 +240,7 @@ export function RewardsPage({ title }: { title: string }) {
               <Box width='100%'>
                 {activeView.fields.viewType === 'table' && (
                   <Table
+                    setSelectedProperty={setSelectedProperty}
                     board={activeBoard}
                     activeView={activeView}
                     cardPages={cardPages as CardPage[]}
@@ -305,6 +308,12 @@ export function RewardsPage({ title }: { title: string }) {
 
             {isAdmin && (
               <ViewSidebar
+                sidebarView={selectedProperty ? 'card-properties' : undefined}
+                setSelectedProperty={(_selectedProperty) => {
+                  setSelectedProperty(_selectedProperty);
+                  setShowSidebar(true);
+                }}
+                selectedProperty={selectedProperty}
                 cards={cards as Card[]}
                 views={views}
                 board={activeBoard}

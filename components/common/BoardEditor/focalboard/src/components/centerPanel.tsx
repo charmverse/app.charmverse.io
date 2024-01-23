@@ -90,6 +90,7 @@ type State = {
 function CenterPanel(props: Props) {
   const { activeView, board, currentRootPageId, pageIcon, showView, views, page: boardPage } = props;
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
+  const [selectedProperty, setSelectedProperty] = useState<null | IPropertyTemplate>(null);
 
   const [state, setState] = useState<State>({
     cardIdToFocusOnRender: '',
@@ -97,6 +98,7 @@ function CenterPanel(props: Props) {
     // assume this is a page type 'inline_linked_board' or 'linked_board' if no view exists
     openSettings: null
   });
+
   const [loadingFormResponses, setLoadingFormResponses] = useState(false);
 
   const router = useRouter();
@@ -137,12 +139,14 @@ function CenterPanel(props: Props) {
     if (!isActiveView) {
       return;
     }
-    if (views.length === 0) {
+    if (selectedProperty) {
+      setState((s) => ({ ...s, openSettings: 'view-options' }));
+    } else if (views.length === 0) {
       setState((s) => ({ ...s, openSettings: 'create-linked-view' }));
     } else if (activeView) {
       setState((s) => ({ ...s, openSettings: null }));
     }
-  }, [activeView?.id, views.length, isActiveView]);
+  }, [activeView?.id, views.length, isActiveView, selectedProperty]);
 
   // filter cards by whats accessible
   const { cardPages, cardPageIds } = useMemo(() => {
@@ -653,6 +657,7 @@ function CenterPanel(props: Props) {
                 )}
                 {activeBoard && activeView?.fields.viewType === 'table' && (
                   <Table
+                    setSelectedProperty={setSelectedProperty}
                     board={activeBoard}
                     activeView={activeView}
                     cardPages={cardPages}
@@ -700,6 +705,11 @@ function CenterPanel(props: Props) {
             )}
 
             <ViewSidebar
+              selectedProperty={selectedProperty}
+              sidebarView={selectedProperty ? 'card-property' : undefined}
+              setSelectedProperty={(_selectedProperty) => {
+                setSelectedProperty(_selectedProperty);
+              }}
               cards={cards}
               views={views}
               page={props.page}

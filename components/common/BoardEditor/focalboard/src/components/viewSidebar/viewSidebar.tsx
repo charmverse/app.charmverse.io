@@ -1,5 +1,6 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import { ClickAwayListener, Collapse } from '@mui/material';
+import type { Dispatch, SetStateAction } from 'react';
 import { memo, useEffect, useState } from 'react';
 
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
@@ -34,6 +35,9 @@ interface Props {
   hidePropertiesRow?: boolean;
   supportedViewTypes?: IViewType[];
   cards: Card[];
+  selectedProperty: IPropertyTemplate | null;
+  setSelectedProperty: Dispatch<SetStateAction<IPropertyTemplate | null>>;
+  sidebarView?: SidebarView;
 }
 
 function getDefaultView(hasBoardView: boolean): SidebarView {
@@ -41,21 +45,26 @@ function getDefaultView(hasBoardView: boolean): SidebarView {
 }
 
 function ViewSidebar(props: Props) {
-  const [sidebarView, setSidebarView] = useState<SidebarView>(getDefaultView(!!props.view));
-  const [selectedProperty, setSelectedProperty] = useState<null | IPropertyTemplate>(null);
+  const [sidebarView, setSidebarView] = useState<SidebarView>(props.sidebarView ?? getDefaultView(!!props.view));
   function goToSidebarHome() {
     setSidebarView('view-options');
   }
 
   useEffect(() => {
-    // reset state on close
-    if (!props.isOpen) {
+    if (props.sidebarView) {
+      setSidebarView(props.sidebarView);
+    } else if (!props.isOpen) {
       setSidebarView(getDefaultView(!!props.view));
     }
-  }, [props.isOpen]);
+  }, [props.isOpen, props.sidebarView]);
+
+  const onClose = () => {
+    props.closeSidebar();
+    props.setSelectedProperty(null);
+  };
 
   return (
-    <ClickAwayListener mouseEvent={props.isOpen ? 'onMouseDown' : false} onClickAway={props.closeSidebar}>
+    <ClickAwayListener mouseEvent={props.isOpen ? 'onMouseDown' : false} onClickAway={onClose}>
       <Collapse
         in={props.isOpen}
         orientation='horizontal'
@@ -68,7 +77,7 @@ function ViewSidebar(props: Props) {
             <>
               {sidebarView === 'layout' && (
                 <>
-                  <DatabaseSidebarHeader goBack={goToSidebarHome} title='Layout' onClose={props.closeSidebar} />
+                  <DatabaseSidebarHeader goBack={goToSidebarHome} title='Layout' onClose={onClose} />
                   <ViewLayoutOptions
                     hideLayoutSelectOptions={props.hideLayoutSelectOptions}
                     board={props.board}
@@ -79,10 +88,10 @@ function ViewSidebar(props: Props) {
               )}
               {sidebarView === 'card-properties' && (
                 <>
-                  <DatabaseSidebarHeader goBack={goToSidebarHome} title='Properties' onClose={props.closeSidebar} />
+                  <DatabaseSidebarHeader goBack={goToSidebarHome} title='Properties' onClose={onClose} />
                   <ViewPropertyOptions
                     setSelectedProperty={(property) => {
-                      setSelectedProperty(property);
+                      props.setSelectedProperty(property);
                       setSidebarView('card-property');
                     }}
                     properties={props.board?.fields.cardProperties ?? []}
@@ -92,7 +101,7 @@ function ViewSidebar(props: Props) {
               )}
               {sidebarView === 'group-by' && (
                 <>
-                  <DatabaseSidebarHeader goBack={goToSidebarHome} title='Group by' onClose={props.closeSidebar} />
+                  <DatabaseSidebarHeader goBack={goToSidebarHome} title='Group by' onClose={onClose} />
                   <GroupOptions
                     properties={props.board?.fields.cardProperties || []}
                     view={props.view}
@@ -100,14 +109,14 @@ function ViewSidebar(props: Props) {
                   />
                 </>
               )}
-              {sidebarView === 'card-property' && selectedProperty && props.board && props.view && (
+              {sidebarView === 'card-property' && props.selectedProperty && props.board && props.view && (
                 <>
                   <DatabaseSidebarHeader
                     goBack={() => {
                       setSidebarView('card-properties');
                     }}
                     title='Edit property'
-                    onClose={props.closeSidebar}
+                    onClose={onClose}
                   />
                   <ViewPropertyOption
                     goBackStep={() => {
@@ -117,7 +126,7 @@ function ViewSidebar(props: Props) {
                     board={props.board}
                     view={props.view}
                     cards={props.cards}
-                    property={selectedProperty}
+                    property={props.selectedProperty}
                   />
                 </>
               )}
@@ -131,7 +140,7 @@ function ViewSidebar(props: Props) {
               views={props.views}
               // We don't want to allow going back if this board is locked to charmverse databases
               closeSourceOptions={goToSidebarHome}
-              closeSidebar={props.closeSidebar}
+              closeSidebar={onClose}
               showView={props.showView}
             />
           )}

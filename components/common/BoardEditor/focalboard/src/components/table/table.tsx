@@ -45,6 +45,7 @@ type Props = {
   subRowsEmptyValueContent?: React.ReactElement | string;
   checkedIds?: string[];
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
+  setSelectedProperty: Dispatch<SetStateAction<IPropertyTemplate | null>>;
 };
 
 const TableRowsContainer = forwardRef<HTMLDivElement, { children: ReactNode }>(({ children }, ref) => {
@@ -78,7 +79,8 @@ function Table(props: Props): JSX.Element {
     rowExpansionLocalStoragePrefix,
     subRowsEmptyValueContent,
     setCheckedIds,
-    checkedIds
+    checkedIds,
+    setSelectedProperty
   } = props;
   const isManualSort = activeView.fields.sortOptions?.length === 0;
   const dispatch = useAppDispatch();
@@ -294,6 +296,7 @@ function Table(props: Props): JSX.Element {
           readOnly={props.readOnly}
           checkedIds={checkedIds}
           setCheckedIds={setCheckedIds}
+          setSelectedProperty={setSelectedProperty}
         />
 
         {/* Table rows */}
