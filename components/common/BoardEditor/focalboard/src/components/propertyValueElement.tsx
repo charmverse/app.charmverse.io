@@ -12,14 +12,15 @@ import { mutate } from 'swr';
 import charmClient from 'charmClient';
 import { useUpdateProposalEvaluation } from 'charmClient/hooks/proposals';
 import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
+import { RelationPropertyPagesAutocomplete } from 'components/common/BoardEditor/components/properties/RelationPropertyPagesAutocomplete';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import { BreadcrumbPageTitle } from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
+import type { PageListItem } from 'components/common/PagesList';
 import { ProposalStatusSelect } from 'components/proposals/components/ProposalStatusSelect';
 import { ProposalStepSelect } from 'components/proposals/components/ProposalStepSelect';
-import { useProposalsWhereUserIsEvaluator } from 'components/proposals/hooks/useProposalsWhereUserIsEvaluator';
 import {
   REWARD_APPLICATION_STATUS_LABELS,
   RewardApplicationStatusChip
@@ -29,7 +30,7 @@ import { allMembersSystemRole } from 'components/settings/proposals/components/E
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { Board, DatabaseProposalPropertyType, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import {
@@ -52,6 +53,7 @@ import {
 } from 'lib/rewards/blocks/constants';
 import type { RewardStatus } from 'lib/rewards/interfaces';
 import { getAbsolutePath } from 'lib/utilities/browser';
+import { isTruthy } from 'lib/utilities/types';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import { TextInput } from '../../../components/properties/TextInput';
@@ -68,6 +70,7 @@ import LastModifiedBy from './properties/lastModifiedBy/lastModifiedBy';
 import URLProperty from './properties/link/link';
 import { TokenAmount } from './properties/tokenAmount/tokenAmount';
 import { TokenChain } from './properties/tokenChain/tokenChain';
+import { LinkCharmVerseDatabase } from './viewSidebar/viewSourceOptions/components/LinkCharmVerseDatabase';
 
 type Props = {
   board: Board;
@@ -85,6 +88,7 @@ type Props = {
   mutator?: Mutator;
   subRowsEmptyValueContent?: ReactElement | string;
   proposal?: CardPage['proposal'];
+  relationPropertyCards?: PageListItem[];
 };
 
 export const validatePropertyValue = (propType: string, val: string): boolean => {
@@ -158,6 +162,12 @@ function PropertyValueElement(props: Props) {
       dateTime: formatDateTime
     }
   });
+
+  const pageListItemsRecord =
+    props.relationPropertyCards?.reduce<Record<string, PageListItem>>((acc, pageListItem) => {
+      acc[pageListItem.id] = pageListItem;
+      return acc;
+    }, {}) ?? {};
 
   const emptyDisplayValue = showEmptyPlaceholder
     ? intl.formatMessage({ id: 'PropertyValueElement.empty', defaultMessage: 'Empty' })
@@ -272,6 +282,26 @@ function PropertyValueElement(props: Props) {
         onChange={() => null}
         value={propertyValue as any}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
+      />
+    );
+  } else if (propertyTemplate.type === 'relation') {
+    return (
+      <RelationPropertyPagesAutocomplete
+        onChange={async (newValue) => {
+          try {
+            await mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+          } catch (error) {
+            showError(error);
+          }
+        }}
+        wrapColumn={props.wrapColumn}
+        selectedPageListItems={(Array.isArray(propertyValue)
+          ? propertyValue.map((pageListItemId) => {
+              return pageListItemsRecord[pageListItemId];
+            })
+          : []
+        ).filter(isTruthy)}
+        pageListItems={props.relationPropertyCards ?? []}
       />
     );
   } else if (propertyTemplate.type === 'select' || propertyTemplate.type === 'multiSelect') {

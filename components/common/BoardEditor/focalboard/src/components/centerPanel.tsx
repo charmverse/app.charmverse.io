@@ -27,6 +27,7 @@ import {
   sortCards
 } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { webhookEndpoint } from 'config/constants';
@@ -42,6 +43,7 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
+import { isTruthy } from 'lib/utilities/types';
 
 import mutator from '../mutator';
 import { addCard as _addCard, addTemplate } from '../store/cards';
@@ -172,6 +174,39 @@ function CenterPanel(props: Props) {
   }, [isActiveView, _cards, pages, localViewSettings?.localSort]);
 
   const cards = cardPages.map(({ card }) => card);
+
+  const relationPropertiesCardsRecord = useMemo(() => {
+    const boardCardsRecord: PageListItemsRecord = {};
+    const relationProperties = activeBoard.fields.cardProperties.filter((o) => o.type === 'relation');
+
+    Object.values(pages)
+      .filter(isTruthy)
+      .forEach((page) => {
+        const pageListItem = {
+          icon: page.icon,
+          id: page.id,
+          title: page.title,
+          hasContent: page.hasContent,
+          path: page.path,
+          type: page.type
+        };
+        if (page.type === 'card' && page.parentId) {
+          if (!boardCardsRecord[page.parentId]) {
+            boardCardsRecord[page.parentId] = [pageListItem];
+          } else {
+            boardCardsRecord[page.parentId].push(pageListItem);
+          }
+        }
+      });
+
+    return relationProperties.reduce<PageListItemsRecord>((acc, relationProperty) => {
+      const boardId = relationProperty.relationData?.boardId;
+      if (boardId && boardCardsRecord[boardId]) {
+        acc[relationProperty.id] = boardCardsRecord[boardId];
+      }
+      return acc;
+    }, {});
+  }, [pages, activeBoard?.id]);
 
   // Make sure the checkedIds are still cards that exist
   useEffect(() => {
@@ -658,6 +693,7 @@ function CenterPanel(props: Props) {
                 )}
                 {activeBoard && activeView?.fields.viewType === 'table' && (
                   <Table
+                    relationPropertiesCardsRecord={relationPropertiesCardsRecord}
                     setSelectedPropertyId={setSelectedPropertyId}
                     board={activeBoard}
                     activeView={activeView}

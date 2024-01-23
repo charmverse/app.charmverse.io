@@ -4,6 +4,7 @@ import type { Dispatch, ReactElement, SetStateAction } from 'react';
 import React, { useState } from 'react';
 
 import charmClient from 'charmClient';
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { PageSizeInputPopup } from 'components/PageSizeInputPopup';
 import { NewWorkButton } from 'components/rewards/components/RewardApplications/NewWorkButton';
 import { useLocalStorage } from 'hooks/useLocalStorage';
@@ -35,11 +36,13 @@ type Props = {
   subRowsEmptyValueContent?: ReactElement | string;
   checkedIds?: string[];
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
+  relationPropertiesCardsRecord?: PageListItemsRecord;
 };
 
 function TableRows(props: Props): JSX.Element {
   const {
     board,
+    relationPropertiesCardsRecord,
     cardPages: allCardPages,
     activeView,
     onDeleteCard,
@@ -48,7 +51,6 @@ function TableRows(props: Props): JSX.Element {
     setCheckedIds,
     checkedIds = []
   } = props;
-
   const hasSubPages = allCardPages.some((cardPage) => cardPage.subPages?.length);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const { data: cardPages, hasNextPage, showNextPage } = usePaginatedData(allCardPages as CardPage[], { pageSize });
@@ -122,6 +124,7 @@ function TableRows(props: Props): JSX.Element {
           setIsExpanded={setIsExpanded}
           setCheckedIds={setCheckedIds}
           isChecked={checkedIds.includes(page.id)}
+          relationPropertiesCardsRecord={relationPropertiesCardsRecord}
           emptySubPagesPlaceholder={
             page.bountyId ? (
               <Box

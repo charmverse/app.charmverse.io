@@ -5,18 +5,17 @@ import CollapseIcon from '@mui/icons-material/ArrowDropDown';
 import ExpandIcon from '@mui/icons-material/ArrowRight';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { Box, Checkbox, Stack } from '@mui/material';
-import React, { memo, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { Dispatch, MouseEvent, ReactElement, ReactNode, SetStateAction } from 'react';
+import React, { memo, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { mutate } from 'swr';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { filterPropertyTemplates } from 'components/common/BoardEditor/utils/updateVisibilePropertyIds';
 import { PageActionsMenu } from 'components/common/PageActions/components/PageActionsMenu';
 import { PageIcon } from 'components/common/PageIcon';
 import { RewardApplicationStatusIcon } from 'components/rewards/components/RewardApplicationStatusChip';
 import { SelectionContext, useSelected } from 'hooks/useAreaSelection';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDragDrop } from 'hooks/useDragDrop';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -29,7 +28,6 @@ import { isTouchScreen } from 'lib/utilities/browser';
 import { mergeRefs } from 'lib/utilities/react';
 
 import { TextInput } from '../../../../components/properties/TextInput';
-import mutator from '../../mutator';
 import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
 import PropertyValueElement from '../propertyValueElement';
@@ -72,6 +70,7 @@ type Props = {
   isChecked?: boolean;
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
   proposal?: CardPage['proposal'];
+  relationPropertiesCardsRecord?: PageListItemsRecord;
 };
 
 export const StyledCheckbox = styled(Checkbox, {
@@ -359,6 +358,7 @@ function TableRow(props: Props) {
             onPaste={(e) => e.stopPropagation()}
           >
             <PropertyValueElement
+              relationPropertyCards={props.relationPropertiesCardsRecord?.[template.id]}
               readOnly={props.readOnly}
               syncWithPageId={cardPage?.syncWithPageId}
               card={card}

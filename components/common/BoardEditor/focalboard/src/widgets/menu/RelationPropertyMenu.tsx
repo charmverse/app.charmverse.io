@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import type { SxProps } from '@mui/material';
-import { Box, Menu, MenuItem, MenuList, Stack, Switch, Typography } from '@mui/material';
+import { Box, Menu, MenuItem, MenuList, Stack, Typography } from '@mui/material';
 import { bindMenu } from 'material-ui-popup-state';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
@@ -130,7 +130,11 @@ export function RelationProperty({
             alignItems: 'center'
           }}
         >
-          <PageIcon isEditorEmpty={selectedPage.hasContent === false} pageType={selectedPage.type} />
+          <PageIcon
+            icon={selectedPage.icon}
+            isEditorEmpty={selectedPage.hasContent === false}
+            pageType={selectedPage.type}
+          />
           <Typography variant='subtitle1' color='secondary'>
             {selectedPage.title ?? 'Untitled'}
           </Typography>

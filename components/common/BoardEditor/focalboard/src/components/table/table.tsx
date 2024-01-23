@@ -4,6 +4,7 @@ import type { Dispatch, LegacyRef, ReactNode, SetStateAction } from 'react';
 import React, { forwardRef, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDrop } from 'react-dnd';
 
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { SelectionContext, useAreaSelection } from 'hooks/useAreaSelection';
 import useEfficientDragLayer from 'hooks/useEffecientDragLayer';
 import useKeydownPress from 'hooks/useKeydownPress';
@@ -46,6 +47,7 @@ type Props = {
   checkedIds?: string[];
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
   setSelectedPropertyId: Dispatch<SetStateAction<string | null>>;
+  relationPropertiesCardsRecord?: PageListItemsRecord;
 };
 
 const TableRowsContainer = forwardRef<HTMLDivElement, { children: ReactNode }>(({ children }, ref) => {
@@ -80,7 +82,8 @@ function Table(props: Props): JSX.Element {
     subRowsEmptyValueContent,
     setCheckedIds,
     checkedIds,
-    setSelectedPropertyId
+    setSelectedPropertyId,
+    relationPropertiesCardsRecord
   } = props;
   const isManualSort = activeView.fields.sortOptions?.length === 0;
   const dispatch = useAppDispatch();
@@ -335,6 +338,7 @@ function Table(props: Props): JSX.Element {
             {/* No Grouping, Rows, one per card */}
             {!activeView.fields.groupById && (
               <TableRows
+                relationPropertiesCardsRecord={relationPropertiesCardsRecord}
                 board={board}
                 activeView={activeView}
                 columnRefs={columnRefs}
