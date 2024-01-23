@@ -70,11 +70,7 @@ export function PageTemplateBanner({ proposalType, isNewPage, pageType, parentId
         </Grid>
         <Grid item xs={8} display='flex' justifyContent='center'>
           {!isShowingCard ? (
-            <span>
-              You're {isNewPage ? 'creating' : 'editing'} a{' '}
-              {proposalType ? `${proposalType === 'free_form' ? 'free-form' : 'structured'} ` : ''}
-              {getFeatureTitle(pageType === 'bounty_template' ? 'reward' : 'proposal')} template
-            </span>
+            <span>You're {isNewPage ? 'creating' : 'editing'} a template</span>
           ) : (
             <>
               <span>You're editing a template in</span>
