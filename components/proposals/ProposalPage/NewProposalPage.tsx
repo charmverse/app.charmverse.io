@@ -362,7 +362,7 @@ export function NewProposalPage({
             flexDirection='column'
             overflow='auto'
           >
-            <PageTemplateBanner pageType={formInputs.type} isNewPage proposalType={formInputs.proposalType} />
+            <PageTemplateBanner pageType={formInputs.type} isNewPage />
             {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
             <StyledContainer data-test='page-charmeditor' top={defaultPageTop} fullWidth={isSmallScreen}>
               <Box minHeight={450}>

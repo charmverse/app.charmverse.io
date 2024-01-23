@@ -29,12 +29,10 @@ type Props = {
   parentId?: string | null;
   pageType?: PageMeta['type'];
   customTitle?: string;
-  proposalType?: 'free_form' | 'structured';
 };
 
-export function PageTemplateBanner({ proposalType, isNewPage, pageType, parentId, customTitle }: Props) {
+export function PageTemplateBanner({ isNewPage, pageType, parentId, customTitle }: Props) {
   const { space } = useCurrentSpace();
-  const { getFeatureTitle } = useSpaceFeatures();
   const theme = useTheme();
   const { pages } = usePages();
   const parentPage = parentId ? pages[parentId] : undefined;
