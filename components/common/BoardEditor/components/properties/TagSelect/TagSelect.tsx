@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 import { Stack } from '@mui/material';
 import { useCallback, useMemo, useState } from 'react';
 
+import { PopupFieldWrapper } from 'components/common/BoardEditor/components/properties/PopupFieldWrapper';
 import {
   mapPropertyOptionToSelectOption,
   mapSelectOptionToPropertyOption
@@ -63,15 +64,6 @@ const StyledSelect = styled(SelectField)<ContainerProps>`
   ${({ fluidWidth }) => (!fluidWidth ? 'flex-grow: 1;' : '')}
   .MuiInputBase-root {
     background-color: ${({ theme }) => theme.palette.background.paper};
-
-    ${({ displayType, theme }) =>
-      displayType === 'table'
-        ? `
-        .MuiAutocomplete-input {
-          width: 100%;
-          border-top: 1px solid ${theme.palette.divider};
-        }`
-        : ''}
   }
 
   // override styles from focalboard
@@ -186,31 +178,7 @@ export function TagSelect({
     return null;
   }
 
-  if (!isOpened) {
-    return (
-      <SelectPreviewContainer
-        data-test={props['data-test']}
-        onClick={onEdit}
-        displayType={displayType}
-        readOnly={readOnly}
-        fluidWidth={fluidWidth}
-      >
-        <SelectPreview
-          readOnly={readOnly}
-          readOnlyMessage={readOnlyMessage}
-          sx={{ height: '100%' }}
-          wrapColumn={wrapColumn}
-          value={selectValue}
-          options={selectOptions}
-          size='small'
-          emptyMessage={props.emptyMessage}
-          showEmpty={showEmpty ?? displayType === 'details'}
-        />
-      </SelectPreviewContainer>
-    );
-  }
-
-  return (
+  const activeField = (
     <StyledSelect
       canEditOptions={canEditOptions}
       includeSelectedOptions={includeSelectedOptions}
@@ -230,6 +198,39 @@ export function TagSelect({
       forcePopupIcon={false}
       displayType={displayType}
       fluidWidth={fluidWidth}
+      popupField={displayType === 'table'}
     />
   );
+
+  const previewField = (
+    <SelectPreviewContainer
+      data-test={props['data-test']}
+      onClick={onEdit}
+      displayType={displayType}
+      readOnly={readOnly}
+      fluidWidth={fluidWidth}
+    >
+      <SelectPreview
+        readOnly={readOnly}
+        readOnlyMessage={readOnlyMessage}
+        sx={{ height: '100%' }}
+        wrapColumn={wrapColumn}
+        value={selectValue}
+        options={selectOptions}
+        size='small'
+        emptyMessage={props.emptyMessage}
+        showEmpty={showEmpty}
+      />
+    </SelectPreviewContainer>
+  );
+
+  if (displayType === 'table') {
+    return <PopupFieldWrapper previewField={previewField} activeField={activeField} disabled={readOnly} />;
+  }
+
+  if (!isOpened) {
+    return previewField;
+  }
+
+  return activeField;
 }

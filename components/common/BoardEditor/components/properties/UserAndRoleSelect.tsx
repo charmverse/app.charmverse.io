@@ -2,8 +2,10 @@ import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
 import { Alert, Autocomplete, Box, Chip, IconButton, Stack, TextField, Tooltip } from '@mui/material';
+import type { ReactNode } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 
+import { PopupFieldWrapper } from 'components/common/BoardEditor/components/properties/PopupFieldWrapper';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import UserDisplay from 'components/common/UserDisplay';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
@@ -32,6 +34,8 @@ export type SelectOptionPopulated = RoleOptionPopulated | MemberOptionPopulated 
 type ContainerProps = {
   displayType?: PropertyValueDisplayType;
 };
+
+const renderDiv = (props: any & { children: ReactNode }) => <div>{props.children}</div>;
 
 const StyledAutocomplete = styled(Autocomplete<SelectOptionPopulated, true, boolean>)`
   min-width: 150px;
@@ -87,10 +91,11 @@ function SelectedOptions({
           <>
             {option.group === 'user' && (
               <Stack
+                mr={1}
+                my={0.25}
                 alignItems='center'
                 flexDirection='row'
                 key={option.id}
-                gap={0.5}
                 data-test='selected-user-or-role-option'
                 sx={wrapColumn ? { justifyContent: 'space-between', overflowX: 'hidden' } : { overflowX: 'hidden' }}
               >
@@ -112,7 +117,7 @@ function SelectedOptions({
               <Chip
                 data-test='selected-user-or-role-option'
                 color={errorValues?.includes?.(option.id) ? 'warning' : undefined}
-                sx={{ px: 0.5, cursor: readOnly || isRequiredValue(option) ? 'text' : 'pointer' }}
+                sx={{ px: 0.5, cursor: readOnly || isRequiredValue(option) ? 'text' : 'pointer', mr: 1, my: 0.25 }}
                 label={option.name}
                 // color={option.color}
                 key={option.id}
@@ -132,7 +137,7 @@ function SelectedOptions({
               <Chip
                 data-test='selected-user-or-role-option'
                 color={errorValues?.includes?.(option.id) ? 'warning' : undefined}
-                sx={{ px: 0.5, cursor: readOnly || isRequiredValue(option) ? 'text' : 'pointer' }}
+                sx={{ px: 0.5, cursor: readOnly || isRequiredValue(option) ? 'text' : 'pointer', mr: 1, my: 0.25 }}
                 label={option.label}
                 key={option.id}
                 icon={option.icon}
@@ -173,6 +178,7 @@ type Props<T> = {
   type?: 'role' | 'roleAndUser';
   required?: boolean;
   errorValues?: string[];
+  popupField?: boolean;
 };
 
 export function UserAndRoleSelect<T extends { id: string; group: string } = SelectOption>({
@@ -262,39 +268,40 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
     return 'Search for a person or role...';
   }
 
-  // TODO: maybe we don't need a separate component for un-open state?
-  if (variant === 'standard' && !isOpen) {
-    return (
-      <SelectPreviewContainer
-        data-test={dataTest}
-        isHidden={isOpen}
-        displayType={displayType}
-        readOnly={readOnly}
-        onClick={onClickToEdit}
-      >
-        <Tooltip title={readOnlyMessage ?? null}>
-          <Box display='inline-flex' flexWrap={wrapColumn ? 'wrap' : 'nowrap'} gap={0.5}>
-            {applicableValues.length === 0 ? (
-              showEmptyPlaceholder && <EmptyPlaceholder>{emptyPlaceholderContent}</EmptyPlaceholder>
-            ) : (
-              <SelectedOptions
-                wrapColumn={wrapColumn}
-                readOnly
-                value={populatedValue}
-                onRemove={removeOption}
-                errorValues={errorValues}
-              />
-            )}
-          </Box>
-        </Tooltip>
-      </SelectPreviewContainer>
-    );
-  }
+  const popupField = displayType === 'table';
 
-  return (
+  const previewField = (
+    <SelectPreviewContainer
+      data-test={dataTest}
+      isHidden={isOpen}
+      displayType={displayType}
+      readOnly={readOnly}
+      onClick={onClickToEdit}
+    >
+      <Tooltip title={readOnlyMessage ?? null}>
+        <Box display='inline-flex' flexWrap={wrapColumn ? 'wrap' : 'nowrap'} gap={0.5}>
+          {applicableValues.length === 0 ? (
+            showEmptyPlaceholder && <EmptyPlaceholder>{emptyPlaceholderContent}</EmptyPlaceholder>
+          ) : (
+            <SelectedOptions
+              wrapColumn={wrapColumn}
+              readOnly
+              value={populatedValue}
+              onRemove={removeOption}
+              errorValues={errorValues}
+            />
+          )}
+        </Box>
+      </Tooltip>
+    </SelectPreviewContainer>
+  );
+
+  const activeField = (
     <Tooltip title={readOnlyMessage ?? null}>
       <StyledUserPropertyContainer displayType={displayType}>
         <StyledAutocomplete
+          PopperComponent={popupField ? renderDiv : undefined}
+          PaperComponent={popupField ? renderDiv : undefined}
           data-test={dataTest}
           autoHighlight
           disableClearable
@@ -388,4 +395,15 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
       </StyledUserPropertyContainer>
     </Tooltip>
   );
+
+  if (displayType === 'table') {
+    return <PopupFieldWrapper disabled={readOnly} previewField={previewField} activeField={activeField} />;
+  }
+
+  // TODO: maybe we don't need a separate component for un-open state?
+  if (variant === 'standard' && !isOpen) {
+    return previewField;
+  }
+
+  return activeField;
 }
