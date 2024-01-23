@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import List from '@mui/material/List';
 import { useEffect, useRef, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
@@ -68,7 +69,6 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
   async function handleConnectEmailRequest(email: string) {
     if (sendingMagicLink.current === false) {
       sendingMagicLink.current = true;
-      // console.log('Handling magic link request');
       try {
         await requestMagicLinkViaFirebase({ email, connectToExistingAccount: true });
         showMessage(`Magic link sent. Please check your inbox for ${email}`, 'success');
@@ -76,6 +76,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
         setIdentityToAdd(null);
       } catch (err) {
         showMessage((err as any).message ?? 'Something went wrong', 'error');
+        log.error('Error sending magic link in identity modal.', { error: err });
       } finally {
         sendingMagicLink.current = false;
       }
