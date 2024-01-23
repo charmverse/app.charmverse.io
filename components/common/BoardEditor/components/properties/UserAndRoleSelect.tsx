@@ -97,7 +97,11 @@ function SelectedOptions({
                 flexDirection='row'
                 key={option.id}
                 data-test='selected-user-or-role-option'
-                sx={wrapColumn ? { justifyContent: 'space-between', overflowX: 'hidden' } : { overflowX: 'hidden' }}
+                sx={
+                  wrapColumn
+                    ? { justifyContent: 'space-between', overflowX: 'hidden' }
+                    : { overflowX: 'hidden', minWidth: 'fit-content' }
+                }
               >
                 <UserDisplay fontSize={14} avatarSize='xSmall' userId={option.id} wrapName={wrapColumn} />
                 {!readOnly && !isRequiredValue(option) && (
@@ -117,7 +121,7 @@ function SelectedOptions({
               <Chip
                 data-test='selected-user-or-role-option'
                 color={errorValues?.includes?.(option.id) ? 'warning' : undefined}
-                sx={{ px: 0.5, cursor: readOnly || isRequiredValue(option) ? 'text' : 'pointer', mr: 1, my: 0.25 }}
+                sx={{ px: 0.5, cursor: readOnly || isRequiredValue(option) ? 'text' : 'pointer', mr: 1 }}
                 label={option.name}
                 // color={option.color}
                 key={option.id}
@@ -137,7 +141,7 @@ function SelectedOptions({
               <Chip
                 data-test='selected-user-or-role-option'
                 color={errorValues?.includes?.(option.id) ? 'warning' : undefined}
-                sx={{ px: 0.5, cursor: readOnly || isRequiredValue(option) ? 'text' : 'pointer', mr: 1, my: 0.25 }}
+                sx={{ px: 0.5, cursor: readOnly || isRequiredValue(option) ? 'text' : 'pointer', mr: 1 }}
                 label={option.label}
                 key={option.id}
                 icon={option.icon}
@@ -273,7 +277,7 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
   const previewField = (
     <SelectPreviewContainer
       data-test={dataTest}
-      isHidden={isOpen}
+      isHidden={popupField ? false : isOpen}
       displayType={displayType}
       readOnly={readOnly}
       onClick={onClickToEdit}

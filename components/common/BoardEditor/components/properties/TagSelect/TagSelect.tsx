@@ -29,7 +29,7 @@ export const SelectPreviewContainer = styled(Stack, {
   ${({ isHidden }) => (isHidden ? 'display: none;' : '')};
   ${({ fluidWidth }) => (!fluidWidth ? 'width: 100%;' : '')}
   height: 100%;
-  justify-content: center;
+  justify-content: ${({ displayType }) => (displayType === 'table' ? 'flex-start' : 'center')}
   padding: ${({ theme, displayType }) => theme.spacing(displayType === 'table' ? 0 : 0.25, 0)};
   transition: background-color 0.2s ease-in-out;
 
