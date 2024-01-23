@@ -240,7 +240,10 @@ export function RewardsPage({ title }: { title: string }) {
               <Box width='100%'>
                 {activeView.fields.viewType === 'table' && (
                   <Table
-                    setSelectedProperty={setSelectedProperty}
+                    setSelectedProperty={(_selectedProperty) => {
+                      setSelectedProperty(_selectedProperty);
+                      setShowSidebar(true);
+                    }}
                     board={activeBoard}
                     activeView={activeView}
                     cardPages={cardPages as CardPage[]}
@@ -308,11 +311,8 @@ export function RewardsPage({ title }: { title: string }) {
 
             {isAdmin && (
               <ViewSidebar
-                sidebarView={selectedProperty ? 'card-properties' : undefined}
-                setSelectedProperty={(_selectedProperty) => {
-                  setSelectedProperty(_selectedProperty);
-                  setShowSidebar(true);
-                }}
+                sidebarView={selectedProperty ? 'card-property' : undefined}
+                setSelectedProperty={setSelectedProperty}
                 selectedProperty={selectedProperty}
                 cards={cards as Card[]}
                 views={views}

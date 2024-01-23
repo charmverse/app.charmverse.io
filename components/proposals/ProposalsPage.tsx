@@ -185,7 +185,10 @@ export function ProposalsPage({ title }: { title: string }) {
             {cardPages.length > 0 ? (
               <Box width='100%'>
                 <Table
-                  setSelectedProperty={setSelectedProperty}
+                  setSelectedProperty={(_selectedProperty) => {
+                    setSelectedProperty(_selectedProperty);
+                    setShowSidebar(true);
+                  }}
                   board={activeBoard}
                   activeView={activeView}
                   cardPages={cardPages}
@@ -217,18 +220,17 @@ export function ProposalsPage({ title }: { title: string }) {
 
             <ViewSidebar
               selectedProperty={selectedProperty}
-              setSelectedProperty={(_selectedProperty) => {
-                setSelectedProperty(_selectedProperty);
-                setShowSidebar(true);
-              }}
-              sidebarView={selectedProperty && showSidebar ? 'card-properties' : undefined}
+              setSelectedProperty={setSelectedProperty}
+              sidebarView={selectedProperty && showSidebar ? 'card-property' : undefined}
               cards={cards}
               views={views}
               board={activeBoard}
               rootBoard={activeBoard}
               view={activeView}
               isOpen={showSidebar}
-              closeSidebar={() => setShowSidebar(false)}
+              closeSidebar={() => {
+                setShowSidebar(false);
+              }}
               hideLayoutOptions
               hideSourceOptions
               hideGroupOptions
