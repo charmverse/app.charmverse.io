@@ -1,4 +1,4 @@
-import type { CredentialTemplate } from '@charmverse/core/dist/cjs/prisma-client';
+import type { CredentialEventType, CredentialTemplate } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { InputLabel } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -17,13 +17,15 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { getAttestationSchemaId } from 'lib/credentials/schemas';
 
+import { CredentialEventsSelector } from './CredentialEventsForm';
 import type { ProposalCredentialToPreview } from './ProposalCredentialPreview';
 import { ProposalCredentialPreview } from './ProposalCredentialPreview';
 
 const schema = yup.object({
   name: yup.string().required(),
   organization: yup.string().required(),
-  description: yup.string()
+  description: yup.string(),
+  credentialEvents: yup.array()
 });
 
 type FormValues = yup.InferType<typeof schema>;
@@ -53,7 +55,8 @@ function CredentialTemplateForm({
     defaultValues: {
       organization: credentialTemplate?.organization ?? space?.name,
       name: credentialTemplate?.name,
-      description: credentialTemplate?.description
+      description: credentialTemplate?.description,
+      credentialEvents: credentialTemplate?.credentialEvents ?? []
     },
     // mode: 'onChange',
     resolver: yupResolver(schema)
@@ -75,7 +78,8 @@ function CredentialTemplateForm({
           description: formValues.description ?? '',
           schemaType: 'proposal',
           spaceId: space?.id as string,
-          schemaAddress: schemaId
+          schemaAddress: schemaId,
+          credentialEvents: formValues.credentialEvents as CredentialEventType[]
         });
       } else {
         await charmClient.credentials.updateCredentialTemplate({
@@ -90,6 +94,8 @@ function CredentialTemplateForm({
     }
     setIsSaving(false);
   }
+
+  const selectedCredentialEvents = watch('credentialEvents');
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -128,6 +134,13 @@ function CredentialTemplateForm({
               error={!!errors.description}
               helperText={errors.description?.message}
               onChange={onChange}
+            />
+          </Box>
+          <Divider />
+          <Box>
+            <CredentialEventsSelector
+              selectedCredentialEvents={selectedCredentialEvents as CredentialEventType[]}
+              onChange={(events) => setValue('credentialEvents', events)}
             />
           </Box>
           {isValid && <ProposalCredentialPreview credential={getValues() as ProposalCredentialToPreview} />}

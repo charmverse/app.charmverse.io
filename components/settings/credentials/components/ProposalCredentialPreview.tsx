@@ -6,7 +6,6 @@ import Typography from '@mui/material/Typography';
 import { v4 as uuid } from 'uuid';
 
 import Link from 'components/common/Link';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { getEasConnector } from 'lib/credentials/connectors';
 import { attestationSchemaIds } from 'lib/credentials/schemas';
 import { getPagePermalink } from 'lib/pages/getPagePermalink';
@@ -20,7 +19,6 @@ type Props = {
 const exampleId = uuid();
 
 export function ProposalCredentialPreview({ credential }: Props) {
-  const { space } = useCurrentSpace();
   const proposalSchemaUrl = `${getEasConnector(10).attestationExplorerUrl}/schema/view/${
     attestationSchemaIds.proposal[10]
   }`;

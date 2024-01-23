@@ -1,10 +1,9 @@
-import type { CredentialTemplate, CredentialEventType, Space } from '@charmverse/core/prisma-client';
+import type { CredentialTemplate } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
+import { urPK } from '@mui/x-date-pickers';
 
 import { InvalidInputError } from 'lib/utilities/errors';
-
-import { defaultCredentialChain, getEasConnector } from './connectors';
 
 export async function getCredentialTemplates({ spaceId }: { spaceId: string }): Promise<CredentialTemplate[]> {
   if (!stringUtils.isUUID(spaceId)) {
