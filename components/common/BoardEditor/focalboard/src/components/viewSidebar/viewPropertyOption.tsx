@@ -3,7 +3,7 @@ import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import { Divider, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import { Divider, MenuItem, Typography, Stack, TextField } from '@mui/material';
 import { useMemo, useState } from 'react';
 
 import { proposalPropertyTypesList, type Board, type IPropertyTemplate } from 'lib/focalboard/board';
