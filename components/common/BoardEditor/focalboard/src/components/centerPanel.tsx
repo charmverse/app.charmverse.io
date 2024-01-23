@@ -206,7 +206,7 @@ function CenterPanel(props: Props) {
       }
       return acc;
     }, {});
-  }, [pages, activeBoard?.id]);
+  }, [pages, activeBoard]);
 
   // Make sure the checkedIds are still cards that exist
   useEffect(() => {
