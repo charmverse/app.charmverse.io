@@ -13,6 +13,7 @@ import AddBountyButton from 'components/common/BoardEditor/focalboard/src/compon
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import { blockLoad, databaseViewsLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { CardPropertiesWrapper } from 'components/common/CharmEditor/CardPropertiesWrapper';
 import { handleImageFileDrop } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
@@ -65,9 +66,17 @@ export interface DocumentPageProps {
   readOnly?: boolean;
   insideModal?: boolean;
   enableSidebar?: boolean;
+  relationPropertiesCardsRecord?: PageListItemsRecord;
 }
 
-function DocumentPage({ insideModal = false, page, savePage, readOnly = false, enableSidebar }: DocumentPageProps) {
+function DocumentPage({
+  relationPropertiesCardsRecord,
+  insideModal = false,
+  page,
+  savePage,
+  readOnly = false,
+  enableSidebar
+}: DocumentPageProps) {
   const { user } = useUser();
   const { router } = useCharmRouter();
   const { activeView: sidebarView, setActiveView, closeSidebar } = usePageSidebar();
@@ -258,6 +267,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
             readOnly={readOnly}
             pageUpdatedAt={page.updatedAt.toString()}
             pageUpdatedBy={page.updatedBy}
+            relationPropertiesCardsRecord={relationPropertiesCardsRecord}
           />
           <AddBountyButton readOnly={readOnly} cardId={page.id} />
         </>

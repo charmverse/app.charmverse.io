@@ -13,6 +13,8 @@ import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/boar
 import type { Card } from 'lib/focalboard/card';
 import { getPropertyName } from 'lib/focalboard/getPropertyName';
 
+import type { PageListItemsRecord } from '../../interfaces';
+
 export const PropertyNameContainer = styled(Stack)`
   position: relative;
   flex-direction: row;
@@ -46,7 +48,8 @@ export function CardDetailProperty({
   onDrop,
   syncWithPageId,
   mutator,
-  disableEditPropertyOption
+  disableEditPropertyOption,
+  relationPropertiesCardsRecord
 }: {
   syncWithPageId?: string | null;
   readOnly: boolean;
@@ -61,6 +64,7 @@ export function CardDetailProperty({
   mutator: Mutator;
   disableEditPropertyOption?: boolean;
   onDrop: (template: IPropertyTemplate, container: IPropertyTemplate) => void;
+  relationPropertiesCardsRecord?: PageListItemsRecord;
 }) {
   const [isDragging, isOver, columnRef] = useSortable('column', property, !readOnly, onDrop);
   const changePropertyPopupState = usePopupState({ variant: 'popover', popupId: 'card-property' });
@@ -119,6 +123,7 @@ export function CardDetailProperty({
         showEmptyPlaceholder
         displayType='details'
         mutator={mutator}
+        relationPropertyCards={relationPropertiesCardsRecord?.[property.id]}
       />
     </Stack>
   );

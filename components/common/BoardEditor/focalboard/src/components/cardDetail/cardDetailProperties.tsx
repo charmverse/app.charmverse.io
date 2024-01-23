@@ -5,6 +5,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CardDetailProperty } from 'components/common/BoardEditor/components/cardProperties/CardDetailProperty';
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useSmallScreen } from 'hooks/useMediaScreens';
@@ -37,6 +38,7 @@ type Props = {
   mutator?: Mutator;
   readOnlyProperties?: string[];
   disableEditPropertyOption?: boolean;
+  relationPropertiesCardsRecord?: PageListItemsRecord;
 };
 
 function CardDetailProperties(props: Props) {
@@ -50,7 +52,8 @@ function CardDetailProperties(props: Props) {
     pageUpdatedBy,
     syncWithPageId,
     mutator = defaultMutator,
-    disableEditPropertyOption
+    disableEditPropertyOption,
+    relationPropertiesCardsRecord
   } = props;
   const [newTemplateId, setNewTemplateId] = useState('');
   const intl = useIntl();
@@ -288,6 +291,7 @@ function CardDetailProperties(props: Props) {
             readOnly={isReadonlyTemplateProperty}
             mutator={mutator}
             disableEditPropertyOption={disableEditPropertyOption}
+            relationPropertiesCardsRecord={relationPropertiesCardsRecord}
           />
         );
       })}

@@ -18,8 +18,11 @@ import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
+import { getRelationPropertiesCardsRecord } from 'lib/focalboard/getRelationPropertiesCardsRecord';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
+import { makeSelectBoard } from '../BoardEditor/focalboard/src/store/boards';
+import { useAppSelector } from '../BoardEditor/focalboard/src/store/hooks';
 import { FullPageActionsMenuButton } from '../PageActions/FullPageActionsMenuButton';
 import { DocumentHeaderElements } from '../PageLayout/components/Header/components/DocumentHeaderElements';
 
@@ -48,7 +51,7 @@ function PageDialogBase(props: Props) {
   const { setCurrentPageId } = useCurrentPage();
   const { editMode, resetPageProps, setPageProps } = useCharmEditor();
 
-  const { updatePage } = usePages();
+  const { updatePage, pages } = usePages();
   const { page } = usePage({ pageIdOrPath: pageId });
   const pagePermissions = page?.permissionFlags || new AvailablePagePermissions().full;
   const domain = router.query.domain as string;
@@ -57,6 +60,20 @@ function PageDialogBase(props: Props) {
     : applicationContext
     ? `/${domain}/rewards/applications/${applicationContext.applicationId}`
     : null;
+
+  const selectBoard = useMemo(makeSelectBoard, []);
+  const activeBoard = useAppSelector((state) => selectBoard(state, page?.type === 'card' ? page.parentId ?? '' : ''));
+
+  const relationPropertiesCardsRecord = useMemo(
+    () =>
+      activeBoard && pages
+        ? getRelationPropertiesCardsRecord({
+            pages,
+            activeBoard
+          })
+        : {},
+    [pages, activeBoard]
+  );
 
   const readOnlyPage = readOnly || !pagePermissions?.edit_content;
 
@@ -175,7 +192,13 @@ function PageDialogBase(props: Props) {
       onClose={close}
     >
       {page && contentType === 'page' && (
-        <DocumentPage insideModal page={page} savePage={savePage} readOnly={readOnlyPage} />
+        <DocumentPage
+          relationPropertiesCardsRecord={relationPropertiesCardsRecord}
+          insideModal
+          page={page}
+          savePage={savePage}
+          readOnly={readOnlyPage}
+        />
       )}
       {contentType === 'application' && applicationContext && (
         <RewardApplicationPage
