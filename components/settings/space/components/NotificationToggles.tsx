@@ -6,7 +6,7 @@ import { Controller } from 'react-hook-form';
 
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { NotificationGroup } from 'lib/notifications/interfaces';
-import type { NotificationToggleOption } from 'lib/notifications/notificationToggles';
+import type { NotificationToggles, NotificationToggleOption } from 'lib/notifications/notificationToggles';
 
 import type { FormValues } from '../SpaceSettings';
 
@@ -14,7 +14,7 @@ type NotificationType = { label: string; type?: NotificationToggleOption };
 
 type ConfigurableGroups = Extract<NotificationGroup, 'rewards' | 'proposals' | 'polls'>;
 
-const notifications: Record<ConfigurableGroups, { title: string; types: NotificationType[][] }> = {
+const notificationTypes: Record<ConfigurableGroups, { title: string; types: NotificationType[][] }> = {
   rewards: {
     title: 'Rewards',
     types: [
@@ -54,6 +54,25 @@ const notifications: Record<ConfigurableGroups, { title: string; types: Notifica
   }
 };
 
+// set all notifications to true by default
+export function getDefaultValues(toggles: NotificationToggles): NotificationToggles {
+  const defaultValues: NotificationToggles = {
+    rewards: toggles.rewards ?? true,
+    proposals: toggles.proposals ?? true,
+    polls: toggles.polls ?? true
+  };
+  Object.entries(notificationTypes).forEach(([, settings]) => {
+    settings.types.forEach((typeColumn) => {
+      typeColumn.forEach((type) => {
+        if (type.type) {
+          defaultValues[type.type] = toggles[type.type] ?? true;
+        }
+      });
+    });
+  });
+  return defaultValues;
+}
+
 export function NotificationTogglesInput({
   isAdmin,
   control,
@@ -80,7 +99,7 @@ export function NotificationTogglesInput({
             disabled={!isAdmin}
             enabled={formValues.notificationToggles?.rewards}
             title={getFeatureTitle('Rewards')}
-            types={notifications.rewards.types}
+            types={notificationTypes.rewards.types}
           />
         }
         disabled={!isAdmin}
@@ -95,7 +114,7 @@ export function NotificationTogglesInput({
             disabled={!isAdmin}
             enabled={formValues.notificationToggles?.proposals}
             title={getFeatureTitle('Proposals')}
-            types={notifications.proposals.types}
+            types={notificationTypes.proposals.types}
           />
         }
         disabled={!isAdmin}
@@ -109,8 +128,8 @@ export function NotificationTogglesInput({
             control={control}
             disabled={!isAdmin}
             enabled={formValues.notificationToggles?.polls}
-            title={notifications.polls.title}
-            types={notifications.polls.types}
+            title={notificationTypes.polls.title}
+            types={notificationTypes.polls.types}
           />
         }
         disabled={!isAdmin}
@@ -174,7 +193,7 @@ function NotificationRuleComponent({
   control: any;
   enabled?: boolean;
   title: string;
-  types: (typeof notifications)['rewards']['types'];
+  types: (typeof notificationTypes)['rewards']['types'];
 }) {
   return (
     <Box width='100%'>
