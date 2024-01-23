@@ -508,14 +508,6 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
           )}
         </PageEditorContainer>
       </Box>
-      {page.type === 'proposal' && proposal?.status === 'draft' && (
-        <ProposalStickyFooter
-          page={page}
-          proposal={proposal}
-          isStructuredProposal={isStructuredProposal}
-          refreshProposal={refreshProposal}
-        />
-      )}
       {(page.type === 'proposal' || page.type === 'proposal_template') && (
         <ProposalSidebar
           isOpen={sidebarView === 'proposal_evaluation'}
@@ -535,6 +527,14 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
           onChangeWorkflow={onChangeWorkflow}
         />
       )}
+      {/* {page.type === 'proposal' && proposal?.status === 'draft' && (
+        <ProposalStickyFooter
+          page={page}
+          proposal={proposal}
+          isStructuredProposal={isStructuredProposal}
+          refreshProposal={refreshProposal}
+        />
+      )} */}
     </PrimaryColumn>
   );
 }

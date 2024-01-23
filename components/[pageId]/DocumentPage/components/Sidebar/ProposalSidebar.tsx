@@ -44,7 +44,7 @@ function SidebarComponent(props: SidebarProps) {
   }
   return (
     <SidebarContainer id='proposal-action-sidebar' open={isOpen}>
-      <Box overflow='hidden' width={sidebarWidth}>
+      <Box overflow='hidden'>
         <Box display='flex' height='100%' flexDirection='column' gap={1} px={1}>
           <Box display='flex' gap={0.5} alignItems='center'>
             <ToggleProposalSidebarButton isOpen={isOpen} onClick={toggleSidebar} />
@@ -54,7 +54,9 @@ function SidebarComponent(props: SidebarProps) {
               </Typography>
             )}
           </Box>
-          <ProposalEvaluations {...props} expanded={isOpen} />
+          <div onClick={openSidebar}>
+            <ProposalEvaluations {...props} expanded={isOpen} />
+          </div>
         </Box>
       </Box>
     </SidebarContainer>
