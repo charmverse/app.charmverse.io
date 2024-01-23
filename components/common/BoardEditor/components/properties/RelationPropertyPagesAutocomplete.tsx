@@ -6,6 +6,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { PageIcon } from 'components/common/PageIcon';
 import PageTitle from 'components/common/PageLayout/components/PageTitle';
 import type { PageListItem } from 'components/common/PagesList';
+import type { RelationPropertyData } from 'lib/focalboard/board';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { PropertyValueDisplayType } from '../../interfaces';
@@ -68,14 +69,16 @@ function PageListItemsContainer({
 
 export function RelationPropertyPagesAutocomplete({
   onChange,
-  selectedPageListItems,
+  selectedPageListItems: _selectedPageListItems,
   pageListItems,
   readOnly,
   wrapColumn,
   displayType = 'details',
   emptyPlaceholderContent = 'Empty',
-  showEmptyPlaceholder = true
+  showEmptyPlaceholder = true,
+  relationLimit
 }: {
+  relationLimit: RelationPropertyData['limit'];
   displayType?: PropertyValueDisplayType;
   readOnly?: boolean;
   pageListItems: PageListItem[];
@@ -87,7 +90,8 @@ export function RelationPropertyPagesAutocomplete({
 }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-
+  const selectedPageListItems =
+    relationLimit === 'single_page' ? _selectedPageListItems.slice(0, 1) : _selectedPageListItems;
   const sortedPages = useMemo(() => {
     const lowerCaseSearchTerm = searchTerm.toLowerCase();
     return pageListItems
@@ -135,8 +139,14 @@ export function RelationPropertyPagesAutocomplete({
         isOptionEqualToValue={(option, value) => option.id === value.id}
         multiple
         noOptionsText='No pages found'
-        onChange={(_, value) => {
-          onChange(value.map((v) => v.id) ?? []);
+        onChange={(_, _pageListItems) => {
+          if (relationLimit === 'single_page') {
+            const selectedPageItem = _pageListItems[1] ?? _pageListItems[0];
+            if (selectedPageItem) {
+              _pageListItems = [selectedPageItem];
+            }
+          }
+          return onChange(_pageListItems.map((v) => v.id) ?? []);
         }}
         onClose={() => setIsOpen(false)}
         openOnFocus

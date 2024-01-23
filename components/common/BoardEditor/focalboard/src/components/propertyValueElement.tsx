@@ -284,9 +284,10 @@ function PropertyValueElement(props: Props) {
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
       />
     );
-  } else if (propertyTemplate.type === 'relation') {
+  } else if (propertyTemplate.relationData && propertyTemplate.type === 'relation') {
     return (
       <RelationPropertyPagesAutocomplete
+        relationLimit={propertyTemplate.relationData.limit}
         onChange={async (newValue) => {
           try {
             await mutator.changePropertyValue(card, propertyTemplate.id, newValue);
