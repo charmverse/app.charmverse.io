@@ -2,7 +2,7 @@ import type { Space } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { CharmVerseCredentialInput } from 'lib/credentials/attest';
-import type { PublishedSignedCredential } from 'lib/credentials/queriesAndMutations';
+import type { EASAttestationFromApi } from 'lib/credentials/external/getExternalCredentials';
 import type {
   CreateCredentialTemplateInput,
   CredentialTemplateUpdate,
@@ -11,7 +11,7 @@ import type {
 
 export class CredentialsApi {
   // TODO Test endpoint for generating a credential - remove later
-  attest(data: CharmVerseCredentialInput): Promise<PublishedSignedCredential> {
+  attest(data: CharmVerseCredentialInput): Promise<EASAttestationFromApi> {
     return http.POST(`/api/credentials`, data);
   }
 

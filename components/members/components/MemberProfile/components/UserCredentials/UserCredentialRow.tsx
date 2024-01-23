@@ -1,13 +1,12 @@
 import LaunchIcon from '@mui/icons-material/Launch';
 import { Typography } from '@mui/material';
 import Box from '@mui/material/Box';
-import Icon from '@mui/material/Icon';
 import Image from 'next/image';
 
 import Link from 'components/common/Link';
-import type { PublishedSignedCredential } from 'lib/credentials/queriesAndMutations';
+import type { EASAttestationFromApi } from 'lib/credentials/external/getExternalCredentials';
 
-export function UserCredentialRow({ credential }: { credential: PublishedSignedCredential }) {
+export function UserCredentialRow({ credential }: { credential: EASAttestationFromApi }) {
   return (
     <Box display='flex' alignItems='center' justifyContent='space-between'>
       <Box ml={2} display='flex' alignItems='center' gap={2}>
