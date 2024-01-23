@@ -144,6 +144,7 @@ export function RelationPropertyPagesAutocomplete({
         renderInput={(params) => (
           <TextField
             {...params}
+            autoFocus
             size='small'
             value={selectedPageListItems}
             placeholder={selectedPageListItems.length === 0 ? 'Link a page' : ''}
@@ -154,6 +155,7 @@ export function RelationPropertyPagesAutocomplete({
               },
               disableUnderline: true
             }}
+            variant='standard'
           />
         )}
         renderOption={(props, pageListItem) => {

@@ -296,9 +296,7 @@ function PropertyValueElement(props: Props) {
         }}
         wrapColumn={props.wrapColumn}
         selectedPageListItems={(Array.isArray(propertyValue)
-          ? propertyValue.map((pageListItemId) => {
-              return pageListItemsRecord[pageListItemId];
-            })
+          ? propertyValue.map((pageListItemId) => pageListItemsRecord[pageListItemId])
           : []
         ).filter(isTruthy)}
         pageListItems={props.relationPropertyCards ?? []}
