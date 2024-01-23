@@ -6,13 +6,15 @@ import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Divider, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 
-import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import { proposalPropertyTypesList, type Board, type IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
 import { getPropertyName } from 'lib/focalboard/getPropertyName';
+import { defaultRewardPropertyIds } from 'lib/rewards/blocks/constants';
 
 import mutator from '../../mutator';
+import { DEFAULT_BLOCK_IDS } from '../table/tableHeader';
 
 const StyledMenuItem = styled(MenuItem)`
   padding-left: ${({ theme }) => theme.spacing(1)};
@@ -47,6 +49,13 @@ function ViewPropertyOption({
   );
   const isVisible = visiblePropertyIdsWithTitle.includes(property.id);
 
+  const disabled =
+    proposalPropertyTypesList.includes(property.type as any) ||
+    DEFAULT_BLOCK_IDS.includes(property.id) ||
+    defaultRewardPropertyIds.includes(property.id) ||
+    !!property.formFieldId ||
+    !!property.proposalFieldId;
+
   const toggleVisibility = () => {
     let newVisiblePropertyIds = [];
     if (isVisible) {
@@ -73,6 +82,7 @@ function ViewPropertyOption({
         onClick={(e) => {
           e.stopPropagation();
         }}
+        disabled={disabled}
         onChange={(e) => {
           e.stopPropagation();
           setTempName(e.target.value);
@@ -90,15 +100,15 @@ function ViewPropertyOption({
           mt: 2
         }}
       />
-      <StyledMenuItem onClick={toggleVisibility}>
+      <StyledMenuItem disabled={disabled} onClick={toggleVisibility}>
         {isVisible ? <VisibilityOffOutlinedIcon fontSize='small' /> : <VisibilityOutlinedIcon fontSize='small' />}
         <Typography variant='body2'>{isVisible ? 'Hide in view' : 'Show in view'}</Typography>
       </StyledMenuItem>
-      <StyledMenuItem onClick={duplicateProperty}>
+      <StyledMenuItem disabled={disabled} onClick={duplicateProperty}>
         <ContentCopyOutlinedIcon fontSize='small' />
         <Typography variant='body2'>Duplicate</Typography>
       </StyledMenuItem>
-      <StyledMenuItem onClick={deleteProperty}>
+      <StyledMenuItem disabled={disabled} onClick={deleteProperty}>
         <DeleteOutlinedIcon fontSize='small' />
         <Typography variant='body2'>Delete</Typography>
       </StyledMenuItem>

@@ -67,7 +67,7 @@ type Props = {
   setSelectedProperty: Dispatch<SetStateAction<IPropertyTemplate | null>>;
 };
 
-const DEFAULT_BLOCK_IDS = [
+export const DEFAULT_BLOCK_IDS = [
   DEFAULT_BOARD_BLOCK_ID,
   DEFAULT_VIEW_BLOCK_ID,
   PROPOSAL_STATUS_BLOCK_ID,
