@@ -320,24 +320,6 @@ export function NewProposalPage({
           </div>
         </div>
       </div>
-      {currentSpace && (
-        <ProposalSidebar
-          isUnpublishedProposal
-          isOpen={internalSidebarView === 'proposal_evaluation'}
-          closeSidebar={() => setActiveView(null)}
-          openSidebar={() => setActiveView('proposal_evaluation')}
-          proposalInput={formInputs}
-          templateId={formInputs.proposalTemplateId}
-          onChangeEvaluation={(evaluationId, updates) => {
-            const evaluations = formInputs.evaluations.map((e) => (e.id === evaluationId ? { ...e, ...updates } : e));
-            setFormInputs({
-              ...formInputs,
-              evaluations
-            });
-          }}
-          onChangeWorkflow={applyWorkflow}
-        />
-      )}
     </>
   );
 
@@ -372,101 +354,124 @@ export function NewProposalPage({
 
   return (
     <Box flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
-      <PrimaryColumn showPageActionSidebar={!!internalSidebarView}>
-        <Box className={`document-print-container ${fontClassName}`} display='flex' flexDirection='column'>
-          <PageTemplateBanner pageType={formInputs.type} isNewPage proposalType={formInputs.proposalType} />
-          {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
-          <StyledContainer data-test='page-charmeditor' top={defaultPageTop} fullWidth={isSmallScreen}>
-            <Box minHeight={450}>
-              {isStructured ? (
-                <>
-                  {proposalPageContent}
-                  {formInputs.type === 'proposal_template' ? (
-                    <ControlledFormFieldsEditor
-                      collapsedFieldIds={collapsedFieldIds}
-                      toggleCollapse={toggleCollapse}
-                      formFields={proposalFormFields}
-                      setFormFields={(formFields) => {
-                        setFormInputs({
-                          formFields
-                        });
-                      }}
-                    />
-                  ) : (
-                    <ControlledFormFieldInputs
-                      control={proposalFormFieldControl}
-                      errors={proposalFormFieldErrors}
-                      onFormChange={(updatedFormFields) => {
-                        setFormInputs({
-                          formAnswers: formAnswersRef.current?.map((formAnswer) => {
-                            const updatedFormField = updatedFormFields.find((f) => f.id === formAnswer.fieldId);
-                            return {
-                              ...formAnswer,
-                              value: updatedFormField?.value ?? formAnswer.value
-                            };
-                          })
-                        });
-                        onFormChange(updatedFormFields);
-                      }}
-                      formFields={proposalFormFields}
-                    />
-                  )}
-                </>
-              ) : (
-                <CharmEditor
-                  placeholderText={`Describe the proposal. Type '/' to see the list of available commands`}
-                  content={formInputs.content as PageContent}
-                  autoFocus={false}
-                  enableVoting={false}
-                  containerWidth={containerWidth}
-                  pageType='proposal'
-                  disableNestedPages
-                  onContentChange={applyProposalContent}
-                  focusOnInit
-                  isContentControlled
-                  key={`${String(formInputs.proposalTemplateId)}`}
-                >
-                  {/* temporary? disable editing of page title when in suggestion mode */}
-                  {proposalPageContent}
-                </CharmEditor>
-              )}
-            </Box>
-          </StyledContainer>
-        </Box>
-        <StickyFooterContainer>
-          {isTemplate ? (
-            <Button
-              data-test='create-proposal-button'
-              disabled={Boolean(disabledTooltip) || isCreatingProposal}
-              disabledTooltip={disabledTooltip}
-              onClick={() => saveForm({ isDraft: true })}
-              loading={isCreatingProposal && !submittedDraft}
-            >
-              Save
-            </Button>
-          ) : (
-            <>
+      <PrimaryColumn showPageActionSidebar={false}>
+        <Box display='flex' flexDirection='column' width='100%'>
+          <Box
+            className={`document-print-container ${fontClassName}`}
+            display='flex'
+            flexDirection='column'
+            overflow='auto'
+          >
+            <PageTemplateBanner pageType={formInputs.type} isNewPage proposalType={formInputs.proposalType} />
+            {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
+            <StyledContainer data-test='page-charmeditor' top={defaultPageTop} fullWidth={isSmallScreen}>
+              <Box minHeight={450}>
+                {isStructured ? (
+                  <>
+                    {proposalPageContent}
+                    {formInputs.type === 'proposal_template' ? (
+                      <ControlledFormFieldsEditor
+                        collapsedFieldIds={collapsedFieldIds}
+                        toggleCollapse={toggleCollapse}
+                        formFields={proposalFormFields}
+                        setFormFields={(formFields) => {
+                          setFormInputs({
+                            formFields
+                          });
+                        }}
+                      />
+                    ) : (
+                      <ControlledFormFieldInputs
+                        control={proposalFormFieldControl}
+                        errors={proposalFormFieldErrors}
+                        onFormChange={(updatedFormFields) => {
+                          setFormInputs({
+                            formAnswers: formAnswersRef.current?.map((formAnswer) => {
+                              const updatedFormField = updatedFormFields.find((f) => f.id === formAnswer.fieldId);
+                              return {
+                                ...formAnswer,
+                                value: updatedFormField?.value ?? formAnswer.value
+                              };
+                            })
+                          });
+                          onFormChange(updatedFormFields);
+                        }}
+                        formFields={proposalFormFields}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <CharmEditor
+                    placeholderText={`Describe the proposal. Type '/' to see the list of available commands`}
+                    content={formInputs.content as PageContent}
+                    autoFocus={false}
+                    enableVoting={false}
+                    containerWidth={containerWidth}
+                    pageType='proposal'
+                    disableNestedPages
+                    onContentChange={applyProposalContent}
+                    focusOnInit
+                    isContentControlled
+                    key={`${String(formInputs.proposalTemplateId)}`}
+                  >
+                    {/* temporary? disable editing of page title when in suggestion mode */}
+                    {proposalPageContent}
+                  </CharmEditor>
+                )}
+              </Box>
+            </StyledContainer>
+          </Box>
+          <StickyFooterContainer>
+            {isTemplate ? (
               <Button
-                disabled={Boolean(disabledTooltip) || isCreatingProposal}
-                disabledTooltip={disabledTooltip}
-                loading={isCreatingProposal && submittedDraft}
                 data-test='create-proposal-button'
-                variant='outlined'
-                onClick={() => saveForm({ isDraft: true })}
-              >
-                Save draft
-              </Button>
-              <Button
                 disabled={Boolean(disabledTooltip) || isCreatingProposal}
                 disabledTooltip={disabledTooltip}
-                onClick={() => saveForm()}
+                onClick={() => saveForm({ isDraft: true })}
                 loading={isCreatingProposal && !submittedDraft}
               >
-                Publish
+                Save
               </Button>
-            </>
-          )}
-        </StickyFooterContainer>
+            ) : (
+              <>
+                <Button
+                  disabled={Boolean(disabledTooltip) || isCreatingProposal}
+                  disabledTooltip={disabledTooltip}
+                  loading={isCreatingProposal && submittedDraft}
+                  data-test='create-proposal-button'
+                  variant='outlined'
+                  onClick={() => saveForm({ isDraft: true })}
+                >
+                  Save draft
+                </Button>
+                <Button
+                  disabled={Boolean(disabledTooltip) || isCreatingProposal}
+                  disabledTooltip={disabledTooltip}
+                  onClick={() => saveForm()}
+                  loading={isCreatingProposal && !submittedDraft}
+                >
+                  Publish
+                </Button>
+              </>
+            )}
+          </StickyFooterContainer>
+        </Box>
+        <ProposalSidebar
+          isUnpublishedProposal
+          isOpen={internalSidebarView === 'proposal_evaluation'}
+          closeSidebar={() => setActiveView(null)}
+          openSidebar={() => setActiveView('proposal_evaluation')}
+          proposalInput={formInputs}
+          templateId={formInputs.proposalTemplateId}
+          onChangeEvaluation={(evaluationId, updates) => {
+            const evaluations = formInputs.evaluations.map((e) => (e.id === evaluationId ? { ...e, ...updates } : e));
+            setFormInputs({
+              ...formInputs,
+              evaluations
+            });
+          }}
+          onChangeWorkflow={applyWorkflow}
+        />
         <ConfirmDeleteModal
           onClose={() => {
             setSelectedProposalTemplateId(null);

@@ -7,8 +7,6 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { getProposalErrors } from 'lib/proposal/getProposalErrors';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 
-import { CompleteDraftButton } from './components/CompleteDraftButton';
-
 export function ProposalStickyFooter({
   proposal,
   page,

@@ -12,12 +12,5 @@ export const PrimaryColumn = styled.div<{
   ${theme.breakpoints.up('md')} {
     width: ${showPageActionSidebar ? 'calc(100% - 430px)' : '100%'};
   }
-
-  // main content
-  & > :first-of-type {
-    flex-grow: 1;
-    min-height: 1px;
-    overflow: auto;
-  }
 `
 );
