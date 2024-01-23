@@ -217,7 +217,7 @@ export function EvaluationSidebar({
           updateEvaluation={updateEvaluation}
         />
       )}
-      <Divider />
+      <Divider sx={{ mb: 1 }} />
       {pagePath && pageTitle && proposal && (
         <ProposalSocialShare
           lensPostLink={proposal.lensPostLink}
