@@ -221,13 +221,13 @@ export function ProposalsPage({ title }: { title: string }) {
                 setSelectedProperty(_selectedProperty);
                 setShowSidebar(true);
               }}
-              sidebarView={selectedProperty ? 'card-properties' : undefined}
+              sidebarView={selectedProperty && showSidebar ? 'card-properties' : undefined}
               cards={cards}
               views={views}
               board={activeBoard}
               rootBoard={activeBoard}
               view={activeView}
-              isOpen={!!showSidebar}
+              isOpen={showSidebar}
               closeSidebar={() => setShowSidebar(false)}
               hideLayoutOptions
               hideSourceOptions

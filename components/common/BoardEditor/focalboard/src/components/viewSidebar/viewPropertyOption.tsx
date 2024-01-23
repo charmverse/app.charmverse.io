@@ -75,6 +75,8 @@ function ViewPropertyOption({
     mutator.duplicatePropertyTemplate(board, view, property.id);
   };
 
+  const isTitleProperty = property.id === Constants.titleColumnId;
+
   return (
     <Stack p={2}>
       <TextField
@@ -100,15 +102,15 @@ function ViewPropertyOption({
           mt: 2
         }}
       />
-      <StyledMenuItem disabled={disabled} onClick={toggleVisibility}>
+      <StyledMenuItem disabled={disabled || isTitleProperty} onClick={toggleVisibility}>
         {isVisible ? <VisibilityOffOutlinedIcon fontSize='small' /> : <VisibilityOutlinedIcon fontSize='small' />}
         <Typography variant='body2'>{isVisible ? 'Hide in view' : 'Show in view'}</Typography>
       </StyledMenuItem>
-      <StyledMenuItem disabled={disabled} onClick={duplicateProperty}>
+      <StyledMenuItem disabled={disabled || isTitleProperty} onClick={duplicateProperty}>
         <ContentCopyOutlinedIcon fontSize='small' />
         <Typography variant='body2'>Duplicate</Typography>
       </StyledMenuItem>
-      <StyledMenuItem disabled={disabled} onClick={deleteProperty}>
+      <StyledMenuItem disabled={disabled || isTitleProperty} onClick={deleteProperty}>
         <DeleteOutlinedIcon fontSize='small' />
         <Typography variant='body2'>Delete</Typography>
       </StyledMenuItem>

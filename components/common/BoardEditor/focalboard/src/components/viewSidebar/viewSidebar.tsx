@@ -51,10 +51,10 @@ function ViewSidebar(props: Props) {
   }
 
   useEffect(() => {
-    if (props.sidebarView) {
-      setSidebarView(props.sidebarView);
-    } else if (!props.isOpen) {
+    if (!props.isOpen) {
       setSidebarView(getDefaultView(!!props.view));
+    } else if (props.sidebarView) {
+      setSidebarView(props.sidebarView);
     }
   }, [props.isOpen, props.sidebarView]);
 

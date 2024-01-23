@@ -74,7 +74,8 @@ function PropertyMenuItem({
         <IconButton
           disabled={visibilityToggleDisabled}
           size='small'
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation();
             toggleVisibility(property.id);
           }}
         >
@@ -218,6 +219,7 @@ function PropertyOptions(props: LayoutOptionsProps) {
           <Stack>
             {hiddenProperties.map((property) => (
               <PropertyMenuItem
+                onClick={() => setSelectedProperty(property)}
                 onDrop={onDrop}
                 isVisible={false}
                 property={property}
