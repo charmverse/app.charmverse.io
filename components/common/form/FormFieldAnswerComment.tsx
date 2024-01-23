@@ -74,7 +74,7 @@ function FormFieldAnswerThreads({
             color='secondary'
             sx={{
               fontSize: {
-                md: '1.5rem',
+                md: '1.25rem',
                 xs: '1rem'
               }
             }}
@@ -159,7 +159,7 @@ export function FormFieldAnswerInput({
             sx={{
               cursor: 'pointer',
               fontSize: {
-                md: '1.5rem',
+                md: '1.25rem',
                 xs: '1rem'
               }
             }}
