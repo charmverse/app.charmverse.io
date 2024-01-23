@@ -310,7 +310,7 @@ test.describe.serial('Structured proposal template', () => {
     await expect(formField.getFormFieldInput(formFieldIds[1])).toHaveValue('John Doe');
   });
 
-  test.skip('Visit structured proposal and view only public form fields as a space member', async ({
+  test('Visit structured proposal and view only public form fields as a space member', async ({
     proposalListPage,
     documentPage,
     formField
