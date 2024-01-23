@@ -305,6 +305,7 @@ export function RewardsPage({ title }: { title: string }) {
 
             {isAdmin && (
               <ViewSidebar
+                cards={cards as Card[]}
                 views={views}
                 board={activeBoard}
                 rootBoard={activeBoard}

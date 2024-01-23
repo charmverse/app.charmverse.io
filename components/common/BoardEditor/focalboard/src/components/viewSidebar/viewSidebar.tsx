@@ -4,11 +4,13 @@ import { memo, useEffect, useState } from 'react';
 
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView, IViewType } from 'lib/focalboard/boardView';
+import type { Card } from 'lib/focalboard/card';
 
 import { DatabaseSidebarHeader } from './databaseSidebarHeader';
 import { StyledSidebar } from './styledSidebar';
 import GroupOptions from './viewGroupOptions';
 import ViewLayoutOptions from './viewLayoutOptions';
+import { ViewPropertyOption } from './viewPropertyOption';
 import ViewPropertyOptions from './viewPropertyOptions';
 import type { SidebarView } from './viewSidebarSelect';
 import { ViewSidebarSelect } from './viewSidebarSelect';
@@ -31,6 +33,7 @@ interface Props {
   hideLayoutSelectOptions?: boolean;
   hidePropertiesRow?: boolean;
   supportedViewTypes?: IViewType[];
+  cards: Card[];
 }
 
 function getDefaultView(hasBoardView: boolean): SidebarView {
@@ -39,6 +42,7 @@ function getDefaultView(hasBoardView: boolean): SidebarView {
 
 function ViewSidebar(props: Props) {
   const [sidebarView, setSidebarView] = useState<SidebarView>(getDefaultView(!!props.view));
+  const [selectedProperty, setSelectedProperty] = useState<null | IPropertyTemplate>(null);
   function goToSidebarHome() {
     setSidebarView('view-options');
   }
@@ -57,7 +61,7 @@ function ViewSidebar(props: Props) {
         orientation='horizontal'
         sx={{ position: 'absolute', right: 0, top: 0, bottom: 0, zIndex: 1000 }}
       >
-        <StyledSidebar data-test='view-sidebar-content'>
+        <StyledSidebar data-test='view-sidebar-content' className='disable-drag-selection'>
           {sidebarView === 'view-options' && <ViewSidebarSelect {...props} setSidebarView={setSidebarView} />}
 
           {props.view && (
@@ -76,7 +80,14 @@ function ViewSidebar(props: Props) {
               {sidebarView === 'card-properties' && (
                 <>
                   <DatabaseSidebarHeader goBack={goToSidebarHome} title='Properties' onClose={props.closeSidebar} />
-                  <ViewPropertyOptions properties={props.board?.fields.cardProperties ?? []} view={props.view} />
+                  <ViewPropertyOptions
+                    setSelectedProperty={(property) => {
+                      setSelectedProperty(property);
+                      setSidebarView('card-property');
+                    }}
+                    properties={props.board?.fields.cardProperties ?? []}
+                    view={props.view}
+                  />
                 </>
               )}
               {sidebarView === 'group-by' && (
@@ -86,6 +97,27 @@ function ViewSidebar(props: Props) {
                     properties={props.board?.fields.cardProperties || []}
                     view={props.view}
                     groupByProperty={props.groupByProperty}
+                  />
+                </>
+              )}
+              {sidebarView === 'card-property' && selectedProperty && props.board && props.view && (
+                <>
+                  <DatabaseSidebarHeader
+                    goBack={() => {
+                      setSidebarView('card-properties');
+                    }}
+                    title='Edit property'
+                    onClose={props.closeSidebar}
+                  />
+                  <ViewPropertyOption
+                    goBackStep={() => {
+                      setSidebarView('card-properties');
+                    }}
+                    views={props.views}
+                    board={props.board}
+                    view={props.view}
+                    cards={props.cards}
+                    property={selectedProperty}
                   />
                 </>
               )}

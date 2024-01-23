@@ -700,6 +700,7 @@ function CenterPanel(props: Props) {
             )}
 
             <ViewSidebar
+              cards={cards}
               views={views}
               page={props.page}
               board={activeBoard}

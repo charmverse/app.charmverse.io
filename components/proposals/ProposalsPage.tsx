@@ -214,6 +214,7 @@ export function ProposalsPage({ title }: { title: string }) {
             )}
 
             <ViewSidebar
+              cards={cards}
               views={views}
               board={activeBoard}
               rootBoard={activeBoard}

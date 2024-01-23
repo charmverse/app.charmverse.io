@@ -651,6 +651,21 @@ export class Mutator {
     return this.updateBlocks(newBlocks, oldBlocks, description);
   }
 
+  async updateRelationProperty(board: Board, relationPropertyId: string, updatedRelationProperty: IPropertyTemplate) {
+    const newBoard = createBoard({ block: board });
+    const cardPropertyIndex = board.fields.cardProperties.findIndex(
+      (o: IPropertyTemplate) => o.id === relationPropertyId
+    );
+
+    if (cardPropertyIndex === -1) {
+      return;
+    }
+
+    newBoard.fields.cardProperties[cardPropertyIndex] = updatedRelationProperty;
+
+    await this.updateBlock(newBoard, board, 'change relation property');
+  }
+
   async changePropertyTypeAndName(
     board: Board,
     cards: Card[],
