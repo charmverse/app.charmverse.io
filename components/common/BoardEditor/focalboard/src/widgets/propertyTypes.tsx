@@ -17,6 +17,7 @@ const propertyTypesList: PropertyType[] = [
   'date',
   'person',
   'checkbox',
+  'relation',
   'createdTime',
   'createdBy',
   'updatedTime',

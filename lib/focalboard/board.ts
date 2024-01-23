@@ -39,6 +39,7 @@ export type PropertyType =
   | 'updatedBy'
   | 'tokenAmount'
   | 'tokenChain'
+  | 'relation'
   | DatabaseProposalPropertyType;
 
 interface IPropertyOption<T = string> {
@@ -58,6 +59,11 @@ export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
   description?: string;
   formFieldId?: string;
   proposalFieldId?: string;
+  relation?: {
+    boardId: string;
+    limit: 'single_page' | 'multiple_page';
+    relatedPropertyId: string;
+  };
 };
 
 export type DataSourceType = 'board_page' | 'google_form' | 'proposals';
