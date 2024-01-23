@@ -44,10 +44,7 @@ const StyledLoadingComponent = styled(LoadingComponent)`
   align-items: flex-end;
 `;
 
-export const EditorViewContext = React.createContext<EditorView>(
-  /* we have to provide a default value to createContext */
-  null as unknown as EditorView
-);
+export const EditorViewContext = React.createContext<EditorView | null>(null);
 
 interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<PluginMetadata> {
   pageId?: string;

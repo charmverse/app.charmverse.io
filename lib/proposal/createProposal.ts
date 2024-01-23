@@ -15,6 +15,7 @@ import type { ProposalFields } from 'lib/proposal/interface';
 
 import { getPagePath } from '../pages';
 
+import { createVoteIfNecessary } from './createVoteIfNecessary';
 import type { VoteSettings } from './interface';
 import type { RubricDataInput } from './rubric/upsertRubricCriteria';
 import { upsertRubricCriteria } from './rubric/upsertRubricCriteria';
@@ -223,6 +224,11 @@ export async function createProposal({
     formId && formAnswers?.length && page.type === 'proposal'
       ? await upsertProposalFormAnswers({ formId, proposalId, answers: formAnswers })
       : null;
+
+  await createVoteIfNecessary({
+    createdBy: userId,
+    proposalId
+  });
 
   return {
     page: page as PageWithPermissions,
