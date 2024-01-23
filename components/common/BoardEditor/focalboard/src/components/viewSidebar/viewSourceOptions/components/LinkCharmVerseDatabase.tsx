@@ -17,6 +17,7 @@ const SidebarContent = styled.div`
 type Props = {
   currentSourceDatabaseId?: string;
   onSelectLinkedDatabase: (data: { sourceDatabaseId: string }) => void;
+  placeholder?: string;
 };
 
 export function LinkCharmVerseDatabase(props: Props) {
@@ -40,7 +41,7 @@ export function LinkCharmVerseDatabase(props: Props) {
       <TextField
         data-test='linked-database-search'
         autoFocus
-        placeholder='Search pages'
+        placeholder={props.placeholder ?? 'Search pages'}
         value={searchTerm}
         onChange={(e) => {
           setSearchTerm(e.target.value);

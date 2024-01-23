@@ -25,7 +25,6 @@ const PropertyMenu = React.memo((props: Props) => {
   const [name, setName] = useState(propertyName);
   const changePropertyTypePopupState = usePopupState({ variant: 'popover', popupId: 'card-property-type' });
   const intl = useIntl();
-
   return (
     <Stack gap={1}>
       <TextField
@@ -82,9 +81,13 @@ const PropertyMenu = React.memo((props: Props) => {
         }}
       >
         <PropertyTypes
+          selectedTypes={[propertyType]}
           onClick={(type) => {
-            props.onTypeAndNameChanged(type, name);
-            changePropertyTypePopupState.close();
+            if (type !== propertyType) {
+              // only change the type if it's different
+              props.onTypeAndNameChanged(type, name);
+              changePropertyTypePopupState.close();
+            }
           }}
         />
       </Menu>

@@ -59,10 +59,11 @@ export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
   description?: string;
   formFieldId?: string;
   proposalFieldId?: string;
-  relation?: {
+  relationData?: {
     boardId: string;
     limit: 'single_page' | 'multiple_page';
-    relatedPropertyId: string;
+    relatedPropertyId: string | null;
+    showOnRelatedBoard: boolean;
   };
 };
 

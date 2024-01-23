@@ -59,6 +59,7 @@ function TableHeaders(props: Props): JSX.Element {
   const intl = useIntl();
   const { formatDateTime, formatDate } = useDateFormatter();
   const addPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-property' });
+
   const isSmallScreen = useSmallScreen();
   const theme = useTheme();
   const sortOptions = useViewSortOptions(activeView);
@@ -183,13 +184,14 @@ function TableHeaders(props: Props): JSX.Element {
       activeView && (
         <PropertyTypes
           isMobile={isSmallScreen}
-          onClick={async (type) => {
+          onClick={async (type, relationData) => {
             addPropertyPopupState.close();
             const template: IPropertyTemplate = {
               id: Utils.createGuid(IDType.BlockID),
               name: typeDisplayName(intl, type),
               type,
-              options: []
+              options: [],
+              relationData
             };
             await mutator.insertPropertyTemplate(board, activeView, -1, template);
           }}

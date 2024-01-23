@@ -235,12 +235,13 @@ function CardDetailProperties(props: Props) {
       activeView && (
         <PropertyTypes
           isMobile={isSmallScreen}
-          onClick={async (type) => {
+          onClick={async (type, relationData) => {
             const template: IPropertyTemplate = {
               id: Utils.createGuid(IDType.BlockID),
               name: typeDisplayName(intl, type),
               type,
-              options: []
+              options: [],
+              relationData
             };
             const templateId = await mutator.insertPropertyTemplate(board, activeView, -1, template);
             setNewTemplateId(templateId);
