@@ -1,7 +1,9 @@
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
-import { log } from '@charmverse/core/dist/cjs/lib/log';
+import { log } from '@charmverse/core/log';
 import { getAddress } from 'viem';
 import { arbitrum, base, optimism } from 'viem/chains';
+
+import { prettyPrint } from 'lib/utilities/strings';
 
 import type { EasSchemaChain } from '../connectors';
 import { getOnChainAttestationUrl } from '../connectors';
@@ -57,30 +59,32 @@ function getTrackedOnChainCredentials({
   chainId: ExternalCredentialChain;
   wallets: string[];
 }): Promise<EASAttestationFromApi[]> {
+  const query = {
+    where: {
+      recipient: { in: wallets.map((w) => getAddress(w)) },
+      OR: trackedSchemas[chainId].map((_schema) => ({
+        schemaId: {
+          equals: _schema.schemaId
+        },
+        attester: {
+          in: _schema.issuers
+        }
+      }))
+    }
+  };
+
   return graphQlClients[chainId]
     .query({
       query: GET_EXTERNAL_CREDENTIALS,
       variables: {
-        filter: {
-          where: {
-            recipient: { in: wallets.map((w) => getAddress(w)) },
-            OR: trackedSchemas[chainId].map((_schema) => ({
-              schemaId: {
-                equals: _schema.schemaId
-              },
-              attester: {
-                in: _schema.issuers
-              }
-            }))
-          }
-        }
+        filter: query
       },
       // For now, let's refetch each time and rely on http endpoint-level caching
       // https://www.apollographql.com/docs/react/data/queries/#supported-fetch-policies
       fetchPolicy: 'no-cache'
     })
-    .then(({ data }) =>
-      data.map(
+    .then(({ data }) => {
+      return data.attestations.map(
         (attestation: any) =>
           ({
             ...attestation,
@@ -88,8 +92,8 @@ function getTrackedOnChainCredentials({
             timeCreated: attestation.timeCreated * 1000,
             verificationUrl: getOnChainAttestationUrl({ chainId, attestationId: attestation.id })
           } as EASAttestationFromApi)
-      )
-    );
+      );
+    });
 }
 
 export async function getAllOnChainAttestations({ wallets }: { wallets: string[] }): Promise<EASAttestationFromApi[]> {
@@ -100,9 +104,10 @@ export async function getAllOnChainAttestations({ wallets }: { wallets: string[]
   const attestations = await Promise.all(
     externalCredentialChains.map((chainId) =>
       getTrackedOnChainCredentials({ chainId, wallets }).catch((err) => {
-        log.error(`Error fetching on chain EAS attestations for wallets ${wallets.join('')} on chainId ${chainId}`, {
+        log.error(`Error fetching on chain EAS attestations for wallets ${wallets.join(', ')} on chainId ${chainId}`, {
           wallets,
-          chainId
+          chainId,
+          error: err
         });
         return [] as EASAttestationFromApi[];
       })
