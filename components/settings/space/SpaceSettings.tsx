@@ -51,7 +51,7 @@ import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFrom
 import { IdentityIcon } from '../profile/components/IdentityIcon';
 
 import Avatar from './components/LargeAvatar';
-import { NotificationTogglesInput } from './components/NotificationToggles';
+import { NotificationTogglesInput, getDefaultValues } from './components/NotificationToggles';
 import { SettingsItem } from './components/SettingsItem';
 import { TwoFactorAuth } from './components/TwoFactorAuth';
 
@@ -606,19 +606,12 @@ function getProfileWidgetLogo(name: MemberProfileName) {
 }
 
 function _getFormValues(space: Space): FormValues {
-  const notificationToggles = { ...(space.notificationToggles as any) } as NotificationToggles;
-  // set all notifications to true by default. TODO: find a programmatic way to do this?
-  notificationToggles.proposals ??= true;
-  notificationToggles.polls ??= true;
-  notificationToggles.rewards ??= true;
-  notificationToggles.proposals__start_discussion ??= true;
-  notificationToggles.proposals__vote ??= true;
   return {
     name: space.name,
     spaceImage: space.spaceImage,
     spaceArtwork: space.spaceArtwork,
     domain: space.domain,
     requireMembersTwoFactorAuth: space.requireMembersTwoFactorAuth,
-    notificationToggles
+    notificationToggles: getDefaultValues(space.notificationToggles as NotificationToggles)
   };
 }
