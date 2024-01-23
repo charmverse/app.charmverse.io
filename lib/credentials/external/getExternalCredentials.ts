@@ -1,9 +1,8 @@
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
 import { log } from '@charmverse/core/log';
+import { chain } from 'lodash';
 import { getAddress } from 'viem';
 import { arbitrum, base, optimism } from 'viem/chains';
-
-import { prettyPrint } from 'lib/utilities/strings';
 
 import type { EasSchemaChain } from '../connectors';
 import { getOnChainAttestationUrl } from '../connectors';
@@ -59,25 +58,25 @@ function getTrackedOnChainCredentials({
   chainId: ExternalCredentialChain;
   wallets: string[];
 }): Promise<EASAttestationFromApi[]> {
+  const recipient = wallets.map((w) => getAddress(w));
+
   const query = {
-    where: {
-      recipient: { in: wallets.map((w) => getAddress(w)) },
-      OR: trackedSchemas[chainId].map((_schema) => ({
-        schemaId: {
-          equals: _schema.schemaId
-        },
-        attester: {
-          in: _schema.issuers
-        }
-      }))
-    }
+    OR: trackedSchemas[chainId].map((_schema) => ({
+      schemaId: {
+        equals: _schema.schemaId
+      },
+      attester: {
+        in: _schema.issuers
+      },
+      recipient: { in: recipient }
+    }))
   };
 
   return graphQlClients[chainId]
     .query({
       query: GET_EXTERNAL_CREDENTIALS,
       variables: {
-        filter: query
+        where: query
       },
       // For now, let's refetch each time and rely on http endpoint-level caching
       // https://www.apollographql.com/docs/react/data/queries/#supported-fetch-policies
