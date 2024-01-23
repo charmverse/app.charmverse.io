@@ -168,7 +168,7 @@ function NotificationRuleComponent({
   enabled,
   title,
   disabled,
-  types: listsOftypes
+  types: typeColumns
 }: {
   disabled: boolean;
   control: any;
@@ -180,7 +180,7 @@ function NotificationRuleComponent({
     <Box width='100%'>
       <Typography sx={{ my: 1 }}>{title}</Typography>
       <Grid container sx={{ mb: 2, maxWidth: 600 }}>
-        {listsOftypes.map((types) => (
+        {typeColumns.map((types) => (
           <Grid xs={12} md={6} item key={types.map((e) => e.label).join()}>
             <Typography variant='caption'>
               <Stack ml={1}>
@@ -198,7 +198,7 @@ function NotificationRuleComponent({
                             <Checkbox
                               checked={value}
                               onChange={onChange}
-                              disabled={disabled}
+                              disabled={disabled || !enabled}
                               sx={{ p: 1, '& .MuiSvgIcon-root': { fontSize: 12 } }}
                             />
                           }
