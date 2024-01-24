@@ -1,3 +1,4 @@
+import type { BountyStatus } from '@charmverse/core/prisma-client';
 import { Box, Collapse, Divider, Stack, Tooltip } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import clsx from 'clsx';
@@ -44,6 +45,7 @@ type Props = {
   selectedTemplate?: RewardTemplate | null;
   resetTemplate?: VoidFunction;
   forcedApplicationType?: RewardApplicationType;
+  rewardStatus?: BountyStatus | null;
 };
 
 const getApplicationType = (values: UpdateableRewardFields, forcedApplicationType?: RewardApplicationType) => {
@@ -72,7 +74,8 @@ export function RewardPropertiesForm({
   addPageFromTemplate,
   selectedTemplate,
   resetTemplate,
-  forcedApplicationType
+  forcedApplicationType,
+  rewardStatus
 }: Props) {
   const [rewardApplicationType, setRewardApplicationTypeRaw] = useState<RewardApplicationType>(() =>
     getApplicationType(values, forcedApplicationType)
@@ -125,18 +128,11 @@ export function RewardPropertiesForm({
       }
     }
 
-    if ('rewardType' in updates && updates.rewardType === 'None') {
-      updates.rewardAmount = null;
-      updates.chainId = null;
-      updates.rewardToken = null;
-      updates.customReward = null;
-    }
-
     onChange(updates);
   }
 
   useEffect(() => {
-    if (rewardType === 'None') {
+    if (rewardType === 'None' && rewardStatus !== 'paid') {
       applyUpdates({
         rewardAmount: null,
         chainId: null,
@@ -144,7 +140,7 @@ export function RewardPropertiesForm({
         customReward: null
       });
     }
-  }, [rewardType]);
+  }, [rewardType, rewardStatus]);
 
   const applyUpdatesDebounced = useMemo(() => {
     if (useDebouncedInputs) {

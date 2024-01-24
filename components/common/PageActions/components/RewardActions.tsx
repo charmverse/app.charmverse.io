@@ -22,7 +22,7 @@ export function RewardActions({ rewardId, onClick }: { rewardId: string; onClick
     return null;
   }
 
-  const isMarkRewardPaidEnabled = rewardPermissions?.mark_paid;
+  const isMarkRewardPaidEnabled = rewardPermissions?.mark_paid && reward.status !== 'paid';
 
   const isMarkRewardCompletedEnabled = rewardPermissions?.lock && reward.status === 'open';
 
@@ -53,6 +53,8 @@ export function RewardActions({ rewardId, onClick }: { rewardId: string; onClick
 
   const disabledMarkRewardPaidTooltipMessage = !rewardPermissions?.mark_paid
     ? "You don't have permission to mark this reward as paid"
+    : reward.status === 'paid'
+    ? 'This reward is already marked as paid'
     : `All applications must be completed or marked as paid to mark this reward as paid`;
   const disabledMarkRewardCompletedTooltipMessage = !rewardPermissions?.lock
     ? `You don't have permission to mark this reward as complete`
