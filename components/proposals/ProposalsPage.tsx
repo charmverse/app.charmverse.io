@@ -8,7 +8,6 @@ import { ViewSettingsRow } from 'components/common/BoardEditor/components/ViewSe
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
 import { ToggleViewSidebarButton } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ToggleViewSidebarButton';
-import { ViewHeaderRowsMenu } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderRowsMenu/viewHeaderRowsMenu';
 import ViewSidebar from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import ErrorPage from 'components/common/errors/ErrorPage';
@@ -29,6 +28,8 @@ import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+
+import { HeaderRowActionsMenu } from './components/HeaderRowActionsMenu';
 
 export function ProposalsPage({ title }: { title: string }) {
   const { space: currentSpace } = useCurrentSpace();
@@ -76,15 +77,6 @@ export function ProposalsPage({ title }: { title: string }) {
     },
     [showError, trashPages]
   );
-
-  async function deleteProposals(pageIds: string[]) {
-    try {
-      await trashPages({ pageIds, trash: true });
-    } catch (error) {
-      showError(error, 'Could not archive pages');
-    }
-    await refreshProposals();
-  }
 
   if (isLoadingAccess) {
     return null;
@@ -138,7 +130,7 @@ export function ProposalsPage({ title }: { title: string }) {
         <Stack gap={0.75}>
           <div className={`ViewHeader ${showViewHeaderRowsMenu ? 'view-header-rows-menu-visible' : ''}`}>
             {showViewHeaderRowsMenu && (
-              <ViewHeaderRowsMenu
+              <HeaderRowActionsMenu
                 board={activeBoard}
                 cards={cards}
                 checkedIds={checkedIds}
@@ -147,7 +139,7 @@ export function ProposalsPage({ title }: { title: string }) {
                 onChange={() => {
                   refreshProposals();
                 }}
-                onDelete={deleteProposals}
+                refreshProposals={refreshProposals}
               />
             )}
             <div className='octo-spacer' />

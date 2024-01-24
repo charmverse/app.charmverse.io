@@ -17,22 +17,7 @@ import { PropertyMenu, StyledMenuItem } from './PropertyMenu';
 import { SelectPropertyTemplateMenu } from './SelectPropertyTemplateMenu';
 import { TextPropertyTemplateMenu } from './TextPropertyTemplateMenu';
 
-export function PropertyTemplateMenu({
-  propertyTemplate,
-  cards,
-  checkedIds,
-  board,
-  onChange,
-  isAdmin,
-  onProposalAuthorSelect,
-  onProposalReviewerSelect,
-  onProposalStepUpdate,
-  onProposalStatusUpdate,
-  onPersonPropertyChange,
-  firstCheckedProposal,
-  disabledTooltip,
-  lastChild
-}: {
+export type PropertyTemplateMenuProps = {
   board: Board;
   checkedIds: string[];
   cards: Card[];
@@ -52,7 +37,24 @@ export function PropertyTemplateMenu({
   firstCheckedProposal?: ProposalWithUsersLite;
   disabledTooltip?: string;
   lastChild: boolean;
-}) {
+};
+
+export function PropertyTemplateMenu({
+  propertyTemplate,
+  cards,
+  checkedIds,
+  board,
+  onChange,
+  isAdmin,
+  onProposalAuthorSelect,
+  onProposalReviewerSelect,
+  onProposalStepUpdate,
+  onProposalStatusUpdate,
+  onPersonPropertyChange,
+  firstCheckedProposal,
+  disabledTooltip,
+  lastChild
+}: PropertyTemplateMenuProps) {
   const checkedCards = cards.filter((card) => checkedIds.includes(card.id));
 
   if (checkedCards.length === 0) {

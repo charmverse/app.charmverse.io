@@ -1,32 +1,25 @@
-import type { ProposalEvaluationResult, ProposalSystemRole } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import { Stack, Tooltip, Typography } from '@mui/material';
 import type { Dispatch, SetStateAction } from 'react';
 import { useMemo, useState } from 'react';
-import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import { useTrashPages } from 'charmClient/hooks/pages';
-import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import { useBatchUpdateProposalStatusOrStep } from 'components/proposals/hooks/useBatchUpdateProposalStatusOrStep';
-import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card, CardPropertyValue } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
 import type { CreateEventPayload } from 'lib/notifications/interfaces';
-import type { ProposalEvaluationStep } from 'lib/proposal/interface';
-import { isTruthy } from 'lib/utilities/types';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import mutator from '../../../mutator';
 
 import { StyledMenuItem } from './PropertyMenu';
+import type { PropertyTemplateMenuProps } from './PropertyTemplateMenu';
 import { PropertyTemplateMenu } from './PropertyTemplateMenu';
 
 const StyledStack = styled(Stack)`
@@ -62,6 +55,23 @@ const validPropertyTypes = [
   'proposalStatus'
 ] as PropertyType[];
 
+export type ViewHeaderRowsMenuProps = {
+  board: Board;
+  cards: Card[];
+  setCheckedIds: Dispatch<SetStateAction<string[]>>;
+  checkedIds: string[];
+  propertyTemplates: IPropertyTemplate<PropertyType>[];
+  onChange?: VoidFunction;
+  onProposalAuthorSelect: PropertyTemplateMenuProps['onProposalAuthorSelect'];
+  onProposalReviewerSelect: PropertyTemplateMenuProps['onProposalReviewerSelect'];
+  onProposalStatusUpdate: PropertyTemplateMenuProps['onProposalStatusUpdate'];
+  onProposalStepUpdate: PropertyTemplateMenuProps['onProposalStepUpdate'];
+  isStepDisabled?: boolean;
+  isStatusDisabled?: boolean;
+  isReviewersDisabled?: boolean;
+  firstCheckedProposal?: PropertyTemplateMenuProps['firstCheckedProposal'];
+};
+
 export function ViewHeaderRowsMenu({
   cards,
   checkedIds,
@@ -69,22 +79,18 @@ export function ViewHeaderRowsMenu({
   board,
   propertyTemplates,
   onChange,
-  onDelete
-}: {
-  board: Board;
-  cards: Card[];
-  setCheckedIds: Dispatch<SetStateAction<string[]>>;
-  checkedIds: string[];
-  propertyTemplates: IPropertyTemplate<PropertyType>[];
-  onChange?: VoidFunction;
-  onDelete?: (pageIds: string[]) => Promise<void>;
-}) {
-  const { pages } = usePages();
+  onProposalAuthorSelect,
+  onProposalReviewerSelect,
+  onProposalStatusUpdate,
+  onProposalStepUpdate,
+  isStepDisabled,
+  isStatusDisabled,
+  isReviewersDisabled,
+  firstCheckedProposal
+}: ViewHeaderRowsMenuProps) {
   const isAdmin = useIsAdmin();
-  const { proposalsMap } = useProposals();
   const { space } = useCurrentSpace();
   const [isDeleting, setIsDeleting] = useState(false);
-  const { updateStatuses, updateSteps } = useBatchUpdateProposalStatusOrStep();
   const { trigger: trashPages } = useTrashPages();
   const { showConfirmation } = useConfirmationModal();
   const { showError } = useSnackbar();
@@ -103,191 +109,12 @@ export function ViewHeaderRowsMenu({
     }
     setIsDeleting(true);
     try {
-      if (onDelete) {
-        await onDelete(checkedIds);
-      } else {
-        await trashPages({ pageIds: checkedIds, trash: true });
-      }
+      await trashPages({ pageIds: checkedIds, trash: true });
     } catch (error) {
       showError(error, 'There was an error deleting cards');
     } finally {
       setCheckedIds([]);
       setIsDeleting(false);
-    }
-  }
-
-  async function onProposalAuthorSelect(pageIds: string[], authorIds: string[]) {
-    for (const pageId of pageIds) {
-      const proposalId = pages[pageId]?.proposalId;
-      const proposal = proposalId ? proposalsMap[proposalId] : null;
-      if (proposalId && !proposal?.archived) {
-        try {
-          await charmClient.proposals.updateProposal({
-            authors: authorIds,
-            proposalId
-          });
-        } catch (error) {
-          showError(error, 'There was an error updating authors');
-        }
-      }
-    }
-  }
-
-  const { isStepDisabled, isStatusDisabled, isReviewersDisabled } = useMemo(() => {
-    const checkedPages = checkedIds.map((id) => pages[id]).filter(isTruthy);
-    const firstProposal = proposalsMap[checkedPages[0]?.proposalId ?? ''];
-    const _isReviewerDisabled = checkedPages.some((checkedPage) => {
-      const proposal = proposalsMap[checkedPage.proposalId ?? ''];
-      return (
-        !proposal ||
-        proposal.archived ||
-        proposal.currentStep.step === 'draft' ||
-        proposal.currentStep.step === 'feedback'
-      );
-    });
-
-    const _isStatusDisabled =
-      !firstProposal ||
-      checkedPages.some((checkedPage) => {
-        const proposal = proposalsMap[checkedPage.proposalId ?? ''];
-        return !proposal || proposal.archived || proposal.currentStep.step !== firstProposal.currentStep.step;
-      });
-
-    const _isStepDisabled =
-      !firstProposal ||
-      checkedPages.some((checkedPage) => {
-        const proposal = proposalsMap[checkedPage.proposalId ?? ''];
-        return (
-          !proposal ||
-          proposal.archived ||
-          proposal.evaluations.length !== firstProposal.evaluations.length ||
-          // Check if all evaluations are in the same workflow
-          proposal.evaluations.some((evaluation, index) => {
-            const firstProposalEvaluation = firstProposal.evaluations[index];
-            return (
-              evaluation.type !== firstProposalEvaluation.type || evaluation.title !== firstProposalEvaluation.title
-            );
-          })
-        );
-      });
-
-    return {
-      isStepDisabled: _isStepDisabled,
-      isStatusDisabled: _isStatusDisabled,
-      isReviewersDisabled: _isReviewerDisabled
-    };
-  }, [pages, checkedIds, proposalsMap]);
-
-  async function onProposalReviewerSelect(pageIds: string[], reviewers: SelectOption[]) {
-    let proposalReviewersChanged = false;
-    for (const pageId of pageIds) {
-      const page = pages[pageId];
-      const proposalId = page?.proposalId;
-      const proposal = proposalId ? proposalsMap[proposalId] : null;
-      const proposalWithEvaluationId = proposal?.currentEvaluationId;
-      if (proposal && proposalWithEvaluationId && !proposal.archived) {
-        await charmClient.proposals.updateProposalEvaluation({
-          reviewers: reviewers.map((reviewer) => ({
-            roleId: reviewer.group === 'role' ? reviewer.id : null,
-            systemRole: reviewer.group === 'system_role' ? (reviewer.id as ProposalSystemRole) : null,
-            userId: reviewer.group === 'user' ? reviewer.id : null
-          })),
-          proposalId: proposal.id,
-          evaluationId: proposalWithEvaluationId
-        });
-        proposalReviewersChanged = true;
-      }
-    }
-    if (proposalReviewersChanged) {
-      try {
-        await mutate(`/api/spaces/${board.spaceId}/proposals`);
-      } catch (error) {
-        showError(error, 'There was an error updating reviewers');
-      }
-    }
-  }
-
-  async function onProposalStatusUpdate(pageIds: string[], result: ProposalEvaluationResult) {
-    if (pageIds.length === 0) {
-      return;
-    }
-
-    const firstProposal = proposalsMap[pages[pageIds[0]]?.proposalId ?? ''];
-
-    if (!firstProposal) {
-      return;
-    }
-
-    const proposalsData: {
-      proposalId: string;
-      evaluationId?: string;
-    }[] = [];
-
-    pageIds.forEach((pageId) => {
-      const proposal = proposalsMap[pages[pageId]?.proposalId ?? ''];
-      if (proposal?.currentStep.step === firstProposal.currentStep.step && !proposal.archived) {
-        proposalsData.push({
-          proposalId: proposal.id,
-          evaluationId: proposal.currentEvaluationId
-        });
-      }
-    });
-
-    if (proposalsData.length) {
-      try {
-        await updateStatuses({
-          proposalsData,
-          result,
-          currentEvaluationStep: firstProposal.currentStep.step
-        });
-      } catch (error) {
-        showError(error, 'There was an error updating statuses');
-      }
-    }
-  }
-
-  async function onProposalStepUpdate(pageIds: string[], evaluationId: string, moveForward: boolean) {
-    if (pageIds.length === 0) {
-      return;
-    }
-
-    const firstProposal = proposalsMap[pages[pageIds[0]]?.proposalId ?? ''];
-
-    if (!firstProposal) {
-      return;
-    }
-
-    const evaluationIndex = firstProposal.evaluations.findIndex((evaluation) => evaluation.id === evaluationId);
-
-    const proposalsData: {
-      proposalId: string;
-      evaluationId: string;
-      currentEvaluationStep: ProposalEvaluationStep;
-    }[] = [];
-
-    pageIds.forEach((pageId) => {
-      const proposal = proposalsMap[pages[pageId]?.proposalId ?? ''];
-      if (proposal && !proposal.archived) {
-        if (
-          (evaluationId === 'rewards' &&
-            ((proposal.fields?.pendingRewards ?? []).length > 0 || (proposal.rewardIds ?? [])?.length > 0)) ||
-          evaluationId !== 'rewards'
-        ) {
-          proposalsData.push({
-            proposalId: proposal.id,
-            evaluationId: evaluationId === 'draft' ? evaluationId : proposal.evaluations[evaluationIndex].id,
-            currentEvaluationStep: proposal.currentStep.step
-          });
-        }
-      }
-    });
-
-    if (proposalsData.length) {
-      try {
-        await updateSteps(proposalsData, moveForward);
-      } catch (error) {
-        showError(error, 'There was an error updating steps');
-      }
     }
   }
 
@@ -342,18 +169,6 @@ export function ViewHeaderRowsMenu({
         propertyTemplate.id !== Constants.titleColumnId
     );
   }, [propertyTemplates]);
-
-  const firstCheckedProposal = useMemo(() => {
-    let firstCheckedProposalId;
-    for (const checkedId of checkedIds) {
-      const proposalId = pages[checkedId]?.proposalId;
-      if (proposalId) {
-        firstCheckedProposalId = proposalId;
-        break;
-      }
-    }
-    return firstCheckedProposalId ? proposalsMap[firstCheckedProposalId] : undefined;
-  }, [checkedIds, pages, proposalsMap]);
 
   if (!space) {
     return null;
