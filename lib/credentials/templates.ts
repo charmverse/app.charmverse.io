@@ -1,10 +1,8 @@
-import type { CredentialTemplate, CredentialEventType, Space } from '@charmverse/core/prisma-client';
+import type { CredentialTemplate } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
 import { InvalidInputError } from 'lib/utilities/errors';
-
-import { defaultCredentialChain, getEasConnector } from './connectors';
 
 export async function getCredentialTemplates({ spaceId }: { spaceId: string }): Promise<CredentialTemplate[]> {
   if (!stringUtils.isUUID(spaceId)) {
@@ -20,7 +18,9 @@ export async function getCredentialTemplates({ spaceId }: { spaceId: string }): 
   return credentials;
 }
 
-type CredentialTemplateUpdateableFields = Partial<Pick<CredentialTemplate, 'name' | 'description' | 'organization'>>;
+type CredentialTemplateUpdateableFields = Partial<
+  Pick<CredentialTemplate, 'name' | 'description' | 'organization' | 'credentialEvents'>
+>;
 
 export type CredentialTemplateUpdate = {
   templateId: string;
@@ -38,14 +38,15 @@ export async function updateCredentialTemplate({
     data: {
       name: fields.name,
       description: fields.description,
-      organization: fields.organization
+      organization: fields.organization,
+      credentialEvents: fields.credentialEvents
     }
   });
 }
 
 export type CreateCredentialTemplateInput = Pick<
   CredentialTemplate,
-  'name' | 'description' | 'organization' | 'spaceId' | 'schemaType' | 'schemaAddress'
+  'name' | 'description' | 'organization' | 'spaceId' | 'schemaType' | 'schemaAddress' | 'credentialEvents'
 >;
 
 export async function createCredentialTemplate({
@@ -54,7 +55,8 @@ export async function createCredentialTemplate({
   organization,
   schemaAddress,
   schemaType,
-  spaceId
+  spaceId,
+  credentialEvents
 }: CreateCredentialTemplateInput): Promise<CredentialTemplate> {
   return prisma.credentialTemplate.create({
     data: {
@@ -63,30 +65,8 @@ export async function createCredentialTemplate({
       organization,
       schemaAddress,
       schemaType,
+      credentialEvents,
       space: { connect: { id: spaceId } }
-    }
-  });
-}
-
-export type SpaceCredentialEventUpdate = {
-  spaceId: string;
-  credentialEvents: CredentialEventType[];
-};
-
-export async function updateSpaceCredentialEvents({
-  spaceId,
-  credentialEvents
-}: SpaceCredentialEventUpdate): Promise<Space> {
-  if (!stringUtils.isUUID(spaceId)) {
-    throw new InvalidInputError(`Invalid spaceId: ${spaceId}`);
-  }
-
-  return prisma.space.update({
-    where: {
-      id: spaceId
-    },
-    data: {
-      credentialEvents
     }
   });
 }

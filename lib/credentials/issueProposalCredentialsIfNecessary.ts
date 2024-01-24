@@ -101,8 +101,13 @@ export async function issueProposalCredentialsIfNecessary({
       space: {
         select: {
           id: true,
-          credentialTemplates: true,
-          credentialEvents: true
+          credentialTemplates: {
+            where: {
+              credentialEvents: {
+                has: event
+              }
+            }
+          }
         }
       }
     }
@@ -110,11 +115,6 @@ export async function issueProposalCredentialsIfNecessary({
 
   if (!proposalWithSpaceConfig.page) {
     throw new DataNotFoundError(`Proposal with id ${proposalId} has no matching page`);
-  }
-
-  if (!proposalWithSpaceConfig.space.credentialEvents.includes(event)) {
-    // Space doesn't want to issue credentials for this event
-    return;
   }
 
   const issuedCredentials = await prisma.issuedCredential.findMany({
@@ -137,6 +137,7 @@ export async function issueProposalCredentialsIfNecessary({
           (issuedCredential) =>
             issuedCredential.credentialTemplateId === credentialTemplateId && issuedCredential.userId === author.userId
         ) &&
+        // Only credentials which match the event will have been returned by the query
         proposalWithSpaceConfig.space.credentialTemplates.some((t) => t.id === credentialTemplateId)
       ) {
         if (!credentialsToIssue[author.userId]) {

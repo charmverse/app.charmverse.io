@@ -6,10 +6,9 @@ import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
 import Legend from '../Legend';
 
-import { CredentialEventsForm } from './components/CredentialEventsForm';
 import { CredentialTemplates } from './components/CredentialTemplates';
 
-export function SpaceCredentialSettings({ space }: { space: Space }) {
+export function SpaceCredentialSettings() {
   const { getFeatureTitle } = useSpaceFeatures();
 
   useTrackPageView({ type: 'settings/credentials' });
@@ -28,10 +27,6 @@ export function SpaceCredentialSettings({ space }: { space: Space }) {
       <Box mb={2}>
         <CredentialTemplates />
       </Box>
-      <Typography variant='h6'>Proposals</Typography>
-      <CredentialEventsForm />
-
-      {/** Modal */}
     </>
   );
 }
