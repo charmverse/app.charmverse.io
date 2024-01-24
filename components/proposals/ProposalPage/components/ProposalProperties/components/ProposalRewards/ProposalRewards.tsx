@@ -1,7 +1,7 @@
 import type { ProposalReviewer } from '@charmverse/core/prisma';
 import { Delete, Edit } from '@mui/icons-material';
 import { Box, Grid, Hidden, IconButton, Stack, Typography } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { SelectPreviewContainer } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
@@ -15,6 +15,7 @@ import { useNewReward } from 'components/rewards/hooks/useNewReward';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
+import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalPendingReward } from 'lib/proposal/interface';
@@ -56,6 +57,8 @@ export function ProposalRewards({
   const [currentPendingId, setCurrentPendingId] = useState<null | string>(null);
   const { getRewardPage } = useRewardPage();
   const { rewards: allRewards } = useRewards();
+  const { templates } = useRewardTemplates({ load: !!requiredTemplateId });
+
   const {
     updateURLQuery,
     navigateToSpacePath,
@@ -117,7 +120,18 @@ export function ProposalRewards({
 
   function selectTemplate(template: RewardTemplate) {
     setRewardValues(template.reward);
+    updateNewPageValues({
+      templateId: template.page.id
+    });
   }
+
+  // kind of hacky.. support applying a template when one is provided from the proposal template
+  useEffect(() => {
+    const template = templates?.find((t) => t.page.id === requiredTemplateId);
+    if (template) {
+      selectTemplate(template);
+    }
+  }, [requiredTemplateId, templates]);
 
   if (rewards.length) {
     return (
@@ -273,7 +287,7 @@ export function ProposalRewards({
             isTemplate={false}
             expandedByDefault
             forcedApplicationType='assigned'
-            templateId={requiredTemplateId || undefined}
+            templateId={newPageValues?.templateId}
             readOnlyTemplate={!!requiredTemplateId}
             selectTemplate={selectTemplate}
           />
