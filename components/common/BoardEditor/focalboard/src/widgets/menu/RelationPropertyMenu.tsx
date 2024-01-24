@@ -135,7 +135,7 @@ export function RelationProperty({
             isEditorEmpty={selectedPage.hasContent === false}
             pageType={selectedPage.type}
           />
-          <Typography variant='subtitle1' color='secondary'>
+          <Typography variant='subtitle1' color='secondary' m={0} component='div'>
             {selectedPage.title ?? 'Untitled'}
           </Typography>
           <KeyboardArrowRightIcon color='secondary' fontSize='small' />
@@ -156,7 +156,7 @@ export function RelationProperty({
                   });
                 }}
               >
-                1 page
+                <Typography component='div'>1 page</Typography>
               </MenuItem>
               <MenuItem
                 selected={relationData.limit === 'multiple_page'}
@@ -178,7 +178,7 @@ export function RelationProperty({
               alignItems: 'center'
             }}
           >
-            <Typography variant='subtitle1' color='secondary'>
+            <Typography variant='subtitle1' color='secondary' m={0} component='div'>
               {relationData.limit === 'single_page' ? '1 page' : 'No limit'}
             </Typography>
             <KeyboardArrowRightIcon color='secondary' fontSize='small' />
