@@ -4,7 +4,7 @@ import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { Box, Divider, useMediaQuery } from '@mui/material';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 import { v4 as uuid } from 'uuid';
 
@@ -17,8 +17,8 @@ import { PrimaryColumn } from 'components/[pageId]/DocumentPage/components/Prima
 import { PageSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/PageSidebar';
 import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/components/StickyFooterContainer';
 import { defaultPageTop } from 'components/[pageId]/DocumentPage/DocumentPage';
-import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
+import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
@@ -38,7 +38,6 @@ import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
-import { getRelationPropertiesCardsRecord } from 'lib/focalboard/getRelationPropertiesCardsRecord';
 import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
 import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposal/rubric/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
@@ -46,7 +45,6 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
 import { getNewCriteria } from './components/EvaluationSettingsSidebar/components/RubricCriteriaSettings';
-import { useProposalsBoardAdapter } from './components/ProposalProperties/hooks/useProposalsBoardAdapter';
 import type { ProposalPropertiesInput } from './components/ProposalProperties/ProposalPropertiesBase';
 import { ProposalPropertiesBase } from './components/ProposalProperties/ProposalPropertiesBase';
 import { TemplateSelect } from './components/TemplateSelect';
@@ -106,7 +104,6 @@ export function NewProposalPage({
   const isAdmin = useIsAdmin();
 
   const sourceTemplate = proposalTemplates?.find((template) => template.page.id === formInputs.proposalTemplateId);
-  const { boardCustomProperties: activeBoard } = useProposalsBoardAdapter();
 
   const isStructured = formInputs.proposalType === 'structured' || !!formInputs.formId;
   const proposalFormFields = isStructured
@@ -151,17 +148,6 @@ export function NewProposalPage({
   const isTemplateRequired = Boolean(currentSpace?.requireProposalTemplate);
   const templatePageOptions = (proposalTemplates || []).map((template) => template.page);
   const { pages } = usePages();
-
-  const relationPropertiesCardsRecord = useMemo(
-    () =>
-      activeBoard?.fields && pages
-        ? getRelationPropertiesCardsRecord({
-            pages,
-            activeBoard
-          })
-        : {},
-    [pages, activeBoard]
-  );
 
   const proposalTemplatePage = formInputs.proposalTemplateId ? pages[formInputs.proposalTemplateId] : null;
 
@@ -330,7 +316,6 @@ export function NewProposalPage({
               readOnlyAuthors={!!sourceTemplate?.authors.length}
               readOnlyCustomProperties={readOnlyCustomProperties}
               readOnlySelectedCredentialTemplates={readOnlySelectedCredentialTemplates}
-              relationPropertiesCardsRecord={relationPropertiesCardsRecord}
             />
           </div>
         </div>

@@ -27,7 +27,6 @@ import {
   sortCards
 } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { webhookEndpoint } from 'config/constants';
@@ -151,6 +150,15 @@ function CenterPanel(props: Props) {
     }
   }, [activeView?.id, views.length, isActiveView, selectedPropertyId]);
 
+  const relationPropertiesCardsRecord = useMemo(
+    () =>
+      getRelationPropertiesCardsRecord({
+        pages,
+        activeBoard
+      }),
+    [pages, activeBoard]
+  );
+
   // filter cards by whats accessible
   const { cardPages, cardPageIds } = useMemo(() => {
     const result = _cards
@@ -161,7 +169,14 @@ function CenterPanel(props: Props) {
       .filter(({ page }) => !!page && !page.deletedAt);
 
     const _cardPages = isActiveView
-      ? sortCards(result, activeBoard, activeView, membersRecord, localViewSettings?.localSort)
+      ? sortCards(
+          result,
+          activeBoard,
+          activeView,
+          membersRecord,
+          relationPropertiesCardsRecord,
+          localViewSettings?.localSort
+        )
       : [];
 
     const _cardPageIds = new Set<string>();
@@ -171,18 +186,9 @@ function CenterPanel(props: Props) {
       cardPages: _cardPages,
       cardPageIds: _cardPageIds
     };
-  }, [isActiveView, _cards, pages, localViewSettings?.localSort]);
+  }, [isActiveView, _cards, pages, localViewSettings?.localSort, relationPropertiesCardsRecord]);
 
   const cards = cardPages.map(({ card }) => card);
-
-  const relationPropertiesCardsRecord = useMemo(
-    () =>
-      getRelationPropertiesCardsRecord({
-        pages,
-        activeBoard
-      }),
-    [pages, activeBoard]
-  );
 
   // Make sure the checkedIds are still cards that exist
   useEffect(() => {

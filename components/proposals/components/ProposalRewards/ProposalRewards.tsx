@@ -1,6 +1,6 @@
 import { Delete, Edit } from '@mui/icons-material';
 import { Box, Grid, Hidden, IconButton, Stack, Typography } from '@mui/material';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
@@ -20,9 +20,7 @@ import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useCharmRouter } from 'hooks/useCharmRouter';
-import { usePages } from 'hooks/usePages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import { getRelationPropertiesCardsRecord } from 'lib/focalboard/getRelationPropertiesCardsRecord';
 import type { ProposalPendingReward, ProposalReviewerInput } from 'lib/proposal/interface';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -50,19 +48,7 @@ export function ProposalRewards({
   useRewardsNavigation(rewardQueryKey);
   const { mappedFeatures } = useSpaceFeatures();
   const rewardsTitle = mappedFeatures.rewards.title;
-  const { board: activeBoard } = useRewardsBoardAdapter();
-  const { pages } = usePages();
-
-  const relationPropertiesCardsRecord = useMemo(
-    () =>
-      activeBoard && pages
-        ? getRelationPropertiesCardsRecord({
-            pages,
-            activeBoard
-          })
-        : {},
-    [pages, activeBoard]
-  );
+  const { relationPropertiesCardsRecord } = useRewardsBoardAdapter();
 
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
   const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, isSavingReward } = useNewReward();

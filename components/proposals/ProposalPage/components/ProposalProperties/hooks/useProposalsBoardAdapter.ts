@@ -18,6 +18,7 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
 import { Constants } from 'lib/focalboard/constants';
+import { getRelationPropertiesCardsRecord } from 'lib/focalboard/getRelationPropertiesCardsRecord';
 import { PROPOSAL_STEP_LABELS } from 'lib/focalboard/proposalDbProperties';
 import {
   AUTHORS_BLOCK_ID,
@@ -42,6 +43,7 @@ export function useProposalsBoardAdapter() {
   const { proposalBoardBlock, proposalBlocks } = useProposalBlocks();
   const proposalPage = pages[boardProposal?.id || ''];
   const proposalData = proposals?.find((p) => p.id === boardProposal?.id);
+
   const proposal = {
     ...boardProposal,
     ...proposalData,
@@ -75,6 +77,17 @@ export function useProposalsBoardAdapter() {
         evaluationStepTitles
       }),
     [evaluationStepTitles, proposalBoardBlock]
+  );
+
+  const relationPropertiesCardsRecord = useMemo(
+    () =>
+      board?.fields && pages
+        ? getRelationPropertiesCardsRecord({
+            pages,
+            activeBoard: board
+          })
+        : {},
+    [pages, board]
   );
 
   const activeView = useMemo(() => {
@@ -142,7 +155,7 @@ export function useProposalsBoardAdapter() {
     }
 
     const sortedCardPages = activeView
-      ? sortCards(cards, board, activeView, membersRecord, localViewSettings?.localSort)
+      ? sortCards(cards, board, activeView, membersRecord, relationPropertiesCardsRecord, localViewSettings?.localSort)
       : [];
 
     return sortedCardPages;
@@ -176,6 +189,7 @@ export function useProposalsBoardAdapter() {
   const views: BoardView[] = [];
 
   return {
+    relationPropertiesCardsRecord,
     board,
     boardCustomProperties,
     card,

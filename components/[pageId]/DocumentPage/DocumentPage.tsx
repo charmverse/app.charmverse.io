@@ -281,7 +281,6 @@ function DocumentPage({
           proposalPage={page}
           proposal={proposal}
           refreshProposal={refreshProposal}
-          relationPropertiesCardsRecord={relationPropertiesCardsRecord}
         />
       )}
       {reward && (

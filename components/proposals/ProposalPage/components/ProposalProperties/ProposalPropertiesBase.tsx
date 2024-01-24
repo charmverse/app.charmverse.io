@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
-import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { CredentialSelect } from 'components/credentials/CredentialsSelect';
 import { ProposalRewards } from 'components/proposals/components/ProposalRewards/ProposalRewards';
 import { CustomPropertiesAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/CustomPropertiesAdapter';
@@ -44,7 +43,6 @@ type ProposalPropertiesProps = {
   isReviewer?: boolean;
   rewardIds?: string[] | null;
   proposalId?: string;
-  relationPropertiesCardsRecord?: PageListItemsRecord;
 };
 
 export function ProposalPropertiesBase({
@@ -57,8 +55,7 @@ export function ProposalPropertiesBase({
   readOnlySelectedCredentialTemplates,
   isReviewer,
   rewardIds,
-  proposalId,
-  relationPropertiesCardsRecord
+  proposalId
 }: ProposalPropertiesProps) {
   const { user } = useUser();
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
@@ -153,7 +150,6 @@ export function ProposalPropertiesBase({
               fields: { ...proposalFormInputs.fields, properties: properties ? { ...properties } : {} }
             });
           }}
-          relationPropertiesCardsRecord={relationPropertiesCardsRecord}
         />
         <ProposalRewards
           pendingRewards={pendingRewards}

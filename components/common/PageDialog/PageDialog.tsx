@@ -6,7 +6,7 @@ import { Box } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import { trackPageView } from 'charmClient/hooks/track';
 import DocumentPage from 'components/[pageId]/DocumentPage';
@@ -20,7 +20,6 @@ import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
 import { useRelationProperties } from 'hooks/useRelationProperties';
-import { getRelationPropertiesCardsRecord } from 'lib/focalboard/getRelationPropertiesCardsRecord';
 import type { PageWithContent } from 'lib/pages';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
@@ -52,19 +51,7 @@ function RewardsDocumentPage({
   page: PageWithContent;
   savePage: (p: Partial<Page>) => void;
 }) {
-  const { board: activeBoard } = useRewardsBoardAdapter();
-  const { pages } = usePages();
-
-  const relationPropertiesCardsRecord = useMemo(
-    () =>
-      activeBoard && pages
-        ? getRelationPropertiesCardsRecord({
-            pages,
-            activeBoard
-          })
-        : {},
-    [pages, activeBoard]
-  );
+  const { relationPropertiesCardsRecord } = useRewardsBoardAdapter();
 
   return (
     <DocumentPage

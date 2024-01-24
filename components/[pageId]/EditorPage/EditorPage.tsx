@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { Page } from '@charmverse/core/prisma';
 import { Box } from '@mui/material';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import { trackPageView } from 'charmClient/hooks/track';
 import ErrorPage from 'components/common/errors/ErrorPage';
@@ -15,7 +15,6 @@ import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useRelationProperties } from 'hooks/useRelationProperties';
-import { getRelationPropertiesCardsRecord } from 'lib/focalboard/getRelationPropertiesCardsRecord';
 import type { PageWithContent } from 'lib/pages';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
@@ -33,18 +32,7 @@ function ProposalEditorPage({
 }) {
   const { pages } = usePages();
 
-  const { board: activeBoard } = useProposalsBoardAdapter();
-
-  const relationPropertiesCardsRecord = useMemo(
-    () =>
-      activeBoard?.fields && pages
-        ? getRelationPropertiesCardsRecord({
-            pages,
-            activeBoard
-          })
-        : {},
-    [pages, activeBoard]
-  );
+  const { relationPropertiesCardsRecord } = useProposalsBoardAdapter();
 
   return (
     <Box flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
@@ -68,19 +56,7 @@ function RewardEditorPage({
   savePage: (p: Partial<Page>) => void;
   page: PageWithContent;
 }) {
-  const { pages } = usePages();
-  const { board: activeBoard } = useRewardsBoardAdapter();
-
-  const relationPropertiesCardsRecord = useMemo(
-    () =>
-      activeBoard?.fields && pages
-        ? getRelationPropertiesCardsRecord({
-            pages,
-            activeBoard
-          })
-        : {},
-    [pages, activeBoard]
-  );
+  const { relationPropertiesCardsRecord } = useRewardsBoardAdapter();
 
   return (
     <Box flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>

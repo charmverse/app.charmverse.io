@@ -1,7 +1,7 @@
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { ButtonGroup } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
 import { Button } from 'components/common/Button';
@@ -14,9 +14,7 @@ import { RewardPropertiesForm } from 'components/rewards/components/RewardProper
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { usePages } from 'hooks/usePages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import { getRelationPropertiesCardsRecord } from 'lib/focalboard/getRelationPropertiesCardsRecord';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 
@@ -36,22 +34,11 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
   const { templates, isLoading } = useRewardTemplates();
   const [currentSpacePermissions] = useCurrentSpacePermissions();
   const { getFeatureTitle } = useSpaceFeatures();
-  const { board: activeBoard } = useRewardsBoardAdapter();
-  const { pages } = usePages();
+  const { relationPropertiesCardsRecord } = useRewardsBoardAdapter();
   const { trigger: trashPages } = useTrashPages();
   function deleteTemplate(pageId: string) {
     return trashPages({ pageIds: [pageId], trash: true });
   }
-  const relationPropertiesCardsRecord = useMemo(
-    () =>
-      activeBoard && pages
-        ? getRelationPropertiesCardsRecord({
-            pages,
-            activeBoard
-          })
-        : {},
-    [pages, activeBoard]
-  );
   const isDisabled = !currentSpacePermissions?.createBounty;
 
   function createTemplate() {
