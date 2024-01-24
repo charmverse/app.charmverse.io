@@ -1,5 +1,6 @@
-import { Chip, MenuItem, TextField, Typography, Stack } from '@mui/material';
+import { Chip, MenuItem, TextField, Typography, Stack, Box } from '@mui/material';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
+import type { ReactNode } from 'react';
 import { forwardRef, useEffect, useRef, useState } from 'react';
 import { v4 } from 'uuid';
 
@@ -9,6 +10,7 @@ import { SelectOptionItem } from 'components/common/form/fields/Select/SelectOpt
 import type { ControlFieldProps, FieldProps } from 'components/common/form/interfaces';
 import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
 
+const renderDiv = (props: any & { children: ReactNode }) => <div>{props.children}</div>;
 const filter = createFilterOptions<SelectOptionType>();
 
 type SelectProps = {
@@ -30,6 +32,8 @@ type SelectProps = {
   forcePopupIcon?: boolean | 'auto';
   required?: boolean;
   fluidWidth?: boolean;
+  popupField?: boolean;
+  dataTest?: string;
 };
 
 type Props = Omit<ControlFieldProps, 'value'> & FieldProps & SelectProps;
@@ -59,6 +63,8 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
       noOptionsText,
       helperText,
       fluidWidth,
+      popupField,
+      dataTest,
       ...inputProps
     },
     ref
@@ -123,11 +129,11 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
         iconLabel={iconLabel}
       >
         <Autocomplete
-          data-test='autocomplete'
+          data-test={dataTest || 'autocomplete'}
           className={className}
           onClose={() => setIsOpened(false)}
           onOpen={() => setIsOpened(true)}
-          open={isOpened || isOptionEditOpened}
+          open={isOpened || isOptionEditOpened || popupField}
           ref={ref}
           disabled={disabled}
           disableCloseOnSelect={multiselect}
@@ -136,6 +142,8 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
           clearOnBlur
           handleHomeEndKeys
           multiple
+          PopperComponent={popupField ? renderDiv : undefined}
+          PaperComponent={popupField ? renderDiv : undefined}
           filterSelectedOptions={!includeSelectedOptions}
           sx={!fluidWidth ? { minWidth: 150, width: '100%', zIndex: 1 } : { zIndex: 1 }}
           options={options}
@@ -158,20 +166,19 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
               />
             );
           }}
-          renderTags={(value, getTagProps) => (
-            <Stack flexDirection='row' gap={1}>
-              {value.map((option, index) => (
-                // eslint-disable-next-line react/jsx-key
-                <Chip
-                  {...getTagProps({ index })}
-                  style={{ margin: 0, maxWidth: 'none' }} // margin is added when dropdown is open for some reason, making the input height increase
-                  size='small'
-                  label={option.name}
-                  color={option.color}
-                />
-              ))}
-            </Stack>
-          )}
+          renderTags={(value, getTagProps) =>
+            value.map((option, index) => (
+              // eslint-disable-next-line react/jsx-key
+              <Chip
+                {...getTagProps({ index })}
+                sx={{ px: 0.5 }}
+                style={{ margin: 0, marginRight: 8, marginBottom: 2, marginTop: 2 }} // margin is added when dropdown is open for some reason, making the input height increase
+                size='small'
+                label={option.name}
+                color={option.color}
+              />
+            ))
+          }
           noOptionsText={<Typography variant='caption'>{noOptionsText || 'No options available'}</Typography>}
           renderInput={(params) => (
             <TextField

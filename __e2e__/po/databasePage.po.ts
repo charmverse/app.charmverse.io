@@ -90,10 +90,7 @@ export class DatabasePage extends GlobalPage {
         .locator(`data-test=database-row-${cardId}`)
         .locator('data-test=select-preview')
         .first(),
-      openSelect: this.getPageOrBoardLocator({ boardId })
-        .locator(`data-test=database-row-${cardId}`)
-        .locator('data-test=autocomplete')
-        .first()
+      openSelect: this.getPageOrBoardLocator({ boardId }).locator('data-test=active-select-autocomplete').first()
     };
   }
 
