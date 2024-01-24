@@ -282,7 +282,7 @@ function TableHeader(props: Props): JSX.Element {
           </MenuItem>,
           <MenuItem
             key='duplicate'
-            disabled={isDisabled}
+            disabled={isDisabled || template.type === 'relation'}
             onClick={() => {
               mutator.duplicatePropertyTemplate(board, activeView, templateId);
             }}

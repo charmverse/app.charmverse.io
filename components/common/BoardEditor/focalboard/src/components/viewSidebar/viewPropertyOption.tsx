@@ -121,7 +121,10 @@ function ViewPropertyOption({
         {isVisible ? <VisibilityOffOutlinedIcon fontSize='small' /> : <VisibilityOutlinedIcon fontSize='small' />}
         <Typography variant='body2'>{isVisible ? 'Hide in view' : 'Show in view'}</Typography>
       </StyledMenuItem>
-      <StyledMenuItem disabled={disabled || isTitleProperty} onClick={duplicateProperty}>
+      <StyledMenuItem
+        disabled={disabled || isTitleProperty || property.type === 'relation'}
+        onClick={duplicateProperty}
+      >
         <ContentCopyOutlinedIcon fontSize='small' />
         <Typography variant='body2'>Duplicate</Typography>
       </StyledMenuItem>
