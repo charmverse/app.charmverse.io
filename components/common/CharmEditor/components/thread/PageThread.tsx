@@ -246,6 +246,7 @@ interface PageThreadProps {
   onDeleteComment?: (threadId: string) => void;
   onToggleResolve?: (threadId: string, resolved: boolean) => void;
   sx?: SxProps<Theme>;
+  hideContext?: boolean;
 }
 
 export const RelativeDate = memo<{ createdAt: string | Date; prefix?: string; updatedAt?: string | Date | null }>(
@@ -288,7 +289,16 @@ export const RelativeDate = memo<{ createdAt: string | Date; prefix?: string; up
 
 const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
   (
-    { sx, onToggleResolve, onDeleteComment, showFindButton = false, threadId, inline = false, canCreateComments },
+    {
+      hideContext = false,
+      sx,
+      onToggleResolve,
+      onDeleteComment,
+      showFindButton = false,
+      threadId,
+      inline = false,
+      canCreateComments
+    },
     ref
   ) => {
     showFindButton = showFindButton ?? !inline;
@@ -426,7 +436,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
                     </Box>
                   </div>
                 </Box>
-                {commentIndex === 0 && (
+                {commentIndex === 0 && !hideContext && (
                   <Box
                     pl={4}
                     pb={1}

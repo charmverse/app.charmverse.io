@@ -217,6 +217,7 @@ function FormFieldInputsBase({
                           <FormFieldAnswerComment
                             formFieldAnswer={formField.formFieldAnswer}
                             pageId={pageId}
+                            formFieldName={formField.name}
                             disabled={disabled}
                             fieldAnswerThreads={fieldAnswerThreads}
                             canCreateComments={isAdmin || isReviewer}
