@@ -49,10 +49,12 @@ export function RewardStatusBadge({ truncate = false, showEmptyStatus, hideStatu
 export function RewardAmount({
   reward,
   truncate = false,
+  truncatePrecision = 4,
   typographyProps
 }: {
   reward: Pick<Reward, 'rewardAmount' | 'rewardToken' | 'chainId' | 'customReward'>;
   truncate?: boolean;
+  truncatePrecision?: number;
   typographyProps?: TypographyProps;
 }) {
   const [paymentMethods] = usePaymentMethods();
@@ -86,7 +88,7 @@ export function RewardAmount({
 
   const truncatedAmount = () => {
     try {
-      return millify(rewardAmount, { precision: 4 });
+      return millify(rewardAmount, { precision: truncatePrecision });
     } catch (error) {
       return 'Invalid number';
     }

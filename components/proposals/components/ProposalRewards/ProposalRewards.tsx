@@ -200,6 +200,7 @@ export function ProposalRewards({
                                   rewardToken: reward.rewardToken || null
                                 }}
                                 truncate={true}
+                                truncatePrecision={2}
                                 typographyProps={{ variant: 'body2', fontWeight: 'normal', fontSize: 'normal' }}
                               />
                             </Stack>
