@@ -1,4 +1,4 @@
-import type { FormFieldAnswer } from '@charmverse/core/prisma-client';
+import type { FormField, FormFieldAnswer } from '@charmverse/core/prisma-client';
 import { MessageOutlined } from '@mui/icons-material';
 import AddCommentOutlinedIcon from '@mui/icons-material/AddCommentOutlined';
 import { Box, Stack, Tooltip, Typography } from '@mui/material';
@@ -14,8 +14,6 @@ import { isTruthy } from 'lib/utilities/types';
 import { ThreadContainer } from '../CharmEditor/components/inlineComment/components/InlineCommentSubMenu';
 import PageThread from '../CharmEditor/components/thread/PageThread';
 import PopperPopup from '../PopperPopup';
-
-import type { FormFieldValue } from './interfaces';
 
 function FormFieldAnswerThreads({
   disabled,
@@ -50,11 +48,22 @@ function FormFieldAnswerThreads({
                 sx={{
                   boxShadow: 'none'
                 }}
+                hideContext
               />
             </ThreadContainer>
           ))}
         </Box>
       }
+      popoverProps={{
+        anchorOrigin: {
+          vertical: 'top',
+          horizontal: 'left'
+        },
+        transformOrigin: {
+          vertical: 'top',
+          horizontal: 'left'
+        }
+      }}
       disablePopup={disabled}
       paperSx={{
         boxShadow: 'none'
@@ -103,25 +112,25 @@ export function FormFieldAnswerInput({
   pageId,
   disabled,
   formFieldAnswer,
-  canCreateComments
+  canCreateComments,
+  formFieldName
 }: {
   disabled?: boolean;
   pageId: string;
   formFieldAnswer: FormFieldAnswer;
   canCreateComments?: boolean;
+  formFieldName: string;
 }) {
-  const formFieldAnswerValue = formFieldAnswer.value as FormFieldValue;
   const { trigger: createThread } = useCreateThread();
   const { refetchThreads } = useThreads();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleSubmit = async ({ commentContent, event, threadAccessGroups }: InlineCommentInputHandleSubmitParams) => {
     event.preventDefault();
-    const value = Array.isArray(formFieldAnswerValue) ? formFieldAnswerValue[0] : formFieldAnswerValue;
 
     await createThread({
       comment: commentContent,
-      context: (typeof value === 'object' ? value.contentText : value) as string,
+      context: formFieldName,
       pageId,
       accessGroups: threadAccessGroups.map((threadAccessGroup) => ({
         id: threadAccessGroup.id,
@@ -177,13 +186,15 @@ export function FormFieldAnswerComment({
   disabled,
   fieldAnswerThreads = [],
   formFieldAnswer,
-  canCreateComments
+  canCreateComments,
+  formFieldName
 }: {
   disabled?: boolean;
   pageId: string;
   fieldAnswerThreads?: ThreadWithComments[];
   formFieldAnswer: FormFieldAnswer;
   canCreateComments?: boolean;
+  formFieldName: string;
 }) {
   return (
     <Stack
@@ -204,6 +215,7 @@ export function FormFieldAnswerComment({
     >
       <FormFieldAnswerThreads fieldAnswerThreads={fieldAnswerThreads} />
       <FormFieldAnswerInput
+        formFieldName={formFieldName}
         disabled={disabled}
         pageId={pageId}
         formFieldAnswer={formFieldAnswer}
