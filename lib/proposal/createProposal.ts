@@ -126,7 +126,7 @@ export async function createProposal({
   }
 
   for (const evaluation of evaluations) {
-    if (evaluation.reviewers.length === 0 && evaluation.type !== 'feedback') {
+    if (evaluation.reviewers.length === 0) {
       throw new Error('No reviewers defined for proposal evaluation step');
     }
   }

@@ -379,7 +379,6 @@ function PropertyValueElement(props: Props) {
           readOnly ||
           (displayType !== 'details' && displayType !== 'table') ||
           proposal.currentStep?.step === 'draft' ||
-          proposal.currentStep?.step === 'feedback' ||
           !!proposal.sourceTemplateId
         }
         required

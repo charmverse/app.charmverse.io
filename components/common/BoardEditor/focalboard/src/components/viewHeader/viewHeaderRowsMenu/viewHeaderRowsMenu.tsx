@@ -138,12 +138,7 @@ export function ViewHeaderRowsMenu({
     const firstProposal = proposalsMap[checkedPages[0]?.proposalId ?? ''];
     const _isReviewerDisabled = checkedPages.some((checkedPage) => {
       const proposal = proposalsMap[checkedPage.proposalId ?? ''];
-      return (
-        !proposal ||
-        proposal.archived ||
-        proposal.currentStep.step === 'draft' ||
-        proposal.currentStep.step === 'feedback'
-      );
+      return !proposal || proposal.archived || proposal.currentStep.step === 'draft';
     });
 
     const _isStatusDisabled =
