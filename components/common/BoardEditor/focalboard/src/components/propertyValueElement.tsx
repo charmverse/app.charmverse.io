@@ -295,6 +295,7 @@ function PropertyValueElement(props: Props) {
             showError(error);
           }
         }}
+        readOnly={readOnly}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
         selectedPageListItems={(Array.isArray(propertyValue)
           ? propertyValue.map((pageListItemId) => pageListItemsRecord[pageListItemId])
