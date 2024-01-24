@@ -65,6 +65,8 @@ describe('isValidEmail', () => {
 });
 
 describe('stringSimilarity()', () => {
+  const threshold = 0.4;
+
   it('should return 1 for identical strings', () => {
     expect(stringSimilarity('hello', 'hello')).toBe(1);
   });
@@ -74,5 +76,20 @@ describe('stringSimilarity()', () => {
   it('should return a value between 0 and 1 for similar strings', () => {
     expect(stringSimilarity('hello', 'hell')).toBeGreaterThan(0);
     expect(stringSimilarity('hello', 'hell')).toBeLessThan(1);
+  });
+
+  it('should return below the threshold (that we use in production)', () => {
+    expect(stringSimilarity('a', 'b')).toBeLessThan(threshold);
+    expect(stringSimilarity('', 'a non empty string')).toBeLessThan(threshold);
+    expect(stringSimilarity('Create meme for twitter', 'template with authors')).toBeLessThan(threshold);
+    expect(stringSimilarity('cc', 'Cccccccccccccccccccccccccccccccc')).toBeLessThan(threshold);
+  });
+
+  it('should return above the threshold (that we use in production)', () => {
+    expect(stringSimilarity('DateCreated', 'CreatedDate')).toBeGreaterThanOrEqual(threshold);
+    expect(stringSimilarity('WolfmanJackIsDaBomb', 'WolfmanJackIsDaBest')).toBeGreaterThanOrEqual(threshold);
+    expect(stringSimilarity('Phyllis', 'PyllisX')).toBeGreaterThanOrEqual(threshold);
+    expect(stringSimilarity('Phyllis', 'Pylhlis')).toBeGreaterThanOrEqual(threshold);
+    expect(stringSimilarity('a whole long thing', 'a whole')).toBeGreaterThanOrEqual(threshold);
   });
 });
