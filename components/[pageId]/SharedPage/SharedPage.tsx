@@ -1,12 +1,12 @@
 import { Box } from '@mui/material';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { trackPageView } from 'charmClient/hooks/track';
 import { DatabasePage } from 'components/[pageId]/DatabasePage';
 import DocumentPage from 'components/[pageId]/DocumentPage';
-import { updateBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
+import { makeSelectBoard, updateBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { addCard } from 'components/common/BoardEditor/focalboard/src/store/cards';
-import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { addView, setCurrent } from 'components/common/BoardEditor/focalboard/src/store/views';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -15,6 +15,7 @@ import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
+import { getRelationPropertiesCardsRecord } from 'lib/focalboard/getRelationPropertiesCardsRecord';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
 
 type Props = {
@@ -27,6 +28,22 @@ export function SharedPage({ publicPage }: Props) {
   const { pages } = usePages();
   const [, setPageTitle] = usePageTitle();
   const { space } = useCurrentSpace();
+
+  const selectBoard = useMemo(makeSelectBoard, []);
+  const activeBoard = useAppSelector((state) =>
+    selectBoard(state, publicPage?.page?.type === 'card' ? publicPage?.page?.parentId ?? '' : '')
+  );
+
+  const relationPropertiesCardsRecord = useMemo(
+    () =>
+      activeBoard && pages
+        ? getRelationPropertiesCardsRecord({
+            pages,
+            activeBoard
+          })
+        : {},
+    [pages, activeBoard]
+  );
 
   const basePageId = publicPage?.page?.id || '';
 
@@ -88,7 +105,13 @@ export function SharedPage({ publicPage }: Props) {
     <DatabasePage page={currentPage} setPage={() => null} readOnly />
   ) : (
     <Box sx={{ overflowY: 'auto' }}>
-      <DocumentPage page={publicPage.page} savePage={() => null} readOnly enableSidebar />
+      <DocumentPage
+        relationPropertiesCardsRecord={relationPropertiesCardsRecord}
+        page={publicPage.page}
+        savePage={() => null}
+        readOnly
+        enableSidebar
+      />
     </Box>
   );
 }
