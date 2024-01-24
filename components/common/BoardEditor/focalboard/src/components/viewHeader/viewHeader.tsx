@@ -137,6 +137,7 @@ function ViewHeader(props: Props) {
               checkedIds={checkedIds}
               setCheckedIds={setCheckedIds}
               propertyTemplates={propertyTemplates}
+              relationPropertiesCardsRecord={props.relationPropertiesCardsRecord}
             />
           </div>
         ) : (

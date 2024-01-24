@@ -1,13 +1,18 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
+import Box from '@mui/material/Box';
 
+import { RelationPropertyPagesAutocomplete } from 'components/common/BoardEditor/components/properties/RelationPropertyPagesAutocomplete';
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
+import type { PageListItem } from 'components/common/PagesList';
 import { ControlledProposalStatusSelect } from 'components/proposals/components/ProposalStatusSelect';
 import { ControlledProposalStepSelect } from 'components/proposals/components/ProposalStepSelect';
 import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card, CardPropertyValue } from 'lib/focalboard/card';
 import type { ProposalWithUsersLite } from 'lib/proposal/interface';
+import { isTruthy } from 'lib/utilities/types';
 
 import mutator from '../../../mutator';
 
@@ -31,8 +36,10 @@ export function PropertyTemplateMenu({
   onPersonPropertyChange,
   firstCheckedProposal,
   disabledTooltip,
-  lastChild
+  lastChild,
+  relationPropertyCards
 }: {
+  relationPropertyCards: PageListItem[];
   board: Board;
   checkedIds: string[];
   cards: Card[];
@@ -54,6 +61,7 @@ export function PropertyTemplateMenu({
   lastChild: boolean;
 }) {
   const checkedCards = cards.filter((card) => checkedIds.includes(card.id));
+  const { showError } = useSnackbar();
 
   if (checkedCards.length === 0) {
     return null;
@@ -89,6 +97,41 @@ export function PropertyTemplateMenu({
           cards={checkedCards}
           propertyTemplate={propertyTemplate}
         />
+      );
+    }
+
+    case 'relation': {
+      const pageListItemsRecord =
+        relationPropertyCards.reduce<Record<string, PageListItem>>((acc, pageListItem) => {
+          acc[pageListItem.id] = pageListItem;
+          return acc;
+        }, {}) ?? {};
+
+      return (
+        <PropertyMenu lastChild={lastChild} cards={cards} propertyTemplate={propertyTemplate}>
+          <Box
+            sx={{
+              minWidth: 100,
+              minHeight: 25
+            }}
+          >
+            <RelationPropertyPagesAutocomplete
+              relationLimit={propertyTemplate.relationData?.limit ?? 'single_page'}
+              onChange={async (newValue) => {
+                try {
+                  await mutator.changePropertyValues(checkedCards, propertyTemplate.id, newValue);
+                } catch (error) {
+                  showError(error);
+                }
+              }}
+              selectedPageListItems={(Array.isArray(propertyValue)
+                ? propertyValue.map((pageListItemId) => pageListItemsRecord[pageListItemId])
+                : []
+              ).filter(isTruthy)}
+              pageListItems={relationPropertyCards ?? []}
+            />
+          </Box>
+        </PropertyMenu>
       );
     }
 

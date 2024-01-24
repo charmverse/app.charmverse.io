@@ -9,6 +9,7 @@ import { mutate } from 'swr';
 import charmClient from 'charmClient';
 import { useTrashPages } from 'charmClient/hooks/pages';
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { useBatchUpdateProposalStatusOrStep } from 'components/proposals/hooks/useBatchUpdateProposalStatusOrStep';
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
@@ -59,7 +60,8 @@ const validPropertyTypes = [
   'proposalAuthor',
   'proposalReviewer',
   'proposalStep',
-  'proposalStatus'
+  'proposalStatus',
+  'relation'
 ] as PropertyType[];
 
 export function ViewHeaderRowsMenu({
@@ -69,8 +71,10 @@ export function ViewHeaderRowsMenu({
   board,
   propertyTemplates,
   onChange,
-  onDelete
+  onDelete,
+  relationPropertiesCardsRecord
 }: {
+  relationPropertiesCardsRecord: PageListItemsRecord;
   board: Board;
   cards: Card[];
   setCheckedIds: Dispatch<SetStateAction<string[]>>;
@@ -370,6 +374,7 @@ export function ViewHeaderRowsMenu({
       {cards.length !== 0
         ? filteredPropertyTemplates.map((propertyTemplate, index) => (
             <PropertyTemplateMenu
+              relationPropertyCards={relationPropertiesCardsRecord[propertyTemplate.id] ?? []}
               isAdmin={isAdmin}
               board={board}
               checkedIds={checkedIds}

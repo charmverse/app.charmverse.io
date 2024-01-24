@@ -157,6 +157,7 @@ export function ProposalsPage({ title }: { title: string }) {
                   refreshProposals();
                 }}
                 onDelete={deleteProposals}
+                relationPropertiesCardsRecord={relationPropertiesCardsRecord}
               />
             )}
             <div className='octo-spacer' />

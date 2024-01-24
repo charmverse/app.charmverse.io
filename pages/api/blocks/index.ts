@@ -4,10 +4,9 @@ import type { Block, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { v4 } from 'uuid';
 
 import { prismaToBlock } from 'lib/focalboard/block';
-import type { BoardFields, IPropertyTemplate, RelationPropertyData } from 'lib/focalboard/board';
+import type { BoardFields } from 'lib/focalboard/board';
 import type { BoardViewFields } from 'lib/focalboard/boardView';
 import {
   ActionNotPermittedError,
@@ -271,17 +270,17 @@ async function updateBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) 
       title: true
     }
   });
-  const dbBlockPages = await prisma.page.findMany({
-    where: {
-      boardId: {
-        in: blocks.map((block) => block.id)
-      }
-    },
-    select: {
-      id: true,
-      title: true
-    }
-  });
+  // const dbBlockPages = await prisma.page.findMany({
+  //   where: {
+  //     boardId: {
+  //       in: blocks.map((block) => block.id)
+  //     }
+  //   },
+  //   select: {
+  //     id: true,
+  //     title: true
+  //   }
+  // });
 
   // validate access to the space
   await Promise.all(
@@ -295,148 +294,148 @@ async function updateBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) 
     })
   );
 
-  const boardBlocks = blocks.filter((block) => block.type === 'board');
+  // const boardBlocks = blocks.filter((block) => block.type === 'board');
 
-  for (const block of boardBlocks) {
-    const dbBlock = dbBlocks.find((b) => b.id === block.id);
-    const dbPage = dbBlockPages.find((p) => p.id === block.id);
-    if (block.type === 'board' && dbBlock) {
-      const newBlockProperties = (block.fields as unknown as BoardFields).cardProperties;
-      const dbBlockProperties = (dbBlock.fields as unknown as BoardFields).cardProperties;
-      const newRelationProperties = newBlockProperties.filter(
-        (p) => p.type === 'relation' && !dbBlockProperties.find((dbp) => dbp.id === p.id) && p.relationData
-      );
+  // for (const block of boardBlocks) {
+  //   const dbBlock = dbBlocks.find((b) => b.id === block.id);
+  //   const dbPage = dbBlockPages.find((p) => p.id === block.id);
+  //   if (block.type === 'board' && dbBlock) {
+  //     const newBlockProperties = (block.fields as unknown as BoardFields).cardProperties;
+  //     const dbBlockProperties = (dbBlock.fields as unknown as BoardFields).cardProperties;
+  //     const newRelationProperties = newBlockProperties.filter(
+  //       (p) => p.type === 'relation' && !dbBlockProperties.find((dbp) => dbp.id === p.id) && p.relationData
+  //     );
 
-      const deletedRelationProperties = dbBlockProperties.filter(
-        (p) => p.type === 'relation' && !newBlockProperties.find((dbp) => dbp.id === p.id) && p.relationData
-      );
+  //     const deletedRelationProperties = dbBlockProperties.filter(
+  //       (p) => p.type === 'relation' && !newBlockProperties.find((dbp) => dbp.id === p.id) && p.relationData
+  //     );
 
-      const deletedRelationPropertyBoards = await prisma.block.findMany({
-        where: {
-          id: {
-            in: deletedRelationProperties.map((p) => (p.relationData as RelationPropertyData).boardId)
-          }
-        },
-        select: {
-          id: true,
-          fields: true
-        }
-      });
+  //     const deletedRelationPropertyBoards = await prisma.block.findMany({
+  //       where: {
+  //         id: {
+  //           in: deletedRelationProperties.map((p) => (p.relationData as RelationPropertyData).boardId)
+  //         }
+  //       },
+  //       select: {
+  //         id: true,
+  //         fields: true
+  //       }
+  //     });
 
-      await Promise.all([
-        ...newRelationProperties.map(async (newRelationProperty) => {
-          const connectedRelationPropertyId = v4();
-          const updatedProperties = (block.fields as unknown as BoardFields).cardProperties.map((cp) => {
-            if (cp.id === newRelationProperty.id) {
-              return {
-                ...newRelationProperty,
-                relationData: {
-                  ...newRelationProperty.relationData,
-                  relatedPropertyId: connectedRelationPropertyId
-                }
-              };
-            }
-            return cp;
-          });
-          const propertyRelationData = newRelationProperty.relationData as RelationPropertyData;
-          const connectedBoard = await prisma.block.findUnique({
-            where: {
-              id: propertyRelationData.boardId
-            },
-            select: {
-              fields: true
-            }
-          });
-          const views =
-            (await prisma.block.findMany({
-              where: {
-                type: 'view',
-                parentId: propertyRelationData.boardId
-              },
-              select: {
-                id: true,
-                fields: true
-              }
-            })) ?? [];
+  //     await Promise.all([
+  //       ...newRelationProperties.map(async (newRelationProperty) => {
+  //         const connectedRelationPropertyId = v4();
+  //         const updatedProperties = (block.fields as unknown as BoardFields).cardProperties.map((cp) => {
+  //           if (cp.id === newRelationProperty.id) {
+  //             return {
+  //               ...newRelationProperty,
+  //               relationData: {
+  //                 ...newRelationProperty.relationData,
+  //                 relatedPropertyId: connectedRelationPropertyId
+  //               }
+  //             };
+  //           }
+  //           return cp;
+  //         });
+  //         const propertyRelationData = newRelationProperty.relationData as RelationPropertyData;
+  //         const connectedBoard = await prisma.block.findUnique({
+  //           where: {
+  //             id: propertyRelationData.boardId
+  //           },
+  //           select: {
+  //             fields: true
+  //           }
+  //         });
+  //         const views =
+  //           (await prisma.block.findMany({
+  //             where: {
+  //               type: 'view',
+  //               parentId: propertyRelationData.boardId
+  //             },
+  //             select: {
+  //               id: true,
+  //               fields: true
+  //             }
+  //           })) ?? [];
 
-          await prisma.$transaction([
-            prisma.block.update({
-              data: {
-                fields: {
-                  ...(connectedBoard?.fields as any),
-                  cardProperties: [
-                    ...(connectedBoard?.fields as unknown as BoardFields).cardProperties,
-                    {
-                      id: connectedRelationPropertyId,
-                      type: 'relation',
-                      name: dbPage?.title ?? 'Untitled',
-                      relationData: {
-                        limit: 'single_page',
-                        relatedPropertyId: newRelationProperty.id,
-                        showOnRelatedBoard: true,
-                        boardId: block.id
-                      } as RelationPropertyData
-                    } as IPropertyTemplate
-                  ]
-                }
-              },
-              where: {
-                id: propertyRelationData.boardId
-              }
-            }),
-            prisma.block.update({
-              data: {
-                fields: {
-                  ...(block?.fields as any),
-                  cardProperties: updatedProperties
-                }
-              },
-              where: {
-                id: block.id
-              }
-            }),
-            ...views.map((view) =>
-              prisma.block.update({
-                where: {
-                  id: view.id
-                },
-                data: {
-                  fields: {
-                    ...(view.fields as any),
-                    visiblePropertyIds: [
-                      ...(view.fields as BoardViewFields).visibleOptionIds,
-                      connectedRelationPropertyId
-                    ]
-                  }
-                }
-              })
-            )
-          ]);
-        }),
-        ...deletedRelationProperties.map((deletedRelationProperty) => {
-          const deletedRelationPropertyBoard = deletedRelationPropertyBoards.find(
-            (b) => b.id === (deletedRelationProperty.relationData as RelationPropertyData).boardId
-          );
-          if (!deletedRelationPropertyBoard) {
-            return [];
-          }
-          return prisma.block.update({
-            where: {
-              id: deletedRelationPropertyBoard.id
-            },
-            data: {
-              fields: {
-                ...(deletedRelationPropertyBoard.fields as any),
-                cardProperties: (deletedRelationPropertyBoard.fields as unknown as BoardFields).cardProperties.filter(
-                  (p) => p.id !== deletedRelationProperty.relationData?.relatedPropertyId
-                )
-              }
-            }
-          });
-        })
-      ]);
-    }
-  }
+  //         await prisma.$transaction([
+  //           prisma.block.update({
+  //             data: {
+  //               fields: {
+  //                 ...(connectedBoard?.fields as any),
+  //                 cardProperties: [
+  //                   ...(connectedBoard?.fields as unknown as BoardFields).cardProperties,
+  //                   {
+  //                     id: connectedRelationPropertyId,
+  //                     type: 'relation',
+  //                     name: dbPage?.title ?? 'Untitled',
+  //                     relationData: {
+  //                       limit: 'single_page',
+  //                       relatedPropertyId: newRelationProperty.id,
+  //                       showOnRelatedBoard: true,
+  //                       boardId: block.id
+  //                     } as RelationPropertyData
+  //                   } as IPropertyTemplate
+  //                 ]
+  //               }
+  //             },
+  //             where: {
+  //               id: propertyRelationData.boardId
+  //             }
+  //           }),
+  //           prisma.block.update({
+  //             data: {
+  //               fields: {
+  //                 ...(block?.fields as any),
+  //                 cardProperties: updatedProperties
+  //               }
+  //             },
+  //             where: {
+  //               id: block.id
+  //             }
+  //           }),
+  //           ...views.map((view) =>
+  //             prisma.block.update({
+  //               where: {
+  //                 id: view.id
+  //               },
+  //               data: {
+  //                 fields: {
+  //                   ...(view.fields as any),
+  //                   visiblePropertyIds: [
+  //                     ...(view.fields as BoardViewFields).visibleOptionIds,
+  //                     connectedRelationPropertyId
+  //                   ]
+  //                 }
+  //               }
+  //             })
+  //           )
+  //         ]);
+  //       }),
+  //       ...deletedRelationProperties.map((deletedRelationProperty) => {
+  //         const deletedRelationPropertyBoard = deletedRelationPropertyBoards.find(
+  //           (b) => b.id === (deletedRelationProperty.relationData as RelationPropertyData).boardId
+  //         );
+  //         if (!deletedRelationPropertyBoard) {
+  //           return [];
+  //         }
+  //         return prisma.block.update({
+  //           where: {
+  //             id: deletedRelationPropertyBoard.id
+  //           },
+  //           data: {
+  //             fields: {
+  //               ...(deletedRelationPropertyBoard.fields as any),
+  //               cardProperties: (deletedRelationPropertyBoard.fields as unknown as BoardFields).cardProperties.filter(
+  //                 (p) => p.id !== deletedRelationProperty.relationData?.relatedPropertyId
+  //               )
+  //             }
+  //           }
+  //         });
+  //       })
+  //     ]);
+  //   }
+  // }
 
   const updatedBlocks = await prisma.$transaction(
     blocks.map((block) => {
