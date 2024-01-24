@@ -1,5 +1,5 @@
+import { useGetCredentialTemplates } from 'charmClient/hooks/credentialHooks';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
-import { useGetCredentialTemplates } from 'components/settings/credentials/hooks/credentialHooks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { IPropertyOption } from 'lib/focalboard/board';
 
