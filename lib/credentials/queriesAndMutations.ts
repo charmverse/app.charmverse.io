@@ -1,15 +1,14 @@
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
 import { log } from '@charmverse/core/log';
-import { prisma } from '@charmverse/core/prisma-client';
+import type { AttestationType } from '@charmverse/core/prisma-client';
 import { Wallet } from 'ethers';
 
 import { credentialsWalletPrivateKey, graphQlServerEndpoint } from 'config/constants';
 
+import type { EasSchemaChain } from './connectors';
+import type { EASAttestationFromApi } from './external/getExternalCredentials';
+import type { ExternalCredentialChain } from './external/schemas';
 import type { ProposalCredential } from './schemas';
-
-// Assuming DID and AttestationType are defined elsewhere in your TypeScript code.
-type DID = string; // or whatever the actual type is
-type AttestationType = 'proposal'; // Extend this based on actual enum values
 
 const apolloClient = new ApolloClient({
   cache: new InMemoryCache(),
@@ -24,7 +23,7 @@ type CredentialFromCeramic = {
   sig: string;
   type: AttestationType;
   verificationUrl: string;
-  chainId: number;
+  chainId: ExternalCredentialChain | EasSchemaChain;
   schemaId: string;
   timestamp: Date;
 };
@@ -57,7 +56,7 @@ const CREATE_SIGNED_CREDENTIAL_MUTATION = gql`
 
 export type CredentialToPublish = Omit<PublishedSignedCredential, 'author' | 'id'>;
 
-function getParsedCredential(credential: CredentialFromCeramic): PublishedSignedCredential {
+function getParsedCredential(credential: CredentialFromCeramic): EASAttestationFromApi {
   let parsed = {} as any;
 
   try {
@@ -69,11 +68,14 @@ function getParsedCredential(credential: CredentialFromCeramic): PublishedSigned
 
   return {
     ...credential,
-    content: parsed
+    content: parsed,
+    attester: credential.issuer,
+    timeCreated: new Date(credential.timestamp).valueOf(),
+    type: 'internal'
   };
 }
 
-export async function publishSignedCredential(input: CredentialToPublish): Promise<PublishedSignedCredential> {
+export async function publishSignedCredential(input: CredentialToPublish): Promise<EASAttestationFromApi> {
   const record = await apolloClient
     .mutate({
       mutation: CREATE_SIGNED_CREDENTIAL_MUTATION,
@@ -114,19 +116,23 @@ const GET_CREDENTIALS = gql`
   }
 `;
 
-export async function getCredentialsByRecipient({
-  recipient
+export async function getCharmverseCredentialsByWallets({
+  wallets
 }: {
-  recipient: string;
-}): Promise<PublishedSignedCredential> {
-  const credentialWalletAddress = new Wallet(credentialsWalletPrivateKey).address.toLowerCase();
+  wallets: string[];
+}): Promise<EASAttestationFromApi[]> {
+  const credentialWalletAddress = new Wallet(credentialsWalletPrivateKey as string).address.toLowerCase();
+  if (!wallets.length) {
+    return [];
+  }
+
   return apolloClient
     .query({
       query: GET_CREDENTIALS,
       variables: {
         filter: {
           where: {
-            recipient: { equalTo: recipient.toLowerCase() },
+            recipient: { in: wallets.map((w) => w.toLowerCase()) },
             issuer: { equalTo: credentialWalletAddress }
           }
         }
@@ -136,20 +142,4 @@ export async function getCredentialsByRecipient({
       fetchPolicy: 'no-cache'
     })
     .then(({ data }) => data.signedCredentialFourIndex.edges.map((e: any) => getParsedCredential(e.node)));
-}
-export async function getCredentialsByUserId({ userId }: { userId: string }): Promise<PublishedSignedCredential[]> {
-  const user = await prisma.user.findUniqueOrThrow({
-    where: {
-      id: userId
-    },
-    select: {
-      wallets: true
-    }
-  });
-
-  const credentials: PublishedSignedCredential[] = await Promise.all(
-    user.wallets.map((w) => getCredentialsByRecipient({ recipient: w.address }))
-  ).then((data) => data.flat());
-
-  return credentials;
 }
