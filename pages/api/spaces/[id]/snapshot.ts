@@ -31,7 +31,6 @@ async function updateSnapshotConnection(req: NextApiRequest, res: NextApiRespons
       id: spaceId
     },
     data: {
-      defaultVotingDuration,
       snapshotDomain
     }
   });

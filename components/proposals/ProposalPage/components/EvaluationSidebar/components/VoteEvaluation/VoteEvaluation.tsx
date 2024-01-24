@@ -78,6 +78,7 @@ export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation }: Prop
               evaluationId={evaluation.id}
               proposalId={proposal!.id}
               snapshotProposalId={evaluation.snapshotId}
+              durationDays={evaluation.voteSettings?.durationDays}
             />
           </span>
         </Tooltip>
