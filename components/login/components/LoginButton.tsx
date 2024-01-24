@@ -124,12 +124,15 @@ function LoginHandler(props: DialogProps) {
   const { requestMagicLinkViaFirebase } = useFirebaseAuth();
   const { loginWithGooglePopup } = useGoogleLogin();
 
-  async function handleLogin(loggedInUser: { identityType?: string; displayName?: string; user?: LoggedInUser }) {
+  async function handleLogin(loggedInUser: { identityType?: string }) {
     showMessage(`Logged in with ${loggedInUser?.identityType}. Redirecting you now`, 'success');
-    window.location.reload();
   }
+
   async function handleGoogleLogin() {
-    const onSuccess = () => handleLogin({ identityType: 'Google' });
+    const onSuccess = () => {
+      handleLogin({ identityType: 'Google' });
+      window.location.reload();
+    };
     return loginWithGooglePopup({ onSuccess });
   }
 
@@ -152,12 +155,11 @@ function LoginHandler(props: DialogProps) {
 
   async function handleWeb3Login(authSig: AuthSig) {
     try {
-      const user = await loginFromWeb3Account(authSig);
-      handleLogin({
-        identityType: 'Wallet',
-        displayName: authSig.address,
-        user
-      });
+      const resp = await loginFromWeb3Account(authSig);
+      if (resp?.id) {
+        window.location.reload();
+      }
+      handleLogin({ identityType: 'Wallet' });
     } catch (err) {
       handleLoginError(err);
     }

@@ -1,4 +1,6 @@
-import { authSecret as _maybeAuthSecret, isTestEnv, baseUrl, cookieName } from 'config/constants';
+import type { IdentityType } from '@charmverse/core/prisma-client';
+
+import { authSecret as _maybeAuthSecret, isTestEnv } from 'config/constants';
 import 'iron-session';
 
 declare module 'iron-session' {
@@ -9,6 +11,8 @@ declare module 'iron-session' {
     anonymousUserId?: string;
     // Used when logged is as a different user
     isRemote?: boolean;
+    // Used when not logged in and waiting for OTP to be validated
+    otpUser?: { id: string; method: IdentityType };
   }
 }
 
