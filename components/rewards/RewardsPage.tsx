@@ -33,8 +33,10 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
+import { usePages } from 'hooks/usePages';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { viewTypeToBlockId } from 'lib/focalboard/customBlocks/constants';
+import { getRelationPropertiesCardsRecord } from 'lib/focalboard/getRelationPropertiesCardsRecord';
 import { DUE_DATE_ID } from 'lib/rewards/blocks/constants';
 import { defaultRewardViews, supportedRewardViewTypes } from 'lib/rewards/blocks/views';
 
@@ -63,6 +65,7 @@ export function RewardsPage({ title }: { title: string }) {
 
   const [showSidebar, setShowSidebar] = useState(false);
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
+  const { pages } = usePages();
 
   const groupByProperty = useMemo(() => {
     let _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
@@ -73,6 +76,17 @@ export function RewardsPage({ title }: { title: string }) {
 
     return _groupByProperty;
   }, [activeBoard?.fields.cardProperties, activeView?.fields.groupById, activeView?.fields.viewType]);
+
+  const relationPropertiesCardsRecord = useMemo(
+    () =>
+      activeBoard && pages
+        ? getRelationPropertiesCardsRecord({
+            pages,
+            activeBoard
+          })
+        : {},
+    [pages, activeBoard]
+  );
 
   const { visible: visibleGroups, hidden: hiddenGroups } = activeView
     ? getVisibleAndHiddenGroups(
@@ -243,6 +257,7 @@ export function RewardsPage({ title }: { title: string }) {
                       setSelectedPropertyId(_setSelectedPropertyId);
                       setShowSidebar(true);
                     }}
+                    relationPropertiesCardsRecord={relationPropertiesCardsRecord}
                     board={activeBoard}
                     activeView={activeView}
                     cardPages={cardPages as CardPage[]}
@@ -274,6 +289,7 @@ export function RewardsPage({ title }: { title: string }) {
                     dateDisplayProperty={dateDisplayProperty}
                     showCard={showRewardOrApplication}
                     addCard={async () => {}}
+                    relationPropertiesCardsRecord={relationPropertiesCardsRecord}
                     disableAddingCards
                   />
                 )}
@@ -293,6 +309,7 @@ export function RewardsPage({ title }: { title: string }) {
                     showCard={showRewardOrApplication}
                     disableAddingCards
                     readOnlyTitle
+                    relationPropertiesCardsRecord={relationPropertiesCardsRecord}
                     disableDnd
                     hideLinkedBounty
                   />

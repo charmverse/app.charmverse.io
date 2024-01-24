@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import type { ProposalFields } from 'lib/proposal/interface';
@@ -14,9 +15,17 @@ type Props = {
   readOnly?: boolean;
   readOnlyProperties?: string[];
   proposalId?: string;
+  relationPropertiesCardsRecord?: PageListItemsRecord;
 };
 
-export function CustomPropertiesAdapter({ proposal, onChange, readOnly, readOnlyProperties, proposalId }: Props) {
+export function CustomPropertiesAdapter({
+  relationPropertiesCardsRecord,
+  proposal,
+  onChange,
+  readOnly,
+  readOnlyProperties,
+  proposalId
+}: Props) {
   const { user } = useUser();
   const isAdmin = useIsAdmin();
 
@@ -45,6 +54,7 @@ export function CustomPropertiesAdapter({ proposal, onChange, readOnly, readOnly
       mutator={mutator ?? undefined}
       readOnlyProperties={readOnlyProperties}
       disableEditPropertyOption={!isAdmin}
+      relationPropertiesCardsRecord={relationPropertiesCardsRecord}
     />
   );
 }

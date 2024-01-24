@@ -42,7 +42,17 @@ export function useProposalsBoardAdapter() {
   const { proposalBoardBlock, proposalBlocks } = useProposalBlocks();
   const proposalPage = pages[boardProposal?.id || ''];
   const proposalData = proposals?.find((p) => p.id === boardProposal?.id);
-  const proposal = { ...boardProposal, ...proposalData };
+  const proposal = {
+    ...boardProposal,
+    ...proposalData,
+    fields: {
+      ...proposalData?.fields,
+      properties: {
+        ...proposalData?.fields?.properties,
+        ...boardProposal?.fields?.properties
+      }
+    }
+  };
   const isLoading = isProposalsLoading || isPagesLoading;
 
   const localViewSettings = useLocalDbViewSettings(`proposals-${space?.id}-${DEFAULT_VIEW_BLOCK_ID}`);

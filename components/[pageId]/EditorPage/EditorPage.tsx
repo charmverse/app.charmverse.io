@@ -1,21 +1,62 @@
 import { log } from '@charmverse/core/log';
 import type { Page } from '@charmverse/core/prisma';
 import { Box } from '@mui/material';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 
 import { trackPageView } from 'charmClient/hooks/track';
 import ErrorPage from 'components/common/errors/ErrorPage';
+import { useProposalsBoardAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter';
 import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
+import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useRelationProperties } from 'hooks/useRelationProperties';
+import { getRelationPropertiesCardsRecord } from 'lib/focalboard/getRelationPropertiesCardsRecord';
+import type { PageWithContent } from 'lib/pages';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
 import { DatabasePage } from '../DatabasePage';
 import DocumentPage from '../DocumentPage';
+
+function ProposalEditorPage({
+  page,
+  readOnly,
+  savePage
+}: {
+  readOnly?: boolean;
+  savePage: (p: Partial<Page>) => void;
+  page: PageWithContent;
+}) {
+  const { pages } = usePages();
+
+  const { boardCustomProperties: activeBoard } = useProposalsBoardAdapter();
+
+  const relationPropertiesCardsRecord = useMemo(
+    () =>
+      activeBoard?.fields && pages
+        ? getRelationPropertiesCardsRecord({
+            pages,
+            activeBoard
+          })
+        : {},
+    [pages, activeBoard]
+  );
+
+  return (
+    <Box flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
+      <DocumentPage
+        relationPropertiesCardsRecord={relationPropertiesCardsRecord}
+        page={page}
+        readOnly={readOnly}
+        savePage={savePage}
+        enableSidebar
+      />
+    </Box>
+  );
+}
 
 export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
   const { setCurrentPageId } = useCurrentPage();
@@ -116,6 +157,8 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
       page.type === 'linked_board'
     ) {
       return <DatabasePage page={page} setPage={savePage} pagePermissions={page.permissionFlags} />;
+    } else if (page.type === 'proposal' || page.type === 'proposal_template') {
+      return <ProposalEditorPage page={page} readOnly={readOnly} savePage={savePage} />;
     } else {
       // Document page is used in a few places, so it is responsible for retrieving its own permissions
       return (

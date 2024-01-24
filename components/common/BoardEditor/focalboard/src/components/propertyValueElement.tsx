@@ -70,7 +70,6 @@ import LastModifiedBy from './properties/lastModifiedBy/lastModifiedBy';
 import URLProperty from './properties/link/link';
 import { TokenAmount } from './properties/tokenAmount/tokenAmount';
 import { TokenChain } from './properties/tokenChain/tokenChain';
-import { LinkCharmVerseDatabase } from './viewSidebar/viewSourceOptions/components/LinkCharmVerseDatabase';
 
 type Props = {
   board: Board;
@@ -145,7 +144,6 @@ function PropertyValueElement(props: Props) {
   const { trigger } = useUpdateProposalEvaluation({ proposalId: proposal?.id });
 
   const isAdmin = useIsAdmin();
-
   const intl = useIntl();
   const propertyValue = card.fields.properties[propertyTemplate.id];
   const cardProperties = board.fields.cardProperties;

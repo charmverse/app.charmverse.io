@@ -68,7 +68,6 @@ export function CardDetailProperty({
 }) {
   const [isDragging, isOver, columnRef] = useSortable('column', property, !readOnly, onDrop);
   const changePropertyPopupState = usePopupState({ variant: 'popover', popupId: 'card-property' });
-
   return (
     <Stack
       ref={columnRef}
