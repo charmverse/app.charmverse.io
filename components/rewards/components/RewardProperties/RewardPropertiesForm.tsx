@@ -110,8 +110,10 @@ export function RewardPropertiesForm({
   useEffect(() => {
     if (isTruthy(values?.customReward)) {
       setRewardType('Custom');
+    } else if (!values?.rewardToken || !values?.rewardAmount || !values?.chainId) {
+      setRewardType('None');
     }
-  }, [values?.customReward]);
+  }, [values?.customReward, values?.rewardAmount, values?.rewardToken, values?.chainId]);
 
   async function applyUpdates(updates: Partial<UpdateableRewardFields>) {
     if ('customReward' in updates) {
