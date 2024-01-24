@@ -7,8 +7,6 @@ import { credentialsWalletPrivateKey, graphQlServerEndpoint } from 'config/const
 
 import type { ProposalCredential } from './schemas';
 
-const credentialWalletAddress = new Wallet(credentialsWalletPrivateKey).address.toLowerCase();
-
 // Assuming DID and AttestationType are defined elsewhere in your TypeScript code.
 type DID = string; // or whatever the actual type is
 type AttestationType = 'proposal'; // Extend this based on actual enum values
@@ -121,6 +119,7 @@ export async function getCredentialsByRecipient({
 }: {
   recipient: string;
 }): Promise<PublishedSignedCredential> {
+  const credentialWalletAddress = new Wallet(credentialsWalletPrivateKey).address.toLowerCase();
   return apolloClient
     .query({
       query: GET_CREDENTIALS,
