@@ -11,7 +11,6 @@ import type { RewardWithUsers, RewardWithUsersAndPageMeta } from 'lib/rewards/in
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
 import { RewardSignupButton } from './components/RewardSignupButton';
-import { useRewardsBoardAdapter } from './hooks/useRewardsBoardAdapter';
 
 export function RewardProperties(props: {
   readOnly?: boolean;
@@ -23,8 +22,6 @@ export function RewardProperties(props: {
   isTemplate?: boolean;
   expandedRewardProperties?: boolean;
 }) {
-  const { relationPropertiesCardsRecord } = useRewardsBoardAdapter();
-
   const {
     reward: initialReward,
     pageId,
@@ -86,7 +83,6 @@ export function RewardProperties(props: {
         readOnly={readOnly}
         expandedByDefault={expandedRewardProperties}
         isTemplate={isTemplate}
-        relationPropertiesCardsRecord={relationPropertiesCardsRecord}
       />
 
       {!isTemplate && (

@@ -20,10 +20,8 @@ export function AttachRewardButton({
   reviewers,
   assignedSubmitters,
   readOnly,
-  children,
-  relationPropertiesCardsRecord
+  children
 }: {
-  relationPropertiesCardsRecord?: PageListItemsRecord;
   onSave: (reward: ProposalPendingReward) => void;
   reviewers: ProposalReviewerInput[];
   assignedSubmitters: string[];
@@ -89,7 +87,6 @@ export function AttachRewardButton({
             isTemplate={false}
             expandedByDefault
             forcedApplicationType='assigned'
-            relationPropertiesCardsRecord={relationPropertiesCardsRecord}
           />
         </NewDocumentPage>
       </NewPageDialog>

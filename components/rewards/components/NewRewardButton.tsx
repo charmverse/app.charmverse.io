@@ -20,8 +20,6 @@ import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 
 import { useRewardTemplates } from '../hooks/useRewardTemplates';
 
-import { useRewardsBoardAdapter } from './RewardProperties/hooks/useRewardsBoardAdapter';
-
 export function NewRewardButton({ showPage }: { showPage: (pageId: string) => void }) {
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
   const [selectedTemplate, setSelectedTemplate] = useState<RewardTemplate | null>(null);
@@ -34,7 +32,6 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
   const { templates, isLoading } = useRewardTemplates();
   const [currentSpacePermissions] = useCurrentSpacePermissions();
   const { getFeatureTitle } = useSpaceFeatures();
-  const { relationPropertiesCardsRecord } = useRewardsBoardAdapter();
   const { trigger: trashPages } = useTrashPages();
   function deleteTemplate(pageId: string) {
     return trashPages({ pageIds: [pageId], trash: true });
@@ -166,7 +163,6 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
             addPageFromTemplate={addPageFromTemplate}
             selectedTemplate={templates?.find((tpl) => tpl.page.id === newPageValues?.templateId)}
             resetTemplate={resetTemplate}
-            relationPropertiesCardsRecord={relationPropertiesCardsRecord}
           />
         </NewDocumentPage>
       </NewPageDialog>

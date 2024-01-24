@@ -45,7 +45,6 @@ type Props = {
   selectedTemplate?: RewardTemplate | null;
   resetTemplate?: VoidFunction;
   forcedApplicationType?: RewardApplicationType;
-  relationPropertiesCardsRecord?: PageListItemsRecord;
 };
 
 const getApplicationType = (values: UpdateableRewardFields, forcedApplicationType?: RewardApplicationType) => {
@@ -74,8 +73,7 @@ export function RewardPropertiesForm({
   addPageFromTemplate,
   selectedTemplate,
   resetTemplate,
-  forcedApplicationType,
-  relationPropertiesCardsRecord
+  forcedApplicationType
 }: Props) {
   const [rewardApplicationType, setRewardApplicationTypeRaw] = useState<RewardApplicationType>(() =>
     getApplicationType(values, forcedApplicationType)

@@ -10,15 +10,12 @@ import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 
 import { useRewardTemplates } from '../hooks/useRewardTemplates';
 
-import { useRewardsBoardAdapter } from './RewardProperties/hooks/useRewardsBoardAdapter';
-
 export function NewInlineReward({ pageId }: { pageId: string }) {
   const { clearRewardValues, rewardValues, setRewardValues, createReward, isSavingReward } = useNewReward();
   const { setCreatingInlineReward } = useRewards();
   const { refreshPage } = usePages();
   const [selectedTemplate, setSelectedTemplate] = useState<RewardTemplate | null>(null);
   const { templates } = useRewardTemplates();
-  const { relationPropertiesCardsRecord } = useRewardsBoardAdapter();
   function resetForm() {
     clearRewardValues();
   }
@@ -53,7 +50,6 @@ export function NewInlineReward({ pageId }: { pageId: string }) {
         expandedByDefault
         isNewReward
         resetTemplate={() => setSelectedTemplate(null)}
-        relationPropertiesCardsRecord={relationPropertiesCardsRecord}
       />
       <Stack direction='row' alignItems='center' justifyContent='flex-end' flex={1} gap={1}>
         <Button onClick={() => setCreatingInlineReward(false)} variant='outlined' color='secondary'>

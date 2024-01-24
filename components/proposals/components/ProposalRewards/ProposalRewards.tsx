@@ -13,7 +13,6 @@ import {
   getDisabledTooltip
 } from 'components/proposals/components/ProposalRewards/AttachRewardButton';
 import { RewardTokenInfo } from 'components/rewards/components/RewardProperties/components/RewardTokenInfo';
-import { useRewardsBoardAdapter } from 'components/rewards/components/RewardProperties/hooks/useRewardsBoardAdapter';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
@@ -48,8 +47,6 @@ export function ProposalRewards({
   useRewardsNavigation(rewardQueryKey);
   const { mappedFeatures } = useSpaceFeatures();
   const rewardsTitle = mappedFeatures.rewards.title;
-  const { relationPropertiesCardsRecord } = useRewardsBoardAdapter();
-
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
   const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, isSavingReward } = useNewReward();
   const [currentPendingId, setCurrentPendingId] = useState<null | string>(null);
@@ -156,7 +153,6 @@ export function ProposalRewards({
         onSave={onSave}
         reviewers={reviewers}
         assignedSubmitters={assignedSubmitters}
-        relationPropertiesCardsRecord={relationPropertiesCardsRecord}
       />
     );
   }
@@ -236,7 +232,6 @@ export function ProposalRewards({
                 onSave={onSave}
                 reviewers={reviewers}
                 assignedSubmitters={assignedSubmitters}
-                relationPropertiesCardsRecord={relationPropertiesCardsRecord}
               />
             </Box>
           </Stack>
@@ -248,7 +243,6 @@ export function ProposalRewards({
               onSave={onSave}
               reviewers={reviewers}
               assignedSubmitters={assignedSubmitters}
-              relationPropertiesCardsRecord={relationPropertiesCardsRecord}
             >
               <SelectPreviewContainer displayType='details'>
                 <EmptyPlaceholder>Empty</EmptyPlaceholder>
@@ -282,7 +276,6 @@ export function ProposalRewards({
             isTemplate={false}
             expandedByDefault
             forcedApplicationType='assigned'
-            relationPropertiesCardsRecord={relationPropertiesCardsRecord}
           />
         </NewDocumentPage>
       </NewPageDialog>
