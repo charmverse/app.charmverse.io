@@ -112,7 +112,7 @@ export default function PopperPopup(props: PopperPopupProps) {
           {children}
         </div>
       )}
-      <Popover {...popoverProps} disablePortal>
+      <Popover {...popoverProps}>
         <Paper sx={props.paperSx}>{popupContent}</Paper>
       </Popover>
     </div>

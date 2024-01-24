@@ -107,6 +107,7 @@ export type TagSelectProps = {
   fluidWidth?: boolean;
   emptyMessage?: string;
   showEmpty?: boolean;
+  dataTestActive?: string;
 };
 
 export function TagSelect({
@@ -128,6 +129,7 @@ export function TagSelect({
   disableClearable = false,
   fluidWidth,
   showEmpty,
+  dataTestActive,
   ...props
 }: TagSelectProps) {
   const [isOpened, setIsOpened] = useState(defaultOpened);
@@ -180,6 +182,7 @@ export function TagSelect({
 
   const activeField = (
     <StyledSelect
+      dataTest={dataTestActive}
       canEditOptions={canEditOptions}
       includeSelectedOptions={includeSelectedOptions}
       placeholder='Search for an option...'

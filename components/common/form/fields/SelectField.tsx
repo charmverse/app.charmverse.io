@@ -33,6 +33,7 @@ type SelectProps = {
   required?: boolean;
   fluidWidth?: boolean;
   popupField?: boolean;
+  dataTest?: string;
 };
 
 type Props = Omit<ControlFieldProps, 'value'> & FieldProps & SelectProps;
@@ -63,6 +64,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
       helperText,
       fluidWidth,
       popupField,
+      dataTest,
       ...inputProps
     },
     ref
@@ -127,7 +129,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
         iconLabel={iconLabel}
       >
         <Autocomplete
-          data-test='autocomplete'
+          data-test={dataTest || 'autocomplete'}
           className={className}
           onClose={() => setIsOpened(false)}
           onOpen={() => setIsOpened(true)}
