@@ -4,13 +4,12 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
+import { useGetCredentialTemplates } from 'charmClient/hooks/credentialHooks';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
-
-import { useGetCredentialTemplates } from '../hooks/credentialHooks';
 
 import { CredentialTemplateDialog } from './CredentialTemplateDialog';
 import { CredentialTemplateRow } from './CredentialTemplateRow';

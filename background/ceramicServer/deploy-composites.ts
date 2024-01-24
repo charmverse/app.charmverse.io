@@ -12,7 +12,7 @@ import ora from 'ora';
 
 import { getCeramicClient } from './authenticate';
 
-const folder = 'lib/credentials/config';
+const folder = 'background/ceramicServer';
 
 function getCompositesFolder(filename: string) {
   return `${folder}/generated/${filename}`;
