@@ -68,7 +68,7 @@ export function RelationPropertyMenu({
                     boardId: sourceDatabaseId,
                     limit: 'single_page',
                     relatedPropertyId: null,
-                    showOnRelatedBoard: true
+                    showOnRelatedBoard: false
                   }
             );
             setShowSelectDatabaseMenu(false);
