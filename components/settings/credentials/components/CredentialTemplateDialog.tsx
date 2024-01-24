@@ -130,7 +130,6 @@ function CredentialTemplateForm({
               {...register('description')}
               placeholder='Participated in RPGF Season 5'
               fullWidth
-              autoFocus
               error={!!errors.description}
               helperText={errors.description?.message}
               onChange={onChange}
