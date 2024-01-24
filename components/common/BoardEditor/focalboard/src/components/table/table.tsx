@@ -46,7 +46,7 @@ type Props = {
   subRowsEmptyValueContent?: React.ReactElement | string;
   checkedIds?: string[];
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
-  setSelectedPropertyId: Dispatch<SetStateAction<string | null>>;
+  setSelectedPropertyId?: Dispatch<SetStateAction<string | null>>;
   relationPropertiesCardsRecord?: PageListItemsRecord;
 };
 

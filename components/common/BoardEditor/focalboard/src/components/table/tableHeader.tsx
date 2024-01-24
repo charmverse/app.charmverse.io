@@ -64,7 +64,7 @@ type Props = {
   offset: number;
   onDrop: (template: IPropertyTemplate, container: IPropertyTemplate) => void;
   onAutoSizeColumn: (columnID: string, headerWidth: number) => void;
-  setSelectedPropertyId: Dispatch<SetStateAction<string | null>>;
+  setSelectedPropertyId?: Dispatch<SetStateAction<string | null>>;
 };
 
 export const DEFAULT_BLOCK_IDS = [

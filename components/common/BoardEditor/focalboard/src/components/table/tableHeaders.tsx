@@ -41,7 +41,7 @@ type Props = {
   columnRefs: Map<string, React.RefObject<HTMLDivElement>>;
   checkedIds?: string[];
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
-  setSelectedPropertyId: Dispatch<SetStateAction<string | null>>;
+  setSelectedPropertyId?: Dispatch<SetStateAction<string | null>>;
 };
 
 function TableHeaders(props: Props): JSX.Element {
