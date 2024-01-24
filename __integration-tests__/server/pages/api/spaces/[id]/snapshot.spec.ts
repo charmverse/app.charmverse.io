@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Space } from '@charmverse/core/prisma';
 import request from 'supertest';
 
@@ -28,9 +27,8 @@ beforeAll(async () => {
 
 describe('PUT /api/spaces/[id]/snapshot - Update snapshot connection', () => {
   it("should update a space's snapshot connection if the user is a space admin, responding with 200", async () => {
-    const update: Pick<Space, 'snapshotDomain' | 'defaultVotingDuration'> = {
-      snapshotDomain: 'aave.eth',
-      defaultVotingDuration: 12
+    const update = {
+      snapshotDomain: 'aave.eth'
     };
 
     const updatedSpace = (
@@ -42,13 +40,11 @@ describe('PUT /api/spaces/[id]/snapshot - Update snapshot connection', () => {
     ).body as Space;
 
     expect(updatedSpace.snapshotDomain).toBe(update.snapshotDomain);
-    expect(updatedSpace.defaultVotingDuration).toBe(update.defaultVotingDuration);
   });
 
   it('should fail if the user is not an admin of the space, and respond 401', async () => {
-    const update: Pick<Space, 'snapshotDomain' | 'defaultVotingDuration'> = {
-      snapshotDomain: 'aave.eth',
-      defaultVotingDuration: 12
+    const update = {
+      snapshotDomain: 'aave.eth'
     };
 
     await request(baseUrl)
@@ -59,9 +55,8 @@ describe('PUT /api/spaces/[id]/snapshot - Update snapshot connection', () => {
   });
 
   it('should fail if the domain does not exist, and respond 404', async () => {
-    const update: Pick<Space, 'snapshotDomain' | 'defaultVotingDuration'> = {
-      snapshotDomain: 'completely-inexistent-domain.abc',
-      defaultVotingDuration: 12
+    const update = {
+      snapshotDomain: 'completely-inexistent-domain.abc'
     };
 
     await request(baseUrl)
