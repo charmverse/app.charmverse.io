@@ -84,7 +84,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
 
-  const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow } = useProposal({
+  const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow, onChangeRewardTemplate } = useProposal({
     proposalId
   });
 
@@ -281,6 +281,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
           readOnly={readOnly}
           showApplications
           expandedRewardProperties
+          requiredTemplateId={page.sourceTemplateId || undefined}
           isTemplate={page.type === 'bounty_template'}
         />
       )}
@@ -311,6 +312,8 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
           refreshProposal={refreshProposal}
           disabledViews={isStructuredProposal ? ['suggestions', 'comments'] : []}
           onChangeWorkflow={onChangeWorkflow}
+          onChangeRewardTemplate={onChangeRewardTemplate}
+          isProposalTemplate={page.type === 'proposal_template'}
         />
       )}
     </CardPropertiesWrapper>

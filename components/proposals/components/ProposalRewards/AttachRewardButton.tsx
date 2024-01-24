@@ -19,11 +19,13 @@ export function AttachRewardButton({
   reviewers,
   assignedSubmitters,
   readOnly,
+  templateId,
   children
 }: {
   onSave: (reward: ProposalPendingReward) => void;
   reviewers: ProposalReviewerInput[];
   assignedSubmitters: string[];
+  templateId?: string;
   readOnly: boolean;
   children?: React.ReactNode;
 }) {
@@ -42,6 +44,7 @@ export function AttachRewardButton({
     setRewardValues({ reviewers: rewardReviewers, assignedSubmitters }, { skipDirty: true });
 
     openNewPage({
+      templateId,
       type: 'bounty'
     });
   }
@@ -86,6 +89,7 @@ export function AttachRewardButton({
             isTemplate={false}
             expandedByDefault
             forcedApplicationType='assigned'
+            templateId={newPageValues?.templateId || undefined}
           />
         </NewDocumentPage>
       </NewPageDialog>

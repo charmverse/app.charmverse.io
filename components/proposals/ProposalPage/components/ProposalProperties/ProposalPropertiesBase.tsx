@@ -153,6 +153,7 @@ export function ProposalPropertiesBase({
         />
         <ProposalRewards
           pendingRewards={pendingRewards}
+          templateId={proposalFormInputs.fields?.rewardsTemplateId}
           reviewers={proposalReviewers}
           assignedSubmitters={proposalAuthorIds}
           rewardIds={rewardIds || []}
@@ -201,10 +202,4 @@ export function ProposalPropertiesBase({
       />
     </>
   );
-}
-
-function templateTooltip(fieldName: string, isAdmin: boolean) {
-  return isAdmin
-    ? `Only admins can override ${fieldName} when using a template`
-    : `Cannot change ${fieldName} when using template`;
 }

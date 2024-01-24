@@ -337,7 +337,17 @@ export function NewProposalPage({
               evaluations
             });
           }}
+          onChangeRewardTemplate={(rewardsTemplateId) => {
+            setFormInputs({
+              ...formInputs,
+              fields: {
+                ...formInputs.fields,
+                rewardsTemplateId: rewardsTemplateId || undefined
+              }
+            });
+          }}
           onChangeWorkflow={applyWorkflow}
+          isProposalTemplate={isTemplate}
         />
       )}
     </>
@@ -413,6 +423,7 @@ export function NewProposalPage({
                       formFields={proposalFormFields}
                     />
                   )}
+                  x
                 </>
               ) : (
                 <CharmEditor

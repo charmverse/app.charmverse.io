@@ -31,6 +31,7 @@ type Props = {
   onDelete: (draftId: string) => void;
   reviewers: ProposalReviewerInput[];
   assignedSubmitters: string[];
+  templateId?: string | null;
 };
 
 const rewardQueryKey = 'rewardId';
@@ -42,7 +43,8 @@ export function ProposalRewards({
   onDelete,
   rewardIds,
   reviewers,
-  assignedSubmitters
+  assignedSubmitters,
+  templateId
 }: Props) {
   useRewardsNavigation(rewardQueryKey);
   const { mappedFeatures } = useSpaceFeatures();
@@ -151,6 +153,7 @@ export function ProposalRewards({
     return (
       <AttachRewardButton
         readOnly={readOnly}
+        templateId={templateId || undefined}
         onSave={onSave}
         reviewers={reviewers}
         assignedSubmitters={assignedSubmitters}
@@ -241,6 +244,7 @@ export function ProposalRewards({
           (canCreatePendingRewards ? (
             <AttachRewardButton
               readOnly={false}
+              templateId={templateId || undefined}
               onSave={onSave}
               reviewers={reviewers}
               assignedSubmitters={assignedSubmitters}
@@ -277,6 +281,7 @@ export function ProposalRewards({
             isTemplate={false}
             expandedByDefault
             forcedApplicationType='assigned'
+            templateId={templateId || undefined}
           />
         </NewDocumentPage>
       </NewPageDialog>

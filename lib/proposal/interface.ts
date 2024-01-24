@@ -52,7 +52,11 @@ export type VoteSettings = Pick<Vote, 'type' | 'threshold' | 'maxChoices'> & {
 };
 
 export type ProposalPendingReward = { reward: UpdateableRewardFields; page: NewPageValues | null; draftId: string };
-export type ProposalFields = { properties?: ProposalPropertiesField; pendingRewards?: ProposalPendingReward[] };
+export type ProposalFields = {
+  properties?: ProposalPropertiesField;
+  pendingRewards?: ProposalPendingReward[];
+  rewardsTemplateId?: string;
+};
 type ProposalFormData = {
   form: {
     id: string;

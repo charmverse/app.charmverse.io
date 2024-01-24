@@ -41,7 +41,7 @@ type Props = {
   isTemplate?: boolean;
   expandedByDefault?: boolean;
   addPageFromTemplate?: (templateId: string) => void;
-  selectedTemplate?: RewardTemplate | null;
+  templateId?: string;
   resetTemplate?: VoidFunction;
   forcedApplicationType?: RewardApplicationType;
 };
@@ -70,7 +70,7 @@ export function RewardPropertiesForm({
   pageId,
   expandedByDefault,
   addPageFromTemplate,
-  selectedTemplate,
+  templateId,
   resetTemplate,
   forcedApplicationType
 }: Props) {
@@ -214,7 +214,7 @@ export function RewardPropertiesForm({
                   <Box display='flex' flex={1}>
                     <TemplateSelect
                       options={rewardTemplates.map((rewardTemplate) => rewardTemplate.page)}
-                      value={selectedTemplate?.page ?? null}
+                      value={templateId ? { id: templateId } : null}
                       onChange={(templatePage) => {
                         if (!templatePage) {
                           resetTemplate?.();

@@ -163,7 +163,7 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
             isTemplate={isTemplate}
             expandedByDefault
             addPageFromTemplate={addPageFromTemplate}
-            selectedTemplate={templates?.find((tpl) => tpl.page.id === newPageValues?.templateId)}
+            templateId={newPageValues?.templateId}
             resetTemplate={resetTemplate}
           />
         </NewDocumentPage>

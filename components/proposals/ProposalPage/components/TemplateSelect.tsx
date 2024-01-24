@@ -7,12 +7,13 @@ const maxTitleLength = 35;
 
 type Props = {
   disabled?: boolean;
+  displayType?: 'details';
   options: PageMeta[];
-  value: PageMeta | null;
+  value: { id: string } | null;
   onChange: (value: PageMeta | null) => void;
 };
 
-export function TemplateSelect({ disabled, options, value, onChange }: Props) {
+export function TemplateSelect({ disabled, displayType, options, value, onChange }: Props) {
   const propertyOptions = options.map((option) => ({
     id: option.id,
     color: 'gray',
@@ -34,6 +35,7 @@ export function TemplateSelect({ disabled, options, value, onChange }: Props) {
   return (
     <TagSelect
       wrapColumn
+      displayType={displayType}
       readOnly={disabled}
       options={propertyOptions}
       noOptionsText={

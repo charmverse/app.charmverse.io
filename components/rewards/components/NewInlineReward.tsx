@@ -14,7 +14,7 @@ export function NewInlineReward({ pageId }: { pageId: string }) {
   const { clearRewardValues, rewardValues, setRewardValues, createReward, isSavingReward } = useNewReward();
   const { setCreatingInlineReward } = useRewards();
   const { refreshPage } = usePages();
-  const [selectedTemplate, setSelectedTemplate] = useState<RewardTemplate | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<string | undefined>();
   const { templates } = useRewardTemplates();
 
   function resetForm() {
@@ -35,7 +35,7 @@ export function NewInlineReward({ pageId }: { pageId: string }) {
     if (template) {
       setRewardValues(template.reward);
     }
-    setSelectedTemplate(template);
+    setSelectedTemplate(templateId);
   }
 
   useEffect(() => {
@@ -45,13 +45,13 @@ export function NewInlineReward({ pageId }: { pageId: string }) {
   return (
     <Stack gap={1}>
       <RewardPropertiesForm
-        selectedTemplate={selectedTemplate}
+        templateId={selectedTemplate}
         addPageFromTemplate={addPageFromTemplate}
         onChange={setRewardValues}
         values={rewardValues}
         expandedByDefault
         isNewReward
-        resetTemplate={() => setSelectedTemplate(null)}
+        resetTemplate={() => setSelectedTemplate(undefined)}
       />
       <Stack direction='row' alignItems='center' justifyContent='flex-end' flex={1} gap={1}>
         <Button onClick={() => setCreatingInlineReward(false)} variant='outlined' color='secondary'>
