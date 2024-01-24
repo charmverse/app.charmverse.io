@@ -226,10 +226,12 @@ export function NewProposalPage({
         const rubricCriteria = (
           evaluation.type === 'rubric' ? existingStep?.rubricCriteria || [getNewCriteria()] : []
         ) as ProposalRubricCriteriaWithTypedParams[];
+        // include author as default reviewer for feedback
+        const defaultReviewers = evaluation.type === 'feedback' && user ? [{ userId: user.id }] : [];
         return {
           id: evaluation.id,
           index,
-          reviewers: existingStep?.reviewers || [],
+          reviewers: existingStep?.reviewers || defaultReviewers,
           rubricCriteria,
           title: evaluation.title,
           type: evaluation.type,

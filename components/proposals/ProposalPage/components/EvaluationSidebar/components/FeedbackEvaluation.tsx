@@ -1,7 +1,10 @@
-import { Box, Card, Stack, Typography } from '@mui/material';
+import { Box, Card, Stack, FormLabel, Typography } from '@mui/material';
 
 import { useSubmitEvaluationResult } from 'charmClient/hooks/proposals';
+import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
+import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { Button } from 'components/common/Button';
+import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PopulatedEvaluation } from 'lib/proposal/interface';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
@@ -27,6 +30,10 @@ export function FeedbackEvaluation({
 }: Props) {
   const { showMessage } = useSnackbar();
   const { trigger, isMutating } = useSubmitEvaluationResult({ proposalId });
+  const reviewerOptions: SelectOption[] = evaluation.reviewers.map((reviewer) => ({
+    group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
+    id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
+  }));
 
   const completedDate = evaluation.completedAt ? getRelativeTimeInThePast(new Date(evaluation.completedAt)) : null;
   const disabledTooltip = !isCurrent
@@ -51,6 +58,20 @@ export function FeedbackEvaluation({
 
   return (
     <>
+      <Box mb={2}>
+        <FormLabel>
+          <Typography sx={{ mb: 1 }} variant='subtitle1'>
+            Reviewers
+          </Typography>
+        </FormLabel>
+        <UserAndRoleSelect
+          data-test='evaluation-reviewer-select'
+          systemRoles={[allMembersSystemRole]}
+          readOnly={true}
+          value={reviewerOptions}
+          onChange={() => {}}
+        />
+      </Box>
       {/* <Card variant='outlined'> */}
       {!evaluation.result && (
         <Box display='flex' justifyContent='flex-end' alignItems='center'>

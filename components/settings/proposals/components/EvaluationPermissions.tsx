@@ -21,12 +21,12 @@ type SupportedOperation = Extract<ProposalOperation, 'view' | 'comment' | 'edit'
 
 export const proposalOperations: SupportedOperation[] = ['view', 'comment', 'edit', 'move'];
 
-const evaluateVerbs = {
-  [ProposalEvaluationType.feedback]: 'Move Forward',
-  [ProposalEvaluationType.vote]: 'Move Forward (Vote)',
-  [ProposalEvaluationType.rubric]: 'Move Forward (Evaluate)',
-  [ProposalEvaluationType.pass_fail]: 'Move Forward (Review)'
-};
+// const evaluateVerbs = {
+//   [ProposalEvaluationType.feedback]: 'Move Forward',
+//   [ProposalEvaluationType.vote]: 'Move Forward (Vote)',
+//   [ProposalEvaluationType.rubric]: 'Move Forward (Evaluate)',
+//   [ProposalEvaluationType.pass_fail]: 'Move Forward (Review)'
+// };
 
 export const allMembersSystemRole = {
   group: 'system_role',
@@ -167,7 +167,7 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
 
       {proposalOperations.map((operation) => (
         <Box key={operation} className='octo-propertyrow'>
-          <PropertyLabel readOnly>{operation === 'view' ? 'Move backward' : capitalize(operation)}</PropertyLabel>
+          <PropertyLabel readOnly>{operation === 'move' ? 'Move Backward' : capitalize(operation)}</PropertyLabel>
           <UserAndRoleSelect
             readOnly={readOnly}
             variant='outlined'
@@ -189,7 +189,7 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
 
       {/* show evaluation action which is uneditable */}
       <Box className='octo-propertyrow' display='flex' alignItems='center !important'>
-        <PropertyLabel readOnly>{evaluateVerbs[evaluation.type]}</PropertyLabel>
+        <PropertyLabel readOnly>Move Forward</PropertyLabel>
         <UserAndRoleSelect
           readOnly
           wrapColumn
