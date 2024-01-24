@@ -6,7 +6,7 @@ import { Box } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { trackPageView } from 'charmClient/hooks/track';
 import DocumentPage from 'components/[pageId]/DocumentPage';
@@ -14,11 +14,14 @@ import { DocumentPageProviders } from 'components/[pageId]/DocumentPage/Document
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
 import type { PageDialogContext } from 'components/common/PageDialog/hooks/usePageDialog';
+import { useRewardsBoardAdapter } from 'components/rewards/components/RewardProperties/hooks/useRewardsBoardAdapter';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
 import { useRelationProperties } from 'hooks/useRelationProperties';
+import { getRelationPropertiesCardsRecord } from 'lib/focalboard/getRelationPropertiesCardsRecord';
+import type { PageWithContent } from 'lib/pages';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
 import { FullPageActionsMenuButton } from '../PageActions/FullPageActionsMenuButton';
@@ -38,6 +41,40 @@ interface Props {
   readOnly?: boolean;
   hideToolsMenu?: boolean;
   applicationContext?: PageDialogContext;
+}
+
+function RewardsDocumentPage({
+  page,
+  readOnlyPage,
+  savePage
+}: {
+  readOnlyPage: boolean;
+  page: PageWithContent;
+  savePage: (p: Partial<Page>) => void;
+}) {
+  const { board: activeBoard } = useRewardsBoardAdapter();
+  const { pages } = usePages();
+
+  const relationPropertiesCardsRecord = useMemo(
+    () =>
+      activeBoard && pages
+        ? getRelationPropertiesCardsRecord({
+            pages,
+            activeBoard
+          })
+        : {},
+    [pages, activeBoard]
+  );
+
+  return (
+    <DocumentPage
+      relationPropertiesCardsRecord={relationPropertiesCardsRecord}
+      insideModal
+      page={page}
+      savePage={savePage}
+      readOnly={readOnlyPage}
+    />
+  );
 }
 
 function PageDialogBase(props: Props) {
@@ -139,7 +176,6 @@ function PageDialogBase(props: Props) {
     }, 500),
     [page]
   );
-
   if (!popupState.isOpen) {
     return null;
   }
@@ -177,15 +213,19 @@ function PageDialogBase(props: Props) {
       }
       onClose={close}
     >
-      {page && contentType === 'page' && (
-        <DocumentPage
-          relationPropertiesCardsRecord={relationPropertiesCardsRecord}
-          insideModal
-          page={page}
-          savePage={savePage}
-          readOnly={readOnlyPage}
-        />
-      )}
+      {page &&
+        contentType === 'page' &&
+        (page.type === 'bounty' || page.type === 'bounty_template' ? (
+          <RewardsDocumentPage page={page} readOnlyPage={readOnlyPage} savePage={savePage} />
+        ) : (
+          <DocumentPage
+            relationPropertiesCardsRecord={relationPropertiesCardsRecord}
+            insideModal
+            page={page}
+            savePage={savePage}
+            readOnly={readOnlyPage}
+          />
+        ))}
       {contentType === 'application' && applicationContext && (
         <RewardApplicationPage
           applicationId={applicationContext.applicationId || null}

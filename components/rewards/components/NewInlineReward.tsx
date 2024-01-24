@@ -1,14 +1,18 @@
 import { Stack } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { Button } from 'components/common/Button';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { usePages } from 'hooks/usePages';
+import { getRelationPropertiesCardsRecord } from 'lib/focalboard/getRelationPropertiesCardsRecord';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 
 import { useRewardTemplates } from '../hooks/useRewardTemplates';
+
+import { useRewardsBoardAdapter } from './RewardProperties/hooks/useRewardsBoardAdapter';
 
 export function NewInlineReward({ pageId }: { pageId: string }) {
   const { clearRewardValues, rewardValues, setRewardValues, createReward, isSavingReward } = useNewReward();
@@ -16,11 +20,21 @@ export function NewInlineReward({ pageId }: { pageId: string }) {
   const { refreshPage } = usePages();
   const [selectedTemplate, setSelectedTemplate] = useState<RewardTemplate | null>(null);
   const { templates } = useRewardTemplates();
-
+  const { pages } = usePages();
+  const { board: activeBoard } = useRewardsBoardAdapter();
   function resetForm() {
     clearRewardValues();
   }
-
+  const relationPropertiesCardsRecord = useMemo(
+    () =>
+      activeBoard && pages
+        ? getRelationPropertiesCardsRecord({
+            pages,
+            activeBoard
+          })
+        : {},
+    [pages, activeBoard]
+  );
   async function saveForm() {
     const success = await createReward({ linkedPageId: pageId });
     if (success) {
@@ -52,6 +66,7 @@ export function NewInlineReward({ pageId }: { pageId: string }) {
         expandedByDefault
         isNewReward
         resetTemplate={() => setSelectedTemplate(null)}
+        relationPropertiesCardsRecord={relationPropertiesCardsRecord}
       />
       <Stack direction='row' alignItems='center' justifyContent='flex-end' flex={1} gap={1}>
         <Button onClick={() => setCreatingInlineReward(false)} variant='outlined' color='secondary'>

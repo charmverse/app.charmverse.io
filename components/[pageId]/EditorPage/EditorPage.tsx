@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { trackPageView } from 'charmClient/hooks/track';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import { useProposalsBoardAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter';
+import { useRewardsBoardAdapter } from 'components/rewards/components/RewardProperties/hooks/useRewardsBoardAdapter';
 import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
@@ -32,7 +33,43 @@ function ProposalEditorPage({
 }) {
   const { pages } = usePages();
 
-  const { boardCustomProperties: activeBoard } = useProposalsBoardAdapter();
+  const { board: activeBoard } = useProposalsBoardAdapter();
+
+  const relationPropertiesCardsRecord = useMemo(
+    () =>
+      activeBoard?.fields && pages
+        ? getRelationPropertiesCardsRecord({
+            pages,
+            activeBoard
+          })
+        : {},
+    [pages, activeBoard]
+  );
+
+  return (
+    <Box flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
+      <DocumentPage
+        relationPropertiesCardsRecord={relationPropertiesCardsRecord}
+        page={page}
+        readOnly={readOnly}
+        savePage={savePage}
+        enableSidebar
+      />
+    </Box>
+  );
+}
+
+function RewardEditorPage({
+  page,
+  readOnly,
+  savePage
+}: {
+  readOnly?: boolean;
+  savePage: (p: Partial<Page>) => void;
+  page: PageWithContent;
+}) {
+  const { pages } = usePages();
+  const { board: activeBoard } = useRewardsBoardAdapter();
 
   const relationPropertiesCardsRecord = useMemo(
     () =>
@@ -159,6 +196,8 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
       return <DatabasePage page={page} setPage={savePage} pagePermissions={page.permissionFlags} />;
     } else if (page.type === 'proposal' || page.type === 'proposal_template') {
       return <ProposalEditorPage page={page} readOnly={readOnly} savePage={savePage} />;
+    } else if (page.type === 'bounty' || page.type === 'bounty_template') {
+      return <RewardEditorPage page={page} readOnly={readOnly} savePage={savePage} />;
     } else {
       // Document page is used in a few places, so it is responsible for retrieving its own permissions
       return (

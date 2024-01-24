@@ -2,6 +2,7 @@ import { Stack } from '@mui/material';
 import { v4 } from 'uuid';
 
 import { AddAPropertyButton } from 'components/common/BoardEditor/components/properties/AddAProperty';
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
 import type { NewPageValues } from 'components/common/PageDialog/hooks/useNewPage';
 import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
@@ -19,8 +20,10 @@ export function AttachRewardButton({
   reviewers,
   assignedSubmitters,
   readOnly,
-  children
+  children,
+  relationPropertiesCardsRecord
 }: {
+  relationPropertiesCardsRecord?: PageListItemsRecord;
   onSave: (reward: ProposalPendingReward) => void;
   reviewers: ProposalReviewerInput[];
   assignedSubmitters: string[];
@@ -86,6 +89,7 @@ export function AttachRewardButton({
             isTemplate={false}
             expandedByDefault
             forcedApplicationType='assigned'
+            relationPropertiesCardsRecord={relationPropertiesCardsRecord}
           />
         </NewDocumentPage>
       </NewPageDialog>

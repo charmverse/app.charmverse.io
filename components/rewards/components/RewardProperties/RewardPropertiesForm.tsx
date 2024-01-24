@@ -12,6 +12,7 @@ import type { RoleOption } from 'components/common/BoardEditor/components/proper
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import Checkbox from 'components/common/BoardEditor/focalboard/src/widgets/checkbox';
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { TemplateSelect } from 'components/proposals/ProposalPage/components/TemplateSelect';
 import { RewardApplicationType } from 'components/rewards/components/RewardProperties/components/RewardApplicationType';
 import { RewardPropertiesHeader } from 'components/rewards/components/RewardProperties/components/RewardPropertiesHeader';
@@ -44,6 +45,7 @@ type Props = {
   selectedTemplate?: RewardTemplate | null;
   resetTemplate?: VoidFunction;
   forcedApplicationType?: RewardApplicationType;
+  relationPropertiesCardsRecord?: PageListItemsRecord;
 };
 
 const getApplicationType = (values: UpdateableRewardFields, forcedApplicationType?: RewardApplicationType) => {
@@ -72,7 +74,8 @@ export function RewardPropertiesForm({
   addPageFromTemplate,
   selectedTemplate,
   resetTemplate,
-  forcedApplicationType
+  forcedApplicationType,
+  relationPropertiesCardsRecord
 }: Props) {
   const [rewardApplicationType, setRewardApplicationTypeRaw] = useState<RewardApplicationType>(() =>
     getApplicationType(values, forcedApplicationType)
@@ -457,6 +460,7 @@ export function RewardPropertiesForm({
                   fields: { properties: properties ? { ...properties } : {} } as Reward['fields']
                 });
               }}
+              relationPropertiesCardsRecord={relationPropertiesCardsRecord}
             />
           </>
         </Collapse>

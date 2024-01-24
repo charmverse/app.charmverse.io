@@ -1,6 +1,6 @@
 import { Delete, Edit } from '@mui/icons-material';
 import { Box, Grid, Hidden, IconButton, Stack, Typography } from '@mui/material';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
@@ -13,13 +13,16 @@ import {
   getDisabledTooltip
 } from 'components/proposals/components/ProposalRewards/AttachRewardButton';
 import { RewardTokenInfo } from 'components/rewards/components/RewardProperties/components/RewardTokenInfo';
+import { useRewardsBoardAdapter } from 'components/rewards/components/RewardProperties/hooks/useRewardsBoardAdapter';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { usePages } from 'hooks/usePages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
+import { getRelationPropertiesCardsRecord } from 'lib/focalboard/getRelationPropertiesCardsRecord';
 import type { ProposalPendingReward, ProposalReviewerInput } from 'lib/proposal/interface';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -47,6 +50,19 @@ export function ProposalRewards({
   useRewardsNavigation(rewardQueryKey);
   const { mappedFeatures } = useSpaceFeatures();
   const rewardsTitle = mappedFeatures.rewards.title;
+  const { board: activeBoard } = useRewardsBoardAdapter();
+  const { pages } = usePages();
+
+  const relationPropertiesCardsRecord = useMemo(
+    () =>
+      activeBoard && pages
+        ? getRelationPropertiesCardsRecord({
+            pages,
+            activeBoard
+          })
+        : {},
+    [pages, activeBoard]
+  );
 
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
   const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, isSavingReward } = useNewReward();
@@ -154,6 +170,7 @@ export function ProposalRewards({
         onSave={onSave}
         reviewers={reviewers}
         assignedSubmitters={assignedSubmitters}
+        relationPropertiesCardsRecord={relationPropertiesCardsRecord}
       />
     );
   }
@@ -233,6 +250,7 @@ export function ProposalRewards({
                 onSave={onSave}
                 reviewers={reviewers}
                 assignedSubmitters={assignedSubmitters}
+                relationPropertiesCardsRecord={relationPropertiesCardsRecord}
               />
             </Box>
           </Stack>
@@ -244,6 +262,7 @@ export function ProposalRewards({
               onSave={onSave}
               reviewers={reviewers}
               assignedSubmitters={assignedSubmitters}
+              relationPropertiesCardsRecord={relationPropertiesCardsRecord}
             >
               <SelectPreviewContainer displayType='details'>
                 <EmptyPlaceholder>Empty</EmptyPlaceholder>
@@ -277,6 +296,7 @@ export function ProposalRewards({
             isTemplate={false}
             expandedByDefault
             forcedApplicationType='assigned'
+            relationPropertiesCardsRecord={relationPropertiesCardsRecord}
           />
         </NewDocumentPage>
       </NewPageDialog>

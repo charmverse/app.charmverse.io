@@ -3,7 +3,6 @@ import { Box } from '@mui/material';
 
 import { useGetIsReviewer, useUpdateProposal } from 'charmClient/hooks/proposals';
 import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
-import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useProposalTemplateById } from 'components/proposals/hooks/useProposalTemplates';
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { ProposalPropertiesBase } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';

@@ -1,16 +1,20 @@
 import { Divider, Stack } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { useGetPermissions } from 'charmClient/hooks/permissions';
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { RewardApplications } from 'components/rewards/components/RewardApplications/RewardApplications';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
+import { usePages } from 'hooks/usePages';
+import { getRelationPropertiesCardsRecord } from 'lib/focalboard/getRelationPropertiesCardsRecord';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardWithUsersAndPageMeta, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
 import { RewardSignupButton } from './components/RewardSignupButton';
+import { useRewardsBoardAdapter } from './hooks/useRewardsBoardAdapter';
 
 export function RewardProperties(props: {
   readOnly?: boolean;
@@ -22,6 +26,20 @@ export function RewardProperties(props: {
   isTemplate?: boolean;
   expandedRewardProperties?: boolean;
 }) {
+  const { pages } = usePages();
+  const { board: activeBoard } = useRewardsBoardAdapter();
+
+  const relationPropertiesCardsRecord = useMemo(
+    () =>
+      activeBoard && pages
+        ? getRelationPropertiesCardsRecord({
+            pages,
+            activeBoard
+          })
+        : {},
+    [pages, activeBoard]
+  );
+
   const {
     reward: initialReward,
     pageId,
@@ -83,6 +101,7 @@ export function RewardProperties(props: {
         readOnly={readOnly}
         expandedByDefault={expandedRewardProperties}
         isTemplate={isTemplate}
+        relationPropertiesCardsRecord={relationPropertiesCardsRecord}
       />
 
       {!isTemplate && (
