@@ -271,6 +271,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
           proposalPage={page}
           proposal={proposal}
           refreshProposal={refreshProposal}
+          templateId={proposal?.fields?.rewardsTemplateId}
         />
       )}
       {reward && (
@@ -281,7 +282,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
           readOnly={readOnly}
           showApplications
           expandedRewardProperties
-          requiredTemplateId={page.sourceTemplateId || undefined}
+          templateId={page.sourceTemplateId || undefined}
           isTemplate={page.type === 'bounty_template'}
         />
       )}

@@ -154,6 +154,7 @@ export function ProposalRewards({
       <AttachRewardButton
         readOnly={readOnly}
         templateId={templateId || undefined}
+        readOnlyTemplate={!!templateId}
         onSave={onSave}
         reviewers={reviewers}
         assignedSubmitters={assignedSubmitters}
@@ -236,6 +237,8 @@ export function ProposalRewards({
                 onSave={onSave}
                 reviewers={reviewers}
                 assignedSubmitters={assignedSubmitters}
+                templateId={templateId || undefined}
+                readOnlyTemplate={!!templateId}
               />
             </Box>
           </Stack>
@@ -245,6 +248,7 @@ export function ProposalRewards({
             <AttachRewardButton
               readOnly={false}
               templateId={templateId || undefined}
+              readOnlyTemplate={!!templateId}
               onSave={onSave}
               reviewers={reviewers}
               assignedSubmitters={assignedSubmitters}
@@ -282,6 +286,7 @@ export function ProposalRewards({
             expandedByDefault
             forcedApplicationType='assigned'
             templateId={templateId || undefined}
+            readOnlyTemplate={!!templateId}
           />
         </NewDocumentPage>
       </NewPageDialog>

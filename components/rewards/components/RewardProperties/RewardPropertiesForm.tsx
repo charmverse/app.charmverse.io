@@ -24,7 +24,6 @@ import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates'
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { RewardFieldsProp, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
-import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 import type { Reward, RewardWithUsers, RewardReviewer } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { isTruthy } from 'lib/utilities/types';
@@ -42,6 +41,7 @@ type Props = {
   expandedByDefault?: boolean;
   addPageFromTemplate?: (templateId: string) => void;
   templateId?: string;
+  readOnlyTemplate?: boolean;
   resetTemplate?: VoidFunction;
   forcedApplicationType?: RewardApplicationType;
 };
@@ -71,6 +71,7 @@ export function RewardPropertiesForm({
   expandedByDefault,
   addPageFromTemplate,
   templateId,
+  readOnlyTemplate,
   resetTemplate,
   forcedApplicationType
 }: Props) {
@@ -214,6 +215,7 @@ export function RewardPropertiesForm({
                   <Box display='flex' flex={1}>
                     <TemplateSelect
                       options={rewardTemplates.map((rewardTemplate) => rewardTemplate.page)}
+                      disabled={readOnlyTemplate}
                       value={templateId ? { id: templateId } : null}
                       onChange={(templatePage) => {
                         if (!templatePage) {

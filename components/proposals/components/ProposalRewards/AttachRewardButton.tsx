@@ -20,6 +20,7 @@ export function AttachRewardButton({
   assignedSubmitters,
   readOnly,
   templateId,
+  readOnlyTemplate,
   children
 }: {
   onSave: (reward: ProposalPendingReward) => void;
@@ -27,6 +28,7 @@ export function AttachRewardButton({
   assignedSubmitters: string[];
   templateId?: string;
   readOnly: boolean;
+  readOnlyTemplate?: boolean;
   children?: React.ReactNode;
 }) {
   const { isSpaceMember } = useIsSpaceMember();
@@ -90,6 +92,7 @@ export function AttachRewardButton({
             expandedByDefault
             forcedApplicationType='assigned'
             templateId={newPageValues?.templateId || undefined}
+            readOnlyTemplate={readOnlyTemplate}
           />
         </NewDocumentPage>
       </NewPageDialog>

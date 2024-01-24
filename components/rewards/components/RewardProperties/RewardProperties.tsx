@@ -22,6 +22,7 @@ export function RewardProperties(props: {
   isTemplate?: boolean;
   expandedRewardProperties?: boolean;
   templateId?: string;
+  readOnlyTemplate?: boolean;
 }) {
   const {
     reward: initialReward,
@@ -31,7 +32,8 @@ export function RewardProperties(props: {
     showApplications,
     isTemplate,
     expandedRewardProperties,
-    templateId
+    templateId,
+    readOnlyTemplate
   } = props;
   const { updateReward, refreshReward } = useRewards();
   const [currentReward, setCurrentReward] = useState<Partial<RewardCreationData & RewardWithUsers> | undefined>(
@@ -86,6 +88,7 @@ export function RewardProperties(props: {
         expandedByDefault={expandedRewardProperties}
         templateId={templateId}
         isTemplate={isTemplate}
+        readOnlyTemplate={readOnlyTemplate}
       />
 
       {!isTemplate && (
