@@ -1,7 +1,7 @@
 import type { FormFieldAnswer } from '@charmverse/core/prisma-client';
 import { MessageOutlined } from '@mui/icons-material';
 import AddCommentOutlinedIcon from '@mui/icons-material/AddCommentOutlined';
-import { Box, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, Divider, Stack, Tooltip, Typography } from '@mui/material';
 import { useState } from 'react';
 
 import { useCreateThread } from 'charmClient/hooks/comments';
@@ -110,8 +110,20 @@ function FormFieldAnswerThreads({
   return (
     <PopperPopup
       popupContent={
-        <Box display='flex' flexDirection='column' gap={1}>
-          {unResolvedThreads.map((resolvedThread) => (
+        <Box
+          display='flex'
+          flexDirection='column'
+          gap={1}
+          sx={{
+            p: 1,
+            '& > .MuiPaper-root': {
+              background: 'transparent',
+              boxShadow: 'none',
+              margin: 0
+            }
+          }}
+        >
+          {unResolvedThreads.map((resolvedThread, index) => (
             <ThreadContainer key={resolvedThread.id} elevation={4}>
               <PageThread
                 canCreateComments
@@ -138,9 +150,6 @@ function FormFieldAnswerThreads({
         }
       }}
       disablePopup={disabled}
-      paperSx={{
-        boxShadow: 'none'
-      }}
     >
       <FormFieldAnswerCommentsCounter disabled={disabled} unResolvedThreads={unResolvedThreads} />
     </PopperPopup>

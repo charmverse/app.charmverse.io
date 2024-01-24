@@ -183,9 +183,8 @@ function FormFieldInputsBase({
     <Stack gap={1} mb={15}>
       <FormFieldInputsContainer>
         {formFields.map((formField) => {
-          const fieldAnswerThreads = formField.formFieldAnswer
-            ? fieldAnswerIdThreadRecord[formField.formFieldAnswer.id]
-            : [];
+          const fieldAnswerThreads =
+            (formField.formFieldAnswer ? fieldAnswerIdThreadRecord[formField.formFieldAnswer.id] : []) ?? [];
           return (
             <StyledStack
               key={formField.id}
