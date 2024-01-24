@@ -7,7 +7,6 @@ import charmClient from 'charmClient';
 import { useGetRewardPermissions } from 'charmClient/hooks/rewards';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { submissionIsComplete } from 'lib/rewards/countRemainingSubmissionSlots';
 
 export function RewardActions({ rewardId, onClick }: { rewardId: string; onClick?: VoidFunction }) {
   const { refreshReward, rewards } = useRewards();
@@ -23,16 +22,9 @@ export function RewardActions({ rewardId, onClick }: { rewardId: string; onClick
     return null;
   }
 
-  const isMarkRewardPaidEnabled =
-    rewardPermissions?.mark_paid &&
-    reward.status !== 'paid' &&
-    reward.status !== 'complete' &&
-    reward.applications.length > 0 &&
-    reward.applications.every(
-      (submission) => submissionIsComplete({ application: submission }) || submission.status === 'rejected'
-    );
+  const isMarkRewardPaidEnabled = rewardPermissions?.mark_paid;
 
-  const isMarkrewardCompletedEnabled = rewardPermissions?.lock && reward.status === 'open';
+  const isMarkRewardCompletedEnabled = rewardPermissions?.lock && reward.status === 'open';
 
   async function markRewardAsPaid() {
     try {
@@ -59,16 +51,16 @@ export function RewardActions({ rewardId, onClick }: { rewardId: string; onClick
     }
   }
 
-  const disabledMarkrewardPaidTooltipMessage = !rewardPermissions?.mark_paid
+  const disabledMarkRewardPaidTooltipMessage = !rewardPermissions?.mark_paid
     ? "You don't have permission to mark this reward as paid"
     : `All applications must be completed or marked as paid to mark this reward as paid`;
-  const disabledMarkrewardCompletedTooltipMessage = !rewardPermissions?.lock
+  const disabledMarkRewardCompletedTooltipMessage = !rewardPermissions?.lock
     ? `You don't have permission to mark this reward as complete`
     : 'This reward cannot be marked as complete';
 
   return (
     <>
-      <Tooltip title={!isMarkRewardPaidEnabled ? disabledMarkrewardPaidTooltipMessage : ''}>
+      <Tooltip title={!isMarkRewardPaidEnabled ? disabledMarkRewardPaidTooltipMessage : ''}>
         <div>
           <MenuItem dense onClick={markRewardAsPaid} disabled={!isMarkRewardPaidEnabled}>
             <PaidIcon
@@ -81,9 +73,9 @@ export function RewardActions({ rewardId, onClick }: { rewardId: string; onClick
           </MenuItem>
         </div>
       </Tooltip>
-      <Tooltip title={!isMarkrewardCompletedEnabled ? disabledMarkrewardCompletedTooltipMessage : ''}>
+      <Tooltip title={!isMarkRewardCompletedEnabled ? disabledMarkRewardCompletedTooltipMessage : ''}>
         <div>
-          <MenuItem dense onClick={closereward} disabled={!isMarkrewardCompletedEnabled}>
+          <MenuItem dense onClick={closereward} disabled={!isMarkRewardCompletedEnabled}>
             <CheckCircleOutlinedIcon
               sx={{
                 mr: 1
