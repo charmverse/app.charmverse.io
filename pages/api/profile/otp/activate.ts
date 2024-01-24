@@ -2,6 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { verifyOtpToken } from 'lib/profile/otp/verifyOtpToken';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -27,6 +28,8 @@ async function activateOtp(req: NextApiRequest, res: NextApiResponse<void>) {
       activatedAt: new Date()
     }
   });
+
+  trackUserAction('add_otp', { userId });
 
   return res.status(200).end();
 }

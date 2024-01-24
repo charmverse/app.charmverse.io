@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { IdentityType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import EmailIcon from '@mui/icons-material/Email';
@@ -166,6 +167,7 @@ function LoginHandler(props: DialogProps) {
     if ((err as SystemError)?.errorType === 'Disabled account') {
       setShowLoginError(true);
     }
+    log.error(`Error on login.`, { error: err });
   }
 
   function toggleEmailDialog(position: 'open' | 'close') {

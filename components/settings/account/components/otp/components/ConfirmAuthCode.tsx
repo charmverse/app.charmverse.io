@@ -42,6 +42,7 @@ export function ConfirmAuthCode({ onSubmit, errorMessage, loading }: Props) {
           disabled={loading}
           helperText={error}
           data-test='confirm-auth-code-input'
+          disableArrows
           {...register('code', {
             required: true,
             validate: (val) => String(val).length === 6 || 'Must be exactly 6 characters'
