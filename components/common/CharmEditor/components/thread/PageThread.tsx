@@ -247,6 +247,7 @@ interface PageThreadProps {
   onToggleResolve?: (threadId: string, resolved: boolean) => void;
   sx?: SxProps<Theme>;
   hideContext?: boolean;
+  scrollToThreadElement?: (threadId: string) => void;
 }
 
 export const RelativeDate = memo<{ createdAt: string | Date; prefix?: string; updatedAt?: string | Date | null }>(
@@ -297,7 +298,8 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
       showFindButton = false,
       threadId,
       inline = false,
-      canCreateComments
+      canCreateComments,
+      scrollToThreadElement
     },
     ref
   ) => {
@@ -390,7 +392,11 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
                     gap={1}
                     onClick={() => {
                       if (showFindButton) {
-                        scrollToThread(threadId);
+                        if (scrollToThreadElement) {
+                          scrollToThreadElement(threadId);
+                        } else {
+                          scrollToThread(threadId);
+                        }
                       }
                     }}
                   >
@@ -443,7 +449,11 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
                     display='flex'
                     onClick={() => {
                       if (showFindButton) {
-                        scrollToThread(threadId);
+                        if (scrollToThreadElement) {
+                          scrollToThreadElement(threadId);
+                        } else {
+                          scrollToThread(threadId);
+                        }
                       }
                     }}
                   >
@@ -470,7 +480,11 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
                   onContainerClick={() => {
                     // Shouldn't scroll if we are in comment edit mode
                     if (showFindButton && !isEditable) {
-                      scrollToThread(threadId);
+                      if (scrollToThreadElement) {
+                        scrollToThreadElement(threadId);
+                      } else {
+                        scrollToThread(threadId);
+                      }
                     }
                   }}
                   onSave={async (cb) => {

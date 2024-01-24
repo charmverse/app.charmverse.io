@@ -137,6 +137,7 @@ function CommentsSidebar({
   threadList,
   onDeleteComment,
   onToggleResolve,
+  scrollToThreadElement,
   canCreateComments
 }: {
   threadList: ThreadWithComments[];
@@ -145,6 +146,7 @@ function CommentsSidebar({
   canCreateComments: boolean;
   onToggleResolve?: (threadId: string, remove: boolean) => void;
   onDeleteComment?: (threadId: string) => void;
+  scrollToThreadElement?: (threadId: string) => void;
 }) {
   return (
     <>
@@ -183,6 +185,7 @@ function CommentsSidebar({
                   threadId={resolvedThread.id}
                   onDeleteComment={() => onDeleteComment?.(resolvedThread.id)}
                   onToggleResolve={(_, remove) => onToggleResolve?.(resolvedThread.id, remove)}
+                  scrollToThreadElement={scrollToThreadElement}
                 />
               )
           )
@@ -304,6 +307,26 @@ function FormCommentsSidebarComponent({
       canCreateComments={canCreateComments}
       threadFilter={threadFilter}
       threadList={threadList}
+      scrollToThreadElement={(threadId) => {
+        const fieldAnswerElements = document.querySelectorAll('.proposal-form-field-answer');
+        for (const fieldAnswerElement of fieldAnswerElements) {
+          const threadIds = fieldAnswerElement.getAttribute('data-thread-ids');
+          if (threadIds?.includes(threadId)) {
+            requestAnimationFrame(() => {
+              fieldAnswerElement.scrollIntoView({
+                behavior: 'smooth'
+              });
+
+              setTimeout(() => {
+                requestAnimationFrame(() => {
+                  highlightDomElement(fieldAnswerElement as HTMLElement);
+                });
+              }, 250);
+            });
+            break;
+          }
+        }
+      }}
     />
   );
 }
