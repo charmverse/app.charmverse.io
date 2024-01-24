@@ -601,6 +601,7 @@ function CenterPanel(props: Props) {
               embeddedBoardPath={props.embeddedBoardPath}
               checkedIds={checkedIds}
               setCheckedIds={setCheckedIds}
+              relationPropertiesCardsRecord={relationPropertiesCardsRecord}
             />
           )}
         </div>

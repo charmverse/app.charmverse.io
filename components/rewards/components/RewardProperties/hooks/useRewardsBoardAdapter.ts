@@ -166,7 +166,8 @@ export function useRewardsBoardAdapter() {
     membersRecord,
     pages,
     rewards,
-    space?.id
+    space?.id,
+    relationPropertiesCardsRecord
   ]);
 
   const boardCustomProperties: Board = getDefaultBoard({

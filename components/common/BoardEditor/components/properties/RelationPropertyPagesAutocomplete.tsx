@@ -22,7 +22,7 @@ const StyledAutocomplete = styled(Autocomplete<PageListItem, true, boolean>)`
   }
 `;
 
-function PageListItemsContainer({
+export function RelationPageListItemsContainer({
   readOnly,
   pageListItems,
   wrapColumn,
@@ -117,7 +117,11 @@ export function RelationPropertyPagesAutocomplete({
           {selectedPageListItems.length === 0 ? (
             showEmptyPlaceholder && <EmptyPlaceholder>{emptyPlaceholderContent}</EmptyPlaceholder>
           ) : (
-            <PageListItemsContainer readOnly={readOnly} wrapColumn={wrapColumn} pageListItems={selectedPageListItems} />
+            <RelationPageListItemsContainer
+              readOnly={readOnly}
+              wrapColumn={wrapColumn}
+              pageListItems={selectedPageListItems}
+            />
           )}
         </Box>
       </SelectPreviewContainer>
@@ -191,7 +195,7 @@ export function RelationPropertyPagesAutocomplete({
           );
         }}
         renderTags={(_pageListItems) => (
-          <PageListItemsContainer
+          <RelationPageListItemsContainer
             readOnly={readOnly}
             onRemove={removeOption}
             wrapColumn={wrapColumn}

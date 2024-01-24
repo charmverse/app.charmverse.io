@@ -460,7 +460,6 @@ export function RewardPropertiesForm({
                   fields: { properties: properties ? { ...properties } : {} } as Reward['fields']
                 });
               }}
-              relationPropertiesCardsRecord={relationPropertiesCardsRecord}
             />
           </>
         </Collapse>

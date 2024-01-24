@@ -1,5 +1,5 @@
 import { Popover } from '@mui/material';
-import { bindPopover, bindTrigger, usePopupState, type PopupState } from 'material-ui-popup-state/hooks';
+import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { FormattedMessage } from 'react-intl';
 
 import FilterComponent from 'components/common/BoardEditor/focalboard/src/components/viewHeader/filterComponent';
@@ -8,12 +8,15 @@ import { useViewFilter } from 'hooks/useViewFilter';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 
+import type { PageListItemsRecord } from '../interfaces';
+
 type Props = {
   activeBoard: Board | undefined;
   activeView: BoardView;
+  relationPropertiesCardsRecord: PageListItemsRecord;
 };
 
-export function ViewFilterControl({ activeBoard, activeView }: Props) {
+export function ViewFilterControl({ relationPropertiesCardsRecord, activeBoard, activeView }: Props) {
   const filter = useViewFilter(activeView);
   const hasFilter = filter && filter.filters?.length > 0;
   const viewFilterPopup = usePopupState({ variant: 'popover', popupId: 'view-filter' });
@@ -39,7 +42,11 @@ export function ViewFilterControl({ activeBoard, activeView }: Props) {
           overflow: 'auto'
         }}
       >
-        <FilterComponent properties={activeBoard?.fields.cardProperties ?? []} activeView={activeView} />
+        <FilterComponent
+          properties={activeBoard?.fields.cardProperties ?? []}
+          activeView={activeView}
+          relationPropertiesCardsRecord={relationPropertiesCardsRecord}
+        />
       </Popover>
     </>
   );

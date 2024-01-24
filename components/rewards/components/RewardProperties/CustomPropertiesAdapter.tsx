@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
-import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { usePropertiesMutator } from 'components/rewards/components/RewardProperties/hooks/useRewardsMutator';
 import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -12,13 +11,21 @@ type Props = {
   reward: { spaceId?: string; id?: string } & RewardFieldsProp;
   onChange?: (properties: RewardPropertiesField) => void;
   readOnly?: boolean;
-  relationPropertiesCardsRecord?: PageListItemsRecord;
 };
 
-export function CustomPropertiesAdapter({ relationPropertiesCardsRecord, reward, onChange, readOnly }: Props) {
+export function CustomPropertiesAdapter({ reward, onChange, readOnly }: Props) {
   const { user } = useUser();
   const isAdmin = useIsAdmin();
-  const { boardCustomProperties, card, cards, activeView, views, rewardPage, setBoardReward } = useRewardsBoard();
+  const {
+    boardCustomProperties,
+    card,
+    cards,
+    activeView,
+    views,
+    rewardPage,
+    setBoardReward,
+    relationPropertiesCardsRecord
+  } = useRewardsBoard();
   const mutator = usePropertiesMutator({ reward, onChange });
 
   useEffect(() => {

@@ -167,7 +167,8 @@ export function useProposalsBoardAdapter() {
     membersRecord,
     pages,
     proposals,
-    space?.id
+    space?.id,
+    relationPropertiesCardsRecord
   ]);
 
   const boardCustomProperties: Board = getDefaultBoard({

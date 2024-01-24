@@ -26,24 +26,30 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
-import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
-import { getRelationPropertiesCardsRecord } from 'lib/focalboard/getRelationPropertiesCardsRecord';
 
 export function ProposalsPage({ title }: { title: string }) {
   const { space: currentSpace } = useCurrentSpace();
   const { isFreeSpace } = useIsFreeSpace();
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
   const [selectedPropertyId, setSelectedPropertyId] = useState<null | string>(null);
-  const { pages } = usePages();
   const canSeeProposals = hasAccess || isFreeSpace || currentSpace?.publicProposals === true;
   const { navigateToSpacePath } = useCharmRouter();
   const isAdmin = useIsAdmin();
   const { showError } = useSnackbar();
   const { user } = useUser();
-  const { board: activeBoard, views, cardPages, activeView, cards, isLoading, refreshProposals } = useProposalsBoard();
+  const {
+    board: activeBoard,
+    views,
+    cardPages,
+    activeView,
+    cards,
+    isLoading,
+    refreshProposals,
+    relationPropertiesCardsRecord
+  } = useProposalsBoard();
   const [showSidebar, setShowSidebar] = useState(false);
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
@@ -62,16 +68,6 @@ export function ProposalsPage({ title }: { title: string }) {
     return _groupByProperty;
   }, [activeBoard?.fields.cardProperties, activeView?.fields.groupById, activeView?.fields.viewType]);
 
-  const relationPropertiesCardsRecord = useMemo(
-    () =>
-      activeBoard && pages
-        ? getRelationPropertiesCardsRecord({
-            pages,
-            activeBoard
-          })
-        : {},
-    [pages, activeBoard]
-  );
   useProposalsBoardMutator();
 
   function openPage(pageId: string | null) {
@@ -165,7 +161,11 @@ export function ProposalsPage({ title }: { title: string }) {
             )}
             <div className='octo-spacer' />
             <Box className='view-actions'>
-              <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
+              <ViewFilterControl
+                relationPropertiesCardsRecord={relationPropertiesCardsRecord}
+                activeBoard={activeBoard}
+                activeView={activeView}
+              />
               <ViewSortControl
                 activeBoard={activeBoard}
                 activeView={activeView}

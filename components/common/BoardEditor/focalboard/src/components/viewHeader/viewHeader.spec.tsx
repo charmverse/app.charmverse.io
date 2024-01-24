@@ -47,6 +47,7 @@ describe('components/viewHeader/viewHeader', () => {
       wrapDNDIntl(
         <ReduxProvider store={store}>
           <ViewHeader
+            relationPropertiesCardsRecord={{}}
             showCard={jest.fn()}
             showView={jest.fn()}
             toggleViewOptions={jest.fn()}
@@ -68,6 +69,7 @@ describe('components/viewHeader/viewHeader', () => {
       wrapDNDIntl(
         <ReduxProvider store={store}>
           <ViewHeader
+            relationPropertiesCardsRecord={{}}
             viewsBoard={board}
             showCard={jest.fn()}
             showView={jest.fn()}

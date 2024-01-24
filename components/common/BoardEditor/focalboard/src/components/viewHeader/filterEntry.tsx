@@ -23,6 +23,10 @@ import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useEffect, useMemo, useState } from 'react';
 
+import { RelationPageListItemsContainer } from 'components/common/BoardEditor/components/properties/RelationPropertyPagesAutocomplete';
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
+import { PageIcon } from 'components/common/PageIcon';
+import PageTitle from 'components/common/PageLayout/components/PageTitle';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
@@ -35,6 +39,7 @@ import { getPropertyName } from 'lib/focalboard/getPropertyName';
 import { EVALUATION_STATUS_LABELS, PROPOSAL_STEP_LABELS } from 'lib/focalboard/proposalDbProperties';
 import { AUTHORS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposal/blocks/constants';
 import type { ProposalEvaluationStatus, ProposalEvaluationStep } from 'lib/proposal/interface';
+import { isTruthy } from 'lib/utilities/types';
 import { focalboardColorsMap } from 'theme/colors';
 
 import { iconForPropertyType } from '../../widgets/iconForPropertyType';
@@ -45,6 +50,7 @@ type Props = {
   filter: FilterClause;
   changeViewFilter: (filterGroup: FilterGroup) => void;
   currentFilter: FilterGroup;
+  relationPropertiesCardsRecord: PageListItemsRecord;
 };
 
 function formatCondition(condition: string) {
@@ -77,12 +83,14 @@ function FilterPropertyValue({
   properties,
   filter: initialFilter,
   changeViewFilter,
-  currentFilter
+  currentFilter,
+  relationPropertiesCardsRecord
 }: {
   filter: FilterClause;
   properties: IPropertyTemplate[];
   changeViewFilter: (filterGroup: FilterGroup) => void;
   currentFilter: FilterGroup;
+  relationPropertiesCardsRecord: PageListItemsRecord;
 }) {
   const [filter, setFilter] = useState(initialFilter);
 
@@ -253,6 +261,54 @@ function FilterPropertyValue({
             return (
               <MenuItem value={chain.chainId.toString()} key={chain.chainId}>
                 <Chip size='small' label={chain.chainName} />
+              </MenuItem>
+            );
+          })}
+        </Select>
+      );
+    } else if (property.type === 'relation') {
+      const pageListItems = relationPropertiesCardsRecord[property.id];
+      return (
+        <Select<string[]>
+          size='small'
+          multiple
+          displayEmpty
+          value={filter.values}
+          onChange={updateMultiSelectValue}
+          renderValue={(pageListItemIds) => {
+            return pageListItemIds.length === 0 ? (
+              <Typography color='secondary' fontSize='small'>
+                Select a page
+              </Typography>
+            ) : (
+              <RelationPageListItemsContainer
+                pageListItems={pageListItemIds
+                  .map((pageListItemId) => {
+                    const pageListItem = pageListItems.find((_pageListItem) => _pageListItem.id === pageListItemId);
+                    return pageListItem;
+                  })
+                  .filter(isTruthy)}
+              />
+            );
+          }}
+        >
+          {pageListItems.map((pageListItem) => {
+            return (
+              <MenuItem
+                key={pageListItem.id}
+                value={pageListItem.id}
+                selected={!!filter.values.find((selectedPageListItemId) => selectedPageListItemId === pageListItem.id)}
+              >
+                <ListItemIcon>
+                  <PageIcon
+                    icon={pageListItem.icon}
+                    isEditorEmpty={!pageListItem.hasContent}
+                    pageType={pageListItem.type}
+                  />
+                </ListItemIcon>
+                <PageTitle hasContent={!pageListItem.title} sx={{ fontWeight: 'bold' }}>
+                  {pageListItem.title ? pageListItem.title : 'Untitled'}
+                </PageTitle>
               </MenuItem>
             );
           })}
@@ -504,6 +560,7 @@ function FilterEntry(props: Props) {
         </PopupState>
         <FilterPropertyValue
           filter={filter}
+          relationPropertiesCardsRecord={props.relationPropertiesCardsRecord}
           properties={properties}
           changeViewFilter={changeViewFilter}
           currentFilter={currentFilter}
