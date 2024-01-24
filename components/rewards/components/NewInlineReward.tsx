@@ -8,14 +8,11 @@ import { useRewards } from 'components/rewards/hooks/useRewards';
 import { usePages } from 'hooks/usePages';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 
-import { useRewardTemplates } from '../hooks/useRewardTemplates';
-
 export function NewInlineReward({ pageId }: { pageId: string }) {
   const { clearRewardValues, rewardValues, setRewardValues, createReward, isSavingReward } = useNewReward();
   const { setCreatingInlineReward } = useRewards();
   const { refreshPage } = usePages();
   const [selectedTemplate, setSelectedTemplate] = useState<string | undefined>();
-  const { templates } = useRewardTemplates();
 
   function resetForm() {
     clearRewardValues();
@@ -30,12 +27,9 @@ export function NewInlineReward({ pageId }: { pageId: string }) {
     }
   }
 
-  function addPageFromTemplate(templateId: string) {
-    const template = templates?.find((tpl) => tpl.page.id === templateId) ?? null;
-    if (template) {
-      setRewardValues(template.reward);
-    }
-    setSelectedTemplate(templateId);
+  function selectTemplate(template: RewardTemplate) {
+    setRewardValues(template.reward);
+    setSelectedTemplate(template.page.id);
   }
 
   useEffect(() => {
@@ -46,7 +40,7 @@ export function NewInlineReward({ pageId }: { pageId: string }) {
     <Stack gap={1}>
       <RewardPropertiesForm
         templateId={selectedTemplate}
-        addPageFromTemplate={addPageFromTemplate}
+        selectTemplate={selectTemplate}
         onChange={setRewardValues}
         values={rewardValues}
         expandedByDefault

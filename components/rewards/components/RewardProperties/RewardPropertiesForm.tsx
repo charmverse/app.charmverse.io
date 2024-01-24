@@ -24,6 +24,7 @@ import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates'
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { RewardFieldsProp, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
+import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 import type { Reward, RewardWithUsers, RewardReviewer } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { isTruthy } from 'lib/utilities/types';
@@ -39,7 +40,7 @@ type Props = {
   isNewReward?: boolean;
   isTemplate?: boolean;
   expandedByDefault?: boolean;
-  addPageFromTemplate?: (templateId: string) => void;
+  selectTemplate?: (template: RewardTemplate) => void;
   templateId?: string;
   readOnlyTemplate?: boolean;
   resetTemplate?: VoidFunction;
@@ -69,7 +70,7 @@ export function RewardPropertiesForm({
   isTemplate,
   pageId,
   expandedByDefault,
-  addPageFromTemplate,
+  selectTemplate,
   templateId,
   readOnlyTemplate,
   resetTemplate,
@@ -222,8 +223,8 @@ export function RewardPropertiesForm({
                           resetTemplate?.();
                         }
                         const template = rewardTemplates.find((_template) => _template.page.id === templatePage?.id);
-                        if (template && addPageFromTemplate) {
-                          addPageFromTemplate(template.page.id);
+                        if (template && selectTemplate) {
+                          selectTemplate(template);
                         }
                       }}
                     />
