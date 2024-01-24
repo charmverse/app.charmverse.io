@@ -304,15 +304,27 @@ async function updateBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) 
       const newBlockProperties = (block.fields as unknown as BoardFields).cardProperties;
       const dbBlockProperties = (dbBlock.fields as unknown as BoardFields).cardProperties;
       const newRelationProperties = newBlockProperties.filter(
-        (p) => p.type === 'relation' && !dbBlockProperties.find((dbp) => dbp.id === p.id)
+        (p) => p.type === 'relation' && !dbBlockProperties.find((dbp) => dbp.id === p.id) && p.relationData
       );
 
       const deletedRelationProperties = dbBlockProperties.filter(
-        (p) => p.type === 'relation' && newBlockProperties.find((dbp) => dbp.id !== p.id) && p.relationData
+        (p) => p.type === 'relation' && !newBlockProperties.find((dbp) => dbp.id === p.id) && p.relationData
       );
 
-      await Promise.all(
-        newRelationProperties.map(async (newRelationProperty) => {
+      const deletedRelationPropertyBoards = await prisma.block.findMany({
+        where: {
+          id: {
+            in: deletedRelationProperties.map((p) => (p.relationData as RelationPropertyData).boardId)
+          }
+        },
+        select: {
+          id: true,
+          fields: true
+        }
+      });
+
+      await Promise.all([
+        ...newRelationProperties.map(async (newRelationProperty) => {
           const connectedRelationPropertyId = v4();
           const updatedProperties = (block.fields as unknown as BoardFields).cardProperties.map((cp) => {
             if (cp.id === newRelationProperty.id) {
@@ -400,8 +412,29 @@ async function updateBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) 
               })
             )
           ]);
+        }),
+        ...deletedRelationProperties.map((deletedRelationProperty) => {
+          const deletedRelationPropertyBoard = deletedRelationPropertyBoards.find(
+            (b) => b.id === (deletedRelationProperty.relationData as RelationPropertyData).boardId
+          );
+          if (!deletedRelationPropertyBoard) {
+            return [];
+          }
+          return prisma.block.update({
+            where: {
+              id: deletedRelationPropertyBoard.id
+            },
+            data: {
+              fields: {
+                ...(deletedRelationPropertyBoard.fields as any),
+                cardProperties: (deletedRelationPropertyBoard.fields as unknown as BoardFields).cardProperties.filter(
+                  (p) => p.id !== deletedRelationProperty.relationData?.relatedPropertyId
+                )
+              }
+            }
+          });
         })
-      );
+      ]);
     }
   }
 
