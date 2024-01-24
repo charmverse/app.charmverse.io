@@ -22,7 +22,18 @@ export async function updateProposal({
   actorId
 }: UpdateProposalRequest & { actorId: string }) {
   if (authors && authors.length === 0) {
-    throw new InvalidStateError('Proposal must have at least 1 author');
+    const page = await prisma.page.findUniqueOrThrow({
+      where: {
+        proposalId
+      },
+      select: {
+        type: true
+      }
+    });
+
+    if (page.type === 'proposal') {
+      throw new InvalidStateError('Proposal must have at least 1 author');
+    }
   }
 
   await prisma.$transaction(async (tx) => {
