@@ -43,7 +43,7 @@ services:
       [
         'sh',
         '-c',
-        'npm run prisma:deploy && npx react-env --path .env -- node --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000 & npm run ceramic:graphql'
+        'npm run prisma:deploy && npx react-env --path .env -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000'
       ]
     # environment:
     #   - FORCE_SUBDOMAINS=true

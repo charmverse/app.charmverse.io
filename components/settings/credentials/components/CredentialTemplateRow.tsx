@@ -5,11 +5,13 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import MedalIcon from '@mui/icons-material/WorkspacePremium';
 import { Box, IconButton, ListItemButton, ListItemText, Popover, Tooltip, useMediaQuery } from '@mui/material';
+import Chip from '@mui/material/Chip';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef, useState } from 'react';
 
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { credentialLabelMap } from 'lib/credentials/constants';
 
 export function CredentialTemplateRow({
   template,
@@ -40,9 +42,14 @@ export function CredentialTemplateRow({
 
   return (
     <Box display='flex' justifyContent='space-between'>
-      <Box component='span' sx={{ alignItems: 'center', display: 'flex' }}>
+      <Box component='div' sx={{ alignItems: 'center', display: 'flex' }}>
         <MedalIcon />
         {template.name}
+        <Box sx={{ ml: 2 }} gap={2} display='flex'>
+          {template.credentialEvents.map((ev) => (
+            <Chip key={ev} label={credentialLabelMap[ev]} variant='outlined' size='small' />
+          ))}
+        </Box>
       </Box>
       <Box ref={pageMenuAnchor} display='flex' alignSelf='stretch' alignItems='center'>
         <div>
@@ -71,7 +78,10 @@ export function CredentialTemplateRow({
               <ListItemButton
                 data-test='edit-credential-template'
                 disabled={!isAdmin}
-                onClick={() => onClickEdit(template)}
+                onClick={() => {
+                  setPageMenuAnchorElement(null);
+                  onClickEdit(template);
+                }}
               >
                 <EditOutlinedIcon
                   fontSize='small'

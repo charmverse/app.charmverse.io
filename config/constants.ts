@@ -1,5 +1,4 @@
 import env from '@beam-australia/react-env';
-import { generatePrivateKey } from 'viem/accounts';
 
 // Note: NODE_ENV can only be 'development' or 'production' according to Next.js, but we don't want to mix them with test env
 export const isTestEnv = (env('APP_ENV') ?? process.env.REACT_APP_APP_ENV ?? process.env.NODE_ENV) === 'test';
@@ -48,9 +47,7 @@ export const webhookEndpoint = 'api/v1/webhooks/addToDatabase';
 export const appSubdomain = 'app';
 
 // In CI, we want to have a private key for signing, but we don't need a fixed one. We also want to have errors if we are not in CI environment and CREDENTIAL_WALLET_KEY is not set
-export const credentialsWalletPrivateKey =
-  process.env.CREDENTIAL_WALLET_KEY ??
-  ((isTestEnv && !isProdEnv && !isStagingEnv && !isDevEnv ? generatePrivateKey() : undefined) as string);
+export const credentialsWalletPrivateKey = process.env.CREDENTIAL_WALLET_KEY;
 export const awsS3Bucket = process.env.S3_UPLOAD_BUCKET as string;
 
 // Ceramic Node
