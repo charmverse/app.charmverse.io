@@ -137,7 +137,7 @@ function sortList<T extends { title: string; originalTitle?: string }>({
       item,
       similarity: stringSimilarity(item.originalTitle || item.title, triggerText)
     }))
-    .filter(({ similarity }) => similarity >= 0.4)
+    .filter(({ similarity }) => similarity >= 0.2)
     .sort((a, b) => b.similarity - a.similarity)
     .map(({ item }) => item);
 }

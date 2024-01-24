@@ -197,7 +197,7 @@ export function isValidEmail(email: string) {
 
 // from https://stackoverflow.com/questions/23305000/javascript-fuzzy-search-that-makes-sense
 // https://gist.github.com/mavaddat/a522c2ed59162d6330569999cab03d76
-export function stringSimilarity(str1?: string, str2?: string, gramSize: number = 3) {
+export function stringSimilarity(str1?: string, str2?: string, gramSize: number = 2) {
   function getNGrams(s: string, len: number) {
     s = ' '.repeat(len - 1) + s.toLowerCase() + ' '.repeat(len - 1);
     const v = new Array(s.length - len + 1);
