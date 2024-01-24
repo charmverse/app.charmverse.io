@@ -4,7 +4,7 @@ import { useSubmitEvaluationResult } from 'charmClient/hooks/proposals';
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { Button } from 'components/common/Button';
-import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
+import { authorSystemRole, allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PopulatedEvaluation } from 'lib/proposal/interface';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
@@ -66,7 +66,7 @@ export function FeedbackEvaluation({
         </FormLabel>
         <UserAndRoleSelect
           data-test='evaluation-reviewer-select'
-          systemRoles={[allMembersSystemRole]}
+          systemRoles={[authorSystemRole, allMembersSystemRole]}
           readOnly={true}
           value={reviewerOptions}
           onChange={() => {}}

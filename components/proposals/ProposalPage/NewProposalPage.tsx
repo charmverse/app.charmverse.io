@@ -30,6 +30,7 @@ import { getInitialFormFieldValue, useFormFields } from 'components/common/form/
 import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
+import { authorSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -227,7 +228,7 @@ export function NewProposalPage({
           evaluation.type === 'rubric' ? existingStep?.rubricCriteria || [getNewCriteria()] : []
         ) as ProposalRubricCriteriaWithTypedParams[];
         // include author as default reviewer for feedback
-        const defaultReviewers = evaluation.type === 'feedback' && user ? [{ userId: user.id }] : [];
+        const defaultReviewers = evaluation.type === 'feedback' && user ? [{ systemRole: authorSystemRole.id }] : [];
         return {
           id: evaluation.id,
           index,
