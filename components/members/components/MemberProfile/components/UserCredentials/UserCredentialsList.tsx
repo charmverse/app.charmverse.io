@@ -1,8 +1,8 @@
 import { Alert, Box, Divider } from '@mui/material';
 import Stack from '@mui/material/Stack';
 
+import { useGetUserCredentials } from 'charmClient/hooks/credentialHooks';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { useGetUserCredentials } from 'components/settings/credentials/hooks/credentialHooks';
 
 import { UserCredentialRow } from './UserCredentialRow';
 

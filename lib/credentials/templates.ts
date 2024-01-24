@@ -1,7 +1,6 @@
 import type { CredentialTemplate } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-import { urPK } from '@mui/x-date-pickers';
 
 import { InvalidInputError } from 'lib/utilities/errors';
 

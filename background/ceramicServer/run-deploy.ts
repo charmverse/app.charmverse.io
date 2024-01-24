@@ -32,7 +32,3 @@ async function cleanup() {
 
 process.on('SIGINT', cleanup);
 process.on('SIGTERM', cleanup);
-
-process.on('SIGTERM', async () => {
-  log.info('GraphQL Composedb server stopped');
-});
