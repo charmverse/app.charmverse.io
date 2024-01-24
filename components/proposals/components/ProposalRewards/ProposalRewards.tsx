@@ -14,6 +14,7 @@ import {
 } from 'components/proposals/components/ProposalRewards/AttachRewardButton';
 import { RewardTokenInfo } from 'components/rewards/components/RewardProperties/components/RewardTokenInfo';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
+import { RewardAmount } from 'components/rewards/components/RewardStatusBadge';
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
@@ -191,17 +192,16 @@ export function ProposalRewards({
                         <Hidden lgDown>
                           <Grid item xs={5}>
                             <Stack alignItems='center' direction='row' height='100%'>
-                              {reward.customReward ? (
-                                <Typography component='span' variant='subtitle1' fontWeight='normal'>
-                                  {reward.customReward}
-                                </Typography>
-                              ) : (
-                                <RewardTokenInfo
-                                  chainId={reward.chainId || null}
-                                  symbolOrAddress={reward.rewardToken || null}
-                                  rewardAmount={reward.rewardAmount || null}
-                                />
-                              )}
+                              <RewardAmount
+                                reward={{
+                                  chainId: reward.chainId || null,
+                                  customReward: reward.customReward || null,
+                                  rewardAmount: reward.rewardAmount || null,
+                                  rewardToken: reward.rewardToken || null
+                                }}
+                                truncate={true}
+                                typographyProps={{ variant: 'body2', fontWeight: 'normal', fontSize: 'normal' }}
+                              />
                             </Stack>
                           </Grid>
                         </Hidden>
