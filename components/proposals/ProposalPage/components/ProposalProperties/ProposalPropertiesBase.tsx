@@ -3,12 +3,12 @@ import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Collapse, Divider, IconButton, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
+import { useGetCredentialTemplates } from 'charmClient/hooks/credentialHooks';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import { CredentialSelect } from 'components/credentials/CredentialsSelect';
 import { ProposalRewards } from 'components/proposals/components/ProposalRewards/ProposalRewards';
 import { CustomPropertiesAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/CustomPropertiesAdapter';
-import { useGetCredentialTemplates } from 'components/settings/credentials/hooks/credentialHooks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useUser } from 'hooks/useUser';

@@ -36,13 +36,18 @@ const mockedSignAndPublishCharmverseCredential = jest.mocked(signAndPublishCharm
 describe('issueProposalCredentialIfNecessary', () => {
   it('should issue credentials once for a unique combination of user, proposal and credential template', async () => {
     const { space, user: author1 } = await testUtilsUser.generateUserAndSpace({
-      spaceCredentialEvents: ['proposal_approved', 'proposal_created'],
       wallet: randomETHWalletAddress(),
       domain: `cvt-testing-${uuid()}`
     });
     const author2 = await testUtilsUser.generateSpaceUser({ spaceId: space.id, wallet: randomETHWalletAddress() });
-    const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({ spaceId: space.id });
-    const secondCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({ spaceId: space.id });
+    const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
+      spaceId: space.id,
+      credentialEvents: ['proposal_approved', 'proposal_created']
+    });
+    const secondCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
+      spaceId: space.id,
+      credentialEvents: ['proposal_approved', 'proposal_created']
+    });
 
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
@@ -129,15 +134,20 @@ describe('issueProposalCredentialIfNecessary', () => {
     );
   });
 
-  it('should only issue credentials if the space allows issuing credentials for the event', async () => {
+  it('should only issue credentials if the credential template allows issuing credentials for the event', async () => {
     const { space, user: author1 } = await testUtilsUser.generateUserAndSpace({
-      spaceCredentialEvents: ['proposal_approved'],
       wallet: randomETHWalletAddress(),
       domain: `cvt-testing-${uuid()}`
     });
     const author2 = await testUtilsUser.generateSpaceUser({ spaceId: space.id, wallet: randomETHWalletAddress() });
-    const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({ spaceId: space.id });
-    const secondCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({ spaceId: space.id });
+    const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
+      spaceId: space.id,
+      credentialEvents: ['proposal_approved']
+    });
+    const secondCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
+      spaceId: space.id,
+      credentialEvents: []
+    });
 
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
@@ -158,7 +168,7 @@ describe('issueProposalCredentialIfNecessary', () => {
       proposalId: proposal.id
     });
 
-    expect(mockedSignAndPublishCharmverseCredential).toHaveBeenCalledTimes(4);
+    expect(mockedSignAndPublishCharmverseCredential).toHaveBeenCalledTimes(2);
 
     const issuedCredentials = await prisma.issuedCredential.findMany({
       where: {
@@ -166,8 +176,8 @@ describe('issueProposalCredentialIfNecessary', () => {
       }
     });
 
-    // 1 event type * 2 credential templates * 2 authors
-    expect(issuedCredentials).toHaveLength(4);
+    // 1 event type * 1 credential templates * 2 authors
+    expect(issuedCredentials).toHaveLength(2);
 
     expect(issuedCredentials).toMatchObject(
       expect.arrayContaining<Partial<IssuedCredential>>([
@@ -177,19 +187,9 @@ describe('issueProposalCredentialIfNecessary', () => {
           credentialTemplateId: firstCredentialTemplate.id
         }),
         expect.objectContaining({
-          userId: author1.id,
+          userId: author2.id,
           credentialEvent: 'proposal_approved',
           credentialTemplateId: firstCredentialTemplate.id
-        }),
-        expect.objectContaining({
-          userId: author2.id,
-          credentialEvent: 'proposal_approved',
-          credentialTemplateId: secondCredentialTemplate.id
-        }),
-        expect.objectContaining({
-          userId: author2.id,
-          credentialEvent: 'proposal_approved',
-          credentialTemplateId: secondCredentialTemplate.id
         })
       ])
     );
@@ -197,13 +197,18 @@ describe('issueProposalCredentialIfNecessary', () => {
 
   it('should issue credentials for newly added authors', async () => {
     const { space, user: author1 } = await testUtilsUser.generateUserAndSpace({
-      spaceCredentialEvents: ['proposal_approved'],
       wallet: randomETHWalletAddress(),
       domain: `cvt-testing-${uuid()}`
     });
     const author2 = await testUtilsUser.generateSpaceUser({ spaceId: space.id, wallet: randomETHWalletAddress() });
-    const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({ spaceId: space.id });
-    const secondCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({ spaceId: space.id });
+    const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
+      spaceId: space.id,
+      credentialEvents: ['proposal_approved']
+    });
+    const secondCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
+      spaceId: space.id,
+      credentialEvents: ['proposal_approved']
+    });
 
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
@@ -263,14 +268,16 @@ describe('issueProposalCredentialIfNecessary', () => {
 
   it('should ignore inexistent selected credentials', async () => {
     const { space, user: author1 } = await testUtilsUser.generateUserAndSpace({
-      spaceCredentialEvents: ['proposal_approved'],
       wallet: randomETHWalletAddress(),
       domain: `cvt-testing-${uuid()}`
     });
 
     const inexistentCredentialId = uuid();
 
-    const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({ spaceId: space.id });
+    const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
+      spaceId: space.id,
+      credentialEvents: ['proposal_approved']
+    });
 
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
@@ -310,13 +317,15 @@ describe('issueProposalCredentialIfNecessary', () => {
 
   it('should not attempt to issue the credential if the user has no wallet', async () => {
     const { space, user: author1 } = await testUtilsUser.generateUserAndSpace({
-      spaceCredentialEvents: ['proposal_approved'],
       // Dont' assign a wallet to the user
       wallet: undefined,
       domain: `cvt-testing-${uuid()}`
     });
 
-    const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({ spaceId: space.id });
+    const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
+      spaceId: space.id,
+      credentialEvents: ['proposal_approved']
+    });
 
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
@@ -345,12 +354,14 @@ describe('issueProposalCredentialIfNecessary', () => {
 
   it('should not issue a proposal_created credential if the proposal status is draft', async () => {
     const { space, user: author1 } = await testUtilsUser.generateUserAndSpace({
-      spaceCredentialEvents: ['proposal_created'],
       wallet: randomETHWalletAddress(),
       domain: `cvt-testing-${uuid()}`
     });
 
-    const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({ spaceId: space.id });
+    const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
+      spaceId: space.id,
+      credentialEvents: ['proposal_created']
+    });
 
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
@@ -379,12 +390,14 @@ describe('issueProposalCredentialIfNecessary', () => {
 
   it('should not issue a proposal_approved credential if the proposal evaluation is failed', async () => {
     const { space, user: author1 } = await testUtilsUser.generateUserAndSpace({
-      spaceCredentialEvents: ['proposal_approved'],
       wallet: randomETHWalletAddress(),
       domain: `cvt-testing-${uuid()}`
     });
 
-    const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({ spaceId: space.id });
+    const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
+      spaceId: space.id,
+      credentialEvents: ['proposal_approved']
+    });
 
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
@@ -413,12 +426,14 @@ describe('issueProposalCredentialIfNecessary', () => {
 
   it('should not issue a proposal_approved credential if the final proposal evaluation has not been reached', async () => {
     const { space, user: author1 } = await testUtilsUser.generateUserAndSpace({
-      spaceCredentialEvents: ['proposal_approved'],
       wallet: randomETHWalletAddress(),
       domain: `cvt-testing-${uuid()}`
     });
 
-    const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({ spaceId: space.id });
+    const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
+      spaceId: space.id,
+      credentialEvents: ['proposal_approved']
+    });
 
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
