@@ -1,4 +1,3 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import styled from '@emotion/styled';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
@@ -20,9 +19,7 @@ import type { TemplateItem } from 'components/common/TemplatesMenu/TemplatesMenu
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { usePages } from 'hooks/usePages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import { isTruthy } from 'lib/utilities/types';
 
 import { useProposalTemplates } from '../hooks/useProposalTemplates';
 import type { ProposalPageAndPropertiesInput } from '../ProposalPage/NewProposalPage';
@@ -47,7 +44,6 @@ export function NewProposalButton() {
   const { getFeatureTitle } = useSpaceFeatures();
   const [spacePermissions] = useCurrentSpacePermissions();
   const isAdmin = useIsAdmin();
-  const { pages } = usePages();
   const proposalTemplateCreateModalState = usePopupState({ variant: 'dialog' });
   // MUI Menu specific content
   const buttonRef = useRef<HTMLDivElement>(null);
@@ -59,8 +55,7 @@ export function NewProposalButton() {
 
   const proposalTemplatePages: TemplateItem[] = (proposalTemplates || []).map((proposal) => ({
     id: proposal.page.id,
-    // grab page title from pages context so that title is always up-to-date
-    title: pages[proposal.page.id]?.title || proposal.page.title,
+    title: proposal.page.title,
     proposalId: proposal.id,
     isStructuredProposal: !!proposal.formId,
     archived: !!proposal.archived

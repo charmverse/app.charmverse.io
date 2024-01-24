@@ -1,9 +1,6 @@
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
-import { InvalidInputError } from '@charmverse/core/dist/cjs/errors';
-import { stringUtils } from '@charmverse/core/dist/cjs/utilities';
 import { log } from '@charmverse/core/log';
 import type { AttestationType } from '@charmverse/core/prisma-client';
-import { prisma } from '@charmverse/core/prisma-client';
 import { Wallet } from 'ethers';
 
 import { credentialsWalletPrivateKey, graphQlServerEndpoint } from 'config/constants';
@@ -12,8 +9,6 @@ import type { EasSchemaChain } from './connectors';
 import type { EASAttestationFromApi } from './external/getExternalCredentials';
 import type { ExternalCredentialChain } from './external/schemas';
 import type { ProposalCredential } from './schemas';
-
-const credentialWalletAddress = new Wallet(credentialsWalletPrivateKey).address.toLowerCase();
 
 const apolloClient = new ApolloClient({
   cache: new InMemoryCache(),
@@ -126,6 +121,7 @@ export async function getCharmverseCredentialsByWallets({
 }: {
   wallets: string[];
 }): Promise<EASAttestationFromApi[]> {
+  const credentialWalletAddress = new Wallet(credentialsWalletPrivateKey).address.toLowerCase();
   if (!wallets.length) {
     return [];
   }
