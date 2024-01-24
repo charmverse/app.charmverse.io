@@ -22,7 +22,6 @@ interface Props {
   snapshotProposalId: string | null;
   renderContent: (props: { onClick?: () => void; label: string; icon: ReactNode }) => ReactNode;
   onPublish?: () => void;
-  durationDays?: number;
 }
 
 export function PublishToSnapshot({
@@ -31,8 +30,7 @@ export function PublishToSnapshot({
   renderContent,
   evaluationId,
   proposalId,
-  onPublish = () => null,
-  durationDays
+  onPublish = () => null
 }: Props) {
   const [checkingProposal, setCheckingProposal] = useState(!!snapshotProposalId);
   const [proposal, setProposal] = useState<SnapshotProposal | null>(null);
@@ -98,7 +96,6 @@ export function PublishToSnapshot({
             <PublishingForm
               evaluationId={evaluationId}
               proposalId={proposalId}
-              durationDays={durationDays}
               onSubmit={() => {
                 close();
                 onPublish();
