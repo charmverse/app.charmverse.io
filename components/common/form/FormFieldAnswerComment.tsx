@@ -1,4 +1,4 @@
-import type { FormField, FormFieldAnswer } from '@charmverse/core/prisma-client';
+import type { FormFieldAnswer } from '@charmverse/core/prisma-client';
 import { MessageOutlined } from '@mui/icons-material';
 import AddCommentOutlinedIcon from '@mui/icons-material/AddCommentOutlined';
 import { Box, Stack, Tooltip, Typography } from '@mui/material';
@@ -7,13 +7,81 @@ import { useState } from 'react';
 import { useCreateThread } from 'charmClient/hooks/comments';
 import type { InlineCommentInputHandleSubmitParams } from 'components/[pageId]/DocumentPage/components/InlineCommentInput';
 import { InlineCommentInput } from 'components/[pageId]/DocumentPage/components/InlineCommentInput';
+import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { useThreads } from 'hooks/useThreads';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
+import { highlightDomElement } from 'lib/utilities/browser';
 import { isTruthy } from 'lib/utilities/types';
 
 import { ThreadContainer } from '../CharmEditor/components/inlineComment/components/InlineCommentSubMenu';
 import PageThread from '../CharmEditor/components/thread/PageThread';
 import PopperPopup from '../PopperPopup';
+
+function FormFieldAnswerCommentsCounter({
+  disabled,
+  unResolvedThreads
+}: {
+  disabled?: boolean;
+  unResolvedThreads: ThreadWithComments[];
+}) {
+  const { activeView: sidebarView } = usePageSidebar();
+  return (
+    <Tooltip title={!disabled ? 'View form field answer threads' : ''}>
+      <Box
+        display='flex'
+        gap={{
+          md: 0.5,
+          xs: 0.25
+        }}
+        alignItems='center'
+        sx={{ cursor: 'pointer' }}
+        onClick={() => {
+          if (sidebarView === 'comments') {
+            const firstUnresolvedThread = unResolvedThreads[0];
+            const unresolvedThreadElement = document.getElementById(`thread.${firstUnresolvedThread.id}`);
+            if (unresolvedThreadElement) {
+              requestAnimationFrame(() => {
+                unresolvedThreadElement.scrollIntoView({
+                  behavior: 'smooth'
+                });
+
+                setTimeout(() => {
+                  requestAnimationFrame(() => {
+                    highlightDomElement(unresolvedThreadElement as HTMLElement);
+                  });
+                }, 250);
+              });
+            }
+          }
+        }}
+      >
+        <MessageOutlined
+          color='secondary'
+          sx={{
+            fontSize: {
+              md: '1.25rem',
+              xs: '1rem'
+            }
+          }}
+        />
+        <Typography
+          component='span'
+          variant='subtitle1'
+          sx={{
+            position: 'relative',
+            top: -2,
+            fontSize: {
+              md: '1rem',
+              xs: '0.75rem'
+            }
+          }}
+        >
+          {unResolvedThreads.reduce((acc, thread) => acc + thread.comments.length, 0)}
+        </Typography>
+      </Box>
+    </Tooltip>
+  );
+}
 
 function FormFieldAnswerThreads({
   disabled,
@@ -22,6 +90,7 @@ function FormFieldAnswerThreads({
   disabled?: boolean;
   fieldAnswerThreads?: ThreadWithComments[];
 }) {
+  const { activeView: sidebarView } = usePageSidebar();
   const unResolvedThreads =
     fieldAnswerThreads
       .filter((thread) => thread && !thread?.resolved)
@@ -32,6 +101,10 @@ function FormFieldAnswerThreads({
 
   if (fieldAnswerThreads.length === 0 || unResolvedThreads.length === 0) {
     return null;
+  }
+
+  if (sidebarView === 'comments') {
+    return <FormFieldAnswerCommentsCounter disabled={disabled} unResolvedThreads={unResolvedThreads} />;
   }
 
   return (
@@ -69,41 +142,7 @@ function FormFieldAnswerThreads({
         boxShadow: 'none'
       }}
     >
-      <Tooltip title={!disabled ? 'View form field answer threads' : ''}>
-        <Box
-          display='flex'
-          gap={{
-            md: 0.5,
-            xs: 0.25
-          }}
-          alignItems='center'
-          sx={{ cursor: 'pointer' }}
-        >
-          <MessageOutlined
-            color='secondary'
-            sx={{
-              fontSize: {
-                md: '1.25rem',
-                xs: '1rem'
-              }
-            }}
-          />
-          <Typography
-            component='span'
-            variant='subtitle1'
-            sx={{
-              position: 'relative',
-              top: -2,
-              fontSize: {
-                md: '1rem',
-                xs: '0.75rem'
-              }
-            }}
-          >
-            {unResolvedThreads.reduce((acc, thread) => acc + thread.comments.length, 0)}
-          </Typography>
-        </Box>
-      </Tooltip>
+      <FormFieldAnswerCommentsCounter disabled={disabled} unResolvedThreads={unResolvedThreads} />
     </PopperPopup>
   );
 }
