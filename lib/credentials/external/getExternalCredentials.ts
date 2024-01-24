@@ -1,6 +1,6 @@
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
 import { log } from '@charmverse/core/log';
-import { chain } from 'lodash';
+import type { SchemaDecodedItem } from '@ethereum-attestation-service/eas-sdk';
 import { getAddress } from 'viem';
 import { arbitrum, base, optimism } from 'viem/chains';
 
@@ -87,8 +87,12 @@ function getTrackedOnChainCredentials({
         (attestation: any) =>
           ({
             ...attestation,
+            type: 'external',
             chainId,
-            content: JSON.parse(attestation.decodedDataJson),
+            content: JSON.parse(attestation.decodedDataJson).reduce((acc: any, val: SchemaDecodedItem) => {
+              acc[val.name] = val.value.value;
+              return acc;
+            }, {} as any),
             timeCreated: attestation.timeCreated * 1000,
             verificationUrl: getOnChainAttestationUrl({ chainId, attestationId: attestation.id })
           } as EASAttestationFromApi)
