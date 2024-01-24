@@ -80,7 +80,7 @@ export function RewardPropertiesForm({
   const { getFeatureTitle } = useSpaceFeatures();
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(!!expandedByDefault);
-  const [rewardType, setRewardType] = useState<RewardType>(values?.customReward ? 'Custom' : 'Token');
+  const [rewardType, setRewardType] = useState(values?.customReward ? 'Custom' : ('Token' as RewardType));
   const allowedSubmittersValue: RoleOption[] = (values?.allowedSubmitterRoles ?? []).map((id) => ({
     id,
     group: 'role'
@@ -123,8 +123,26 @@ export function RewardPropertiesForm({
       }
     }
 
+    if ('rewardType' in updates && updates.rewardType === 'None') {
+      updates.rewardAmount = null;
+      updates.chainId = null;
+      updates.rewardToken = null;
+      updates.customReward = null;
+    }
+
     onChange(updates);
   }
+
+  useEffect(() => {
+    if (rewardType === 'None') {
+      applyUpdates({
+        rewardAmount: null,
+        chainId: null,
+        rewardToken: null,
+        customReward: null
+      });
+    }
+  }, [rewardType]);
 
   const applyUpdatesDebounced = useMemo(() => {
     if (useDebouncedInputs) {
@@ -431,7 +449,6 @@ export function RewardPropertiesForm({
                   onChange={updateRewardCustomReward}
                   value={values?.customReward ?? ''}
                   required
-                  defaultValue={values?.maxSubmissions}
                   size='small'
                   inputProps={{
                     style: { height: 'auto' },

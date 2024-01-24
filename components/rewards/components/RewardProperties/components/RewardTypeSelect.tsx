@@ -11,6 +11,11 @@ export const rewardTypeOptions: IPropertyOption[] = [
     id: 'Custom' as const,
     value: 'Custom',
     color: 'yellow'
+  },
+  {
+    id: 'None' as const,
+    value: 'None',
+    color: 'red'
   }
 ];
 
