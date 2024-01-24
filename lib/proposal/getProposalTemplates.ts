@@ -16,15 +16,6 @@ export async function getProposalTemplates({ spaceId, userId }: SpaceResourcesRe
     throw new InvalidInputError(`SpaceID is required`);
   }
 
-  const space = await prisma.space.findUnique({
-    where: {
-      id: spaceId
-    },
-    select: {
-      paidTier: true
-    }
-  });
-
   const { spaceRole, isAdmin } = await hasAccessToSpace({
     spaceId,
     userId
@@ -38,7 +29,8 @@ export async function getProposalTemplates({ spaceId, userId }: SpaceResourcesRe
     where: {
       spaceId,
       page: {
-        type: 'proposal_template'
+        type: 'proposal_template',
+        deletedAt: null
       }
     },
     include: {
