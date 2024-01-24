@@ -65,29 +65,23 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
     }
   }
 
-  function createRewardFromTemplate(templateId: string) {
-    const template = templates?.find((tpl) => tpl.page.id === templateId);
-    if (template) {
-      openNewPage({
-        ...template.page,
-        content: template.page.content as PageContent,
-        type: 'bounty',
-        templateId
-      });
-      setRewardValues(template.reward);
-    } else {
-      throw new Error('Reward template not found');
-    }
+  function createRewardFromTemplate(template: RewardTemplate) {
+    openNewPage({
+      ...template.page,
+      content: template.page.content as PageContent,
+      type: 'bounty',
+      templateId: template.page.id
+    });
+    setRewardValues(template.reward);
   }
 
-  function addPageFromTemplate(templateId: string) {
-    const template = templates?.find((tpl) => tpl.page.id === templateId);
-    const templateContentChanged = template?.page.content !== newPageValues?.content;
+  function selectTemplate(template: RewardTemplate) {
+    const templateContentChanged = template.page.content !== newPageValues?.content;
 
     if (newPageValues?.contentText.length !== 0 && templateContentChanged) {
       overrideContentModalPopupState.open();
     } else {
-      createRewardFromTemplate(templateId);
+      createRewardFromTemplate(template);
     }
     setSelectedTemplate(template ?? null);
   }
@@ -131,7 +125,12 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
       <TemplatesMenu
         isLoading={isLoading}
         templates={templates?.map((tpl) => tpl.page) ?? []}
-        addPageFromTemplate={createRewardFromTemplate}
+        addPageFromTemplate={(pageId) => {
+          const template = templates?.find((tpl) => tpl.page.id === pageId);
+          if (template) {
+            createRewardFromTemplate(template);
+          }
+        }}
         createTemplate={createTemplate}
         editTemplate={(pageId) => showPage(pageId)}
         deleteTemplate={deleteTemplate}
@@ -162,7 +161,7 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
             isNewReward
             isTemplate={isTemplate}
             expandedByDefault
-            addPageFromTemplate={addPageFromTemplate}
+            selectTemplate={selectTemplate}
             templateId={newPageValues?.templateId}
             resetTemplate={resetTemplate}
           />
@@ -179,7 +178,7 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
         question='Are you sure you want to overwrite your current content with the reward template content?'
         onConfirm={() => {
           if (selectedTemplate?.page?.id) {
-            createRewardFromTemplate(selectedTemplate.page.id);
+            createRewardFromTemplate(selectedTemplate);
           }
         }}
       />

@@ -10,7 +10,7 @@ import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardWithUsersAndPageMeta, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
-import { RewardSignupButton } from './components/RewardSignupButton';
+import { RewardSignupButton } from '../../../rewards/components/RewardProperties/components/RewardSignupButton';
 
 export function RewardProperties(props: {
   readOnly?: boolean;
@@ -89,6 +89,8 @@ export function RewardProperties(props: {
         templateId={templateId}
         isTemplate={isTemplate}
         readOnlyTemplate={readOnlyTemplate}
+        // templates are not enabled for existing pages
+        selectTemplate={() => {}}
       />
 
       {!isTemplate && (

@@ -22,6 +22,7 @@ export function RewardsPage() {
           isNewReward
           isTemplate={false}
           expandedByDefault
+          selectTemplate={() => {}}
         />
       </NewDocumentPage>
     </GlobalContext>

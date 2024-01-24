@@ -1,4 +1,3 @@
-import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import { Box } from '@mui/material';
 
 import { useUpdateProposal } from 'charmClient/hooks/proposals';
@@ -6,7 +5,7 @@ import { useProposalTemplateById } from 'components/proposals/hooks/useProposalT
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { ProposalPropertiesBase } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useUser } from 'hooks/useUser';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { PageWithContent } from 'lib/pages';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 
@@ -18,7 +17,6 @@ interface ProposalPropertiesProps {
   proposal?: ProposalWithUsersAndRubric;
   refreshProposal: VoidFunction;
 }
-
 export function ProposalProperties({
   pageId,
   proposalId,
@@ -28,8 +26,7 @@ export function ProposalProperties({
   refreshProposal
 }: ProposalPropertiesProps) {
   const { trigger: updateProposal } = useUpdateProposal({ proposalId });
-  const { user } = useUser();
-
+  const { showError } = useSnackbar();
   const sourceTemplate = useProposalTemplateById(proposal?.page?.sourceTemplateId);
 
   const isAdmin = useIsAdmin();
@@ -62,8 +59,12 @@ export function ProposalProperties({
   };
 
   async function onChangeProperties(values: Partial<ProposalPropertiesInput>) {
-    await updateProposal(values);
-    refreshProposal();
+    try {
+      await updateProposal(values);
+      refreshProposal();
+    } catch (error) {
+      showError(error);
+    }
   }
 
   return (

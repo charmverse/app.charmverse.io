@@ -18,6 +18,7 @@ import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigat
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalPendingReward } from 'lib/proposal/interface';
+import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 import type { RewardReviewer } from 'lib/rewards/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -112,6 +113,10 @@ export function ProposalRewards({
 
     const pageId = getRewardPage(rewardId)?.id || rewardId;
     updateURLQuery({ [rewardQueryKey]: pageId });
+  }
+
+  function selectTemplate(template: RewardTemplate) {
+    setRewardValues(template.reward);
   }
 
   if (rewards.length) {
@@ -270,6 +275,7 @@ export function ProposalRewards({
             forcedApplicationType='assigned'
             templateId={requiredTemplateId || undefined}
             readOnlyTemplate={!!requiredTemplateId}
+            selectTemplate={selectTemplate}
           />
         </NewDocumentPage>
       </NewPageDialog>

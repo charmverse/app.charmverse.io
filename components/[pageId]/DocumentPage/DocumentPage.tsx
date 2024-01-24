@@ -55,7 +55,7 @@ import { useProposal } from './hooks/useProposal';
 export const defaultPageTop = 56; // we need to add some room for the announcement banner and other banners
 
 const RewardProperties = dynamic(
-  () => import('components/rewards/components/RewardProperties/RewardProperties').then((r) => r.RewardProperties),
+  () => import('components/[pageId]/DocumentPage/components/RewardProperties').then((r) => r.RewardProperties),
   { ssr: false }
 );
 

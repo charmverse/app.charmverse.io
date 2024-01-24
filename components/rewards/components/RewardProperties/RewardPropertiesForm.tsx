@@ -40,7 +40,7 @@ type Props = {
   isNewReward?: boolean;
   isTemplate?: boolean;
   expandedByDefault?: boolean;
-  selectTemplate?: (template: RewardTemplate) => void;
+  selectTemplate: (template: RewardTemplate) => void;
   templateId?: string;
   readOnlyTemplate?: boolean;
   resetTemplate?: VoidFunction;
