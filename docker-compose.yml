@@ -76,6 +76,15 @@ services:
     profiles:
       - prd-sockets
 
+  stg-ceramic:
+    extends:
+      service: defaults
+    command: ['sh', '-c', 'npx', 'tsx', 'background/ceramicServer/run-deploy.ts']
+    ports:
+      - '5001:5001'
+    profiles:
+      - stg-ceramic
+
   stg-sockets:
     extends:
       service: defaults
