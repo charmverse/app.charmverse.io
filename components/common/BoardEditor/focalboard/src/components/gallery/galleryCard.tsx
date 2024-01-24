@@ -4,6 +4,7 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import { KanbanPageActionsMenuButton } from 'components/common/PageActions/KanbanPageActionButton';
 import { PageIcon } from 'components/common/PageIcon';
@@ -15,7 +16,6 @@ import { Constants } from 'lib/focalboard/constants';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 import { useSortable } from '../../hooks/sortable';
-import mutator from '../../mutator';
 import PropertyValueElement from '../propertyValueElement';
 
 const StyledBox = styled(Box)`
@@ -32,6 +32,7 @@ type Props = {
   readOnly: boolean;
   isManualSort: boolean;
   onDrop: (srcCard: Card, dstCard: Card) => void;
+  relationPropertiesCardsRecord?: PageListItemsRecord;
 };
 
 const GalleryCard = React.memo((props: Props) => {
@@ -105,6 +106,7 @@ const GalleryCard = React.memo((props: Props) => {
               showEmptyPlaceholder={false}
               showTooltip
               displayType='gallery'
+              relationPropertyCards={props.relationPropertiesCardsRecord?.[template.id]}
             />
           ))}
         </div>

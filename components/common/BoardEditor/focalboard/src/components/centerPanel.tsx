@@ -37,7 +37,6 @@ import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
 import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
-import { useRelationProperties } from 'hooks/useRelationProperties';
 import type { Block } from 'lib/focalboard/block';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
@@ -45,7 +44,6 @@ import type { Card, CardPage } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
 import { getRelationPropertiesCardsRecord } from 'lib/focalboard/getRelationPropertiesCardsRecord';
-import { isTruthy } from 'lib/utilities/types';
 
 import mutator from '../mutator';
 import { addCard as _addCard, addTemplate } from '../store/cards';
@@ -667,6 +665,7 @@ function CenterPanel(props: Props) {
                     showCard={showCard}
                     disableAddingCards={disableAddingNewCards}
                     readOnlyTitle={readOnlyTitle}
+                    relationPropertiesCardsRecord={relationPropertiesCardsRecord}
                   />
                 )}
                 {activeBoard && activeView?.fields.viewType === 'table' && (
@@ -701,6 +700,7 @@ function CenterPanel(props: Props) {
                     showCard={showCard}
                     addCard={calendarAddCard}
                     disableAddingCards={disableAddingNewCards}
+                    relationPropertiesCardsRecord={relationPropertiesCardsRecord}
                   />
                 )}
                 {activeBoard && activeView?.fields.viewType === 'gallery' && (
@@ -713,6 +713,7 @@ function CenterPanel(props: Props) {
                     selectedCardIds={state.selectedCardIds}
                     addCard={galleryAddCard}
                     disableAddingCards={disableAddingNewCards}
+                    relationPropertiesCardsRecord={relationPropertiesCardsRecord}
                   />
                 )}
                 {isLoadingSourceData && <LoadingComponent isLoading={true} height={400} />}

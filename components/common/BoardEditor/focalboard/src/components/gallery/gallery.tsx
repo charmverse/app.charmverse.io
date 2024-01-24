@@ -1,6 +1,7 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
@@ -20,6 +21,7 @@ type Props = {
   selectedCardIds: string[];
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
   disableAddingCards?: boolean;
+  relationPropertiesCardsRecord?: PageListItemsRecord;
 };
 
 function Gallery(props: Props): JSX.Element {
@@ -71,6 +73,7 @@ function Gallery(props: Props): JSX.Element {
               readOnly={props.readOnly}
               onDrop={onDropToCard}
               isManualSort={isManualSort}
+              relationPropertiesCardsRecord={props.relationPropertiesCardsRecord}
             />
           );
         })}

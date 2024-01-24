@@ -5,6 +5,7 @@ import React, { useState, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
@@ -32,6 +33,7 @@ type Props = {
   // eslint-disable-next-line
   showCard: (cardId: string | null) => void;
   isManualSort: boolean;
+  relationPropertiesCardsRecord?: PageListItemsRecord;
   hideLinkedBounty?: boolean;
 };
 
@@ -77,7 +79,6 @@ const KanbanCard = React.memo((props: Props) => {
   if (props.isManualSort && isOver) {
     className += ' dragover';
   }
-  const { space } = useCurrentSpace();
 
   const router = useRouter();
   const { pages } = usePages();
@@ -153,6 +154,7 @@ const KanbanCard = React.memo((props: Props) => {
             {visiblePropertyTemplates.map((template) => (
               <PropertyValueElement
                 key={template.id}
+                relationPropertyCards={props.relationPropertiesCardsRecord?.[template.id]}
                 board={board}
                 readOnly
                 card={card}

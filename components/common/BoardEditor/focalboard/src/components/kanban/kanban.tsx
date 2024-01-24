@@ -7,6 +7,7 @@ import type { IntlShape } from 'react-intl';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { KanbanGroupColumn } from 'components/common/BoardEditor/components/kanban/KanbanGroupColumn';
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
@@ -73,6 +74,7 @@ type Props = {
   readOnlyTitle?: boolean;
   disableDnd?: boolean;
   hideLinkedBounty?: boolean;
+  relationPropertiesCardsRecord?: PageListItemsRecord;
 };
 
 function Kanban(props: Props) {
@@ -345,6 +347,7 @@ function Kanban(props: Props) {
           {visibleGroups.map((group) => (
             <KanbanGroupColumn
               group={group}
+              relationPropertiesCardsRecord={props.relationPropertiesCardsRecord}
               board={board}
               visiblePropertyTemplates={visiblePropertyTemplates}
               key={group.option.id || 'empty'}

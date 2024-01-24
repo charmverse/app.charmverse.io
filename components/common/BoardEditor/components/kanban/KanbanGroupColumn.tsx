@@ -11,6 +11,8 @@ import { DEFAULT_PAGE_SIZE, usePaginatedData } from 'hooks/usePaginatedData';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 
+import type { PageListItemsRecord } from '../../interfaces';
+
 type Props = {
   group: BoardGroup;
   board: Board;
@@ -24,6 +26,7 @@ type Props = {
   showCard: (cardId: string | null) => void;
   isManualSort: boolean;
   disableAddingCards?: boolean;
+  relationPropertiesCardsRecord?: PageListItemsRecord;
   hideLinkedBounty?: boolean;
 };
 
@@ -40,7 +43,8 @@ export function KanbanGroupColumn({
   showCard,
   isManualSort,
   disableAddingCards,
-  hideLinkedBounty
+  hideLinkedBounty,
+  relationPropertiesCardsRecord
 }: Props) {
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const { data: cards, hasNextPage, showNextPage } = usePaginatedData(group.cards, { pageSize });
@@ -61,6 +65,7 @@ export function KanbanGroupColumn({
           showCard={showCard}
           isManualSort={isManualSort}
           hideLinkedBounty={hideLinkedBounty}
+          relationPropertiesCardsRecord={relationPropertiesCardsRecord}
         />
       ))}
       {hasNextPage && (

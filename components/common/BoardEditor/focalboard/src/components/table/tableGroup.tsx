@@ -3,6 +3,7 @@ import type { Dispatch, ReactElement, SetStateAction } from 'react';
 import React from 'react';
 import { useDrop } from 'react-dnd';
 
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import type { Board, IPropertyOption, IPropertyTemplate, BoardGroup } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
@@ -32,6 +33,7 @@ type Props = {
   subRowsEmptyValueContent?: ReactElement | string;
   checkedIds?: string[];
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
+  relationPropertiesCardsRecord?: PageListItemsRecord;
 };
 
 const TableGroup = React.memo((props: Props): JSX.Element => {
@@ -93,6 +95,7 @@ const TableGroup = React.memo((props: Props): JSX.Element => {
           subRowsEmptyValueContent={props.subRowsEmptyValueContent}
           checkedIds={props.checkedIds}
           setCheckedIds={props.setCheckedIds}
+          relationPropertiesCardsRecord={props.relationPropertiesCardsRecord}
         />
       )}
     </div>

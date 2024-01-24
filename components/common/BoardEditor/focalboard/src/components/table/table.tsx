@@ -309,6 +309,7 @@ function Table(props: Props): JSX.Element {
               visibleGroups.map((group) => {
                 return (
                   <TableGroup
+                    relationPropertiesCardsRecord={relationPropertiesCardsRecord}
                     key={group.option.id}
                     board={board}
                     activeView={activeView}
