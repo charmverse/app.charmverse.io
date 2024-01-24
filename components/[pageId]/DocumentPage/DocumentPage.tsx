@@ -266,12 +266,10 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
         <ProposalProperties
           pageId={page.id}
           proposalId={proposalId}
-          pagePermissions={pagePermissions}
           readOnly={readonlyProposalProperties}
           proposalPage={page}
           proposal={proposal}
           refreshProposal={refreshProposal}
-          templateId={proposal?.fields?.rewardsTemplateId}
         />
       )}
       {reward && (

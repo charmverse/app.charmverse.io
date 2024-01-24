@@ -4,8 +4,6 @@ import type { SelectOptionType } from 'components/common/form/fields/Select/inte
 import { SelectField } from 'components/common/form/fields/SelectField';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 
-import { TemplateSelect } from '../../TemplateSelect';
-
 type Props = {
   value: string | null | undefined;
   onChange: (value: string | null) => void;

@@ -33,12 +33,6 @@ export type ProposalEvaluationStatus =
 export type ProposalEvaluationStep = ProposalEvaluationType | 'rewards' | 'draft';
 export type ProposalEvaluationResultExtended = ProposalEvaluationResult | 'in_progress';
 
-export interface ProposalReviewerInput {
-  group: 'system_role' | 'role' | 'user';
-  id: string;
-  evaluationId?: string;
-}
-
 export type ProposalRubricData = {
   rubricCriteria: ProposalRubricCriteriaWithTypedParams[];
   rubricAnswers: ProposalRubricCriteriaAnswerWithTypedResponse[];

@@ -1,8 +1,7 @@
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import { Box } from '@mui/material';
 
-import { useGetIsReviewer, useUpdateProposal } from 'charmClient/hooks/proposals';
-import { useProposals } from 'components/proposals/hooks/useProposals';
+import { useUpdateProposal } from 'charmClient/hooks/proposals';
 import { useProposalTemplateById } from 'components/proposals/hooks/useProposalTemplates';
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { ProposalPropertiesBase } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
@@ -15,14 +14,12 @@ interface ProposalPropertiesProps {
   readOnly?: boolean;
   pageId: string;
   proposalId: string;
-  pagePermissions?: PagePermissionFlags;
   proposalPage: PageWithContent;
   proposal?: ProposalWithUsersAndRubric;
   refreshProposal: VoidFunction;
 }
 
 export function ProposalProperties({
-  pagePermissions,
   pageId,
   proposalId,
   readOnly,
@@ -35,15 +32,12 @@ export function ProposalProperties({
 
   const sourceTemplate = useProposalTemplateById(proposal?.page?.sourceTemplateId);
 
-  const { data: isReviewer } = useGetIsReviewer(pageId || undefined);
   const isAdmin = useIsAdmin();
 
   // further restrict readOnly if user cannot update proposal properties specifically
-  const readOnlyProperties = readOnly || !(pagePermissions?.edit_content || isAdmin);
+  const readOnlyProperties = readOnly || !proposal?.permissions.edit;
   const readOnlySelectedCredentialTemplates =
-    readOnly ||
-    !(pagePermissions?.edit_content || isAdmin) ||
-    (sourceTemplate?.selectedCredentialTemplates && !isAdmin);
+    readOnly || !proposal?.permissions.edit || (sourceTemplate?.selectedCredentialTemplates && !isAdmin);
 
   // properties with values from templates should be read only
   const readOnlyCustomProperties =
@@ -62,12 +56,6 @@ export function ProposalProperties({
     archived: proposal?.archived ?? false,
     authors: proposal?.authors.map((author) => author.userId) ?? [],
     evaluations: proposal?.evaluations ?? [],
-    publishToLens: proposal ? proposal.publishToLens ?? false : !!user?.publishToLensDefault,
-    reviewers:
-      proposal?.reviewers.map((reviewer) => ({
-        group: reviewer.roleId ? 'role' : 'user',
-        id: reviewer.roleId ?? (reviewer.userId as string)
-      })) ?? [],
     type: proposalPage.type,
     fields: typeof proposal?.fields === 'object' && !!proposal?.fields ? proposal.fields : { properties: {} },
     selectedCredentialTemplates: proposal?.selectedCredentialTemplates
@@ -97,7 +85,6 @@ export function ProposalProperties({
           proposalFormInputs={proposalFormInputs}
           setProposalFormInputs={onChangeProperties}
           readOnlyCustomProperties={readOnlyCustomProperties}
-          isReviewer={isReviewer}
           rewardIds={proposal?.rewardIds}
           readOnlySelectedCredentialTemplates={readOnlySelectedCredentialTemplates}
         />
