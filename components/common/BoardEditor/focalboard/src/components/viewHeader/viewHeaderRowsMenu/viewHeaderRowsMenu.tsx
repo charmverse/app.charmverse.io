@@ -61,15 +61,17 @@ export type ViewHeaderRowsMenuProps = {
   setCheckedIds: Dispatch<SetStateAction<string[]>>;
   checkedIds: string[];
   propertyTemplates: IPropertyTemplate<PropertyType>[];
-  onChange?: VoidFunction;
-  onProposalAuthorSelect: PropertyTemplateMenuProps['onProposalAuthorSelect'];
-  onProposalReviewerSelect: PropertyTemplateMenuProps['onProposalReviewerSelect'];
-  onProposalStatusUpdate: PropertyTemplateMenuProps['onProposalStatusUpdate'];
-  onProposalStepUpdate: PropertyTemplateMenuProps['onProposalStepUpdate'];
+  // below are special props used by proposals table
+  firstCheckedProposal?: PropertyTemplateMenuProps['firstCheckedProposal'];
   isStepDisabled?: boolean;
   isStatusDisabled?: boolean;
   isReviewersDisabled?: boolean;
-  firstCheckedProposal?: PropertyTemplateMenuProps['firstCheckedProposal'];
+  onArchiveProposals?: (pageIds: string[]) => void;
+  onChange?: VoidFunction;
+  onChangeProposalsAuthors?: PropertyTemplateMenuProps['onChangeProposalsAuthors'];
+  onChangeProposalsReviewers?: PropertyTemplateMenuProps['onChangeProposalsReviewers'];
+  onChangeProposalsStatuses?: PropertyTemplateMenuProps['onChangeProposalsStatuses'];
+  onChangeProposalsSteps?: PropertyTemplateMenuProps['onChangeProposalsSteps'];
 };
 
 export function ViewHeaderRowsMenu({
@@ -78,15 +80,16 @@ export function ViewHeaderRowsMenu({
   setCheckedIds,
   board,
   propertyTemplates,
-  onChange,
-  onProposalAuthorSelect,
-  onProposalReviewerSelect,
-  onProposalStatusUpdate,
-  onProposalStepUpdate,
+  firstCheckedProposal,
   isStepDisabled,
   isStatusDisabled,
   isReviewersDisabled,
-  firstCheckedProposal
+  onArchiveProposals,
+  onChange,
+  onChangeProposalsAuthors,
+  onChangeProposalsReviewers,
+  onChangeProposalsStatuses,
+  onChangeProposalsSteps
 }: ViewHeaderRowsMenuProps) {
   const isAdmin = useIsAdmin();
   const { space } = useCurrentSpace();
@@ -193,10 +196,10 @@ export function ViewHeaderRowsMenu({
               key={propertyTemplate.id}
               onChange={onChange}
               firstCheckedProposal={firstCheckedProposal}
-              onProposalAuthorSelect={onProposalAuthorSelect}
-              onProposalReviewerSelect={onProposalReviewerSelect}
-              onProposalStatusUpdate={onProposalStatusUpdate}
-              onProposalStepUpdate={onProposalStepUpdate}
+              onChangeProposalsAuthors={onChangeProposalsAuthors}
+              onChangeProposalsReviewers={onChangeProposalsReviewers}
+              onChangeProposalsStatuses={onChangeProposalsStatuses}
+              onChangeProposalsSteps={onChangeProposalsSteps}
               onPersonPropertyChange={onPersonPropertyChange}
               lastChild={!showTrashIcon && index === filteredPropertyTemplates.length - 1}
               disabledTooltip={

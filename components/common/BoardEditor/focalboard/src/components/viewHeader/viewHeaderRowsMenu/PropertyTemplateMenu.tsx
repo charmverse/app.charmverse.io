@@ -24,10 +24,10 @@ export type PropertyTemplateMenuProps = {
   propertyTemplate: IPropertyTemplate<PropertyType>;
   onChange?: VoidFunction;
   isAdmin: boolean;
-  onProposalAuthorSelect: (pageIds: string[], userIds: string[]) => Promise<void>;
-  onProposalReviewerSelect: (pageIds: string[], options: SelectOption[]) => Promise<void>;
-  onProposalStepUpdate(pageIds: string[], evaluationId: string, moveForward: boolean): Promise<void>;
-  onProposalStatusUpdate(pageIds: string[], result: ProposalEvaluationResult | null): Promise<void>;
+  onChangeProposalsAuthors?: (pageIds: string[], userIds: string[]) => Promise<void>;
+  onChangeProposalsReviewers?: (pageIds: string[], options: SelectOption[]) => Promise<void>;
+  onChangeProposalsSteps?: (pageIds: string[], evaluationId: string, moveForward: boolean) => Promise<void>;
+  onChangeProposalsStatuses?: (pageIds: string[], result: ProposalEvaluationResult | null) => Promise<void>;
   onPersonPropertyChange: (a: {
     checkedCards: Card[];
     propertyTemplate: IPropertyTemplate;
@@ -46,10 +46,10 @@ export function PropertyTemplateMenu({
   board,
   onChange,
   isAdmin,
-  onProposalAuthorSelect,
-  onProposalReviewerSelect,
-  onProposalStepUpdate,
-  onProposalStatusUpdate,
+  onChangeProposalsAuthors,
+  onChangeProposalsReviewers,
+  onChangeProposalsSteps,
+  onChangeProposalsStatuses,
   onPersonPropertyChange,
   firstCheckedProposal,
   disabledTooltip,
@@ -123,10 +123,7 @@ export function PropertyTemplateMenu({
         <PersonPropertyTemplateMenu
           lastChild={lastChild}
           onChange={async (userIds) => {
-            await onProposalAuthorSelect(checkedIds, userIds);
-            if (onChange) {
-              onChange();
-            }
+            await onChangeProposalsAuthors?.(checkedIds, userIds);
           }}
           cards={checkedCards}
           propertyTemplate={propertyTemplate}
@@ -152,10 +149,7 @@ export function PropertyTemplateMenu({
                 value={propertyValue as any}
                 systemRoles={[allMembersSystemRole]}
                 onChange={async (options) => {
-                  await onProposalReviewerSelect(checkedIds, options);
-                  if (onChange) {
-                    onChange();
-                  }
+                  await onChangeProposalsReviewers?.(checkedIds, options);
                 }}
                 required
               />
@@ -194,7 +188,7 @@ export function PropertyTemplateMenu({
             propertyTemplate={propertyTemplate}
           >
             <ControlledProposalStatusSelect
-              onChange={(result) => onProposalStatusUpdate(checkedIds, result)}
+              onChange={(result) => onChangeProposalsStatuses?.(checkedIds, result)}
               proposal={firstCheckedProposal}
             />
           </PropertyMenu>
@@ -213,7 +207,9 @@ export function PropertyTemplateMenu({
             propertyTemplate={propertyTemplate}
           >
             <ControlledProposalStepSelect
-              onChange={({ evaluationId, moveForward }) => onProposalStepUpdate(checkedIds, evaluationId, moveForward)}
+              onChange={({ evaluationId, moveForward }) =>
+                onChangeProposalsSteps?.(checkedIds, evaluationId, moveForward)
+              }
               proposal={{
                 archived: firstCheckedProposal.archived ?? false,
                 currentStep: firstCheckedProposal.currentStep,

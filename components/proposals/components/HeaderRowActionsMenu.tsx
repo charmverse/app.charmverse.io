@@ -33,7 +33,7 @@ export function HeaderRowActionsMenu({
   const { proposalsMap } = useProposals();
   const { updateStatuses, updateSteps } = useBatchUpdateProposalStatusOrStep();
 
-  async function onProposalReviewerSelect(pageIds: string[], reviewers: SelectOption[]) {
+  async function onChangeProposalsReviewers(pageIds: string[], reviewers: SelectOption[]) {
     let proposalReviewersChanged = false;
     for (const pageId of pageIds) {
       const page = pages[pageId];
@@ -62,7 +62,7 @@ export function HeaderRowActionsMenu({
     }
   }
 
-  async function onProposalStatusUpdate(pageIds: string[], result: ProposalEvaluationResult) {
+  async function onChangeProposalsStatuses(pageIds: string[], result: ProposalEvaluationResult | null) {
     if (pageIds.length === 0) {
       return;
     }
@@ -101,7 +101,7 @@ export function HeaderRowActionsMenu({
     }
   }
 
-  async function onProposalStepUpdate(pageIds: string[], evaluationId: string, moveForward: boolean) {
+  async function onChangeProposalsSteps(pageIds: string[], evaluationId: string, moveForward: boolean) {
     if (pageIds.length === 0) {
       return;
     }
@@ -146,7 +146,25 @@ export function HeaderRowActionsMenu({
     }
   }
 
-  async function onProposalAuthorSelect(pageIds: string[], authorIds: string[]) {
+  async function onChangeProposalsAuthors(pageIds: string[], authorIds: string[]) {
+    for (const pageId of pageIds) {
+      const proposalId = pages[pageId]?.proposalId;
+      const proposal = proposalId ? proposalsMap[proposalId] : null;
+      if (proposalId && !proposal?.archived) {
+        try {
+          await charmClient.proposals.updateProposal({
+            authors: authorIds,
+            proposalId
+          });
+          await refreshProposals();
+        } catch (error) {
+          showError(error, 'There was an error updating authors');
+        }
+      }
+    }
+  }
+
+  async function onArchiveProposals(pageIds: string[]) {
     for (const pageId of pageIds) {
       const proposalId = pages[pageId]?.proposalId;
       const proposal = proposalId ? proposalsMap[proposalId] : null;
@@ -234,10 +252,11 @@ export function HeaderRowActionsMenu({
       isStepDisabled={isStepDisabled}
       isStatusDisabled={isStatusDisabled}
       isReviewersDisabled={isReviewersDisabled}
-      onProposalAuthorSelect={onProposalAuthorSelect}
-      onProposalReviewerSelect={onProposalReviewerSelect}
-      onProposalStatusUpdate={onProposalStatusUpdate}
-      onProposalStepUpdate={onProposalStepUpdate}
+      onChangeProposalsAuthors={onChangeProposalsAuthors}
+      onChangeProposalsReviewers={onChangeProposalsReviewers}
+      onChangeProposalsStatuses={onChangeProposalsStatuses}
+      onChangeProposalsSteps={onChangeProposalsSteps}
+      onArchiveProposals={onArchiveProposals}
     />
   );
 }
