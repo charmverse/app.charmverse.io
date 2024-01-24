@@ -121,6 +121,9 @@ export function ProposalRewards({
   function selectTemplate(template: RewardTemplate) {
     setRewardValues(template.reward);
     updateNewPageValues({
+      ...template.page,
+      content: template.page.content as any,
+      type: 'bounty',
       templateId: template.page.id
     });
   }
