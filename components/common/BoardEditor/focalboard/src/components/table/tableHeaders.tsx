@@ -9,6 +9,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import React, { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 
+import { useSyncRelationProperty } from 'charmClient/hooks/blocks';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useSmallScreen } from 'hooks/useMediaScreens';
@@ -60,6 +61,7 @@ function TableHeaders(props: Props): JSX.Element {
   const intl = useIntl();
   const { formatDateTime, formatDate } = useDateFormatter();
   const addPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-property' });
+  const { trigger: syncRelationProperty } = useSyncRelationProperty();
 
   const isSmallScreen = useSmallScreen();
   const theme = useTheme();
@@ -195,6 +197,13 @@ function TableHeaders(props: Props): JSX.Element {
               relationData
             };
             await mutator.insertPropertyTemplate(board, activeView, -1, template);
+            if (relationData?.showOnRelatedBoard) {
+              syncRelationProperty({
+                boardId: board.id,
+                created: true,
+                templateId: template.id
+              });
+            }
           }}
         />
       ),

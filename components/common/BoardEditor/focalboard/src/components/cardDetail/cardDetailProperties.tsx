@@ -4,6 +4,8 @@ import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/ho
 import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import charmClient from 'charmClient';
+import { useSyncRelationProperty } from 'charmClient/hooks/blocks';
 import { CardDetailProperty } from 'components/common/BoardEditor/components/cardProperties/CardDetailProperty';
 import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
@@ -58,7 +60,7 @@ function CardDetailProperties(props: Props) {
   const [newTemplateId, setNewTemplateId] = useState('');
   const intl = useIntl();
   const addPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-property' });
-
+  const { trigger: syncRelationProperty } = useSyncRelationProperty();
   const { showMessage } = useSnackbar();
   const theme = useTheme();
   const isSmallScreen = useSmallScreen();
@@ -247,6 +249,13 @@ function CardDetailProperties(props: Props) {
               relationData
             };
             const templateId = await mutator.insertPropertyTemplate(board, activeView, -1, template);
+            if (relationData?.showOnRelatedBoard) {
+              syncRelationProperty({
+                boardId: board.id,
+                created: true,
+                templateId
+              });
+            }
             setNewTemplateId(templateId);
             addPropertyPopupState.close();
           }}

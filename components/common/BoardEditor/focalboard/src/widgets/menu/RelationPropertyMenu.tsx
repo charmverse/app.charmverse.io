@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import type { SxProps } from '@mui/material';
-import { Box, Menu, MenuItem, MenuList, Stack, Typography } from '@mui/material';
+import { Box, Menu, MenuItem, MenuList, Stack, Switch, Typography } from '@mui/material';
 import { bindMenu } from 'material-ui-popup-state';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
@@ -184,6 +184,17 @@ export function RelationProperty({
             <KeyboardArrowRightIcon color='secondary' fontSize='small' />
           </Stack>
         </PopperPopup>
+      </StyledMenuItem>
+      <StyledMenuItem
+        onClick={() => {
+          onChange({
+            ...relationData,
+            showOnRelatedBoard: !relationData.showOnRelatedBoard
+          });
+        }}
+      >
+        <Typography mr={3}>Show on {selectedPage.title ?? 'Untitled'}</Typography>
+        <Switch size='small' checked={relationData.showOnRelatedBoard} />
       </StyledMenuItem>
       {onButtonClick && (
         <Button
