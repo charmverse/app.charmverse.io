@@ -465,7 +465,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                 class="MuiCollapse-wrapperInner MuiCollapse-horizontal css-14vyde3-MuiCollapse-wrapperInner"
               >
                 <div
-                  class="css-1tk713d"
+                  class="disable-drag-selection css-1tk713d"
                   data-test="view-sidebar-content"
                 >
                   <div
@@ -914,7 +914,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                 class="MuiCollapse-wrapperInner MuiCollapse-horizontal css-14vyde3-MuiCollapse-wrapperInner"
               >
                 <div
-                  class="css-1tk713d"
+                  class="disable-drag-selection css-1tk713d"
                   data-test="view-sidebar-content"
                 >
                   <div
@@ -1453,7 +1453,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                 class="MuiCollapse-wrapperInner MuiCollapse-horizontal css-14vyde3-MuiCollapse-wrapperInner"
               >
                 <div
-                  class="css-1tk713d"
+                  class="disable-drag-selection css-1tk713d"
                   data-test="view-sidebar-content"
                 >
                   <div
@@ -2094,7 +2094,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                 class="MuiCollapse-wrapperInner MuiCollapse-horizontal css-14vyde3-MuiCollapse-wrapperInner"
               >
                 <div
-                  class="css-1tk713d"
+                  class="disable-drag-selection css-1tk713d"
                   data-test="view-sidebar-content"
                 >
                   <div
