@@ -5,13 +5,15 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { Formatters, PropertyContext } from 'components/common/BoardEditor/focalboard/src/octoUtils';
 import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtils';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { formatDate, formatDateTime } from 'lib/utilities/dates';
 
-import type { Board, IPropertyTemplate, PropertyType } from './board';
+import type { Board, BoardFields, IPropertyTemplate, PropertyType } from './board';
 import type { BoardView, BoardViewFields } from './boardView';
-import type { Card } from './card';
+import type { Card, CardFields } from './card';
 import { Constants } from './constants';
+import { getRelationPropertiesCardsRecord } from './getRelationPropertiesCardsRecord';
 
 export async function loadAndGenerateCsv({
   databaseId,
@@ -124,6 +126,56 @@ export async function loadAndGenerateCsv({
       }, {} as Record<string, { username: string }>)
     );
 
+  const relationProperties = (boardBlock?.fields as unknown as BoardFields).cardProperties.filter(
+    (property) => property.type === 'relation'
+  );
+
+  const cardPropertyPageIds: string[] = [];
+
+  relationProperties.forEach((relationProperty) => {
+    cardBlocks.forEach((cardBlock) => {
+      const connectedPageIds = (cardBlock.fields as CardFields).properties[relationProperty.id] as string[];
+      if (connectedPageIds?.length) {
+        cardPropertyPageIds.push(...connectedPageIds);
+      }
+    });
+  });
+
+  const connectedAccessiblePageIds = await permissionsApiClient.pages
+    .bulkComputePagePermissions({
+      userId,
+      pageIds: cardPropertyPageIds
+    })
+    .then((permissions) =>
+      Object.entries(permissions)
+        .filter(([pageId, computed]) => !!computed.read)
+        .map(([pageId]) => pageId)
+    );
+
+  const connectedPages = await prisma.page.findMany({
+    where: {
+      id: {
+        in: connectedAccessiblePageIds
+      }
+    },
+    select: {
+      id: true,
+      title: true,
+      type: true,
+      path: true,
+      parentId: true,
+      icon: true,
+      hasContent: true
+    }
+  });
+
+  const relationPropertiesCardsRecord = boardBlock
+    ? getRelationPropertiesCardsRecord({
+        activeBoard: boardBlock as unknown as Board,
+        pages: connectedPages
+      })
+    : {};
+
   const csvData = generateCSV(
     boardBlock as any,
     viewBlock as any,
@@ -135,7 +187,8 @@ export async function loadAndGenerateCsv({
     {
       users: spaceMembers,
       spaceDomain: space.domain
-    }
+    },
+    relationPropertiesCardsRecord
   );
 
   return {
@@ -149,9 +202,10 @@ export function generateCSV(
   view: BoardView,
   cards: Card[],
   formatters: Formatters,
-  context: PropertyContext
+  context: PropertyContext,
+  relationPropertiesCardsRecord: PageListItemsRecord
 ) {
-  const rows = generateTableArray(board, cards, view, formatters, context);
+  const rows = generateTableArray(board, cards, view, formatters, context, relationPropertiesCardsRecord);
   let csvContent = '';
 
   rows.forEach((row) => {
@@ -176,12 +230,13 @@ function encodeText(text: string): string {
   return text.replace(/"/g, '""');
 }
 
-function generateTableArray(
+export function generateTableArray(
   board: Pick<Board, 'fields'>,
   cards: Card[],
   viewToExport: BoardView,
   formatters: Formatters,
-  context: PropertyContext
+  context: PropertyContext,
+  relationPropertiesCardsRecord: PageListItemsRecord
 ): string[][] {
   const rows: string[][] = [];
   const cardProperties = board.fields.cardProperties as IPropertyTemplate[];
@@ -213,7 +268,8 @@ function generateTableArray(
       context,
       formatters,
       hasTitleProperty: !!titleProperty,
-      visibleProperties: cardProperties
+      visibleProperties: cardProperties,
+      relationPropertiesCardsRecord
     });
     rows.push(rowColumns);
   });
@@ -226,8 +282,10 @@ export function getCSVColumns({
   context,
   formatters,
   hasTitleProperty,
-  visibleProperties
+  visibleProperties,
+  relationPropertiesCardsRecord
 }: {
+  relationPropertiesCardsRecord: PageListItemsRecord;
   card: Card;
   context: PropertyContext;
   formatters: Formatters;
@@ -241,7 +299,14 @@ export function getCSVColumns({
   visibleProperties.forEach((propertyTemplate: IPropertyTemplate) => {
     const propertyValue = card.fields.properties[propertyTemplate.id];
     const displayValue =
-      OctoUtils.propertyDisplayValue({ block: card, context, propertyValue, propertyTemplate, formatters }) || '';
+      OctoUtils.propertyDisplayValue({
+        block: card,
+        context,
+        propertyValue,
+        propertyTemplate,
+        formatters,
+        relationPropertiesCardsRecord
+      }) || '';
     if (propertyTemplate.id === Constants.titleColumnId) {
       columns.push(`"${encodeText(card.title)}"`);
     } else if (
@@ -256,7 +321,8 @@ export function getCSVColumns({
       propertyTemplate.type === 'person' ||
       propertyTemplate.type === 'proposalEvaluatedBy' ||
       propertyTemplate.type === 'proposalAuthor' ||
-      propertyTemplate.type === 'proposalReviewer'
+      propertyTemplate.type === 'proposalReviewer' ||
+      propertyTemplate.type === 'relation'
     ) {
       const multiSelectValue = (((displayValue as unknown) || []) as string[]).join('|');
       columns.push(multiSelectValue);
