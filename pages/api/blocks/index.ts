@@ -4,9 +4,10 @@ import type { Block, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { v4 } from 'uuid';
 
 import { prismaToBlock } from 'lib/focalboard/block';
-import type { BoardFields } from 'lib/focalboard/board';
+import type { BoardFields, IPropertyTemplate, RelationPropertyData } from 'lib/focalboard/board';
 import type { BoardViewFields } from 'lib/focalboard/boardView';
 import {
   ActionNotPermittedError,
@@ -19,7 +20,7 @@ import {
 import { createPage } from 'lib/pages/server/createPage';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { getPagePath } from 'lib/pages/utils';
-import { getPermissionsClient, permissionsApiClient } from 'lib/permissions/api/client';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
@@ -257,17 +258,152 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
 
 async function updateBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) {
   const blocks: Block[] = req.body;
+  const dbBlocks = await prisma.block.findMany({
+    where: {
+      id: {
+        in: blocks.map((block) => block.id)
+      }
+    },
+    select: {
+      id: true,
+      spaceId: true,
+      fields: true,
+      title: true
+    }
+  });
+  const dbBlockPages = await prisma.page.findMany({
+    where: {
+      boardId: {
+        in: blocks.map((block) => block.id)
+      }
+    },
+    select: {
+      id: true,
+      title: true
+    }
+  });
 
   // validate access to the space
   await Promise.all(
     blocks.map(async (block) => {
-      const spaceId = block.spaceId ?? (await prisma.block.findUnique({ where: { id: block.id } }))?.spaceId;
+      const dbBlock = dbBlocks.find((b) => b.id === block.id);
+      const spaceId = block.spaceId ?? dbBlock?.spaceId;
       const { error } = await hasAccessToSpace({ userId: req.session.user.id, spaceId });
       if (error) {
         throw new UnauthorisedActionError();
       }
     })
   );
+
+  const boardBlocks = blocks.filter((block) => block.type === 'board');
+
+  for (const block of boardBlocks) {
+    const dbBlock = dbBlocks.find((b) => b.id === block.id);
+    const dbPage = dbBlockPages.find((p) => p.id === block.id);
+    if (block.type === 'board' && dbBlock) {
+      const newBlockProperties = (block.fields as unknown as BoardFields).cardProperties;
+      const dbBlockProperties = (dbBlock.fields as unknown as BoardFields).cardProperties;
+      const newRelationProperties = newBlockProperties.filter(
+        (p) => p.type === 'relation' && !dbBlockProperties.find((dbp) => dbp.id === p.id)
+      );
+
+      const deletedRelationProperties = dbBlockProperties.filter(
+        (p) => p.type === 'relation' && newBlockProperties.find((dbp) => dbp.id !== p.id) && p.relationData
+      );
+
+      await Promise.all(
+        newRelationProperties.map(async (newRelationProperty) => {
+          const connectedRelationPropertyId = v4();
+          const updatedProperties = (block.fields as unknown as BoardFields).cardProperties.map((cp) => {
+            if (cp.id === newRelationProperty.id) {
+              return {
+                ...newRelationProperty,
+                relationData: {
+                  ...newRelationProperty.relationData,
+                  relatedPropertyId: connectedRelationPropertyId
+                }
+              };
+            }
+            return cp;
+          });
+          const propertyRelationData = newRelationProperty.relationData as RelationPropertyData;
+          const connectedBoard = await prisma.block.findUnique({
+            where: {
+              id: propertyRelationData.boardId
+            },
+            select: {
+              fields: true
+            }
+          });
+          const views =
+            (await prisma.block.findMany({
+              where: {
+                type: 'view',
+                parentId: propertyRelationData.boardId
+              },
+              select: {
+                id: true,
+                fields: true
+              }
+            })) ?? [];
+
+          await prisma.$transaction([
+            prisma.block.update({
+              data: {
+                fields: {
+                  ...(connectedBoard?.fields as any),
+                  cardProperties: [
+                    ...(connectedBoard?.fields as unknown as BoardFields).cardProperties,
+                    {
+                      id: connectedRelationPropertyId,
+                      type: 'relation',
+                      name: dbPage?.title ?? 'Untitled',
+                      relationData: {
+                        limit: 'single_page',
+                        relatedPropertyId: newRelationProperty.id,
+                        showOnRelatedBoard: true,
+                        boardId: block.id
+                      } as RelationPropertyData
+                    } as IPropertyTemplate
+                  ]
+                }
+              },
+              where: {
+                id: propertyRelationData.boardId
+              }
+            }),
+            prisma.block.update({
+              data: {
+                fields: {
+                  ...(block?.fields as any),
+                  cardProperties: updatedProperties
+                }
+              },
+              where: {
+                id: block.id
+              }
+            }),
+            ...views.map((view) =>
+              prisma.block.update({
+                where: {
+                  id: view.id
+                },
+                data: {
+                  fields: {
+                    ...(view.fields as any),
+                    visiblePropertyIds: [
+                      ...(view.fields as BoardViewFields).visibleOptionIds,
+                      connectedRelationPropertyId
+                    ]
+                  }
+                }
+              })
+            )
+          ]);
+        })
+      );
+    }
+  }
 
   const updatedBlocks = await prisma.$transaction(
     blocks.map((block) => {
