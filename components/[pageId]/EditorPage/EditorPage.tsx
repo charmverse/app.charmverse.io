@@ -1,20 +1,17 @@
 import { log } from '@charmverse/core/log';
 import type { Page } from '@charmverse/core/prisma';
 import { Box } from '@mui/material';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import { trackPageView } from 'charmClient/hooks/track';
-import { makeSelectBoard } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
-import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
-import { getRelationPropertiesCardsRecord } from 'lib/focalboard/getRelationPropertiesCardsRecord';
+import { useRelationProperties } from 'hooks/useRelationProperties';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
 import { DatabasePage } from '../DatabasePage';
@@ -27,21 +24,7 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
   const { space: currentSpace } = useCurrentSpace();
   useRewardsNavigation();
   const { error: pageWithContentError, page, updatePage } = usePage({ pageIdOrPath, spaceId: currentSpace?.id });
-
-  const selectBoard = useMemo(makeSelectBoard, []);
-  const activeBoard = useAppSelector((state) => selectBoard(state, page?.type === 'card' ? page.parentId ?? '' : ''));
-  const { pages } = usePages();
-
-  const relationPropertiesCardsRecord = useMemo(
-    () =>
-      activeBoard && pages
-        ? getRelationPropertiesCardsRecord({
-            pages,
-            activeBoard
-          })
-        : {},
-    [pages, activeBoard]
-  );
+  const relationPropertiesCardsRecord = useRelationProperties({ page });
 
   const readOnly =
     (page?.permissionFlags.edit_content === false && editMode !== 'suggesting') || editMode === 'viewing';

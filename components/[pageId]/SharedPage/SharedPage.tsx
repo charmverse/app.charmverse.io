@@ -1,12 +1,12 @@
 import { Box } from '@mui/material';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 
 import { trackPageView } from 'charmClient/hooks/track';
 import { DatabasePage } from 'components/[pageId]/DatabasePage';
 import DocumentPage from 'components/[pageId]/DocumentPage';
-import { makeSelectBoard, updateBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
+import { updateBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { addCard } from 'components/common/BoardEditor/focalboard/src/store/cards';
-import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { addView, setCurrent } from 'components/common/BoardEditor/focalboard/src/store/views';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -15,7 +15,7 @@ import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
-import { getRelationPropertiesCardsRecord } from 'lib/focalboard/getRelationPropertiesCardsRecord';
+import { useRelationProperties } from 'hooks/useRelationProperties';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
 
 type Props = {
@@ -29,21 +29,9 @@ export function SharedPage({ publicPage }: Props) {
   const [, setPageTitle] = usePageTitle();
   const { space } = useCurrentSpace();
 
-  const selectBoard = useMemo(makeSelectBoard, []);
-  const activeBoard = useAppSelector((state) =>
-    selectBoard(state, publicPage?.page?.type === 'card' ? publicPage?.page?.parentId ?? '' : '')
-  );
-
-  const relationPropertiesCardsRecord = useMemo(
-    () =>
-      activeBoard && pages
-        ? getRelationPropertiesCardsRecord({
-            pages,
-            activeBoard
-          })
-        : {},
-    [pages, activeBoard]
-  );
+  const relationPropertiesCardsRecord = useRelationProperties({
+    page: publicPage?.page
+  });
 
   const basePageId = publicPage?.page?.id || '';
 
