@@ -69,6 +69,7 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
     openNewPage({
       ...template.page,
       content: template.page.content as PageContent,
+      title: undefined,
       type: 'bounty',
       templateId: template.page.id
     });

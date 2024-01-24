@@ -123,6 +123,7 @@ export function ProposalRewards({
     updateNewPageValues({
       ...template.page,
       content: template.page.content as any,
+      title: undefined,
       type: 'bounty',
       templateId: template.page.id
     });
