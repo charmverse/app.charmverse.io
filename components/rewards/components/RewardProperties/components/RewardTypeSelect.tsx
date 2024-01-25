@@ -15,7 +15,7 @@ export const rewardTypeOptions: IPropertyOption[] = [
   {
     id: 'None' as const,
     value: 'None',
-    color: 'red'
+    color: 'gray'
   }
 ];
 
