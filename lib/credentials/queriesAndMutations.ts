@@ -1,29 +1,20 @@
-import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
+import { gql } from '@apollo/client';
 import { log } from '@charmverse/core/log';
 import type { AttestationType } from '@charmverse/core/prisma-client';
-import { persistCache } from 'apollo3-cache-persist';
 import { Wallet } from 'ethers';
 
 import { credentialsWalletPrivateKey, graphQlServerEndpoint } from 'config/constants';
 
+import { ApolloClientWithRedisCache } from './apolloClientWithRedisCache';
 import type { EasSchemaChain } from './connectors';
 import type { EASAttestationFromApi } from './external/getExternalCredentials';
 import type { ExternalCredentialChain } from './external/schemas';
-import { GraphQlRedisStorage } from './graphQLRedisCache';
 import type { ProposalCredential } from './schemas';
 
-const cache = new InMemoryCache({});
-
-persistCache({
-  cache,
-  storage: new GraphQlRedisStorage({ persistForSeconds: 10 }),
-  serialize: true,
-  key: 'charmverse-graphql-ceramic-cache'
-});
-
-const apolloClient = new ApolloClient({
-  cache,
-  uri: graphQlServerEndpoint
+const ceramicGraphQlClient = new ApolloClientWithRedisCache({
+  uri: graphQlServerEndpoint,
+  persistForSeconds: 300,
+  cacheKeyPrefix: 'ceramic'
 });
 
 type CredentialFromCeramic = {
@@ -87,7 +78,7 @@ function getParsedCredential(credential: CredentialFromCeramic): EASAttestationF
 }
 
 export async function publishSignedCredential(input: CredentialToPublish): Promise<EASAttestationFromApi> {
-  const record = await apolloClient
+  const record = await ceramicGraphQlClient
     .mutate({
       mutation: CREATE_SIGNED_CREDENTIAL_MUTATION,
       variables: {
@@ -137,7 +128,7 @@ export async function getCharmverseCredentialsByWallets({
     return [];
   }
 
-  return apolloClient
+  return ceramicGraphQlClient
     .query({
       query: GET_CREDENTIALS,
       variables: {
