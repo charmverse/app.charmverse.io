@@ -34,6 +34,8 @@ export type Props = {
     | 'currentEvaluationId'
     | 'page'
     | 'lensPostLink'
+    | 'formId'
+    | 'form'
   >;
   onChangeEvaluation?: (evaluationId: string, updated: Partial<ProposalEvaluationValues>) => void;
   refreshProposal?: VoidFunction;
@@ -217,7 +219,7 @@ export function EvaluationSidebar({
           updateEvaluation={updateEvaluation}
         />
       )}
-      <Divider />
+      <Divider sx={{ mb: 1 }} />
       {pagePath && pageTitle && proposal && (
         <ProposalSocialShare
           lensPostLink={proposal.lensPostLink}

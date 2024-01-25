@@ -1,3 +1,4 @@
+import type { BountyStatus } from '@charmverse/core/prisma-client';
 import { Box, Collapse, Divider, Stack, Tooltip } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import clsx from 'clsx';
@@ -41,10 +42,11 @@ type Props = {
   isNewReward?: boolean;
   isTemplate?: boolean;
   expandedByDefault?: boolean;
-  addPageFromTemplate?: (templateId: string) => void;
-  selectedTemplate?: RewardTemplate | null;
-  resetTemplate?: VoidFunction;
+  selectTemplate: (template: RewardTemplate | null) => void;
+  templateId?: string;
+  readOnlyTemplate?: boolean;
   forcedApplicationType?: RewardApplicationType;
+  rewardStatus?: BountyStatus | null;
 };
 
 const getApplicationType = (values: UpdateableRewardFields, forcedApplicationType?: RewardApplicationType) => {
@@ -70,10 +72,11 @@ export function RewardPropertiesForm({
   isTemplate,
   pageId,
   expandedByDefault,
-  addPageFromTemplate,
-  selectedTemplate,
-  resetTemplate,
-  forcedApplicationType
+  selectTemplate,
+  templateId,
+  readOnlyTemplate,
+  forcedApplicationType,
+  rewardStatus
 }: Props) {
   const [rewardApplicationType, setRewardApplicationTypeRaw] = useState<RewardApplicationType>(() =>
     getApplicationType(values, forcedApplicationType)
@@ -81,7 +84,7 @@ export function RewardPropertiesForm({
   const { getFeatureTitle } = useSpaceFeatures();
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(!!expandedByDefault);
-  const [rewardType, setRewardType] = useState<RewardType>(values?.customReward ? 'Custom' : 'Token');
+  const [rewardType, setRewardType] = useState(values?.customReward ? 'Custom' : ('Token' as RewardType));
   const allowedSubmittersValue: RoleOption[] = (values?.allowedSubmitterRoles ?? []).map((id) => ({
     id,
     group: 'role'
@@ -111,8 +114,10 @@ export function RewardPropertiesForm({
   useEffect(() => {
     if (isTruthy(values?.customReward)) {
       setRewardType('Custom');
+    } else if (!values?.rewardToken || !values?.rewardAmount || !values?.chainId) {
+      setRewardType('None');
     }
-  }, [values?.customReward]);
+  }, [values?.customReward, values?.rewardAmount, values?.rewardToken, values?.chainId]);
 
   async function applyUpdates(updates: Partial<UpdateableRewardFields>) {
     if ('customReward' in updates) {
@@ -126,6 +131,17 @@ export function RewardPropertiesForm({
 
     onChange(updates);
   }
+
+  useEffect(() => {
+    if (rewardType === 'None' && rewardStatus !== 'paid') {
+      applyUpdates({
+        rewardAmount: null,
+        chainId: null,
+        rewardToken: null,
+        customReward: null
+      });
+    }
+  }, [rewardType, rewardStatus]);
 
   const applyUpdatesDebounced = useMemo(() => {
     if (useDebouncedInputs) {
@@ -215,14 +231,15 @@ export function RewardPropertiesForm({
                   <Box display='flex' flex={1}>
                     <TemplateSelect
                       options={rewardTemplates.map((rewardTemplate) => rewardTemplate.page)}
-                      value={selectedTemplate?.page ?? null}
+                      disabled={readOnlyTemplate}
+                      value={templateId ? { id: templateId } : null}
                       onChange={(templatePage) => {
                         if (!templatePage) {
-                          resetTemplate?.();
+                          selectTemplate(null);
                         }
                         const template = rewardTemplates.find((_template) => _template.page.id === templatePage?.id);
-                        if (template && addPageFromTemplate) {
-                          addPageFromTemplate(template.page.id);
+                        if (template && selectTemplate) {
+                          selectTemplate(template);
                         }
                       }}
                     />
@@ -432,7 +449,6 @@ export function RewardPropertiesForm({
                   onChange={updateRewardCustomReward}
                   value={values?.customReward ?? ''}
                   required
-                  defaultValue={values?.maxSubmissions}
                   size='small'
                   inputProps={{
                     style: { height: 'auto' },

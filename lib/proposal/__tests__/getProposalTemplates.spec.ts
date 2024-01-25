@@ -53,23 +53,17 @@ describe('getProposalTemplates', () => {
 
     expect(templates).toHaveLength(0);
   });
-});
 
-describe('getProposalTemplates - public space', () => {
-  it('should return all templates for members in a public space', async () => {
+  it('should not return a deleted template', async () => {
     const { space, user: adminUser } = await testUtilsUser.generateUserAndSpace({
       isAdmin: true,
-      spacePaidTier: 'free'
+      spacePaidTier: 'community'
     });
 
     await testUtilsProposals.generateProposalTemplate({
       spaceId: space.id,
-      userId: adminUser.id
-    });
-
-    await testUtilsProposals.generateProposalTemplate({
-      spaceId: space.id,
-      userId: adminUser.id
+      userId: adminUser.id,
+      deletedAt: new Date()
     });
 
     const spaceMember = await testUtilsUser.generateSpaceUser({
@@ -80,40 +74,6 @@ describe('getProposalTemplates - public space', () => {
     const templates = await getProposalTemplates({
       spaceId: space.id,
       userId: spaceMember.id
-    });
-
-    expect(templates).toHaveLength(2);
-    expect(templates).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining<Partial<ProposalWithUsers>>({
-          authors: expect.any(Array),
-          reviewers: expect.any(Array),
-          createdBy: adminUser.id,
-          id: expect.any(String)
-        }),
-        expect.objectContaining<Partial<ProposalWithUsers>>({
-          authors: expect.any(Array),
-          reviewers: expect.any(Array),
-          createdBy: adminUser.id,
-          id: expect.any(String)
-        })
-      ])
-    );
-  });
-  it('should return an empty list for people outside the space since they cannot create proposals', async () => {
-    const { space, user: adminUser } = await testUtilsUser.generateUserAndSpace({
-      isAdmin: true,
-      spacePaidTier: 'free'
-    });
-
-    await testUtilsProposals.generateProposalTemplate({
-      spaceId: space.id,
-      userId: adminUser.id
-    });
-
-    const templates = await getProposalTemplates({
-      spaceId: space.id,
-      userId: undefined
     });
 
     expect(templates).toHaveLength(0);

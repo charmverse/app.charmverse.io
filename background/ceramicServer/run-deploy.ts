@@ -23,7 +23,12 @@ async function bootstrapGqlServer() {
 
 const server = bootstrapGqlServer();
 
-process.on('SIGTERM', async () => {
-  (await server).stop();
-  log.info('GraphQL Composedb server stopped');
-});
+async function cleanup() {
+  log.info('[server] Closing GraphQL server...');
+  await (await server).stop();
+  log.info('[server] Exiting process...');
+  process.exit(0);
+}
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);

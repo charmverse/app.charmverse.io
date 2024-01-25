@@ -56,7 +56,7 @@ import { useProposal } from './hooks/useProposal';
 export const defaultPageTop = 56; // we need to add some room for the announcement banner and other banners
 
 const RewardProperties = dynamic(
-  () => import('components/rewards/components/RewardProperties/RewardProperties').then((r) => r.RewardProperties),
+  () => import('components/[pageId]/DocumentPage/components/RewardProperties').then((r) => r.RewardProperties),
   { ssr: false }
 );
 
@@ -93,7 +93,7 @@ function DocumentPage({
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
 
-  const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow } = useProposal({
+  const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow, onChangeRewardTemplate } = useProposal({
     proposalId
   });
 
@@ -276,7 +276,6 @@ function DocumentPage({
         <ProposalProperties
           pageId={page.id}
           proposalId={proposalId}
-          pagePermissions={pagePermissions}
           readOnly={readonlyProposalProperties}
           proposalPage={page}
           proposal={proposal}
@@ -291,6 +290,7 @@ function DocumentPage({
           readOnly={readOnly}
           showApplications
           expandedRewardProperties
+          templateId={page.sourceTemplateId || undefined}
           isTemplate={page.type === 'bounty_template'}
         />
       )}
@@ -319,15 +319,16 @@ function DocumentPage({
           proposalTemplateId={proposal?.page?.sourceTemplateId}
           onChangeEvaluation={onChangeEvaluation}
           refreshProposal={refreshProposal}
-          disabledViews={isStructuredProposal ? ['suggestions', 'comments'] : []}
+          disabledViews={isStructuredProposal ? ['suggestions'] : []}
           onChangeWorkflow={onChangeWorkflow}
+          onChangeRewardTemplate={onChangeRewardTemplate}
+          isProposalTemplate={page.type === 'proposal_template'}
         />
       )}
     </CardPropertiesWrapper>
   );
 
   const proposalAuthors = proposal ? [proposal.createdBy, ...proposal.authors.map((author) => author.userId)] : [];
-
   return (
     <PrimaryColumn id='file-drop-container' ref={containerRef} showPageActionSidebar={showPageActionSidebar}>
       <Box
@@ -471,9 +472,13 @@ function DocumentPage({
                       />
                     ) : (
                       <ProposalFormFieldInputs
+                        pageId={page.id}
+                        isReviewer={(proposal?.permissions.evaluate || proposal?.permissions.review) ?? false}
                         proposalId={proposal.id}
                         formFields={proposal?.form.formFields ?? []}
                         readOnly={!user || !pagePermissions.edit_content || !!proposal?.archived}
+                        threads={threads}
+                        isDraft={proposal?.status === 'draft'}
                       />
                     )}
                   </Box>

@@ -8,7 +8,6 @@ import { ViewSettingsRow } from 'components/common/BoardEditor/components/ViewSe
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
 import { ToggleViewSidebarButton } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ToggleViewSidebarButton';
-import { ViewHeaderRowsMenu } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderRowsMenu/viewHeaderRowsMenu';
 import ViewSidebar from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import ErrorPage from 'components/common/errors/ErrorPage';
@@ -18,9 +17,6 @@ import {
   DatabaseStickyHeader,
   DatabaseTitle
 } from 'components/common/PageLayout/components/DatabasePageContent';
-import { NewProposalButton } from 'components/proposals/components/NewProposalButton';
-import { useProposalsBoardMutator } from 'components/proposals/components/ProposalsBoard/hooks/useProposalsBoardMutator';
-import { useProposalsBoard } from 'components/proposals/hooks/useProposalsBoard';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
@@ -28,7 +24,11 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+
+import { NewProposalButton } from './components/NewProposalButton';
+import { useProposalsBoardMutator } from './components/ProposalsBoard/hooks/useProposalsBoardMutator';
+import { ProposalsHeaderRowsMenu } from './components/ProposalsHeaderRowsMenu';
+import { useProposalsBoard } from './hooks/useProposalsBoard';
 
 export function ProposalsPage({ title }: { title: string }) {
   const { space: currentSpace } = useCurrentSpace();
@@ -86,15 +86,6 @@ export function ProposalsPage({ title }: { title: string }) {
     [showError, trashPages]
   );
 
-  async function deleteProposals(pageIds: string[]) {
-    try {
-      await trashPages({ pageIds, trash: true });
-    } catch (error) {
-      showError(error, 'Could not archive pages');
-    }
-    await refreshProposals();
-  }
-
   if (isLoadingAccess) {
     return null;
   }
@@ -104,21 +95,6 @@ export function ProposalsPage({ title }: { title: string }) {
   }
 
   const showViewHeaderRowsMenu = checkedIds.length !== 0 && activeBoard;
-
-  const propertyTemplates: IPropertyTemplate<PropertyType>[] = [];
-
-  if (activeView?.fields?.visiblePropertyIds.length) {
-    activeView.fields.visiblePropertyIds.forEach((propertyId) => {
-      const property = activeBoard?.fields.cardProperties.find((p) => p.id === propertyId);
-      if (property) {
-        propertyTemplates.push(property);
-      }
-    });
-  } else {
-    activeBoard?.fields.cardProperties.forEach((property) => {
-      propertyTemplates.push(property);
-    });
-  }
 
   return (
     <DatabaseContainer>
@@ -147,17 +123,16 @@ export function ProposalsPage({ title }: { title: string }) {
         <Stack gap={0.75}>
           <div className={`ViewHeader ${showViewHeaderRowsMenu ? 'view-header-rows-menu-visible' : ''}`}>
             {showViewHeaderRowsMenu && (
-              <ViewHeaderRowsMenu
+              <ProposalsHeaderRowsMenu
+                visiblePropertyIds={activeView?.fields.visiblePropertyIds}
                 board={activeBoard}
                 cards={cards}
                 checkedIds={checkedIds}
                 setCheckedIds={setCheckedIds}
-                propertyTemplates={propertyTemplates}
                 onChange={() => {
                   refreshProposals();
                 }}
-                onDelete={deleteProposals}
-                relationPropertiesCardsRecord={relationPropertiesCardsRecord}
+                refreshProposals={refreshProposals}
               />
             )}
             <div className='octo-spacer' />
