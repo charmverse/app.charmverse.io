@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import { Stack } from '@mui/material';
+import type { ReactNode } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 
 import { PopupFieldWrapper } from 'components/common/BoardEditor/components/properties/PopupFieldWrapper';
@@ -108,6 +109,7 @@ export type TagSelectProps = {
   emptyMessage?: string;
   showEmpty?: boolean;
   dataTestActive?: string;
+  dropdownFooter?: ReactNode;
 };
 
 export function TagSelect({
@@ -130,6 +132,7 @@ export function TagSelect({
   fluidWidth,
   showEmpty,
   dataTestActive,
+  dropdownFooter,
   ...props
 }: TagSelectProps) {
   const [isOpened, setIsOpened] = useState(defaultOpened);
@@ -180,6 +183,8 @@ export function TagSelect({
     return null;
   }
 
+  const showInsidePopup = displayType === 'table';
+
   const activeField = (
     <StyledSelect
       dataTest={dataTestActive}
@@ -201,7 +206,7 @@ export function TagSelect({
       forcePopupIcon={false}
       displayType={displayType}
       fluidWidth={fluidWidth}
-      popupField={displayType === 'table'}
+      disablePopper={showInsidePopup}
     />
   );
 
@@ -227,7 +232,7 @@ export function TagSelect({
     </SelectPreviewContainer>
   );
 
-  if (displayType === 'table') {
+  if (showInsidePopup) {
     return <PopupFieldWrapper previewField={previewField} activeField={activeField} disabled={readOnly} />;
   }
 

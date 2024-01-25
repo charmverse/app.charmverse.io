@@ -5,9 +5,12 @@ import { useState } from 'react';
 import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
+import { Button } from 'components/common/Button';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { IPropertyOption } from 'lib/focalboard/board';
 
 type Props = {
   onChange?: (value: ProposalWorkflowTyped) => void;
@@ -18,17 +21,29 @@ type Props = {
 };
 
 export function WorkflowSelect({ onChange, value, readOnly, required, requireConfirmation }: Props) {
+  const { openSettings } = useSettingsDialog();
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions } = useGetProposalWorkflows(currentSpace?.id);
   const { showConfirmation } = useConfirmationModal();
   const { showMessage } = useSnackbar();
-  const propertyOptions = (workflowOptions || []).map((option) => ({
+  const propertyOptions: IPropertyOption[] = (workflowOptions || []).map((option) => ({
     id: option.id,
     value: option.title,
     color: 'grey'
   }));
 
+  propertyOptions.push({
+    id: 'add_new',
+    value: '+ Add New',
+    color: 'gray',
+    variant: 'plain'
+  });
+
   async function changeWorkflow(newValue: string) {
+    if (newValue === 'add_new') {
+      openSettings('proposals', '', 'new-workflow-btn');
+      return;
+    }
     const option = workflowOptions?.find(({ id }) => id === newValue);
     if (option && onChange) {
       try {

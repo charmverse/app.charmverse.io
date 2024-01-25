@@ -108,12 +108,14 @@ export default function PopperPopup(props: PopperPopupProps) {
   return (
     <div ref={toggleRef} style={style}>
       {children && (
-        <div {...popoverToggleProps} onMouseDown={(e) => e.preventDefault()} style={toggleStyle}>
+        <div {...popoverToggleProps} className='foooooooo' onMouseDown={(e) => e.preventDefault()} style={toggleStyle}>
           {children}
         </div>
       )}
       <Popover {...popoverProps}>
-        <Paper sx={props.paperSx}>{popupContent}</Paper>
+        <Paper sx={props.paperSx} className='baaaaaaaa'>
+          {popupContent}
+        </Paper>
       </Popover>
     </div>
   );

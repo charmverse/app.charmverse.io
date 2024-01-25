@@ -1,7 +1,7 @@
-import { Chip, MenuItem, TextField, Typography, Stack, Box } from '@mui/material';
+import { Button, Chip, MenuItem, TextField, Typography, Paper, Box } from '@mui/material';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import type { ReactNode } from 'react';
-import { forwardRef, useEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
 import { v4 } from 'uuid';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
@@ -10,7 +10,6 @@ import { SelectOptionItem } from 'components/common/form/fields/Select/SelectOpt
 import type { ControlFieldProps, FieldProps } from 'components/common/form/interfaces';
 import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
 
-const renderDiv = (props: any & { children: ReactNode }) => <div>{props.children}</div>;
 const filter = createFilterOptions<SelectOptionType>();
 
 type SelectProps = {
@@ -32,8 +31,9 @@ type SelectProps = {
   forcePopupIcon?: boolean | 'auto';
   required?: boolean;
   fluidWidth?: boolean;
-  popupField?: boolean;
+  isInsideOpenPopup?: boolean;
   dataTest?: string;
+  disablePopper?: boolean;
 };
 
 type Props = Omit<ControlFieldProps, 'value'> & FieldProps & SelectProps;
@@ -64,8 +64,9 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
       noOptionsText,
       helperText,
       fluidWidth,
-      popupField,
+      isInsideOpenPopup,
       dataTest,
+      disablePopper,
       ...inputProps
     },
     ref
@@ -135,7 +136,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
           className={className}
           onClose={() => setIsOpened(false)}
           onOpen={() => setIsOpened(true)}
-          open={isOpened || isOptionEditOpened || popupField}
+          open={isOpened || isOptionEditOpened}
           ref={ref}
           disabled={disabled}
           disableCloseOnSelect={multiselect}
@@ -144,8 +145,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
           clearOnBlur
           handleHomeEndKeys
           multiple
-          PopperComponent={popupField ? renderDiv : undefined}
-          PaperComponent={popupField ? renderDiv : undefined}
+          PopperComponent={disablePopper ? NoPopperComponent : undefined}
           filterSelectedOptions={!includeSelectedOptions}
           sx={!fluidWidth ? { minWidth: 150, width: '100%', zIndex: 1 } : { zIndex: 1 }}
           options={options}
@@ -228,3 +228,8 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
     );
   }
 );
+
+// We replace the Popper with a div when SelectField is inside another popup. See PopupFieldWrapper
+function NoPopperComponent(props: any & { children: ReactNode }) {
+  return <div>{props.children}</div>;
+}
