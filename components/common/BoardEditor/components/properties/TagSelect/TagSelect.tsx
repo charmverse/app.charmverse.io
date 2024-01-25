@@ -131,7 +131,6 @@ export function TagSelect({
   fluidWidth,
   showEmpty,
   dataTestActive,
-  dropdownFooter,
   ...props
 }: TagSelectProps) {
   const [isOpened, setIsOpened] = useState(defaultOpened);
