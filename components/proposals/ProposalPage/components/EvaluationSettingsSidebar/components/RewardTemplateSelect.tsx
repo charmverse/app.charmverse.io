@@ -43,7 +43,7 @@ export function RewardTemplateSelect({ value, onChange }: Props) {
           onChange={async (templatePageId: string | string[]) => {
             if (templatePageId === 'add_new') {
               const { confirmed } = await showConfirmation(
-                'Are you sure you want to navigate away? Changes will not be saved.'
+                'Are you sure you want to leave? Changes will not be saved.'
               );
               if (confirmed) {
                 navigateToSpacePath('/rewards');

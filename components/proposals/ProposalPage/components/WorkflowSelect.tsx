@@ -40,10 +40,6 @@ export function WorkflowSelect({ onChange, value, readOnly, required, requireCon
   });
 
   async function changeWorkflow(newValue: string) {
-    if (newValue === 'add_new') {
-      openSettings('proposals', '', 'new-workflow-btn');
-      return;
-    }
     const option = workflowOptions?.find(({ id }) => id === newValue);
     if (option && onChange) {
       try {
@@ -57,6 +53,15 @@ export function WorkflowSelect({ onChange, value, readOnly, required, requireCon
   async function onConfirmValueChange(values: string | string[]) {
     const newValue = Array.isArray(values) ? values[0] : values;
     if (!newValue) {
+      return;
+    }
+    if (newValue === 'add_new') {
+      openSettings('proposals');
+      // open the new workflow input after the settings dialog is open
+      setTimeout(() => {
+        const btnElement = document.getElementById('new-workflow-btn');
+        btnElement?.click();
+      }, 100);
       return;
     }
     // no confirmation needed for draft or feedback

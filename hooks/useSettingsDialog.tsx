@@ -13,7 +13,7 @@ type IContext = {
   isOpen: boolean;
   activePath?: SettingsPath;
   onClose: () => void;
-  openSettings: (path?: SettingsPath, section?: string, buttonId?: string) => void;
+  openSettings: (path?: SettingsPath, section?: string) => void;
   openUpgradeSubscription: () => void;
 };
 
@@ -29,17 +29,13 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
   const [activePath, setActivePath] = useState<SettingsPath | undefined>();
   const router = useRouter();
 
-  function openSettings(_path?: SettingsPath, _section?: string, buttonId?: string) {
+  function openSettings(_path?: SettingsPath, _section?: string) {
     setActivePath(_path);
     settingsModalState.open();
     setTimeout(() => {
       if (_section) {
         const domSection = document.getElementById(_section);
         domSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-      if (buttonId) {
-        const btnElement = document.getElementById(buttonId);
-        btnElement?.click();
       }
     }, 200);
   }
