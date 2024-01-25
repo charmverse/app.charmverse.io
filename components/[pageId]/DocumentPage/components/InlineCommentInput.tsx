@@ -43,7 +43,7 @@ export function InlineCommentInput({
   return (
     <Box p={1}>
       {pageType === 'proposal' && (
-        <Stack height='fit-content'>
+        <Stack height='fit-content' gap={0.5}>
           <Stack flexDirection='row' gap={0.5} alignItems='center'>
             <PersonIcon fontSize='small' color='secondary' />
             <Typography variant='subtitle2'>Viewable by:</Typography>

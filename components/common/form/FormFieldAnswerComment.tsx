@@ -131,10 +131,12 @@ function FormFieldAnswerThreads({
                 key={resolvedThread.id}
                 threadId={resolvedThread?.id}
                 sx={{
-                  boxShadow: 'none'
+                  boxShadow: 'none',
+                  border: 0
                 }}
                 hideContext
               />
+              {index !== unResolvedThreads.length - 1 ? <Divider sx={{ my: 1 }} /> : null}
             </ThreadContainer>
           ))}
         </Box>
@@ -204,7 +206,9 @@ export function FormFieldAnswerInput({
       open={isOpen}
     >
       <Tooltip
-        title={!disabled ? 'Add a comment to the form field answer' : "You don't have permission to add a comment"}
+        title={
+          !disabled ? 'Start a new thread for the form field answer' : "You don't have permission to start a new thread"
+        }
       >
         <Box
           sx={{
@@ -254,7 +258,7 @@ export function FormFieldAnswerComment({
         md: 1,
         xs: 0.5
       }}
-      className='icons'
+      className={fieldAnswerThreads.length === 0 ? 'icons' : ''}
       position='relative'
       alignItems={{
         md: 'center',
@@ -262,13 +266,15 @@ export function FormFieldAnswerComment({
       }}
     >
       <FormFieldAnswerThreads fieldAnswerThreads={fieldAnswerThreads} />
-      <FormFieldAnswerInput
-        formFieldName={formFieldName}
-        disabled={disabled}
-        pageId={pageId}
-        formFieldAnswer={formFieldAnswer}
-        canCreateComments={canCreateComments}
-      />
+      <span className={fieldAnswerThreads.length !== 0 ? 'icons' : ''}>
+        <FormFieldAnswerInput
+          formFieldName={formFieldName}
+          disabled={disabled}
+          pageId={pageId}
+          formFieldAnswer={formFieldAnswer}
+          canCreateComments={canCreateComments}
+        />
+      </span>
     </Stack>
   );
 }
