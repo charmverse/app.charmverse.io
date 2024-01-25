@@ -83,6 +83,7 @@ export function RewardProperties(props: {
         readOnly={readOnly}
         expandedByDefault={expandedRewardProperties}
         isTemplate={isTemplate}
+        rewardStatus={currentReward.status}
       />
 
       {!isTemplate && (

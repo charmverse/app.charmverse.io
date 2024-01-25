@@ -105,11 +105,6 @@ export function getDisabledTooltip({
     disabledTooltip = 'Page title is required';
   } else if (!rewardValues.reviewers?.length) {
     disabledTooltip = 'Reviewer is required';
-  } else if (
-    !rewardValues.customReward &&
-    (!rewardValues.rewardToken || !rewardValues.rewardAmount || !rewardValues.chainId)
-  ) {
-    disabledTooltip = 'Reward is required';
   } else if (rewardValues.assignedSubmitters && rewardValues.assignedSubmitters.length === 0) {
     disabledTooltip = 'You need to assign at least one submitter';
   }
