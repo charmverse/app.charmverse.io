@@ -4,9 +4,6 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { useRef, useState } from 'react';
 
-import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
-import type { Card } from 'lib/focalboard/card';
-
 export const StyledMenuItem = styled(MenuItem)<{ firstChild?: boolean; lastChild?: boolean }>(
   ({ firstChild, lastChild, theme }) => `
   border-left: 1px solid ${theme.palette.divider};
@@ -37,15 +34,13 @@ export const StyledMenuItem = styled(MenuItem)<{ firstChild?: boolean; lastChild
 );
 
 export function PropertyMenu({
-  cards,
   disabledTooltip,
   propertyTemplate,
   children,
   lastChild
 }: {
   disabledTooltip?: string;
-  cards: Card[];
-  propertyTemplate: IPropertyTemplate<PropertyType>;
+  propertyTemplate: { name: string };
   children: ReactNode | ((option: { isPropertyOpen: boolean; closeMenu: VoidFunction }) => ReactNode);
   lastChild: boolean;
 }) {
@@ -53,10 +48,6 @@ export function PropertyMenu({
   // Without this state, the options menu list is not placed in the correct position
   const [isPropertyOpen, setIsPropertyOpen] = useState(false);
   const ref = useRef<HTMLLIElement>(null);
-  if (cards.length === 0) {
-    return null;
-  }
-
   return (
     <>
       <Tooltip title={disabledTooltip ?? ''}>
@@ -80,25 +71,13 @@ export function PropertyMenu({
       <Menu
         anchorEl={ref.current}
         open={popupState.isOpen}
-        style={{
-          position: 'relative',
-          top: -32,
-          height: '100%'
-        }}
         elevation={1}
         onClose={() => {
           popupState.close();
           setIsPropertyOpen(false);
         }}
       >
-        <Box
-          sx={{
-            padding: '2px 4px',
-            display: 'flex'
-          }}
-        >
-          {typeof children === 'function' ? children({ isPropertyOpen, closeMenu: popupState.close }) : children}
-        </Box>
+        {typeof children === 'function' ? children({ isPropertyOpen, closeMenu: popupState.close }) : children}
       </Menu>
     </>
   );

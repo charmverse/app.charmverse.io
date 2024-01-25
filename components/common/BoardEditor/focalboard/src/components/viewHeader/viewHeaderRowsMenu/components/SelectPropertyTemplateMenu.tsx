@@ -5,7 +5,7 @@ import { TagSelect } from 'components/common/BoardEditor/components/properties/T
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 
-import mutator from '../../../mutator';
+import mutator from '../../../../mutator';
 
 import { PropertyMenu } from './PropertyMenu';
 
@@ -46,13 +46,8 @@ export function SelectPropertyTemplateMenu({
   };
 
   return (
-    <PropertyMenu lastChild={lastChild} cards={cards} propertyTemplate={propertyTemplate}>
-      <Box
-        sx={{
-          minWidth: 100,
-          minHeight: 25
-        }}
-      >
+    <PropertyMenu lastChild={lastChild} propertyTemplate={propertyTemplate}>
+      <Box display='flex' py='2px' px='4px' minHeight={25} minWidth={100}>
         <TagSelect {...tagSelectProps} showEmpty />
       </Box>
     </PropertyMenu>

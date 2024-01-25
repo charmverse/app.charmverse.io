@@ -2,36 +2,50 @@ import type { ProposalEvaluationResult, ProposalSystemRole } from '@charmverse/c
 import { useMemo } from 'react';
 
 import charmClient from 'charmClient';
+import { useArchiveProposals } from 'charmClient/hooks/proposals';
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import type { ViewHeaderRowsMenuProps } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderRowsMenu/viewHeaderRowsMenu';
-import { ViewHeaderRowsMenu } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderRowsMenu/viewHeaderRowsMenu';
+import type { ViewHeaderRowsMenuProps } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ViewHeaderRowsMenu/ViewHeaderRowsMenu';
+import { ViewHeaderRowsMenu } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ViewHeaderRowsMenu/ViewHeaderRowsMenu';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { ProposalEvaluationStep } from 'lib/proposal/interface';
 import { isTruthy } from 'lib/utilities/types';
 
 import { useBatchUpdateProposalStatusOrStep } from '../hooks/useBatchUpdateProposalStatusOrStep';
 import { useProposals } from '../hooks/useProposals';
 
-type Props = Pick<
-  ViewHeaderRowsMenuProps,
-  'checkedIds' | 'setCheckedIds' | 'cards' | 'board' | 'propertyTemplates' | 'onChange'
-> & {
+type Props = Pick<ViewHeaderRowsMenuProps, 'checkedIds' | 'setCheckedIds' | 'cards' | 'board' | 'onChange'> & {
+  visiblePropertyIds?: string[];
   refreshProposals: VoidFunction;
 };
 
-export function HeaderRowActionsMenu({
+export function ProposalsHeaderRowsMenu({
   board,
+  visiblePropertyIds,
   cards,
   checkedIds,
   setCheckedIds,
-  propertyTemplates,
   refreshProposals
 }: Props) {
   const { showError } = useSnackbar();
   const { pages } = usePages();
   const { proposalsMap } = useProposals();
   const { updateStatuses, updateSteps } = useBatchUpdateProposalStatusOrStep();
+  const { trigger: archiveProposals } = useArchiveProposals();
+
+  let propertyTemplates: IPropertyTemplate<PropertyType>[] = [];
+
+  if (visiblePropertyIds?.length) {
+    visiblePropertyIds.forEach((propertyId) => {
+      const property = board.fields.cardProperties.find((p) => p.id === propertyId);
+      if (property) {
+        propertyTemplates.push(property);
+      }
+    });
+  } else {
+    propertyTemplates = [...board.fields.cardProperties];
+  }
 
   async function onChangeProposalsReviewers(pageIds: string[], reviewers: SelectOption[]) {
     let proposalReviewersChanged = false;
@@ -164,20 +178,11 @@ export function HeaderRowActionsMenu({
     }
   }
 
-  async function onArchiveProposals(pageIds: string[]) {
-    for (const pageId of pageIds) {
-      const proposalId = pages[pageId]?.proposalId;
-      const proposal = proposalId ? proposalsMap[proposalId] : null;
-      if (proposalId && !proposal?.archived) {
-        try {
-          await charmClient.proposals.updateProposal({
-            authors: authorIds,
-            proposalId
-          });
-        } catch (error) {
-          showError(error, 'There was an error updating authors');
-        }
-      }
+  async function onArchiveProposals(input: { archived: boolean; proposalIds: string[] }) {
+    try {
+      await archiveProposals(input);
+    } catch (error) {
+      showError(error);
     }
   }
 
@@ -226,6 +231,10 @@ export function HeaderRowActionsMenu({
     };
   }, [pages, checkedIds, proposalsMap]);
 
+  function _onArchiveProposals(archived: boolean) {
+    onArchiveProposals({ archived, proposalIds: checkedIds });
+  }
+
   const firstCheckedProposal = useMemo(() => {
     let firstCheckedProposalId;
     for (const checkedId of checkedIds) {
@@ -256,7 +265,7 @@ export function HeaderRowActionsMenu({
       onChangeProposalsReviewers={onChangeProposalsReviewers}
       onChangeProposalsStatuses={onChangeProposalsStatuses}
       onChangeProposalsSteps={onChangeProposalsSteps}
-      onArchiveProposals={onArchiveProposals}
+      onArchiveProposals={_onArchiveProposals}
     />
   );
 }

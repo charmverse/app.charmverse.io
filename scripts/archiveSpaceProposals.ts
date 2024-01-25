@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { archiveProposal } from 'lib/proposal/archiveProposal';
+import { archiveProposals } from 'lib/proposal/archiveProposals';
 import { createBotUser } from 'lib/spaces/createBotUser';
-
 
 const spaceDomain = '';
 
@@ -28,17 +27,14 @@ async function archiveSpaceProposals() {
     throw new Error(`Bot user for the space not found`);
   }
 
-  const proposalsToArchive = await prisma.proposal.findMany({ where: { archived: false, spaceId: space.id }, select: { id: true } });
+  const proposalsToArchive = await prisma.proposal.findMany({
+    where: { archived: false, spaceId: space.id },
+    select: { id: true }
+  });
 
   console.log('🔥', 'Number of proposals to be archived:', proposalsToArchive.length);
 
-  let numOfArchivedProposals = 0;
-  for (const proposal of proposalsToArchive) {
-    await archiveProposal({ archived: true, proposalId: proposal.id, actorId });
-
-    numOfArchivedProposals++;
-    console.log('🔥', 'Archived proposal no:', numOfArchivedProposals);
-  }
+  await archiveProposals({ archived: true, proposalIds: proposalsToArchive.map((p) => p.id), actorId });
 }
 
 archiveSpaceProposals().then(() => {

@@ -18,9 +18,10 @@ import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import mutator from '../../../mutator';
 
-import { StyledMenuItem } from './PropertyMenu';
-import type { PropertyTemplateMenuProps } from './PropertyTemplateMenu';
-import { PropertyTemplateMenu } from './PropertyTemplateMenu';
+import { ArchiveProposals } from './components/ArchiveProposals';
+import { StyledMenuItem } from './components/PropertyMenu';
+import type { PropertyTemplateMenuProps } from './components/PropertyTemplateMenu';
+import { PropertyTemplateMenu } from './components/PropertyTemplateMenu';
 
 const StyledStack = styled(Stack)`
   flex-direction: row;
@@ -66,7 +67,7 @@ export type ViewHeaderRowsMenuProps = {
   isStepDisabled?: boolean;
   isStatusDisabled?: boolean;
   isReviewersDisabled?: boolean;
-  onArchiveProposals?: (pageIds: string[]) => void;
+  onArchiveProposals?: (archived: boolean) => void;
   onChange?: VoidFunction;
   onChangeProposalsAuthors?: PropertyTemplateMenuProps['onChangeProposalsAuthors'];
   onChangeProposalsReviewers?: PropertyTemplateMenuProps['onChangeProposalsReviewers'];
@@ -214,6 +215,7 @@ export function ViewHeaderRowsMenu({
             />
           ))
         : null}
+      {onArchiveProposals && <ArchiveProposals onChange={onArchiveProposals} />}
       {showTrashIcon && (
         <StyledMenuItem lastChild onClick={deleteCheckedCards} disabled={isDeleting}>
           <Tooltip title='Delete'>

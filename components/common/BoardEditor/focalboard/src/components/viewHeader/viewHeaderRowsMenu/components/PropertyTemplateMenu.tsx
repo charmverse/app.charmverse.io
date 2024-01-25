@@ -1,4 +1,5 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
+import { Box } from '@mui/material';
 
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
@@ -9,7 +10,7 @@ import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/boar
 import type { Card, CardPropertyValue } from 'lib/focalboard/card';
 import type { ProposalWithUsersLite } from 'lib/proposal/interface';
 
-import mutator from '../../../mutator';
+import mutator from '../../../../mutator';
 
 import { DatePropertyTemplateMenu } from './DatePropertyTemplateMenu';
 import { PersonPropertyTemplateMenu } from './PersonPropertyTemplateMenu';
@@ -137,32 +138,29 @@ export function PropertyTemplateMenu({
       }
 
       return (
-        <PropertyMenu
-          lastChild={lastChild}
-          disabledTooltip={disabledTooltip}
-          cards={cards}
-          propertyTemplate={propertyTemplate}
-        >
-          {({ isPropertyOpen }) =>
-            isPropertyOpen ? (
-              <UserAndRoleSelect
-                value={propertyValue as any}
-                systemRoles={[allMembersSystemRole]}
-                onChange={async (options) => {
-                  await onChangeProposalsReviewers?.(checkedIds, options);
-                }}
-                required
-              />
-            ) : (
-              <UserAndRoleSelect
-                onChange={() => {}}
-                value={propertyValue as any}
-                systemRoles={[allMembersSystemRole]}
-                readOnly
-                required
-              />
-            )
-          }
+        <PropertyMenu lastChild={lastChild} disabledTooltip={disabledTooltip} propertyTemplate={propertyTemplate}>
+          {({ isPropertyOpen }) => (
+            <Box display='flex' py='2px' px='4px'>
+              {isPropertyOpen ? (
+                <UserAndRoleSelect
+                  value={propertyValue as any}
+                  systemRoles={[allMembersSystemRole]}
+                  onChange={async (options) => {
+                    await onChangeProposalsReviewers?.(checkedIds, options);
+                  }}
+                  required
+                />
+              ) : (
+                <UserAndRoleSelect
+                  onChange={() => {}}
+                  value={propertyValue as any}
+                  systemRoles={[allMembersSystemRole]}
+                  readOnly
+                  required
+                />
+              )}
+            </Box>
+          )}
         </PropertyMenu>
       );
     }
@@ -181,16 +179,13 @@ export function PropertyTemplateMenu({
     case 'proposalStatus': {
       if (firstCheckedProposal) {
         return (
-          <PropertyMenu
-            lastChild={lastChild}
-            cards={cards}
-            disabledTooltip={disabledTooltip}
-            propertyTemplate={propertyTemplate}
-          >
-            <ControlledProposalStatusSelect
-              onChange={(result) => onChangeProposalsStatuses?.(checkedIds, result)}
-              proposal={firstCheckedProposal}
-            />
+          <PropertyMenu lastChild={lastChild} disabledTooltip={disabledTooltip} propertyTemplate={propertyTemplate}>
+            <Box display='flex' py='2px' px='4px'>
+              <ControlledProposalStatusSelect
+                onChange={(result) => onChangeProposalsStatuses?.(checkedIds, result)}
+                proposal={firstCheckedProposal}
+              />
+            </Box>
           </PropertyMenu>
         );
       }
@@ -200,27 +195,24 @@ export function PropertyTemplateMenu({
     case 'proposalStep': {
       if (firstCheckedProposal) {
         return (
-          <PropertyMenu
-            lastChild={lastChild}
-            disabledTooltip={disabledTooltip}
-            cards={cards}
-            propertyTemplate={propertyTemplate}
-          >
-            <ControlledProposalStepSelect
-              onChange={({ evaluationId, moveForward }) =>
-                onChangeProposalsSteps?.(checkedIds, evaluationId, moveForward)
-              }
-              proposal={{
-                archived: firstCheckedProposal.archived ?? false,
-                currentStep: firstCheckedProposal.currentStep,
-                id: firstCheckedProposal.id,
-                evaluations: firstCheckedProposal.evaluations,
-                currentEvaluationId: firstCheckedProposal.currentEvaluationId,
-                hasRewards:
-                  (firstCheckedProposal.rewardIds ?? []).length > 0 ||
-                  (firstCheckedProposal.fields?.pendingRewards ?? []).length > 0
-              }}
-            />
+          <PropertyMenu lastChild={lastChild} disabledTooltip={disabledTooltip} propertyTemplate={propertyTemplate}>
+            <Box display='flex' py='2px' px='4px'>
+              <ControlledProposalStepSelect
+                onChange={({ evaluationId, moveForward }) =>
+                  onChangeProposalsSteps?.(checkedIds, evaluationId, moveForward)
+                }
+                proposal={{
+                  archived: firstCheckedProposal.archived ?? false,
+                  currentStep: firstCheckedProposal.currentStep,
+                  id: firstCheckedProposal.id,
+                  evaluations: firstCheckedProposal.evaluations,
+                  currentEvaluationId: firstCheckedProposal.currentEvaluationId,
+                  hasRewards:
+                    (firstCheckedProposal.rewardIds ?? []).length > 0 ||
+                    (firstCheckedProposal.fields?.pendingRewards ?? []).length > 0
+                }}
+              />
+            </Box>
           </PropertyMenu>
         );
       }
