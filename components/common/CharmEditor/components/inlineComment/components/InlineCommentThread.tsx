@@ -5,7 +5,9 @@ import type { PluginKey } from 'prosemirror-state';
 import { createPortal } from 'react-dom';
 
 import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
+import { useInlineComment } from 'hooks/useInlineComment';
 import { useThreads } from 'hooks/useThreads';
+import { removeInlineCommentMark } from 'lib/prosemirror/plugins/inlineComments/removeInlineCommentMark';
 import { isTruthy } from 'lib/utilities/types';
 
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
@@ -40,6 +42,7 @@ export function InlineCommentThread({
   const view = useEditorViewContext();
   const { tooltipContentDOM, show: isVisible, ids } = usePluginState(pluginKey) as InlineCommentPluginState;
   const { threads } = useThreads();
+  const { updateThreadPluginState } = useInlineComment();
 
   // Find unresolved threads in the thread ids and sort them based on desc order of createdAt
   const unResolvedThreads = ids
@@ -76,6 +79,20 @@ export function InlineCommentThread({
                   inline={ids.length === 1}
                   key={resolvedThread.id}
                   threadId={resolvedThread?.id}
+                  onDeleteComment={() => {
+                    removeInlineCommentMark(view, resolvedThread.id, true);
+                    updateThreadPluginState({
+                      remove: true,
+                      threadId: resolvedThread.id
+                    });
+                  }}
+                  onToggleResolve={(_, remove) => {
+                    removeInlineCommentMark(view, resolvedThread.id);
+                    updateThreadPluginState({
+                      remove,
+                      threadId: resolvedThread.id
+                    });
+                  }}
                 />
               </ThreadContainer>
             ))}

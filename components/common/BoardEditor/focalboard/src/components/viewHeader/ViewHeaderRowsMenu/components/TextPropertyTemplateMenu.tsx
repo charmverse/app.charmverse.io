@@ -1,11 +1,12 @@
+import { Box } from '@mui/material';
 import { useState } from 'react';
 
 import { TextInput } from 'components/common/BoardEditor/components/properties/TextInput';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 
-import mutator from '../../../mutator';
-import { validatePropertyValue } from '../../propertyValueElement';
+import mutator from '../../../../mutator';
+import { validatePropertyValue } from '../../../propertyValueElement';
 
 import { PropertyMenu } from './PropertyMenu';
 
@@ -24,9 +25,9 @@ export function TextPropertyTemplateMenu({
   const [value, setValue] = useState(propertyValue);
 
   return (
-    <PropertyMenu lastChild={lastChild} cards={cards} propertyTemplate={propertyTemplate}>
-      {({ closeMenu }) => {
-        return (
+    <PropertyMenu lastChild={lastChild} propertyTemplate={propertyTemplate}>
+      {({ closeMenu }) => (
+        <Box display='flex' py='2px' px='4px'>
           <TextInput
             className='octo-propertyvalue'
             placeholderText='Empty'
@@ -43,8 +44,8 @@ export function TextPropertyTemplateMenu({
             validator={(newValue: string) => validatePropertyValue(propertyTemplate.type, newValue)}
             spellCheck={propertyTemplate.type === 'text'}
           />
-        );
-      }}
+        </Box>
+      )}
     </PropertyMenu>
   );
 }

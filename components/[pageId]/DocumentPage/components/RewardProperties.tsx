@@ -10,7 +10,7 @@ import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardWithUsersAndPageMeta, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
-import { RewardSignupButton } from './components/RewardSignupButton';
+import { RewardSignupButton } from '../../../rewards/components/RewardProperties/components/RewardSignupButton';
 
 export function RewardProperties(props: {
   readOnly?: boolean;
@@ -21,6 +21,8 @@ export function RewardProperties(props: {
   showApplications?: boolean;
   isTemplate?: boolean;
   expandedRewardProperties?: boolean;
+  templateId?: string;
+  readOnlyTemplate?: boolean;
 }) {
   const {
     reward: initialReward,
@@ -29,7 +31,9 @@ export function RewardProperties(props: {
     rewardChanged,
     showApplications,
     isTemplate,
-    expandedRewardProperties
+    expandedRewardProperties,
+    templateId,
+    readOnlyTemplate
   } = props;
   const { updateReward, refreshReward } = useRewards();
   const [currentReward, setCurrentReward] = useState<Partial<RewardCreationData & RewardWithUsers> | undefined>(
@@ -82,7 +86,12 @@ export function RewardProperties(props: {
         onChange={applyRewardUpdates}
         readOnly={readOnly}
         expandedByDefault={expandedRewardProperties}
+        templateId={templateId}
         isTemplate={isTemplate}
+        readOnlyTemplate={readOnlyTemplate}
+        // templates are not enabled for existing pages
+        selectTemplate={() => {}}
+        rewardStatus={currentReward.status}
       />
 
       {!isTemplate && (

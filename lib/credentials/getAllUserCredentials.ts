@@ -1,4 +1,5 @@
 import { InvalidInputError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
@@ -32,7 +33,10 @@ export async function getAllUserCredentials({ userId }: { userId: string }): Pro
   }
 
   const allCredentials = await Promise.all([
-    getCharmverseCredentialsByWallets({ wallets }),
+    getCharmverseCredentialsByWallets({ wallets }).catch((error) => {
+      log.error(`Error loading Charmverse Ceramic credentials for user ${userId}`, { error, userId });
+      return [];
+    }),
     getAllOnChainAttestations({ wallets: testWallets })
   ]).then((data) => data.flat());
 

@@ -32,7 +32,7 @@ import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import type { BountyPermissions } from 'lib/permissions/bounties';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
-import type { ProposalWithUsersAndRubric, ProposalReviewerInput } from 'lib/proposal/interface';
+import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { getRewardOrThrow } from 'lib/rewards/getReward';
 import type { ApplicationMeta } from 'lib/rewards/interfaces';
@@ -870,6 +870,13 @@ export function createBlock(options: Partial<Block> & Pick<Block, 'createdBy' | 
 }
 
 type PageWithProposal = Page & { proposal: ProposalWithUsersAndRubric };
+
+type ProposalReviewerInput = {
+  group: 'system_role' | 'role' | 'user';
+  id: string;
+  evaluationId?: string;
+};
+
 /**
  * Creates a proposal with the linked authors and reviewers
  */
