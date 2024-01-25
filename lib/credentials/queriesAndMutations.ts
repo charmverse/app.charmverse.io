@@ -1,6 +1,6 @@
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
 import { log } from '@charmverse/core/log';
-import type { AttestationType } from '@charmverse/core/prisma-client';
+import { prisma, type AttestationType } from '@charmverse/core/prisma-client';
 import { Wallet } from 'ethers';
 
 import { credentialsWalletPrivateKey, graphQlServerEndpoint } from 'config/constants';
@@ -126,7 +126,7 @@ export async function getCharmverseCredentialsByWallets({
     return [];
   }
 
-  return apolloClient
+  const charmverseCredentials: EASAttestationFromApi[] = await apolloClient
     .query({
       query: GET_CREDENTIALS,
       variables: {
@@ -142,4 +142,44 @@ export async function getCharmverseCredentialsByWallets({
       fetchPolicy: 'no-cache'
     })
     .then(({ data }) => data.signedCredentialFourIndex.edges.map((e: any) => getParsedCredential(e.node)));
+
+  const credentialIds = charmverseCredentials.map((c) => c.id);
+
+  const issuedCredentials = await prisma.issuedCredential.findMany({
+    where: {
+      ceramicId: {
+        in: credentialIds
+      }
+    },
+    select: {
+      id: true,
+      proposal: {
+        select: {
+          space: {
+            select: {
+              spaceArtwork: true,
+              credentialLogo: true
+            }
+          }
+        }
+      }
+    }
+  });
+
+  const issuedCredentialsSpaceArtworkRecord = issuedCredentials.reduce((acc, val) => {
+    acc[val.id] = {
+      spaceArtwork: val.proposal.space.spaceArtwork,
+      credentialLogo: val.proposal.space.credentialLogo
+    };
+    return acc;
+  }, {} as Record<string, undefined | { spaceArtwork: string | null; credentialLogo: string | null }>);
+
+  return charmverseCredentials.map((credential) => {
+    return {
+      ...credential,
+      iconUrl:
+        issuedCredentialsSpaceArtworkRecord[credential.id]?.credentialLogo ??
+        issuedCredentialsSpaceArtworkRecord[credential.id]?.spaceArtwork
+    };
+  });
 }

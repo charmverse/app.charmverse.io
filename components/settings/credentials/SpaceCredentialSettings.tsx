@@ -53,7 +53,7 @@ export function SpaceCredentialSettings() {
             setCredentialLogoChanged(true);
           }}
           editable={isAdmin && !isMutating}
-          hideDelete
+          hideDelete={!!space?.credentialLogo}
         />
       </Box>
       {isAdmin && (
