@@ -13,7 +13,8 @@ export function ProposalFormFieldInputs({
   readOnly,
   isReviewer,
   pageId,
-  threads
+  threads,
+  isDraft
 }: {
   readOnly?: boolean;
   proposalId: string;
@@ -21,6 +22,7 @@ export function ProposalFormFieldInputs({
   isReviewer: boolean;
   pageId: string;
   threads: Record<string, ThreadWithComments | undefined>;
+  isDraft?: boolean;
 }) {
   const { data: proposalFormFieldAnswers = [], isLoading } = useGetProposalFormFieldAnswers({ proposalId });
   const { trigger } = useUpdateProposalFormFieldAnswers({ proposalId });
@@ -47,6 +49,7 @@ export function ProposalFormFieldInputs({
       pageId={pageId}
       disabled={readOnly}
       threads={threads}
+      isDraft={isDraft}
       formFields={formFields
         .map((formField) => {
           const proposalFormFieldAnswer = proposalFormFieldAnswers.find(

@@ -45,6 +45,7 @@ type FormFieldInputsProps = {
   values?: Record<string, FormFieldValue>;
   isReviewer: boolean;
   pageId?: string;
+  isDraft?: boolean;
 };
 
 export function ControlledFormFieldInputs({
@@ -72,7 +73,8 @@ export function FormFieldInputs({
   onSave,
   isReviewer,
   pageId,
-  threads
+  threads,
+  isDraft
 }: Omit<FormFieldInputsProps, 'control' | 'errors' | 'onFormChange'> & {
   isReviewer: boolean;
   threads?: Record<string, ThreadWithComments | undefined>;
@@ -115,6 +117,7 @@ function FormFieldInputsBase({
   onFormChange,
   isReviewer,
   pageId,
+  isDraft,
   threads = {}
 }: FormFieldInputsProps & {
   isReviewer: boolean;
@@ -223,7 +226,7 @@ function FormFieldInputsBase({
                             formFieldName={formField.name}
                             disabled={disabled}
                             fieldAnswerThreads={fieldAnswerThreads}
-                            canCreateComments={isAdmin || isReviewer}
+                            canCreateComments={(isAdmin || isReviewer) && !isDraft}
                           />
                         </Box>
                       )

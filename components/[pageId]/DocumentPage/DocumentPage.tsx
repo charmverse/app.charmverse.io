@@ -466,6 +466,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
                         formFields={proposal?.form.formFields ?? []}
                         readOnly={!user || !pagePermissions.edit_content || !!proposal?.archived}
                         threads={threads}
+                        isDraft={proposal?.status === 'draft'}
                       />
                     )}
                   </Box>

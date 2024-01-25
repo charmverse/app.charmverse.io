@@ -26,7 +26,7 @@ function FormFieldAnswerCommentsCounter({
 }) {
   const { activeView: sidebarView } = usePageSidebar();
   return (
-    <Tooltip title={!disabled ? 'View form field answer threads' : ''}>
+    <Tooltip title={!disabled ? 'View comments' : ''}>
       <Box
         display='flex'
         gap={{
@@ -123,7 +123,7 @@ function FormFieldAnswerThreads({
             }
           }}
         >
-          {unResolvedThreads.map((resolvedThread, index) => (
+          {unResolvedThreads.map((resolvedThread) => (
             <ThreadContainer key={resolvedThread.id} elevation={4}>
               <PageThread
                 canCreateComments
@@ -131,12 +131,10 @@ function FormFieldAnswerThreads({
                 key={resolvedThread.id}
                 threadId={resolvedThread?.id}
                 sx={{
-                  boxShadow: 'none',
-                  border: 0
+                  boxShadow: 'none'
                 }}
                 hideContext
               />
-              {index !== unResolvedThreads.length - 1 ? <Divider sx={{ my: 1 }} /> : null}
             </ThreadContainer>
           ))}
         </Box>
@@ -205,11 +203,7 @@ export function FormFieldAnswerInput({
       }}
       open={isOpen}
     >
-      <Tooltip
-        title={
-          !disabled ? 'Start a new thread for the form field answer' : "You don't have permission to start a new thread"
-        }
-      >
+      <Tooltip title={!disabled ? 'Add a comment' : "You don't have permission to add a comment"}>
         <Box
           sx={{
             display: 'flex',
