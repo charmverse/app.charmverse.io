@@ -14,7 +14,7 @@ interface IdentityProviderItemProps extends ListItemProps {
   loading?: boolean;
   disabled?: boolean;
   connected?: boolean;
-  active?: boolean;
+  primary?: boolean;
   error?: ReactNode;
   actions?: ReactNode;
   children?: ReactNode;
@@ -26,7 +26,7 @@ export default function IdentityProviderItem({
   loading = false,
   disabled = false,
   connected = false,
-  active = false,
+  primary = false,
   error,
   actions,
   children
@@ -60,7 +60,7 @@ export default function IdentityProviderItem({
             primaryTypographyProps={{ ml: 1 }}
             primary={connected ? text || `Connected with ${typeLabel}` : text || `Connect with ${typeLabel}`}
           />
-          {active && <Chip size='small' sx={{ ml: 1 }} label='Active' variant='outlined' />}
+          {primary && <Chip size='small' sx={{ ml: 1 }} label='Primary' variant='outlined' />}
         </Box>
 
         <Box px={1}>
