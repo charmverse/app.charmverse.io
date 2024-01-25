@@ -309,7 +309,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
           proposalTemplateId={proposal?.page?.sourceTemplateId}
           onChangeEvaluation={onChangeEvaluation}
           refreshProposal={refreshProposal}
-          disabledViews={isStructuredProposal ? ['suggestions', 'comments'] : []}
+          disabledViews={isStructuredProposal ? ['suggestions'] : []}
           onChangeWorkflow={onChangeWorkflow}
           onChangeRewardTemplate={onChangeRewardTemplate}
           isProposalTemplate={page.type === 'proposal_template'}
@@ -319,7 +319,6 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
   );
 
   const proposalAuthors = proposal ? [proposal.createdBy, ...proposal.authors.map((author) => author.userId)] : [];
-
   return (
     <PrimaryColumn id='file-drop-container' ref={containerRef} showPageActionSidebar={showPageActionSidebar}>
       <Box
@@ -463,9 +462,13 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
                       />
                     ) : (
                       <ProposalFormFieldInputs
+                        pageId={page.id}
+                        isReviewer={(proposal?.permissions.evaluate || proposal?.permissions.review) ?? false}
                         proposalId={proposal.id}
                         formFields={proposal?.form.formFields ?? []}
                         readOnly={!user || !pagePermissions.edit_content || !!proposal?.archived}
+                        threads={threads}
+                        isDraft={proposal?.status === 'draft'}
                       />
                     )}
                   </Box>

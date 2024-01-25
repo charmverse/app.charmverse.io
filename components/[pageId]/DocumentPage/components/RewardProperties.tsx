@@ -91,6 +91,7 @@ export function RewardProperties(props: {
         readOnlyTemplate={readOnlyTemplate}
         // templates are not enabled for existing pages
         selectTemplate={() => {}}
+        rewardStatus={currentReward.status}
       />
 
       {!isTemplate && (

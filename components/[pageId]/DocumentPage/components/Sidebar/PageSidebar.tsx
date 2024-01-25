@@ -14,7 +14,7 @@ import type { ThreadWithComments } from 'lib/threads/interfaces';
 
 import type { PageSidebarView } from '../../hooks/usePageSidebar';
 
-import { CommentsSidebar } from './components/CommentsSidebar';
+import { EditorCommentsSidebar, FormCommentsSidebar } from './components/CommentsSidebar';
 import { PageSidebarViewToggle } from './components/PageSidebarViewToggle';
 import { SuggestionsSidebar } from './components/SuggestionsSidebar';
 import { SIDEBAR_VIEWS } from './constants';
@@ -247,13 +247,21 @@ function SidebarContents({
           state={editorState}
         />
       )}
-      {sidebarView === 'comments' && (
-        <CommentsSidebar
-          openSidebar={openSidebar!}
-          threads={threads || {}}
-          canCreateComments={!!pagePermissions?.comment}
-        />
-      )}
+      {sidebarView === 'comments' &&
+        (proposal?.formId ? (
+          <FormCommentsSidebar
+            canCreateComments={!!pagePermissions?.comment}
+            openSidebar={openSidebar!}
+            threads={threads || {}}
+            formFields={proposal.form.formFields}
+          />
+        ) : (
+          <EditorCommentsSidebar
+            openSidebar={openSidebar!}
+            threads={threads || {}}
+            canCreateComments={!!pagePermissions?.comment}
+          />
+        ))}
     </>
   );
 }

@@ -58,10 +58,7 @@ export class SpacesApi {
     return http.GET<CheckDomainResponse>('/api/spaces/checkDomain', params);
   }
 
-  updateSnapshotConnection(
-    spaceId: string,
-    data: Pick<Space, 'snapshotDomain' | 'defaultVotingDuration'>
-  ): Promise<Space> {
+  updateSnapshotConnection(spaceId: string, data: Pick<Space, 'snapshotDomain'>): Promise<Space> {
     return http.PUT(`/api/spaces/${spaceId}/snapshot`, data);
   }
 

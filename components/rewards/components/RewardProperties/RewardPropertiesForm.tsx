@@ -1,3 +1,4 @@
+import type { BountyStatus } from '@charmverse/core/prisma-client';
 import { Box, Collapse, Divider, Stack, Tooltip } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import clsx from 'clsx';
@@ -45,6 +46,7 @@ type Props = {
   readOnlyTemplate?: boolean;
   resetTemplate?: VoidFunction;
   forcedApplicationType?: RewardApplicationType;
+  rewardStatus?: BountyStatus | null;
 };
 
 const getApplicationType = (values: UpdateableRewardFields, forcedApplicationType?: RewardApplicationType) => {
@@ -74,7 +76,8 @@ export function RewardPropertiesForm({
   templateId,
   readOnlyTemplate,
   resetTemplate,
-  forcedApplicationType
+  forcedApplicationType,
+  rewardStatus
 }: Props) {
   const [rewardApplicationType, setRewardApplicationTypeRaw] = useState<RewardApplicationType>(() =>
     getApplicationType(values, forcedApplicationType)
@@ -82,7 +85,7 @@ export function RewardPropertiesForm({
   const { getFeatureTitle } = useSpaceFeatures();
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(!!expandedByDefault);
-  const [rewardType, setRewardType] = useState<RewardType>(values?.customReward ? 'Custom' : 'Token');
+  const [rewardType, setRewardType] = useState(values?.customReward ? 'Custom' : ('Token' as RewardType));
   const allowedSubmittersValue: RoleOption[] = (values?.allowedSubmitterRoles ?? []).map((id) => ({
     id,
     group: 'role'
@@ -112,8 +115,10 @@ export function RewardPropertiesForm({
   useEffect(() => {
     if (isTruthy(values?.customReward)) {
       setRewardType('Custom');
+    } else if (!values?.rewardToken || !values?.rewardAmount || !values?.chainId) {
+      setRewardType('None');
     }
-  }, [values?.customReward]);
+  }, [values?.customReward, values?.rewardAmount, values?.rewardToken, values?.chainId]);
 
   async function applyUpdates(updates: Partial<UpdateableRewardFields>) {
     if ('customReward' in updates) {
@@ -127,6 +132,17 @@ export function RewardPropertiesForm({
 
     onChange(updates);
   }
+
+  useEffect(() => {
+    if (rewardType === 'None' && rewardStatus !== 'paid') {
+      applyUpdates({
+        rewardAmount: null,
+        chainId: null,
+        rewardToken: null,
+        customReward: null
+      });
+    }
+  }, [rewardType, rewardStatus]);
 
   const applyUpdatesDebounced = useMemo(() => {
     if (useDebouncedInputs) {
@@ -434,7 +450,6 @@ export function RewardPropertiesForm({
                   onChange={updateRewardCustomReward}
                   value={values?.customReward ?? ''}
                   required
-                  defaultValue={values?.maxSubmissions}
                   size='small'
                   inputProps={{
                     style: { height: 'auto' },
