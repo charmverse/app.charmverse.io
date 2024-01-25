@@ -1,6 +1,8 @@
+import { Box } from '@mui/material';
+
 import type { UserSelectProps } from 'components/common/BoardEditor/components/properties/UserSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
-import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 
 import { PropertyMenu } from './PropertyMenu';
@@ -26,10 +28,12 @@ export function PersonPropertyTemplateMenu({
   };
 
   return (
-    <PropertyMenu lastChild={lastChild} cards={cards} propertyTemplate={propertyTemplate}>
-      {({ isPropertyOpen }) =>
-        isPropertyOpen ? <UserSelect defaultOpened {...userSelectProps} /> : <UserSelect {...userSelectProps} />
-      }
+    <PropertyMenu lastChild={lastChild} propertyTemplate={propertyTemplate}>
+      {({ isPropertyOpen }) => (
+        <Box display='flex' py='2px' px='4px'>
+          {isPropertyOpen ? <UserSelect defaultOpened {...userSelectProps} /> : <UserSelect {...userSelectProps} />}
+        </Box>
+      )}
     </PropertyMenu>
   );
 }

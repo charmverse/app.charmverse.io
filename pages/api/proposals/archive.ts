@@ -14,28 +14,28 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).post(archiveProposalController);
 
 async function archiveProposalController(req: NextApiRequest, res: NextApiResponse<ProposalWithUsers>) {
-  const proposalId = req.query.id as string;
+  const { proposalIds, archived } = req.body as ArchiveProposalRequest;
   const userId = req.session.user.id;
 
-  const { archived } = req.body as ArchiveProposalRequest;
+  for (const proposalId of proposalIds) {
+    const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
+      resourceId: proposalId,
+      userId
+    });
 
-  const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
-    resourceId: proposalId,
-    userId
-  });
-
-  if (typeof archived !== 'boolean') {
-    throw new InvalidInputError(`Property "archived" must be true or false`);
-  }
-  if (archived === true && !permissions.archive) {
-    throw new UnauthorisedActionError(`You cannot archive this proposal`);
-  } else if (archived === false && !permissions.unarchive) {
-    throw new UnauthorisedActionError(`You cannot unarchive this proposal`);
+    if (typeof archived !== 'boolean') {
+      throw new InvalidInputError(`Property "archived" must be true or false`);
+    }
+    if (archived === true && !permissions.archive) {
+      throw new UnauthorisedActionError(`You cannot archive this proposal`);
+    } else if (archived === false && !permissions.unarchive) {
+      throw new UnauthorisedActionError(`You cannot unarchive this proposal`);
+    }
   }
 
   await archiveProposals({
     archived,
-    proposalIds: [proposalId],
+    proposalIds,
     actorId: userId
   });
 
