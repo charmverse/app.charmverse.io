@@ -79,18 +79,31 @@ export function ProposalRewards({
 
   function createNewReward() {
     clearRewardValues();
-    const rewardReviewers = reviewers
-      .map((reviewer) =>
-        reviewer.roleId
-          ? { group: 'role', id: reviewer.roleId }
-          : reviewer.userId
-          ? { group: 'user', id: reviewer.userId }
-          : null
-      )
-      .filter(isTruthy) as RewardReviewer[];
-    setRewardValues({ reviewers: rewardReviewers, assignedSubmitters }, { skipDirty: true });
+    const template = templates?.find((t) => t.page.id === requiredTemplateId);
+    // use reviewers from the proposal if not set in the template
+    const rewardReviewers = template?.reward.reviewers?.length
+      ? template.reward.reviewers
+      : (reviewers
+          .map((reviewer) =>
+            reviewer.roleId
+              ? { group: 'role', id: reviewer.roleId }
+              : reviewer.userId
+              ? { group: 'user', id: reviewer.userId }
+              : null
+          )
+          .filter(isTruthy) as RewardReviewer[]);
+    const rewardAssignedSubmitters = template?.reward.allowedSubmitterRoles?.length
+      ? template.reward.allowedSubmitterRoles
+      : assignedSubmitters;
+
+    setRewardValues(
+      { ...template?.reward, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters },
+      { skipDirty: true }
+    );
 
     openNewPage({
+      ...template?.page,
+      content: template?.page.content as any,
       templateId: requiredTemplateId || undefined,
       type: 'bounty'
     });
@@ -134,14 +147,6 @@ export function ProposalRewards({
       });
     }
   }
-
-  // kind of hacky.. support applying a template when one is provided from the proposal template
-  useEffect(() => {
-    const template = templates?.find((t) => t.page.id === requiredTemplateId);
-    if (template) {
-      selectTemplate(template);
-    }
-  }, [requiredTemplateId, templates]);
 
   if (rewards.length) {
     return (
