@@ -1,4 +1,5 @@
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
+import { Box } from '@mui/material';
 
 import { useProposalTemplateById } from 'components/proposals/hooks/useProposalTemplates';
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationStepSettings';
@@ -10,30 +11,35 @@ import { EvaluationStepRow } from '../EvaluationSidebar/components/EvaluationSte
 import { WorkflowSelect } from '../WorkflowSelect';
 
 import { EvaluationStepSettings } from './components/EvaluationStepSettings';
+import { RewardTemplateSelect } from './components/RewardTemplateSelect';
 
 export type Props = {
   proposal?: Pick<ProposalPropertiesInput, 'fields' | 'evaluations' | 'workflowId'>;
+  isTemplate?: boolean;
   onChangeEvaluation?: (evaluationId: string, updated: Partial<ProposalEvaluationValues>) => void;
   readOnly: boolean;
   isReviewer: boolean;
   onChangeWorkflow: (workflow: ProposalWorkflowTyped) => void;
+  onChangeRewardTemplate?: (templateId: string | null) => void;
   templateId?: string | null;
   requireWorkflowChangeConfirmation?: boolean;
 };
 
 export function EvaluationSettingsSidebar({
   proposal,
+  isTemplate,
   onChangeEvaluation,
   readOnly,
   onChangeWorkflow,
+  onChangeRewardTemplate,
   isReviewer,
   templateId,
   requireWorkflowChangeConfirmation
 }: Props) {
   const proposalTemplate = useProposalTemplateById(templateId);
-  const pendingRewards = proposal?.fields?.pendingRewards;
   const { mappedFeatures } = useSpaceFeatures();
   const isAdmin = useIsAdmin();
+
   return (
     <div data-test='evaluation-settings-sidebar'>
       <WorkflowSelect
@@ -63,12 +69,18 @@ export function EvaluationSettingsSidebar({
               </EvaluationStepRow>
             );
           })}
-          {!!pendingRewards?.length && (
-            <EvaluationStepRow
-              index={proposal ? proposal.evaluations.length + 1 : 0}
-              result={null}
-              title={mappedFeatures.rewards.title}
-            />
+          {/* reward settings */}
+          {isTemplate && onChangeRewardTemplate && (
+            <Box mb={8}>
+              <EvaluationStepRow
+                index={proposal ? proposal.evaluations.length + 1 : 0}
+                result={null}
+                title={mappedFeatures.rewards.title}
+                expanded
+              >
+                <RewardTemplateSelect value={proposal.fields?.rewardsTemplateId} onChange={onChangeRewardTemplate} />
+              </EvaluationStepRow>
+            </Box>
           )}
         </>
       )}

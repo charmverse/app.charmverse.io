@@ -55,7 +55,7 @@ import { useProposal } from './hooks/useProposal';
 export const defaultPageTop = 56; // we need to add some room for the announcement banner and other banners
 
 const RewardProperties = dynamic(
-  () => import('components/rewards/components/RewardProperties/RewardProperties').then((r) => r.RewardProperties),
+  () => import('components/[pageId]/DocumentPage/components/RewardProperties').then((r) => r.RewardProperties),
   { ssr: false }
 );
 
@@ -84,7 +84,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
 
-  const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow } = useProposal({
+  const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow, onChangeRewardTemplate } = useProposal({
     proposalId
   });
 
@@ -266,7 +266,6 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
         <ProposalProperties
           pageId={page.id}
           proposalId={proposalId}
-          pagePermissions={pagePermissions}
           readOnly={readonlyProposalProperties}
           proposalPage={page}
           proposal={proposal}
@@ -281,6 +280,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
           readOnly={readOnly}
           showApplications
           expandedRewardProperties
+          templateId={page.sourceTemplateId || undefined}
           isTemplate={page.type === 'bounty_template'}
         />
       )}
@@ -311,6 +311,8 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
           refreshProposal={refreshProposal}
           disabledViews={isStructuredProposal ? ['suggestions'] : []}
           onChangeWorkflow={onChangeWorkflow}
+          onChangeRewardTemplate={onChangeRewardTemplate}
+          isProposalTemplate={page.type === 'proposal_template'}
         />
       )}
     </CardPropertiesWrapper>

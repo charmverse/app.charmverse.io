@@ -4,7 +4,8 @@ import {
   useUpdateProposalEvaluation,
   useGetProposalDetails,
   useUpsertRubricCriteria,
-  useUpdateWorkflow
+  useUpdateWorkflow,
+  useUpdateProposal
 } from 'charmClient/hooks/proposals';
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationStepSettings';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
@@ -12,6 +13,7 @@ import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 export function useProposal({ proposalId }: { proposalId?: string | null }) {
   const { data: proposal, mutate: refreshProposal } = useGetProposalDetails(proposalId);
+  const { trigger: updateProposal } = useUpdateProposal({ proposalId });
   const { trigger: updateProposalEvaluation } = useUpdateProposalEvaluation({ proposalId });
   const { trigger: upsertRubricCriteria } = useUpsertRubricCriteria({ proposalId });
   const { trigger: updateProposalWorkflow } = useUpdateWorkflow({ proposalId });
@@ -59,8 +61,19 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
       onChangeWorkflow: async ({ id }: { id: string }) => {
         await updateProposalWorkflow({ workflowId: id });
         await refreshProposal();
+      },
+      onChangeRewardTemplate: async (templateId: string | null) => {
+        if (proposal) {
+          await updateProposal({
+            fields: {
+              ...proposal.fields,
+              rewardsTemplateId: templateId || undefined
+            }
+          });
+          await refreshProposal();
+        }
       }
     }),
-    [proposal, refreshProposal, updateProposalEvaluation, updateProposalWorkflow, upsertRubricCriteria]
+    [proposal, refreshProposal, updateProposalEvaluation, updateProposalWorkflow, upsertRubricCriteria, updateProposal]
   );
 }

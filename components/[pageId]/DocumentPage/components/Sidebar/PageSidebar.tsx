@@ -52,6 +52,7 @@ type SidebarProps = {
   proposalInput?: ProposalSettingsProps['proposal'];
   onChangeEvaluation: ProposalSettingsProps['onChangeEvaluation'];
   onChangeWorkflow: ProposalSettingsProps['onChangeWorkflow'];
+  onChangeRewardTemplate?: ProposalSettingsProps['onChangeRewardTemplate'];
   refreshProposal?: VoidFunction;
   isUnpublishedProposal?: boolean;
   isReviewer?: boolean; // TODO: we need to know the reviewer for each step instead
@@ -60,6 +61,8 @@ type SidebarProps = {
   pagePath?: string;
   pageTitle?: string;
   proposalTemplateId?: string | null;
+  // eslint-disable-next-line react/no-unused-prop-types
+  isProposalTemplate?: boolean;
 };
 
 function PageSidebarComponent(props: SidebarProps) {
@@ -200,12 +203,14 @@ function SidebarContents({
   proposalInput,
   onChangeEvaluation,
   onChangeWorkflow,
+  onChangeRewardTemplate,
   refreshProposal,
   isUnpublishedProposal,
   isReviewer,
   pagePath,
   pageTitle,
-  proposalTemplateId
+  proposalTemplateId,
+  isProposalTemplate
 }: SidebarProps) {
   const isNotNewProposal = !!proposal;
   return (
@@ -214,9 +219,11 @@ function SidebarContents({
         (isUnpublishedProposal ? (
           <EvaluationSettingsSidebar
             proposal={proposalInput}
+            isTemplate={isProposalTemplate}
             readOnly={!!readOnlyProposalPermissions}
             templateId={proposalTemplateId}
             onChangeEvaluation={onChangeEvaluation}
+            onChangeRewardTemplate={onChangeRewardTemplate}
             onChangeWorkflow={onChangeWorkflow}
             isReviewer={!!isReviewer}
             requireWorkflowChangeConfirmation={isNotNewProposal}

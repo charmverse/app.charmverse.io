@@ -5,8 +5,8 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import type { ProposalFields } from 'lib/proposal/interface';
 
-import { usePropertiesMutator } from './hooks/usePropertiesMutator';
-import { useProposalsBoardAdapter } from './hooks/useProposalsBoardAdapter';
+import { usePropertiesMutator } from '../hooks/usePropertiesMutator';
+import { useProposalsBoardAdapter } from '../hooks/useProposalsBoardAdapter';
 
 type Props = {
   proposal: { fields: ProposalFields | null; id?: string };

@@ -41,8 +41,9 @@ type Props = {
   isNewReward?: boolean;
   isTemplate?: boolean;
   expandedByDefault?: boolean;
-  addPageFromTemplate?: (templateId: string) => void;
-  selectedTemplate?: RewardTemplate | null;
+  selectTemplate: (template: RewardTemplate) => void;
+  templateId?: string;
+  readOnlyTemplate?: boolean;
   resetTemplate?: VoidFunction;
   forcedApplicationType?: RewardApplicationType;
   rewardStatus?: BountyStatus | null;
@@ -71,8 +72,9 @@ export function RewardPropertiesForm({
   isTemplate,
   pageId,
   expandedByDefault,
-  addPageFromTemplate,
-  selectedTemplate,
+  selectTemplate,
+  templateId,
+  readOnlyTemplate,
   resetTemplate,
   forcedApplicationType,
   rewardStatus
@@ -230,14 +232,15 @@ export function RewardPropertiesForm({
                   <Box display='flex' flex={1}>
                     <TemplateSelect
                       options={rewardTemplates.map((rewardTemplate) => rewardTemplate.page)}
-                      value={selectedTemplate?.page ?? null}
+                      disabled={readOnlyTemplate}
+                      value={templateId ? { id: templateId } : null}
                       onChange={(templatePage) => {
                         if (!templatePage) {
                           resetTemplate?.();
                         }
                         const template = rewardTemplates.find((_template) => _template.page.id === templatePage?.id);
-                        if (template && addPageFromTemplate) {
-                          addPageFromTemplate(template.page.id);
+                        if (template && selectTemplate) {
+                          selectTemplate(template);
                         }
                       }}
                     />

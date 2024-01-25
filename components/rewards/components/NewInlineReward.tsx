@@ -8,14 +8,11 @@ import { useRewards } from 'components/rewards/hooks/useRewards';
 import { usePages } from 'hooks/usePages';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 
-import { useRewardTemplates } from '../hooks/useRewardTemplates';
-
 export function NewInlineReward({ pageId }: { pageId: string }) {
   const { clearRewardValues, rewardValues, setRewardValues, createReward, isSavingReward } = useNewReward();
   const { setCreatingInlineReward } = useRewards();
   const { refreshPage } = usePages();
-  const [selectedTemplate, setSelectedTemplate] = useState<RewardTemplate | null>(null);
-  const { templates } = useRewardTemplates();
+  const [selectedTemplate, setSelectedTemplate] = useState<string | undefined>();
 
   function resetForm() {
     clearRewardValues();
@@ -30,12 +27,9 @@ export function NewInlineReward({ pageId }: { pageId: string }) {
     }
   }
 
-  function addPageFromTemplate(templateId: string) {
-    const template = templates?.find((tpl) => tpl.page.id === templateId) ?? null;
-    if (template) {
-      setRewardValues(template.reward);
-    }
-    setSelectedTemplate(template);
+  function selectTemplate(template: RewardTemplate) {
+    setRewardValues(template.reward);
+    setSelectedTemplate(template.page.id);
   }
 
   useEffect(() => {
@@ -45,13 +39,13 @@ export function NewInlineReward({ pageId }: { pageId: string }) {
   return (
     <Stack gap={1}>
       <RewardPropertiesForm
-        selectedTemplate={selectedTemplate}
-        addPageFromTemplate={addPageFromTemplate}
+        templateId={selectedTemplate}
+        selectTemplate={selectTemplate}
         onChange={setRewardValues}
         values={rewardValues}
         expandedByDefault
         isNewReward
-        resetTemplate={() => setSelectedTemplate(null)}
+        resetTemplate={() => setSelectedTemplate(undefined)}
       />
       <Stack direction='row' alignItems='center' justifyContent='flex-end' flex={1} gap={1}>
         <Button onClick={() => setCreatingInlineReward(false)} variant='outlined' color='secondary'>
