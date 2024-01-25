@@ -327,9 +327,11 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
                     />
                   </div>
                   <div
-                    style="width: 100%;"
+                    style="width: 100%; height: 100%;"
                   >
-                    <div>
+                    <div
+                      style="height: 100%;"
+                    >
                       <div
                         class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-2umbt5-MuiInputBase-root"
                         spellcheck="true"
@@ -364,25 +366,33 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-1s6sld2-MuiStack-root"
-                data-test="closed-select-input"
+                style="width: 100%; height: 100%;"
               >
                 <div
-                  class="MuiStack-root css-1a59yxd-MuiStack-root"
-                  data-test="select-preview"
+                  style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-b3ouwx-MuiStack-root"
-                    data-mui-internal-clone-element="true"
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
                   >
                     <div
-                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
                     >
-                      <span
-                        class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
                       >
-                        value 1
-                      </span>
+                        <div
+                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
+                        >
+                          <span
+                            class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
+                          >
+                            value 1
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -393,17 +403,25 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-1s6sld2-MuiStack-root"
-                data-test="closed-select-input"
+                style="width: 100%; height: 100%;"
               >
                 <div
-                  class="MuiStack-root css-1a59yxd-MuiStack-root"
-                  data-test="select-preview"
+                  style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-b3ouwx-MuiStack-root"
-                    data-mui-internal-clone-element="true"
-                  />
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -470,9 +488,11 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
                     />
                   </div>
                   <div
-                    style="width: 100%;"
+                    style="width: 100%; height: 100%;"
                   >
-                    <div>
+                    <div
+                      style="height: 100%;"
+                    >
                       <div
                         class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-2umbt5-MuiInputBase-root"
                         spellcheck="true"
@@ -507,25 +527,33 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-1s6sld2-MuiStack-root"
-                data-test="closed-select-input"
+                style="width: 100%; height: 100%;"
               >
                 <div
-                  class="MuiStack-root css-1a59yxd-MuiStack-root"
-                  data-test="select-preview"
+                  style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-b3ouwx-MuiStack-root"
-                    data-mui-internal-clone-element="true"
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
                   >
                     <div
-                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
                     >
-                      <span
-                        class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
                       >
-                        value 1
-                      </span>
+                        <div
+                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
+                        >
+                          <span
+                            class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
+                          >
+                            value 1
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -536,17 +564,25 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-1s6sld2-MuiStack-root"
-                data-test="closed-select-input"
+                style="width: 100%; height: 100%;"
               >
                 <div
-                  class="MuiStack-root css-1a59yxd-MuiStack-root"
-                  data-test="select-preview"
+                  style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-b3ouwx-MuiStack-root"
-                    data-mui-internal-clone-element="true"
-                  />
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1017,9 +1053,11 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
                     />
                   </div>
                   <div
-                    style="width: 100%;"
+                    style="width: 100%; height: 100%;"
                   >
-                    <div>
+                    <div
+                      style="height: 100%;"
+                    >
                       <div
                         class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-2umbt5-MuiInputBase-root"
                         spellcheck="true"
@@ -1054,25 +1092,33 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-1s6sld2-MuiStack-root"
-                data-test="closed-select-input"
+                style="width: 100%; height: 100%;"
               >
                 <div
-                  class="MuiStack-root css-1a59yxd-MuiStack-root"
-                  data-test="select-preview"
+                  style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-b3ouwx-MuiStack-root"
-                    data-mui-internal-clone-element="true"
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
                   >
                     <div
-                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
                     >
-                      <span
-                        class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
                       >
-                        value 1
-                      </span>
+                        <div
+                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
+                        >
+                          <span
+                            class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
+                          >
+                            value 1
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1083,17 +1129,25 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-1s6sld2-MuiStack-root"
-                data-test="closed-select-input"
+                style="width: 100%; height: 100%;"
               >
                 <div
-                  class="MuiStack-root css-1a59yxd-MuiStack-root"
-                  data-test="select-preview"
+                  style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-b3ouwx-MuiStack-root"
-                    data-mui-internal-clone-element="true"
-                  />
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1154,9 +1208,11 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
                     />
                   </div>
                   <div
-                    style="width: 100%;"
+                    style="width: 100%; height: 100%;"
                   >
-                    <div>
+                    <div
+                      style="height: 100%;"
+                    >
                       <div
                         class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-2umbt5-MuiInputBase-root"
                         spellcheck="true"
@@ -1191,25 +1247,33 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-1s6sld2-MuiStack-root"
-                data-test="closed-select-input"
+                style="width: 100%; height: 100%;"
               >
                 <div
-                  class="MuiStack-root css-1a59yxd-MuiStack-root"
-                  data-test="select-preview"
+                  style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-b3ouwx-MuiStack-root"
-                    data-mui-internal-clone-element="true"
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
                   >
                     <div
-                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
                     >
-                      <span
-                        class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
                       >
-                        value 1
-                      </span>
+                        <div
+                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
+                        >
+                          <span
+                            class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
+                          >
+                            value 1
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1220,17 +1284,25 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-1s6sld2-MuiStack-root"
-                data-test="closed-select-input"
+                style="width: 100%; height: 100%;"
               >
                 <div
-                  class="MuiStack-root css-1a59yxd-MuiStack-root"
-                  data-test="select-preview"
+                  style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-b3ouwx-MuiStack-root"
-                    data-mui-internal-clone-element="true"
-                  />
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1698,9 +1770,11 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
                     />
                   </div>
                   <div
-                    style="width: 100%;"
+                    style="width: 100%; height: 100%;"
                   >
-                    <div>
+                    <div
+                      style="height: 100%;"
+                    >
                       <div
                         class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-2umbt5-MuiInputBase-root"
                         spellcheck="true"
@@ -1735,25 +1809,33 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-1s6sld2-MuiStack-root"
-                data-test="closed-select-input"
+                style="width: 100%; height: 100%;"
               >
                 <div
-                  class="MuiStack-root css-1a59yxd-MuiStack-root"
-                  data-test="select-preview"
+                  style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-b3ouwx-MuiStack-root"
-                    data-mui-internal-clone-element="true"
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
                   >
                     <div
-                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
                     >
-                      <span
-                        class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
                       >
-                        value 1
-                      </span>
+                        <div
+                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
+                        >
+                          <span
+                            class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
+                          >
+                            value 1
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1764,17 +1846,25 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-1s6sld2-MuiStack-root"
-                data-test="closed-select-input"
+                style="width: 100%; height: 100%;"
               >
                 <div
-                  class="MuiStack-root css-1a59yxd-MuiStack-root"
-                  data-test="select-preview"
+                  style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-b3ouwx-MuiStack-root"
-                    data-mui-internal-clone-element="true"
-                  />
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1841,9 +1931,11 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
                     />
                   </div>
                   <div
-                    style="width: 100%;"
+                    style="width: 100%; height: 100%;"
                   >
-                    <div>
+                    <div
+                      style="height: 100%;"
+                    >
                       <div
                         class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-2umbt5-MuiInputBase-root"
                         spellcheck="true"
@@ -1878,25 +1970,33 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-1s6sld2-MuiStack-root"
-                data-test="closed-select-input"
+                style="width: 100%; height: 100%;"
               >
                 <div
-                  class="MuiStack-root css-1a59yxd-MuiStack-root"
-                  data-test="select-preview"
+                  style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-b3ouwx-MuiStack-root"
-                    data-mui-internal-clone-element="true"
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
                   >
                     <div
-                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
                     >
-                      <span
-                        class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
                       >
-                        value 1
-                      </span>
+                        <div
+                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
+                        >
+                          <span
+                            class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
+                          >
+                            value 1
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1907,17 +2007,25 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-1s6sld2-MuiStack-root"
-                data-test="closed-select-input"
+                style="width: 100%; height: 100%;"
               >
                 <div
-                  class="MuiStack-root css-1a59yxd-MuiStack-root"
-                  data-test="select-preview"
+                  style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-b3ouwx-MuiStack-root"
-                    data-mui-internal-clone-element="true"
-                  />
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -2388,9 +2496,11 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
                     />
                   </div>
                   <div
-                    style="width: 100%;"
+                    style="width: 100%; height: 100%;"
                   >
-                    <div>
+                    <div
+                      style="height: 100%;"
+                    >
                       <div
                         class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-2umbt5-MuiInputBase-root"
                         spellcheck="true"
@@ -2425,25 +2535,33 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-1s6sld2-MuiStack-root"
-                data-test="closed-select-input"
+                style="width: 100%; height: 100%;"
               >
                 <div
-                  class="MuiStack-root css-1a59yxd-MuiStack-root"
-                  data-test="select-preview"
+                  style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-b3ouwx-MuiStack-root"
-                    data-mui-internal-clone-element="true"
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
                   >
                     <div
-                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
                     >
-                      <span
-                        class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
                       >
-                        value 1
-                      </span>
+                        <div
+                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
+                        >
+                          <span
+                            class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
+                          >
+                            value 1
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -2454,17 +2572,25 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-1s6sld2-MuiStack-root"
-                data-test="closed-select-input"
+                style="width: 100%; height: 100%;"
               >
                 <div
-                  class="MuiStack-root css-1a59yxd-MuiStack-root"
-                  data-test="select-preview"
+                  style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-b3ouwx-MuiStack-root"
-                    data-mui-internal-clone-element="true"
-                  />
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -2525,9 +2651,11 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
                     />
                   </div>
                   <div
-                    style="width: 100%;"
+                    style="width: 100%; height: 100%;"
                   >
-                    <div>
+                    <div
+                      style="height: 100%;"
+                    >
                       <div
                         class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-2umbt5-MuiInputBase-root"
                         spellcheck="true"
@@ -2562,25 +2690,33 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-1s6sld2-MuiStack-root"
-                data-test="closed-select-input"
+                style="width: 100%; height: 100%;"
               >
                 <div
-                  class="MuiStack-root css-1a59yxd-MuiStack-root"
-                  data-test="select-preview"
+                  style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-b3ouwx-MuiStack-root"
-                    data-mui-internal-clone-element="true"
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
                   >
                     <div
-                      class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
                     >
-                      <span
-                        class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
                       >
-                        value 1
-                      </span>
+                        <div
+                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
+                        >
+                          <span
+                            class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
+                          >
+                            value 1
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -2591,17 +2727,25 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="MuiStack-root css-1s6sld2-MuiStack-root"
-                data-test="closed-select-input"
+                style="width: 100%; height: 100%;"
               >
                 <div
-                  class="MuiStack-root css-1a59yxd-MuiStack-root"
-                  data-test="select-preview"
+                  style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-b3ouwx-MuiStack-root"
-                    data-mui-internal-clone-element="true"
-                  />
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

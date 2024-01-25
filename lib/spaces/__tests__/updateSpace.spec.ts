@@ -53,7 +53,6 @@ describe('updateSpace', () => {
       snapshotDomain: `snapshot-domain-${v4()}`,
       deletedAt: new Date(),
       publicBountyBoard: false,
-      defaultVotingDuration: 20,
       defaultPostCategoryId: v4(),
       defaultPublicPages: false,
       discordServerId: v4(),

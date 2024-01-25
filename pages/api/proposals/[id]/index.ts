@@ -97,7 +97,7 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const { publishToLens, authors, fields } = req.body as UpdateProposalRequest;
+  const { authors, fields } = req.body as UpdateProposalRequest;
 
   const proposal = await prisma.proposal.findUnique({
     where: {
@@ -144,7 +144,6 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
   await updateProposal({
     proposalId: proposal.id,
     authors,
-    publishToLens,
     fields,
     selectedCredentialTemplates: req.body.selectedCredentialTemplates,
     actorId: userId

@@ -6,9 +6,11 @@ exports[`components/properties/link returns link properties correctly 1`] = `
     class="URLProperty property-link url"
   >
     <div
-      style="width: 100%;"
+      style="width: 100%; height: 100%;"
     >
-      <div>
+      <div
+        style="height: 100%;"
+      >
         <div
           class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-d4pqsu-MuiInputBase-root"
         >
@@ -21,7 +23,7 @@ exports[`components/properties/link returns link properties correctly 1`] = `
       </div>
     </div>
     <a
-      class="Link__button"
+      class="Link__button "
       href="https://github.com/mattermost/focalboard"
       rel="noreferrer"
       target="_blank"

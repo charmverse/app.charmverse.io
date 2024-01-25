@@ -42,6 +42,7 @@ interface Props {
   pageId: string;
   proposalId?: string;
   evaluationId?: string;
+  durationDays?: number;
 }
 
 const MAX_SNAPSHOT_PROPOSAL_CHARACTERS = 20000;
@@ -70,9 +71,7 @@ export function PublishingForm({ onSubmit, pageId, proposalId, evaluationId }: P
 
   // Form data
   const [startDate, setStartDate] = useState<DateTime>(DateTime.fromMillis(Date.now()).plus({ hour: 1 }));
-  const [endDate, setEndDate] = useState<DateTime>(
-    DateTime.fromMillis(startDate.toMillis()).plus({ days: space?.defaultVotingDuration ?? 7 })
-  );
+  const [endDate, setEndDate] = useState<DateTime>(DateTime.fromMillis(startDate.toMillis()).plus({ days: 7 }));
   const [selectedVotingStrategies, setSelectedVotingStrategies] = useState<SnapshotVotingStrategy[]>([]);
   const [snapshotBlockNumber, setSnapshotBlockNumber] = useState<number | null>(null);
   const [snapshotVoteMode, setSnapshotVoteMode] = useState<ProposalType>('single-choice');
