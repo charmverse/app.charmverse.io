@@ -3,9 +3,14 @@ import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { v4 } from 'uuid';
 
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
-import type { ProposalReviewerInput } from 'lib/proposal/interface';
 
 export type ProposalWithUsersAndPageMeta = ProposalWithUsers & { page: Pick<Page, 'title' | 'path'> };
+
+type ProposalReviewerInput = {
+  group: 'system_role' | 'role' | 'user';
+  id: string;
+  evaluationId?: string;
+};
 
 /**
  * Creates a proposal with the linked authors and reviewers
@@ -15,14 +20,12 @@ export async function generateProposal({
   spaceId,
   proposalStatus = 'draft',
   authors = [],
-  reviewers = [],
   deletedAt = null
 }: {
   deletedAt?: Page['deletedAt'];
   userId: string;
   spaceId: string;
   authors?: string[];
-  reviewers?: ProposalReviewerInput[];
   proposalStatus?: ProposalStatus;
 }): Promise<ProposalWithUsersAndPageMeta> {
   const proposalId = v4();
@@ -61,18 +64,6 @@ export async function generateProposal({
             : {
                 createMany: {
                   data: authors.map((authorId) => ({ userId: authorId }))
-                }
-              },
-          reviewers: !reviewers.length
-            ? undefined
-            : {
-                createMany: {
-                  data: (reviewers ?? []).map((r) => {
-                    return {
-                      userId: r.group === 'user' ? r.id : undefined,
-                      roleId: r.group === 'role' ? r.id : undefined
-                    };
-                  })
                 }
               }
         }

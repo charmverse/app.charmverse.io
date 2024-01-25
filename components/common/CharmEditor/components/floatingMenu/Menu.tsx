@@ -10,7 +10,6 @@ const StyledMenu = styled(Paper, { shouldForwardProp: (prop: string) => prop !==
   inline?: boolean;
 }>`
   display: flex;
-  padding: ${({ theme }) => theme.spacing(0, 0.5)};
   border-radius: 4px;
   ${({ theme, type }) =>
     type && ['defaultMenu', 'inlineCommentSubMenu'].includes(type) && theme.breakpoints.down('sm')} {

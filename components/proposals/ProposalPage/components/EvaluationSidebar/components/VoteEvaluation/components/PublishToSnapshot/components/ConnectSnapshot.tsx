@@ -30,13 +30,10 @@ export const schema = yup.object({
       const foundSpace = await getSnapshotSpace(domain);
 
       return isTruthy(foundSpace);
-    }),
-  defaultVotingDuration: yup.number().required()
+    })
 });
 
 export type FormValues = yup.InferType<typeof schema>;
-
-const DEFAULT_VOTING_DURATION = 7;
 
 export default function ConnectSnapshot() {
   const { space } = useCurrentSpace();
@@ -52,7 +49,6 @@ export default function ConnectSnapshot() {
     formState: { errors, isValid }
   } = useForm<FormValues>({
     defaultValues: {
-      defaultVotingDuration: space?.defaultVotingDuration ?? DEFAULT_VOTING_DURATION,
       snapshotDomain: space?.snapshotDomain as any
     },
     resolver: yupResolver(schema),
@@ -98,22 +94,6 @@ export default function ConnectSnapshot() {
             />
           )}
         </Grid>
-        {values.snapshotDomain && !errors.snapshotDomain && (
-          <Grid item>
-            <FieldLabel>Default voting duration (days)</FieldLabel>
-            <TextField
-              {...register('defaultVotingDuration', {
-                onChange: () => {
-                  setTouched(true);
-                }
-              })}
-              disabled={!isAdmin}
-              fullWidth
-              error={!!errors.defaultVotingDuration}
-              helperText={errors.defaultVotingDuration?.message}
-            />
-          </Grid>
-        )}
 
         {formError && (
           <Grid item>
