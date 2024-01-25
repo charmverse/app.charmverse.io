@@ -118,15 +118,21 @@ export function ProposalRewards({
     updateURLQuery({ [rewardQueryKey]: pageId });
   }
 
-  function selectTemplate(template: RewardTemplate) {
-    setRewardValues(template.reward);
-    updateNewPageValues({
-      ...template.page,
-      content: template.page.content as any,
-      title: undefined,
-      type: 'bounty',
-      templateId: template.page.id
-    });
+  function selectTemplate(template: RewardTemplate | null) {
+    if (template) {
+      setRewardValues(template.reward);
+      updateNewPageValues({
+        ...template.page,
+        content: template.page.content as any,
+        title: undefined,
+        type: 'bounty',
+        templateId: template.page.id
+      });
+    } else {
+      updateNewPageValues({
+        templateId: undefined
+      });
+    }
   }
 
   // kind of hacky.. support applying a template when one is provided from the proposal template
