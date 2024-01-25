@@ -31,7 +31,6 @@ type SelectProps = {
   forcePopupIcon?: boolean | 'auto';
   required?: boolean;
   fluidWidth?: boolean;
-  isInsideOpenPopup?: boolean;
   dataTest?: string;
   disablePopper?: boolean;
 };
@@ -64,7 +63,6 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
       noOptionsText,
       helperText,
       fluidWidth,
-      isInsideOpenPopup,
       dataTest,
       disablePopper,
       ...inputProps
