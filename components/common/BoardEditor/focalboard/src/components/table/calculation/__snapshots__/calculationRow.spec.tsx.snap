@@ -1,0 +1,183 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`components/table/calculation/CalculationRow should match snapshot 1`] = `
+<div>
+  <span
+    class="variable variable"
+  >
+    <div
+      class="CalculationRow octo-table-row"
+      style="margin-left: 25px;"
+    >
+      <div
+        class="Calculation count octo-table-cell   "
+        style="width: 100px;"
+        tabindex="0"
+      >
+        <div />
+        <span
+          class="calculationLabel"
+        >
+          Count
+        </span>
+        <span
+          class="calculationValue"
+        >
+          2
+        </span>
+      </div>
+      <div
+        class="Calculation count octo-table-cell   "
+        style="width: 100px;"
+        tabindex="0"
+      >
+        <div />
+        <span
+          class="calculationLabel"
+        >
+          Count
+        </span>
+        <span
+          class="calculationValue"
+        >
+          2
+        </span>
+      </div>
+      <div
+        class="Calculation countValue octo-table-cell   "
+        style="width: 100px;"
+        tabindex="0"
+      >
+        <div />
+        <span
+          class="calculationLabel"
+        >
+          Values
+        </span>
+        <span
+          class="calculationValue"
+        >
+          1
+        </span>
+      </div>
+      <div
+        class="Calculation countUniqueValue octo-table-cell   "
+        style="width: 100px;"
+        tabindex="0"
+      >
+        <div />
+        <span
+          class="calculationLabel"
+        >
+          Unique
+        </span>
+        <span
+          class="calculationValue"
+        >
+          1
+        </span>
+      </div>
+    </div>
+  </span>
+</div>
+`;
+
+exports[`components/table/calculation/CalculationRow should render three calculation elements 1`] = `
+<div>
+  <span
+    class="variable variable"
+  >
+    <div
+      class="CalculationRow octo-table-row"
+      style="margin-left: 25px;"
+    >
+      <div
+        class="Calculation count octo-table-cell   "
+        style="width: 100px;"
+        tabindex="0"
+      >
+        <div />
+        <span
+          class="calculationLabel"
+        >
+          Count
+        </span>
+        <span
+          class="calculationValue"
+        >
+          2
+        </span>
+      </div>
+      <div
+        class="Calculation none octo-table-cell   "
+        style="width: 100px;"
+        tabindex="0"
+      >
+        <div />
+        <span
+          class="calculationLabel"
+        >
+          Calculate
+        </span>
+        <svg
+          aria-hidden="true"
+          class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+          data-testid="ExpandMoreIcon"
+          focusable="false"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
+          />
+        </svg>
+      </div>
+      <div
+        class="Calculation none octo-table-cell   "
+        style="width: 100px;"
+        tabindex="0"
+      >
+        <div />
+        <span
+          class="calculationLabel"
+        >
+          Calculate
+        </span>
+        <svg
+          aria-hidden="true"
+          class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+          data-testid="ExpandMoreIcon"
+          focusable="false"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
+          />
+        </svg>
+      </div>
+      <div
+        class="Calculation none octo-table-cell   "
+        style="width: 100px;"
+        tabindex="0"
+      >
+        <div />
+        <span
+          class="calculationLabel"
+        >
+          Calculate
+        </span>
+        <svg
+          aria-hidden="true"
+          class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+          data-testid="ExpandMoreIcon"
+          focusable="false"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
+          />
+        </svg>
+      </div>
+    </div>
+  </span>
+</div>
+`;
