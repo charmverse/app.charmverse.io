@@ -12,7 +12,8 @@ export const DateInputField = forwardRef<HTMLDivElement, Props>(
   (
     {
       label,
-      endAdornment,
+      labelEndAdornment,
+      inputEndAdornment,
       description,
       iconLabel,
       inline,
@@ -32,12 +33,13 @@ export const DateInputField = forwardRef<HTMLDivElement, Props>(
 
     return (
       <FieldWrapper
-        endAdornment={endAdornment}
+        labelEndAdornment={labelEndAdornment}
         description={description}
         required={required}
         label={label}
         inline={inline}
         iconLabel={iconLabel}
+        inputEndAdornment={inputEndAdornment}
       >
         <DateTimePicker
           value={dateValue}

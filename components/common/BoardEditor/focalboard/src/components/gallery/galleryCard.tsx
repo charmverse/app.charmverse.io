@@ -15,7 +15,6 @@ import { Constants } from 'lib/focalboard/constants';
 import { isTouchScreen } from 'lib/utilities/browser';
 
 import { useSortable } from '../../hooks/sortable';
-import mutator from '../../mutator';
 import PropertyValueElement from '../propertyValueElement';
 
 const StyledBox = styled(Box)`
