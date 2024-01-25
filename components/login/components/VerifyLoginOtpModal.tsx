@@ -32,10 +32,10 @@ export function CustomModal({ onClose, ...props }: Omit<ModalProps, 'children'>,
   };
 
   return (
-    <Modal title='Two factor authentication' size='medium' ref={ref} {...props}>
+    <Modal title='Two factor authentication' size='medium' ref={ref} onClose={onClose} {...props}>
       <ConfirmAuthCode errorMessage={error?.message} loading={isMutating} onSubmit={onSubmit} />
     </Modal>
   );
 }
 
-export const LoginValidationCodeModal = forwardRef(CustomModal);
+export const VerifyLoginOtpModal = forwardRef(CustomModal);

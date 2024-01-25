@@ -22,6 +22,7 @@ import type { LoggedInUser } from 'models';
 
 import { PREFIX, useLocalStorage } from './useLocalStorage';
 import { useUser } from './useUser';
+import { useVerifyLoginOtp } from './useVerifyLoginOtp';
 
 type IContext = {
   // Web3 account belonging to the current logged in user
@@ -62,6 +63,7 @@ export const Web3Context = createContext<Readonly<IContext>>({
 // a wrapper around account and library from web3react
 export function Web3AccountProvider({ children }: { children: ReactNode }) {
   const { address: account, connector: activeConnector } = useAccount();
+  const { open: openVerifyOtpModal } = useVerifyLoginOtp();
   const router = useRouter();
   const { chain } = useNetwork();
   const chainId = chain?.id;
@@ -167,13 +169,12 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
         if ('id' in resp) {
           // User is returned
           setUser(resp);
+          return resp;
         } else {
-          // User needs to authenticate through 2fa
-          router.push('/authenticate/otp');
+          // Open the otp modal for verification
+          openVerifyOtpModal();
           return;
         }
-
-        return resp;
       } catch (err) {
         if ((err as SystemError)?.errorType === 'Disabled account') {
           throw err;
