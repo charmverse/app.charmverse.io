@@ -7,12 +7,6 @@ import type { RedisClientType } from 'redis';
 
 import { redisClient } from 'adapters/redis/redisClient';
 
-if (!redisClient?.isOpen) {
-  redisClient?.connect().catch((err) => {
-    log.error('error', 'Error connecting to Redis', err);
-  });
-}
-
 /**
  *
  */
