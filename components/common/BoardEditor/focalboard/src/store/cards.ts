@@ -233,7 +233,13 @@ export function sortCards(
         }
 
         let result = 0;
-        if (template.type === 'number' || template.type === 'date' || template.type === 'tokenAmount') {
+        if (
+          template.type === 'number' ||
+          template.type === 'date' ||
+          template.type === 'tokenAmount' ||
+          template.type === 'proposalEvaluationAverage' ||
+          template.type === 'proposalEvaluationTotal'
+        ) {
           // Always put empty values at the bottom
           if (aValue && !bValue) {
             return -1;
