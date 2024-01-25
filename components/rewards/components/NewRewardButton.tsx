@@ -76,22 +76,21 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
     setRewardValues(template.reward);
   }
 
-  function selectTemplate(template: RewardTemplate) {
-    const templateContentChanged = template.page.content !== newPageValues?.content;
+  function selectTemplate(template: RewardTemplate | null) {
+    if (template) {
+      const templateContentChanged = template.page.content !== newPageValues?.content;
 
-    if (newPageValues?.contentText.length !== 0 && templateContentChanged) {
-      overrideContentModalPopupState.open();
+      if (newPageValues?.contentText.length !== 0 && templateContentChanged) {
+        overrideContentModalPopupState.open();
+      } else {
+        createRewardFromTemplate(template);
+      }
     } else {
-      createRewardFromTemplate(template);
+      updateNewPageValues({
+        templateId: undefined
+      });
     }
-    setSelectedTemplate(template ?? null);
-  }
-
-  function resetTemplate() {
-    setSelectedTemplate(null);
-    updateNewPageValues({
-      templateId: undefined
-    });
+    setSelectedTemplate(template);
   }
 
   let disabledTooltip: string | undefined;
@@ -159,7 +158,6 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
             expandedByDefault
             selectTemplate={selectTemplate}
             templateId={newPageValues?.templateId}
-            resetTemplate={resetTemplate}
           />
         </NewDocumentPage>
       </NewPageDialog>

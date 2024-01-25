@@ -35,6 +35,7 @@ export function TemplateSelect({ disabled, displayType, options, value, onChange
   return (
     <TagSelect
       wrapColumn
+      showEmpty
       displayType={displayType}
       readOnly={disabled}
       options={propertyOptions}

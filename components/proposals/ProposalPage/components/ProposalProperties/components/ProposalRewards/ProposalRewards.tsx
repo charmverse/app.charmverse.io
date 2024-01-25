@@ -79,18 +79,31 @@ export function ProposalRewards({
 
   function createNewReward() {
     clearRewardValues();
-    const rewardReviewers = reviewers
-      .map((reviewer) =>
-        reviewer.roleId
-          ? { group: 'role', id: reviewer.roleId }
-          : reviewer.userId
-          ? { group: 'user', id: reviewer.userId }
-          : null
-      )
-      .filter(isTruthy) as RewardReviewer[];
-    setRewardValues({ reviewers: rewardReviewers, assignedSubmitters }, { skipDirty: true });
+    const template = templates?.find((t) => t.page.id === requiredTemplateId);
+    // use reviewers from the proposal if not set in the template
+    const rewardReviewers = template?.reward.reviewers?.length
+      ? template.reward.reviewers
+      : (reviewers
+          .map((reviewer) =>
+            reviewer.roleId
+              ? { group: 'role', id: reviewer.roleId }
+              : reviewer.userId
+              ? { group: 'user', id: reviewer.userId }
+              : null
+          )
+          .filter(isTruthy) as RewardReviewer[]);
+    const rewardAssignedSubmitters = template?.reward.allowedSubmitterRoles?.length
+      ? template.reward.allowedSubmitterRoles
+      : assignedSubmitters;
+
+    setRewardValues(
+      { ...template?.reward, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters },
+      { skipDirty: true }
+    );
 
     openNewPage({
+      ...template?.page,
+      content: template?.page.content as any,
       templateId: requiredTemplateId || undefined,
       type: 'bounty'
     });
@@ -118,24 +131,22 @@ export function ProposalRewards({
     updateURLQuery({ [rewardQueryKey]: pageId });
   }
 
-  function selectTemplate(template: RewardTemplate) {
-    setRewardValues(template.reward);
-    updateNewPageValues({
-      ...template.page,
-      content: template.page.content as any,
-      title: undefined,
-      type: 'bounty',
-      templateId: template.page.id
-    });
-  }
-
-  // kind of hacky.. support applying a template when one is provided from the proposal template
-  useEffect(() => {
-    const template = templates?.find((t) => t.page.id === requiredTemplateId);
+  function selectTemplate(template: RewardTemplate | null) {
     if (template) {
-      selectTemplate(template);
+      setRewardValues(template.reward);
+      updateNewPageValues({
+        ...template.page,
+        content: template.page.content as any,
+        title: undefined,
+        type: 'bounty',
+        templateId: template.page.id
+      });
+    } else {
+      updateNewPageValues({
+        templateId: undefined
+      });
     }
-  }, [requiredTemplateId, templates]);
+  }
 
   if (rewards.length) {
     return (

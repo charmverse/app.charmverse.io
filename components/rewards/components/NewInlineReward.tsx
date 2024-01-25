@@ -14,22 +14,22 @@ export function NewInlineReward({ pageId }: { pageId: string }) {
   const { refreshPage } = usePages();
   const [selectedTemplate, setSelectedTemplate] = useState<string | undefined>();
 
-  function resetForm() {
-    clearRewardValues();
-  }
-
   async function saveForm() {
     const success = await createReward({ linkedPageId: pageId });
     if (success) {
-      resetForm();
+      clearRewardValues();
       setCreatingInlineReward(false);
       refreshPage(pageId);
     }
   }
 
-  function selectTemplate(template: RewardTemplate) {
-    setRewardValues(template.reward);
-    setSelectedTemplate(template.page.id);
+  function selectTemplate(template: RewardTemplate | null) {
+    if (template) {
+      setRewardValues(template.reward);
+      setSelectedTemplate(template.page.id);
+    } else {
+      setSelectedTemplate(undefined);
+    }
   }
 
   useEffect(() => {
@@ -45,7 +45,6 @@ export function NewInlineReward({ pageId }: { pageId: string }) {
         values={rewardValues}
         expandedByDefault
         isNewReward
-        resetTemplate={() => setSelectedTemplate(undefined)}
       />
       <Stack direction='row' alignItems='center' justifyContent='flex-end' flex={1} gap={1}>
         <Button onClick={() => setCreatingInlineReward(false)} variant='outlined' color='secondary'>
