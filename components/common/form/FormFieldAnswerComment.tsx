@@ -1,7 +1,7 @@
 import type { FormFieldAnswer } from '@charmverse/core/prisma-client';
 import { MessageOutlined } from '@mui/icons-material';
 import AddCommentOutlinedIcon from '@mui/icons-material/AddCommentOutlined';
-import { Box, Divider, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, Stack, Tooltip, Typography } from '@mui/material';
 import { useState } from 'react';
 
 import { useCreateThread } from 'charmClient/hooks/comments';

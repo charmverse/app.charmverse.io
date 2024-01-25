@@ -2,6 +2,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 
+import { threadIncludeClause } from './utils';
+
 export async function getPageThreads({
   pageId,
   userId
@@ -65,13 +67,7 @@ export async function getPageThreads({
     orderBy: {
       createdAt: 'desc'
     },
-    include: {
-      comments: {
-        orderBy: {
-          createdAt: 'asc'
-        }
-      }
-    }
+    include: threadIncludeClause()
   });
 
   return accessibleThreads as unknown as ThreadWithComments[];

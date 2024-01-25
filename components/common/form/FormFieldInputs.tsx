@@ -95,6 +95,7 @@ export function FormFieldInputs({
       isReviewer={isReviewer}
       pageId={pageId}
       threads={threads}
+      isDraft={isDraft}
     />
   );
 }

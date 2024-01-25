@@ -3,6 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 
 import type { ThreadCreatePayload, ThreadWithComments } from './interfaces';
+import { threadIncludeClause } from './utils';
 
 export async function createThread({
   comment,
@@ -76,9 +77,7 @@ export async function createThread({
         }
       }
     },
-    include: {
-      comments: true
-    }
+    include: threadIncludeClause()
   });
 
   return thread as unknown as ThreadWithComments;

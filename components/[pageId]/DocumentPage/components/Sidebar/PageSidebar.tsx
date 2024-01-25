@@ -246,6 +246,7 @@ function SidebarContents({
             canCreateComments={!!pagePermissions?.comment}
             openSidebar={openSidebar!}
             threads={threads || {}}
+            formFields={proposal.form.formFields}
           />
         ) : (
           <EditorCommentsSidebar

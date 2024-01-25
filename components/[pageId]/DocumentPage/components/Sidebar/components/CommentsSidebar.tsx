@@ -1,4 +1,5 @@
 import { isEmptyDocument } from '@bangle.dev/utils';
+import type { FormField } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import type { SelectProps } from '@mui/material';
@@ -11,6 +12,7 @@ import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/use
 import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import PageThread from 'components/common/CharmEditor/components/thread/PageThread';
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
+import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { useInlineComment } from 'hooks/useInlineComment';
 import type { CommentThreadsMap } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
@@ -274,8 +276,14 @@ function EditorCommentsSidebarComponent({
 function FormCommentsSidebarComponent({
   canCreateComments,
   threads,
-  openSidebar
+  openSidebar,
+  formFields
 }: {
+  formFields:
+    | (Omit<FormField, 'options'> & {
+        options: SelectOptionType[];
+      })[]
+    | null;
   threads: CommentThreadsMap;
   canCreateComments: boolean;
   openSidebar: (view: PageSidebarView) => void;
@@ -283,13 +291,33 @@ function FormCommentsSidebarComponent({
   const { user } = useUser();
   const [threadFilter, setThreadFilter] = useState<'resolved' | 'open' | 'all' | 'you'>('open');
 
-  const { threadList } = useMemo(() => {
-    return getThreadList({
+  const threadList = useMemo(() => {
+    const { threadList: _threadList } = getThreadList({
       threadFilter,
       threads,
       userId: user?.id
     });
-  }, [threads, threadFilter, user?.id]);
+
+    if (!formFields || formFields.length === 0) {
+      return _threadList;
+    }
+
+    _threadList.sort((a, b) => {
+      const aFormFieldIndex = formFields.findIndex((formField) => formField.id === a.fieldAnswer?.fieldId);
+      const bFormFieldIndex = formFields.findIndex((formField) => formField.id === b.fieldAnswer?.fieldId);
+      if (aFormFieldIndex === -1 || bFormFieldIndex === -1) {
+        return 0;
+      }
+
+      if (aFormFieldIndex === bFormFieldIndex) {
+        return a.createdAt > b.createdAt ? 1 : -1;
+      }
+
+      return aFormFieldIndex - bFormFieldIndex;
+    });
+
+    return _threadList;
+  }, [threads, formFields, threadFilter, user?.id]);
 
   const handleThreadFilterChange: SelectProps['onChange'] = (event) => {
     setThreadFilter(event.target.value as any);

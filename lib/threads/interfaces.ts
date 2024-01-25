@@ -1,4 +1,4 @@
-import { type Thread, type Comment, Prisma } from '@charmverse/core/prisma';
+import type { FormFieldAnswer, Thread, Comment } from '@charmverse/core/prisma';
 
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
@@ -34,6 +34,7 @@ export interface ThreadCreatePayload {
 export interface ThreadWithComments extends Omit<Thread, 'accessGroups'> {
   comments: Comment[];
   accessGroups: ThreadAccessGroup[];
+  fieldAnswer?: Pick<FormFieldAnswer, 'fieldId' | 'id' | 'proposalId'>;
 }
 
 export interface MultipleThreadsInput {

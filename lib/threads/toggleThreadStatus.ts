@@ -4,6 +4,7 @@ import { InvalidInputError } from 'lib/utilities/errors';
 
 import type { ThreadStatusUpdate, ThreadWithComments } from './interfaces';
 import { ThreadStatus } from './interfaces';
+import { threadIncludeClause } from './utils';
 
 export async function toggleThreadStatus({ id, status }: ThreadStatusUpdate): Promise<ThreadWithComments> {
   if (Object.keys(ThreadStatus).indexOf(status) === -1) {
@@ -29,9 +30,7 @@ export async function toggleThreadStatus({ id, status }: ThreadStatusUpdate): Pr
     data: {
       resolved: resolvedStatus
     },
-    include: {
-      comments: true
-    }
+    include: threadIncludeClause()
   });
 
   return updatedThread as unknown as ThreadWithComments;
