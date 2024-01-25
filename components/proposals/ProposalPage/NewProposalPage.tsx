@@ -422,7 +422,6 @@ export function NewProposalPage({
                       formFields={proposalFormFields}
                     />
                   )}
-                  x
                 </>
               ) : (
                 <CharmEditor
