@@ -43,7 +43,6 @@ export type CreateProposalInput = {
   userId: string;
   spaceId: string;
   evaluations: ProposalEvaluationInput[];
-  publishToLens?: boolean;
   fields?: ProposalFields | null;
   workflowId?: string;
   formFields?: FormFieldInput[];
@@ -51,6 +50,8 @@ export type CreateProposalInput = {
   formId?: string;
   isDraft?: boolean;
   selectedCredentialTemplates?: string[];
+  sourcePageId?: string;
+  sourcePostId?: string;
 };
 
 export type CreatedProposal = {
@@ -64,14 +65,15 @@ export async function createProposal({
   pageProps,
   authors,
   evaluations = [],
-  publishToLens,
   fields,
   workflowId,
   formId,
   formFields,
   formAnswers,
   isDraft,
-  selectedCredentialTemplates
+  selectedCredentialTemplates,
+  sourcePageId,
+  sourcePostId
 }: CreateProposalInput) {
   const proposalId = uuid();
   const proposalStatus: ProposalStatus = isDraft ? 'draft' : 'published';
@@ -229,6 +231,26 @@ export async function createProposal({
     createdBy: userId,
     proposalId
   });
+
+  if (sourcePageId) {
+    await prisma.page.update({
+      where: {
+        id: sourcePageId
+      },
+      data: {
+        convertedProposalId: proposalId
+      }
+    });
+  } else if (sourcePostId) {
+    await prisma.post.update({
+      where: {
+        id: sourcePostId
+      },
+      data: {
+        proposalId
+      }
+    });
+  }
 
   return {
     page: page as PageWithPermissions,

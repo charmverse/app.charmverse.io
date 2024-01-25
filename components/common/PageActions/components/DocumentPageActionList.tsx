@@ -4,6 +4,7 @@ import styled from '@emotion/styled';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
+import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { List, ListItemButton, ListItemIcon, ListItemText, Switch } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
@@ -16,6 +17,7 @@ import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSi
 import { Button } from 'components/common/Button';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -101,7 +103,6 @@ type Props = {
   isInsideDialog?: boolean;
   isStructuredProposal?: boolean;
 };
-
 export function DocumentPageActionList({
   isInsideDialog,
   page,
@@ -115,12 +116,15 @@ export function DocumentPageActionList({
   const { navigateToSpacePath } = useCharmRouter();
   const { updatePage, deletePage } = usePages();
   const { rewards, mutateRewards: refreshRewards } = useRewards();
+  const [spacePermissions] = useCurrentSpacePermissions();
   const { showMessage } = useSnackbar();
   const { members } = useMembers();
   const { setActiveView } = usePageSidebar();
   const pageType = page.type;
   const isExportablePage = documentTypes.includes(pageType as PageType);
   const basePageBounty = rewards?.find((r) => r.id === pageId);
+
+  const canCreateProposal = spacePermissions?.createProposals;
 
   function setPageProperty(prop: Partial<PageUpdates>) {
     updatePage({
@@ -169,11 +173,7 @@ export function DocumentPageActionList({
   const charmversePage = members.find((member) => member.id === page.createdBy);
 
   async function convertToProposal() {
-    const convertedProposal = await charmClient.pages.convertToProposal({
-      pageId
-    });
-    onComplete();
-    navigateToSpacePath(`/${convertedProposal.path}`);
+    navigateToSpacePath(`/proposals/new`, { sourcePageId: page.id });
   }
 
   return (
@@ -281,7 +281,7 @@ export function DocumentPageActionList({
       <CopyPageLinkAction path={`/${page.path}`} onComplete={onComplete} />
 
       <Divider sx={{ my: '0 !important' }} />
-      {/* {(page.type === 'card' || page.type === 'card_synced' || page.type === 'page') && (
+      {(page.type === 'card' || page.type === 'card_synced' || page.type === 'page') && (
         <>
           <Tooltip title={!canCreateProposal ? 'You do not have the permission to convert to proposal' : ''}>
             <div>
@@ -302,7 +302,7 @@ export function DocumentPageActionList({
           </Tooltip>
           <Divider />
         </>
-      )} */}
+      )}
 
       <DeleteMenuItem
         onClick={onDeletePage}

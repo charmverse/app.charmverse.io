@@ -68,11 +68,7 @@ export function ForumPostActionList({
   }
 
   async function convertToProposal(pageId: string) {
-    onComplete();
-    const { path } = await charmClient.forum.convertToProposal({
-      postId: pageId
-    });
-    navigateToSpacePath(`/${path}`);
+    navigateToSpacePath(`/proposals/new`, { sourcePostId: post?.id });
   }
 
   return (
@@ -84,7 +80,7 @@ export function ForumPostActionList({
       <Divider />
       <ExportMarkdownAction onClick={exportMarkdownPage} />
       <ExportToPDFAction pdfTitle={post?.title} onComplete={onComplete} />
-      {/* <Tooltip
+      <Tooltip
         title={
           post?.isDraft
             ? 'Draft post cannot be converted proposal'
@@ -108,7 +104,7 @@ export function ForumPostActionList({
             <ListItemText primary='Convert to proposal' />
           </ListItemButton>
         </div>
-      </Tooltip> */}
+      </Tooltip>
       {post && postCreator ? (
         <>
           <Divider />

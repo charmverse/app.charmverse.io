@@ -8,6 +8,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 import { v4 as uuid } from 'uuid';
 
+import { useForumPost } from 'charmClient/hooks/forum';
+import { useGetPage } from 'charmClient/hooks/pages';
 import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
 import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
 import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
@@ -71,14 +73,20 @@ const StyledContainer = styled(PageEditorContainer)`
 export function NewProposalPage({
   isTemplate,
   templateId: templateIdFromUrl,
-  proposalType
+  proposalType,
+  sourcePageId,
+  sourcePostId
 }: {
   isTemplate?: boolean;
   templateId?: string;
   proposalType?: ProposalPageAndPropertiesInput['proposalType'];
+  sourcePageId?: string;
+  sourcePostId?: string;
 }) {
   const { navigateToSpacePath } = useCharmRouter();
   const { space: currentSpace } = useCurrentSpace();
+  const { data: sourcePage } = useGetPage(sourcePageId);
+  const { data: sourcePost } = useForumPost(sourcePostId);
   const { user } = useUser();
   const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>([]);
   const { activeView: sidebarView, setActiveView } = usePageSidebar();
@@ -381,6 +389,24 @@ export function NewProposalPage({
     formAnswersRef.current = formInputs.formAnswers;
   }, [formInputs.formAnswers]);
 
+  // apply title and content if converting a page into a proposal
+  useEffect(() => {
+    if (sourcePage) {
+      setFormInputs({
+        content: sourcePage.content as any,
+        contentText: sourcePage.contentText,
+        title: sourcePage.title,
+        sourcePageId: sourcePage.id
+      });
+    } else if (sourcePost) {
+      setFormInputs({
+        content: sourcePost.content as any,
+        contentText: sourcePost.contentText,
+        title: sourcePost.title,
+        sourcePostId: sourcePost.id
+      });
+    }
+  }, [!!sourcePage && !!sourcePost]);
   return (
     <Box flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
       <PrimaryColumn showPageActionSidebar={!!internalSidebarView}>
@@ -435,7 +461,7 @@ export function NewProposalPage({
                   onContentChange={applyProposalContent}
                   focusOnInit
                   isContentControlled
-                  key={`${String(formInputs.proposalTemplateId)}`}
+                  key={`${formInputs.proposalTemplateId ?? formInputs.sourcePageId ?? formInputs.sourcePostId}`}
                 >
                   {/* temporary? disable editing of page title when in suggestion mode */}
                   {proposalPageContent}

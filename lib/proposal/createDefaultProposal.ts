@@ -34,7 +34,6 @@ export async function createDefaultProposal({ spaceId, userId }: { spaceId: stri
     spaceId,
     userId,
     authors: [userId],
-    publishToLens: false,
     workflowId: workflow.id,
     evaluations: workflow.evaluations.map(
       (evaluation: any, index) =>
