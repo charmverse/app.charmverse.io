@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Box, Menu, MenuItem, Tooltip } from '@mui/material';
+import { Box, Menu, ListItemText, ListItemIcon, MenuItem, Tooltip } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { useRef, useState } from 'react';
@@ -40,7 +40,7 @@ export function PropertyMenu({
   lastChild
 }: {
   disabledTooltip?: string;
-  propertyTemplate: { name: string };
+  propertyTemplate: { icon?: ReactNode; name: string };
   children: ReactNode | ((option: { isPropertyOpen: boolean; closeMenu: VoidFunction }) => ReactNode);
   lastChild: boolean;
 }) {
@@ -63,7 +63,11 @@ export function PropertyMenu({
               }, 150);
             }}
           >
-            {propertyTemplate.name}
+            {propertyTemplate.icon && (
+              // override large minWidth set by MUI
+              <ListItemIcon sx={{ minWidth: '20px !important' }}>{propertyTemplate.icon}</ListItemIcon>
+            )}
+            <ListItemText>{propertyTemplate.name}</ListItemText>
           </StyledMenuItem>
         </div>
       </Tooltip>
