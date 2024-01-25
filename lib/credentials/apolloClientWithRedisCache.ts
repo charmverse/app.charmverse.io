@@ -35,14 +35,35 @@ export class ApolloClientWithRedisCache extends ApolloClient<any> {
     return `${this.cacheKeyPrefix}${createHash('md5').update(jsonString).digest('hex')}`;
   }
 
+  async getFromCache(cacheKey: string): Promise<ApolloQueryResult<any> | null> {
+    try {
+      const data = await this.redisClient.get(cacheKey);
+      if (data) {
+        return JSON.parse(data);
+      }
+      return null;
+    } catch {
+      log.error('Error reading redis cache');
+      return null;
+    }
+  }
+
+  setCache(cacheKey: string, data: ApolloQueryResult<any>): void {
+    try {
+      this.redisClient.SETEX(cacheKey, this.persistForSeconds, JSON.stringify(data));
+    } catch (error) {
+      log.error('Error setting redis cache', error);
+    }
+  }
+
   /**
    * This method overrides the default query method of ApolloClient
    * If redisClient exists, the query will always be executed, unless a result is found in the Redis cache
    *
    * If no Redis Client is available, the query will be executed as usual
    */
-  async query(options: Pick<QueryOptions, 'query' | 'variables'>): Promise<ApolloQueryResult<any>> {
-    if (!this.redisClient || !this.redisClient.isReady) {
+  async query<T = any>(options: Pick<QueryOptions, 'query' | 'variables'>): Promise<ApolloQueryResult<T>> {
+    if (!this.redisClient || !this.redisClient.isOpen || !this.redisClient.isReady) {
       return super.query(options);
     }
 
@@ -51,15 +72,13 @@ export class ApolloClientWithRedisCache extends ApolloClient<any> {
 
     const cacheKey = this.createCacheKey({ query: options.query, variables: options.variables });
 
-    const existingData = await this.redisClient.get(cacheKey);
+    const data = await this.getFromCache(cacheKey);
 
-    if (existingData) {
-      return JSON.parse(existingData);
+    if (!data) {
+      return data ?? super.query(options);
     }
 
-    const result = await super.query(options);
-    this.redisClient.SETEX(cacheKey, this.persistForSeconds, JSON.stringify(result));
-
-    return result;
+    this.setCache(cacheKey, data);
+    return data;
   }
 }
