@@ -10,7 +10,6 @@ export type IContext = {
   setUser: (user: LoggedInUser | any) => void;
   updateUser: (user: Partial<LoggedInUser>) => void;
   isLoaded: boolean;
-  setIsLoaded: (isLoaded: boolean) => void;
   refreshUser: () => Promise<void>;
   logoutUser: () => Promise<void>;
 };
@@ -20,7 +19,6 @@ export const UserContext = createContext<Readonly<IContext>>({
   setUser: () => undefined,
   updateUser: () => undefined,
   isLoaded: false,
-  setIsLoaded: () => undefined,
   refreshUser: () => Promise.resolve(),
   logoutUser: () => Promise.resolve()
 });
@@ -44,6 +42,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
     await getUser(undefined, {
       onSuccess: (_user) => {
         setUser(_user);
+        setIsLoaded(true);
+      },
+      onError: () => {
         setIsLoaded(true);
       }
     });
@@ -70,7 +71,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
       user,
       setUser,
       isLoaded,
-      setIsLoaded,
       updateUser,
       refreshUser,
       logoutUser

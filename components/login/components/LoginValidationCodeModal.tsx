@@ -5,10 +5,9 @@ import { forwardRef } from 'react';
 import { useVerifyOtp } from 'charmClient/hooks/profile';
 import type { ModalProps } from 'components/common/Modal';
 import Modal from 'components/common/Modal';
+import { ConfirmAuthCode } from 'components/settings/account/components/otp/components/ConfirmAuthCode';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-
-import { ConfirmAuthCode } from './ConfirmAuthCode';
 
 export function CustomModal({ onClose, ...props }: Omit<ModalProps, 'children'>, ref: Ref<HTMLDivElement>) {
   const { trigger, error, isMutating } = useVerifyOtp();

@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box';
 
 import { getLayout } from 'components/common/BaseLayout/getLayout';
-import { LoginValidationCodeModal } from 'components/settings/account/components/otp/components/LoginValidationCodeModal';
+import { LoginValidationCodeModal } from 'components/login/components/LoginValidationCodeModal';
 
 export default function Otp() {
   return getLayout(
