@@ -4,7 +4,7 @@ import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { Box, Divider, useMediaQuery } from '@mui/material';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 import { v4 as uuid } from 'uuid';
 
@@ -181,10 +181,6 @@ export function NewProposalPage({
         authors,
         content: template.page.content as PageContent,
         contentText: template.page.contentText,
-        reviewers: template.reviewers.map((reviewer) => ({
-          group: reviewer.roleId ? 'role' : 'user',
-          id: reviewer.roleId ?? (reviewer.userId as string)
-        })),
         selectedCredentialTemplates: template.selectedCredentialTemplates ?? [],
         proposalTemplateId: _templateId,
         headerImage: template.page.headerImage,
@@ -313,7 +309,7 @@ export function NewProposalPage({
               proposalStatus='draft'
               proposalFormInputs={formInputs}
               setProposalFormInputs={setFormInputs}
-              readOnlyAuthors={!!sourceTemplate?.authors.length}
+              readOnlyAuthors={!isAdmin && !!sourceTemplate?.authors.length}
               readOnlyCustomProperties={readOnlyCustomProperties}
               readOnlySelectedCredentialTemplates={readOnlySelectedCredentialTemplates}
             />
@@ -337,7 +333,17 @@ export function NewProposalPage({
               evaluations
             });
           }}
+          onChangeRewardTemplate={(rewardsTemplateId) => {
+            setFormInputs({
+              ...formInputs,
+              fields: {
+                ...formInputs.fields,
+                rewardsTemplateId: rewardsTemplateId || undefined
+              }
+            });
+          }}
           onChangeWorkflow={applyWorkflow}
+          isProposalTemplate={isTemplate}
         />
       )}
     </>
@@ -413,6 +419,7 @@ export function NewProposalPage({
                       formFields={proposalFormFields}
                     />
                   )}
+                  x
                 </>
               ) : (
                 <CharmEditor
