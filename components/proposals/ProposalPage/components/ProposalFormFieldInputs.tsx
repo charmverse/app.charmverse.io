@@ -4,15 +4,25 @@ import { useGetProposalFormFieldAnswers, useUpdateProposalFormFieldAnswers } fro
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { FormFieldInputs } from 'components/common/form/FormFieldInputs';
 import type { FormFieldValue } from 'components/common/form/interfaces';
+import type { ThreadWithComments } from 'lib/threads/interfaces';
+import { isTruthy } from 'lib/utilities/types';
 
 export function ProposalFormFieldInputs({
   proposalId,
   formFields,
-  readOnly
+  readOnly,
+  isReviewer,
+  pageId,
+  threads,
+  isDraft
 }: {
   readOnly?: boolean;
   proposalId: string;
   formFields: FormField[];
+  isReviewer: boolean;
+  pageId: string;
+  threads: Record<string, ThreadWithComments | undefined>;
+  isDraft?: boolean;
 }) {
   const { data: proposalFormFieldAnswers = [], isLoading } = useGetProposalFormFieldAnswers({ proposalId });
   const { trigger } = useUpdateProposalFormFieldAnswers({ proposalId });
@@ -34,18 +44,28 @@ export function ProposalFormFieldInputs({
 
   return (
     <FormFieldInputs
+      isReviewer={isReviewer}
       onSave={onSave}
+      pageId={pageId}
       disabled={readOnly}
-      formFields={formFields.map((formField) => {
-        const proposalFormFieldAnswer = proposalFormFieldAnswers.find(
-          (_proposalFormFieldAnswer) => _proposalFormFieldAnswer.fieldId === formField.id
-        );
-        return {
-          ...formField,
-          value: proposalFormFieldAnswer?.value as FormFieldValue,
-          options: (formField.options ?? []) as SelectOptionType[]
-        };
-      })}
+      threads={threads}
+      isDraft={isDraft}
+      formFields={formFields
+        .map((formField) => {
+          const proposalFormFieldAnswer = proposalFormFieldAnswers.find(
+            (_proposalFormFieldAnswer) => _proposalFormFieldAnswer.fieldId === formField.id
+          );
+          if (!proposalFormFieldAnswer) {
+            return null;
+          }
+          return {
+            ...formField,
+            formFieldAnswer: proposalFormFieldAnswer,
+            value: proposalFormFieldAnswer?.value as FormFieldValue,
+            options: (formField.options ?? []) as SelectOptionType[]
+          };
+        })
+        .filter(isTruthy)}
     />
   );
 }

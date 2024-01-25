@@ -1,4 +1,4 @@
-import type { SxProps } from '@mui/material';
+import { Stack, type SxProps } from '@mui/material';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import type { ReactNode } from 'react';
@@ -37,19 +37,23 @@ type ContentProps = {
   iconLabel?: ReactNode;
   required?: boolean;
   description?: PageContent;
-  endAdornment?: ReactNode;
+  labelEndAdornment?: ReactNode;
+  inputEndAdornment?: ReactNode;
+  inputEndAdornmentAlignItems?: React.CSSProperties['alignItems'];
 };
 
 // a wrapper for FieldWrapper with props for label and description
 export function FieldWrapper({
   sx,
-  endAdornment,
+  labelEndAdornment,
   description,
   required,
   children,
   label,
   inline,
-  iconLabel
+  iconLabel,
+  inputEndAdornment,
+  inputEndAdornmentAlignItems = 'center'
 }: ContentProps & FieldWrapperProps) {
   if (!label) {
     return children as JSX.Element;
@@ -68,13 +72,16 @@ export function FieldWrapper({
                   *
                 </Typography>
               )}
-              {endAdornment}
+              {labelEndAdornment}
             </FieldLabel>
           )}
         </Box>
       )}
       <ReadonlyCharmContent content={description} />
-      {children}
+      <Stack gap={1} alignItems={inputEndAdornmentAlignItems} flexDirection='row'>
+        <div style={{ flexGrow: 1 }}>{children}</div>
+        {inputEndAdornment}
+      </Stack>
     </FieldWrapperContainer>
   );
 }

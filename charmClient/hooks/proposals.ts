@@ -136,3 +136,7 @@ export function useUpdateWorkflow({ proposalId }: { proposalId: MaybeString }) {
 export function useArchiveProposal({ proposalId }: { proposalId: MaybeString }) {
   return usePOST<{ archived: boolean }>(`/api/proposals/${proposalId}/archive`);
 }
+
+export function useArchiveProposals() {
+  return usePOST<{ archived: boolean; proposalIds: string[] }>(`/api/proposals/archive`);
+}

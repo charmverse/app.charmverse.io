@@ -17,6 +17,7 @@ interface PopperPopupProps {
   paperSx?: SxProps<Theme>;
   style?: React.CSSProperties;
   popoverProps?: Partial<PopoverProps>;
+  toggleStyle?: any;
   disablePopup?: boolean;
 }
 
@@ -31,7 +32,8 @@ export default function PopperPopup(props: PopperPopupProps) {
     onOpen,
     open,
     disablePopup,
-    popoverProps: customPopoverProps = {}
+    popoverProps: customPopoverProps = {},
+    toggleStyle
   } = props;
 
   const popupState = usePopupState({ variant: 'popper', popupId: 'iframe-selector' });
@@ -106,7 +108,7 @@ export default function PopperPopup(props: PopperPopupProps) {
   return (
     <div ref={toggleRef} style={style}>
       {children && (
-        <div {...popoverToggleProps} onMouseDown={(e) => e.preventDefault()}>
+        <div {...popoverToggleProps} onMouseDown={(e) => e.preventDefault()} style={toggleStyle}>
           {children}
         </div>
       )}

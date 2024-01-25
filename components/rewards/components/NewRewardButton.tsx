@@ -108,11 +108,6 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
     // these values are not required for templates
     if (!rewardValues.reviewers?.length) {
       disabledTooltip = 'Reviewer is required';
-    } else if (
-      !rewardValues.customReward &&
-      (!rewardValues.rewardToken || !rewardValues.rewardAmount || !rewardValues.chainId)
-    ) {
-      disabledTooltip = 'Reward is required';
     } else if (rewardValues.assignedSubmitters && rewardValues.assignedSubmitters.length === 0) {
       disabledTooltip = 'You need to assign at least one submitter';
     }

@@ -12,11 +12,11 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
-  .use(requireKeys(['snapshotDomain', 'defaultVotingDuration'], 'body'))
+  .use(requireKeys(['snapshotDomain'], 'body'))
   .put(updateSnapshotConnection);
 
 async function updateSnapshotConnection(req: NextApiRequest, res: NextApiResponse<Space>) {
-  const { snapshotDomain, defaultVotingDuration } = req.body;
+  const { snapshotDomain } = req.body;
 
   const spaceId = req.query.id as string;
 
@@ -31,7 +31,6 @@ async function updateSnapshotConnection(req: NextApiRequest, res: NextApiRespons
       id: spaceId
     },
     data: {
-      defaultVotingDuration,
       snapshotDomain
     }
   });
