@@ -6,6 +6,7 @@ import { useArchiveProposals } from 'charmClient/hooks/proposals';
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import type { ViewHeaderRowsMenuProps } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ViewHeaderRowsMenu/ViewHeaderRowsMenu';
 import { ViewHeaderRowsMenu } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ViewHeaderRowsMenu/ViewHeaderRowsMenu';
+import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
@@ -19,7 +20,6 @@ type Props = Pick<ViewHeaderRowsMenuProps, 'checkedIds' | 'setCheckedIds' | 'car
   visiblePropertyIds?: string[];
   refreshProposals: VoidFunction;
 };
-
 export function ProposalsHeaderRowsMenu({
   board,
   visiblePropertyIds,
@@ -30,6 +30,7 @@ export function ProposalsHeaderRowsMenu({
 }: Props) {
   const { showError } = useSnackbar();
   const { pages } = usePages();
+  const { showConfirmation } = useConfirmationModal();
   const { proposalsMap } = useProposals();
   const { updateStatuses, updateSteps } = useBatchUpdateProposalStatusOrStep();
   const { trigger: archiveProposals } = useArchiveProposals();
@@ -178,14 +179,6 @@ export function ProposalsHeaderRowsMenu({
     }
   }
 
-  async function onArchiveProposals(input: { archived: boolean; proposalIds: string[] }) {
-    try {
-      await archiveProposals(input);
-    } catch (error) {
-      showError(error);
-    }
-  }
-
   const { isStepDisabled, isStatusDisabled, isReviewersDisabled } = useMemo(() => {
     const checkedPages = checkedIds.map((id) => pages[id]).filter(isTruthy);
     const firstProposal = proposalsMap[checkedPages[0]?.proposalId ?? ''];
@@ -231,8 +224,18 @@ export function ProposalsHeaderRowsMenu({
     };
   }, [pages, checkedIds, proposalsMap]);
 
-  function _onArchiveProposals(archived: boolean) {
-    onArchiveProposals({ archived, proposalIds: checkedIds });
+  async function onArchiveProposals(archived: boolean) {
+    if (archived) {
+      const { confirmed } = await showConfirmation('Are you sure you want to archive these proposals?');
+      if (!confirmed) {
+        return;
+      }
+    }
+    try {
+      await archiveProposals({ archived, proposalIds: checkedIds });
+    } catch (error) {
+      showError(error);
+    }
   }
 
   const firstCheckedProposal = useMemo(() => {
@@ -265,7 +268,7 @@ export function ProposalsHeaderRowsMenu({
       onChangeProposalsReviewers={onChangeProposalsReviewers}
       onChangeProposalsStatuses={onChangeProposalsStatuses}
       onChangeProposalsSteps={onChangeProposalsSteps}
-      onArchiveProposals={_onArchiveProposals}
+      onArchiveProposals={onArchiveProposals}
     />
   );
 }
