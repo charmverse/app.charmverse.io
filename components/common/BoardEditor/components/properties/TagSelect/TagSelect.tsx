@@ -109,7 +109,6 @@ export type TagSelectProps = {
   emptyMessage?: string;
   showEmpty?: boolean;
   dataTestActive?: string;
-  dropdownFooter?: ReactNode;
 };
 
 export function TagSelect({
