@@ -13,8 +13,8 @@ import { AdministratorOnlyError } from 'lib/users/errors';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
-  .use(requireUser)
   .get(getCredentialsController)
+  .use(requireUser)
   .post(
     requireSpaceMembership({ adminOnly: true, spaceIdKey: 'spaceId', location: 'body' }),
     createCredentialController
