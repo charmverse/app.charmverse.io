@@ -293,7 +293,7 @@ export function FormField(
         <Stack gap={1} width='100%' ml={1}>
           {!isOpen || readOnly ? (
             <FieldTypeRenderer
-              endAdornment={formField.private ? <Chip sx={{ mx: 1 }} label='Private' size='small' /> : undefined}
+              labelEndAdornment={formField.private ? <Chip sx={{ mx: 1 }} label='Private' size='small' /> : undefined}
               type={formField.type as any}
               description={formField.description as PageContent}
               disabled

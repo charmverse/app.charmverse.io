@@ -42,7 +42,8 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
   (
     {
       description,
-      endAdornment,
+      labelEndAdornment,
+      inputEndAdornment,
       required,
       label,
       iconLabel,
@@ -121,12 +122,13 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
 
     return (
       <FieldWrapper
-        endAdornment={endAdornment}
+        labelEndAdornment={labelEndAdornment}
         description={description}
         label={label}
         required={required}
         inline={inline}
         iconLabel={iconLabel}
+        inputEndAdornment={inputEndAdornment}
       >
         <Autocomplete
           data-test={dataTest || 'autocomplete'}

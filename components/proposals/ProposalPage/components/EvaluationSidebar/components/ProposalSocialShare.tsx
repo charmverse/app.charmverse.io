@@ -104,13 +104,13 @@ function ProposalLensSocialShare({
     <>
       <Tooltip
         title={
-          canPublishToLens
-            ? lensPostLink
-              ? 'View on lens'
-              : lensProfile
+          lensPostLink
+            ? 'View on lens'
+            : lensProfile
+            ? canPublishToLens
               ? 'Publish to Lens'
-              : 'Please create a Lens profile first'
-            : 'You do not have permission to publish to Lens'
+              : 'You do not have permission to publish to Lens'
+            : 'Please create a Lens profile first'
         }
       >
         <div style={{ display: 'flex' }}>
