@@ -1,10 +1,10 @@
-import type { PaymentMethod, Space } from '@charmverse/core/prisma';
+import type { PaymentMethod, Prisma, Space } from '@charmverse/core/prisma';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 
 import type { CustomJoinParams } from 'lib/spaces/customConditionJoinSpace';
 
 import type { MaybeString } from './helpers';
-import { useDELETE, useGETImmutable, useGET, usePOST } from './helpers';
+import { useDELETE, useGETImmutable, usePOST, usePUT } from './helpers';
 
 export function useSearchByDomain(domain: MaybeString) {
   return useGETImmutable<Space | null>(domain ? `/api/spaces/search-domain` : null, {
@@ -36,4 +36,8 @@ function stripUrlParts(maybeUrl: string) {
 
 export function useVerifyCustomJoinSpace(spaceId: MaybeString) {
   return usePOST<CustomJoinParams, Space>(`/api/spaces/${spaceId}/custom-join`);
+}
+
+export function useUpdateSpace(spaceId: MaybeString) {
+  return usePUT<Omit<Prisma.SpaceUpdateInput, 'id'>, Space>(`/api/spaces/${spaceId}`);
 }
