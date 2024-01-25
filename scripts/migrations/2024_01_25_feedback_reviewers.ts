@@ -15,7 +15,7 @@ async function migrateReviewers() {
       permissions: true,
       proposal: {
         include: {
-          page: { select: { createdAt: true, title: true, path: true, type: true } }
+          page: { select: { createdAt: true, spaceId: true, title: true, type: true } }
         }
       }
     }
@@ -24,35 +24,33 @@ async function migrateReviewers() {
   console.log('found', feedbackSteps.length, 'feedback steps');
   for (const step of feedbackSteps) {
     if (step.reviewers.length > 0) {
-      console.log('Feedback step already has reviewers', step);
+      if (step.proposal.page?.title !== 'Getting Started') {
+        console.log('Feedback step already has reviewers', step);
+      }
     } else {
       const withMoveAccess = step.permissions.filter((p) => p.operation === 'move');
       if (withMoveAccess.length === 0) {
-        if (step.proposal.page?.type === 'proposal') {
-         // console.error('Feedback step does not have move permission for anyone?!', step);
-        }
         // add author to feedback step in templates
-        // await prisma.proposalReviewer.create({
-        //   data: {
-        //     systemRole: 'author',
-        //     id: v4(),
-        //     evaluationId: step.id,
-        //     proposalId: step.proposalId
-        //   }
-        // });
+        await prisma.proposalReviewer.create({
+          data: {
+            systemRole: 'author',
+            id: v4(),
+            evaluationId: step.id,
+            proposalId: step.proposalId
+          }
+        });
         stepsUpdated++;
-
       } else {
         for (const entity of withMoveAccess) {
-          // await prisma.proposalReviewer.create({
-          //   data: {
-          //     ...entity,
-          //     operation: undefined,
-          //     id: v4(),
-          //     evaluationId: step.id,
-          //     proposalId: step.proposalId
-          //   }
-          // });
+          await prisma.proposalReviewer.create({
+            data: {
+              ...entity,
+              operation: undefined,
+              id: v4(),
+              evaluationId: step.id,
+              proposalId: step.proposalId
+            }
+          });
         }
         stepsUpdated++;
       }

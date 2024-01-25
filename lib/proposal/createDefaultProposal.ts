@@ -42,7 +42,7 @@ export async function createDefaultProposal({ spaceId, userId }: { spaceId: stri
           ...evaluation,
           id: uuid(),
           index,
-          reviewers: [{ systemRole: 'space_member' }],
+          reviewers: [{ systemRole: evaluation.type === 'feedback' ? 'author' : 'space_member' }],
           voteSettings: evaluation.type === 'vote' ? voteSettings : null
         } as ProposalEvaluationInput)
     ) as ProposalEvaluationInput[],
