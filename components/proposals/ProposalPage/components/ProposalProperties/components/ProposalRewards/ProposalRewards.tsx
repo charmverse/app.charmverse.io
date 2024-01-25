@@ -105,6 +105,7 @@ export function ProposalRewards({
       ...template?.page,
       content: template?.page.content as any,
       templateId: requiredTemplateId || undefined,
+      title: undefined,
       type: 'bounty'
     });
   }
