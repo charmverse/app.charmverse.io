@@ -72,7 +72,7 @@ ProposalInEvaluation.parameters = {
               min: 0,
               max: 2
             },
-            evaluationId: null
+            evaluationId: '1'
           },
           {
             id: '2',
@@ -86,7 +86,7 @@ ProposalInEvaluation.parameters = {
               min: 0,
               max: 10
             },
-            evaluationId: null
+            evaluationId: '1'
           },
           {
             id: '3',
@@ -99,7 +99,7 @@ ProposalInEvaluation.parameters = {
               min: 0,
               max: 4
             },
-            evaluationId: null
+            evaluationId: '1'
           },
           {
             id: '4',
@@ -112,7 +112,7 @@ ProposalInEvaluation.parameters = {
               min: 0,
               max: 4
             },
-            evaluationId: null
+            evaluationId: '1'
           },
           {
             id: '5',
@@ -125,7 +125,7 @@ ProposalInEvaluation.parameters = {
               min: 0,
               max: 4
             },
-            evaluationId: null
+            evaluationId: '1'
           },
           {
             id: '6',
@@ -138,7 +138,7 @@ ProposalInEvaluation.parameters = {
               min: 0,
               max: 4
             },
-            evaluationId: null
+            evaluationId: '1'
           },
           {
             id: '7',
@@ -151,7 +151,7 @@ ProposalInEvaluation.parameters = {
               min: 0,
               max: 4
             },
-            evaluationId: null
+            evaluationId: '1'
           }
         ];
         const rubricAnswers: PopulatedEvaluation['rubricAnswers'] = [
@@ -196,9 +196,9 @@ ProposalInEvaluation.parameters = {
               rubricCriteria,
               rubricAnswers,
               reviewers: [
-                { evaluationId: null, id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null },
-                { evaluationId: null, id: '2', proposalId: '', roleId: null, userId: members[0].id, systemRole: null },
-                { evaluationId: null, id: '3', proposalId: '', roleId: null, userId: members[1].id, systemRole: null }
+                { evaluationId: '1', id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null },
+                { evaluationId: '1', id: '2', proposalId: '', roleId: null, userId: members[0].id, systemRole: null },
+                { evaluationId: '1', id: '3', proposalId: '', roleId: null, userId: members[1].id, systemRole: null }
               ]
             }
           ]
