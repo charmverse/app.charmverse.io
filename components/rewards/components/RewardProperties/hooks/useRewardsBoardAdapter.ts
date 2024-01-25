@@ -69,7 +69,7 @@ export function useRewardsBoardAdapter() {
     () =>
       board?.fields && pages
         ? getRelationPropertiesCardsRecord({
-            pages,
+            pages: Object.values(pages),
             activeBoard: board
           })
         : {},

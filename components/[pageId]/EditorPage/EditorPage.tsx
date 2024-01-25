@@ -30,8 +30,6 @@ function ProposalEditorPage({
   savePage: (p: Partial<Page>) => void;
   page: PageWithContent;
 }) {
-  const { pages } = usePages();
-
   const { relationPropertiesCardsRecord } = useProposalsBoardAdapter();
 
   return (

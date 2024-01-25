@@ -11,14 +11,12 @@ export function getRelationPropertiesCardsRecord({
   pages
 }: {
   activeBoard: Board;
-  pages:
-    | (PageListItem & { parentId: PageMeta['parentId'] })[]
-    | Record<string, (PageListItem & { parentId: PageMeta['parentId'] }) | undefined>;
+  pages: ((PageListItem & { parentId: PageMeta['parentId'] }) | undefined)[];
 }) {
   const boardCardsRecord: PageListItemsRecord = {};
   const relationProperties = activeBoard.fields.cardProperties.filter((o) => o.type === 'relation');
 
-  (Array.isArray(pages) ? pages : Object.values(pages)).filter(isTruthy).forEach((page) => {
+  pages.filter(isTruthy).forEach((page) => {
     const pageListItem = {
       icon: page.icon,
       id: page.id,

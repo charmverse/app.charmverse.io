@@ -7,18 +7,16 @@ import type { PublicPageResponse } from 'lib/pages';
 
 import { usePages } from './usePages';
 
-export function useRelationProperties({ page, boardId }: { boardId?: string; page?: PublicPageResponse['page'] }) {
+export function useRelationProperties({ page }: { page?: PublicPageResponse['page'] }) {
   const { pages } = usePages();
   const selectBoard = useMemo(makeSelectBoard, []);
-  const activeBoard = useAppSelector((state) =>
-    selectBoard(state, boardId ?? page?.type === 'card' ? page?.parentId ?? '' : '')
-  );
+  const activeBoard = useAppSelector((state) => selectBoard(state, page?.type === 'card' ? page?.parentId ?? '' : ''));
 
   const relationPropertiesCardsRecord = useMemo(
     () =>
       activeBoard && pages
         ? getRelationPropertiesCardsRecord({
-            pages,
+            pages: Object.values(pages),
             activeBoard
           })
         : {},

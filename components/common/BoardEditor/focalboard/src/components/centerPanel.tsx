@@ -153,7 +153,7 @@ function CenterPanel(props: Props) {
   const relationPropertiesCardsRecord = useMemo(
     () =>
       getRelationPropertiesCardsRecord({
-        pages,
+        pages: Object.values(pages),
         activeBoard
       }),
     [pages, activeBoard]

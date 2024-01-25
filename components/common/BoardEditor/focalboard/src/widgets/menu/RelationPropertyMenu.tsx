@@ -75,19 +75,22 @@ export function RelationPropertyMenu({
           }}
         />
       ) : relationPropertyData ? (
-        <RelationProperty
+        <Box
           sx={{
             minWidth: 200,
             px: 1
           }}
-          onChange={setRelationPropertyData}
-          relationData={relationPropertyData}
-          onButtonClick={() => {
-            onClick('relation', relationPropertyData);
-            onClose();
-          }}
-          setShowSelectDatabaseMenu={setShowSelectDatabaseMenu}
-        />
+        >
+          <RelationProperty
+            onChange={setRelationPropertyData}
+            relationData={relationPropertyData}
+            onButtonClick={() => {
+              onClick('relation', relationPropertyData);
+              onClose();
+            }}
+            setShowSelectDatabaseMenu={setShowSelectDatabaseMenu}
+          />
+        </Box>
       ) : null}
     </Menu>
   );
@@ -114,7 +117,7 @@ export function RelationProperty({
   }
 
   return (
-    <Box sx={sx}>
+    <>
       <StyledMenuItem
         onClick={() => {
           setShowSelectDatabaseMenu?.(true);
@@ -124,12 +127,7 @@ export function RelationProperty({
         <Typography color={setShowSelectDatabaseMenu ? '' : 'secondary'} mr={3}>
           Related to
         </Typography>
-        <Stack
-          sx={{
-            flexDirection: 'row',
-            alignItems: 'center'
-          }}
-        >
+        <Stack flexDirection='row' alignItems='center'>
           <PageIcon
             icon={selectedPage.icon}
             isEditorEmpty={selectedPage.hasContent === false}
@@ -210,6 +208,6 @@ export function RelationProperty({
           Add relation
         </Button>
       )}
-    </Box>
+    </>
   );
 }

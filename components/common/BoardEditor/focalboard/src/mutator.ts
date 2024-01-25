@@ -656,7 +656,7 @@ export class Mutator {
     const cardPropertyIndex = board.fields.cardProperties.findIndex((o: IPropertyTemplate) => o.id === propertyId);
 
     if (cardPropertyIndex === -1) {
-      return;
+      throw new Error(`Cannot find property with id: ${propertyId}`);
     }
 
     newBoard.fields.cardProperties[cardPropertyIndex] = updatedProperty;

@@ -83,7 +83,7 @@ export function useProposalsBoardAdapter() {
     () =>
       board?.fields && pages
         ? getRelationPropertiesCardsRecord({
-            pages,
+            pages: Object.values(pages),
             activeBoard: board
           })
         : {},
