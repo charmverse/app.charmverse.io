@@ -4,6 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { disconnectProposalChildren } from 'lib/proposal/disconnectProposalChildren';
 import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
 import { v4 } from 'uuid';
+
 async function migrateReviewers() {
   const feedbackSteps = await prisma.proposalEvaluation.findMany({
     where: {
@@ -11,27 +12,55 @@ async function migrateReviewers() {
     },
     include: {
       reviewers: true,
-      permissions: true
+      permissions: true,
+      proposal: {
+        include: {
+          page: { select: { type: true } }
+        }
+      }
     }
   });
+  let stepsUpdated = 0;
   console.log('found', feedbackSteps.length, 'feedback steps');
   for (const step of feedbackSteps) {
-    const withMoveAccess = step.permissions.filter((p) => p.type === 'move');
-    if (withMoveAccess.length === 0) {
-      console.error('Feedback step does not have move permission for anyone?!', step);
+    if (step.reviewers.length > 0) {
+      console.log('Feedback step already has reviewers');
     } else {
-      for (const entity of withMoveAccess) {
-        await prisma.prisma.proposalReviewer.create({
-          ...entity,
-          id: v4(),
-          evaluationId: step.evaluationId,
-          proposalId: step.proposalId
-        });
+      const withMoveAccess = step.permissions.filter((p) => p.operation === 'move');
+      if (withMoveAccess.length === 0) {
+        if (step.proposal.page?.type === 'proposal') {
+          console.error('Feedback step does not have move permission for anyone?!', step);
+        } else {
+          // add author to feedback step in templates
+          await prisma.proposalReviewer.create({
+            data: {
+              systemRole: 'author',
+              id: v4(),
+              evaluationId: step.id,
+              proposalId: step.proposalId
+            }
+          });
+          stepsUpdated++;
+        }
+      } else {
+        for (const entity of withMoveAccess) {
+          await prisma.proposalReviewer.create({
+            data: {
+              ...entity,
+              operation: undefined,
+              id: v4(),
+              evaluationId: step.id,
+              proposalId: step.proposalId
+            }
+          });
+        }
+        stepsUpdated++;
       }
     }
     if (feedbackSteps.indexOf(step) % 100 === 0) {
       console.log('migrated', feedbackSteps.indexOf(step), 'feedback steps');
     }
   }
+  console.log({ stepsUpdated });
 }
-// migrateProposals()
+migrateReviewers();

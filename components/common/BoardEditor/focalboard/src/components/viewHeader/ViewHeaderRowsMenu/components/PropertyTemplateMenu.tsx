@@ -5,7 +5,7 @@ import type { SelectOption } from 'components/common/BoardEditor/components/prop
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { ControlledProposalStatusSelect } from 'components/proposals/components/ProposalStatusSelect';
 import { ControlledProposalStepSelect } from 'components/proposals/components/ProposalStepSelect';
-import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
+import { allMembersSystemRole, authorSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card, CardPropertyValue } from 'lib/focalboard/card';
 import type { ProposalWithUsersLite } from 'lib/proposal/interface';
@@ -144,7 +144,7 @@ export function PropertyTemplateMenu({
               {isPropertyOpen ? (
                 <UserAndRoleSelect
                   value={propertyValue as any}
-                  systemRoles={[allMembersSystemRole]}
+                  systemRoles={[allMembersSystemRole, authorSystemRole]}
                   onChange={async (options) => {
                     await onChangeProposalsReviewers?.(checkedIds, options);
                   }}
