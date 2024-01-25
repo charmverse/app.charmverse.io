@@ -214,7 +214,16 @@ test.describe.serial('Proposal Evaluation', () => {
         index: 0,
         proposalId: proposalTemplate.id,
         title: settingsToTest.evaluationFeedbackTitle,
-        reviewers: [],
+        reviewers: [
+          {
+            evaluationId: expect.any(String),
+            id: expect.any(String),
+            proposalId: proposalTemplate.id,
+            roleId: null,
+            userId: null,
+            systemRole: 'author'
+          }
+        ],
         rubricCriteria: []
       })
     );
