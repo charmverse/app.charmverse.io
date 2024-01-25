@@ -1,6 +1,7 @@
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
 import { log } from '@charmverse/core/log';
 import type { AttestationType } from '@charmverse/core/prisma-client';
+import { persistCache } from 'apollo3-cache-persist';
 import { Wallet } from 'ethers';
 
 import { credentialsWalletPrivateKey, graphQlServerEndpoint } from 'config/constants';
@@ -8,10 +9,20 @@ import { credentialsWalletPrivateKey, graphQlServerEndpoint } from 'config/const
 import type { EasSchemaChain } from './connectors';
 import type { EASAttestationFromApi } from './external/getExternalCredentials';
 import type { ExternalCredentialChain } from './external/schemas';
+import { GraphQlRedisStorage } from './graphQLRedisCache';
 import type { ProposalCredential } from './schemas';
 
+const cache = new InMemoryCache({});
+
+persistCache({
+  cache,
+  storage: new GraphQlRedisStorage({ persistForSeconds: 10 }),
+  serialize: true,
+  key: 'charmverse-graphql-ceramic-cache'
+});
+
 const apolloClient = new ApolloClient({
-  cache: new InMemoryCache(),
+  cache,
   uri: graphQlServerEndpoint
 });
 
@@ -136,10 +147,9 @@ export async function getCharmverseCredentialsByWallets({
             issuer: { equalTo: credentialWalletAddress }
           }
         }
-      },
+      }
       // For now, let's refetch each time and rely on http endpoint-level caching
       // https://www.apollographql.com/docs/react/data/queries/#supported-fetch-policies
-      fetchPolicy: 'no-cache'
     })
     .then(({ data }) => data.signedCredentialFourIndex.edges.map((e: any) => getParsedCredential(e.node)));
 }

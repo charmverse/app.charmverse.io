@@ -1,5 +1,3 @@
-import type { Space } from '@charmverse/core/prisma';
-
 import * as http from 'adapters/http';
 import type { CharmVerseCredentialInput } from 'lib/credentials/attest';
 import type { EASAttestationFromApi } from 'lib/credentials/external/getExternalCredentials';

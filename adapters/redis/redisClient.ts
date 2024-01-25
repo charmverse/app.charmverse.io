@@ -4,10 +4,11 @@ import { createClient } from 'redis';
 
 let redisClientInstance: RedisClientType | null = null;
 
-if (process.env.REDIS_URI) {
+const redisUri = process.env.REDIS_URI;
+
+if (redisUri) {
   try {
-    redisClientInstance =
-      ((global as any).redisClient as RedisClientType) ?? createClient({ url: process.env.REDIS_URI });
+    redisClientInstance = ((global as any).redisClient as RedisClientType) ?? createClient({ url: redisUri });
     redisClientInstance.on('error', (error) => log.error('Redis Client Error', error));
   } catch (error) {
     log.error('Could not instantiate Redis. Error occurred', error);

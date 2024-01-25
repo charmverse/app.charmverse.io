@@ -165,6 +165,7 @@
     "@uauth/js": "^2.4.0",
     "@wagmi/core": "^1.4.5-cjs",
     "@zoralabs/zdk": "^2.4.0",
+    "apollo3-cache-persist": "^0.14.1",
     "async-sema": "^3.1.1",
     "autosuggest-highlight": "^3.3.0",
     "bcrypt": "^5.1.1",
