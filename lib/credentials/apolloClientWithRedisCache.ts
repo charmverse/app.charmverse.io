@@ -50,7 +50,9 @@ export class ApolloClientWithRedisCache extends ApolloClient<any> {
 
   setCache(cacheKey: string, data: ApolloQueryResult<any>): void {
     try {
-      this.redisClient.SETEX(cacheKey, this.persistForSeconds, JSON.stringify(data));
+      this.redisClient.set(cacheKey, JSON.stringify(data), {
+        EX: this.persistForSeconds
+      });
     } catch (error) {
       log.error('Error setting redis cache', error);
     }
@@ -74,11 +76,13 @@ export class ApolloClientWithRedisCache extends ApolloClient<any> {
 
     const data = await this.getFromCache(cacheKey);
 
-    if (!data) {
-      return data ?? super.query(options);
+    if (data) {
+      return data;
     }
 
-    this.setCache(cacheKey, data);
-    return data;
+    const refreshedData = await super.query(options);
+
+    this.setCache(cacheKey, refreshedData);
+    return refreshedData;
   }
 }
