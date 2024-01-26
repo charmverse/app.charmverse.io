@@ -35,7 +35,6 @@ export const customRenderWithContext = (
             user: createMockUser(),
             setUser: () => {},
             updateUser: () => {},
-            setIsLoaded: () => {},
             refreshUser: async () => {},
             logoutUser: async () => {},
             isLoaded: true,

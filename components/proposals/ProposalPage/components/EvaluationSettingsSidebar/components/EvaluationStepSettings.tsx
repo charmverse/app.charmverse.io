@@ -3,7 +3,7 @@ import { Box, Typography, FormLabel } from '@mui/material';
 
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
+import { authorSystemRole, allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { ProposalEvaluationInput } from 'lib/proposal/createProposal';
 import type { PopulatedEvaluation } from 'lib/proposal/interface';
@@ -69,7 +69,7 @@ export function EvaluationStepSettings({
           emptyPlaceholderContent='Select user or role'
           value={reviewerOptions as SelectOption[]}
           readOnly={readOnlyReviewers}
-          systemRoles={[allMembersSystemRole]}
+          systemRoles={[authorSystemRole, allMembersSystemRole]}
           variant='outlined'
           onChange={handleOnChangeReviewers}
           required

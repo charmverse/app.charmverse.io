@@ -9,7 +9,6 @@ import { getChainById } from 'connectors/chains';
 import { Wallet, providers } from 'ethers';
 
 import { credentialsWalletPrivateKey } from 'config/constants';
-import { getENSName } from 'lib/blockchain';
 import { isValidChainAddress } from 'lib/tokens/validation';
 
 import type { EasSchemaChain } from './connectors';

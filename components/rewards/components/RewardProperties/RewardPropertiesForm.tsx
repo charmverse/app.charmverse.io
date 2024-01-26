@@ -84,8 +84,10 @@ export function RewardPropertiesForm({
   const { getFeatureTitle } = useSpaceFeatures();
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(!!expandedByDefault);
-  const [rewardType, setRewardType] = useState(values?.customReward ? 'Custom' : ('Token' as RewardType));
-  const allowedSubmittersValue: RoleOption[] = (values?.allowedSubmitterRoles ?? []).map((id) => ({
+  const [rewardType, setRewardType] = useState<RewardType>(
+    values.customReward ? 'Custom' : isNewReward || values.rewardToken ? 'Token' : 'None'
+  );
+  const allowedSubmittersValue: RoleOption[] = (values.allowedSubmitterRoles ?? []).map((id) => ({
     id,
     group: 'role'
   }));
@@ -110,14 +112,6 @@ export function RewardPropertiesForm({
 
     setRewardApplicationTypeRaw(updatedType);
   }, []);
-
-  useEffect(() => {
-    if (isTruthy(values?.customReward)) {
-      setRewardType('Custom');
-    } else if (!values?.rewardToken || !values?.rewardAmount || !values?.chainId) {
-      setRewardType('None');
-    }
-  }, [values?.customReward, values?.rewardAmount, values?.rewardToken, values?.chainId]);
 
   async function applyUpdates(updates: Partial<UpdateableRewardFields>) {
     if ('customReward' in updates) {

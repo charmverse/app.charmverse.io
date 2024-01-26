@@ -60,7 +60,9 @@ export function useNewProposal({ newProposal }: Props) {
         formAnswers: formInputs.formAnswers,
         workflowId: formInputs.workflowId || undefined,
         isDraft,
-        selectedCredentialTemplates: formInputs.selectedCredentialTemplates ?? []
+        selectedCredentialTemplates: formInputs.selectedCredentialTemplates ?? [],
+        sourcePageId: formInputs.sourcePageId,
+        sourcePostId: formInputs.sourcePostId
       }).catch((err: any) => {
         showMessage(err.message ?? 'Something went wrong', 'error');
         throw err;

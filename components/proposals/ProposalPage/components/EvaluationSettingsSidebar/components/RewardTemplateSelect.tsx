@@ -16,6 +16,13 @@ export function RewardTemplateSelect({ value, onChange }: Props) {
     name: template.page.title,
     color: 'default'
   }));
+  // when we are ready to offer this option with a modal inside the page
+  // options.push({
+  //   id: 'add_new',
+  //   name: '+ Add New',
+  //   color: 'gray',
+  //   variant: 'plain'
+  // });
   return (
     <>
       <FormLabel>
@@ -30,8 +37,10 @@ export function RewardTemplateSelect({ value, onChange }: Props) {
           placeholder='Select'
           value={value || ''}
           options={options}
-          onChange={(templatePageId: string | string[]) => {
-            if (typeof templatePageId === 'string') {
+          onChange={async (templatePageId: string | string[]) => {
+            if (templatePageId === 'add_new') {
+              // TODO: show modal for new reward template
+            } else if (typeof templatePageId === 'string') {
               onChange(templatePageId ?? null);
             }
           }}

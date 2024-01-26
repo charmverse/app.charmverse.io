@@ -1,6 +1,7 @@
 import type { ProposalReviewer } from '@charmverse/core/prisma';
 import { Delete, Edit } from '@mui/icons-material';
 import { Box, Grid, Hidden, IconButton, Stack, Typography } from '@mui/material';
+import { uniqBy } from 'lodash';
 import { useEffect, useState } from 'react';
 
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
@@ -82,15 +83,18 @@ export function ProposalRewards({
     // use reviewers from the proposal if not set in the template
     const rewardReviewers = template?.reward.reviewers?.length
       ? template.reward.reviewers
-      : (reviewers
-          .map((reviewer) =>
-            reviewer.roleId
-              ? { group: 'role', id: reviewer.roleId }
-              : reviewer.userId
-              ? { group: 'user', id: reviewer.userId }
-              : null
-          )
-          .filter(isTruthy) as RewardReviewer[]);
+      : uniqBy(
+          reviewers
+            .map((reviewer) =>
+              reviewer.roleId
+                ? { group: 'role', id: reviewer.roleId }
+                : reviewer.userId
+                ? { group: 'user', id: reviewer.userId }
+                : null
+            )
+            .filter(isTruthy) as RewardReviewer[],
+          'id'
+        );
     const rewardAssignedSubmitters = template?.reward.allowedSubmitterRoles?.length
       ? template.reward.allowedSubmitterRoles
       : assignedSubmitters;

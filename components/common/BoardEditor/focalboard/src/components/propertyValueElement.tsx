@@ -26,7 +26,7 @@ import {
   RewardApplicationStatusChip
 } from 'components/rewards/components/RewardApplicationStatusChip';
 import { RewardStatusChip } from 'components/rewards/components/RewardChip';
-import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
+import { allMembersSystemRole, authorSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -275,6 +275,7 @@ function PropertyValueElement(props: Props) {
         data-test='selected-reviewers'
         readOnly={readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any)}
         onChange={() => null}
+        systemRoles={[allMembersSystemRole, authorSystemRole]}
         value={propertyValue as any}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
       />
@@ -407,12 +408,11 @@ function PropertyValueElement(props: Props) {
           readOnly ||
           (displayType !== 'details' && displayType !== 'table') ||
           proposal.currentStep?.step === 'draft' ||
-          proposal.currentStep?.step === 'feedback' ||
           !!proposal.sourceTemplateId
         }
         required
         data-test='selected-reviewers'
-        systemRoles={[allMembersSystemRole]}
+        systemRoles={[allMembersSystemRole, authorSystemRole]}
         onChange={async (reviewers) => {
           const evaluationId = proposal?.currentEvaluationId;
           if (evaluationId) {

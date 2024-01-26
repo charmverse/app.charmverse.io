@@ -52,7 +52,7 @@ describe('createCardsFromProposals', () => {
   });
 
   it('should create cards from proposals', async () => {
-    const newProposal = await generateProposal({
+    const newProposal = await testUtilsProposals.generateProposal({
       authors: [user.id],
       proposalStatus: 'published',
       reviewers: [
@@ -73,10 +73,10 @@ describe('createCardsFromProposals', () => {
       cards.every(
         (card) =>
           card.syncWithPageId === newProposal.id &&
-          card.title === newProposal.title &&
-          card.contentText === newProposal.contentText &&
-          card.hasContent === newProposal.hasContent &&
-          isEqual(newProposal.content, card.content)
+          card.title === newProposal.page.title &&
+          card.contentText === newProposal.page.contentText &&
+          card.hasContent === newProposal.page.hasContent &&
+          isEqual(newProposal.page.content, card.content)
       )
     ).toBeTruthy();
   });
@@ -85,7 +85,6 @@ describe('createCardsFromProposals', () => {
     await generateProposal({
       authors: [],
       proposalStatus: 'draft',
-      reviewers: [],
       spaceId: space.id,
       userId: user.id
     });
@@ -511,7 +510,7 @@ describe('createCardsFromProposals', () => {
       userId: spaceMember.id
     });
 
-    const proposal = await generateProposal({
+    const proposal = await testUtilsProposals.generateProposal({
       authors: [proposalAuthor.id],
       proposalStatus: 'published',
       reviewers: [
