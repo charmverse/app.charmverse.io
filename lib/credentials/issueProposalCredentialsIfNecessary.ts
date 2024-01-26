@@ -173,33 +173,37 @@ export async function issueProposalCredentialsIfNecessary({
         credentialsToIssue
       });
     } else {
-      for (const credentialTemplate of credentialsToGiveUser) {
-        // Iterate through credentials one at a time so we can ensure they're properly created and tracked
-        const publishedCredential = await signAndPublishCharmverseCredential({
-          chainId: optimism.id,
-          recipient: targetWallet.address,
-          credential: {
-            type: 'proposal',
-            data: {
-              name: credentialTemplate.name,
-              description: credentialTemplate.description ?? '',
-              organization: credentialTemplate.organization,
-              // TODO - Add label mapping
-              status: labels[event],
-              url: getPagePermalink({ pageId: proposalWithSpaceConfig.page.id })
+      try {
+        for (const credentialTemplate of credentialsToGiveUser) {
+          // Iterate through credentials one at a time so we can ensure they're properly created and tracked
+          const publishedCredential = await signAndPublishCharmverseCredential({
+            chainId: optimism.id,
+            recipient: targetWallet.address,
+            credential: {
+              type: 'proposal',
+              data: {
+                name: credentialTemplate.name,
+                description: credentialTemplate.description ?? '',
+                organization: credentialTemplate.organization,
+                // TODO - Add label mapping
+                status: labels[event],
+                url: getPagePermalink({ pageId: proposalWithSpaceConfig.page.id })
+              }
             }
-          }
-        });
+          });
 
-        await prisma.issuedCredential.create({
-          data: {
-            ceramicId: publishedCredential.id,
-            credentialEvent: event,
-            credentialTemplate: { connect: { id: credentialTemplate.id } },
-            proposal: { connect: { id: proposalId } },
-            user: { connect: { id: authorUserId } }
-          }
-        });
+          await prisma.issuedCredential.create({
+            data: {
+              ceramicId: publishedCredential.id,
+              credentialEvent: event,
+              credentialTemplate: { connect: { id: credentialTemplate.id } },
+              proposal: { connect: { id: proposalId } },
+              user: { connect: { id: authorUserId } }
+            }
+          });
+        }
+      } catch (e) {
+        log.error('Failed to issue credential', { proposalId, authorUserId, credentialsToGiveUser, error: e });
       }
     }
   }
