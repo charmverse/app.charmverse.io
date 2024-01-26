@@ -20,7 +20,7 @@ export function UserCredentialRow({ credential }: { credential: EASAttestationFr
       ? {
           title: credential.content.name,
           subtitle: credential.content.organization,
-          iconUrl: '/images/logo_black_transparent.64.png',
+          iconUrl: credential.iconUrl ?? '/images/logo_black_transparent.64.png',
           attestationContent: [{ name: 'status', value: credential.content.status }]
         }
       : {
