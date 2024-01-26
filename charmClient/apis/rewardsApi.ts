@@ -83,19 +83,8 @@ export class RewardsApi {
     );
   }
 
-  editApplicationComment({
-    applicationId,
-    commentId,
-    payload
-  }: {
-    applicationId: string;
-    commentId: string;
-    payload: CreateApplicationCommentPayload;
-  }) {
-    return http.PUT<ApplicationComment>(
-      `/api/reward-applications/comments/${commentId}?applicationId=${applicationId}`,
-      payload
-    );
+  editApplicationComment({ commentId, payload }: { commentId: string; payload: CreateApplicationCommentPayload }) {
+    return http.PUT<ApplicationComment>(`/api/reward-applications/comments/${commentId}`, payload);
   }
 
   isRewardEditable(rewardId: string) {

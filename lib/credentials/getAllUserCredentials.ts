@@ -37,7 +37,7 @@ export async function getAllUserCredentials({ userId }: { userId: string }): Pro
       log.error(`Error loading Charmverse Ceramic credentials for user ${userId}`, { error, userId });
       return [];
     }),
-    getAllOnChainAttestations({ wallets: testWallets })
+    getAllOnChainAttestations({ wallets })
   ]).then((data) => data.flat());
 
   return allCredentials;

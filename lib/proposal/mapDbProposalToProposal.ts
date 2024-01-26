@@ -77,7 +77,7 @@ export function mapDbProposalToProposalLite({
   proposal,
   permissions
 }: {
-  proposal: ProposalWithUsers & {
+  proposal: Omit<ProposalWithUsers, 'reviewers'> & {
     evaluations: (ProposalEvaluation & { reviewers: ProposalReviewer[] })[];
     rewards: { id: string }[];
   };
@@ -105,7 +105,7 @@ export function mapDbProposalToProposalLite({
     }),
     currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
     status: proposal.status,
-    reviewers: currentEvaluation?.reviewers || proposal.reviewers,
+    reviewers: (proposal.status !== 'draft' && currentEvaluation?.reviewers) || [],
     rewardIds: rewards.map((r) => r.id) || null,
     fields
   };

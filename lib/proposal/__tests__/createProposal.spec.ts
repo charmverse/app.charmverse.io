@@ -2,11 +2,12 @@ import { InsecureOperationError } from '@charmverse/core/errors';
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
-import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsMembers, testUtilsProposals, testUtilsPages, testUtilsUser } from '@charmverse/core/test';
 import { v4 as uuid, v4 } from 'uuid';
 
 import type { FormFieldInput } from 'components/common/form/interfaces';
 import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
+import { generateForumPost } from 'testing/utils/forums';
 
 import type { ProposalEvaluationInput } from '../createProposal';
 import { createProposal } from '../createProposal';
@@ -364,5 +365,66 @@ describe('Creates a page and proposal with relevant configuration', () => {
         }))
       )
     );
+  });
+});
+describe('Converting from post and proposal', () => {
+  it('Marks the page as converted', async () => {
+    const pageTitle = 'page title 124';
+
+    const templateId = uuid();
+
+    const createdPage = await testUtilsPages.generatePage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+    const { proposal } = await createProposal({
+      pageProps: {
+        contentText: '',
+        title: pageTitle,
+        sourceTemplateId: templateId
+      },
+      userId: user.id,
+      spaceId: space.id,
+      authors: [user.id],
+      evaluations: [],
+      sourcePageId: createdPage.id
+    });
+
+    const converted = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: createdPage.id
+      }
+    });
+    expect(converted.convertedProposalId).toEqual(proposal.id);
+  });
+
+  it('Marks the post as converted', async () => {
+    const pageTitle = 'page title 124';
+
+    const templateId = uuid();
+
+    const createdPost = await generateForumPost({
+      userId: user.id,
+      spaceId: space.id
+    });
+    const { proposal } = await createProposal({
+      pageProps: {
+        contentText: '',
+        title: pageTitle,
+        sourceTemplateId: templateId
+      },
+      userId: user.id,
+      spaceId: space.id,
+      authors: [user.id],
+      evaluations: [],
+      sourcePostId: createdPost.id
+    });
+
+    const converted = await prisma.post.findUniqueOrThrow({
+      where: {
+        id: createdPost.id
+      }
+    });
+    expect(converted.proposalId).toEqual(proposal.id);
   });
 });

@@ -1,12 +1,11 @@
-import type { Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsProposals } from '@charmverse/core/test';
 import type { Browser } from '@playwright/test';
 import { chromium, expect, test } from '@playwright/test';
 import { v4 } from 'uuid';
 
 import { baseUrl } from 'config/constants';
-import type { ProposalWithUsers } from 'lib/proposal/interface';
-import { generateProposal, generateRole } from 'testing/setupDatabase';
+import { generateRole } from 'testing/setupDatabase';
 
 import { generateUserAndSpace } from './utils/mocks';
 
@@ -18,8 +17,6 @@ test.beforeAll(async () => {
 });
 
 test.describe.skip('Make a proposals page public and visit it', async () => {
-  let proposal: Page & { proposal: ProposalWithUsers };
-
   test('visit a public proposal page', async () => {
     const userContext = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
 
@@ -41,7 +38,7 @@ test.describe.skip('Make a proposals page public and visit it', async () => {
 
     const title = `Proposal ${v4()}`;
 
-    proposal = await generateProposal({
+    const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       proposalStatus: 'draft',
       reviewers: [
@@ -63,7 +60,7 @@ test.describe.skip('Make a proposals page public and visit it', async () => {
       }
     });
 
-    await page.goto(`${baseUrl}/${space.domain}/${proposal.path}`);
+    await page.goto(`${baseUrl}/${space.domain}/${proposal.page.path}`);
 
     // Make sure proposal property reviewer role is visible
     const titleLocator = await page.locator('data-test=editor-page-title');

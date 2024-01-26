@@ -44,11 +44,7 @@ async function updateEvaluationResultEndpoint(req: NextApiRequest, res: NextApiR
     throw new ActionNotPermittedError(`You cannot move an archived proposal to a different step.`);
   }
 
-  if (evaluation.type === 'feedback') {
-    if (!proposalPermissions.move) {
-      throw new ActionNotPermittedError(`You don't have permission to move this proposal.`);
-    }
-  } else if (!proposalPermissions.evaluate) {
+  if (!proposalPermissions.evaluate) {
     throw new ActionNotPermittedError(`You don't have permission to review this proposal.`);
   }
 
