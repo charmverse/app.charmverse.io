@@ -156,7 +156,9 @@ export function ProposalPropertiesBase({
           rewardIds={rewardIds || []}
           readOnly={readOnlyRewards}
           onSave={(pendingReward) => {
-            const isExisting = pendingRewards.find((reward) => reward.draftId === pendingReward.draftId);
+            const isExisting = pendingRewards.find(
+              (reward) => reward.draftId && pendingReward.draftId && reward.draftId === pendingReward.draftId
+            );
             if (!isExisting) {
               setProposalFormInputs({
                 fields: {
