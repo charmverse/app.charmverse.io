@@ -154,6 +154,7 @@ export async function getCharmverseCredentialsByWallets({
     },
     select: {
       id: true,
+      ceramicId: true,
       proposal: {
         select: {
           space: {
@@ -168,7 +169,7 @@ export async function getCharmverseCredentialsByWallets({
   });
 
   return charmverseCredentials.map((credential) => {
-    const issuedCredential = issuedCredentials.find((ic) => ic.id === credential.id);
+    const issuedCredential = issuedCredentials.find((ic) => ic.ceramicId === credential.id);
 
     return {
       ...credential,

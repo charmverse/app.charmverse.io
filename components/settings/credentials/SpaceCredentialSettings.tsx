@@ -15,15 +15,11 @@ import { CredentialTemplates } from './components/CredentialTemplates';
 
 export function SpaceCredentialSettings() {
   const { getFeatureTitle } = useSpaceFeatures();
-  const { space } = useCurrentSpace();
+  const { space, refreshCurrentSpace } = useCurrentSpace();
   useTrackPageView({ type: 'settings/credentials' });
   const isAdmin = useIsAdmin();
-  const [credentialLogo, setCredentialLogo] = useState<string>(
-    space?.credentialLogo ?? space?.spaceArtwork ?? '/images/logo_black_lightgrey.png'
-  );
-  const [credentialLogoChanged, setCredentialLogoChanged] = useState(false);
+  const [credentialLogo, setCredentialLogo] = useState(space?.credentialLogo ?? null);
   const { trigger, isMutating } = useUpdateSpace(space?.id);
-
   return (
     <>
       <Legend>Credentials</Legend>
@@ -43,17 +39,16 @@ export function SpaceCredentialSettings() {
       <Box display='flex' flexDirection='column' alignItems='left' mb={2}>
         <Typography variant='body1'>Select a custom logo which will appear on Credentials in CharmVerse</Typography>
       </Box>
-      <Box mb={2}>
+      <Box mb={1}>
         <Avatar
           name={space?.name ?? ''}
           variant='rounded'
-          image={credentialLogo}
+          image={(credentialLogo ?? space?.spaceArtwork) || '/images/logo_black_lightgrey.png'}
           updateImage={(url: string) => {
             setCredentialLogo(url);
-            setCredentialLogoChanged(true);
           }}
           editable={isAdmin && !isMutating}
-          hideDelete={!space?.credentialLogo}
+          hideDelete={isMutating || credentialLogo === ''}
         />
       </Box>
       {isAdmin && (
@@ -63,11 +58,9 @@ export function SpaceCredentialSettings() {
           }}
           disableElevation
           size='large'
-          disabled={isMutating || !credentialLogoChanged}
-          onClick={async () => {
-            trigger({ credentialLogo }).finally(() => {
-              setCredentialLogoChanged(false);
-            });
+          disabled={isMutating || credentialLogo === space?.credentialLogo}
+          onClick={() => {
+            trigger({ credentialLogo }).then(() => refreshCurrentSpace());
           }}
           loading={isMutating}
         >
