@@ -6,9 +6,8 @@ import { InvalidInputError } from 'lib/utilities/errors';
 
 import type { PostSortOption } from './constants';
 import { defaultPostsPerResult, postSortOptions } from './constants';
-import type { PostWithRelations } from './getPostMeta';
 import { getPostMeta } from './getPostMeta';
-import type { ForumPostMeta } from './interfaces';
+import type { PostWithRelations, ForumPostMeta } from './getPostMeta';
 
 export type PaginatedPostList = PaginatedResponse<ForumPostMeta & { totalComments: number }> & { cursor: number };
 
