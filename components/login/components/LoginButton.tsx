@@ -158,8 +158,8 @@ function LoginHandler(props: DialogProps) {
       const resp = await loginFromWeb3Account(authSig);
       if (resp?.id) {
         window.location.reload();
+        handleLogin({ identityType: 'Wallet' });
       }
-      handleLogin({ identityType: 'Wallet' });
     } catch (err) {
       handleLoginError(err);
     }
