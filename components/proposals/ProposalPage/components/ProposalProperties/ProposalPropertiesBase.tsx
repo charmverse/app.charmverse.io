@@ -27,6 +27,8 @@ export type ProposalPropertiesInput = {
   type: PageType;
   selectedCredentialTemplates?: string[];
   archived?: boolean;
+  sourcePageId?: string;
+  sourcePostId?: string;
 };
 
 type ProposalPropertiesProps = {

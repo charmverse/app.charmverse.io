@@ -1,4 +1,4 @@
-import { ProposalOperation, ProposalSystemRole } from '@charmverse/core/prisma';
+import { ProposalOperation, ProposalSystemRole, ProposalEvaluationType } from '@charmverse/core/prisma';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { Box, Card, Stack, Tooltip, Typography } from '@mui/material';
 import { capitalize } from 'lodash';
@@ -10,9 +10,8 @@ import {
   type SystemRoleOptionPopulated
 } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { MembersIcon, ProposalIcon } from 'components/common/PageIcon';
-import { isTruthy } from 'lib/utilities/types';
 
-import { evaluateVerbs, evaluationIcons } from '../constants';
+import { evaluationIcons } from '../constants';
 
 import type { ContextMenuProps } from './EvaluationContextMenu';
 import { EvaluationContextMenu } from './EvaluationContextMenu';
@@ -21,6 +20,13 @@ import type { EvaluationTemplateFormItem } from './EvaluationDialog';
 type SupportedOperation = Extract<ProposalOperation, 'view' | 'comment' | 'edit' | 'move'>;
 
 export const proposalOperations: SupportedOperation[] = ['view', 'comment', 'edit', 'move'];
+
+// const evaluateVerbs = {
+//   [ProposalEvaluationType.feedback]: 'Move Forward',
+//   [ProposalEvaluationType.vote]: 'Move Forward (Vote)',
+//   [ProposalEvaluationType.rubric]: 'Move Forward (Evaluate)',
+//   [ProposalEvaluationType.pass_fail]: 'Move Forward (Review)'
+// };
 
 export const allMembersSystemRole = {
   group: 'system_role',
@@ -31,6 +37,17 @@ export const allMembersSystemRole = {
   ),
   id: ProposalSystemRole.space_member,
   label: 'All members'
+} as const;
+
+export const authorSystemRole = {
+  group: 'system_role',
+  icon: (
+    <Tooltip title='Author'>
+      <ProposalIcon color='secondary' fontSize='small' />
+    </Tooltip>
+  ),
+  id: ProposalSystemRole.author,
+  label: 'Author'
 } as const;
 
 const currentReviewerSystemRole = {
@@ -51,16 +68,7 @@ const currentVoterSystemRole = {
 };
 
 export const extraEvaluationRoles: SystemRoleOptionPopulated<ProposalSystemRole>[] = [
-  {
-    group: 'system_role',
-    icon: (
-      <Tooltip title='Author'>
-        <ProposalIcon color='secondary' fontSize='small' />
-      </Tooltip>
-    ),
-    id: ProposalSystemRole.author,
-    label: 'Author'
-  },
+  authorSystemRole,
   currentReviewerSystemRole,
   {
     group: 'system_role',
@@ -161,7 +169,7 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
 
       {proposalOperations.map((operation) => (
         <Box key={operation} className='octo-propertyrow'>
-          <PropertyLabel readOnly>{capitalize(operation)}</PropertyLabel>
+          <PropertyLabel readOnly>{operation === 'move' ? 'Move Backward' : capitalize(operation)}</PropertyLabel>
           <UserAndRoleSelect
             readOnly={readOnly}
             variant='outlined'
@@ -183,20 +191,14 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
 
       {/* show evaluation action which is uneditable */}
       <Box className='octo-propertyrow' display='flex' alignItems='center !important'>
-        <PropertyLabel readOnly>{evaluateVerbs[evaluation.type]}</PropertyLabel>
-        {evaluation.type === 'feedback' ? (
-          <Typography color='secondary' variant='caption'>
-            There is no review step for Feedback
-          </Typography>
-        ) : (
-          <UserAndRoleSelect
-            readOnly
-            wrapColumn
-            value={[{ group: 'system_role', id: ProposalSystemRole.current_reviewer }]}
-            systemRoles={evaluation.type === 'vote' ? [currentVoterSystemRole] : [currentReviewerSystemRole]}
-            onChange={() => {}}
-          />
-        )}
+        <PropertyLabel readOnly>Move Forward</PropertyLabel>
+        <UserAndRoleSelect
+          readOnly
+          wrapColumn
+          value={[{ group: 'system_role', id: ProposalSystemRole.current_reviewer }]}
+          systemRoles={evaluation.type === 'vote' ? [currentVoterSystemRole] : [currentReviewerSystemRole]}
+          onChange={() => {}}
+        />
       </Box>
     </>
   );

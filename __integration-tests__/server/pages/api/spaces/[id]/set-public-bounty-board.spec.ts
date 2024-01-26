@@ -26,7 +26,7 @@ beforeAll(async () => {
   adminUserCookie = await loginUser(adminUser.id);
 });
 
-describe.skip('POST /api/spaces/[id]/set-public-bounty-board - Make the space bounty board public or private', () => {
+describe('POST /api/spaces/[id]/set-public-bounty-board - Make the space bounty board public or private', () => {
   it('should update a space`s public bounty board status, set its mode to "custom" and return the space, responding with 200', async () => {
     const update: PublicRewardToggle = {
       publicRewardBoard: true

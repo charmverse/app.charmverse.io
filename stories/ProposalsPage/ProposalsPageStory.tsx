@@ -28,23 +28,19 @@ export const proposals = [
   createMockProposal({
     authors: [{ proposalId: '', userId: members[0].id }],
     reviewers: [
-      { evaluationId: null, id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null },
-      { evaluationId: null, id: '2', proposalId: '', roleId: null, userId: members[0].id, systemRole: null }
+      { evaluationId: '1', id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null },
+      { evaluationId: '1', id: '2', proposalId: '', roleId: null, userId: members[0].id, systemRole: null }
     ],
     status: 'draft'
   }),
   createMockProposal({
     authors: [{ proposalId: '', userId: members[1].id }],
-    reviewers: [
-      { evaluationId: null, id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null }
-    ],
+    reviewers: [{ evaluationId: '1', id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null }],
     status: 'published'
   }),
   createMockProposal({
     authors: [{ proposalId: '', userId: members[2].id }],
-    reviewers: [
-      { evaluationId: null, id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null }
-    ],
+    reviewers: [{ evaluationId: '1', id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null }],
     status: 'published'
   })
 ];

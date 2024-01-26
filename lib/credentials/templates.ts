@@ -18,7 +18,7 @@ export async function getCredentialTemplates({ spaceId }: { spaceId: string }): 
   return credentials;
 }
 
-type CredentialTemplateUpdateableFields = Partial<
+export type CredentialTemplateUpdateableFields = Partial<
   Pick<CredentialTemplate, 'name' | 'description' | 'organization' | 'credentialEvents'>
 >;
 

@@ -41,7 +41,6 @@ export function ApplicationComments({ applicationId }: { applicationId: string }
 
   async function updateComment(commentId: string, comment: UpdateCommentPayload) {
     const updatedComment = await charmClient.rewards.editApplicationComment({
-      applicationId,
       commentId,
       payload: {
         content: comment.content,
