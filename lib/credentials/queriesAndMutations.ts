@@ -167,20 +167,12 @@ export async function getCharmverseCredentialsByWallets({
     }
   });
 
-  const issuedCredentialsSpaceArtworkRecord = issuedCredentials.reduce((acc, val) => {
-    acc[val.id] = {
-      spaceArtwork: val.proposal.space.spaceArtwork,
-      credentialLogo: val.proposal.space.credentialLogo
-    };
-    return acc;
-  }, {} as Record<string, undefined | { spaceArtwork: string | null; credentialLogo: string | null }>);
-
   return charmverseCredentials.map((credential) => {
+    const issuedCredential = issuedCredentials.find((ic) => ic.id === credential.id);
+
     return {
       ...credential,
-      iconUrl:
-        issuedCredentialsSpaceArtworkRecord[credential.id]?.credentialLogo ??
-        issuedCredentialsSpaceArtworkRecord[credential.id]?.spaceArtwork
+      iconUrl: issuedCredential?.proposal.space.credentialLogo ?? issuedCredential?.proposal.space.spaceArtwork
     };
   });
 }

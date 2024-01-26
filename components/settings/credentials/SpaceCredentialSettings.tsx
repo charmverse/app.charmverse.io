@@ -1,4 +1,4 @@
-import { Box, Stack, TextField, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { useState } from 'react';
 
 import { useUpdateSpace } from 'charmClient/hooks/spaces';
@@ -53,7 +53,7 @@ export function SpaceCredentialSettings() {
             setCredentialLogoChanged(true);
           }}
           editable={isAdmin && !isMutating}
-          hideDelete={!!space?.credentialLogo}
+          hideDelete={!space?.credentialLogo}
         />
       </Box>
       {isAdmin && (
@@ -65,8 +65,9 @@ export function SpaceCredentialSettings() {
           size='large'
           disabled={isMutating || !credentialLogoChanged}
           onClick={async () => {
-            await trigger({ credentialLogo });
-            setCredentialLogoChanged(false);
+            trigger({ credentialLogo }).finally(() => {
+              setCredentialLogoChanged(false);
+            });
           }}
           loading={isMutating}
         >
