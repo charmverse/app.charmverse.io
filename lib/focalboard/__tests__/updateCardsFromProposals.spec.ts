@@ -1,6 +1,6 @@
 import type { FormField, Page, Prisma, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsMembers, testUtilsUser, testUtilsProposals } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import { getDefaultBoard } from 'components/proposals/components/ProposalsBoard/utils/boardData';
@@ -828,7 +828,7 @@ describe('updateCardsFromProposals()', () => {
       userId: spaceMember.id
     });
 
-    const proposal = await generateProposal({
+    const proposal = await testUtilsProposals.generateProposal({
       authors: [proposalAuthor.id],
       proposalStatus: 'published',
       reviewers: [
@@ -891,7 +891,7 @@ describe('updateCardsFromProposals()', () => {
       userId: proposalAuthor.id
     });
 
-    const proposal2 = await generateProposal({
+    const proposal2 = await testUtilsProposals.generateProposal({
       authors: [proposalAuthor.id],
       proposalStatus: 'published',
       reviewers: [

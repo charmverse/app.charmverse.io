@@ -886,7 +886,6 @@ export async function generateProposal({
   pageType = 'proposal',
   proposalStatus,
   authors,
-  reviewers,
   deletedAt = null,
   title = 'Proposal'
 }: {
@@ -894,7 +893,6 @@ export async function generateProposal({
   userId: string;
   spaceId: string;
   authors: string[];
-  reviewers: ProposalReviewerInput[];
   pageType?: PageType;
   proposalStatus: ProposalStatus;
   title?: string;
@@ -937,16 +935,6 @@ export async function generateProposal({
           authors: {
             createMany: {
               data: authors.map((authorId) => ({ userId: authorId }))
-            }
-          },
-          reviewers: {
-            createMany: {
-              data: (reviewers ?? []).map((r) => {
-                return {
-                  userId: r.group === 'user' ? r.id : undefined,
-                  roleId: r.group === 'role' ? r.id : undefined
-                };
-              })
             }
           }
         }

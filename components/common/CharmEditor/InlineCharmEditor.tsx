@@ -85,7 +85,7 @@ export function charmEditorPlugins({
     bold.plugins(),
     code.plugins(),
     italic.plugins(),
-    linkPlugins({ key: linksPluginKey }),
+    linkPlugins({ key: linksPluginKey, readOnly }),
     paragraph.plugins(),
     strike.plugins(),
     underline.plugins(),

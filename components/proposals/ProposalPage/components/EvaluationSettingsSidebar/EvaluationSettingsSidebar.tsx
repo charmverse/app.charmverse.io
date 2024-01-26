@@ -57,18 +57,15 @@ export function EvaluationSettingsSidebar({
             const matchingTemplateStep = proposalTemplate?.evaluations?.find((e) => e.title === evaluation.title);
             return (
               <EvaluationStepRow key={evaluation.id} expanded result={null} index={index + 1} title={evaluation.title}>
-                {/* <Divider sx={{ my: 1 }} /> */}
-                {evaluation.type !== 'feedback' && (
-                  <EvaluationStepSettings
-                    evaluation={evaluation}
-                    evaluationTemplate={matchingTemplateStep}
-                    isReviewer={isReviewer}
-                    readOnly={readOnly}
-                    onChange={(updated) => {
-                      onChangeEvaluation?.(evaluation.id, updated);
-                    }}
-                  />
-                )}
+                <EvaluationStepSettings
+                  evaluation={evaluation}
+                  evaluationTemplate={matchingTemplateStep}
+                  isReviewer={isReviewer}
+                  readOnly={readOnly}
+                  onChange={(updated) => {
+                    onChangeEvaluation?.(evaluation.id, updated);
+                  }}
+                />
               </EvaluationStepRow>
             );
           })}

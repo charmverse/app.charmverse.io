@@ -181,8 +181,7 @@ describe('exportWorkspacePages', () => {
       authors: [_user.id],
       spaceId: spaceWithDeletedPage.id,
       proposalStatus: 'published',
-      userId: _user.id,
-      reviewers: []
+      userId: _user.id
     });
 
     const returnedPage = await createPage({

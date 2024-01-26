@@ -1,18 +1,20 @@
-import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
+import { gql } from '@apollo/client';
 import { log } from '@charmverse/core/log';
 import { prisma, type AttestationType } from '@charmverse/core/prisma-client';
 import { Wallet } from 'ethers';
 
 import { credentialsWalletPrivateKey, graphQlServerEndpoint } from 'config/constants';
 
+import { ApolloClientWithRedisCache } from './apolloClientWithRedisCache';
 import type { EasSchemaChain } from './connectors';
 import type { EASAttestationFromApi } from './external/getExternalCredentials';
 import type { ExternalCredentialChain } from './external/schemas';
 import type { ProposalCredential } from './schemas';
 
-const apolloClient = new ApolloClient({
-  cache: new InMemoryCache(),
-  uri: graphQlServerEndpoint
+const ceramicGraphQlClient = new ApolloClientWithRedisCache({
+  uri: graphQlServerEndpoint,
+  persistForSeconds: 300,
+  cacheKeyPrefix: 'ceramic'
 });
 
 type CredentialFromCeramic = {
@@ -76,7 +78,7 @@ function getParsedCredential(credential: CredentialFromCeramic): EASAttestationF
 }
 
 export async function publishSignedCredential(input: CredentialToPublish): Promise<EASAttestationFromApi> {
-  const record = await apolloClient
+  const record = await ceramicGraphQlClient
     .mutate({
       mutation: CREATE_SIGNED_CREDENTIAL_MUTATION,
       variables: {
@@ -126,7 +128,7 @@ export async function getCharmverseCredentialsByWallets({
     return [];
   }
 
-  const charmverseCredentials: EASAttestationFromApi[] = await apolloClient
+  const charmverseCredentials: EASAttestationFromApi[] = await ceramicGraphQlClient
     .query({
       query: GET_CREDENTIALS,
       variables: {
@@ -136,10 +138,9 @@ export async function getCharmverseCredentialsByWallets({
             issuer: { equalTo: credentialWalletAddress }
           }
         }
-      },
+      }
       // For now, let's refetch each time and rely on http endpoint-level caching
       // https://www.apollographql.com/docs/react/data/queries/#supported-fetch-policies
-      fetchPolicy: 'no-cache'
     })
     .then(({ data }) => data.signedCredentialFourIndex.edges.map((e: any) => getParsedCredential(e.node)));
 
