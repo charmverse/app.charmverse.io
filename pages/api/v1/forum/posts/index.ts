@@ -60,6 +60,7 @@ const handler = apiHandler();
  */
 export type PublicApiForumPost = {
   id: string;
+  author: UserProfile;
   createdAt: string;
   category: {
     id: string;
