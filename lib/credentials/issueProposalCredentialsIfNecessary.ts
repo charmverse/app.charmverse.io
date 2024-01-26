@@ -160,13 +160,12 @@ export async function issueProposalCredentialsIfNecessary({
         id: authorUserId
       },
       select: {
-        wallets: true
+        wallets: true,
+        primaryWallet: true
       }
     });
 
-    const primaryWallet = author.wallets.find((wallet) => wallet.primary);
-
-    const targetWallet = primaryWallet ?? author.wallets[0];
+    const targetWallet = author.primaryWallet ?? author.wallets[0];
 
     if (!targetWallet) {
       log.error(`User ${authorUserId} has no wallet to issue credentials to`, {

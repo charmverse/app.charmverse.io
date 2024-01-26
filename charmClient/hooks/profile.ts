@@ -28,3 +28,7 @@ export function useResetRecoveryCode() {
     `/api/profile/otp/recovery-code`
   );
 }
+
+export function useSetPrimaryWallet() {
+  return usePUT<{ walletId: string }, void>(`/api/profile/primary-wallet`);
+}

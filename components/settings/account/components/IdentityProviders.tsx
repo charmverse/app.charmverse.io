@@ -22,7 +22,7 @@ import { Fragment, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
-import { getPrimaryWalletKey, useGetPrimaryWallet, useSetPrimaryWallet } from 'charmClient/hooks/wallets';
+import { useSetPrimaryWallet } from 'charmClient/hooks/profile';
 import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/Web3ConnectionManager';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import Legend from 'components/settings/Legend';
@@ -60,12 +60,12 @@ export function IdentityProviders() {
   const discordAccount = user?.discordUser?.account as Partial<DiscordAccount> | undefined;
   const telegramAccount = user?.telegramUser?.account as Partial<TelegramAccount> | undefined;
   const [openAddress, setOpenAddress] = useState<string | null>(null);
-  const { data: primaryWallet, mutate: mutateGetPrimaryWallet } = useGetPrimaryWallet(user?.id);
   const { trigger: setPrimaryWallet, isMutating: isSettingPrimaryWallet } = useSetPrimaryWallet();
   const handleOpenDeleteModal = (address: string) => (event: MouseEvent<HTMLElement>) => {
     setOpenAddress(address);
     deleteWalletPopupState.open(event);
   };
+  const primaryWallet = user?.wallets?.find((w) => w.id === user.primaryWalletId);
 
   const { trigger: saveUser, isMutating: isLoadingUserUpdate } = useSWRMutation(
     '/profile',
@@ -92,9 +92,10 @@ export function IdentityProviders() {
 
   const onSetPrimaryWallet = async (walletId: string) => {
     try {
-      const newPrimaryWallet = await setPrimaryWallet({ walletId });
-      mutateGetPrimaryWallet(newPrimaryWallet, {
-        revalidate: false
+      await setPrimaryWallet({ walletId });
+      setUser({
+        ...user,
+        primaryWalletId: walletId
       });
       showMessage('Primary wallet set successfully', 'success');
     } catch (error) {
