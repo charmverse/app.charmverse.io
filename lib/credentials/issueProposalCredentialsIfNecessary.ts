@@ -5,7 +5,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { optimism } from 'viem/chains';
 
-import { isCharmVerseSpace } from 'lib/featureFlag/isCharmVerseSpace';
 import { getPagePermalink } from 'lib/pages/getPagePermalink';
 
 import { signAndPublishCharmverseCredential } from './attest';
@@ -42,26 +41,9 @@ export async function issueProposalCredentialsIfNecessary({
         orderBy: {
           index: 'asc'
         }
-      },
-      // TODO - Remove this before releasing
-      space: {
-        select: {
-          domain: true
-        }
       }
-      // TODO - Remove this before releasing
     }
   });
-
-  // TODO - Remove this before releasing
-  const issueCredential = isCharmVerseSpace({
-    space: baseProposal.space
-  });
-
-  if (!issueCredential) {
-    return;
-  }
-  // TODO - Remove this before releasing
 
   if (baseProposal.status === 'draft') {
     return;

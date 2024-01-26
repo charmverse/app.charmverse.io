@@ -38,8 +38,8 @@ export type PublishedSignedCredential = Omit<CredentialFromCeramic, 'content'> &
 };
 
 const CREATE_SIGNED_CREDENTIAL_MUTATION = gql`
-  mutation CreateCredentials($i: CreateSignedCredentialFourInput!) {
-    createSignedCredentialFour(input: $i) {
+  mutation CreateCredentials($i: CreateCharmVerseCredentialInput!) {
+    createCharmVerseCredential(input: $i) {
       document {
         id
         sig
@@ -93,13 +93,13 @@ export async function publishSignedCredential(input: CredentialToPublish): Promi
         }
       }
     })
-    .then((doc) => getParsedCredential(doc.data.createSignedCredentialFour.document));
+    .then((doc) => getParsedCredential(doc.data.createCharmVerseCredential.document));
   return record;
 }
 
 const GET_CREDENTIALS = gql`
-  query GetCredentials($filter: SignedCredentialFourFiltersInput!) {
-    signedCredentialFourIndex(filters: $filter, first: 1000) {
+  query GetCredentials($filter: CharmVerseCredentialFiltersInput!) {
+    charmVerseCredentialIndex(filters: $filter, first: 1000) {
       edges {
         node {
           id
@@ -142,7 +142,7 @@ export async function getCharmverseCredentialsByWallets({
       // For now, let's refetch each time and rely on http endpoint-level caching
       // https://www.apollographql.com/docs/react/data/queries/#supported-fetch-policies
     })
-    .then(({ data }) => data.signedCredentialFourIndex.edges.map((e: any) => getParsedCredential(e.node)));
+    .then(({ data }) => data.charmVerseCredentialIndex.edges.map((e: any) => getParsedCredential(e.node)));
 
   const credentialIds = charmverseCredentials.map((c) => c.id);
 
