@@ -82,7 +82,7 @@ const PropertyMenu = React.memo((props: Props) => {
       >
         <PropertyTypes
           selectedTypes={[propertyType]}
-          onClick={(type) => {
+          onClick={({ type }) => {
             if (type !== propertyType) {
               // only change the type if it's different
               props.onTypeAndNameChanged(type, name);

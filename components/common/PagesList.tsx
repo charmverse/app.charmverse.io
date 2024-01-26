@@ -15,7 +15,7 @@ interface Props {
   activeItemIndex?: number;
   activePageId?: string;
   pages: PageListItem[];
-  onSelectPage: (pageId: string, type: PageListItem['type'], path: string) => void;
+  onSelectPage: (pageId: string, type: PageListItem['type'], path: string, title: string) => void;
   emptyText?: string;
   style?: React.CSSProperties;
 }
@@ -55,7 +55,7 @@ export function PagesList({
           data-type={page.type}
           data-path={page.path}
           className={isActive(page.id, pageIndex) ? 'mention-selected' : ''}
-          onClick={() => onSelectPage(page.id, page.type, page.path)}
+          onClick={() => onSelectPage(page.id, page.type, page.path, page.title)}
           key={page.id}
           selected={isActive(page.id, pageIndex)}
         >

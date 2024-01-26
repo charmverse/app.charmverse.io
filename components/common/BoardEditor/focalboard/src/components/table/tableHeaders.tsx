@@ -187,11 +187,11 @@ function TableHeaders(props: Props): JSX.Element {
       activeView && (
         <PropertyTypes
           isMobile={isSmallScreen}
-          onClick={async (type, relationData) => {
+          onClick={async ({ type, relationData, name }) => {
             addPropertyPopupState.close();
             const template: IPropertyTemplate = {
               id: Utils.createGuid(IDType.BlockID),
-              name: typeDisplayName(intl, type),
+              name: name ?? typeDisplayName(intl, type),
               type,
               options: [],
               relationData

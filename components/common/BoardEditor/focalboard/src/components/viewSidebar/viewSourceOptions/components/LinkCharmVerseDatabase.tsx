@@ -17,7 +17,7 @@ const SidebarContent = styled.div`
 
 type Props = {
   currentSourceDatabaseId?: string;
-  onSelectLinkedDatabase: (data: { sourceDatabaseId: string }) => void;
+  onSelectLinkedDatabase: (data: { sourceDatabaseId: string; pageTitle: string }) => void;
   placeholder?: string;
   pages?: PageListItem[];
 };
@@ -60,7 +60,9 @@ export function LinkCharmVerseDatabase(props: Props) {
         emptyText='No databases found'
         pages={sortedPages}
         activePageId={props.currentSourceDatabaseId}
-        onSelectPage={(pageId) => props.onSelectLinkedDatabase({ sourceDatabaseId: pageId })}
+        onSelectPage={(pageId, _, __, pageTitle) =>
+          props.onSelectLinkedDatabase({ sourceDatabaseId: pageId, pageTitle })
+        }
         style={{
           height: '250px',
           overflow: 'auto'

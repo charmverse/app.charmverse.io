@@ -1,7 +1,6 @@
 import styled from '@emotion/styled';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import type { SxProps } from '@mui/material';
-import { Box, Menu, MenuItem, MenuList, Stack, Switch, Typography } from '@mui/material';
+import { Box, Divider, Menu, MenuItem, MenuList, Stack, TextField, Typography } from '@mui/material';
 import { bindMenu } from 'material-ui-popup-state';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
@@ -28,13 +27,18 @@ export function RelationPropertyMenu({
   relationData
 }: {
   popupState: PopupState;
-  onClick: (type: PropertyType, relationData?: IPropertyTemplate['relationData']) => void;
+  onClick: (property: {
+    type: PropertyType;
+    relationData?: IPropertyTemplate['relationData'];
+    name?: IPropertyTemplate['name'];
+  }) => void;
   relationData?: IPropertyTemplate['relationData'];
 }) {
   const bindMenuProps = bindMenu(popupState);
   const [relationPropertyData, setRelationPropertyData] = useState<IPropertyTemplate['relationData'] | null>(
     relationData ?? null
   );
+  const [propertyTitle, setPropertyTitle] = useState('Relation' || '');
   const [showSelectDatabaseMenu, setShowSelectDatabaseMenu] = useState(true);
 
   function onClose() {
@@ -57,7 +61,7 @@ export function RelationPropertyMenu({
       {showSelectDatabaseMenu ? (
         <LinkCharmVerseDatabase
           placeholder='Link to a database'
-          onSelectLinkedDatabase={({ sourceDatabaseId }) => {
+          onSelectLinkedDatabase={({ sourceDatabaseId, pageTitle = 'Untitled' }) => {
             setRelationPropertyData(
               relationPropertyData
                 ? {
@@ -71,6 +75,7 @@ export function RelationPropertyMenu({
                     showOnRelatedBoard: false
                   }
             );
+            setPropertyTitle(`Related to ${pageTitle}`);
             setShowSelectDatabaseMenu(false);
           }}
         />
@@ -81,13 +86,34 @@ export function RelationPropertyMenu({
             px: 1
           }}
         >
+          <TextField
+            value={propertyTitle}
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+            onChange={(e) => {
+              e.stopPropagation();
+              setPropertyTitle(e.target.value);
+            }}
+            autoFocus
+          />
+          <Divider
+            sx={{
+              mt: 2
+            }}
+          />
           <RelationPropertyOptions
             onChange={setRelationPropertyData}
             relationData={relationPropertyData}
             onButtonClick={() => {
-              onClick('relation', relationPropertyData);
+              onClick({
+                type: 'relation',
+                relationData: relationPropertyData,
+                name: propertyTitle
+              });
               onClose();
             }}
+            disabled={propertyTitle.length === 0}
             setShowSelectDatabaseMenu={setShowSelectDatabaseMenu}
           />
         </Box>
@@ -100,8 +126,10 @@ export function RelationPropertyOptions({
   setShowSelectDatabaseMenu,
   relationData,
   onChange,
-  onButtonClick
+  onButtonClick,
+  disabled
 }: {
+  disabled?: boolean;
   relationData: IPropertyTemplate['relationData'];
   setShowSelectDatabaseMenu?: (show: boolean) => void;
   onChange: (relationData?: IPropertyTemplate['relationData']) => void;
@@ -181,17 +209,6 @@ export function RelationPropertyOptions({
           </Stack>
         </PopperPopup>
       </StyledMenuItem>
-      {/* <StyledMenuItem
-        onClick={() => {
-          onChange({
-            ...relationData,
-            showOnRelatedBoard: !relationData.showOnRelatedBoard
-          });
-        }}
-      >
-        <Typography mr={3}>Show on {selectedPage.title ?? 'Untitled'}</Typography>
-        <Switch size='small' checked={relationData.showOnRelatedBoard} />
-      </StyledMenuItem> */}
       {onButtonClick && (
         <Button
           onClick={() => {
@@ -199,6 +216,7 @@ export function RelationPropertyOptions({
           }}
           primary
           fullWidth
+          disabled={disabled}
           sx={{
             mt: 1
           }}

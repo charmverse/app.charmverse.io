@@ -32,7 +32,11 @@ export function PropertyTypes({
   isMobile
 }: {
   selectedTypes?: PropertyType[];
-  onClick: (type: PropertyType, relationData?: IPropertyTemplate['relationData']) => void;
+  onClick: (property: {
+    type: PropertyType;
+    relationData?: IPropertyTemplate['relationData'];
+    name?: IPropertyTemplate['name'];
+  }) => void;
   isMobile?: boolean;
 }) {
   const addRelationPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-relation-property' });
@@ -59,7 +63,7 @@ export function PropertyTypes({
               {...(type === 'relation'
                 ? bindTriggerProps
                 : {
-                    onClick: () => onClick(type)
+                    onClick: () => onClick({ type })
                   })}
             >
               <ListItemIcon>{iconForPropertyType(type)}</ListItemIcon>
