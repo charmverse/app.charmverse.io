@@ -67,6 +67,24 @@ services:
     profiles:
       - stg-webapp
 
+  stg-ceramic:
+    extends:
+      service: defaults
+    command: ['sh', '-c', 'node ./dist/ceramic-client.js']
+    ports:
+      - '5001:5001'
+    profiles:
+      - stg-ceramic
+
+  prd-ceramic:
+    extends:
+      service: defaults
+    command: ['sh', '-c', 'node ./dist/ceramic-client.js']
+    ports:
+      - '5001:5001'
+    profiles:
+      - prd-ceramic
+
   prd-sockets:
     extends:
       service: defaults

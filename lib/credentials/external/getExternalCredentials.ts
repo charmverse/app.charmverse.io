@@ -1,26 +1,36 @@
-import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
+import type { ApolloClient } from '@apollo/client';
+import { gql } from '@apollo/client';
 import { log } from '@charmverse/core/log';
 import type { SchemaDecodedItem } from '@ethereum-attestation-service/eas-sdk';
 import { getAddress } from 'viem';
 import { arbitrum, base, optimism } from 'viem/chains';
 
+import { ApolloClientWithRedisCache } from '../apolloClientWithRedisCache';
 import type { EasSchemaChain } from '../connectors';
 import { getOnChainAttestationUrl } from '../connectors';
 
 import type { ExternalCredentialChain } from './schemas';
 import { externalCredentialChains, trackedSchemas } from './schemas';
 
-function getClient(url: string) {
-  return new ApolloClient({
-    cache: new InMemoryCache(),
-    uri: url
-  });
-}
+// For a specific profile, only refresh attestations every half hour
+const defaultEASCacheDuration = 1800;
 
 const graphQlClients: Record<ExternalCredentialChain, ApolloClient<any>> = {
-  [optimism.id]: getClient('https://optimism.easscan.org/graphql'),
-  [base.id]: getClient('https://base.easscan.org/graphql'),
-  [arbitrum.id]: getClient('https://arbitrum.easscan.org/graphql')
+  [optimism.id]: new ApolloClientWithRedisCache({
+    cacheKeyPrefix: 'optimism-easscan',
+    uri: 'https://optimism.easscan.org/graphql',
+    persistForSeconds: defaultEASCacheDuration
+  }),
+  [base.id]: new ApolloClientWithRedisCache({
+    cacheKeyPrefix: 'base-easscan',
+    uri: 'https://base.easscan.org/graphql',
+    persistForSeconds: defaultEASCacheDuration
+  }),
+  [arbitrum.id]: new ApolloClientWithRedisCache({
+    uri: 'https://arbitrum.easscan.org/graphql',
+    cacheKeyPrefix: 'arbitrum-easscan',
+    persistForSeconds: defaultEASCacheDuration
+  })
 };
 
 /**
@@ -77,10 +87,7 @@ function getTrackedOnChainCredentials({
       query: GET_EXTERNAL_CREDENTIALS,
       variables: {
         where: query
-      },
-      // For now, let's refetch each time and rely on http endpoint-level caching
-      // https://www.apollographql.com/docs/react/data/queries/#supported-fetch-policies
-      fetchPolicy: 'no-cache'
+      }
     })
     .then(({ data }) => {
       return data.attestations.map(

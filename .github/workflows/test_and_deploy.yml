@@ -240,6 +240,11 @@ jobs:
           rm -rf .ebextensions && mv .ebextensions_cron .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_cron.zip
 
+      - name: Update and Package ceramic server
+        run: |
+          rm -rf .ebextensions && mv .ebextensions_ceramic .ebextensions
+          cat files_to_zip.txt | zip --symlinks -r@ deploy_ceramic.zip
+
       - name: Update and Package websockets
         id: pkg_websocket
         run: |
@@ -291,6 +296,20 @@ jobs:
           version_label: ${{ github.sha }}
           region: us-east-1
           deployment_package: deploy_cron.zip
+          use_existing_version_if_available: true # allows triggering re-deploys with same version
+          wait_for_deployment: false # set to false to save sweet Github minutes
+
+
+      - name: Deploy Ceramic to Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: prd-charmverse-ceramic-link
+          environment_name: prd-charmverse-ceramic-link
+          version_label: ${{ github.sha }}
+          region: us-east-1
+          deployment_package: deploy_ceramic.zip
           use_existing_version_if_available: true # allows triggering re-deploys with same version
           wait_for_deployment: false # set to false to save sweet Github minutes
 

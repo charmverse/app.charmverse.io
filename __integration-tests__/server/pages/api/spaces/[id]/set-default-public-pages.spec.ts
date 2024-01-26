@@ -5,7 +5,7 @@ import request from 'supertest';
 
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
-describe.skip('POST /api/spaces/[id]/set-default-public-page - Set whether newly created root pages in a space should be public by default', () => {
+describe('POST /api/spaces/[id]/set-default-public-page - Set whether newly created root pages in a space should be public by default', () => {
   it('should update the space default if user is admin, and return the space, responding with 200', async () => {
     const { space, user: adminUser } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
 
