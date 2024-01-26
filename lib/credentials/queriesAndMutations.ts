@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client';
 import { log } from '@charmverse/core/log';
-import type { AttestationType } from '@charmverse/core/prisma-client';
+import { prisma, type AttestationType } from '@charmverse/core/prisma-client';
 import { Wallet } from 'ethers';
 
 import { credentialsWalletPrivateKey, graphQlServerEndpoint } from 'config/constants';
@@ -128,7 +128,7 @@ export async function getCharmverseCredentialsByWallets({
     return [];
   }
 
-  return ceramicGraphQlClient
+  const charmverseCredentials: EASAttestationFromApi[] = await ceramicGraphQlClient
     .query({
       query: GET_CREDENTIALS,
       variables: {
@@ -143,4 +143,36 @@ export async function getCharmverseCredentialsByWallets({
       // https://www.apollographql.com/docs/react/data/queries/#supported-fetch-policies
     })
     .then(({ data }) => data.signedCredentialFourIndex.edges.map((e: any) => getParsedCredential(e.node)));
+
+  const credentialIds = charmverseCredentials.map((c) => c.id);
+
+  const issuedCredentials = await prisma.issuedCredential.findMany({
+    where: {
+      ceramicId: {
+        in: credentialIds
+      }
+    },
+    select: {
+      id: true,
+      proposal: {
+        select: {
+          space: {
+            select: {
+              spaceArtwork: true,
+              credentialLogo: true
+            }
+          }
+        }
+      }
+    }
+  });
+
+  return charmverseCredentials.map((credential) => {
+    const issuedCredential = issuedCredentials.find((ic) => ic.id === credential.id);
+
+    return {
+      ...credential,
+      iconUrl: issuedCredential?.proposal.space.credentialLogo ?? issuedCredential?.proposal.space.spaceArtwork
+    };
+  });
 }

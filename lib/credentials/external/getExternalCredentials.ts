@@ -46,6 +46,7 @@ export type EASAttestationFromApi<T = any> = {
   chainId: ExternalCredentialChain | EasSchemaChain;
   type: 'external' | 'internal';
   verificationUrl: string;
+  iconUrl?: string | null;
 };
 
 const GET_EXTERNAL_CREDENTIALS = gql`
