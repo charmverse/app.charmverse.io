@@ -17,14 +17,14 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireWalletSignature).post(login);
 
-async function login(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
+async function login(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { otpRequired: true }>) {
   const { address } = req.body as Web3LoginRequest;
 
   const user = await prisma.user.findFirst({
     where: {
       wallets: {
         some: {
-          address
+          address: address.toLowerCase()
         }
       }
     },
@@ -39,17 +39,24 @@ async function login(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { 
     throw new DisabledAccountError();
   }
 
-  req.session.user = { id: user.id };
   await updateGuildRolesForUser(
     user.wallets.map((w) => w.address),
     user.spaceRoles
   );
 
-  log.info(`User ${user.id} logged in with Wallet`, { userId: user.id, method: 'wallet' });
+  if (user.otp?.activatedAt) {
+    req.session.otpUser = { id: user.id, method: 'Wallet' };
+    await req.session.save();
 
+    return res.status(200).json({ otpRequired: true });
+  }
+
+  req.session.user = { id: user.id };
   await req.session.save();
 
   trackUserAction('sign_in', { userId: user.id, identityType: 'Wallet' });
+
+  log.info(`User ${user.id} logged in with Wallet`, { userId: user.id, method: 'wallet' });
 
   return res.status(200).json(user);
 }

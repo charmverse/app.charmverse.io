@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
+import { useGetTriggerUser } from 'charmClient/hooks/profile';
 import type { LoggedInUser } from 'models';
 
 export type IContext = {
@@ -9,7 +10,6 @@ export type IContext = {
   setUser: (user: LoggedInUser | any) => void;
   updateUser: (user: Partial<LoggedInUser>) => void;
   isLoaded: boolean;
-  setIsLoaded: (isLoaded: boolean) => void;
   refreshUser: () => Promise<void>;
   logoutUser: () => Promise<void>;
 };
@@ -19,7 +19,6 @@ export const UserContext = createContext<Readonly<IContext>>({
   setUser: () => undefined,
   updateUser: () => undefined,
   isLoaded: false,
-  setIsLoaded: () => undefined,
   refreshUser: () => Promise.resolve(),
   logoutUser: () => Promise.resolve()
 });
@@ -27,6 +26,7 @@ export const UserContext = createContext<Readonly<IContext>>({
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<LoggedInUser | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const { trigger: getUser } = useGetTriggerUser();
 
   async function logoutUser() {
     await charmClient.logout();
@@ -39,14 +39,15 @@ export function UserProvider({ children }: { children: ReactNode }) {
    * Logs out current user if the web 3 account is not the same as the current user, otherwise refreshes them
    */
   async function refreshUser() {
-    charmClient
-      .getUser()
-      .then((_user) => {
+    await getUser(undefined, {
+      onSuccess: (_user) => {
         setUser(_user);
-      })
-      .finally(() => {
         setIsLoaded(true);
-      });
+      },
+      onError: () => {
+        setIsLoaded(true);
+      }
+    });
   }
 
   useEffect(() => {
@@ -70,7 +71,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
       user,
       setUser,
       isLoaded,
-      setIsLoaded,
       updateUser,
       refreshUser,
       logoutUser
