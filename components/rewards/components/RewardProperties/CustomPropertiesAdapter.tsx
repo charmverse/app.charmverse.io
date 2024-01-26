@@ -16,16 +16,7 @@ type Props = {
 export function CustomPropertiesAdapter({ reward, onChange, readOnly }: Props) {
   const { user } = useUser();
   const isAdmin = useIsAdmin();
-  const {
-    boardCustomProperties,
-    card,
-    cards,
-    activeView,
-    views,
-    rewardPage,
-    setBoardReward,
-    relationPropertiesCardsRecord
-  } = useRewardsBoard();
+  const { boardCustomProperties, card, cards, activeView, views, rewardPage, setBoardReward } = useRewardsBoard();
   const mutator = usePropertiesMutator({ reward, onChange });
 
   useEffect(() => {
@@ -45,7 +36,6 @@ export function CustomPropertiesAdapter({ reward, onChange, readOnly }: Props) {
       pageUpdatedBy={rewardPage?.updatedBy || user?.id || ''}
       mutator={mutator ?? undefined}
       disableEditPropertyOption={!isAdmin}
-      relationPropertiesCardsRecord={relationPropertiesCardsRecord}
     />
   );
 }

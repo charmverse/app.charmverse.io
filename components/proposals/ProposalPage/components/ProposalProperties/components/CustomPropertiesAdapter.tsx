@@ -21,16 +21,8 @@ export function CustomPropertiesAdapter({ proposal, onChange, readOnly, readOnly
   const isAdmin = useIsAdmin();
 
   // TODO - use value from context instead of raw hook
-  const {
-    relationPropertiesCardsRecord,
-    boardCustomProperties,
-    card,
-    cards,
-    activeView,
-    views,
-    proposalPage,
-    setBoardProposal
-  } = useProposalsBoardAdapter();
+  const { boardCustomProperties, card, cards, activeView, views, proposalPage, setBoardProposal } =
+    useProposalsBoardAdapter();
   const mutator = usePropertiesMutator({ proposal, onChange });
 
   useEffect(() => {
@@ -53,7 +45,6 @@ export function CustomPropertiesAdapter({ proposal, onChange, readOnly, readOnly
       mutator={mutator ?? undefined}
       readOnlyProperties={readOnlyProperties}
       disableEditPropertyOption={!isAdmin}
-      relationPropertiesCardsRecord={relationPropertiesCardsRecord}
     />
   );
 }

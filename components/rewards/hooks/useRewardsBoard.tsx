@@ -2,7 +2,6 @@ import type { PageMeta } from '@charmverse/core/pages';
 import type { ReactNode } from 'react';
 import { createContext, useContext } from 'react';
 
-import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import type { BoardReward } from 'components/rewards/components/RewardProperties/hooks/useRewardsBoardAdapter';
 import { useRewardsBoardAdapter } from 'components/rewards/components/RewardProperties/hooks/useRewardsBoardAdapter';
 import type { Board } from 'lib/focalboard/board';
@@ -21,7 +20,6 @@ type RewardsBoardContextType = {
   rewardPage: PageMeta | undefined;
   boardReward: BoardReward | null;
   setBoardReward: (boardReward: BoardReward | null) => void;
-  relationPropertiesCardsRecord: PageListItemsRecord;
 };
 
 const RewardsBoardContext = createContext<Readonly<RewardsBoardContextType>>({
@@ -34,8 +32,7 @@ const RewardsBoardContext = createContext<Readonly<RewardsBoardContextType>>({
   views: [],
   rewardPage: undefined,
   boardReward: null,
-  setBoardReward: () => {},
-  relationPropertiesCardsRecord: {}
+  setBoardReward: () => {}
 });
 
 export function RewardsBoardProvider({ children }: { children: ReactNode }) {

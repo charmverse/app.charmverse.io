@@ -66,17 +66,9 @@ export interface DocumentPageProps {
   readOnly?: boolean;
   insideModal?: boolean;
   enableSidebar?: boolean;
-  relationPropertiesCardsRecord?: PageListItemsRecord;
 }
 
-function DocumentPage({
-  relationPropertiesCardsRecord,
-  insideModal = false,
-  page,
-  savePage,
-  readOnly = false,
-  enableSidebar
-}: DocumentPageProps) {
+function DocumentPage({ insideModal = false, page, savePage, readOnly = false, enableSidebar }: DocumentPageProps) {
   const { user } = useUser();
   const { router } = useCharmRouter();
   const { activeView: sidebarView, setActiveView, closeSidebar } = usePageSidebar();
@@ -267,7 +259,6 @@ function DocumentPage({
             readOnly={readOnly}
             pageUpdatedAt={page.updatedAt.toString()}
             pageUpdatedBy={page.updatedBy}
-            relationPropertiesCardsRecord={relationPropertiesCardsRecord}
           />
           <AddBountyButton readOnly={readOnly} cardId={page.id} />
         </>

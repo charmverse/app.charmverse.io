@@ -183,7 +183,7 @@ export function RelationProperty({
           </Stack>
         </PopperPopup>
       </StyledMenuItem>
-      <StyledMenuItem
+      {/* <StyledMenuItem
         onClick={() => {
           onChange({
             ...relationData,
@@ -193,7 +193,7 @@ export function RelationProperty({
       >
         <Typography mr={3}>Show on {selectedPage.title ?? 'Untitled'}</Typography>
         <Switch size='small' checked={relationData.showOnRelatedBoard} />
-      </StyledMenuItem>
+      </StyledMenuItem> */}
       {onButtonClick && (
         <Button
           onClick={() => {

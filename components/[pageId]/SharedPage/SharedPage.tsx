@@ -15,7 +15,6 @@ import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
-import { useRelationProperties } from 'hooks/useRelationProperties';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
 
 type Props = {
@@ -28,10 +27,6 @@ export function SharedPage({ publicPage }: Props) {
   const { pages } = usePages();
   const [, setPageTitle] = usePageTitle();
   const { space } = useCurrentSpace();
-
-  const relationPropertiesCardsRecord = useRelationProperties({
-    page: publicPage?.page
-  });
 
   const basePageId = publicPage?.page?.id || '';
 
@@ -93,13 +88,7 @@ export function SharedPage({ publicPage }: Props) {
     <DatabasePage page={currentPage} setPage={() => null} readOnly />
   ) : (
     <Box sx={{ overflowY: 'auto' }}>
-      <DocumentPage
-        relationPropertiesCardsRecord={relationPropertiesCardsRecord}
-        page={publicPage.page}
-        savePage={() => null}
-        readOnly
-        enableSidebar
-      />
+      <DocumentPage page={publicPage.page} savePage={() => null} readOnly enableSidebar />
     </Box>
   );
 }

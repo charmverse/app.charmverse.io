@@ -14,13 +14,10 @@ import { DocumentPageProviders } from 'components/[pageId]/DocumentPage/Document
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
 import type { PageDialogContext } from 'components/common/PageDialog/hooks/usePageDialog';
-import { useRewardsBoardAdapter } from 'components/rewards/components/RewardProperties/hooks/useRewardsBoardAdapter';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
-import { useRelationProperties } from 'hooks/useRelationProperties';
-import type { PageWithContent } from 'lib/pages';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
 import { FullPageActionsMenuButton } from '../PageActions/FullPageActionsMenuButton';
@@ -42,28 +39,6 @@ interface Props {
   applicationContext?: PageDialogContext;
 }
 
-function RewardsDocumentPage({
-  page,
-  readOnlyPage,
-  savePage
-}: {
-  readOnlyPage: boolean;
-  page: PageWithContent;
-  savePage: (p: Partial<Page>) => void;
-}) {
-  const { relationPropertiesCardsRecord } = useRewardsBoardAdapter();
-
-  return (
-    <DocumentPage
-      relationPropertiesCardsRecord={relationPropertiesCardsRecord}
-      insideModal
-      page={page}
-      savePage={savePage}
-      readOnly={readOnlyPage}
-    />
-  );
-}
-
 function PageDialogBase(props: Props) {
   const { hideToolsMenu = false, pageId, readOnly, applicationContext } = props;
 
@@ -82,8 +57,6 @@ function PageDialogBase(props: Props) {
     : applicationContext
     ? `/${domain}/rewards/applications/${applicationContext.applicationId}`
     : null;
-
-  const relationPropertiesCardsRecord = useRelationProperties({ page });
 
   const readOnlyPage = readOnly || !pagePermissions?.edit_content;
 
@@ -200,19 +173,9 @@ function PageDialogBase(props: Props) {
       }
       onClose={close}
     >
-      {page &&
-        contentType === 'page' &&
-        (page.type === 'bounty' || page.type === 'bounty_template' ? (
-          <RewardsDocumentPage page={page} readOnlyPage={readOnlyPage} savePage={savePage} />
-        ) : (
-          <DocumentPage
-            relationPropertiesCardsRecord={relationPropertiesCardsRecord}
-            insideModal
-            page={page}
-            savePage={savePage}
-            readOnly={readOnlyPage}
-          />
-        ))}
+      {page && contentType === 'page' && (
+        <DocumentPage insideModal page={page} savePage={savePage} readOnly={readOnlyPage} />
+      )}
       {contentType === 'application' && applicationContext && (
         <RewardApplicationPage
           applicationId={applicationContext.applicationId || null}

@@ -2,7 +2,6 @@ import type { PageMeta } from '@charmverse/core/pages';
 import type { ReactNode } from 'react';
 import { createContext, useContext } from 'react';
 
-import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
@@ -24,7 +23,6 @@ export type ProposalsBoardContextType = {
   isLoading: boolean;
   refreshProposals: VoidFunction;
   setBoardProposal: (boardProposal: BoardProposal | null) => void;
-  relationPropertiesCardsRecord: PageListItemsRecord;
 };
 
 export const ProposalsBoardContext = createContext<Readonly<ProposalsBoardContextType>>({
@@ -39,7 +37,6 @@ export const ProposalsBoardContext = createContext<Readonly<ProposalsBoardContex
   isLoading: true,
   refreshProposals: () => {},
   boardProposal: null,
-  relationPropertiesCardsRecord: {},
   setBoardProposal: () => {}
 });
 

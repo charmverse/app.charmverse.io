@@ -5,13 +5,11 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import type { Dispatch, SetStateAction } from 'react';
 import React from 'react';
-import { mutate } from 'swr';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
 import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFilterControl';
 import { ViewSettingsRow } from 'components/common/BoardEditor/components/ViewSettingsRow';
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
-import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import Link from 'components/common/Link';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -53,7 +51,6 @@ type Props = {
   toggleViewOptions: (open?: boolean) => void;
   checkedIds?: string[];
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
-  relationPropertiesCardsRecord: PageListItemsRecord;
 };
 
 function ViewHeader(props: Props) {
@@ -185,11 +182,7 @@ function ViewHeader(props: Props) {
               )}
 
               {/* Filter */}
-              <ViewFilterControl
-                relationPropertiesCardsRecord={props.relationPropertiesCardsRecord}
-                activeBoard={activeBoard}
-                activeView={activeView}
-              />
+              <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
 
               {/* Sort */}
               {withSortBy && (

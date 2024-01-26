@@ -40,16 +40,7 @@ export function ProposalsPage({ title }: { title: string }) {
   const isAdmin = useIsAdmin();
   const { showError } = useSnackbar();
   const { user } = useUser();
-  const {
-    board: activeBoard,
-    views,
-    cardPages,
-    activeView,
-    cards,
-    isLoading,
-    refreshProposals,
-    relationPropertiesCardsRecord
-  } = useProposalsBoard();
+  const { board: activeBoard, views, cardPages, activeView, cards, isLoading, refreshProposals } = useProposalsBoard();
   const [showSidebar, setShowSidebar] = useState(false);
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
@@ -137,11 +128,7 @@ export function ProposalsPage({ title }: { title: string }) {
             )}
             <div className='octo-spacer' />
             <Box className='view-actions'>
-              <ViewFilterControl
-                relationPropertiesCardsRecord={relationPropertiesCardsRecord}
-                activeBoard={activeBoard}
-                activeView={activeView}
-              />
+              <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
               <ViewSortControl
                 activeBoard={activeBoard}
                 activeView={activeView}
@@ -177,7 +164,6 @@ export function ProposalsPage({ title }: { title: string }) {
                     setSelectedPropertyId(_setSelectedPropertyId);
                     setShowSidebar(true);
                   }}
-                  relationPropertiesCardsRecord={relationPropertiesCardsRecord}
                   board={activeBoard}
                   activeView={activeView}
                   cardPages={cardPages}

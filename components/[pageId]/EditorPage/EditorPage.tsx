@@ -5,69 +5,16 @@ import { useCallback, useEffect } from 'react';
 
 import { trackPageView } from 'charmClient/hooks/track';
 import ErrorPage from 'components/common/errors/ErrorPage';
-import { useProposalsBoardAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter';
-import { useRewardsBoardAdapter } from 'components/rewards/components/RewardProperties/hooks/useRewardsBoardAdapter';
 import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
-import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
-import { useRelationProperties } from 'hooks/useRelationProperties';
-import type { PageWithContent } from 'lib/pages';
 import debouncePromise from 'lib/utilities/debouncePromise';
 
 import { DatabasePage } from '../DatabasePage';
 import DocumentPage from '../DocumentPage';
-
-function ProposalEditorPage({
-  page,
-  readOnly,
-  savePage
-}: {
-  readOnly?: boolean;
-  savePage: (p: Partial<Page>) => void;
-  page: PageWithContent;
-}) {
-  const { relationPropertiesCardsRecord } = useProposalsBoardAdapter();
-
-  return (
-    <Box flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
-      <DocumentPage
-        relationPropertiesCardsRecord={relationPropertiesCardsRecord}
-        page={page}
-        readOnly={readOnly}
-        savePage={savePage}
-        enableSidebar
-      />
-    </Box>
-  );
-}
-
-function RewardEditorPage({
-  page,
-  readOnly,
-  savePage
-}: {
-  readOnly?: boolean;
-  savePage: (p: Partial<Page>) => void;
-  page: PageWithContent;
-}) {
-  const { relationPropertiesCardsRecord } = useRewardsBoardAdapter();
-
-  return (
-    <Box flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
-      <DocumentPage
-        relationPropertiesCardsRecord={relationPropertiesCardsRecord}
-        page={page}
-        readOnly={readOnly}
-        savePage={savePage}
-        enableSidebar
-      />
-    </Box>
-  );
-}
 
 export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
   const { setCurrentPageId } = useCurrentPage();
@@ -76,7 +23,6 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
   const { space: currentSpace } = useCurrentSpace();
   useRewardsNavigation();
   const { error: pageWithContentError, page, updatePage } = usePage({ pageIdOrPath, spaceId: currentSpace?.id });
-  const relationPropertiesCardsRecord = useRelationProperties({ page });
 
   const readOnly =
     (page?.permissionFlags.edit_content === false && editMode !== 'suggesting') || editMode === 'viewing';
@@ -168,21 +114,11 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
       page.type === 'linked_board'
     ) {
       return <DatabasePage page={page} setPage={savePage} pagePermissions={page.permissionFlags} />;
-    } else if (page.type === 'proposal' || page.type === 'proposal_template') {
-      return <ProposalEditorPage page={page} readOnly={readOnly} savePage={savePage} />;
-    } else if (page.type === 'bounty' || page.type === 'bounty_template') {
-      return <RewardEditorPage page={page} readOnly={readOnly} savePage={savePage} />;
     } else {
       // Document page is used in a few places, so it is responsible for retrieving its own permissions
       return (
         <Box flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
-          <DocumentPage
-            relationPropertiesCardsRecord={relationPropertiesCardsRecord}
-            page={page}
-            readOnly={readOnly}
-            savePage={savePage}
-            enableSidebar
-          />
+          <DocumentPage page={page} readOnly={readOnly} savePage={savePage} enableSidebar />
         </Box>
       );
     }

@@ -19,7 +19,6 @@ import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
 import { Constants } from 'lib/focalboard/constants';
 import { viewTypeToBlockId } from 'lib/focalboard/customBlocks/constants';
-import { getRelationPropertiesCardsRecord } from 'lib/focalboard/getRelationPropertiesCardsRecord';
 import type { Member } from 'lib/members/interfaces';
 import type { PagesMap } from 'lib/pages';
 import {
@@ -64,17 +63,6 @@ export function useRewardsBoardAdapter() {
     storedBoard: rewardBoardBlock,
     hasMilestoneRewards
   });
-
-  const relationPropertiesCardsRecord = useMemo(
-    () =>
-      board?.fields && pages
-        ? getRelationPropertiesCardsRecord({
-            pages: Object.values(pages),
-            activeBoard: board
-          })
-        : {},
-    [pages, board]
-  );
 
   const views = useMemo(() => {
     return board.fields.viewIds
@@ -153,7 +141,7 @@ export function useRewardsBoardAdapter() {
       cards = cards.filter((cp) => filteredCardsIds.includes(cp.card.id));
     }
     const sortedCardPages = activeView
-      ? sortCards(cards, board, activeView, membersRecord, relationPropertiesCardsRecord, localViewSettings?.localSort)
+      ? sortCards(cards, board, activeView, membersRecord, {}, localViewSettings?.localSort)
       : [];
 
     return sortedCardPages;
@@ -166,8 +154,7 @@ export function useRewardsBoardAdapter() {
     membersRecord,
     pages,
     rewards,
-    space?.id,
-    relationPropertiesCardsRecord
+    space?.id
   ]);
 
   const boardCustomProperties: Board = getDefaultBoard({
@@ -188,7 +175,6 @@ export function useRewardsBoardAdapter() {
   const cards: Card[] = cardPages.map((cp) => cp.card) || [];
 
   return {
-    relationPropertiesCardsRecord,
     board,
     boardCustomProperties,
     card,

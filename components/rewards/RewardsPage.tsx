@@ -59,7 +59,7 @@ export function RewardsPage({ title }: { title: string }) {
 
   const isAdmin = useIsAdmin();
 
-  const { board: activeBoard, views, cardPages, activeView, cards, relationPropertiesCardsRecord } = useRewardsBoard();
+  const { board: activeBoard, views, cardPages, activeView, cards } = useRewardsBoard();
 
   const [showSidebar, setShowSidebar] = useState(false);
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
@@ -202,11 +202,7 @@ export function RewardsPage({ title }: { title: string }) {
                 />
               )}
 
-              <ViewFilterControl
-                relationPropertiesCardsRecord={relationPropertiesCardsRecord}
-                activeBoard={activeBoard}
-                activeView={activeView}
-              />
+              <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
 
               <ViewSortControl
                 activeBoard={activeBoard}
@@ -247,7 +243,6 @@ export function RewardsPage({ title }: { title: string }) {
                       setSelectedPropertyId(_setSelectedPropertyId);
                       setShowSidebar(true);
                     }}
-                    relationPropertiesCardsRecord={relationPropertiesCardsRecord}
                     board={activeBoard}
                     activeView={activeView}
                     cardPages={cardPages as CardPage[]}
@@ -279,7 +274,6 @@ export function RewardsPage({ title }: { title: string }) {
                     dateDisplayProperty={dateDisplayProperty}
                     showCard={showRewardOrApplication}
                     addCard={async () => {}}
-                    relationPropertiesCardsRecord={relationPropertiesCardsRecord}
                     disableAddingCards
                   />
                 )}
@@ -299,7 +293,6 @@ export function RewardsPage({ title }: { title: string }) {
                     showCard={showRewardOrApplication}
                     disableAddingCards
                     readOnlyTitle
-                    relationPropertiesCardsRecord={relationPropertiesCardsRecord}
                     disableDnd
                     hideLinkedBounty
                   />
