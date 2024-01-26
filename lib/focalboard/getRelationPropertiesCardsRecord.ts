@@ -1,20 +1,20 @@
-import type { PageMeta } from '@charmverse/core/dist/cjs/pages';
+import type { PageMeta } from '@charmverse/core/pages';
 
 import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import type { PageListItem } from 'components/common/PagesList';
 import { isTruthy } from 'lib/utilities/types';
 
-import type { Board } from './board';
+import type { IPropertyTemplate } from './board';
 
 export function getRelationPropertiesCardsRecord({
-  activeBoard,
+  properties,
   pages
 }: {
-  activeBoard: Board;
+  properties: IPropertyTemplate[];
   pages: ((PageListItem & { parentId: PageMeta['parentId'] }) | undefined)[];
 }) {
   const boardCardsRecord: PageListItemsRecord = {};
-  const relationProperties = activeBoard.fields.cardProperties.filter((o) => o.type === 'relation');
+  const relationProperties = properties.filter((o) => o.type === 'relation');
 
   pages.filter(isTruthy).forEach((page) => {
     const pageListItem = {

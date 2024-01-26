@@ -161,12 +161,6 @@ function PropertyValueElement(props: Props) {
     }
   });
 
-  const pageListItemsRecord =
-    props.relationPropertyCards?.reduce<Record<string, PageListItem>>((acc, pageListItem) => {
-      acc[pageListItem.id] = pageListItem;
-      return acc;
-    }, {}) ?? {};
-
   const emptyDisplayValue = showEmptyPlaceholder
     ? intl.formatMessage({ id: 'PropertyValueElement.empty', defaultMessage: 'Empty' })
     : '';
@@ -288,21 +282,23 @@ function PropertyValueElement(props: Props) {
   } else if (propertyTemplate.relationData && propertyTemplate.type === 'relation') {
     return (
       <RelationPropertyPagesAutocomplete
-        relationLimit={propertyTemplate.relationData.limit}
-        onChange={async (newValue) => {
+        boardProperties={board.fields.cardProperties}
+        propertyTemplate={propertyTemplate}
+        selectedPageListItemIds={
+          typeof propertyValue === 'string' ? [propertyValue] : (propertyValue as string[]) ?? []
+        }
+        displayType={displayType}
+        emptyPlaceholderContent={emptyDisplayValue}
+        showEmptyPlaceholder={showEmptyPlaceholder}
+        onChange={async (pageListItemIds) => {
           try {
-            await mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+            await mutator.changePropertyValue(card, propertyTemplate.id, pageListItemIds);
           } catch (error) {
             showError(error);
           }
         }}
         readOnly={readOnly}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
-        selectedPageListItems={(Array.isArray(propertyValue)
-          ? propertyValue.map((pageListItemId) => pageListItemsRecord[pageListItemId])
-          : []
-        ).filter(isTruthy)}
-        pageListItems={props.relationPropertyCards ?? []}
       />
     );
   } else if (propertyTemplate.type === 'select' || propertyTemplate.type === 'multiSelect') {

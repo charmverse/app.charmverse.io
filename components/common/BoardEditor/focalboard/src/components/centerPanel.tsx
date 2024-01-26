@@ -154,7 +154,7 @@ function CenterPanel(props: Props) {
     () =>
       getRelationPropertiesCardsRecord({
         pages: Object.values(pages),
-        activeBoard
+        properties: activeBoard?.fields.cardProperties ?? []
       }),
     [pages, activeBoard]
   );

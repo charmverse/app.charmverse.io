@@ -23,7 +23,7 @@ import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { RelationPageListItemsContainer } from 'components/common/BoardEditor/components/properties/RelationPropertyPagesAutocomplete';
+import { RelationPageListItemsContainer } from 'components/common/BoardEditor/components/properties/PagesAutocomplete';
 import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { PageIcon } from 'components/common/PageIcon';
 import PageTitle from 'components/common/PageLayout/components/PageTitle';

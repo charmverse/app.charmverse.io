@@ -171,7 +171,7 @@ export async function loadAndGenerateCsv({
 
   const relationPropertiesCardsRecord = boardBlock
     ? getRelationPropertiesCardsRecord({
-        activeBoard: boardBlock as unknown as Board,
+        properties: (boardBlock.fields as unknown as BoardFields)?.cardProperties ?? [],
         pages: connectedPages
       })
     : {};

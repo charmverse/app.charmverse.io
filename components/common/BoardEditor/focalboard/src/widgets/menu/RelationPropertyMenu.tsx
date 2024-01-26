@@ -81,7 +81,7 @@ export function RelationPropertyMenu({
             px: 1
           }}
         >
-          <RelationProperty
+          <RelationPropertyOptions
             onChange={setRelationPropertyData}
             relationData={relationPropertyData}
             onButtonClick={() => {
@@ -96,18 +96,16 @@ export function RelationPropertyMenu({
   );
 }
 
-export function RelationProperty({
+export function RelationPropertyOptions({
   setShowSelectDatabaseMenu,
   relationData,
   onChange,
-  onButtonClick,
-  sx
+  onButtonClick
 }: {
   relationData: IPropertyTemplate['relationData'];
   setShowSelectDatabaseMenu?: (show: boolean) => void;
   onChange: (relationData?: IPropertyTemplate['relationData']) => void;
   onButtonClick?: () => void;
-  sx?: SxProps;
 }) {
   const { pages } = usePages();
   const selectedPage = relationData ? pages[relationData.boardId] : null;
