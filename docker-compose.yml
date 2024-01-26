@@ -79,7 +79,7 @@ services:
   stg-ceramic:
     extends:
       service: defaults
-    command: ['sh', '-c', 'npx', 'tsx', 'background/ceramicServer/run-deploy.ts']
+    command: ['sh', '-c', 'node ./dist/ceramic-client.js']
     ports:
       - '5001:5001'
     profiles:

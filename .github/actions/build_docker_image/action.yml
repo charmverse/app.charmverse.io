@@ -27,7 +27,7 @@ runs:
       id: prune_dev_dep
       shell: bash
       run: |
-        # npm prune --omit=dev
+        npm prune --omit=dev
         rm -rf .next/cache
 
     - name: Set up Docker Buildx
