@@ -126,13 +126,11 @@ function LoginHandler(props: DialogProps) {
 
   async function handleLogin(loggedInUser: { identityType?: string }) {
     showMessage(`Logged in with ${loggedInUser?.identityType}. Redirecting you now`, 'success');
+    window.location.reload();
   }
 
   async function handleGoogleLogin() {
-    const onSuccess = () => {
-      handleLogin({ identityType: 'Google' });
-      window.location.reload();
-    };
+    const onSuccess = () => handleLogin({ identityType: 'Google' });
     return loginWithGooglePopup({ onSuccess });
   }
 
@@ -157,7 +155,6 @@ function LoginHandler(props: DialogProps) {
     try {
       const resp = await loginFromWeb3Account(authSig);
       if (resp?.id) {
-        window.location.reload();
         handleLogin({ identityType: 'Wallet' });
       }
     } catch (err) {
