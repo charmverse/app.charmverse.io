@@ -121,7 +121,11 @@ export default function LargeAvatar(props: LargeAvatarProps) {
   }
 
   if (!editable) {
-    return <Avatar avatar={image} name={name} variant={variant} isNft={isNft} size='2xLarge' />;
+    return (
+      <StyledBox>
+        <Avatar avatar={image} name={name} variant={variant} isNft={isNft} size='2xLarge' />
+      </StyledBox>
+    );
   }
 
   return (

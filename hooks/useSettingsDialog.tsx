@@ -37,7 +37,7 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
         const domSection = document.getElementById(_section);
         domSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-    }, 300);
+    }, 200);
   }
 
   function onClose() {
