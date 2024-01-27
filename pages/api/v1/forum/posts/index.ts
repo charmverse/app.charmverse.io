@@ -86,7 +86,7 @@ export type PublicApiForumPost = {
  *    CreateForumPostInput:
  *      type: object
  *      properties:
- *        createdBy:
+ *        userId:
  *          type: string
  *          format: uuid
  *        contentMarkdown:
@@ -101,7 +101,7 @@ export type PublicApiForumPost = {
  */
 
 interface CreateForumPostInput {
-  createdBy: string;
+  userId: string;
   contentMarkdown: string;
   title: string;
   categoryId: string;
@@ -152,7 +152,7 @@ async function createPost(req: NextApiRequest, res: NextApiResponse<PublicApiFor
   const spaceRole = await prisma.spaceRole.findFirst({
     where: {
       spaceId: space.id,
-      userId: payload.createdBy
+      userId: payload.userId
     }
   });
 
@@ -166,7 +166,7 @@ async function createPost(req: NextApiRequest, res: NextApiResponse<PublicApiFor
     categoryId: payload.categoryId,
     content: postContent,
     contentText: payload.contentMarkdown,
-    createdBy: payload.createdBy,
+    createdBy: payload.userId,
     isDraft: false,
     spaceId: space.id,
     title: payload.title
@@ -197,7 +197,7 @@ async function createPost(req: NextApiRequest, res: NextApiResponse<PublicApiFor
   const forumPost = await getPublicForumPost({
     post: {
       ...post,
-      votes: getPostVoteSummary(upDownVotes, payload.createdBy),
+      votes: getPostVoteSummary(upDownVotes, payload.userId),
       author: getUserProfile(post.author),
       createdAt: post.createdAt.toISOString(),
       updatedAt: post.updatedAt.toISOString(),
