@@ -40,8 +40,8 @@ import { InputVotingStrategies } from './InputVotingStrategies';
 interface Props {
   onSubmit: () => void;
   pageId: string;
-  proposalId?: string;
-  evaluationId?: string;
+  proposalId: string;
+  evaluationId: string;
   durationDays?: number;
 }
 
@@ -213,7 +213,6 @@ export function PublishingForm({ onSubmit, pageId, proposalId, evaluationId }: P
         content: pageWithDetails.content,
         generatorOptions: { members }
       });
-
       if (!account || !web3Provider) {
         throw new MissingWeb3AccountError();
       }
@@ -249,13 +248,11 @@ export function PublishingForm({ onSubmit, pageId, proposalId, evaluationId }: P
         const timestampWithVotingDelay = start - snapshotSpace.voting.delay;
         proposalParams.timestamp = timestampWithVotingDelay;
       }
-
       const receipt: SnapshotReceipt = (await client.proposal(
         web3Provider,
         getAddress(account as string),
         proposalParams
       )) as SnapshotReceipt;
-
       if (evaluationId) {
         updateProposalEvaluation({
           evaluationId,

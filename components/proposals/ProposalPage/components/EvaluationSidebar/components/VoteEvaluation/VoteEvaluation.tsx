@@ -17,14 +17,15 @@ import { SnapshotVoteDetails } from './components/SnapshotVoteDetails';
 export type Props = {
   isCurrent: boolean;
   pageId: string;
-  proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'permissions' | 'archived'>;
+  proposal: Pick<ProposalWithUsersAndRubric, 'id' | 'permissions' | 'archived'>;
   evaluation: PopulatedEvaluation;
+  refreshProposal?: VoidFunction;
 };
 
-export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation }: Props) {
+export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation, refreshProposal }: Props) {
   const { data: votes, mutate: refreshVotes, isLoading } = useGetVotesForPage(pageId ? { pageId } : undefined);
   const { showMessage } = useSnackbar();
-  const isReviewer = isCurrent && proposal?.permissions.evaluate;
+  const isReviewer = isCurrent && proposal.permissions.evaluate;
   const vote = votes?.find((v) => v.id === evaluation.voteId);
   const hasVote = !!vote;
 
@@ -46,7 +47,9 @@ export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation }: Prop
     await refreshVotes();
   }
 
-  function onPublishToSnapshot() {}
+  function onPublishToSnapshot() {
+    refreshProposal?.();
+  }
 
   useEffect(() => {
     if (!hasVote && isCurrent) {
@@ -60,7 +63,9 @@ export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation }: Prop
   }
 
   if (!vote) {
-    if (evaluation.voteSettings?.publishToSnapshot) {
+    if (evaluation.snapshotId) {
+      return <SnapshotVoteDetails snapshotProposalId={evaluation.snapshotId} />;
+    } else if (evaluation.voteSettings?.publishToSnapshot) {
       return (
         <Tooltip
           title={!isReviewer ? 'Only proposal authors and space admins can publish this proposal to snapshot' : ''}
@@ -76,7 +81,7 @@ export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation }: Prop
               onPublish={onPublishToSnapshot}
               pageId={pageId!}
               evaluationId={evaluation.id}
-              proposalId={proposal!.id}
+              proposalId={proposal.id}
               snapshotProposalId={evaluation.snapshotId}
             />
           </span>
@@ -103,9 +108,7 @@ export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation }: Prop
   vote.title = evaluation.title;
 
   if (evaluation.voteSettings?.publishToSnapshot) {
-    return evaluation.snapshotId ? (
-      <SnapshotVoteDetails snapshotProposalId={evaluation.snapshotId} />
-    ) : (
+    return evaluation.snapshotId ? null : (
       <NoCommentsMessage
         icon={
           <HowToVoteIcon
