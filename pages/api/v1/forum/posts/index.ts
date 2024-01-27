@@ -7,6 +7,8 @@ import { InvalidStateError } from 'lib/middleware';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import { apiHandler } from 'lib/public-api/handler';
 import type { UserProfile } from 'lib/public-api/interfaces';
+import type { UserInfo } from 'lib/public-api/searchUserProfile';
+import { getUserProfile, userProfileSelect } from 'lib/public-api/searchUserProfile';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = apiHandler();
@@ -47,16 +49,13 @@ const handler = apiHandler();
  *              format: uuid
  *            name:
  *              type: string
- *        totalComments:
+ *        comments:
  *          type: number
- *        votes:
- *          type: object
- *          properties:
- *            upvotes:
- *              type: number
- *            downvotes:
- *              type: number
- *
+ *          optional: true
+ *        upvotes:
+ *          type: number
+ *        downvotes:
+ *          type: number
  */
 export type PublicApiForumPost = {
   id: string;
@@ -115,13 +114,20 @@ async function listPosts(
   const space = await prisma.space.findUniqueOrThrow({
     where: {
       id: spaceId
+    },
+    select: {
+      id: true,
+      domain: true
     }
   });
 
-  const { data: posts, cursor: nextPage } = await listForumPosts({
+  const { data, cursor: nextPage } = await listForumPosts({
     spaceId: space.id,
-    sort: 'new'
+    sort: 'new',
+    authorSelect: userProfileSelect
   });
+
+  const posts = data as (ForumPostMeta & { totalComments: number; author: UserInfo })[];
 
   const categories = await prisma.postCategory.findMany({
     where: {
@@ -131,8 +137,15 @@ async function listPosts(
   const categoryMap = new Map(categories.map((category) => [category.id, category]));
 
   const mappedPosts: PublicApiForumPost[] = await Promise.all(
-    posts.map((post, index) => {
-      return getPublicForumPost(post, categoryMap, space);
+    posts.map((post) => {
+      return getPublicForumPost(
+        {
+          ...post,
+          author: getUserProfile(post.author)
+        },
+        categoryMap,
+        space
+      );
     })
   );
 
@@ -140,7 +153,7 @@ async function listPosts(
 }
 
 export async function getPublicForumPost(
-  post: Omit<ForumPostMeta, 'summary'> & { totalComments?: number },
+  post: Omit<ForumPostMeta, 'summary'> & { totalComments?: number; author: UserProfile },
   categoryMap: Map<string, { name: string }>,
   space: { domain: string }
 ): Promise<PublicApiForumPost> {
@@ -153,6 +166,7 @@ export async function getPublicForumPost(
     markdownText = 'markdown not available';
   }
   return {
+    author: post.author,
     id: post.id,
     createdAt: post.createdAt,
     url: `${process.env.DOMAIN}/${space.domain}/forum/posts/${post.path}`,

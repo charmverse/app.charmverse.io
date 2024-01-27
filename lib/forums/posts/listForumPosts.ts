@@ -26,8 +26,11 @@ export async function listForumPosts(
     // Count is the number of posts we want per page
     count = defaultPostsPerResult,
     categoryId,
-    sort
-  }: ListForumPostsRequest,
+    sort,
+    authorSelect
+  }: ListForumPostsRequest & {
+    authorSelect?: Prisma.UserSelect;
+  },
   userId?: string
 ): Promise<PaginatedPostList> {
   // Replicates prisma behaviour, but avoids a database call
@@ -50,7 +53,7 @@ export async function listForumPosts(
     createdAt: 'desc'
   };
 
-  const orderByMostCommmented: Prisma.PostOrderByWithRelationAndSearchRelevanceInput = {
+  const orderByMostCommented: Prisma.PostOrderByWithRelationAndSearchRelevanceInput = {
     comments: {
       _count: 'desc'
     }
@@ -70,7 +73,7 @@ export async function listForumPosts(
     // Return posts ordered from most recent to oldest
     orderBy: {
       ...((sort === 'new' || !sort || !postSortOptions.includes(sort)) && orderByNewest),
-      ...(sort === 'hot' && orderByMostCommmented),
+      ...(sort === 'hot' && orderByMostCommented),
       ...(sort === 'top' && orderByMostVoted)
     }
   };
@@ -95,7 +98,12 @@ export async function listForumPosts(
           upvoted: true,
           createdBy: true
         }
-      }
+      },
+      author: authorSelect
+        ? {
+            select: authorSelect
+          }
+        : undefined
     }
   });
 
