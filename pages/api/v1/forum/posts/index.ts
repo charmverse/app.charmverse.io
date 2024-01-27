@@ -2,7 +2,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { createForumPost } from 'lib/forums/posts/createForumPost';
-import { getForumPost } from 'lib/forums/posts/getForumPost';
 import { getPostVoteSummary, type ForumPostMeta } from 'lib/forums/posts/getPostMeta';
 import { listForumPosts } from 'lib/forums/posts/listForumPosts';
 import { InvalidStateError } from 'lib/middleware';
