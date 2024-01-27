@@ -1,10 +1,11 @@
+import { UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { createForumPost } from 'lib/forums/posts/createForumPost';
 import { getPostVoteSummary, type ForumPostMeta } from 'lib/forums/posts/getPostMeta';
 import { listForumPosts } from 'lib/forums/posts/listForumPosts';
-import { InvalidStateError } from 'lib/middleware';
+import { requireKeys, InvalidStateError } from 'lib/middleware';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
 import { apiHandler } from 'lib/public-api/handler';
@@ -148,12 +149,16 @@ async function createPost(req: NextApiRequest, res: NextApiResponse<PublicApiFor
     }
   });
 
-  await prisma.spaceRole.findFirstOrThrow({
+  const spaceRole = await prisma.spaceRole.findFirst({
     where: {
       spaceId: space.id,
       userId: payload.createdBy
     }
   });
+
+  if (!spaceRole) {
+    throw new UnauthorisedActionError('User does not have access to this space');
+  }
 
   const postContent = parseMarkdown(payload.contentMarkdown);
 
@@ -205,7 +210,7 @@ async function createPost(req: NextApiRequest, res: NextApiResponse<PublicApiFor
   return res.status(200).json(forumPost);
 }
 
-handler.post(createPost);
+handler.post(requireKeys(['createdBy', 'contentMarkdown', 'title', 'categoryId'], 'body'), createPost);
 
 handler.get(listPosts);
 /**
@@ -215,6 +220,13 @@ handler.get(listPosts);
  *     summary: Get forum posts
  *     tags:
  *      - 'Space API'
+ *     parameters:
+ *      - name: categoryId
+ *        in: query
+ *        description: ID of the post category to filter by
+ *        schema:
+ *          type: string
+ *          format: uuid
  *     responses:
  *       200:
  *         description: List of forum posts
@@ -237,7 +249,7 @@ async function listPosts(
 ) {
   // This should never be undefined, but adding this safeguard for future proofing
   const spaceId = req.authorizedSpaceId;
-
+  const categoryId = req.query.categoryId as string | undefined;
   if (!spaceId) {
     throw new InvalidStateError('Space ID is undefined');
   }
@@ -255,7 +267,8 @@ async function listPosts(
   const { data, cursor: nextPage } = await listForumPosts({
     spaceId: space.id,
     sort: 'new',
-    authorSelect: userProfileSelect
+    authorSelect: userProfileSelect,
+    categoryId
   });
 
   const posts = data as (ForumPostMeta & { totalComments: number; author: UserInfo })[];

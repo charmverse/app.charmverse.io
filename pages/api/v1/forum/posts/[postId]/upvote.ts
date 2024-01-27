@@ -1,9 +1,11 @@
+import { UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { getForumPost } from 'lib/forums/posts/getForumPost';
 import { requireKeys } from 'lib/middleware';
 import { superApiHandler } from 'lib/public-api/handler';
+import { getUserProfile, userProfileSelect } from 'lib/public-api/searchUserProfile';
 import { withSessionRoute } from 'lib/session/withSession';
 
 import { getPublicForumPost } from '../index';
@@ -11,27 +13,27 @@ import type { PublicApiForumPost } from '../index';
 
 const handler = superApiHandler();
 
-handler.post(requireKeys(['userId'], 'body'), voteOnPost);
+handler.post(requireKeys(['userId', 'upvoted'], 'body'), upvoteDownvotePost);
+
+interface PostUpvoteInput {
+  userId: string;
+  upvoted: boolean | null;
+}
 
 /**
  * @swagger
- * /forum/posts/{postId}/vote:
+ * /forum/posts/{postId}/upvote:
  *   post:
- *     summary: Up/downvote a proposal comment
- *     description: Adds a vote for a proposal comment by a specific user
+ *     summary: Up/downvote a form post
+ *     description: Upvote or downvote a forum post. If the user has already upvoted / downvoted the post, this will toggle the vote.
  *     tags:
  *      - 'Partner API'
  *     parameters:
- *       - name: proposalIdOrPath
- *         in: path
- *         required: true
- *         type: string
- *         description: ID or page path of the related proposal
  *       - name: postId
  *         in: path
  *         required: true
  *         type: string
- *         description: ID of the comment to create a vote for
+ *         description: ID of the post to upvote / downvote
  *     requestBody:
  *       required: true
  *       content:
@@ -41,6 +43,7 @@ handler.post(requireKeys(['userId'], 'body'), voteOnPost);
  *             properties:
  *               userId:
  *                 type: string
+ *                 format: uuid
  *                 description: User ID of the user who is performing the upvote / downvote
  *                 example: "69a54a56-50d6-4f7b-b350-2d9c312f81f3"
  *               upvoted:
@@ -61,12 +64,12 @@ handler.post(requireKeys(['userId'], 'body'), voteOnPost);
  *                $ref: '#/components/schemas/ProposalComment'
  *
  */
-async function voteOnPost(req: NextApiRequest, res: NextApiResponse<PublicApiForumPost>) {
-  // This should never be undefined, but adding this safeguard for future proofing
-  const userId = req.body.userId as string;
+
+async function upvoteDownvotePost(req: NextApiRequest, res: NextApiResponse<PublicApiForumPost>) {
+  const { userId, upvoted } = req.body as PostUpvoteInput;
   const postId = req.query.postId as string;
 
-  await prisma.post.findFirstOrThrow({
+  const proposal = await prisma.post.findFirstOrThrow({
     where: {
       id: postId,
       spaceId: {
@@ -74,11 +77,23 @@ async function voteOnPost(req: NextApiRequest, res: NextApiResponse<PublicApiFor
       }
     },
     select: {
+      spaceId: true,
       id: true
     }
   });
 
-  if (req.body.upvoted === null) {
+  const spaceRole = await prisma.spaceRole.findFirst({
+    where: {
+      spaceId: proposal.spaceId,
+      userId
+    }
+  });
+
+  if (!spaceRole) {
+    throw new UnauthorisedActionError('User does not have access to this space');
+  }
+
+  if (upvoted === null) {
     await prisma.postUpDownVote.delete({
       where: {
         createdBy_postId: {
@@ -97,32 +112,41 @@ async function voteOnPost(req: NextApiRequest, res: NextApiResponse<PublicApiFor
       },
       create: {
         createdBy: userId,
-        upvoted: req.body.upvoted,
+        upvoted,
         post: { connect: { id: postId } }
       },
       update: {
-        upvoted: req.body.upvoted
+        upvoted
       }
     });
   }
   const post = await getForumPost({ postId: req.query.postId as string });
-  const { category, space } = await prisma.post.findFirstOrThrow({
+  const { category, space, author } = await prisma.post.findFirstOrThrow({
     where: {
       id: req.query.postId as string
     },
     select: {
       category: true,
-      space: true
+      space: true,
+      author: {
+        select: userProfileSelect
+      }
     }
   });
-  const categoryMap = new Map([[post.categoryId, category]]);
   const cleanPost = {
     ...post,
     isDraft: !!post.isDraft,
     createdAt: post.createdAt.toISOString(),
     updatedAt: post.updatedAt.toISOString()
   };
-  const result = await getPublicForumPost(cleanPost, categoryMap, space);
+  const result = await getPublicForumPost({
+    post: {
+      ...cleanPost,
+      author: getUserProfile(author)
+    },
+    spaceDomain: space.domain,
+    categoryName: category.name
+  });
 
   return res.status(200).json(result);
 }
