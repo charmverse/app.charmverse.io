@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { Divider, Stack, Typography } from '@mui/material';
+import { Box, Divider, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 
 import { Button } from 'components/common/Button';
@@ -65,16 +65,16 @@ export function SnapshotVotingForm(props: SnapshotVotingProps) {
         {isSupported ? (
           <>
             <RenderFormComponent {...props} voteChoice={voteChoice} setVoteChoice={setVoteChoice} />
-            <Stack flex={1} direction='row' justifyContent='flex-end' alignItems='center' spacing={1}>
+            <Box display='flex' justifyContent='flex-end' mt={1}>
               <Button
-                sx={{ px: 5, mt: 0.5, mb: 1 }}
+                sx={{ px: 5, mt: 1, mb: 1 }}
                 disabled={voteChoice === null || !props.votingPower}
                 onClick={onVote}
                 loading={isSaving}
               >
                 Vote
               </Button>
-            </Stack>
+            </Box>
           </>
         ) : (
           <Typography sx={{ my: 2 }}>Unsupported voting type. Plese visit snapshot to vote</Typography>
