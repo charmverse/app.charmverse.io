@@ -1,8 +1,9 @@
 import { InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
-import type { PageComment, PageCommentVote } from '@charmverse/core/prisma-client';
+import type { PostComment } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import type { PostCommentVote } from 'lib/forums/comments/interface';
 import { InvalidStateError, requireApiKey, requireKeys, requireSuperApiKey } from 'lib/middleware';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
@@ -78,12 +79,12 @@ export type PublicApiPostComment = {
   children: PublicApiPostComment[];
 };
 
-async function mapReducePageComments({
+async function mapReducePostComments({
   comments,
   reduceToTree
 }: {
-  comments: (Pick<PageComment, 'id' | 'parentId' | 'content' | 'contentText' | 'createdAt'> & {
-    votes: Pick<PageCommentVote, 'upvoted'>[];
+  comments: (Pick<PostComment, 'id' | 'parentId' | 'content' | 'contentText' | 'createdAt'> & {
+    votes: Pick<PostCommentVote, 'upvoted'>[];
     createdBy: string | UserProfile;
   })[];
   reduceToTree?: boolean;
@@ -253,7 +254,7 @@ async function getPostComments(req: NextApiRequest, res: NextApiResponse<PublicA
     }
   });
 
-  const mappedComments = await mapReducePageComments({
+  const mappedComments = await mapReducePostComments({
     comments: postComments.map((postComment) => {
       return {
         ...postComment,

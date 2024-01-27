@@ -3,30 +3,30 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { requireKeys } from 'lib/middleware';
-import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
 import { superApiHandler } from 'lib/public-api/handler';
 import { withSessionRoute } from 'lib/session/withSession';
 
-import type { PublicApiProposalComment } from '../index';
+import type { PublicApiPostComment } from '..';
 
 const handler = superApiHandler();
 
-handler.delete(deleteProposalComment).put(requireKeys(['contentMarkdown'], 'body'), updateProposalComment);
+handler.delete(deletePostComment).put(requireKeys(['contentMarkdown'], 'body'), updatePostComment);
 
 /**
  * @swagger
- * /proposals/{proposalIdOrPath}/comments/{commentId}:
+ * /forum/posts/{postId}/comments/{commentId}:
  *   delete:
- *     summary: Delete a proposal comment
+ *     summary: Delete a post comment
  *     tags:
  *      - 'Partner API'
  *     parameters:
- *       - name: proposalIdOrPath
- *         in: params
+ *       - name: postId
+ *         in: path
  *         required: true
- *         type: string
- *         description: ID or page path of the related proposal
+ *         schema:
+ *           type: string
+ *         description: ID of the related post
  *       - name: commentId
  *         in: params
  *         required: true
@@ -34,13 +34,14 @@ handler.delete(deleteProposalComment).put(requireKeys(['contentMarkdown'], 'body
  *         description: ID of the comment to update
  *
  */
-async function deleteProposalComment(req: NextApiRequest, res: NextApiResponse<PublicApiProposalComment>) {
+async function deletePostComment(req: NextApiRequest, res: NextApiResponse) {
   // This should never be undefined, but adding this safeguard for future proofing
 
-  const result = await prisma.pageComment.findFirstOrThrow({
+  const result = await prisma.postComment.findFirstOrThrow({
     where: {
       id: req.query.commentId as string,
-      page: {
+      post: {
+        id: req.query.postId as string,
         spaceId: req.authorizedSpaceId
           ? req.authorizedSpaceId
           : {
@@ -54,7 +55,7 @@ async function deleteProposalComment(req: NextApiRequest, res: NextApiResponse<P
   });
 
   if (result) {
-    await prisma.pageComment.delete({
+    await prisma.postComment.delete({
       where: {
         id: result.id
       }
@@ -68,18 +69,19 @@ async function deleteProposalComment(req: NextApiRequest, res: NextApiResponse<P
 
 /**
  * @swagger
- * /proposals/{proposalIdOrPath}/comments/{commentId}:
+ * /forum/posts/{postId}/comments/{commentId}:
  *   put:
- *     summary: Update a proposal comment
- *     description: Update the content of an existing proposal comment
+ *     summary: Update a post comment
+ *     description: Update the content of an existing post comment
  *     tags:
  *      - 'Partner API'
  *     parameters:
- *       - name: proposalIdOrPath
- *         in: params
+ *       - name: postId
+ *         in: path
  *         required: true
- *         type: string
- *         description: ID or page path of the related proposal
+ *         schema:
+ *           type: string
+ *         description: ID of the related post
  *       - name: commentId
  *         in: params
  *         required: true
@@ -110,21 +112,19 @@ async function deleteProposalComment(req: NextApiRequest, res: NextApiResponse<P
  *            application/json:
  *              schema:
  *                type: object
- *                $ref: '#/components/schemas/ProposalComment'
+ *                $ref: '#/components/schemas/ForumPostComment'
  *
  */
-async function updateProposalComment(req: NextApiRequest, res: NextApiResponse<PublicApiProposalComment>) {
+async function updatePostComment(req: NextApiRequest, res: NextApiResponse<PublicApiPostComment>) {
   // This should never be undefined, but adding this safeguard for future proofing
 
   const newCommentText = req.body.contentMarkdown;
 
-  const existingComment = await prisma.pageComment.findFirstOrThrow({
+  const existingComment = await prisma.postComment.findFirstOrThrow({
     where: {
       id: req.query.commentId as string,
-      page: {
-        ...generatePageQuery({
-          pageIdOrPath: req.query.proposalId as string
-        }),
+      post: {
+        id: req.query.postId as string,
         spaceId: req.authorizedSpaceId
           ? req.authorizedSpaceId
           : {
@@ -137,9 +137,9 @@ async function updateProposalComment(req: NextApiRequest, res: NextApiResponse<P
     }
   });
 
-  const commentContent = await parseMarkdown(newCommentText);
+  const commentContent = parseMarkdown(newCommentText);
 
-  const proposalComment = await prisma.pageComment.update({
+  const postComment = await prisma.postComment.update({
     where: {
       id: existingComment.id
     },
@@ -160,21 +160,21 @@ async function updateProposalComment(req: NextApiRequest, res: NextApiResponse<P
     }
   });
 
-  const apiComment: PublicApiProposalComment = {
-    id: proposalComment.id,
-    createdAt: proposalComment.createdAt.toISOString(),
+  const apiComment: PublicApiPostComment = {
+    id: postComment.id,
+    createdAt: postComment.createdAt.toISOString(),
     content: {
       markdown: newCommentText,
       text: newCommentText
     },
-    createdBy: proposalComment.createdBy,
-    downvotes: proposalComment.votes.filter((v) => !v.upvoted).length,
-    upvotes: proposalComment.votes.filter((v) => v.upvoted).length,
-    parentId: proposalComment.parentId,
+    createdBy: postComment.createdBy,
+    downvotes: postComment.votes.filter((v) => !v.upvoted).length,
+    upvotes: postComment.votes.filter((v) => v.upvoted).length,
+    parentId: postComment.parentId,
     children: []
   };
 
-  log.debug('[public-api] Updated comment content', { query: req.query, commentId: proposalComment.id });
+  log.debug('[public-api] Updated comment content', { query: req.query, commentId: postComment.id });
 
   return res.status(200).json(apiComment);
 }
