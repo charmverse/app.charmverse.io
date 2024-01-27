@@ -61,7 +61,7 @@ export function SnapshotVotingForm(props: SnapshotVotingProps) {
 
   return (
     <Stack sx={{ pointerEvents: !props.votingPower ? 'none' : 'auto', opacity: !props.votingPower ? 0.5 : 1 }}>
-      <Stack px={1}>
+      <Stack px={1} py={1}>
         {isSupported ? (
           <>
             <RenderFormComponent {...props} voteChoice={voteChoice} setVoteChoice={setVoteChoice} />

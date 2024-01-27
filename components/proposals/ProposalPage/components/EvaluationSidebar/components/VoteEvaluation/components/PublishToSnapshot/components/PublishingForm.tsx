@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { Typography } from '@mui/material';
+import { ButtonGroupButtonContext, Typography } from '@mui/material';
 import type { AlertColor } from '@mui/material/Alert';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
@@ -16,11 +16,11 @@ import { getAddress } from 'viem';
 import charmClient from 'charmClient';
 import { useUpdateSnapshotProposal } from 'charmClient/hooks/proposals';
 import { OpenWalletSelectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/OpenWalletSelectorButton';
+import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import InputEnumToOption from 'components/common/form/InputEnumToOptions';
 import InputGeneratorText from 'components/common/form/InputGeneratorText';
 import { LoadingIcon } from 'components/common/LoadingComponent';
-import PrimaryButton from 'components/common/PrimaryButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
@@ -254,7 +254,7 @@ export function PublishingForm({ onSubmit, pageId, proposalId, evaluationId }: P
         proposalParams
       )) as SnapshotReceipt;
       if (evaluationId) {
-        updateProposalEvaluation({
+        await updateProposalEvaluation({
           evaluationId,
           snapshotProposalId: receipt.id
         });
@@ -459,8 +459,8 @@ export function PublishingForm({ onSubmit, pageId, proposalId, evaluationId }: P
               </Grid>
             )}
 
-            <Grid item display='flex' justifyContent='space-between'>
-              <PrimaryButton onClick={publish} disabled={!formValid() || publishing} type='submit'>
+            <Grid item display='flex' justifyContent='flex-end'>
+              <Button onClick={publish} disabled={!formValid() || publishing} type='submit'>
                 {publishing ? (
                   <>
                     <LoadingIcon size={18} sx={{ mr: 1 }} />
@@ -469,7 +469,7 @@ export function PublishingForm({ onSubmit, pageId, proposalId, evaluationId }: P
                 ) : (
                   'Publish to Snapshot'
                 )}
-              </PrimaryButton>
+              </Button>
             </Grid>
           </Grid>
         </form>
