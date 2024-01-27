@@ -15,7 +15,29 @@ const handler = superApiHandler();
 
 handler.post(requireKeys(['userId', 'upvoted'], 'body'), upvoteDownvotePost);
 
-interface PostUpvoteInput {
+/**
+ * @swagger
+ * components
+ *   schemas:
+ *     UpvoteInput:
+ *       type: object
+ *       properties:
+ *         userId:
+ *           type: string
+ *           format: uuid
+ *           description: User ID of the user who is performing the upvote / downvote
+ *           example: "69a54a56-50d6-4f7b-b350-2d9c312f81f3"
+ *         upvoted:
+ *           type: boolean
+ *           nullable: true
+ *           description: true for an upvote, false for a downvote, null to delete the user's upvote / downvote
+ *           example: true
+ *       required:
+ *         - userId
+ *         - upvoted
+ */
+
+export interface UpvoteInput {
   userId: string;
   upvoted: boolean | null;
 }
@@ -40,20 +62,7 @@ interface PostUpvoteInput {
  *         application/json:
  *           schema:
  *             type: object
- *             properties:
- *               userId:
- *                 type: string
- *                 format: uuid
- *                 description: User ID of the user who is performing the upvote / downvote
- *                 example: "69a54a56-50d6-4f7b-b350-2d9c312f81f3"
- *               upvoted:
- *                 type: boolean
- *                 nullable: true
- *                 description: true for an upvote, false for a downvote, null to delete the user's upvote / downvote
- *                 example: true
- *             required:
- *               - userId
- *               - upvoted
+ *             $ref: '#/components/schemas/UpvoteInput'
  *     responses:
  *       200:
  *         description: Comment where the vote was made with refreshed vote count
@@ -66,7 +75,7 @@ interface PostUpvoteInput {
  */
 
 async function upvoteDownvotePost(req: NextApiRequest, res: NextApiResponse<PublicApiForumPost>) {
-  const { userId, upvoted } = req.body as PostUpvoteInput;
+  const { userId, upvoted } = req.body as UpvoteInput;
   const postId = req.query.postId as string;
 
   const proposal = await prisma.post.findFirstOrThrow({
