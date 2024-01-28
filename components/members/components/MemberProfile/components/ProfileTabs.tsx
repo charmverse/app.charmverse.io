@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import type { TabConfig } from 'components/common/MultiTabs';
 import MultiTabs from 'components/common/MultiTabs';
 import { ProfileWidgets } from 'components/members/components/MemberProfile/components/ProfileWidgets/ProfileWidgets';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import type { Member } from 'lib/members/interfaces';
 import type { LoggedInUser } from 'models';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
@@ -13,6 +14,8 @@ import { UserSpacesList } from './UserSpacesList/UserSpacesList';
 
 export function ProfileTabs(props: { user: Member | PublicUser | LoggedInUser; readOnly?: boolean }) {
   const { readOnly } = props;
+
+  const showCredentialsTab = useIsCharmverseSpace();
 
   const [activeTab, setActiveTab] = useState(0);
 
@@ -25,12 +28,14 @@ export function ProfileTabs(props: { user: Member | PublicUser | LoggedInUser; r
           <UserSpacesList userId={props.user.id} />
         </Stack>,
         { sx: { px: 0 } }
-      ],
-      ['Credentials', <UserCredentialsList key='credentials' userId={props.user.id} />, { sx: { px: 0 } }]
+      ]
     ];
 
+    if (showCredentialsTab) {
+      _tabs.push(['Credentials', <UserCredentialsList key='credentials' userId={props.user.id} />, { sx: { px: 0 } }]);
+    }
     return _tabs as TabConfig[];
-  }, [readOnly, props.user.id]);
+  }, [readOnly, props.user.id, showCredentialsTab]);
 
   return <MultiTabs activeTab={activeTab} setActiveTab={setActiveTab} tabs={tabs} />;
 }

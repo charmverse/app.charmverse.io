@@ -10,6 +10,7 @@ import { CredentialSelect } from 'components/credentials/CredentialsSelect';
 import { CustomPropertiesAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/components/CustomPropertiesAdapter';
 import { ProposalRewards } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewards';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import type { ProposalFields } from 'lib/proposal/interface';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
@@ -60,7 +61,9 @@ export function ProposalPropertiesBase({
 
   const { data: credentialTemplates } = useGetCredentialTemplates({ spaceId: space?.id });
 
-  const showCredentialSelect = !!credentialTemplates?.length;
+  const isCharmverseSpace = useIsCharmverseSpace();
+
+  const showCredentialSelect = isCharmverseSpace && !!credentialTemplates?.length;
 
   const proposalAuthorIds = proposalFormInputs.authors;
   const proposalReviewers = proposalFormInputs.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat();
