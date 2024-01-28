@@ -1,5 +1,4 @@
-import MedalIcon from '@mui/icons-material/WorkspacePremium';
-import { Alert, Box, Card, Divider, Typography } from '@mui/material';
+import { Alert, Box, Divider } from '@mui/material';
 import Stack from '@mui/material/Stack';
 
 import { useGetUserCredentials } from 'charmClient/hooks/credentialHooks';
@@ -12,14 +11,6 @@ export function UserCredentialsList({ userId }: { userId: string }) {
   return (
     <Stack gap={1}>
       {!userCredentials && isLoading && <LoadingComponent />}
-      {userCredentials?.length === 0 && !isLoading && (
-        <Card variant='outlined'>
-          <Box p={3} textAlign='center'>
-            <MedalIcon fontSize='large' color='secondary' />
-            <Typography color='secondary'>No credentials found</Typography>
-          </Box>
-        </Card>
-      )}
       {error && !isLoading && <Alert severity='warning'>Error loading credentials</Alert>}
       {userCredentials?.map((credential) => (
         <Box key={credential.id}>
