@@ -196,6 +196,7 @@ type CharmEditorProps = {
   disableVideo?: boolean;
   setEditorState?: (state: EditorState) => void; // this is used to pass the state to the suggestions sidebar
   threadIds?: string[];
+  registerView?: (view: EditorView) => void;
 };
 
 function CharmEditor({
@@ -228,7 +229,8 @@ function CharmEditor({
   disableVideo = false,
   sidebarView,
   setSidebarView,
-  threadIds
+  threadIds,
+  registerView
 }: CharmEditorProps) {
   const router = useRouter();
   const { showMessage } = useSnackbar();
@@ -396,6 +398,7 @@ function CharmEditor({
       readOnly={readOnly}
       enableComments={enableComments}
       onConnectionEvent={onConnectionEvent}
+      registerView={registerView}
       style={{
         ...(style ?? {}),
         width: '100%',

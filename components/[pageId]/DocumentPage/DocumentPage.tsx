@@ -26,6 +26,7 @@ import { ProposalStickyFooter } from 'components/proposals/ProposalPage/componen
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmEditor } from 'hooks/useCharmEditor';
+import { useCharmEditorView } from 'hooks/useCharmEditorView';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMdScreen } from 'hooks/useMediaScreens';
@@ -72,6 +73,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
   const { router } = useCharmRouter();
   const { activeView: sidebarView, setActiveView, closeSidebar } = usePageSidebar();
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
+  const { setView: setCharmEditorView } = useCharmEditorView();
   const [connectionError, setConnectionError] = useState<Error | null>(null);
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const dispatch = useAppDispatch();
@@ -237,6 +239,12 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
     }
   }, [printRef, _printRef]);
 
+  useEffect(() => {
+    return () => {
+      setCharmEditorView(null);
+    };
+  }, [setCharmEditorView]);
+
   function focusDocumentEditor() {
     const focusEvent = new CustomEvent(focusEventName);
     // TODO: use a ref passed down instead
@@ -319,6 +327,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
   );
 
   const proposalAuthors = proposal ? [proposal.createdBy, ...proposal.authors.map((author) => author.userId)] : [];
+
   return (
     <PrimaryColumn id='file-drop-container' ref={containerRef} showPageActionSidebar={showPageActionSidebar}>
       <Box
@@ -498,6 +507,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
                   setEditorState={setEditorState}
                   snapshotProposalId={page.snapshotProposalId}
                   onParticipantUpdate={onParticipantUpdate}
+                  registerView={setCharmEditorView}
                   style={{
                     // 5 lines
                     minHeight: proposalId || page?.type.includes('card') ? '150px' : 'unset'

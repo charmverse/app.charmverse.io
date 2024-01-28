@@ -9,10 +9,10 @@ import type { ReactNode } from 'react';
 import React, { memo, useLayoutEffect, useMemo, useState } from 'react';
 
 import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
-import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import PageThread from 'components/common/CharmEditor/components/thread/PageThread';
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import { useCharmEditorView } from 'hooks/useCharmEditorView';
 import { useInlineComment } from 'hooks/useInlineComment';
 import type { CommentThreadsMap } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
@@ -221,20 +221,24 @@ function EditorCommentsSidebarComponent({
     setThreadFilter(event.target.value as any);
   };
 
-  const view = useEditorViewContext();
+  const { view } = useCharmEditorView();
 
   // view.state.doc stays the same (empty content) even when the document content changes
-  const extractedThreadIds = isEmptyDocument(view.state.doc)
+  const extractedThreadIds = !view
+    ? new Set()
+    : isEmptyDocument(view.state.doc)
     ? new Set(Object.keys(threads))
     : extractThreadIdsFromDoc(view.state.doc, specRegistry.schema);
 
   // Making sure the position sort doesn't filter out comments that are not in the view
-  const inlineThreadsIds = Array.from(
-    new Set([
-      ...findTotalInlineComments(view.state.schema, view.state.doc, threads, true).threadIds,
-      ...allThreads.map((thread) => thread?.id)
-    ])
-  ).filter((id) => extractedThreadIds.has(id));
+  const inlineThreadsIds = view
+    ? Array.from(
+        new Set([
+          ...findTotalInlineComments(view.state.schema, view.state.doc, threads, true).threadIds,
+          ...allThreads.map((thread) => thread?.id)
+        ])
+      ).filter((id) => extractedThreadIds.has(id))
+    : [];
 
   const threadListSet = new Set(threadList.map((thread) => thread.id));
   const sortedThreadList = inlineThreadsIds
@@ -256,18 +260,22 @@ function EditorCommentsSidebarComponent({
       threadFilter={threadFilter}
       threadList={sortedThreadList}
       onDeleteComment={(threadId) => {
-        removeInlineCommentMark(view, threadId, true);
-        updateThreadPluginState({
-          remove: true,
-          threadId
-        });
+        if (view) {
+          removeInlineCommentMark(view, threadId, true);
+          updateThreadPluginState({
+            remove: true,
+            threadId
+          });
+        }
       }}
       onToggleResolve={(threadId, remove) => {
-        removeInlineCommentMark(view, threadId);
-        updateThreadPluginState({
-          remove,
-          threadId
-        });
+        if (view) {
+          removeInlineCommentMark(view, threadId);
+          updateThreadPluginState({
+            remove,
+            threadId
+          });
+        }
       }}
     />
   );
