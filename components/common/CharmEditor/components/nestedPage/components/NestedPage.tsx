@@ -60,7 +60,7 @@ function resetPageNodeDropPluginState(view: EditorView) {
 export default function NestedPage({ isLinkedPage = false, node, getPos }: NodeViewProps & { isLinkedPage?: boolean }) {
   const view = useEditorViewContext();
   const { pages, loadingPages } = usePages();
-  const { getFeatureTitle } = useSpaceFeatures();
+  const { getFeatureTitle, mappedFeatures } = useSpaceFeatures();
   const { categories } = useForumCategories();
 
   const documentPage = pages[node.attrs.id];
@@ -69,7 +69,7 @@ export default function NestedPage({ isLinkedPage = false, node, getPos }: NodeV
   const isProposalTemplate = node.attrs.type === 'proposal_template';
   let pageTitle = '';
   if (staticPage) {
-    pageTitle = getFeatureTitle(staticPage.feature);
+    pageTitle = mappedFeatures[staticPage.feature]?.title;
   } else if (isProposalTemplate) {
     pageTitle = `Submit ${getFeatureTitle('Proposal')} > ${documentPage?.title || 'Untitled'}`;
   } else if (documentPage) {
