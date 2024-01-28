@@ -1,12 +1,17 @@
+import { UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import type { ForumPostMeta } from 'lib/forums/posts/getPostMeta';
+import { createForumPost } from 'lib/forums/posts/createForumPost';
+import { getPostVoteSummary, type ForumPostMeta } from 'lib/forums/posts/getPostMeta';
 import { listForumPosts } from 'lib/forums/posts/listForumPosts';
-import { InvalidStateError } from 'lib/middleware';
+import { requireKeys, InvalidStateError } from 'lib/middleware';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
+import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
 import { apiHandler } from 'lib/public-api/handler';
 import type { UserProfile } from 'lib/public-api/interfaces';
+import type { UserInfo } from 'lib/public-api/searchUserProfile';
+import { getUserProfile, userProfileSelect } from 'lib/public-api/searchUserProfile';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = apiHandler();
@@ -47,16 +52,13 @@ const handler = apiHandler();
  *              format: uuid
  *            name:
  *              type: string
- *        totalComments:
+ *        comments:
  *          type: number
- *        votes:
- *          type: object
- *          properties:
- *            upvotes:
- *              type: number
- *            downvotes:
- *              type: number
- *
+ *          optional: true
+ *        upvotes:
+ *          type: number
+ *        downvotes:
+ *          type: number
  */
 export type PublicApiForumPost = {
   id: string;
@@ -77,6 +79,139 @@ export type PublicApiForumPost = {
   downvotes: number;
 };
 
+/**
+ * @swagger
+ * components
+ *  schemas:
+ *    CreateForumPostInput:
+ *      type: object
+ *      properties:
+ *        userId:
+ *          type: string
+ *          format: uuid
+ *        contentMarkdown:
+ *          type: string
+ *          description: Markdown content of the forum post
+ *        title:
+ *          type: string
+ *          description: Title of the forum post
+ *        categoryId:
+ *          type: string
+ *          format: uuid
+ */
+
+interface CreateForumPostInput {
+  userId: string;
+  contentMarkdown: string;
+  title: string;
+  categoryId: string;
+}
+
+/**
+ * @swagger
+ * /proposals:
+ *   post:
+ *     summary: Create a new forum post
+ *     tags:
+ *      - 'Space API'
+ *     requestBody:
+ *        description: Forum post to create
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              $ref: '#/components/schemas/CreateForumPostInput'
+ *     responses:
+ *       200:
+ *         description: Created forum post
+ *         content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                $ref: '#/components/schemas/ForumPost'
+ */
+
+async function createPost(req: NextApiRequest, res: NextApiResponse<PublicApiForumPost>) {
+  // This should never be undefined, but adding this safeguard for future proofing
+  const spaceId = req.authorizedSpaceId;
+  const payload = req.body as CreateForumPostInput;
+  if (!spaceId) {
+    throw new InvalidStateError('Space ID is undefined');
+  }
+
+  const space = await prisma.space.findUniqueOrThrow({
+    where: {
+      id: spaceId
+    },
+    select: {
+      id: true,
+      domain: true
+    }
+  });
+
+  const spaceRole = await prisma.spaceRole.findFirst({
+    where: {
+      spaceId: space.id,
+      userId: payload.userId
+    }
+  });
+
+  if (!spaceRole) {
+    throw new UnauthorisedActionError('User does not have access to this space');
+  }
+
+  const postContent = parseMarkdown(payload.contentMarkdown);
+
+  const createdFormPost = await createForumPost({
+    categoryId: payload.categoryId,
+    content: postContent,
+    contentText: payload.contentMarkdown,
+    createdBy: payload.userId,
+    isDraft: false,
+    spaceId: space.id,
+    title: payload.title
+  });
+
+  const { upDownVotes, ...post } = await prisma.post.findFirstOrThrow({
+    where: {
+      id: createdFormPost.id
+    },
+    include: {
+      upDownVotes: {
+        select: {
+          upvoted: true,
+          createdBy: true
+        }
+      },
+      category: {
+        select: {
+          name: true
+        }
+      },
+      author: {
+        select: userProfileSelect
+      }
+    }
+  });
+
+  const forumPost = await getPublicForumPost({
+    post: {
+      ...post,
+      votes: getPostVoteSummary(upDownVotes, payload.userId),
+      author: getUserProfile(post.author),
+      createdAt: post.createdAt.toISOString(),
+      updatedAt: post.updatedAt.toISOString(),
+      isDraft: false
+    },
+    spaceDomain: space.domain,
+    categoryName: post.category.name
+  });
+
+  return res.status(200).json(forumPost);
+}
+
+handler.post(requireKeys(['createdBy', 'contentMarkdown', 'title', 'categoryId'], 'body'), createPost);
+
 handler.get(listPosts);
 /**
  * @swagger
@@ -85,6 +220,13 @@ handler.get(listPosts);
  *     summary: Get forum posts
  *     tags:
  *      - 'Space API'
+ *     parameters:
+ *      - name: categoryId
+ *        in: query
+ *        description: ID of the post category to filter by
+ *        schema:
+ *          type: string
+ *          format: uuid
  *     responses:
  *       200:
  *         description: List of forum posts
@@ -107,7 +249,7 @@ async function listPosts(
 ) {
   // This should never be undefined, but adding this safeguard for future proofing
   const spaceId = req.authorizedSpaceId;
-
+  const categoryId = req.query.categoryId as string | undefined;
   if (!spaceId) {
     throw new InvalidStateError('Space ID is undefined');
   }
@@ -115,13 +257,21 @@ async function listPosts(
   const space = await prisma.space.findUniqueOrThrow({
     where: {
       id: spaceId
+    },
+    select: {
+      id: true,
+      domain: true
     }
   });
 
-  const { data: posts, cursor: nextPage } = await listForumPosts({
+  const { data, cursor: nextPage } = await listForumPosts({
     spaceId: space.id,
-    sort: 'new'
+    sort: 'new',
+    authorSelect: userProfileSelect,
+    categoryId
   });
+
+  const posts = data as (ForumPostMeta & { totalComments: number; author: UserInfo })[];
 
   const categories = await prisma.postCategory.findMany({
     where: {
@@ -131,19 +281,30 @@ async function listPosts(
   const categoryMap = new Map(categories.map((category) => [category.id, category]));
 
   const mappedPosts: PublicApiForumPost[] = await Promise.all(
-    posts.map((post, index) => {
-      return getPublicForumPost(post, categoryMap, space);
+    posts.map((post) => {
+      return getPublicForumPost({
+        post: {
+          ...post,
+          author: getUserProfile(post.author)
+        },
+        spaceDomain: space.domain,
+        categoryName: categoryMap.get(post.categoryId)?.name
+      });
     })
   );
 
   return res.status(200).json({ posts: mappedPosts, nextPage: nextPage || undefined });
 }
 
-export async function getPublicForumPost(
-  post: Omit<ForumPostMeta, 'summary'> & { totalComments?: number },
-  categoryMap: Map<string, { name: string }>,
-  space: { domain: string }
-): Promise<PublicApiForumPost> {
+export async function getPublicForumPost({
+  categoryName,
+  post,
+  spaceDomain
+}: {
+  post: Omit<ForumPostMeta, 'summary'> & { totalComments?: number; author: UserProfile };
+  spaceDomain: string;
+  categoryName?: string;
+}): Promise<PublicApiForumPost> {
   let markdownText: string;
   try {
     markdownText = await generateMarkdown({
@@ -153,13 +314,14 @@ export async function getPublicForumPost(
     markdownText = 'markdown not available';
   }
   return {
+    author: post.author,
     id: post.id,
     createdAt: post.createdAt,
-    url: `${process.env.DOMAIN}/${space.domain}/forum/posts/${post.path}`,
+    url: `${process.env.DOMAIN}/${spaceDomain}/forum/posts/${post.path}`,
     title: post.title,
     category: {
       id: post.categoryId,
-      name: categoryMap.get(post.categoryId)?.name ?? ''
+      name: categoryName ?? ''
     },
     content: {
       text: post.contentText ?? '',

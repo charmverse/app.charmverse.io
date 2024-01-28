@@ -34,6 +34,7 @@ export function CredentialSelect({ onChange, selectedCredentialTemplates, readOn
       propertyValue={selectedCredentialTemplates as any}
       canEditOptions={false}
       multiselect
+      showEmpty
       readOnly={readOnly}
       readOnlyMessage='You cannot add a credential'
       noOptionsText='No credentials found'

@@ -187,6 +187,7 @@ export function EvaluationSidebar({
                 proposal={proposal}
                 isCurrent={isCurrent}
                 evaluation={evaluation}
+                refreshProposal={refreshProposal}
               />
             )}
           </EvaluationStepRow>

@@ -122,7 +122,7 @@ class CharmClient {
   }
 
   async login({ address, walletSignature }: Web3LoginRequest) {
-    const user = await http.POST<LoggedInUser>('/api/session/login', {
+    const user = await http.POST<LoggedInUser | { otpRequired: true }>('/api/session/login', {
       address,
       walletSignature
     });

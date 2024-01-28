@@ -46,6 +46,7 @@ interface IPropertyOption<T = string> {
   value: string;
   color: string;
   disabled?: boolean;
+  variant?: 'chip' | 'plain';
   dropdownValue?: string; // the label to show in the dropdown, if its different from the normal value
 }
 

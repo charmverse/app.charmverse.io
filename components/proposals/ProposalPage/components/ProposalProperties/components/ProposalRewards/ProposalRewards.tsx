@@ -3,6 +3,7 @@ import { Delete, Edit } from '@mui/icons-material';
 import { Box, Grid, Hidden, IconButton, Stack, Typography } from '@mui/material';
 import { uniqBy } from 'lodash';
 import { useEffect, useState } from 'react';
+import { v4 } from 'uuid';
 
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { SelectPreviewContainer } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
@@ -71,6 +72,7 @@ export function ProposalRewards({
   function closeDialog() {
     clearRewardValues();
     clearNewPage();
+    setCurrentPendingId(null);
   }
 
   async function saveForm() {
@@ -112,6 +114,8 @@ export function ProposalRewards({
       title: undefined,
       type: 'bounty'
     });
+    // set a new draftId
+    setCurrentPendingId(v4());
   }
 
   function editReward({ reward, page, draftId }: ProposalPendingReward) {

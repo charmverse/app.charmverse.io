@@ -1,7 +1,9 @@
+import { UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { requireKeys } from 'lib/middleware';
+import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import { superApiHandler } from 'lib/public-api/handler';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -9,46 +11,35 @@ import type { PublicApiPostComment } from '../index';
 
 const handler = superApiHandler();
 
-handler.post(requireKeys(['userId'], 'body'), voteOnComment);
+handler.post(requireKeys(['userId', 'upvoted'], 'body'), upvoteOnComment);
 
 /**
  * @swagger
  * /forum/posts/{postId}/comments/{commentId}/vote:
  *   post:
- *     summary: Up/downvote a proposal comment
- *     description: Adds a vote for a proposal comment by a specific user
+ *     summary: Up/downvote a post comment
+ *     description: Adds a vote for a post comment by a specific user
  *     tags:
  *      - 'Partner API'
  *     parameters:
- *       - name: proposalIdOrPath
- *         in: path
- *         required: true
- *         type: string
- *         description: ID or page path of the related proposal
  *       - name: postId
  *         in: path
  *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the related post
+ *       - name: commentId
+ *         in: params
+ *         required: true
  *         type: string
- *         description: ID of the comment to create a vote for
+ *         description: ID of the comment to update
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             properties:
- *               userId:
- *                 type: string
- *                 description: User ID of the user who is performing the upvote / downvote
- *                 example: "69a54a56-50d6-4f7b-b350-2d9c312f81f3"
- *               upvoted:
- *                 type: boolean
- *                 nullable: true
- *                 description: true for an upvote, false for a downvote, null to delete the user's upvote / downvote
- *                 example: true
- *             required:
- *               - userId
- *               - upvoted
+ *             $ref: '#/components/schemas/UpvoteInput'
  *     responses:
  *       200:
  *         description: Comment where the vote was made with refreshed vote count
@@ -56,10 +47,10 @@ handler.post(requireKeys(['userId'], 'body'), voteOnComment);
  *            application/json:
  *              schema:
  *                type: object
- *                $ref: '#/components/schemas/ProposalComment'
+ *                $ref: '#/components/schemas/ForumPostComment'
  *
  */
-async function voteOnComment(req: NextApiRequest, res: NextApiResponse<PublicApiPostComment>) {
+async function upvoteOnComment(req: NextApiRequest, res: NextApiResponse<PublicApiPostComment>) {
   // This should never be undefined, but adding this safeguard for future proofing
   const userId = req.body.userId as string;
   const postId = req.query.postId as string;
@@ -76,6 +67,19 @@ async function voteOnComment(req: NextApiRequest, res: NextApiResponse<PublicApi
       id: true
     }
   });
+
+  const spaceRole = await prisma.spaceRole.findFirst({
+    where: {
+      spaceId: {
+        in: req.spaceIdRange
+      },
+      userId
+    }
+  });
+
+  if (!spaceRole) {
+    throw new UnauthorisedActionError('User does not have access to this space');
+  }
 
   if (req.body.upvoted === null) {
     await prisma.postCommentUpDownVote.delete({
@@ -106,7 +110,48 @@ async function voteOnComment(req: NextApiRequest, res: NextApiResponse<PublicApi
     });
   }
 
-  return res.status(200).json({});
+  const comment = await prisma.postComment.findUniqueOrThrow({
+    where: {
+      id: commentId
+    },
+    include: {
+      votes: {
+        select: {
+          upvoted: true
+        }
+      }
+    }
+  });
+
+  const parsedContent = await generateMarkdown({
+    content: comment.content
+  });
+
+  const { upvotes, downvotes } = comment.votes.reduce(
+    (acc, val) => {
+      if (val.upvoted) {
+        acc.upvotes += 1;
+      } else if (val.upvoted === false) {
+        acc.downvotes += 1;
+      }
+      return acc;
+    },
+    { upvotes: 0, downvotes: 0 }
+  );
+
+  return res.status(200).json({
+    id: comment.id,
+    createdBy: comment.createdBy,
+    createdAt: comment.createdAt.toISOString(),
+    parentId: comment.parentId,
+    content: {
+      markdown: parsedContent,
+      text: comment.contentText
+    },
+    upvotes,
+    downvotes,
+    children: []
+  });
 }
 
 export default withSessionRoute(handler);

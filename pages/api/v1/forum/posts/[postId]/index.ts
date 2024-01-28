@@ -1,16 +1,143 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { getForumPost } from 'lib/forums/posts/getForumPost';
+import { getPostVoteSummary } from 'lib/forums/posts/getPostMeta';
+import { updateForumPost } from 'lib/forums/posts/updateForumPost';
 import { InvalidStateError } from 'lib/middleware';
+import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
 import { apiHandler } from 'lib/public-api/handler';
+import { getUserProfile, userProfileSelect } from 'lib/public-api/searchUserProfile';
 import { withSessionRoute } from 'lib/session/withSession';
 
 import type { PublicApiForumPost } from '../index';
 import { getPublicForumPost } from '../index';
 
 const handler = apiHandler();
+
+/**
+ * @swagger
+ * components
+ *  schemas:
+ *    UpdateForumPostInput:
+ *      type: object
+ *      properties:
+ *        contentMarkdown:
+ *          type: string
+ *          description: Markdown content of the forum post
+ *          optional: true
+ *        title:
+ *          type: string
+ *          description: Title of the forum post
+ *          optional: true
+ *        categoryId:
+ *          type: string
+ *          format: uuid
+ *          optional: true
+ */
+
+interface UpdateForumPostInput {
+  contentMarkdown?: string;
+  title?: string;
+  categoryId?: string;
+}
+
+/**
+ * @swagger
+ * /proposals/{proposalId}:
+ *   post:
+ *     summary: Update a forum post
+ *     tags:
+ *      - 'Space API'
+ *     parameters:
+ *      - name: postId
+ *        in: path
+ *        required: true
+ *        schema:
+ *          type: string
+ *     requestBody:
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              $ref: '#/components/schemas/UpdateForumPostInput'
+ *     responses:
+ *       200:
+ *         description: Updated forum post
+ *         content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                $ref: '#/components/schemas/ForumPost'
+ */
+
+async function updatePost(req: NextApiRequest, res: NextApiResponse<PublicApiForumPost>) {
+  const spaceId = req.authorizedSpaceId;
+  const payload = req.body as UpdateForumPostInput;
+  if (!spaceId) {
+    throw new InvalidStateError('Space ID is undefined');
+  }
+  const postId = req.query.postId as string;
+
+  const space = await prisma.space.findUniqueOrThrow({
+    where: {
+      id: spaceId
+    },
+    select: {
+      id: true,
+      domain: true
+    }
+  });
+
+  const postContent = parseMarkdown(payload.contentMarkdown ?? '');
+
+  const updatedFormPost = await updateForumPost(postId, {
+    categoryId: payload.categoryId,
+    content: postContent,
+    contentText: payload.contentMarkdown,
+    isDraft: false,
+    title: payload.title
+  });
+
+  const { upDownVotes, ...post } = await prisma.post.findFirstOrThrow({
+    where: {
+      id: updatedFormPost.id
+    },
+    include: {
+      upDownVotes: {
+        select: {
+          upvoted: true,
+          createdBy: true
+        }
+      },
+      category: {
+        select: {
+          name: true
+        }
+      },
+      author: {
+        select: userProfileSelect
+      }
+    }
+  });
+
+  const forumPost = await getPublicForumPost({
+    post: {
+      ...post,
+      votes: getPostVoteSummary(upDownVotes, post.author.id),
+      author: getUserProfile(post.author),
+      createdAt: post.createdAt.toISOString(),
+      updatedAt: post.updatedAt.toISOString(),
+      isDraft: !!post.isDraft
+    },
+    spaceDomain: space.domain,
+    categoryName: post.category.name
+  });
+
+  return res.status(200).json(forumPost);
+}
+
+handler.post(updatePost);
 
 handler.get(getProposal);
 
@@ -45,16 +172,18 @@ async function getProposal(req: NextApiRequest, res: NextApiResponse<PublicApiFo
   }
 
   const post = await getForumPost({ postId: req.query.postId as string });
-  const { category, space } = await prisma.post.findFirstOrThrow({
+  const { category, space, author } = await prisma.post.findFirstOrThrow({
     where: {
       id: req.query.postId as string
     },
     select: {
       category: true,
-      space: true
+      space: true,
+      author: {
+        select: userProfileSelect
+      }
     }
   });
-  const categoryMap = new Map([[post.categoryId, category]]);
   const cleanPost = {
     ...post,
     isDraft: !!post.isDraft,
@@ -62,7 +191,14 @@ async function getProposal(req: NextApiRequest, res: NextApiResponse<PublicApiFo
     updatedAt: post.updatedAt.toISOString()
   };
 
-  const result = await getPublicForumPost(cleanPost, categoryMap, space);
+  const result = await getPublicForumPost({
+    post: {
+      ...cleanPost,
+      author: getUserProfile(author)
+    },
+    spaceDomain: space.domain,
+    categoryName: category.name
+  });
 
   return res.status(200).json(result);
 }

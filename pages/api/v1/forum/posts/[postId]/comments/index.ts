@@ -1,10 +1,10 @@
-import { InvalidInputError } from '@charmverse/core/errors';
-import type { PageComment, PageCommentVote } from '@charmverse/core/prisma-client';
+import { InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
+import type { PostComment } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import type { PostCommentVote } from 'lib/forums/comments/interface';
 import { InvalidStateError, requireApiKey, requireKeys, requireSuperApiKey } from 'lib/middleware';
-import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
 import { defaultHandler, logApiRequest } from 'lib/public-api/handler';
@@ -59,17 +59,15 @@ handler.post(requireSuperApiKey, logApiRequest, requireKeys(['userId', 'contentM
  *         downvotes:
  *           type: integer
  *           example: 2
- *         comments:
- *           type: integer
- *           example: 2
  *         children:
  *           type: array
  *           description: Child comments of this comment. By default, this array is empty unless you request comments as a tree
  *           example: []
+ *
  */
 export type PublicApiPostComment = {
   id: string;
-  author: UserProfile;
+  createdBy: string | UserProfile;
   createdAt: string;
   parentId: string | null;
   content: {
@@ -81,12 +79,12 @@ export type PublicApiPostComment = {
   children: PublicApiPostComment[];
 };
 
-async function mapReducePageComments({
+async function mapReducePostComments({
   comments,
   reduceToTree
 }: {
-  comments: (Pick<PageComment, 'id' | 'parentId' | 'content' | 'contentText' | 'createdAt'> & {
-    votes: Pick<PageCommentVote, 'upvoted'>[];
+  comments: (Pick<PostComment, 'id' | 'parentId' | 'content' | 'contentText' | 'createdAt'> & {
+    votes: Pick<PostCommentVote, 'upvoted'>[];
     createdBy: string | UserProfile;
   })[];
   reduceToTree?: boolean;
@@ -159,8 +157,8 @@ const expandableFields = ['user'];
  * @swagger
  * /forum/posts/{postId}/comments:
  *   get:
- *     summary: Get proposal comments
- *     description: Return comments for a proposal as an array (default) or a tree
+ *     summary: Get post comments
+ *     description: Return comments for a post as an array (default) or a tree
  *     tags:
  *      - 'Space API'
  *     parameters:
@@ -187,7 +185,7 @@ const expandableFields = ['user'];
  *             enum: [user]
  *     responses:
  *       200:
- *         description: List of proposal comments
+ *         description: List of post comments
  *         content:
  *            application/json:
  *              schema:
@@ -199,17 +197,16 @@ const expandableFields = ['user'];
 async function getPostComments(req: NextApiRequest, res: NextApiResponse<PublicApiPostComment[]>) {
   // This should never be undefined, but adding this safeguard for future proofing
   const spaceId = req.authorizedSpaceId;
+  const postId = req.query.postId as string;
 
   if (!spaceId) {
     throw new InvalidStateError('Space ID is undefined');
   }
 
-  const proposal = await prisma.proposal.findFirstOrThrow({
+  await prisma.post.findFirstOrThrow({
     where: {
-      page: generatePageQuery({
-        pageIdOrPath: req.query.proposalId as string,
-        spaceIdOrDomain: spaceId
-      })
+      spaceId,
+      id: postId
     },
     select: {
       id: true
@@ -231,9 +228,9 @@ async function getPostComments(req: NextApiRequest, res: NextApiResponse<PublicA
     );
   }
 
-  const proposalComments = await prisma.pageComment.findMany({
+  const postComments = await prisma.postComment.findMany({
     where: {
-      pageId: proposal.id
+      postId
     },
     select: {
       id: true,
@@ -257,13 +254,11 @@ async function getPostComments(req: NextApiRequest, res: NextApiResponse<PublicA
     }
   });
 
-  const mappedComments = await mapReducePageComments({
-    comments: proposalComments.map((proposalComment) => {
+  const mappedComments = await mapReducePostComments({
+    comments: postComments.map((postComment) => {
       return {
-        ...proposalComment,
-        createdBy: proposalComment.user
-          ? getUserProfile(proposalComment.user as unknown as UserInfo)
-          : proposalComment.createdBy
+        ...postComment,
+        createdBy: postComment.user ? getUserProfile(postComment.user as unknown as UserInfo) : postComment.createdBy
       };
     }),
     reduceToTree: req.query.resultsAsTree === 'true'
@@ -318,7 +313,7 @@ async function getPostComments(req: NextApiRequest, res: NextApiResponse<PublicA
  *            application/json:
  *              schema:
  *                type: object
- *                $ref: '#/components/schemas/postComment'
+ *                $ref: '#/components/schemas/ForumPostComment'
  *
  */
 async function createPostComment(req: NextApiRequest, res: NextApiResponse<PublicApiPostComment>) {
@@ -326,28 +321,39 @@ async function createPostComment(req: NextApiRequest, res: NextApiResponse<Publi
   if (!req.spaceIdRange) {
     throw new InvalidStateError('Space ID is undefined');
   }
+  const postId = req.query.postId as string;
 
-  const proposal = await prisma.proposal.findFirstOrThrow({
+  const post = await prisma.post.findFirstOrThrow({
     where: {
-      page: generatePageQuery({
-        pageIdOrPath: req.query.proposalId as string
-      }),
+      id: postId,
       spaceId: {
         in: req.spaceIdRange
       }
     },
     select: {
+      spaceId: true,
       id: true
     }
   });
 
   const userId = req.body.userId as string;
 
-  const commentContent = await parseMarkdown(req.body.contentMarkdown);
+  const spaceRole = await prisma.spaceRole.findFirst({
+    where: {
+      spaceId: post.spaceId,
+      userId
+    }
+  });
 
-  const proposalComment = await prisma.pageComment.create({
+  if (!spaceRole) {
+    throw new UnauthorisedActionError('User does not have access to this space');
+  }
+
+  const commentContent = parseMarkdown(req.body.contentMarkdown);
+
+  const postComment = await prisma.postComment.create({
     data: {
-      page: { connect: { id: proposal.id } },
+      post: { connect: { id: postId } },
       parentId: req.body.parentId,
       contentText: req.body.contentMarkdown,
       user: { connect: { id: userId } },
@@ -356,8 +362,8 @@ async function createPostComment(req: NextApiRequest, res: NextApiResponse<Publi
   });
 
   const apiComment: PublicApiPostComment = {
-    id: proposalComment.id,
-    createdAt: proposalComment.createdAt.toISOString(),
+    id: postComment.id,
+    createdAt: postComment.createdAt.toISOString(),
     content: {
       markdown: req.body.contentMarkdown,
       text: req.body.contentMarkdown
@@ -365,7 +371,7 @@ async function createPostComment(req: NextApiRequest, res: NextApiResponse<Publi
     createdBy: userId,
     downvotes: 0,
     upvotes: 0,
-    parentId: proposalComment.parentId,
+    parentId: postComment.parentId,
     children: []
   };
 
