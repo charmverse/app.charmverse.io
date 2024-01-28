@@ -49,6 +49,7 @@ import { SnackbarProvider } from 'hooks/useSnackbar';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
 import { useUserAcquisition } from 'hooks/useUserAcquisition';
+import { VerifyLoginOtpProvider } from 'hooks/useVerifyLoginOtp';
 import { Web3AccountProvider } from 'hooks/useWeb3Account';
 import { WebSocketClientProvider } from 'hooks/useWebSocketClient';
 import { AppThemeProvider } from 'theme/AppThemeProvider';
@@ -218,42 +219,44 @@ function DataProviders({ children }: { children: ReactNode }) {
       }}
     >
       <UserProvider>
-        <DiscordProvider>
-          <WagmiProvider>
-            <Web3ConnectionManager>
-              <WalletSelectorModal />
-              <Web3AccountProvider>
-                <SpacesProvider>
-                  <CurrentSpaceProvider>
-                    <PostCategoriesProvider>
-                      <IsSpaceMemberProvider>
-                        <WebSocketClientProvider>
-                          <MembersProvider>
-                            <PaymentMethodsProvider>
-                              <FocalBoardProvider>
-                                <PagesProvider>
-                                  <RewardsProvider>
-                                    <MemberPropertiesProvider>
-                                      <LensProvider config={lensConfig}>
-                                        <UserProfileProvider>
-                                          <PageTitleProvider>{children}</PageTitleProvider>
-                                        </UserProfileProvider>
-                                      </LensProvider>
-                                    </MemberPropertiesProvider>
-                                  </RewardsProvider>
-                                </PagesProvider>
-                              </FocalBoardProvider>
-                            </PaymentMethodsProvider>
-                          </MembersProvider>
-                        </WebSocketClientProvider>
-                      </IsSpaceMemberProvider>
-                    </PostCategoriesProvider>
-                  </CurrentSpaceProvider>
-                </SpacesProvider>
-              </Web3AccountProvider>
-            </Web3ConnectionManager>
-          </WagmiProvider>
-        </DiscordProvider>
+        <VerifyLoginOtpProvider>
+          <DiscordProvider>
+            <WagmiProvider>
+              <Web3ConnectionManager>
+                <WalletSelectorModal />
+                <Web3AccountProvider>
+                  <SpacesProvider>
+                    <CurrentSpaceProvider>
+                      <PostCategoriesProvider>
+                        <IsSpaceMemberProvider>
+                          <WebSocketClientProvider>
+                            <MembersProvider>
+                              <PaymentMethodsProvider>
+                                <FocalBoardProvider>
+                                  <PagesProvider>
+                                    <RewardsProvider>
+                                      <MemberPropertiesProvider>
+                                        <LensProvider config={lensConfig}>
+                                          <UserProfileProvider>
+                                            <PageTitleProvider>{children}</PageTitleProvider>
+                                          </UserProfileProvider>
+                                        </LensProvider>
+                                      </MemberPropertiesProvider>
+                                    </RewardsProvider>
+                                  </PagesProvider>
+                                </FocalBoardProvider>
+                              </PaymentMethodsProvider>
+                            </MembersProvider>
+                          </WebSocketClientProvider>
+                        </IsSpaceMemberProvider>
+                      </PostCategoriesProvider>
+                    </CurrentSpaceProvider>
+                  </SpacesProvider>
+                </Web3AccountProvider>
+              </Web3ConnectionManager>
+            </WagmiProvider>
+          </DiscordProvider>
+        </VerifyLoginOtpProvider>
       </UserProvider>
     </SWRConfig>
   );

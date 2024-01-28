@@ -3,6 +3,7 @@ import type { UserWallet } from '@charmverse/core/prisma';
 import type { Web3Provider } from '@ethersproject/providers';
 import type { Signer } from 'ethers';
 import { SiweMessage } from 'lit-siwe';
+import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useCallback, createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { mutate } from 'swr';
@@ -21,6 +22,7 @@ import type { LoggedInUser } from 'models';
 
 import { PREFIX, useLocalStorage } from './useLocalStorage';
 import { useUser } from './useUser';
+import { useVerifyLoginOtp } from './useVerifyLoginOtp';
 
 type IContext = {
   // Web3 account belonging to the current logged in user
@@ -35,7 +37,7 @@ type IContext = {
   verifiableWalletDetected: boolean;
   isSigning: boolean;
   resetSigning: () => void;
-  loginFromWeb3Account: (authSig?: AuthSig) => Promise<LoggedInUser>;
+  loginFromWeb3Account: (authSig?: AuthSig) => Promise<LoggedInUser | undefined>;
   setAccountUpdatePaused: (paused: boolean) => void;
   signer: Signer | undefined;
   provider: Web3Provider | undefined;
@@ -60,8 +62,9 @@ export const Web3Context = createContext<Readonly<IContext>>({
 
 // a wrapper around account and library from web3react
 export function Web3AccountProvider({ children }: { children: ReactNode }) {
-  // const { account, library, chainId, connector } = useWeb3React();
   const { address: account, connector: activeConnector } = useAccount();
+  const { open: openVerifyOtpModal } = useVerifyLoginOtp();
+  const router = useRouter();
   const { chain } = useNetwork();
   const chainId = chain?.id;
   const { signMessageAsync } = useSignMessage();
@@ -157,14 +160,21 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
         signature = await requestSignature();
       }
 
+      setSignature(account, signature, true);
+
       try {
         // Refresh the user account. This was required as otherwise the user would not be able to see the first page upon joining the space
-        const refreshedProfile = await charmClient.login({ address: signature.address, walletSignature: signature });
+        const resp = await charmClient.login({ address: signature.address, walletSignature: signature });
 
-        setSignature(account, signature, true);
-        setUser(refreshedProfile);
-
-        return refreshedProfile;
+        if ('id' in resp) {
+          // User is returned
+          setUser(resp);
+          return resp;
+        } else {
+          // Open the otp modal for verification
+          openVerifyOtpModal();
+          return;
+        }
       } catch (err) {
         if ((err as SystemError)?.errorType === 'Disabled account') {
           throw err;
@@ -176,7 +186,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
         return newProfile;
       }
     },
-    [account, setSignature, setUser, requestSignature, verifiableWalletDetected]
+    [account, setSignature, setUser, requestSignature, router, verifiableWalletDetected]
   );
 
   // Only expose account if current user and account match up

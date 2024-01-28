@@ -22,6 +22,7 @@ import { Fragment, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
+import { useSetPrimaryWallet } from 'charmClient/hooks/profile';
 import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/Web3ConnectionManager';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import Legend from 'components/settings/Legend';
@@ -59,11 +60,12 @@ export function IdentityProviders() {
   const discordAccount = user?.discordUser?.account as Partial<DiscordAccount> | undefined;
   const telegramAccount = user?.telegramUser?.account as Partial<TelegramAccount> | undefined;
   const [openAddress, setOpenAddress] = useState<string | null>(null);
-
+  const { trigger: setPrimaryWallet, isMutating: isSettingPrimaryWallet } = useSetPrimaryWallet();
   const handleOpenDeleteModal = (address: string) => (event: MouseEvent<HTMLElement>) => {
     setOpenAddress(address);
     deleteWalletPopupState.open(event);
   };
+  const primaryWallet = user?.wallets?.find((w) => w.id === user.primaryWalletId);
 
   const { trigger: saveUser, isMutating: isLoadingUserUpdate } = useSWRMutation(
     '/profile',
@@ -87,6 +89,19 @@ export function IdentityProviders() {
       }
     }
   );
+
+  const onSetPrimaryWallet = async (walletId: string) => {
+    try {
+      await setPrimaryWallet({ walletId });
+      setUser({
+        ...user,
+        primaryWalletId: walletId
+      });
+      showMessage('Primary wallet set successfully', 'success');
+    } catch (error) {
+      log.error('Error setting primary wallet', error);
+    }
+  };
 
   const generateWalletAuth = async () => {
     try {
@@ -137,7 +152,7 @@ export function IdentityProviders() {
 
   const { connect, isConnected, isLoading: isDiscordLoading, error } = useDiscordConnection();
   // Don't allow a user to remove their last identity
-  const cannotDisconnect = !user || countConnectableIdentities(user) <= 1;
+  const cannotDisconnect = !user || (user.wallets.length === 0 && countConnectableIdentities(user) <= 1);
 
   return (
     <>
@@ -188,17 +203,30 @@ export function IdentityProviders() {
             <IdentityProviderItem
               text={wallet.ensname || shortWalletAddress(wallet.address)}
               type='Wallet'
-              loading={isConnectingIdentity || isVerifyingWallet || isSigning}
+              loading={isConnectingIdentity || isVerifyingWallet || isSigning || isSettingPrimaryWallet}
               disabled={cannotDisconnect}
               connected={true}
-              active={lowerCaseEqual(wallet.address, account)}
+              primary={lowerCaseEqual(wallet.address, primaryWallet?.address)}
               actions={[
                 verifiableWalletDetected && !account && !isConnectingIdentity ? (
                   <MenuItem key='verify' onClick={generateWalletAuth}>
                     Verify Wallet
                   </MenuItem>
                 ) : null,
-                <MenuItem key='disconnect' onClick={handleOpenDeleteModal(wallet.address)}>
+                <MenuItem
+                  disabled={lowerCaseEqual(wallet.address, primaryWallet?.address)}
+                  key='set-primary'
+                  onClick={() => {
+                    onSetPrimaryWallet(wallet.id);
+                  }}
+                >
+                  Set as Primary
+                </MenuItem>,
+                <MenuItem
+                  disabled={lowerCaseEqual(wallet.address, account)}
+                  key='disconnect'
+                  onClick={handleOpenDeleteModal(wallet.address)}
+                >
                   Disconnect Wallet
                 </MenuItem>
               ]}

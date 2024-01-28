@@ -28,3 +28,15 @@ export function useResetRecoveryCode() {
     `/api/profile/otp/recovery-code`
   );
 }
+
+export function useSetPrimaryWallet() {
+  return usePUT<{ walletId: string }, void>(`/api/profile/primary-wallet`);
+}
+
+export function useVerifyOtp() {
+  return usePOST<{ authCode: string }, LoggedInUser>(`/api/profile/otp/verify`);
+}
+
+export function useGetTriggerUser() {
+  return useGETtrigger<undefined, LoggedInUser>('/api/profile');
+}

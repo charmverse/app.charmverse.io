@@ -169,7 +169,7 @@ export function UserSelect({
             showEmptyPlaceholder && <EmptyPlaceholder>Empty</EmptyPlaceholder>
           ) : (
             <MembersDisplay
-              wrapColumn={wrapColumn ?? false}
+              wrapColumn={displayType === 'details' ? false : wrapColumn ?? false}
               readOnly={true}
               memberIds={memberIds}
               setMemberIds={_onChange}

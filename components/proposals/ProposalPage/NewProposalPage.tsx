@@ -389,6 +389,7 @@ export function NewProposalPage({
     formAnswersRef.current = formInputs.formAnswers;
   }, [formInputs.formAnswers]);
 
+  const hasSource = !!sourcePage || !!sourcePost;
   // apply title and content if converting a page into a proposal
   useEffect(() => {
     if (sourcePage) {
@@ -406,7 +407,8 @@ export function NewProposalPage({
         sourcePostId: sourcePost.id
       });
     }
-  }, [!!sourcePage && !!sourcePost]);
+  }, [hasSource]);
+
   return (
     <Box flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
       <PrimaryColumn showPageActionSidebar={!!internalSidebarView}>
