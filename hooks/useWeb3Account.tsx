@@ -2,14 +2,16 @@ import { log } from '@charmverse/core/log';
 import type { UserWallet } from '@charmverse/core/prisma';
 import type { Web3Provider } from '@ethersproject/providers';
 import type { Signer } from 'ethers';
+import { Contract, utils } from 'ethers';
 import { SiweMessage } from 'lit-siwe';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { useCallback, createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { mutate } from 'swr';
 import useSWRMutation from 'swr/mutation';
-import { recoverMessageAddress, getAddress } from 'viem';
-import { useAccount, useConnect, useNetwork, useSignMessage } from 'wagmi';
+import type { Abi } from 'viem';
+import { getAddress, recoverMessageAddress, parseAbi } from 'viem';
+import { useAccount, useConnect, useNetwork, usePublicClient, useSignMessage } from 'wagmi';
 
 import charmClient from 'charmClient';
 import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/Web3ConnectionManager';
@@ -23,6 +25,12 @@ import type { LoggedInUser } from 'models';
 import { PREFIX, useLocalStorage } from './useLocalStorage';
 import { useUser } from './useUser';
 import { useVerifyLoginOtp } from './useVerifyLoginOtp';
+
+const EIP1271_MAGIC_VALUE = '0x1626ba7e';
+
+const eip1271ContractInterface = new utils.Interface([
+  'function isValidSignature(bytes32 _message, bytes _signature) public view returns (bytes4)'
+]);
 
 type IContext = {
   // Web3 account belonging to the current logged in user
@@ -67,7 +75,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { chain } = useNetwork();
   const chainId = chain?.id;
-  const { signMessageAsync } = useSignMessage();
+  const { signMessageAsync } = useSignMessage({});
 
   const { isConnectingIdentity } = useWeb3ConnectionManager();
   const [isSigning, setIsSigning] = useState(false);
@@ -81,6 +89,8 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
   const { user, setUser, logoutUser } = useUser();
 
   const { connectors, connectAsync } = useConnect();
+
+  const { readContract } = usePublicClient({ chainId: 1 });
 
   const [walletAuthSignature, setWalletAuthSignature] = useState<AuthSig | null>(null);
   const [accountUpdatePaused, setAccountUpdatePaused] = useState(false);
@@ -98,6 +108,40 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       setWalletAuthSignature(signature);
     },
     [setLitAuthSignature, setLitProvider]
+  );
+
+  const validateSignatureEIP1271 = useCallback(
+    async ({
+      contractAddress,
+      message,
+      signature
+    }: {
+      contractAddress: string;
+      message: string;
+      signature: string;
+    }) => {
+      const messageHash = utils.id(message);
+
+      console.log('INPUT', {
+        messageHash,
+        signature
+      });
+
+      // 'function isValidSignature(bytes32 _message, bytes _signature) public view returns (bytes4)'
+
+      const abi = parseAbi([
+        'function isValidSignature(bytes32 _messageHash, bytes _signature) public view returns (bytes4)'
+      ]);
+
+      const data = await readContract({
+        account: contractAddress as any,
+        address: contractAddress as any,
+        abi,
+        args: messageHash ? [messageHash, signature] : (null as any),
+        functionName: 'isValidSignature'
+      });
+    },
+    []
   );
 
   const requestSignature = useCallback(async (): Promise<AuthSig> => {
@@ -122,7 +166,16 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       const newSignature = await signMessageAsync({
         message: body
       });
+
       const signatureAddress = await recoverMessageAddress({ message: body, signature: newSignature });
+
+      const isValid = await validateSignatureEIP1271({
+        contractAddress: account,
+        message: body,
+        signature: newSignature
+      });
+
+      console.log({ newSignature, body, account, signatureAddress, isValid });
 
       if (!lowerCaseEqual(signatureAddress, account)) {
         throw new Error('Signature address does not match account');
