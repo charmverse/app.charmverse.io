@@ -2,15 +2,14 @@ import { log } from '@charmverse/core/log';
 import type { UserWallet } from '@charmverse/core/prisma';
 import type { Web3Provider } from '@ethersproject/providers';
 import type { Signer } from 'ethers';
-import { Contract, utils } from 'ethers';
+import { utils } from 'ethers';
 import { SiweMessage } from 'lit-siwe';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { mutate } from 'swr';
 import useSWRMutation from 'swr/mutation';
-import type { Abi } from 'viem';
-import { getAddress, recoverMessageAddress, parseAbi } from 'viem';
+import { getAddress, parseAbi, recoverMessageAddress } from 'viem';
 import { useAccount, useConnect, useNetwork, usePublicClient, useSignMessage } from 'wagmi';
 
 import charmClient from 'charmClient';
@@ -120,14 +119,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       message: string;
       signature: string;
     }) => {
-      const messageHash = utils.id(message);
-
-      console.log('INPUT', {
-        messageHash,
-        signature
-      });
-
-      // 'function isValidSignature(bytes32 _message, bytes _signature) public view returns (bytes4)'
+      const messageHash = utils.hashMessage(message);
 
       const abi = parseAbi([
         'function isValidSignature(bytes32 _messageHash, bytes _signature) public view returns (bytes4)'
@@ -140,6 +132,8 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
         args: messageHash ? [messageHash, signature] : (null as any),
         functionName: 'isValidSignature'
       });
+
+      return data === EIP1271_MAGIC_VALUE;
     },
     []
   );
@@ -167,17 +161,19 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
         message: body
       });
 
-      const signatureAddress = await recoverMessageAddress({ message: body, signature: newSignature });
+      const [signatureAddress, isValidGnosisSafeSignature] = await Promise.all([
+        recoverMessageAddress({
+          message: body,
+          signature: newSignature
+        }),
+        validateSignatureEIP1271({
+          contractAddress: account,
+          message: body,
+          signature: newSignature
+        })
+      ]);
 
-      const isValid = await validateSignatureEIP1271({
-        contractAddress: account,
-        message: body,
-        signature: newSignature
-      });
-
-      console.log({ newSignature, body, account, signatureAddress, isValid });
-
-      if (!lowerCaseEqual(signatureAddress, account)) {
+      if (!lowerCaseEqual(signatureAddress, account) && !isValidGnosisSafeSignature) {
         throw new Error('Signature address does not match account');
       }
 
