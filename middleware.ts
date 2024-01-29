@@ -12,11 +12,11 @@ const PUBLIC_FILE = /\.(.*)$/; // Files
 
 const FORCE_SUBDOMAINS = process.env.FORCE_SUBDOMAINS === 'true';
 
-export async function middleware(req: NextRequest) {
-  if (isTestEnv) {
-    // Skip middleware in tests
-    return;
-  }
+export function middleware(req: NextRequest) {
+  // if (isTestEnv) {
+  //   // Skip middleware in tests
+  //   return;
+  // }
 
   // Clone the URL
   const url = req.nextUrl.clone();
@@ -26,7 +26,7 @@ export async function middleware(req: NextRequest) {
   // Skip api routes
   if (url.pathname.includes('/api/')) return;
   // Skip public pages
-  const firstPart = url.pathname.split('/')[0];
+  const firstPart = url.pathname.split('/')[1]; // url.pathname starts with a "/", so grab the second element
   const isPublicPage = DOMAIN_BLACKLIST.includes(firstPart);
 
   if (isPublicPage) return;
@@ -46,7 +46,6 @@ export async function middleware(req: NextRequest) {
 
     return NextResponse.redirect(redirectUrl);
   }
-
   if (subdomain && spaceDomainFromPath && spaceDomainFromPath === subdomain) {
     // We are on url with subdomain AND domain in path - redirect to url without domain in path
     const pathWithoutSpaceDomain = url.pathname.replace(`/${spaceDomainFromPath}`, '') || '/';
@@ -60,7 +59,6 @@ export async function middleware(req: NextRequest) {
   if (rewriteDomain) {
     // Subdomain available, rewriting
     url.pathname = `/${rewriteDomain}${url.pathname}`;
-
     return NextResponse.rewrite(url);
   }
 }
