@@ -1,0 +1,61 @@
+import { prisma } from '@charmverse/core/prisma-client';
+
+import { addCharms } from 'lib/charms/addCharms';
+import { CharmActionTrigger } from 'lib/charms/addCharmTransaction';
+import { getCharmTx } from 'lib/charms/getCharmTx';
+import { getUserOrSpaceWallet } from 'lib/charms/getUserOrSpaceWallet';
+import { generateUserAndSpace } from 'testing/setupDatabase';
+
+describe('addCharms', () => {
+  it('adds charms to empty user wallet', async () => {
+    const { user } = await generateUserAndSpace({ isAdmin: true });
+    const wallet = await getUserOrSpaceWallet({ userId: user.id });
+
+    const { balance, txId } = await addCharms({ recipient: { userId: user.id }, amount: 100 });
+    const tx = await getCharmTx(txId);
+
+    expect(balance).toBe(100);
+    expect(tx).toBeDefined();
+    expect(tx?.amount).toBe(100);
+    expect(tx?.from).toBe(null);
+    expect(tx?.to).toBe(wallet.id);
+    expect(tx?.metadata).toEqual({});
+  });
+
+  it('top ups charms balance', async () => {
+    const { user } = await generateUserAndSpace({ isAdmin: true });
+    const wallet = await getUserOrSpaceWallet({ userId: user.id });
+    await prisma.charmWallet.update({ where: { id: wallet.id }, data: { balance: 50 } });
+
+    const { balance, txId } = await addCharms({ recipient: { userId: user.id }, amount: 100 });
+    const tx = await getCharmTx(txId);
+
+    expect(balance).toBe(150);
+    expect(tx).toBeDefined();
+    expect(tx?.amount).toBe(100);
+    expect(tx?.from).toBe(null);
+    expect(tx?.to).toBe(wallet.id);
+    expect(tx?.metadata).toEqual({});
+  });
+
+  it('top ups charms balance and stores metadata', async () => {
+    const { user } = await generateUserAndSpace({ isAdmin: true });
+    const wallet = await getUserOrSpaceWallet({ userId: user.id });
+    await prisma.charmWallet.update({ where: { id: wallet.id }, data: { balance: 50 } });
+
+    const { balance, txId } = await addCharms({
+      recipient: { userId: user.id },
+      amount: 100,
+      actorId: '123',
+      actionTrigger: CharmActionTrigger.invite
+    });
+    const tx = await getCharmTx(txId);
+
+    expect(balance).toBe(150);
+    expect(tx).toBeDefined();
+    expect(tx?.amount).toBe(100);
+    expect(tx?.from).toBe(null);
+    expect(tx?.to).toBe(wallet.id);
+    expect(tx?.metadata).toEqual({ actorId: '123', actionTrigger: CharmActionTrigger.invite });
+  });
+});
