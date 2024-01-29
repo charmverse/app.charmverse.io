@@ -32,7 +32,7 @@ export function CustomModal({ onClose, ...props }: Omit<ModalProps, 'children'>,
   };
 
   return (
-    <Modal title='Two factor authentication' size='medium' ref={ref} onClose={onClose} {...props}>
+    <Modal title='Two factor authentication' size='small' ref={ref} onClose={onClose} {...props}>
       <ConfirmAuthCode errorMessage={error?.message} loading={isMutating} onSubmit={onSubmit} />
     </Modal>
   );
