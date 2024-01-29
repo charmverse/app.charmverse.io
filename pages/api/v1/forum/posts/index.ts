@@ -215,7 +215,7 @@ handler.post(requireKeys(['createdBy', 'contentMarkdown', 'title', 'categoryId']
 handler.get(listPosts);
 /**
  * @swagger
- * /proposals:
+ * /forum/posts:
  *   get:
  *     summary: Get forum posts
  *     tags:

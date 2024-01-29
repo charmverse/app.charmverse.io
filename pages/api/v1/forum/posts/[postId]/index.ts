@@ -44,7 +44,7 @@ interface UpdateForumPostInput {
 
 /**
  * @swagger
- * /proposals/{proposalId}:
+ * /forum/posts/{postId}:
  *   post:
  *     summary: Update a forum post
  *     tags:
