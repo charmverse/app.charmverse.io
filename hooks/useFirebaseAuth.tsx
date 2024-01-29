@@ -26,7 +26,6 @@ export function useFirebaseAuth({ authenticatePath = 'authenticate' } = {}) {
   const { setUser } = useUser();
   const [emailForSignIn, setEmailForSignIn] = useLocalStorage('emailForSignIn', '');
   const router = useRouter();
-  const { open: openVerifyOtpModal } = useVerifyLoginOtp();
 
   useEffect(() => {
     provider.addScope('email');
@@ -95,13 +94,11 @@ export function useFirebaseAuth({ authenticatePath = 'authenticate' } = {}) {
 
         if ('id' in resp) {
           setUser(resp);
-          setEmailForSignIn('');
-          return resp;
-        } else {
-          openVerifyOtpModal();
-          setEmailForSignIn('');
-          return;
         }
+
+        setEmailForSignIn('');
+
+        return resp;
         // We want to bubble up the error, so we can show a relevant message, but always clear the email
       } catch (err) {
         setEmailForSignIn('');

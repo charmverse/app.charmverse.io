@@ -26,7 +26,7 @@ export default function Authenticate() {
   const { showMessage } = useSnackbar();
   const router = useRouter();
   const emailPopup = usePopupState({ variant: 'popover', popupId: 'emailPopup' });
-  const { close: closeVerifyOtp, isOpen: isVerifyOtpOpen } = useVerifyLoginOtp();
+  const { close: closeVerifyOtp, isOpen: isVerifyOtpOpen, open: openVerifyOtpModal } = useVerifyLoginOtp();
 
   async function redirectLoggedInUser() {
     const redirectPath = typeof router.query.redirectUrl === 'string' ? router.query.redirectUrl : '/';
@@ -54,9 +54,11 @@ export default function Authenticate() {
 
     await validateMagicLink(emailForSignIn)
       .then((data) => {
-        if (data) {
+        if ('id' in data) {
           showMessage('Logged in with email. Redirecting you now', 'success');
           redirectLoggedInUser();
+        } else if ('otpRequired' in data) {
+          openVerifyOtpModal();
         }
       })
       .catch((err) => {
