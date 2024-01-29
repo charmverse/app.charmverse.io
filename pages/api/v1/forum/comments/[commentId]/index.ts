@@ -7,7 +7,7 @@ import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
 import { superApiHandler } from 'lib/public-api/handler';
 import { withSessionRoute } from 'lib/session/withSession';
 
-import type { PublicApiPostComment } from '..';
+import type { PublicApiPostComment } from '../../posts/[postId]/comments';
 
 const handler = superApiHandler();
 
@@ -15,18 +15,12 @@ handler.delete(deletePostComment).put(requireKeys(['contentMarkdown'], 'body'), 
 
 /**
  * @swagger
- * /forum/posts/{postId}/comments/{commentId}:
+ * /forum/comments/{commentId}:
  *   delete:
  *     summary: Delete a post comment
  *     tags:
  *      - 'Partner API'
  *     parameters:
- *       - name: postId
- *         in: path
- *         required: true
- *         schema:
- *           type: string
- *         description: ID of the related post
  *       - name: commentId
  *         in: params
  *         required: true
@@ -41,7 +35,6 @@ async function deletePostComment(req: NextApiRequest, res: NextApiResponse) {
     where: {
       id: req.query.commentId as string,
       post: {
-        id: req.query.postId as string,
         spaceId: req.authorizedSpaceId
           ? req.authorizedSpaceId
           : {
@@ -69,19 +62,13 @@ async function deletePostComment(req: NextApiRequest, res: NextApiResponse) {
 
 /**
  * @swagger
- * /forum/posts/{postId}/comments/{commentId}:
+ * /forum/comments/{commentId}:
  *   put:
  *     summary: Update a post comment
  *     description: Update the content of an existing post comment
  *     tags:
  *      - 'Partner API'
  *     parameters:
- *       - name: postId
- *         in: path
- *         required: true
- *         schema:
- *           type: string
- *         description: ID of the related post
  *       - name: commentId
  *         in: params
  *         required: true
@@ -124,7 +111,6 @@ async function updatePostComment(req: NextApiRequest, res: NextApiResponse<Publi
     where: {
       id: req.query.commentId as string,
       post: {
-        id: req.query.postId as string,
         spaceId: req.authorizedSpaceId
           ? req.authorizedSpaceId
           : {
@@ -145,7 +131,8 @@ async function updatePostComment(req: NextApiRequest, res: NextApiResponse<Publi
     },
     data: {
       contentText: newCommentText,
-      content: commentContent
+      content: commentContent,
+      updatedAt: new Date()
     },
     select: {
       id: true,

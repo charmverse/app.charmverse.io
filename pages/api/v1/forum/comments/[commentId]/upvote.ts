@@ -7,7 +7,7 @@ import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkd
 import { superApiHandler } from 'lib/public-api/handler';
 import { withSessionRoute } from 'lib/session/withSession';
 
-import type { PublicApiPostComment } from '../index';
+import type { PublicApiPostComment } from '../../posts/[postId]/comments/index';
 
 const handler = superApiHandler();
 
@@ -15,19 +15,13 @@ handler.post(requireKeys(['userId', 'upvoted'], 'body'), upvoteOnComment);
 
 /**
  * @swagger
- * /forum/posts/{postId}/comments/{commentId}/vote:
+ * /forum/comments/{commentId}/vote:
  *   post:
  *     summary: Up/downvote a post comment
  *     description: Adds a vote for a post comment by a specific user
  *     tags:
  *      - 'Partner API'
  *     parameters:
- *       - name: postId
- *         in: path
- *         required: true
- *         schema:
- *           type: string
- *         description: ID of the related post
  *       - name: commentId
  *         in: params
  *         required: true
@@ -53,18 +47,19 @@ handler.post(requireKeys(['userId', 'upvoted'], 'body'), upvoteOnComment);
 async function upvoteOnComment(req: NextApiRequest, res: NextApiResponse<PublicApiPostComment>) {
   // This should never be undefined, but adding this safeguard for future proofing
   const userId = req.body.userId as string;
-  const postId = req.query.postId as string;
   const commentId = req.query.commentId as string;
 
-  await prisma.post.findFirstOrThrow({
+  const { postId } = await prisma.postComment.findFirstOrThrow({
     where: {
-      id: postId,
-      spaceId: {
-        in: req.spaceIdRange
+      id: commentId,
+      post: {
+        spaceId: {
+          in: req.spaceIdRange
+        }
       }
     },
     select: {
-      id: true
+      postId: true
     }
   });
 
