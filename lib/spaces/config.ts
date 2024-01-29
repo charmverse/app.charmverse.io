@@ -9,7 +9,6 @@ export const DOMAIN_BLACKLIST = [
   'join',
   'share',
   'signup',
-  'u',
   'loop',
   'permalink'
 ];
