@@ -34,7 +34,7 @@ import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
 import type { SelectOptionType } from './fields/Select/interfaces';
 import type { FormFieldInput } from './interfaces';
 
-const FormFieldContainer = styled(Stack, {
+export const FormFieldContainer = styled(Stack, {
   shouldForwardProp(propName) {
     return propName !== 'dragDirection';
   }

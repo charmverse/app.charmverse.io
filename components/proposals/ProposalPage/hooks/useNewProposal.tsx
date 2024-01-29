@@ -165,7 +165,7 @@ function emptyState({
     title: '',
     type: 'proposal',
     selectedCredentialTemplates: [],
-    fields: { properties: {} },
+    fields: { properties: {}, enableRewards: true },
     ...inputs,
     // leave authors empty for proposals
     authors: inputs.type !== 'proposal_template' && userId ? [userId] : []
