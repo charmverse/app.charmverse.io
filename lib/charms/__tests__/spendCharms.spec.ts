@@ -1,45 +1,49 @@
-import { InvalidInputError } from '@charmverse/core/errors';
+import { InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { getCharmTx } from 'lib/charms/getCharmTx';
 import { getUserOrSpaceWallet } from 'lib/charms/getUserOrSpaceWallet';
+import { spendCharms } from 'lib/charms/spendCharms';
 import { transferCharms } from 'lib/charms/transferCharms';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
 describe('spendCharms', () => {
-  it('sends charms from user to space', async () => {
+  it('spends space charms by admin', async () => {
     const { user, space } = await generateUserAndSpace({ isAdmin: true });
-    const userWallet = await getUserOrSpaceWallet({ userId: user.id });
     const spaceWallet = await getUserOrSpaceWallet({ spaceId: space.id });
+    // update space balance
+    await prisma.charmWallet.update({ where: { spaceId: space.id }, data: { balance: 137 } });
 
-    // update user balance
-    await prisma.charmWallet.update({ where: { userId: user.id }, data: { balance: 1337 } });
-
-    const { txId, balance } = await transferCharms({ sender: user.id, recipient: { spaceId: space.id }, amount: 107 });
+    const { txId, balance } = await spendCharms({ actorId: user.id, spaceId: space.id, amount: 10 });
     const tx = await getCharmTx(txId);
 
-    expect(balance).toBe(1230);
+    expect(balance).toBe(127);
     expect(tx).toBeDefined();
-    expect(tx?.amount).toBe(107);
-    expect(tx?.from).toBe(userWallet.id);
-    expect(tx?.to).toBe(spaceWallet.id);
+    expect(tx?.amount).toBe(10);
+    expect(tx?.to).toBe(null);
+    expect(tx?.from).toBe(spaceWallet.id);
     expect(tx?.metadata).toEqual({});
   });
 
-  it('should throw an error if account does not have sufficient balance', async () => {
+  it('should throw an error if space account does not have sufficient balance', async () => {
     const { user, space } = await generateUserAndSpace({ isAdmin: true });
-    await getUserOrSpaceWallet({ userId: user.id });
-    await getUserOrSpaceWallet({ spaceId: space.id });
+    const spaceWallet = await getUserOrSpaceWallet({ spaceId: space.id });
+    // update space balance
+    await prisma.charmWallet.update({ where: { spaceId: space.id }, data: { balance: 13 } });
 
-    // update user balance
-    await prisma.charmWallet.update({ where: { userId: user.id }, data: { balance: 13 } });
+    await expect(spendCharms({ actorId: user.id, spaceId: space.id, amount: 14 })).rejects.toThrowError(
+      InvalidInputError
+    );
+  });
 
-    await expect(
-      transferCharms({
-        sender: user.id,
-        recipient: { spaceId: space.id },
-        amount: 13.37
-      })
-    ).rejects.toThrowError(InvalidInputError);
+  it('should throw an error if user is not an admin', async () => {
+    const { user, space } = await generateUserAndSpace({ isAdmin: false });
+    const spaceWallet = await getUserOrSpaceWallet({ spaceId: space.id });
+    // update space balance
+    await prisma.charmWallet.update({ where: { spaceId: space.id }, data: { balance: 13 } });
+
+    await expect(spendCharms({ actorId: user.id, spaceId: space.id, amount: 10 })).rejects.toThrowError(
+      UnauthorisedActionError
+    );
   });
 });
