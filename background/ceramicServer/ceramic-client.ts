@@ -5,6 +5,7 @@ import { serveEncodedDefinition } from '@composedb/devtools-node';
 import { ceramicHost, getCeramicClient } from './authenticate';
 import { compositeDefinitionFile, writeComposite } from './deploy-composites';
 
+// Start the GraphQL server
 async function bootstrapGqlServer() {
   const ceramic = await getCeramicClient();
 
