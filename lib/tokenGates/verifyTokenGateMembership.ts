@@ -114,7 +114,7 @@ export async function verifyTokenGateMembership({
           return r.value;
         }
         if (r.status === 'rejected') {
-          log.error('Error verifying token gate', { error: r.reason });
+          log.warn('Error verifying token gate', { error: r.reason });
         }
         return undefined;
       })

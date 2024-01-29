@@ -2,7 +2,7 @@ import { Box, Card, Stack, Typography } from '@mui/material';
 
 import { useCreateProposalRewards } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
-import { RewardTokenInfo } from 'components/rewards/components/RewardProperties/components/RewardTokenInfo';
+import { RewardAmount } from 'components/rewards/components/RewardStatusBadge';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
@@ -68,17 +68,17 @@ export function PublishRewardsButton({ proposalId, pendingRewards, rewardIds, di
             {page?.title || 'Untitled'}
           </Typography>
           <Stack alignItems='center' direction='row' height='100%'>
-            {reward.customReward ? (
-              <Typography component='span' variant='subtitle1' fontWeight='normal'>
-                {reward.customReward}
-              </Typography>
-            ) : (
-              <RewardTokenInfo
-                chainId={reward.chainId || null}
-                symbolOrAddress={reward.rewardToken || null}
-                rewardAmount={reward.rewardAmount || null}
-              />
-            )}
+            <RewardAmount
+              reward={{
+                chainId: reward.chainId || null,
+                customReward: reward.customReward || null,
+                rewardAmount: reward.rewardAmount || null,
+                rewardToken: reward.rewardToken || null
+              }}
+              truncate={true}
+              truncatePrecision={2}
+              typographyProps={{ variant: 'body2', fontWeight: 'normal', fontSize: 'normal' }}
+            />
           </Stack>
         </Box>
       ))}
