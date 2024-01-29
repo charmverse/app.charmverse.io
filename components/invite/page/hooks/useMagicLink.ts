@@ -50,6 +50,7 @@ export function useMagicLink({ error: ssrError }: { error?: 'error_invalid_page_
             // refresh page to redirect user
             router.replace(router.asPath);
           } else if ('otpRequired' in data && data.otpRequired) {
+            setStatus('verifying_otp');
             log.info('Magic link validated, opening the otp of the user');
             openVerifyOtpModal();
           }
