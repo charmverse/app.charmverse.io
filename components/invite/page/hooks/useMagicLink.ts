@@ -39,11 +39,13 @@ export function useMagicLink({ error: ssrError }: { error?: 'error_invalid_page_
       if (emailForSignIn && status === undefined) {
         try {
           setStatus('verifying_email');
-          await validateMagicLink(emailForSignIn);
-          log.info('Magic link validated, redirect user to page');
-          setStatus('verified_email');
-          // refresh page to redirect user
-          router.replace(router.asPath);
+          const data = await validateMagicLink(emailForSignIn);
+          if (data) {
+            log.info('Magic link validated, redirect user to page');
+            setStatus('verified_email');
+            // refresh page to redirect user
+            router.replace(router.asPath);
+          }
         } catch (error) {
           log.error('Error validating firebase magic link', { error });
           if ((error as any)?.code === 'auth/invalid_action_code') {

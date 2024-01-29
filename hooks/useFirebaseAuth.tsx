@@ -95,11 +95,13 @@ export function useFirebaseAuth({ authenticatePath = 'authenticate' } = {}) {
 
         if ('id' in resp) {
           setUser(resp);
+          setEmailForSignIn('');
+          return resp;
         } else {
           openVerifyOtpModal();
+          setEmailForSignIn('');
+          return;
         }
-
-        setEmailForSignIn('');
         // We want to bubble up the error, so we can show a relevant message, but always clear the email
       } catch (err) {
         setEmailForSignIn('');
