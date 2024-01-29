@@ -17,11 +17,11 @@ import { PublishingForm } from './components/PublishingForm';
 
 interface Props {
   pageId: string;
-  evaluationId?: string;
-  proposalId?: string;
+  evaluationId: string;
+  proposalId: string;
   snapshotProposalId: string | null;
   renderContent: (props: { onClick?: () => void; label: string; icon: ReactNode }) => ReactNode;
-  onPublish?: () => void;
+  onPublish: () => void;
 }
 
 export function PublishToSnapshot({
@@ -30,18 +30,18 @@ export function PublishToSnapshot({
   renderContent,
   evaluationId,
   proposalId,
-  onPublish = () => null
+  onPublish
 }: Props) {
   const [checkingProposal, setCheckingProposal] = useState(!!snapshotProposalId);
-  const [proposal, setProposal] = useState<SnapshotProposal | null>(null);
+  const [snapshotProposal, setSnapshotProposal] = useState<SnapshotProposal | null>(null);
   const { space: currentSpace } = useCurrentSpace();
   const { trigger: updateProposalEvaluation } = useUpdateSnapshotProposal({ proposalId });
 
   const { isOpen, open, close } = usePopupState({ variant: 'popover', popupId: 'publish-proposal' });
 
   async function verifyProposal(snapshotId: string) {
-    const snapshotProposal = await getSnapshotProposal(snapshotId);
-    if (!snapshotProposal) {
+    const _snapshotProposal = await getSnapshotProposal(snapshotId);
+    if (!_snapshotProposal) {
       if (evaluationId) {
         await updateProposalEvaluation({
           evaluationId,
@@ -54,16 +54,16 @@ export function PublishToSnapshot({
       }
       await charmClient.updatePageSnapshotData(pageId, { snapshotProposalId: null });
     }
-    return snapshotProposal;
+    return _snapshotProposal;
   }
 
   useEffect(() => {
     async function init() {
       if (snapshotProposalId) {
-        const _proposal = await verifyProposal(snapshotProposalId);
-        setProposal(_proposal);
+        const _snapshotProposal = await verifyProposal(snapshotProposalId);
+        setSnapshotProposal(_snapshotProposal);
       } else {
-        setProposal(null);
+        setSnapshotProposal(null);
       }
       setCheckingProposal(false);
     }
@@ -80,7 +80,7 @@ export function PublishToSnapshot({
           })}
         </>
       )}
-      {!checkingProposal && !proposal && (
+      {!checkingProposal && !snapshotProposal && (
         <>
           {renderContent({
             label: 'Publish to Snapshot',
@@ -105,13 +105,13 @@ export function PublishToSnapshot({
           </Modal>
         </>
       )}
-      {!checkingProposal && proposal && (
+      {!checkingProposal && snapshotProposal && (
         <Link
           sx={{ display: 'flex', verticalAlign: 'center' }}
           color='textPrimary'
           external
           target='_blank'
-          href={`https://snapshot.org/#/${proposal.space.id}/proposal/${proposal.id}`}
+          href={`https://snapshot.org/#/${snapshotProposal.space.id}/proposal/${snapshotProposal.id}`}
         >
           {renderContent({
             label: 'View on Snapshot',
