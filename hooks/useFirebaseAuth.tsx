@@ -17,6 +17,7 @@ import { getAppUrl } from 'lib/utilities/browser';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 import { useLocalStorage } from './useLocalStorage';
+import { useVerifyLoginOtp } from './useVerifyLoginOtp';
 
 export function useFirebaseAuth({ authenticatePath = 'authenticate' } = {}) {
   const [firebaseApp] = useState<FirebaseApp>(initializeApp(googleWebClientConfig));
@@ -25,6 +26,7 @@ export function useFirebaseAuth({ authenticatePath = 'authenticate' } = {}) {
   const { setUser } = useUser();
   const [emailForSignIn, setEmailForSignIn] = useLocalStorage('emailForSignIn', '');
   const router = useRouter();
+  const { open: openVerifyOtpModal } = useVerifyLoginOtp();
 
   useEffect(() => {
     provider.addScope('email');
@@ -83,7 +85,7 @@ export function useFirebaseAuth({ authenticatePath = 'authenticate' } = {}) {
       try {
         const result = await signInWithEmailLink(auth, email, window.location.href);
         const token = await result.user.getIdToken();
-        const loggedInUser = await (router.query.connectToExistingAccount === 'true'
+        const resp = await (router.query.connectToExistingAccount === 'true'
           ? charmClient.google.connectEmailAccount({
               accessToken: token
             })
@@ -91,7 +93,12 @@ export function useFirebaseAuth({ authenticatePath = 'authenticate' } = {}) {
               accessToken: token
             }));
 
-        setUser(loggedInUser);
+        if ('id' in resp) {
+          setUser(resp);
+        } else {
+          openVerifyOtpModal();
+        }
+
         setEmailForSignIn('');
         // We want to bubble up the error, so we can show a relevant message, but always clear the email
       } catch (err) {

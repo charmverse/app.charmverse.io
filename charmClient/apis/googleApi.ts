@@ -23,7 +23,7 @@ export class GoogleApi {
   }
 
   authenticateMagicLink(data: Pick<LoginWithGoogleRequest, 'accessToken'>) {
-    return http.POST<LoggedInUser>('/api/google/verify-magic-link', data);
+    return http.POST<LoggedInUser | { otpRequired: true }>('/api/google/verify-magic-link', data);
   }
 
   connectEmailAccount(data: Pick<LoginWithGoogleRequest, 'accessToken'>) {
