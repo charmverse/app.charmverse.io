@@ -1,14 +1,16 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { addCharmTransaction } from 'lib/charms/addCharmTransaction';
-import type { CharmTxRecipient, CharmActionTrigger } from 'lib/charms/addCharmTransaction';
+import type { CharmTxRecipient, CharmActionTrigger, CharmTxResult } from 'lib/charms/addCharmTransaction';
 import { getUserOrSpaceWallet } from 'lib/charms/getUserOrSpaceWallet';
 
-type AddCharmsResult = {
-  txId: string;
-  balance: number;
-};
-
+/**
+ * Spend space's charms by admin
+ * @param recipient - Space ID or User ID
+ * @param actorId - ID of user who triggered the action
+ * @param actionTrigger - Action that triggered the charm addition
+ * @param amount - Amount of charms to spend
+ */
 export async function addCharms({
   recipient,
   amount,
@@ -19,7 +21,7 @@ export async function addCharms({
   amount: number;
   actorId?: string;
   actionTrigger?: CharmActionTrigger;
-}): Promise<AddCharmsResult> {
+}): Promise<CharmTxResult> {
   const { id, balance } = await getUserOrSpaceWallet(recipient);
 
   const res = await prisma.$transaction([

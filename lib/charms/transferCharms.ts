@@ -2,9 +2,15 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { addCharmTransaction } from 'lib/charms/addCharmTransaction';
-import type { CharmTxRecipient } from 'lib/charms/addCharmTransaction';
+import type { CharmTxRecipient, CharmTxResult } from 'lib/charms/addCharmTransaction';
 import { getUserOrSpaceWallet } from 'lib/charms/getUserOrSpaceWallet';
 
+/**
+ * Transfer charms from user to space or another user
+ * @param sender - User ID
+ * @param recipient - Space ID or User ID
+ * @param amount - Amount of charms to transfer
+ */
 export async function transferCharms({
   sender,
   recipient,
@@ -13,20 +19,20 @@ export async function transferCharms({
   sender: string;
   recipient: CharmTxRecipient;
   amount: number;
-}): Promise<number> {
-  const { address: senderAddress, balance: senderBalance } = await getUserOrSpaceWallet({ userId: sender });
+}): Promise<CharmTxResult> {
+  const { id: senderId, balance: senderBalance } = await getUserOrSpaceWallet({ userId: sender });
 
   if (senderBalance < amount) {
     throw new InvalidInputError('Insufficient balance');
   }
 
-  const { address: recipientAddress, balance: recipientBalance } = await getUserOrSpaceWallet(recipient);
+  const { id: recipientId, balance: recipientBalance } = await getUserOrSpaceWallet(recipient);
 
   const res = await prisma.$transaction([
-    prisma.charmWallet.update({ where: { address: recipientAddress }, data: { balance: recipientBalance + amount } }),
-    prisma.charmWallet.update({ where: { address: senderAddress }, data: { balance: senderBalance - amount } }),
-    addCharmTransaction({ fromAddress: senderAddress, toAddress: recipientAddress, amount })
+    prisma.charmWallet.update({ where: { id: senderId }, data: { balance: senderBalance - amount } }),
+    prisma.charmWallet.update({ where: { id: recipientId }, data: { balance: recipientBalance + amount } }),
+    addCharmTransaction({ fromAddress: senderId, toAddress: recipientId, amount })
   ]);
 
-  return res[0].balance;
+  return { balance: res[0].balance, txId: res[2].id };
 }

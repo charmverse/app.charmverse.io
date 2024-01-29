@@ -14,6 +14,11 @@ type CharmTransactionMetadata = {
 
 export type CharmTxRecipient = { userId: string } | { spaceId: string };
 
+export type CharmTxResult = {
+  txId: string;
+  balance: number;
+};
+
 export function addCharmTransaction({
   fromAddress,
   toAddress,
