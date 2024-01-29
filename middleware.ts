@@ -13,11 +13,7 @@ const PUBLIC_FILE = /\.(.*)$/; // Files
 const FORCE_SUBDOMAINS = process.env.FORCE_SUBDOMAINS === 'true';
 
 export function middleware(req: NextRequest) {
-  // if (isTestEnv) {
-  //   // Skip middleware in tests
-  //   return;
-  // }
-
+  
   // Clone the URL
   const url = req.nextUrl.clone();
 
