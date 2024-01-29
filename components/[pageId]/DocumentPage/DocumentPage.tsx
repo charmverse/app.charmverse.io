@@ -558,7 +558,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
               )}
 
               {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') && (
-                <Box mt='-100px'>
+                <Box>
                   {/* add negative margin to offset height of .charm-empty-footer */}
                   <PageComments page={page} canCreateComments={pagePermissions.comment} />
                 </Box>
