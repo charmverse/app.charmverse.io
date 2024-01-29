@@ -29,11 +29,9 @@ handler.post(requireSuperApiKey, logApiRequest, requireKeys(['userId', 'contentM
  *         id:
  *           type: string
  *           example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
- *         parentId:
- *           type: string
- *           nullable: true
- *           description: Parent comment
- *           example: null
+ *         author:
+ *           type: object
+ *           $ref: '#/components/schemas/SearchUserResponseBody'
  *         content:
  *           type: object
  *           properties:
@@ -43,16 +41,15 @@ handler.post(requireSuperApiKey, logApiRequest, requireKeys(['userId', 'contentM
  *             markdown:
  *               type: string
  *               example: "## This is a comment."
- *         createdBy:
- *           oneOf:
- *             - type: string
- *               description: User ID of the user who created the comment
- *               example: "69a54a56-50d6-4f7b-b350-2d9c312f81f3"
- *             - $ref: '#/components/schemas/SearchUserResponseBody'
  *         createdAt:
  *           type: string
  *           description: ISO Timestamp of comment creation date
  *           example: '2023-09-20T01:37:24.262Z'
+ *         parentId:
+ *           type: string
+ *           nullable: true
+ *           description: Parent comment
+ *           example: null
  *         upvotes:
  *           type: integer
  *           example: 5
@@ -67,7 +64,7 @@ handler.post(requireSuperApiKey, logApiRequest, requireKeys(['userId', 'contentM
  */
 export type PublicApiPostComment = {
   id: string;
-  createdBy: string | UserProfile;
+  author: UserProfile;
   createdAt: string;
   parentId: string | null;
   content: {
@@ -85,7 +82,7 @@ async function mapReducePostComments({
 }: {
   comments: (Pick<PostComment, 'id' | 'parentId' | 'content' | 'contentText' | 'createdAt'> & {
     votes: Pick<PostCommentVote, 'upvoted'>[];
-    createdBy: string | UserProfile;
+    user: UserInfo;
   })[];
   reduceToTree?: boolean;
 }): Promise<PublicApiPostComment[]> {
@@ -113,7 +110,7 @@ async function mapReducePostComments({
 
     const commentWithDetails: PublicApiPostComment = {
       id: comment.id,
-      createdBy: comment.createdBy,
+      author: getUserProfile(comment.user),
       createdAt: comment.createdAt.toISOString(),
       parentId: comment.parentId,
       content: {
@@ -150,8 +147,6 @@ async function mapReducePostComments({
 
   return rootComments;
 }
-
-const expandableFields = ['user'];
 
 /**
  * @swagger
@@ -213,21 +208,6 @@ async function getPostComments(req: NextApiRequest, res: NextApiResponse<PublicA
     }
   });
 
-  // If a single key=value pair is passed its converted into a string
-  const expand = Array.isArray(req.query.expand)
-    ? req.query.expand
-    : typeof req.query.expand === 'string'
-    ? [req.query.expand]
-    : [];
-
-  const hasUnsupportedExpandableFields = expand.some((expandField) => !expandableFields.includes(expandField));
-
-  if (hasUnsupportedExpandableFields) {
-    throw new InvalidInputError(
-      `Unsupported expand field: ${expand}. Please provide one of ${expandableFields.join(',')}`
-    );
-  }
-
   const postComments = await prisma.postComment.findMany({
     where: {
       postId
@@ -244,23 +224,14 @@ async function getPostComments(req: NextApiRequest, res: NextApiResponse<PublicA
           upvoted: true
         }
       },
-      ...(expand.includes('user')
-        ? {
-            user: {
-              select: userProfileSelect
-            }
-          }
-        : {})
+      user: {
+        select: userProfileSelect
+      }
     }
   });
 
   const mappedComments = await mapReducePostComments({
-    comments: postComments.map((postComment) => {
-      return {
-        ...postComment,
-        createdBy: postComment.user ? getUserProfile(postComment.user as unknown as UserInfo) : postComment.createdBy
-      };
-    }),
+    comments: postComments,
     reduceToTree: req.query.resultsAsTree === 'true'
   });
 
@@ -361,6 +332,16 @@ async function createPostComment(req: NextApiRequest, res: NextApiResponse<Publi
     }
   });
 
+  const user = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: userId
+    },
+    include: {
+      wallets: true,
+      googleAccounts: true
+    }
+  });
+
   const apiComment: PublicApiPostComment = {
     id: postComment.id,
     createdAt: postComment.createdAt.toISOString(),
@@ -368,7 +349,7 @@ async function createPostComment(req: NextApiRequest, res: NextApiResponse<Publi
       markdown: req.body.contentMarkdown,
       text: req.body.contentMarkdown
     },
-    createdBy: userId,
+    author: getUserProfile(user),
     downvotes: 0,
     upvotes: 0,
     parentId: postComment.parentId,

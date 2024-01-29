@@ -5,6 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { requireKeys } from 'lib/middleware';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import { superApiHandler } from 'lib/public-api/handler';
+import { userProfileSelect, getUserProfile } from 'lib/public-api/searchUserProfile';
 import { withSessionRoute } from 'lib/session/withSession';
 
 import type { PublicApiPostComment } from '../../posts/[postId]/comments/index';
@@ -114,7 +115,8 @@ async function upvoteOnComment(req: NextApiRequest, res: NextApiResponse<PublicA
         select: {
           upvoted: true
         }
-      }
+      },
+      user: { select: userProfileSelect }
     }
   });
 
@@ -136,7 +138,7 @@ async function upvoteOnComment(req: NextApiRequest, res: NextApiResponse<PublicA
 
   return res.status(200).json({
     id: comment.id,
-    createdBy: comment.createdBy,
+    author: getUserProfile(comment.user),
     createdAt: comment.createdAt.toISOString(),
     parentId: comment.parentId,
     content: {

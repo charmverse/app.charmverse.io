@@ -5,6 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { requireKeys } from 'lib/middleware';
 import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
 import { superApiHandler } from 'lib/public-api/handler';
+import { getUserProfile, userProfileSelect } from 'lib/public-api/searchUserProfile';
 import { withSessionRoute } from 'lib/session/withSession';
 
 import type { PublicApiPostComment } from '../../posts/[postId]/comments';
@@ -143,7 +144,7 @@ async function updatePostComment(req: NextApiRequest, res: NextApiResponse<Publi
           upvoted: true
         }
       },
-      createdBy: true
+      user: { select: userProfileSelect }
     }
   });
 
@@ -154,7 +155,7 @@ async function updatePostComment(req: NextApiRequest, res: NextApiResponse<Publi
       markdown: newCommentText,
       text: newCommentText
     },
-    createdBy: postComment.createdBy,
+    author: getUserProfile(postComment.user),
     downvotes: postComment.votes.filter((v) => !v.upvoted).length,
     upvotes: postComment.votes.filter((v) => v.upvoted).length,
     parentId: postComment.parentId,

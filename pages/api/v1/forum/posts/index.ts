@@ -74,7 +74,7 @@ export type PublicApiForumPost = {
   };
   title: string;
   url: string;
-  comments?: number;
+  comments: number;
   upvotes: number;
   downvotes: number;
 };
@@ -104,12 +104,12 @@ interface CreateForumPostInput {
   userId: string;
   contentMarkdown: string;
   title: string;
-  categoryId: string;
+  categoryId?: string;
 }
 
 /**
  * @swagger
- * /proposals:
+ * /forum/posts:
  *   post:
  *     summary: Create a new forum post
  *     tags:
@@ -162,8 +162,19 @@ async function createPost(req: NextApiRequest, res: NextApiResponse<PublicApiFor
 
   const postContent = parseMarkdown(payload.contentMarkdown);
 
+  let categoryId = payload.categoryId;
+  if (!categoryId) {
+    const categories = await prisma.postCategory.findMany({
+      where: {
+        spaceId: space.id
+      }
+    });
+    const generalCategory = categories.find((c) => c.name === 'General');
+    categoryId = generalCategory?.id || categories[0].id;
+  }
+
   const createdFormPost = await createForumPost({
-    categoryId: payload.categoryId,
+    categoryId: categoryId as string,
     content: postContent,
     contentText: payload.contentMarkdown,
     createdBy: payload.userId,
@@ -327,7 +338,7 @@ export async function getPublicForumPost({
       text: post.contentText ?? '',
       markdown: markdownText
     },
-    comments: post.totalComments,
+    comments: post.totalComments || 0,
     upvotes: post.votes.upvotes,
     downvotes: post.votes.downvotes
   };
