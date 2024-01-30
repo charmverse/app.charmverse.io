@@ -37,8 +37,9 @@ const StyledVoteSettings = styled.div`
 
 export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps) {
   const [passThreshold, setPassThreshold] = useState<number>(value?.threshold || 50);
+  // Default values for approval type vote
   const [voteType, setVoteType] = useState<VoteType>(value?.type ?? VoteType.Approval);
-  const [options, setOptions] = useState<string[]>(value?.options ?? []);
+  const [options, setOptions] = useState<string[]>(value?.options ?? ['Yes', 'No', 'Abstain']);
   const [maxChoices, setMaxChoices] = useState(value?.maxChoices ?? 1);
   const [durationDays, setDurationDays] = useState(value?.durationDays ?? 5);
   const [publishToSnapshot, setPublishToSnapshot] = useState(value?.publishToSnapshot ?? false);
