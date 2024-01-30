@@ -3,7 +3,7 @@ import type { UrlObject } from 'url';
 import { log } from '@charmverse/core/log';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { useRef, useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useSharedPage } from 'hooks/useSharedPage';
 import { useSpaces } from 'hooks/useSpaces';
@@ -13,20 +13,9 @@ import { redirectToAppLogin, shouldRedirectToAppLogin } from 'lib/utilities/brow
 import { getCustomDomainFromHost } from 'lib/utilities/domains/getCustomDomainFromHost';
 // Pages shared to the public that don't require user login
 // When adding a page here or any new top-level pages, please also add this page to DOMAIN_BLACKLIST in lib/spaces/config.ts
-const publicPages = [
-  '/',
-  'share',
-  'api-docs',
-  'u',
-  'join',
-  'invite',
-  'authenticate',
-  'test',
-  'permalink',
-  'proposals/new'
-];
+const publicPages = ['/', 'share', 'api-docs', 'u', 'join', 'invite', 'authenticate', 'test', 'permalink'];
 // pages that should be always available to logged in users
-const publicLoggedInPages = ['createSpace', '[domain]/proposals/new'];
+const publicLoggedInPages = ['createSpace'];
 
 export default function RouteGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -67,9 +56,6 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
   async function authCheck(url: string, _spaceDomain: string): Promise<{ authorized: boolean; redirect?: UrlObject }> {
     const path = url.split('?')[0];
 
-    // Remove the leading slash
-    const routerPathName = router.pathname.slice(1);
-
     const firstPathSegment =
       path.split('/').filter((pathElem) => {
         // Only get segments that evaluate to some value
@@ -79,9 +65,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
     // special case, when visiting main app url on space subdomain
     const isSpaceSubdomainPath = firstPathSegment === '/' && !!_spaceDomain;
     // visiting page that shoould be alway available to logged in users
-    const isAvailableToLoggedInUsers = publicLoggedInPages.some(
-      (_path) => firstPathSegment === _path || routerPathName === _path
-    );
+    const isAvailableToLoggedInUsers = publicLoggedInPages.some((basePath) => firstPathSegment === basePath);
 
     // condition: public page
     if ((isPublicPath && !isSpaceSubdomainPath) || hasSharedPageAccess) {

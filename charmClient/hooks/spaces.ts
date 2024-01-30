@@ -34,10 +34,6 @@ function stripUrlParts(maybeUrl: string) {
   return maybeUrl.replace('https://app.charmverse.io/', '').replace('http://localhost:3000/', '').split('/')[0];
 }
 
-export function useVerifyCustomJoinSpace(spaceId: MaybeString) {
-  return usePOST<CustomJoinParams, Space>(`/api/spaces/${spaceId}/custom-join`);
-}
-
 export function useUpdateSpace(spaceId: MaybeString) {
   return usePUT<Omit<Prisma.SpaceUpdateInput, 'id'>, Space>(`/api/spaces/${spaceId}`);
 }
