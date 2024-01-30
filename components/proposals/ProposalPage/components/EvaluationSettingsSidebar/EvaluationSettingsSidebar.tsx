@@ -1,5 +1,5 @@
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
-import { Box } from '@mui/material';
+import { Box, Chip, Stack, Switch, Typography, FormLabel } from '@mui/material';
 
 import { useProposalTemplateById } from 'components/proposals/hooks/useProposalTemplates';
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationStepSettings';
@@ -11,7 +11,8 @@ import { EvaluationStepRow } from '../EvaluationSidebar/components/EvaluationSte
 import { WorkflowSelect } from '../WorkflowSelect';
 
 import { EvaluationStepSettings } from './components/EvaluationStepSettings';
-import { RewardTemplateSelect } from './components/RewardTemplateSelect';
+import type { RewardSettingsProps } from './components/RewardSettings';
+import { RewardSettings } from './components/RewardSettings';
 
 export type Props = {
   proposal?: Pick<ProposalPropertiesInput, 'fields' | 'evaluations' | 'workflowId'>;
@@ -20,8 +21,9 @@ export type Props = {
   readOnly: boolean;
   isReviewer: boolean;
   onChangeWorkflow: (workflow: ProposalWorkflowTyped) => void;
-  onChangeRewardTemplate?: (templateId: string | null) => void;
+  onChangeRewardSettings?: RewardSettingsProps['onChange'];
   templateId?: string | null;
+  isStructuredProposal: boolean;
   requireWorkflowChangeConfirmation?: boolean;
 };
 
@@ -31,9 +33,10 @@ export function EvaluationSettingsSidebar({
   onChangeEvaluation,
   readOnly,
   onChangeWorkflow,
-  onChangeRewardTemplate,
+  onChangeRewardSettings,
   isReviewer,
   templateId,
+  isStructuredProposal,
   requireWorkflowChangeConfirmation
 }: Props) {
   const proposalTemplate = useProposalTemplateById(templateId);
@@ -70,15 +73,31 @@ export function EvaluationSettingsSidebar({
             );
           })}
           {/* reward settings */}
-          {isTemplate && onChangeRewardTemplate && (
+          {isTemplate && onChangeRewardSettings && (
             <Box mb={8}>
               <EvaluationStepRow
                 index={proposal ? proposal.evaluations.length + 1 : 0}
                 result={null}
                 title={mappedFeatures.rewards.title}
                 expanded
+                actions={
+                  isStructuredProposal && (
+                    <Stack direction='row' alignItems='center' gap={1}>
+                      {!proposal.fields?.enableRewards && <Chip label='Disabled' size='small' />}
+                      {/* <Typography component='span' variant='subtitle1'>
+                        Enabled
+                      </Typography> */}
+                      <Switch
+                        checked={proposal.fields?.enableRewards}
+                        onChange={(e, checked) => onChangeRewardSettings({ enableRewards: checked })}
+                      />
+                    </Stack>
+                  )
+                }
               >
-                <RewardTemplateSelect value={proposal.fields?.rewardsTemplateId} onChange={onChangeRewardTemplate} />
+                {(proposal.fields?.enableRewards || !isStructuredProposal) && (
+                  <RewardSettings value={proposal.fields} onChange={onChangeRewardSettings} />
+                )}
               </EvaluationStepRow>
             </Box>
           )}
