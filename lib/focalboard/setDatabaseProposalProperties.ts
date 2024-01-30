@@ -120,6 +120,14 @@ export function getBoardProperties({
   const stepProp = generateUpdatedProposalStepProperty({ boardProperties, evaluationStepTitles });
   const proposalAuthorProp = generateUpdatedProposalAuthorProperty({ boardProperties });
 
+  const existingAuthorPropIndex = boardProperties.findIndex((p) => p.type === 'proposalAuthor');
+
+  if (existingAuthorPropIndex > -1) {
+    boardProperties[existingAuthorPropIndex] = proposalAuthorProp;
+  } else {
+    boardProperties.push(proposalAuthorProp);
+  }
+
   const existingStatusPropIndex = boardProperties.findIndex((p) => p.type === 'proposalStatus');
 
   if (existingStatusPropIndex > -1) {
@@ -149,14 +157,6 @@ export function getBoardProperties({
     boardProperties[existingStepPropIndex] = stepProp;
   } else {
     boardProperties.push(stepProp);
-  }
-
-  const existingAuthorPropIndex = boardProperties.findIndex((p) => p.type === 'proposalAuthor');
-
-  if (existingAuthorPropIndex > -1) {
-    boardProperties[existingAuthorPropIndex] = proposalAuthorProp;
-  } else {
-    boardProperties.push(proposalAuthorProp);
   }
 
   addProposalEvaluationProperties({
