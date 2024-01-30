@@ -435,11 +435,9 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
                     page.type === 'proposal' ||
                     page.type === 'proposal_template') && (
                     <PageSidebar
-                      pagePath={page.path}
                       id='page-action-sidebar'
                       pageId={page.id}
                       spaceId={page.spaceId}
-                      proposalId={proposalId}
                       pagePermissions={pagePermissions}
                       editorState={editorState}
                       sidebarView={sidebarView}

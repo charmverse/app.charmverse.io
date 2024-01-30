@@ -5,8 +5,8 @@ import type { EditorState } from 'prosemirror-state';
 import { memo } from 'react';
 
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
-import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { useMdScreen } from 'hooks/useMediaScreens';
+import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 
 import type { PageSidebarView } from '../../hooks/usePageSidebar';
@@ -39,16 +39,15 @@ type SidebarProps = {
   editorState?: EditorState | null;
   pagePermissions?: PagePermissionFlags | null;
   sidebarView: PageSidebarView | null;
-  openSidebar?: (view: PageSidebarView) => void; // leave undefined to hide navigation
+  openSidebar: (view: PageSidebarView) => void;
   // eslint-disable-next-line react/no-unused-prop-types
   closeSidebar: () => void;
-  // eslint-disable-next-line react/no-unused-prop-types
-  proposalId?: string | null;
-  proposal?: Pick<ProposalPropertiesInput, 'formId' | 'fields' | 'evaluations' | 'workflowId'>;
+  proposal?: Pick<
+    ProposalWithUsersAndRubric,
+    'formId' | 'fields' | 'form' | 'evaluations' | 'workflowId' | 'permissions'
+  >;
   // eslint-disable-next-line react/no-unused-prop-types
   disabledViews?: PageSidebarView[];
-  // eslint-disable-next-line react/no-unused-prop-types
-  pagePath?: string;
 };
 
 function PageSidebarComponent(props: SidebarProps) {
