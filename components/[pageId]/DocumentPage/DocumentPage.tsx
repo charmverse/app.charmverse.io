@@ -463,7 +463,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
                 )}
               </CardPropertiesWrapper>
               {proposal && proposal.formId ? (
-                <Box mb={10}>
+                <Box mb={4}>
                   {page.type === 'proposal_template' ? (
                     <FormFieldsEditor
                       readOnly={(!isAdmin && (!user || !proposalAuthors.includes(user.id))) || !!proposal?.archived}
