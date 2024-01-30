@@ -1,5 +1,6 @@
 import type { Block, Page, ProposalRubricCriteria, ProposalRubricCriteriaAnswer } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import _ from 'lodash';
 
 import { prismaToBlock } from 'lib/focalboard/block';
 import { extractCardProposalProperties } from 'lib/focalboard/extractCardProposalProperties';
@@ -208,7 +209,16 @@ export async function updateCardsFromProposals({
           }
         }
       },
-      include: {
+      select: {
+        id: true,
+        title: true,
+        hasContent: true,
+        content: true,
+        contentText: true,
+        createdAt: true,
+        deletedAt: true,
+        path: true,
+        spaceId: true,
         proposal: {
           select: {
             status: true,
@@ -356,7 +366,7 @@ export async function updateCardsFromProposals({
     const proposalEvaluationType = currentStep?.step ?? 'draft';
 
     if (card) {
-      const { cardProposalStatus, cardEvaluationType, cardProposalStep, cardProposalUrl } =
+      const { cardProposalStatus, cardEvaluationType, cardProposalStep, cardProposalUrl, cardProposalAuthor } =
         extractCardProposalProperties({
           card: card.block,
           databaseProperties: databaseProposalProps
@@ -390,6 +400,9 @@ export async function updateCardsFromProposals({
             databaseProposalProps.proposalEvaluationType?.options.find((opt) => opt.value === proposalEvaluationType)
               ?.id) ||
         (!pageWithProposal.proposal?.archived &&
+          cardProposalAuthor &&
+          !_.isEqual(pageWithProposal.proposal?.authors ?? [], cardProposalAuthor.value)) ||
+        (!pageWithProposal.proposal?.archived &&
           cardProposalStep?.optionId !==
             databaseProposalProps.proposalStep?.options.find((opt) => opt.value === proposalEvaluationStep)?.id) ||
         hasCustomPropertyValueChanged
@@ -399,7 +412,8 @@ export async function updateCardsFromProposals({
           [cardProposalUrl?.propertyId ?? '']: pageWithProposal.path,
           [cardProposalStatus?.propertyId ?? '']: proposalEvaluationStatus,
           [cardEvaluationType?.propertyId ?? '']: proposalEvaluationType,
-          [cardProposalStep?.propertyId ?? '']: proposalEvaluationStep
+          [cardProposalStep?.propertyId ?? '']: proposalEvaluationStep,
+          [cardProposalAuthor?.propertyId ?? '']: pageWithProposal.proposal?.authors.map((a) => a.userId) ?? []
         };
 
         pageWithProposal.proposal?.evaluations.forEach((evaluation) => {
@@ -471,6 +485,11 @@ export async function updateCardsFromProposals({
 
       if (databaseProposalProps.proposalStep) {
         properties[databaseProposalProps.proposalStep.id] = proposalEvaluationStep ?? '';
+      }
+
+      if (databaseProposalProps.proposalAuthor) {
+        properties[databaseProposalProps.proposalAuthor.id] =
+          pageWithProposal.proposal?.authors.map((a) => a.userId) ?? [];
       }
 
       boardBlockCardProperties.forEach((cardProperty) => {
