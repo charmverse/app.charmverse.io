@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { GetServerSidePropsContext } from 'next';
+import type { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/router';
 
 import getPageLayout from 'components/common/PageLayout/getLayout';
@@ -10,18 +10,18 @@ import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { withSessionSsr } from 'lib/session/withSession';
 import { customConditionJoinSpace } from 'lib/spaces/customConditionJoinSpace';
 
-export const getServerSideProps = withSessionSsr(async (ctx: GetServerSidePropsContext) => {
-  const { template } = ctx.query ?? {};
+export const getServerSideProps: GetServerSideProps = withSessionSsr(async (context: GetServerSidePropsContext) => {
+  const template = context.query?.template;
 
-  const customDomain = ctx.req.headers.host;
+  const customDomain = context.req.headers.host;
 
-  const spaceDomainFromPath = ctx.params?.domain;
+  const spaceDomainFromPath = context.params?.domain;
 
   const domainToUse = (spaceDomainFromPath ?? customDomain) as string | undefined;
 
-  const userId = ctx.req.session?.user?.id;
+  const sessionUserId = context.req.session?.user?.id;
 
-  if (userId && domainToUse && template) {
+  if (sessionUserId && domainToUse && template) {
     const space = await prisma.space.findFirst({
       where: spaceDomainFromPath ? { domain: domainToUse } : { customDomain: domainToUse, isCustomDomainVerified: true }
     });
@@ -29,18 +29,23 @@ export const getServerSideProps = withSessionSsr(async (ctx: GetServerSidePropsC
     if (space) {
       const spaceRole = await prisma.spaceRole.findFirst({
         where: {
-          userId,
+          userId: sessionUserId,
           spaceId: space.id
         }
       });
 
       if (!spaceRole) {
         await customConditionJoinSpace({
-          userId,
+          userId: sessionUserId,
           spaceId: space.id,
           params: { proposalTemplate: template as string }
         }).catch((err) => {
-          log.error('User could not join space via template', { template, userId, spaceId: space.id, err });
+          log.error('User could not join space via template', {
+            template,
+            userId: sessionUserId,
+            spaceId: space.id,
+            err
+          });
         });
       }
     }
