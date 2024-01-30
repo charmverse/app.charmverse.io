@@ -44,7 +44,7 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
   const [publishToSnapshot, setPublishToSnapshot] = useState(value?.publishToSnapshot ?? false);
 
   useEffect(() => {
-    if (voteType === VoteType.SingleChoice) {
+    if (voteType === VoteType.SingleChoice && !value?.options?.length) {
       setOptions(['Option 1', 'Option 2', 'Abstain']);
     } else if (voteType === VoteType.Approval) {
       setOptions(['Yes', 'No', 'Abstain']);
