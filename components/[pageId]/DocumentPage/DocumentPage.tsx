@@ -1,6 +1,6 @@
 import type { Page } from '@charmverse/core/prisma';
 import type { Theme } from '@mui/material';
-import { Box, Tab, Tabs, useMediaQuery } from '@mui/material';
+import { Box, Tab, Tabs, Typography, useMediaQuery } from '@mui/material';
 import dynamic from 'next/dynamic';
 import type { EditorState } from 'prosemirror-state';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
@@ -22,6 +22,7 @@ import { focusEventName } from 'components/common/CharmEditor/constants';
 import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import { EvaluationSidebar } from 'components/proposals/ProposalPage/components/EvaluationSidebar/EvaluationSidebar';
 import { ProposalFormFieldInputs } from 'components/proposals/ProposalPage/components/ProposalFormFieldInputs';
+import { ProposalRewards } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewards';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
@@ -30,6 +31,7 @@ import { useCharmEditorView } from 'hooks/useCharmEditorView';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMdScreen } from 'hooks/useMediaScreens';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import type { PageWithContent } from 'lib/pages/interfaces';
@@ -71,6 +73,7 @@ export interface DocumentPageProps {
 function DocumentPage({ insideModal = false, page, savePage, readOnly = false, enableSidebar }: DocumentPageProps) {
   const { user } = useUser();
   const { router } = useCharmRouter();
+  const { getFeatureTitle } = useSpaceFeatures();
   const { activeView: sidebarView, setActiveView, closeSidebar } = usePageSidebar();
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
   const { setView: setCharmEditorView } = useCharmEditorView();
@@ -86,7 +89,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
 
-  const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow, onChangeRewardTemplate } = useProposal({
+  const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow, onChangeRewardSettings } = useProposal({
     proposalId
   });
 
@@ -453,8 +456,9 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
                     refreshProposal={refreshProposal}
                     disabledViews={isStructuredProposal ? ['suggestions'] : []}
                     onChangeWorkflow={onChangeWorkflow}
-                    onChangeRewardTemplate={onChangeRewardTemplate}
+                    onChangeRewardSettings={onChangeRewardSettings}
                     isProposalTemplate={page.type === 'proposal_template'}
+                    isStructuredProposal={!!proposal?.formId}
                   />
                 )}
               </CardPropertiesWrapper>
@@ -514,9 +518,52 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
                   threadIds={threadIds}
                 />
               )}
+              {isStructuredProposal && proposal?.fields?.enableRewards && (
+                <>
+                  <Box my={1}>
+                    <Typography variant='h5'>{getFeatureTitle('Rewards')}</Typography>
+                  </Box>
+                  <ProposalRewards
+                    pendingRewards={proposal.fields.pendingRewards || []}
+                    requiredTemplateId={proposal.fields.rewardsTemplateId}
+                    reviewers={proposal.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat()}
+                    assignedSubmitters={proposal.authors.map((a) => a.userId)}
+                    variant='solid_button'
+                    rewardIds={proposal.rewardIds || []}
+                    onSave={(pendingReward) => {
+                      const isExisting = proposal.fields?.pendingRewards?.find(
+                        (r) => r.draftId === pendingReward.draftId
+                      );
+                      if (!isExisting) {
+                        onChangeRewardSettings({
+                          pendingRewards: [...(proposal.fields?.pendingRewards || []), pendingReward]
+                        });
+
+                        return;
+                      }
+
+                      onChangeRewardSettings({
+                        pendingRewards: [...(proposal.fields?.pendingRewards || [])].map((draft) => {
+                          if (draft.draftId === pendingReward.draftId) {
+                            return pendingReward;
+                          }
+                          return draft;
+                        })
+                      });
+                    }}
+                    onDelete={(draftId: string) => {
+                      onChangeRewardSettings({
+                        pendingRewards: [...(proposal.fields?.pendingRewards || [])].filter(
+                          (draft) => draft.draftId !== draftId
+                        )
+                      });
+                    }}
+                  />
+                </>
+              )}
 
               {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') && (
-                <Box mt='-100px'>
+                <Box>
                   {/* add negative margin to offset height of .charm-empty-footer */}
                   <PageComments page={page} canCreateComments={pagePermissions.comment} />
                 </Box>

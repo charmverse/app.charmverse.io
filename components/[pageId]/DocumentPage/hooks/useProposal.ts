@@ -9,6 +9,7 @@ import {
 } from 'charmClient/hooks/proposals';
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationStepSettings';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
+import type { ProposalFields } from 'lib/proposal/interface';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 export function useProposal({ proposalId }: { proposalId?: string | null }) {
@@ -62,12 +63,12 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
         await updateProposalWorkflow({ workflowId: id });
         await refreshProposal();
       },
-      onChangeRewardTemplate: async (templateId: string | null) => {
+      onChangeRewardSettings: async (values: Partial<ProposalFields>) => {
         if (proposal) {
           await updateProposal({
             fields: {
               ...proposal.fields,
-              rewardsTemplateId: templateId || undefined
+              ...values
             }
           });
           await refreshProposal();

@@ -49,7 +49,8 @@ export type ProposalPendingReward = { reward: UpdateableRewardFields; page: NewP
 export type ProposalFields = {
   properties?: ProposalPropertiesField;
   pendingRewards?: ProposalPendingReward[];
-  rewardsTemplateId?: string;
+  rewardsTemplateId?: string; // require a particular template to be used for rewards
+  enableRewards?: boolean; // used by form templates to enable rewards for new proposals
 };
 type ProposalFormData = {
   form: {

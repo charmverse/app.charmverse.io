@@ -1,5 +1,5 @@
 import AddIcon from '@mui/icons-material/Add';
-import { Box, Stack } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { useRef, useEffect, useState } from 'react';
 import { v4 } from 'uuid';
 
@@ -11,7 +11,7 @@ import { Button } from '../Button';
 
 import { checkFormFieldErrors } from './checkFormFieldErrors';
 import type { SelectOptionType } from './fields/Select/interfaces';
-import { FormField } from './FormField';
+import { FormField, FormFieldContainer } from './FormField';
 import type { FormFieldInput } from './interfaces';
 
 export function ControlledFormFieldsEditor({

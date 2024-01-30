@@ -3,7 +3,7 @@ import type { PageType } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
-import { Box, Divider, useMediaQuery } from '@mui/material';
+import { Box, Divider, useMediaQuery, Typography } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 import { v4 as uuid } from 'uuid';
@@ -32,6 +32,7 @@ import { getInitialFormFieldValue, useFormFields } from 'components/common/form/
 import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
+import { ProposalRewards } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewards';
 import { authorSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -40,6 +41,7 @@ import { useMdScreen } from 'hooks/useMediaScreens';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useUser } from 'hooks/useUser';
 import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
 import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposal/rubric/interfaces';
@@ -83,6 +85,7 @@ export function NewProposalPage({
   sourcePageId?: string;
   sourcePostId?: string;
 }) {
+  const { getFeatureTitle } = useSpaceFeatures();
   const { navigateToSpacePath } = useCharmRouter();
   const { space: currentSpace } = useCurrentSpace();
   const { data: sourcePage } = useGetPage(sourcePageId);
@@ -115,6 +118,7 @@ export function NewProposalPage({
   const sourceTemplate = proposalTemplates?.find((template) => template.page.id === formInputs.proposalTemplateId);
 
   const isStructured = formInputs.proposalType === 'structured' || !!formInputs.formId;
+  const pendingRewards = formInputs.fields?.pendingRewards || [];
   const proposalFormFields = isStructured
     ? formInputs.formFields ?? [
         {
@@ -378,6 +382,7 @@ export function NewProposalPage({
                       readOnlyAuthors={!isAdmin && !!sourceTemplate?.authors.length}
                       readOnlyCustomProperties={readOnlyCustomProperties}
                       readOnlySelectedCredentialTemplates={readOnlySelectedCredentialTemplates}
+                      isStructuredProposal={isStructured}
                     />
                   </div>
                 </div>
@@ -447,18 +452,69 @@ export function NewProposalPage({
                       evaluations
                     });
                   }}
-                  onChangeRewardTemplate={(rewardsTemplateId) => {
+                  onChangeRewardSettings={(values) => {
                     setFormInputs({
                       ...formInputs,
                       fields: {
                         ...formInputs.fields,
-                        rewardsTemplateId: rewardsTemplateId || undefined
+                        ...values
                       }
                     });
                   }}
                   onChangeWorkflow={applyWorkflow}
                   isProposalTemplate={isTemplate}
+                  isStructuredProposal={isStructured}
                 />
+              )}
+              {isStructured && formInputs.fields?.enableRewards && (
+                <>
+                  <Box my={1}>
+                    <Typography variant='h5'>{getFeatureTitle('Rewards')}</Typography>
+                  </Box>
+                  <ProposalRewards
+                    pendingRewards={pendingRewards}
+                    requiredTemplateId={formInputs.fields?.rewardsTemplateId}
+                    reviewers={formInputs.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat()}
+                    assignedSubmitters={formInputs.authors}
+                    variant='solid_button'
+                    rewardIds={[]}
+                    onSave={(pendingReward) => {
+                      const isExisting = pendingRewards.find((reward) => reward.draftId === pendingReward.draftId);
+                      if (!isExisting) {
+                        setFormInputs({
+                          fields: {
+                            ...formInputs.fields,
+                            pendingRewards: [...(formInputs.fields?.pendingRewards || []), pendingReward]
+                          }
+                        });
+
+                        return;
+                      }
+
+                      setFormInputs({
+                        fields: {
+                          ...formInputs.fields,
+                          pendingRewards: [...(formInputs.fields?.pendingRewards || [])].map((draft) => {
+                            if (draft.draftId === pendingReward.draftId) {
+                              return pendingReward;
+                            }
+                            return draft;
+                          })
+                        }
+                      });
+                    }}
+                    onDelete={(draftId: string) => {
+                      setFormInputs({
+                        fields: {
+                          ...formInputs.fields,
+                          pendingRewards: [...(formInputs.fields?.pendingRewards || [])].filter(
+                            (draft) => draft.draftId !== draftId
+                          )
+                        }
+                      });
+                    }}
+                  />
+                </>
               )}
             </Box>
           </StyledContainer>
