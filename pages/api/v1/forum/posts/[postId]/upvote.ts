@@ -70,7 +70,7 @@ export interface UpvoteInput {
  *            application/json:
  *              schema:
  *                type: object
- *                $ref: '#/components/schemas/ProposalComment'
+ *                $ref: '#/components/schemas/ForumPost'
  *
  */
 
