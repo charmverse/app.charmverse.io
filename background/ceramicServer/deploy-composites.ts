@@ -44,4 +44,3 @@ export async function writeComposite({ spinner }: { spinner: OraSpinner } = { sp
   await deployComposite.startIndexingOn(ceramic);
   spinner.succeed('composite deployed & ready for use');
 }
-// writeComposite().then(() => console.log('Complete deployment complete on:', ceramicHost));

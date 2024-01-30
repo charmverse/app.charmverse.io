@@ -58,7 +58,7 @@ function PagesListWithContext({
 }) {
   const { pages } = usePages();
   const { categories } = useForumCategories();
-  const { getFeatureTitle } = useSpaceFeatures();
+  const { mappedFeatures, getFeatureTitle } = useSpaceFeatures();
   const { proposalTemplates } = useProposalTemplates();
   const debouncedTriggerText = useDebouncedValue(triggerText, 200);
 
@@ -68,7 +68,7 @@ function PagesListWithContext({
         id: page.path,
         path: page.path,
         hasContent: true,
-        title: getFeatureTitle(page.feature),
+        title: mappedFeatures[page.feature]?.title,
         type: page.path,
         icon: null
       };
@@ -89,7 +89,7 @@ function PagesListWithContext({
       path: page.path || '',
       hasContent: true,
       originalTitle: page.name,
-      title: `${getFeatureTitle('Forum')} > ${page.name}`,
+      title: `Template > ${page.name}`,
       type: 'forum_category',
       icon: null
     }));
@@ -98,7 +98,7 @@ function PagesListWithContext({
       path: template.page.path || '',
       hasContent: true,
       originalTitle: template.page.title,
-      title: `${getFeatureTitle('Proposal')} Template > ${template.page.title}`,
+      title: `Template > ${template.page.title}`,
       type: template.page.type,
       icon: null
     }));
