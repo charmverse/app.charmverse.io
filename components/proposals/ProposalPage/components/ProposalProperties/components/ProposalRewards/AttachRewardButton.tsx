@@ -19,7 +19,11 @@ export function AttachRewardButton({
       </AddAPropertyButton>
     );
   } else {
-    return <Button onClick={createNewReward}>+ Add a {getFeatureTitle('reward')}</Button>;
+    return (
+      <Button size='small' onClick={createNewReward}>
+        + Add a {getFeatureTitle('reward')}
+      </Button>
+    );
   }
 }
 

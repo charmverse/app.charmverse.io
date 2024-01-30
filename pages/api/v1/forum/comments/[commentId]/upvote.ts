@@ -16,7 +16,7 @@ handler.post(requireKeys(['userId', 'upvoted'], 'body'), upvoteOnComment);
 
 /**
  * @swagger
- * /forum/comments/{commentId}/vote:
+ * /forum/comments/{commentId}/upvote:
  *   post:
  *     summary: Up/downvote a post comment
  *     description: Adds a vote for a post comment by a specific user
