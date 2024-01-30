@@ -74,90 +74,6 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
 
   return (
     <StyledVoteSettings data-test='evaluation-vote-settings'>
-      <Stack
-        data-test='vote-duration'
-        direction='row'
-        alignItems='center'
-        gap={2}
-        justifyContent='space-between'
-        mb={1}
-      >
-        <FormLabel>
-          <Typography component='span' variant='subtitle1'>
-            Duration (days)
-          </Typography>
-        </FormLabel>
-        <NumericFieldWithButtons
-          disabled={readOnly}
-          value={durationDays}
-          onChange={setDurationDays}
-          min={1}
-          max={100}
-        />
-      </Stack>
-
-      <FormLabel>
-        <Typography component='span' variant='subtitle1'>
-          Options
-        </Typography>
-      </FormLabel>
-      <RadioGroup
-        row
-        defaultValue={voteType}
-        value={voteType}
-        onChange={(e) => {
-          setVoteType(e.target.value as VoteType);
-        }}
-        sx={{ mb: 1 }}
-      >
-        <FormControlLabel
-          disabled={readOnly}
-          value={VoteType.Approval}
-          control={<Radio />}
-          label='Yes / No / Abstain'
-        />
-        <FormControlLabel
-          disabled={readOnly}
-          value={VoteType.SingleChoice}
-          control={<Radio />}
-          label='Custom Options'
-          sx={{ mr: 0 }}
-        />
-      </RadioGroup>
-      {voteType === VoteType.SingleChoice && (
-        <Stack mb={2}>
-          <InlineVoteOptions options={options} setOptions={setOptions} />
-          <Stack direction='row' alignItems='center' gap={2} mt={2} justifyContent='space-between'>
-            <FormLabel>
-              <Typography component='span' variant='subtitle1'>
-                Max choices
-              </Typography>
-            </FormLabel>
-            <NumericFieldWithButtons disabled={readOnly} value={maxChoices} onChange={setMaxChoices} min={1} />
-          </Stack>
-        </Stack>
-      )}
-
-      {maxChoices === 1 && (
-        <Stack
-          data-test='vote-pass-threshold'
-          direction='row'
-          alignItems='center'
-          gap={2}
-          justifyContent='space-between'
-          mb={2}
-        >
-          <FormLabel>
-            <Typography component='span' variant='subtitle1'>
-              Pass Threshold (%)
-            </Typography>
-          </FormLabel>
-          <NumericFieldWithButtons disabled={readOnly} value={passThreshold} onChange={setPassThreshold} max={100} />
-        </Stack>
-      )}
-
-      <Divider sx={{ my: 1 }} />
-
       <Stack direction='row' alignItems='center' gap={2} justifyContent='space-between'>
         <FormLabel>
           <Typography component='span' variant='subtitle1'>
@@ -170,6 +86,97 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
           onChange={(e, checked) => setPublishToSnapshot(checked)}
         />
       </Stack>
+      <Divider sx={{ mt: 1, mb: 2 }} />
+      {!publishToSnapshot && (
+        <>
+          <Stack
+            data-test='vote-duration'
+            direction='row'
+            alignItems='center'
+            gap={2}
+            justifyContent='space-between'
+            mb={1}
+          >
+            <FormLabel>
+              <Typography component='span' variant='subtitle1'>
+                Duration (days)
+              </Typography>
+            </FormLabel>
+            <NumericFieldWithButtons
+              disabled={readOnly}
+              value={durationDays}
+              onChange={setDurationDays}
+              min={1}
+              max={100}
+            />
+          </Stack>
+
+          <FormLabel>
+            <Typography component='span' variant='subtitle1'>
+              Options
+            </Typography>
+          </FormLabel>
+          <RadioGroup
+            row
+            defaultValue={voteType}
+            value={voteType}
+            onChange={(e) => {
+              setVoteType(e.target.value as VoteType);
+            }}
+            sx={{ mb: 1 }}
+          >
+            <FormControlLabel
+              disabled={readOnly}
+              value={VoteType.Approval}
+              control={<Radio />}
+              label='Yes / No / Abstain'
+            />
+            <FormControlLabel
+              disabled={readOnly}
+              value={VoteType.SingleChoice}
+              control={<Radio />}
+              label='Custom Options'
+              sx={{ mr: 0 }}
+            />
+          </RadioGroup>
+          {voteType === VoteType.SingleChoice && (
+            <Stack mb={2}>
+              <InlineVoteOptions options={options} setOptions={setOptions} />
+              <Stack direction='row' alignItems='center' gap={2} mt={2} justifyContent='space-between'>
+                <FormLabel>
+                  <Typography component='span' variant='subtitle1'>
+                    Max choices
+                  </Typography>
+                </FormLabel>
+                <NumericFieldWithButtons disabled={readOnly} value={maxChoices} onChange={setMaxChoices} min={1} />
+              </Stack>
+            </Stack>
+          )}
+
+          {maxChoices === 1 && (
+            <Stack
+              data-test='vote-pass-threshold'
+              direction='row'
+              alignItems='center'
+              gap={2}
+              justifyContent='space-between'
+              mb={2}
+            >
+              <FormLabel>
+                <Typography component='span' variant='subtitle1'>
+                  Pass Threshold (%)
+                </Typography>
+              </FormLabel>
+              <NumericFieldWithButtons
+                disabled={readOnly}
+                value={passThreshold}
+                onChange={setPassThreshold}
+                max={100}
+              />
+            </Stack>
+          )}
+        </>
+      )}
     </StyledVoteSettings>
   );
 }
