@@ -10,6 +10,6 @@ export interface UpdateProfileItemRequest {
 
 export class UnstoppableDomainsApi {
   login(login: UnstoppableDomainsLoginRequest) {
-    return http.POST<LoggedInUser>('/api/unstoppable-domains/login', login);
+    return http.POST<LoggedInUser | { otpRequired: true }>('/api/unstoppable-domains/login', login);
   }
 }

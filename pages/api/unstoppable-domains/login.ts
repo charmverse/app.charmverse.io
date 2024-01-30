@@ -14,7 +14,10 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.post(loginViaUnstoppableDomains);
 
-async function loginViaUnstoppableDomains(req: NextApiRequest, res: NextApiResponse<LoggedInUser>) {
+async function loginViaUnstoppableDomains(
+  req: NextApiRequest,
+  res: NextApiResponse<LoggedInUser | { otpRequired: true }>
+) {
   const { authSig } = req.body as UnstoppableDomainsLoginRequest;
   const cookiesToParse = req.cookies as Record<SignupCookieType, string>;
   const signupAnalytics = extractSignupAnalytics(cookiesToParse);
@@ -23,6 +26,13 @@ async function loginViaUnstoppableDomains(req: NextApiRequest, res: NextApiRespo
     authSig,
     signupAnalytics
   });
+
+  if (loggedInUser.otp?.activatedAt) {
+    req.session.otpUser = { id: loggedInUser.id, method: 'UnstoppableDomain' };
+    await req.session.save();
+
+    return res.status(200).json({ otpRequired: true });
+  }
 
   await saveSession({ req, userId: loggedInUser.id });
 

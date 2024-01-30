@@ -13,6 +13,8 @@ import type { UdomainsPopupLoginState } from 'lib/oauth/interfaces';
 import { getAppUrl } from 'lib/utilities/browser';
 import { DisabledAccountError, BrowserPopupError } from 'lib/utilities/errors';
 
+import { useVerifyLoginOtp } from './useVerifyLoginOtp';
+
 const clientID = env('UNSTOPPABLE_DOMAINS_CLIENT_ID');
 
 const UDOMAINS_AUTH_URL = '/authenticate/udomains';
@@ -22,6 +24,7 @@ export function useUnstoppableDomains() {
   const { isWalletSelectorModalOpen, setIsConnectingIdentity } = useWeb3ConnectionManager();
   const { isOnCustomDomain } = useCustomDomain();
   const { openPopupLogin } = usePopupLogin<UdomainsPopupLoginState>();
+  const { open: openVerifyOtpModal } = useVerifyLoginOtp();
 
   useEffect(() => {
     if (!isWalletSelectorModalOpen) {
@@ -63,7 +66,11 @@ export function useUnstoppableDomains() {
       const popupLoginCallback = async (data: UdomainsPopupLoginState) => {
         if ('authSig' in data) {
           const { user, domain } = await loginWithAuthSig(data.authSig);
-          loginSuccess({ displayName: domain, identityType: 'UnstoppableDomain', user });
+          if ('id' in user) {
+            loginSuccess({ displayName: domain, identityType: 'UnstoppableDomain', user });
+          } else if ('otpRequired' in user) {
+            openVerifyOtpModal();
+          }
         } else if ('error' in data) {
           onError?.(new DisabledAccountError(data.error));
         }
@@ -78,7 +85,11 @@ export function useUnstoppableDomains() {
       const authSig = (await uauth.loginWithPopup()) as any as UnstoppableDomainsAuthSig;
       const { user, domain } = await loginWithAuthSig(authSig);
 
-      loginSuccess({ displayName: domain, identityType: 'UnstoppableDomain', user });
+      if ('id' in user) {
+        loginSuccess({ displayName: domain, identityType: 'UnstoppableDomain', user });
+      } else if ('otpRequired' in user) {
+        openVerifyOtpModal();
+      }
     } catch (err) {
       if ((err as DisabledAccountError)?.errorType === 'Disabled account') {
         onError?.(err as DisabledAccountError);
