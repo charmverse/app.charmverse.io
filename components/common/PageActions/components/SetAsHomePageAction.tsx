@@ -8,7 +8,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 
 export function SetAsHomePageAction({ pageId, onComplete }: { pageId: string; onComplete: VoidFunction }) {
   const { space } = useCurrentSpace();
-  const { isAdmin } = useIsAdmin();
+  const isAdmin = useIsAdmin();
   const { trigger: updateSpace } = useUpdateSpace(space?.id);
   const isHomePage = space?.homePageId === pageId;
 
