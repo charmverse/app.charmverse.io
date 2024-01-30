@@ -237,7 +237,7 @@ export function DocumentPageActionList({
           label={<Typography variant='body2'>Full width</Typography>}
         />
       </ListItemButton>
-      {!isInsideDialog && !isStructuredProposal && (
+      {!isInsideDialog && (
         <>
           <Divider />
           <ListItemButton
@@ -252,17 +252,19 @@ export function DocumentPageActionList({
             </ListItemIcon>
             <ListItemText primary='View comments' />
           </ListItemButton>
-          <ListItemButton
-            onClick={() => {
-              setActiveView('suggestions');
-              onComplete();
-            }}
-          >
-            <ListItemIcon>
-              <RateReviewOutlinedIcon fontSize='small' />
-            </ListItemIcon>
-            <ListItemText primary='View suggestions' />
-          </ListItemButton>
+          {!isStructuredProposal && (
+            <ListItemButton
+              onClick={() => {
+                setActiveView('suggestions');
+                onComplete();
+              }}
+            >
+              <ListItemIcon>
+                <RateReviewOutlinedIcon fontSize='small' />
+              </ListItemIcon>
+              <ListItemText primary='View suggestions' />
+            </ListItemButton>
+          )}
         </>
       )}
       <Divider />
