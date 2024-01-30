@@ -159,6 +159,11 @@ jobs:
 
             yq -I 4 -i '
               with(.option_settings."aws:elasticbeanstalk:application:environment";
+                    .IMGTAG = "${{ needs.build-docker-image.outputs.img_tag}}")
+              ' .ebextensions_ceramic/00_env_vars.config
+
+            yq -I 4 -i '
+              with(.option_settings."aws:elasticbeanstalk:application:environment";
                     .IMGTAG = "${{ needs.build-docker-image.outputs.img_tag }}")
               ' .ebextensions_websockets/00_env_vars.config
 
