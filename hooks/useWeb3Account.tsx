@@ -16,6 +16,7 @@ import charmClient from 'charmClient';
 import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/Web3ConnectionManager';
 import { useWeb3Signer } from 'hooks/useWeb3Signer';
 import type { AuthSig } from 'lib/blockchain/interfaces';
+import { verifyEIP1271Signature } from 'lib/blockchain/signAndVerify';
 import type { SystemError } from 'lib/utilities/errors';
 import { MissingWeb3AccountError } from 'lib/utilities/errors';
 import { lowerCaseEqual } from 'lib/utilities/strings';
@@ -89,8 +90,6 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
 
   const { connectors, connectAsync } = useConnect();
 
-  const { readContract } = usePublicClient({ chainId: 1 });
-
   const [walletAuthSignature, setWalletAuthSignature] = useState<AuthSig | null>(null);
   const [accountUpdatePaused, setAccountUpdatePaused] = useState(false);
   const { signer, provider } = useWeb3Signer({ chainId });
@@ -107,35 +106,6 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       setWalletAuthSignature(signature);
     },
     [setLitAuthSignature, setLitProvider]
-  );
-
-  const validateSignatureEIP1271 = useCallback(
-    async ({
-      contractAddress,
-      message,
-      signature
-    }: {
-      contractAddress: string;
-      message: string;
-      signature: string;
-    }) => {
-      const messageHash = utils.hashMessage(message);
-
-      const abi = parseAbi([
-        'function isValidSignature(bytes32 _messageHash, bytes _signature) public view returns (bytes4)'
-      ]);
-
-      const data = await readContract({
-        account: contractAddress as any,
-        address: contractAddress as any,
-        abi,
-        args: messageHash ? [messageHash, signature] : (null as any),
-        functionName: 'isValidSignature'
-      });
-
-      return data === EIP1271_MAGIC_VALUE;
-    },
-    []
   );
 
   const requestSignature = useCallback(async (): Promise<AuthSig> => {
@@ -166,9 +136,9 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
           message: body,
           signature: newSignature
         }),
-        validateSignatureEIP1271({
-          contractAddress: account,
+        verifyEIP1271Signature({
           message: body,
+          safeAddress: account,
           signature: newSignature
         })
       ]);
@@ -181,7 +151,8 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
         sig: newSignature,
         derivedVia: 'charmverse.sign',
         signedMessage: body,
-        address: signatureAddress
+        // Signature address is not reliable if coming from Gnosis, so we should use the detected account address
+        address: account
       };
 
       setSignature(account, generated, true);

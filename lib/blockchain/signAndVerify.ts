@@ -1,5 +1,6 @@
+import { readContract } from '@wagmi/core';
 import { SiweMessage } from 'lit-siwe';
-import { getAddress, recoverMessageAddress } from 'viem';
+import { getAddress, recoverMessageAddress, hashMessage, parseAbi } from 'viem';
 
 import { InvalidInputError } from '../utilities/errors';
 import { lowerCaseEqual } from '../utilities/strings';
@@ -73,4 +74,35 @@ export async function isValidWalletSignature({ address, host, signature }: Signa
   }
 
   return true;
+}
+
+const EIP1271_MAGIC_VALUE = '0x1626ba7e';
+
+const gnosisEipVerifyAbi = parseAbi([
+  'function isValidSignature(bytes32 _messageHash, bytes _signature) public view returns (bytes4)'
+]);
+
+export async function verifyEIP1271Signature({
+  message,
+  signature,
+  safeAddress
+}: {
+  message: string;
+  signature: string;
+  safeAddress: string;
+}): Promise<boolean> {
+  const chainId = parseInt(message.split('Chain ID:')[1]?.split('\n')[0]?.trim());
+
+  const messageHash = hashMessage(message);
+
+  const data = await readContract({
+    address: safeAddress as any,
+    account: safeAddress as any,
+    abi: gnosisEipVerifyAbi,
+    args: messageHash ? [messageHash, signature] : (null as any),
+    functionName: 'isValidSignature',
+    chainId
+  });
+
+  return data === EIP1271_MAGIC_VALUE;
 }
