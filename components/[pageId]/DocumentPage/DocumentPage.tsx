@@ -445,7 +445,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
                     // dont let users collapse sidebar when looking at a proposal
                     closeSidebar={closeSidebar}
                     openSidebar={setActiveView}
-                    threads={threads}
+                    threads={isLoadingThreads ? undefined : threads}
                     proposal={proposal}
                     proposalInput={proposal}
                     proposalTemplateId={proposal?.page?.sourceTemplateId}

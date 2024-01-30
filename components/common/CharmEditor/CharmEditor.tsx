@@ -167,7 +167,6 @@ type CharmEditorProps = {
   colorMode?: 'dark';
   content?: PageContent;
   autoFocus?: boolean;
-  children?: ReactNode;
   enableSuggestingMode?: boolean;
   onContentChange?: UpdatePageContent;
   readOnly?: boolean;
@@ -203,7 +202,6 @@ function CharmEditor({
   colorMode,
   enableSuggestingMode = false,
   content,
-  children,
   onContentChange,
   style,
   readOnly = false,
@@ -541,7 +539,6 @@ function CharmEditor({
         enableVoting={enableVoting}
         pageId={pageId}
       />
-      {children}
       {!disablePageSpecificFeatures && (
         <span className='font-family-default'>
           <InlineCommentThread
