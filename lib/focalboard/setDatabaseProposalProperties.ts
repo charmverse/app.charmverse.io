@@ -118,6 +118,7 @@ export function getBoardProperties({
   const proposalUrlProp = generateUpdatedProposalUrlProperty({ boardProperties });
   const proposalEvaluationTypeProp = generateUpdatedProposalEvaluationTypeProperty({ boardProperties });
   const stepProp = generateUpdatedProposalStepProperty({ boardProperties, evaluationStepTitles });
+  const proposalAuthorProp = generateUpdatedProposalAuthorProperty({ boardProperties });
 
   const existingStatusPropIndex = boardProperties.findIndex((p) => p.type === 'proposalStatus');
 
@@ -148,6 +149,14 @@ export function getBoardProperties({
     boardProperties[existingStepPropIndex] = stepProp;
   } else {
     boardProperties.push(stepProp);
+  }
+
+  const existingAuthorPropIndex = boardProperties.findIndex((p) => p.type === 'proposalAuthor');
+
+  if (existingAuthorPropIndex > -1) {
+    boardProperties[existingAuthorPropIndex] = proposalAuthorProp;
+  } else {
+    boardProperties.push(proposalAuthorProp);
   }
 
   addProposalEvaluationProperties({
@@ -274,6 +283,19 @@ function addProposalEvaluationProperties({
       });
     }
   }
+}
+
+function generateUpdatedProposalAuthorProperty(
+  { boardProperties }: { boardProperties: IPropertyTemplate[] } = { boardProperties: [] }
+): IPropertyTemplate {
+  const existingProposalAuthorProperty = boardProperties.find((p) => p.type === 'proposalAuthor');
+
+  return {
+    ...(existingProposalAuthorProperty ?? {
+      ...proposalDbProperties.proposalAuthor(),
+      id: uuid()
+    })
+  };
 }
 
 function generateUpdatedProposalStepProperty({
