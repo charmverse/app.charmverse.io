@@ -1,5 +1,5 @@
 import { prisma } from "@charmverse/core/prisma-client";
-import { BoardFields } from 'lib/focalboard/board';
+import { BoardFields, IPropertyTemplate } from 'lib/focalboard/board';
 import { BoardViewFields } from 'lib/focalboard/boardView';
 import { Constants } from 'lib/focalboard/constants';
 import { proposalDbProperties } from 'lib/focalboard/proposalDbProperties';
@@ -26,7 +26,7 @@ async function addProposalAuthorColumn() {
     try {
       let proposalAuthorProperty = (proposalBoardBlock.fields as unknown as BoardFields).cardProperties?.find(boardCardProperty => {
         return boardCardProperty.type === "proposalAuthor"
-      })
+      }) as IPropertyTemplate
 
       const transactions: any[] = []
 
@@ -71,6 +71,7 @@ async function addProposalAuthorColumn() {
           const viewBlockVisiblePropertyIds = viewBlockFields.visiblePropertyIds.filter(
             visiblePropertyId => visiblePropertyId !== proposalAuthorProperty.id
             ) || []
+
           viewBlockVisiblePropertyIds.splice(hasTitleProperty ? 1 : 0, 0, proposalAuthorProperty.id)
 
           return prisma.block.update({
