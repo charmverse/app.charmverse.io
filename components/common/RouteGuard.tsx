@@ -5,7 +5,6 @@ import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useRef, useEffect, useState } from 'react';
 
-import { useCustomJoinSpace } from 'hooks/useCustomJoinSpace';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
@@ -14,9 +13,20 @@ import { redirectToAppLogin, shouldRedirectToAppLogin } from 'lib/utilities/brow
 import { getCustomDomainFromHost } from 'lib/utilities/domains/getCustomDomainFromHost';
 // Pages shared to the public that don't require user login
 // When adding a page here or any new top-level pages, please also add this page to DOMAIN_BLACKLIST in lib/spaces/config.ts
-const publicPages = ['/', 'share', 'api-docs', 'u', 'join', 'invite', 'authenticate', 'test', 'permalink'];
+const publicPages = [
+  '/',
+  'share',
+  'api-docs',
+  'u',
+  'join',
+  'invite',
+  'authenticate',
+  'test',
+  'permalink',
+  'proposals/new'
+];
 // pages that should be always available to logged in users
-const publicLoggedInPages = ['createSpace'];
+const publicLoggedInPages = ['createSpace', '[domain]/proposals/new'];
 
 export default function RouteGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -24,8 +34,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
   const [authorized, setAuthorized] = useState(true);
   const { user, isLoaded } = useUser();
   const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
-  const { accessChecked: customJoinAccessChecked } = useCustomJoinSpace();
-  const isLoading = !isLoaded || !isSpacesLoaded || !accessChecked || !customJoinAccessChecked;
+  const isLoading = !isLoaded || !isSpacesLoaded || !accessChecked;
   const authorizedSpaceDomainRef = useRef('');
   const spaceDomain = (router.query.domain as string) || '';
 
@@ -58,6 +67,9 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
   async function authCheck(url: string, _spaceDomain: string): Promise<{ authorized: boolean; redirect?: UrlObject }> {
     const path = url.split('?')[0];
 
+    // Remove the leading slash
+    const routerPathName = router.pathname.slice(1);
+
     const firstPathSegment =
       path.split('/').filter((pathElem) => {
         // Only get segments that evaluate to some value
@@ -67,7 +79,9 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
     // special case, when visiting main app url on space subdomain
     const isSpaceSubdomainPath = firstPathSegment === '/' && !!_spaceDomain;
     // visiting page that shoould be alway available to logged in users
-    const isAvailableToLoggedInUsers = publicLoggedInPages.some((basePath) => firstPathSegment === basePath);
+    const isAvailableToLoggedInUsers = publicLoggedInPages.some(
+      (_path) => firstPathSegment === _path || routerPathName === _path
+    );
 
     // condition: public page
     if ((isPublicPath && !isSpaceSubdomainPath) || hasSharedPageAccess) {
