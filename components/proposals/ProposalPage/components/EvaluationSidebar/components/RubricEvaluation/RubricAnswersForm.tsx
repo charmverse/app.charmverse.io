@@ -156,6 +156,9 @@ export function RubricAnswersForm({
       message: 'Submit your results?',
       confirmButton: 'Submit'
     });
+    if (!confirmed) {
+      return;
+    }
     // answers are optional - filter out ones with no score
     const filteredAnswers = values.answers.filter((answer) => typeof (answer.response as any)?.score === 'number');
     await upsertRubricCriteriaAnswer({
