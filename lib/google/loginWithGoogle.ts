@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { generateCharmWallet } from 'lib/charms/generateCharmWallet';
 import type { GoogleLoginOauthParams } from 'lib/google/authorization/authClient';
 import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
@@ -92,6 +93,9 @@ export async function loginWithGoogle({
         },
         include: sessionUserRelations
       });
+
+      await generateCharmWallet({ userId: user.id });
+
       trackUserAction('sign_up', { userId: user.id, identityType: 'Google', ...signupAnalytics });
     } else {
       await prisma.googleAccount.update({

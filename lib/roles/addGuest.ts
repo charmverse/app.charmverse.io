@@ -1,6 +1,7 @@
 import type { Prisma, SpaceRole, User, VerifiedEmail } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { generateCharmWallet } from 'lib/charms/generateCharmWallet';
 import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 import { DataNotFoundError, InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
 import { isUUID, isValidEmail, uid } from 'lib/utilities/strings';
@@ -106,6 +107,8 @@ export async function addGuest({ userIdOrEmail, spaceId }: GuestToAdd) {
         verifiedEmails: true
       }
     });
+
+    await generateCharmWallet({ userId: user.id });
   }
 
   const existingSpaceRole = user!.spaceRoles.find((sr) => sr.spaceId === spaceId);

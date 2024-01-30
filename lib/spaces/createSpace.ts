@@ -3,6 +3,7 @@ import path from 'node:path';
 import type { Prisma, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { generateCharmWallet } from 'lib/charms/generateCharmWallet';
 import { STATIC_PAGES } from 'lib/features/constants';
 import { generateDefaultPostCategories } from 'lib/forums/categories/generateDefaultPostCategories';
 import { setDefaultPostCategory } from 'lib/forums/categories/setDefaultPostCategory';
@@ -234,6 +235,8 @@ export async function createWorkspace({
 
   // Generate the first count
   await countSpaceBlocksAndSave({ spaceId: space.id });
+
+  await generateCharmWallet({ spaceId: space.id });
 
   logSpaceCreation(space);
 

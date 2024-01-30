@@ -3,6 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { getENSName } from 'lib/blockchain/getENSName';
+import { generateCharmWallet } from 'lib/charms/generateCharmWallet';
 import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
@@ -49,6 +50,8 @@ export async function createUserFromWallet(
       },
       include: sessionUserRelations
     });
+
+    await generateCharmWallet({ userId: newUser.id });
 
     try {
       await prepopulateUserProfile(newUser, ens);
