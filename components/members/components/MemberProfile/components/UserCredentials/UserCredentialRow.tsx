@@ -5,10 +5,18 @@ import Image from 'next/image';
 
 import Link from 'components/common/Link';
 import type { EASAttestationFromApi } from 'lib/credentials/external/getExternalCredentials';
+import type { TrackedSchemaParams } from 'lib/credentials/external/schemas';
 import { trackedSchemas } from 'lib/credentials/external/schemas';
 
 export function UserCredentialRow({ credential }: { credential: EASAttestationFromApi }) {
-  const schemaInfo = trackedSchemas[credential.chainId]?.find((s) => s.schemaId === credential.schemaId);
+  const schemaInfo = credential.chainId
+    ? trackedSchemas[credential.chainId]?.find((s) => s.schemaId === credential.schemaId)
+    : ({
+        title: credential.content.title,
+        organization: credential.content.organization,
+        iconUrl: credential.iconUrl,
+        fields: credential.content.fields ?? []
+      } as TrackedSchemaParams);
 
   const credentialInfo: {
     title: string;
@@ -35,10 +43,6 @@ export function UserCredentialRow({ credential }: { credential: EASAttestationFr
           }))
         };
 
-  if (credential.type === 'external' && !schemaInfo) {
-    return null;
-  }
-
   return (
     <Grid container display='flex' alignItems='center' justifyContent='space-between'>
       <Grid item xs={5}>
@@ -59,11 +63,13 @@ export function UserCredentialRow({ credential }: { credential: EASAttestationFr
           <Chip variant='outlined' key={field.name} label={field.value} />
         ))}
       </Grid>
-      <Grid item xs={2} display='flex' justifyContent='flex-end' pr={2}>
-        <Link href={credential.verificationUrl} external target='_blank'>
-          <LaunchIcon sx={{ alignSelf: 'center' }} />
-        </Link>
-      </Grid>
+      {credential.verificationUrl && (
+        <Grid item xs={2} display='flex' justifyContent='flex-end' pr={2}>
+          <Link href={credential.verificationUrl} external target='_blank'>
+            <LaunchIcon sx={{ alignSelf: 'center' }} />
+          </Link>
+        </Grid>
+      )}
     </Grid>
   );
 }
