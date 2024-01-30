@@ -59,6 +59,22 @@ describe('getDefaultPageForSpace()', () => {
     expect(url).toEqual(`/${space.domain}/forum`);
   });
 
+  it('should send user to home page if one exists', async () => {
+    const { space, user } = await generateUserAndSpace();
+    await createPage({ spaceId: space.id, createdBy: user.id, index: 1 });
+    const homePage = await createPage({ spaceId: space.id, createdBy: user.id, index: 2 });
+    await prisma.space.update({
+      where: {
+        id: space.id
+      },
+      data: {
+        homePageId: homePage.id
+      }
+    });
+    const url = await getDefaultPageForSpace({ space, userId: user.id });
+    expect(url).toEqual(`/${space.domain}/${homePage.path}`);
+  });
+
   it('should send user to last visited document page', async () => {
     const { space, user } = await generateUserAndSpace();
     const page = await createPage({ spaceId: space.id, createdBy: user.id });

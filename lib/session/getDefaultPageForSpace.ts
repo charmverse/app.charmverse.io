@@ -114,8 +114,20 @@ async function getDefaultPageForSpaceRaw({
   // TODO: simplify types of sortNodes input to only be index and createdAt
   const sortedPages = pageTree.sortNodes(pagesToLookup as PageMeta[]);
 
+  const { homePageId } = await prisma.space.findUniqueOrThrow({
+    where: {
+      id: spaceId
+    },
+    select: {
+      homePageId: true
+    }
+  });
+
   const firstPage = sortedPages[0];
-  if (firstPage) {
+  const homePage = homePageId && pageMap[homePageId];
+  if (homePage) {
+    return `${defaultSpaceUrl}/${homePage.path}`;
+  } else if (firstPage) {
     return `${defaultSpaceUrl}/${firstPage.path}`;
   } else {
     return `${defaultSpaceUrl}/members`;
