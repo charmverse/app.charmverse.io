@@ -21,7 +21,7 @@ import type { ConnectionEvent } from 'components/common/CharmEditor/components/f
 import { focusEventName } from 'components/common/CharmEditor/constants';
 import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import { EvaluationSidebar } from 'components/proposals/ProposalPage/components/EvaluationSidebar/EvaluationSidebar';
-import { ProposalFormFieldInputs } from 'components/proposals/ProposalPage/components/ProposalFormFieldInputs';
+import { ProposalFormFieldsInput } from 'components/proposals/ProposalPage/components/ProposalFormFieldsInput';
 import { ProposalRewards } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewards';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
@@ -472,7 +472,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
                       refreshProposal={refreshProposal}
                     />
                   ) : (
-                    <ProposalFormFieldInputs
+                    <ProposalFormFieldsInput
                       pageId={page.id}
                       isReviewer={(proposal?.permissions.evaluate || proposal?.permissions.review) ?? false}
                       proposalId={proposal.id}
