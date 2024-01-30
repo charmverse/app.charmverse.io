@@ -23,6 +23,8 @@ import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
 import { useSpaces } from 'hooks/useSpaces';
 import { getAbsolutePath } from 'lib/utilities/browser';
 
+import { TogglePublicProposalTemplates } from './TogglePublicProposalTemplates';
+
 const StyledInput = styled(Input)`
   font-size: 0.8em;
   height: 35px;
@@ -152,6 +154,9 @@ export default function ShareProposals({ padding = 1 }: Props) {
             </Box>
           )}
         </Collapse>
+      </Grid>
+      <Grid mt={2} item justifyContent='space-between' alignItems='center'>
+        <TogglePublicProposalTemplates />
       </Grid>
 
       {proposalsArePublic && (
