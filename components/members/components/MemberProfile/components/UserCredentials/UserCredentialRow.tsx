@@ -5,19 +5,11 @@ import Image from 'next/image';
 
 import Link from 'components/common/Link';
 import type { EASAttestationFromApi } from 'lib/credentials/external/getExternalCredentials';
-import type { TrackedSchemaParams } from 'lib/credentials/external/schemas';
 import { trackedSchemas } from 'lib/credentials/external/schemas';
 import { isTruthy } from 'lib/utilities/types';
 
 export function UserCredentialRow({ credential }: { credential: EASAttestationFromApi }) {
-  const schemaInfo = credential.chainId
-    ? trackedSchemas[credential.chainId]?.find((s) => s.schemaId === credential.schemaId)
-    : ({
-        title: credential.content.title,
-        organization: credential.content.organization,
-        iconUrl: credential.iconUrl,
-        fields: credential.content.fields ?? []
-      } as TrackedSchemaParams);
+  const schemaInfo = trackedSchemas[credential.chainId].find((s) => s.schemaId === credential.schemaId);
 
   const credentialInfo: {
     title: string;
@@ -53,6 +45,10 @@ export function UserCredentialRow({ credential }: { credential: EASAttestationFr
             })
             .filter(isTruthy)
         };
+
+  if (credential.type === 'external' && !schemaInfo) {
+    return null;
+  }
 
   return (
     <Grid container display='flex' alignItems='center' justifyContent='space-between'>

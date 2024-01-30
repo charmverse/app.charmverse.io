@@ -43,7 +43,7 @@ export type EASAttestationFromApi<T = any> = {
   recipient: string;
   schemaId: string;
   timeCreated: number;
-  chainId: ExternalCredentialChain | EasSchemaChain | null;
+  chainId: ExternalCredentialChain | EasSchemaChain;
   type: 'external' | 'internal';
   verificationUrl: string | null;
   iconUrl?: string | null;
