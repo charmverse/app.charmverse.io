@@ -69,7 +69,14 @@ export function EvaluationsSettings({
             // find matching template step, and allow editing if there were no reviewers set
             const matchingTemplateStep = proposalTemplate?.evaluations?.find((e) => e.title === evaluation.title);
             return (
-              <EvaluationStepRow key={evaluation.id} expanded result={null} index={index + 1} title={evaluation.title}>
+              <EvaluationStepRow
+                key={evaluation.id}
+                expanded={expandedContainer}
+                expandedContainer={expandedContainer}
+                result={null}
+                index={index + 1}
+                title={evaluation.title}
+              >
                 <EvaluationStepSettings
                   evaluation={evaluation}
                   evaluationTemplate={matchingTemplateStep}
@@ -89,7 +96,8 @@ export function EvaluationsSettings({
                 index={proposal ? proposal.evaluations.length + 1 : 0}
                 result={null}
                 title={mappedFeatures.rewards.title}
-                expanded
+                expanded={expandedContainer}
+                expandedContainer={expandedContainer}
                 actions={
                   isStructuredProposal && (
                     <Stack direction='row' alignItems='center' gap={1}>
