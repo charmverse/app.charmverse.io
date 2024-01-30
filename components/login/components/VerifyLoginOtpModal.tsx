@@ -25,7 +25,13 @@ export function CustomModal({ onClose, ...props }: Omit<ModalProps, 'children'>,
           showMessage(`Logged in. Redirecting you now`, 'success');
           setUser(_user);
           onClose?.();
-          router.push('/');
+          // If user is in an authenticate page we need to push the user to the login page where RouteGuard will handle the user redirect
+          if (router.pathname.startsWith('/authenticate')) {
+            router.push('/');
+          } else {
+            // When user is populated, we just need to reload the page
+            router.reload();
+          }
         }
       }
     );
