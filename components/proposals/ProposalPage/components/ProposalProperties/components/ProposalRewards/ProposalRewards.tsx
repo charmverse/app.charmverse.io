@@ -2,7 +2,7 @@ import type { ProposalReviewer } from '@charmverse/core/prisma';
 import { Delete, Edit } from '@mui/icons-material';
 import { Box, Grid, Hidden, IconButton, Stack, Typography } from '@mui/material';
 import { uniqBy } from 'lodash';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { v4 } from 'uuid';
 
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
@@ -10,7 +10,6 @@ import { SelectPreviewContainer } from 'components/common/BoardEditor/components
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
 import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
-import { RewardTokenInfo } from 'components/rewards/components/RewardProperties/components/RewardTokenInfo';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { RewardAmount } from 'components/rewards/components/RewardStatusBadge';
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
@@ -187,17 +186,17 @@ export function ProposalRewards({
                       </Typography>
                       <Hidden mdDown>
                         <Stack alignItems='center' direction='row' height='100%'>
-                          {reward.customReward ? (
-                            <Typography component='span' variant='subtitle1' fontWeight='normal'>
-                              {reward.customReward}
-                            </Typography>
-                          ) : (
-                            <RewardTokenInfo
-                              chainId={reward.chainId || null}
-                              symbolOrAddress={reward.rewardToken || null}
-                              rewardAmount={reward.rewardAmount || null}
-                            />
-                          )}
+                          <RewardAmount
+                            reward={{
+                              chainId: reward.chainId || null,
+                              customReward: reward.customReward || null,
+                              rewardAmount: reward.rewardAmount || null,
+                              rewardToken: reward.rewardToken || null
+                            }}
+                            truncate={true}
+                            truncatePrecision={2}
+                            typographyProps={{ variant: 'body2', fontWeight: 'normal', fontSize: 'normal' }}
+                          />
                         </Stack>
                       </Hidden>
                     </Stack>

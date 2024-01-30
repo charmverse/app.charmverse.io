@@ -45,7 +45,7 @@ async function upsertProposalAnswersController(
 async function deleteRubricAnswers(req: NextApiRequest, res: NextApiResponse) {
   const proposalId = req.query.id as string;
   const isDraft = req.query.isDraft === 'true';
-  const evaluationId = req.query.evaluationId as string | undefined;
+  const evaluationId = req.query.evaluationId as string;
 
   const userId = req.session.user.id;
 
