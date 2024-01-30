@@ -1,6 +1,7 @@
 import AddIcon from '@mui/icons-material/Add';
 import { Box, Stack } from '@mui/material';
-import { useRef, useEffect, useState } from 'react';
+import debounce from 'lodash/debounce';
+import { useRef, useEffect, useMemo, useState } from 'react';
 import { v4 } from 'uuid';
 
 import { useUpdateProposalFormFields } from 'charmClient/hooks/proposals';
@@ -14,98 +15,57 @@ import type { SelectOptionType } from './fields/Select/interfaces';
 import { FormField } from './FormField';
 import type { FormFieldInput } from './interfaces';
 
-export function ControlledFormFieldsEditor({
-  formFields,
-  setFormFields,
-  collapsedFieldIds,
-  toggleCollapse
-}: {
-  formFields: FormFieldInput[];
-  setFormFields: (updatedFormFields: FormFieldInput[]) => void;
-  collapsedFieldIds: string[];
-  toggleCollapse: (fieldId: string) => void;
-}) {
-  return (
-    <FormFieldsEditorBase
-      collapsedFieldIds={collapsedFieldIds}
-      formFields={formFields}
-      setFormFields={setFormFields}
-      toggleCollapse={toggleCollapse}
-    />
-  );
-}
-
 export function FormFieldsEditor({
   proposalId,
   formFields: initialFormFields,
-  readOnly,
-  refreshProposal
+  readOnly
 }: {
   proposalId: string;
   formFields: FormFieldInput[];
   readOnly?: boolean;
-  refreshProposal: VoidFunction;
 }) {
   const [formFields, setFormFields] = useState([...initialFormFields]);
   const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>(formFields.map((field) => field.id));
-  const { trigger, isMutating } = useUpdateProposalFormFields({ proposalId });
-  const { showMessage } = useSnackbar();
-  const [isFormDirty, setIsFormDirty] = useState(false);
+  const { trigger } = useUpdateProposalFormFields({ proposalId });
+  const { showError } = useSnackbar();
+  const debouncedUpdate = useMemo(() => {
+    return debounce(trigger, 500);
+  }, [trigger]);
 
-  async function saveFormFields() {
+  async function updateFormFields(_formFields: FormFieldInput[]) {
+    if (readOnly) {
+      return;
+    }
+    const errors = checkFormFieldErrors(_formFields);
+    setFormFields(_formFields);
+    if (errors) {
+      return;
+    }
     try {
-      await trigger({ formFields });
-      refreshProposal?.();
-      showMessage('Form fields saved successfully');
-    } catch (_) {
-      //
-    } finally {
-      setIsFormDirty(false);
+      await debouncedUpdate({ formFields: _formFields });
+    } catch (error) {
+      showError(error, 'Error saving form fields');
     }
   }
 
-  const saveButtonDisabledTooltip = !isFormDirty
-    ? 'Please edit the form before saving'
-    : checkFormFieldErrors(formFields);
-
-  function updateFormFields(fields: FormFieldInput[]) {
-    setFormFields(fields);
-    setIsFormDirty(true);
-  }
-
   return (
-    <>
-      <Box mb={1}>
-        <FormFieldsEditorBase
-          collapsedFieldIds={collapsedFieldIds}
-          formFields={formFields}
-          setFormFields={updateFormFields}
-          toggleCollapse={(fieldId) => {
-            if (collapsedFieldIds.includes(fieldId)) {
-              setCollapsedFieldIds(collapsedFieldIds.filter((id) => id !== fieldId));
-            } else {
-              setCollapsedFieldIds([...collapsedFieldIds, fieldId]);
-            }
-          }}
-          readOnly={readOnly}
-        />
-      </Box>
-      {formFields.length !== 0 && !readOnly && (
-        <Button
-          data-test='form-fields-save-button'
-          onClick={saveFormFields}
-          disabledTooltip={saveButtonDisabledTooltip}
-          loading={isMutating}
-          disabled={!!saveButtonDisabledTooltip}
-        >
-          Save
-        </Button>
-      )}
-    </>
+    <ControlledFormFieldsEditor
+      collapsedFieldIds={collapsedFieldIds}
+      formFields={formFields}
+      setFormFields={updateFormFields}
+      toggleCollapse={(fieldId) => {
+        if (collapsedFieldIds.includes(fieldId)) {
+          setCollapsedFieldIds(collapsedFieldIds.filter((id) => id !== fieldId));
+        } else {
+          setCollapsedFieldIds([...collapsedFieldIds, fieldId]);
+        }
+      }}
+      readOnly={readOnly}
+    />
   );
 }
 
-function FormFieldsEditorBase({
+export function ControlledFormFieldsEditor({
   formFields,
   setFormFields,
   collapsedFieldIds,

@@ -469,7 +469,6 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
                       readOnly={(!isAdmin && (!user || !proposalAuthors.includes(user.id))) || !!proposal?.archived}
                       proposalId={proposal.id}
                       formFields={proposal?.form.formFields ?? []}
-                      refreshProposal={refreshProposal}
                     />
                   ) : (
                     <ProposalFormFieldsInput
