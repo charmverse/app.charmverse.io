@@ -41,8 +41,7 @@ test.describe('Proposal templates', () => {
       title: 'Proposal template',
       pageType: 'proposal_template',
       proposalStatus: 'draft',
-      authors: [],
-      reviewers: []
+      authors: []
     });
 
     await proposalListPage.goToProposals(space.domain);

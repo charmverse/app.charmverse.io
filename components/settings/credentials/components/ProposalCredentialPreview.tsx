@@ -6,10 +6,8 @@ import Typography from '@mui/material/Typography';
 import { v4 as uuid } from 'uuid';
 
 import Link from 'components/common/Link';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { getEasConnector } from 'lib/credentials/connectors';
 import { attestationSchemaIds } from 'lib/credentials/schemas';
-import { getPagePermalink } from 'lib/pages/getPagePermalink';
 
 export type ProposalCredentialToPreview = Pick<CredentialTemplate, 'name' | 'description' | 'organization'>;
 
@@ -17,10 +15,7 @@ type Props = {
   credential: ProposalCredentialToPreview;
 };
 
-const exampleId = uuid();
-
 export function ProposalCredentialPreview({ credential }: Props) {
-  const { space } = useCurrentSpace();
   const proposalSchemaUrl = `${getEasConnector(10).attestationExplorerUrl}/schema/view/${
     attestationSchemaIds.proposal[10]
   }`;
@@ -35,7 +30,7 @@ export function ProposalCredentialPreview({ credential }: Props) {
               sx={{ fontSize: 14, width: 'fit-content' }}
               color='text.secondary'
             >
-              Off-chain credential
+              Credential Preview
             </Typography>
             <Link sx={{ fontSize: 12 }} href={proposalSchemaUrl} external target='_blank'>
               View Schema
@@ -63,7 +58,7 @@ export function ProposalCredentialPreview({ credential }: Props) {
           </Grid>
           <Grid item xs>
             <Typography variant='body2'>
-              <b>Proposal URL:</b> {getPagePermalink({ pageId: exampleId })}
+              <b>URL:</b> [Link to proposal]
             </Typography>
           </Grid>
         </Grid>

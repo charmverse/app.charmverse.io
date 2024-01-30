@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { useCreateProposal } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -34,12 +34,6 @@ export function useNewProposal({ newProposal }: Props) {
     [setFormInputsRaw]
   );
 
-  useEffect(() => {
-    setFormInputs({
-      publishToLens: !!user?.publishToLensDefault
-    });
-  }, [setFormInputs, user?.publishToLensDefault]);
-
   async function createProposal({ isDraft }: { isDraft?: boolean }) {
     log.info('[user-journey] Create a proposal');
     if (currentSpace) {
@@ -58,13 +52,14 @@ export function useNewProposal({ newProposal }: Props) {
         formFields: formInputs.formFields,
         evaluations: formInputs.evaluations,
         spaceId: currentSpace.id,
-        publishToLens: formInputs.publishToLens,
         fields: formInputs.fields,
         formId: formInputs.formId,
         formAnswers: formInputs.formAnswers,
         workflowId: formInputs.workflowId || undefined,
         isDraft,
-        selectedCredentialTemplates: formInputs.selectedCredentialTemplates ?? []
+        selectedCredentialTemplates: formInputs.selectedCredentialTemplates ?? [],
+        sourcePageId: formInputs.sourcePageId,
+        sourcePostId: formInputs.sourcePostId
       }).catch((err: any) => {
         showMessage(err.message ?? 'Something went wrong', 'error');
         throw err;
@@ -100,13 +95,11 @@ function emptyState({
     headerImage: null,
     icon: null,
     proposalTemplateId: null,
-    reviewers: [],
     evaluations: [],
     title: '',
     type: 'proposal',
-    publishToLens: false,
     selectedCredentialTemplates: [],
-    fields: { properties: {} },
+    fields: { properties: {}, enableRewards: true },
     ...inputs,
     // leave authors empty for proposals
     authors: inputs.type !== 'proposal_template' && userId ? [userId] : []

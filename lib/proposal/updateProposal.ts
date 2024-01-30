@@ -8,7 +8,6 @@ import { setPageUpdatedAt } from './setPageUpdatedAt';
 export type UpdateProposalRequest = {
   proposalId: string;
   authors?: string[];
-  publishToLens?: boolean;
   fields?: ProposalFields | null;
   selectedCredentialTemplates?: string[];
 };
@@ -16,27 +15,26 @@ export type UpdateProposalRequest = {
 export async function updateProposal({
   proposalId,
   authors,
-  publishToLens,
   fields,
   selectedCredentialTemplates,
   actorId
 }: UpdateProposalRequest & { actorId: string }) {
   if (authors && authors.length === 0) {
-    throw new InvalidStateError('Proposal must have at least 1 author');
+    const page = await prisma.page.findUniqueOrThrow({
+      where: {
+        proposalId
+      },
+      select: {
+        type: true
+      }
+    });
+
+    if (page.type === 'proposal') {
+      throw new InvalidStateError('Proposal must have at least 1 author');
+    }
   }
 
   await prisma.$transaction(async (tx) => {
-    if (typeof publishToLens === 'boolean') {
-      await tx.proposal.update({
-        where: {
-          id: proposalId
-        },
-        data: {
-          publishToLens
-        }
-      });
-    }
-
     if (selectedCredentialTemplates) {
       await tx.proposal.update({
         where: {

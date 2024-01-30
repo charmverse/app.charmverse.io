@@ -9,7 +9,6 @@ import { getChainById } from 'connectors/chains';
 import { Wallet, providers } from 'ethers';
 
 import { credentialsWalletPrivateKey } from 'config/constants';
-import { getENSName } from 'lib/blockchain';
 import { isValidChainAddress } from 'lib/tokens/validation';
 
 import type { EasSchemaChain } from './connectors';
@@ -97,7 +96,7 @@ export async function signCharmverseAttestation({
 }: CharmVerseCredentialInput): Promise<SignedAttestation> {
   const provider = new providers.JsonRpcProvider(getChainById(chainId)?.rpcUrls[0] as string, chainId);
 
-  const wallet = new Wallet(credentialsWalletPrivateKey, provider);
+  const wallet = new Wallet(credentialsWalletPrivateKey as string, provider);
 
   const signature = await attestOffchain({
     attester: wallet.address,

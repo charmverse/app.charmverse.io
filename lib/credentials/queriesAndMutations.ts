@@ -1,21 +1,20 @@
-import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
+import { gql } from '@apollo/client';
 import { log } from '@charmverse/core/log';
-import { prisma } from '@charmverse/core/prisma-client';
+import { prisma, type AttestationType } from '@charmverse/core/prisma-client';
 import { Wallet } from 'ethers';
 
 import { credentialsWalletPrivateKey, graphQlServerEndpoint } from 'config/constants';
 
+import { ApolloClientWithRedisCache } from './apolloClientWithRedisCache';
+import type { EasSchemaChain } from './connectors';
+import type { EASAttestationFromApi } from './external/getExternalCredentials';
+import type { ExternalCredentialChain } from './external/schemas';
 import type { ProposalCredential } from './schemas';
 
-const credentialWalletAddress = new Wallet(credentialsWalletPrivateKey).address.toLowerCase();
-
-// Assuming DID and AttestationType are defined elsewhere in your TypeScript code.
-type DID = string; // or whatever the actual type is
-type AttestationType = 'proposal'; // Extend this based on actual enum values
-
-const apolloClient = new ApolloClient({
-  cache: new InMemoryCache(),
-  uri: graphQlServerEndpoint
+const ceramicGraphQlClient = new ApolloClientWithRedisCache({
+  uri: graphQlServerEndpoint,
+  persistForSeconds: 300,
+  cacheKeyPrefix: 'ceramic'
 });
 
 type CredentialFromCeramic = {
@@ -26,7 +25,7 @@ type CredentialFromCeramic = {
   sig: string;
   type: AttestationType;
   verificationUrl: string;
-  chainId: number;
+  chainId: ExternalCredentialChain | EasSchemaChain;
   schemaId: string;
   timestamp: Date;
 };
@@ -39,8 +38,8 @@ export type PublishedSignedCredential = Omit<CredentialFromCeramic, 'content'> &
 };
 
 const CREATE_SIGNED_CREDENTIAL_MUTATION = gql`
-  mutation CreateCredentials($i: CreateSignedCredentialFourInput!) {
-    createSignedCredentialFour(input: $i) {
+  mutation CreateCredentials($i: CreateCharmVerseCredentialInput!) {
+    createCharmVerseCredential(input: $i) {
       document {
         id
         sig
@@ -59,7 +58,7 @@ const CREATE_SIGNED_CREDENTIAL_MUTATION = gql`
 
 export type CredentialToPublish = Omit<PublishedSignedCredential, 'author' | 'id'>;
 
-function getParsedCredential(credential: CredentialFromCeramic): PublishedSignedCredential {
+function getParsedCredential(credential: CredentialFromCeramic): EASAttestationFromApi {
   let parsed = {} as any;
 
   try {
@@ -71,12 +70,15 @@ function getParsedCredential(credential: CredentialFromCeramic): PublishedSigned
 
   return {
     ...credential,
-    content: parsed
+    content: parsed,
+    attester: credential.issuer,
+    timeCreated: new Date(credential.timestamp).valueOf(),
+    type: 'internal'
   };
 }
 
-export async function publishSignedCredential(input: CredentialToPublish): Promise<PublishedSignedCredential> {
-  const record = await apolloClient
+export async function publishSignedCredential(input: CredentialToPublish): Promise<EASAttestationFromApi> {
+  const record = await ceramicGraphQlClient
     .mutate({
       mutation: CREATE_SIGNED_CREDENTIAL_MUTATION,
       variables: {
@@ -91,13 +93,13 @@ export async function publishSignedCredential(input: CredentialToPublish): Promi
         }
       }
     })
-    .then((doc) => getParsedCredential(doc.data.createSignedCredentialFour.document));
+    .then((doc) => getParsedCredential(doc.data.createCharmVerseCredential.document));
   return record;
 }
 
 const GET_CREDENTIALS = gql`
-  query GetCredentials($filter: SignedCredentialFourFiltersInput!) {
-    signedCredentialFourIndex(filters: $filter, first: 1000) {
+  query GetCredentials($filter: CharmVerseCredentialFiltersInput!) {
+    charmVerseCredentialIndex(filters: $filter, first: 1000) {
       edges {
         node {
           id
@@ -116,41 +118,62 @@ const GET_CREDENTIALS = gql`
   }
 `;
 
-export async function getCredentialsByRecipient({
-  recipient
+export async function getCharmverseCredentialsByWallets({
+  wallets
 }: {
-  recipient: string;
-}): Promise<PublishedSignedCredential> {
-  return apolloClient
+  wallets: string[];
+}): Promise<EASAttestationFromApi[]> {
+  const credentialWalletAddress = new Wallet(credentialsWalletPrivateKey as string).address.toLowerCase();
+  if (!wallets.length) {
+    return [];
+  }
+
+  const charmverseCredentials: EASAttestationFromApi[] = await ceramicGraphQlClient
     .query({
       query: GET_CREDENTIALS,
       variables: {
         filter: {
           where: {
-            recipient: { equalTo: recipient.toLowerCase() },
+            recipient: { in: wallets.map((w) => w.toLowerCase()) },
             issuer: { equalTo: credentialWalletAddress }
           }
         }
-      },
+      }
       // For now, let's refetch each time and rely on http endpoint-level caching
       // https://www.apollographql.com/docs/react/data/queries/#supported-fetch-policies
-      fetchPolicy: 'no-cache'
     })
-    .then(({ data }) => data.signedCredentialFourIndex.edges.map((e: any) => getParsedCredential(e.node)));
-}
-export async function getCredentialsByUserId({ userId }: { userId: string }): Promise<PublishedSignedCredential[]> {
-  const user = await prisma.user.findUniqueOrThrow({
+    .then(({ data }) => data.charmVerseCredentialIndex.edges.map((e: any) => getParsedCredential(e.node)));
+
+  const credentialIds = charmverseCredentials.map((c) => c.id);
+
+  const issuedCredentials = await prisma.issuedCredential.findMany({
     where: {
-      id: userId
+      ceramicId: {
+        in: credentialIds
+      }
     },
     select: {
-      wallets: true
+      id: true,
+      ceramicId: true,
+      proposal: {
+        select: {
+          space: {
+            select: {
+              spaceArtwork: true,
+              credentialLogo: true
+            }
+          }
+        }
+      }
     }
   });
 
-  const credentials: PublishedSignedCredential[] = await Promise.all(
-    user.wallets.map((w) => getCredentialsByRecipient({ recipient: w.address }))
-  ).then((data) => data.flat());
+  return charmverseCredentials.map((credential) => {
+    const issuedCredential = issuedCredentials.find((ic) => ic.ceramicId === credential.id);
 
-  return credentials;
+    return {
+      ...credential,
+      iconUrl: issuedCredential?.proposal.space.credentialLogo ?? issuedCredential?.proposal.space.spaceArtwork
+    };
+  });
 }

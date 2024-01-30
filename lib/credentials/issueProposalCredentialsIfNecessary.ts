@@ -5,7 +5,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { optimism } from 'viem/chains';
 
-import { isCharmVerseSpace } from 'lib/featureFlag/isCharmVerseSpace';
 import { getPagePermalink } from 'lib/pages/getPagePermalink';
 
 import { signAndPublishCharmverseCredential } from './attest';
@@ -42,26 +41,9 @@ export async function issueProposalCredentialsIfNecessary({
         orderBy: {
           index: 'asc'
         }
-      },
-      // TODO - Remove this before releasing
-      space: {
-        select: {
-          domain: true
-        }
       }
-      // TODO - Remove this before releasing
     }
   });
-
-  // TODO - Remove this before releasing
-  const issueCredential = isCharmVerseSpace({
-    space: baseProposal.space
-  });
-
-  if (!issueCredential) {
-    return;
-  }
-  // TODO - Remove this before releasing
 
   if (baseProposal.status === 'draft') {
     return;
@@ -101,8 +83,13 @@ export async function issueProposalCredentialsIfNecessary({
       space: {
         select: {
           id: true,
-          credentialTemplates: true,
-          credentialEvents: true
+          credentialTemplates: {
+            where: {
+              credentialEvents: {
+                has: event
+              }
+            }
+          }
         }
       }
     }
@@ -110,11 +97,6 @@ export async function issueProposalCredentialsIfNecessary({
 
   if (!proposalWithSpaceConfig.page) {
     throw new DataNotFoundError(`Proposal with id ${proposalId} has no matching page`);
-  }
-
-  if (!proposalWithSpaceConfig.space.credentialEvents.includes(event)) {
-    // Space doesn't want to issue credentials for this event
-    return;
   }
 
   const issuedCredentials = await prisma.issuedCredential.findMany({
@@ -137,6 +119,7 @@ export async function issueProposalCredentialsIfNecessary({
           (issuedCredential) =>
             issuedCredential.credentialTemplateId === credentialTemplateId && issuedCredential.userId === author.userId
         ) &&
+        // Only credentials which match the event will have been returned by the query
         proposalWithSpaceConfig.space.credentialTemplates.some((t) => t.id === credentialTemplateId)
       ) {
         if (!credentialsToIssue[author.userId]) {
@@ -159,11 +142,12 @@ export async function issueProposalCredentialsIfNecessary({
         id: authorUserId
       },
       select: {
-        wallets: true
+        wallets: true,
+        primaryWallet: true
       }
     });
 
-    const targetWallet = author.wallets[0];
+    const targetWallet = author.primaryWallet ?? author.wallets[0];
 
     if (!targetWallet) {
       log.error(`User ${authorUserId} has no wallet to issue credentials to`, {
@@ -172,33 +156,37 @@ export async function issueProposalCredentialsIfNecessary({
         credentialsToIssue
       });
     } else {
-      for (const credentialTemplate of credentialsToGiveUser) {
-        // Iterate through credentials one at a time so we can ensure they're properly created and tracked
-        const publishedCredential = await signAndPublishCharmverseCredential({
-          chainId: optimism.id,
-          recipient: targetWallet.address,
-          credential: {
-            type: 'proposal',
-            data: {
-              name: credentialTemplate.name,
-              description: credentialTemplate.description ?? '',
-              organization: credentialTemplate.organization,
-              // TODO - Add label mapping
-              status: labels[event],
-              url: getPagePermalink({ pageId: proposalWithSpaceConfig.page.id })
+      try {
+        for (const credentialTemplate of credentialsToGiveUser) {
+          // Iterate through credentials one at a time so we can ensure they're properly created and tracked
+          const publishedCredential = await signAndPublishCharmverseCredential({
+            chainId: optimism.id,
+            recipient: targetWallet.address,
+            credential: {
+              type: 'proposal',
+              data: {
+                name: credentialTemplate.name,
+                description: credentialTemplate.description ?? '',
+                organization: credentialTemplate.organization,
+                // TODO - Add label mapping
+                status: labels[event],
+                url: getPagePermalink({ pageId: proposalWithSpaceConfig.page.id })
+              }
             }
-          }
-        });
+          });
 
-        await prisma.issuedCredential.create({
-          data: {
-            ceramicId: publishedCredential.id,
-            credentialEvent: event,
-            credentialTemplate: { connect: { id: credentialTemplate.id } },
-            proposal: { connect: { id: proposalId } },
-            user: { connect: { id: authorUserId } }
-          }
-        });
+          await prisma.issuedCredential.create({
+            data: {
+              ceramicId: publishedCredential.id,
+              credentialEvent: event,
+              credentialTemplate: { connect: { id: credentialTemplate.id } },
+              proposal: { connect: { id: proposalId } },
+              user: { connect: { id: authorUserId } }
+            }
+          });
+        }
+      } catch (e) {
+        log.error('Failed to issue credential', { proposalId, authorUserId, credentialsToGiveUser, error: e });
       }
     }
   }

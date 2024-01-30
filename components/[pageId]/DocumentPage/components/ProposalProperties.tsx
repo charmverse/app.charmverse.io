@@ -1,13 +1,11 @@
-import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import { Box } from '@mui/material';
 
-import { useGetIsReviewer, useUpdateProposal } from 'charmClient/hooks/proposals';
-import { useProposals } from 'components/proposals/hooks/useProposals';
+import { useUpdateProposal } from 'charmClient/hooks/proposals';
 import { useProposalTemplateById } from 'components/proposals/hooks/useProposalTemplates';
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { ProposalPropertiesBase } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useUser } from 'hooks/useUser';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { PageWithContent } from 'lib/pages';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 
@@ -15,14 +13,11 @@ interface ProposalPropertiesProps {
   readOnly?: boolean;
   pageId: string;
   proposalId: string;
-  pagePermissions?: PagePermissionFlags;
   proposalPage: PageWithContent;
   proposal?: ProposalWithUsersAndRubric;
   refreshProposal: VoidFunction;
 }
-
 export function ProposalProperties({
-  pagePermissions,
   pageId,
   proposalId,
   readOnly,
@@ -31,19 +26,15 @@ export function ProposalProperties({
   refreshProposal
 }: ProposalPropertiesProps) {
   const { trigger: updateProposal } = useUpdateProposal({ proposalId });
-  const { user } = useUser();
-
+  const { showError } = useSnackbar();
   const sourceTemplate = useProposalTemplateById(proposal?.page?.sourceTemplateId);
 
-  const { data: isReviewer } = useGetIsReviewer(pageId || undefined);
   const isAdmin = useIsAdmin();
 
   // further restrict readOnly if user cannot update proposal properties specifically
-  const readOnlyProperties = readOnly || !(pagePermissions?.edit_content || isAdmin);
+  const readOnlyProperties = readOnly || !proposal?.permissions.edit;
   const readOnlySelectedCredentialTemplates =
-    readOnly ||
-    !(pagePermissions?.edit_content || isAdmin) ||
-    (sourceTemplate?.selectedCredentialTemplates && !isAdmin);
+    readOnly || !proposal?.permissions.edit || (sourceTemplate?.selectedCredentialTemplates && !isAdmin);
 
   // properties with values from templates should be read only
   const readOnlyCustomProperties =
@@ -62,20 +53,18 @@ export function ProposalProperties({
     archived: proposal?.archived ?? false,
     authors: proposal?.authors.map((author) => author.userId) ?? [],
     evaluations: proposal?.evaluations ?? [],
-    publishToLens: proposal ? proposal.publishToLens ?? false : !!user?.publishToLensDefault,
-    reviewers:
-      proposal?.reviewers.map((reviewer) => ({
-        group: reviewer.roleId ? 'role' : 'user',
-        id: reviewer.roleId ?? (reviewer.userId as string)
-      })) ?? [],
     type: proposalPage.type,
     fields: typeof proposal?.fields === 'object' && !!proposal?.fields ? proposal.fields : { properties: {} },
     selectedCredentialTemplates: proposal?.selectedCredentialTemplates
   };
 
   async function onChangeProperties(values: Partial<ProposalPropertiesInput>) {
-    await updateProposal(values);
-    refreshProposal();
+    try {
+      await updateProposal(values);
+      refreshProposal();
+    } catch (error) {
+      showError(error);
+    }
   }
 
   return (
@@ -97,9 +86,9 @@ export function ProposalProperties({
           proposalFormInputs={proposalFormInputs}
           setProposalFormInputs={onChangeProperties}
           readOnlyCustomProperties={readOnlyCustomProperties}
-          isReviewer={isReviewer}
           rewardIds={proposal?.rewardIds}
           readOnlySelectedCredentialTemplates={readOnlySelectedCredentialTemplates}
+          isStructuredProposal={!!proposal?.formId}
         />
       </div>
     </Box>

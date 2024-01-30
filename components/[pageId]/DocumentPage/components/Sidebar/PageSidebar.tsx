@@ -5,12 +5,13 @@ import type { EditorState } from 'prosemirror-state';
 import { memo } from 'react';
 
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
+import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 
 import type { PageSidebarView } from '../../hooks/usePageSidebar';
 
-import { CommentsSidebar } from './components/CommentsSidebar';
+import { EditorCommentsSidebar, FormCommentsSidebar } from './components/CommentsSidebar';
 import { SuggestionsSidebar } from './components/SuggestionsSidebar';
 import { TogglePageSidebarButton } from './components/TogglePageButton';
 import { SIDEBAR_VIEWS } from './constants';
@@ -42,7 +43,12 @@ type SidebarProps = {
   // eslint-disable-next-line react/no-unused-prop-types
   closeSidebar: () => void;
   // eslint-disable-next-line react/no-unused-prop-types
+  proposalId?: string | null;
+  proposal?: Pick<ProposalPropertiesInput, 'formId' | 'fields' | 'evaluations' | 'workflowId'>;
+  // eslint-disable-next-line react/no-unused-prop-types
   disabledViews?: PageSidebarView[];
+  // eslint-disable-next-line react/no-unused-prop-types
+  pagePath?: string;
 };
 
 function PageSidebarComponent(props: SidebarProps) {
@@ -152,7 +158,8 @@ function SidebarContents({
   pagePermissions,
   editorState,
   threads,
-  openSidebar
+  openSidebar,
+  proposal
 }: SidebarProps) {
   return (
     <>
@@ -164,13 +171,21 @@ function SidebarContents({
           state={editorState}
         />
       )}
-      {sidebarView === 'comments' && (
-        <CommentsSidebar
-          openSidebar={openSidebar!}
-          threads={threads || {}}
-          canCreateComments={!!pagePermissions?.comment}
-        />
-      )}
+      {sidebarView === 'comments' &&
+        (proposal?.formId ? (
+          <FormCommentsSidebar
+            canCreateComments={!!proposal.permissions?.comment}
+            openSidebar={openSidebar!}
+            threads={threads}
+            formFields={proposal.form.formFields}
+          />
+        ) : (
+          <EditorCommentsSidebar
+            openSidebar={openSidebar!}
+            threads={threads}
+            canCreateComments={!!pagePermissions?.comment}
+          />
+        ))}
     </>
   );
 }

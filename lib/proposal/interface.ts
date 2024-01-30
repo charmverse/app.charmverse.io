@@ -33,12 +33,6 @@ export type ProposalEvaluationStatus =
 export type ProposalEvaluationStep = ProposalEvaluationType | 'rewards' | 'draft';
 export type ProposalEvaluationResultExtended = ProposalEvaluationResult | 'in_progress';
 
-export interface ProposalReviewerInput {
-  group: 'system_role' | 'role' | 'user';
-  id: string;
-  evaluationId?: string;
-}
-
 export type ProposalRubricData = {
   rubricCriteria: ProposalRubricCriteriaWithTypedParams[];
   rubricAnswers: ProposalRubricCriteriaAnswerWithTypedResponse[];
@@ -52,7 +46,12 @@ export type VoteSettings = Pick<Vote, 'type' | 'threshold' | 'maxChoices'> & {
 };
 
 export type ProposalPendingReward = { reward: UpdateableRewardFields; page: NewPageValues | null; draftId: string };
-export type ProposalFields = { properties?: ProposalPropertiesField; pendingRewards?: ProposalPendingReward[] };
+export type ProposalFields = {
+  properties?: ProposalPropertiesField;
+  pendingRewards?: ProposalPendingReward[];
+  rewardsTemplateId?: string; // require a particular template to be used for rewards
+  enableRewards?: boolean; // used by form templates to enable rewards for new proposals
+};
 type ProposalFormData = {
   form: {
     id: string;

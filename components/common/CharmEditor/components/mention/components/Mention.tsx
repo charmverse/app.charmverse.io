@@ -40,11 +40,16 @@ export default function Mention({ node }: NodeViewProps) {
   const member = getMemberById(attrs.value);
   const { roles } = useRoles();
   const { space } = useCurrentSpace();
+
   let value: ReactNode = null;
   if (attrs.type === 'page') {
     const page = pages[attrs.value];
+    const href =
+      page?.type === 'proposal_template'
+        ? `/${space?.domain}/proposals/new?template=${page.id}`
+        : `/${space?.domain}/${page?.path}`;
     value = page ? (
-      <MentionContainer color='inherit' href={`/${space?.domain}/${page.path}`}>
+      <MentionContainer color='inherit' href={href}>
         <Box display='flex' alignItems='center'>
           <PageIcon isLinkedPage icon={page.icon} isEditorEmpty={!page.hasContent} pageType={page.type} />
           <StyledTypography>{page.title || 'Untitled'}</StyledTypography>

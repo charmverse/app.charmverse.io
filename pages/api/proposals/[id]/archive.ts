@@ -1,12 +1,12 @@
-import { UnauthorisedActionError } from '@charmverse/core/errors';
+import { UnauthorisedActionError, InvalidInputError } from '@charmverse/core/errors';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';
-import { archiveProposal } from 'lib/proposal/archiveProposal';
+import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposals';
+import { archiveProposals } from 'lib/proposal/archiveProposals';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -24,15 +24,18 @@ async function archiveProposalController(req: NextApiRequest, res: NextApiRespon
     userId
   });
 
+  if (typeof archived !== 'boolean') {
+    throw new InvalidInputError(`Property "archived" must be true or false`);
+  }
   if (archived === true && !permissions.archive) {
     throw new UnauthorisedActionError(`You cannot archive this proposal`);
   } else if (archived === false && !permissions.unarchive) {
     throw new UnauthorisedActionError(`You cannot unarchive this proposal`);
   }
 
-  await archiveProposal({
+  await archiveProposals({
     archived,
-    proposalId,
+    proposalIds: [proposalId],
     actorId: userId
   });
 

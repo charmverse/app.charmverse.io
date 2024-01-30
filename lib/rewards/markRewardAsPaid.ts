@@ -14,12 +14,13 @@ export async function markRewardAsPaid(rewardId: string): Promise<RewardWithUser
     throw new InvalidInputError('All applications need to be either completed or paid in order to mark reward as paid');
   }
 
-  const completedApplications = reward.applications.filter((app) => app.status === 'complete');
-
   await prisma.application.updateMany({
     where: {
       id: {
-        in: completedApplications.map((completedApplication) => completedApplication.id)
+        // Keep the status of the rejected applications as is
+        in: reward.applications
+          .filter((application) => application.status !== 'rejected' && application.status !== 'submission_rejected')
+          .map((application) => application.id)
       }
     },
     data: {

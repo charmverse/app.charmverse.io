@@ -32,15 +32,10 @@ beforeAll(async () => {
     authors: [secondProposalAuthor.id],
     proposalStatus: 'draft',
     spaceId: space.id,
-    userId: originalProposalAuthor.id,
-    reviewers: [
-      {
-        group: 'user',
-        id: proposalReviewer.id
-      }
-    ]
+    userId: originalProposalAuthor.id
   });
 });
+
 describe('isProposalAuthor', () => {
   it('should return true if proposal.createdBy matches the user id', () => {
     const isAuthor = isProposalAuthor({

@@ -67,6 +67,7 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   pageType?: PageType | 'post';
   postId?: string;
   threadIds?: string[];
+  registerView?: (view: EditorView) => void;
 }
 
 const warningText = 'You have unsaved changes. Please confirm changes.';
@@ -95,7 +96,8 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     allowClickingFooter,
     pageType,
     postId,
-    threadIds
+    threadIds,
+    registerView
   },
   ref
 ) {
@@ -284,6 +286,9 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     }
     (_editor.view as any)._updatePluginWatcher = updatePluginWatcher(_editor);
     setEditor(_editor);
+    if (registerView) {
+      registerView(_editor.view);
+    }
     return () => {
       fEditor?.close();
       _editor.destroy();

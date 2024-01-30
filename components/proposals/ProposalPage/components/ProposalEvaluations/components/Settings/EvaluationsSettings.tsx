@@ -1,5 +1,5 @@
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
-import { Collapse } from '@mui/material';
+import { Box, Chip, Collapse, Stack, Switch } from '@mui/material';
 
 import { useProposalTemplateById } from 'components/proposals/hooks/useProposalTemplates';
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/ProposalEvaluations/components/Settings/components/EvaluationStepSettings';
@@ -11,32 +11,40 @@ import { WorkflowSelect } from '../../../WorkflowSelect';
 import { EvaluationStepRow } from '../Review/components/EvaluationStepRow';
 
 import { EvaluationStepSettings } from './components/EvaluationStepSettings';
+import type { RewardSettingsProps } from './components/RewardSettings';
+import { RewardSettings } from './components/RewardSettings';
 
 export type Props = {
   proposal?: Pick<ProposalPropertiesInput, 'fields' | 'evaluations' | 'workflowId'>;
+  isTemplate?: boolean;
   onChangeEvaluation?: (evaluationId: string, updated: Partial<ProposalEvaluationValues>) => void;
   readOnly: boolean;
   isReviewer: boolean;
   onChangeWorkflow: (workflow: ProposalWorkflowTyped) => void;
+  onChangeRewardSettings?: RewardSettingsProps['onChange'];
   templateId?: string | null;
+  isStructuredProposal: boolean;
   requireWorkflowChangeConfirmation?: boolean;
   expanded: boolean;
 };
 
 export function EvaluationsSettings({
   proposal,
+  isTemplate,
   onChangeEvaluation,
   readOnly,
   onChangeWorkflow,
+  onChangeRewardSettings,
   isReviewer,
   templateId,
   requireWorkflowChangeConfirmation,
-  expanded: expandedContainer
+  expanded: expandedContainer,
+  isStructuredProposal
 }: Props) {
   const proposalTemplate = useProposalTemplateById(templateId);
-  const pendingRewards = proposal?.fields?.pendingRewards;
   const { mappedFeatures } = useSpaceFeatures();
   const isAdmin = useIsAdmin();
+
   return (
     <div data-test='evaluation-settings-sidebar'>
       <Collapse in={expandedContainer}>
@@ -61,36 +69,44 @@ export function EvaluationsSettings({
             // find matching template step, and allow editing if there were no reviewers set
             const matchingTemplateStep = proposalTemplate?.evaluations?.find((e) => e.title === evaluation.title);
             return (
-              <EvaluationStepRow
-                key={evaluation.id}
-                expanded={expandedContainer}
-                expandedContainer={expandedContainer}
-                result={null}
-                index={index + 1}
-                title={evaluation.title}
-              >
-                {/* <Divider sx={{ my: 1 }} /> */}
-                {evaluation.type !== 'feedback' && (
-                  <EvaluationStepSettings
-                    evaluation={evaluation}
-                    evaluationTemplate={matchingTemplateStep}
-                    isReviewer={isReviewer}
-                    readOnly={readOnly}
-                    onChange={(updated) => {
-                      onChangeEvaluation?.(evaluation.id, updated);
-                    }}
-                  />
-                )}
+              <EvaluationStepRow key={evaluation.id} expanded result={null} index={index + 1} title={evaluation.title}>
+                <EvaluationStepSettings
+                  evaluation={evaluation}
+                  evaluationTemplate={matchingTemplateStep}
+                  isReviewer={isReviewer}
+                  readOnly={readOnly}
+                  onChange={(updated) => {
+                    onChangeEvaluation?.(evaluation.id, updated);
+                  }}
+                />
               </EvaluationStepRow>
             );
           })}
-          {!!pendingRewards?.length && (
-            <EvaluationStepRow
-              expandedContainer={expandedContainer}
-              index={proposal ? proposal.evaluations.length + 1 : 0}
-              result={null}
-              title={mappedFeatures.rewards.title}
-            />
+          {/* reward settings */}
+          {isTemplate && onChangeRewardSettings && (
+            <Box mb={8}>
+              <EvaluationStepRow
+                index={proposal ? proposal.evaluations.length + 1 : 0}
+                result={null}
+                title={mappedFeatures.rewards.title}
+                expanded
+                actions={
+                  isStructuredProposal && (
+                    <Stack direction='row' alignItems='center' gap={1}>
+                      {!proposal.fields?.enableRewards && <Chip label='Disabled' size='small' />}
+                      <Switch
+                        checked={proposal.fields?.enableRewards}
+                        onChange={(e, checked) => onChangeRewardSettings({ enableRewards: checked })}
+                      />
+                    </Stack>
+                  )
+                }
+              >
+                {(proposal.fields?.enableRewards || !isStructuredProposal) && (
+                  <RewardSettings value={proposal.fields} onChange={onChangeRewardSettings} />
+                )}
+              </EvaluationStepRow>
+            </Box>
           )}
         </>
       )}

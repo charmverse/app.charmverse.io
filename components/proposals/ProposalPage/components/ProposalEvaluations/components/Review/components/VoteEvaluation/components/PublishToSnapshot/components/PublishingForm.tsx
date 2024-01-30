@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { Typography } from '@mui/material';
+import { ButtonGroupButtonContext, Typography } from '@mui/material';
 import type { AlertColor } from '@mui/material/Alert';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
@@ -16,11 +16,11 @@ import { getAddress } from 'viem';
 import charmClient from 'charmClient';
 import { useUpdateSnapshotProposal } from 'charmClient/hooks/proposals';
 import { OpenWalletSelectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/OpenWalletSelectorButton';
+import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import InputEnumToOption from 'components/common/form/InputEnumToOptions';
 import InputGeneratorText from 'components/common/form/InputGeneratorText';
 import { LoadingIcon } from 'components/common/LoadingComponent';
-import PrimaryButton from 'components/common/PrimaryButton';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
@@ -40,8 +40,9 @@ import { InputVotingStrategies } from './InputVotingStrategies';
 interface Props {
   onSubmit: () => void;
   pageId: string;
-  proposalId?: string;
-  evaluationId?: string;
+  proposalId: string;
+  evaluationId: string;
+  durationDays?: number;
 }
 
 const MAX_SNAPSHOT_PROPOSAL_CHARACTERS = 20000;
@@ -70,9 +71,7 @@ export function PublishingForm({ onSubmit, pageId, proposalId, evaluationId }: P
 
   // Form data
   const [startDate, setStartDate] = useState<DateTime>(DateTime.fromMillis(Date.now()).plus({ hour: 1 }));
-  const [endDate, setEndDate] = useState<DateTime>(
-    DateTime.fromMillis(startDate.toMillis()).plus({ days: space?.defaultVotingDuration ?? 7 })
-  );
+  const [endDate, setEndDate] = useState<DateTime>(DateTime.fromMillis(startDate.toMillis()).plus({ days: 7 }));
   const [selectedVotingStrategies, setSelectedVotingStrategies] = useState<SnapshotVotingStrategy[]>([]);
   const [snapshotBlockNumber, setSnapshotBlockNumber] = useState<number | null>(null);
   const [snapshotVoteMode, setSnapshotVoteMode] = useState<ProposalType>('single-choice');
@@ -214,7 +213,6 @@ export function PublishingForm({ onSubmit, pageId, proposalId, evaluationId }: P
         content: pageWithDetails.content,
         generatorOptions: { members }
       });
-
       if (!account || !web3Provider) {
         throw new MissingWeb3AccountError();
       }
@@ -250,15 +248,13 @@ export function PublishingForm({ onSubmit, pageId, proposalId, evaluationId }: P
         const timestampWithVotingDelay = start - snapshotSpace.voting.delay;
         proposalParams.timestamp = timestampWithVotingDelay;
       }
-
       const receipt: SnapshotReceipt = (await client.proposal(
         web3Provider,
         getAddress(account as string),
         proposalParams
       )) as SnapshotReceipt;
-
       if (evaluationId) {
-        updateProposalEvaluation({
+        await updateProposalEvaluation({
           evaluationId,
           snapshotProposalId: receipt.id
         });
@@ -463,8 +459,8 @@ export function PublishingForm({ onSubmit, pageId, proposalId, evaluationId }: P
               </Grid>
             )}
 
-            <Grid item display='flex' justifyContent='space-between'>
-              <PrimaryButton onClick={publish} disabled={!formValid() || publishing} type='submit'>
+            <Grid item display='flex' justifyContent='flex-end'>
+              <Button onClick={publish} disabled={!formValid() || publishing} type='submit'>
                 {publishing ? (
                   <>
                     <LoadingIcon size={18} sx={{ mr: 1 }} />
@@ -473,7 +469,7 @@ export function PublishingForm({ onSubmit, pageId, proposalId, evaluationId }: P
                 ) : (
                   'Publish to Snapshot'
                 )}
-              </PrimaryButton>
+              </Button>
             </Grid>
           </Grid>
         </form>

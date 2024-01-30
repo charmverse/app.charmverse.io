@@ -1,5 +1,5 @@
+import { useGetCredentialTemplates } from 'charmClient/hooks/credentialHooks';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
-import { useGetCredentialTemplates } from 'components/settings/credentials/hooks/credentialHooks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { IPropertyOption } from 'lib/focalboard/board';
 
@@ -34,6 +34,7 @@ export function CredentialSelect({ onChange, selectedCredentialTemplates, readOn
       propertyValue={selectedCredentialTemplates as any}
       canEditOptions={false}
       multiselect
+      showEmpty
       readOnly={readOnly}
       readOnlyMessage='You cannot add a credential'
       noOptionsText='No credentials found'

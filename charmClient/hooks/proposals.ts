@@ -88,7 +88,7 @@ export function useUpsertDraftRubricCriteriaAnswers({ proposalId }: { proposalId
 }
 
 export function useDeleteRubricCriteriaAnswers({ proposalId }: { proposalId: MaybeString }) {
-  return useDELETE<{ isDraft: boolean; evaluationId?: string }>(`/api/proposals/${proposalId}/rubric-answers`);
+  return useDELETE<{ isDraft: boolean; evaluationId: string }>(`/api/proposals/${proposalId}/rubric-answers`);
 }
 
 export function useUpdateProposalLensProperties({ proposalId }: { proposalId: string }) {
@@ -135,4 +135,8 @@ export function useUpdateWorkflow({ proposalId }: { proposalId: MaybeString }) {
 
 export function useArchiveProposal({ proposalId }: { proposalId: MaybeString }) {
   return usePOST<{ archived: boolean }>(`/api/proposals/${proposalId}/archive`);
+}
+
+export function useArchiveProposals() {
+  return usePOST<{ archived: boolean; proposalIds: string[] }>(`/api/proposals/archive`);
 }
