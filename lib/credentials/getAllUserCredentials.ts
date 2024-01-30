@@ -42,7 +42,7 @@ export async function getAllUserCredentials({ userId }: { userId: string }): Pro
       log.error(`Error loading Gitcoin credentials for user ${userId}`, { error, userId });
       return [];
     }),
-    getAllOnChainAttestations({ wallets })
+    getAllOnChainAttestations({ wallets: testWallets })
   ]).then((data) => data.flat());
 
   return allCredentials;

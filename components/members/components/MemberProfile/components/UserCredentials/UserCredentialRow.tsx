@@ -7,6 +7,7 @@ import Link from 'components/common/Link';
 import type { EASAttestationFromApi } from 'lib/credentials/external/getExternalCredentials';
 import type { TrackedSchemaParams } from 'lib/credentials/external/schemas';
 import { trackedSchemas } from 'lib/credentials/external/schemas';
+import { isTruthy } from 'lib/utilities/types';
 
 export function UserCredentialRow({ credential }: { credential: EASAttestationFromApi }) {
   const schemaInfo = credential.chainId
@@ -35,12 +36,22 @@ export function UserCredentialRow({ credential }: { credential: EASAttestationFr
           title: schemaInfo?.title ?? '',
           subtitle: schemaInfo?.organization ?? '',
           iconUrl: schemaInfo?.iconUrl ?? '',
-          attestationContent: (schemaInfo?.fields ?? []).map((fieldDef) => ({
-            name: fieldDef.name,
-            value: fieldDef.mapper
-              ? fieldDef.mapper(credential.content[fieldDef.name])
-              : credential.content[fieldDef.name]
-          }))
+          attestationContent: (schemaInfo?.fields ?? [])
+            .map((fieldDef) => {
+              const value = fieldDef.mapper
+                ? fieldDef.mapper(credential.content[fieldDef.name])
+                : credential.content[fieldDef.name];
+
+              if (!value) {
+                return null;
+              }
+
+              return {
+                name: fieldDef.name,
+                value
+              };
+            })
+            .filter(isTruthy)
         };
 
   return (

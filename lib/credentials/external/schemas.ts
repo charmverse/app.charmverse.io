@@ -16,12 +16,13 @@ export type TrackedSchemaParams = {
   iconUrl: string;
   // Some schemas have unfriendly schema keys or values that aren't useful by themselves.
   // For simplicity, we render only the value, but can optionally tweak the rendered value if required
-  fields?: { name: string; mapper?: (val: any) => string }[];
+  fields?: { name: string; mapper?: (val: any) => string | undefined }[];
 };
 
 const baseLogo = '/images/cryptoLogos/base-logo.svg';
 const optimismLogo = '/images/cryptoLogos/optimism.svg';
 const devfolioLogo = '/images/logos/devfolio.png';
+const gitcoinPassportLogo = `/images/logos/Gitcoin_Passport_Logomark_SeaFoam.svg`;
 
 // Optimism schemas ------------------
 // https://optimism.easscan.org/schema/view/0xfdcfdad2dbe7489e0ce56b260348b7f14e8365a8a325aef9834818c00d46b31b
@@ -45,6 +46,21 @@ const optimismRetroPgfContributionSchema: TrackedSchemaParams = {
     { name: 'Rpgf_Round', mapper: (val) => `Round ${val}` },
     {
       name: 'RetroPGF_Contribution'
+    }
+  ]
+};
+
+// https://optimism.easscan.org/schema/view/0xd7b8c4ffa4c9fd1ecb3f6db8201e916a8d7dba11f161c1b0b5ccf44ceb8e2a39
+const optimismGitcoinPassportSchema: TrackedSchemaParams = {
+  schemaId: '0xd7b8c4ffa4c9fd1ecb3f6db8201e916a8d7dba11f161c1b0b5ccf44ceb8e2a39',
+  issuers: ['0x843829986e895facd330486a61Ebee9E1f1adB1a'],
+  title: 'Gitcoin Passport',
+  organization: 'Gitcoin',
+  iconUrl: gitcoinPassportLogo,
+  fields: [
+    {
+      name: 'passport_score',
+      mapper: (val) => (val ? `Passport Score: ${val}` : undefined)
     }
   ]
 };
@@ -87,7 +103,7 @@ const arbitrumDevfolioOnchainCredentialAttestationSchema: TrackedSchemaParams = 
 // };
 
 export const trackedSchemas: Record<ExternalCredentialChain, TrackedSchemaParams[]> = {
-  [optimism.id]: [optimismRetroPgfBadgeHolderSchema, optimismRetroPgfContributionSchema],
+  [optimism.id]: [optimismRetroPgfBadgeHolderSchema, optimismRetroPgfContributionSchema, optimismGitcoinPassportSchema],
   [base.id]: [baseVerifiedAccountSchema],
   [arbitrum.id]: [arbitrumDevfolioQuadraticVotingAttestationSchema, arbitrumDevfolioOnchainCredentialAttestationSchema]
 };

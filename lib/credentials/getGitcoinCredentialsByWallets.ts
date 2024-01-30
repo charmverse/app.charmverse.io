@@ -142,19 +142,16 @@ export async function getGitcoinCredentialsByWallets({
     const mappedData: EASAttestationFromApi = {
       id: stamp.metadata.platform.id, // This is not the stamp id, the api doesn't return the stamp id
       content: {
-        title: 'Gitcoin Passport',
-        organization: 'Gitcoin',
-        fields: gitcoinPassportScore ? [{ name: 'passport_score' }] : [],
-        passport_score: gitcoinPassportScore ? `Passport Score: ${gitcoinPassportScore.evidence.rawScore}` : null
+        passport_score: gitcoinPassportScore ? gitcoinPassportScore.evidence.rawScore : null
       },
-      attester: stamp.credential.issuer, // This is in did:key:{publicKey} format not a address
+      attester: '0x843829986e895facd330486a61Ebee9E1f1adB1a', // This is in did:key:{publicKey} format not a address
       recipient: stamp.recipient,
       schemaId: '0xd7b8c4ffa4c9fd1ecb3f6db8201e916a8d7dba11f161c1b0b5ccf44ceb8e2a39', // Optimism attestation schema id: https://docs.passport.gitcoin.co/building-with-passport/smart-contracts/contract-reference#eas-schema,
       timeCreated: new Date(stamp.credential.issuanceDate).getTime(),
-      chainId: null, // Optimism or Linea chain id
+      chainId: 10, // Optimism or Linea chain id
       type: 'external',
       verificationUrl: null,
-      iconUrl: `/images/logos/Gitcoin_Passport_Logomark_SeaFoam.svg`
+      iconUrl: null
     };
 
     return mappedData;
