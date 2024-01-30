@@ -5,17 +5,23 @@ import { MenuItem, ListItemIcon, ListItemText } from '@mui/material';
 import { useUpdateSpace } from 'charmClient/hooks/spaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useSnackbar } from 'hooks/useSnackbar';
 
 export function SetAsHomePageAction({ pageId, onComplete }: { pageId: string; onComplete: VoidFunction }) {
-  const { space } = useCurrentSpace();
+  const { space, refreshCurrentSpace } = useCurrentSpace();
   const isAdmin = useIsAdmin();
   const { trigger: updateSpace } = useUpdateSpace(space?.id);
   const isHomePage = space?.homePageId === pageId;
+  const { showMessage, showError } = useSnackbar();
 
   function onClick() {
-    updateSpace({ homePageId: isHomePage ? null : pageId }).then(() => {
-      onComplete();
-    });
+    updateSpace({ homePageId: isHomePage ? null : pageId })
+      .then(() => {
+        onComplete();
+        refreshCurrentSpace();
+        showMessage(isHomePage ? 'Home page unset' : 'Home page set');
+      })
+      .catch((error) => showError(error));
   }
   if (!isAdmin) {
     return null;

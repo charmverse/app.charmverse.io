@@ -25,7 +25,7 @@ export async function getDefaultPageForSpace({
   host,
   userId
 }: {
-  space: Pick<Space, 'id' | 'domain' | 'customDomain'>;
+  space: Pick<Space, 'id' | 'domain' | 'customDomain' | 'homePageId'>;
   host?: string;
   userId: string;
 }) {
@@ -41,14 +41,15 @@ async function getDefaultPageForSpaceRaw({
   host,
   userId
 }: {
-  space: Pick<Space, 'id' | 'domain' | 'customDomain'>;
+  space: Pick<Space, 'id' | 'domain' | 'customDomain' | 'homePageId'>;
   host?: string;
   userId: string;
 }) {
   const { id: spaceId } = space;
   const lastPageView = await getLastPageView({ userId, spaceId });
   const defaultSpaceUrl = getSpaceUrl(space, host);
-  if (lastPageView) {
+
+  if (lastPageView && !space.homePageId) {
     // grab the original path a user was on to include query params like filters, etc.
     const pathname = (lastPageView.meta as ViewMeta)?.pathname;
     const fullPathname = pathname && getSubdomainPath(pathname, space, host);
@@ -114,17 +115,8 @@ async function getDefaultPageForSpaceRaw({
   // TODO: simplify types of sortNodes input to only be index and createdAt
   const sortedPages = pageTree.sortNodes(pagesToLookup as PageMeta[]);
 
-  const { homePageId } = await prisma.space.findUniqueOrThrow({
-    where: {
-      id: spaceId
-    },
-    select: {
-      homePageId: true
-    }
-  });
-
   const firstPage = sortedPages[0];
-  const homePage = homePageId && pageMap[homePageId];
+  const homePage = space.homePageId && pageMap[space.homePageId];
   if (homePage) {
     return `${defaultSpaceUrl}/${homePage.path}`;
   } else if (firstPage) {
