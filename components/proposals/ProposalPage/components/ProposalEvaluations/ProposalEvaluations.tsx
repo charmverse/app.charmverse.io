@@ -13,11 +13,14 @@ export type ProposalEvaluationsProps = {
   proposalInput?: ProposalSettingsProps['proposal'];
   onChangeEvaluation: ProposalSettingsProps['onChangeEvaluation'];
   onChangeWorkflow: ProposalSettingsProps['onChangeWorkflow'];
+  onChangeRewardSettings?: ProposalSettingsProps['onChangeRewardSettings'];
   refreshProposal?: VoidFunction;
   isReviewer?: boolean; // TODO: we need to know the reviewer for each step instead
   pagePath?: string;
   pageTitle?: string;
   templateId?: string | null;
+  isProposalTemplate: boolean;
+  isStructuredProposal: boolean;
   expanded?: boolean;
 };
 
@@ -29,12 +32,15 @@ export function ProposalEvaluations({
   proposalInput,
   onChangeEvaluation,
   onChangeWorkflow,
+  onChangeRewardSettings,
   refreshProposal,
   isReviewer,
   pagePath,
   pageTitle,
   isUnpublishedProposal,
   templateId,
+  isProposalTemplate,
+  isStructuredProposal,
   expanded = true
 }: ProposalEvaluationsProps) {
   if (isUnpublishedProposal) {
@@ -49,6 +55,9 @@ export function ProposalEvaluations({
         isReviewer={!!isReviewer}
         requireWorkflowChangeConfirmation={isNotNewProposal}
         expanded={expanded}
+        isTemplate={isProposalTemplate}
+        onChangeRewardSettings={onChangeRewardSettings}
+        isStructuredProposal={!!isStructuredProposal}
       />
     );
   } else {

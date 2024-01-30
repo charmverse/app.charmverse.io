@@ -164,21 +164,14 @@ test.describe.serial('Structured proposal template', () => {
 
     await expect(formField.addNewFormFieldButton).toBeVisible();
 
-    // Should be disabled as there are no changes
-    await expect(formField.formFieldsSaveButton).toBeDisabled();
-
     await formField.toggleFormFieldButton.nth(0).click();
 
     // Rename first field
     await formField.getFormFieldNameInput().fill('Full name');
 
-    await expect(formField.formFieldsSaveButton).toBeEnabled();
-
     await formField.addNewFormFieldButton.click();
 
     await formField.getFormFieldNameInput(1).fill('Surname');
-
-    await formField.formFieldsSaveButton.click();
 
     await proposalPage.page.waitForTimeout(500);
 
