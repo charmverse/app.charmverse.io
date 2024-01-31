@@ -383,6 +383,7 @@ export function NewProposalPage({
                       readOnlyCustomProperties={readOnlyCustomProperties}
                       readOnlySelectedCredentialTemplates={readOnlySelectedCredentialTemplates}
                       isStructuredProposal={isStructured}
+                      isProposalTemplate={!!isTemplate}
                     />
                   </div>
                 </div>
@@ -477,6 +478,7 @@ export function NewProposalPage({
                     reviewers={formInputs.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat()}
                     assignedSubmitters={formInputs.authors}
                     variant='solid_button'
+                    isProposalTemplate={isTemplate}
                     rewardIds={[]}
                     onSave={(pendingReward) => {
                       const isExisting = pendingRewards.find((reward) => reward.draftId === pendingReward.draftId);

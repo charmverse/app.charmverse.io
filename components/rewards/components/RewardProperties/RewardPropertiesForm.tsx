@@ -46,6 +46,7 @@ type Props = {
   readOnlyTemplate?: boolean;
   forcedApplicationType?: RewardApplicationType;
   rewardStatus?: BountyStatus | null;
+  isProposalTemplate?: boolean;
 };
 
 const getApplicationType = (values: UpdateableRewardFields, forcedApplicationType?: RewardApplicationType) => {
@@ -75,11 +76,13 @@ export function RewardPropertiesForm({
   templateId,
   readOnlyTemplate,
   forcedApplicationType,
-  rewardStatus
+  rewardStatus,
+  isProposalTemplate
 }: Props) {
   const [rewardApplicationType, setRewardApplicationTypeRaw] = useState<RewardApplicationType>(() =>
     getApplicationType(values, forcedApplicationType)
   );
+
   const { getFeatureTitle } = useSpaceFeatures();
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(!!expandedByDefault);
@@ -295,13 +298,12 @@ export function RewardPropertiesForm({
                 open={isDateTimePickerOpen}
               />
             </Box>
-
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
               <PropertyLabel readOnly highlighted>
                 Application Type
               </PropertyLabel>
               <RewardApplicationType
-                readOnly={readOnly || !!forcedApplicationType}
+                readOnly={readOnly || !!forcedApplicationType || isProposalTemplate}
                 value={rewardApplicationType}
                 onChange={setRewardApplicationType}
               />
@@ -390,7 +392,7 @@ export function RewardPropertiesForm({
             )}
 
             {/* Select authors */}
-            {isAssignedReward && (
+            {isAssignedReward && !isProposalTemplate && (
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
                 <PropertyLabel readOnly required={!isTemplate && !readOnly} highlighted>
                   Assigned applicants

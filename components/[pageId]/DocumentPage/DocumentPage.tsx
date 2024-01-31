@@ -412,6 +412,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
                     proposalPage={page}
                     proposal={proposal}
                     refreshProposal={refreshProposal}
+                    isProposalTemplate={page.type === 'proposal_template'}
                   />
                 )}
                 {reward && (

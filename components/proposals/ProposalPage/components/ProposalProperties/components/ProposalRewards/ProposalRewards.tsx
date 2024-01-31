@@ -34,6 +34,7 @@ type Props = {
   assignedSubmitters: string[];
   requiredTemplateId?: string | null;
   variant?: 'solid_button' | 'card_property'; // solid_button is used for form proposals
+  isProposalTemplate?: boolean;
 };
 
 const rewardQueryKey = 'rewardId';
@@ -47,7 +48,8 @@ export function ProposalRewards({
   reviewers,
   assignedSubmitters,
   requiredTemplateId,
-  variant
+  variant,
+  isProposalTemplate
 }: Props) {
   useRewardsNavigation(rewardQueryKey);
 
@@ -298,6 +300,7 @@ export function ProposalRewards({
             templateId={newPageValues?.templateId}
             readOnlyTemplate={!!requiredTemplateId}
             selectTemplate={selectTemplate}
+            isProposalTemplate={isProposalTemplate}
           />
         </NewDocumentPage>
       </NewPageDialog>
