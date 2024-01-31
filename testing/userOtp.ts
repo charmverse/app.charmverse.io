@@ -32,7 +32,7 @@ export async function updateTestUserOtp(userId: string, data: Partial<Otp>) {
 
 export async function createTestUserOtp(userId: string) {
   const otp = createOtp({ username: 'Test user' } as User);
-  const recoveryCode = createRecoveryCode();
+  const recoveryCode = await createRecoveryCode();
 
   const recoveryCodePrisma = await prisma.recoveryCode.create({
     data: {
@@ -51,7 +51,7 @@ export async function createTestUserOtp(userId: string) {
     }
   });
 
-  return userOtp;
+  return { otp: userOtp, backupCode: recoveryCode.otp };
 }
 
 export function generateTestOtpToken(label: string, secret: string, decrypted?: boolean) {
