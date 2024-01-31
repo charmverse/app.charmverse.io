@@ -3,12 +3,13 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { generateCharmWallet } from 'lib/charms/generateCharmWallet';
 
-export async function getUserOrSpaceWallet(
-  params: ({ userId: string } | { spaceId: string }) & { readOnly?: boolean }
-): Promise<CharmWallet | null> {
+export async function getUserOrSpaceWallet({
+  readOnly,
+  ...params
+}: ({ userId: string } | { spaceId: string }) & { readOnly?: boolean }): Promise<CharmWallet | null> {
   const wallet = await prisma.charmWallet.findUnique({ where: { ...params } });
 
-  if (!wallet && !params.readOnly) {
+  if (!wallet && !readOnly) {
     return generateCharmWallet(params);
   }
 

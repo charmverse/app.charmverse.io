@@ -1,14 +1,10 @@
 import type { Space, User } from '@charmverse/core/prisma';
-import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
-import { v4 } from 'uuid';
 
 import { addCharms } from 'lib/charms/addCharms';
 import type { CharmTxResult } from 'lib/charms/addCharmTransaction';
-import { getUserOrSpaceWallet } from 'lib/charms/getUserOrSpaceWallet';
-import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
+import { generateUserAndSpace } from 'testing/setupDatabase';
 
 let space: Space;
 let user: User;
