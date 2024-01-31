@@ -19,7 +19,7 @@ function UserFavoriteList({
   mutateUserCredentials?: KeyedMutator<EASAttestationWithFavorite[]>;
 }) {
   return (
-    <Stack>
+    <Stack gap={1}>
       <Typography variant='h6' fontWeight='bold'>
         Favorites
       </Typography>

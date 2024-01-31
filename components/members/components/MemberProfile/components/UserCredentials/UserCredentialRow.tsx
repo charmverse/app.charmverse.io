@@ -1,7 +1,7 @@
 import LaunchIcon from '@mui/icons-material/Launch';
 import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
 import StarOutlinedIcon from '@mui/icons-material/StarOutlined';
-import { Chip, Grid, IconButton, Stack, Typography } from '@mui/material';
+import { Chip, Grid, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Image from 'next/image';
 import type { KeyedMutator } from 'swr';
@@ -19,13 +19,15 @@ import { lowerCaseEqual } from 'lib/utilities/strings';
 
 export function UserCredentialRow({
   credential,
-  mutateUserCredentials
+  mutateUserCredentials,
+  totalFavorites = 0
 }: {
   credential: EASAttestationFromApi & {
     favorite?: boolean;
     index: number;
   };
   mutateUserCredentials?: KeyedMutator<EASAttestationWithFavorite[]>;
+  totalFavorites?: number;
 }) {
   const { trigger: favoriteCredential, isMutating } = useFavoriteCredential();
   const { showMessage } = useSnackbar();
@@ -101,6 +103,8 @@ export function UserCredentialRow({
     return null;
   }
 
+  const isDisabled = isMutating || totalFavorites >= 5;
+
   return (
     <Grid container display='flex' alignItems='center' justifyContent='space-between'>
       <Grid item xs={5}>
@@ -123,13 +127,25 @@ export function UserCredentialRow({
       </Grid>
       {isUserRecipient && (
         <Grid item xs={1} display='flex' justifyContent='flex-end'>
-          <IconButton size='small' onClick={toggleFavorite} disabled={isMutating}>
-            {!credential.favorite ? (
-              <StarBorderOutlinedIcon color='primary' fontSize='small' sx={{ alignSelf: 'center' }} />
-            ) : (
-              <StarOutlinedIcon color='primary' fontSize='small' sx={{ alignSelf: 'center' }} />
-            )}
-          </IconButton>
+          <Tooltip title={totalFavorites >= 5 ? 'You can only favorite 5 credentials' : 'Favorite'}>
+            <div>
+              <IconButton size='small' onClick={toggleFavorite} disabled={isDisabled}>
+                {!credential.favorite ? (
+                  <StarBorderOutlinedIcon
+                    color={isDisabled ? 'disabled' : 'primary'}
+                    fontSize='small'
+                    sx={{ alignSelf: 'center' }}
+                  />
+                ) : (
+                  <StarOutlinedIcon
+                    color={isDisabled ? 'disabled' : 'primary'}
+                    fontSize='small'
+                    sx={{ alignSelf: 'center' }}
+                  />
+                )}
+              </IconButton>
+            </div>
+          </Tooltip>
         </Grid>
       )}
       <Grid item xs={1} display='flex' justifyContent='flex-end' pr={2}>
