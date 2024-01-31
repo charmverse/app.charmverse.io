@@ -176,7 +176,8 @@ export async function getCharmverseCredentialsByWallets({
     },
     select: {
       index: true,
-      issuedCredentialId: true
+      issuedCredentialId: true,
+      id: true
     }
   });
 
@@ -189,7 +190,7 @@ export async function getCharmverseCredentialsByWallets({
       return {
         ...credential,
         iconUrl,
-        favorite: true,
+        favoriteCredentialId: favoriteCredential.id,
         index: favoriteCredential.index,
         issuedCredentialId: issuedCredential?.id
       };
@@ -198,7 +199,7 @@ export async function getCharmverseCredentialsByWallets({
     return {
       ...credential,
       iconUrl,
-      favorite: false,
+      favoriteCredentialId: null,
       index: -1,
       issuedCredentialId: issuedCredential?.id
     };

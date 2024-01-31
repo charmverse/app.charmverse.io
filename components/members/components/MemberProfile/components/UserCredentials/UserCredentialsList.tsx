@@ -2,23 +2,25 @@ import StarOutlinedIcon from '@mui/icons-material/StarOutlined';
 import MedalIcon from '@mui/icons-material/WorkspacePremium';
 import { Alert, Box, Card, Divider, Typography } from '@mui/material';
 import Stack from '@mui/material/Stack';
-import type { KeyedMutator } from 'swr';
 
-import { useGetUserCredentials } from 'charmClient/hooks/credentialHooks';
+import { useGetUserCredentials } from 'charmClient/hooks/credentials';
+import { DraggableListItem } from 'components/common/DraggableListItem';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { useFavoriteCredentials } from 'hooks/useFavoriteCredentials';
 import type { EASAttestationWithFavorite } from 'lib/credentials/external/getExternalCredentials';
 
 import { UserCredentialRow } from './UserCredentialRow';
 
 export function UserFavoriteList({
   credentials,
-  mutateUserCredentials,
-  hideTitle = false
+  hideTitle = false,
+  readOnly = false
 }: {
   credentials: EASAttestationWithFavorite[];
   hideTitle?: boolean;
-  mutateUserCredentials?: KeyedMutator<EASAttestationWithFavorite[]>;
+  readOnly?: boolean;
 }) {
+  const { reorderFavorites } = useFavoriteCredentials();
   return (
     <Stack gap={1}>
       {!hideTitle && (
@@ -35,12 +37,24 @@ export function UserFavoriteList({
         </Card>
       ) : (
         <Stack gap={1}>
-          {credentials.map((credential) => (
-            <Box key={credential.id}>
-              <UserCredentialRow mutateUserCredentials={mutateUserCredentials} credential={credential} />
-              <Divider sx={{ mt: 1 }} />
-            </Box>
-          ))}
+          {credentials.map((credential) =>
+            !readOnly ? (
+              <DraggableListItem
+                key={credential.id}
+                name='credentialItem'
+                itemId={credential.favoriteCredentialId!}
+                changeOrderHandler={reorderFavorites}
+              >
+                <UserCredentialRow credential={credential} />
+                <Divider sx={{ mt: 1 }} />
+              </DraggableListItem>
+            ) : (
+              <Box key={credential.id}>
+                <UserCredentialRow readOnly credential={credential} />
+                <Divider sx={{ mt: 1 }} />
+              </Box>
+            )
+          )}
         </Stack>
       )}
     </Stack>
@@ -49,12 +63,12 @@ export function UserFavoriteList({
 
 export function UserAllCredentialsList({
   credentials,
-  mutateUserCredentials,
-  hideTitle = false
+  hideTitle = false,
+  readOnly = false
 }: {
   hideTitle?: boolean;
   credentials: EASAttestationWithFavorite[];
-  mutateUserCredentials?: KeyedMutator<EASAttestationWithFavorite[]>;
+  readOnly?: boolean;
 }) {
   return (
     <Stack gap={1}>
@@ -65,7 +79,7 @@ export function UserAllCredentialsList({
       )}
       {credentials?.map((credential) => (
         <Box key={credential.id}>
-          <UserCredentialRow mutateUserCredentials={mutateUserCredentials} credential={credential} />
+          <UserCredentialRow readOnly={readOnly} credential={credential} />
           <Divider sx={{ mt: 1 }} />
         </Box>
       ))}
@@ -73,9 +87,12 @@ export function UserAllCredentialsList({
   );
 }
 
-export function UserCredentialsList({ userId }: { userId: string }) {
-  const { data: userCredentials, error, isLoading, mutate: mutateUserCredentials } = useGetUserCredentials({ userId });
-  const favoriteCredentials = userCredentials?.filter((credential) => credential.favorite).slice(0, 5);
+export function UserCredentialsList({ userId, readOnly = false }: { readOnly?: boolean; userId: string }) {
+  const { data: userCredentials, error, isLoading } = useGetUserCredentials({ userId });
+  const favoriteCredentials = userCredentials
+    ?.filter((credential) => credential.favoriteCredentialId)
+    .slice(0, 5)
+    .sort((a, b) => (a.index || 0) - (b.index || 0));
 
   if (!userCredentials && isLoading) {
     return (
@@ -102,10 +119,8 @@ export function UserCredentialsList({ userId }: { userId: string }) {
 
   return (
     <Stack gap={2}>
-      <UserFavoriteList mutateUserCredentials={mutateUserCredentials} credentials={favoriteCredentials ?? []} />
-      {userCredentials?.length ? (
-        <UserAllCredentialsList mutateUserCredentials={mutateUserCredentials} credentials={userCredentials} />
-      ) : null}
+      <UserFavoriteList credentials={favoriteCredentials ?? []} />
+      {userCredentials?.length ? <UserAllCredentialsList readOnly={readOnly} credentials={userCredentials} /> : null}
     </Stack>
   );
 }

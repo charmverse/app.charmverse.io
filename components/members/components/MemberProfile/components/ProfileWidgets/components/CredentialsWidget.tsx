@@ -1,4 +1,5 @@
 import MedalIcon from '@mui/icons-material/WorkspacePremium';
+import { Stack } from '@mui/material';
 import type { Dispatch, SetStateAction } from 'react';
 
 import { Button } from 'components/common/Button';
@@ -15,32 +16,37 @@ export function CredentialsWidget({
   setActiveTab?: Dispatch<SetStateAction<number>>;
   credentials: EASAttestationWithFavorite[];
 }) {
-  const favoriteCredentials = credentials?.filter((credential) => credential.favorite).slice(0, 5);
+  const favoriteCredentials = credentials
+    ?.filter((credential) => credential.favoriteCredentialId)
+    .slice(0, 5)
+    .sort((a, b) => (a.index || 0) - (b.index || 0));
   const nonFavoriteCredentials = credentials
-    ?.filter((credential) => !credential.favorite)
+    ?.filter((credential) => !credential.favoriteCredentialId)
     .slice(0, 5 - favoriteCredentials.length);
 
   return (
     <ProfileWidget title='Credentials' avatarComponent={<MedalIcon />}>
-      {favoriteCredentials.length !== 0 && <UserFavoriteList hideTitle credentials={favoriteCredentials} />}
-      <UserAllCredentialsList hideTitle credentials={nonFavoriteCredentials} />
-      {credentials.length > 5 && setActiveTab && (
-        <Button
-          variant='text'
-          color='primary'
-          size='small'
-          sx={{
-            mt: 1,
-            width: 'fit-content',
-            fontWeight: 'bold'
-          }}
-          onClick={() => {
-            setActiveTab(2);
-          }}
-        >
-          View All Credentials
-        </Button>
-      )}
+      <Stack gap={1}>
+        {favoriteCredentials.length !== 0 && <UserFavoriteList readOnly hideTitle credentials={favoriteCredentials} />}
+        <UserAllCredentialsList hideTitle readOnly credentials={nonFavoriteCredentials} />
+        {credentials.length > 5 && setActiveTab && (
+          <Button
+            variant='text'
+            color='primary'
+            size='small'
+            sx={{
+              mt: 1,
+              width: 'fit-content',
+              fontWeight: 'bold'
+            }}
+            onClick={() => {
+              setActiveTab(2);
+            }}
+          >
+            View All Credentials
+          </Button>
+        )}
+      </Stack>
     </ProfileWidget>
   );
 }

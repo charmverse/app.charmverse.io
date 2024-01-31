@@ -4,76 +4,44 @@ import StarOutlinedIcon from '@mui/icons-material/StarOutlined';
 import { Chip, Grid, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Image from 'next/image';
-import type { KeyedMutator } from 'swr';
 
-import { useFavoriteCredential } from 'charmClient/hooks/credentialHooks';
 import Link from 'components/common/Link';
+import { useFavoriteCredentials } from 'hooks/useFavoriteCredentials';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type {
-  EASAttestationFromApi,
-  EASAttestationWithFavorite
-} from 'lib/credentials/external/getExternalCredentials';
+import type { EASAttestationWithFavorite } from 'lib/credentials/external/getExternalCredentials';
 import { trackedSchemas } from 'lib/credentials/external/schemas';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
 export function UserCredentialRow({
   credential,
-  mutateUserCredentials,
-  totalFavorites = 0
+  readOnly = false
 }: {
-  credential: EASAttestationFromApi & {
-    favorite?: boolean;
-    index: number;
-  };
-  mutateUserCredentials?: KeyedMutator<EASAttestationWithFavorite[]>;
-  totalFavorites?: number;
+  credential: EASAttestationWithFavorite;
+  readOnly?: boolean;
 }) {
-  const { trigger: favoriteCredential, isMutating } = useFavoriteCredential();
+  const { addFavorite, removeFavorite, isRemoveFavoriteCredentialLoading, isAddFavoriteCredentialLoading } =
+    useFavoriteCredentials();
   const { showMessage } = useSnackbar();
-  async function toggleFavorite() {
-    const isCharmverseIssuedCredential = credential.issuedCredentialId && credential.type === 'internal';
-    try {
-      await favoriteCredential({
-        favorite: !credential.favorite,
-        index: credential.index,
-        attestationId: isCharmverseIssuedCredential ? undefined : credential.id,
-        issuedCredentialId: isCharmverseIssuedCredential ? credential.issuedCredentialId : undefined,
-        chainId: credential.chainId
-      });
-
-      if (mutateUserCredentials) {
-        mutateUserCredentials(
-          (userCredentials) => {
-            if (!userCredentials) {
-              return userCredentials;
-            }
-
-            return userCredentials.map((userCredential) => {
-              if (userCredential.id === credential.id) {
-                return {
-                  ...userCredential,
-                  favorite: !userCredential.favorite
-                };
-              }
-
-              return userCredential;
-            });
-          },
-          {
-            revalidate: false
-          }
-        );
-      }
-    } catch (_) {
-      showMessage('Failed to favorite credential', 'error');
-    }
-  }
-
   const schemaInfo = trackedSchemas[credential.chainId]?.find((s) => s.schemaId === credential.schemaId);
   const { user } = useUser();
   const isUserRecipient = user?.wallets.find((wallet) => lowerCaseEqual(wallet.address, credential.recipient));
-
+  const isMutating = isRemoveFavoriteCredentialLoading || isAddFavoriteCredentialLoading;
+  async function toggleFavorite() {
+    try {
+      if (credential.favoriteCredentialId) {
+        await removeFavorite(credential.favoriteCredentialId);
+      } else {
+        await addFavorite({
+          chainId: credential.chainId,
+          attestationId: credential.issuedCredentialId ? undefined : credential.id,
+          issuedCredentialId: credential.issuedCredentialId
+        });
+      }
+    } catch (_) {
+      showMessage(`Failed to ${credential.favoriteCredentialId ? 'unfavorite' : 'favorite'} credential`, 'error');
+    }
+  }
   const credentialInfo: {
     title: string;
     subtitle: string;
@@ -123,12 +91,12 @@ export function UserCredentialRow({
           <Chip variant='outlined' key={field.name} label={field.value} />
         ))}
       </Grid>
-      {isUserRecipient && mutateUserCredentials && (
+      {isUserRecipient && !readOnly && (
         <Grid item xs={1} display='flex' justifyContent='flex-end'>
-          <Tooltip title={isMutating ? '' : 'Favorite'}>
+          <Tooltip title={isMutating ? '' : !credential.favoriteCredentialId ? 'Favorite' : 'Unfavorite'}>
             <div>
               <IconButton size='small' onClick={toggleFavorite} disabled={isMutating}>
-                {!credential.favorite ? (
+                {!credential.favoriteCredentialId ? (
                   <StarBorderOutlinedIcon
                     color={isMutating ? 'disabled' : 'primary'}
                     fontSize='small'

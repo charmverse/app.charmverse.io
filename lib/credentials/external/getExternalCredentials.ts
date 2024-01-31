@@ -52,8 +52,9 @@ export type EASAttestationFromApi<T = any> = {
 };
 
 export type EASAttestationWithFavorite<T = any> = EASAttestationFromApi<T> & {
-  favorite: boolean;
   index: number;
+  // If its favorite then the value is non null
+  favoriteCredentialId: string | null;
 };
 
 const GET_EXTERNAL_CREDENTIALS = gql`
@@ -68,57 +69,6 @@ const GET_EXTERNAL_CREDENTIALS = gql`
     }
   }
 `;
-
-const GET_EXTERNAL_CREDENTIAL = gql`
-  query ($where: AttestationWhereUniqueInput!) {
-    attestation(where: $where) {
-      id
-      data
-      decodedDataJson
-      attester
-      recipient
-      schemaId
-    }
-  }
-`;
-
-export async function getTrackOnChainAttestation({
-  chainId,
-  attestationId
-}: {
-  chainId: ExternalCredentialChain;
-  attestationId: string;
-}): Promise<EASAttestationFromApi | null> {
-  const query = {
-    id: attestationId
-  };
-
-  try {
-    const { data } = await graphQlClients[chainId].query({
-      query: GET_EXTERNAL_CREDENTIAL,
-      variables: {
-        where: query
-      }
-    });
-    const { attestation } = data;
-    if (!attestation) {
-      return null;
-    }
-    return {
-      ...attestation,
-      type: 'external',
-      chainId,
-      content: JSON.parse(attestation.decodedDataJson).reduce((acc: any, val: SchemaDecodedItem) => {
-        acc[val.name] = val.value.value;
-        return acc;
-      }, {} as any),
-      timeCreated: attestation.timeCreated * 1000,
-      verificationUrl: getOnChainAttestationUrl({ chainId, attestationId: attestation.id })
-    } as EASAttestationFromApi;
-  } catch (_) {
-    return null;
-  }
-}
 
 function getTrackedOnChainCredentials({
   chainId,
@@ -196,7 +146,8 @@ export async function getAllOnChainAttestations({
     },
     select: {
       index: true,
-      attestationId: true
+      attestationId: true,
+      id: true
     }
   });
 
@@ -206,14 +157,16 @@ export async function getAllOnChainAttestations({
       return {
         ...attestation,
         favorite: true,
-        index: favoriteCredential.index
+        index: favoriteCredential.index,
+        favoriteCredentialId: favoriteCredential.id
       };
     }
 
     return {
       ...attestation,
       favorite: false,
-      index: -1
+      index: -1,
+      favoriteCredentialId: null
     };
   });
 }

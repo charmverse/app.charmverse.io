@@ -3,7 +3,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import { useGetUserCredentials } from 'charmClient/hooks/credentialHooks';
+import { useGetUserCredentials } from 'charmClient/hooks/credentials';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMemberProfileTypes } from 'hooks/useMemberProfileTypes';
@@ -84,6 +84,7 @@ export function ProfileWidgets({
 
             case 'credentials':
               return (
+                userCredentials &&
                 userCredentials?.length !== 0 && (
                   <Grid item xs={12} md={6} alignItems='stretch' key={id}>
                     <CredentialsWidget setActiveTab={setActiveTab} credentials={userCredentials ?? []} />
