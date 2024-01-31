@@ -1,14 +1,71 @@
 import LaunchIcon from '@mui/icons-material/Launch';
-import { Chip, Grid, Typography } from '@mui/material';
+import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
+import StarOutlinedIcon from '@mui/icons-material/StarOutlined';
+import { Chip, Grid, IconButton, Stack, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Image from 'next/image';
+import type { KeyedMutator } from 'swr';
 
+import { useFavoriteCredential } from 'charmClient/hooks/credentialHooks';
 import Link from 'components/common/Link';
-import type { EASAttestationFromApi } from 'lib/credentials/external/getExternalCredentials';
+import { useUser } from 'hooks/useUser';
+import type {
+  EASAttestationFromApi,
+  EASAttestationWithFavorite
+} from 'lib/credentials/external/getExternalCredentials';
 import { trackedSchemas } from 'lib/credentials/external/schemas';
+import { lowerCaseEqual } from 'lib/utilities/strings';
 
-export function UserCredentialRow({ credential }: { credential: EASAttestationFromApi }) {
+export function UserCredentialRow({
+  credential,
+  mutateUserCredentials
+}: {
+  credential: EASAttestationFromApi & {
+    favorite?: boolean;
+    index: number;
+  };
+  mutateUserCredentials?: KeyedMutator<EASAttestationWithFavorite[]>;
+}) {
+  const { trigger: favoriteCredential, isMutating } = useFavoriteCredential();
+
+  async function toggleFavorite() {
+    const isCharmverseIssuedCredential = credential.issuedCredentialId && credential.type === 'internal';
+    await favoriteCredential({
+      favorite: !credential.favorite,
+      index: credential.index,
+      attestationId: isCharmverseIssuedCredential ? undefined : credential.id,
+      issuedCredentialId: isCharmverseIssuedCredential ? credential.issuedCredentialId : undefined,
+      chainId: credential.chainId
+    });
+
+    if (mutateUserCredentials) {
+      mutateUserCredentials(
+        (userCredentials) => {
+          if (!userCredentials) {
+            return userCredentials;
+          }
+
+          return userCredentials.map((userCredential) => {
+            if (userCredential.id === credential.id) {
+              return {
+                ...userCredential,
+                favorite: !userCredential.favorite
+              };
+            }
+
+            return userCredential;
+          });
+        },
+        {
+          revalidate: false
+        }
+      );
+    }
+  }
+
   const schemaInfo = trackedSchemas[credential.chainId]?.find((s) => s.schemaId === credential.schemaId);
+  const { user } = useUser();
+  const isUserRecipient = user?.wallets.find((wallet) => lowerCaseEqual(wallet.address, credential.recipient));
 
   const credentialInfo: {
     title: string;
@@ -59,10 +116,30 @@ export function UserCredentialRow({ credential }: { credential: EASAttestationFr
           <Chip variant='outlined' key={field.name} label={field.value} />
         ))}
       </Grid>
-      <Grid item xs={2} display='flex' justifyContent='flex-end' pr={2}>
-        <Link href={credential.verificationUrl} external target='_blank'>
-          <LaunchIcon sx={{ alignSelf: 'center' }} />
-        </Link>
+      {isUserRecipient && (
+        <Grid item xs={1} display='flex' justifyContent='flex-end'>
+          <IconButton size='small' onClick={toggleFavorite} disabled={isMutating}>
+            {!credential.favorite ? (
+              <StarBorderOutlinedIcon color='primary' fontSize='small' sx={{ alignSelf: 'center' }} />
+            ) : (
+              <StarOutlinedIcon color='primary' fontSize='small' sx={{ alignSelf: 'center' }} />
+            )}
+          </IconButton>
+        </Grid>
+      )}
+      <Grid item xs={1} display='flex' justifyContent='flex-end' pr={2}>
+        <Stack alignItems='center'>
+          <Link
+            href={credential.verificationUrl}
+            external
+            target='_blank'
+            sx={{
+              display: 'flex'
+            }}
+          >
+            <LaunchIcon fontSize='small' sx={{ alignSelf: 'center' }} />
+          </Link>
+        </Stack>
       </Grid>
     </Grid>
   );
