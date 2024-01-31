@@ -1,6 +1,7 @@
 import type { IdentityType, Prisma, Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
+import MedalIcon from '@mui/icons-material/WorkspacePremium';
 import {
   Box,
   FormHelperText,
@@ -424,45 +425,52 @@ export function SpaceSettings({
             <Stack gap={1}>
               {memberProfileTypesInput
                 .filter((mp) => !mp.isHidden)
-                .map(({ id, title }) => (
-                  <DraggableListItem
-                    key={id}
-                    name='memberProfileItem'
-                    itemId={id}
-                    disabled={!isAdmin}
-                    changeOrderHandler={async (draggedProperty: string, droppedOnProperty: string) =>
-                      changeMembersOrder(draggedProperty as MemberProfileName, droppedOnProperty as MemberProfileName)
-                    }
-                  >
-                    <SettingsItem
-                      sx={{ gap: 0 }}
-                      data-test={`settings-profiles-item-${id}`}
-                      actions={[
-                        <MenuItem
-                          key='1'
-                          data-test='settings-profiles-option-hide'
-                          onClick={() => {
-                            setMemberProfileProperties((prevState) => {
-                              const newState = [...prevState];
-                              const index = newState.findIndex((prevMp) => prevMp.id === id);
-                              newState[index] = { id, title, isHidden: true };
-                              return [...newState];
-                            });
-                          }}
-                        >
-                          Hide
-                        </MenuItem>
-                      ]}
+                .map(({ id, title }) => {
+                  const profileWidgetLogo = getProfileWidgetLogo(id);
+                  return (
+                    <DraggableListItem
+                      key={id}
+                      name='memberProfileItem'
+                      itemId={id}
                       disabled={!isAdmin}
-                      text={
-                        <Box display='flex' alignItems='center' gap={1}>
-                          <Image width={25} height={25} alt={id} src={getProfileWidgetLogo(id)} />
-                          <Typography>{title}</Typography>
-                        </Box>
+                      changeOrderHandler={async (draggedProperty: string, droppedOnProperty: string) =>
+                        changeMembersOrder(draggedProperty as MemberProfileName, droppedOnProperty as MemberProfileName)
                       }
-                    />
-                  </DraggableListItem>
-                ))}
+                    >
+                      <SettingsItem
+                        sx={{ gap: 0 }}
+                        data-test={`settings-profiles-item-${id}`}
+                        actions={[
+                          <MenuItem
+                            key='1'
+                            data-test='settings-profiles-option-hide'
+                            onClick={() => {
+                              setMemberProfileProperties((prevState) => {
+                                const newState = [...prevState];
+                                const index = newState.findIndex((prevMp) => prevMp.id === id);
+                                newState[index] = { id, title, isHidden: true };
+                                return [...newState];
+                              });
+                            }}
+                          >
+                            Hide
+                          </MenuItem>
+                        ]}
+                        disabled={!isAdmin}
+                        text={
+                          <Box display='flex' alignItems='center' gap={1}>
+                            {typeof profileWidgetLogo === 'string' ? (
+                              <Image width={25} height={25} alt={id} src={profileWidgetLogo} />
+                            ) : (
+                              profileWidgetLogo
+                            )}
+                            <Typography>{title}</Typography>
+                          </Box>
+                        }
+                      />
+                    </DraggableListItem>
+                  );
+                })}
             </Stack>
             {isAdmin && memberProfileTypesInput.filter((mp) => mp.isHidden).length > 0 && (
               <Button
@@ -551,38 +559,45 @@ export function SpaceSettings({
         <List>
           {memberProfileTypesInput
             .filter((mp) => mp.isHidden)
-            .map(({ id, title }) => (
-              <ListItem
-                key={id}
-                secondaryAction={
-                  <Button
-                    data-test={`add-profile-button-${id}`}
-                    onClick={() => {
-                      setMemberProfileProperties((prevState) => {
-                        const prevMemberProfiles = [...prevState];
-                        const targetedMemberProfileIndex = prevMemberProfiles.findIndex((_mp) => _mp.id === id);
-                        prevMemberProfiles[targetedMemberProfileIndex] = {
-                          id,
-                          title,
-                          isHidden: false
-                        };
-                        if (prevMemberProfiles.every((_mp) => _mp.isHidden === false)) {
-                          memberProfilesPopupState.close();
-                        }
-                        return prevMemberProfiles;
-                      });
-                    }}
-                  >
-                    Add
-                  </Button>
-                }
-              >
-                <ListItemIcon>
-                  <Image width={25} height={25} alt={id} src={getProfileWidgetLogo(id)} />
-                </ListItemIcon>
-                <ListItemText primary={title} />
-              </ListItem>
-            ))}
+            .map(({ id, title }) => {
+              const profileWidgetLogo = getProfileWidgetLogo(id);
+              return (
+                <ListItem
+                  key={id}
+                  secondaryAction={
+                    <Button
+                      data-test={`add-profile-button-${id}`}
+                      onClick={() => {
+                        setMemberProfileProperties((prevState) => {
+                          const prevMemberProfiles = [...prevState];
+                          const targetedMemberProfileIndex = prevMemberProfiles.findIndex((_mp) => _mp.id === id);
+                          prevMemberProfiles[targetedMemberProfileIndex] = {
+                            id,
+                            title,
+                            isHidden: false
+                          };
+                          if (prevMemberProfiles.every((_mp) => _mp.isHidden === false)) {
+                            memberProfilesPopupState.close();
+                          }
+                          return prevMemberProfiles;
+                        });
+                      }}
+                    >
+                      Add
+                    </Button>
+                  }
+                >
+                  <ListItemIcon>
+                    {typeof profileWidgetLogo === 'string' ? (
+                      <Image width={25} height={25} alt={id} src={profileWidgetLogo} />
+                    ) : (
+                      profileWidgetLogo
+                    )}
+                  </ListItemIcon>
+                  <ListItemText primary={title} />
+                </ListItem>
+              );
+            })}
         </List>
       </Modal>
     </>
@@ -600,6 +615,8 @@ function getProfileWidgetLogo(name: MemberProfileName) {
       return '/images/logos/lens_logo.png';
     case 'summon':
       return '/images/logos/summon_dark_mark.svg';
+    case 'credentials':
+      return <MedalIcon fontSize='small' />;
     default:
       return '';
   }

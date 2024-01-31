@@ -2,7 +2,6 @@ import MedalIcon from '@mui/icons-material/WorkspacePremium';
 import type { Dispatch, SetStateAction } from 'react';
 
 import { Button } from 'components/common/Button';
-import { useMemberDialog } from 'components/members/hooks/useMemberDialog';
 import type { EASAttestationWithFavorite } from 'lib/credentials/external/getExternalCredentials';
 
 import { UserAllCredentialsList, UserFavoriteList } from '../../UserCredentials/UserCredentialsList';
@@ -25,7 +24,7 @@ export function CredentialsWidget({
     <ProfileWidget title='Credentials' avatarComponent={<MedalIcon />}>
       {favoriteCredentials.length !== 0 && <UserFavoriteList hideTitle credentials={favoriteCredentials} />}
       <UserAllCredentialsList hideTitle credentials={nonFavoriteCredentials} />
-      {credentials.length < 5 && setActiveTab && (
+      {credentials.length > 5 && setActiveTab && (
         <Button
           variant='text'
           color='primary'

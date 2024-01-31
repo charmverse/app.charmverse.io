@@ -69,13 +69,7 @@ export function ProfileWidgets({
 
   return (
     <Grid container spacing={4}>
-      {[
-        ...memberProfileTypes,
-        {
-          isHidden: false,
-          id: 'credentials'
-        }
-      ]
+      {memberProfileTypes
         ?.filter(({ isHidden }) => !isHidden)
         .map(({ id }) => {
           switch (id) {
