@@ -13,7 +13,10 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireKeys(['code'], 'body')).post(connectAccountWithGoogleCodeHandler);
 
-async function connectAccountWithGoogleCodeHandler(req: NextApiRequest, res: NextApiResponse) {
+async function connectAccountWithGoogleCodeHandler(
+  req: NextApiRequest,
+  res: NextApiResponse<LoggedInUser | { otpRequired: true } | null>
+) {
   const { code, type = 'login' } = req.body as { code: string; type: 'login' | 'connect' };
 
   let loggedInUser: LoggedInUser | null = null;
@@ -24,6 +27,13 @@ async function connectAccountWithGoogleCodeHandler(req: NextApiRequest, res: Nex
       code,
       signupAnalytics
     });
+
+    if (loggedInUser.otp?.activatedAt) {
+      req.session.otpUser = { id: loggedInUser.id, method: 'Google' };
+      await req.session.save();
+
+      return res.status(200).json({ otpRequired: true });
+    }
   } else if (type === 'connect') {
     loggedInUser = await connectAccountWithGoogleCode({ code, userId: req.session.user.id });
   }
