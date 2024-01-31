@@ -15,7 +15,12 @@ export function RewardsPage() {
 
   return (
     <GlobalContext>
-      <NewDocumentPage titlePlaceholder='Title (required)' values={newPageValues} onChange={updateNewPageValues}>
+      <NewDocumentPage
+        key={newPageValues?.templateId}
+        titlePlaceholder='Title (required)'
+        values={newPageValues}
+        onChange={updateNewPageValues}
+      >
         <RewardPropertiesForm
           onChange={setRewardValues}
           values={rewardValues}

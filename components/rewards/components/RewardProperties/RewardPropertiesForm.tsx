@@ -2,7 +2,6 @@ import type { BountyStatus } from '@charmverse/core/prisma-client';
 import { Box, Collapse, Divider, Stack, Tooltip } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import clsx from 'clsx';
-import debounce from 'lodash/debounce';
 import { DateTime } from 'luxon';
 import type { ChangeEvent } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -22,6 +21,7 @@ import type { RewardType } from 'components/rewards/components/RewardProperties/
 import { RewardTypeSelect } from 'components/rewards/components/RewardProperties/components/RewardTypeSelect';
 import { CustomPropertiesAdapter } from 'components/rewards/components/RewardProperties/CustomPropertiesAdapter';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { RewardFieldsProp, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
@@ -34,8 +34,6 @@ type Props = {
   onChange: (values: Partial<UpdateableRewardFields>) => void;
   values: UpdateableRewardFields;
   readOnly?: boolean;
-  // only needed for saving existing reward
-  useDebouncedInputs?: boolean;
   pageId?: string;
   refreshPermissions?: VoidFunction;
   isNewReward?: boolean;
@@ -49,7 +47,7 @@ type Props = {
   isProposalTemplate?: boolean;
 };
 
-const getApplicationType = (values: UpdateableRewardFields, forcedApplicationType?: RewardApplicationType) => {
+function getApplicationType(values: UpdateableRewardFields, forcedApplicationType?: RewardApplicationType) {
   if (forcedApplicationType) {
     return forcedApplicationType;
   }
@@ -61,14 +59,23 @@ const getApplicationType = (values: UpdateableRewardFields, forcedApplicationTyp
   }
 
   return applicationType;
-};
+}
+
+function getRewardType(values: UpdateableRewardFields, isNewReward: boolean, isFromTemplate: boolean) {
+  return values.customReward
+    ? 'Custom'
+    : values.rewardToken
+    ? 'Token'
+    : isNewReward && !isFromTemplate
+    ? 'Token'
+    : 'None';
+}
 
 export function RewardPropertiesForm({
   onChange,
   values,
   readOnly,
-  useDebouncedInputs,
-  isNewReward,
+  isNewReward = false,
   isTemplate,
   pageId,
   expandedByDefault,
@@ -84,18 +91,40 @@ export function RewardPropertiesForm({
   );
 
   const { getFeatureTitle } = useSpaceFeatures();
+  const isAdmin = useIsAdmin();
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(!!expandedByDefault);
-  const [rewardType, setRewardType] = useState<RewardType>(
-    values.customReward ? 'Custom' : isNewReward || values.rewardToken ? 'Token' : 'None'
-  );
+  // Token type rules:
+  // If it is a new reward and not using a template, use Token
+  // If neither rewardToken nor customReward is set, use None
+  const [rewardType, setRewardType] = useState<RewardType>(() => getRewardType(values, isNewReward, !!templateId));
+
   const allowedSubmittersValue: RoleOption[] = (values.allowedSubmitterRoles ?? []).map((id) => ({
     id,
     group: 'role'
   }));
-
   const isAssignedReward = rewardApplicationType === 'assigned';
   const { templates: rewardTemplates = [] } = useRewardTemplates();
+  const template = rewardTemplates?.find((tpl) => tpl.page.id === templateId);
+  const readOnlyReviewers = !isAdmin && (readOnly || !!template?.reward.reviewers?.length);
+  const readOnlyDueDate = !isAdmin && (readOnly || !!template?.reward.dueDate);
+  const readOnlyApplicationType = !isAdmin && (readOnly || !!forcedApplicationType || !!template || isProposalTemplate);
+  const readOnlyProperties = !isAdmin && (readOnly || !!template);
+  const readOnlyNumberAvailable = !isAdmin && (readOnly || typeof template?.reward.maxSubmissions === 'number');
+  const readOnlyApplicantRoles = !isAdmin && (readOnly || !!template?.reward.allowedSubmitterRoles?.length);
+
+  async function applyUpdates(updates: Partial<UpdateableRewardFields>) {
+    if ('customReward' in updates) {
+      const customReward = updates.customReward;
+      if (isTruthy(customReward)) {
+        updates.rewardAmount = null;
+        updates.chainId = null;
+        updates.rewardToken = null;
+      }
+    }
+
+    onChange(updates);
+  }
 
   const setRewardApplicationType = useCallback((updatedType: RewardApplicationType) => {
     if (updatedType === 'direct_submission') {
@@ -115,19 +144,6 @@ export function RewardPropertiesForm({
     setRewardApplicationTypeRaw(updatedType);
   }, []);
 
-  async function applyUpdates(updates: Partial<UpdateableRewardFields>) {
-    if ('customReward' in updates) {
-      const customReward = updates.customReward;
-      if (isTruthy(customReward)) {
-        updates.rewardAmount = null;
-        updates.chainId = null;
-        updates.rewardToken = null;
-      }
-    }
-
-    onChange(updates);
-  }
-
   useEffect(() => {
     if (rewardType === 'None' && rewardStatus !== 'paid') {
       applyUpdates({
@@ -138,16 +154,6 @@ export function RewardPropertiesForm({
       });
     }
   }, [rewardType, rewardStatus]);
-
-  const applyUpdatesDebounced = useMemo(() => {
-    if (useDebouncedInputs) {
-      return debounce((updates: Partial<UpdateableRewardFields>) => {
-        applyUpdates(updates);
-      }, 1000);
-    }
-
-    return applyUpdates;
-  }, [useDebouncedInputs]);
 
   async function onRewardTokenUpdate(rewardToken: RewardTokenDetails | null) {
     if (rewardToken) {
@@ -161,7 +167,7 @@ export function RewardPropertiesForm({
   }
 
   const updateRewardCustomReward = useCallback((e: any) => {
-    applyUpdatesDebounced({
+    applyUpdates({
       customReward: e.target.value
     });
   }, []);
@@ -177,13 +183,13 @@ export function RewardPropertiesForm({
   const updateRewardMaxSubmissions = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const updatedValue = Number(e.target.value);
 
-    applyUpdatesDebounced({
+    applyUpdates({
       maxSubmissions: updatedValue <= 0 ? null : updatedValue
     });
   }, []);
 
   const updateRewardDueDate = useCallback((date: DateTime | null) => {
-    applyUpdatesDebounced({
+    applyUpdates({
       dueDate: date?.toJSDate() || undefined
     });
   }, []);
@@ -233,10 +239,11 @@ export function RewardPropertiesForm({
                         if (!templatePage) {
                           selectTemplate(null);
                         }
-                        const template = rewardTemplates.find((_template) => _template.page.id === templatePage?.id);
-                        if (template && selectTemplate) {
-                          selectTemplate(template);
+                        const selected = rewardTemplates.find((_template) => _template.page.id === templatePage?.id);
+                        if (selected && selectTemplate) {
+                          selectTemplate(selected);
                         }
+                        setRewardType(getRewardType(selected?.reward || values, isNewReward, !!templatePage));
                       }}
                     />
                   </Box>
@@ -249,7 +256,7 @@ export function RewardPropertiesForm({
                 Reviewers
               </PropertyLabel>
               <UserAndRoleSelect
-                readOnly={readOnly}
+                readOnly={readOnlyReviewers}
                 value={values.reviewers ?? []}
                 onChange={async (options) => {
                   const reviewerOptions = options.filter(
@@ -271,7 +278,7 @@ export function RewardPropertiesForm({
                 minDate={DateTime.fromMillis(Date.now())}
                 value={values?.dueDate || null}
                 disableMaskedInput
-                disabled={readOnly}
+                disabled={readOnlyDueDate}
                 onAccept={async (value) => {
                   updateRewardDueDate(value);
                 }}
@@ -303,7 +310,7 @@ export function RewardPropertiesForm({
                 Application Type
               </PropertyLabel>
               <RewardApplicationType
-                readOnly={readOnly || !!forcedApplicationType || isProposalTemplate}
+                readOnly={readOnlyApplicationType}
                 value={rewardApplicationType}
                 onChange={setRewardApplicationType}
               />
@@ -341,8 +348,8 @@ export function RewardPropertiesForm({
                           allowMultipleApplications: !!isOn
                         });
                       }}
-                      disabled={readOnly}
-                      readOnly={readOnly}
+                      disabled={readOnlyProperties}
+                      readOnly={readOnlyProperties}
                     />
                   </Box>
                 </Tooltip>
@@ -353,7 +360,7 @@ export function RewardPropertiesForm({
                   </PropertyLabel>
                   <UserAndRoleSelect
                     type='role'
-                    readOnly={readOnly}
+                    readOnly={readOnlyApplicantRoles}
                     value={allowedSubmittersValue}
                     onChange={async (options) => {
                       const roleIds = options.filter((option) => option.group === 'role').map((option) => option.id);
@@ -384,7 +391,7 @@ export function RewardPropertiesForm({
                     sx={{
                       width: '100%'
                     }}
-                    disabled={readOnly}
+                    disabled={readOnlyNumberAvailable}
                     placeholder='Unlimited'
                   />
                 </Box>
@@ -418,7 +425,7 @@ export function RewardPropertiesForm({
               <PropertyLabel readOnly highlighted>
                 Type
               </PropertyLabel>
-              <RewardTypeSelect readOnly={readOnly} value={rewardType} onChange={setRewardType} />
+              <RewardTypeSelect readOnly={readOnlyProperties} value={rewardType} onChange={setRewardType} />
             </Box>
 
             {rewardType === 'Token' && (
@@ -429,7 +436,7 @@ export function RewardPropertiesForm({
                 <RewardTokenProperty
                   onChange={onRewardTokenUpdate}
                   currentReward={values as (RewardCreationData & RewardWithUsers) | null}
-                  readOnly={readOnly}
+                  readOnly={readOnlyProperties}
                 />
               </Box>
             )}
@@ -452,7 +459,7 @@ export function RewardPropertiesForm({
                   sx={{
                     width: '100%'
                   }}
-                  disabled={readOnly}
+                  disabled={readOnlyProperties}
                   placeholder='T-shirt'
                   autoFocus
                   rows={1}
