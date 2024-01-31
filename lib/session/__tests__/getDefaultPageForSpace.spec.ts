@@ -59,6 +59,35 @@ describe('getDefaultPageForSpace()', () => {
     expect(url).toEqual(`/${space.domain}/forum`);
   });
 
+  it('should send user to home page if one is set, even if there is a last page view', async () => {
+    const { space, user } = await generateUserAndSpace();
+    await createPage({
+      spaceId: space.id,
+      createdBy: user.id,
+      index: 1,
+      // add basic permission
+      pagePermissions: [{ permissionLevel: 'view', spaceId: space.id }]
+    });
+    await savePageView({ createdBy: user.id, spaceId: space.id, pageType: 'forum_posts_list' });
+    const homePage = await createPage({
+      spaceId: space.id,
+      createdBy: user.id,
+      index: 2,
+      // add basic permission
+      pagePermissions: [{ permissionLevel: 'view', spaceId: space.id }]
+    });
+    const updated = await prisma.space.update({
+      where: {
+        id: space.id
+      },
+      data: {
+        homePageId: homePage.id
+      }
+    });
+    const url = await getDefaultPageForSpace({ space: updated, userId: user.id });
+    expect(url).toEqual(`/${space.domain}/${homePage.path}`);
+  });
+
   it('should send user to last visited document page', async () => {
     const { space, user } = await generateUserAndSpace();
     const page = await createPage({ spaceId: space.id, createdBy: user.id });

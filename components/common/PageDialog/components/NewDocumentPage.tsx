@@ -54,6 +54,20 @@ export function NewDocumentPage({
         {newPageValues.headerImage && <PageBanner headerImage={newPageValues.headerImage} setPage={onChange} />}
         <StyledContainer data-test='page-charmeditor' top={getPageTop(newPageValues)} fullWidth={isSmallScreen}>
           <Box minHeight={450}>
+            {/* temporary? disable editing of page title when in suggestion mode */}
+            <PageHeader
+              headerImage={newPageValues.headerImage || null}
+              icon={newPageValues.icon || null}
+              updatedAt={new Date().toString()}
+              title={newPageValues.title || ''}
+              readOnly={false}
+              setPage={onChange}
+              placeholder={titlePlaceholder}
+              focusDocumentEditor={focusDocumentEditor}
+            />
+            <div className='focalboard-body font-family-default'>
+              <div className='CardDetail content'>{children}</div>
+            </div>
             <CharmEditor
               placeholderText={placeholder}
               content={newPageValues.content as PageContent}
@@ -65,22 +79,7 @@ export function NewDocumentPage({
               onContentChange={({ rawText, doc }) => onChange({ content: doc, contentText: rawText })}
               focusOnInit
               isContentControlled
-            >
-              {/* temporary? disable editing of page title when in suggestion mode */}
-              <PageHeader
-                headerImage={newPageValues.headerImage || null}
-                icon={newPageValues.icon || null}
-                updatedAt={new Date().toString()}
-                title={newPageValues.title || ''}
-                readOnly={false}
-                setPage={onChange}
-                placeholder={titlePlaceholder}
-                focusDocumentEditor={focusDocumentEditor}
-              />
-              <div className='focalboard-body font-family-default'>
-                <div className='CardDetail content'>{children}</div>
-              </div>
-            </CharmEditor>
+            />
           </Box>
         </StyledContainer>
       </Box>

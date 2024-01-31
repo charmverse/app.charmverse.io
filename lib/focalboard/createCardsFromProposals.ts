@@ -84,7 +84,15 @@ export async function createCardsFromProposals({
       },
       deletedAt: null
     },
-    include: {
+    select: {
+      id: true,
+      path: true,
+      title: true,
+      content: true,
+      contentText: true,
+      hasContent: true,
+      createdAt: true,
+      spaceId: true,
       proposal: {
         select: {
           id: true,
@@ -261,6 +269,10 @@ export async function createCardsFromProposals({
 
     if (currentStep && proposalProps.proposalStep) {
       properties[proposalProps.proposalStep.id] = currentStep.title;
+    }
+
+    if (proposalProps.proposalAuthor && pageProposal.proposal) {
+      properties[proposalProps.proposalAuthor.id] = pageProposal.proposal.authors.map((author) => author.userId);
     }
 
     const formFields = pageProposal.proposal?.form?.formFields ?? [];

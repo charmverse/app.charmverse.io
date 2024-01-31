@@ -1,6 +1,7 @@
 import { PageSidebarProvider } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { ProposalsProvider } from 'components/proposals/hooks/useProposals';
 import { CharmEditorProvider } from 'hooks/useCharmEditor';
+import { CharmEditorViewProvider } from 'hooks/useCharmEditorView';
 import { CurrentPageProvider } from 'hooks/useCurrentPage';
 import { ThreadsProvider } from 'hooks/useThreads';
 import { VotesProvider } from 'hooks/useVotes';
@@ -12,7 +13,9 @@ export function DocumentPageProviders({ children }: { children: React.ReactNode 
         <ThreadsProvider>
           <VotesProvider>
             <ProposalsProvider>
-              <PageSidebarProvider>{children}</PageSidebarProvider>
+              <CharmEditorViewProvider>
+                <PageSidebarProvider>{children}</PageSidebarProvider>
+              </CharmEditorViewProvider>
             </ProposalsProvider>
           </VotesProvider>
         </ThreadsProvider>

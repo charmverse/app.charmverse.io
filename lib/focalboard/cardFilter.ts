@@ -415,7 +415,7 @@ class CardFilter {
         switch (condition) {
           case 'contains':
           case 'is_not_empty': {
-            if (filterProperty.type === 'person') {
+            if (filterProperty.type === 'person' || filterProperty.type === 'proposalAuthor') {
               return {
                 id: filterClause.propertyId,
                 value: filterClause.values

@@ -185,6 +185,7 @@ describe('getCSVColumns()', () => {
     });
 
     let properties: Record<string, CardPropertyValue> = {
+      [databaseProperties.proposalAuthor!.id]: ['user_1'],
       [databaseProperties.proposalUrl!.id]: 'path-123',
       [databaseProperties.proposalStatus!.id]: 'in_progress',
       [databaseProperties.proposalEvaluationType!.id]: 'rubric',
@@ -242,6 +243,7 @@ describe('getCSVColumns()', () => {
 
     expect(rowColumns).toEqual([
       '"title"',
+      'Mo',
       '"In Progress"',
       '"http://localhost/test-space/path-123"',
       '"Rubric"',

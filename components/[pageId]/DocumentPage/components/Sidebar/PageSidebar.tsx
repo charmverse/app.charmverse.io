@@ -52,7 +52,7 @@ type SidebarProps = {
   proposalInput?: ProposalSettingsProps['proposal'];
   onChangeEvaluation: ProposalSettingsProps['onChangeEvaluation'];
   onChangeWorkflow: ProposalSettingsProps['onChangeWorkflow'];
-  onChangeRewardTemplate?: ProposalSettingsProps['onChangeRewardTemplate'];
+  onChangeRewardSettings?: ProposalSettingsProps['onChangeRewardSettings'];
   refreshProposal?: VoidFunction;
   isUnpublishedProposal?: boolean;
   isReviewer?: boolean; // TODO: we need to know the reviewer for each step instead
@@ -63,6 +63,7 @@ type SidebarProps = {
   proposalTemplateId?: string | null;
   // eslint-disable-next-line react/no-unused-prop-types
   isProposalTemplate?: boolean;
+  isStructuredProposal: boolean;
 };
 
 function PageSidebarComponent(props: SidebarProps) {
@@ -203,14 +204,15 @@ function SidebarContents({
   proposalInput,
   onChangeEvaluation,
   onChangeWorkflow,
-  onChangeRewardTemplate,
+  onChangeRewardSettings,
   refreshProposal,
   isUnpublishedProposal,
   isReviewer,
   pagePath,
   pageTitle,
   proposalTemplateId,
-  isProposalTemplate
+  isProposalTemplate,
+  isStructuredProposal
 }: SidebarProps) {
   const isNotNewProposal = !!proposal;
   return (
@@ -223,9 +225,10 @@ function SidebarContents({
             readOnly={!!readOnlyProposalPermissions}
             templateId={proposalTemplateId}
             onChangeEvaluation={onChangeEvaluation}
-            onChangeRewardTemplate={onChangeRewardTemplate}
+            onChangeRewardSettings={onChangeRewardSettings}
             onChangeWorkflow={onChangeWorkflow}
             isReviewer={!!isReviewer}
+            isStructuredProposal={!!isStructuredProposal}
             requireWorkflowChangeConfirmation={isNotNewProposal}
           />
         ) : (
@@ -252,13 +255,13 @@ function SidebarContents({
           <FormCommentsSidebar
             canCreateComments={!!pagePermissions?.comment}
             openSidebar={openSidebar!}
-            threads={threads || {}}
+            threads={threads}
             formFields={proposal.form.formFields}
           />
         ) : (
           <EditorCommentsSidebar
             openSidebar={openSidebar!}
-            threads={threads || {}}
+            threads={threads}
             canCreateComments={!!pagePermissions?.comment}
           />
         ))}
