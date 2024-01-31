@@ -8,6 +8,7 @@ import type { KeyedMutator } from 'swr';
 
 import { useFavoriteCredential } from 'charmClient/hooks/credentialHooks';
 import Link from 'components/common/Link';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type {
   EASAttestationFromApi,
@@ -27,39 +28,43 @@ export function UserCredentialRow({
   mutateUserCredentials?: KeyedMutator<EASAttestationWithFavorite[]>;
 }) {
   const { trigger: favoriteCredential, isMutating } = useFavoriteCredential();
-
+  const { showMessage } = useSnackbar();
   async function toggleFavorite() {
     const isCharmverseIssuedCredential = credential.issuedCredentialId && credential.type === 'internal';
-    await favoriteCredential({
-      favorite: !credential.favorite,
-      index: credential.index,
-      attestationId: isCharmverseIssuedCredential ? undefined : credential.id,
-      issuedCredentialId: isCharmverseIssuedCredential ? credential.issuedCredentialId : undefined,
-      chainId: credential.chainId
-    });
+    try {
+      await favoriteCredential({
+        favorite: !credential.favorite,
+        index: credential.index,
+        attestationId: isCharmverseIssuedCredential ? undefined : credential.id,
+        issuedCredentialId: isCharmverseIssuedCredential ? credential.issuedCredentialId : undefined,
+        chainId: credential.chainId
+      });
 
-    if (mutateUserCredentials) {
-      mutateUserCredentials(
-        (userCredentials) => {
-          if (!userCredentials) {
-            return userCredentials;
-          }
-
-          return userCredentials.map((userCredential) => {
-            if (userCredential.id === credential.id) {
-              return {
-                ...userCredential,
-                favorite: !userCredential.favorite
-              };
+      if (mutateUserCredentials) {
+        mutateUserCredentials(
+          (userCredentials) => {
+            if (!userCredentials) {
+              return userCredentials;
             }
 
-            return userCredential;
-          });
-        },
-        {
-          revalidate: false
-        }
-      );
+            return userCredentials.map((userCredential) => {
+              if (userCredential.id === credential.id) {
+                return {
+                  ...userCredential,
+                  favorite: !userCredential.favorite
+                };
+              }
+
+              return userCredential;
+            });
+          },
+          {
+            revalidate: false
+          }
+        );
+      }
+    } catch (_) {
+      showMessage('Failed to favorite credential', 'error');
     }
   }
 

@@ -38,8 +38,8 @@ export async function getAllUserCredentials({ userId }: { userId: string }): Pro
       log.error(`Error loading Charmverse Ceramic credentials for user ${userId}`, { error, userId });
       return [];
     }),
-    getAllOnChainAttestations({ wallets: testWallets })
+    getAllOnChainAttestations({ wallets })
   ]).then((data) => data.flat());
 
-  return allCredentials.map((cred) => ({ ...cred, recipient: '0xb1b9FFF08F3827875F91ddE929036a65f2A5d27d' }));
+  return allCredentials;
 }
