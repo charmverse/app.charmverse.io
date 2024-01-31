@@ -104,6 +104,8 @@ export function RewardPropertiesForm({
   const readOnlyDueDate = !isAdmin && (readOnly || !!template?.reward.dueDate);
   const readOnlyApplicationType = !isAdmin && (readOnly || !!forcedApplicationType || !!template);
   const readOnlyProperties = !isAdmin && (readOnly || !!template);
+  const readOnlyNumberAvailable = !isAdmin && (readOnly || typeof template?.reward.maxSubmissions === 'number');
+  const readOnlyApplicantRoles = !isAdmin && (readOnly || !!template?.reward.allowedSubmitterRoles?.length);
 
   const setRewardApplicationType = useCallback((updatedType: RewardApplicationType) => {
     if (updatedType === 'direct_submission') {
@@ -350,8 +352,8 @@ export function RewardPropertiesForm({
                           allowMultipleApplications: !!isOn
                         });
                       }}
-                      disabled={readOnly}
-                      readOnly={readOnly}
+                      disabled={readOnlyProperties}
+                      readOnly={readOnlyProperties}
                     />
                   </Box>
                 </Tooltip>
@@ -362,7 +364,7 @@ export function RewardPropertiesForm({
                   </PropertyLabel>
                   <UserAndRoleSelect
                     type='role'
-                    readOnly={readOnly}
+                    readOnly={readOnlyApplicantRoles}
                     value={allowedSubmittersValue}
                     onChange={async (options) => {
                       const roleIds = options.filter((option) => option.group === 'role').map((option) => option.id);
@@ -393,7 +395,7 @@ export function RewardPropertiesForm({
                     sx={{
                       width: '100%'
                     }}
-                    disabled={readOnly}
+                    disabled={readOnlyNumberAvailable}
                     placeholder='Unlimited'
                   />
                 </Box>
