@@ -10,6 +10,7 @@ export type MagicLinkResponseStatus =
   | 'sent_link'
   | 'verifying_email'
   | 'verified_email'
+  | 'verifying_otp'
   | 'error'
   | 'error_invalid_code'
   | 'error_invalid_email'
@@ -40,6 +41,11 @@ export function PageInviteLink({ email, status, submitEmail }: InviteToPageProps
         {status === 'verifying_email' && (
           <Alert sx={{ width: '100%' }} severity='info'>
             Verifying email...
+          </Alert>
+        )}
+        {status === 'verifying_otp' && (
+          <Alert sx={{ width: '100%' }} severity='info'>
+            Verifying otp...
           </Alert>
         )}
         {status === 'verified_email' && (
