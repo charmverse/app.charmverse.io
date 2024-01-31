@@ -1,6 +1,6 @@
 import type { Page } from '@charmverse/core/prisma';
 import type { Theme } from '@mui/material';
-import { Box, Tab, Tabs, useMediaQuery } from '@mui/material';
+import { Box, Tab, Tabs, Typography, useMediaQuery } from '@mui/material';
 import dynamic from 'next/dynamic';
 import type { EditorState } from 'prosemirror-state';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
@@ -21,14 +21,17 @@ import type { ConnectionEvent } from 'components/common/CharmEditor/components/f
 import { focusEventName } from 'components/common/CharmEditor/constants';
 import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import { EvaluationSidebar } from 'components/proposals/ProposalPage/components/EvaluationSidebar/EvaluationSidebar';
-import { ProposalFormFieldInputs } from 'components/proposals/ProposalPage/components/ProposalFormFieldInputs';
+import { ProposalFormFieldsInput } from 'components/proposals/ProposalPage/components/ProposalFormFieldsInput';
+import { ProposalRewards } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewards';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmEditor } from 'hooks/useCharmEditor';
+import { useCharmEditorView } from 'hooks/useCharmEditorView';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMdScreen } from 'hooks/useMediaScreens';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import type { PageWithContent } from 'lib/pages/interfaces';
@@ -70,8 +73,10 @@ export interface DocumentPageProps {
 function DocumentPage({ insideModal = false, page, savePage, readOnly = false, enableSidebar }: DocumentPageProps) {
   const { user } = useUser();
   const { router } = useCharmRouter();
+  const { getFeatureTitle } = useSpaceFeatures();
   const { activeView: sidebarView, setActiveView, closeSidebar } = usePageSidebar();
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
+  const { setView: setCharmEditorView } = useCharmEditorView();
   const [connectionError, setConnectionError] = useState<Error | null>(null);
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const dispatch = useAppDispatch();
@@ -84,7 +89,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
 
-  const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow, onChangeRewardTemplate } = useProposal({
+  const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow, onChangeRewardSettings } = useProposal({
     proposalId
   });
 
@@ -237,88 +242,20 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
     }
   }, [printRef, _printRef]);
 
+  useEffect(() => {
+    return () => {
+      setCharmEditorView(null);
+    };
+  }, [setCharmEditorView]);
+
   function focusDocumentEditor() {
     const focusEvent = new CustomEvent(focusEventName);
     // TODO: use a ref passed down instead
     document.querySelector(`.bangle-editor-core[data-page-id="${page.id}"]`)?.dispatchEvent(focusEvent);
   }
 
-  const documentPageContent = (
-    <CardPropertiesWrapper>
-      {/* Property list */}
-      {card && board && !hideCardDetails && (
-        <>
-          <CardDetailProperties
-            syncWithPageId={page.syncWithPageId}
-            board={board}
-            card={card}
-            cards={cards}
-            activeView={activeBoardView}
-            views={boardViews}
-            readOnly={readOnly}
-            pageUpdatedAt={page.updatedAt.toString()}
-            pageUpdatedBy={page.updatedBy}
-          />
-          <AddBountyButton readOnly={readOnly} cardId={page.id} />
-        </>
-      )}
-      {proposalId && (
-        <ProposalProperties
-          pageId={page.id}
-          proposalId={proposalId}
-          readOnly={readonlyProposalProperties}
-          proposalPage={page}
-          proposal={proposal}
-          refreshProposal={refreshProposal}
-        />
-      )}
-      {reward && (
-        <RewardProperties
-          reward={reward}
-          pageId={page.id}
-          pagePath={page.path}
-          readOnly={readOnly}
-          showApplications
-          expandedRewardProperties
-          templateId={page.sourceTemplateId || undefined}
-          isTemplate={page.type === 'bounty_template'}
-        />
-      )}
-      {creatingInlineReward && !readOnly && <NewInlineReward pageId={page.id} />}
-      {/** Structured proposal isn't inside a CharmEditor context, thus useViewContext used in PageSidebar would throw error for undefined view */}
-      {(enableComments || enableSuggestingMode || page.type === 'proposal' || page.type === 'proposal_template') && (
-        <PageSidebar
-          pagePath={page.path}
-          pageTitle={page.title}
-          id='page-action-sidebar'
-          pageId={page.id}
-          spaceId={page.spaceId}
-          proposalId={proposalId}
-          isUnpublishedProposal={proposal?.status === 'draft' || page.type === 'proposal_template'}
-          readOnlyProposalPermissions={!proposal?.permissions.edit}
-          isReviewer={proposal?.permissions.evaluate}
-          pagePermissions={pagePermissions}
-          editorState={editorState}
-          sidebarView={sidebarView}
-          // dont let users collapse sidebar when looking at a proposal
-          closeSidebar={closeSidebar}
-          openSidebar={setActiveView}
-          threads={threads}
-          proposal={proposal}
-          proposalInput={proposal}
-          proposalTemplateId={proposal?.page?.sourceTemplateId}
-          onChangeEvaluation={onChangeEvaluation}
-          refreshProposal={refreshProposal}
-          disabledViews={isStructuredProposal ? ['suggestions'] : []}
-          onChangeWorkflow={onChangeWorkflow}
-          onChangeRewardTemplate={onChangeRewardTemplate}
-          isProposalTemplate={page.type === 'proposal_template'}
-        />
-      )}
-    </CardPropertiesWrapper>
-  );
-
   const proposalAuthors = proposal ? [proposal.createdBy, ...proposal.authors.map((author) => author.userId)] : [];
+
   return (
     <PrimaryColumn id='file-drop-container' ref={containerRef} showPageActionSidebar={showPageActionSidebar}>
       <Box
@@ -449,30 +386,102 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
 
           {currentTab === 0 && (
             <>
+              <CardPropertiesWrapper>
+                {/* Property list */}
+                {card && board && !hideCardDetails && (
+                  <>
+                    <CardDetailProperties
+                      syncWithPageId={page.syncWithPageId}
+                      board={board}
+                      card={card}
+                      cards={cards}
+                      activeView={activeBoardView}
+                      views={boardViews}
+                      readOnly={readOnly}
+                      pageUpdatedAt={page.updatedAt.toString()}
+                      pageUpdatedBy={page.updatedBy}
+                    />
+                    <AddBountyButton readOnly={readOnly} cardId={page.id} />
+                  </>
+                )}
+                {proposalId && (
+                  <ProposalProperties
+                    pageId={page.id}
+                    proposalId={proposalId}
+                    readOnly={readonlyProposalProperties}
+                    proposalPage={page}
+                    proposal={proposal}
+                    refreshProposal={refreshProposal}
+                  />
+                )}
+                {reward && (
+                  <RewardProperties
+                    reward={reward}
+                    pageId={page.id}
+                    pagePath={page.path}
+                    readOnly={readOnly}
+                    showApplications
+                    expandedRewardProperties
+                    templateId={page.sourceTemplateId || undefined}
+                    isTemplate={page.type === 'bounty_template'}
+                  />
+                )}
+                {creatingInlineReward && !readOnly && <NewInlineReward pageId={page.id} />}
+                {/** Structured proposal isn't inside a CharmEditor context, thus useViewContext used in PageSidebar would throw error for undefined view */}
+                {(enableComments ||
+                  enableSuggestingMode ||
+                  page.type === 'proposal' ||
+                  page.type === 'proposal_template') && (
+                  <PageSidebar
+                    pagePath={page.path}
+                    pageTitle={page.title}
+                    id='page-action-sidebar'
+                    pageId={page.id}
+                    spaceId={page.spaceId}
+                    proposalId={proposalId}
+                    isUnpublishedProposal={proposal?.status === 'draft' || page.type === 'proposal_template'}
+                    readOnlyProposalPermissions={!proposal?.permissions.edit}
+                    isReviewer={proposal?.permissions.evaluate}
+                    pagePermissions={pagePermissions}
+                    editorState={editorState}
+                    sidebarView={sidebarView}
+                    // dont let users collapse sidebar when looking at a proposal
+                    closeSidebar={closeSidebar}
+                    openSidebar={setActiveView}
+                    threads={isLoadingThreads ? undefined : threads}
+                    proposal={proposal}
+                    proposalInput={proposal}
+                    proposalTemplateId={proposal?.page?.sourceTemplateId}
+                    onChangeEvaluation={onChangeEvaluation}
+                    refreshProposal={refreshProposal}
+                    disabledViews={isStructuredProposal ? ['suggestions'] : []}
+                    onChangeWorkflow={onChangeWorkflow}
+                    onChangeRewardSettings={onChangeRewardSettings}
+                    isProposalTemplate={page.type === 'proposal_template'}
+                    isStructuredProposal={!!proposal?.formId}
+                  />
+                )}
+              </CardPropertiesWrapper>
               {proposal && proposal.formId ? (
-                <>
-                  {documentPageContent}
-                  <Box mb={10}>
-                    {page.type === 'proposal_template' ? (
-                      <FormFieldsEditor
-                        readOnly={(!isAdmin && (!user || !proposalAuthors.includes(user.id))) || !!proposal?.archived}
-                        proposalId={proposal.id}
-                        formFields={proposal?.form.formFields ?? []}
-                        refreshProposal={refreshProposal}
-                      />
-                    ) : (
-                      <ProposalFormFieldInputs
-                        pageId={page.id}
-                        isReviewer={(proposal?.permissions.evaluate || proposal?.permissions.review) ?? false}
-                        proposalId={proposal.id}
-                        formFields={proposal?.form.formFields ?? []}
-                        readOnly={!user || !pagePermissions.edit_content || !!proposal?.archived}
-                        threads={threads}
-                        isDraft={proposal?.status === 'draft'}
-                      />
-                    )}
-                  </Box>
-                </>
+                <Box mb={4}>
+                  {page.type === 'proposal_template' ? (
+                    <FormFieldsEditor
+                      readOnly={(!isAdmin && (!user || !proposalAuthors.includes(user.id))) || !!proposal?.archived}
+                      proposalId={proposal.id}
+                      formFields={proposal?.form.formFields ?? []}
+                    />
+                  ) : (
+                    <ProposalFormFieldsInput
+                      pageId={page.id}
+                      isReviewer={(proposal?.permissions.evaluate || proposal?.permissions.review) ?? false}
+                      proposalId={proposal.id}
+                      formFields={proposal?.form.formFields ?? []}
+                      readOnly={!user || !pagePermissions.edit_content || !!proposal?.archived}
+                      threads={threads}
+                      isDraft={proposal?.status === 'draft'}
+                    />
+                  )}
+                </Box>
               ) : (
                 <CharmEditor
                   placeholderText={
@@ -498,6 +507,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
                   setEditorState={setEditorState}
                   snapshotProposalId={page.snapshotProposalId}
                   onParticipantUpdate={onParticipantUpdate}
+                  registerView={setCharmEditorView}
                   style={{
                     // 5 lines
                     minHeight: proposalId || page?.type.includes('card') ? '150px' : 'unset'
@@ -505,13 +515,54 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
                   disableNestedPages={page?.type === 'proposal' || page?.type === 'proposal_template'}
                   allowClickingFooter={true}
                   threadIds={threadIds}
-                >
-                  {documentPageContent}
-                </CharmEditor>
+                />
+              )}
+              {isStructuredProposal && proposal?.fields?.enableRewards && (
+                <>
+                  <Box my={1}>
+                    <Typography variant='h5'>{getFeatureTitle('Rewards')}</Typography>
+                  </Box>
+                  <ProposalRewards
+                    pendingRewards={proposal.fields.pendingRewards || []}
+                    requiredTemplateId={proposal.fields.rewardsTemplateId}
+                    reviewers={proposal.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat()}
+                    assignedSubmitters={proposal.authors.map((a) => a.userId)}
+                    variant='solid_button'
+                    rewardIds={proposal.rewardIds || []}
+                    onSave={(pendingReward) => {
+                      const isExisting = proposal.fields?.pendingRewards?.find(
+                        (r) => r.draftId === pendingReward.draftId
+                      );
+                      if (!isExisting) {
+                        onChangeRewardSettings({
+                          pendingRewards: [...(proposal.fields?.pendingRewards || []), pendingReward]
+                        });
+
+                        return;
+                      }
+
+                      onChangeRewardSettings({
+                        pendingRewards: [...(proposal.fields?.pendingRewards || [])].map((draft) => {
+                          if (draft.draftId === pendingReward.draftId) {
+                            return pendingReward;
+                          }
+                          return draft;
+                        })
+                      });
+                    }}
+                    onDelete={(draftId: string) => {
+                      onChangeRewardSettings({
+                        pendingRewards: [...(proposal.fields?.pendingRewards || [])].filter(
+                          (draft) => draft.draftId !== draftId
+                        )
+                      });
+                    }}
+                  />
+                </>
               )}
 
               {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') && (
-                <Box mt='-100px'>
+                <Box>
                   {/* add negative margin to offset height of .charm-empty-footer */}
                   <PageComments page={page} canCreateComments={pagePermissions.comment} />
                 </Box>

@@ -22,6 +22,9 @@ export function extractDatabaseProposalProperties({
     ),
     proposalEvaluationType: (boardBlock.fields as BoardFields).cardProperties.find(
       (prop: IPropertyTemplate) => prop.type === 'proposalEvaluationType'
+    ),
+    proposalAuthor: (boardBlock.fields as BoardFields).cardProperties.find(
+      (prop: IPropertyTemplate) => prop.type === 'proposalAuthor'
     )
   };
 }

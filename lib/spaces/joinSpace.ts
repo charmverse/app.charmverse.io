@@ -69,7 +69,7 @@ export async function joinSpace({ userId, spaceId, source }: Props): Promise<Spa
     }
   });
 
-  updateTrackUserProfileById(userId);
+  // updateTrackUserProfileById(userId);
   trackUserAction('join_a_workspace', { userId, source: source || 'unknown', spaceId });
   publishMemberEvent({
     scope: WebhookEventNames.UserJoined,

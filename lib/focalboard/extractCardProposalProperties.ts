@@ -2,6 +2,7 @@ import type { Block } from '@charmverse/core/prisma';
 
 import type { ProposalEvaluationResultExtended, ProposalEvaluationStatus } from 'lib/proposal/interface';
 
+import type { CardFields, CardPropertyValue } from './card';
 import type { ExtractedDatabaseProposalProperties } from './extractDatabaseProposalProperties';
 
 export type ExtractedCardProposalProperties = {
@@ -9,6 +10,7 @@ export type ExtractedCardProposalProperties = {
   cardProposalStatus: { propertyId: string; optionId: string; value: ProposalEvaluationStatus };
   cardEvaluationType: { propertyId: string; value: ProposalEvaluationResultExtended; optionId: string };
   cardProposalStep: { propertyId: string; optionId: string; value: string };
+  cardProposalAuthor: { propertyId: string; value: string[] };
 };
 
 export function extractCardProposalProperties({
@@ -18,14 +20,22 @@ export function extractCardProposalProperties({
   card: Pick<Block, 'fields'>;
   databaseProperties: Partial<ExtractedDatabaseProposalProperties>;
 }): Partial<ExtractedCardProposalProperties> {
-  const cardValues = (card.fields as any).properties as Record<string, string | number | string[]>;
+  const cardValues = (card.fields as CardFields).properties as Record<string, CardPropertyValue>;
 
   const extractedPropertyValues: Partial<ExtractedCardProposalProperties> = {};
 
   const proposalEvaluationTypePropertyId = databaseProperties.proposalEvaluationType?.id;
+  const proposalAuthorPropertyId = databaseProperties.proposalAuthor?.id;
   const proposalEvaluationTypeValueId = proposalEvaluationTypePropertyId
     ? cardValues[proposalEvaluationTypePropertyId]
     : undefined;
+
+  if (proposalAuthorPropertyId) {
+    extractedPropertyValues.cardProposalAuthor = {
+      propertyId: proposalAuthorPropertyId,
+      value: cardValues[proposalAuthorPropertyId] as string[]
+    };
+  }
 
   if (proposalEvaluationTypePropertyId) {
     extractedPropertyValues.cardEvaluationType = {
