@@ -2,7 +2,7 @@ import type { Space, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 
 import { addCharms } from 'lib/charms/addCharms';
-import type { CharmTxResult } from 'lib/charms/addCharmTransaction';
+import type { TransactionResult } from 'lib/charms/addTransaction';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
@@ -42,7 +42,7 @@ describe('PUT /api/profile/charms - Transfers user charms', () => {
           amount: 60
         })
         .expect(200)
-    ).body as CharmTxResult;
+    ).body as TransactionResult;
 
     expect(response.balance).toBe(40);
   });

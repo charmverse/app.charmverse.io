@@ -1,8 +1,8 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { addCharmTransaction } from 'lib/charms/addCharmTransaction';
-import type { CharmTxRecipient, CharmTxResult } from 'lib/charms/addCharmTransaction';
+import { addTransaction } from 'lib/charms/addTransaction';
+import type { TransactionResult, TransactionRecipient } from 'lib/charms/addTransaction';
 import { getUserOrSpaceWallet } from 'lib/charms/getUserOrSpaceWallet';
 
 /**
@@ -17,9 +17,9 @@ export async function transferCharms({
   amount
 }: {
   sender: string;
-  recipient: CharmTxRecipient;
+  recipient: TransactionRecipient;
   amount: number;
-}): Promise<CharmTxResult> {
+}): Promise<TransactionResult> {
   const senderWallet = await getUserOrSpaceWallet({ userId: sender });
 
   if (!senderWallet) {
@@ -43,7 +43,7 @@ export async function transferCharms({
   const res = await prisma.$transaction([
     prisma.charmWallet.update({ where: { id: senderId }, data: { balance: senderBalance - amount } }),
     prisma.charmWallet.update({ where: { id: recipientId }, data: { balance: recipientBalance + amount } }),
-    addCharmTransaction({ fromAddress: senderId, toAddress: recipientId, amount })
+    addTransaction({ fromAddress: senderId, toAddress: recipientId, amount })
   ]);
 
   return { balance: res[0].balance, txId: res[2].id };

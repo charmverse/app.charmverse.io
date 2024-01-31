@@ -2,7 +2,7 @@ import { InvalidInputError, UnauthorisedActionError } from '@charmverse/core/err
 import type { CharmWallet } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { getCharmTx } from 'lib/charms/getCharmTx';
+import { getTransaction } from 'lib/charms/getTransaction';
 import { getUserOrSpaceWallet } from 'lib/charms/getUserOrSpaceWallet';
 import { spendCharms } from 'lib/charms/spendCharms';
 import { transferCharms } from 'lib/charms/transferCharms';
@@ -16,7 +16,7 @@ describe('spendCharms', () => {
     await prisma.charmWallet.update({ where: { spaceId: space.id }, data: { balance: 137 } });
 
     const { txId, balance } = await spendCharms({ actorId: user.id, spaceId: space.id, amount: 10 });
-    const tx = await getCharmTx(txId);
+    const tx = await getTransaction(txId);
 
     expect(balance).toBe(127);
     expect(tx).toBeDefined();

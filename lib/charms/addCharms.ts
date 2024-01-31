@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { addCharmTransaction } from 'lib/charms/addCharmTransaction';
-import type { CharmTxRecipient, CharmActionTrigger, CharmTxResult } from 'lib/charms/addCharmTransaction';
+import { addTransaction } from 'lib/charms/addTransaction';
+import type { TransactionRecipient, CharmActionTrigger, TransactionResult } from 'lib/charms/addTransaction';
 import { getUserOrSpaceWallet } from 'lib/charms/getUserOrSpaceWallet';
 
 /**
@@ -17,11 +17,11 @@ export async function addCharms({
   actorId,
   actionTrigger
 }: {
-  recipient: CharmTxRecipient;
+  recipient: TransactionRecipient;
   amount: number;
   actorId?: string;
   actionTrigger?: CharmActionTrigger;
-}): Promise<CharmTxResult> {
+}): Promise<TransactionResult> {
   const wallet = await getUserOrSpaceWallet(recipient);
   if (!wallet) {
     throw new Error('Wallet not found');
@@ -31,7 +31,7 @@ export async function addCharms({
 
   const res = await prisma.$transaction([
     prisma.charmWallet.update({ where: { id }, data: { balance: balance + amount } }),
-    addCharmTransaction({ fromAddress: undefined, toAddress: id, amount, metadata: { actorId, actionTrigger } })
+    addTransaction({ fromAddress: undefined, toAddress: id, amount, metadata: { actorId, actionTrigger } })
   ]);
 
   return { balance: res[0].balance, txId: res[1].id };

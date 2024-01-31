@@ -2,8 +2,8 @@ import type { CharmWallet } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { addCharms } from 'lib/charms/addCharms';
-import { CharmActionTrigger } from 'lib/charms/addCharmTransaction';
-import { getCharmTx } from 'lib/charms/getCharmTx';
+import { CharmActionTrigger } from 'lib/charms/addTransaction';
+import { getTransaction } from 'lib/charms/getTransaction';
 import { getUserOrSpaceWallet } from 'lib/charms/getUserOrSpaceWallet';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
@@ -13,7 +13,7 @@ describe('addCharms', () => {
     const wallet = (await getUserOrSpaceWallet({ userId: user.id })) as CharmWallet;
 
     const { balance, txId } = await addCharms({ recipient: { userId: user.id }, amount: 100 });
-    const tx = await getCharmTx(txId);
+    const tx = await getTransaction(txId);
 
     expect(balance).toBe(100);
     expect(tx).toBeDefined();
@@ -29,7 +29,7 @@ describe('addCharms', () => {
     await prisma.charmWallet.update({ where: { id: wallet.id }, data: { balance: 50 } });
 
     const { balance, txId } = await addCharms({ recipient: { userId: user.id }, amount: 100 });
-    const tx = await getCharmTx(txId);
+    const tx = await getTransaction(txId);
 
     expect(balance).toBe(150);
     expect(tx).toBeDefined();
@@ -50,7 +50,7 @@ describe('addCharms', () => {
       actorId: '123',
       actionTrigger: CharmActionTrigger.invite
     });
-    const tx = await getCharmTx(txId);
+    const tx = await getTransaction(txId);
 
     expect(balance).toBe(150);
     expect(tx).toBeDefined();

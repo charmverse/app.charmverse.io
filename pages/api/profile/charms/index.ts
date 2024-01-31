@@ -2,7 +2,7 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { CharmTxResult } from 'lib/charms/addCharmTransaction';
+import type { TransactionResult } from 'lib/charms/addTransaction';
 import { getUserOrSpaceWallet } from 'lib/charms/getUserOrSpaceWallet';
 import { transferCharms } from 'lib/charms/transferCharms';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
@@ -20,7 +20,7 @@ async function getCharmsHandler(req: NextApiRequest, res: NextApiResponse<{ bala
   res.status(200).json(wallet ? { balance: wallet.balance, id: wallet.id } : null);
 }
 
-async function transferCharmsHandler(req: NextApiRequest, res: NextApiResponse<CharmTxResult>) {
+async function transferCharmsHandler(req: NextApiRequest, res: NextApiResponse<TransactionResult>) {
   const sender = req.session.user.id;
   const recipientSpaceId = req.body.spaceId as string;
   const recipientUserId = req.body.userId as string;

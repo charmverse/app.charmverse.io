@@ -1,8 +1,8 @@
 import { InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { CharmTxResult } from 'lib/charms/addCharmTransaction';
-import { addCharmTransaction } from 'lib/charms/addCharmTransaction';
+import type { TransactionResult } from 'lib/charms/addTransaction';
+import { addTransaction } from 'lib/charms/addTransaction';
 import { getUserOrSpaceWallet } from 'lib/charms/getUserOrSpaceWallet';
 
 /**
@@ -19,7 +19,7 @@ export async function spendCharms({
   spaceId: string;
   actorId: string;
   amount: number;
-}): Promise<CharmTxResult> {
+}): Promise<TransactionResult> {
   const spaceRole = await prisma.spaceRole.findFirst({ where: { spaceId, userId: actorId } });
 
   if (!spaceRole?.isAdmin) {
@@ -39,7 +39,7 @@ export async function spendCharms({
   }
   const res = await prisma.$transaction([
     prisma.charmWallet.update({ where: { id: senderId }, data: { balance: senderBalance - amount } }),
-    addCharmTransaction({ fromAddress: senderId, toAddress: undefined, amount })
+    addTransaction({ fromAddress: senderId, toAddress: undefined, amount })
   ]);
 
   return { balance: res[0].balance, txId: res[1].id };

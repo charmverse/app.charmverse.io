@@ -1,4 +1,3 @@
-import type { CharmTransaction, PrismaPromise } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 export enum CharmActionTrigger {
@@ -12,14 +11,14 @@ type CharmTransactionMetadata = {
   actionTrigger?: CharmActionTrigger;
 };
 
-export type CharmTxRecipient = { userId: string } | { spaceId: string };
+export type TransactionRecipient = { userId: string } | { spaceId: string };
 
-export type CharmTxResult = {
+export type TransactionResult = {
   txId: string;
   balance: number;
 };
 
-export function addCharmTransaction({
+export function addTransaction({
   fromAddress,
   toAddress,
   amount,
