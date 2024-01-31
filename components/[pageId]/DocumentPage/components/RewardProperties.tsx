@@ -1,5 +1,5 @@
 import { Divider, Stack } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { useGetPermissions } from 'charmClient/hooks/permissions';
 import { RewardApplications } from 'components/rewards/components/RewardApplications/RewardApplications';
@@ -9,6 +9,7 @@ import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardWithUsersAndPageMeta, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
+import debouncePromise from 'lib/utilities/debouncePromise';
 
 import { RewardSignupButton } from '../../../rewards/components/RewardProperties/components/RewardSignupButton';
 
@@ -35,7 +36,7 @@ export function RewardProperties(props: {
     templateId,
     readOnlyTemplate
   } = props;
-  const { updateReward, refreshReward } = useRewards();
+  const { updateReward } = useRewards();
   const [currentReward, setCurrentReward] = useState<Partial<RewardCreationData & RewardWithUsers> | undefined>(
     initialReward
   );
@@ -48,14 +49,7 @@ export function RewardProperties(props: {
   const { mutate: refreshPagePermissionsList } = useGetPermissions(pageId);
   const { isSpaceMember } = useIsSpaceMember();
 
-  async function resyncReward() {
-    const _rewardId = currentReward?.id;
-    if (_rewardId) {
-      const updated = await refreshReward(_rewardId);
-      setCurrentReward({ ...currentReward, ...updated });
-      rewardChanged?.();
-    }
-  }
+  const debouncedUpdateReward = useMemo(() => debouncePromise(updateReward, 500), [updateReward]);
 
   const readOnly = parentReadOnly || !isSpaceMember || props.readOnly;
 
@@ -65,10 +59,10 @@ export function RewardProperties(props: {
     }
 
     setCurrentReward((_currentReward) => ({ ...(_currentReward as RewardWithUsers), ...updates }));
-
     if (currentReward?.id) {
-      await updateReward({ rewardId: currentReward.id, updateContent: updates });
-      resyncReward();
+      debouncedUpdateReward({ rewardId: currentReward.id, updateContent: updates }).then(() => {
+        rewardChanged?.();
+      });
     }
   }
 
@@ -80,7 +74,6 @@ export function RewardProperties(props: {
       <RewardPropertiesForm
         pageId={pageId}
         refreshPermissions={refreshPagePermissionsList}
-        useDebouncedInputs
         values={currentReward}
         onChange={applyRewardUpdates}
         readOnly={readOnly}

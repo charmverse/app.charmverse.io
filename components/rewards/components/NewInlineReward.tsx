@@ -37,7 +37,7 @@ export function NewInlineReward({ pageId }: { pageId: string }) {
   }, []);
 
   return (
-    <Stack gap={1}>
+    <Stack gap={1} key={selectedTemplate}>
       <RewardPropertiesForm
         templateId={selectedTemplate}
         selectTemplate={selectTemplate}
