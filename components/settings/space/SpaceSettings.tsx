@@ -616,7 +616,7 @@ function getProfileWidgetLogo(name: MemberProfileName) {
     case 'summon':
       return '/images/logos/summon_dark_mark.svg';
     case 'credentials':
-      return <MedalIcon fontSize='small' />;
+      return <MedalIcon />;
     default:
       return '';
   }
