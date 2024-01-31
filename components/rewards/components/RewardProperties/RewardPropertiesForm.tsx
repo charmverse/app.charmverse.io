@@ -83,9 +83,13 @@ export function RewardPropertiesForm({
   const { getFeatureTitle } = useSpaceFeatures();
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(!!expandedByDefault);
+  // Token type rules:
+  // If it is a new reward and not using a template, use Token
+  // If neither rewardToken nor customReward is set, use None
   const [rewardType, setRewardType] = useState<RewardType>(
-    values.customReward ? 'Custom' : isNewReward || values.rewardToken ? 'Token' : 'None'
+    values.customReward ? 'Custom' : values.rewardToken ? 'Token' : isNewReward && !templateId ? 'Token' : 'None'
   );
+
   const allowedSubmittersValue: RoleOption[] = (values.allowedSubmitterRoles ?? []).map((id) => ({
     id,
     group: 'role'
