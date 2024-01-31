@@ -156,11 +156,6 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{
   ${fiduswriterStyles}
 `;
 
-const defaultContent: PageContent = {
-  type: 'doc',
-  content: []
-};
-
 export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 
 type CharmEditorProps = {
@@ -195,7 +190,7 @@ type CharmEditorProps = {
   disableVideo?: boolean;
   setEditorState?: (state: EditorState) => void; // this is used to pass the state to the suggestions sidebar
   threadIds?: string[];
-  registerView?: (view: EditorView) => void;
+  setCharmEditorView?: (view: EditorView | null) => void;
 };
 
 function CharmEditor({
@@ -228,7 +223,7 @@ function CharmEditor({
   sidebarView,
   setSidebarView,
   threadIds,
-  registerView
+  setCharmEditorView
 }: CharmEditorProps) {
   const router = useRouter();
   const { showMessage } = useSnackbar();
@@ -396,7 +391,7 @@ function CharmEditor({
       readOnly={readOnly}
       enableComments={enableComments}
       onConnectionEvent={onConnectionEvent}
-      registerView={registerView}
+      setCharmEditorView={setCharmEditorView}
       style={{
         ...(style ?? {}),
         width: '100%',
