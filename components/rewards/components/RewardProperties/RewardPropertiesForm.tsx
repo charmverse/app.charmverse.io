@@ -4,7 +4,7 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import clsx from 'clsx';
 import { DateTime } from 'luxon';
 import type { ChangeEvent } from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { StyledFocalboardTextInput } from 'components/common/BoardEditor/components/properties/TextInput';
@@ -26,7 +26,7 @@ import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { RewardFieldsProp, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
-import type { Reward, RewardWithUsers, RewardReviewer } from 'lib/rewards/interfaces';
+import type { Reward, RewardReviewer, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -108,7 +108,7 @@ export function RewardPropertiesForm({
   const template = rewardTemplates?.find((tpl) => tpl.page.id === templateId);
   const readOnlyReviewers = !isAdmin && (readOnly || !!template?.reward.reviewers?.length);
   const readOnlyDueDate = !isAdmin && (readOnly || !!template?.reward.dueDate);
-  const readOnlyApplicationType = !isAdmin && (readOnly || !!forcedApplicationType || !!template || isProposalTemplate);
+  const readOnlyApplicationType = !isAdmin && (readOnly || !!forcedApplicationType || !!template);
   const readOnlyProperties = !isAdmin && (readOnly || !!template);
   const readOnlyNumberAvailable = !isAdmin && (readOnly || typeof template?.reward.maxSubmissions === 'number');
   const readOnlyApplicantRoles = !isAdmin && (readOnly || !!template?.reward.allowedSubmitterRoles?.length);
@@ -310,7 +310,7 @@ export function RewardPropertiesForm({
                 Application Type
               </PropertyLabel>
               <RewardApplicationType
-                readOnly={readOnlyApplicationType}
+                readOnly={readOnlyApplicationType || isProposalTemplate}
                 value={rewardApplicationType}
                 onChange={setRewardApplicationType}
               />

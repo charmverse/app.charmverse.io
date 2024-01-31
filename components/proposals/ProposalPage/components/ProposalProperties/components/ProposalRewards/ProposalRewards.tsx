@@ -278,7 +278,7 @@ export function ProposalRewards({
 
       <NewPageDialog
         contentUpdated={contentUpdated || isDirty}
-        disabledTooltip={getDisabledTooltip({ newPageValues, rewardValues })}
+        disabledTooltip={getDisabledTooltip({ newPageValues, rewardValues, isProposalTemplate })}
         isOpen={!!newPageValues}
         onClose={closeDialog}
         onSave={saveForm}
