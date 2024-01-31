@@ -91,15 +91,13 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
   }, [proposalId, enableSidebar, isMdScreen]);
 
   return (
-    <Stack direction='row' id='file-drop-container' width='100%'>
-      <Box display='flex' flexDirection='column' width='100%'>
-        <DocumentPage
-          {...props}
-          setEditorState={setEditorState}
-          setSidebarView={setActiveView}
-          sidebarView={sidebarView}
-        />
-      </Box>
+    <Stack direction='row' width='100%'>
+      <DocumentPage
+        {...props}
+        setEditorState={setEditorState}
+        setSidebarView={setActiveView}
+        sidebarView={sidebarView}
+      />
       {(enableComments || enableSuggestingMode) && (
         <PageSidebar
           id='page-action-sidebar'
