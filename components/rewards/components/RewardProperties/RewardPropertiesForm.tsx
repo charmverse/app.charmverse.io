@@ -22,6 +22,7 @@ import type { RewardType } from 'components/rewards/components/RewardProperties/
 import { RewardTypeSelect } from 'components/rewards/components/RewardProperties/components/RewardTypeSelect';
 import { CustomPropertiesAdapter } from 'components/rewards/components/RewardProperties/CustomPropertiesAdapter';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { RewardFieldsProp, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
@@ -81,11 +82,16 @@ export function RewardPropertiesForm({
     getApplicationType(values, forcedApplicationType)
   );
   const { getFeatureTitle } = useSpaceFeatures();
+  const isAdmin = useIsAdmin();
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(!!expandedByDefault);
+  // Token type rules:
+  // If it is a new reward and not using a template, use Token
+  // If neither rewardToken nor customReward is set, use None
   const [rewardType, setRewardType] = useState<RewardType>(
-    values.customReward ? 'Custom' : isNewReward || values.rewardToken ? 'Token' : 'None'
+    values.customReward ? 'Custom' : values.rewardToken ? 'Token' : isNewReward && !templateId ? 'Token' : 'None'
   );
+
   const allowedSubmittersValue: RoleOption[] = (values.allowedSubmitterRoles ?? []).map((id) => ({
     id,
     group: 'role'
@@ -93,6 +99,11 @@ export function RewardPropertiesForm({
 
   const isAssignedReward = rewardApplicationType === 'assigned';
   const { templates: rewardTemplates = [] } = useRewardTemplates();
+  const template = rewardTemplates?.find((tpl) => tpl.page.id === templateId);
+  const readOnlyReviewers = !isAdmin && (readOnly || !!template?.reward.reviewers?.length);
+  const readOnlyDueDate = !isAdmin && (readOnly || !!template?.reward.dueDate);
+  const readOnlyApplicationType = !isAdmin && (readOnly || !!forcedApplicationType || !!template);
+  const readOnlyProperties = !isAdmin && (readOnly || !!template);
 
   const setRewardApplicationType = useCallback((updatedType: RewardApplicationType) => {
     if (updatedType === 'direct_submission') {
@@ -230,9 +241,9 @@ export function RewardPropertiesForm({
                         if (!templatePage) {
                           selectTemplate(null);
                         }
-                        const template = rewardTemplates.find((_template) => _template.page.id === templatePage?.id);
-                        if (template && selectTemplate) {
-                          selectTemplate(template);
+                        const selected = rewardTemplates.find((_template) => _template.page.id === templatePage?.id);
+                        if (selected && selectTemplate) {
+                          selectTemplate(selected);
                         }
                       }}
                     />
@@ -246,7 +257,7 @@ export function RewardPropertiesForm({
                 Reviewers
               </PropertyLabel>
               <UserAndRoleSelect
-                readOnly={readOnly}
+                readOnly={readOnlyReviewers}
                 value={values.reviewers ?? []}
                 onChange={async (options) => {
                   const reviewerOptions = options.filter(
@@ -268,7 +279,7 @@ export function RewardPropertiesForm({
                 minDate={DateTime.fromMillis(Date.now())}
                 value={values?.dueDate || null}
                 disableMaskedInput
-                disabled={readOnly}
+                disabled={readOnlyDueDate}
                 onAccept={async (value) => {
                   updateRewardDueDate(value);
                 }}
@@ -301,7 +312,7 @@ export function RewardPropertiesForm({
                 Application Type
               </PropertyLabel>
               <RewardApplicationType
-                readOnly={readOnly || !!forcedApplicationType}
+                readOnly={readOnlyApplicationType}
                 value={rewardApplicationType}
                 onChange={setRewardApplicationType}
               />
@@ -416,7 +427,7 @@ export function RewardPropertiesForm({
               <PropertyLabel readOnly highlighted>
                 Type
               </PropertyLabel>
-              <RewardTypeSelect readOnly={readOnly} value={rewardType} onChange={setRewardType} />
+              <RewardTypeSelect readOnly={readOnlyProperties} value={rewardType} onChange={setRewardType} />
             </Box>
 
             {rewardType === 'Token' && (
@@ -427,7 +438,7 @@ export function RewardPropertiesForm({
                 <RewardTokenProperty
                   onChange={onRewardTokenUpdate}
                   currentReward={values as (RewardCreationData & RewardWithUsers) | null}
-                  readOnly={readOnly}
+                  readOnly={readOnlyProperties}
                 />
               </Box>
             )}
@@ -450,7 +461,7 @@ export function RewardPropertiesForm({
                   sx={{
                     width: '100%'
                   }}
-                  disabled={readOnly}
+                  disabled={readOnlyProperties}
                   placeholder='T-shirt'
                   autoFocus
                   rows={1}

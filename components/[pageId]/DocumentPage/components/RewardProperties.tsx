@@ -75,7 +75,6 @@ export function RewardProperties(props: {
   if (!currentReward) {
     return null;
   }
-
   return (
     <Stack flex={1}>
       <RewardPropertiesForm
