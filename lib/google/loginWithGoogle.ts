@@ -92,7 +92,6 @@ export async function loginWithGoogle({
         },
         include: sessionUserRelations
       });
-
       trackUserAction('sign_up', { userId: user.id, identityType: 'Google', ...signupAnalytics });
     } else {
       await prisma.googleAccount.update({
