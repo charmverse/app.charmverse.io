@@ -21,6 +21,13 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
 
   const sessionUserId = context.req.session?.user?.id;
 
+  if (!sessionUserId) {
+    // show the normal login UI
+    return {
+      props: {}
+    };
+  }
+
   if (sessionUserId && domainToUse && template) {
     const space = await prisma.space.findFirst({
       where: spaceDomainFromPath ? { domain: domainToUse } : { customDomain: domainToUse, isCustomDomainVerified: true }
