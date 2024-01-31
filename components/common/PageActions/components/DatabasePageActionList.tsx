@@ -26,6 +26,7 @@ import ConfirmImportModal from 'components/common/Modal/ConfirmImportModal';
 import { AddToFavoritesAction } from 'components/common/PageActions/components/AddToFavoritesAction';
 import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
 import { DuplicatePageAction } from 'components/common/PageActions/components/DuplicatePageAction';
+import { SetAsHomePageAction } from 'components/common/PageActions/components/SetAsHomePageAction';
 import { useApiPageKeys } from 'hooks/useApiPageKeys';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
@@ -199,6 +200,7 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
   return (
     <List dense>
       <AddToFavoritesAction pageId={pageId} onComplete={onComplete} />
+      <SetAsHomePageAction pageId={pageId} onComplete={onComplete} />
       <DuplicatePageAction
         onComplete={onComplete}
         pageId={pageId}

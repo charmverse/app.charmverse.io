@@ -6,7 +6,7 @@ import { getIronSession, unsealData } from 'iron-session';
 import type { Socket } from 'socket.io';
 
 import { ActionNotPermittedError } from 'lib/middleware';
-import { authSecret } from 'lib/session/config';
+import { authSecret } from 'lib/session/authSecret';
 import { getIronOptions } from 'lib/session/getIronOptions';
 import type { SealedUserId } from 'lib/websockets/interfaces';
 

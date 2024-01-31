@@ -15,6 +15,7 @@ import Typography from '@mui/material/Typography';
 import charmClient from 'charmClient';
 import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { Button } from 'components/common/Button';
+import { SetAsHomePageAction } from 'components/common/PageActions/components/SetAsHomePageAction';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
@@ -267,7 +268,10 @@ export function DocumentPageActionList({
       )}
       <Divider />
       {(page.type === 'card' || page.type === 'card_synced' || page.type === 'page') && (
-        <AddToFavoritesAction pageId={pageId} onComplete={onComplete} />
+        <>
+          <AddToFavoritesAction pageId={pageId} onComplete={onComplete} />
+          <SetAsHomePageAction pageId={pageId} onComplete={onComplete} />
+        </>
       )}
       {page && (
         <DuplicatePageAction
