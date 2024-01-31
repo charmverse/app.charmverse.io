@@ -284,6 +284,7 @@ export function ProposalRewards({
         isSaving={isSavingReward}
       >
         <NewDocumentPage
+          key={newPageValues?.templateId}
           titlePlaceholder='Reward title (required)'
           values={newPageValues}
           onChange={updateNewPageValues}
