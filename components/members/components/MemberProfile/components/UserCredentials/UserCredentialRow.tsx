@@ -103,12 +103,10 @@ export function UserCredentialRow({
     return null;
   }
 
-  const isDisabled = isMutating || totalFavorites >= 5;
-
   return (
     <Grid container display='flex' alignItems='center' justifyContent='space-between'>
       <Grid item xs={5}>
-        <Box ml={2} display='flex' alignItems='center' gap={2}>
+        <Box display='flex' alignItems='center' gap={2}>
           <Image src={credentialInfo.iconUrl} alt='charmverse-logo' height={30} width={30} />
           <Box display='flex' flexDirection='column'>
             <Typography variant='body1' fontWeight='bold'>
@@ -125,20 +123,20 @@ export function UserCredentialRow({
           <Chip variant='outlined' key={field.name} label={field.value} />
         ))}
       </Grid>
-      {isUserRecipient && (
+      {isUserRecipient && mutateUserCredentials && (
         <Grid item xs={1} display='flex' justifyContent='flex-end'>
-          <Tooltip title={totalFavorites >= 5 ? 'You can only favorite 5 credentials' : 'Favorite'}>
+          <Tooltip title={isMutating ? '' : 'Favorite'}>
             <div>
-              <IconButton size='small' onClick={toggleFavorite} disabled={isDisabled}>
+              <IconButton size='small' onClick={toggleFavorite} disabled={isMutating}>
                 {!credential.favorite ? (
                   <StarBorderOutlinedIcon
-                    color={isDisabled ? 'disabled' : 'primary'}
+                    color={isMutating ? 'disabled' : 'primary'}
                     fontSize='small'
                     sx={{ alignSelf: 'center' }}
                   />
                 ) : (
                   <StarOutlinedIcon
-                    color={isDisabled ? 'disabled' : 'primary'}
+                    color={isMutating ? 'disabled' : 'primary'}
                     fontSize='small'
                     sx={{ alignSelf: 'center' }}
                   />

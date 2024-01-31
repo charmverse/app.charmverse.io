@@ -41,5 +41,5 @@ export async function getAllUserCredentials({ userId }: { userId: string }): Pro
     getAllOnChainAttestations({ wallets })
   ]).then((data) => data.flat());
 
-  return allCredentials;
+  return allCredentials.sort((a, b) => b.timeCreated - a.timeCreated);
 }

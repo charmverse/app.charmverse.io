@@ -6,23 +6,26 @@ import type { KeyedMutator } from 'swr';
 
 import { useGetUserCredentials } from 'charmClient/hooks/credentialHooks';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { useUser } from 'hooks/useUser';
 import type { EASAttestationWithFavorite } from 'lib/credentials/external/getExternalCredentials';
 
 import { UserCredentialRow } from './UserCredentialRow';
 
-function UserFavoriteList({
+export function UserFavoriteList({
   credentials,
-  mutateUserCredentials
+  mutateUserCredentials,
+  hideTitle = false
 }: {
   credentials: EASAttestationWithFavorite[];
+  hideTitle?: boolean;
   mutateUserCredentials?: KeyedMutator<EASAttestationWithFavorite[]>;
 }) {
   return (
     <Stack gap={1}>
-      <Typography variant='h6' fontWeight='bold'>
-        Favorites
-      </Typography>
+      {!hideTitle && (
+        <Typography variant='h6' fontWeight='bold'>
+          Favorites
+        </Typography>
+      )}
       {credentials.length === 0 ? (
         <Card variant='outlined'>
           <Box p={3} textAlign='center'>
@@ -44,11 +47,35 @@ function UserFavoriteList({
   );
 }
 
+export function UserAllCredentialsList({
+  credentials,
+  mutateUserCredentials,
+  hideTitle = false
+}: {
+  hideTitle?: boolean;
+  credentials: EASAttestationWithFavorite[];
+  mutateUserCredentials?: KeyedMutator<EASAttestationWithFavorite[]>;
+}) {
+  return (
+    <Stack gap={1}>
+      {!hideTitle && (
+        <Typography variant='h6' fontWeight='bold'>
+          All
+        </Typography>
+      )}
+      {credentials?.map((credential) => (
+        <Box key={credential.id}>
+          <UserCredentialRow mutateUserCredentials={mutateUserCredentials} credential={credential} />
+          <Divider sx={{ mt: 1 }} />
+        </Box>
+      ))}
+    </Stack>
+  );
+}
+
 export function UserCredentialsList({ userId }: { userId: string }) {
   const { data: userCredentials, error, isLoading, mutate: mutateUserCredentials } = useGetUserCredentials({ userId });
   const favoriteCredentials = userCredentials?.filter((credential) => credential.favorite).slice(0, 5);
-  const nonFavoriteCredentials = userCredentials?.filter((credential) => !credential.favorite);
-  const { user } = useUser();
 
   if (!userCredentials && isLoading) {
     return (
@@ -73,26 +100,12 @@ export function UserCredentialsList({ userId }: { userId: string }) {
     );
   }
 
-  if (user?.id === userId) {
-    return (
-      <Stack gap={2}>
-        <UserFavoriteList mutateUserCredentials={mutateUserCredentials} credentials={favoriteCredentials ?? []} />
-        {nonFavoriteCredentials?.length ? (
-          <Stack gap={1}>
-            <Typography variant='h6' fontWeight='bold'>
-              Credentials
-            </Typography>
-            {nonFavoriteCredentials?.map((credential) => (
-              <Box key={credential.id}>
-                <UserCredentialRow mutateUserCredentials={mutateUserCredentials} credential={credential} />
-                <Divider sx={{ mt: 1 }} />
-              </Box>
-            ))}
-          </Stack>
-        ) : null}
-      </Stack>
-    );
-  }
-
-  return <UserFavoriteList credentials={favoriteCredentials ?? []} />;
+  return (
+    <Stack gap={2}>
+      <UserFavoriteList mutateUserCredentials={mutateUserCredentials} credentials={favoriteCredentials ?? []} />
+      {userCredentials?.length ? (
+        <UserAllCredentialsList mutateUserCredentials={mutateUserCredentials} credentials={userCredentials} />
+      ) : null}
+    </Stack>
+  );
 }
