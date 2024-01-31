@@ -23,26 +23,15 @@ async function getRewardBlocksHandler(req: NextApiRequest, res: NextApiResponse<
   const spaceId = req.query.id as string;
   const blockId = req.query.blockId as string;
 
-  // Session may be undefined as non-logged in users can access this endpoint
-  const userId = req.session?.user?.id;
-
-  const { spaceRole } = await hasAccessToSpace({
-    spaceId,
-    userId
-  });
-
   const space = await prisma.space.findUniqueOrThrow({
     where: {
       id: spaceId
     },
     select: {
-      publicBountyBoard: true
+      publicBountyBoard: true,
+      publicProposals: true
     }
   });
-
-  if (!spaceRole && !space.publicBountyBoard) {
-    throw new ActionNotPermittedError(`You cannot access the rewards list`);
-  }
 
   const rewardBlocks = await getBlocks({
     spaceId,
