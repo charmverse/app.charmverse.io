@@ -29,6 +29,7 @@ async function verifyOtp(req: NextApiRequest, res: NextApiResponse<LoggedInUser>
 
   await verifyOtpToken(userId, authCode);
 
+  req.session.anonymousUserId = undefined;
   req.session.otpUser = undefined;
   req.session.user = { id: userId };
   await req.session.save();
@@ -37,7 +38,7 @@ async function verifyOtp(req: NextApiRequest, res: NextApiResponse<LoggedInUser>
 
   trackUserAction('sign_in_otp', { userId: user.id, identityType: method });
 
-  log.info(`User ${user.id} logged in with ${method}`, { userId: user.id, method });
+  log.info(`User ${user.id} verified otp and logged in  with ${method}`, { userId: user.id, method });
 
   res.status(200).json(user);
 }
