@@ -1,6 +1,6 @@
 import type { Page } from '@charmverse/core/prisma';
 import type { Theme } from '@mui/material';
-import { Box, Tab, Tabs, Typography, useMediaQuery } from '@mui/material';
+import { Box, Stack, Tab, Tabs, Typography, useMediaQuery } from '@mui/material';
 import dynamic from 'next/dynamic';
 import type { EditorState } from 'prosemirror-state';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
@@ -259,7 +259,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
   const proposalAuthors = proposal ? [proposal.createdBy, ...proposal.authors.map((author) => author.userId)] : [];
 
   return (
-    <PrimaryColumn id='file-drop-container' ref={containerRef} showPageActionSidebar={showPageActionSidebar}>
+    <Stack direction='row' ref={containerRef} id='file-drop-container' width='100%'>
       <Box display='flex' flexDirection='column' width='100%'>
         <Box
           ref={printRef}
@@ -429,25 +429,6 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
                     />
                   )}
                   {creatingInlineReward && !readOnly && <NewInlineReward pageId={page.id} />}
-                  {/** Structured proposal isn't inside a CharmEditor context, thus useViewContext used in PageSidebar would throw error for undefined view */}
-                  {(enableComments ||
-                    enableSuggestingMode ||
-                    page.type === 'proposal' ||
-                    page.type === 'proposal_template') && (
-                    <PageSidebar
-                      id='page-action-sidebar'
-                      pageId={page.id}
-                      spaceId={page.spaceId}
-                      pagePermissions={pagePermissions}
-                      editorState={editorState}
-                      sidebarView={sidebarView}
-                      closeSidebar={closeSidebar}
-                      openSidebar={setActiveView}
-                      threads={isLoadingThreads ? undefined : threads}
-                      proposal={proposal}
-                      disabledViews={isStructuredProposal ? ['suggestions'] : []}
-                    />
-                  )}
                 </CardPropertiesWrapper>
                 {proposal && proposal.formId ? (
                   <Box mb={10}>
@@ -568,6 +549,21 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
           />
         )}
       </Box>
+      {(enableComments || enableSuggestingMode) && (
+        <PageSidebar
+          id='page-action-sidebar'
+          pageId={page.id}
+          spaceId={page.spaceId}
+          pagePermissions={pagePermissions}
+          editorState={editorState}
+          sidebarView={sidebarView}
+          closeSidebar={closeSidebar}
+          openSidebar={setActiveView}
+          threads={isLoadingThreads ? undefined : threads}
+          proposal={proposal}
+          disabledViews={isStructuredProposal ? ['suggestions'] : []}
+        />
+      )}
       {(page.type === 'proposal' || page.type === 'proposal_template') && (
         <ProposalSidebar
           isOpen={sidebarView === 'proposal_evaluation'}
@@ -589,7 +585,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
           onChangeWorkflow={onChangeWorkflow}
         />
       )}
-    </PrimaryColumn>
+    </Stack>
   );
 }
 

@@ -16,19 +16,37 @@ import { SuggestionsSidebar } from './components/SuggestionsSidebar';
 import { TogglePageSidebarButton } from './components/TogglePageButton';
 import { SIDEBAR_VIEWS } from './constants';
 
-const DesktopContainer = styled.div`
-  position: fixed;
-  right: 0px;
-  width: 430px;
-  max-width: 100%;
-  top: 56px; // height of MUI Toolbar
-  z-index: var(--z-index-drawer);
-  height: calc(100% - 56px);
-  overflow: auto;
-  padding: ${({ theme }) => theme.spacing(0, 1)};
-  background: ${({ theme }) => theme.palette.background.default};
+// const DesktopContainer = styled.div`
+//   position: fixed;
+//   right: 0px;
+//   width: 430px;
+//   max-width: 100%;
+//   top: 56px; // height of MUI Toolbar
+//   z-index: var(--z-index-drawer);
+//   height: calc(100% - 56px);
+//   overflow: auto;
+//   padding: ${({ theme }) => theme.spacing(0, 1)};
+//   background: ${({ theme }) => theme.palette.background.default};
+//   border-left: 1px solid var(--input-border);
+// `;
+
+const sidebarWidth = '430px';
+const sidebarMinWidth = '0px';
+
+const DesktopContainer = styled('div', {
+  shouldForwardProp: (prop) => prop !== 'open'
+})<{ open: boolean }>(
+  ({ open, theme }) => `
+
+  background: ${theme.palette.background.default};
   border-left: 1px solid var(--input-border);
-`;
+  overflow: auto;
+  max-width: ${open ? sidebarWidth : sidebarMinWidth};
+  width: 100%;
+  transition: max-width ease-in 0.25s;
+  height: 100%;
+`
+);
 
 type SidebarProps = {
   // eslint-disable-next-line react/no-unused-prop-types
@@ -69,46 +87,43 @@ function PageSidebarComponent(props: SidebarProps) {
   }
 
   return isMdScreen ? (
-    <Slide
-      appear={false}
-      direction='left'
-      in={isOpen}
-      style={{
-        transformOrigin: 'left top'
-      }}
-      easing={{
-        enter: 'ease-in',
-        exit: 'ease-out'
-      }}
-      timeout={250}
-    >
-      <DesktopContainer id={id}>
-        <Box
-          sx={{
-            height: 'calc(100%)',
-            gap: 1,
-            display: 'flex',
-            flexDirection: 'column'
-          }}
-        >
-          <Box display='flex' gap={1} alignItems='center'>
-            <TogglePageSidebarButton onClick={toggleSidebar} />
-            <Typography flexGrow={1} fontWeight={600} fontSize={20}>
-              {sidebarTitle}
-            </Typography>
-            {openSidebar && (
-              <SidebarNavigationIcons
-                activeView={sidebarView}
-                openSidebar={openSidebar}
-                disabledViews={disabledViews}
-              />
-            )}
-          </Box>
-          <SidebarContents {...props} />
+    // <Slide
+    //   appear={false}
+    //   direction='left'
+    //   in={isOpen}
+    //   style={{
+    //     transformOrigin: 'left top'
+    //   }}
+    //   easing={{
+    //     enter: 'ease-in',
+    //     exit: 'ease-out'
+    //   }}
+    //   timeout={250}
+    // >
+    <DesktopContainer id={id} open={isOpen}>
+      <Box
+        sx={{
+          height: '100%',
+          gap: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          px: 1
+        }}
+      >
+        <Box display='flex' gap={1} alignItems='center'>
+          <TogglePageSidebarButton onClick={toggleSidebar} />
+          <Typography flexGrow={1} fontWeight={600} fontSize={20}>
+            {sidebarTitle}
+          </Typography>
+          {openSidebar && (
+            <SidebarNavigationIcons activeView={sidebarView} openSidebar={openSidebar} disabledViews={disabledViews} />
+          )}
         </Box>
-      </DesktopContainer>
-    </Slide>
+        <SidebarContents {...props} />
+      </Box>
+    </DesktopContainer>
   ) : (
+    // </Slide>
     <MobileDialog
       title={sidebarTitle}
       open={isOpen}

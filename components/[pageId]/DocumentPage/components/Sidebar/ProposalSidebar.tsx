@@ -18,7 +18,7 @@ const SidebarContainer = styled('div', {
   ({ open, theme }) => `
   background: ${theme.palette.background.default};
   border-left: 1px solid var(--input-border);
-  overflow: hidden;
+  overflow: auto;
   max-width: ${open ? sidebarWidth : sidebarMinWidth};
   width: 100%;
   transition: max-width ease-in 0.25s;
@@ -54,7 +54,7 @@ function SidebarComponent(props: SidebarProps) {
               </Typography>
             )}
           </Box>
-          <div onClick={openSidebar}>
+          <div onClick={openSidebar} style={{ overflow: 'auto', height: '100%' }}>
             <ProposalEvaluations {...props} expanded={isOpen} />
           </div>
         </Box>

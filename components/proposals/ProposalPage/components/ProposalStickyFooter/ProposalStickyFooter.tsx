@@ -35,7 +35,7 @@ export function ProposalStickyFooter({
       proposalType: isStructuredProposal ? 'structured' : 'free_form',
       title: page.title,
       ...proposal,
-      formFields: proposal.form.formFields || undefined,
+      formFields: proposal.form?.formFields || undefined,
       authors: proposal.authors.map((a) => a.userId)
     }
   }).join('\n');
