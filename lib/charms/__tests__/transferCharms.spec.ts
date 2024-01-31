@@ -1,4 +1,5 @@
 import { InvalidInputError } from '@charmverse/core/errors';
+import type { CharmWallet } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { getCharmTx } from 'lib/charms/getCharmTx';
@@ -9,8 +10,8 @@ import { generateUserAndSpace } from 'testing/setupDatabase';
 describe('transferCharms', () => {
   it('sends charms from user to space', async () => {
     const { user, space } = await generateUserAndSpace({ isAdmin: true });
-    const userWallet = await getUserOrSpaceWallet({ userId: user.id });
-    const spaceWallet = await getUserOrSpaceWallet({ spaceId: space.id });
+    const userWallet = (await getUserOrSpaceWallet({ userId: user.id })) as CharmWallet;
+    const spaceWallet = (await getUserOrSpaceWallet({ spaceId: space.id })) as CharmWallet;
 
     // update user balance
     await prisma.charmWallet.update({ where: { userId: user.id }, data: { balance: 1337 } });

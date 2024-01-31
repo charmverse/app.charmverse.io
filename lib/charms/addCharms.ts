@@ -22,7 +22,12 @@ export async function addCharms({
   actorId?: string;
   actionTrigger?: CharmActionTrigger;
 }): Promise<CharmTxResult> {
-  const { id, balance } = await getUserOrSpaceWallet(recipient);
+  const wallet = await getUserOrSpaceWallet(recipient);
+  if (!wallet) {
+    throw new Error('Wallet not found');
+  }
+
+  const { id, balance } = wallet;
 
   const res = await prisma.$transaction([
     prisma.charmWallet.update({ where: { id }, data: { balance: balance + amount } }),

@@ -1,3 +1,4 @@
+import type { CharmWallet } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { addCharms } from 'lib/charms/addCharms';
@@ -9,7 +10,7 @@ import { generateUserAndSpace } from 'testing/setupDatabase';
 describe('addCharms', () => {
   it('adds charms to empty user wallet', async () => {
     const { user } = await generateUserAndSpace({ isAdmin: true });
-    const wallet = await getUserOrSpaceWallet({ userId: user.id });
+    const wallet = (await getUserOrSpaceWallet({ userId: user.id })) as CharmWallet;
 
     const { balance, txId } = await addCharms({ recipient: { userId: user.id }, amount: 100 });
     const tx = await getCharmTx(txId);
@@ -24,7 +25,7 @@ describe('addCharms', () => {
 
   it('top ups charms balance', async () => {
     const { user } = await generateUserAndSpace({ isAdmin: true });
-    const wallet = await getUserOrSpaceWallet({ userId: user.id });
+    const wallet = (await getUserOrSpaceWallet({ userId: user.id })) as CharmWallet;
     await prisma.charmWallet.update({ where: { id: wallet.id }, data: { balance: 50 } });
 
     const { balance, txId } = await addCharms({ recipient: { userId: user.id }, amount: 100 });
@@ -40,7 +41,7 @@ describe('addCharms', () => {
 
   it('top ups charms balance and stores metadata', async () => {
     const { user } = await generateUserAndSpace({ isAdmin: true });
-    const wallet = await getUserOrSpaceWallet({ userId: user.id });
+    const wallet = (await getUserOrSpaceWallet({ userId: user.id })) as CharmWallet;
     await prisma.charmWallet.update({ where: { id: wallet.id }, data: { balance: 50 } });
 
     const { balance, txId } = await addCharms({

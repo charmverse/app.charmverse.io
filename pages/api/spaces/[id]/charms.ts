@@ -9,12 +9,12 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' })).get(getCharmsHandler);
 
-async function getCharmsHandler(req: NextApiRequest, res: NextApiResponse<{ balance: number }>) {
+async function getCharmsHandler(req: NextApiRequest, res: NextApiResponse<{ balance: number; id: string } | null>) {
   const spaceId = req.query.id as string;
 
-  const { balance } = await getUserOrSpaceWallet({ spaceId });
+  const wallet = await getUserOrSpaceWallet({ spaceId, readOnly: true });
 
-  res.status(200).json({ balance });
+  res.status(200).json(wallet ? { balance: wallet.balance, id: wallet.id } : null);
 }
 
 export default withSessionRoute(handler);

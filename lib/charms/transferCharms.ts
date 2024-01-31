@@ -20,13 +20,25 @@ export async function transferCharms({
   recipient: CharmTxRecipient;
   amount: number;
 }): Promise<CharmTxResult> {
-  const { id: senderId, balance: senderBalance } = await getUserOrSpaceWallet({ userId: sender });
+  const senderWallet = await getUserOrSpaceWallet({ userId: sender });
+
+  if (!senderWallet) {
+    throw new Error('Sender wallet not found');
+  }
+
+  const { id: senderId, balance: senderBalance } = senderWallet;
 
   if (senderBalance < amount) {
     throw new InvalidInputError('Insufficient balance');
   }
 
-  const { id: recipientId, balance: recipientBalance } = await getUserOrSpaceWallet(recipient);
+  const recipientWallet = await getUserOrSpaceWallet(recipient);
+
+  if (!recipientWallet) {
+    throw new Error('Recipient wallet not found');
+  }
+
+  const { id: recipientId, balance: recipientBalance } = recipientWallet;
 
   const res = await prisma.$transaction([
     prisma.charmWallet.update({ where: { id: senderId }, data: { balance: senderBalance - amount } }),

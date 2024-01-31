@@ -12,12 +12,12 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).get(getCharmsHandler).put(transferCharmsHandler);
 
-async function getCharmsHandler(req: NextApiRequest, res: NextApiResponse<{ balance: number }>) {
+async function getCharmsHandler(req: NextApiRequest, res: NextApiResponse<{ balance: number; id: string } | null>) {
   const userId = req.session.user.id;
 
-  const { balance } = await getUserOrSpaceWallet({ userId });
+  const wallet = await getUserOrSpaceWallet({ userId, readOnly: true });
 
-  res.status(200).json({ balance });
+  res.status(200).json(wallet ? { balance: wallet.balance, id: wallet.id } : null);
 }
 
 async function transferCharmsHandler(req: NextApiRequest, res: NextApiResponse<CharmTxResult>) {

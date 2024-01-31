@@ -1,4 +1,5 @@
 import { InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
+import type { CharmWallet } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { getCharmTx } from 'lib/charms/getCharmTx';
@@ -10,7 +11,7 @@ import { generateUserAndSpace } from 'testing/setupDatabase';
 describe('spendCharms', () => {
   it('spends space charms by admin', async () => {
     const { user, space } = await generateUserAndSpace({ isAdmin: true });
-    const spaceWallet = await getUserOrSpaceWallet({ spaceId: space.id });
+    const spaceWallet = (await getUserOrSpaceWallet({ spaceId: space.id })) as CharmWallet;
     // update space balance
     await prisma.charmWallet.update({ where: { spaceId: space.id }, data: { balance: 137 } });
 

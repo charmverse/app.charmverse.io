@@ -26,7 +26,13 @@ export async function spendCharms({
     throw new UnauthorisedActionError('Only space admins can spend charms');
   }
 
-  const { id: senderId, balance: senderBalance } = await getUserOrSpaceWallet({ spaceId });
+  const senderWallet = await getUserOrSpaceWallet({ spaceId });
+
+  if (!senderWallet) {
+    throw new Error('Sender wallet not found');
+  }
+
+  const { id: senderId, balance: senderBalance } = senderWallet;
 
   if (senderBalance < amount) {
     throw new InvalidInputError('Insufficient balance');
