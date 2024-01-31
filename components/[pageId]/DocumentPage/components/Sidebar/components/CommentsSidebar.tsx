@@ -251,7 +251,7 @@ function EditorCommentsSidebarComponent({
     .filter((inlineThreadsId) => threadListSet.has(inlineThreadsId))
     .map((filteredThreadId) => threads && threads[filteredThreadId])
     .filter(isTruthy);
-  const { updateThreadPluginState } = useInlineComment();
+  const { updateThreadPluginState } = useInlineComment(view);
 
   useHighlightThreadBox({
     openSidebar,
