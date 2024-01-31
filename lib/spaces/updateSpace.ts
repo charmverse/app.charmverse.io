@@ -10,6 +10,7 @@ export type UpdateableSpaceFields = Partial<
   Pick<
     Space,
     | 'hiddenFeatures'
+    | 'homePageId'
     | 'domain'
     | 'name'
     | 'spaceImage'
@@ -62,6 +63,7 @@ export async function updateSpace(spaceId: string, updates: UpdateableSpaceField
     },
     data: {
       domain,
+      homePageId: updates.homePageId,
       name: updates.name,
       spaceImage: updates.spaceImage,
       spaceArtwork: updates.spaceArtwork,

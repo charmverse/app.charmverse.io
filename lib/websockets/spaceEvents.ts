@@ -15,12 +15,12 @@ import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { authSecret } from 'lib/session/config';
+import { authSecret } from 'lib/session/authSecret';
 import type { ClientMessage, SealedUserId } from 'lib/websockets/interfaces';
 
 import type { DocumentRoom } from './documentEvents/docRooms';
 import type { DocumentEventHandler } from './documentEvents/documentEvents';
-import type { ClientDiffMessage, ProsemirrorJSONStep } from './documentEvents/interfaces';
+import type { ProsemirrorJSONStep } from './documentEvents/interfaces';
 import type { AbstractWebsocketBroadcaster } from './interfaces';
 
 export class SpaceEventHandler {

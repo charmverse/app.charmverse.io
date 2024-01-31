@@ -1,6 +1,5 @@
 import type { IdentityType } from '@charmverse/core/prisma-client';
 
-import { authSecret as _maybeAuthSecret, isTestEnv } from 'config/constants';
 import 'iron-session';
 
 declare module 'iron-session' {
@@ -15,12 +14,6 @@ declare module 'iron-session' {
     otpUser?: { id: string; method: IdentityType };
   }
 }
-
-if (!_maybeAuthSecret && !isTestEnv) {
-  throw new Error('The AUTH_SECRET env var is required to start server');
-}
-
-export const authSecret = _maybeAuthSecret as string;
 
 // a map of relationships we pull in for the logged-in user (try to keep this small)
 export const sessionUserRelations = {

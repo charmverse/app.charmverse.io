@@ -4,10 +4,10 @@ import type { Space } from '@charmverse/core/prisma';
 import { PageType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { StaticPageType, PageEventMap } from 'lib/metrics/mixpanel/interfaces/PageEvent';
+import type { PageEventMap, StaticPageType } from 'lib/metrics/mixpanel/interfaces/PageEvent';
 import { filterVisiblePages } from 'lib/pages/filterVisiblePages';
-import { getPermissionsClient, permissionsApiClient } from 'lib/permissions/api/client';
-import { getSubdomainPath, getSpaceUrl, fullyDecodeURI } from 'lib/utilities/browser';
+import { permissionsApiClient } from 'lib/permissions/api/client';
+import { fullyDecodeURI, getSpaceUrl, getSubdomainPath } from 'lib/utilities/browser';
 
 type ViewMeta = PageEventMap['page_view']['meta'];
 
@@ -25,14 +25,48 @@ export async function getDefaultPageForSpace({
   host,
   userId
 }: {
-  space: Pick<Space, 'id' | 'domain' | 'customDomain'>;
+  space: Pick<Space, 'id' | 'domain' | 'customDomain' | 'homePageId'>;
   host?: string;
-  userId: string;
+  userId?: string;
 }) {
-  const defaultPage = await getDefaultPageForSpaceRaw({ space, host, userId });
+  const defaultPage = await (userId
+    ? getDefaultPageForSpaceRaw({ space, host, userId })
+    : getDefaultPageForSpaceWithNonLoggedInUser({ space, host }));
   // encode to handle Japanese characters
   // call fullyDecodeURI to handle cases where we saved the pathname with encoded characters
   return encodeURI(fullyDecodeURI(defaultPage));
+}
+
+async function getDefaultPageForSpaceWithNonLoggedInUser({
+  space,
+  host
+}: {
+  space: Pick<Space, 'id' | 'domain' | 'customDomain' | 'homePageId'>;
+  host?: string;
+}): Promise<string> {
+  const defaultReturnValue = `join?domain=${space.domain}`;
+  const defaultSpaceUrl = getSpaceUrl(space, host);
+
+  if (!space.homePageId) {
+    return defaultReturnValue;
+  }
+
+  const page = await prisma.page.findFirst({
+    where: {
+      id: space.homePageId,
+      permissions: {
+        some: {
+          public: true
+        }
+      }
+    }
+  });
+
+  if (page) {
+    return `${defaultSpaceUrl}/${page.path}`;
+  } else {
+    return defaultReturnValue;
+  }
 }
 
 // get default page when we have a space domain
@@ -41,14 +75,15 @@ async function getDefaultPageForSpaceRaw({
   host,
   userId
 }: {
-  space: Pick<Space, 'id' | 'domain' | 'customDomain'>;
+  space: Pick<Space, 'id' | 'domain' | 'customDomain' | 'homePageId'>;
   host?: string;
   userId: string;
 }) {
   const { id: spaceId } = space;
   const lastPageView = await getLastPageView({ userId, spaceId });
   const defaultSpaceUrl = getSpaceUrl(space, host);
-  if (lastPageView) {
+
+  if (lastPageView && !space.homePageId) {
     // grab the original path a user was on to include query params like filters, etc.
     const pathname = (lastPageView.meta as ViewMeta)?.pathname;
     const fullPathname = pathname && getSubdomainPath(pathname, space, host);
@@ -115,7 +150,10 @@ async function getDefaultPageForSpaceRaw({
   const sortedPages = pageTree.sortNodes(pagesToLookup as PageMeta[]);
 
   const firstPage = sortedPages[0];
-  if (firstPage) {
+  const homePage = space.homePageId && pageMap[space.homePageId];
+  if (homePage) {
+    return `${defaultSpaceUrl}/${homePage.path}`;
+  } else if (firstPage) {
     return `${defaultSpaceUrl}/${firstPage.path}`;
   } else {
     return `${defaultSpaceUrl}/members`;

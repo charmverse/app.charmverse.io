@@ -45,7 +45,7 @@ interface UpdateForumPostInput {
 /**
  * @swagger
  * /forum/posts/{postId}:
- *   post:
+ *   put:
  *     summary: Update a forum post
  *     tags:
  *      - 'Space API'
@@ -137,7 +137,7 @@ async function updatePost(req: NextApiRequest, res: NextApiResponse<PublicApiFor
   return res.status(200).json(forumPost);
 }
 
-handler.post(updatePost);
+handler.put(updatePost);
 
 handler.get(getProposal);
 
