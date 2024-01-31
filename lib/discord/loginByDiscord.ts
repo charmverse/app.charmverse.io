@@ -3,7 +3,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
-import { generateCharmWallet } from 'lib/charms/generateCharmWallet';
 import { getDiscordAccount } from 'lib/discord/client/getDiscordAccount';
 import { getDiscordCallbackUrl } from 'lib/discord/getDiscordCallbackUrl';
 import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
@@ -95,8 +94,6 @@ export async function loginByDiscord({
       },
       include: sessionUserRelations
     });
-
-    await generateCharmWallet({ userId: newUser.id });
 
     updateTrackUserProfile(newUser);
     trackUserAction('sign_up', { userId: newUser.id, identityType: 'Discord', ...signupAnalytics });

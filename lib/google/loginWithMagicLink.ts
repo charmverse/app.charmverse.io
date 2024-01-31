@@ -2,7 +2,6 @@ import { InvalidInputError, UnauthorisedActionError } from '@charmverse/core/err
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
-import { generateCharmWallet } from 'lib/charms/generateCharmWallet';
 import { firebaseApp } from 'lib/google/firebaseApp';
 import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 import { sessionUserRelations } from 'lib/session/config';
@@ -82,8 +81,6 @@ export async function loginWithMagicLink({ magicLink }: MagicLinkLoginRequest): 
       },
       include: sessionUserRelations
     });
-
-    await generateCharmWallet({ userId: user.id });
   } else {
     const userId = user.id;
 

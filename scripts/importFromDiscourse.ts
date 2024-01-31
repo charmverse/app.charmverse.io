@@ -231,8 +231,6 @@ async function createCharmverseUser({
     }
   });
 
-  await generateCharmWallet({ userId: charmverseUser.id });
-
   await prisma.spaceRole.create({
     data: {
       userId: charmverseUser.id,

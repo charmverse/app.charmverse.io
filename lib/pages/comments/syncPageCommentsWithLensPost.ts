@@ -79,8 +79,6 @@ export async function syncPageCommentsWithLensPost({
           }
         });
 
-        await generateCharmWallet({ userId: createdCharmVerseUser.id });
-
         charmverseUserId = createdCharmVerseUser.id;
       } else {
         const hasSpaceRole = charmVerseUser.spaceRoles.length === 0;

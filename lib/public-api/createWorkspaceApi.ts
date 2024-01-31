@@ -2,7 +2,6 @@ import type { SuperApiToken, Space as PrismaSpace } from '@charmverse/core/prism
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { baseUrl } from 'config/constants';
-import { generateCharmWallet } from 'lib/charms/generateCharmWallet';
 import { upsertSpaceRolesFromDiscord } from 'lib/discord/collabland/upsertSpaceRolesFromDiscord';
 import { upsertUserRolesFromDiscord } from 'lib/discord/collabland/upsertUserRolesFromDiscord';
 import { upsertUserForDiscordId } from 'lib/discord/upsertUserForDiscordId';
@@ -77,8 +76,6 @@ export async function createWorkspaceApi({
     extraAdmins: [botUser.id],
     spaceTemplate: internalTemplate
   });
-
-  await generateCharmWallet({ spaceId: space.id });
 
   // create roles from discord
   if (discordServerId) {
