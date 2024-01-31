@@ -15,7 +15,6 @@ import TurndownService from 'turndown';
 import emoji from 'emoji-js';
 import { PremiumPermissionsClient } from '@charmverse/core/permissions';
 import { getPermissionsClient } from 'lib/permissions/api';
-import { generateCharmWallet } from 'lib/charms/generateCharmWallet';
 
 const rateLimiter = RateLimit(1);
 

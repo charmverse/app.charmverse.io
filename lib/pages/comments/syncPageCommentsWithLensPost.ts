@@ -1,6 +1,5 @@
 import { Prisma, prisma } from '@charmverse/core/prisma-client';
 
-import { generateCharmWallet } from 'lib/charms/generateCharmWallet';
 import { fetchLensPageComments } from 'lib/lens/fetchLensPostComments';
 import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
 
