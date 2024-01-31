@@ -2,6 +2,7 @@ import type { PaymentMethod, Prisma, Space } from '@charmverse/core/prisma';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 
 import type { CustomJoinParams } from 'lib/spaces/customConditionJoinSpace';
+import type { UpdateableSpaceFields } from 'lib/spaces/updateSpace';
 
 import type { MaybeString } from './helpers';
 import { useDELETE, useGETImmutable, usePOST, usePUT } from './helpers';
@@ -39,5 +40,5 @@ export function useVerifyCustomJoinSpace(spaceId: MaybeString) {
 }
 
 export function useUpdateSpace(spaceId: MaybeString) {
-  return usePUT<Omit<Prisma.SpaceUpdateInput, 'id'>, Space>(`/api/spaces/${spaceId}`);
+  return usePUT<UpdateableSpaceFields, Space>(`/api/spaces/${spaceId}`);
 }

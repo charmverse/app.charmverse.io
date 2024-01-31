@@ -23,6 +23,7 @@ import Link from 'components/common/Link';
 import { AddToFavoritesAction } from 'components/common/PageActions/components/AddToFavoritesAction';
 import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
 import { DuplicatePageAction } from 'components/common/PageActions/components/DuplicatePageAction';
+import { SetAsHomePageAction } from 'components/common/PageActions/components/SetAsHomePageAction';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePageFromPath } from 'hooks/usePageFromPath';
@@ -438,6 +439,7 @@ function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => voi
         </div>
       </Tooltip>
       <AddToFavoritesAction pageId={pageId} onComplete={closeMenu} />
+      <SetAsHomePageAction pageId={pageId} onComplete={closeMenu} />
       <DuplicatePageAction
         pageId={pageId}
         pageType={page?.type}
