@@ -33,7 +33,6 @@ type Props = {
   subRowsEmptyValueContent?: ReactElement | string;
   checkedIds?: string[];
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
-  relationPropertiesCardsRecord?: PageListItemsRecord;
 };
 
 const TableGroup = React.memo((props: Props): JSX.Element => {
@@ -95,7 +94,6 @@ const TableGroup = React.memo((props: Props): JSX.Element => {
           subRowsEmptyValueContent={props.subRowsEmptyValueContent}
           checkedIds={props.checkedIds}
           setCheckedIds={props.setCheckedIds}
-          relationPropertiesCardsRecord={props.relationPropertiesCardsRecord}
         />
       )}
     </div>

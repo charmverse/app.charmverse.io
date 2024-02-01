@@ -74,7 +74,6 @@ type Props = {
   readOnlyTitle?: boolean;
   disableDnd?: boolean;
   hideLinkedBounty?: boolean;
-  relationPropertiesCardsRecord?: PageListItemsRecord;
 };
 
 function Kanban(props: Props) {
@@ -347,7 +346,6 @@ function Kanban(props: Props) {
           {visibleGroups.map((group) => (
             <KanbanGroupColumn
               group={group}
-              relationPropertiesCardsRecord={props.relationPropertiesCardsRecord}
               board={board}
               visiblePropertyTemplates={visiblePropertyTemplates}
               key={group.option.id || 'empty'}

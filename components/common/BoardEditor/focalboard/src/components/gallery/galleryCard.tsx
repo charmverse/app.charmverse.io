@@ -32,7 +32,6 @@ type Props = {
   readOnly: boolean;
   isManualSort: boolean;
   onDrop: (srcCard: Card, dstCard: Card) => void;
-  relationPropertiesCardsRecord?: PageListItemsRecord;
 };
 
 const GalleryCard = React.memo((props: Props) => {
@@ -106,7 +105,6 @@ const GalleryCard = React.memo((props: Props) => {
               showEmptyPlaceholder={false}
               showTooltip
               displayType='gallery'
-              relationPropertyCards={props.relationPropertiesCardsRecord?.[template.id]}
             />
           ))}
         </div>

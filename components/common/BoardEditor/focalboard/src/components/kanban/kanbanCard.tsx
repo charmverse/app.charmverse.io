@@ -33,7 +33,6 @@ type Props = {
   // eslint-disable-next-line
   showCard: (cardId: string | null) => void;
   isManualSort: boolean;
-  relationPropertiesCardsRecord?: PageListItemsRecord;
   hideLinkedBounty?: boolean;
 };
 
@@ -154,7 +153,6 @@ const KanbanCard = React.memo((props: Props) => {
             {visiblePropertyTemplates.map((template) => (
               <PropertyValueElement
                 key={template.id}
-                relationPropertyCards={props.relationPropertiesCardsRecord?.[template.id]}
                 board={board}
                 readOnly
                 card={card}

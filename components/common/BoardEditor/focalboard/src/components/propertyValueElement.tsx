@@ -53,7 +53,6 @@ import {
 } from 'lib/rewards/blocks/constants';
 import type { RewardStatus } from 'lib/rewards/interfaces';
 import { getAbsolutePath } from 'lib/utilities/browser';
-import { isTruthy } from 'lib/utilities/types';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import { TextInput } from '../../../components/properties/TextInput';
@@ -87,7 +86,6 @@ type Props = {
   mutator?: Mutator;
   subRowsEmptyValueContent?: ReactElement | string;
   proposal?: CardPage['proposal'];
-  relationPropertyCards?: PageListItem[];
 };
 
 export const validatePropertyValue = (propType: string, val: string): boolean => {

@@ -21,7 +21,6 @@ type Props = {
   selectedCardIds: string[];
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
   disableAddingCards?: boolean;
-  relationPropertiesCardsRecord?: PageListItemsRecord;
 };
 
 function Gallery(props: Props): JSX.Element {
@@ -73,7 +72,6 @@ function Gallery(props: Props): JSX.Element {
               readOnly={props.readOnly}
               onDrop={onDropToCard}
               isManualSort={isManualSort}
-              relationPropertiesCardsRecord={props.relationPropertiesCardsRecord}
             />
           );
         })}

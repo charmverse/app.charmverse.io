@@ -48,8 +48,7 @@ export function CardDetailProperty({
   onDrop,
   syncWithPageId,
   mutator,
-  disableEditPropertyOption,
-  relationPropertiesCardsRecord
+  disableEditPropertyOption
 }: {
   syncWithPageId?: string | null;
   readOnly: boolean;
@@ -64,7 +63,6 @@ export function CardDetailProperty({
   mutator: Mutator;
   disableEditPropertyOption?: boolean;
   onDrop: (template: IPropertyTemplate, container: IPropertyTemplate) => void;
-  relationPropertiesCardsRecord?: PageListItemsRecord;
 }) {
   const [isDragging, isOver, columnRef] = useSortable('column', property, !readOnly, onDrop);
   const changePropertyPopupState = usePopupState({ variant: 'popover', popupId: 'card-property' });
@@ -122,7 +120,6 @@ export function CardDetailProperty({
         showEmptyPlaceholder
         displayType='details'
         mutator={mutator}
-        relationPropertyCards={relationPropertiesCardsRecord?.[property.id]}
       />
     </Stack>
   );

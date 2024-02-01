@@ -174,6 +174,7 @@ function CenterPanel(props: Props) {
           activeBoard,
           activeView,
           membersRecord,
+          // Required to sort cards by relation properties
           relationPropertiesCardsRecord,
           localViewSettings?.localSort
         )
@@ -671,12 +672,10 @@ function CenterPanel(props: Props) {
                     showCard={showCard}
                     disableAddingCards={disableAddingNewCards}
                     readOnlyTitle={readOnlyTitle}
-                    relationPropertiesCardsRecord={relationPropertiesCardsRecord}
                   />
                 )}
                 {activeBoard && activeView?.fields.viewType === 'table' && (
                   <Table
-                    relationPropertiesCardsRecord={relationPropertiesCardsRecord}
                     setSelectedPropertyId={setSelectedPropertyId}
                     board={activeBoard}
                     activeView={activeView}
@@ -706,7 +705,6 @@ function CenterPanel(props: Props) {
                     showCard={showCard}
                     addCard={calendarAddCard}
                     disableAddingCards={disableAddingNewCards}
-                    relationPropertiesCardsRecord={relationPropertiesCardsRecord}
                   />
                 )}
                 {activeBoard && activeView?.fields.viewType === 'gallery' && (
@@ -719,7 +717,6 @@ function CenterPanel(props: Props) {
                     selectedCardIds={state.selectedCardIds}
                     addCard={galleryAddCard}
                     disableAddingCards={disableAddingNewCards}
-                    relationPropertiesCardsRecord={relationPropertiesCardsRecord}
                   />
                 )}
                 {isLoadingSourceData && <LoadingComponent isLoading={true} height={400} />}

@@ -40,7 +40,6 @@ type Props = {
   mutator?: Mutator;
   readOnlyProperties?: string[];
   disableEditPropertyOption?: boolean;
-  relationPropertiesCardsRecord?: PageListItemsRecord;
 };
 
 function CardDetailProperties(props: Props) {
@@ -54,8 +53,7 @@ function CardDetailProperties(props: Props) {
     pageUpdatedBy,
     syncWithPageId,
     mutator = defaultMutator,
-    disableEditPropertyOption,
-    relationPropertiesCardsRecord
+    disableEditPropertyOption
   } = props;
   const [newTemplateId, setNewTemplateId] = useState('');
   const intl = useIntl();
@@ -300,7 +298,6 @@ function CardDetailProperties(props: Props) {
             readOnly={isReadonlyTemplateProperty}
             mutator={mutator}
             disableEditPropertyOption={disableEditPropertyOption}
-            relationPropertiesCardsRecord={relationPropertiesCardsRecord}
           />
         );
       })}

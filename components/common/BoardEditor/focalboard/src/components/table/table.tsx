@@ -47,7 +47,6 @@ type Props = {
   checkedIds?: string[];
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
   setSelectedPropertyId?: Dispatch<SetStateAction<string | null>>;
-  relationPropertiesCardsRecord?: PageListItemsRecord;
 };
 
 const TableRowsContainer = forwardRef<HTMLDivElement, { children: ReactNode }>(({ children }, ref) => {
@@ -82,8 +81,7 @@ function Table(props: Props): JSX.Element {
     subRowsEmptyValueContent,
     setCheckedIds,
     checkedIds,
-    setSelectedPropertyId,
-    relationPropertiesCardsRecord
+    setSelectedPropertyId
   } = props;
   const isManualSort = activeView.fields.sortOptions?.length === 0;
   const dispatch = useAppDispatch();
@@ -309,7 +307,6 @@ function Table(props: Props): JSX.Element {
               visibleGroups.map((group) => {
                 return (
                   <TableGroup
-                    relationPropertiesCardsRecord={relationPropertiesCardsRecord}
                     key={group.option.id}
                     board={board}
                     activeView={activeView}
@@ -339,7 +336,6 @@ function Table(props: Props): JSX.Element {
             {/* No Grouping, Rows, one per card */}
             {!activeView.fields.groupById && (
               <TableRows
-                relationPropertiesCardsRecord={relationPropertiesCardsRecord}
                 board={board}
                 activeView={activeView}
                 columnRefs={columnRefs}

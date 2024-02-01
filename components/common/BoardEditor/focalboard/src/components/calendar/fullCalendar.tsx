@@ -34,7 +34,6 @@ type Props = {
   showCard: (cardId: string) => void;
   addCard: (properties: Record<string, string>) => void;
   disableAddingCards?: boolean;
-  relationPropertiesCardsRecord?: PageListItemsRecord;
 };
 
 const timeZoneOffset = (date: number): number => {
@@ -156,7 +155,6 @@ function CalendarFullView(props: Props): JSX.Element | null {
             return (
               <PropertyValueElement
                 board={board}
-                relationPropertyCards={props.relationPropertiesCardsRecord?.[template.id]}
                 syncWithPageId={page?.syncWithPageId}
                 key={template.id}
                 readOnly

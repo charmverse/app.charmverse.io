@@ -10,7 +10,6 @@ import React, { memo, useContext, useEffect, useMemo, useRef, useState } from 'r
 import { FormattedMessage } from 'react-intl';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
-import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { filterPropertyTemplates } from 'components/common/BoardEditor/utils/updateVisibilePropertyIds';
 import { PageActionsMenu } from 'components/common/PageActions/components/PageActionsMenu';
 import { PageIcon } from 'components/common/PageIcon';
@@ -70,7 +69,6 @@ type Props = {
   isChecked?: boolean;
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
   proposal?: CardPage['proposal'];
-  relationPropertiesCardsRecord?: PageListItemsRecord;
 };
 
 export const StyledCheckbox = styled(Checkbox, {
@@ -358,7 +356,6 @@ function TableRow(props: Props) {
             onPaste={(e) => e.stopPropagation()}
           >
             <PropertyValueElement
-              relationPropertyCards={props.relationPropertiesCardsRecord?.[template.id]}
               readOnly={props.readOnly}
               syncWithPageId={cardPage?.syncWithPageId}
               card={card}
