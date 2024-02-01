@@ -18,10 +18,15 @@ export function FeatureLink({ feature, onClick }: { feature: MappedFeature; onCl
       label={feature.title}
       onClick={onClick}
       data-test={`sidebar-link-${feature.path}`}
+      sx={{ pr: '8px !important' }}
     >
-      {feature.id === 'forum' && <AddIconButton tooltip='Add a post' />}
-      {feature.id === 'rewards' && <AddIconButton tooltip={`Add a ${getFeatureTitle('reward')}`} />}
-      {feature.id === 'proposals' && <AddIconButton tooltip={`Add a ${getFeatureTitle('proposal')}`} />}
+      {feature.id === 'forum' && <AddIconButton className='add-a-page' tooltip='Add a post' />}
+      {feature.id === 'rewards' && (
+        <AddIconButton className='add-a-page' tooltip={`Add a ${getFeatureTitle('reward')}`} />
+      )}
+      {feature.id === 'proposals' && (
+        <AddIconButton className='add-a-page' tooltip={`Add a ${getFeatureTitle('proposal')}`} />
+      )}
     </SidebarLink>
   );
 }

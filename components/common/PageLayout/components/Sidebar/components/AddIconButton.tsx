@@ -12,7 +12,8 @@ export const StyledIconButton = styled(MuiIconButton)`
   cursor: pointer;
 
   svg {
-    font-size: 16px;
+    font-size: 16px !important;
+    margin: 0 !important; // override styles from SidebarLink
   }
   // disable hover UX on ios which converts first click to a hover event
   @media (pointer: fine) {
