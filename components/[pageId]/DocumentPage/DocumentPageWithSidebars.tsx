@@ -18,11 +18,10 @@ import { useProposal } from './hooks/useProposal';
 type DocumentPageWithSidebarsProps = DocumentPageProps & {
   readOnly?: boolean;
   insideModal?: boolean;
-  enableSidebar?: boolean;
 };
 
 function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps) {
-  const { page, readOnly = false, enableSidebar } = props;
+  const { page, readOnly = false } = props;
   const { router } = useCharmRouter();
   const { activeView: sidebarView, setActiveView, closeSidebar } = usePageSidebar();
   const { editMode } = useCharmEditor();
@@ -55,9 +54,6 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
 
   // show page sidebar by default if there are comments or votes
   useEffect(() => {
-    if (!enableSidebar) {
-      return;
-    }
     let highlightedCommentId = new URLSearchParams(window.location.search).get('commentId');
     // hack to handle improperly-created URLs from notifications
     if (highlightedCommentId === 'undefined') {
@@ -80,13 +76,13 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
         return setActiveView('comments');
       }
     }
-  }, [isLoadingThreads, page.id, enableSidebar, threadsPageId]);
+  }, [isLoadingThreads, page.id, threadsPageId]);
 
   useEffect(() => {
-    if (proposalId && enableSidebar) {
+    if (proposalId) {
       setActiveView(isMdScreen ? 'proposal_evaluation' : null);
     }
-  }, [proposalId, enableSidebar, isMdScreen]);
+  }, [proposalId, isMdScreen]);
 
   return (
     <DocumentColumnLayout>
