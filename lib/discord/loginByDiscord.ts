@@ -29,7 +29,7 @@ export async function loginByDiscord({
   discordApiUrl,
   userId = v4(),
   signupAnalytics = {},
-  authFlowType = 'page'
+  authFlowType
 }: LoginWithDiscord) {
   const discordAccount = await getDiscordAccount({
     code,

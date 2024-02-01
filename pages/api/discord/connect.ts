@@ -34,7 +34,7 @@ export interface ConnectDiscordResponse {
 // TODO: Add nonce for oauth state
 async function connectDiscord(req: NextApiRequest, res: NextApiResponse<ConnectDiscordResponse | { error: string }>) {
   const { code } = req.body as ConnectDiscordPayload;
-  const authFlowType = req.query.authFlowType as OauthFlowType;
+  const authFlowType = req.query.authFlowType as OauthFlowType | undefined;
 
   if (!code) {
     res.status(400).json({
