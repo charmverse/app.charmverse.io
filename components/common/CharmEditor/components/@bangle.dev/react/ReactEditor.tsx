@@ -44,10 +44,7 @@ const StyledLoadingComponent = styled(LoadingComponent)`
   align-items: flex-end;
 `;
 
-export const EditorViewContext = React.createContext<EditorView>(
-  /* we have to provide a default value to createContext */
-  null as unknown as EditorView
-);
+export const EditorViewContext = React.createContext<EditorView | null>(null);
 
 interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<PluginMetadata> {
   pageId?: string;
@@ -70,7 +67,7 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   pageType?: PageType | 'post';
   postId?: string;
   threadIds?: string[];
-  registerView?: (view: EditorView) => void;
+  setCharmEditorView?: (view: EditorView | null) => void;
 }
 
 const warningText = 'You have unsaved changes. Please confirm changes.';
@@ -100,7 +97,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     pageType,
     postId,
     threadIds,
-    registerView
+    setCharmEditorView
   },
   ref
 ) {
@@ -289,10 +286,11 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     }
     (_editor.view as any)._updatePluginWatcher = updatePluginWatcher(_editor);
     setEditor(_editor);
-    if (registerView) {
-      registerView(_editor.view);
+    if (setCharmEditorView) {
+      setCharmEditorView(_editor.view);
     }
     return () => {
+      setCharmEditorView?.(null);
       fEditor?.close();
       _editor.destroy();
     };

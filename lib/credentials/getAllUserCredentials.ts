@@ -3,8 +3,8 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
-import { getAllOnChainAttestations } from './external/getOnchainCredentials';
 import type { EASAttestationWithFavorite } from './external/getOnchainCredentials';
+import { getAllOnChainAttestations } from './external/getOnchainCredentials';
 import { getGitcoinCredentialsByWallets } from './getGitcoinCredentialsByWallets';
 import { getCharmverseCredentialsByWallets } from './queriesAndMutations';
 

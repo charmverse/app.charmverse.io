@@ -9,7 +9,7 @@ import { useRouter } from 'next/router';
 import { useCallback, useEffect, useRef } from 'react';
 
 import { trackPageView } from 'charmClient/hooks/track';
-import DocumentPage from 'components/[pageId]/DocumentPage';
+import { DocumentPage } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { DocumentPageProviders } from 'components/[pageId]/DocumentPage/DocumentPageProviders';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
