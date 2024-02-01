@@ -4,12 +4,13 @@ import Box from '@mui/material/Box';
 import Image from 'next/image';
 
 import Link from 'components/common/Link';
+import { useSmallScreen } from 'hooks/useMediaScreens';
 import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
 import { trackedSchemas } from 'lib/credentials/external/schemas';
 
 export function UserCredentialRow({ credential }: { credential: EASAttestationFromApi }) {
   const schemaInfo = trackedSchemas[credential.chainId]?.find((s) => s.schemaId === credential.schemaId);
-
+  const isSmallScreen = useSmallScreen();
   const credentialInfo: {
     title: string;
     subtitle: string;
@@ -28,7 +29,9 @@ export function UserCredentialRow({ credential }: { credential: EASAttestationFr
           title: 'Gitcoin Passport Score',
           subtitle: 'Gitcoin',
           iconUrl: '/images/logos/Gitcoin_Passport_Logomark_SeaFoam.svg',
-          attestationContent: [{ name: 'Passport Score', value: credential.content.passport_score }]
+          attestationContent: [
+            { name: 'Passport Score', value: `Passport Score: ${credential.content.passport_score?.toFixed(2)}` }
+          ]
         }
       : {
           title: schemaInfo?.title ?? '',
@@ -47,10 +50,22 @@ export function UserCredentialRow({ credential }: { credential: EASAttestationFr
   }
 
   return (
-    <Grid container display='flex' alignItems='center' justifyContent='space-between'>
-      <Grid item xs={5}>
-        <Box ml={2} display='flex' alignItems='center' gap={2}>
-          <Image src={credentialInfo.iconUrl} alt='charmverse-logo' height={30} width={30} />
+    <Grid container display='flex' gap={{ xs: 1 }} alignItems='center' justifyContent='space-between'>
+      <Grid item xs={12} md={5}>
+        <Box
+          display='flex'
+          alignItems='center'
+          gap={{
+            xs: 1,
+            md: 2
+          }}
+        >
+          <Image
+            src={credentialInfo.iconUrl}
+            alt='charmverse-logo'
+            height={isSmallScreen ? 40 : 30}
+            width={isSmallScreen ? 40 : 30}
+          />
           <Box display='flex' flexDirection='column'>
             <Typography variant='body1' fontWeight='bold'>
               {credentialInfo.title}
@@ -61,15 +76,15 @@ export function UserCredentialRow({ credential }: { credential: EASAttestationFr
           </Box>
         </Box>
       </Grid>
-      <Grid item display='flex' justifyContent='flex-start' xs={credential.verificationUrl ? 5 : 7} gap={1}>
+      <Grid item display='flex' justifyContent='flex-start' xs={8} md={credential.verificationUrl ? 4 : 6} gap={1}>
         {credentialInfo.attestationContent.map((field) => (
-          <Chip variant='outlined' key={field.name} label={field.value} />
+          <Chip size={isSmallScreen ? 'small' : 'medium'} variant='outlined' key={field.name} label={field.value} />
         ))}
       </Grid>
       {credential.verificationUrl && (
-        <Grid item xs={2} display='flex' justifyContent='flex-end' pr={2}>
+        <Grid item xs={1} display='flex' justifyContent='flex-end'>
           <Link href={credential.verificationUrl} external target='_blank'>
-            <LaunchIcon sx={{ alignSelf: 'center' }} />
+            <LaunchIcon sx={{ alignSelf: 'center' }} fontSize={isSmallScreen ? 'small' : 'medium'} />
           </Link>
         </Grid>
       )}
