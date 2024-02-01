@@ -1,4 +1,4 @@
-import type { Feature, MappedFeatures } from './constants';
+import type { Feature, FeatureMap } from './constants';
 import { STATIC_PAGES } from './constants';
 
 export type FeatureTitleVariation =
@@ -35,7 +35,7 @@ export const getFeatureTitle = ({
   mappedFeatures
 }: {
   featureTitle: FeatureTitleVariation;
-  mappedFeatures: MappedFeatures;
+  mappedFeatures: FeatureMap;
 }) => {
   const isCapitalized = featureTitle.charAt(0) === featureTitle.charAt(0).toUpperCase();
   const feature = featureTitleRecord[featureTitle];

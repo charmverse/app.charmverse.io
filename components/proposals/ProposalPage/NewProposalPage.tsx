@@ -340,6 +340,26 @@ export function NewProposalPage({
     }
   }, [hasSource]);
 
+  // watch for changes in isTemplate
+  useEffect(() => {
+    if (isTemplate) {
+      setFormInputs(
+        {
+          type: 'proposal_template',
+          proposalTemplateId: null
+        },
+        { fromUser: false }
+      );
+    } else {
+      setFormInputs(
+        {
+          type: 'proposal'
+        },
+        { fromUser: false }
+      );
+    }
+  }, [isTemplate]);
+
   return (
     <Box display='flex' flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
       <DocumentColumnLayout>
