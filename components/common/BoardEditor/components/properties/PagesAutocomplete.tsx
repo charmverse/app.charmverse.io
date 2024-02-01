@@ -147,9 +147,6 @@ function PagesAutocompleteBase({
         filterSelectedOptions
         forcePopupIcon={false}
         fullWidth
-        getOptionLabel={(option) => {
-          return (option.title || 'Untitled').toLocaleLowerCase() || 'untitled';
-        }}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         multiple
         noOptionsText='No pages found'
