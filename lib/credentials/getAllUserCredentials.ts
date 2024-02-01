@@ -38,7 +38,7 @@ export async function getAllUserCredentials({ userId }: { userId: string }): Pro
       log.error(`Error loading Charmverse Ceramic credentials for user ${userId}`, { error, userId });
       return [];
     }),
-    getGitcoinCredentialsByWallets({ wallets: testWallets }).catch((error) => {
+    getGitcoinCredentialsByWallets({ wallets }).catch((error) => {
       log.error(`Error loading Gitcoin Ceramic credentials for user ${userId}`, { error, userId });
       return [];
     }),

@@ -28,7 +28,7 @@ export function UserCredentialRow({ credential }: { credential: EASAttestationFr
           title: 'Gitcoin Passport Score',
           subtitle: 'Gitcoin',
           iconUrl: '/images/logos/Gitcoin_Passport_Logomark_SeaFoam.svg',
-          attestationContent: [{ name: 'Passport Score', value: credential.content.score }]
+          attestationContent: [{ name: 'Passport Score', value: credential.content.passport_score }]
         }
       : {
           title: schemaInfo?.title ?? '',
@@ -61,7 +61,7 @@ export function UserCredentialRow({ credential }: { credential: EASAttestationFr
           </Box>
         </Box>
       </Grid>
-      <Grid item display='flex' justifyContent='flex-start' xs={5} gap={1}>
+      <Grid item display='flex' justifyContent='flex-start' xs={credential.verificationUrl ? 5 : 7} gap={1}>
         {credentialInfo.attestationContent.map((field) => (
           <Chip variant='outlined' key={field.name} label={field.value} />
         ))}

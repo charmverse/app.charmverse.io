@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 
 import * as http from 'adapters/http';
+import { lowerCaseEqual } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { EASAttestationFromApi } from './external/getOnchainCredentials';
@@ -31,25 +32,25 @@ type ScoreItem = {
   stamp_scores: Record<string, unknown>;
 };
 
-type GetAddressesGitcoinPassportScoresResponse = {
-  items: ScoreItem[];
-  count: number;
-};
-
 async function getGitcoinPassportScores(wallets: string[]) {
   try {
-    const response = await http.GET<GetAddressesGitcoinPassportScoresResponse>(
-      `${GITCOIN_SCORER_BASE_URL}/registry/score/${GITCOIN_SCORER_ID}`,
-      {
-        addresses: wallets.map((wallet) => wallet.toLowerCase()).join(',')
-      },
-      {
-        credentials: 'omit',
-        headers: GITCOIN_API_HEADERS
-      }
+    const scoreItems = await Promise.all(
+      wallets.map((wallet) =>
+        http.POST<ScoreItem>(
+          `${GITCOIN_SCORER_BASE_URL}/registry/submit-passport`,
+          {
+            address: wallet,
+            scorer_id: GITCOIN_SCORER_ID
+          },
+          {
+            credentials: 'omit',
+            headers: GITCOIN_API_HEADERS
+          }
+        )
+      )
     );
 
-    return response.items;
+    return scoreItems;
   } catch (error: any) {
     log.error('Error getting Gitcoin Passport scores', {
       error: error.message,
@@ -67,16 +68,15 @@ export async function getGitcoinCredentialsByWallets({
   const gitcoinPassportScores = await getGitcoinPassportScores(wallets);
   return wallets
     .map((wallet) => {
-      const gitcoinPassportScore = gitcoinPassportScores.find((score) => score.address === wallet);
-
-      if (!gitcoinPassportScore || !gitcoinPassportScore.evidence) {
+      const gitcoinPassportScore = gitcoinPassportScores.find((score) => lowerCaseEqual(score.address, wallet));
+      if (!gitcoinPassportScore) {
         return null;
       }
 
       const mappedData: EASAttestationFromApi = {
         id: `${wallet}-gitcoin-passport-score`,
         content: {
-          passport_score: gitcoinPassportScore.evidence.rawScore
+          passport_score: Number(gitcoinPassportScore.score)
         },
         attester: '0x843829986e895facd330486a61Ebee9E1f1adB1a', // https://optimism.easscan.org/address/0x843829986e895facd330486a61Ebee9E1f1adB1a
         recipient: wallet,
