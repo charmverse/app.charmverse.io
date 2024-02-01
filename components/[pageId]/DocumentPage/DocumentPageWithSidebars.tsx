@@ -1,6 +1,7 @@
 import type { EditorState } from 'prosemirror-state';
 import { memo, useEffect, useState } from 'react';
 
+import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useMdScreen } from 'hooks/useMediaScreens';
@@ -78,11 +79,16 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
     }
   }, [isLoadingThreads, page.id, threadsPageId]);
 
+  // having `internalSidebarView` allows us to have the sidebar open by default, because usePageSidebar() does not allow us to do this currently
+  const [defaultSidebarView, setDefaultView] = useState<PageSidebarView | null>(
+    proposalId ? 'proposal_evaluation' : null
+  );
+  const internalSidebarView = defaultSidebarView || sidebarView;
+
   useEffect(() => {
-    if (proposalId) {
-      setActiveView(isMdScreen ? 'proposal_evaluation' : null);
-    }
-  }, [proposalId, isMdScreen]);
+    setActiveView(defaultSidebarView);
+    setDefaultView(null);
+  }, []);
 
   return (
     <DocumentColumnLayout>
@@ -91,7 +97,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
           {...props}
           setEditorState={setEditorState}
           setSidebarView={setActiveView}
-          sidebarView={sidebarView}
+          sidebarView={internalSidebarView}
         />
       </DocumentColumn>
       {(enableComments || enableSuggestingMode) && (
@@ -101,7 +107,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
           spaceId={page.spaceId}
           pagePermissions={pagePermissions}
           editorState={editorState}
-          sidebarView={sidebarView}
+          sidebarView={internalSidebarView}
           closeSidebar={closeSidebar}
           openSidebar={setActiveView}
           threads={isLoadingThreads ? undefined : threads}
@@ -111,7 +117,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
       )}
       {(page.type === 'proposal' || page.type === 'proposal_template') && (
         <ProposalSidebar
-          isOpen={sidebarView === 'proposal_evaluation'}
+          isOpen={internalSidebarView === 'proposal_evaluation'}
           pagePath={page.path}
           pageTitle={page.title}
           pageId={page.id}

@@ -105,6 +105,7 @@ export function NewProposalPage({
     contentUpdated,
     disabledTooltip: _disabledTooltip,
     isCreatingProposal,
+    isFormLoaded,
     createProposal
   } = useNewProposal({
     newProposal: { type: proposalPageType, proposalType }
@@ -190,36 +191,39 @@ export function NewProposalPage({
     if (template) {
       const formFields = template.form?.formFields ?? [];
       const authors = Array.from(new Set([user!.id].concat(template.authors.map((author) => author.userId))));
-      setFormInputs({
-        authors,
-        content: template.page.content as PageContent,
-        contentText: template.page.contentText,
-        selectedCredentialTemplates: template.selectedCredentialTemplates ?? [],
-        proposalTemplateId: _templateId,
-        headerImage: template.page.headerImage,
-        icon: template.page.icon,
-        evaluations: template.evaluations,
-        fields:
-          {
-            ...template.fields,
-            pendingRewards: template.fields?.pendingRewards?.map((pendingReward) => ({
-              ...pendingReward,
-              reward: {
-                ...pendingReward.reward,
-                assignedSubmitters: authors
-              }
+      setFormInputs(
+        {
+          authors,
+          content: template.page.content as PageContent,
+          contentText: template.page.contentText,
+          selectedCredentialTemplates: template.selectedCredentialTemplates ?? [],
+          proposalTemplateId: _templateId,
+          headerImage: template.page.headerImage,
+          icon: template.page.icon,
+          evaluations: template.evaluations,
+          fields:
+            {
+              ...template.fields,
+              pendingRewards: template.fields?.pendingRewards?.map((pendingReward) => ({
+                ...pendingReward,
+                reward: {
+                  ...pendingReward.reward,
+                  assignedSubmitters: authors
+                }
+              }))
+            } || {},
+          type: proposalPageType,
+          formId: template.formId ?? undefined,
+          formFields: isTemplate ? formFields.map((formField) => ({ ...formField, id: uuid() })) : formFields,
+          formAnswers: (template?.form?.formFields ?? [])
+            .filter((formField) => formField.type !== 'label')
+            .map((proposalFormField) => ({
+              fieldId: proposalFormField.id,
+              value: getInitialFormFieldValue(proposalFormField) as FieldAnswerInput['value']
             }))
-          } || {},
-        type: proposalPageType,
-        formId: template.formId ?? undefined,
-        formFields: isTemplate ? formFields.map((formField) => ({ ...formField, id: uuid() })) : formFields,
-        formAnswers: (template?.form?.formFields ?? [])
-          .filter((formField) => formField.type !== 'label')
-          .map((proposalFormField) => ({
-            fieldId: proposalFormField.id,
-            value: getInitialFormFieldValue(proposalFormField) as FieldAnswerInput['value']
-          }))
-      });
+        },
+        { fromUser: false }
+      );
       const workflow = workflowOptions?.find((w) => w.id === template.workflowId);
       if (workflow) {
         // pass in the template since the formState will not be updated in this instance of applyWorkflow
@@ -235,31 +239,34 @@ export function NewProposalPage({
   }
 
   function applyWorkflow(workflow: ProposalWorkflowTyped, template?: ProposalTemplate) {
-    setFormInputs({
-      workflowId: workflow.id,
-      evaluations: workflow.evaluations.map((evaluation, index) => {
-        // try to retain existing reviewers and configuration
-        const existingStep = (template?.evaluations || formInputs.evaluations).find(
-          (e) => e.title === evaluation.title
-        );
-        const rubricCriteria = (
-          evaluation.type === 'rubric' ? existingStep?.rubricCriteria || [getNewCriteria()] : []
-        ) as ProposalRubricCriteriaWithTypedParams[];
-        // include author as default reviewer for feedback
-        const defaultReviewers = evaluation.type === 'feedback' && user ? [{ systemRole: authorSystemRole.id }] : [];
-        return {
-          id: evaluation.id,
-          index,
-          reviewers: existingStep?.reviewers || defaultReviewers,
-          rubricCriteria,
-          title: evaluation.title,
-          type: evaluation.type,
-          result: null,
-          voteSettings: existingStep?.voteSettings,
-          permissions: evaluation.permissions as ProposalEvaluationPermission[]
-        };
-      })
-    });
+    setFormInputs(
+      {
+        workflowId: workflow.id,
+        evaluations: workflow.evaluations.map((evaluation, index) => {
+          // try to retain existing reviewers and configuration
+          const existingStep = (template?.evaluations || formInputs.evaluations).find(
+            (e) => e.title === evaluation.title
+          );
+          const rubricCriteria = (
+            evaluation.type === 'rubric' ? existingStep?.rubricCriteria || [getNewCriteria()] : []
+          ) as ProposalRubricCriteriaWithTypedParams[];
+          // include author as default reviewer for feedback
+          const defaultReviewers = evaluation.type === 'feedback' && user ? [{ systemRole: authorSystemRole.id }] : [];
+          return {
+            id: evaluation.id,
+            index,
+            reviewers: existingStep?.reviewers || defaultReviewers,
+            rubricCriteria,
+            title: evaluation.title,
+            type: evaluation.type,
+            result: null,
+            voteSettings: existingStep?.voteSettings,
+            permissions: evaluation.permissions as ProposalEvaluationPermission[]
+          };
+        })
+      },
+      { fromUser: false }
+    );
   }
 
   function applyProposalContent({ doc, rawText }: ICharmEditorOutput) {
@@ -278,18 +285,14 @@ export function NewProposalPage({
   }
 
   // having `internalSidebarView` allows us to have the sidebar open by default, because usePageSidebar() does not allow us to do this currently
-  const [defaultSidebarView, setDefaultView] = useState<PageSidebarView | null>(
-    isMdScreen ? 'proposal_evaluation' : null
-  );
+  const [defaultSidebarView, setDefaultView] = useState<PageSidebarView | null>('proposal_evaluation');
   const internalSidebarView = defaultSidebarView || sidebarView;
 
   useEffect(() => {
     // clear out page title on load
     setPageTitle('');
-    if (isMdScreen) {
-      setActiveView('proposal_evaluation');
-      setDefaultView(null);
-    }
+    setActiveView('proposal_evaluation');
+    setDefaultView(null);
   }, []);
 
   useEffect(() => {
@@ -316,19 +319,25 @@ export function NewProposalPage({
   // apply title and content if converting a page into a proposal
   useEffect(() => {
     if (sourcePage) {
-      setFormInputs({
-        content: sourcePage.content as any,
-        contentText: sourcePage.contentText,
-        title: sourcePage.title,
-        sourcePageId: sourcePage.id
-      });
+      setFormInputs(
+        {
+          content: sourcePage.content as any,
+          contentText: sourcePage.contentText,
+          title: sourcePage.title,
+          sourcePageId: sourcePage.id
+        },
+        { fromUser: false }
+      );
     } else if (sourcePost) {
-      setFormInputs({
-        content: sourcePost.content as any,
-        contentText: sourcePost.contentText,
-        title: sourcePost.title,
-        sourcePostId: sourcePost.id
-      });
+      setFormInputs(
+        {
+          content: sourcePost.content as any,
+          contentText: sourcePost.contentText,
+          title: sourcePost.title,
+          sourcePostId: sourcePost.id
+        },
+        { fromUser: false }
+      );
     }
   }, [hasSource]);
 
@@ -549,7 +558,7 @@ export function NewProposalPage({
           isStructuredProposal={isStructured}
           closeSidebar={() => setActiveView(null)}
           openSidebar={() => setActiveView('proposal_evaluation')}
-          proposalInput={formInputs}
+          proposalInput={isFormLoaded ? formInputs : undefined}
           templateId={formInputs.proposalTemplateId}
           onChangeEvaluation={(evaluationId, updates) => {
             const evaluations = formInputs.evaluations.map((e) => (e.id === evaluationId ? { ...e, ...updates } : e));

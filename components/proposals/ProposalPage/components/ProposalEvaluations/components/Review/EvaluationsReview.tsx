@@ -1,6 +1,7 @@
 import { Collapse, Divider, Tooltip } from '@mui/material';
 import { useEffect, useState } from 'react';
 
+import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
@@ -107,7 +108,7 @@ export function EvaluationsReview({
   const expandedEvaluationId = expandedContainer && _expandedEvaluationId;
 
   return (
-    <div>
+    <LoadingComponent isLoading={!proposal}>
       <Collapse in={expandedContainer}>
         <Tooltip title='Workflow can be changed in Draft step'>
           <span>
@@ -241,6 +242,6 @@ export function EvaluationsReview({
           updateEvaluation={updateEvaluation}
         />
       )}
-    </div>
+    </LoadingComponent>
   );
 }

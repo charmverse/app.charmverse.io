@@ -22,13 +22,18 @@ export function useNewProposal({ newProposal }: Props) {
   const { trigger: createProposalTrigger, isMutating: isCreatingProposal } = useCreateProposal();
 
   const [contentUpdated, setContentUpdated] = useState(false);
+  // keep track of whether the form is "loaded" so we can hide elements that depend on it. TODO: maybe formInputs should be null at first?
+  const [isFormLoaded, setIsFormLoaded] = useState(false);
   const [formInputs, setFormInputsRaw] = useState<ProposalPageAndPropertiesInput>(
     emptyState({ ...newProposal, userId: user?.id })
   );
 
   const setFormInputs = useCallback(
-    (partialFormInputs: Partial<ProposalPageAndPropertiesInput>) => {
-      setContentUpdated(true);
+    (partialFormInputs: Partial<ProposalPageAndPropertiesInput>, { fromUser = true }: { fromUser?: boolean } = {}) => {
+      if (fromUser) {
+        setContentUpdated(true);
+      }
+      setIsFormLoaded(true); // form is loaded when we first apply templates, workflows, content from templates, etc.
       setFormInputsRaw((existingFormInputs) => ({ ...existingFormInputs, ...partialFormInputs }));
     },
     [setFormInputsRaw]
@@ -80,7 +85,8 @@ export function useNewProposal({ newProposal }: Props) {
     createProposal,
     disabledTooltip,
     isCreatingProposal,
-    contentUpdated
+    contentUpdated,
+    isFormLoaded
   };
 }
 

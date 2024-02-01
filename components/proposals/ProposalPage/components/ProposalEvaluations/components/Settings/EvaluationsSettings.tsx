@@ -1,6 +1,7 @@
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { Box, Chip, Collapse, Stack, Switch } from '@mui/material';
 
+import LoadingComponent from 'components/common/LoadingComponent';
 import { useProposalTemplateById } from 'components/proposals/hooks/useProposalTemplates';
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/ProposalEvaluations/components/Settings/components/EvaluationStepSettings';
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
@@ -44,9 +45,8 @@ export function EvaluationsSettings({
   const proposalTemplate = useProposalTemplateById(templateId);
   const { mappedFeatures } = useSpaceFeatures();
   const isAdmin = useIsAdmin();
-
   return (
-    <div data-test='evaluation-settings-sidebar'>
+    <LoadingComponent isLoading={!proposal} data-test='evaluation-settings-sidebar'>
       <Collapse in={expandedContainer}>
         <WorkflowSelect
           value={proposal?.workflowId}
@@ -118,6 +118,6 @@ export function EvaluationsSettings({
           )}
         </>
       )}
-    </div>
+    </LoadingComponent>
   );
 }
