@@ -4,6 +4,7 @@ import type { MouseEvent } from 'react';
 
 import Link from 'components/common/Link';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { MappedFeature } from 'lib/features/constants';
 
@@ -19,12 +20,15 @@ export function FeatureLink({ feature, onClick }: { feature: MappedFeature; onCl
   const { router } = useCharmRouter();
   const { getFeatureTitle } = useSpaceFeatures();
   const [visibleMenu, setVisibleMenu] = useState<PopupMenu | false>(false);
+  const isAdmin = useIsAdmin();
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>, menu: PopupMenu) => {
-    setVisibleMenu(menu);
-    setAnchorEl(event.currentTarget);
-    event.preventDefault();
-    event.stopPropagation();
+    if (isAdmin) {
+      setVisibleMenu(menu);
+      setAnchorEl(event.currentTarget);
+      event.preventDefault();
+      event.stopPropagation();
+    }
   };
 
   const handleClose = (event?: any) => {
@@ -49,13 +53,17 @@ export function FeatureLink({ feature, onClick }: { feature: MappedFeature; onCl
           </Link>
         )}
         {feature.id === 'rewards' && (
-          <AddIconButton onClick={(e) => handleClick(e, 'rewards')} tooltip={`Add a ${getFeatureTitle('Reward')}`} />
+          <Link href='/rewards?new=1'>
+            <AddIconButton onClick={(e) => handleClick(e, 'rewards')} tooltip={`Add a ${getFeatureTitle('Reward')}`} />
+          </Link>
         )}
         {feature.id === 'proposals' && (
-          <AddIconButton
-            onClick={(e) => handleClick(e, 'proposals')}
-            tooltip={`Add a ${getFeatureTitle('Proposal')}`}
-          />
+          <Link href='/proposals/new'>
+            <AddIconButton
+              onClick={(e) => handleClick(e, 'proposals')}
+              tooltip={`Add a ${getFeatureTitle('Proposal')}`}
+            />
+          </Link>
         )}
       </span>
       {visibleMenu === 'proposals' && (
