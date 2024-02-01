@@ -44,8 +44,8 @@ export type EASAttestationFromApi<T = any> = {
   schemaId: string;
   timeCreated: number;
   chainId: ExternalCredentialChain | EasSchemaChain;
-  type: 'external' | 'internal';
-  verificationUrl: string;
+  type: 'onchain' | 'charmverse' | 'gitcoin';
+  verificationUrl: string | null;
   iconUrl?: string | null;
 };
 
