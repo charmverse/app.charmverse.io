@@ -1,4 +1,3 @@
-import styled from '@emotion/styled';
 import { Box, Typography } from '@mui/material';
 import { memo } from 'react';
 
@@ -6,25 +5,14 @@ import type { ProposalEvaluationsProps } from 'components/proposals/ProposalPage
 import { ProposalEvaluations } from 'components/proposals/ProposalPage/components/ProposalEvaluations/ProposalEvaluations';
 import { useMdScreen } from 'hooks/useMediaScreens';
 
+import { SidebarColumn } from '../DocumentColumnLayout';
+
+import { SidebarContentLayout, SidebarHeader } from './components/SidebarContentLayout';
 import { ToggleProposalSidebarButton } from './components/ToggleProposalButton';
 import { SIDEBAR_VIEWS } from './constants';
 
-const sidebarWidth = '430px';
-const sidebarMinWidth = '54px';
-
-const SidebarContainer = styled('div', {
-  shouldForwardProp: (prop) => prop !== 'open'
-})<{ open: boolean }>(
-  ({ open, theme }) => `
-  background: ${theme.palette.background.default};
-  border-left: 1px solid var(--input-border);
-  overflow: auto;
-  max-width: ${open ? sidebarWidth : sidebarMinWidth};
-  width: 100%;
-  transition: max-width ease-in 0.25s;
-  height: 100%;
-`
-);
+const sidebarWidth = 430;
+const sidebarMinWidth = 54;
 
 type SidebarProps = ProposalEvaluationsProps & {
   isOpen: boolean;
@@ -40,26 +28,25 @@ function SidebarComponent(props: SidebarProps) {
     (isOpen ? closeSidebar : openSidebar)();
   }
   if (!isMdScreen) {
+    // this UI appears under a tab on mobile
     return null;
   }
   return (
-    <SidebarContainer id='proposal-action-sidebar' open={isOpen}>
-      <Box overflow='hidden'>
-        <Box display='flex' height='100%' flexDirection='column' gap={1} px={1}>
-          <Box display='flex' gap={0.5} alignItems='center'>
-            <ToggleProposalSidebarButton isOpen={isOpen} onClick={toggleSidebar} />
-            {isOpen && (
-              <Typography flexGrow={1} fontWeight={600} fontSize={20}>
-                {SIDEBAR_VIEWS.proposal_evaluation.title}
-              </Typography>
-            )}
-          </Box>
-          <div onClick={openSidebar} style={{ overflow: 'auto', height: '100%' }}>
-            <ProposalEvaluations {...props} expanded={isOpen} />
-          </div>
+    <SidebarColumn id='proposal-action-sidebar' open={isOpen} width={sidebarWidth} minWidth={sidebarMinWidth}>
+      <SidebarContentLayout>
+        <SidebarHeader gap={0.5} px={1}>
+          <ToggleProposalSidebarButton isOpen={isOpen} onClick={toggleSidebar} />
+          {isOpen && (
+            <Typography flexGrow={1} fontWeight={600} fontSize={20}>
+              {SIDEBAR_VIEWS.proposal_evaluation.title}
+            </Typography>
+          )}
+        </SidebarHeader>
+        <Box overflow='auto' height='100%' px={1} onClick={openSidebar}>
+          <ProposalEvaluations {...props} expanded={isOpen} />
         </Box>
-      </Box>
-    </SidebarContainer>
+      </SidebarContentLayout>
+    </SidebarColumn>
   );
 }
 

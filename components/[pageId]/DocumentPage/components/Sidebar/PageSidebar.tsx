@@ -1,6 +1,5 @@
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
-import styled from '@emotion/styled';
-import { Box, IconButton, Slide, Tooltip, Typography } from '@mui/material';
+import { Box, IconButton, Tooltip, Typography } from '@mui/material';
 import type { EditorState } from 'prosemirror-state';
 import { memo } from 'react';
 
@@ -10,43 +9,15 @@ import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 
 import type { PageSidebarView } from '../../hooks/usePageSidebar';
+import { SidebarColumn } from '../DocumentColumnLayout';
 
 import { EditorCommentsSidebar, FormCommentsSidebar } from './components/CommentsSidebar';
+import { SidebarContentLayout, SidebarHeader } from './components/SidebarContentLayout';
 import { SuggestionsSidebar } from './components/SuggestionsSidebar';
 import { TogglePageSidebarButton } from './components/TogglePageButton';
 import { SIDEBAR_VIEWS } from './constants';
 
-// const DesktopContainer = styled.div`
-//   position: fixed;
-//   right: 0px;
-//   width: 430px;
-//   max-width: 100%;
-//   top: 56px; // height of MUI Toolbar
-//   z-index: var(--z-index-drawer);
-//   height: calc(100% - 56px);
-//   overflow: auto;
-//   padding: ${({ theme }) => theme.spacing(0, 1)};
-//   background: ${({ theme }) => theme.palette.background.default};
-//   border-left: 1px solid var(--input-border);
-// `;
-
-const sidebarWidth = '430px';
-const sidebarMinWidth = '0px';
-
-const DesktopContainer = styled('div', {
-  shouldForwardProp: (prop) => prop !== 'open'
-})<{ open: boolean }>(
-  ({ open, theme }) => `
-
-  background: ${theme.palette.background.default};
-  border-left: 1px solid var(--input-border);
-  overflow: auto;
-  max-width: ${open ? sidebarWidth : sidebarMinWidth};
-  width: 100%;
-  transition: max-width ease-in 0.25s;
-  height: 100%;
-`
-);
+const sidebarWidth = 430;
 
 type SidebarProps = {
   // eslint-disable-next-line react/no-unused-prop-types
@@ -87,31 +58,9 @@ function PageSidebarComponent(props: SidebarProps) {
   }
 
   return isMdScreen ? (
-    // <Slide
-    //   appear={false}
-    //   direction='left'
-    //   in={isOpen}
-    //   style={{
-    //     transformOrigin: 'left top'
-    //   }}
-    //   easing={{
-    //     enter: 'ease-in',
-    //     exit: 'ease-out'
-    //   }}
-    //   timeout={250}
-    // >
-    <DesktopContainer id={id} open={isOpen}>
-      <Box
-        sx={{
-          height: '100%',
-          gap: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          width: 430,
-          px: 1
-        }}
-      >
-        <Box display='flex' gap={1} alignItems='center'>
+    <SidebarColumn id={id} open={isOpen} width={sidebarWidth}>
+      <SidebarContentLayout width={sidebarWidth}>
+        <SidebarHeader gap={1} px={1}>
           <TogglePageSidebarButton onClick={toggleSidebar} />
           <Typography flexGrow={1} fontWeight={600} fontSize={20}>
             {sidebarTitle}
@@ -119,12 +68,11 @@ function PageSidebarComponent(props: SidebarProps) {
           {openSidebar && (
             <SidebarNavigationIcons activeView={sidebarView} openSidebar={openSidebar} disabledViews={disabledViews} />
           )}
-        </Box>
+        </SidebarHeader>
         <SidebarContents {...props} />
-      </Box>
-    </DesktopContainer>
+      </SidebarContentLayout>
+    </SidebarColumn>
   ) : (
-    // </Slide>
     <MobileDialog
       title={sidebarTitle}
       open={isOpen}

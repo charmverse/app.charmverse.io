@@ -10,8 +10,6 @@ export function ToggleProposalSidebarButton({ onClick, isOpen }: { onClick: Void
       onClick={onClick}
       size='small'
       sx={{
-        // add extra margin so it aligns with evaluation icons below
-        ml: '3px',
         '&.MuiIconButton-root': {
           borderRadius: '4px',
           transition: theme.transitions.create('opacity', {

@@ -1,4 +1,3 @@
-import { Box, Stack } from '@mui/material';
 import type { EditorState } from 'prosemirror-state';
 import { memo, useEffect, useState } from 'react';
 
@@ -8,14 +7,13 @@ import { useMdScreen } from 'hooks/useMediaScreens';
 import { useThreads } from 'hooks/useThreads';
 import { isTruthy } from 'lib/utilities/types';
 
+import { DocumentColumnLayout, DocumentColumn } from './components/DocumentColumnLayout';
 import { PageSidebar } from './components/Sidebar/PageSidebar';
 import { ProposalSidebar } from './components/Sidebar/ProposalSidebar';
 import type { DocumentPageProps } from './DocumentPage';
 import { DocumentPage } from './DocumentPage';
 import { usePageSidebar } from './hooks/usePageSidebar';
 import { useProposal } from './hooks/useProposal';
-
-const defaultPageTop = 56; // we need to add some room for the announcement banner and other banners
 
 type DocumentPageWithSidebarsProps = DocumentPageProps & {
   readOnly?: boolean;
@@ -91,21 +89,15 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
   }, [proposalId, enableSidebar, isMdScreen]);
 
   return (
-    <Stack direction='row' width='100%'>
-      <div
-        style={{
-          // overflowX: hidden is required to shrink the main content less than the 860px width of charm editor
-          overflowX: 'hidden',
-          flexGrow: 1
-        }}
-      >
+    <DocumentColumnLayout>
+      <DocumentColumn>
         <DocumentPage
           {...props}
           setEditorState={setEditorState}
           setSidebarView={setActiveView}
           sidebarView={sidebarView}
         />
-      </div>
+      </DocumentColumn>
       {(enableComments || enableSuggestingMode) && (
         <PageSidebar
           id='page-action-sidebar'
@@ -142,7 +134,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
           onChangeWorkflow={onChangeWorkflow}
         />
       )}
-    </Stack>
+    </DocumentColumnLayout>
   );
 }
 

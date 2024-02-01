@@ -154,7 +154,7 @@ function CommentsSidebar({
 }) {
   return (
     <>
-      <Box display='flex' alignItems='center' gap={1}>
+      <Box display='flex' alignItems='center' gap={1} px={1}>
         <InputLabel>Filter</InputLabel>
         <Select variant='outlined' value={threadFilter} onChange={handleThreadFilterChange}>
           <MenuItem value='open'>Open</MenuItem>
@@ -163,7 +163,7 @@ function CommentsSidebar({
           <MenuItem value='all'>All</MenuItem>
         </Select>
       </Box>
-      <StyledSidebar className='charm-inline-comment-sidebar' sx={{ height: '100%' }}>
+      <StyledSidebar className='charm-inline-comment-sidebar' sx={{ height: '100%', px: 1 }}>
         {isLoading ? (
           <LoadingComponent />
         ) : threadList.length === 0 ? (

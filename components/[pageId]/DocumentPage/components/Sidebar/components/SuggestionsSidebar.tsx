@@ -97,7 +97,7 @@ export function SuggestionsSidebar({
         </Box>
       )}
       {suggestions.length > 0 && (
-        <Stack gap={2}>
+        <Stack px={1} gap={2}>
           {suggestions.map((mark) => (
             <div onClick={() => highlightMark(mark)} key={mark.pos}>
               <SuggestionCard
