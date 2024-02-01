@@ -5,6 +5,7 @@ import React, { useState, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
@@ -77,7 +78,6 @@ const KanbanCard = React.memo((props: Props) => {
   if (props.isManualSort && isOver) {
     className += ' dragover';
   }
-  const { space } = useCurrentSpace();
 
   const router = useRouter();
   const { pages } = usePages();

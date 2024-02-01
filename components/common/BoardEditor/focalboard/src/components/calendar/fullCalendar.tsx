@@ -8,6 +8,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { usePages } from 'hooks/usePages';
 import { useUserPreferences } from 'hooks/useUserPreferences';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';

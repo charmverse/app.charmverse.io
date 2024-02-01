@@ -19,8 +19,8 @@ import { PrimaryColumn } from 'components/[pageId]/DocumentPage/components/Prima
 import { PageSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/PageSidebar';
 import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/components/StickyFooterContainer';
 import { defaultPageTop } from 'components/[pageId]/DocumentPage/DocumentPage';
-import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
+import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';

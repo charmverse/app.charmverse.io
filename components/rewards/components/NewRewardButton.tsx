@@ -32,12 +32,10 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
   const { templates, isLoading } = useRewardTemplates();
   const [currentSpacePermissions] = useCurrentSpacePermissions();
   const { getFeatureTitle } = useSpaceFeatures();
-
   const { trigger: trashPages } = useTrashPages();
   function deleteTemplate(pageId: string) {
     return trashPages({ pageIds: [pageId], trash: true });
   }
-
   const isDisabled = !currentSpacePermissions?.createBounty;
 
   function createTemplate() {

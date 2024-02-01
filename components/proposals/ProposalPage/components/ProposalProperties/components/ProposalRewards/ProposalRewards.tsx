@@ -50,7 +50,6 @@ export function ProposalRewards({
   variant
 }: Props) {
   useRewardsNavigation(rewardQueryKey);
-
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
   const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, isSavingReward } = useNewReward();
   const [currentPendingId, setCurrentPendingId] = useState<null | string>(null);

@@ -34,7 +34,7 @@ export function ProposalsPage({ title }: { title: string }) {
   const { space: currentSpace } = useCurrentSpace();
   const { isFreeSpace } = useIsFreeSpace();
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
-
+  const [selectedPropertyId, setSelectedPropertyId] = useState<null | string>(null);
   const canSeeProposals = hasAccess || isFreeSpace || currentSpace?.publicProposals === true;
   const { navigateToSpacePath } = useCharmRouter();
   const isAdmin = useIsAdmin();
@@ -160,6 +160,10 @@ export function ProposalsPage({ title }: { title: string }) {
             {cardPages.length > 0 ? (
               <Box width='100%'>
                 <Table
+                  setSelectedPropertyId={(_setSelectedPropertyId) => {
+                    setSelectedPropertyId(_setSelectedPropertyId);
+                    setShowSidebar(true);
+                  }}
                   board={activeBoard}
                   activeView={activeView}
                   cardPages={cardPages}
@@ -190,12 +194,18 @@ export function ProposalsPage({ title }: { title: string }) {
             )}
 
             <ViewSidebar
+              selectedPropertyId={selectedPropertyId}
+              setSelectedPropertyId={setSelectedPropertyId}
+              sidebarView={selectedPropertyId && showSidebar ? 'card-property' : undefined}
+              cards={cards}
               views={views}
               board={activeBoard}
               rootBoard={activeBoard}
               view={activeView}
-              isOpen={!!showSidebar}
-              closeSidebar={() => setShowSidebar(false)}
+              isOpen={showSidebar}
+              closeSidebar={() => {
+                setShowSidebar(false);
+              }}
               hideLayoutOptions
               hideSourceOptions
               hideGroupOptions
