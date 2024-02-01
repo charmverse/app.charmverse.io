@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import Image from 'next/image';
 
 import Link from 'components/common/Link';
-import type { EASAttestationFromApi } from 'lib/credentials/external/getExternalCredentials';
+import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
 import { trackedSchemas } from 'lib/credentials/external/schemas';
 
 export function UserCredentialRow({ credential }: { credential: EASAttestationFromApi }) {
@@ -16,12 +16,19 @@ export function UserCredentialRow({ credential }: { credential: EASAttestationFr
     iconUrl: string;
     attestationContent: { name: string; value: string }[];
   } =
-    credential.type === 'internal'
+    credential.type === 'charmverse'
       ? {
           title: credential.content.name,
           subtitle: credential.content.organization,
           iconUrl: credential.iconUrl ?? '/images/logo_black_lightgrey.png',
           attestationContent: [{ name: 'status', value: credential.content.status }]
+        }
+      : credential.type === 'gitcoin'
+      ? {
+          title: 'Gitcoin Passport Score',
+          subtitle: 'Gitcoin',
+          iconUrl: '/images/logos/Gitcoin_Passport_Logomark_SeaFoam.svg',
+          attestationContent: [{ name: 'Passport Score', value: credential.content.score }]
         }
       : {
           title: schemaInfo?.title ?? '',
@@ -35,7 +42,7 @@ export function UserCredentialRow({ credential }: { credential: EASAttestationFr
           }))
         };
 
-  if (credential.type === 'external' && !schemaInfo) {
+  if (credential.type === 'onchain' && !schemaInfo) {
     return null;
   }
 
@@ -59,11 +66,13 @@ export function UserCredentialRow({ credential }: { credential: EASAttestationFr
           <Chip variant='outlined' key={field.name} label={field.value} />
         ))}
       </Grid>
-      <Grid item xs={2} display='flex' justifyContent='flex-end' pr={2}>
-        <Link href={credential.verificationUrl} external target='_blank'>
-          <LaunchIcon sx={{ alignSelf: 'center' }} />
-        </Link>
-      </Grid>
+      {credential.verificationUrl && (
+        <Grid item xs={2} display='flex' justifyContent='flex-end' pr={2}>
+          <Link href={credential.verificationUrl} external target='_blank'>
+            <LaunchIcon sx={{ alignSelf: 'center' }} />
+          </Link>
+        </Grid>
+      )}
     </Grid>
   );
 }
