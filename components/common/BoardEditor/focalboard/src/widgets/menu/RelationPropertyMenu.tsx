@@ -91,6 +91,7 @@ export function RelationPropertyMenu({
             onClick={(e) => {
               e.stopPropagation();
             }}
+            fullWidth
             onChange={(e) => {
               e.stopPropagation();
               setPropertyTitle(e.target.value);
@@ -99,7 +100,7 @@ export function RelationPropertyMenu({
           />
           <Divider
             sx={{
-              mt: 2
+              my: 1
             }}
           />
           <RelationPropertyOptions

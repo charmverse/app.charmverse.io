@@ -43,7 +43,7 @@ export function RelationPropertyPagesAutocomplete({
     <PagesAutocomplete
       onChange={onChange}
       selectedPageListItems={selectedPageListItemIds.map((id) => pages[id]).filter(isTruthy) as PageListItem[]}
-      pageListItems={relationPropertiesCardsRecord[propertyTemplate.id]}
+      pageListItems={relationPropertiesCardsRecord[propertyTemplate.id] ?? []}
       readOnly={readOnly}
       wrapColumn={wrapColumn}
       displayType={displayType}
