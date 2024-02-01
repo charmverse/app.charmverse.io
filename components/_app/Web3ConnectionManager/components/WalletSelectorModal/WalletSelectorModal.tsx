@@ -1,8 +1,6 @@
 import { log } from '@charmverse/core/log';
-import type { IdentityType } from '@charmverse/core/prisma';
 import ArrowSquareOut from '@mui/icons-material/Launch';
 import { Grid, IconButton, Typography } from '@mui/material';
-import Alert from '@mui/material/Alert';
 import { useEffect } from 'react';
 import type { Connector } from 'wagmi';
 import { useAccount, useConnect } from 'wagmi';
@@ -11,22 +9,13 @@ import { useMetamaskConnect } from 'components/_app/Web3ConnectionManager/hooks/
 import ErrorComponent from 'components/common/errors/WalletError';
 import Link from 'components/common/Link';
 import { Modal } from 'components/common/Modal';
-import type { AnyIdLogin } from 'components/login/components/LoginButton';
-import type { DisabledAccountError } from 'lib/utilities/errors';
 
 import { useWeb3ConnectionManager } from '../../Web3ConnectionManager';
 
 import { ConnectorButton } from './components/ConnectorButton';
 import processConnectionError from './utils/processConnectionError';
 
-type AnyIdPostLoginHandler<I extends IdentityType = IdentityType> = (loginInfo: AnyIdLogin<I>) => any;
-
-type Props = {
-  loginSuccess?: AnyIdPostLoginHandler<'Wallet'>;
-  onError?: (err: DisabledAccountError) => void;
-};
-
-export function WalletSelector({ loginSuccess = () => null, onError = () => null }: Props) {
+export function WalletSelector() {
   const { closeWalletSelectorModal, isWalletSelectorModalOpen, isConnectingIdentity } = useWeb3ConnectionManager();
   const { pendingConnector, error, isLoading, connectAsync, connectors } = useConnect();
   const { connector: activeConnector, isConnected } = useAccount();
