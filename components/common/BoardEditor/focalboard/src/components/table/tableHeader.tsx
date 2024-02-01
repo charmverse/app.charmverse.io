@@ -25,7 +25,7 @@ import {
 } from '@mui/material';
 import { bindPopover, bindToggle, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import type { Dispatch, SetStateAction } from 'react';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useViewSortOptions } from 'hooks/useViewSortOptions';
@@ -116,6 +116,12 @@ function TableHeader(props: Props): JSX.Element {
     }
   };
 
+  useEffect(() => {
+    if (template.name !== tempName) {
+      setTempName(template.name);
+    }
+  }, [template.name]);
+
   const popoverToggle = bindToggle(popupState);
   const popoverToggleProps: typeof popoverToggle = {
     ...popoverToggle,
@@ -199,7 +205,7 @@ function TableHeader(props: Props): JSX.Element {
             autoFocus
             onKeyDown={(e) => {
               e.stopPropagation();
-              if (e.code === 'Enter' && tempName.length !== 0) {
+              if (e.code === 'Enter' && tempName.length !== 0 && tempName !== name) {
                 renameColumn();
               }
             }}
