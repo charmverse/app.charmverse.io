@@ -12,7 +12,6 @@ import ErrorComponent from 'components/common/errors/WalletError';
 import Link from 'components/common/Link';
 import { Modal } from 'components/common/Modal';
 import type { AnyIdLogin } from 'components/login/components/LoginButton';
-import { useUnstoppableDomains } from 'hooks/useUnstoppableDomains';
 import type { DisabledAccountError } from 'lib/utilities/errors';
 
 import { useWeb3ConnectionManager } from '../../Web3ConnectionManager';
@@ -23,13 +22,12 @@ import processConnectionError from './utils/processConnectionError';
 type AnyIdPostLoginHandler<I extends IdentityType = IdentityType> = (loginInfo: AnyIdLogin<I>) => any;
 
 type Props = {
-  loginSuccess?: AnyIdPostLoginHandler<'UnstoppableDomain' | 'Wallet'>;
+  loginSuccess?: AnyIdPostLoginHandler<'Wallet'>;
   onError?: (err: DisabledAccountError) => void;
 };
 
 export function WalletSelector({ loginSuccess = () => null, onError = () => null }: Props) {
   const { closeWalletSelectorModal, isWalletSelectorModalOpen, isConnectingIdentity } = useWeb3ConnectionManager();
-  const { uAuthPopupError, unstoppableDomainsLogin } = useUnstoppableDomains();
   const { pendingConnector, error, isLoading, connectAsync, connectors } = useConnect();
   const { connector: activeConnector, isConnected } = useAccount();
 
@@ -63,10 +61,6 @@ export function WalletSelector({ loginSuccess = () => null, onError = () => null
 
   function isWalletConnected(connectorId?: string) {
     return !!(connectorId && activeConnector?.id === connectorId);
-  }
-
-  async function handleUnstoppableDomainsLogin() {
-    unstoppableDomainsLogin({ loginSuccess, onError });
   }
 
   return (
@@ -103,23 +97,6 @@ export function WalletSelector({ loginSuccess = () => null, onError = () => null
             isActive={isWalletConnected(coinbaseWalletConnector?.id)}
             isLoading={isLoading && pendingConnector?.id === coinbaseWalletConnector?.id}
           />
-        </Grid>
-
-        <Grid item xs={12}>
-          <ConnectorButton
-            name='Unstoppable Domains'
-            onClick={handleUnstoppableDomainsLogin}
-            iconUrl='unstoppable-domains.png'
-            disabled={false}
-            isActive={false}
-            isLoading={isConnectingIdentity}
-          />
-          {uAuthPopupError && (
-            <Alert severity='warning'>
-              Could not open Unstoppable Domains. Please ensure popups are enabled for the CharmVerse site in your
-              browser.
-            </Alert>
-          )}
         </Grid>
 
         <Grid item>
