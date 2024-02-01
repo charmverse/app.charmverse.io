@@ -6,7 +6,7 @@ import { Box } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import { trackPageView } from 'charmClient/hooks/track';
 import DocumentPage from 'components/[pageId]/DocumentPage';
@@ -136,7 +136,6 @@ function PageDialogBase(props: Props) {
     }, 500),
     [page]
   );
-
   if (!popupState.isOpen) {
     return null;
   }

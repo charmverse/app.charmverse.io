@@ -4,12 +4,14 @@ import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/ho
 import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { useSyncRelationProperty } from 'charmClient/hooks/blocks';
 import { CardDetailProperty } from 'components/common/BoardEditor/components/cardProperties/CardDetailProperty';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { proposalPropertyTypesList, type Board, type IPropertyTemplate, type PropertyType } from 'lib/focalboard/board';
+import { type RelationPropertyData, type Board, type IPropertyTemplate, type PropertyType } from 'lib/focalboard/board';
+import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
@@ -55,7 +57,7 @@ function CardDetailProperties(props: Props) {
   const [newTemplateId, setNewTemplateId] = useState('');
   const intl = useIntl();
   const addPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-property' });
-
+  const { trigger: syncRelationProperty } = useSyncRelationProperty();
   const { showMessage } = useSnackbar();
   const theme = useTheme();
   const isSmallScreen = useSmallScreen();
@@ -98,7 +100,8 @@ function CardDetailProperties(props: Props) {
   function onPropertyChangeSetAndOpenConfirmationDialog(
     newType: PropertyType,
     newName: string,
-    propertyTemplate: IPropertyTemplate
+    propertyTemplate: IPropertyTemplate,
+    relationPropertyData?: RelationPropertyData
   ) {
     const oldType = propertyTemplate.type;
 
@@ -111,7 +114,7 @@ function CardDetailProperties(props: Props) {
 
     // if no card has this value set delete the property directly without warning
     if (affectsNumOfCards === '0') {
-      mutator.changePropertyTypeAndName(board, cards, propertyTemplate, newType, newName, views);
+      mutator.changePropertyTypeAndName(board, cards, propertyTemplate, newType, newName, views, relationPropertyData);
       return;
     }
 
@@ -158,7 +161,15 @@ function CardDetailProperties(props: Props) {
       onConfirm: async () => {
         setShowConfirmationDialog(false);
         try {
-          await mutator.changePropertyTypeAndName(board, cards, propertyTemplate, newType, newName, views);
+          await mutator.changePropertyTypeAndName(
+            board,
+            cards,
+            propertyTemplate,
+            newType,
+            newName,
+            views,
+            relationPropertyData
+          );
         } catch (err: any) {
           Utils.logError(`Error Changing Property And Name:${propertyTemplate.name}: ${err?.toString()}`);
         }
@@ -235,14 +246,22 @@ function CardDetailProperties(props: Props) {
       activeView && (
         <PropertyTypes
           isMobile={isSmallScreen}
-          onClick={async (type) => {
+          onClick={async ({ type, relationData, name }) => {
             const template: IPropertyTemplate = {
               id: Utils.createGuid(IDType.BlockID),
-              name: typeDisplayName(intl, type),
+              name: name ?? typeDisplayName(intl, type),
               type,
-              options: []
+              options: [],
+              relationData
             };
             const templateId = await mutator.insertPropertyTemplate(board, activeView, -1, template);
+            if (relationData?.showOnRelatedBoard) {
+              syncRelationProperty({
+                boardId: board.id,
+                created: true,
+                templateId
+              });
+            }
             setNewTemplateId(templateId);
             addPropertyPopupState.close();
           }}
@@ -278,8 +297,8 @@ function CardDetailProperties(props: Props) {
             card={card}
             deleteDisabledMessage={getDeleteDisabled(propertyTemplate)}
             onDelete={() => onPropertyDeleteSetAndOpenConfirmationDialog(propertyTemplate)}
-            onTypeAndNameChanged={(newType: PropertyType, newName: string) => {
-              onPropertyChangeSetAndOpenConfirmationDialog(newType, newName, propertyTemplate);
+            onTypeAndNameChanged={(newType: PropertyType, newName: string, relationData?: RelationPropertyData) => {
+              onPropertyChangeSetAndOpenConfirmationDialog(newType, newName, propertyTemplate, relationData);
             }}
             pageUpdatedAt={pageUpdatedAt}
             pageUpdatedBy={pageUpdatedBy}

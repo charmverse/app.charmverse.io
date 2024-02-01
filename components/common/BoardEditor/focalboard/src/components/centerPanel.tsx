@@ -42,6 +42,7 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
+import { getRelationPropertiesCardsRecord } from 'lib/focalboard/getRelationPropertiesCardsRecord';
 
 import mutator from '../mutator';
 import { addCard as _addCard, addTemplate } from '../store/cards';
@@ -90,6 +91,7 @@ type State = {
 function CenterPanel(props: Props) {
   const { activeView, board, currentRootPageId, pageIcon, showView, views, page: boardPage } = props;
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
+  const [selectedPropertyId, setSelectedPropertyId] = useState<null | string>(null);
 
   const [state, setState] = useState<State>({
     cardIdToFocusOnRender: '',
@@ -97,6 +99,7 @@ function CenterPanel(props: Props) {
     // assume this is a page type 'inline_linked_board' or 'linked_board' if no view exists
     openSettings: null
   });
+
   const [loadingFormResponses, setLoadingFormResponses] = useState(false);
 
   const router = useRouter();
@@ -123,6 +126,7 @@ function CenterPanel(props: Props) {
   const _dateDisplayProperty = activeBoard?.fields.cardProperties.find(
     (o) => o.id === activeView?.fields.dateDisplayPropertyId
   );
+
   const selectViewCardsSortedFilteredAndGrouped = useMemo(makeSelectViewCardsSortedFilteredAndGrouped, []);
   const _cards = useAppSelector((state) =>
     selectViewCardsSortedFilteredAndGrouped(state, {
@@ -137,12 +141,23 @@ function CenterPanel(props: Props) {
     if (!isActiveView) {
       return;
     }
-    if (views.length === 0) {
+    if (selectedPropertyId) {
+      setState((s) => ({ ...s, openSettings: 'view-options' }));
+    } else if (views.length === 0) {
       setState((s) => ({ ...s, openSettings: 'create-linked-view' }));
     } else if (activeView) {
       setState((s) => ({ ...s, openSettings: null }));
     }
-  }, [activeView?.id, views.length, isActiveView]);
+  }, [activeView?.id, views.length, isActiveView, selectedPropertyId]);
+
+  const relationPropertiesCardsRecord = useMemo(
+    () =>
+      getRelationPropertiesCardsRecord({
+        pages: Object.values(pages),
+        properties: activeBoard?.fields.cardProperties ?? []
+      }),
+    [pages, activeBoard]
+  );
 
   // filter cards by whats accessible
   const { cardPages, cardPageIds } = useMemo(() => {
@@ -154,7 +169,15 @@ function CenterPanel(props: Props) {
       .filter(({ page }) => !!page && !page.deletedAt);
 
     const _cardPages = isActiveView
-      ? sortCards(result, activeBoard, activeView, membersRecord, localViewSettings?.localSort)
+      ? sortCards(
+          result,
+          activeBoard,
+          activeView,
+          membersRecord,
+          // Required to sort cards by relation properties
+          relationPropertiesCardsRecord,
+          localViewSettings?.localSort
+        )
       : [];
 
     const _cardPageIds = new Set<string>();
@@ -164,7 +187,7 @@ function CenterPanel(props: Props) {
       cardPages: _cardPages,
       cardPageIds: _cardPageIds
     };
-  }, [isActiveView, _cards, pages, localViewSettings?.localSort]);
+  }, [isActiveView, _cards, pages, localViewSettings?.localSort, relationPropertiesCardsRecord]);
 
   const cards = cardPages.map(({ card }) => card);
 
@@ -653,6 +676,7 @@ function CenterPanel(props: Props) {
                 )}
                 {activeBoard && activeView?.fields.viewType === 'table' && (
                   <Table
+                    setSelectedPropertyId={setSelectedPropertyId}
                     board={activeBoard}
                     activeView={activeView}
                     cardPages={cardPages}
@@ -700,6 +724,12 @@ function CenterPanel(props: Props) {
             )}
 
             <ViewSidebar
+              selectedPropertyId={selectedPropertyId}
+              sidebarView={selectedPropertyId ? 'card-property' : undefined}
+              setSelectedPropertyId={(_selectedPropertyId) => {
+                setSelectedPropertyId(_selectedPropertyId);
+              }}
+              cards={cards}
               views={views}
               page={props.page}
               board={activeBoard}

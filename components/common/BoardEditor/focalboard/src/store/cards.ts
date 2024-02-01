@@ -2,6 +2,7 @@ import type { PageMeta } from '@charmverse/core/pages';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { tokenChainOptions } from 'components/rewards/components/RewardsBoard/utils/boardData';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
@@ -184,6 +185,7 @@ export function sortCards(
   board: Board,
   activeView: BoardView,
   members: Record<string, Member>,
+  relationPropertiesCardsRecord: PageListItemsRecord,
   localSort?: ISortOption[] | null
 ): CardPage[] {
   if (!activeView) {
@@ -230,6 +232,16 @@ export function sortCards(
           if (typeof bValue !== 'number') {
             bValue = bValue === '' ? '' : JSON.parse(bValue as string).from;
           }
+        } else if (template.type === 'relation') {
+          const pageListItems = relationPropertiesCardsRecord[template.id] ?? [];
+          const aPageListItems = Array.isArray(aValue)
+            ? aValue.map((pageId) => pageListItems.find((pageListItem) => pageListItem.id === pageId)?.title)
+            : [];
+          const bPageListItems = Array.isArray(bValue)
+            ? bValue.map((pageId) => pageListItems.find((pageListItem) => pageListItem.id === pageId)?.title)
+            : [];
+          aValue = aPageListItems.join(', ');
+          bValue = bPageListItems.join(', ');
         }
 
         let result = 0;
