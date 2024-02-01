@@ -97,7 +97,6 @@ export function NewProposalPage({
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>();
   const [, setPageTitle] = usePageTitle();
   const { data: workflowOptions, isLoading: isLoadingWorkflows } = useGetProposalWorkflows(currentSpace?.id);
-  const isMdScreen = useMdScreen();
   const proposalPageType = isTemplate ? 'proposal_template' : 'proposal';
   const {
     formInputs,
@@ -340,6 +339,26 @@ export function NewProposalPage({
       );
     }
   }, [hasSource]);
+
+  // watch for changes in isTemplate
+  useEffect(() => {
+    if (isTemplate) {
+      setFormInputs(
+        {
+          type: 'proposal_template',
+          proposalTemplateId: null
+        },
+        { fromUser: false }
+      );
+    } else {
+      setFormInputs(
+        {
+          type: 'proposal'
+        },
+        { fromUser: false }
+      );
+    }
+  }, [isTemplate]);
 
   return (
     <Box display='flex' flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>

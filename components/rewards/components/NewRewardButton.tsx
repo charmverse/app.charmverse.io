@@ -113,7 +113,7 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
     } else if (router.query.new_template) {
       createTemplate();
     }
-  }, [router.isReady]);
+  }, [router.query.new_template, router.query.new]);
 
   return (
     <>
