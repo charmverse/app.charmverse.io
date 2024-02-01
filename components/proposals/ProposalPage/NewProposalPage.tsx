@@ -97,7 +97,6 @@ export function NewProposalPage({
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>();
   const [, setPageTitle] = usePageTitle();
   const { data: workflowOptions, isLoading: isLoadingWorkflows } = useGetProposalWorkflows(currentSpace?.id);
-  const isMdScreen = useMdScreen();
   const proposalPageType = isTemplate ? 'proposal_template' : 'proposal';
   const {
     formInputs,
