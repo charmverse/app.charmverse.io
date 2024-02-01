@@ -38,6 +38,7 @@ export function FeatureLink({ feature, onClick }: { feature: MappedFeature; onCl
   const [visibleMenu, setVisibleMenu] = useState<PopupMenu | false>(false);
   const isAdmin = useIsAdmin();
 
+  // left this in for future use, if we want to have menus open up including templates
   const handleClick = (event: MouseEvent<HTMLButtonElement>, menu: PopupMenu) => {
     if (isAdmin) {
       setVisibleMenu(menu);
@@ -70,24 +71,20 @@ export function FeatureLink({ feature, onClick }: { feature: MappedFeature; onCl
         )}
         {feature.id === 'rewards' && (
           <Link href='/rewards?new=1'>
-            <AddIconButton onClick={(e) => handleClick(e, 'rewards')} tooltip={`Add a ${getFeatureTitle('Reward')}`} />
+            <AddIconButton tooltip={`Add a ${getFeatureTitle('Reward')}`} />
           </Link>
         )}
         {feature.id === 'proposals' && (
           <Link href='/proposals/new'>
-            <AddIconButton
-              onClick={(e) => handleClick(e, 'proposals')}
-              tooltip={`Add a ${getFeatureTitle('Proposal')}`}
-            />
+            <AddIconButton tooltip={`Add a ${getFeatureTitle('Proposal')}`} />
           </Link>
         )}
       </span>
-      {visibleMenu === 'proposals' && (
+      {/* {visibleMenu === 'proposals' && (
         <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={handleClose}>
           <MenuItem component={Link} href='/proposals/new' onClick={handleClose}>
             <ListItemText>Add {getFeatureTitle('Proposal')}</ListItemText>
           </MenuItem>
-          {/* create a linked board page by default, which can be changed to 'board' by the user */}
           <MenuItem component={Link} href='/proposals/new?type=proposal_template' onClick={handleClose}>
             <ListItemText>Add {getFeatureTitle('Proposal')} Template</ListItemText>
           </MenuItem>
@@ -98,12 +95,11 @@ export function FeatureLink({ feature, onClick }: { feature: MappedFeature; onCl
           <MenuItem component={Link} href='/rewards?new=1' onClick={handleClose}>
             <ListItemText>Add {getFeatureTitle('Reward')}</ListItemText>
           </MenuItem>
-          {/* create a linked board page by default, which can be changed to 'board' by the user */}
           <MenuItem component={Link} href='/rewards?new_template=1' onClick={handleClose}>
             <ListItemText>Add {getFeatureTitle('Reward')} Template</ListItemText>
           </MenuItem>
         </Menu>
-      )}
+      )} */}
     </StyledSidebarLink>
   );
 }
