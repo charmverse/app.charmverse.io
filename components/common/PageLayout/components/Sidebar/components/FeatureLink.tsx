@@ -1,11 +1,9 @@
 import styled from '@emotion/styled';
-import { ListItemText, Menu, MenuItem } from '@mui/material';
 import { useState } from 'react';
 import type { MouseEvent } from 'react';
 
 import Link from 'components/common/Link';
 import { useCharmRouter } from 'hooks/useCharmRouter';
-import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { MappedFeature } from 'lib/features/constants';
 
@@ -36,16 +34,13 @@ export function FeatureLink({ feature, onClick }: { feature: MappedFeature; onCl
   const { router } = useCharmRouter();
   const { getFeatureTitle } = useSpaceFeatures();
   const [visibleMenu, setVisibleMenu] = useState<PopupMenu | false>(false);
-  const isAdmin = useIsAdmin();
 
   // left this in for future use, if we want to have menus open up including templates
   const handleClick = (event: MouseEvent<HTMLButtonElement>, menu: PopupMenu) => {
-    if (isAdmin) {
-      setVisibleMenu(menu);
-      setAnchorEl(event.currentTarget);
-      event.preventDefault();
-      event.stopPropagation();
-    }
+    setVisibleMenu(menu);
+    setAnchorEl(event.currentTarget);
+    event.preventDefault();
+    event.stopPropagation();
   };
 
   const handleClose = (event?: any) => {
