@@ -1,3 +1,4 @@
+import styled from '@emotion/styled';
 import { ListItemText, Menu, MenuItem } from '@mui/material';
 import { useState } from 'react';
 import type { MouseEvent } from 'react';
@@ -14,6 +15,21 @@ import { AddIconButton } from './AddIconButton';
 import { SidebarLink } from './SidebarButton';
 
 type PopupMenu = 'rewards' | 'proposals';
+
+const StyledSidebarLink = styled(SidebarLink)`
+  // disable hover UX on ios which converts first click to a hover event
+  @media (pointer: fine) {
+    .hover-action {
+      opacity: 0;
+      transition: opacity 0.2s ease-in-out;
+    }
+    &:hover {
+      .hover-action {
+        opacity: 1;
+      }
+    }
+  }
+`;
 
 export function FeatureLink({ feature, onClick }: { feature: MappedFeature; onClick?: VoidFunction }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -37,7 +53,7 @@ export function FeatureLink({ feature, onClick }: { feature: MappedFeature; onCl
   };
 
   return (
-    <SidebarLink
+    <StyledSidebarLink
       href={`/${feature.path}`}
       active={router.pathname.startsWith(`/[domain]/${feature.path}`)}
       icon={<PageIcon icon={null} pageType={feature.path} />}
@@ -46,7 +62,7 @@ export function FeatureLink({ feature, onClick }: { feature: MappedFeature; onCl
       data-test={`sidebar-link-${feature.path}`}
       sx={{ pr: '8px !important' }}
     >
-      <span className='add-a-page'>
+      <span className='hover-action'>
         {feature.id === 'forum' && (
           <Link href='/forum?new=1'>
             <AddIconButton tooltip='Add a Post' />
@@ -88,6 +104,6 @@ export function FeatureLink({ feature, onClick }: { feature: MappedFeature; onCl
           </MenuItem>
         </Menu>
       )}
-    </SidebarLink>
+    </StyledSidebarLink>
   );
 }
