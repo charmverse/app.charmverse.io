@@ -1,7 +1,8 @@
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { ButtonGroup } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useRef, useState } from 'react';
+import { useRouter } from 'next/router';
+import { useEffect, useRef, useState } from 'react';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
 import { Button } from 'components/common/Button';
@@ -22,6 +23,7 @@ import { useRewardTemplates } from '../hooks/useRewardTemplates';
 
 export function NewRewardButton({ showPage }: { showPage: (pageId: string) => void }) {
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
+  const router = useRouter();
   const [selectedTemplate, setSelectedTemplate] = useState<RewardTemplate | null>(null);
   const overrideContentModalPopupState = usePopupState({ variant: 'popover', popupId: 'override-content' });
   const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, createReward, isSavingReward } =
@@ -104,6 +106,14 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
       disabledTooltip = 'You need to assign at least one submitter';
     }
   }
+
+  useEffect(() => {
+    if (router.query.new) {
+      createNewReward();
+    } else if (router.query.new_template) {
+      createTemplate();
+    }
+  }, [router.isReady]);
 
   return (
     <>

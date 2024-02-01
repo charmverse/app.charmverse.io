@@ -7,8 +7,6 @@ import type { SyntheticEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo } from 'react';
 
 import charmClient from 'charmClient';
-import { NavIconHover } from 'components/common/PageLayout/components/PageNavigation/components/NavIconHover';
-import { TreeRoot } from 'components/common/PageLayout/components/PageNavigation/components/TreeRoot';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useFavoritePages } from 'hooks/useFavoritePages';
@@ -23,8 +21,10 @@ import { addPageAndRedirect } from 'lib/pages';
 import { filterVisiblePages } from 'lib/pages/filterVisiblePages';
 import { isTruthy } from 'lib/utilities/types';
 
+import { NavIconHover } from './components/NavIconHover';
 import type { MenuNode, ParentMenuNode } from './components/TreeNode';
 import TreeNode from './components/TreeNode';
+import { TreeRoot } from './components/TreeRoot';
 
 function mapPageToMenuNode(page: PageMeta): MenuNode {
   return {

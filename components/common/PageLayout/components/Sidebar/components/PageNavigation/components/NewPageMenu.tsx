@@ -1,42 +1,17 @@
 import type { Page } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
-import AddIcon from '@mui/icons-material/Add';
 import ArticleIcon from '@mui/icons-material/InsertDriveFileOutlined';
-import IconButton from '@mui/material/IconButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import type { MouseEvent } from 'react';
 import { memo, useState } from 'react';
 
 import { greyColor2 } from 'theme/colors';
 
-import { StyledDatabaseIcon } from '../../PageIcon';
-
-export const StyledIconButton = styled(IconButton)`
-  border-radius: 3px;
-  border: 1px solid ${({ theme }) => theme.palette.divider};
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-
-  svg {
-    font-size: 16px;
-  }
-  // disable hover UX on ios which converts first click to a hover event
-  @media (pointer: fine) {
-    &:hover {
-      background-color: ${({ theme }) => theme.palette.action.hover};
-    }
-  }
-  ${({ theme }) => `
-    ${theme.breakpoints.down('md')} {
-      height: 26px;
-      width: 26px;
-  `}
-`;
+import { StyledDatabaseIcon } from '../../../../../../PageIcon';
+import { AddIconButton } from '../../AddIconButton';
 
 export const StyledArticleIcon = styled(ArticleIcon)`
   color: ${greyColor2};
@@ -66,11 +41,7 @@ function NewPageMenu({ addPage, tooltip }: Props) {
 
   return (
     <>
-      <Tooltip disableInteractive title={tooltip} leaveDelay={0} placement='top' arrow>
-        <StyledIconButton data-test='add-page' onClick={handleClick}>
-          <AddIcon color='secondary' />
-        </StyledIconButton>
-      </Tooltip>
+      <AddIconButton data-test='add-page' onClick={handleClick} tooltip={tooltip} />
 
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         <MenuItem onClick={(e) => createPage(e, { type: 'page' })}>
