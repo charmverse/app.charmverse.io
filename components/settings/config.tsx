@@ -1,3 +1,4 @@
+import { DiamondOutlined } from '@mui/icons-material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import UserRoleIcon from '@mui/icons-material/AssignmentIndOutlined';
 import CloudSyncOutlinedIcon from '@mui/icons-material/CloudSyncOutlined';
@@ -25,13 +26,14 @@ export const SPACE_SETTINGS_TABS = [
 
 export type SpaceSettingsTab = (typeof SPACE_SETTINGS_TABS)[number];
 export type SpaceSettingsSection = SpaceSettingsTab['path'];
-export const accountSettingsSections = ['account', 'profile'] as const;
+export const accountSettingsSections = ['account', 'profile', 'charms'] as const;
 
 export type UserSettingsSection = (typeof accountSettingsSections)[number];
 
 export const ACCOUNT_TABS = [
   { icon: <ManageAccountsIcon fontSize='small' />, path: 'account', label: 'My Account' },
-  { icon: <AccountCircleIcon fontSize='small' />, path: 'profile', label: 'My Profile' }
+  { icon: <AccountCircleIcon fontSize='small' />, path: 'profile', label: 'My Profile' },
+  { icon: <DiamondOutlined fontSize='small' />, path: 'charms', label: 'Charms' }
 ] as const;
 
 export type UserSettingsTab = (typeof ACCOUNT_TABS)[number];
