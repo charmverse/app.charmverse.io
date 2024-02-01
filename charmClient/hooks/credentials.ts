@@ -1,7 +1,7 @@
 import type { CredentialTemplate } from '@charmverse/core/prisma-client';
 
 import type { MaybeString } from 'charmClient/hooks/helpers';
-import type { EASAttestationWithFavorite } from 'lib/credentials/external/getExternalCredentials';
+import type { EASAttestationWithFavorite } from 'lib/credentials/external/getOnchainCredentials';
 import type { AddFavoriteCredentialPayload, ReorderFavoriteCredentialsPayload } from 'pages/api/credentials/favorites';
 
 import { useDELETE, useGET, usePOST, usePUT } from './helpers';

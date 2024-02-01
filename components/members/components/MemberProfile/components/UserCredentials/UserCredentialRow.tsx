@@ -1,15 +1,16 @@
 import LaunchIcon from '@mui/icons-material/Launch';
 import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
 import StarOutlinedIcon from '@mui/icons-material/StarOutlined';
-import { Chip, Grid, IconButton, Stack, Tooltip, Typography } from '@mui/material';
+import { Chip, Grid, IconButton, Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Image from 'next/image';
 
 import Link from 'components/common/Link';
 import { useFavoriteCredentials } from 'hooks/useFavoriteCredentials';
+import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { EASAttestationWithFavorite } from 'lib/credentials/external/getExternalCredentials';
+import type { EASAttestationWithFavorite } from 'lib/credentials/external/getOnchainCredentials';
 import { trackedSchemas } from 'lib/credentials/external/schemas';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
@@ -42,18 +43,28 @@ export function UserCredentialRow({
       showMessage(`Failed to ${credential.favoriteCredentialId ? 'unfavorite' : 'favorite'} credential`, 'error');
     }
   }
+  const isSmallScreen = useSmallScreen();
   const credentialInfo: {
     title: string;
     subtitle: string;
     iconUrl: string;
     attestationContent: { name: string; value: string }[];
   } =
-    credential.type === 'internal'
+    credential.type === 'charmverse'
       ? {
           title: credential.content.name,
           subtitle: credential.content.organization,
           iconUrl: credential.iconUrl ?? '/images/logo_black_lightgrey.png',
           attestationContent: [{ name: 'status', value: credential.content.status }]
+        }
+      : credential.type === 'gitcoin'
+      ? {
+          title: 'Gitcoin Passport Score',
+          subtitle: 'Gitcoin',
+          iconUrl: '/images/logos/Gitcoin_Passport_Logomark_SeaFoam.svg',
+          attestationContent: [
+            { name: 'Passport Score', value: `Passport Score: ${credential.content.passport_score?.toFixed(2)}` }
+          ]
         }
       : {
           title: schemaInfo?.title ?? '',
@@ -67,15 +78,27 @@ export function UserCredentialRow({
           }))
         };
 
-  if (credential.type === 'external' && !schemaInfo) {
+  if (credential.type === 'onchain' && !schemaInfo) {
     return null;
   }
 
   return (
-    <Grid container display='flex' alignItems='center' justifyContent='space-between'>
-      <Grid item xs={5}>
-        <Box display='flex' alignItems='center' gap={2}>
-          <Image src={credentialInfo.iconUrl} alt='charmverse-logo' height={30} width={30} />
+    <Grid container display='flex' gap={{ xs: 1 }} alignItems='center' justifyContent='space-between'>
+      <Grid item xs={12} md={5}>
+        <Box
+          display='flex'
+          alignItems='center'
+          gap={{
+            xs: 1,
+            md: 2
+          }}
+        >
+          <Image
+            src={credentialInfo.iconUrl}
+            alt='charmverse-logo'
+            height={isSmallScreen ? 40 : 30}
+            width={isSmallScreen ? 40 : 30}
+          />
           <Box display='flex' flexDirection='column'>
             <Typography variant='body1' fontWeight='bold'>
               {credentialInfo.title}
@@ -86,9 +109,9 @@ export function UserCredentialRow({
           </Box>
         </Box>
       </Grid>
-      <Grid item display='flex' justifyContent='flex-start' xs={5} gap={1}>
+      <Grid item display='flex' justifyContent='flex-start' xs={8} md={credential.verificationUrl ? 4 : 6} gap={1}>
         {credentialInfo.attestationContent.map((field) => (
-          <Chip variant='outlined' key={field.name} label={field.value} />
+          <Chip size={isSmallScreen ? 'small' : 'medium'} variant='outlined' key={field.name} label={field.value} />
         ))}
       </Grid>
       {isUserRecipient && !readOnly && (
@@ -114,20 +137,13 @@ export function UserCredentialRow({
           </Tooltip>
         </Grid>
       )}
-      <Grid item xs={1} display='flex' justifyContent='flex-end' pr={2}>
-        <Stack alignItems='center'>
-          <Link
-            href={credential.verificationUrl}
-            external
-            target='_blank'
-            sx={{
-              display: 'flex'
-            }}
-          >
-            <LaunchIcon fontSize='small' sx={{ alignSelf: 'center' }} />
+      {credential.verificationUrl && (
+        <Grid item xs={1} display='flex' justifyContent='flex-end'>
+          <Link href={credential.verificationUrl} external target='_blank'>
+            <LaunchIcon sx={{ alignSelf: 'center' }} fontSize={isSmallScreen ? 'small' : 'medium'} />
           </Link>
-        </Stack>
-      </Grid>
+        </Grid>
+      )}
     </Grid>
   );
 }

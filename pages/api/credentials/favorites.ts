@@ -18,6 +18,7 @@ export type AddFavoriteCredentialPayload = {
   attestationId?: string;
   chainId: number;
   issuedCredentialId?: string;
+  gitcoinWalletAddress?: string;
 };
 
 async function addFavoriteCredential(req: NextApiRequest, res: NextApiResponse) {
@@ -29,7 +30,9 @@ async function addFavoriteCredential(req: NextApiRequest, res: NextApiResponse) 
     data: {
       attestationId: payload.attestationId,
       chainId: payload.chainId,
-      issuedCredentialId: payload.issuedCredentialId
+      issuedCredentialId: payload.issuedCredentialId,
+      userId: req.session.user.id,
+      gitcoinWalletAddress: payload.gitcoinWalletAddress
     }
   });
   return res.status(200).send({

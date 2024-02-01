@@ -3,7 +3,7 @@ import { Stack } from '@mui/material';
 import type { Dispatch, SetStateAction } from 'react';
 
 import { Button } from 'components/common/Button';
-import type { EASAttestationWithFavorite } from 'lib/credentials/external/getExternalCredentials';
+import type { EASAttestationWithFavorite } from 'lib/credentials/external/getOnchainCredentials';
 
 import { UserAllCredentialsList, UserFavoriteList } from '../../UserCredentials/UserCredentialsList';
 

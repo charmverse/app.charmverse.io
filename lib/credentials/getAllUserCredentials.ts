@@ -3,8 +3,9 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
-import { getAllOnChainAttestations } from './external/getExternalCredentials';
-import type { EASAttestationWithFavorite } from './external/getExternalCredentials';
+import { getAllOnChainAttestations } from './external/getOnchainCredentials';
+import type { EASAttestationWithFavorite } from './external/getOnchainCredentials';
+import { getGitcoinCredentialsByWallets } from './getGitcoinCredentialsByWallets';
 import { getCharmverseCredentialsByWallets } from './queriesAndMutations';
 
 // Use these wallets to return at least 1 of all the tracked credentials
@@ -36,6 +37,10 @@ export async function getAllUserCredentials({ userId }: { userId: string }): Pro
   const allCredentials = await Promise.all([
     getCharmverseCredentialsByWallets({ wallets }).catch((error) => {
       log.error(`Error loading Charmverse Ceramic credentials for user ${userId}`, { error, userId });
+      return [];
+    }),
+    getGitcoinCredentialsByWallets({ wallets }).catch((error) => {
+      log.error(`Error loading Gitcoin Ceramic credentials for user ${userId}`, { error, userId });
       return [];
     }),
     getAllOnChainAttestations({ wallets })

@@ -7,7 +7,7 @@ import { useGetUserCredentials } from 'charmClient/hooks/credentials';
 import { DraggableListItem } from 'components/common/DraggableListItem';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useFavoriteCredentials } from 'hooks/useFavoriteCredentials';
-import type { EASAttestationWithFavorite } from 'lib/credentials/external/getExternalCredentials';
+import type { EASAttestationWithFavorite } from 'lib/credentials/external/getOnchainCredentials';
 
 import { UserCredentialRow } from './UserCredentialRow';
 
