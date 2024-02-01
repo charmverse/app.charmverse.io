@@ -22,7 +22,6 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
   const [, setTitleState] = usePageTitle();
   const { space: currentSpace } = useCurrentSpace();
   useRewardsNavigation();
-
   const { error: pageWithContentError, page, updatePage } = usePage({ pageIdOrPath, spaceId: currentSpace?.id });
 
   const readOnly =

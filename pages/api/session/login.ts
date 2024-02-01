@@ -44,7 +44,7 @@ async function login(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { 
     user.spaceRoles
   );
 
-  if (user.otp?.activatedAt) {
+  if (user.otp?.activatedAt && !req.session.user?.id) {
     req.session.otpUser = { id: user.id, method: 'Wallet' };
     await req.session.save();
 

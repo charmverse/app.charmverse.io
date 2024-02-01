@@ -1,4 +1,4 @@
-import type { CredentialTemplate } from '@charmverse/core/dist/cjs/prisma-client';
+import type { CredentialTemplate } from '@charmverse/core/prisma-client';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Grid from '@mui/material/Grid';

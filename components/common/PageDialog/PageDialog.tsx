@@ -136,7 +136,6 @@ function PageDialogBase(props: Props) {
     }, 500),
     [page]
   );
-
   if (!popupState.isOpen) {
     return null;
   }
