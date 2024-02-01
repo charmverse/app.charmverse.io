@@ -216,7 +216,7 @@ function DocumentPageComponent({
   const proposalAuthors = proposal ? [proposal.createdBy, ...proposal.authors.map((author) => author.userId)] : [];
 
   return (
-    <Box ref={containerRef} id='file-drop-container' display='flex' flexDirection='column' height='100%' width='100%'>
+    <Box ref={containerRef} id='file-drop-container' display='flex' flexDirection='column' height='100%'>
       <Box
         ref={printRef}
         className={`document-print-container ${fontClassName} drag-area-container`}
