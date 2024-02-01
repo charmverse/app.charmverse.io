@@ -199,7 +199,17 @@ export function NewProposalPage({
         headerImage: template.page.headerImage,
         icon: template.page.icon,
         evaluations: template.evaluations,
-        fields: template.fields || {},
+        fields:
+          {
+            ...template.fields,
+            pendingRewards: template.fields?.pendingRewards?.map((pendingReward) => ({
+              ...pendingReward,
+              reward: {
+                ...pendingReward.reward,
+                assignedSubmitters: authors
+              }
+            }))
+          } || {},
         type: proposalPageType,
         formId: template.formId ?? undefined,
         formFields: isTemplate ? formFields.map((formField) => ({ ...formField, id: uuid() })) : formFields,

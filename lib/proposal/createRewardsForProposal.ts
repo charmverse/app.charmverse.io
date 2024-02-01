@@ -66,18 +66,11 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
     throw new InvalidStateError('There are no pending rewards for this proposal');
   }
 
-  const authors = await prisma.proposalAuthor.findMany({
-    where: {
-      proposalId: proposal.id
-    }
-  });
-
   let rewardsToCreate = [...pendingRewards];
   const rewardsPromises = rewardsToCreate.map(async ({ page, reward, draftId }) => {
     // create reward
     const { createdPageId } = await createReward({
       ...reward,
-      assignedSubmitters: reward.assignedSubmitters?.length ? reward.assignedSubmitters : authors.map((a) => a.userId),
       pageProps: page || {},
       spaceId: proposal.spaceId,
       userId,

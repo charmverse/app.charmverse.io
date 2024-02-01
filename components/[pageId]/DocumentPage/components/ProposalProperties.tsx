@@ -16,7 +16,6 @@ interface ProposalPropertiesProps {
   proposalPage: PageWithContent;
   proposal?: ProposalWithUsersAndRubric;
   refreshProposal: VoidFunction;
-  isProposalTemplate: boolean;
 }
 export function ProposalProperties({
   pageId,
@@ -24,8 +23,7 @@ export function ProposalProperties({
   readOnly,
   proposalPage,
   proposal,
-  refreshProposal,
-  isProposalTemplate
+  refreshProposal
 }: ProposalPropertiesProps) {
   const { trigger: updateProposal } = useUpdateProposal({ proposalId });
   const { showError } = useSnackbar();
@@ -91,7 +89,7 @@ export function ProposalProperties({
           rewardIds={proposal?.rewardIds}
           readOnlySelectedCredentialTemplates={readOnlySelectedCredentialTemplates}
           isStructuredProposal={!!proposal?.formId}
-          isProposalTemplate={isProposalTemplate}
+          isProposalTemplate={proposalPage.type === 'proposal_template'}
         />
       </div>
     </Box>
