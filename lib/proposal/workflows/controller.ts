@@ -1,6 +1,6 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
-import { original } from '@reduxjs/toolkit';
 
 export async function getWorkflowTemplates(spaceId: string) {
   const dbWorkflows = await prisma.proposalWorkflow.findMany({
@@ -87,5 +87,10 @@ export async function upsertWorkflowTemplate(workflow: ProposalWorkflowTyped) {
         }
       });
     }
+    log.debug('Updated proposal template based on workflow changes', {
+      spaceId: workflow.spaceId,
+      workflowId: workflow.id,
+      pageId: template.id
+    });
   }
 }
