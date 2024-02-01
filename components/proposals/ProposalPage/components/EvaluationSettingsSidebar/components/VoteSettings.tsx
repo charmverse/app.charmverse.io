@@ -37,19 +37,12 @@ const StyledVoteSettings = styled.div`
 
 export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps) {
   const [passThreshold, setPassThreshold] = useState<number>(value?.threshold || 50);
+  // Default values for approval type vote
   const [voteType, setVoteType] = useState<VoteType>(value?.type ?? VoteType.Approval);
-  const [options, setOptions] = useState<string[]>(value?.options ?? []);
+  const [options, setOptions] = useState<string[]>(value?.options ?? ['Yes', 'No', 'Abstain']);
   const [maxChoices, setMaxChoices] = useState(value?.maxChoices ?? 1);
   const [durationDays, setDurationDays] = useState(value?.durationDays ?? 5);
   const [publishToSnapshot, setPublishToSnapshot] = useState(value?.publishToSnapshot ?? false);
-
-  useEffect(() => {
-    if (voteType === VoteType.SingleChoice) {
-      setOptions(['Option 1', 'Option 2', 'Abstain']);
-    } else if (voteType === VoteType.Approval) {
-      setOptions(['Yes', 'No', 'Abstain']);
-    }
-  }, [voteType]);
 
   // useEffect on the values to call onChange() doesnt seem ideal and triggers on the first load, but it works for now. TODO: use react-hook-form?
   useEffect(() => {
@@ -72,92 +65,19 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
     }
   }, [voteType, options, maxChoices, durationDays, passThreshold, publishToSnapshot]);
 
+  function handleVoteTypeChange(_voteType: VoteType) {
+    if (_voteType !== value?.type) {
+      setVoteType(_voteType);
+      if (_voteType === VoteType.Approval) {
+        setOptions(['Yes', 'No', 'Abstain']);
+      } else if (_voteType === VoteType.SingleChoice) {
+        setOptions(['Option 1', 'Option 2', 'Abstain']);
+      }
+    }
+  }
+
   return (
     <StyledVoteSettings data-test='evaluation-vote-settings'>
-      <Stack
-        data-test='vote-duration'
-        direction='row'
-        alignItems='center'
-        gap={2}
-        justifyContent='space-between'
-        mb={1}
-      >
-        <FormLabel>
-          <Typography component='span' variant='subtitle1'>
-            Duration (days)
-          </Typography>
-        </FormLabel>
-        <NumericFieldWithButtons
-          disabled={readOnly}
-          value={durationDays}
-          onChange={setDurationDays}
-          min={1}
-          max={100}
-        />
-      </Stack>
-
-      <FormLabel>
-        <Typography component='span' variant='subtitle1'>
-          Options
-        </Typography>
-      </FormLabel>
-      <RadioGroup
-        row
-        defaultValue={voteType}
-        value={voteType}
-        onChange={(e) => {
-          setVoteType(e.target.value as VoteType);
-        }}
-        sx={{ mb: 1 }}
-      >
-        <FormControlLabel
-          disabled={readOnly}
-          value={VoteType.Approval}
-          control={<Radio />}
-          label='Yes / No / Abstain'
-        />
-        <FormControlLabel
-          disabled={readOnly}
-          value={VoteType.SingleChoice}
-          control={<Radio />}
-          label='Custom Options'
-          sx={{ mr: 0 }}
-        />
-      </RadioGroup>
-      {voteType === VoteType.SingleChoice && (
-        <Stack mb={2}>
-          <InlineVoteOptions options={options} setOptions={setOptions} />
-          <Stack direction='row' alignItems='center' gap={2} mt={2} justifyContent='space-between'>
-            <FormLabel>
-              <Typography component='span' variant='subtitle1'>
-                Max choices
-              </Typography>
-            </FormLabel>
-            <NumericFieldWithButtons disabled={readOnly} value={maxChoices} onChange={setMaxChoices} min={1} />
-          </Stack>
-        </Stack>
-      )}
-
-      {maxChoices === 1 && (
-        <Stack
-          data-test='vote-pass-threshold'
-          direction='row'
-          alignItems='center'
-          gap={2}
-          justifyContent='space-between'
-          mb={2}
-        >
-          <FormLabel>
-            <Typography component='span' variant='subtitle1'>
-              Pass Threshold (%)
-            </Typography>
-          </FormLabel>
-          <NumericFieldWithButtons disabled={readOnly} value={passThreshold} onChange={setPassThreshold} max={100} />
-        </Stack>
-      )}
-
-      <Divider sx={{ my: 1 }} />
-
       <Stack direction='row' alignItems='center' gap={2} justifyContent='space-between'>
         <FormLabel>
           <Typography component='span' variant='subtitle1'>
@@ -170,6 +90,97 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
           onChange={(e, checked) => setPublishToSnapshot(checked)}
         />
       </Stack>
+      <Divider sx={{ mt: 1, mb: 2 }} />
+      {!publishToSnapshot && (
+        <>
+          <Stack
+            data-test='vote-duration'
+            direction='row'
+            alignItems='center'
+            gap={2}
+            justifyContent='space-between'
+            mb={1}
+          >
+            <FormLabel>
+              <Typography component='span' variant='subtitle1'>
+                Duration (days)
+              </Typography>
+            </FormLabel>
+            <NumericFieldWithButtons
+              disabled={readOnly}
+              value={durationDays}
+              onChange={setDurationDays}
+              min={1}
+              max={100}
+            />
+          </Stack>
+
+          <FormLabel>
+            <Typography component='span' variant='subtitle1'>
+              Options
+            </Typography>
+          </FormLabel>
+          <RadioGroup
+            row
+            defaultValue={voteType}
+            value={voteType}
+            onChange={(e) => {
+              handleVoteTypeChange(e.target.value as VoteType);
+            }}
+            sx={{ mb: 1 }}
+          >
+            <FormControlLabel
+              disabled={readOnly}
+              value={VoteType.Approval}
+              control={<Radio />}
+              label='Yes / No / Abstain'
+            />
+            <FormControlLabel
+              disabled={readOnly}
+              value={VoteType.SingleChoice}
+              control={<Radio />}
+              label='Custom Options'
+              sx={{ mr: 0 }}
+            />
+          </RadioGroup>
+          {voteType === VoteType.SingleChoice && (
+            <Stack mb={2}>
+              <InlineVoteOptions options={options} setOptions={setOptions} />
+              <Stack direction='row' alignItems='center' gap={2} mt={2} justifyContent='space-between'>
+                <FormLabel>
+                  <Typography component='span' variant='subtitle1'>
+                    Max choices
+                  </Typography>
+                </FormLabel>
+                <NumericFieldWithButtons disabled={readOnly} value={maxChoices} onChange={setMaxChoices} min={1} />
+              </Stack>
+            </Stack>
+          )}
+
+          {maxChoices === 1 && (
+            <Stack
+              data-test='vote-pass-threshold'
+              direction='row'
+              alignItems='center'
+              gap={2}
+              justifyContent='space-between'
+              mb={2}
+            >
+              <FormLabel>
+                <Typography component='span' variant='subtitle1'>
+                  Pass Threshold (%)
+                </Typography>
+              </FormLabel>
+              <NumericFieldWithButtons
+                disabled={readOnly}
+                value={passThreshold}
+                onChange={setPassThreshold}
+                max={100}
+              />
+            </Stack>
+          )}
+        </>
+      )}
     </StyledVoteSettings>
   );
 }

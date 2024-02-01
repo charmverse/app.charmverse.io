@@ -15,7 +15,11 @@ export interface UpdateProfileItemRequest {
 
 export class GoogleApi {
   loginWithCode({ code, type, redirectUri }: { code: string; type?: 'login' | 'connect'; redirectUri?: string }) {
-    return http.POST<LoggedInUser>('/api/google/code', { code, type: type || 'login', redirectUri });
+    return http.POST<LoggedInUser | { otpRequired: true }>('/api/google/code', {
+      code,
+      type: type || 'login',
+      redirectUri
+    });
   }
 
   disconnectAccount(params: Omit<DisconnectGoogleAccountRequest, 'userId'>) {
@@ -23,7 +27,7 @@ export class GoogleApi {
   }
 
   authenticateMagicLink(data: Pick<LoginWithGoogleRequest, 'accessToken'>) {
-    return http.POST<LoggedInUser>('/api/google/verify-magic-link', data);
+    return http.POST<LoggedInUser | { otpRequired: true }>('/api/google/verify-magic-link', data);
   }
 
   connectEmailAccount(data: Pick<LoginWithGoogleRequest, 'accessToken'>) {

@@ -100,7 +100,7 @@ function FilterPropertyValue({
   }, {});
   const { members } = useMembers();
   const isPropertyTypePerson =
-    propertyRecord[filter.propertyId].type.match(/person|createdBy|updatedBy|proposalEvaluatedBy/) ||
+    propertyRecord[filter.propertyId].type.match(/person|createdBy|updatedBy|proposalEvaluatedBy|proposalAuthor/) ||
     filter.propertyId === PROPOSAL_REVIEWERS_BLOCK_ID ||
     filter.propertyId === AUTHORS_BLOCK_ID;
   const isPropertyTypeEvaluationType = propertyRecord[filter.propertyId].type === 'proposalEvaluationType';

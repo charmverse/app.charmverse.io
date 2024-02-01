@@ -21,12 +21,12 @@ import { FormFieldAnswerComment } from './FormFieldAnswerComment';
 import { useFormFields } from './hooks/useFormFields';
 import type { FormFieldValue } from './interfaces';
 
-const FormFieldInputsContainer = styled(Stack)`
+const FormFieldsInputContainer = styled(Stack)`
   gap: ${(props) => props.theme.spacing(1)};
   flex-direction: column;
 `;
 
-type FormFieldInputsProps = {
+type FormFieldsInputProps = {
   formFields: (Pick<FormField, 'type' | 'name' | 'required' | 'id' | 'description' | 'private'> & {
     value?: FormFieldValue;
     options?: SelectOptionType[];
@@ -43,20 +43,19 @@ type FormFieldInputsProps = {
   ) => void;
   onSave?: (answers: { id: string; value: FormFieldValue }[]) => Promise<void>;
   values?: Record<string, FormFieldValue>;
-  isReviewer: boolean;
   pageId?: string;
   isDraft?: boolean;
 };
 
-export function ControlledFormFieldInputs({
+export function ControlledFormFieldsInput({
   formFields,
   disabled,
   control,
   errors,
   onFormChange
-}: Omit<FormFieldInputsProps, 'onSave' | 'isReviewer'>) {
+}: Omit<FormFieldsInputProps, 'onSave'>) {
   return (
-    <FormFieldInputsBase
+    <FormFieldsInputBase
       control={control}
       errors={errors}
       formFields={formFields}
@@ -67,7 +66,7 @@ export function ControlledFormFieldInputs({
   );
 }
 
-export function FormFieldInputs({
+export function FormFieldsInput({
   formFields,
   disabled,
   onSave,
@@ -75,7 +74,7 @@ export function FormFieldInputs({
   pageId,
   threads,
   isDraft
-}: Omit<FormFieldInputsProps, 'control' | 'errors' | 'onFormChange'> & {
+}: Omit<FormFieldsInputProps, 'control' | 'errors' | 'onFormChange'> & {
   isReviewer: boolean;
   threads?: Record<string, ThreadWithComments | undefined>;
 }) {
@@ -84,7 +83,7 @@ export function FormFieldInputs({
   });
 
   return (
-    <FormFieldInputsBase
+    <FormFieldsInputBase
       control={control}
       errors={errors}
       formFields={formFields}
@@ -108,7 +107,7 @@ const StyledStack = styled(Stack)`
   position: relative;
 `;
 
-function FormFieldInputsBase({
+function FormFieldsInputBase({
   onSave,
   formFields,
   values,
@@ -120,7 +119,7 @@ function FormFieldInputsBase({
   pageId,
   isDraft,
   threads = {}
-}: FormFieldInputsProps & {
+}: FormFieldsInputProps & {
   isReviewer: boolean;
   threads?: Record<string, ThreadWithComments | undefined>;
 }) {
@@ -184,78 +183,76 @@ function FormFieldInputsBase({
   }, [debouncedValues]);
 
   return (
-    <Stack gap={1} mb={15}>
-      <FormFieldInputsContainer>
-        {formFields.map((formField) => {
-          const fieldAnswerThreads =
-            (formField.formFieldAnswer ? fieldAnswerIdThreadRecord[formField.formFieldAnswer.id] : []) ?? [];
-          return (
-            <StyledStack
-              key={formField.id}
-              className='proposal-form-field-answer'
-              data-thread-ids={fieldAnswerThreads.map((fieldAnswerThread) => fieldAnswerThread.id).join(',')}
-            >
-              <Controller
-                name={formField.id}
-                control={control}
-                render={({ field }) => (
-                  <FieldTypeRenderer
-                    {...field}
-                    value={(field.value ?? '') as FormFieldValue}
-                    placeholder={fieldTypePlaceholderRecord[formField.type]}
-                    labelEndAdornment={
-                      formField.private ? <Chip sx={{ ml: 1 }} label='Private' size='small' /> : undefined
-                    }
-                    inputEndAdornment={
-                      pageId &&
-                      formField.type !== 'label' &&
-                      formField.formFieldAnswer &&
-                      user && (
-                        <Box
-                          sx={{
-                            position: 'absolute',
-                            left: '100%',
-                            ml: {
-                              md: 1,
-                              xs: 0.5
-                            }
-                          }}
-                        >
-                          <FormFieldAnswerComment
-                            formFieldAnswer={formField.formFieldAnswer}
-                            pageId={pageId}
-                            formFieldName={formField.name}
-                            disabled={disabled}
-                            fieldAnswerThreads={fieldAnswerThreads}
-                            canCreateComments={(isAdmin || isReviewer) && !isDraft}
-                          />
-                        </Box>
-                      )
-                    }
-                    description={formField.description as PageContent}
-                    disabled={disabled}
-                    type={formField.type}
-                    label={formField.name}
-                    options={formField.options as SelectOptionType[]}
-                    error={errors[formField.id] as any}
-                    required={formField.required}
-                    data-test={`form-field-input-${formField.id}`}
-                    onChange={(e) => {
-                      setIsFormDirty(true);
-                      onFormChange([
-                        {
-                          id: formField.id,
-                          value: typeof e?.target?.value === 'string' ? e.target.value : e
-                        }
-                      ]);
-                    }}
-                  />
-                )}
-              />
-            </StyledStack>
-          );
-        })}
-      </FormFieldInputsContainer>
-    </Stack>
+    <FormFieldsInputContainer>
+      {formFields.map((formField) => {
+        const fieldAnswerThreads =
+          (formField.formFieldAnswer ? fieldAnswerIdThreadRecord[formField.formFieldAnswer.id] : []) ?? [];
+        return (
+          <StyledStack
+            key={formField.id}
+            className='proposal-form-field-answer'
+            data-thread-ids={fieldAnswerThreads.map((fieldAnswerThread) => fieldAnswerThread.id).join(',')}
+          >
+            <Controller
+              name={formField.id}
+              control={control}
+              render={({ field }) => (
+                <FieldTypeRenderer
+                  {...field}
+                  value={(field.value ?? '') as FormFieldValue}
+                  placeholder={fieldTypePlaceholderRecord[formField.type]}
+                  labelEndAdornment={
+                    formField.private ? <Chip sx={{ ml: 1 }} label='Private' size='small' /> : undefined
+                  }
+                  inputEndAdornment={
+                    pageId &&
+                    formField.type !== 'label' &&
+                    formField.formFieldAnswer &&
+                    user && (
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          left: '100%',
+                          ml: {
+                            md: 1,
+                            xs: 0.5
+                          }
+                        }}
+                      >
+                        <FormFieldAnswerComment
+                          formFieldAnswer={formField.formFieldAnswer}
+                          pageId={pageId}
+                          formFieldName={formField.name}
+                          disabled={disabled}
+                          fieldAnswerThreads={fieldAnswerThreads}
+                          canCreateComments={(isAdmin || isReviewer) && !isDraft}
+                        />
+                      </Box>
+                    )
+                  }
+                  description={formField.description as PageContent}
+                  disabled={disabled}
+                  type={formField.type}
+                  label={formField.name}
+                  options={formField.options as SelectOptionType[]}
+                  error={errors[formField.id] as any}
+                  required={formField.required}
+                  data-test={`form-field-input-${formField.id}`}
+                  onChange={(e) => {
+                    setIsFormDirty(true);
+                    onFormChange([
+                      {
+                        id: formField.id,
+                        value: typeof e?.target?.value === 'string' ? e.target.value : e
+                      }
+                    ]);
+                  }}
+                />
+              )}
+            />
+          </StyledStack>
+        );
+      })}
+    </FormFieldsInputContainer>
   );
 }

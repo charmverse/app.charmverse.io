@@ -9,6 +9,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
+import type { SyntheticEvent } from 'react';
 import { useRef, useState } from 'react';
 
 import { WalletSelector } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal';
@@ -63,8 +64,8 @@ export function LoginButton({ redirectUrl, showSignup, emailOnly }: Props) {
   const loginDialog = usePopupState({ variant: 'popover', popupId: 'login-dialog' });
   const { resetSigning } = useWeb3Account();
 
-  const handleClickOpen = () => {
-    loginDialog.open();
+  const handleClickOpen = (eventOrAnchorEl?: Element | SyntheticEvent<Element, Event> | null | undefined) => {
+    loginDialog.open(eventOrAnchorEl);
   };
 
   const handleClose = () => {

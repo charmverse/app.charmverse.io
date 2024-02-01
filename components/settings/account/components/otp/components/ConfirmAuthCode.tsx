@@ -43,6 +43,7 @@ export function ConfirmAuthCode({ onSubmit, errorMessage, loading }: Props) {
           helperText={error}
           data-test='confirm-auth-code-input'
           disableArrows
+          placeholder='e.g. 123456'
           {...register('code', {
             required: true,
             validate: (val) => String(val).length === 6 || 'Must be exactly 6 characters'

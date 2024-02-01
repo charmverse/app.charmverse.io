@@ -34,7 +34,7 @@ import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
 import type { SelectOptionType } from './fields/Select/interfaces';
 import type { FormFieldInput } from './interfaces';
 
-const FormFieldContainer = styled(Stack, {
+export const FormFieldContainer = styled(Stack, {
   shouldForwardProp(propName) {
     return propName !== 'dragDirection';
   }
@@ -292,16 +292,18 @@ export function FormField(
       <FormFieldContainer dragDirection={isAdjacentActive ? ((offset?.y ?? 0) < 0 ? 'top' : 'bottom') : undefined}>
         <Stack gap={1} width='100%' ml={1}>
           {!isOpen || readOnly ? (
-            <FieldTypeRenderer
-              labelEndAdornment={formField.private ? <Chip sx={{ mx: 1 }} label='Private' size='small' /> : undefined}
-              type={formField.type as any}
-              description={formField.description as PageContent}
-              disabled
-              label={formField.name}
-              required={formField.required}
-              options={formField.options}
-              placeholder={fieldTypePlaceholderRecord[formField.type]}
-            />
+            <div style={{ cursor: 'pointer' }} onClick={toggleOpen}>
+              <FieldTypeRenderer
+                labelEndAdornment={formField.private ? <Chip sx={{ mx: 1 }} label='Private' size='small' /> : undefined}
+                type={formField.type as any}
+                description={formField.description as PageContent}
+                disabled
+                label={formField.name}
+                required={formField.required}
+                options={formField.options}
+                placeholder={fieldTypePlaceholderRecord[formField.type]}
+              />
+            </div>
           ) : (
             <ExpandedFormField {...props} shouldFocus={shouldFocus} />
           )}

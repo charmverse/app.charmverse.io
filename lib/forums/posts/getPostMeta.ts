@@ -3,12 +3,24 @@ import type { Post, PostUpDownVote } from '@charmverse/core/prisma';
 import { extractSummary } from 'lib/prosemirror/extractSummary';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-import type { ForumPostMeta, ForumVotes } from './interfaces';
+import type { ForumPostVotes } from './interfaces';
 
 type UpDownVoteData = Pick<PostUpDownVote, 'createdBy' | 'upvoted'>;
 
 export type PostWithRelations = Post & {
   upDownVotes: UpDownVoteData[];
+};
+export type ForumVotes = { upvotes: number; downvotes: number; upvoted: boolean | null };
+
+export type ForumPostMeta = Pick<
+  Post,
+  'content' | 'contentText' | 'createdBy' | 'id' | 'categoryId' | 'title' | 'path'
+> & {
+  summary: PageContent | null;
+  votes: ForumPostVotes;
+  createdAt: string;
+  updatedAt: string;
+  isDraft: boolean;
 };
 
 export function getPostVoteSummary(upDownVotes: UpDownVoteData[], userId?: string): ForumVotes {
