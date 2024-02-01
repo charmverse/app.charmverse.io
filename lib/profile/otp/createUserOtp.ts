@@ -32,7 +32,7 @@ export async function createUserOtp(userId: string): Promise<CreateOtpResponse> 
 
   const createdOtp = createOtp(user);
 
-  const createdRecoveryCode = createRecoveryCode();
+  const createdRecoveryCode = await createRecoveryCode();
 
   if (user.otp?.recoveryCodeId) {
     await prisma.recoveryCode.update({

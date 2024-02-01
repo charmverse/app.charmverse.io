@@ -19,8 +19,8 @@ import { PrimaryColumn } from 'components/[pageId]/DocumentPage/components/Prima
 import { PageSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/PageSidebar';
 import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/components/StickyFooterContainer';
 import { defaultPageTop } from 'components/[pageId]/DocumentPage/DocumentPage';
-import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
+import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
@@ -199,7 +199,17 @@ export function NewProposalPage({
         headerImage: template.page.headerImage,
         icon: template.page.icon,
         evaluations: template.evaluations,
-        fields: template.fields || {},
+        fields:
+          {
+            ...template.fields,
+            pendingRewards: template.fields?.pendingRewards?.map((pendingReward) => ({
+              ...pendingReward,
+              reward: {
+                ...pendingReward.reward,
+                assignedSubmitters: authors
+              }
+            }))
+          } || {},
         type: proposalPageType,
         formId: template.formId ?? undefined,
         formFields: isTemplate ? formFields.map((formField) => ({ ...formField, id: uuid() })) : formFields,
@@ -383,6 +393,7 @@ export function NewProposalPage({
                       readOnlyCustomProperties={readOnlyCustomProperties}
                       readOnlySelectedCredentialTemplates={readOnlySelectedCredentialTemplates}
                       isStructuredProposal={isStructured}
+                      isProposalTemplate={!!isTemplate}
                     />
                   </div>
                 </div>
@@ -477,6 +488,7 @@ export function NewProposalPage({
                     reviewers={formInputs.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat()}
                     assignedSubmitters={formInputs.authors}
                     variant='solid_button'
+                    isProposalTemplate={isTemplate}
                     rewardIds={[]}
                     onSave={(pendingReward) => {
                       const isExisting = pendingRewards.find((reward) => reward.draftId === pendingReward.draftId);

@@ -4,6 +4,7 @@ import type { Dispatch, LegacyRef, ReactNode, SetStateAction } from 'react';
 import React, { forwardRef, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDrop } from 'react-dnd';
 
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { SelectionContext, useAreaSelection } from 'hooks/useAreaSelection';
 import useEfficientDragLayer from 'hooks/useEffecientDragLayer';
 import useKeydownPress from 'hooks/useKeydownPress';
@@ -45,6 +46,7 @@ type Props = {
   subRowsEmptyValueContent?: React.ReactElement | string;
   checkedIds?: string[];
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
+  setSelectedPropertyId?: Dispatch<SetStateAction<string | null>>;
 };
 
 const TableRowsContainer = forwardRef<HTMLDivElement, { children: ReactNode }>(({ children }, ref) => {
@@ -78,7 +80,8 @@ function Table(props: Props): JSX.Element {
     rowExpansionLocalStoragePrefix,
     subRowsEmptyValueContent,
     setCheckedIds,
-    checkedIds
+    checkedIds,
+    setSelectedPropertyId
   } = props;
   const isManualSort = activeView.fields.sortOptions?.length === 0;
   const dispatch = useAppDispatch();
@@ -294,6 +297,7 @@ function Table(props: Props): JSX.Element {
           readOnly={props.readOnly}
           checkedIds={checkedIds}
           setCheckedIds={setCheckedIds}
+          setSelectedPropertyId={setSelectedPropertyId}
         />
 
         {/* Table rows */}

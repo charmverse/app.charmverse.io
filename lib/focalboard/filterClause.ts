@@ -78,6 +78,10 @@ export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
     datatype: 'date',
     conditions: DateDataTypeConditions
   },
+  relation: {
+    datatype: 'multi_select',
+    conditions: MultiSelectDataTypeConditions
+  },
   checkbox: {
     datatype: 'boolean',
     conditions: BooleanDataTypeConditions

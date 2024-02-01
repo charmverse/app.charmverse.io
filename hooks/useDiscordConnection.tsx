@@ -10,6 +10,8 @@ import { getDiscordLoginPath } from 'lib/discord/getDiscordLoginPath';
 import { getCookie, deleteCookie } from 'lib/utilities/browser';
 import type { LoggedInUser } from 'models';
 
+import { useVerifyLoginOtp } from './useVerifyLoginOtp';
+
 interface Props {
   children: JSX.Element;
 }
@@ -41,6 +43,7 @@ export function DiscordProvider({ children }: Props) {
 
   const connectedWithDiscord = Boolean(user?.discordUser);
   const { openPopupLogin } = usePopupLogin<{ code: string }>();
+  const { open: openVerifyOtpModal } = useVerifyLoginOtp();
 
   async function connect() {
     if (!isConnectDiscordLoading) {
@@ -88,21 +91,18 @@ export function DiscordProvider({ children }: Props) {
 
       try {
         if (type === 'connect') {
-          const updatedUser = await charmClient.discord
-            .connectDiscord(
-              {
-                code
-              },
-              'popup'
-            )
-            .catch((err) => {
-              setDiscordError(err.message || err.error || 'Something went wrong. Please try again');
-            });
+          const updatedUser = await charmClient.discord.connectDiscord({ code }, 'popup').catch((err) => {
+            setDiscordError(err.message || err.error || 'Something went wrong. Please try again');
+          });
 
           setUser((_user: LoggedInUser) => ({ ..._user, ...updatedUser }));
         } else {
-          const loggedInUser = await charmClient.discord.loginWithDiscordCode(code);
-          setUser(loggedInUser);
+          const resp = await charmClient.discord.loginWithDiscordCode(code);
+          if ('id' in resp) {
+            setUser(resp);
+          } else {
+            openVerifyOtpModal();
+          }
         }
       } catch (e: any) {
         showMessage(e.message || 'Failed to login with discord', 'error');

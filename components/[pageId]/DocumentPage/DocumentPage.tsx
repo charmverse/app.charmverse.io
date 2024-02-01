@@ -13,6 +13,7 @@ import AddBountyButton from 'components/common/BoardEditor/focalboard/src/compon
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import { blockLoad, databaseViewsLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { CardPropertiesWrapper } from 'components/common/CharmEditor/CardPropertiesWrapper';
 import { handleImageFileDrop } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
