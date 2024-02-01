@@ -1,8 +1,7 @@
 import { Card, CardContent, Grid, Stack, Typography } from '@mui/material';
 
 import { Button } from 'components/common/Button';
-import PrimaryButton from 'components/common/PrimaryButton';
-import { getDiscordLoginPath } from 'lib/discord/getDiscordLoginPath';
+import { useDiscordConnection } from 'hooks/useDiscordConnection';
 
 import { VerifyCheckmark } from '../VerifyCheckmark';
 
@@ -15,9 +14,10 @@ export function DiscordGate({
   joiningSpace,
   isVerifying
 }: DiscordGateState) {
+  const { popupLogin } = useDiscordConnection();
   const isVerified = discordGate?.isVerified;
-
   const returnUrl = encodeURIComponent(window.location.href);
+  const onClick = () => popupLogin(returnUrl ?? '/', 'login');
 
   return (
     <Stack>
@@ -56,7 +56,7 @@ export function DiscordGate({
                     data-test='connect-discord'
                     sx={{ width: 140 }}
                     size='large'
-                    href={getDiscordLoginPath({ type: 'login', redirectUrl: returnUrl })}
+                    onClick={onClick}
                   >
                     Connect Discord
                   </Button>
