@@ -64,9 +64,7 @@ export function UserCredentialRow({
           title: 'Gitcoin Passport Score',
           subtitle: 'Gitcoin',
           iconUrl: '/images/logos/Gitcoin_Passport_Logomark_SeaFoam.svg',
-          attestationContent: [
-            { name: 'Passport Score', value: `Passport Score: ${credential.content.passport_score?.toFixed(2)}` }
-          ]
+          attestationContent: [{ name: 'Passport Score', value: credential.content.passport_score?.toFixed(2) }]
         }
       : {
           title: schemaInfo?.title ?? '',

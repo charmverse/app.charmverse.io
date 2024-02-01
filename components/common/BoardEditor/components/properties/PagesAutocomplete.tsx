@@ -50,7 +50,7 @@ export function RelationPageListItemsContainer({
           >
             <PageIcon icon={pageListItem.icon} isEditorEmpty={!pageListItem.hasContent} pageType={pageListItem.type} />
             <PageTitle hasContent={!pageListItem.title} sx={{ fontWeight: 'bold' }}>
-              {pageListItem.title ? pageListItem.title : 'Untitled'}
+              {pageListItem.title || 'Untitled'}
             </PageTitle>
 
             {!readOnly && onRemove && (
@@ -147,9 +147,6 @@ function PagesAutocompleteBase({
         filterSelectedOptions
         forcePopupIcon={false}
         fullWidth
-        getOptionLabel={(option) => {
-          return option.title.toLocaleLowerCase() || 'untitled';
-        }}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         multiple
         noOptionsText='No pages found'
@@ -196,7 +193,7 @@ function PagesAutocompleteBase({
                 />
               </ListItemIcon>
               <PageTitle hasContent={!pageListItem.title} sx={{ fontWeight: 'bold' }}>
-                {pageListItem.title ? pageListItem.title : 'Untitled'}
+                {pageListItem.title || 'Untitled'}
               </PageTitle>
             </MenuItem>
           );

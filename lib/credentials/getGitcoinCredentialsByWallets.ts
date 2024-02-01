@@ -36,22 +36,39 @@ type ScoreItem = {
 async function getGitcoinPassportScores(wallets: string[]) {
   try {
     const scoreItems = await Promise.all(
-      wallets.map((wallet) =>
-        http.POST<ScoreItem>(
-          `${GITCOIN_SCORER_BASE_URL}/registry/submit-passport`,
-          {
-            address: wallet,
-            scorer_id: GITCOIN_SCORER_ID
-          },
-          {
-            credentials: 'omit',
-            headers: GITCOIN_API_HEADERS
+      wallets.map(async (wallet) => {
+        try {
+          let score = await http.GET<ScoreItem>(
+            `${GITCOIN_SCORER_BASE_URL}/registry/score/${GITCOIN_SCORER_ID}/${wallet}`,
+            undefined,
+            {
+              credentials: 'omit',
+              headers: GITCOIN_API_HEADERS
+            }
+          );
+
+          if (!score) {
+            score = await http.POST<ScoreItem>(
+              `${GITCOIN_SCORER_BASE_URL}/registry/submit-passport`,
+              {
+                address: wallet,
+                scorer_id: GITCOIN_SCORER_ID
+              },
+              {
+                credentials: 'omit',
+                headers: GITCOIN_API_HEADERS
+              }
+            );
           }
-        )
-      )
+
+          return score;
+        } catch (_) {
+          return null;
+        }
+      })
     );
 
-    return scoreItems;
+    return scoreItems.filter(isTruthy);
   } catch (error: any) {
     log.error('Error getting Gitcoin Passport scores', {
       error: error.message,
