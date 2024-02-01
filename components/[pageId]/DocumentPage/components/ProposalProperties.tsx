@@ -89,6 +89,7 @@ export function ProposalProperties({
           rewardIds={proposal?.rewardIds}
           readOnlySelectedCredentialTemplates={readOnlySelectedCredentialTemplates}
           isStructuredProposal={!!proposal?.formId}
+          isProposalTemplate={proposalPage.type === 'proposal_template'}
         />
       </div>
     </Box>

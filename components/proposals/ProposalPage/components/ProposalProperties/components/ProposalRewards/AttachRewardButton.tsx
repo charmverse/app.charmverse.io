@@ -6,10 +6,12 @@ import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
 export function AttachRewardButton({
   createNewReward,
-  variant = 'card_property'
+  variant = 'card_property',
+  isProposalTemplate
 }: {
   createNewReward: VoidFunction;
   variant?: 'solid_button' | 'card_property';
+  isProposalTemplate?: boolean;
 }) {
   const { getFeatureTitle } = useSpaceFeatures();
   if (variant === 'card_property') {
@@ -29,17 +31,19 @@ export function AttachRewardButton({
 
 export function getDisabledTooltip({
   newPageValues,
-  rewardValues
+  rewardValues,
+  isProposalTemplate
 }: {
   newPageValues: NewPageValues | null;
   rewardValues: UpdateableRewardFields;
+  isProposalTemplate?: boolean;
 }) {
   let disabledTooltip: string | undefined;
   if (!newPageValues?.title) {
     disabledTooltip = 'Page title is required';
   } else if (!rewardValues.reviewers?.length) {
     disabledTooltip = 'Reviewer is required';
-  } else if (rewardValues.assignedSubmitters && rewardValues.assignedSubmitters.length === 0) {
+  } else if (rewardValues.assignedSubmitters && rewardValues.assignedSubmitters.length && !isProposalTemplate) {
     disabledTooltip = 'You need to assign at least one submitter';
   }
 
