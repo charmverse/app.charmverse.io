@@ -1,5 +1,4 @@
-import { ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
-import { usePopupState } from 'material-ui-popup-state/hooks';
+import { ListItemText, Menu, MenuItem } from '@mui/material';
 import { useState } from 'react';
 import type { MouseEvent } from 'react';
 
@@ -46,16 +45,16 @@ export function FeatureLink({ feature, onClick }: { feature: MappedFeature; onCl
       <span className='add-a-page'>
         {feature.id === 'forum' && (
           <Link href='/forum?new=1'>
-            <AddIconButton tooltip='Add a post' />
+            <AddIconButton tooltip='Add a Post' />
           </Link>
         )}
         {feature.id === 'rewards' && (
-          <AddIconButton onClick={(e) => handleClick(e, 'rewards')} tooltip={`Add a ${getFeatureTitle('reward')}`} />
+          <AddIconButton onClick={(e) => handleClick(e, 'rewards')} tooltip={`Add a ${getFeatureTitle('Reward')}`} />
         )}
         {feature.id === 'proposals' && (
           <AddIconButton
             onClick={(e) => handleClick(e, 'proposals')}
-            tooltip={`Add a ${getFeatureTitle('proposal')}`}
+            tooltip={`Add a ${getFeatureTitle('Proposal')}`}
           />
         )}
       </span>
