@@ -1,14 +1,5 @@
 import type { Post } from '@charmverse/core/prisma';
 
-import type { PageContent } from 'lib/prosemirror/interfaces';
+export type ForumPostVotes = { upvotes: number; downvotes: number; upvoted: boolean | null };
 
-export type ForumVotes = { upvotes: number; downvotes: number; upvoted: boolean | null };
-export type PostWithVotes = Post & { votes: ForumVotes };
-
-export type ForumPostMeta = Pick<Post, 'createdBy' | 'id' | 'categoryId' | 'title' | 'path'> & {
-  summary: PageContent | null;
-  votes: ForumVotes;
-  createdAt: string;
-  updatedAt: string;
-  isDraft: boolean;
-};
+export type PostWithVotes = Post & { votes: ForumPostVotes };

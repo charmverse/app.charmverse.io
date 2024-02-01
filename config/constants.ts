@@ -12,6 +12,7 @@ export const appEnv = isProdEnv ? 'production' : isStagingEnv ? 'staging' : isTe
 export const baseUrl = process.env.DOMAIN as string | undefined;
 // for cookies
 export const authSecret = process.env.AUTH_SECRET as string | undefined;
+export const recoveryCodeSecretKey = process.env.RECOVERY_CODE_SECRET_KEY as string | undefined;
 // export const cookieDomain = process.env.COOKIE_DOMAIN as string | undefined;
 export const cookieDomain = undefined; // TODO: set cookie domain so that we can have cross-subdomain sessions
 export const cookieName = 'charm.sessionId';
@@ -20,6 +21,7 @@ export const websocketsHost = env('WEBSOCKETS_HOST');
 // Google config
 export const googleOAuthClientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
 export const googleOAuthClientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
+
 // Google client
 // To retrieve these values, go to Firebase, then project settings, and retrieve the JSON for the web client. You can then assign the values for each key in the client secrets area.
 export const googleWebClientConfig = {
@@ -44,4 +46,9 @@ export const webhookEndpoint = 'api/v1/webhooks/addToDatabase';
 
 export const appSubdomain = 'app';
 
+// In CI, we want to have a private key for signing, but we don't need a fixed one. We also want to have errors if we are not in CI environment and CREDENTIAL_WALLET_KEY is not set
+export const credentialsWalletPrivateKey = process.env.CREDENTIAL_WALLET_KEY;
 export const awsS3Bucket = process.env.S3_UPLOAD_BUCKET as string;
+
+// Ceramic Node
+export const graphQlServerEndpoint = process.env.CERAMIC_GRAPHQL_SERVER as string;

@@ -32,11 +32,13 @@ import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData
 import { encodeFilename } from 'lib/utilities/encodeFilename';
 import type { SocketAuthResponse } from 'lib/websockets/interfaces';
 import type { LoggedInUser } from 'models';
+import type { SyncRelationPropertyPayload } from 'pages/api/blocks/sync-relation-property';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { BlockchainApi } from './apis/blockchainApi';
 import { CommentsApi } from './apis/commentsApi';
+import { CredentialsApi } from './apis/credentialsApi';
 import { DiscordApi } from './apis/discordApi';
 import { FileApi } from './apis/fileApi';
 import { ForumApi } from './apis/forumApi';
@@ -114,12 +116,14 @@ class CharmClient {
 
   rewards = new RewardsApi();
 
+  credentials = new CredentialsApi();
+
   async socket() {
     return http.GET<SocketAuthResponse>('/api/socket');
   }
 
   async login({ address, walletSignature }: Web3LoginRequest) {
-    const user = await http.POST<LoggedInUser>('/api/session/login', {
+    const user = await http.POST<LoggedInUser | { otpRequired: true }>('/api/session/login', {
       address,
       walletSignature
     });
@@ -177,20 +181,8 @@ class CharmClient {
     return http.POST<PageWithPermissions>('/api/pages', pageOpts);
   }
 
-  archivePage(pageId: string) {
-    return http.PUT<ModifyChildPagesResponse>(`/api/pages/${pageId}/archive`, { archive: true });
-  }
-
-  restorePage(pageId: string) {
-    return http.PUT<ModifyChildPagesResponse>(`/api/pages/${pageId}/archive`, { archive: false });
-  }
-
-  deletePage(pageId: string) {
+  deletePageForever(pageId: string) {
     return http.DELETE<ModifyChildPagesResponse>(`/api/pages/${pageId}`);
-  }
-
-  deletePages(pageIds: string[]) {
-    return http.DELETE<undefined>(`/api/pages`, { pageIds });
   }
 
   favoritePage(pageId: string) {
@@ -411,6 +403,10 @@ class CharmClient {
 
   resolveEnsName(ens: string) {
     return http.GET<string | null>('/api/resolve-ens', { ens });
+  }
+
+  syncRelationProperty(payload: SyncRelationPropertyPayload) {
+    return http.PUT<void>('/api/blocks/sync-relation-property', payload);
   }
 }
 

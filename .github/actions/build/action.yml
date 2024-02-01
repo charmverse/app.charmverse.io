@@ -25,8 +25,9 @@ runs:
           .next
           .env.test.local
           dist
+          background/ceramicServer/generated
         # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
-        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx', '**/*.scss', '!node_modules', '!.next', '!dist', '!dont_cache') }}
+        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx', '**/*.gql', '**/*.scss', '!node_modules', '!.next', '!dist', '!dont_cache') }}
 
     - name: Build
       shell: bash
@@ -42,5 +43,6 @@ runs:
           .next
           .env.test.local
           dist
+          background/ceramicServer/generated
         # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
-        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx', '**/*.scss', '!node_modules', '!.next', '!dist', '!dont_cache') }}
+        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx', '**/*.gql', '**/*.scss', '!node_modules', '!.next', '!dist', '!dont_cache') }}

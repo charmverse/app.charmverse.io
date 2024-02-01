@@ -11,7 +11,7 @@ export function CharmEditorInputField({ placeholder, error, ...inputProps }: Pro
   const theme = useTheme();
 
   return (
-    <FieldWrapper {...inputProps}>
+    <FieldWrapper inputEndAdornmentAlignItems='flex-start' {...inputProps}>
       <CharmEditor
         onContentChange={({ doc, rawText }) => {
           inputProps.onChange?.({ content: doc, contentText: rawText });

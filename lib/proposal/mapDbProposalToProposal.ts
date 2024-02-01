@@ -8,13 +8,8 @@ import { sortBy } from 'lodash';
 import { getProposalFormFields } from 'lib/proposal/form/getProposalFormFields';
 
 import { getCurrentStep } from './getCurrentStep';
-import { getOldProposalStatus } from './getProposalEvaluationStatus';
-import type {
-  ProposalEvaluationStep,
-  ProposalFields,
-  ProposalWithUsersAndRubric,
-  ProposalWithUsersLite
-} from './interface';
+// import { getOldProposalStatus } from './getProposalEvaluationStatus';
+import type { ProposalFields, ProposalWithUsersAndRubric, ProposalWithUsersLite } from './interface';
 
 type FormFieldsIncludeType = {
   form: {
@@ -26,6 +21,7 @@ type FormFieldsIncludeType = {
 export function mapDbProposalToProposal({
   proposal,
   permissions,
+  permissionsByStep,
   canAccessPrivateFormFields
 }: {
   proposal: Proposal &
@@ -36,41 +32,41 @@ export function mapDbProposalToProposal({
         draftRubricAnswers: any[];
       })[];
       rewards: { id: string }[];
-      reviewers: ProposalReviewer[];
-      rubricAnswers: any[];
-      draftRubricAnswers: any[];
     };
   permissions?: ProposalPermissionFlags;
+  permissionsByStep?: Record<string, ProposalPermissionFlags>;
   canAccessPrivateFormFields?: boolean;
 }): ProposalWithUsersAndRubric {
-  const { rewards, form, ...rest } = proposal;
+  const { rewards, form, evaluations, ...rest } = proposal;
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
   const formFields = getProposalFormFields(form?.formFields, !!canAccessPrivateFormFields);
-  const fields = (rest.fields as ProposalFields) ?? null;
+  //   const fields = (rest.fields as ProposalFields) ?? null;
+  const mappedEvaluations = proposal.evaluations.map((evaluation) => {
+    const stepPermissions = permissionsByStep?.[evaluation.id];
+    if (!stepPermissions?.evaluate) {
+      evaluation.draftRubricAnswers = [];
+      evaluation.rubricAnswers = [];
+    }
+    return {
+      ...evaluation,
+      isReviewer: !!stepPermissions?.evaluate
+    };
+  });
 
   const proposalWithUsers = {
     ...rest,
+    evaluations: mappedEvaluations,
     permissions,
     currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
-    evaluationType: currentEvaluation?.type || proposal.evaluationType,
-    status: getOldProposalStatus(proposal),
-    // Support old model: filter out evaluation-specific reviewers and rubric answers
-    rubricAnswers: currentEvaluation?.rubricAnswers || proposal.rubricAnswers,
-    draftRubricAnswers: currentEvaluation?.draftRubricAnswers || proposal.draftRubricAnswers,
-    reviewers: currentEvaluation?.reviewers || proposal.reviewers,
+    status: proposal.status,
+    // reviewers: currentEvaluation?.reviewers || [],
     rewardIds: rewards.map((r) => r.id) || null,
     form: form
       ? {
           formFields: formFields || null,
           id: form?.id || null
         }
-      : null,
-    currentStep: getCurrentStep({
-      evaluations: proposal.evaluations,
-      hasPendingRewards: (fields?.pendingRewards ?? []).length > 0,
-      proposalStatus: proposal.status,
-      hasPublishedRewards: rewards.length > 0
-    })
+      : null
   };
 
   return proposalWithUsers as ProposalWithUsersAndRubric;
@@ -81,7 +77,7 @@ export function mapDbProposalToProposalLite({
   proposal,
   permissions
 }: {
-  proposal: ProposalWithUsers & {
+  proposal: Omit<ProposalWithUsers, 'reviewers'> & {
     evaluations: (ProposalEvaluation & { reviewers: ProposalReviewer[] })[];
     rewards: { id: string }[];
   };
@@ -108,9 +104,8 @@ export function mapDbProposalToProposalLite({
       hasPublishedRewards: rewards.length > 0
     }),
     currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
-    evaluationType: currentEvaluation?.type || proposal.evaluationType,
-    status: getOldProposalStatus(proposal),
-    reviewers: currentEvaluation?.reviewers || proposal.reviewers,
+    status: proposal.status,
+    reviewers: (proposal.status !== 'draft' && currentEvaluation?.reviewers) || [],
     rewardIds: rewards.map((r) => r.id) || null,
     fields
   };

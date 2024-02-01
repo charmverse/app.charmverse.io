@@ -7,7 +7,7 @@ import Box from '@mui/material/Box';
 import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import type { SyntheticEvent, ReactNode } from 'react';
+import type { ReactNode, SyntheticEvent } from 'react';
 
 import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
@@ -25,6 +25,7 @@ import { AccountSettings } from './account/AccountSettings';
 import { ApiSettings } from './api/ApiSettings';
 import type { SpaceSettingsTab, UserSettingsTab } from './config';
 import { ACCOUNT_TABS, SPACE_SETTINGS_TABS } from './config';
+import { SpaceCredentialSettings } from './credentials/SpaceCredentialSettings';
 import { ImportSettings } from './import/ImportSettings';
 import { Invites } from './invites/Invites';
 import ProfileSettings from './profile/ProfileSettings';
@@ -53,7 +54,8 @@ const spaceTabs: Record<SpaceSettingsTab['path'], typeof SpaceSettings> = {
   roles: RoleSettings,
   subscription: SubscriptionSettings,
   space: SpaceSettings,
-  proposals: SpaceProposalSettings
+  proposals: SpaceProposalSettings,
+  credentials: SpaceCredentialSettings
 };
 
 function TabPanel(props: TabPanelProps) {
@@ -107,6 +109,7 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
         {ACCOUNT_TABS.map((tab) => (
           <SidebarLink
             key={tab.path}
+            data-test={`space-settings-tab-${tab.path}`}
             label={tab.label}
             icon={tab.icon}
             onClick={() => onSelectPath(tab.path)}

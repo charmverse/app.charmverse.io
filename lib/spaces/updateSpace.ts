@@ -10,6 +10,7 @@ export type UpdateableSpaceFields = Partial<
   Pick<
     Space,
     | 'hiddenFeatures'
+    | 'homePageId'
     | 'domain'
     | 'name'
     | 'spaceImage'
@@ -18,6 +19,8 @@ export type UpdateableSpaceFields = Partial<
     | 'memberProfiles'
     | 'notificationToggles'
     | 'primaryMemberIdentity'
+    | 'requireMembersTwoFactorAuth'
+    | 'credentialLogo'
   >
 >;
 
@@ -60,6 +63,7 @@ export async function updateSpace(spaceId: string, updates: UpdateableSpaceField
     },
     data: {
       domain,
+      homePageId: updates.homePageId,
       name: updates.name,
       spaceImage: updates.spaceImage,
       spaceArtwork: updates.spaceArtwork,
@@ -67,7 +71,9 @@ export async function updateSpace(spaceId: string, updates: UpdateableSpaceField
       notificationToggles: updates.notificationToggles as any,
       features: updates.features as any,
       memberProfiles: updates.memberProfiles as any,
-      primaryMemberIdentity: updates.primaryMemberIdentity
+      primaryMemberIdentity: updates.primaryMemberIdentity,
+      requireMembersTwoFactorAuth: updates.requireMembersTwoFactorAuth,
+      credentialLogo: updates.credentialLogo
     }
   });
 

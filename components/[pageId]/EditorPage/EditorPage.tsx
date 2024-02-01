@@ -5,7 +5,6 @@ import { useCallback, useEffect } from 'react';
 
 import { trackPageView } from 'charmClient/hooks/track';
 import ErrorPage from 'components/common/errors/ErrorPage';
-import { PageDialogGlobal } from 'components/common/PageDialog/PageDialogGlobal';
 import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
@@ -23,13 +22,7 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
   const [, setTitleState] = usePageTitle();
   const { space: currentSpace } = useCurrentSpace();
   useRewardsNavigation();
-
-  const {
-    error: pageWithContentError,
-    page,
-    refreshPage,
-    updatePage
-  } = usePage({ pageIdOrPath, spaceId: currentSpace?.id });
+  const { error: pageWithContentError, page, updatePage } = usePage({ pageIdOrPath, spaceId: currentSpace?.id });
 
   const readOnly =
     (page?.permissionFlags.edit_content === false && editMode !== 'suggesting') || editMode === 'viewing';
@@ -125,10 +118,7 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
       // Document page is used in a few places, so it is responsible for retrieving its own permissions
       return (
         <Box flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
-          <DocumentPage page={page} refreshPage={refreshPage} readOnly={readOnly} savePage={savePage} enableSidebar />
-
-          {/* needed to handle applications for rewards */}
-          <PageDialogGlobal />
+          <DocumentPage page={page} readOnly={readOnly} savePage={savePage} enableSidebar />
         </Box>
       );
     }

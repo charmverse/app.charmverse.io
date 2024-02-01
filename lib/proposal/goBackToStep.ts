@@ -3,6 +3,9 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { isTruthy } from 'lib/utilities/types';
+import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
+
+import { setPageUpdatedAt } from './setPageUpdatedAt';
 
 export type GoBackToStepRequest = {
   proposalId: string;
@@ -10,7 +13,13 @@ export type GoBackToStepRequest = {
 };
 
 // clear the result of a proposal evaluation and all evaluations after it
-export async function goBackToStep({ evaluationId: maybeEvaluationId, proposalId }: GoBackToStepRequest) {
+export async function goBackToStep({
+  userId,
+  evaluationId: maybeEvaluationId,
+  proposalId
+}: GoBackToStepRequest & {
+  userId: string;
+}) {
   const evaluationId = maybeEvaluationId === 'draft' ? null : maybeEvaluationId;
   const backToDraft = !evaluationId;
 
@@ -18,7 +27,9 @@ export async function goBackToStep({ evaluationId: maybeEvaluationId, proposalId
     where: {
       id: proposalId
     },
-    include: {
+    select: {
+      archived: true,
+      spaceId: true,
       evaluations: {
         orderBy: {
           index: 'asc'
@@ -27,6 +38,10 @@ export async function goBackToStep({ evaluationId: maybeEvaluationId, proposalId
       rewards: true
     }
   });
+
+  if (proposal.archived) {
+    throw new InvalidInputError('Cannot clear the results of an archived proposal');
+  }
 
   if (proposal.rewards.length > 0) {
     throw new InvalidInputError('Cannot clear the results of a proposal with rewards');
@@ -98,5 +113,14 @@ export async function goBackToStep({ evaluationId: maybeEvaluationId, proposalId
         status: 'draft'
       }
     });
+  } else {
+    await publishProposalEvent({
+      currentEvaluationId: maybeEvaluationId,
+      proposalId,
+      spaceId: proposal.spaceId,
+      userId
+    });
   }
+
+  await setPageUpdatedAt({ proposalId, userId });
 }

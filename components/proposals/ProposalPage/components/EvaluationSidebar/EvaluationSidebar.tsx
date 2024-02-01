@@ -1,4 +1,4 @@
-import { Tooltip } from '@mui/material';
+import { Divider, Tooltip } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -13,32 +13,46 @@ import { EvaluationStepRow } from './components/EvaluationStepRow';
 import { EvaluationStepSettingsModal } from './components/EvaluationStepSettingsModal';
 import { FeedbackEvaluation } from './components/FeedbackEvaluation';
 import { PassFailEvaluation } from './components/PassFailEvaluation';
+import { ProposalSocialShare } from './components/ProposalSocialShare';
 import { PublishRewardsButton } from './components/PublishRewardsButton';
 import { RubricEvaluation } from './components/RubricEvaluation/RubricEvaluation';
-import { VoteEvaluation } from './components/VoteEvaluation';
+import { VoteEvaluation } from './components/VoteEvaluation/VoteEvaluation';
 
 export type Props = {
   pageId?: string;
   proposal?: Pick<
     ProposalWithUsersAndRubric,
+    | 'archived'
     | 'id'
     | 'authors'
     | 'evaluations'
     | 'permissions'
     | 'status'
-    | 'evaluationType'
     | 'fields'
     | 'rewardIds'
     | 'workflowId'
     | 'currentEvaluationId'
     | 'page'
+    | 'lensPostLink'
+    | 'formId'
+    | 'form'
   >;
   onChangeEvaluation?: (evaluationId: string, updated: Partial<ProposalEvaluationValues>) => void;
   refreshProposal?: VoidFunction;
-  templateId?: string | null;
+  templateId: string | null | undefined;
+  pagePath?: string;
+  pageTitle?: string;
 };
 
-export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refreshProposal, templateId }: Props) {
+export function EvaluationSidebar({
+  pagePath,
+  pageTitle,
+  pageId,
+  proposal,
+  onChangeEvaluation,
+  refreshProposal,
+  templateId
+}: Props) {
   const [activeEvaluationId, setActiveEvaluationId] = useState<string | undefined>(proposal?.currentEvaluationId);
   const { mappedFeatures } = useSpaceFeatures();
   const { showMessage } = useSnackbar();
@@ -106,6 +120,7 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
             permissions={proposal?.permissions}
             proposalId={proposal?.id}
             refreshProposal={refreshProposal}
+            archived={proposal?.archived ?? false}
           />
         }
       />
@@ -123,6 +138,7 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
             title={evaluation.title}
             actions={
               <EvaluationStepActions
+                archived={proposal?.archived ?? false}
                 isPreviousStep={previousStepIndex === index + 1}
                 permissions={proposal?.permissions}
                 proposalId={proposal?.id}
@@ -134,6 +150,7 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
           >
             {evaluation.type === 'feedback' && (
               <FeedbackEvaluation
+                archived={proposal?.archived ?? false}
                 key={evaluation.id}
                 evaluation={evaluation}
                 proposalId={proposal?.id}
@@ -145,11 +162,11 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
             )}
             {evaluation.type === 'pass_fail' && (
               <PassFailEvaluation
+                archived={proposal?.archived ?? false}
                 key={evaluation.id}
                 evaluation={evaluation}
                 proposalId={proposal?.id}
                 isCurrent={isCurrent}
-                isReviewer={proposal?.permissions.evaluate}
                 refreshProposal={refreshProposal}
               />
             )}
@@ -170,7 +187,7 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
                 proposal={proposal}
                 isCurrent={isCurrent}
                 evaluation={evaluation}
-                addVote={() => setEvaluationInput({ ...evaluation })}
+                refreshProposal={refreshProposal}
               />
             )}
           </EvaluationStepRow>
@@ -186,7 +203,7 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
           title={rewardsTitle}
         >
           <PublishRewardsButton
-            disabled={!(proposal?.permissions.evaluate && isRewardsActive && !isRewardsComplete)}
+            disabled={!(proposal?.permissions.evaluate && isRewardsActive && !isRewardsComplete) || !!proposal.archived}
             proposalId={proposal?.id}
             pendingRewards={pendingRewards}
             rewardIds={proposal?.rewardIds}
@@ -201,6 +218,16 @@ export function EvaluationSidebar({ pageId, proposal, onChangeEvaluation, refres
           templateId={templateId}
           saveEvaluation={saveEvaluation}
           updateEvaluation={updateEvaluation}
+        />
+      )}
+      <Divider sx={{ mb: 1 }} />
+      {pagePath && pageTitle && proposal && (
+        <ProposalSocialShare
+          lensPostLink={proposal.lensPostLink}
+          proposalId={proposal.id}
+          proposalPath={pagePath}
+          proposalTitle={pageTitle}
+          proposalAuthors={proposal.authors.map((a) => a.userId)}
         />
       )}
     </div>

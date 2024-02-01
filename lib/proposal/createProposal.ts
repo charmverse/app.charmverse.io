@@ -1,7 +1,6 @@
-import { InsecureOperationError } from '@charmverse/core/errors';
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page, ProposalReviewer, ProposalStatus } from '@charmverse/core/prisma';
-import type { Prisma, ProposalEvaluation, ProposalEvaluationType } from '@charmverse/core/prisma-client';
+import type { Prisma, ProposalEvaluation } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWithUsers, ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { arrayUtils } from '@charmverse/core/utilities';
@@ -13,15 +12,13 @@ import { upsertProposalFormAnswers } from 'lib/form/upsertProposalFormAnswers';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { createPage } from 'lib/pages/server/createPage';
 import type { ProposalFields } from 'lib/proposal/interface';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 import { getPagePath } from '../pages';
 
-import type { ProposalReviewerInput, VoteSettings } from './interface';
+import { createVoteIfNecessary } from './createVoteIfNecessary';
+import type { VoteSettings } from './interface';
 import type { RubricDataInput } from './rubric/upsertRubricCriteria';
 import { upsertRubricCriteria } from './rubric/upsertRubricCriteria';
-import { validateProposalAuthorsAndReviewers } from './validateProposalAuthorsAndReviewers';
 
 type PageProps = Partial<
   Pick<
@@ -33,7 +30,8 @@ type PageProps = Partial<
 export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'id' | 'index' | 'title' | 'type'> & {
   reviewers: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[];
   rubricCriteria: RubricDataInput[];
-  permissions?: WorkflowEvaluationJson['permissions']; // pass these in to override workflow defaults
+  // TODO: fix tests that need to pass in permissions
+  permissions?: WorkflowEvaluationJson['permissions'];
   voteSettings?: VoteSettings | null;
 };
 
@@ -41,20 +39,19 @@ export type CreateProposalInput = {
   pageId?: string;
   pageProps?: PageProps;
   proposalTemplateId?: string | null;
-  reviewers?: ProposalReviewerInput[];
   authors?: string[];
   userId: string;
   spaceId: string;
-  evaluationType?: ProposalEvaluationType;
-  rubricCriteria?: RubricDataInput[];
-  evaluations?: ProposalEvaluationInput[];
-  publishToLens?: boolean;
+  evaluations: ProposalEvaluationInput[];
   fields?: ProposalFields | null;
   workflowId?: string;
   formFields?: FormFieldInput[];
   formAnswers?: FieldAnswerInput[];
   formId?: string;
   isDraft?: boolean;
+  selectedCredentialTemplates?: string[];
+  sourcePageId?: string;
+  sourcePostId?: string;
 };
 
 export type CreatedProposal = {
@@ -67,23 +64,22 @@ export async function createProposal({
   spaceId,
   pageProps,
   authors,
-  reviewers,
   evaluations = [],
-  evaluationType,
-  rubricCriteria,
-  publishToLens,
   fields,
-  proposalTemplateId,
   workflowId,
   formId,
   formFields,
   formAnswers,
-  isDraft
+  isDraft,
+  selectedCredentialTemplates,
+  sourcePageId,
+  sourcePostId
 }: CreateProposalInput) {
   const proposalId = uuid();
   const proposalStatus: ProposalStatus = isDraft ? 'draft' : 'published';
 
-  const authorsList = arrayUtils.uniqueValues(authors ? [...authors, userId] : [userId]);
+  const defaultAuthorsList = pageProps?.type !== 'proposal_template' ? [userId] : [];
+  const authorsList = arrayUtils.uniqueValues([...(authors || []), ...defaultAuthorsList]);
 
   const workflow = workflowId
     ? ((await prisma.proposalWorkflow.findUnique({
@@ -93,15 +89,6 @@ export async function createProposal({
       })) as ProposalWorkflowTyped | null)
     : null;
 
-  const validation = await validateProposalAuthorsAndReviewers({
-    authors: authorsList,
-    reviewers: reviewers ?? [],
-    spaceId
-  });
-
-  if (!validation.valid) {
-    throw new InsecureOperationError(`You cannot create a proposal with authors or reviewers outside the space`);
-  }
   const evaluationIds = evaluations.map(() => uuid());
 
   const evaluationPermissionsToCreate: Prisma.ProposalEvaluationPermissionCreateManyInput[] = [];
@@ -109,42 +96,39 @@ export async function createProposal({
   const reviewersInput: Prisma.ProposalReviewerCreateManyInput[] = [];
 
   // retrieve permissions and apply evaluation ids to reviewers
-  if (evaluations.length > 0) {
-    // TODO: fix tests that need to pass in permissions
-    evaluations.forEach(({ id: evaluationId, permissions: providedPermissions, reviewers: evalReviewers }, index) => {
-      const configuredEvaluation = workflow?.evaluations[index];
-      const permissions = configuredEvaluation?.permissions || providedPermissions;
-      if (!permissions) {
-        throw new Error(
-          `Cannot find permissions for evaluation step. Workflow: ${workflowId}. Evaluation: ${evaluationId}`
-        );
-      }
-      evaluationPermissionsToCreate.push(
-        ...permissions.map((permission) => ({
-          evaluationId: evaluationIds[index],
-          operation: permission.operation,
-          systemRole: permission.systemRole
-        }))
+  evaluations.forEach(({ id: evaluationId, permissions: providedPermissions, reviewers: evalReviewers }, index) => {
+    const configuredEvaluation = workflow?.evaluations[index];
+    const permissions = configuredEvaluation?.permissions || providedPermissions;
+    if (!permissions) {
+      throw new Error(
+        `Cannot find permissions for evaluation step. Workflow: ${workflowId}. Evaluation: ${evaluationId}`
       );
-      reviewersInput.push(
-        ...evalReviewers.map((reviewer) => ({
-          roleId: reviewer.roleId,
-          systemRole: reviewer.systemRole,
-          userId: reviewer.userId,
-          proposalId,
-          evaluationId: evaluationIds[index]
-        }))
-      );
-    });
-  }
+    }
+    evaluationPermissionsToCreate.push(
+      ...permissions.map((permission) => ({
+        ...permission,
+        evaluationId: evaluationIds[index]
+      }))
+    );
+    reviewersInput.push(
+      ...evalReviewers.map((reviewer) => ({
+        roleId: reviewer.roleId,
+        systemRole: reviewer.systemRole,
+        userId: reviewer.userId,
+        proposalId,
+        evaluationId: evaluationIds[index]
+      }))
+    );
+  });
 
   let proposalFormId = formId;
-  if (!proposalFormId && formFields?.length && pageProps?.type === 'proposal_template') {
+  // Always create new form for proposal templates
+  if (formFields?.length && pageProps?.type === 'proposal_template') {
     proposalFormId = await createForm(formFields);
   }
 
   for (const evaluation of evaluations) {
-    if (evaluation.reviewers.length === 0 && evaluation.type !== 'feedback') {
+    if (evaluation.reviewers.length === 0) {
       throw new Error('No reviewers defined for proposal evaluation step');
     }
   }
@@ -158,8 +142,7 @@ export async function createProposal({
         id: proposalId,
         space: { connect: { id: spaceId } },
         status: proposalStatus,
-        evaluationType,
-        publishToLens,
+        selectedCredentialTemplates,
         authors: {
           createMany: {
             data: authorsList.map((author) => ({ userId: author }))
@@ -222,21 +205,14 @@ export async function createProposal({
 
   trackUserAction('new_proposal_created', { userId, pageId: page.id, resourceId: proposal.id, spaceId });
 
-  const upsertedCriteria = rubricCriteria
-    ? await upsertRubricCriteria({
-        proposalId: proposal.id,
-        evaluationId: null,
-        rubricCriteria
-      })
-    : [];
-
   await Promise.all(
     evaluations.map(async (evaluation, index) => {
       if (evaluation.rubricCriteria?.length > 0) {
         await upsertRubricCriteria({
           evaluationId: evaluationIds[index],
           proposalId: proposal.id,
-          rubricCriteria: evaluation.rubricCriteria
+          rubricCriteria: evaluation.rubricCriteria,
+          actorId: userId
         });
       }
     })
@@ -251,21 +227,36 @@ export async function createProposal({
       ? await upsertProposalFormAnswers({ formId, proposalId, answers: formAnswers })
       : null;
 
-  await publishProposalEvent({
-    scope: WebhookEventNames.ProposalStatusChanged,
-    proposalId: proposal.id,
-    newStatus: proposal.status,
-    spaceId,
-    userId,
-    oldStatus: null
+  await createVoteIfNecessary({
+    createdBy: userId,
+    proposalId
   });
+
+  if (sourcePageId) {
+    await prisma.page.update({
+      where: {
+        id: sourcePageId
+      },
+      data: {
+        convertedProposalId: proposalId
+      }
+    });
+  } else if (sourcePostId) {
+    await prisma.post.update({
+      where: {
+        id: sourcePostId
+      },
+      data: {
+        proposalId
+      }
+    });
+  }
 
   return {
     page: page as PageWithPermissions,
     proposal: {
       ...proposal,
       reviewers: createdReviewers,
-      rubricCriteria: upsertedCriteria,
       draftRubricAnswers: [],
       rubricAnswers: [],
       formFields: proposalFormFields,

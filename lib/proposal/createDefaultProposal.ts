@@ -34,9 +34,6 @@ export async function createDefaultProposal({ spaceId, userId }: { spaceId: stri
     spaceId,
     userId,
     authors: [userId],
-    evaluationType: 'vote',
-    publishToLens: false,
-    rubricCriteria: [],
     workflowId: workflow.id,
     evaluations: workflow.evaluations.map(
       (evaluation: any, index) =>
@@ -44,7 +41,7 @@ export async function createDefaultProposal({ spaceId, userId }: { spaceId: stri
           ...evaluation,
           id: uuid(),
           index,
-          reviewers: [{ systemRole: 'space_member' }],
+          reviewers: [{ systemRole: evaluation.type === 'feedback' ? 'author' : 'space_member' }],
           voteSettings: evaluation.type === 'vote' ? voteSettings : null
         } as ProposalEvaluationInput)
     ) as ProposalEvaluationInput[],
@@ -74,7 +71,7 @@ export async function createDefaultProposal({ spaceId, userId }: { spaceId: stri
     fields: {
       properties: {
         [AUTHORS_BLOCK_ID]: [userId],
-        [CREATED_AT_ID]: '',
+        // [CREATED_AT_ID]: '',
         [PROPOSAL_REVIEWERS_BLOCK_ID]: [
           {
             group: 'user',
@@ -83,12 +80,6 @@ export async function createDefaultProposal({ spaceId, userId }: { spaceId: stri
         ],
         [Constants.titleColumnId]: 'Getting Started'
       }
-    },
-    reviewers: [
-      {
-        group: 'user',
-        id: userId
-      }
-    ]
+    }
   });
 }

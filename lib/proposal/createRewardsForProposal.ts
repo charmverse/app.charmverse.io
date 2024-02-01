@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
 import { InvalidStateError } from 'lib/middleware';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
@@ -7,20 +8,30 @@ import type { ProposalFields } from 'lib/proposal/interface';
 import { createReward } from 'lib/rewards/createReward';
 import { InvalidInputError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishProposalEvent, publishProposalEventBase } from 'lib/webhookPublisher/publishEvent';
 import { relay } from 'lib/websockets/relay';
-
-import { ProposalNotFoundError } from './errors';
 
 export async function createRewardsForProposal({ proposalId, userId }: { userId: string; proposalId: string }) {
   if (!proposalId) {
     throw new InvalidInputError('Please provide a valid proposalId');
   }
 
-  const proposal = await prisma.proposal.findUnique({
+  const proposal = await prisma.proposal.findUniqueOrThrow({
     where: {
       id: proposalId
     },
     select: {
+      evaluations: {
+        select: {
+          index: true,
+          result: true,
+          id: true
+        },
+        orderBy: {
+          index: 'asc'
+        }
+      },
       spaceId: true,
       archived: true,
       status: true,
@@ -31,9 +42,9 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
     }
   });
 
-  if (!proposal) {
-    throw new ProposalNotFoundError(proposalId);
-  } else if (proposal.archived) {
+  const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
+
+  if (proposal.archived) {
     throw new InvalidStateError(`Archived proposals cannot be updated`);
   } else if (proposal.rewards?.length) {
     throw new InvalidStateError(`Rewards have already been created for this proposal`);
@@ -113,6 +124,16 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
     },
     proposal.spaceId
   );
+
+  if (currentEvaluation) {
+    await publishProposalEventBase({
+      currentEvaluationId: currentEvaluation.id,
+      proposalId: proposal.id,
+      scope: WebhookEventNames.ProposalStatusChanged,
+      spaceId: proposal.spaceId,
+      userId
+    });
+  }
 
   return updatedProposal;
 }

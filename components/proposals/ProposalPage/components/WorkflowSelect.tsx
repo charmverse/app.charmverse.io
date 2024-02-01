@@ -5,9 +5,12 @@ import { useState } from 'react';
 import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
-import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
+import { Button } from 'components/common/Button';
+import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { IPropertyOption } from 'lib/focalboard/board';
 
 type Props = {
   onChange?: (value: ProposalWorkflowTyped) => void;
@@ -18,15 +21,23 @@ type Props = {
 };
 
 export function WorkflowSelect({ onChange, value, readOnly, required, requireConfirmation }: Props) {
+  const { openSettings } = useSettingsDialog();
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions } = useGetProposalWorkflows(currentSpace?.id);
-  const [newWorkflowId, setNewWorkflowId] = useState<string | null>(null);
+  const { showConfirmation } = useConfirmationModal();
   const { showMessage } = useSnackbar();
-  const propertyOptions = (workflowOptions || []).map((option) => ({
+  const propertyOptions: IPropertyOption[] = (workflowOptions || []).map((option) => ({
     id: option.id,
     value: option.title,
     color: 'grey'
   }));
+
+  propertyOptions.push({
+    id: 'add_new',
+    value: '+ Add New',
+    color: 'gray',
+    variant: 'plain'
+  });
 
   async function changeWorkflow(newValue: string) {
     const option = workflowOptions?.find(({ id }) => id === newValue);
@@ -39,21 +50,32 @@ export function WorkflowSelect({ onChange, value, readOnly, required, requireCon
     }
   }
 
-  function onConfirmValueChange(values: string | string[]) {
+  async function onConfirmValueChange(values: string | string[]) {
     const newValue = Array.isArray(values) ? values[0] : values;
     if (!newValue) {
+      return;
+    }
+    if (newValue === 'add_new') {
+      openSettings('proposals');
+      // open the new workflow input after the settings dialog is open
+      setTimeout(() => {
+        const btnElement = document.getElementById('new-workflow-btn');
+        btnElement?.click();
+      }, 100);
       return;
     }
     // no confirmation needed for draft or feedback
     if (!requireConfirmation) {
       changeWorkflow(newValue);
     } else {
-      setNewWorkflowId(newValue);
+      const { confirmed } = await showConfirmation({
+        message: 'This action will clear the setting of all steps and cannot be undone.',
+        confirmButton: 'Continue'
+      });
+      if (confirmed) {
+        changeWorkflow(newValue);
+      }
     }
-  }
-
-  function onCancel() {
-    setNewWorkflowId(null);
   }
 
   return (
@@ -73,14 +95,6 @@ export function WorkflowSelect({ onChange, value, readOnly, required, requireCon
           fluidWidth
         />
       </Box>
-      <ModalWithButtons
-        open={!!newWorkflowId}
-        buttonText='Continue'
-        onClose={onCancel}
-        onConfirm={() => changeWorkflow(newWorkflowId!)}
-      >
-        <Typography>This action will clear the setting of all steps and cannot be undone.</Typography>
-      </ModalWithButtons>
     </Box>
   );
 }

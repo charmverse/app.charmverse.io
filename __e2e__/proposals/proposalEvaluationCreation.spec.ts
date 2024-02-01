@@ -1,11 +1,4 @@
-import type {
-  ProposalCategory,
-  ProposalSystemRole,
-  ProposalWorkflow,
-  Role,
-  Space,
-  User
-} from '@charmverse/core/prisma-client';
+import type { ProposalSystemRole, ProposalWorkflow, Role, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsSpaces } from '@charmverse/core/test';
@@ -183,7 +176,16 @@ test.describe.serial('Proposal Evaluation', () => {
         index: 0,
         proposalId: proposal.id,
         title: settingsToTest.evaluationFeedbackTitle,
-        reviewers: [],
+        reviewers: [
+          {
+            evaluationId: expect.any(String),
+            id: expect.any(String),
+            proposalId: proposal.id,
+            roleId: null,
+            userId: null,
+            systemRole: 'author'
+          }
+        ],
         permissions: expect.arrayContaining(
           proposalEvaluationPermissions[0].permissions.map((p) => expect.objectContaining(p))
         )

@@ -14,7 +14,7 @@ import type { ThreadWithComments } from 'lib/threads/interfaces';
 
 import type { PageSidebarView } from '../../hooks/usePageSidebar';
 
-import { CommentsSidebar } from './components/CommentsSidebar';
+import { EditorCommentsSidebar, FormCommentsSidebar } from './components/CommentsSidebar';
 import { PageSidebarViewToggle } from './components/PageSidebarViewToggle';
 import { SuggestionsSidebar } from './components/SuggestionsSidebar';
 import { SIDEBAR_VIEWS } from './constants';
@@ -52,12 +52,18 @@ type SidebarProps = {
   proposalInput?: ProposalSettingsProps['proposal'];
   onChangeEvaluation: ProposalSettingsProps['onChangeEvaluation'];
   onChangeWorkflow: ProposalSettingsProps['onChangeWorkflow'];
+  onChangeRewardSettings?: ProposalSettingsProps['onChangeRewardSettings'];
   refreshProposal?: VoidFunction;
   isUnpublishedProposal?: boolean;
   isReviewer?: boolean; // TODO: we need to know the reviewer for each step instead
   // eslint-disable-next-line react/no-unused-prop-types
   disabledViews?: PageSidebarView[];
+  pagePath?: string;
+  pageTitle?: string;
   proposalTemplateId?: string | null;
+  // eslint-disable-next-line react/no-unused-prop-types
+  isProposalTemplate?: boolean;
+  isStructuredProposal: boolean;
 };
 
 function PageSidebarComponent(props: SidebarProps) {
@@ -198,10 +204,15 @@ function SidebarContents({
   proposalInput,
   onChangeEvaluation,
   onChangeWorkflow,
+  onChangeRewardSettings,
   refreshProposal,
   isUnpublishedProposal,
   isReviewer,
-  proposalTemplateId
+  pagePath,
+  pageTitle,
+  proposalTemplateId,
+  isProposalTemplate,
+  isStructuredProposal
 }: SidebarProps) {
   const isNotNewProposal = !!proposal;
   return (
@@ -210,15 +221,20 @@ function SidebarContents({
         (isUnpublishedProposal ? (
           <EvaluationSettingsSidebar
             proposal={proposalInput}
+            isTemplate={isProposalTemplate}
             readOnly={!!readOnlyProposalPermissions}
             templateId={proposalTemplateId}
             onChangeEvaluation={onChangeEvaluation}
+            onChangeRewardSettings={onChangeRewardSettings}
             onChangeWorkflow={onChangeWorkflow}
             isReviewer={!!isReviewer}
+            isStructuredProposal={!!isStructuredProposal}
             requireWorkflowChangeConfirmation={isNotNewProposal}
           />
         ) : (
           <EvaluationSidebar
+            pagePath={pagePath}
+            pageTitle={pageTitle}
             pageId={pageId}
             proposal={proposal}
             onChangeEvaluation={onChangeEvaluation}
@@ -234,13 +250,21 @@ function SidebarContents({
           state={editorState}
         />
       )}
-      {sidebarView === 'comments' && (
-        <CommentsSidebar
-          openSidebar={openSidebar!}
-          threads={threads || {}}
-          canCreateComments={!!pagePermissions?.comment}
-        />
-      )}
+      {sidebarView === 'comments' &&
+        (proposal?.formId ? (
+          <FormCommentsSidebar
+            canCreateComments={!!pagePermissions?.comment}
+            openSidebar={openSidebar!}
+            threads={threads}
+            formFields={proposal.form.formFields}
+          />
+        ) : (
+          <EditorCommentsSidebar
+            openSidebar={openSidebar!}
+            threads={threads}
+            canCreateComments={!!pagePermissions?.comment}
+          />
+        ))}
     </>
   );
 }

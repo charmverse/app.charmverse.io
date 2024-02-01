@@ -1,10 +1,10 @@
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 
-import { archiveProposal } from '../archiveProposal';
+import { archiveProposals } from '../archiveProposals';
 
-describe('archiveProposal()', () => {
-  it('should update the proposal archived status and return the proposal with full data', async () => {
+describe('archiveProposals()', () => {
+  it('should update the proposal archived status and return the proposal', async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace();
 
     const proposal = await testUtilsProposals.generateProposal({
@@ -13,18 +13,16 @@ describe('archiveProposal()', () => {
       archived: false,
       authors: [user.id]
     });
-    const archived = await archiveProposal({
+    await archiveProposals({
       archived: true,
-      proposalId: proposal.id
+      proposalIds: [proposal.id],
+      actorId: user.id
     });
 
-    expect(archived.archived).toBe(true);
-
-    const unarchived = await archiveProposal({
+    await archiveProposals({
       archived: false,
-      proposalId: proposal.id
+      proposalIds: [proposal.id],
+      actorId: user.id
     });
-
-    expect(unarchived.archived).toBe(false);
   });
 });

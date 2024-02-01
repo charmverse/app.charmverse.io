@@ -2,7 +2,7 @@ import { arrayUtils } from '@charmverse/core/utilities';
 import { mean, sum } from 'lodash';
 
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
-import { isNumber } from 'lib/utilities/numbers';
+import { isNumber, roundNumber } from 'lib/utilities/numbers';
 
 /**
  * null if no answers available
@@ -28,7 +28,7 @@ export type AggregateResults = {
 export type AnswerData = Pick<
   ProposalRubricCriteriaAnswerWithTypedResponse,
   'comment' | 'userId' | 'response' | 'rubricCriteriaId'
->;
+> & { evaluationId?: string | null };
 
 export function aggregateResults({
   criteria,
@@ -87,7 +87,7 @@ export function aggregateResults({
 
   const allScores = Object.values(criteriaScores).flat();
   const allScoresSum = allScores.length ? sum(allScores) : null;
-  const allScoresAverage = allScores.length ? mean(allScores) : null;
+  const allScoresAverage = allScores.length ? roundNumber(mean(allScores)) : null;
 
   const mappedReviewerResults = reviewersResults.reduce((acc, reviewer) => {
     acc[reviewer.id] = reviewer;
@@ -97,6 +97,6 @@ export function aggregateResults({
   return {
     reviewersResults: mappedReviewerResults,
     criteriaSummary,
-    allScores: { sum: allScoresSum, average: allScoresAverage }
+    allScores: { sum: allScoresSum, average: allScoresAverage !== null ? Number(allScoresAverage) : null }
   };
 }

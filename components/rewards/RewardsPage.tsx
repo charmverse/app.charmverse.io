@@ -3,7 +3,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import dynamic from 'next/dynamic';
 import { useCallback, useMemo, useState } from 'react';
 
-import charmClient from 'charmClient';
+import { useTrashPages } from 'charmClient/hooks/pages';
 import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFilterControl';
 import { ViewSettingsRow } from 'components/common/BoardEditor/components/ViewSettingsRow';
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
@@ -11,7 +11,7 @@ import AddViewMenu from 'components/common/BoardEditor/focalboard/src/components
 import { getVisibleAndHiddenGroups } from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
 import Kanban from 'components/common/BoardEditor/focalboard/src/components/kanban/kanban';
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
-import ViewHeaderActionsMenu from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderActionsMenu';
+import { ToggleViewSidebarButton } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ToggleViewSidebarButton';
 import ViewHeaderDisplayByMenu from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderDisplayByMenu';
 import ViewTabs from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewTabs';
 import ViewSidebar from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
@@ -52,10 +52,10 @@ export function RewardsPage({ title }: { title: string }) {
   const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
   const { isFreeSpace } = useIsFreeSpace();
   const { rewards, isLoading: loadingData } = useRewards();
-
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
   const canSeeRewards = hasAccess || isFreeSpace || currentSpace?.publicBountyBoard === true;
   const { getRewardPage } = useRewardPage();
+  const [selectedPropertyId, setSelectedPropertyId] = useState<null | string>(null);
 
   const isAdmin = useIsAdmin();
 
@@ -88,6 +88,7 @@ export function RewardsPage({ title }: { title: string }) {
   const openPageIn = activeView?.fields.openPageIn ?? 'center_peek';
   const withDisplayBy = activeView?.fields.viewType === 'calendar';
 
+  const { trigger: trashPages } = useTrashPages();
   const dateDisplayProperty = useMemo(
     () =>
       activeBoard?.fields.cardProperties.find((o) => {
@@ -110,7 +111,7 @@ export function RewardsPage({ title }: { title: string }) {
   }
 
   const onDelete = useCallback(async (rewardId: string) => {
-    await charmClient.deletePage(rewardId);
+    await trashPages({ pageIds: [rewardId], trash: true });
   }, []);
 
   const showRewardOrApplication = (id: string | null, rewardId?: string) => {
@@ -211,7 +212,7 @@ export function RewardsPage({ title }: { title: string }) {
               />
 
               {isAdmin && (
-                <ViewHeaderActionsMenu
+                <ToggleViewSidebarButton
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -238,6 +239,10 @@ export function RewardsPage({ title }: { title: string }) {
               <Box width='100%'>
                 {activeView.fields.viewType === 'table' && (
                   <Table
+                    setSelectedPropertyId={(_setSelectedPropertyId) => {
+                      setSelectedPropertyId(_setSelectedPropertyId);
+                      setShowSidebar(true);
+                    }}
                     board={activeBoard}
                     activeView={activeView}
                     cardPages={cardPages as CardPage[]}
@@ -305,6 +310,10 @@ export function RewardsPage({ title }: { title: string }) {
 
             {isAdmin && (
               <ViewSidebar
+                sidebarView={selectedPropertyId ? 'card-property' : undefined}
+                setSelectedPropertyId={setSelectedPropertyId}
+                selectedPropertyId={selectedPropertyId}
+                cards={cards as Card[]}
                 views={views}
                 board={activeBoard}
                 rootBoard={activeBoard}

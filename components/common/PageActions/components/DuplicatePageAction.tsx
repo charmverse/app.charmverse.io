@@ -9,7 +9,7 @@ import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 
-const excludedPageTypes: (PageType | undefined)[] = ['bounty_template'];
+const excludedPageTypes: (PageType | undefined)[] = ['bounty_template', 'proposal'];
 
 export function DuplicatePageAction({
   pageId,
@@ -27,7 +27,6 @@ export function DuplicatePageAction({
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const { navigateToSpacePath } = useCharmRouter();
   const { refreshReward } = useRewards();
-  const { refreshProposal } = useProposals();
 
   const disabled = !pagePermissions?.read || !userSpacePermissions?.createPage;
 
@@ -46,8 +45,6 @@ export function DuplicatePageAction({
       }
       if (pageType === 'bounty' || pageType === 'bounty_template') {
         refreshReward(duplicatePageResponse.rootPageId);
-      } else if (pageType === 'proposal') {
-        refreshProposal(duplicatePageResponse.rootPageId);
       }
     }
     onComplete?.();

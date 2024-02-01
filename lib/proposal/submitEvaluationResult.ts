@@ -1,7 +1,10 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
+
 import { createVoteIfNecessary } from './createVoteIfNecessary';
+import { setPageUpdatedAt } from './setPageUpdatedAt';
 
 export type ReviewEvaluationRequest = {
   decidedBy: string;
@@ -10,7 +13,15 @@ export type ReviewEvaluationRequest = {
   result: ProposalEvaluationResult;
 };
 
-export async function submitEvaluationResult({ decidedBy, evaluationId, proposalId, result }: ReviewEvaluationRequest) {
+export async function submitEvaluationResult({
+  decidedBy,
+  evaluationId,
+  proposalId,
+  result,
+  spaceId
+}: ReviewEvaluationRequest & {
+  spaceId: string;
+}) {
   await prisma.proposalEvaluation.update({
     where: {
       id: evaluationId
@@ -21,6 +32,9 @@ export async function submitEvaluationResult({ decidedBy, evaluationId, proposal
       completedAt: new Date()
     }
   });
+
+  await setPageUpdatedAt({ proposalId, userId: decidedBy });
+
   // determine if we should create vote for the next stage
   if (result === 'pass') {
     await createVoteIfNecessary({
@@ -28,4 +42,11 @@ export async function submitEvaluationResult({ decidedBy, evaluationId, proposal
       proposalId
     });
   }
+
+  await publishProposalEvent({
+    currentEvaluationId: evaluationId,
+    proposalId,
+    spaceId,
+    userId: decidedBy
+  });
 }

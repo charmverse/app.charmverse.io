@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { useCreateProposal } from 'charmClient/hooks/proposals';
 import { checkFormFieldErrors } from 'components/common/form/checkFormFieldErrors';
@@ -37,12 +37,6 @@ export function useNewProposal({ newProposal }: Props) {
     [setFormInputsRaw]
   );
 
-  useEffect(() => {
-    setFormInputs({
-      publishToLens: !!user?.publishToLensDefault
-    });
-  }, [setFormInputs, user?.publishToLensDefault]);
-
   async function createProposal({ isDraft }: { isDraft?: boolean }) {
     log.info('[user-journey] Create a proposal');
     if (currentSpace) {
@@ -60,15 +54,15 @@ export function useNewProposal({ newProposal }: Props) {
         },
         formFields: formInputs.formFields,
         evaluations: formInputs.evaluations,
-        evaluationType: formInputs.evaluationType,
-        reviewers: formInputs.reviewers,
         spaceId: currentSpace.id,
-        publishToLens: formInputs.publishToLens,
         fields: formInputs.fields,
         formId: formInputs.formId,
         formAnswers: formInputs.formAnswers,
         workflowId: formInputs.workflowId || undefined,
-        isDraft
+        isDraft,
+        selectedCredentialTemplates: formInputs.selectedCredentialTemplates ?? [],
+        sourcePageId: formInputs.sourcePageId,
+        sourcePostId: formInputs.sourcePostId
       }).catch((err: any) => {
         showMessage(err.message ?? 'Something went wrong', 'error');
         throw err;
@@ -99,7 +93,7 @@ export function getProposalErrors({
 }: {
   proposal: Pick<
     ProposalPageAndPropertiesInput,
-    'title' | 'type' | 'proposalTemplateId' | 'formFields' | 'content' | 'proposalType' | 'evaluations'
+    'authors' | 'title' | 'type' | 'proposalTemplateId' | 'formFields' | 'content' | 'proposalType' | 'evaluations'
   >;
   requireTemplates?: boolean;
 }) {
@@ -110,6 +104,9 @@ export function getProposalErrors({
 
   if (requireTemplates && proposal.type === 'proposal' && !proposal.proposalTemplateId) {
     errors.push('Template is required');
+  }
+  if (proposal.type === 'proposal' && proposal.authors.length === 0) {
+    errors.push('At least one author is required');
   }
 
   if (proposal.proposalType === 'structured') {
@@ -163,15 +160,14 @@ function emptyState({
     contentText: '',
     headerImage: null,
     icon: null,
-    evaluationType: 'vote',
     proposalTemplateId: null,
-    reviewers: [],
     evaluations: [],
     title: '',
     type: 'proposal',
-    publishToLens: false,
-    fields: { properties: {} },
+    selectedCredentialTemplates: [],
+    fields: { properties: {}, enableRewards: true },
     ...inputs,
-    authors: userId ? [userId] : []
+    // leave authors empty for proposals
+    authors: inputs.type !== 'proposal_template' && userId ? [userId] : []
   };
 }

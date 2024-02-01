@@ -1,9 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { issueProposalCredentialsIfNecessary } from 'lib/credentials/issueProposalCredentialsIfNecessary';
 import { isTruthy } from 'lib/utilities/types';
 import { getVotesByState } from 'lib/votes/getVotesByState';
 import { VOTE_STATUS } from 'lib/votes/interfaces';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 const updateVoteStatus = async () => {
@@ -61,17 +61,6 @@ const updateVoteStatus = async () => {
         status: 'Rejected'
       }
     }),
-    // update proposals
-    prisma.proposal.updateMany({
-      where: {
-        id: {
-          in: proposalPageIds
-        }
-      },
-      data: {
-        status: 'vote_closed'
-      }
-    }),
     prisma.proposalEvaluation.updateMany({
       where: {
         id: {
@@ -97,27 +86,26 @@ const updateVoteStatus = async () => {
   ]);
 
   await Promise.all([
-    ...rejectedVotes.map((vote) => {
-      if (vote.pageId) {
+    [...rejectedVotes, ...passedVotes].map((vote) => {
+      const evaluation = passedEvaluations.find((e) => e.voteId === vote.id);
+      if (vote.pageId && evaluation) {
         return publishProposalEvent({
-          scope: WebhookEventNames.ProposalFailed,
           spaceId: vote.spaceId,
-          proposalId: vote.pageId
-        });
-      }
-      return Promise.resolve();
-    }),
-    ...passedVotes.map((vote) => {
-      if (vote.pageId) {
-        return publishProposalEvent({
-          scope: WebhookEventNames.ProposalPassed,
-          spaceId: vote.spaceId,
-          proposalId: vote.pageId
+          proposalId: vote.pageId,
+          currentEvaluationId: evaluation.id,
+          userId: evaluation.decidedBy ?? vote.createdBy
         });
       }
       return Promise.resolve();
     })
   ]);
+
+  for (const passedEval of passedEvaluations) {
+    await issueProposalCredentialsIfNecessary({
+      event: 'proposal_approved',
+      proposalId: passedEval.proposalId
+    });
+  }
 
   return votesPassedDeadline.length;
 };

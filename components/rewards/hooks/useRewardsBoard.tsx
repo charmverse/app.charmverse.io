@@ -1,13 +1,12 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import type { ReactNode } from 'react';
-import { createContext, useContext, useMemo } from 'react';
+import { createContext, useContext } from 'react';
 
 import type { BoardReward } from 'components/rewards/components/RewardProperties/hooks/useRewardsBoardAdapter';
 import { useRewardsBoardAdapter } from 'components/rewards/components/RewardProperties/hooks/useRewardsBoardAdapter';
 import type { Board } from 'lib/focalboard/board';
-import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
+import type { BoardView } from 'lib/focalboard/boardView';
 import type { CardPage } from 'lib/focalboard/card';
-import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import type { RewardCard, RewardPropertyValue } from 'lib/rewards/blocks/interfaces';
 
 type RewardsBoardContextType = {
@@ -23,7 +22,7 @@ type RewardsBoardContextType = {
   setBoardReward: (boardReward: BoardReward | null) => void;
 };
 
-export const RewardsBoardContext = createContext<Readonly<RewardsBoardContextType>>({
+const RewardsBoardContext = createContext<Readonly<RewardsBoardContextType>>({
   board: {} as Board,
   boardCustomProperties: {} as Board,
   card: {} as RewardCard,

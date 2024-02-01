@@ -1,22 +1,23 @@
-import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { prisma } from '@charmverse/core/prisma-client';
-
-/**
-
-  userId: cb9a5ede-6ff7-4eaa-9c23-91e684e23aed
-  spaceId: 33918abc-f753-4a3d-858d-63c3fa36fa15
-
-  kameil userId: f7d47848-f993-4d16-8008-e1f5b23b8ad3 or 356af4f7-cbd1-4350-b046-9f55da500fec
-*/
 
 /**
  * Use this script to perform database searches.
  */
 
 async function search() {
-  const acc = await prisma.proposalWorkflow.deleteMany({});
+  const acc = await prisma.page.findMany({
+    where: {
+      type: 'bounty_template'
+    },
+    select: { createdAt: true, space: true, bounty: { include: { permissions: true } } }
+  });
 
-  console.log(acc);
+  console.log('Acc', acc.length);
+  console.log('Acc', acc.filter((a) => !a.bounty?.permissions.some((p) => p.permissionLevel === 'reviewer')).length);
+  console.log(
+    'Acc',
+    acc.filter((a) => !a.bounty?.permissions.some((p) => p.permissionLevel === 'reviewer')).map((a) => a.createdAt)
+  );
 }
 
 search().then(() => console.log('Done'));

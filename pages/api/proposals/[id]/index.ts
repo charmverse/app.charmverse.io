@@ -1,11 +1,10 @@
-import { InsecureOperationError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { ActionNotPermittedError, NotFoundError, onError, onNoMatch } from 'lib/middleware';
+import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { canAccessPrivateFields } from 'lib/proposal/form/canAccessPrivateFields';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import { mapDbProposalToProposal } from 'lib/proposal/mapDbProposalToProposal';
@@ -17,9 +16,7 @@ import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .put(providePermissionClients({ key: 'id', location: 'query', resourceIdType: 'proposal' }), updateProposalController)
-  .get(getProposalController);
+handler.get(getProposalController).use(requireUser).put(updateProposalController);
 
 async function getProposalController(req: NextApiRequest, res: NextApiResponse<ProposalWithUsersAndRubric>) {
   const proposalId = req.query.id as string;
@@ -30,13 +27,6 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
       id: proposalId
     },
     include: {
-      draftRubricAnswers: true,
-      rubricAnswers: true,
-      rubricCriteria: {
-        orderBy: {
-          index: 'asc'
-        }
-      },
       evaluations: {
         orderBy: {
           index: 'asc'
@@ -44,7 +34,11 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
         include: {
           permissions: true,
           reviewers: true,
-          rubricCriteria: true,
+          rubricCriteria: {
+            orderBy: {
+              index: 'asc'
+            }
+          },
           rubricAnswers: true,
           draftRubricAnswers: true,
           vote: true
@@ -69,44 +63,41 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
   if (!proposal) {
     throw new NotFoundError();
   }
-  const proposalPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
+  const permissionsByStep = await permissionsApiClient.proposals.computeAllProposalEvaluationPermissions({
     // Proposal id is the same as page
     resourceId: proposal?.id,
     userId
   });
 
-  if (!proposalPermissions?.view) {
+  const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
+
+  const currentPermissions =
+    proposal.status === 'draft'
+      ? permissionsByStep.draft
+      : currentEvaluation && permissionsByStep[currentEvaluation.id];
+
+  if (!currentPermissions?.view) {
     throw new NotFoundError();
-  }
-
-  const { spaceRole } = await hasAccessToSpace({
-    spaceId: proposal.spaceId,
-    userId
-  });
-
-  const canSeeAnswers = spaceRole?.isAdmin || proposalPermissions.evaluate || proposalPermissions.review;
-  if (!canSeeAnswers) {
-    proposal.draftRubricAnswers = [];
-    proposal.rubricAnswers = [];
-    proposal.evaluations.forEach((evaluation) => {
-      evaluation.draftRubricAnswers = [];
-      evaluation.rubricAnswers = [];
-    });
   }
 
   // If we are viewing a proposal template, we can see all private fields since the user might be creating a proposal
   const canAccessPrivateFormFields = await canAccessPrivateFields({ proposal, userId, proposalId: proposal.id });
 
-  return res
-    .status(200)
-    .json(mapDbProposalToProposal({ proposal, permissions: proposalPermissions, canAccessPrivateFormFields }));
+  return res.status(200).json(
+    mapDbProposalToProposal({
+      proposal,
+      permissions: currentPermissions,
+      permissionsByStep,
+      canAccessPrivateFormFields
+    })
+  );
 }
 
 async function updateProposalController(req: NextApiRequest, res: NextApiResponse) {
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const { publishToLens, authors, fields } = req.body as UpdateProposalRequest;
+  const { authors, fields } = req.body as UpdateProposalRequest;
 
   const proposal = await prisma.proposal.findUnique({
     where: {
@@ -153,8 +144,9 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
   await updateProposal({
     proposalId: proposal.id,
     authors,
-    publishToLens,
-    fields
+    fields,
+    selectedCredentialTemplates: req.body.selectedCredentialTemplates,
+    actorId: userId
   });
 
   return res.status(200).end();

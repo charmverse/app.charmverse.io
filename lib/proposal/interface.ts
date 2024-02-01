@@ -22,15 +22,16 @@ import type {
   ProposalRubricCriteriaWithTypedParams
 } from './rubric/interfaces';
 
-export type ProposalEvaluationStatus = 'in_progress' | 'complete' | 'passed' | 'declined' | 'unpublished' | 'published';
+export type ProposalEvaluationStatus =
+  | 'in_progress'
+  | 'complete'
+  | 'passed'
+  | 'declined'
+  | 'unpublished'
+  | 'published'
+  | 'archived';
 export type ProposalEvaluationStep = ProposalEvaluationType | 'rewards' | 'draft';
 export type ProposalEvaluationResultExtended = ProposalEvaluationResult | 'in_progress';
-
-export interface ProposalReviewerInput {
-  group: 'system_role' | 'role' | 'user';
-  id: string;
-  evaluationId?: string;
-}
 
 export type ProposalRubricData = {
   rubricCriteria: ProposalRubricCriteriaWithTypedParams[];
@@ -45,8 +46,13 @@ export type VoteSettings = Pick<Vote, 'type' | 'threshold' | 'maxChoices'> & {
 };
 
 export type ProposalPendingReward = { reward: UpdateableRewardFields; page: NewPageValues | null; draftId: string };
-export type ProposalFields = { properties?: ProposalPropertiesField; pendingRewards?: ProposalPendingReward[] };
-export type ProposalFormData = {
+export type ProposalFields = {
+  properties?: ProposalPropertiesField;
+  pendingRewards?: ProposalPendingReward[];
+  rewardsTemplateId?: string; // require a particular template to be used for rewards
+  enableRewards?: boolean; // used by form templates to enable rewards for new proposals
+};
+type ProposalFormData = {
   form: {
     id: string;
     formFields:
@@ -63,7 +69,6 @@ export type ProposalWithUsers = Omit<CoreProposalWithUsers, 'fields'> & {
 
 export type ProposalWithUsersLite = ProposalWithUsers & {
   currentEvaluationId?: string;
-  evaluationType: ProposalEvaluationType;
   permissions?: ProposalPermissionFlags;
   evaluations: {
     title: string;
@@ -80,12 +85,13 @@ export type PopulatedEvaluation = ProposalRubricData &
     permissions: ProposalEvaluationPermission[];
     reviewers: ProposalWithUsers['reviewers'];
     voteSettings: VoteSettings | null;
+    isReviewer?: boolean; // added by the webapp api
   };
 
 export type ProposalWithUsersAndRubric = ProposalWithUsers &
-  ProposalRubricData &
+  // ProposalRubricData &
   ProposalFormData & {
-    currentStep: ProposalStep;
+    // currentStep: ProposalStep;
     evaluations: PopulatedEvaluation[];
     fields: ProposalFields | null;
     page?: { sourceTemplateId: string | null } | null;

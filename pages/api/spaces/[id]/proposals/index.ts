@@ -32,12 +32,12 @@ async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWi
       },
       page: {
         // Ignore proposal templates
-        type: 'proposal'
+        type: 'proposal',
+        deletedAt: null
       }
     },
     include: {
       authors: true,
-      reviewers: true,
       rewards: true,
       evaluations: {
         orderBy: {

@@ -12,14 +12,15 @@ import { mutate } from 'swr';
 import charmClient from 'charmClient';
 import { useUpdateProposalEvaluation } from 'charmClient/hooks/proposals';
 import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
+import { RelationPropertyPagesAutocomplete } from 'components/common/BoardEditor/components/properties/RelationPropertyPagesAutocomplete';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import { BreadcrumbPageTitle } from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
+import type { PageListItem } from 'components/common/PagesList';
 import { ProposalStatusSelect } from 'components/proposals/components/ProposalStatusSelect';
 import { ProposalStepSelect } from 'components/proposals/components/ProposalStepSelect';
-import { useProposalsWhereUserIsEvaluator } from 'components/proposals/hooks/useProposalsWhereUserIsEvaluator';
 import {
   REWARD_APPLICATION_STATUS_LABELS,
   RewardApplicationStatusChip
@@ -29,7 +30,7 @@ import { allMembersSystemRole, authorSystemRole } from 'components/settings/prop
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { Board, DatabaseProposalPropertyType, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import {
@@ -141,7 +142,6 @@ function PropertyValueElement(props: Props) {
   const { trigger } = useUpdateProposalEvaluation({ proposalId: proposal?.id });
 
   const isAdmin = useIsAdmin();
-
   const intl = useIntl();
   const propertyValue = card.fields.properties[propertyTemplate.id];
   const cardProperties = board.fields.cardProperties;
@@ -275,6 +275,28 @@ function PropertyValueElement(props: Props) {
         onChange={() => null}
         systemRoles={[allMembersSystemRole, authorSystemRole]}
         value={propertyValue as any}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
+      />
+    );
+  } else if (propertyTemplate.relationData && propertyTemplate.type === 'relation') {
+    return (
+      <RelationPropertyPagesAutocomplete
+        boardProperties={board.fields.cardProperties}
+        propertyTemplate={propertyTemplate}
+        selectedPageListItemIds={
+          typeof propertyValue === 'string' ? [propertyValue] : (propertyValue as string[]) ?? []
+        }
+        displayType={displayType}
+        emptyPlaceholderContent={emptyDisplayValue}
+        showEmptyPlaceholder={showEmptyPlaceholder}
+        onChange={async (pageListItemIds) => {
+          try {
+            await mutator.changePropertyValue(card, propertyTemplate.id, pageListItemIds);
+          } catch (error) {
+            showError(error);
+          }
+        }}
+        readOnly={readOnly}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
       />
     );

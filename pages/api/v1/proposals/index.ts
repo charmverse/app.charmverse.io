@@ -1,5 +1,6 @@
 import type { ProposalStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { InvalidStateError } from 'lib/middleware';
@@ -80,11 +81,9 @@ type ProposalReviewer = {
  *          type: string
  *          example: vote_active
  *          enum:
- *            - discussion
- *            - review
- *            - reviewed
+ *            - draft
+ *            - published
  *            - vote_active
- *            - vote_closed
  *        title:
  *          type: string
  *          example: EIP-4361 Sign in with Ethereum
@@ -106,7 +105,7 @@ export type PublicApiProposal = {
   };
   authors: ProposalAuthor[];
   reviewers: ProposalReviewer[];
-  status: ProposalStatus;
+  status: ProposalStatus | 'vote_active';
   title: string;
   url: string;
   voteOptions?: string[];
@@ -158,6 +157,7 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
       select: {
         id: true,
         status: true,
+        evaluations: true,
         page: {
           select: {
             votes: {
@@ -221,6 +221,8 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
   }
 
   const publicApiProposalList: PublicApiProposal[] = proposals.map((proposal, index) => {
+    const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
+    const isActiveVote = currentEvaluation?.result === null && currentEvaluation?.type === 'vote';
     const apiProposal: PublicApiProposal = {
       id: proposal.id,
       createdAt: proposal.page?.createdAt as any,
@@ -230,7 +232,7 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
         text: proposal.page?.contentText ?? '',
         markdown: markdownTexts[index]
       },
-      status: proposal.status,
+      status: isActiveVote ? 'vote_active' : proposal.status,
       authors: proposal.authors.map((author) => ({
         userId: author.author?.id,
         address: author.author?.wallets[0]?.address,

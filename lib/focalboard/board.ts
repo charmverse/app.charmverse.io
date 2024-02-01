@@ -39,6 +39,7 @@ export type PropertyType =
   | 'updatedBy'
   | 'tokenAmount'
   | 'tokenChain'
+  | 'relation'
   | DatabaseProposalPropertyType;
 
 interface IPropertyOption<T = string> {
@@ -50,6 +51,13 @@ interface IPropertyOption<T = string> {
   dropdownValue?: string; // the label to show in the dropdown, if its different from the normal value
 }
 
+export type RelationPropertyData = {
+  boardId: string;
+  limit: 'single_page' | 'multiple_page';
+  relatedPropertyId: string | null;
+  showOnRelatedBoard: boolean;
+};
+
 // A template for card properties attached to a board
 export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
   id: string;
@@ -59,6 +67,7 @@ export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
   description?: string;
   formFieldId?: string;
   proposalFieldId?: string;
+  relationData?: RelationPropertyData;
 };
 
 export type DataSourceType = 'board_page' | 'google_form' | 'proposals';

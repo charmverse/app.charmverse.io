@@ -20,6 +20,7 @@ import { useEffect, useState } from 'react';
 import { Button } from 'components/common/Button';
 import UserDisplay from 'components/common/UserDisplay';
 import type { PopulatedEvaluation } from 'lib/proposal/interface';
+import { aggregateResults } from 'lib/proposal/rubric/aggregateResults';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import { isNumber } from 'lib/utilities/numbers';
 
@@ -29,10 +30,10 @@ type Props = {
   answers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
   criteriaList: ProposalRubricCriteria[];
   isCurrent: boolean;
-  isReviewer?: boolean;
   proposalId?: string;
   evaluation?: PopulatedEvaluation;
   refreshProposal?: VoidFunction;
+  archived?: boolean;
 };
 
 type CriteriaSummaryType = 'sum' | 'average';
@@ -66,8 +67,8 @@ export function RubricResults({
   evaluation,
   refreshProposal,
   isCurrent,
-  isReviewer,
-  proposalId
+  proposalId,
+  archived
 }: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [criteriaSummaryType, setCriteriaSummaryType] = useState<CriteriaSummaryType>('average');
@@ -112,9 +113,13 @@ export function RubricResults({
     };
   });
 
-  const allCriteriaScores = populatedCriteria.filter((c) => c.answers.length).map((criteria) => criteria.totalResult);
-  const allCriteriaAverage = roundNumber(mean(allCriteriaScores));
-  const allCriteriaTotal = sum(allCriteriaScores);
+  const { allScores, criteriaSummary } = aggregateResults({
+    answers: allAnswers,
+    criteria: evaluation?.rubricCriteria || []
+  });
+
+  const allCriteriaScores = Object.values(criteriaSummary).map((v) => v.sum);
+
   const allCriteriaTotalDenominator = sum(populatedCriteria.map((criteria) => criteria.totalDenominator));
 
   function expandCriteria(criteriaId: string) {
@@ -207,10 +212,10 @@ export function RubricResults({
         </Menu>
         {allCriteriaScores.length ? (
           criteriaSummaryType === 'average' ? (
-            <strong>{allCriteriaAverage}</strong>
+            <strong>{allScores.average}</strong>
           ) : (
             <span>
-              <strong>{allCriteriaTotal}</strong>
+              <strong>{allScores.sum}</strong>
               <Typography color='secondary' component='span'>
                 {' '}
                 / {allCriteriaTotalDenominator}
@@ -232,10 +237,11 @@ export function RubricResults({
             <PassFailEvaluation
               isCurrent={isCurrent}
               hideReviewer
+              archived={archived}
               key='results'
-              isReviewer={isReviewer}
               evaluation={evaluation}
               proposalId={proposalId}
+              confirmationMessage='Please verify that all reviewers have submitted a response. This will submit the final review for this step.'
               refreshProposal={refreshProposal}
             />
           </Box>

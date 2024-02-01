@@ -3,13 +3,13 @@ import { ButtonGroup } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef, useState } from 'react';
 
-import charmClient from 'charmClient';
+import { useTrashPages } from 'charmClient/hooks/pages';
 import { Button } from 'components/common/Button';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
 import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
-import { TemplatesMenu } from 'components/common/TemplatesMenu';
+import { TemplatesMenu } from 'components/common/TemplatesMenu/TemplatesMenu';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
@@ -32,11 +32,10 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
   const { templates, isLoading } = useRewardTemplates();
   const [currentSpacePermissions] = useCurrentSpacePermissions();
   const { getFeatureTitle } = useSpaceFeatures();
-
+  const { trigger: trashPages } = useTrashPages();
   function deleteTemplate(pageId: string) {
-    return charmClient.deletePage(pageId);
+    return trashPages({ pageIds: [pageId], trash: true });
   }
-
   const isDisabled = !currentSpacePermissions?.createBounty;
 
   function createTemplate() {
@@ -64,38 +63,32 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
     }
   }
 
-  function createRewardFromTemplate(templateId: string) {
-    const template = templates?.find((tpl) => tpl.page.id === templateId);
-    if (template) {
-      openNewPage({
-        ...template.page,
-        content: template.page.content as PageContent,
-        type: 'bounty',
-        templateId
-      });
-      setRewardValues(template.reward);
-    } else {
-      throw new Error('Reward template not found');
-    }
-  }
-
-  function addPageFromTemplate(templateId: string) {
-    const template = templates?.find((tpl) => tpl.page.id === templateId);
-    const templateContentChanged = template?.page.content !== newPageValues?.content;
-
-    if (newPageValues?.contentText.length !== 0 && templateContentChanged) {
-      overrideContentModalPopupState.open();
-    } else {
-      createRewardFromTemplate(templateId);
-    }
-    setSelectedTemplate(template ?? null);
-  }
-
-  function resetTemplate() {
-    setSelectedTemplate(null);
-    updateNewPageValues({
-      templateId: undefined
+  function createRewardFromTemplate(template: RewardTemplate) {
+    openNewPage({
+      ...template.page,
+      content: template.page.content as PageContent,
+      title: undefined,
+      type: 'bounty',
+      templateId: template.page.id
     });
+    setRewardValues(template.reward);
+  }
+
+  function selectTemplate(template: RewardTemplate | null) {
+    if (template) {
+      const templateContentChanged = template.page.content !== newPageValues?.content;
+
+      if (newPageValues?.contentText.length !== 0 && templateContentChanged) {
+        overrideContentModalPopupState.open();
+      } else {
+        createRewardFromTemplate(template);
+      }
+    } else {
+      updateNewPageValues({
+        templateId: undefined
+      });
+    }
+    setSelectedTemplate(template);
   }
 
   let disabledTooltip: string | undefined;
@@ -107,11 +100,6 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
     // these values are not required for templates
     if (!rewardValues.reviewers?.length) {
       disabledTooltip = 'Reviewer is required';
-    } else if (
-      !rewardValues.customReward &&
-      (!rewardValues.rewardToken || !rewardValues.rewardAmount || !rewardValues.chainId)
-    ) {
-      disabledTooltip = 'Reward is required';
     } else if (rewardValues.assignedSubmitters && rewardValues.assignedSubmitters.length === 0) {
       disabledTooltip = 'You need to assign at least one submitter';
     }
@@ -129,8 +117,13 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
       </ButtonGroup>
       <TemplatesMenu
         isLoading={isLoading}
-        pages={templates?.map((tpl) => tpl.page) ?? []}
-        addPageFromTemplate={createRewardFromTemplate}
+        templates={templates?.map((tpl) => tpl.page) ?? []}
+        addPageFromTemplate={(pageId) => {
+          const template = templates?.find((tpl) => tpl.page.id === pageId);
+          if (template) {
+            createRewardFromTemplate(template);
+          }
+        }}
         createTemplate={createTemplate}
         editTemplate={(pageId) => showPage(pageId)}
         deleteTemplate={deleteTemplate}
@@ -161,9 +154,8 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
             isNewReward
             isTemplate={isTemplate}
             expandedByDefault
-            addPageFromTemplate={addPageFromTemplate}
-            selectedTemplate={templates?.find((tpl) => tpl.page.id === newPageValues?.templateId)}
-            resetTemplate={resetTemplate}
+            selectTemplate={selectTemplate}
+            templateId={newPageValues?.templateId}
           />
         </NewDocumentPage>
       </NewPageDialog>
@@ -178,7 +170,7 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
         question='Are you sure you want to overwrite your current content with the reward template content?'
         onConfirm={() => {
           if (selectedTemplate?.page?.id) {
-            createRewardFromTemplate(selectedTemplate.page.id);
+            createRewardFromTemplate(selectedTemplate);
           }
         }}
       />

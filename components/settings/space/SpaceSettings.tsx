@@ -51,8 +51,9 @@ import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFrom
 import { IdentityIcon } from '../profile/components/IdentityIcon';
 
 import Avatar from './components/LargeAvatar';
-import { NotificationTogglesInput } from './components/NotificationToggles';
+import { NotificationTogglesInput, getDefaultValues } from './components/NotificationToggles';
 import { SettingsItem } from './components/SettingsItem';
+import { TwoFactorAuth } from './components/TwoFactorAuth';
 
 export type FormValues = {
   name: string;
@@ -60,6 +61,7 @@ export type FormValues = {
   spaceArtwork?: string | null;
   domain: string;
   notificationToggles: NotificationToggles;
+  requireMembersTwoFactorAuth: boolean;
 };
 
 const schema: yup.Schema<FormValues> = yup.object({
@@ -67,6 +69,7 @@ const schema: yup.Schema<FormValues> = yup.object({
   spaceImage: yup.string().nullable(),
   spaceArtwork: yup.string().nullable(),
   notificationToggles: yup.object(),
+  requireMembersTwoFactorAuth: yup.boolean().required(),
   domain: yup
     .string()
     .ensure()
@@ -162,7 +165,8 @@ export function SpaceSettings({
       domain: values.domain,
       primaryMemberIdentity,
       spaceImage: values.spaceImage,
-      spaceArtwork: values.spaceArtwork
+      spaceArtwork: values.spaceArtwork,
+      requireMembersTwoFactorAuth: values.requireMembersTwoFactorAuth
     });
 
     if (newDomain) {
@@ -265,6 +269,9 @@ export function SpaceSettings({
                 </Stack>
               </Stack>
             </Stack>
+          </Grid>
+          <Grid item>
+            <TwoFactorAuth control={control} isAdmin={isAdmin} />
           </Grid>
           <Grid item>
             <FieldLabel>Notifications</FieldLabel>
@@ -590,7 +597,7 @@ function getProfileWidgetLogo(name: MemberProfileName) {
     case 'ens':
       return '/images/logos/ens_logo.svg';
     case 'lens':
-      return '/images/logos/lens_logo.svg';
+      return '/images/logos/lens_logo.png';
     case 'summon':
       return '/images/logos/summon_dark_mark.svg';
     default:
@@ -599,18 +606,12 @@ function getProfileWidgetLogo(name: MemberProfileName) {
 }
 
 function _getFormValues(space: Space): FormValues {
-  const notificationToggles = { ...(space.notificationToggles as any) } as NotificationToggles;
-  // set all notifications to true by default. TODO: find a programmatic way to do this?
-  notificationToggles.proposals ??= true;
-  notificationToggles.polls ??= true;
-  notificationToggles.rewards ??= true;
-  notificationToggles.proposals__start_discussion ??= true;
-  notificationToggles.proposals__vote ??= true;
   return {
     name: space.name,
     spaceImage: space.spaceImage,
     spaceArtwork: space.spaceArtwork,
     domain: space.domain,
-    notificationToggles
+    requireMembersTwoFactorAuth: space.requireMembersTwoFactorAuth,
+    notificationToggles: getDefaultValues(space.notificationToggles as NotificationToggles)
   };
 }

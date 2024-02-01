@@ -1,7 +1,6 @@
 import type { PageWithPermissions } from '@charmverse/core/pages';
 
 import * as http from 'adapters/http';
-import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';
 import type { ProposalWithUsers, ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { ReviewEvaluationRequest } from 'lib/proposal/submitEvaluationResult';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
@@ -21,10 +20,6 @@ export class ProposalsApi {
 
   updateProposalLensProperties({ proposalId, ...rest }: UpdateProposalLensPropertiesRequest) {
     return http.PUT(`/api/proposals/${proposalId}/update-lens-properties`, rest);
-  }
-
-  archiveProposal({ archived, proposalId }: ArchiveProposalRequest) {
-    return http.POST<ProposalWithUsers>(`/api/proposals/${proposalId}/archive`, { archived });
   }
 
   deleteProposalTemplate({ proposalTemplateId }: { proposalTemplateId: string }): Promise<PageWithPermissions> {
@@ -47,7 +42,7 @@ export class ProposalsApi {
     return http.POST(`/api/proposals/${proposalId}/rewards`);
   }
 
-  goBackToEvaluationStep({ proposalId, ...payload }: { proposalId: string; evaluationId?: string }) {
+  goBackToStep({ proposalId, ...payload }: { proposalId: string; evaluationId?: string }) {
     return http.PUT(`/api/proposals/${proposalId}/back-to-step`, payload);
   }
 }

@@ -1,7 +1,7 @@
-import type { ProposalCategory, Space, User } from '@charmverse/core/prisma';
+import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
-import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsUser } from '@charmverse/core/test';
 import { test as base, expect } from '@playwright/test';
 import { DatabasePage } from '__e2e__/po/databasePage.po';
 import { DocumentPage } from '__e2e__/po/document.po';
@@ -33,7 +33,6 @@ const test = base.extend<Fixtures>({
 let space: Space;
 let spaceAdmin: User;
 let spaceMember: User;
-let proposalCategory: ProposalCategory;
 let defaultWorkflows: ProposalWorkflowTyped[];
 
 test.beforeAll(async () => {
@@ -165,21 +164,14 @@ test.describe.serial('Structured proposal template', () => {
 
     await expect(formField.addNewFormFieldButton).toBeVisible();
 
-    // Should be disabled as there are no changes
-    await expect(formField.formFieldsSaveButton).toBeDisabled();
-
     await formField.toggleFormFieldButton.nth(0).click();
 
     // Rename first field
     await formField.getFormFieldNameInput().fill('Full name');
 
-    await expect(formField.formFieldsSaveButton).toBeEnabled();
-
     await formField.addNewFormFieldButton.click();
 
     await formField.getFormFieldNameInput(1).fill('Surname');
-
-    await formField.formFieldsSaveButton.click();
 
     await proposalPage.page.waitForTimeout(500);
 

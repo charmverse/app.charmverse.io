@@ -6,6 +6,7 @@ import type { SelectOption } from 'components/common/BoardEditor/components/prop
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { Button } from 'components/common/Button';
 import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
+import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PopulatedEvaluation } from 'lib/proposal/interface';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
@@ -13,36 +14,52 @@ import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 export type Props = {
   hideReviewer?: boolean;
   proposalId?: string;
-  isReviewer?: boolean;
-  evaluation: Pick<PopulatedEvaluation, 'id' | 'completedAt' | 'reviewers' | 'result'>;
+  evaluation: Pick<PopulatedEvaluation, 'id' | 'completedAt' | 'reviewers' | 'result' | 'isReviewer'>;
   refreshProposal?: VoidFunction;
+  confirmationMessage?: string;
   isCurrent: boolean;
+  archived?: boolean;
 };
 
 export function PassFailEvaluation({
   proposalId,
   hideReviewer,
-  isReviewer,
   evaluation,
   isCurrent,
-  refreshProposal
+  refreshProposal,
+  confirmationMessage,
+  archived
 }: Props) {
-  const { trigger } = useSubmitEvaluationResult({ proposalId });
+  const { trigger, isMutating } = useSubmitEvaluationResult({ proposalId });
 
   const reviewerOptions = evaluation.reviewers.map((reviewer) => ({
     group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
     id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
   }));
+  const { showConfirmation } = useConfirmationModal();
   const { showMessage } = useSnackbar();
 
   const completedDate = evaluation.completedAt ? getRelativeTimeInThePast(new Date(evaluation.completedAt)) : null;
   const disabledTooltip = !isCurrent
     ? 'This evaluation step is not active'
-    : !isReviewer
+    : !evaluation.isReviewer
     ? 'You are not a reviewer'
+    : isMutating
+    ? 'Submitting review'
+    : archived
+    ? 'You cannot move an archived proposal'
     : null;
 
   async function onSubmitReview(result: NonNullable<PopulatedEvaluation['result']>) {
+    if (confirmationMessage) {
+      const { confirmed } = await showConfirmation({
+        message: confirmationMessage,
+        confirmButton: result === 'pass' ? 'Approve' : 'Decline'
+      });
+      if (!confirmed) {
+        return;
+      }
+    }
     try {
       await trigger({
         evaluationId: evaluation.id,

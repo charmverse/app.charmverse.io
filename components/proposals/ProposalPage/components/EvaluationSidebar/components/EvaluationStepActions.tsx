@@ -14,6 +14,7 @@ type Props = {
   isPreviousStep: boolean;
   refreshProposal?: VoidFunction;
   openSettings?: () => void;
+  archived?: boolean;
 };
 
 const preventAccordionToggle = (e: any) => e.stopPropagation();
@@ -24,7 +25,8 @@ export function EvaluationStepActions({
   evaluation,
   isPreviousStep,
   openSettings,
-  refreshProposal
+  refreshProposal,
+  archived
 }: Props) {
   return (
     <Box display='flex' gap={1} onClick={preventAccordionToggle}>
@@ -32,12 +34,13 @@ export function EvaluationStepActions({
         <GoBackButton
           proposalId={proposalId}
           previousStep={evaluation}
+          archived={archived}
           hasMovePermission={!!permissions?.move}
           onSubmit={refreshProposal}
         />
       )}
 
-      {evaluation?.type !== 'feedback' && (
+      {evaluation && !archived && (
         <Tooltip
           disableInteractive
           title={!permissions?.edit ? 'You do not have permission to edit this evaluation' : 'Edit'}

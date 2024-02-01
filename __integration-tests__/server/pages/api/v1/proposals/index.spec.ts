@@ -28,7 +28,7 @@ type UserWithDetails = User & {
   googleAccounts: GoogleAccount[];
 };
 
-let proposal: ProposalWithDetails;
+let proposal: ProposalWithDetails & { evaluations: { id: string }[] };
 let draftProposal: ProposalWithDetails;
 let privateDraftProposal: ProposalWithDetails;
 let proposalAuthor: UserWithDetails;
@@ -101,7 +101,7 @@ beforeAll(async () => {
   proposal = (await prisma.proposal.create({
     data: {
       createdBy: proposalAuthor.id,
-      status: 'vote_active',
+      status: 'published',
       space: { connect: { id: space.id } },
       page: {
         create: {
@@ -133,23 +133,34 @@ beforeAll(async () => {
           author: { connect: { id: proposalAuthor.id } }
         }
       },
-      reviewers: {
-        createMany: {
-          data: [
-            {
-              userId: proposalReviewer.id
-            },
-            {
-              roleId: reviewerRole.id
-            }
-          ]
+      evaluations: {
+        create: {
+          type: 'pass_fail',
+          index: 0,
+          title: 'pass_fail'
         }
       }
     },
     include: {
-      page: true
+      page: true,
+      evaluations: true
     }
-  })) as ProposalWithDetails;
+  })) as ProposalWithDetails & { evaluations: { id: string }[] };
+
+  await prisma.proposalReviewer.createMany({
+    data: [
+      {
+        evaluationId: proposal.evaluations[0].id,
+        proposalId: proposal.id,
+        userId: proposalReviewer.id
+      },
+      {
+        evaluationId: proposal.evaluations[0].id,
+        proposalId: proposal.id,
+        roleId: reviewerRole.id
+      }
+    ]
+  });
 
   await prisma.vote.create({
     data: {
@@ -363,7 +374,7 @@ describe('GET /api/v1/proposals', () => {
     const deletedProposal = await prisma.proposal.create({
       data: {
         createdBy: space2User.id,
-        status: 'discussion',
+        status: 'published',
         space: { connect: { id: space2.id } },
         page: {
           create: {
@@ -416,7 +427,7 @@ describe('GET /api/v1/proposals', () => {
       spaceId: secondSpace.id,
       userId: secondSpaceUser.id,
       authors: [secondSpaceUser.id],
-      proposalStatus: 'discussion'
+      proposalStatus: 'published'
     });
 
     const otherSuperApiKey = await generateSuperApiKey({ spaceId: secondSpace.id });

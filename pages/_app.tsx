@@ -15,6 +15,7 @@ import { SWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
 import { BaseAuthenticateProviders } from 'components/_app/BaseAuthenticateProviders';
+import { Snackbar } from 'components/_app/components/Snackbar';
 import { GlobalComponents } from 'components/_app/GlobalComponents';
 import { LocalizationProvider } from 'components/_app/LocalizationProvider';
 import type { OpenGraphProps } from 'components/_app/OpenGraphData';
@@ -26,10 +27,11 @@ import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import IntlProvider from 'components/common/IntlProvider';
 import ReactDndProvider from 'components/common/ReactDndProvider';
 import RouteGuard from 'components/common/RouteGuard';
-import Snackbar from 'components/common/Snackbar';
 import { UserProfileProvider } from 'components/members/hooks/useMemberDialog';
+import { ProposalsProvider } from 'components/proposals/hooks/useProposals';
 import { RewardsProvider } from 'components/rewards/hooks/useRewards';
 import { isDevEnv, isProdEnv } from 'config/constants';
+import { ConfirmationModalProvider } from 'hooks/useConfirmationModal';
 import { CurrentSpaceProvider } from 'hooks/useCurrentSpace';
 import { DiscordProvider } from 'hooks/useDiscordConnection';
 import { PostCategoriesProvider } from 'hooks/useForumCategories';
@@ -47,6 +49,7 @@ import { SnackbarProvider } from 'hooks/useSnackbar';
 import { SpacesProvider } from 'hooks/useSpaces';
 import { UserProvider } from 'hooks/useUser';
 import { useUserAcquisition } from 'hooks/useUserAcquisition';
+import { VerifyLoginOtpProvider } from 'hooks/useVerifyLoginOtp';
 import { Web3AccountProvider } from 'hooks/useWeb3Account';
 import { WebSocketClientProvider } from 'hooks/useWebSocketClient';
 import { AppThemeProvider } from 'theme/AppThemeProvider';
@@ -64,9 +67,7 @@ import 'components/common/BoardEditor/focalboard/src/components/kanban/calculati
 import 'components/common/BoardEditor/focalboard/src/components/kanban/kanban.scss';
 import 'components/common/BoardEditor/focalboard/src/components/kanban/kanbanCard.scss';
 import 'components/common/BoardEditor/focalboard/src/components/kanban/kanbanColumn.scss';
-import 'components/common/BoardEditor/focalboard/src/components/properties/createdAt/createdAt.scss';
 import 'components/common/BoardEditor/focalboard/src/components/properties/dateRange/dateRange.scss';
-import 'components/common/BoardEditor/focalboard/src/components/properties/lastModifiedAt/lastModifiedAt.scss';
 import 'components/common/BoardEditor/focalboard/src/components/properties/link/link.scss';
 import 'components/common/BoardEditor/focalboard/src/components/table/calculation/calculationRow.scss';
 import 'components/common/BoardEditor/focalboard/src/components/table/horizontalGrip.scss';
@@ -160,42 +161,44 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
   return (
     <AppThemeProvider>
       <SnackbarProvider>
-        <ReactDndProvider>
-          <DataProviders>
-            <SettingsDialogProvider>
-              <LocalizationProvider>
-                <NotionProvider>
-                  <IntlProvider>
-                    <DbViewSettingsProvider>
-                      <PageHead {...pageProps} />
+        <ConfirmationModalProvider>
+          <ReactDndProvider>
+            <DataProviders>
+              <SettingsDialogProvider>
+                <LocalizationProvider>
+                  <NotionProvider>
+                    <IntlProvider>
+                      <DbViewSettingsProvider>
+                        <PageHead {...pageProps} />
 
-                      <RouteGuard>
-                        <ErrorBoundary>
-                          <Snackbar
-                            isOpen={isOldBuild}
-                            message='New CharmVerse platform update available. Please refresh.'
-                            actions={[
-                              <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                <RefreshIcon fontSize='small' />
-                              </IconButton>
-                            ]}
-                            origin={{ vertical: 'top', horizontal: 'center' }}
-                            severity='warning'
-                            handleClose={() => setIsOldBuild(false)}
-                          />
+                        <RouteGuard>
+                          <ErrorBoundary>
+                            <Snackbar
+                              isOpen={isOldBuild}
+                              message='New CharmVerse platform update available. Please refresh.'
+                              actions={[
+                                <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                  <RefreshIcon fontSize='small' />
+                                </IconButton>
+                              ]}
+                              origin={{ vertical: 'top', horizontal: 'center' }}
+                              severity='warning'
+                              handleClose={() => setIsOldBuild(false)}
+                            />
 
-                          {getLayout(<Component {...pageProps} />)}
+                            {getLayout(<Component {...pageProps} />)}
 
-                          <GlobalComponents />
-                        </ErrorBoundary>
-                      </RouteGuard>
-                    </DbViewSettingsProvider>
-                  </IntlProvider>
-                </NotionProvider>
-              </LocalizationProvider>
-            </SettingsDialogProvider>
-          </DataProviders>
-        </ReactDndProvider>
+                            <GlobalComponents />
+                          </ErrorBoundary>
+                        </RouteGuard>
+                      </DbViewSettingsProvider>
+                    </IntlProvider>
+                  </NotionProvider>
+                </LocalizationProvider>
+              </SettingsDialogProvider>
+            </DataProviders>
+          </ReactDndProvider>
+        </ConfirmationModalProvider>
       </SnackbarProvider>
     </AppThemeProvider>
   );
@@ -216,42 +219,44 @@ function DataProviders({ children }: { children: ReactNode }) {
       }}
     >
       <UserProvider>
-        <DiscordProvider>
-          <WagmiProvider>
-            <Web3ConnectionManager>
-              <WalletSelectorModal />
-              <Web3AccountProvider>
-                <SpacesProvider>
-                  <CurrentSpaceProvider>
-                    <PostCategoriesProvider>
-                      <IsSpaceMemberProvider>
-                        <WebSocketClientProvider>
-                          <MembersProvider>
-                            <RewardsProvider>
+        <VerifyLoginOtpProvider>
+          <DiscordProvider>
+            <WagmiProvider>
+              <Web3ConnectionManager>
+                <WalletSelectorModal />
+                <Web3AccountProvider>
+                  <SpacesProvider>
+                    <CurrentSpaceProvider>
+                      <PostCategoriesProvider>
+                        <IsSpaceMemberProvider>
+                          <WebSocketClientProvider>
+                            <MembersProvider>
                               <PaymentMethodsProvider>
                                 <FocalBoardProvider>
                                   <PagesProvider>
-                                    <MemberPropertiesProvider>
-                                      <LensProvider config={lensConfig}>
-                                        <UserProfileProvider>
-                                          <PageTitleProvider>{children}</PageTitleProvider>
-                                        </UserProfileProvider>
-                                      </LensProvider>
-                                    </MemberPropertiesProvider>
+                                    <RewardsProvider>
+                                      <MemberPropertiesProvider>
+                                        <LensProvider config={lensConfig}>
+                                          <UserProfileProvider>
+                                            <PageTitleProvider>{children}</PageTitleProvider>
+                                          </UserProfileProvider>
+                                        </LensProvider>
+                                      </MemberPropertiesProvider>
+                                    </RewardsProvider>
                                   </PagesProvider>
                                 </FocalBoardProvider>
                               </PaymentMethodsProvider>
-                            </RewardsProvider>
-                          </MembersProvider>
-                        </WebSocketClientProvider>
-                      </IsSpaceMemberProvider>
-                    </PostCategoriesProvider>
-                  </CurrentSpaceProvider>
-                </SpacesProvider>
-              </Web3AccountProvider>
-            </Web3ConnectionManager>
-          </WagmiProvider>
-        </DiscordProvider>
+                            </MembersProvider>
+                          </WebSocketClientProvider>
+                        </IsSpaceMemberProvider>
+                      </PostCategoriesProvider>
+                    </CurrentSpaceProvider>
+                  </SpacesProvider>
+                </Web3AccountProvider>
+              </Web3ConnectionManager>
+            </WagmiProvider>
+          </DiscordProvider>
+        </VerifyLoginOtpProvider>
       </UserProvider>
     </SWRConfig>
   );

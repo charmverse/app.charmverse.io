@@ -1,27 +1,29 @@
-import type { ProposalWorkflow, Space, User } from '@charmverse/core/prisma-client';
+import type { ProposalSystemRole, ProposalWorkflow, Role, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
-import { testUtilsSpaces } from '@charmverse/core/test';
+import { testUtilsMembers, testUtilsSpaces } from '@charmverse/core/test';
 import { expect, test } from '__e2e__/utils/test';
 import { v4 as uuid } from 'uuid';
 
-import { generateUser, generateUserAndSpace, loginBrowserUser } from '../utils/mocks';
+import { generateUserAndSpace, loginBrowserUser } from '../utils/mocks';
 
 test.describe.serial('Proposal Evaluation', () => {
   let space: Space;
   let admin: User;
-  let member: User;
-  let proposalInfo: {
-    id: string;
-    path: string;
-  };
+  let role: Role;
 
   const settingsToTest = {
     proposalTitle: 'Proposal test title',
+    rubricLabel: 'Rubric criteria label',
+    rubricDescription: 'Rubric criteria description',
+    rubricMinScore: 1,
+    rubricMaxScore: 10,
+    voteDuration: 12,
+    votePassThreshold: 70,
     evaluationFeedbackTitle: 'Feedback Eval',
-    testTextValue: 'Test text when creating draft',
-    secondTextValue: 'Second text after proposal exists',
-    memberTextValue: 'Member text value'
+    evaluationPassFailTitle: 'Pass/Fail Eval',
+    evaluationRubricTitle: 'Rubric Eval',
+    evaluationVoteTitle: 'Community Vote Eval'
   };
 
   const proposalEvaluationPermissions: WorkflowEvaluationJson[] = [
@@ -33,6 +35,33 @@ test.describe.serial('Proposal Evaluation', () => {
         { operation: 'view', systemRole: 'space_member' }
       ],
       type: 'feedback'
+    },
+    {
+      id: uuid(),
+      title: settingsToTest.evaluationRubricTitle,
+      permissions: [
+        { systemRole: 'all_reviewers', operation: 'comment' },
+        { operation: 'view', systemRole: 'space_member' }
+      ],
+      type: 'rubric'
+    },
+    {
+      id: uuid(),
+      title: settingsToTest.evaluationPassFailTitle,
+      permissions: [
+        { systemRole: 'all_reviewers', operation: 'comment' },
+        { operation: 'view', systemRole: 'space_member' }
+      ],
+      type: 'pass_fail'
+    },
+    {
+      id: uuid(),
+      title: settingsToTest.evaluationVoteTitle,
+      permissions: [
+        { systemRole: 'all_reviewers', operation: 'comment' },
+        { operation: 'view', systemRole: 'space_member' }
+      ],
+      type: 'vote'
     }
   ];
 
@@ -45,9 +74,6 @@ test.describe.serial('Proposal Evaluation', () => {
       skipOnboarding: true,
       spaceDomain: `cvt-${uuid()}`
     }));
-    member = await generateUser({
-      space: { id: space.id }
-    });
     await testUtilsSpaces.addSpaceOperations({
       forSpaceId: space.id,
       spaceId: space.id,
@@ -61,13 +87,12 @@ test.describe.serial('Proposal Evaluation', () => {
         evaluations: proposalEvaluationPermissions
       }
     });
+    role = await testUtilsMembers.generateRole({
+      createdBy: admin.id,
+      spaceId: space.id
+    });
   });
-  test('An admin can create new custom properties', async ({
-    proposalListPage,
-    documentPage,
-    proposalPage,
-    databasePage
-  }) => {
+  test('A user creates a proposal that uses a workflow', async ({ proposalListPage, documentPage, proposalPage }) => {
     // Initial setup
     await loginBrowserUser({
       browserPage: proposalListPage.page,
@@ -96,15 +121,24 @@ test.describe.serial('Proposal Evaluation', () => {
     // Move into configuring the actual evaluation
     await expect(proposalPage.evaluationSettingsSidebar).toBeVisible();
 
-    await proposalPage.addCardPropertyButton.click();
+    // Configure rubric
+    await proposalPage.selectEvaluationReviewer('rubric', 'space_member' as ProposalSystemRole);
 
-    await databasePage.getPropertyTypeOptionLocator({ type: 'text' }).click();
+    await proposalPage.addRubricCriteriaButton.click();
 
-    const textInput = databasePage.getCardDetailsTextInput();
+    await proposalPage.editRubricCriteriaLabel.fill(settingsToTest.rubricLabel);
+    await proposalPage.editRubricCriteriaDescription.fill(settingsToTest.rubricDescription);
+    await proposalPage.editRubricCriteriaMinScore.fill(settingsToTest.rubricMinScore.toString());
+    await proposalPage.editRubricCriteriaMaxScore.fill(settingsToTest.rubricMaxScore.toString());
 
-    await textInput.fill(settingsToTest.testTextValue);
+    // Configure review
+    await proposalPage.selectEvaluationReviewer('pass_fail', role.id);
 
-    await expect(textInput).toBeVisible();
+    // Configure vote
+    await proposalPage.selectEvaluationReviewer('vote', 'space_member');
+
+    await proposalPage.evaluationVoteDurationInput.fill(settingsToTest.voteDuration.toString());
+    await proposalPage.evaluationVotePassThresholdInput.fill(settingsToTest.votePassThreshold.toString());
 
     proposalPage.saveDraftButton.click();
 
@@ -132,130 +166,122 @@ test.describe.serial('Proposal Evaluation', () => {
       }
     });
 
-    proposalInfo = {
-      id: proposal.id,
-      path: proposal.page!.path
-    };
+    await documentPage.waitForDocumentPage({ domain: space.domain, path: proposal.page?.path as string });
 
-    // Make sure value was persisted in the database
-    expect(Object.values(proposal.fields as any).some((val) => val === settingsToTest.testTextValue));
+    expect(proposal.page?.title).toBe(settingsToTest.proposalTitle);
 
-    await documentPage.waitForDocumentPage({
-      domain: space.domain,
-      path: proposal.page!.path
-    });
-  });
+    expect(proposal.workflowId).toBe(workflow.id);
 
-  test('Admin can edit custom properties', async ({ documentPage, databasePage }) => {
-    await loginBrowserUser({
-      browserPage: documentPage.page,
-      userId: admin.id
-    });
+    expect(proposal.evaluations[0]).toMatchObject(
+      expect.objectContaining({
+        type: 'feedback',
+        index: 0,
+        proposalId: proposal.id,
+        title: settingsToTest.evaluationFeedbackTitle,
+        reviewers: [
+          {
+            evaluationId: expect.any(String),
+            id: expect.any(String),
+            proposalId: proposal.id,
+            roleId: null,
+            userId: null,
+            systemRole: 'author'
+          }
+        ],
+        rubricCriteria: [],
+        permissions: expect.arrayContaining(
+          proposalEvaluationPermissions[0].permissions.map((p) => expect.objectContaining(p))
+        )
+      })
+    );
+    expect(proposal.evaluations[1]).toMatchObject(
+      expect.objectContaining({
+        reviewers: expect.arrayContaining([
+          expect.objectContaining({
+            proposalId: proposal.id,
+            roleId: null,
+            userId: null,
+            systemRole: 'space_member'
+          })
+        ]),
+        permissions: expect.arrayContaining(
+          proposalEvaluationPermissions[1].permissions.map((p) => expect.objectContaining(p))
+        ),
+        type: 'rubric',
+        index: 1,
+        proposalId: proposal.id,
+        title: settingsToTest.evaluationRubricTitle,
+        rubricCriteria: expect.arrayContaining([
+          expect.objectContaining({
+            title: settingsToTest.rubricLabel,
+            description: settingsToTest.rubricDescription,
+            type: 'range',
+            index: 0,
+            proposalId: proposal.id,
+            parameters: {
+              max: settingsToTest.rubricMaxScore,
+              min: settingsToTest.rubricMinScore
+            }
+          })
+        ])
+      })
+    );
 
-    await documentPage.goToPage({
-      domain: space.domain,
-      path: proposalInfo.path
-    });
-
-    const textInputOnFirstReload = databasePage.getCardDetailsTextInput();
-
-    await expect(textInputOnFirstReload).toBeVisible();
-    const firstValue = await textInputOnFirstReload.inputValue();
-
-    // Ensure the value loaded
-    await expect(firstValue).toEqual(settingsToTest.testTextValue);
-
-    // Set the second value
-    await textInputOnFirstReload.fill(settingsToTest.secondTextValue);
-
-    // We need to click elsewhere for the input value to propagate
-    await documentPage.documentTitle.click();
-
-    await documentPage.page.waitForTimeout(1000);
-
-    // await documentPage.page.pause();
-
-    await documentPage.page.reload({ waitUntil: 'domcontentloaded' });
-
-    const textInputOnSecondLoad = databasePage.getCardDetailsTextInput();
-
-    const secondValue = await textInputOnSecondLoad.inputValue();
-
-    // Ensure the value loaded
-    await expect(secondValue).toEqual(settingsToTest.secondTextValue);
-  });
-
-  test('A member can set values in their proposal for custom properties created by the admin', async ({
-    proposalListPage,
-    documentPage,
-    proposalPage,
-    databasePage
-  }) => {
-    // Initial setup
-    await loginBrowserUser({
-      browserPage: proposalListPage.page,
-      userId: member.id
-    });
-
-    await proposalListPage.goToProposals(space.domain);
-
-    await proposalListPage.waitForProposalsList();
-
-    await proposalListPage.createProposalButton.click();
-
-    await expect(documentPage.charmEditor).toBeVisible();
-
-    // Configure proposal settings
-    await documentPage.documentTitle.click();
-
-    await documentPage.documentTitle.locator('textarea').first().fill(settingsToTest.proposalTitle);
-
-    await documentPage.charmEditor.fill('This is a test proposal');
-
-    // Workflow auto-selected when loading the proposal
-    const workflowSelectTextContent = await proposalPage.workflowSelect.textContent();
-    expect(workflowSelectTextContent).toBe(workflow.title);
-
-    // Move into configuring the actual evaluation
-    await expect(proposalPage.evaluationSettingsSidebar).toBeVisible();
-
-    // members cannot see the option to add a custom property. They can only fill existing properties
-    await expect(proposalPage.addCardPropertyButton).not.toBeVisible();
-
-    const textInput = databasePage.getCardDetailsTextInput();
-
-    await textInput.fill(settingsToTest.memberTextValue);
-
-    await expect(textInput).toBeVisible();
-
-    proposalPage.saveDraftButton.click();
-
-    await proposalPage.page.waitForResponse('**/api/proposals');
-
-    // Test proposal data at the database level to ensure correct persistence
-    const memberProposal = await prisma.proposal.findFirstOrThrow({
-      where: {
-        createdBy: member.id,
-        spaceId: space.id,
-        page: {
-          title: settingsToTest.proposalTitle,
-          type: 'proposal'
+    expect(proposal.evaluations[2]).toMatchObject({
+      reviewers: [
+        {
+          evaluationId: expect.any(String),
+          id: expect.any(String),
+          proposalId: proposal.id,
+          roleId: role.id,
+          userId: null,
+          systemRole: null
         }
-      },
-      include: {
-        evaluations: {
-          include: {
-            reviewers: true,
-            permissions: true,
-            rubricCriteria: true
-          },
-          orderBy: { index: 'asc' }
-        },
-        page: true
-      }
+      ],
+      permissions: expect.arrayContaining(
+        proposalEvaluationPermissions[2].permissions.map((p) => expect.objectContaining(p))
+      ),
+      type: 'pass_fail',
+      index: 2,
+      proposalId: proposal.id,
+      result: null,
+      snapshotExpiry: null,
+      snapshotId: null,
+      title: settingsToTest.evaluationPassFailTitle,
+      rubricCriteria: []
     });
 
-    // Make sure value was persisted in the database
-    expect(Object.values(memberProposal.fields as any).some((val) => val === settingsToTest.testTextValue));
+    expect(proposal.evaluations[3]).toMatchObject({
+      reviewers: [
+        {
+          evaluationId: expect.any(String),
+          id: expect.any(String),
+          proposalId: proposal.id,
+          roleId: null,
+          userId: null,
+          systemRole: 'space_member'
+        }
+      ],
+      permissions: expect.arrayContaining(
+        proposalEvaluationPermissions[3].permissions.map((p) => expect.objectContaining(p))
+      ),
+      type: 'vote',
+      index: 3,
+      proposalId: proposal.id,
+      result: null,
+      snapshotExpiry: null,
+      snapshotId: null,
+      title: settingsToTest.evaluationVoteTitle,
+      voteId: null,
+      voteSettings: {
+        durationDays: settingsToTest.voteDuration,
+        maxChoices: 1,
+        options: ['Yes', 'No', 'Abstain'],
+        publishToSnapshot: false,
+        threshold: settingsToTest.votePassThreshold,
+        type: 'Approval'
+      },
+      rubricCriteria: []
+    });
   });
 });

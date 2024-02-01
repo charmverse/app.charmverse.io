@@ -167,7 +167,6 @@ type CharmEditorProps = {
   colorMode?: 'dark';
   content?: PageContent;
   autoFocus?: boolean;
-  children?: ReactNode;
   enableSuggestingMode?: boolean;
   onContentChange?: UpdatePageContent;
   readOnly?: boolean;
@@ -196,13 +195,13 @@ type CharmEditorProps = {
   disableVideo?: boolean;
   setEditorState?: (state: EditorState) => void; // this is used to pass the state to the suggestions sidebar
   threadIds?: string[];
+  registerView?: (view: EditorView) => void;
 };
 
 function CharmEditor({
   colorMode,
   enableSuggestingMode = false,
   content,
-  children,
   onContentChange,
   style,
   readOnly = false,
@@ -228,7 +227,8 @@ function CharmEditor({
   disableVideo = false,
   sidebarView,
   setSidebarView,
-  threadIds
+  threadIds,
+  registerView
 }: CharmEditorProps) {
   const router = useRouter();
   const { showMessage } = useSnackbar();
@@ -396,6 +396,7 @@ function CharmEditor({
       readOnly={readOnly}
       enableComments={enableComments}
       onConnectionEvent={onConnectionEvent}
+      registerView={registerView}
       style={{
         ...(style ?? {}),
         width: '100%',
@@ -477,10 +478,10 @@ function CharmEditor({
             return !disableMention && <Mention {...props}>{_children}</Mention>;
           }
           case 'page': {
-            return <NestedPage currentPageId={pageId} {...props} />;
+            return <NestedPage {...props} />;
           }
           case 'linkedPage': {
-            return <NestedPage isLinkedPage currentPageId={pageId} {...props} />;
+            return <NestedPage isLinkedPage {...props} />;
           }
           case 'pdf': {
             return <ResizablePDF {...allProps} />;
@@ -538,7 +539,6 @@ function CharmEditor({
         enableVoting={enableVoting}
         pageId={pageId}
       />
-      {children}
       {!disablePageSpecificFeatures && (
         <span className='font-family-default'>
           <InlineCommentThread

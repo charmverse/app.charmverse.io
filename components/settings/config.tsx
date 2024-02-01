@@ -6,6 +6,7 @@ import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import SettingsIcon from '@mui/icons-material/WorkOutline';
+import MedalIcon from '@mui/icons-material/WorkspacePremium';
 
 import { ProposalIcon } from 'components/common/PageIcon';
 
@@ -18,6 +19,7 @@ export const SPACE_SETTINGS_TABS = [
   { icon: <FileDownloadOutlinedIcon fontSize='small' />, path: 'import', label: 'Import' },
   { icon: <CloudSyncOutlinedIcon fontSize='small' />, path: 'api', label: 'API' },
   { icon: <CreditCardIcon fontSize='small' />, path: 'subscription', label: 'Billing' },
+  { icon: <MedalIcon fontSize='small' />, path: 'credentials', label: 'Credentials' },
   { icon: <ProposalIcon fontSize='small' />, path: 'proposals', label: 'Proposals' }
 ] as const;
 
@@ -33,3 +35,4 @@ export const ACCOUNT_TABS = [
 ] as const;
 
 export type UserSettingsTab = (typeof ACCOUNT_TABS)[number];
+export type AccountSettingsSection = UserSettingsTab['path'];

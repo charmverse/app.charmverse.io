@@ -1,7 +1,9 @@
 import type { Space, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsProposals } from '@charmverse/core/test';
 
 import { InvalidStateError } from 'lib/middleware';
-import { createProposalWithUsers, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { updateProposal } from '../updateProposal';
 
@@ -10,7 +12,6 @@ let author2: User;
 let reviewer1: User;
 let reviewer2: User;
 let space: Space;
-
 beforeAll(async () => {
   const { user: user1, space: generatedSpace } = await generateUserAndSpaceWithApiToken();
   const { user: user2 } = await generateUserAndSpaceWithApiToken();
@@ -27,18 +28,40 @@ beforeAll(async () => {
 describe('Update proposal specific data', () => {
   it('Should throw error if at least one author is not selected for a proposal', async () => {
     // Create a test proposal first
-    const result = await createProposalWithUsers({
+    const result = await testUtilsProposals.generateProposal({
       spaceId: space.id,
-      userId: author1.id,
-      authors: [],
-      reviewers: [reviewer2.id]
+      userId: author1.id
     });
 
     await expect(
       updateProposal({
         proposalId: result.id,
-        authors: []
+        authors: [],
+        actorId: author1.id
       })
     ).rejects.toBeInstanceOf(InvalidStateError);
+  });
+
+  it('Should not throw error if at least one author is not selected for a proposal template', async () => {
+    // Create a test proposal first
+    const result = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: author1.id
+    });
+    // TODO: allow setting page type in mock util
+    await prisma.page.update({
+      where: {
+        id: result.page.id
+      },
+      data: {
+        type: 'proposal_template'
+      }
+    });
+
+    await updateProposal({
+      proposalId: result.id,
+      authors: [],
+      actorId: author1.id
+    });
   });
 });

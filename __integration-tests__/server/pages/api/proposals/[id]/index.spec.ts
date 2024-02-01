@@ -7,10 +7,8 @@ import { v4 } from 'uuid';
 
 import type { FormFieldInput } from 'components/common/form/interfaces';
 import { createForm } from 'lib/form/createForm';
-import { addSpaceOperations } from 'lib/permissions/spaces/addSpaceOperations';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateRole } from 'testing/setupDatabase';
 
 let author: User;
 let reviewer: User;
@@ -52,15 +50,15 @@ describe('GET /api/proposals/[id] - Get proposal', () => {
             proposalId: generatedProposal.id,
             userId: author.id
           })
-        ]),
-        reviewers: [
-          expect.objectContaining({
-            id: expect.any(String),
-            roleId: null,
-            proposalId: generatedProposal.id,
-            userId: reviewer.id
-          })
-        ]
+        ])
+        // reviewers: [
+        //   expect.objectContaining({
+        //     id: expect.any(String),
+        //     roleId: null,
+        //     proposalId: generatedProposal.id,
+        //     userId: reviewer.id
+        //   })
+        // ]
       })
     );
   });
@@ -108,14 +106,14 @@ describe('GET /api/proposals/[id] - Get proposal', () => {
             userId: author.id
           })
         ]),
-        reviewers: [
-          expect.objectContaining({
-            id: expect.any(String),
-            roleId: null,
-            proposalId: generatedProposal.id,
-            userId: reviewer.id
-          })
-        ],
+        // reviewers: [
+        //   expect.objectContaining({
+        //     id: expect.any(String),
+        //     roleId: null,
+        //     proposalId: generatedProposal.id,
+        //     userId: reviewer.id
+        //   })
+        // ],
         form: {
           id: formId,
           formFields: expect.arrayContaining(fieldsInput.map((field) => expect.objectContaining({ ...field, formId })))
@@ -197,7 +195,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     const { page } = await testUtilsProposals.generateProposal({
       userId: proposalAuthor.id,
       spaceId: adminSpace.id,
-      proposalStatus: 'discussion'
+      proposalStatus: 'published'
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {

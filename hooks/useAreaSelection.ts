@@ -2,18 +2,20 @@ import { useTheme } from '@emotion/react';
 import type { RefObject } from 'react';
 import { createContext, useCallback, useEffect, useRef, useState } from 'react';
 
-interface Coordinates {
+type Coordinates = {
   x: number;
   y: number;
-}
-interface DrawnArea {
+};
+
+type DrawnArea = {
   start: undefined | Coordinates;
   end: undefined | Coordinates;
-}
-interface UseAreaSelectionProps {
-  container: RefObject<HTMLElement> | undefined;
+};
+
+type UseAreaSelectionProps = {
+  innerContainer: RefObject<HTMLElement>;
   readOnly?: boolean;
-}
+};
 
 function createBoxNode(theme: 'dark' | 'light') {
   if (typeof document === 'undefined') return null;
@@ -31,7 +33,9 @@ function createBoxNode(theme: 'dark' | 'light') {
   return boxNode;
 }
 
-export function useAreaSelection({ container = { current: document.body }, readOnly = false }: UseAreaSelectionProps) {
+export function useAreaSelection({ readOnly = false, innerContainer }: UseAreaSelectionProps) {
+  const container = useRef<HTMLElement | null>(null);
+
   const theme = useTheme();
   const boxElement = useRef<HTMLDivElement | null>(createBoxNode(theme.palette.mode));
   const [mouseDown, setMouseDown] = useState<boolean>(false);
@@ -41,10 +45,24 @@ export function useAreaSelection({ container = { current: document.body }, readO
     end: undefined
   });
 
+  const initialOffsetTop = useRef<number>(0);
+  const initialStartY = useRef<number>(0);
+
+  useEffect(() => {
+    if (!container.current) {
+      container.current = document.querySelector('.app-content');
+    }
+  }, []);
+
   const handleMouseMove = (e: MouseEvent) => {
     document.body.style.userSelect = 'none';
+    const offsetTop = (innerContainer.current?.scrollTop || 0) - initialOffsetTop.current;
+
     setDrawArea((prev) => ({
-      ...prev,
+      start: {
+        x: prev.start?.x || e.clientX,
+        y: initialStartY.current - offsetTop
+      },
       end: {
         x: e.clientX,
         y: e.clientY
@@ -52,20 +70,35 @@ export function useAreaSelection({ container = { current: document.body }, readO
     }));
   };
 
+  const handleScroll = () => {
+    const offsetTop = (innerContainer.current?.scrollTop || 0) - initialOffsetTop.current;
+
+    setDrawArea((prev) => ({
+      ...prev,
+      start: {
+        x: prev.start?.x || 0,
+        y: initialStartY.current - offsetTop
+      }
+    }));
+  };
+
   const handleMouseDown = useCallback(
     (e: MouseEvent) => {
       setMouseDown(true);
+      initialOffsetTop.current = innerContainer.current?.scrollTop || 0;
+      initialStartY.current = e.clientY;
 
-      const containerElement = container.current;
       // Skip if the click is on a disable-drag-selection element, don't start the selection box
       const disableDragSelectionElement =
         (e.target as HTMLElement)?.classList.contains('disable-drag-selection') ||
-        (e.target as HTMLElement)?.parentElement?.classList.contains('disable-drag-selection');
+        (e.target as HTMLElement)?.closest('.disable-drag-selection');
 
       if (disableDragSelectionElement) return;
 
-      if (containerElement && containerElement.contains(e.target as HTMLElement)) {
-        document.addEventListener('mousemove', handleMouseMove);
+      if (container?.current && container.current.contains(e.target as HTMLElement)) {
+        container.current.addEventListener('mousemove', handleMouseMove);
+        innerContainer.current?.addEventListener('scroll', handleScroll);
+
         setDrawArea({
           start: {
             x: e.clientX,
@@ -83,9 +116,13 @@ export function useAreaSelection({ container = { current: document.body }, readO
 
   const handleMouseUp = useCallback((e: MouseEvent) => {
     document.body.style.userSelect = 'initial';
-    document.removeEventListener('mousemove', handleMouseMove);
+    container.current?.removeEventListener('mousemove', handleMouseMove);
+    innerContainer.current?.removeEventListener('scroll', handleScroll);
+
     setMouseDown(false);
     setSelection(null);
+    initialOffsetTop.current = 0;
+    initialStartY.current = 0;
   }, []);
 
   const resetState = () => {
@@ -95,6 +132,9 @@ export function useAreaSelection({ container = { current: document.body }, readO
     });
     setSelection(null);
     setMouseDown(false);
+    initialOffsetTop.current = 0;
+    initialStartY.current = 0;
+
     if (boxElement.current && container.current?.contains(boxElement.current)) {
       container.current.removeChild(boxElement.current);
     }
@@ -104,11 +144,12 @@ export function useAreaSelection({ container = { current: document.body }, readO
     const containerElement = container.current;
     if (containerElement && !readOnly) {
       containerElement.addEventListener('mousedown', handleMouseDown);
-      document.addEventListener('mouseup', handleMouseUp);
+
+      container.current?.addEventListener('mouseup', handleMouseUp);
 
       return () => {
         containerElement.removeEventListener('mousedown', handleMouseDown);
-        document.removeEventListener('mouseup', handleMouseUp);
+        container.current?.removeEventListener('mouseup', handleMouseUp);
       };
     }
   }, [container, readOnly]);

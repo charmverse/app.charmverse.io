@@ -18,7 +18,7 @@ beforeAll(async () => {
 });
 
 describe('POST /api/proposals - Create a proposal', () => {
-  it('should allow a space member to create a proposal in a specific category, with page content, reviewers and authors configured and respond with 201', async () => {
+  it('should allow a space member to create a proposal with page content, reviewers and authors configured and respond with 201', async () => {
     const userCookie = await loginUser(user.id);
     const otherUser = await testUtilsUser.generateSpaceUser({
       spaceId: space.id
@@ -28,7 +28,7 @@ describe('POST /api/proposals - Create a proposal', () => {
       spaceId: space.id,
       userId: user.id,
       authors: [user.id, otherUser.id],
-      reviewers: [{ group: 'user', id: user.id }],
+      evaluations: [],
       pageProps: {
         title: 'Proposal title',
         content: { ...emptyDocument },
@@ -48,7 +48,7 @@ describe('POST /api/proposals - Create a proposal', () => {
       spaceId: space.id,
       userId: user.id,
       authors: [user.id],
-      reviewers: [{ group: 'user', id: outsideUser.id }],
+      evaluations: [],
       pageProps: {
         title: 'Proposal title',
         content: { ...emptyDocument },

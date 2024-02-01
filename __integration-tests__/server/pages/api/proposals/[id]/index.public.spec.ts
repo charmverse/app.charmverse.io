@@ -29,8 +29,16 @@ describe('GET /api/proposals/[id] - Get proposal - public space', () => {
       spaceId: space.id,
       userId: author.id,
       authors: [author.id],
-      reviewers: [{ group: 'user', id: reviewer.id }],
-      proposalStatus: 'discussion'
+      evaluationInputs: [
+        {
+          index: 0,
+          title: 'test',
+          reviewers: [{ group: 'user', id: reviewer.id }],
+          evaluationType: 'pass_fail',
+          permissions: []
+        }
+      ],
+      proposalStatus: 'published'
     });
     // Unauthenticated request
     const proposal = (await request(baseUrl).get(`/api/proposals/${generatedProposal.id}`).expect(200))
@@ -41,21 +49,13 @@ describe('GET /api/proposals/[id] - Get proposal - public space', () => {
         id: expect.any(String),
         spaceId: space.id,
         createdBy: author.id,
-        status: 'discussion',
+        status: 'published',
         authors: expect.arrayContaining([
           expect.objectContaining({
             proposalId: generatedProposal.id,
             userId: author.id
           })
-        ]),
-        reviewers: [
-          expect.objectContaining({
-            id: expect.any(String),
-            roleId: null,
-            proposalId: generatedProposal.id,
-            userId: reviewer.id
-          })
-        ]
+        ])
       })
     );
   });
@@ -151,10 +151,13 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     const proposalTemplate = await testUtilsProposals.generateProposalTemplate({
       spaceId: adminSpace.id,
       userId: adminUser.id,
-      reviewers: [
+      evaluationInputs: [
         {
-          group: 'user',
-          id: adminUser.id
+          index: 0,
+          title: 'test',
+          reviewers: [{ group: 'user', id: adminUser.id }],
+          evaluationType: 'pass_fail',
+          permissions: []
         }
       ]
     });

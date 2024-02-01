@@ -1,6 +1,5 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import type { Proposal, Space, User } from '@charmverse/core/prisma-client';
-import { prisma } from '@charmverse/core/prisma-client';
+import type { Space, User } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 as uuid } from 'uuid';
 
@@ -16,7 +15,7 @@ import { upsertRubricCriteria } from '../upsertRubricCriteria';
 describe('upsertRubricAnswers', () => {
   let user: User;
   let space: Space;
-  let proposal: Proposal;
+  let proposal: Awaited<ReturnType<typeof testUtilsProposals.generateProposal>>;
 
   let vibeCriteria: ProposalRubricCriteriaWithTypedParams<'range'>;
   let scoreCriteria: ProposalRubricCriteriaWithTypedParams<'range'>;
@@ -25,16 +24,18 @@ describe('upsertRubricAnswers', () => {
     const generated = await testUtilsUser.generateUserAndSpace({});
     user = generated.user;
     space = generated.space;
-    proposal = await testUtilsProposals.generateProposal({
+    proposal = await rubricProposal({
       spaceId: space.id,
       userId: user.id
     });
     const criteria = await upsertRubricCriteria({
       proposalId: proposal.id,
+      evaluationId: proposal.evaluations[0].id,
       rubricCriteria: [
         { title: 'score', type: 'range', parameters: { max: 10, min: 1 } },
         { title: 'vibe', type: 'range', parameters: { max: 10, min: 1 } }
-      ]
+      ],
+      actorId: user.id
     });
 
     vibeCriteria = criteria.find((c) => c.title === 'vibe') as ProposalRubricCriteriaWithTypedParams;
@@ -46,6 +47,7 @@ describe('upsertRubricAnswers', () => {
 
     await upsertRubricAnswers({
       answers: [{ rubricCriteriaId: scoreCriteria.id, response: { score: 7 }, comment: 'first' }],
+      evaluationId: proposal.evaluations[0].id,
       userId: evaluator.id,
       proposalId: proposal.id
     });
@@ -62,6 +64,7 @@ describe('upsertRubricAnswers', () => {
 
     await upsertRubricAnswers({
       answers: [{ rubricCriteriaId: scoreCriteria.id, response: { score: 6 }, comment: 'second' }],
+      evaluationId: proposal.evaluations[0].id,
       userId: evaluator.id,
       proposalId: proposal.id
     });
@@ -79,6 +82,7 @@ describe('upsertRubricAnswers', () => {
     await upsertRubricAnswers({
       answers: [{ rubricCriteriaId: vibeCriteria.id, response: { score: 7 } }],
       userId: evaluator.id,
+      evaluationId: proposal.evaluations[0].id,
       proposalId: proposal.id
     });
 
@@ -92,7 +96,7 @@ describe('upsertRubricAnswers', () => {
   });
 
   it('should throw an error if some answers are for rubric criteria in a different proposal', async () => {
-    const otherProposal = await testUtilsProposals.generateProposal({ spaceId: space.id, userId: user.id });
+    const otherProposal = await rubricProposal({ spaceId: space.id, userId: user.id });
 
     const evaluator = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
 
@@ -100,6 +104,7 @@ describe('upsertRubricAnswers', () => {
       upsertRubricAnswers({
         answers: [{ rubricCriteriaId: scoreCriteria.id, response: { score: 7 } }],
         userId: evaluator.id,
+        evaluationId: otherProposal.evaluations[0].id,
         proposalId: otherProposal.id
       })
     ).rejects.toBeInstanceOf(InvalidInputError);
@@ -112,6 +117,7 @@ describe('upsertRubricAnswers', () => {
     await expect(
       upsertRubricAnswers({
         answers: [{ rubricCriteriaId: scoreCriteria.id, response: { score: 100000 } }],
+        evaluationId: proposal.evaluations[0].id,
         userId: evaluator.id,
         proposalId: proposal.id
       })
@@ -121,6 +127,7 @@ describe('upsertRubricAnswers', () => {
     await expect(
       upsertRubricAnswers({
         answers: [{ rubricCriteriaId: scoreCriteria.id, response: { score: -5 } }],
+        evaluationId: proposal.evaluations[0].id,
         userId: evaluator.id,
         proposalId: proposal.id
       })
@@ -131,6 +138,7 @@ describe('upsertRubricAnswers', () => {
     await expect(
       upsertRubricAnswers({
         answers: [{ rubricCriteriaId: uuid(), response: { score: 3 } }],
+        evaluationId: proposal.evaluations[0].id,
         userId: user.id,
         proposalId: proposal.id
       })
@@ -142,6 +150,7 @@ describe('upsertRubricAnswers', () => {
 
     await upsertRubricAnswers({
       answers: [{ rubricCriteriaId: scoreCriteria.id, response: { score: 7 }, comment: 'first' }],
+      evaluationId: proposal.evaluations[0].id,
       userId: evaluator.id,
       proposalId: proposal.id,
       isDraft: true
@@ -180,4 +189,29 @@ async function getResponses({
     }
   });
   return answers as ProposalRubricCriteriaAnswerWithTypedResponse[];
+}
+
+function rubricProposal({ userId, spaceId }: { userId: string; spaceId: string }) {
+  return testUtilsProposals.generateProposal({
+    spaceId,
+    userId,
+    proposalStatus: 'draft',
+    evaluationInputs: [
+      {
+        evaluationType: 'rubric',
+        title: 'Rubric',
+        reviewers: [],
+        permissions: [],
+        rubricCriteria: [
+          {
+            title: 'demo',
+            parameters: {
+              max: 4,
+              min: 1
+            }
+          }
+        ]
+      }
+    ]
+  });
 }

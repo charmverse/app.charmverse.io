@@ -103,15 +103,10 @@ describe('Creates rewards for proposal with pending rewards', () => {
         contentText: '',
         title: 'proposal 2'
       },
+      evaluations: [],
       userId: user.id,
       spaceId: space.id,
       authors: [user.id, extraUser.id],
-      reviewers: [
-        {
-          group: 'user',
-          id: reviewerUser.id
-        }
-      ],
       fields: {
         pendingRewards: [
           {

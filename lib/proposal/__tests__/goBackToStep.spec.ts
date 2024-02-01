@@ -26,7 +26,8 @@ describe('goBackToStep()', () => {
 
     await goBackToStep({
       proposalId: proposal.id,
-      evaluationId: 'draft'
+      evaluationId: 'draft',
+      userId: user.id
     });
 
     const updated = await prisma.proposal.findUniqueOrThrow({
@@ -65,7 +66,8 @@ describe('goBackToStep()', () => {
 
     await goBackToStep({
       proposalId: proposal.id,
-      evaluationId: proposal.evaluations[0].id
+      evaluationId: proposal.evaluations[0].id,
+      userId: user.id
     });
 
     const updated = await prisma.proposal.findUniqueOrThrow({
@@ -112,7 +114,8 @@ describe('goBackToStep()', () => {
 
     await goBackToStep({
       proposalId: proposal.id,
-      evaluationId: proposal.evaluations[0].id
+      evaluationId: proposal.evaluations[0].id,
+      userId: user.id
     });
 
     const updated = await prisma.proposal.findUniqueOrThrow({
@@ -162,7 +165,8 @@ describe('goBackToStep()', () => {
     await goBackToStep({
       proposalId: proposal.id,
       // go back to 'feedback' step
-      evaluationId: proposal.evaluations[0].id
+      evaluationId: proposal.evaluations[0].id,
+      userId: user.id
     });
 
     const updated = await prisma.proposal.findUniqueOrThrow({
@@ -219,7 +223,8 @@ describe('goBackToStep()', () => {
     await goBackToStep({
       proposalId: proposal.id,
       // go back to 'feedback' step
-      evaluationId: proposal.evaluations[0].id
+      evaluationId: proposal.evaluations[0].id,
+      userId: user.id
     });
 
     const updated = await prisma.proposal.findUniqueOrThrow({
@@ -271,7 +276,8 @@ describe('goBackToStep()', () => {
       goBackToStep({
         proposalId: proposal.id,
         // go back to 'feedback' step
-        evaluationId: proposal.evaluations[0].id
+        evaluationId: proposal.evaluations[0].id,
+        userId: user.id
       })
     ).rejects.toThrow();
   });
@@ -309,7 +315,8 @@ describe('goBackToStep()', () => {
       goBackToStep({
         proposalId: proposal.id,
         // go back to 'feedback' step
-        evaluationId: proposal.evaluations[0].id
+        evaluationId: proposal.evaluations[0].id,
+        userId: user.id
       })
     ).rejects.toThrow();
   });

@@ -174,7 +174,7 @@ describe('PaidShareToWeb', () => {
     });
     (useGetProposalDetails as jest.Mock<Partial<ReturnType<typeof useGetProposalDetails>>>).mockReturnValueOnce({
       data: {
-        status: 'discussion'
+        status: 'published'
       } as any
     });
 

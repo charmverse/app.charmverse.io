@@ -136,6 +136,7 @@ describe('countProposalBlocks()', () => {
       prisma.proposalRubricCriteria.create({
         data: {
           parameters: [],
+          evaluationId: proposal2.evaluations[0].id,
           proposalId: proposal2.id,
           title: 'First Criteria',
           type: 'range',
@@ -145,6 +146,7 @@ describe('countProposalBlocks()', () => {
       prisma.proposalRubricCriteria.create({
         data: {
           parameters: [],
+          evaluationId: proposal2.evaluations[0].id,
           proposalId: proposal2.id,
           title: 'Second Criteria',
           type: 'range',
@@ -156,24 +158,28 @@ describe('countProposalBlocks()', () => {
     const rubricAnswers = await prisma.proposalRubricCriteriaAnswer.createMany({
       data: [
         {
+          evaluationId: proposal2.evaluations[0].id,
           proposalId: proposal2.id,
           response: {},
           rubricCriteriaId: rubricCriteria[0].id,
           userId: user.id
         },
         {
+          evaluationId: proposal2.evaluations[0].id,
           proposalId: proposal2.id,
           response: {},
           rubricCriteriaId: rubricCriteria[1].id,
           userId: user.id
         },
         {
+          evaluationId: proposal2.evaluations[0].id,
           proposalId: proposal2.id,
           response: {},
           rubricCriteriaId: rubricCriteria[0].id,
           userId: spaceMember.id
         },
         {
+          evaluationId: proposal2.evaluations[0].id,
           proposalId: proposal2.id,
           response: {},
           rubricCriteriaId: rubricCriteria[1].id,
@@ -218,6 +224,7 @@ describe('countProposalBlocks()', () => {
 
     const proposal1 = await testUtilsProposals.generateProposal({
       spaceId: space.id,
+      evaluationType: 'pass_fail',
       userId: user.id,
       customProperties: {
         [textSchema.id]: 'Text',
@@ -226,6 +233,7 @@ describe('countProposalBlocks()', () => {
     });
     const proposal2 = await testUtilsProposals.generateProposal({
       spaceId: space.id,
+      evaluationType: 'pass_fail',
       userId: user.id,
       customProperties: {
         [numberSchema.id]: 8,
@@ -236,6 +244,7 @@ describe('countProposalBlocks()', () => {
     const deletedProposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: user.id,
+      evaluationType: 'pass_fail',
       deletedAt: new Date(),
       customProperties: {
         [numberSchema.id]: 8,
@@ -247,6 +256,7 @@ describe('countProposalBlocks()', () => {
       prisma.proposalRubricCriteria.create({
         data: {
           parameters: [],
+          evaluationId: deletedProposal.evaluations[0].id,
           proposalId: deletedProposal.id,
           title: 'First Criteria',
           type: 'range',
@@ -256,6 +266,7 @@ describe('countProposalBlocks()', () => {
       prisma.proposalRubricCriteria.create({
         data: {
           parameters: [],
+          evaluationId: deletedProposal.evaluations[0].id,
           proposalId: deletedProposal.id,
           title: 'Second Criteria',
           type: 'range',
@@ -267,12 +278,14 @@ describe('countProposalBlocks()', () => {
     const rubricAnswers = await prisma.proposalRubricCriteriaAnswer.createMany({
       data: [
         {
+          evaluationId: deletedProposal.evaluations[0].id,
           proposalId: deletedProposal.id,
           response: {},
           rubricCriteriaId: deletedProposalRubricCriteria[0].id,
           userId: user.id
         },
         {
+          evaluationId: deletedProposal.evaluations[0].id,
           proposalId: deletedProposal.id,
           response: {},
           rubricCriteriaId: deletedProposalRubricCriteria[1].id,

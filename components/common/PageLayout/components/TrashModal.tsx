@@ -19,6 +19,7 @@ import { memo, useMemo, useState } from 'react';
 import useSWR, { mutate } from 'swr';
 
 import charmClient from 'charmClient';
+import { useTrashPages } from 'charmClient/hooks/pages';
 import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -90,6 +91,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
   const { showMessage } = useSnackbar();
   const { sendMessage } = useWebSocketClient();
   const dispatch = useAppDispatch();
+  const { trigger: trashPages } = useTrashPages();
 
   const { data: archivedPages = {}, mutate: setArchivedPages } = useSWR<PagesMap>(
     !space ? null : `archived-pages-${space?.id}`,
@@ -114,7 +116,11 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
           type: 'page_restored'
         });
       } else {
-        const { pageIds: restoredPageIds } = await charmClient.restorePage(pageId);
+        const result = await trashPages({ pageIds: [pageId], trash: false });
+        if (!result) {
+          return;
+        }
+        const restoredPageIds = result.pageIds;
         setArchivedPages((_archivedPages) => {
           if (!_archivedPages) {
             return {};
@@ -136,7 +142,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
   async function deletePage(pageId: string) {
     const currentPage = currentPagePath ? getPageByPath(currentPagePath) : null;
 
-    const { pageIds: deletePageIds } = await charmClient.deletePage(pageId);
+    const { pageIds: deletePageIds } = await charmClient.deletePageForever(pageId);
     setArchivedPages((_archivedPages) => {
       if (!_archivedPages) {
         return {};
@@ -161,7 +167,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
   const searchTextMatchedPages = useMemo(() => {
     return (
       Object.values(archivedPages ?? {})
-        .filter((archivedPage) => archivedPage!.title.toLowerCase().includes(searchText.toLowerCase()))
+        .filter((archivedPage) => archivedPage!.title?.toLowerCase().includes(searchText.toLowerCase()))
         // sort by deleted date, newest first
         .sort((a, b) => (a!.deletedAt! > b!.deletedAt! ? -1 : 1)) as PageMeta[]
     );

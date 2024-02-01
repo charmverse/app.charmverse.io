@@ -21,7 +21,9 @@ import {
   sepolia,
   zkSync,
   zkSyncTestnet,
-  zora
+  zora,
+  taikoJolnir,
+  taikoTestnetSepolia
 } from 'viem/chains';
 
 import { isProdEnv } from 'config/constants';
@@ -389,6 +391,27 @@ const RPC: Record<string, IChainDetails> = {
     shortName: 'hmy-ps-s0',
     testnet: true
   },
+  TAIKO: {
+    ...EVM_DEFAULT,
+    chainId: taikoJolnir.id,
+    viem: taikoJolnir,
+    chainName: 'Taiko Jolnir',
+    rpcUrls: taikoJolnir.rpcUrls.public.http,
+    blockExplorerUrls: [taikoJolnir.blockExplorers.default.url],
+    iconUrl: '/images/cryptoLogos/taiko-logo.svg',
+    shortName: taikoJolnir.network
+  },
+  TAIKO_DEV: {
+    ...EVM_DEFAULT,
+    chainId: taikoTestnetSepolia.id,
+    viem: taikoTestnetSepolia,
+    chainName: 'Taiko Sepolia - Testnet',
+    rpcUrls: taikoTestnetSepolia.rpcUrls.public.http,
+    blockExplorerUrls: [taikoTestnetSepolia.blockExplorers.default.url],
+    iconUrl: '/images/cryptoLogos/taiko-logo.svg',
+    shortName: taikoTestnetSepolia.network,
+    testnet: true
+  },
   ZKSYNC: {
     ...EVM_DEFAULT,
     chainId: zkSync.id,
@@ -404,11 +427,12 @@ const RPC: Record<string, IChainDetails> = {
     ...EVM_DEFAULT,
     chainId: zkSyncTestnet.id,
     viem: zkSyncTestnet,
-    chainName: 'zkSync Era Testnet',
+    chainName: 'zkSync Era - Testnet',
     rpcUrls: ['https://testnet.era.zksync.dev'],
     blockExplorerUrls: ['https://goerli.explorer.zksync.io'],
     iconUrl: '/images/cryptoLogos/zksync-era-logo.svg',
-    shortName: 'zksync-goerli'
+    shortName: 'zksync-goerli',
+    testnet: true
   }
 } as const;
 
@@ -454,7 +478,7 @@ export interface IPairQuote extends ICurrencyPair {
 }
 
 export function getChainById(chainId: number): IChainDetails | undefined {
-  return RPCList.find((rpc) => rpc.chainId === chainId);
+  return RPCList.find((rpc) => rpc.chainId.toString() === chainId.toString());
 }
 
 export function getChainBySymbol(tokenSymbol: string): IChainDetails | undefined {
@@ -486,6 +510,10 @@ export const litChains: IChainDetailsWithLit[] = RPCList.filter(
 
 export const litDaoChains: IChainDetailsWithLit[] = litChains.filter((chain) =>
   ['ethereum', 'arbitrum', 'optimism', 'polygon'].includes(chain.litNetwork)
+);
+
+export const builderDaoChains: IChainDetailsWithLit[] = litChains.filter((chain) =>
+  ['ethereum', 'base', 'optimism', 'zora'].includes(chain.litNetwork)
 );
 
 export const unlockChains = RPCList.filter((chain) => !!chain.unlockNetwork).sort(sortChainList);

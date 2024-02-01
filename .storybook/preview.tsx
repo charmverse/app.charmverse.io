@@ -24,9 +24,7 @@ import 'components/common/BoardEditor/focalboard/src/components/kanban/calculati
 import 'components/common/BoardEditor/focalboard/src/components/kanban/kanban.scss';
 import 'components/common/BoardEditor/focalboard/src/components/kanban/kanbanCard.scss';
 import 'components/common/BoardEditor/focalboard/src/components/kanban/kanbanColumn.scss';
-import 'components/common/BoardEditor/focalboard/src/components/properties/createdAt/createdAt.scss';
 import 'components/common/BoardEditor/focalboard/src/components/properties/dateRange/dateRange.scss';
-import 'components/common/BoardEditor/focalboard/src/components/properties/lastModifiedAt/lastModifiedAt.scss';
 import 'components/common/BoardEditor/focalboard/src/components/properties/link/link.scss';
 import 'components/common/BoardEditor/focalboard/src/components/table/calculation/calculationRow.scss';
 import 'components/common/BoardEditor/focalboard/src/components/table/horizontalGrip.scss';

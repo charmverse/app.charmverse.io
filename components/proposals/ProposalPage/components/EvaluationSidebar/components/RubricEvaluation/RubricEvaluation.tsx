@@ -13,7 +13,7 @@ import { RubricAnswersForm } from './RubricAnswersForm';
 import { RubricResults } from './RubricResults';
 
 export type Props = {
-  proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'evaluations' | 'permissions' | 'status' | 'evaluationType'>;
+  proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'evaluations' | 'permissions' | 'status' | 'archived'>;
   permissions?: ProposalWithUsersAndRubric['permissions'];
   evaluation: PopulatedEvaluation;
   isCurrent?: boolean;
@@ -75,17 +75,18 @@ export function RubricEvaluation({ proposal, permissions, isCurrent, evaluation,
                     draftAnswers={myDraftRubricAnswers}
                     criteriaList={rubricCriteria!}
                     onSubmit={onSubmitEvaluation}
-                    disabled={!canAnswerRubric || !isCurrent}
+                    archived={proposal?.archived ?? false}
+                    disabled={!canAnswerRubric || !isCurrent || !!proposal?.archived}
                   />
                 )}
                 {value === 'Results' && (
                   <RubricResults
+                    archived={proposal?.archived ?? false}
                     key='results'
                     answers={evaluation?.rubricAnswers}
                     criteriaList={rubricCriteria || []}
                     isCurrent={!!isCurrent}
                     evaluation={evaluation}
-                    isReviewer={proposal?.permissions.evaluate}
                     proposalId={proposal?.id}
                     refreshProposal={refreshProposal}
                   />

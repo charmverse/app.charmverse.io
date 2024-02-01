@@ -12,18 +12,20 @@ import {
 } from 'charmClient/hooks/proposals';
 import { TextInput } from 'components/common/BoardEditor/components/properties/TextInput';
 import { Button } from 'components/common/Button';
+import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { getNumberFromString } from 'lib/utilities/numbers';
 
 export type FormInput = { answers: ProposalRubricCriteriaAnswer[] };
 
 type Props = {
   proposalId: string;
-  evaluationId?: string;
+  evaluationId: string;
   disabled: boolean; // for non-reviewers
   answers?: ProposalRubricCriteriaAnswer[];
   draftAnswers?: ProposalRubricCriteriaAnswer[];
   criteriaList: ProposalRubricCriteria[];
   onSubmit: (props: { isDraft: boolean }) => void;
+  archived?: boolean;
 };
 
 const CriteriaRow = styled(Box)`
@@ -108,10 +110,12 @@ export function RubricAnswersForm({
   answers,
   disabled,
   draftAnswers,
+  archived,
   onSubmit
 }: Props) {
   const hasDraft = !!draftAnswers?.length;
 
+  const { showConfirmation } = useConfirmationModal();
   const [showDraftAnswers, setShowDraftAnswers] = useState(hasDraft);
 
   const {
@@ -136,7 +140,7 @@ export function RubricAnswersForm({
     register,
     handleSubmit,
     reset,
-    formState: { errors, isDirty, isValid }
+    formState: { isDirty }
   } = useForm<FormInput>({
     // mode: 'onChange',
     defaultValues: {
@@ -148,6 +152,13 @@ export function RubricAnswersForm({
   const { fields } = useFieldArray({ control, name: 'answers' });
 
   async function submitAnswers(values: FormInput) {
+    const { confirmed } = await showConfirmation({
+      message: 'Submit your results?',
+      confirmButton: 'Submit'
+    });
+    if (!confirmed) {
+      return;
+    }
     // answers are optional - filter out ones with no score
     const filteredAnswers = values.answers.filter((answer) => typeof (answer.response as any)?.score === 'number');
     await upsertRubricCriteriaAnswer({
@@ -281,7 +292,13 @@ export function RubricAnswersForm({
             <Button
               sx={{ alignSelf: 'start' }}
               disabled={disabled || (!isDirty && !showDraftAnswers)}
-              disabledTooltip={disabled ? 'You must be a reviewer to submit an evaluation' : undefined}
+              disabledTooltip={
+                archived
+                  ? 'You cannot evaluate an archived proposal'
+                  : disabled
+                  ? 'You must be a reviewer to submit an evaluation'
+                  : undefined
+              }
               loading={isSaving}
               onClick={handleSubmit(submitAnswers)}
             >

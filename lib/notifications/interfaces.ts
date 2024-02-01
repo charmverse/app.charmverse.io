@@ -1,4 +1,11 @@
-import type { BountyStatus, PageType, ProposalStatus, User, VoteStatus } from '@charmverse/core/prisma-client';
+import type {
+  BountyStatus,
+  PageType,
+  ProposalEvaluation,
+  ProposalStatus,
+  User,
+  VoteStatus
+} from '@charmverse/core/prisma-client';
 
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { CardPropertyEntity, WebhookEventNames } from 'lib/webhookPublisher/interfaces';
@@ -141,6 +148,7 @@ export type ProposalNotification = NotificationBase & {
   pageId: string;
   type: ProposalNotificationType;
   group: 'proposal';
+  evaluation: Pick<ProposalEvaluation, 'title'>;
 };
 
 export type VoteNotificationType = 'new_vote';

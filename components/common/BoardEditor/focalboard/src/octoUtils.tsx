@@ -15,6 +15,8 @@ import type { ProposalEvaluationStep } from 'lib/proposal/interface';
 import { getAbsolutePath } from 'lib/utilities/browser';
 import { isTruthy } from 'lib/utilities/types';
 
+import type { PageListItemsRecord } from '../../interfaces';
+
 import { createCheckboxBlock } from './blocks/checkboxBlock';
 import { createImageBlock } from './blocks/imageBlock';
 import { createTextBlock } from './blocks/textBlock';
@@ -36,13 +38,15 @@ class OctoUtils {
     propertyValue,
     propertyTemplate,
     formatters,
-    context
+    context,
+    relationPropertiesCardsRecord = {}
   }: {
     block: Block;
     propertyValue: string | string[] | undefined | number;
     propertyTemplate: IPropertyTemplate;
     formatters: Formatters;
     context?: PropertyContext;
+    relationPropertiesCardsRecord?: PageListItemsRecord;
   }) {
     const { date: formatDate, dateTime: formatDateTime } = formatters;
     let displayValue: string | string[] | undefined | number;
@@ -89,6 +93,16 @@ class OctoUtils {
       case 'proposalUrl': {
         displayValue =
           typeof propertyValue === 'string' ? getAbsolutePath(`/${propertyValue}`, context?.spaceDomain) : '';
+        break;
+      }
+      case 'relation': {
+        const pageListItems = relationPropertiesCardsRecord[propertyTemplate.id];
+        if (pageListItems && Array.isArray(propertyValue)) {
+          displayValue = propertyValue.map((pageListItemId) => {
+            const pageListItem = pageListItems.find((item) => item.id === pageListItemId);
+            return pageListItem?.title || 'Untitled';
+          });
+        }
         break;
       }
       case 'createdTime': {
