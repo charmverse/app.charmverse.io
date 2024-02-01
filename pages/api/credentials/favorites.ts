@@ -28,14 +28,20 @@ async function addFavoriteCredential(req: NextApiRequest, res: NextApiResponse) 
       'At least one of attestationId, issuedCredentialId, or gitcoinWalletAddress must be provided'
     );
   }
-  const favoriteCredential = await prisma.favoriteCredential.create({
-    data: {
+  const favoriteCredential = await prisma.favoriteCredential.upsert({
+    create: {
       attestationId: payload.attestationId,
       chainId: payload.chainId,
       issuedCredentialId: payload.issuedCredentialId,
       userId: req.session.user.id,
       gitcoinWalletAddress: payload.gitcoinWalletAddress
-    }
+    },
+    where: {
+      gitcoinWalletAddress: payload.gitcoinWalletAddress,
+      attestationId: payload.attestationId,
+      issuedCredentialId: payload.issuedCredentialId
+    },
+    update: {}
   });
   return res.status(200).send({
     index: favoriteCredential.index,

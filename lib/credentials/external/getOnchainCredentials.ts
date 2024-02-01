@@ -103,7 +103,7 @@ function getTrackedOnChainCredentials({
         (attestation: any) =>
           ({
             ...attestation,
-            type: 'external',
+            type: 'onchain',
             chainId,
             content: JSON.parse(attestation.decodedDataJson).reduce((acc: any, val: SchemaDecodedItem) => {
               acc[val.name] = val.value.value;
