@@ -7,7 +7,7 @@ import { credentialsWalletPrivateKey, graphQlServerEndpoint } from 'config/const
 
 import { ApolloClientWithRedisCache } from './apolloClientWithRedisCache';
 import type { EasSchemaChain } from './connectors';
-import type { EASAttestationFromApi } from './external/getExternalCredentials';
+import type { EASAttestationFromApi } from './external/getOnchainCredentials';
 import type { ExternalCredentialChain } from './external/schemas';
 import type { ProposalCredential } from './schemas';
 
@@ -73,7 +73,7 @@ function getParsedCredential(credential: CredentialFromCeramic): EASAttestationF
     content: parsed,
     attester: credential.issuer,
     timeCreated: new Date(credential.timestamp).valueOf(),
-    type: 'internal'
+    type: 'charmverse'
   };
 }
 
