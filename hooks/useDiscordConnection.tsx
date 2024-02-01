@@ -19,13 +19,13 @@ interface Props {
 type IDiscordConnectionContext = {
   isConnected: boolean;
   isLoading: boolean;
-  connect: () => Promise<void> | void;
+  disconnect: () => Promise<void> | void;
   error?: string;
   popupLogin: (redirectUrl: string, type: 'login' | 'connect') => void;
 };
 
 export const DiscordConnectionContext = createContext<Readonly<IDiscordConnectionContext>>({
-  connect: () => {},
+  disconnect: () => {},
   popupLogin: () => {},
   error: undefined,
   isConnected: false,
@@ -45,36 +45,22 @@ export function DiscordProvider({ children }: Props) {
   const { openPopupLogin } = usePopupLogin<{ code: string }>();
   const { open: openVerifyOtpModal } = useVerifyLoginOtp();
 
-  async function connect() {
-    if (!isConnectDiscordLoading) {
-      if (connectedWithDiscord) {
-        await disconnect();
-      } else {
-        const discordLoginPath = getDiscordLoginPath({
-          type: 'connect',
-          redirectUrl: encodeURIComponent(window.location.href.split('?')[0])
-        });
-
-        window.location.replace(discordLoginPath);
-      }
-    }
-    setIsDisconnectingDiscord(false);
-  }
-
   async function disconnect() {
-    setIsDisconnectingDiscord(true);
+    if (!isConnectDiscordLoading && connectedWithDiscord) {
+      setIsDisconnectingDiscord(true);
 
-    return charmClient.discord
-      .disconnectDiscord()
-      .then(() => {
-        setUser((_user: LoggedInUser) => ({ ..._user, discordUser: null }));
-      })
-      .catch((error) => {
-        log.warn('Error disconnecting from discord', error);
-      })
-      .finally(() => {
-        setIsDisconnectingDiscord(false);
-      });
+      return charmClient.discord
+        .disconnectDiscord()
+        .then(() => {
+          setUser((_user: LoggedInUser) => ({ ..._user, discordUser: null }));
+        })
+        .catch((error) => {
+          log.warn('Error disconnecting from discord', error);
+        })
+        .finally(() => {
+          setIsDisconnectingDiscord(false);
+        });
+    }
   }
 
   function popupLogin(redirectUrl: string, type: 'login' | 'connect') {
@@ -159,7 +145,7 @@ export function DiscordProvider({ children }: Props) {
     () => ({
       isLoading,
       isConnected,
-      connect,
+      disconnect,
       error,
       popupLogin
     }),

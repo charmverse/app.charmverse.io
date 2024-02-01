@@ -150,7 +150,7 @@ export function IdentityProviders() {
     }
   };
 
-  const { connect, isConnected, isLoading: isDiscordLoading, error } = useDiscordConnection();
+  const { disconnect, isConnected, isLoading: isDiscordLoading, error } = useDiscordConnection();
   // Don't allow a user to remove their last identity
   const cannotDisconnect = !user || (user.wallets.length === 0 && countConnectableIdentities(user) <= 1);
 
@@ -267,7 +267,7 @@ export function IdentityProviders() {
             loading={isDiscordLoading}
             disabled={cannotDisconnect}
             connected={true}
-            actions={<MenuItem onClick={connect}>Disconnect</MenuItem>}
+            actions={<MenuItem onClick={disconnect}>Disconnect</MenuItem>}
             error={error && <Alert severity='error'>{error}</Alert>}
           />
         )}
