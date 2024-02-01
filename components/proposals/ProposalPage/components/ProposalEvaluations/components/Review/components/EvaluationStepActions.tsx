@@ -3,7 +3,7 @@ import { Box, IconButton, Tooltip } from '@mui/material';
 
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 
-import type { ProposalEvaluationValues } from '../../EvaluationSettingsSidebar/components/EvaluationStepSettings';
+import type { ProposalEvaluationValues } from '../../Settings/components/EvaluationStepSettings';
 
 import { GoBackButton } from './GoBackButton';
 

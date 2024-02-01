@@ -14,7 +14,7 @@ import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalFields } from 'lib/proposal/interface';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-import type { ProposalEvaluationValues } from '../EvaluationSettingsSidebar/components/EvaluationStepSettings';
+import type { ProposalEvaluationValues } from '../ProposalEvaluations/components/Settings/components/EvaluationStepSettings';
 
 export type ProposalPropertiesInput = {
   content?: PageContent | null;

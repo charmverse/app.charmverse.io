@@ -3,10 +3,10 @@ import { Box } from '@mui/material';
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { useProposalTemplateById } from 'components/proposals/hooks/useProposalTemplates';
+import { getEvaluationFormError } from 'lib/proposal/getProposalErrors';
 
-import { getEvaluationFormError } from '../../../hooks/useNewProposal';
-import type { ProposalEvaluationValues } from '../../EvaluationSettingsSidebar/components/EvaluationStepSettings';
-import { EvaluationStepSettings } from '../../EvaluationSettingsSidebar/components/EvaluationStepSettings';
+import type { ProposalEvaluationValues } from '../../Settings/components/EvaluationStepSettings';
+import { EvaluationStepSettings } from '../../Settings/components/EvaluationStepSettings';
 
 export function EvaluationStepSettingsModal({
   close,

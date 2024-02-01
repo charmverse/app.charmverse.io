@@ -1,7 +1,7 @@
 import AddIcon from '@mui/icons-material/Add';
-import { Box, Stack } from '@mui/material';
+import { Stack } from '@mui/material';
 import debounce from 'lodash/debounce';
-import { useRef, useEffect, useMemo, useState } from 'react';
+import { useRef, useEffect, useState, useMemo } from 'react';
 import { v4 } from 'uuid';
 
 import { useUpdateProposalFormFields } from 'charmClient/hooks/proposals';

@@ -29,12 +29,10 @@ type Props = {
   parentId?: string | null;
   pageType?: PageMeta['type'];
   customTitle?: string;
-  proposalType?: 'free_form' | 'structured';
 };
 
-export function PageTemplateBanner({ proposalType, isNewPage, pageType, parentId, customTitle }: Props) {
+export function PageTemplateBanner({ isNewPage, pageType, parentId, customTitle }: Props) {
   const { space } = useCurrentSpace();
-  const { getFeatureTitle } = useSpaceFeatures();
   const theme = useTheme();
   const { pages } = usePages();
   const parentPage = parentId ? pages[parentId] : undefined;
@@ -70,11 +68,7 @@ export function PageTemplateBanner({ proposalType, isNewPage, pageType, parentId
         </Grid>
         <Grid item xs={8} display='flex' justifyContent='center'>
           {!isShowingCard ? (
-            <span>
-              You're {isNewPage ? 'creating' : 'editing'} a{' '}
-              {proposalType ? `${proposalType === 'free_form' ? 'free-form' : 'structured'} ` : ''}
-              {getFeatureTitle(pageType === 'bounty_template' ? 'reward' : 'proposal')} template
-            </span>
+            <span>You're {isNewPage ? 'creating' : 'editing'} a template</span>
           ) : (
             <>
               <span>You're editing a template in</span>

@@ -7,8 +7,6 @@ import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 
 import { useGetReward } from 'charmClient/hooks/rewards';
-import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
-import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import { blockLoad, databaseViewsLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
@@ -21,7 +19,7 @@ import type { FrontendParticipant } from 'components/common/CharmEditor/componen
 import type { ConnectionEvent } from 'components/common/CharmEditor/components/fiduswriter/ws';
 import { focusEventName } from 'components/common/CharmEditor/constants';
 import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
-import { EvaluationSidebar } from 'components/proposals/ProposalPage/components/EvaluationSidebar/EvaluationSidebar';
+import { ProposalEvaluations } from 'components/proposals/ProposalPage/components/ProposalEvaluations/ProposalEvaluations';
 import { ProposalFormFieldsInput } from 'components/proposals/ProposalPage/components/ProposalFormFieldsInput';
 import { ProposalRewards } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewards';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
@@ -45,15 +43,15 @@ import { PageComments } from './components/CommentsFooter/PageComments';
 import PageBanner from './components/PageBanner';
 import { PageConnectionBanner } from './components/PageConnectionBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
+import { PageEditorContainer } from './components/PageEditorContainer';
 import PageHeader, { getPageTop } from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
-import { PrimaryColumn } from './components/PrimaryColumn';
+import { PageTitleInput } from './components/PageTitleInput';
 import { ProposalArchivedBanner } from './components/ProposalArchivedBanner';
 import { ProposalBanner } from './components/ProposalBanner';
 import { ProposalProperties } from './components/ProposalProperties';
-import { PageSidebar } from './components/Sidebar/PageSidebar';
 import { SyncedPageBanner } from './components/SyncedPageBanner';
-import { usePageSidebar } from './hooks/usePageSidebar';
+import type { IPageSidebarContext } from './hooks/usePageSidebar';
 import { useProposal } from './hooks/useProposal';
 
 export const defaultPageTop = 56; // we need to add some room for the announcement banner and other banners
@@ -62,20 +60,28 @@ const RewardProperties = dynamic(
   () => import('components/[pageId]/DocumentPage/components/RewardProperties').then((r) => r.RewardProperties),
   { ssr: false }
 );
-
-export interface DocumentPageProps {
+export type DocumentPageProps = {
   page: PageWithContent;
   savePage: (p: Partial<Page>) => void;
   readOnly?: boolean;
   insideModal?: boolean;
-  enableSidebar?: boolean;
-}
+  setEditorState?: (state: EditorState) => void;
+  sidebarView?: IPageSidebarContext['activeView'];
+  setSidebarView?: IPageSidebarContext['setActiveView'];
+};
 
-function DocumentPage({ insideModal = false, page, savePage, readOnly = false, enableSidebar }: DocumentPageProps) {
+function DocumentPageComponent({
+  insideModal = false,
+  page,
+  savePage,
+  readOnly = false,
+  setEditorState,
+  sidebarView,
+  setSidebarView
+}: DocumentPageProps) {
   const { user } = useUser();
   const { router } = useCharmRouter();
   const { getFeatureTitle } = useSpaceFeatures();
-  const { activeView: sidebarView, setActiveView, closeSidebar } = usePageSidebar();
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
   const { setView: setCharmEditorView } = useCharmEditorView();
   const [connectionError, setConnectionError] = useState<Error | null>(null);
@@ -83,7 +89,6 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
   const dispatch = useAppDispatch();
   const [currentTab, setCurrentTab] = useState<number>(0);
   const [containerRef, { width: containerWidth }] = useElementSize();
-  const [editorState, setEditorState] = useState<EditorState | null>(null);
   const { creatingInlineReward } = useRewards();
   const isMdScreen = useMdScreen();
   const isAdmin = useIsAdmin();
@@ -132,7 +137,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
   const showPageBanner = page.type !== 'proposal' && page.type !== 'proposal_template';
   const pageTop = showPageBanner ? getPageTop(page) : defaultPageTop;
 
-  const { threads, isLoading: isLoadingThreads, currentPageId: threadsPageId } = useThreads();
+  const { threads, currentPageId: threadsPageId } = useThreads();
   const isSharedPage = router.pathname.startsWith('/share');
   // Check if we are on the rewards page, as parent chip is only shown on rewards page
   const isRewardsPage = router.pathname === '/[domain]/rewards';
@@ -145,10 +150,9 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
   const isPageTemplate = page.type.includes('template');
 
   const enableComments = !isSharedPage && !enableSuggestingMode && !isPageTemplate && !!pagePermissions?.comment;
-  const showPageActionSidebar =
-    !!enableSidebar && sidebarView !== null && (sidebarView !== 'comments' || enableComments);
 
-  const isStructuredProposal = proposal && proposal.formId;
+  const isStructuredProposal = Boolean(proposal && proposal.formId);
+  const isUnpublishedProposal = proposal?.status === 'draft' || page.type === 'proposal_template';
 
   // create a key that updates when edit mode changes - default to 'editing' so we dont close sockets immediately
   const editorKey = page.id + (editMode || 'editing') + pagePermissions.edit_content + !!proposal?.archived;
@@ -181,10 +185,6 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
   // reset error and sidebar state whenever page id changes
   useEffect(() => {
     setConnectionError(null);
-    // check page id has changed, otherwwise this runs on every refresh in dev
-    if (threadsPageId !== page.id) {
-      closeSidebar();
-    }
   }, [page.id, threadsPageId]);
 
   const threadIds = useMemo(
@@ -198,41 +198,6 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
     [threads, page.type]
   );
 
-  // show page sidebar by default if there are comments or votes
-  useEffect(() => {
-    if (!enableSidebar) {
-      return;
-    }
-    let highlightedCommentId = new URLSearchParams(window.location.search).get('commentId');
-    // hack to handle improperly-created URLs from notifications
-    if (highlightedCommentId === 'undefined') {
-      highlightedCommentId = null;
-    }
-    const unresolvedThreads = Object.values(threads)
-      .filter((thread) => !thread?.resolved)
-      .filter(isTruthy);
-    if (sidebarView && !highlightedCommentId) {
-      // dont redirect if sidebar is already open
-      return;
-    }
-    if (page.id !== threadsPageId) {
-      // threads result is from a different page, maybe during navigation
-      return;
-    }
-
-    if (!isLoadingThreads) {
-      if (highlightedCommentId || (isMdScreen && unresolvedThreads.length)) {
-        return setActiveView('comments');
-      }
-    }
-  }, [isLoadingThreads, page.id, enableSidebar, threadsPageId]);
-
-  useEffect(() => {
-    if (proposalId && enableSidebar) {
-      setActiveView(isMdScreen ? 'proposal_evaluation' : null);
-    }
-  }, [proposalId, enableSidebar, isMdScreen]);
-
   // keep a ref in sync for printing
   const printRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -243,12 +208,6 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
     }
   }, [printRef, _printRef]);
 
-  useEffect(() => {
-    return () => {
-      setCharmEditorView(null);
-    };
-  }, [setCharmEditorView]);
-
   function focusDocumentEditor() {
     const focusEvent = new CustomEvent(focusEventName);
     // TODO: use a ref passed down instead
@@ -258,7 +217,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
   const proposalAuthors = proposal ? [proposal.createdBy, ...proposal.authors.map((author) => author.userId)] : [];
 
   return (
-    <PrimaryColumn id='file-drop-container' ref={containerRef} showPageActionSidebar={showPageActionSidebar}>
+    <Box ref={containerRef} id='file-drop-container' display='flex' flexDirection='column' height='100%'>
       <Box
         ref={printRef}
         className={`document-print-container ${fontClassName} drag-area-container`}
@@ -299,19 +258,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
             <SyncedPageBanner pageId={page.syncWithPageId} source={board.fields.sourceType} />
           </AlertContainer>
         )}
-        <PageTemplateBanner
-          parentId={page.parentId}
-          pageType={page.type}
-          proposalType={
-            page.type === 'proposal_template'
-              ? proposal
-                ? proposal.formId
-                  ? 'structured'
-                  : 'free_form'
-                : undefined
-              : undefined
-          }
-        />
+        <PageTemplateBanner parentId={page.parentId} pageType={page.type} />
         {/* temporary? disable editing of page meta data when in suggestion mode */}
         {page.headerImage && (
           <PageBanner headerImage={page.headerImage} readOnly={readOnly || !!enableSuggestingMode} setPage={savePage} />
@@ -374,14 +321,21 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
             </Tabs>
           )}
           {currentTab === 1 && (
-            <EvaluationSidebar
+            <ProposalEvaluations
               pagePath={page.path}
               pageTitle={page.title}
               pageId={page.id}
+              isUnpublishedProposal={isUnpublishedProposal}
+              readOnlyProposalPermissions={!proposal?.permissions.edit}
+              isProposalTemplate={page.type === 'proposal_template'}
+              isReviewer={proposal?.permissions.evaluate}
+              isStructuredProposal={isStructuredProposal}
               proposal={proposal}
+              proposalInput={proposal}
+              templateId={proposal?.page?.sourceTemplateId}
               onChangeEvaluation={onChangeEvaluation}
               refreshProposal={refreshProposal}
-              templateId={page.sourceTemplateId}
+              onChangeWorkflow={onChangeWorkflow}
             />
           )}
 
@@ -428,43 +382,9 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
                   />
                 )}
                 {creatingInlineReward && !readOnly && <NewInlineReward pageId={page.id} />}
-                {/** Structured proposal isn't inside a CharmEditor context, thus useViewContext used in PageSidebar would throw error for undefined view */}
-                {(enableComments ||
-                  enableSuggestingMode ||
-                  page.type === 'proposal' ||
-                  page.type === 'proposal_template') && (
-                  <PageSidebar
-                    pagePath={page.path}
-                    pageTitle={page.title}
-                    id='page-action-sidebar'
-                    pageId={page.id}
-                    spaceId={page.spaceId}
-                    proposalId={proposalId}
-                    isUnpublishedProposal={proposal?.status === 'draft' || page.type === 'proposal_template'}
-                    readOnlyProposalPermissions={!proposal?.permissions.edit}
-                    isReviewer={proposal?.permissions.evaluate}
-                    pagePermissions={pagePermissions}
-                    editorState={editorState}
-                    sidebarView={sidebarView}
-                    // dont let users collapse sidebar when looking at a proposal
-                    closeSidebar={closeSidebar}
-                    openSidebar={setActiveView}
-                    threads={isLoadingThreads ? undefined : threads}
-                    proposal={proposal}
-                    proposalInput={proposal}
-                    proposalTemplateId={proposal?.page?.sourceTemplateId}
-                    onChangeEvaluation={onChangeEvaluation}
-                    refreshProposal={refreshProposal}
-                    disabledViews={isStructuredProposal ? ['suggestions'] : []}
-                    onChangeWorkflow={onChangeWorkflow}
-                    onChangeRewardSettings={onChangeRewardSettings}
-                    isProposalTemplate={page.type === 'proposal_template'}
-                    isStructuredProposal={!!proposal?.formId}
-                  />
-                )}
               </CardPropertiesWrapper>
               {proposal && proposal.formId ? (
-                <Box mb={4}>
+                <Box mb={10}>
                   {page.type === 'proposal_template' ? (
                     <FormFieldsEditor
                       readOnly={(!isAdmin && (!user || !proposalAuthors.includes(user.id))) || !!proposal?.archived}
@@ -495,7 +415,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
                   readOnly={readOnly || !!page.syncWithPageId || !!proposal?.archived}
                   autoFocus={false}
                   sidebarView={sidebarView}
-                  setSidebarView={setActiveView}
+                  setSidebarView={setSidebarView}
                   pageId={page.id}
                   disablePageSpecificFeatures={isSharedPage}
                   enableSuggestingMode={enableSuggestingMode}
@@ -508,7 +428,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
                   setEditorState={setEditorState}
                   snapshotProposalId={page.snapshotProposalId}
                   onParticipantUpdate={onParticipantUpdate}
-                  registerView={setCharmEditorView}
+                  setCharmEditorView={setCharmEditorView}
                   style={{
                     // 5 lines
                     minHeight: proposalId || page?.type.includes('card') ? '150px' : 'unset'
@@ -518,6 +438,7 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
                   threadIds={threadIds}
                 />
               )}
+
               {isStructuredProposal && proposal?.fields?.enableRewards && (
                 <>
                   <Box my={1}>
@@ -572,11 +493,16 @@ function DocumentPage({ insideModal = false, page, savePage, readOnly = false, e
           )}
         </PageEditorContainer>
       </Box>
-      {proposal?.status === 'draft' && page?.type !== 'proposal_template' && (
-        <ProposalStickyFooter page={page} proposal={proposal} refreshProposal={refreshProposal} />
+      {page.type === 'proposal' && proposal?.status === 'draft' && (
+        <ProposalStickyFooter
+          page={page}
+          proposal={proposal}
+          isStructuredProposal={isStructuredProposal}
+          refreshProposal={refreshProposal}
+        />
       )}
-    </PrimaryColumn>
+    </Box>
   );
 }
 
-export default memo(DocumentPage);
+export const DocumentPage = memo(DocumentPageComponent);

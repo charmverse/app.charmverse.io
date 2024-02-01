@@ -27,6 +27,7 @@ describe('DELETE /api/proposals/templates/{templateId} - Delete a proposal templ
       evaluations: [],
       spaceId: space.id,
       userId: adminUser.id,
+      authors: [adminUser.id],
       pageProps: {
         type: 'proposal_template'
       }
@@ -45,6 +46,7 @@ describe('DELETE /api/proposals/templates/{templateId} - Delete a proposal templ
       evaluations: [],
       spaceId: space.id,
       userId: adminUser.id,
+      authors: [adminUser.id],
       pageProps: {
         type: 'proposal_template'
       }

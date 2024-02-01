@@ -1,12 +1,11 @@
-import { Tooltip, Typography } from '@mui/material';
-import { useState } from 'react';
+import { Tooltip } from '@mui/material';
 
 import { useGoBackToStep } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useSnackbar } from 'hooks/useSnackbar';
 
-import type { ProposalEvaluationValues } from '../../EvaluationSettingsSidebar/components/EvaluationStepSettings';
+import type { ProposalEvaluationValues } from '../../Settings/components/EvaluationStepSettings';
 
 export function GoBackButton({
   hasMovePermission,

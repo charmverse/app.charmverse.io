@@ -1,12 +1,13 @@
-import { Divider, Tooltip } from '@mui/material';
+import { Collapse, Divider, Tooltip } from '@mui/material';
 import { useEffect, useState } from 'react';
 
+import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 
-import type { ProposalEvaluationValues } from '../EvaluationSettingsSidebar/components/EvaluationStepSettings';
-import { WorkflowSelect } from '../WorkflowSelect';
+import { WorkflowSelect } from '../../../WorkflowSelect';
+import type { ProposalEvaluationValues } from '../Settings/components/EvaluationStepSettings';
 
 import { EvaluationStepActions } from './components/EvaluationStepActions';
 import { EvaluationStepRow } from './components/EvaluationStepRow';
@@ -42,18 +43,20 @@ export type Props = {
   templateId: string | null | undefined;
   pagePath?: string;
   pageTitle?: string;
+  expanded: boolean;
 };
 
-export function EvaluationSidebar({
+export function EvaluationsReview({
   pagePath,
   pageTitle,
   pageId,
   proposal,
   onChangeEvaluation,
   refreshProposal,
+  expanded: expandedContainer,
   templateId
 }: Props) {
-  const [activeEvaluationId, setActiveEvaluationId] = useState<string | undefined>(proposal?.currentEvaluationId);
+  const [_expandedEvaluationId, setExpandedEvaluationId] = useState<string | undefined>(proposal?.currentEvaluationId);
   const { mappedFeatures } = useSpaceFeatures();
   const { showMessage } = useSnackbar();
   const [evaluationInput, setEvaluationInput] = useState<ProposalEvaluationValues | null>(null);
@@ -95,21 +98,26 @@ export function EvaluationSidebar({
     // expand the current evaluation
     if (proposal?.currentEvaluationId) {
       if (isRewardsActive) {
-        setActiveEvaluationId('rewards');
+        setExpandedEvaluationId('rewards');
       } else {
-        setActiveEvaluationId(proposal.currentEvaluationId);
+        setExpandedEvaluationId(proposal.currentEvaluationId);
       }
     }
-  }, [proposal?.currentEvaluationId, isRewardsActive, setActiveEvaluationId]);
+  }, [proposal?.currentEvaluationId, isRewardsActive, setExpandedEvaluationId]);
+
+  const expandedEvaluationId = expandedContainer && _expandedEvaluationId;
 
   return (
-    <div>
-      <Tooltip title='Workflow can be changed in Draft step'>
-        <span>
-          <WorkflowSelect value={proposal?.workflowId} readOnly />
-        </span>
-      </Tooltip>
+    <LoadingComponent isLoading={!proposal}>
+      <Collapse in={expandedContainer}>
+        <Tooltip title='Workflow can be changed in Draft step'>
+          <span>
+            <WorkflowSelect value={proposal?.workflowId} readOnly />
+          </span>
+        </Tooltip>
+      </Collapse>
       <EvaluationStepRow
+        expandedContainer={expandedContainer}
         isCurrent={!proposal?.currentEvaluationId}
         index={0}
         result={proposal?.currentEvaluationId ? 'pass' : null}
@@ -130,9 +138,10 @@ export function EvaluationSidebar({
         return (
           <EvaluationStepRow
             key={evaluation.id}
-            expanded={evaluation.id === activeEvaluationId}
+            expanded={evaluation.id === expandedEvaluationId}
+            expandedContainer={expandedContainer}
             isCurrent={isCurrent}
-            onChange={(e, expand) => setActiveEvaluationId(expand ? evaluation.id : undefined)}
+            onChange={(e, expand) => setExpandedEvaluationId(expand ? evaluation.id : undefined)}
             index={index + 1}
             result={evaluation.result}
             title={evaluation.title}
@@ -195,9 +204,10 @@ export function EvaluationSidebar({
       })}
       {hasRewardsStep && (
         <EvaluationStepRow
-          expanded={activeEvaluationId === 'rewards'}
+          expanded={expandedEvaluationId === 'rewards'}
+          expandedContainer={expandedContainer}
           isCurrent={isRewardsActive}
-          onChange={(e, expand) => setActiveEvaluationId(expand ? 'rewards' : undefined)}
+          onChange={(e, expand) => setExpandedEvaluationId(expand ? 'rewards' : undefined)}
           index={proposal ? proposal.evaluations.length + 1 : 0}
           result={isRewardsComplete ? 'pass' : null}
           title={rewardsTitle}
@@ -211,6 +221,18 @@ export function EvaluationSidebar({
           />
         </EvaluationStepRow>
       )}
+      {pagePath && pageTitle && proposal && expandedContainer && (
+        <>
+          <Divider />
+          <ProposalSocialShare
+            lensPostLink={proposal.lensPostLink}
+            proposalId={proposal.id}
+            proposalPath={pagePath}
+            proposalTitle={pageTitle}
+            proposalAuthors={proposal.authors.map((a) => a.userId)}
+          />
+        </>
+      )}
       {evaluationInput && (
         <EvaluationStepSettingsModal
           close={closeSettings}
@@ -220,16 +242,6 @@ export function EvaluationSidebar({
           updateEvaluation={updateEvaluation}
         />
       )}
-      <Divider sx={{ mb: 1 }} />
-      {pagePath && pageTitle && proposal && (
-        <ProposalSocialShare
-          lensPostLink={proposal.lensPostLink}
-          proposalId={proposal.id}
-          proposalPath={pagePath}
-          proposalTitle={pageTitle}
-          proposalAuthors={proposal.authors.map((a) => a.userId)}
-        />
-      )}
-    </div>
+    </LoadingComponent>
   );
 }

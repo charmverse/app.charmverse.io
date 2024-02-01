@@ -221,7 +221,7 @@ export function ProposalSocialShare({
   }
 
   return (
-    <Stack gap={1} flexDirection='row' alignItems='center' px={1}>
+    <Stack gap={1} flexDirection='row' alignItems='center' p={1}>
       <Typography variant='h6' mr={1}>
         Share
       </Typography>
