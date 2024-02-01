@@ -5,13 +5,13 @@ import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/ho
 import React, { useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { IPropertyTemplate, PropertyType, RelationPropertyData } from 'lib/focalboard/board';
 
 import { PropertyTypes } from './propertyTypes';
 import { typeDisplayName } from './typeDisplayName';
 
 type Props = {
-  onTypeAndNameChanged: (newType: PropertyType, newName: string) => void;
+  onTypeAndNameChanged: (newType: PropertyType, newName: string, relationData?: RelationPropertyData) => void;
   onDelete: (id: string) => void;
   deleteDisabled?: boolean;
   property: IPropertyTemplate;
@@ -82,10 +82,10 @@ const PropertyMenu = React.memo((props: Props) => {
       >
         <PropertyTypes
           selectedTypes={[propertyType]}
-          onClick={({ type }) => {
+          onClick={({ type, relationData }) => {
             if (type !== propertyType) {
               // only change the type if it's different
-              props.onTypeAndNameChanged(type, name);
+              props.onTypeAndNameChanged(type, name, relationData);
               changePropertyTypePopupState.close();
             }
           }}

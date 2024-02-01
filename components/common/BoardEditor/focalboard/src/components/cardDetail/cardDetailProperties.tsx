@@ -4,15 +4,14 @@ import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/ho
 import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import charmClient from 'charmClient';
 import { useSyncRelationProperty } from 'charmClient/hooks/blocks';
 import { CardDetailProperty } from 'components/common/BoardEditor/components/cardProperties/CardDetailProperty';
-import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { proposalPropertyTypesList, type Board, type IPropertyTemplate, type PropertyType } from 'lib/focalboard/board';
+import { type RelationPropertyData, type Board, type IPropertyTemplate, type PropertyType } from 'lib/focalboard/board';
+import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
@@ -101,7 +100,8 @@ function CardDetailProperties(props: Props) {
   function onPropertyChangeSetAndOpenConfirmationDialog(
     newType: PropertyType,
     newName: string,
-    propertyTemplate: IPropertyTemplate
+    propertyTemplate: IPropertyTemplate,
+    relationPropertyData?: RelationPropertyData
   ) {
     const oldType = propertyTemplate.type;
 
@@ -114,7 +114,7 @@ function CardDetailProperties(props: Props) {
 
     // if no card has this value set delete the property directly without warning
     if (affectsNumOfCards === '0') {
-      mutator.changePropertyTypeAndName(board, cards, propertyTemplate, newType, newName, views);
+      mutator.changePropertyTypeAndName(board, cards, propertyTemplate, newType, newName, views, relationPropertyData);
       return;
     }
 
@@ -161,7 +161,15 @@ function CardDetailProperties(props: Props) {
       onConfirm: async () => {
         setShowConfirmationDialog(false);
         try {
-          await mutator.changePropertyTypeAndName(board, cards, propertyTemplate, newType, newName, views);
+          await mutator.changePropertyTypeAndName(
+            board,
+            cards,
+            propertyTemplate,
+            newType,
+            newName,
+            views,
+            relationPropertyData
+          );
         } catch (err: any) {
           Utils.logError(`Error Changing Property And Name:${propertyTemplate.name}: ${err?.toString()}`);
         }
@@ -289,8 +297,8 @@ function CardDetailProperties(props: Props) {
             card={card}
             deleteDisabledMessage={getDeleteDisabled(propertyTemplate)}
             onDelete={() => onPropertyDeleteSetAndOpenConfirmationDialog(propertyTemplate)}
-            onTypeAndNameChanged={(newType: PropertyType, newName: string) => {
-              onPropertyChangeSetAndOpenConfirmationDialog(newType, newName, propertyTemplate);
+            onTypeAndNameChanged={(newType: PropertyType, newName: string, relationData?: RelationPropertyData) => {
+              onPropertyChangeSetAndOpenConfirmationDialog(newType, newName, propertyTemplate, relationData);
             }}
             pageUpdatedAt={pageUpdatedAt}
             pageUpdatedBy={pageUpdatedBy}

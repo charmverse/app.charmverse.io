@@ -4,7 +4,13 @@ import type { PageMeta } from '@charmverse/core/pages';
 import charmClient from 'charmClient';
 import type { Block, BlockPatch } from 'lib/focalboard/block';
 import { createPatchesFromBlocks } from 'lib/focalboard/block';
-import type { Board, IPropertyOption, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type {
+  Board,
+  IPropertyOption,
+  IPropertyTemplate,
+  PropertyType,
+  RelationPropertyData
+} from 'lib/focalboard/board';
 import { createBoard } from 'lib/focalboard/board';
 import type { BoardView, ISortOption, KanbanCalculationFields } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
@@ -670,7 +676,8 @@ export class Mutator {
     propertyTemplate: IPropertyTemplate,
     newType: PropertyType,
     newName: string,
-    views: BoardView[]
+    views: BoardView[],
+    relationData?: RelationPropertyData
   ) {
     const titleProperty: IPropertyTemplate = { id: Constants.titleColumnId, name: 'Title', type: 'text', options: [] };
     if (propertyTemplate.type === newType && propertyTemplate.name === newName) {
@@ -679,7 +686,6 @@ export class Mutator {
     const newBoard = createBoard({ block: board });
     const cardProperty = newBoard.fields.cardProperties.find((o: IPropertyTemplate) => o.id === propertyTemplate.id);
     const newTemplate = propertyTemplate.id === Constants.titleColumnId ? cardProperty || titleProperty : cardProperty;
-
     if (!newTemplate) {
       return;
     }
@@ -694,6 +700,10 @@ export class Mutator {
 
     newTemplate.type = newType;
     newTemplate.name = newName;
+
+    if (newTemplate?.type === 'relation' && relationData) {
+      newTemplate.relationData = relationData;
+    }
 
     const oldBlocks: Block[] = [board];
     const newBlocks: Block[] = [newBoard];

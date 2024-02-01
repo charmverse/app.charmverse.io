@@ -9,11 +9,9 @@ import { useSortable } from 'components/common/BoardEditor/focalboard/src/hooks/
 import type { Mutator } from 'components/common/BoardEditor/focalboard/src/mutator';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import PropertyMenu from 'components/common/BoardEditor/focalboard/src/widgets/propertyMenu';
-import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate, PropertyType, RelationPropertyData } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 import { getPropertyName } from 'lib/focalboard/getPropertyName';
-
-import type { PageListItemsRecord } from '../../interfaces';
 
 export const PropertyNameContainer = styled(Stack)`
   position: relative;
@@ -55,7 +53,7 @@ export function CardDetailProperty({
   property: IPropertyTemplate;
   card: Card;
   board: Board;
-  onTypeAndNameChanged: (newType: PropertyType, newName: string) => void;
+  onTypeAndNameChanged: (newType: PropertyType, newName: string, relationData?: RelationPropertyData) => void;
   onDelete: VoidFunction;
   pageUpdatedAt: string;
   pageUpdatedBy: string;
@@ -101,8 +99,8 @@ export function CardDetailProperty({
               onDelete={onDelete}
               deleteDisabled={deleteDisabledMessage?.length !== 0}
               property={property}
-              onTypeAndNameChanged={(newType, newName) => {
-                onTypeAndNameChanged(newType, newName);
+              onTypeAndNameChanged={(newType, newName, relationData) => {
+                onTypeAndNameChanged(newType, newName, relationData);
                 changePropertyPopupState.close();
               }}
             />
