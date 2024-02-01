@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core/dist/cjs/prisma-client';
 import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import * as http from 'adapters/http';
 import { lowerCaseEqual } from 'lib/utilities/strings';

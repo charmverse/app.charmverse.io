@@ -35,14 +35,16 @@ export function UserCredentialRow({
       } else {
         await addFavorite({
           chainId: credential.chainId,
-          attestationId: credential.issuedCredentialId ? undefined : credential.id,
-          issuedCredentialId: credential.issuedCredentialId
+          attestationId: credential.type === 'onchain' ? credential.id : undefined,
+          issuedCredentialId: credential.type === 'charmverse' ? credential.issuedCredentialId : undefined,
+          gitcoinWalletAddress: credential.type === 'gitcoin' ? credential.recipient : undefined
         });
       }
     } catch (_) {
       showMessage(`Failed to ${credential.favoriteCredentialId ? 'unfavorite' : 'favorite'} credential`, 'error');
     }
   }
+
   const isSmallScreen = useSmallScreen();
   const credentialInfo: {
     title: string;
@@ -109,7 +111,7 @@ export function UserCredentialRow({
           </Box>
         </Box>
       </Grid>
-      <Grid item display='flex' justifyContent='flex-start' xs={8} md={credential.verificationUrl ? 4 : 6} gap={1}>
+      <Grid item display='flex' justifyContent='flex-start' xs={8} md={credential.verificationUrl ? 4 : 5} gap={1}>
         {credentialInfo.attestationContent.map((field) => (
           <Chip size={isSmallScreen ? 'small' : 'medium'} variant='outlined' key={field.name} label={field.value} />
         ))}

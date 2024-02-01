@@ -23,8 +23,10 @@ export type AddFavoriteCredentialPayload = {
 
 async function addFavoriteCredential(req: NextApiRequest, res: NextApiResponse) {
   const payload = req.body as AddFavoriteCredentialPayload;
-  if (!payload.attestationId && !payload.issuedCredentialId) {
-    throw new InvalidInputError('Either attestationId or issuedCredentialId must be provided');
+  if (!payload.attestationId && !payload.issuedCredentialId && !payload.gitcoinWalletAddress) {
+    throw new InvalidInputError(
+      'At least one of attestationId, issuedCredentialId, or gitcoinWalletAddress must be provided'
+    );
   }
   const favoriteCredential = await prisma.favoriteCredential.create({
     data: {
