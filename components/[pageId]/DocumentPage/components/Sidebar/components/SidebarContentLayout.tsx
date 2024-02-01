@@ -6,5 +6,5 @@ export function SidebarContentLayout(props: BoxProps) {
 }
 
 export function SidebarHeader(props: BoxProps) {
-  return <Box display='flex' alignItems='center' {...props} />;
+  return <Box display='flex' alignItems='center' gap={1} px={1} {...props} />;
 }

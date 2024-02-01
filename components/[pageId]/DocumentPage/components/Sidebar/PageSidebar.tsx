@@ -60,7 +60,7 @@ function PageSidebarComponent(props: SidebarProps) {
   return isMdScreen ? (
     <SidebarColumn id={id} open={isOpen} width={sidebarWidth}>
       <SidebarContentLayout width={sidebarWidth}>
-        <SidebarHeader gap={1} px={1}>
+        <SidebarHeader>
           <TogglePageSidebarButton onClick={toggleSidebar} />
           <Typography flexGrow={1} fontWeight={600} fontSize={20}>
             {sidebarTitle}

@@ -34,7 +34,7 @@ function SidebarComponent(props: SidebarProps) {
   return (
     <SidebarColumn id='proposal-action-sidebar' open={isOpen} width={sidebarWidth} minWidth={sidebarMinWidth}>
       <SidebarContentLayout>
-        <SidebarHeader gap={0.5} px={1}>
+        <SidebarHeader>
           <ToggleProposalSidebarButton isOpen={isOpen} onClick={toggleSidebar} />
           {isOpen && (
             <Typography flexGrow={1} fontWeight={600} fontSize={20}>
