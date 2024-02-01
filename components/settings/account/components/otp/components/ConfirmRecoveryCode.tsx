@@ -3,7 +3,7 @@ import Typography from '@mui/material/Typography';
 import { useForm } from 'react-hook-form';
 
 import { Button } from 'components/common/Button';
-import { NumberInputField } from 'components/common/form/fields/NumberInputField';
+import { TextInputField } from 'components/common/form/fields/TextInputField';
 import Link from 'components/common/Link';
 import { charmverseDiscordInvite } from 'config/constants';
 
@@ -14,7 +14,7 @@ type Props = {
   onSubmit: (code: string) => Promise<void>;
 };
 
-export function ConfirmAuthCode({ onSubmit, errorMessage, loading, changeType }: Props) {
+export function ConfirmRecoveryCode({ onSubmit, errorMessage, loading, changeType }: Props) {
   const {
     register,
     getValues,
@@ -33,24 +33,16 @@ export function ConfirmAuthCode({ onSubmit, errorMessage, loading, changeType }:
   return (
     <Box>
       <Typography variant='h5' mb={2}>
-        Enter the confirmation code
-      </Typography>
-      <Typography mb={2}>
-        Follow the instructions on the authenticator app to link your CharmVerse account. Once the authenticator app
-        generates a confirmation code enter it here.
+        Enter your backup code
       </Typography>
       <Box maxWidth={300} mb={1}>
-        <NumberInputField
+        <TextInputField
           error={error}
           disabled={loading}
           helperText={error}
-          data-test='confirm-auth-code-input'
-          disableArrows
-          placeholder='e.g. 123456'
-          {...register('code', {
-            required: true,
-            validate: (val) => String(val).length === 6 || 'Must be exactly 6 characters'
-          })}
+          data-test='confirm-reset-code-input'
+          placeholder='e.g. 1B3423G6VCI01F'
+          {...register('code', { required: true })}
         />
       </Box>
       <Box mb={1}>
@@ -60,7 +52,7 @@ export function ConfirmAuthCode({ onSubmit, errorMessage, loading, changeType }:
             variant='text'
             onClick={changeType}
           >
-            Use backup code
+            Use authenticator app
           </Button>
         )}
         <Link href={charmverseDiscordInvite} variant='body2' external target='_blank'>
