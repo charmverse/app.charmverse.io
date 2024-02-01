@@ -107,6 +107,7 @@ function PageSidebarComponent(props: SidebarProps) {
           gap: 1,
           display: 'flex',
           flexDirection: 'column',
+          width: 430,
           px: 1
         }}
       >

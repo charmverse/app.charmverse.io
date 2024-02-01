@@ -92,12 +92,20 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
 
   return (
     <Stack direction='row' width='100%'>
-      <DocumentPage
-        {...props}
-        setEditorState={setEditorState}
-        setSidebarView={setActiveView}
-        sidebarView={sidebarView}
-      />
+      <div
+        style={{
+          // overflowX: hidden is required to shrink the main content less than the 860px width of charm editor
+          overflowX: 'hidden',
+          flexGrow: 1
+        }}
+      >
+        <DocumentPage
+          {...props}
+          setEditorState={setEditorState}
+          setSidebarView={setActiveView}
+          sidebarView={sidebarView}
+        />
+      </div>
       {(enableComments || enableSuggestingMode) && (
         <PageSidebar
           id='page-action-sidebar'
