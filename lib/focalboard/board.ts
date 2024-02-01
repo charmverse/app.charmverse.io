@@ -41,29 +41,12 @@ export type PropertyType =
   | 'tokenChain'
   | DatabaseProposalPropertyType;
 
-export const propertyTypesList: PropertyType[] = [
-  'text',
-  'number',
-  'email',
-  'phone',
-  'url',
-  'select',
-  'multiSelect',
-  'date',
-  'person',
-  'checkbox',
-  'createdTime',
-  'createdBy',
-  'updatedTime',
-  'updatedBy',
-  ...proposalPropertyTypesList
-];
-
 interface IPropertyOption<T = string> {
   id: T;
   value: string;
   color: string;
   disabled?: boolean;
+  variant?: 'chip' | 'plain';
   dropdownValue?: string; // the label to show in the dropdown, if its different from the normal value
 }
 
@@ -75,6 +58,7 @@ export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
   options: IPropertyOption[];
   description?: string;
   formFieldId?: string;
+  proposalFieldId?: string;
 };
 
 export type DataSourceType = 'board_page' | 'google_form' | 'proposals';

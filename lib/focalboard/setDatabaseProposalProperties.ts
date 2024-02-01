@@ -14,22 +14,22 @@ import {
 import { InvalidStateError } from 'lib/middleware/errors';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-export async function setDatabaseProposalProperties({ boardId }: { boardId: string }): Promise<Board> {
+export async function setDatabaseProposalProperties({
+  boardId,
+  cardProperties
+}: {
+  boardId: string;
+  cardProperties: IPropertyTemplate[];
+}): Promise<Board> {
   const boardBlock = (await prisma.block.findUniqueOrThrow({
     where: {
       id: boardId
     }
   })) as any as Board;
+
   if (boardBlock.fields.sourceType !== 'proposals') {
     throw new InvalidStateError(`Cannot add proposal cards to a database which does not have proposals as its source`);
   }
-
-  const rubricProposals = await prisma.proposal.count({
-    where: {
-      spaceId: boardBlock.spaceId,
-      evaluationType: 'rubric'
-    }
-  });
 
   const forms = await prisma.form.findMany({
     where: {
@@ -56,26 +56,34 @@ export async function setDatabaseProposalProperties({ boardId }: { boardId: stri
     select: {
       evaluations: {
         select: {
+          type: true,
           title: true
+        },
+        orderBy: {
+          index: 'asc'
         }
       }
     }
   });
 
   const evaluationStepTitles: Set<string> = new Set();
+  const rubricStepTitles: Set<string> = new Set();
 
   proposals.forEach((p) => {
     p.evaluations.forEach((e) => {
       evaluationStepTitles.add(e.title);
+      if (e.type === 'rubric') {
+        rubricStepTitles.add(e.title);
+      }
     });
   });
 
-  const spaceUsesRubrics = rubricProposals > 0;
   const boardProperties = getBoardProperties({
     evaluationStepTitles: Array.from(evaluationStepTitles),
     formFields,
     boardBlock,
-    spaceUsesRubrics
+    cardProperties,
+    rubricStepTitles: Array.from(rubricStepTitles)
   });
 
   return prisma.block.update({
@@ -93,13 +101,15 @@ export async function setDatabaseProposalProperties({ boardId }: { boardId: stri
 
 export function getBoardProperties({
   boardBlock,
-  spaceUsesRubrics,
   formFields = [],
-  evaluationStepTitles = []
+  evaluationStepTitles = [],
+  cardProperties = [],
+  rubricStepTitles = []
 }: {
+  rubricStepTitles?: string[];
+  cardProperties?: IPropertyTemplate[];
   evaluationStepTitles?: string[];
   boardBlock: Board;
-  spaceUsesRubrics: boolean;
   formFields?: FormField[];
 }) {
   const boardProperties = boardBlock.fields.cardProperties ?? [];
@@ -108,6 +118,15 @@ export function getBoardProperties({
   const proposalUrlProp = generateUpdatedProposalUrlProperty({ boardProperties });
   const proposalEvaluationTypeProp = generateUpdatedProposalEvaluationTypeProperty({ boardProperties });
   const stepProp = generateUpdatedProposalStepProperty({ boardProperties, evaluationStepTitles });
+  const proposalAuthorProp = generateUpdatedProposalAuthorProperty({ boardProperties });
+
+  const existingAuthorPropIndex = boardProperties.findIndex((p) => p.type === 'proposalAuthor');
+
+  if (existingAuthorPropIndex > -1) {
+    boardProperties[existingAuthorPropIndex] = proposalAuthorProp;
+  } else {
+    boardProperties.push(proposalAuthorProp);
+  }
 
   const existingStatusPropIndex = boardProperties.findIndex((p) => p.type === 'proposalStatus');
 
@@ -140,35 +159,23 @@ export function getBoardProperties({
     boardProperties.push(stepProp);
   }
 
-  if (spaceUsesRubrics) {
-    const evaluatedByProp = generateUpdatedProposalEvaluatedByProperty({ boardProperties });
-    const evaluationTotalProp = generateUpdatedProposalEvaluationTotalProperty({ boardProperties });
-    const evaluationAverageProp = generateUpdatedProposalEvaluationAverageProperty({ boardProperties });
+  addProposalEvaluationProperties({
+    boardProperties,
+    rubricStepTitles
+  });
 
-    const existingEvaluatedByPropPropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluatedBy');
+  cardProperties.forEach((cardProp) => {
+    const existingPropIndex = boardProperties.findIndex((p) => p.id === cardProp.id);
 
-    if (existingEvaluatedByPropPropIndex > -1) {
-      boardProperties[existingEvaluatedByPropPropIndex] = evaluatedByProp;
+    if (existingPropIndex > -1) {
+      boardProperties[existingPropIndex] = { ...cardProp, proposalFieldId: cardProp.id };
     } else {
-      boardProperties.push(evaluatedByProp);
+      boardProperties.push({
+        ...cardProp,
+        proposalFieldId: cardProp.id
+      });
     }
-
-    const existingEvaluationTotalPropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluationTotal');
-
-    if (existingEvaluationTotalPropIndex > -1) {
-      boardProperties[existingEvaluationTotalPropIndex] = evaluationTotalProp;
-    } else {
-      boardProperties.push(evaluationTotalProp);
-    }
-
-    const existingEvaluationAveragePropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluationAverage');
-
-    if (existingEvaluationAveragePropIndex > -1) {
-      boardProperties[existingEvaluationAveragePropIndex] = evaluationAverageProp;
-    } else {
-      boardProperties.push(evaluationAverageProp);
-    }
-  }
+  });
 
   formFields.forEach((formField) => {
     const existingPropIndex = boardProperties.findIndex((p) => p.formFieldId === formField.id);
@@ -233,27 +240,84 @@ export function getBoardProperties({
   return boardProperties;
 }
 
+function addProposalEvaluationProperties({
+  rubricStepTitles,
+  boardProperties
+}: {
+  rubricStepTitles: string[];
+  boardProperties: IPropertyTemplate[];
+}) {
+  for (const rubricStepTitle of rubricStepTitles) {
+    const evaluatedByProp = boardProperties.find((p) => p.type === 'proposalEvaluatedBy' && p.name === rubricStepTitle);
+    const evaluationTotalProp = boardProperties.find(
+      (p) => p.type === 'proposalEvaluationTotal' && p.name === rubricStepTitle
+    );
+    const evaluationAverageProp = boardProperties.find(
+      (p) => p.type === 'proposalEvaluationAverage' && p.name === rubricStepTitle
+    );
+
+    if (!evaluatedByProp) {
+      boardProperties.push({
+        id: uuid(),
+        type: 'proposalEvaluatedBy',
+        name: rubricStepTitle,
+        options: []
+      });
+    }
+
+    if (!evaluationTotalProp) {
+      boardProperties.push({
+        id: uuid(),
+        type: 'proposalEvaluationTotal',
+        name: rubricStepTitle,
+        options: []
+      });
+    }
+
+    if (!evaluationAverageProp) {
+      boardProperties.push({
+        id: uuid(),
+        type: 'proposalEvaluationAverage',
+        name: rubricStepTitle,
+        options: []
+      });
+    }
+  }
+}
+
+function generateUpdatedProposalAuthorProperty(
+  { boardProperties }: { boardProperties: IPropertyTemplate[] } = { boardProperties: [] }
+): IPropertyTemplate {
+  const existingProposalAuthorProperty = boardProperties.find((p) => p.type === 'proposalAuthor');
+
+  return {
+    ...(existingProposalAuthorProperty ?? {
+      ...proposalDbProperties.proposalAuthor(),
+      id: uuid()
+    })
+  };
+}
+
 function generateUpdatedProposalStepProperty({
   boardProperties,
   evaluationStepTitles
 }: {
   evaluationStepTitles: string[];
   boardProperties: IPropertyTemplate[];
-}) {
-  // We will mutate and return this property
-  const proposalStepProp = {
-    ...(boardProperties.find((p) => p.type === 'proposalStep') ?? {
-      ...proposalDbProperties.proposalStep(),
-      id: uuid(),
-      options: ['Draft', 'Rewards', ...evaluationStepTitles].map((title) => ({
-        color: 'propColorGray',
-        id: title,
-        value: title
-      }))
-    })
-  };
+}): IPropertyTemplate {
+  const existingProposalStepProperty = boardProperties.find((p) => p.type === 'proposalStep');
 
-  return proposalStepProp;
+  return {
+    ...(existingProposalStepProperty ?? {
+      ...proposalDbProperties.proposalStep(),
+      id: uuid()
+    }),
+    options: ['Draft', 'Rewards', ...evaluationStepTitles].map((title) => ({
+      color: 'propColorGray',
+      id: title,
+      value: title
+    }))
+  };
 }
 
 function generateUpdatedProposalEvaluationTypeProperty({ boardProperties }: { boardProperties: IPropertyTemplate[] }) {
@@ -314,46 +378,6 @@ function generateUpdatedProposalUrlProperty({ boardProperties }: { boardProperti
   const proposalStatusProp = {
     ...(boardProperties.find((p) => p.type === 'proposalUrl') ?? {
       ...proposalDbProperties.proposalUrl(),
-      id: uuid()
-    })
-  };
-
-  return proposalStatusProp;
-}
-
-function generateUpdatedProposalEvaluatedByProperty({ boardProperties }: { boardProperties: IPropertyTemplate[] }) {
-  // We will mutate and return this property
-  const proposalStatusProp = {
-    ...(boardProperties.find((p) => p.type === 'proposalEvaluatedBy') ?? {
-      ...proposalDbProperties.proposalEvaluatedBy(),
-      id: uuid()
-    })
-  };
-
-  return proposalStatusProp;
-}
-
-function generateUpdatedProposalEvaluationTotalProperty({ boardProperties }: { boardProperties: IPropertyTemplate[] }) {
-  // We will mutate and return this property
-  const proposalStatusProp = {
-    ...(boardProperties.find((p) => p.type === 'proposalEvaluationTotal') ?? {
-      ...proposalDbProperties.proposalEvaluationTotal(),
-      id: uuid()
-    })
-  };
-
-  return proposalStatusProp;
-}
-
-function generateUpdatedProposalEvaluationAverageProperty({
-  boardProperties
-}: {
-  boardProperties: IPropertyTemplate[];
-}) {
-  // We will mutate and return this property
-  const proposalStatusProp = {
-    ...(boardProperties.find((p) => p.type === 'proposalEvaluationAverage') ?? {
-      ...proposalDbProperties.proposalEvaluationAverage(),
       id: uuid()
     })
   };
