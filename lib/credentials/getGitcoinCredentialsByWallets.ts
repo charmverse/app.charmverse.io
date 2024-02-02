@@ -37,21 +37,26 @@ const cachedTime = 60 * 60 * 1000; // 1 hour
 async function getGitcoinPassportScores(wallets: string[]) {
   const scoreItems = await Promise.all(
     wallets.map(async (wallet) => {
-      try {
-        const score = await http
-          .GET<ScoreItem>(`${GITCOIN_SCORER_BASE_URL}/registry/score/${GITCOIN_SCORER_ID}/${wallet}`, undefined, {
-            credentials: 'omit',
-            headers: GITCOIN_API_HEADERS
-          })
-          .catch(() => null);
+      const registryScore = await http
+        .GET<ScoreItem>(`${GITCOIN_SCORER_BASE_URL}/registry/score/${GITCOIN_SCORER_ID}/${wallet}`, undefined, {
+          credentials: 'omit',
+          headers: GITCOIN_API_HEADERS
+        })
+        .catch(() => {
+          log.error('Error getting Gitcoin Passport scores from score registry', {
+            wallet
+          });
+          return null;
+        });
 
-        const currentTime = new Date().getTime();
+      const currentTime = new Date().getTime();
 
-        if (score && currentTime - new Date(score?.last_score_timestamp).getTime() < cachedTime) {
-          return score;
-        }
+      if (registryScore && currentTime - new Date(registryScore.last_score_timestamp).getTime() < cachedTime) {
+        return registryScore;
+      }
 
-        return http.POST<ScoreItem>(
+      const passportScore = await http
+        .POST<ScoreItem>(
           `${GITCOIN_SCORER_BASE_URL}/registry/submit-passport`,
           {
             address: wallet,
@@ -61,14 +66,14 @@ async function getGitcoinPassportScores(wallets: string[]) {
             credentials: 'omit',
             headers: GITCOIN_API_HEADERS
           }
-        );
-      } catch (error: any) {
-        log.error('Error getting Gitcoin Passport scores for wallet', {
-          error: error.message,
-          wallet
+        )
+        .catch(() => {
+          log.error('Error submitting wallet for passport score', {
+            wallet
+          });
+          return null;
         });
-        return null;
-      }
+      return passportScore;
     })
   );
 
