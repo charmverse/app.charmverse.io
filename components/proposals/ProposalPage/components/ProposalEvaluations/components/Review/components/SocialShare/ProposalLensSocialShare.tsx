@@ -99,7 +99,7 @@ export function ProposalLensSocialShare({
     borderRadius: '50%',
     width: 35,
     height: 35,
-    cursor: lensPostLink ? 'pointer' : lensProfile ? 'pointer' : 'default'
+    cursor: lensPostLink || lensProfile ? 'pointer' : 'default'
   };
 
   return (
