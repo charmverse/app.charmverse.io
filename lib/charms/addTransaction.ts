@@ -1,11 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-export enum CharmActionTrigger {
-  'invite' = 'invite'
-  // TODO: add more types like createPage, createSpace, etc.
-}
+import type { CharmActionTrigger } from 'lib/charms/constants';
 
-type CharmTransactionMetadata = {
+export type TransactionMetadata = {
   // actorId - could be different from userId if the action was triggered by someone else (i.e. CV team)
   actorId?: string;
   actionTrigger?: CharmActionTrigger;
@@ -27,7 +24,7 @@ export function addTransaction({
   fromAddress?: string;
   toAddress?: string;
   amount: number;
-  metadata?: CharmTransactionMetadata;
+  metadata?: TransactionMetadata;
 }) {
   return prisma.charmTransaction.create({
     data: {

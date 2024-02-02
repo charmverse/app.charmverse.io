@@ -1,7 +1,5 @@
-import LinkIcon from '@mui/icons-material/Link';
-import { Box, IconButton, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, Tooltip } from '@mui/material';
 import { useState } from 'react';
-import { useCopyToClipboard } from 'usehooks-ts';
 
 import { useProposal } from 'components/[pageId]/DocumentPage/hooks/useProposal';
 import { Button } from 'components/common/Button';
@@ -13,13 +11,10 @@ import { useLensProfile } from 'components/settings/account/hooks/useLensProfile
 import { isProdEnv } from 'config/constants';
 import { useCreateLensPublication } from 'hooks/useCreateLensPublication';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useSnackbar } from 'hooks/useSnackbar';
-import { useUser } from 'hooks/useUser';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { emptyDocument } from 'lib/prosemirror/constants';
 
-function ProposalLensSocialShare({
+export function ProposalLensSocialShare({
   proposalLink,
   proposalTitle,
   proposalId,
@@ -100,6 +95,13 @@ function ProposalLensSocialShare({
     rawText: ''
   });
 
+  const imageStyleProps = {
+    borderRadius: '50%',
+    width: 35,
+    height: 35,
+    cursor: lensPostLink || lensProfile ? 'pointer' : 'default'
+  };
+
   return (
     <>
       <Tooltip
@@ -123,15 +125,7 @@ function ProposalLensSocialShare({
               target='_blank'
               rel='noopener noreferrer'
             >
-              <img
-                src='/images/logos/lens_logo.png'
-                style={{
-                  borderRadius: '50%',
-                  width: 35,
-                  height: 35,
-                  cursor: 'pointer'
-                }}
-              />
+              <img src='/images/logos/lens_logo.png' style={imageStyleProps} />
             </Link>
           ) : (
             <img
@@ -141,12 +135,7 @@ function ProposalLensSocialShare({
                 }
               }}
               src='/images/logos/lens_logo.png'
-              style={{
-                borderRadius: '50%',
-                width: 35,
-                height: 35,
-                cursor: lensProfile ? 'pointer' : 'default'
-              }}
+              style={imageStyleProps}
             />
           )}
         </div>
@@ -190,60 +179,5 @@ function ProposalLensSocialShare({
         </Box>
       </Modal>
     </>
-  );
-}
-
-export function ProposalSocialShare({
-  proposalId,
-  proposalPath,
-  proposalTitle,
-  lensPostLink,
-  proposalAuthors
-}: {
-  proposalAuthors: string[];
-  proposalId: string;
-  proposalPath: string;
-  proposalTitle: string;
-  lensPostLink?: string | null;
-}) {
-  const isAdmin = useIsAdmin();
-  const { user } = useUser();
-  const isProposalAuthor = user ? proposalAuthors.includes(user.id) : false;
-  const { showMessage } = useSnackbar();
-  const { space } = useCurrentSpace();
-  const [, copyFn] = useCopyToClipboard();
-  const proposalLink = `https://app.charmverse.io/${space?.domain}/${proposalPath}`;
-
-  function copyProposalLink() {
-    copyFn(proposalLink).then(() => {
-      showMessage('Copied proposal link');
-    });
-  }
-
-  return (
-    <Stack gap={1} flexDirection='row' alignItems='center' p={1}>
-      <Typography variant='h6' mr={1}>
-        Share
-      </Typography>
-      <ProposalLensSocialShare
-        lensPostLink={lensPostLink}
-        proposalId={proposalId}
-        proposalLink={proposalLink}
-        proposalTitle={proposalTitle}
-        canPublishToLens={isAdmin || isProposalAuthor}
-      />
-      <Tooltip title='Copy proposal link'>
-        <IconButton
-          sx={{
-            width: 35,
-            height: 35,
-            borderRadius: '50%'
-          }}
-          onClick={copyProposalLink}
-        >
-          <LinkIcon />
-        </IconButton>
-      </Tooltip>
-    </Stack>
   );
 }

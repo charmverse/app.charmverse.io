@@ -31,11 +31,12 @@ import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import { greyColor2 } from 'theme/colors';
 
-import { PageIcon } from '../../../../PageIcon';
-import AddNewCard from '../../AddNewCard';
-import NewPageMenu, { StyledIconButton } from '../../NewPageMenu';
-import PageTitle from '../../PageTitle';
+import { PageIcon } from '../../../../../../PageIcon';
+import AddNewCard from '../../../../AddNewCard';
+import PageTitle from '../../../../PageTitle';
+import { StyledIconButton } from '../../AddIconButton';
 
+import NewPageMenu from './NewPageMenu';
 import TreeItemContent from './TreeItemContent';
 
 // disable hover UX on ios which converts first click to a hover event

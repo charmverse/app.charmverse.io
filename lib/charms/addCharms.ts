@@ -1,7 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { addTransaction } from 'lib/charms/addTransaction';
-import type { TransactionRecipient, CharmActionTrigger, TransactionResult } from 'lib/charms/addTransaction';
+import type { TransactionRecipient, TransactionResult } from 'lib/charms/addTransaction';
+import type { CharmActionTrigger } from 'lib/charms/constants';
 import { getUserOrSpaceWallet } from 'lib/charms/getUserOrSpaceWallet';
 
 /**
