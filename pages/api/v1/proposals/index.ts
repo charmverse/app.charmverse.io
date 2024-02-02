@@ -1,4 +1,4 @@
-import type { ProposalEvaluationType } from '@charmverse/core/prisma';
+import type { ProposalEvaluationType, ProposalStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -120,14 +120,15 @@ export type PublicApiProposal = {
   };
   authors: ProposalAuthor[];
   reviewers: ProposalReviewer[];
+  status: ProposalStatus | 'vote_active';
   title: string;
   url: string;
   voteOptions?: string[];
   currentStep: {
     title: string;
     result: ProposalEvaluationResultExtended;
-    type: ProposalEvaluationType;
-  } | null;
+    type: ProposalEvaluationType | 'draft';
+  };
 };
 
 handler.get(listProposals);
@@ -175,6 +176,7 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
       },
       select: {
         id: true,
+        status: true,
         evaluations: true,
         page: {
           select: {
@@ -240,6 +242,7 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
 
   const publicApiProposalList: PublicApiProposal[] = proposals.map((proposal, index) => {
     const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
+    const isActiveVote = currentEvaluation?.result === null && currentEvaluation?.type === 'vote';
     const apiProposal: PublicApiProposal = {
       id: proposal.id,
       createdAt: proposal.page?.createdAt as any,
@@ -255,7 +258,12 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
             title: currentEvaluation.title,
             type: currentEvaluation.type
           }
-        : null,
+        : {
+            result: 'in_progress',
+            title: 'Draft',
+            type: 'draft'
+          },
+      status: isActiveVote ? 'vote_active' : proposal.status,
       authors: proposal.authors.map((author) => ({
         userId: author.author?.id,
         address: author.author?.wallets[0]?.address,

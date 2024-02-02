@@ -138,6 +138,17 @@ async function getProposal(req: NextApiRequest, res: NextApiResponse<PublicApiPr
       text: proposal.page?.contentText ?? '',
       markdown: markdownText
     },
+    currentStep: currentEvaluation
+      ? {
+          type: currentEvaluation.type,
+          result: currentEvaluation.result || 'in_progress',
+          title: currentEvaluation.title
+        }
+      : {
+          result: 'in_progress',
+          title: 'Draft',
+          type: 'draft'
+        },
     status: isActiveVote ? 'vote_active' : proposal.status,
     authors: proposal.authors.map((author) => ({
       userId: author.author?.id,
