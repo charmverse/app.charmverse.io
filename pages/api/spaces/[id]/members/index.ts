@@ -7,7 +7,6 @@ import type { Member } from 'lib/members/interfaces';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { deterministicRandomName } from 'lib/utilities/randomName';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -29,7 +28,8 @@ async function getMembers(req: NextApiRequest, res: NextApiResponse<Member[]>) {
       select: {
         user: {
           select: {
-            id: true
+            id: true,
+            username: true
           }
         }
       }
@@ -44,7 +44,7 @@ async function getMembers(req: NextApiRequest, res: NextApiResponse<Member[]>) {
       joinDate: new Date().toISOString(),
       properties: [],
       roles: [],
-      username: deterministicRandomName(sr.user.id),
+      username: sr.user.username,
       searchValue: ''
     }));
 
