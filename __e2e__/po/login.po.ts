@@ -44,30 +44,6 @@ export class LoginPage {
     await this.page.waitForURL('**/');
   }
 
-  // retrieve the Discord URL when clicking 'connect discord' button
-  async getDiscordUrl() {
-    await this.universalConnectButton.click();
-    const discordButtonHref = await this.connectDiscordButton.evaluate((node) => (node as HTMLAnchorElement).href);
-    expect(discordButtonHref).toBeDefined();
-    const redirectResponse = await this.page.request.get(discordButtonHref, { maxRedirects: 0 });
-    expect(redirectResponse.status()).toBe(307);
-    return redirectResponse.headers().location;
-  }
-
-  async gotoDiscordCallback({
-    discordApiUrl,
-    discordWebsiteUrl
-  }: {
-    discordApiUrl: string;
-    discordWebsiteUrl: string;
-  }) {
-    const discordUrl = new URL(discordWebsiteUrl);
-    const callbackUrl = discordUrl.searchParams.get('redirect_uri'); // http://127.0.0.1:3335/api/discord/callback
-    const state = discordUrl.searchParams.get('state');
-
-    await this.page.goto(`${callbackUrl}?code=123&state=${state}&discordApiUrl=${discordApiUrl}`);
-  }
-
   async waitForWorkspaceLoaded({ domain, page }: { domain: string; page: { path: string; title: string } }) {
     await this.page.waitForURL(`**/${domain}/${page.path}`);
     await this.page.locator(`text=${page.title}`).first().waitFor();
