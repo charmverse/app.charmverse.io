@@ -1,7 +1,12 @@
+import useSWRInfinite from 'swr/infinite';
+
+import * as http from 'adapters/http';
 import { useGET, usePUT } from 'charmClient/hooks/helpers';
 import type { TransactionResult } from 'lib/charms/addTransaction';
+import { TRANSACTIONS_PAGE_SIZE } from 'lib/charms/constants';
 import type { SpaceCharmsStatus } from 'lib/charms/getSpacesCharmsStatus';
 import type { CharmsBalance } from 'lib/charms/getUserOrSpaceBalance';
+import type { HistoryTransaction } from 'lib/charms/listTransactionsHistory';
 import type { TransferCharmsInput } from 'lib/charms/transferCharms';
 
 export function useUserCharms(userId?: string) {
@@ -18,14 +23,26 @@ export function useSpaceCharms(spaceId: string, userId?: string) {
 
 export function useTransactionHistory({
   userId,
-  page,
-  pageSize
+  pageSize = TRANSACTIONS_PAGE_SIZE
 }: {
   userId?: string;
-  page: number;
   pageSize?: number;
 }) {
-  return useGET<CharmsBalance>(userId ? `/api/profile/charms/history` : null, { page, pageSize });
+  return useSWRInfinite(
+    (index) =>
+      userId
+        ? {
+            url: '/api/profile/charms/history',
+            arguments: { userId, page: index }
+          }
+        : null,
+    (args) =>
+      http.GET<HistoryTransaction[]>(args.url, {
+        pageSize,
+        page: args.arguments.page || 0
+      }),
+    { revalidateOnFocus: true }
+  );
 }
 
 export function useTransferCharms() {
