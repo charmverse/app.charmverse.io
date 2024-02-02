@@ -1,6 +1,7 @@
 import { FormatListBulleted } from '@mui/icons-material';
 import { useState } from 'react';
 
+import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { CreateVoteModal } from 'components/votes/components/CreateVoteModal';
 import { usePostPermissions } from 'hooks/usePostPermissions';
@@ -29,6 +30,7 @@ export function PollNodeView({
     postId
   });
 
+  const view = useEditorViewContext();
   const autoOpen = node.marks.some((mark) => mark.type.name === 'tooltip-marker');
 
   const postPermissions = usePostPermissions({
@@ -95,6 +97,7 @@ export function PollNodeView({
         disableVote={(pagePermissions && !pagePermissions.comment) || (postPermissions && !postPermissions.add_comment)}
         vote={votes[pollId]}
         updateDeadline={updateDeadline}
+        view={view}
       />
     );
   }
