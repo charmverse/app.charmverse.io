@@ -245,20 +245,22 @@ export function ProposalRewards({
                         </Grid>
                       </Hidden>
 
-                      <Grid item xs={4} lg={2}>
-                        <Stack className='icons' sx={{ opacity: 0, transition: 'opacity 0.2s ease' }} direction='row'>
-                          <IconButton
-                            size='small'
-                            onClick={() => editReward({ reward, page, draftId })}
-                            disabled={readOnly}
-                          >
-                            <Edit color='secondary' fontSize='small' />
-                          </IconButton>
-                          <IconButton size='small' onClick={() => onDelete(draftId)} disabled={readOnly}>
-                            <Delete color='secondary' fontSize='small' />
-                          </IconButton>
-                        </Stack>
-                      </Grid>
+                      {!readOnly && (
+                        <Grid item xs={4} lg={2}>
+                          <Stack className='icons' sx={{ opacity: 0, transition: 'opacity 0.2s ease' }} direction='row'>
+                            <IconButton
+                              size='small'
+                              onClick={() => editReward({ reward, page, draftId })}
+                              disabled={readOnly}
+                            >
+                              <Edit color='secondary' fontSize='small' />
+                            </IconButton>
+                            <IconButton size='small' onClick={() => onDelete(draftId)} disabled={readOnly}>
+                              <Delete color='secondary' fontSize='small' />
+                            </IconButton>
+                          </Stack>
+                        </Grid>
+                      )}
                     </Grid>
                   </Stack>
                 </SelectPreviewContainer>
@@ -277,7 +279,7 @@ export function ProposalRewards({
 
       <NewPageDialog
         contentUpdated={contentUpdated || isDirty}
-        disabledTooltip={getDisabledTooltip({ newPageValues, rewardValues, isProposalTemplate })}
+        disabledTooltip={getDisabledTooltip({ newPageValues, rewardValues })}
         isOpen={!!newPageValues}
         onClose={closeDialog}
         onSave={saveForm}
