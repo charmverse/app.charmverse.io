@@ -4,7 +4,7 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import clsx from 'clsx';
 import { DateTime } from 'luxon';
 import type { ChangeEvent } from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { StyledFocalboardTextInput } from 'components/common/BoardEditor/components/properties/TextInput';
@@ -12,6 +12,7 @@ import type { RoleOption } from 'components/common/BoardEditor/components/proper
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import Checkbox from 'components/common/BoardEditor/focalboard/src/widgets/checkbox';
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { TemplateSelect } from 'components/proposals/ProposalPage/components/TemplateSelect';
 import { RewardApplicationType } from 'components/rewards/components/RewardProperties/components/RewardApplicationType';
 import { RewardPropertiesHeader } from 'components/rewards/components/RewardProperties/components/RewardPropertiesHeader';
@@ -26,7 +27,7 @@ import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { RewardFieldsProp, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
-import type { Reward, RewardWithUsers, RewardReviewer } from 'lib/rewards/interfaces';
+import type { Reward, RewardReviewer, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -44,6 +45,7 @@ type Props = {
   readOnlyTemplate?: boolean;
   forcedApplicationType?: RewardApplicationType;
   rewardStatus?: BountyStatus | null;
+  isProposalTemplate?: boolean;
 };
 
 function getApplicationType(values: UpdateableRewardFields, forcedApplicationType?: RewardApplicationType) {
@@ -82,11 +84,13 @@ export function RewardPropertiesForm({
   templateId,
   readOnlyTemplate,
   forcedApplicationType,
-  rewardStatus
+  rewardStatus,
+  isProposalTemplate
 }: Props) {
   const [rewardApplicationType, setRewardApplicationTypeRaw] = useState<RewardApplicationType>(() =>
     getApplicationType(values, forcedApplicationType)
   );
+
   const { getFeatureTitle } = useSpaceFeatures();
   const isAdmin = useIsAdmin();
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
@@ -105,7 +109,8 @@ export function RewardPropertiesForm({
   const template = rewardTemplates?.find((tpl) => tpl.page.id === templateId);
   const readOnlyReviewers = !isAdmin && (readOnly || !!template?.reward.reviewers?.length);
   const readOnlyDueDate = !isAdmin && (readOnly || !!template?.reward.dueDate);
-  const readOnlyApplicationType = !isAdmin && (readOnly || !!forcedApplicationType || !!template);
+  const readOnlyApplicationType =
+    (!isAdmin && (readOnly || !!forcedApplicationType || !!template)) || isProposalTemplate;
   const readOnlyProperties = !isAdmin && (readOnly || !!template);
   const readOnlyNumberAvailable = !isAdmin && (readOnly || typeof template?.reward.maxSubmissions === 'number');
   const readOnlyApplicantRoles = !isAdmin && (readOnly || !!template?.reward.allowedSubmitterRoles?.length);
@@ -302,7 +307,6 @@ export function RewardPropertiesForm({
                 open={isDateTimePickerOpen}
               />
             </Box>
-
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
               <PropertyLabel readOnly highlighted>
                 Application Type
@@ -397,7 +401,7 @@ export function RewardPropertiesForm({
             )}
 
             {/* Select authors */}
-            {isAssignedReward && (
+            {isAssignedReward && !isProposalTemplate && (
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
                 <PropertyLabel readOnly required={!isTemplate && !readOnly} highlighted>
                   Assigned applicants

@@ -3,7 +3,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import type { TransactionResult } from 'lib/charms/addTransaction';
-import { getUserOrSpaceWallet } from 'lib/charms/getUserOrSpaceWallet';
+import type { CharmsBalance } from 'lib/charms/getUserOrSpaceBalance';
+import { getUserOrSpaceBalance } from 'lib/charms/getUserOrSpaceBalance';
 import { transferCharms } from 'lib/charms/transferCharms';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -12,12 +13,12 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).get(getCharmsHandler).put(transferCharmsHandler);
 
-async function getCharmsHandler(req: NextApiRequest, res: NextApiResponse<{ balance: number; id: string } | null>) {
+async function getCharmsHandler(req: NextApiRequest, res: NextApiResponse<CharmsBalance | null>) {
   const userId = req.session.user.id;
 
-  const wallet = await getUserOrSpaceWallet({ userId, readOnly: true });
+  const balance = await getUserOrSpaceBalance({ userId, readOnly: true });
 
-  res.status(200).json(wallet ? { balance: wallet.balance, id: wallet.id } : null);
+  res.status(200).json(balance);
 }
 
 async function transferCharmsHandler(req: NextApiRequest, res: NextApiResponse<TransactionResult>) {

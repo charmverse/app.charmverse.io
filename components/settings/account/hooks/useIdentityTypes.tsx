@@ -66,15 +66,6 @@ export function useIdentityTypes() {
       });
     });
 
-    user.unstoppableDomains?.forEach(({ domain }) => {
-      types.push({
-        type: 'UnstoppableDomain',
-        username: domain,
-        isInUse: user.identityType === 'UnstoppableDomain' && user.username === domain,
-        icon: <IdentityIcon type='UnstoppableDomain' />
-      });
-    });
-
     user.verifiedEmails.forEach((verifiedEmail) => {
       types.push({
         type: 'VerifiedEmail',

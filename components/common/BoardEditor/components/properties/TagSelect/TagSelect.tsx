@@ -225,7 +225,7 @@ export function TagSelect({
         options={selectOptions}
         size='small'
         emptyMessage={props.emptyMessage}
-        showEmpty={showEmpty}
+        showEmpty={showEmpty || displayType === 'details'}
       />
     </SelectPreviewContainer>
   );

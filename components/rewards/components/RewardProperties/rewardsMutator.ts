@@ -3,7 +3,13 @@ import { Mutator } from 'components/common/BoardEditor/focalboard/src/mutator';
 import { IDType, Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import type { RewardBlocksContextType } from 'hooks/useRewardBlocks';
 import type { Block } from 'lib/focalboard/block';
-import type { Board, IPropertyOption, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type {
+  Board,
+  IPropertyOption,
+  IPropertyTemplate,
+  PropertyType,
+  RelationPropertyData
+} from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import type { RewardPropertiesBlockFields, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
@@ -63,9 +69,15 @@ export class RewardsMutator extends Mutator {
     propertyTemplate: IPropertyTemplate,
     newType: PropertyType,
     newName: string,
-    views: BoardView[]
+    views: BoardView[],
+    relationData?: RelationPropertyData
   ) {
-    this.blocksContext.updateProperty({ ...propertyTemplate, type: newType, name: newName });
+    this.blocksContext.updateProperty({
+      ...propertyTemplate,
+      type: newType,
+      name: newName,
+      relationData: newType === 'relation' ? relationData : propertyTemplate.relationData
+    });
   }
 
   async reorderProperties(boardId: string, cardProperties: IPropertyTemplate[]): Promise<void> {

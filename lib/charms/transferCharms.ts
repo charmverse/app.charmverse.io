@@ -5,6 +5,12 @@ import { addTransaction } from 'lib/charms/addTransaction';
 import type { TransactionResult, TransactionRecipient } from 'lib/charms/addTransaction';
 import { getUserOrSpaceWallet } from 'lib/charms/getUserOrSpaceWallet';
 
+export type TransferCharmsInput = {
+  amount: number;
+  spaceId?: string;
+  userId?: string;
+};
+
 /**
  * Transfer charms from user to space or another user
  * @param sender - User ID

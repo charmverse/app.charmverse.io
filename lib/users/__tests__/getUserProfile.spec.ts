@@ -28,18 +28,6 @@ beforeAll(async () => {
           avatarUrl: 'https://example.com/avatar.png'
         }
       },
-      unstoppableDomains: {
-        createMany: {
-          data: [
-            {
-              domain: `example-${v4()}.nft`
-            },
-            {
-              domain: `example-${v4()}.nft`
-            }
-          ]
-        }
-      },
       discordUser: {
         create: {
           discordId: `1234567890-${v4()}`,
@@ -50,7 +38,7 @@ beforeAll(async () => {
     include: sessionUserRelations
   });
 
-  if (!user.discordUser || !user.wallets.length || !user.googleAccounts.length || !user.unstoppableDomains.length) {
+  if (!user.discordUser || !user.wallets.length || !user.googleAccounts.length) {
     throw new InvalidInputError('User session relations not retrieved correctly');
   }
 });

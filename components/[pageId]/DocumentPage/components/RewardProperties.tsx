@@ -7,7 +7,7 @@ import { RewardPropertiesForm } from 'components/rewards/components/RewardProper
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import type { RewardCreationData } from 'lib/rewards/createReward';
-import type { RewardWithUsersAndPageMeta, RewardWithUsers } from 'lib/rewards/interfaces';
+import type { RewardWithUsers, RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import debouncePromise from 'lib/utilities/debouncePromise';
 

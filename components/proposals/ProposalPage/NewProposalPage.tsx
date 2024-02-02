@@ -3,7 +3,7 @@ import type { PageType } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
-import { Box, Divider, useMediaQuery, Typography } from '@mui/material';
+import { Box, Divider, useMediaQuery, Stack, Typography } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { useElementSize } from 'usehooks-ts';
 import { v4 as uuid } from 'uuid';
@@ -11,12 +11,12 @@ import { v4 as uuid } from 'uuid';
 import { useForumPost } from 'charmClient/hooks/forum';
 import { useGetPage } from 'charmClient/hooks/pages';
 import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
+import { DocumentColumnLayout, DocumentColumn } from 'components/[pageId]/DocumentPage/components/DocumentColumnLayout';
 import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
 import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import { PageTemplateBanner } from 'components/[pageId]/DocumentPage/components/PageTemplateBanner';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
-import { PrimaryColumn } from 'components/[pageId]/DocumentPage/components/PrimaryColumn';
-import { PageSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/PageSidebar';
+import { ProposalSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/ProposalSidebar';
 import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/components/StickyFooterContainer';
 import { defaultPageTop } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
@@ -49,7 +49,7 @@ import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
-import { getNewCriteria } from './components/EvaluationSettingsSidebar/components/RubricCriteriaSettings';
+import { getNewCriteria } from './components/ProposalEvaluations/components/Settings/components/RubricCriteriaSettings';
 import type { ProposalPropertiesInput } from './components/ProposalProperties/ProposalPropertiesBase';
 import { ProposalPropertiesBase } from './components/ProposalProperties/ProposalPropertiesBase';
 import { TemplateSelect } from './components/TemplateSelect';
@@ -62,7 +62,7 @@ export type ProposalPageAndPropertiesInput = ProposalPropertiesInput & {
   headerImage: string | null;
   icon: string | null;
   type: PageType;
-  proposalType?: 'structured' | 'free_form';
+  proposalType: 'structured' | 'free_form';
   formFields?: FormFieldInput[];
   formAnswers?: FieldAnswerInput[];
   formId?: string;
@@ -97,7 +97,6 @@ export function NewProposalPage({
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>();
   const [, setPageTitle] = usePageTitle();
   const { data: workflowOptions, isLoading: isLoadingWorkflows } = useGetProposalWorkflows(currentSpace?.id);
-  const isMdScreen = useMdScreen();
   const proposalPageType = isTemplate ? 'proposal_template' : 'proposal';
   const {
     formInputs,
@@ -105,6 +104,7 @@ export function NewProposalPage({
     contentUpdated,
     disabledTooltip: _disabledTooltip,
     isCreatingProposal,
+    isFormLoaded,
     createProposal
   } = useNewProposal({
     newProposal: { type: proposalPageType, proposalType }
@@ -190,26 +190,39 @@ export function NewProposalPage({
     if (template) {
       const formFields = template.form?.formFields ?? [];
       const authors = Array.from(new Set([user!.id].concat(template.authors.map((author) => author.userId))));
-      setFormInputs({
-        authors,
-        content: template.page.content as PageContent,
-        contentText: template.page.contentText,
-        selectedCredentialTemplates: template.selectedCredentialTemplates ?? [],
-        proposalTemplateId: _templateId,
-        headerImage: template.page.headerImage,
-        icon: template.page.icon,
-        evaluations: template.evaluations,
-        fields: template.fields || {},
-        type: proposalPageType,
-        formId: template.formId ?? undefined,
-        formFields: isTemplate ? formFields.map((formField) => ({ ...formField, id: uuid() })) : formFields,
-        formAnswers: (template?.form?.formFields ?? [])
-          .filter((formField) => formField.type !== 'label')
-          .map((proposalFormField) => ({
-            fieldId: proposalFormField.id,
-            value: getInitialFormFieldValue(proposalFormField) as FieldAnswerInput['value']
-          }))
-      });
+      setFormInputs(
+        {
+          authors,
+          content: template.page.content as PageContent,
+          contentText: template.page.contentText,
+          selectedCredentialTemplates: template.selectedCredentialTemplates ?? [],
+          proposalTemplateId: _templateId,
+          headerImage: template.page.headerImage,
+          icon: template.page.icon,
+          evaluations: template.evaluations,
+          fields:
+            {
+              ...template.fields,
+              pendingRewards: template.fields?.pendingRewards?.map((pendingReward) => ({
+                ...pendingReward,
+                reward: {
+                  ...pendingReward.reward,
+                  assignedSubmitters: authors
+                }
+              }))
+            } || {},
+          type: proposalPageType,
+          formId: template.formId ?? undefined,
+          formFields: isTemplate ? formFields.map((formField) => ({ ...formField, id: uuid() })) : formFields,
+          formAnswers: (template?.form?.formFields ?? [])
+            .filter((formField) => formField.type !== 'label')
+            .map((proposalFormField) => ({
+              fieldId: proposalFormField.id,
+              value: getInitialFormFieldValue(proposalFormField) as FieldAnswerInput['value']
+            }))
+        },
+        { fromUser: false }
+      );
       const workflow = workflowOptions?.find((w) => w.id === template.workflowId);
       if (workflow) {
         // pass in the template since the formState will not be updated in this instance of applyWorkflow
@@ -225,31 +238,34 @@ export function NewProposalPage({
   }
 
   function applyWorkflow(workflow: ProposalWorkflowTyped, template?: ProposalTemplate) {
-    setFormInputs({
-      workflowId: workflow.id,
-      evaluations: workflow.evaluations.map((evaluation, index) => {
-        // try to retain existing reviewers and configuration
-        const existingStep = (template?.evaluations || formInputs.evaluations).find(
-          (e) => e.title === evaluation.title
-        );
-        const rubricCriteria = (
-          evaluation.type === 'rubric' ? existingStep?.rubricCriteria || [getNewCriteria()] : []
-        ) as ProposalRubricCriteriaWithTypedParams[];
-        // include author as default reviewer for feedback
-        const defaultReviewers = evaluation.type === 'feedback' && user ? [{ systemRole: authorSystemRole.id }] : [];
-        return {
-          id: evaluation.id,
-          index,
-          reviewers: existingStep?.reviewers || defaultReviewers,
-          rubricCriteria,
-          title: evaluation.title,
-          type: evaluation.type,
-          result: null,
-          voteSettings: existingStep?.voteSettings,
-          permissions: evaluation.permissions as ProposalEvaluationPermission[]
-        };
-      })
-    });
+    setFormInputs(
+      {
+        workflowId: workflow.id,
+        evaluations: workflow.evaluations.map((evaluation, index) => {
+          // try to retain existing reviewers and configuration
+          const existingStep = (template?.evaluations || formInputs.evaluations).find(
+            (e) => e.title === evaluation.title
+          );
+          const rubricCriteria = (
+            evaluation.type === 'rubric' ? existingStep?.rubricCriteria || [getNewCriteria()] : []
+          ) as ProposalRubricCriteriaWithTypedParams[];
+          // include author as default reviewer for feedback
+          const defaultReviewers = evaluation.type === 'feedback' && user ? [{ systemRole: authorSystemRole.id }] : [];
+          return {
+            id: evaluation.id,
+            index,
+            reviewers: existingStep?.reviewers || defaultReviewers,
+            rubricCriteria,
+            title: evaluation.title,
+            type: evaluation.type,
+            result: null,
+            voteSettings: existingStep?.voteSettings,
+            permissions: evaluation.permissions as ProposalEvaluationPermission[]
+          };
+        })
+      },
+      { fromUser: false }
+    );
   }
 
   function applyProposalContent({ doc, rawText }: ICharmEditorOutput) {
@@ -268,18 +284,14 @@ export function NewProposalPage({
   }
 
   // having `internalSidebarView` allows us to have the sidebar open by default, because usePageSidebar() does not allow us to do this currently
-  const [defaultSidebarView, setDefaultView] = useState<PageSidebarView | null>(
-    isMdScreen ? 'proposal_evaluation' : null
-  );
+  const [defaultSidebarView, setDefaultView] = useState<PageSidebarView | null>('proposal_evaluation');
   const internalSidebarView = defaultSidebarView || sidebarView;
 
   useEffect(() => {
     // clear out page title on load
     setPageTitle('');
-    if (isMdScreen) {
-      setActiveView('proposal_evaluation');
-      setDefaultView(null);
-    }
+    setActiveView('proposal_evaluation');
+    setDefaultView(null);
   }, []);
 
   useEffect(() => {
@@ -306,253 +318,285 @@ export function NewProposalPage({
   // apply title and content if converting a page into a proposal
   useEffect(() => {
     if (sourcePage) {
-      setFormInputs({
-        content: sourcePage.content as any,
-        contentText: sourcePage.contentText,
-        title: sourcePage.title,
-        sourcePageId: sourcePage.id
-      });
+      setFormInputs(
+        {
+          content: sourcePage.content as any,
+          contentText: sourcePage.contentText,
+          title: sourcePage.title,
+          sourcePageId: sourcePage.id
+        },
+        { fromUser: false }
+      );
     } else if (sourcePost) {
-      setFormInputs({
-        content: sourcePost.content as any,
-        contentText: sourcePost.contentText,
-        title: sourcePost.title,
-        sourcePostId: sourcePost.id
-      });
+      setFormInputs(
+        {
+          content: sourcePost.content as any,
+          contentText: sourcePost.contentText,
+          title: sourcePost.title,
+          sourcePostId: sourcePost.id
+        },
+        { fromUser: false }
+      );
     }
   }, [hasSource]);
 
+  // watch for changes in isTemplate
+  useEffect(() => {
+    if (isTemplate) {
+      setFormInputs(
+        {
+          type: 'proposal_template',
+          proposalTemplateId: null
+        },
+        { fromUser: false }
+      );
+    } else {
+      setFormInputs(
+        {
+          type: 'proposal'
+        },
+        { fromUser: false }
+      );
+    }
+  }, [isTemplate]);
+
   return (
-    <Box flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
-      <PrimaryColumn showPageActionSidebar={!!internalSidebarView}>
-        <Box className={`document-print-container ${fontClassName}`} display='flex' flexDirection='column'>
-          <PageTemplateBanner pageType={formInputs.type} isNewPage proposalType={formInputs.proposalType} />
-          {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
-          <StyledContainer data-test='page-charmeditor' top={defaultPageTop} fullWidth={isSmallScreen}>
-            <Box minHeight={450}>
-              <PageTitleInput
-                readOnly={false}
-                updatedAt={new Date().toString()}
-                value={formInputs.title || ''}
-                onChange={(updatedPage) => {
-                  setFormInputs(updatedPage);
-                  if ('title' in updatedPage) {
-                    setPageTitle(updatedPage.title || '');
-                  }
-                }}
-                focusDocumentEditor={focusDocumentEditor}
-                placeholder='Title (required)'
-              />
-              <div className='focalboard-body font-family-default'>
-                <div className='CardDetail content'>
-                  <div className='octo-propertylist'>
-                    {/* Select a template for new proposals */}
-                    {!isTemplate && (
-                      <>
-                        <Box className='octo-propertyrow'>
-                          <PropertyLabel readOnly highlighted required={isTemplateRequired}>
-                            Template
-                          </PropertyLabel>
-                          <Box display='flex' flex={1}>
-                            <TemplateSelect
-                              options={templatePageOptions}
-                              value={proposalTemplatePage ?? null}
-                              onChange={(page) => {
-                                if (page === null) {
-                                  clearTemplate();
-                                  // if user has not updated the content, then just overwrite everything
-                                } else if (formInputs.contentText?.length === 0) {
-                                  applyTemplate(page.id);
-                                } else {
-                                  // set value to trigger a prompt
-                                  setSelectedProposalTemplateId(page.id);
-                                }
-                              }}
-                            />
-                          </Box>
-                        </Box>
+    <Box display='flex' flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
+      <DocumentColumnLayout>
+        <DocumentColumn>
+          <Box display='flex' flexDirection='column' height='100%'>
+            <Box
+              className={`document-print-container ${fontClassName}`}
+              display='flex'
+              flexDirection='column'
+              overflow='auto'
+              flexGrow={1}
+            >
+              <PageTemplateBanner pageType={formInputs.type} isNewPage />
+              {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
+              <StyledContainer data-test='page-charmeditor' top={defaultPageTop} fullWidth={isSmallScreen}>
+                <Box minHeight={450}>
+                  <PageTitleInput
+                    readOnly={false}
+                    updatedAt={new Date().toString()}
+                    value={formInputs.title || ''}
+                    onChange={(updatedPage) => {
+                      setFormInputs(updatedPage);
+                      if ('title' in updatedPage) {
+                        setPageTitle(updatedPage.title || '');
+                      }
+                    }}
+                    focusDocumentEditor={focusDocumentEditor}
+                    placeholder='Title (required)'
+                  />
+                  <div className='focalboard-body font-family-default'>
+                    <div className='CardDetail content'>
+                      <div className='octo-propertylist'>
+                        {/* Select a template for new proposals */}
+                        {!isTemplate && (
+                          <>
+                            <Box className='octo-propertyrow'>
+                              <PropertyLabel readOnly highlighted required={isTemplateRequired}>
+                                Template
+                              </PropertyLabel>
+                              <Box display='flex' flex={1}>
+                                <TemplateSelect
+                                  options={templatePageOptions}
+                                  value={proposalTemplatePage ?? null}
+                                  onChange={(page) => {
+                                    if (page === null) {
+                                      clearTemplate();
+                                      // if user has not updated the content, then just overwrite everything
+                                    } else if (formInputs.contentText?.length === 0) {
+                                      applyTemplate(page.id);
+                                    } else {
+                                      // set value to trigger a prompt
+                                      setSelectedProposalTemplateId(page.id);
+                                    }
+                                  }}
+                                />
+                              </Box>
+                            </Box>
 
-                        <Divider />
-                      </>
-                    )}
-                    <ProposalPropertiesBase
-                      proposalStatus='draft'
-                      proposalFormInputs={formInputs}
-                      setProposalFormInputs={setFormInputs}
-                      readOnlyAuthors={!isAdmin && !!sourceTemplate?.authors.length}
-                      readOnlyCustomProperties={readOnlyCustomProperties}
-                      readOnlySelectedCredentialTemplates={readOnlySelectedCredentialTemplates}
-                      isStructuredProposal={isStructured}
-                    />
+                            <Divider />
+                          </>
+                        )}
+                        <ProposalPropertiesBase
+                          proposalStatus='draft'
+                          proposalFormInputs={formInputs}
+                          setProposalFormInputs={setFormInputs}
+                          readOnlyAuthors={!isAdmin && !!sourceTemplate?.authors.length}
+                          readOnlyCustomProperties={readOnlyCustomProperties}
+                          readOnlySelectedCredentialTemplates={readOnlySelectedCredentialTemplates}
+                          isStructuredProposal={isStructured}
+                          isProposalTemplate={!!isTemplate}
+                        />
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-              {isStructured ? (
-                formInputs.type === 'proposal_template' ? (
-                  <ControlledFormFieldsEditor
-                    collapsedFieldIds={collapsedFieldIds}
-                    toggleCollapse={toggleCollapse}
-                    formFields={proposalFormFields}
-                    setFormFields={(formFields) => {
-                      setFormInputs({
-                        formFields
-                      });
-                    }}
-                  />
-                ) : (
-                  <ControlledFormFieldsInput
-                    control={proposalFormFieldControl}
-                    errors={proposalFormFieldErrors}
-                    onFormChange={(updatedFormFields) => {
-                      setFormInputs({
-                        formAnswers: formAnswersRef.current?.map((formAnswer) => {
-                          const updatedFormField = updatedFormFields.find((f) => f.id === formAnswer.fieldId);
-                          return {
-                            ...formAnswer,
-                            value: updatedFormField?.value ?? formAnswer.value
-                          };
-                        })
-                      });
-                      onFormChange(updatedFormFields);
-                    }}
-                    formFields={proposalFormFields}
-                  />
-                )
-              ) : (
-                <CharmEditor
-                  placeholderText={`Describe the proposal. Type '/' to see the list of available commands`}
-                  content={formInputs.content as PageContent}
-                  autoFocus={false}
-                  enableVoting={false}
-                  containerWidth={containerWidth}
-                  pageType='proposal'
-                  disableNestedPages
-                  onContentChange={applyProposalContent}
-                  focusOnInit
-                  isContentControlled
-                  key={`${formInputs.proposalTemplateId ?? formInputs.sourcePageId ?? formInputs.sourcePostId}`}
-                />
-              )}
-              {currentSpace && (
-                <PageSidebar
-                  isUnpublishedProposal
-                  id='page-action-sidebar'
-                  spaceId={currentSpace.id}
-                  sidebarView={internalSidebarView || null}
-                  closeSidebar={() => {}}
-                  openSidebar={setActiveView}
-                  proposalInput={formInputs}
-                  proposalTemplateId={formInputs.proposalTemplateId}
-                  onChangeEvaluation={(evaluationId, updates) => {
-                    const evaluations = formInputs.evaluations.map((e) =>
-                      e.id === evaluationId ? { ...e, ...updates } : e
-                    );
-                    setFormInputs({
-                      ...formInputs,
-                      evaluations
-                    });
-                  }}
-                  onChangeRewardSettings={(values) => {
-                    setFormInputs({
-                      ...formInputs,
-                      fields: {
-                        ...formInputs.fields,
-                        ...values
-                      }
-                    });
-                  }}
-                  onChangeWorkflow={applyWorkflow}
-                  isProposalTemplate={isTemplate}
-                  isStructuredProposal={isStructured}
-                />
-              )}
-              {isStructured && formInputs.fields?.enableRewards && (
-                <>
-                  <Box my={1}>
-                    <Typography variant='h5'>{getFeatureTitle('Rewards')}</Typography>
-                  </Box>
-                  <ProposalRewards
-                    pendingRewards={pendingRewards}
-                    requiredTemplateId={formInputs.fields?.rewardsTemplateId}
-                    reviewers={formInputs.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat()}
-                    assignedSubmitters={formInputs.authors}
-                    variant='solid_button'
-                    rewardIds={[]}
-                    onSave={(pendingReward) => {
-                      const isExisting = pendingRewards.find((reward) => reward.draftId === pendingReward.draftId);
-                      if (!isExisting) {
-                        setFormInputs({
-                          fields: {
-                            ...formInputs.fields,
-                            pendingRewards: [...(formInputs.fields?.pendingRewards || []), pendingReward]
+                  {isStructured ? (
+                    formInputs.type === 'proposal_template' ? (
+                      <ControlledFormFieldsEditor
+                        collapsedFieldIds={collapsedFieldIds}
+                        toggleCollapse={toggleCollapse}
+                        formFields={proposalFormFields}
+                        setFormFields={(formFields) => {
+                          setFormInputs({
+                            formFields
+                          });
+                        }}
+                      />
+                    ) : (
+                      <ControlledFormFieldsInput
+                        control={proposalFormFieldControl}
+                        errors={proposalFormFieldErrors}
+                        onFormChange={(updatedFormFields) => {
+                          setFormInputs({
+                            formAnswers: formAnswersRef.current?.map((formAnswer) => {
+                              const updatedFormField = updatedFormFields.find((f) => f.id === formAnswer.fieldId);
+                              return {
+                                ...formAnswer,
+                                value: updatedFormField?.value ?? formAnswer.value
+                              };
+                            })
+                          });
+                          onFormChange(updatedFormFields);
+                        }}
+                        formFields={proposalFormFields}
+                      />
+                    )
+                  ) : (
+                    <CharmEditor
+                      placeholderText={`Describe the proposal. Type '/' to see the list of available commands`}
+                      content={formInputs.content as PageContent}
+                      autoFocus={false}
+                      enableVoting={false}
+                      containerWidth={containerWidth}
+                      pageType='proposal'
+                      disableNestedPages
+                      onContentChange={applyProposalContent}
+                      focusOnInit
+                      isContentControlled
+                      key={`${formInputs.proposalTemplateId ?? formInputs.sourcePageId ?? formInputs.sourcePostId}`}
+                    />
+                  )}
+                  {isStructured && formInputs.fields?.enableRewards && (
+                    <>
+                      <Box my={1}>
+                        <Typography variant='h5'>{getFeatureTitle('Rewards')}</Typography>
+                      </Box>
+                      <ProposalRewards
+                        pendingRewards={pendingRewards}
+                        requiredTemplateId={formInputs.fields?.rewardsTemplateId}
+                        reviewers={formInputs.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat()}
+                        assignedSubmitters={formInputs.authors}
+                        variant='solid_button'
+                        isProposalTemplate={!!isTemplate}
+                        rewardIds={[]}
+                        onSave={(pendingReward) => {
+                          const isExisting = pendingRewards.find((reward) => reward.draftId === pendingReward.draftId);
+                          if (!isExisting) {
+                            setFormInputs({
+                              fields: {
+                                ...formInputs.fields,
+                                pendingRewards: [...(formInputs.fields?.pendingRewards || []), pendingReward]
+                              }
+                            });
+
+                            return;
                           }
-                        });
 
-                        return;
-                      }
-
-                      setFormInputs({
-                        fields: {
-                          ...formInputs.fields,
-                          pendingRewards: [...(formInputs.fields?.pendingRewards || [])].map((draft) => {
-                            if (draft.draftId === pendingReward.draftId) {
-                              return pendingReward;
+                          setFormInputs({
+                            fields: {
+                              ...formInputs.fields,
+                              pendingRewards: [...(formInputs.fields?.pendingRewards || [])].map((draft) => {
+                                if (draft.draftId === pendingReward.draftId) {
+                                  return pendingReward;
+                                }
+                                return draft;
+                              })
                             }
-                            return draft;
-                          })
-                        }
-                      });
-                    }}
-                    onDelete={(draftId: string) => {
-                      setFormInputs({
-                        fields: {
-                          ...formInputs.fields,
-                          pendingRewards: [...(formInputs.fields?.pendingRewards || [])].filter(
-                            (draft) => draft.draftId !== draftId
-                          )
-                        }
-                      });
-                    }}
-                  />
+                          });
+                        }}
+                        onDelete={(draftId: string) => {
+                          setFormInputs({
+                            fields: {
+                              ...formInputs.fields,
+                              pendingRewards: [...(formInputs.fields?.pendingRewards || [])].filter(
+                                (draft) => draft.draftId !== draftId
+                              )
+                            }
+                          });
+                        }}
+                      />
+                    </>
+                  )}
+                </Box>
+              </StyledContainer>
+            </Box>
+            <StickyFooterContainer>
+              {isTemplate ? (
+                <Button
+                  data-test='create-proposal-button'
+                  disabled={Boolean(disabledTooltip) || isCreatingProposal}
+                  disabledTooltip={disabledTooltip}
+                  onClick={() => saveForm({ isDraft: true })}
+                  loading={isCreatingProposal && !submittedDraft}
+                >
+                  Save
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    disabled={Boolean(disabledTooltip) || isCreatingProposal}
+                    disabledTooltip={disabledTooltip}
+                    loading={isCreatingProposal && submittedDraft}
+                    data-test='create-proposal-button'
+                    variant='outlined'
+                    onClick={() => saveForm({ isDraft: true })}
+                  >
+                    Save draft
+                  </Button>
+                  <Button
+                    disabled={Boolean(disabledTooltip) || isCreatingProposal}
+                    disabledTooltip={disabledTooltip}
+                    onClick={() => saveForm()}
+                    loading={isCreatingProposal && !submittedDraft}
+                  >
+                    Publish
+                  </Button>
                 </>
               )}
-            </Box>
-          </StyledContainer>
-        </Box>
-        <StickyFooterContainer>
-          {isTemplate ? (
-            <Button
-              data-test='create-proposal-button'
-              disabled={Boolean(disabledTooltip) || isCreatingProposal}
-              disabledTooltip={disabledTooltip}
-              onClick={() => saveForm({ isDraft: true })}
-              loading={isCreatingProposal && !submittedDraft}
-            >
-              Save
-            </Button>
-          ) : (
-            <>
-              <Button
-                disabled={Boolean(disabledTooltip) || isCreatingProposal}
-                disabledTooltip={disabledTooltip}
-                loading={isCreatingProposal && submittedDraft}
-                data-test='create-proposal-button'
-                variant='outlined'
-                onClick={() => saveForm({ isDraft: true })}
-              >
-                Save draft
-              </Button>
-              <Button
-                disabled={Boolean(disabledTooltip) || isCreatingProposal}
-                disabledTooltip={disabledTooltip}
-                onClick={() => saveForm()}
-                loading={isCreatingProposal && !submittedDraft}
-              >
-                Publish
-              </Button>
-            </>
-          )}
-        </StickyFooterContainer>
+            </StickyFooterContainer>
+          </Box>
+        </DocumentColumn>
+        <ProposalSidebar
+          isUnpublishedProposal
+          isOpen={internalSidebarView === 'proposal_evaluation'}
+          isProposalTemplate={!!isTemplate}
+          isStructuredProposal={isStructured}
+          closeSidebar={() => setActiveView(null)}
+          openSidebar={() => setActiveView('proposal_evaluation')}
+          proposalInput={isFormLoaded ? formInputs : undefined}
+          templateId={formInputs.proposalTemplateId}
+          onChangeEvaluation={(evaluationId, updates) => {
+            const evaluations = formInputs.evaluations.map((e) => (e.id === evaluationId ? { ...e, ...updates } : e));
+            setFormInputs({
+              ...formInputs,
+              evaluations
+            });
+          }}
+          onChangeRewardSettings={(values) => {
+            setFormInputs({
+              ...formInputs,
+              fields: {
+                ...formInputs.fields,
+                ...values
+              }
+            });
+          }}
+          onChangeWorkflow={applyWorkflow}
+        />
         <ConfirmDeleteModal
           onClose={() => {
             setSelectedProposalTemplateId(null);
@@ -567,7 +611,7 @@ export function NewProposalPage({
             setSelectedProposalTemplateId(null);
           }}
         />
-      </PrimaryColumn>
+      </DocumentColumnLayout>
     </Box>
   );
 }
