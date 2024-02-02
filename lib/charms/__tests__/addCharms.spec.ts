@@ -48,7 +48,7 @@ describe('addCharms', () => {
       recipient: { userId: user.id },
       amount: 100,
       actorId: '123',
-      actionTrigger: CharmActionTrigger.invite
+      actionTrigger: CharmActionTrigger.referral
     });
     const tx = await getTransaction(txId);
 
@@ -57,6 +57,6 @@ describe('addCharms', () => {
     expect(tx?.amount).toBe(100);
     expect(tx?.from).toBe(null);
     expect(tx?.to).toBe(wallet.id);
-    expect(tx?.metadata).toEqual({ actorId: '123', actionTrigger: CharmActionTrigger.invite });
+    expect(tx?.metadata).toEqual({ actorId: '123', actionTrigger: CharmActionTrigger.referral });
   });
 });
