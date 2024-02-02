@@ -41,7 +41,7 @@ export function useTransactionHistory({
         pageSize,
         page: args.arguments.page || 0
       }),
-    { revalidateOnFocus: true }
+    { revalidateOnFocus: true, revalidateOnMount: true }
   );
 }
 
