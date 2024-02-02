@@ -2,7 +2,7 @@ import type { CharmWallet } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { addCharms } from 'lib/charms/addCharms';
-import { CharmActionTrigger } from 'lib/charms/addTransaction';
+import { CharmActionTrigger } from 'lib/charms/constants';
 import { getTransaction } from 'lib/charms/getTransaction';
 import { getUserOrSpaceWallet } from 'lib/charms/getUserOrSpaceWallet';
 import { generateUserAndSpace } from 'testing/setupDatabase';
