@@ -4,7 +4,7 @@ import { useSpacesCharmsState, useTransferCharms } from 'charmClient/hooks/charm
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ApplySpaceItem } from 'components/settings/charms/components/ApplySpaceItem';
 import { useUser } from 'hooks/useUser';
-import type { CharmsBalance } from 'lib/charms/getUserOrSpaceWallet';
+import type { CharmsBalance } from 'lib/charms/getUserOrSpaceBalance';
 import type { TransferCharmsInput } from 'lib/charms/transferCharms';
 
 type Props = {

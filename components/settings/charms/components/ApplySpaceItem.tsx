@@ -65,7 +65,12 @@ export function ApplySpaceItem({ spaceStatus, userBalance, onApplyCharms }: Prop
           max={userBalance}
           disabled={!userBalance}
         />
-        <Button variant='outlined' onClick={handleApplyCharms} loading={isSaving}>
+        <Button
+          variant='outlined'
+          onClick={handleApplyCharms}
+          loading={isSaving}
+          disabled={!userBalance || userBalance < charmsToApply}
+        >
           Apply
         </Button>
       </Stack>

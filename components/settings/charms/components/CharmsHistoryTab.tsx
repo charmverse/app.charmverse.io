@@ -1,11 +1,7 @@
-import { Divider, Stack, Typography } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 
-import { useSpacesCharmsState, useTransferCharms } from 'charmClient/hooks/charms';
-import LoadingComponent from 'components/common/LoadingComponent';
-import { ApplySpaceItem } from 'components/settings/charms/components/ApplySpaceItem';
 import { useUser } from 'hooks/useUser';
-import type { CharmsBalance } from 'lib/charms/getUserOrSpaceWallet';
-import type { TransferCharmsInput } from 'lib/charms/transferCharms';
+import type { CharmsBalance } from 'lib/charms/getUserOrSpaceBalance';
 
 type Props = {
   charmWallet?: CharmsBalance | null;

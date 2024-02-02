@@ -3,8 +3,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { generateCharmWallet } from 'lib/charms/generateCharmWallet';
 
-export type CharmsBalance = { id: string | null; balance: number };
-
 export async function getUserOrSpaceWallet({
   readOnly,
   ...params

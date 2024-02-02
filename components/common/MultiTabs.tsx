@@ -14,7 +14,7 @@ interface TabPanelProps extends React.HTMLAttributes<HTMLDivElement> {
   sx?: SxProps;
 }
 
-export function TabPanel(props: TabPanelProps) {
+function TabPanel(props: TabPanelProps) {
   const { children, value, index, label, sx = {}, ...other } = props;
 
   return (

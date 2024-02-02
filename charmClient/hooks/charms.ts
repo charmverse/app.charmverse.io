@@ -1,7 +1,7 @@
 import { useGET, usePUT } from 'charmClient/hooks/helpers';
 import type { TransactionResult } from 'lib/charms/addTransaction';
 import type { SpaceCharmsStatus } from 'lib/charms/getSpacesCharmsStatus';
-import type { CharmsBalance } from 'lib/charms/getUserOrSpaceWallet';
+import type { CharmsBalance } from 'lib/charms/getUserOrSpaceBalance';
 import type { TransferCharmsInput } from 'lib/charms/transferCharms';
 
 export function useUserCharms(userId?: string) {
