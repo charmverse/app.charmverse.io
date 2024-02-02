@@ -450,7 +450,7 @@ function DocumentPageComponent({
                     reviewers={proposal.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat()}
                     assignedSubmitters={proposal.authors.map((a) => a.userId)}
                     variant='solid_button'
-                    readOnlyRewards={!proposal.permissions.edit}
+                    readOnly={!proposal.permissions.edit}
                     rewardIds={proposal.rewardIds || []}
                     onSave={(pendingReward) => {
                       const isExisting = proposal.fields?.pendingRewards?.find(
