@@ -69,10 +69,8 @@ export function ProposalRewards({
   const canCreatePendingRewards = !readOnly && !rewardIds?.length;
 
   function closeDialog() {
-    if (!readOnly) {
-      clearRewardValues();
-      clearNewPage();
-    }
+    clearNewPage();
+    clearRewardValues();
     setCurrentPendingId(null);
   }
 
@@ -120,9 +118,7 @@ export function ProposalRewards({
   }
 
   function editReward({ reward, page, draftId }: ProposalPendingReward) {
-    if (!readOnly) {
-      setRewardValues(reward);
-    }
+    setRewardValues(reward);
     openNewPage(page || undefined);
     setCurrentPendingId(draftId);
   }
@@ -278,7 +274,7 @@ export function ProposalRewards({
       <NewPageDialog
         contentUpdated={contentUpdated || isDirty}
         disabledTooltip={getDisabledTooltip({ newPageValues, rewardValues, isProposalTemplate })}
-        isOpen={!!newPageValues}
+        isOpen={!!currentPendingId}
         onClose={closeDialog}
         onSave={saveForm}
         onCancel={closeDialog}
@@ -289,6 +285,7 @@ export function ProposalRewards({
           titlePlaceholder='Reward title (required)'
           values={newPageValues}
           onChange={updateNewPageValues}
+          readOnly={readOnly}
         >
           <RewardPropertiesForm
             onChange={setRewardValues}
