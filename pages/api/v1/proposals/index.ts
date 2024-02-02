@@ -90,7 +90,6 @@ type ProposalReviewer = {
  *            type: string
  *        currentStep:
  *          type: object
- *          nullable: true
  *          properties:
  *            title:
  *              type: string
@@ -106,6 +105,7 @@ type ProposalReviewer = {
  *              type: string
  *              example: vote
  *              enum:
+ *                - draft
  *                - vote
  *                - rubric
  *                - pass_fail
