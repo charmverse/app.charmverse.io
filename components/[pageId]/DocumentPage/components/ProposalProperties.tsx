@@ -1,3 +1,4 @@
+import { isProposalAuthor } from '@charmverse/core/permissions';
 import { Box } from '@mui/material';
 
 import { useUpdateProposal } from 'charmClient/hooks/proposals';
@@ -6,6 +7,7 @@ import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/
 import { ProposalPropertiesBase } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useUser } from 'hooks/useUser';
 import type { PageWithContent } from 'lib/pages';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 
@@ -30,11 +32,14 @@ export function ProposalProperties({
   const sourceTemplate = useProposalTemplateById(proposal?.page?.sourceTemplateId);
 
   const isAdmin = useIsAdmin();
+  const { user } = useUser();
 
   // further restrict readOnly if user cannot update proposal properties specifically
   const readOnlyProperties = readOnly || !proposal?.permissions.edit;
   const readOnlySelectedCredentialTemplates =
     readOnly || !proposal?.permissions.edit || (sourceTemplate?.selectedCredentialTemplates && !isAdmin);
+  const readOnlyRewards =
+    !isAdmin && !!proposal && !(proposal.createdBy === user?.id || proposal.authors.some((a) => a.userId === user?.id));
 
   // properties with values from templates should be read only
   const readOnlyCustomProperties =
@@ -81,6 +86,7 @@ export function ProposalProperties({
         <ProposalPropertiesBase
           proposalStatus={proposal?.status}
           pageId={pageId}
+          readOnlyRewards={readOnlyRewards}
           proposalId={proposalId}
           readOnlyAuthors={readOnlyProperties ?? !!sourceTemplate?.authors.length}
           proposalFormInputs={proposalFormInputs}

@@ -26,6 +26,7 @@ type Props = {
   values: NewPageValues | null;
   onChange: (values: Partial<NewPageValues | null>) => void;
   headerBannerTitle?: string;
+  readOnly?: boolean;
 };
 
 // Note: this component is only used before a page is saved to the DB
@@ -35,7 +36,8 @@ export function NewDocumentPage({
   titlePlaceholder,
   values: newPageValues,
   onChange,
-  headerBannerTitle
+  headerBannerTitle,
+  readOnly
 }: Props) {
   newPageValues ||= EMPTY_PAGE_VALUES;
   const [, { width: containerWidth }] = useElementSize();
@@ -60,7 +62,7 @@ export function NewDocumentPage({
               icon={newPageValues.icon || null}
               updatedAt={new Date().toString()}
               title={newPageValues.title || ''}
-              readOnly={false}
+              readOnly={!!readOnly}
               setPage={onChange}
               placeholder={titlePlaceholder}
               focusDocumentEditor={focusDocumentEditor}
@@ -72,6 +74,7 @@ export function NewDocumentPage({
               placeholderText={placeholder}
               content={newPageValues.content as PageContent}
               autoFocus={false}
+              readOnly={readOnly}
               enableVoting={false}
               containerWidth={containerWidth}
               pageType={newPageValues.type}

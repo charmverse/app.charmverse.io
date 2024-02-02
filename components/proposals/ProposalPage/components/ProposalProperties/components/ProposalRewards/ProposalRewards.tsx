@@ -69,8 +69,10 @@ export function ProposalRewards({
   const canCreatePendingRewards = !readOnly && !rewardIds?.length;
 
   function closeDialog() {
-    clearRewardValues();
-    clearNewPage();
+    if (!readOnly) {
+      clearRewardValues();
+      clearNewPage();
+    }
     setCurrentPendingId(null);
   }
 
@@ -118,9 +120,9 @@ export function ProposalRewards({
   }
 
   function editReward({ reward, page, draftId }: ProposalPendingReward) {
-    if (readOnly) return;
-
-    setRewardValues(reward);
+    if (!readOnly) {
+      setRewardValues(reward);
+    }
     openNewPage(page || undefined);
     setCurrentPendingId(draftId);
   }
@@ -255,11 +257,6 @@ export function ProposalRewards({
                               <Edit color='secondary' fontSize='small' />
                             )}
                           </IconButton>
-                          {!readOnly && (
-                            <IconButton size='small' onClick={() => onDelete(draftId)} disabled={readOnly}>
-                              <Delete color='secondary' fontSize='small' />
-                            </IconButton>
-                          )}
                         </Stack>
                       </Grid>
                     </Grid>
@@ -297,6 +294,7 @@ export function ProposalRewards({
             onChange={setRewardValues}
             values={rewardValues}
             isNewReward
+            readOnly={readOnly}
             isTemplate={false}
             expandedByDefault
             forcedApplicationType='assigned'
