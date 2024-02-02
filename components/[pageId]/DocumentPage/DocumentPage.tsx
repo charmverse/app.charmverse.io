@@ -447,6 +447,7 @@ function DocumentPageComponent({
                   <ProposalRewards
                     pendingRewards={proposal.fields.pendingRewards || []}
                     requiredTemplateId={proposal.fields.rewardsTemplateId}
+                    readOnly={readonlyProposalProperties}
                     reviewers={proposal.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat()}
                     assignedSubmitters={proposal.authors.map((a) => a.userId)}
                     variant='solid_button'
