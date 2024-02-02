@@ -5,7 +5,6 @@ import { mutate } from 'swr';
 import HexagonalAvatarMask from 'components/common/HexagonalAvatarMask';
 import { VerifyLoginOtpModal } from 'components/login/components/VerifyLoginOtpModal';
 import { MemberProfileDialogGlobal } from 'components/members/components/MemberProfileDialogGlobal';
-import { useImportDiscordRoles } from 'components/settings/roles/hooks/useImportDiscordRoles';
 import { useAppLoadedEvent } from 'hooks/useAppLoadedEvent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMarkNotificationFromUrl } from 'hooks/useMarkNotificationFromUrl';
@@ -31,9 +30,6 @@ export function GlobalComponents() {
   useDatadogLogger();
 
   useAppLoadedEvent();
-
-  // Trigger discord role import on redirect since modal won't be open
-  useImportDiscordRoles();
 
   useMarkNotificationFromUrl();
 

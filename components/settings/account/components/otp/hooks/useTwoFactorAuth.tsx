@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
-import type { SWRMutationConfiguration } from 'swr/mutation';
 
 import { useCreateOtp } from 'charmClient/hooks/profile';
 import type { CreateOtpResponse } from 'lib/profile/otp/createUserOtp';
@@ -9,10 +8,7 @@ export type Screens = 'start' | 'link' | 'confirmation' | 'finish';
 
 type IContext = {
   setFlow: (flow: Screens) => void;
-  trigger: (
-    extraArgument?: undefined,
-    options?: SWRMutationConfiguration<CreateOtpResponse, Error, undefined, string> | undefined
-  ) => Promise<CreateOtpResponse | undefined>;
+  trigger: (extraArgument?: undefined, options?: any) => Promise<CreateOtpResponse | undefined>;
   flow: Screens;
   error?: Error;
   data?: CreateOtpResponse;

@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
+import { useImportDiscordRolesFromServer } from 'charmClient/hooks/discord';
 import { usePopupLogin } from 'hooks/usePopupLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
@@ -10,6 +11,7 @@ import { getDiscordLoginPath } from 'lib/discord/getDiscordLoginPath';
 import { getCookie, deleteCookie } from 'lib/utilities/browser';
 import type { LoggedInUser } from 'models';
 
+import { useRoles } from './useRoles';
 import { useVerifyLoginOtp } from './useVerifyLoginOtp';
 
 interface Props {
@@ -22,11 +24,13 @@ type IDiscordConnectionContext = {
   disconnect: () => Promise<void> | void;
   error?: string;
   popupLogin: (redirectUrl: string, type: 'login' | 'connect') => void;
+  popupServer: (redirectUrl: string, spaceId: string) => void;
 };
 
 export const DiscordConnectionContext = createContext<Readonly<IDiscordConnectionContext>>({
   disconnect: () => {},
   popupLogin: () => {},
+  popupServer: () => {},
   error: undefined,
   isConnected: false,
   isLoading: false
@@ -44,6 +48,8 @@ export function DiscordProvider({ children }: Props) {
   const connectedWithDiscord = Boolean(user?.discordUser);
   const { openPopupLogin } = usePopupLogin<{ code: string }>();
   const { open: openVerifyOtpModal } = useVerifyLoginOtp();
+  const { refreshRoles } = useRoles();
+  const { trigger: importRolesFromDiscordServer, isMutating: isLoadingImportRoles } = useImportDiscordRolesFromServer();
 
   async function disconnect() {
     if (!isConnectDiscordLoading && connectedWithDiscord) {
@@ -98,6 +104,35 @@ export function DiscordProvider({ children }: Props) {
     openPopupLogin(discordLoginPath, loginCallback);
   }
 
+  function popupServer(redirectUrl: string, spaceId: string) {
+    const discordLoginPath = getDiscordLoginPath({
+      type: 'server',
+      redirectUrl,
+      authFlowType: 'popup'
+    });
+
+    const serverCallback = async ({ code, guildId }: { code: string | null; guildId?: string | null }) => {
+      if (!code || !guildId) {
+        return;
+      }
+
+      await importRolesFromDiscordServer(
+        { guildId, spaceId },
+        {
+          onSuccess: async (_roles) => {
+            showMessage(`Successfully imported ${_roles.importedRoleCount} discord roles`, 'success');
+            await refreshRoles();
+          },
+          onError: (err: any) => {
+            showMessage(err.message || err.error || 'Something went wrong. Please try again', 'error');
+          }
+        }
+      );
+    };
+
+    openPopupLogin(discordLoginPath, serverCallback);
+  }
+
   useEffect(() => {
     if (authError) {
       deleteCookie(AUTH_ERROR_COOKIE);
@@ -138,7 +173,8 @@ export function DiscordProvider({ children }: Props) {
   }, [user, authCode]);
 
   const isConnected = connectedWithDiscord;
-  const isLoading = !discordError && (!!authCode || isDisconnectingDiscord || isConnectDiscordLoading);
+  const isLoading =
+    !discordError && (!!authCode || isDisconnectingDiscord || isConnectDiscordLoading || isLoadingImportRoles);
   const error = authError;
 
   const value = useMemo<IDiscordConnectionContext>(
@@ -147,7 +183,8 @@ export function DiscordProvider({ children }: Props) {
       isConnected,
       disconnect,
       error,
-      popupLogin
+      popupLogin,
+      popupServer
     }),
     [isConnected, isLoading, error]
   );

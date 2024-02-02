@@ -18,10 +18,6 @@ export class DiscordApi {
     return http.POST<ConnectDiscordResponse>(`/api/discord/connect${query}`, payload);
   }
 
-  importRolesFromDiscordServer(payload: ImportDiscordRolesPayload) {
-    return http.POST<ImportRolesResponse>('/api/discord/importRoles', payload);
-  }
-
   checkDiscordGate(spaceDomain: string) {
     return http.GET<CheckDiscordGateResult>(`/api/discord/gate?spaceDomain=${spaceDomain}`);
   }
