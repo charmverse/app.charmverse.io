@@ -44,8 +44,8 @@ export function ProposalSocialShareLinks({
       <Typography variant='h6' mr={1}>
         Share
       </Typography>
-      <ProposalSocialShareLink site='twitter' proposalTitle={proposalTitle} proposalLink={proposalLink} />
-      <ProposalSocialShareLink site='farcaster' proposalTitle={proposalTitle} proposalLink={proposalLink} />
+      <ProposalSocialShareLink site='x' proposalTitle={proposalTitle} proposalLink={proposalLink} />
+      <ProposalSocialShareLink site='wrapcast' proposalTitle={proposalTitle} proposalLink={proposalLink} />
       <ProposalLensSocialShare
         lensPostLink={lensPostLink}
         proposalId={proposalId}
