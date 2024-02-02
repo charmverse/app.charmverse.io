@@ -45,6 +45,7 @@ export function ProposalSocialShareLinks({
         Share
       </Typography>
       <ProposalSocialShareLink site='twitter' proposalTitle={proposalTitle} proposalLink={proposalLink} />
+      <ProposalSocialShareLink site='farcaster' proposalTitle={proposalTitle} proposalLink={proposalLink} />
       <ProposalLensSocialShare
         lensPostLink={lensPostLink}
         proposalId={proposalId}
@@ -52,7 +53,6 @@ export function ProposalSocialShareLinks({
         proposalTitle={proposalTitle}
         canPublishToLens={isDisabled}
       />
-      <ProposalSocialShareLink site='farcaster' proposalTitle={proposalTitle} proposalLink={proposalLink} />
       <ProposalSocialShareLink site='telegram' proposalTitle={proposalTitle} proposalLink={proposalLink} />
       <Tooltip title='Copy proposal link'>
         <IconButton

@@ -1,9 +1,9 @@
 import TelegramIcon from '@mui/icons-material/Telegram';
-import XIcon from '@mui/icons-material/X';
 import type { SxProps } from '@mui/material';
 import { Box } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import type { ReactNode } from 'react';
+import { BsTwitterX } from 'react-icons/bs';
 
 import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -12,7 +12,7 @@ import { capitalize } from 'lib/utilities/strings';
 type ShareSite = 'twitter' | 'telegram' | 'farcaster';
 
 const siteIconsRecord: Record<ShareSite, ReactNode> = {
-  twitter: <XIcon fontSize='small' sx={{ fill: 'white', fontSize: 16 }} />,
+  twitter: <BsTwitterX style={{ fill: 'white', fontSize: 16 }} />,
   farcaster: <img src='/images/logos/farcaster.svg' width={20} height={20} />,
   telegram: <TelegramIcon fontSize='small' sx={{ fill: 'white' }} />
 };
