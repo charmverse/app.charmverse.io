@@ -1,7 +1,7 @@
 import type { CredentialTemplate } from '@charmverse/core/prisma-client';
 
 import type { MaybeString } from 'charmClient/hooks/helpers';
-import type { EASAttestationFromApi } from 'lib/credentials/external/getExternalCredentials';
+import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
 
 import { useGET } from './helpers';
 

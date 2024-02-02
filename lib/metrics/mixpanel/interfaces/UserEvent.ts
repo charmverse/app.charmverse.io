@@ -32,10 +32,6 @@ export type UserLoginEvent = BaseEventWithoutGroup & {
   identityType: IdentityType;
 };
 
-export type UserLoginOtpEvent = BaseEventWithoutGroup & {
-  identityType: IdentityType;
-};
-
 export type UserOtp = BaseEventWithoutGroup;
 
 export type TokenGateVerificationEvent = BaseEvent & {
@@ -57,7 +53,8 @@ export type AppLoaded = BaseEventWithoutGroup & { spaceId?: string };
 export interface UserEventMap {
   sign_up: UserSignupEvent;
   sign_in: UserLoginEvent;
-  sign_in_otp: UserLoginOtpEvent;
+  sign_in_otp: UserLoginEvent;
+  sign_in_recovery_code: UserLoginEvent;
   load_a_workspace: BaseEvent;
   create_new_workspace: CreateNewSpace;
   join_a_workspace: SpaceJoined;

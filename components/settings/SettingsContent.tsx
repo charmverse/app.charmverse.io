@@ -13,7 +13,9 @@ import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
 import { SectionName } from 'components/common/PageLayout/components/Sidebar/components/SectionName';
 import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/components/SidebarButton';
+import { CharmsSettings } from 'components/settings/charms/CharmsSettings';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import type { SettingsPath } from 'hooks/useSettingsDialog';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
@@ -44,7 +46,8 @@ type TabPanelProps = BoxProps & {
 
 const accountTabs: Record<UserSettingsTab['path'], typeof ProfileSettings> = {
   account: AccountSettings,
-  profile: ProfileSettings
+  profile: ProfileSettings,
+  charms: CharmsSettings
 };
 
 const spaceTabs: Record<SpaceSettingsTab['path'], typeof SpaceSettings> = {
@@ -86,11 +89,14 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
   const isMobile = useSmallScreen();
   const { memberSpaces } = useSpaces();
   const { mappedFeatures } = useSpaceFeatures();
+  const isCvSpace = useIsCharmverseSpace();
 
   const isSpaceSettingsVisible = !!memberSpaces.find((s) => s.name === currentSpace?.name);
 
   const { subscriptionEnded, hasPassedBlockQuota } = useSpaceSubscription();
   const switchSpaceMenu = usePopupState({ variant: 'popover', popupId: 'switch-space' });
+  const displayAccountItems = isCvSpace ? ACCOUNT_TABS : ACCOUNT_TABS.filter((tab) => tab.path !== 'charms');
+
   return (
     <Box data-test-active-path={activePath} display='flex' flexDirection='row' flex='1' overflow='hidden' height='100%'>
       <Box
@@ -106,7 +112,7 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
         <Box mt={2} py={0.5}>
           <SectionName>Account</SectionName>
         </Box>
-        {ACCOUNT_TABS.map((tab) => (
+        {displayAccountItems.map((tab) => (
           <SidebarLink
             key={tab.path}
             data-test={`space-settings-tab-${tab.path}`}

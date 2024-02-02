@@ -88,15 +88,7 @@ export async function getNFTs({
     (params) => {
       return GET<AlchemyNftResponse>(url, {
         ...params,
-        owner: address,
-        // Only use spam filters on chains we know that work.
-        // Including the request params throw an error when calling for Arbitrum, maybe others
-        ...(filterSpam
-          ? {
-              spamConfidenceLevel: 'HIGH',
-              excludeFilters: ['SPAM']
-            }
-          : {})
+        owner: address
       });
     },
     (response) => (response.pageKey ? { pageKey: response.pageKey } : null)

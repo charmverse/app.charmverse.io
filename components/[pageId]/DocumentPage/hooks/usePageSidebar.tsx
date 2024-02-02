@@ -12,11 +12,7 @@ export type IPageSidebarContext = {
   closeSidebar: () => void;
 };
 
-export const PageSidebarContext = createContext<IPageSidebarContext>({
-  activeView: null,
-  setActiveView: () => undefined,
-  closeSidebar: () => undefined
-});
+export const PageSidebarContext = createContext<IPageSidebarContext | null>(null);
 
 export function PageSidebarProvider({ children }: { children: ReactNode }) {
   const [activeView, setActiveView] = useState<IPageSidebarContext['activeView']>(null);
@@ -50,5 +46,9 @@ export function PageSidebarProvider({ children }: { children: ReactNode }) {
 }
 
 export function usePageSidebar() {
-  return useContext(PageSidebarContext);
+  const context = useContext(PageSidebarContext);
+  if (!context) {
+    throw new Error('usePageSidebar must be used within a PageSidebarProvider');
+  }
+  return context;
 }

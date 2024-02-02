@@ -26,7 +26,7 @@ exports[`should match snapshot on read only 1`] = `
             viewBox="0 0 24 24"
           >
             <path
-              d="m7 10 5 5 5-5H7z"
+              d="m7 10 5 5 5-5z"
             />
           </svg>
         </button>
@@ -82,7 +82,7 @@ exports[`should match snapshot with Group 1`] = `
             viewBox="0 0 24 24"
           >
             <path
-              d="m7 10 5 5 5-5H7z"
+              d="m7 10 5 5 5-5z"
             />
           </svg>
         </button>
@@ -124,7 +124,7 @@ exports[`should match snapshot with Group 1`] = `
             viewBox="0 0 24 24"
           >
             <path
-              d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+              d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
             />
           </svg>
         </button>
@@ -141,7 +141,7 @@ exports[`should match snapshot with Group 1`] = `
           viewBox="0 0 24 24"
         >
           <path
-            d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+            d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
           />
         </svg>
       </button>
@@ -176,7 +176,7 @@ exports[`should match snapshot, add new 1`] = `
             viewBox="0 0 24 24"
           >
             <path
-              d="m7 10 5 5 5-5H7z"
+              d="m7 10 5 5 5-5z"
             />
           </svg>
         </button>
@@ -218,7 +218,7 @@ exports[`should match snapshot, add new 1`] = `
             viewBox="0 0 24 24"
           >
             <path
-              d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+              d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
             />
           </svg>
         </button>
@@ -235,7 +235,7 @@ exports[`should match snapshot, add new 1`] = `
           viewBox="0 0 24 24"
         >
           <path
-            d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+            d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
           />
         </svg>
       </button>
@@ -270,7 +270,7 @@ exports[`should match snapshot, edit title 1`] = `
             viewBox="0 0 24 24"
           >
             <path
-              d="m7 10 5 5 5-5H7z"
+              d="m7 10 5 5 5-5z"
             />
           </svg>
         </button>
@@ -312,7 +312,7 @@ exports[`should match snapshot, edit title 1`] = `
             viewBox="0 0 24 24"
           >
             <path
-              d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+              d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
             />
           </svg>
         </button>
@@ -329,7 +329,7 @@ exports[`should match snapshot, edit title 1`] = `
           viewBox="0 0 24 24"
         >
           <path
-            d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+            d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
           />
         </svg>
       </button>
@@ -364,7 +364,7 @@ exports[`should match snapshot, hide group 1`] = `
             viewBox="0 0 24 24"
           >
             <path
-              d="m7 10 5 5 5-5H7z"
+              d="m7 10 5 5 5-5z"
             />
           </svg>
         </button>
@@ -406,7 +406,7 @@ exports[`should match snapshot, hide group 1`] = `
             viewBox="0 0 24 24"
           >
             <path
-              d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+              d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
             />
           </svg>
         </button>
@@ -423,7 +423,7 @@ exports[`should match snapshot, hide group 1`] = `
           viewBox="0 0 24 24"
         >
           <path
-            d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+            d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
           />
         </svg>
       </button>
@@ -458,7 +458,7 @@ exports[`should match snapshot, no groups 1`] = `
             viewBox="0 0 24 24"
           >
             <path
-              d="m7 10 5 5 5-5H7z"
+              d="m7 10 5 5 5-5z"
             />
           </svg>
         </button>
@@ -495,7 +495,7 @@ exports[`should match snapshot, no groups 1`] = `
             viewBox="0 0 24 24"
           >
             <path
-              d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+              d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
             />
           </svg>
         </button>
@@ -512,7 +512,7 @@ exports[`should match snapshot, no groups 1`] = `
           viewBox="0 0 24 24"
         >
           <path
-            d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+            d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
           />
         </svg>
       </button>

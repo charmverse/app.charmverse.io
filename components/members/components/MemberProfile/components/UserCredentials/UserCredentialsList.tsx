@@ -4,13 +4,20 @@ import Stack from '@mui/material/Stack';
 
 import { useGetUserCredentials } from 'charmClient/hooks/credentialHooks';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { useSmallScreen } from 'hooks/useMediaScreens';
 
 import { UserCredentialRow } from './UserCredentialRow';
 
 export function UserCredentialsList({ userId }: { userId: string }) {
   const { data: userCredentials, error, isLoading } = useGetUserCredentials({ userId });
+
   return (
-    <Stack gap={1}>
+    <Stack
+      gap={{
+        xs: 2,
+        md: 1
+      }}
+    >
       {!userCredentials && isLoading && <LoadingComponent />}
       {userCredentials?.length === 0 && !isLoading && (
         <Card variant='outlined'>

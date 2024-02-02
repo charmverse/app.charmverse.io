@@ -42,7 +42,7 @@ export function InlineCommentThread({
   const view = useEditorViewContext();
   const { tooltipContentDOM, show: isVisible, ids } = usePluginState(pluginKey) as InlineCommentPluginState;
   const { threads } = useThreads();
-  const { updateThreadPluginState } = useInlineComment();
+  const { updateThreadPluginState } = useInlineComment(view);
 
   // Find unresolved threads in the thread ids and sort them based on desc order of createdAt
   const unResolvedThreads = ids

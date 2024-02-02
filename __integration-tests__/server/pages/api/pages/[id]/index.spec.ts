@@ -103,6 +103,7 @@ describe('PUT /api/pages/{id} - update page', () => {
       spaceId: space.id,
       userId: adminUser.id,
       evaluations: [],
+      authors: [adminUser.id],
       pageProps: {
         type: 'proposal_template'
       }
@@ -124,6 +125,7 @@ describe('PUT /api/pages/{id} - update page', () => {
       spaceId: space.id,
       userId: adminUser.id,
       evaluations: [],
+      authors: [adminUser.id],
       pageProps: {
         type: 'proposal_template'
       }

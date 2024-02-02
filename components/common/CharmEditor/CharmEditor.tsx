@@ -156,18 +156,12 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{
   ${fiduswriterStyles}
 `;
 
-const defaultContent: PageContent = {
-  type: 'doc',
-  content: []
-};
-
 export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 
 type CharmEditorProps = {
   colorMode?: 'dark';
   content?: PageContent;
   autoFocus?: boolean;
-  children?: ReactNode;
   enableSuggestingMode?: boolean;
   onContentChange?: UpdatePageContent;
   readOnly?: boolean;
@@ -196,13 +190,13 @@ type CharmEditorProps = {
   disableVideo?: boolean;
   setEditorState?: (state: EditorState) => void; // this is used to pass the state to the suggestions sidebar
   threadIds?: string[];
+  setCharmEditorView?: (view: EditorView | null) => void;
 };
 
 function CharmEditor({
   colorMode,
   enableSuggestingMode = false,
   content,
-  children,
   onContentChange,
   style,
   readOnly = false,
@@ -228,7 +222,8 @@ function CharmEditor({
   disableVideo = false,
   sidebarView,
   setSidebarView,
-  threadIds
+  threadIds,
+  setCharmEditorView
 }: CharmEditorProps) {
   const router = useRouter();
   const { showMessage } = useSnackbar();
@@ -396,6 +391,7 @@ function CharmEditor({
       readOnly={readOnly}
       enableComments={enableComments}
       onConnectionEvent={onConnectionEvent}
+      setCharmEditorView={setCharmEditorView}
       style={{
         ...(style ?? {}),
         width: '100%',
@@ -538,7 +534,6 @@ function CharmEditor({
         enableVoting={enableVoting}
         pageId={pageId}
       />
-      {children}
       {!disablePageSpecificFeatures && (
         <span className='font-family-default'>
           <InlineCommentThread

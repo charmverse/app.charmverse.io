@@ -48,7 +48,6 @@ function TableRows(props: Props): JSX.Element {
     setCheckedIds,
     checkedIds = []
   } = props;
-
   const hasSubPages = allCardPages.some((cardPage) => cardPage.subPages?.length);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const { data: cardPages, hasNextPage, showNextPage } = usePaginatedData(allCardPages as CardPage[], { pageSize });

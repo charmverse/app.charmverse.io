@@ -5,7 +5,6 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import type { Dispatch, SetStateAction } from 'react';
 import React from 'react';
-import { mutate } from 'swr';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
 import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFilterControl';

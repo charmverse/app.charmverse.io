@@ -51,7 +51,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
   const { setFocalboardViewsRecord } = useFocalboardViews();
   const readOnlyBoard = readOnly || !pagePermissions?.edit_content;
-  const { pages, refreshPage } = usePages();
+  const { pages } = usePages();
   useEffect(() => {
     if (typeof router.query.cardId === 'string') {
       setShownCardId(router.query.cardId);

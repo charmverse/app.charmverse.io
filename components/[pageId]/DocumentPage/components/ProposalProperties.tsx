@@ -86,8 +86,11 @@ export function ProposalProperties({
           proposalFormInputs={proposalFormInputs}
           setProposalFormInputs={onChangeProperties}
           readOnlyCustomProperties={readOnlyCustomProperties}
+          readOnlyRewards={!proposal?.permissions.edit}
           rewardIds={proposal?.rewardIds}
           readOnlySelectedCredentialTemplates={readOnlySelectedCredentialTemplates}
+          isStructuredProposal={!!proposal?.formId}
+          isProposalTemplate={proposalPage.type === 'proposal_template'}
         />
       </div>
     </Box>
