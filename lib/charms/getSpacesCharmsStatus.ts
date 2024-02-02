@@ -14,17 +14,30 @@ export async function getSpacesCharmsStatus(userId: string) {
       userId
     },
     select: {
-      space: {
+      spaceId: true
+    }
+  });
+
+  const spaces = await prisma.space.findMany({
+    where: { id: { in: spaceRoles.map(({ spaceId }) => spaceId) } },
+    select: {
+      id: true,
+      charmWallet: {
         select: {
-          id: true,
-          charmWallet: true,
-          blockCounts: true
+          balance: true
+        }
+      },
+      blockCounts: {
+        orderBy: { createdAt: 'desc' },
+        take: 1,
+        select: {
+          count: true
         }
       }
     }
   });
 
-  const spaceCharmsStatuses: SpaceCharmsStatus[] = spaceRoles.map(({ space }) => ({
+  const spaceCharmsStatuses: SpaceCharmsStatus[] = spaces.map((space) => ({
     spaceId: space.id,
     balance: space.charmWallet?.balance || 0,
     balanceNeeded: countCharmsNeeded(space.blockCounts[0].count)
