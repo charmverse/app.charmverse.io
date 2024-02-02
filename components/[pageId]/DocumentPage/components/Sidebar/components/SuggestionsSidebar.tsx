@@ -71,7 +71,7 @@ export function SuggestionsSidebar({
   }
 
   return (
-    <>
+    <Box display='flex' gap={1} flexDirection='column' px={1} height='100%'>
       {!readOnly && suggestions.length > 0 && (
         <Box display='flex' gap={1} flexDirection='row'>
           <Button
@@ -127,6 +127,6 @@ export function SuggestionsSidebar({
           message='No suggestions yet'
         />
       )}
-    </>
+    </Box>
   );
 }

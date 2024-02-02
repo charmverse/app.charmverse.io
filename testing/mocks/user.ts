@@ -33,7 +33,6 @@ export function createMockUser(user?: Partial<LoggedInUser>): LoggedInUser {
       }
     ],
     spaceRoles: [],
-    unstoppableDomains: [],
     favorites: [],
     googleAccounts: [],
     verifiedEmails: [],

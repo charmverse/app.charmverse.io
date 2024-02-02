@@ -17,7 +17,7 @@ async function getCharmsHistoryHandler(req: NextApiRequest, res: NextApiResponse
 
   const txs = await listTransactionsHistory({
     userId,
-    page,
+    page: Number.isNaN(page) || page <= 0 ? 0 : page,
     pageSize: Number.isNaN(pageSize) || pageSize <= 0 ? undefined : pageSize
   });
 

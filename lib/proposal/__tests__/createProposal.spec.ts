@@ -325,6 +325,8 @@ describe('Creates a page and proposal with relevant configuration', () => {
       spaceId: space.id,
       userId: user.id,
       workflowId: proposalWorkflow.id,
+      authors: [user.id],
+      pageProps: { title: 'test' },
       evaluations: evaluationTemplate.map((item, index) => ({
         id: item.id,
         rubricCriteria: [],

@@ -6,6 +6,7 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import TuneIcon from '@mui/icons-material/Tune';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import type { PopoverProps } from '@mui/material';
 import {
@@ -22,8 +23,9 @@ import {
   Typography,
   Switch
 } from '@mui/material';
-import { bindPopover, bindToggle, usePopupState } from 'material-ui-popup-state/hooks';
-import React, { useMemo, useRef, useState } from 'react';
+import { bindPopover, bindToggle, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import type { Dispatch, SetStateAction } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useViewSortOptions } from 'hooks/useViewSortOptions';
@@ -62,9 +64,10 @@ type Props = {
   offset: number;
   onDrop: (template: IPropertyTemplate, container: IPropertyTemplate) => void;
   onAutoSizeColumn: (columnID: string, headerWidth: number) => void;
+  setSelectedPropertyId?: Dispatch<SetStateAction<string | null>>;
 };
 
-const DEFAULT_BLOCK_IDS = [
+export const DEFAULT_BLOCK_IDS = [
   DEFAULT_BOARD_BLOCK_ID,
   DEFAULT_VIEW_BLOCK_ID,
   PROPOSAL_STATUS_BLOCK_ID,
@@ -91,6 +94,8 @@ function TableHeader(props: Props): JSX.Element {
     !!template.proposalFieldId;
 
   const [tempName, setTempName] = useState(name || '');
+  const addRelationPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-relation-property' });
+  const bindTriggerProps = bindTrigger(addRelationPropertyPopupState);
 
   const popupState = usePopupState({ variant: 'popper', popupId: 'iframe-selector' });
   const toggleRef = useRef(null);
@@ -110,6 +115,12 @@ function TableHeader(props: Props): JSX.Element {
       e.stopPropagation();
     }
   };
+
+  useEffect(() => {
+    if (template.name !== tempName) {
+      setTempName(template.name);
+    }
+  }, [template.name]);
 
   const popoverToggle = bindToggle(popupState);
   const popoverToggleProps: typeof popoverToggle = {
@@ -194,12 +205,28 @@ function TableHeader(props: Props): JSX.Element {
             autoFocus
             onKeyDown={(e) => {
               e.stopPropagation();
-              if (e.code === 'Enter' && tempName.length !== 0) {
+              if (e.code === 'Enter' && tempName.length !== 0 && tempName !== name) {
                 renameColumn();
               }
             }}
           />
         </Stack>
+        {template.id !== Constants.titleColumnId && (
+          <>
+            <MenuItem
+              {...bindTriggerProps}
+              onClick={() => {
+                props.setSelectedPropertyId?.(template.id);
+              }}
+            >
+              <ListItemIcon>
+                <TuneIcon fontSize='small' />
+              </ListItemIcon>
+              <Typography variant='subtitle1'>Edit property</Typography>
+            </MenuItem>
+            <Divider />
+          </>
+        )}
         <MenuItem
           onClick={() => {
             changeViewSortOptions([{ propertyId: templateId, reversed: false }]);
@@ -265,7 +292,7 @@ function TableHeader(props: Props): JSX.Element {
           </MenuItem>,
           <MenuItem
             key='duplicate'
-            disabled={isDisabled}
+            disabled={isDisabled || template.type === 'relation'}
             onClick={() => {
               mutator.duplicatePropertyTemplate(board, activeView, templateId);
             }}

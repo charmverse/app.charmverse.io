@@ -1,7 +1,7 @@
 import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
-import { Alert, Autocomplete, Box, Chip, IconButton, Stack, TextField, Tooltip } from '@mui/material';
+import { Autocomplete, Box, Chip, IconButton, Stack, TextField, Tooltip } from '@mui/material';
 import type { ReactNode } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 

@@ -53,11 +53,6 @@ export const sessionUserRelations = {
       id: true
     }
   },
-  unstoppableDomains: {
-    select: {
-      domain: true
-    }
-  },
   otp: {
     select: {
       activatedAt: true

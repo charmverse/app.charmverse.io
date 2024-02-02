@@ -2,7 +2,7 @@ import { Box } from '@mui/material';
 import { rest } from 'msw';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 
-import DocumentPage from 'components/[pageId]/DocumentPage/DocumentPage';
+import { DocumentPageWithSidebars } from 'components/[pageId]/DocumentPage/DocumentPageWithSidebars';
 import { HeaderSpacer } from 'components/common/PageLayout/components/Header/Header';
 import { NewProposalPage as ProposalPageComponent } from 'components/proposals/ProposalPage/NewProposalPage';
 import type { PopulatedEvaluation } from 'lib/proposal/interface';
@@ -49,7 +49,7 @@ export function ProposalInEvaluation() {
   return (
     <GlobalContext>
       <Box sx={{ overflowY: 'auto' }}>
-        <DocumentPage page={page} readOnly={true} savePage={() => {}} />
+        <DocumentPageWithSidebars page={page} readOnly={true} savePage={() => {}} />
       </Box>
     </GlobalContext>
   );

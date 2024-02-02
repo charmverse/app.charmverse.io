@@ -55,6 +55,7 @@ export function RewardsPage({ title }: { title: string }) {
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
   const canSeeRewards = hasAccess || isFreeSpace || currentSpace?.publicBountyBoard === true;
   const { getRewardPage } = useRewardPage();
+  const [selectedPropertyId, setSelectedPropertyId] = useState<null | string>(null);
 
   const isAdmin = useIsAdmin();
 
@@ -238,6 +239,10 @@ export function RewardsPage({ title }: { title: string }) {
               <Box width='100%'>
                 {activeView.fields.viewType === 'table' && (
                   <Table
+                    setSelectedPropertyId={(_setSelectedPropertyId) => {
+                      setSelectedPropertyId(_setSelectedPropertyId);
+                      setShowSidebar(true);
+                    }}
                     board={activeBoard}
                     activeView={activeView}
                     cardPages={cardPages as CardPage[]}
@@ -305,6 +310,10 @@ export function RewardsPage({ title }: { title: string }) {
 
             {isAdmin && (
               <ViewSidebar
+                sidebarView={selectedPropertyId ? 'card-property' : undefined}
+                setSelectedPropertyId={setSelectedPropertyId}
+                selectedPropertyId={selectedPropertyId}
+                cards={cards as Card[]}
                 views={views}
                 board={activeBoard}
                 rootBoard={activeBoard}

@@ -1,7 +1,17 @@
 import type { CharmTransaction } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-export const TRANSACTIONS_PAGE_SIZE = 20;
+import type { TransactionMetadata } from 'lib/charms/addTransaction';
+import { TRANSACTIONS_PAGE_SIZE } from 'lib/charms/constants';
+import { getUserOrSpaceWallet } from 'lib/charms/getUserOrSpaceWallet';
+
+export type TransactionRecipientType = 'user' | 'space';
+
+export type HistoryTransactionMetadata = TransactionMetadata & {
+  recipientName?: string;
+  recipientType?: TransactionRecipientType;
+  isReceived: boolean;
+};
 
 export type ListTransactionsHistoryParams = {
   userId: string;
@@ -9,25 +19,54 @@ export type ListTransactionsHistoryParams = {
   pageSize?: number;
 };
 
+export type HistoryTransaction = CharmTransaction & {
+  metadata: HistoryTransactionMetadata;
+};
+
 export async function listTransactionsHistory({
   userId,
   page = 0,
   pageSize = TRANSACTIONS_PAGE_SIZE
-}: ListTransactionsHistoryParams): Promise<CharmTransaction[]> {
+}: ListTransactionsHistoryParams): Promise<HistoryTransaction[]> {
   const toSkip = Math.max(page, page - 1) * pageSize;
+  const userWallet = await getUserOrSpaceWallet({ userId, readOnly: true });
+
+  if (!userWallet) {
+    return [];
+  }
 
   const txs = await prisma.charmTransaction.findMany({
     take: pageSize,
     skip: toSkip,
     where: {
-      OR: [{ from: userId }, { to: userId }]
+      OR: [{ from: userWallet.id }, { to: userWallet.id }]
     },
     orderBy: {
       createdAt: 'desc'
+    },
+    include: {
+      fromWallet: { include: { user: true, space: true } },
+      toWallet: { include: { user: true, space: true } }
     }
   });
 
-  // TOD: Add recipient (space) name to display in FE
+  const historyTxs = txs.map((tx) => {
+    const isReceived = !!tx.to && !!userWallet && tx.to === userWallet.id;
+    const recipientType = tx.toWallet?.space ? 'space' : 'user';
+    const recipientName = tx.toWallet?.space?.name || tx.toWallet?.user?.username;
 
-  return txs;
+    const metadata: HistoryTransactionMetadata = {
+      ...(tx.metadata as TransactionMetadata),
+      recipientName,
+      recipientType,
+      isReceived
+    };
+
+    return {
+      ...tx,
+      metadata
+    };
+  });
+
+  return historyTxs;
 }

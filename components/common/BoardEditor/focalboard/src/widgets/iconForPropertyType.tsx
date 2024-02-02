@@ -1,5 +1,6 @@
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
+import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
 import EventNoteIcon from '@mui/icons-material/EventNote';
@@ -57,6 +58,8 @@ export const iconForPropertyType = (propertyType: PropertyType, props?: SvgIconP
     case 'url':
     case 'proposalUrl':
       return <LinkIcon fontSize='small' {...props} />;
+    case 'relation':
+      return <ArrowOutwardIcon fontSize='small' {...props} />;
     default:
       return null;
   }

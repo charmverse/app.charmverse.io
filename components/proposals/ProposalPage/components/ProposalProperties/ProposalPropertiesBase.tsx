@@ -14,7 +14,7 @@ import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalFields } from 'lib/proposal/interface';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-import type { ProposalEvaluationValues } from '../EvaluationSettingsSidebar/components/EvaluationStepSettings';
+import type { ProposalEvaluationValues } from '../ProposalEvaluations/components/Settings/components/EvaluationStepSettings';
 
 export type ProposalPropertiesInput = {
   content?: PageContent | null;
@@ -43,6 +43,7 @@ type ProposalPropertiesProps = {
   rewardIds?: string[] | null;
   proposalId?: string;
   isStructuredProposal: boolean;
+  isProposalTemplate: boolean;
 };
 
 export function ProposalPropertiesBase({
@@ -56,7 +57,8 @@ export function ProposalPropertiesBase({
   readOnlyRewards,
   rewardIds,
   proposalId,
-  isStructuredProposal
+  isStructuredProposal,
+  isProposalTemplate
 }: ProposalPropertiesProps) {
   const { mappedFeatures } = useSpaceFeatures();
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
@@ -164,6 +166,7 @@ export function ProposalPropertiesBase({
               assignedSubmitters={proposalAuthorIds}
               rewardIds={rewardIds || []}
               readOnly={readOnlyRewards}
+              isProposalTemplate={isProposalTemplate}
               onSave={(pendingReward) => {
                 const isExisting = pendingRewards.find((reward) => reward.draftId === pendingReward.draftId);
                 if (!isExisting) {

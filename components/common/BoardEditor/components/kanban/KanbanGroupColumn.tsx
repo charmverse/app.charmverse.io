@@ -11,6 +11,8 @@ import { DEFAULT_PAGE_SIZE, usePaginatedData } from 'hooks/usePaginatedData';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 
+import type { PageListItemsRecord } from '../../interfaces';
+
 type Props = {
   group: BoardGroup;
   board: Board;

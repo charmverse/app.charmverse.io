@@ -32,6 +32,7 @@ import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData
 import { encodeFilename } from 'lib/utilities/encodeFilename';
 import type { SocketAuthResponse } from 'lib/websockets/interfaces';
 import type { LoggedInUser } from 'models';
+import type { SyncRelationPropertyPayload } from 'pages/api/blocks/sync-relation-property';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
@@ -58,7 +59,6 @@ import { SpacesApi } from './apis/spacesApi';
 import { SubscriptionApi } from './apis/subscriptionApi';
 import { SummonApi } from './apis/summonApi';
 import { TrackApi } from './apis/trackApi';
-import { UnstoppableDomainsApi } from './apis/unstoppableApi';
 import { VotesApi } from './apis/votesApi';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
@@ -104,8 +104,6 @@ class CharmClient {
   track = new TrackApi();
 
   permissions = new PermissionsApi();
-
-  unstoppableDomains = new UnstoppableDomainsApi();
 
   votes = new VotesApi();
 
@@ -402,6 +400,10 @@ class CharmClient {
 
   resolveEnsName(ens: string) {
     return http.GET<string | null>('/api/resolve-ens', { ens });
+  }
+
+  syncRelationProperty(payload: SyncRelationPropertyPayload) {
+    return http.PUT<void>('/api/blocks/sync-relation-property', payload);
   }
 }
 
