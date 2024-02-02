@@ -14,8 +14,10 @@ import { UserCredentialRow } from './UserCredentialRow';
 export function UserFavoriteList({
   credentials,
   hideTitle = false,
-  readOnly = false
+  readOnly = false,
+  smallScreen
 }: {
+  smallScreen?: boolean;
   credentials: EASAttestationWithFavorite[];
   hideTitle?: boolean;
   readOnly?: boolean;
@@ -45,12 +47,12 @@ export function UserFavoriteList({
                 itemId={credential.favoriteCredentialId!}
                 changeOrderHandler={reorderFavorites}
               >
-                <UserCredentialRow credential={credential} />
+                <UserCredentialRow smallScreen={smallScreen} credential={credential} />
                 <Divider sx={{ mt: 1 }} />
               </DraggableListItem>
             ) : (
               <Box key={credential.id}>
-                <UserCredentialRow readOnly credential={credential} />
+                <UserCredentialRow smallScreen={smallScreen} readOnly credential={credential} />
                 <Divider sx={{ mt: 1 }} />
               </Box>
             )
@@ -64,8 +66,10 @@ export function UserFavoriteList({
 export function UserAllCredentialsList({
   credentials,
   hideTitle = false,
-  readOnly = false
+  readOnly = false,
+  smallScreen
 }: {
+  smallScreen?: boolean;
   hideTitle?: boolean;
   credentials: EASAttestationWithFavorite[];
   readOnly?: boolean;
@@ -79,7 +83,7 @@ export function UserAllCredentialsList({
       )}
       {credentials?.map((credential) => (
         <Box key={credential.id}>
-          <UserCredentialRow readOnly={readOnly} credential={credential} />
+          <UserCredentialRow smallScreen={smallScreen} readOnly={readOnly} credential={credential} />
           <Divider sx={{ mt: 1 }} />
         </Box>
       ))}

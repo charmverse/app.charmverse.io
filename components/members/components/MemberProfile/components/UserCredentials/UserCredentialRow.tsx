@@ -1,7 +1,7 @@
 import LaunchIcon from '@mui/icons-material/Launch';
 import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
 import StarOutlinedIcon from '@mui/icons-material/StarOutlined';
-import { Chip, Grid, IconButton, Tooltip, Typography } from '@mui/material';
+import { Chip, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Image from 'next/image';
 
@@ -16,11 +16,14 @@ import { lowerCaseEqual } from 'lib/utilities/strings';
 
 export function UserCredentialRow({
   credential,
-  readOnly = false
+  readOnly = false,
+  smallScreen
 }: {
   credential: EASAttestationWithFavorite;
   readOnly?: boolean;
+  smallScreen?: boolean;
 }) {
+  const isSmallScreen = useSmallScreen() || smallScreen;
   const { addFavorite, removeFavorite, isRemoveFavoriteCredentialLoading, isAddFavoriteCredentialLoading } =
     useFavoriteCredentials();
   const { showMessage } = useSnackbar();
@@ -45,7 +48,6 @@ export function UserCredentialRow({
     }
   }
 
-  const isSmallScreen = useSmallScreen();
   const credentialInfo: {
     title: string;
     subtitle: string;
@@ -82,40 +84,16 @@ export function UserCredentialRow({
     return null;
   }
 
-  return (
-    <Grid container display='flex' gap={{ xs: 1 }} alignItems='center' justifyContent='space-between'>
-      <Grid item xs={12} md={5}>
-        <Box
-          display='flex'
-          alignItems='center'
-          gap={{
-            xs: 1,
-            md: 2
-          }}
-        >
-          <Image
-            src={credentialInfo.iconUrl}
-            alt='charmverse-logo'
-            height={isSmallScreen ? 40 : 30}
-            width={isSmallScreen ? 40 : 30}
-          />
-          <Box display='flex' flexDirection='column'>
-            <Typography variant='body1' fontWeight='bold'>
-              {credentialInfo.title}
-            </Typography>
-            <Typography variant='caption' fontWeight='bold'>
-              {credentialInfo.subtitle}
-            </Typography>
-          </Box>
-        </Box>
-      </Grid>
-      <Grid item display='flex' justifyContent='flex-start' xs={8} md={credential.verificationUrl ? 4 : 5} gap={1}>
-        {credentialInfo.attestationContent.map((field) => (
-          <Chip size={isSmallScreen ? 'small' : 'medium'} variant='outlined' key={field.name} label={field.value} />
-        ))}
-      </Grid>
-      {isUserRecipient && !readOnly && (
-        <Grid item xs={1} display='flex' justifyContent='flex-end'>
+  const favoriteAndVerificationIconsComponent =
+    (isUserRecipient && !readOnly) || credential.verificationUrl ? (
+      <Stack
+        flexBasis={isSmallScreen ? undefined : '30%'}
+        justifyContent='flex-end'
+        alignItems='center'
+        flexDirection='row'
+        gap={1}
+      >
+        {isUserRecipient && !readOnly && (
           <Tooltip title={isMutating ? '' : !credential.favoriteCredentialId ? 'Favorite' : 'Unfavorite'}>
             <div>
               <IconButton size='small' onClick={toggleFavorite} disabled={isMutating}>
@@ -135,15 +113,63 @@ export function UserCredentialRow({
               </IconButton>
             </div>
           </Tooltip>
-        </Grid>
-      )}
-      {credential.verificationUrl && (
-        <Grid item xs={1} display='flex' justifyContent='flex-end'>
+        )}
+        {credential.verificationUrl && (
           <Link href={credential.verificationUrl} external target='_blank'>
-            <LaunchIcon sx={{ alignSelf: 'center' }} fontSize={isSmallScreen ? 'small' : 'medium'} />
+            <LaunchIcon sx={{ alignSelf: 'center' }} fontSize='small' />
           </Link>
-        </Grid>
-      )}
-    </Grid>
+        )}
+      </Stack>
+    ) : null;
+
+  const credentialOrganizationComponent = (
+    <>
+      <Image
+        src={credentialInfo.iconUrl}
+        alt='charmverse-logo'
+        height={isSmallScreen ? 40 : 30}
+        width={isSmallScreen ? 40 : 30}
+      />
+      <Box display='flex' flexDirection='column' flexGrow={1}>
+        <Typography variant='body1' fontWeight='bold'>
+          {credentialInfo.title}
+        </Typography>
+        <Typography variant='caption' fontWeight='bold'>
+          {credentialInfo.subtitle}
+        </Typography>
+      </Box>
+    </>
+  );
+
+  const attestationContentComponent = credentialInfo.attestationContent.length ? (
+    <Stack flexDirection='row' gap={1} justifySelf='flex-start' flexGrow={isSmallScreen ? 1 : undefined}>
+      {credentialInfo.attestationContent.map((field) => (
+        <Chip size={isSmallScreen ? 'small' : 'medium'} variant='outlined' key={field.name} label={field.value} />
+      ))}
+    </Stack>
+  ) : null;
+
+  if (isSmallScreen) {
+    return (
+      <Stack gap={1}>
+        <Box gap={2} display='flex' alignItems='center' justifyItems='flex-start'>
+          {credentialOrganizationComponent}
+          {favoriteAndVerificationIconsComponent}
+        </Box>
+        {attestationContentComponent}
+      </Stack>
+    );
+  }
+
+  return (
+    <Stack gap={1} alignItems='center' justifyContent='space-between' flexDirection='row'>
+      <Box gap={1} display='flex' alignItems='center' justifyItems='flex-start' flexBasis='50%'>
+        {credentialOrganizationComponent}
+      </Box>
+      <Stack justifyContent='flex-end' alignItems='center' flexDirection='row' flexGrow={1}>
+        {attestationContentComponent}
+        {favoriteAndVerificationIconsComponent}
+      </Stack>
+    </Stack>
   );
 }

@@ -156,7 +156,6 @@ export async function getAllOnChainAttestations({
     if (favoriteCredential) {
       return {
         ...attestation,
-        favorite: true,
         index: favoriteCredential.index,
         favoriteCredentialId: favoriteCredential.id
       };
@@ -164,7 +163,6 @@ export async function getAllOnChainAttestations({
 
     return {
       ...attestation,
-      favorite: false,
       index: -1,
       favoriteCredentialId: null
     };

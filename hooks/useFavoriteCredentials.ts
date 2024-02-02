@@ -6,6 +6,7 @@ import {
   useRemoveFavoriteCredential,
   useReorderFavoriteCredentials
 } from 'charmClient/hooks/credentials';
+import { lowerCaseEqual } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
 import type { AddFavoriteCredentialPayload, ReorderFavoriteCredentialsPayload } from 'pages/api/credentials/favorites';
 
@@ -76,8 +77,14 @@ export function useFavoriteCredentials() {
 
         return _userCredentials.map((_userCredential) => {
           if (
-            _userCredential.issuedCredentialId === payload.issuedCredentialId ||
-            _userCredential.id === payload.attestationId
+            _userCredential.type === 'charmverse'
+              ? // issued credential id is undefined sometimes
+                _userCredential.issuedCredentialId && _userCredential.issuedCredentialId === payload.issuedCredentialId
+              : _userCredential.type === 'onchain'
+              ? _userCredential.id === payload.attestationId
+              : _userCredential.type === 'gitcoin'
+              ? lowerCaseEqual(_userCredential.recipient, payload.gitcoinWalletAddress)
+              : false
           ) {
             return {
               ..._userCredential,
@@ -104,7 +111,3 @@ export function useFavoriteCredentials() {
     addFavorite
   };
 }
-
-// Credential 1: "3fd35941-509b-4cae-83f7-736f4b0fb3eb"
-// Credential 2: "061a56d1-4121-4bd2-a76a-e33f79b81c20"
-// Credential 3: "10b00750-11f1-4754-a635-f5539384761c"

@@ -27,8 +27,10 @@ export function CredentialsWidget({
   return (
     <ProfileWidget title='Credentials' avatarComponent={<MedalIcon />}>
       <Stack gap={1}>
-        {favoriteCredentials.length !== 0 && <UserFavoriteList readOnly hideTitle credentials={favoriteCredentials} />}
-        <UserAllCredentialsList hideTitle readOnly credentials={nonFavoriteCredentials} />
+        {favoriteCredentials.length !== 0 && (
+          <UserFavoriteList smallScreen readOnly hideTitle credentials={favoriteCredentials} />
+        )}
+        <UserAllCredentialsList smallScreen hideTitle readOnly credentials={nonFavoriteCredentials} />
         {credentials.length > 5 && setActiveTab && (
           <Button
             variant='text'
