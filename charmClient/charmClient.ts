@@ -59,7 +59,6 @@ import { SpacesApi } from './apis/spacesApi';
 import { SubscriptionApi } from './apis/subscriptionApi';
 import { SummonApi } from './apis/summonApi';
 import { TrackApi } from './apis/trackApi';
-import { UnstoppableDomainsApi } from './apis/unstoppableApi';
 import { VotesApi } from './apis/votesApi';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
@@ -105,8 +104,6 @@ class CharmClient {
   track = new TrackApi();
 
   permissions = new PermissionsApi();
-
-  unstoppableDomains = new UnstoppableDomainsApi();
 
   votes = new VotesApi();
 
