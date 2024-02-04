@@ -14,7 +14,7 @@ import { getPropertyName } from 'lib/focalboard/getPropertyName';
 import { defaultRewardPropertyIds } from 'lib/rewards/blocks/constants';
 
 import mutator from '../../mutator';
-import { RelationPropertyOptions } from '../../widgets/menu/RelationPropertyMenu';
+import { RelationPropertyEditOptions } from '../../widgets/menu/RelationPropertyMenu';
 import { DEFAULT_BLOCK_IDS } from '../table/tableHeader';
 
 const StyledMenuItem = styled(MenuItem)`
@@ -103,16 +103,18 @@ function ViewPropertyOption({
           mt: 2
         }}
       />
-      {property.type === 'relation' && (
+      {property.type === 'relation' && property.relationData && (
         <>
-          <RelationPropertyOptions
+          <RelationPropertyEditOptions
             onChange={(relationData) => {
               mutator.updateProperty(board, property.id, {
                 ...property,
                 relationData
               });
             }}
+            propertyId={property.id}
             relationData={property.relationData}
+            board={board}
           />
           <Divider sx={{ mt: 1 }} />
         </>
