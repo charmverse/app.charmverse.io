@@ -1,17 +1,19 @@
 import styled from '@emotion/styled';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import { Box, Divider, Menu, MenuItem, MenuList, Stack, TextField, Typography } from '@mui/material';
+import { Box, Divider, Menu, MenuItem, MenuList, Stack, Switch, TextField, Typography } from '@mui/material';
 import { bindMenu } from 'material-ui-popup-state';
 import type { PopupState } from 'material-ui-popup-state/hooks';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
+import { useSyncRelationProperty } from 'charmClient/hooks/blocks';
 import { Button } from 'components/common/Button';
 import { PageIcon } from 'components/common/PageIcon';
 import PopperPopup from 'components/common/PopperPopup';
 import { usePages } from 'hooks/usePages';
-import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate, PropertyType, RelationPropertyData } from 'lib/focalboard/board';
 
 import { LinkCharmVerseDatabase } from '../../components/viewSidebar/viewSourceOptions/components/LinkCharmVerseDatabase';
+import { useAppSelector } from '../../store/hooks';
 
 const StyledMenuItem = styled(MenuItem)`
   padding: ${({ theme }) => theme.spacing(0, 1)};
@@ -103,7 +105,7 @@ export function RelationPropertyMenu({
               my: 1
             }}
           />
-          <RelationPropertyOptions
+          <RelationPropertyCreateOptions
             onChange={setRelationPropertyData}
             relationData={relationPropertyData}
             onButtonClick={() => {
@@ -123,18 +125,16 @@ export function RelationPropertyMenu({
   );
 }
 
-export function RelationPropertyOptions({
-  setShowSelectDatabaseMenu,
+function RelationPropertyOptions({
   relationData,
   onChange,
-  onButtonClick,
+  onRelatedToMenuClicked,
   disabled
 }: {
   disabled?: boolean;
+  onRelatedToMenuClicked?: VoidFunction;
   relationData: IPropertyTemplate['relationData'];
-  setShowSelectDatabaseMenu?: (show: boolean) => void;
-  onChange: (relationData?: IPropertyTemplate['relationData']) => void;
-  onButtonClick?: () => void;
+  onChange: (relationData: RelationPropertyData) => void;
 }) {
   const { pages } = usePages();
   const selectedPage = relationData ? pages[relationData.boardId] : null;
@@ -147,11 +147,11 @@ export function RelationPropertyOptions({
     <>
       <StyledMenuItem
         onClick={() => {
-          setShowSelectDatabaseMenu?.(true);
+          onRelatedToMenuClicked?.();
         }}
-        disabled={!setShowSelectDatabaseMenu}
+        disabled={!onRelatedToMenuClicked || disabled}
       >
-        <Typography color={setShowSelectDatabaseMenu ? '' : 'secondary'} mr={3}>
+        <Typography color={onRelatedToMenuClicked ? '' : 'secondary'} mr={3}>
           Related to
         </Typography>
         <Stack flexDirection='row' alignItems='center'>
@@ -166,7 +166,7 @@ export function RelationPropertyOptions({
           <KeyboardArrowRightIcon color='secondary' fontSize='small' />
         </Stack>
       </StyledMenuItem>
-      <StyledMenuItem>
+      <StyledMenuItem disabled={disabled}>
         <Typography mr={3}>Limit</Typography>
         <PopperPopup
           closeOnClick
@@ -210,20 +210,158 @@ export function RelationPropertyOptions({
           </Stack>
         </PopperPopup>
       </StyledMenuItem>
-      {onButtonClick && (
-        <Button
-          onClick={() => {
-            onButtonClick();
-          }}
-          primary
-          fullWidth
-          disabled={disabled}
-          sx={{
-            mt: 1
-          }}
-        >
-          Add relation
-        </Button>
+      <StyledMenuItem
+        disabled={disabled}
+        onClick={() => {
+          onChange({
+            ...relationData,
+            showOnRelatedBoard: !relationData.showOnRelatedBoard
+          });
+        }}
+      >
+        <Typography mr={3}>Show on {selectedPage.title ?? 'Untitled'}</Typography>
+        <Switch size='small' checked={relationData.showOnRelatedBoard} />
+      </StyledMenuItem>
+    </>
+  );
+}
+
+export function RelationPropertyCreateOptions({
+  setShowSelectDatabaseMenu,
+  relationData,
+  onChange,
+  onButtonClick,
+  disabled
+}: {
+  disabled?: boolean;
+  relationData: IPropertyTemplate['relationData'];
+  setShowSelectDatabaseMenu: (show: boolean) => void;
+  onChange: (relationData?: IPropertyTemplate['relationData']) => void;
+  onButtonClick: () => void;
+}) {
+  const { pages } = usePages();
+  const selectedPage = relationData ? pages[relationData.boardId] : null;
+
+  if (!selectedPage || !relationData) {
+    return null;
+  }
+
+  return (
+    <>
+      <RelationPropertyOptions
+        onChange={onChange}
+        relationData={relationData}
+        onRelatedToMenuClicked={() => {
+          setShowSelectDatabaseMenu(true);
+        }}
+      />
+      <Button
+        onClick={onButtonClick}
+        primary
+        fullWidth
+        disabled={disabled}
+        sx={{
+          mt: 1
+        }}
+      >
+        Add relation
+      </Button>
+    </>
+  );
+}
+
+export function RelationPropertyEditOptions({
+  relationData,
+  onChange,
+  propertyId,
+  board
+}: {
+  relationData: RelationPropertyData;
+  propertyId: string;
+  onChange: (relationData: RelationPropertyData) => void;
+  board: Board;
+}) {
+  const [relationDataTemp, setRelationDataTemp] = useState(relationData);
+  const { trigger: syncRelationProperty, isMutating } = useSyncRelationProperty();
+  const { pages } = usePages();
+  const selectedPage = relationData ? pages[relationData.boardId] : null;
+  const relatedBoard = useAppSelector((state) => state.boards.boards[relationData.boardId]);
+  const relatedProperty = relatedBoard?.fields.cardProperties.find(
+    (property) => property.id === relationData.relatedPropertyId
+  );
+
+  const [relatedPropertyTitle, setRelatedPropertyTitle] = useState(
+    relatedProperty?.name ?? `Related to ${board.title || 'Untitled'}`
+  );
+
+  const relatedPropertyUpdated =
+    relationDataTemp?.showOnRelatedBoard !== relationData.showOnRelatedBoard ||
+    relatedProperty?.name !== relatedPropertyTitle;
+
+  useEffect(() => {
+    setRelationDataTemp(relationData);
+  }, [relationData]);
+
+  if (!selectedPage || !relationData) {
+    return null;
+  }
+
+  return (
+    <>
+      <RelationPropertyOptions
+        onChange={(newRelationData) => {
+          setRelationDataTemp(newRelationData);
+          if (newRelationData?.showOnRelatedBoard === relationData.showOnRelatedBoard) {
+            onChange(newRelationData);
+          }
+        }}
+        disabled={isMutating}
+        relationData={relationDataTemp}
+      />
+      {(relatedProperty || relatedPropertyUpdated) && (
+        <Stack my={1} gap={0.5}>
+          {relationDataTemp.showOnRelatedBoard && (
+            <>
+              <Typography variant='subtitle2'>Related property on {selectedPage?.title || 'Untitled'}</Typography>
+              <TextField
+                value={relatedPropertyTitle}
+                fullWidth
+                disabled={isMutating}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  setRelatedPropertyTitle(e.target.value);
+                }}
+                placeholder={`Related to ${board.title || 'Untitled'}`}
+                autoFocus
+              />
+            </>
+          )}
+          {relatedPropertyUpdated && (
+            <Button
+              onClick={() => {
+                syncRelationProperty({
+                  boardId: board.id,
+                  action:
+                    relatedProperty && relatedPropertyTitle !== relatedProperty.name
+                      ? 'rename'
+                      : relationDataTemp.showOnRelatedBoard
+                      ? 'create'
+                      : 'delete',
+                  templateId: propertyId,
+                  relatedPropertyTitle: relatedPropertyTitle || `Related to ${board.title ?? 'Untitled'}`
+                });
+              }}
+              variant='outlined'
+              fullWidth
+              loading={isMutating}
+              sx={{
+                mt: 1
+              }}
+            >
+              {isMutating ? 'Updating relation' : 'Update relation'}
+            </Button>
+          )}
+        </Stack>
       )}
     </>
   );
