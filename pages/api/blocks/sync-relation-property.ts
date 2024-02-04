@@ -145,6 +145,49 @@ async function syncRelationProperty(req: NextApiRequest, res: NextApiResponse<Bl
         id: connectedBoard.id
       }
     });
+  } else if (action === 'delete') {
+    const connectedBoardProperty = connectedBoardProperties.find(
+      (p) => p.relationData?.relatedPropertyId === templateId
+    );
+    if (!connectedBoardProperty) {
+      throw new NotFoundError('Connected relation property not found');
+    }
+
+    await prisma.$transaction([
+      prisma.block.update({
+        data: {
+          fields: {
+            ...(connectedBoard?.fields as any),
+            cardProperties: connectedBoardProperties.filter((cp) => cp.id !== connectedBoardProperty.id)
+          }
+        },
+        where: {
+          id: connectedBoard.id
+        }
+      }),
+      prisma.block.update({
+        data: {
+          fields: {
+            ...(board?.fields as any),
+            cardProperties: boardProperties.map((cp) => {
+              if (cp.id === templateId) {
+                return {
+                  ...cp,
+                  relationData: {
+                    ...cp.relationData,
+                    showOnRelatedBoard: false
+                  }
+                };
+              }
+              return cp;
+            })
+          }
+        },
+        where: {
+          id: board.id
+        }
+      })
+    ]);
   }
 
   res.status(200).end();
