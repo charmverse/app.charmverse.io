@@ -258,7 +258,7 @@ function CardDetailProperties(props: Props) {
             if (relationData?.showOnRelatedBoard) {
               syncRelationProperty({
                 boardId: board.id,
-                created: true,
+                action: 'create',
                 templateId
               });
             }

@@ -200,7 +200,7 @@ function TableHeaders(props: Props): JSX.Element {
             if (relationData?.showOnRelatedBoard) {
               syncRelationProperty({
                 boardId: board.id,
-                created: true,
+                action: 'create',
                 templateId: template.id
               });
             }
