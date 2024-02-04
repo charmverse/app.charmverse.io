@@ -1,3 +1,4 @@
+import { InvalidInputError } from '@charmverse/core/errors';
 import type { Block } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -113,6 +114,37 @@ async function syncRelationProperty(req: NextApiRequest, res: NextApiResponse<Bl
         }
       })
     ]);
+  } else if (action === 'rename') {
+    const connectedBoardProperty = connectedBoardProperties.find(
+      (p) => p.relationData?.relatedPropertyId === templateId
+    );
+    if (!connectedBoardProperty) {
+      throw new NotFoundError('Connected relation property not found');
+    }
+
+    if (!relatedPropertyTitle) {
+      throw new InvalidInputError('Please provide a new title for the related property');
+    }
+
+    await prisma.block.update({
+      data: {
+        fields: {
+          ...(connectedBoard?.fields as any),
+          cardProperties: connectedBoardProperties.map((cp) => {
+            if (cp.id === connectedBoardProperty.id) {
+              return {
+                ...cp,
+                name: relatedPropertyTitle
+              };
+            }
+            return cp;
+          })
+        }
+      },
+      where: {
+        id: connectedBoard.id
+      }
+    });
   }
 
   res.status(200).end();

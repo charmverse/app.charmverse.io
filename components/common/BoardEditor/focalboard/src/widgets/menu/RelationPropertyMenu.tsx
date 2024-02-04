@@ -339,24 +339,34 @@ export function RelationPropertyEditOptions({
           {relatedPropertyUpdated && (
             <Button
               onClick={() => {
-                syncRelationProperty({
-                  boardId: board.id,
-                  action:
-                    relatedProperty && relatedPropertyTitle !== relatedProperty.name
-                      ? 'rename'
-                      : relationDataTemp.showOnRelatedBoard
+                const action =
+                  relationDataTemp.showOnRelatedBoard !== relationData.showOnRelatedBoard
+                    ? relationDataTemp.showOnRelatedBoard
                       ? 'create'
-                      : 'delete',
-                  templateId: propertyId,
-                  relatedPropertyTitle: relatedPropertyTitle || `Related to ${board.title ?? 'Untitled'}`
-                });
+                      : 'delete'
+                    : relatedProperty && relatedPropertyTitle !== relatedProperty.name
+                    ? 'rename'
+                    : null;
+
+                if (action) {
+                  syncRelationProperty({
+                    boardId: board.id,
+                    action,
+                    templateId: propertyId,
+                    relatedPropertyTitle: relatedPropertyTitle || `Related to ${board.title ?? 'Untitled'}`
+                  });
+                }
               }}
               variant='outlined'
               fullWidth
+              disabled={isMutating || relatedPropertyTitle.length === 0}
               loading={isMutating}
               sx={{
                 mt: 1
               }}
+              disabledTooltip={
+                relatedPropertyTitle.length === 0 ? `Please enter a name for the related property` : undefined
+              }
             >
               {isMutating ? 'Updating relation' : 'Update relation'}
             </Button>
