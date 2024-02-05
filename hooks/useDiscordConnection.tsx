@@ -120,11 +120,7 @@ export function DiscordProvider({ children }: Props) {
         { guildId, spaceId },
         {
           onSuccess: async (_roles) => {
-            showMessage(`Successfully imported ${_roles.importedRoleCount} discord roles`, 'success');
             await refreshRoles();
-          },
-          onError: (err: any) => {
-            showMessage(err.message || err.error || 'Something went wrong. Please try again', 'error');
           }
         }
       );
