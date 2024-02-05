@@ -12,6 +12,7 @@ import { cryptoPriceSpec } from './components/CryptoPrice';
 import * as disclosure from './components/disclosure';
 import * as doc from './components/doc/doc';
 import * as emoji from './components/emojiSuggest/emojiSuggest.specs';
+import { farcasterFrameSpec } from './components/FarcasterFrame';
 import { deletion, formatChange, insertion } from './components/fiduswriter/schema/common/track';
 import { specs as fileSpecs } from './components/file/file.specs';
 import * as heading from './components/heading';
@@ -84,6 +85,7 @@ export const specRegistry = new SpecRegistry([
   inlinePaletteSpecs(), // Not required
   callout.spec(), // OK
   cryptoPriceSpec(), // NO
+  farcasterFrameSpec(),
   pdfSpec(), // NO
   image.spec(), // OK
   columnLayout.spec(), // NO

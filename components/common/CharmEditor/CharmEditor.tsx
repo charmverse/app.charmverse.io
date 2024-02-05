@@ -30,6 +30,7 @@ import { BookmarkNodeView } from './components/bookmark/BookmarkNodeView';
 import Callout from './components/callout/components/Callout';
 import { CryptoPrice } from './components/CryptoPrice';
 import EmojiSuggest from './components/emojiSuggest/EmojiSuggest.component';
+import { FarcasterFrame } from './components/FarcasterFrame';
 import type { FrontendParticipant } from './components/fiduswriter/collab';
 import { getSelectedChanges } from './components/fiduswriter/state_plugins/track';
 import fiduswriterStyles from './components/fiduswriter/styles';
@@ -448,6 +449,9 @@ function CharmEditor({
                 }}
               />
             );
+          }
+          case 'farcasterFrame': {
+            return <FarcasterFrame {...allProps} />;
           }
           case 'blockquote': {
             return <Callout {...allProps}>{_children}</Callout>;

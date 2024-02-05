@@ -18,6 +18,7 @@ export type NodeType =
   | 'columnLayout'
   | 'columnBlock'
   | 'cryptoPrice'
+  | 'farcasterFrame'
   | 'date'
   | 'deletion'
   | 'disclosure'
