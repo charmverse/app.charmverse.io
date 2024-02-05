@@ -393,7 +393,7 @@ function CriteriaInput({
                   }}
                 />
               ) : (
-                <Box display='flex' gap={1}>
+                <Box display='flex' gap={1} alignItems='center'>
                   <FormLabel>
                     <Typography noWrap variant='body2'>
                       Your score ({parameters.min} &ndash; {parameters.max}):
@@ -462,13 +462,10 @@ function IntegerInput({
   sx?: any;
 }) {
   return (
-    <TextInput
-      displayType='details'
-      fullWidth={!maxWidth}
+    <TextField
       inputProps={{ disabled, type: 'number', ...inputProps }}
-      onChange={(newValue) => onChange(getNumberFromString(newValue))}
-      readOnly={readOnly}
-      readOnlyMessage={readOnlyMessage}
+      onChange={(e) => onChange(getNumberFromString(e.target.value))}
+      disabled={readOnly}
       sx={{
         input: { textAlign: 'center', minWidth: '2.5em !important', maxWidth },
         ...sx
