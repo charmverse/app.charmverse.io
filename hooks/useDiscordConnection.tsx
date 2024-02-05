@@ -119,9 +119,8 @@ export function DiscordProvider({ children }: Props) {
       await importRolesFromDiscordServer(
         { guildId, spaceId },
         {
-          onSuccess: async (_roles) => {
-            await refreshRoles();
-          }
+          onError: () => refreshRoles(),
+          onSuccess: () => refreshRoles()
         }
       );
     };

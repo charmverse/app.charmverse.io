@@ -1,5 +1,5 @@
 import type { Role } from '@charmverse/core/prisma';
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import type { CreateRoleInput } from 'components/settings/roles/components/CreateRoleForm';
@@ -10,7 +10,7 @@ export function useRoles() {
   const { space } = useCurrentSpace();
   const { mutateMembers } = useMembers();
 
-  const { data: roles, mutate } = useSWR(space ? `roles/${space.id}` : null, () =>
+  const { data: roles } = useSWR(space ? `roles/${space.id}` : null, () =>
     space ? charmClient.roles.listRoles(space.id) : null
   );
 
@@ -67,9 +67,7 @@ export function useRoles() {
   }
 
   async function refreshRoles() {
-    if (space) {
-      return mutate();
-    }
+    return mutate((key) => typeof key === 'string' && key.startsWith(`roles/${space?.id || ''}`));
   }
 
   return {

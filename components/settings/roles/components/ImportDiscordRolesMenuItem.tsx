@@ -5,14 +5,17 @@ import { useDiscordConnection } from 'hooks/useDiscordConnection';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import DiscordIcon from 'public/images/logos/discord_logo.svg';
 
-export function ImportDiscordRolesMenuItem() {
+export function ImportDiscordRolesMenuItem({ onClose }: { onClose: () => void }) {
   const { space } = useCurrentSpace();
   const { popupServer } = useDiscordConnection();
   const isAdmin = useIsAdmin();
 
   const returnUrl = encodeURIComponent(window.location.href);
 
-  const onClick = () => popupServer(encodeURIComponent(returnUrl), space?.id || '');
+  const onClick = () => {
+    popupServer(encodeURIComponent(returnUrl), space?.id || '');
+    onClose();
+  };
 
   if (!isAdmin) {
     return null;

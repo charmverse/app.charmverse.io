@@ -5,7 +5,6 @@ import type { CheckDiscordGateResult } from 'lib/discord/interface';
 import type { OauthFlowType } from 'lib/oauth/interfaces';
 import type { LoggedInUser } from 'models';
 import type { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
-import type { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 
 export class DiscordApi {
   disconnectDiscord() {
