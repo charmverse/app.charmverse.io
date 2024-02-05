@@ -51,7 +51,7 @@ export function RelationPropertyPagesAutocomplete({
         onChange(pageListItemIds);
         trigger({
           templateId: propertyTemplate.id,
-          connectedCardIds: pageListItemIds,
+          cardIds: pageListItemIds,
           boardId,
           cardId
         });
