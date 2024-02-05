@@ -1,9 +1,11 @@
 import { Alert, Stack, TextField } from '@mui/material';
 
+import charmClient from 'charmClient';
 import { useGetFarcasterFrame } from 'charmClient/hooks/farcaster';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import MultiTabs from 'components/common/MultiTabs';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 import BlockAligner from '../BlockAligner';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
@@ -21,6 +23,7 @@ export function FarcasterFrameNodeView({
 }: CharmNodeViewProps & {
   pageId?: string;
 }) {
+  const { space } = useCurrentSpace();
   const {
     data: farcasterFrame,
     isLoading,
@@ -65,6 +68,13 @@ export function FarcasterFrameNodeView({
               <MediaUrlInput
                 onSubmit={(frameUrl) => {
                   updateAttrs({ src: frameUrl });
+                  if (frameUrl && pageId && space) {
+                    charmClient.track.trackAction('add_farcaster_frame', {
+                      frameUrl,
+                      pageId,
+                      spaceId: space.id
+                    });
+                  }
                 }}
                 key='link'
                 placeholder='https://fc-polls.vercel.app/polls/...'
