@@ -4,6 +4,7 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Divider, MenuItem, Typography, Stack, TextField } from '@mui/material';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useMemo, useState } from 'react';
 
 import { proposalPropertyTypesList, type Board, type IPropertyTemplate } from 'lib/focalboard/board';
@@ -14,7 +15,8 @@ import { getPropertyName } from 'lib/focalboard/getPropertyName';
 import { defaultRewardPropertyIds } from 'lib/rewards/blocks/constants';
 
 import mutator from '../../mutator';
-import { RelationPropertyEditOptions } from '../../widgets/menu/RelationPropertyMenu/RelationPropertyOptions';
+import { DeleteRelationPropertyModal } from '../properties/relation/DeleteRelationPropertyModal';
+import { RelationPropertyEditOptions } from '../properties/relation/RelationPropertyMenu/RelationPropertyOptions';
 import { DEFAULT_BLOCK_IDS } from '../table/tableHeader';
 
 const StyledMenuItem = styled(MenuItem)`
@@ -49,6 +51,7 @@ function ViewPropertyOption({
     [titlePropertyIndex, visiblePropertyIds]
   );
   const isVisible = visiblePropertyIdsWithTitle.includes(property.id);
+  const showRelationPropertyDeletePopup = usePopupState({ variant: 'popover', popupId: 'delete-relation-property' });
 
   const disabled =
     proposalPropertyTypesList.includes(property.type as any) ||
@@ -134,6 +137,16 @@ function ViewPropertyOption({
         <DeleteOutlinedIcon fontSize='small' />
         <Typography variant='body2'>Delete</Typography>
       </StyledMenuItem>
+      {showRelationPropertyDeletePopup.isOpen && (
+        <DeleteRelationPropertyModal
+          board={board}
+          template={property}
+          onDelete={() => {
+            mutator.deleteProperty(board, views, cards, property.id);
+          }}
+          onClose={showRelationPropertyDeletePopup.close}
+        />
+      )}
     </Stack>
   );
 }

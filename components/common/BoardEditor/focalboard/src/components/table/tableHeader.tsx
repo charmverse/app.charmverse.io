@@ -10,7 +10,6 @@ import TuneIcon from '@mui/icons-material/Tune';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import type { PopoverProps } from '@mui/material';
 import {
-  Tooltip,
   Divider,
   IconButton,
   ListItemIcon,
@@ -19,9 +18,10 @@ import {
   Paper,
   Popover,
   Stack,
+  Switch,
   TextField,
-  Typography,
-  Switch
+  Tooltip,
+  Typography
 } from '@mui/material';
 import { bindPopover, bindToggle, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import type { Dispatch, SetStateAction } from 'react';
@@ -40,8 +40,8 @@ import {
   DEFAULT_BOARD_BLOCK_ID,
   DEFAULT_VIEW_BLOCK_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID,
-  PROPOSAL_STEP_BLOCK_ID,
-  PROPOSAL_STATUS_BLOCK_ID
+  PROPOSAL_STATUS_BLOCK_ID,
+  PROPOSAL_STEP_BLOCK_ID
 } from 'lib/proposal/blocks/constants';
 import { defaultRewardPropertyIds } from 'lib/rewards/blocks/constants';
 
@@ -50,6 +50,7 @@ import mutator from '../../mutator';
 import { Utils } from '../../utils';
 import { iconForPropertyType } from '../../widgets/iconForPropertyType';
 import Label from '../../widgets/label';
+import { DeleteRelationPropertyModal } from '../properties/relation/DeleteRelationPropertyModal';
 
 import HorizontalGrip from './horizontalGrip';
 
@@ -96,6 +97,7 @@ function TableHeader(props: Props): JSX.Element {
   const [tempName, setTempName] = useState(name || '');
   const addRelationPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-relation-property' });
   const bindTriggerProps = bindTrigger(addRelationPropertyPopupState);
+  const showRelationPropertyDeletePopup = usePopupState({ variant: 'popover', popupId: 'delete-relation-property' });
 
   const popupState = usePopupState({ variant: 'popper', popupId: 'iframe-selector' });
   const toggleRef = useRef(null);
@@ -306,7 +308,11 @@ function TableHeader(props: Props): JSX.Element {
             key='delete'
             disabled={isDisabled}
             onClick={() => {
-              mutator.deleteProperty(board, views, cards, templateId);
+              if (template.type === 'relation' && template.relationData?.showOnRelatedBoard) {
+                showRelationPropertyDeletePopup.open();
+              } else {
+                mutator.deleteProperty(board, views, cards, templateId);
+              }
             }}
           >
             <ListItemIcon>
@@ -392,6 +398,16 @@ function TableHeader(props: Props): JSX.Element {
       </Stack>
       <div className='octo-spacer' />
       {!readOnly && <HorizontalGrip templateId={templateId} onAutoSizeColumn={onAutoSizeColumn} />}
+      {showRelationPropertyDeletePopup.isOpen && (
+        <DeleteRelationPropertyModal
+          board={board}
+          onDelete={() => {
+            mutator.deleteProperty(board, views, cards, template.id);
+          }}
+          onClose={showRelationPropertyDeletePopup.close}
+          template={template}
+        />
+      )}
     </div>
   );
 }
