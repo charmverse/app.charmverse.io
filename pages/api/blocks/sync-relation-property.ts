@@ -6,8 +6,10 @@ import nc from 'next-connect';
 import { v4 } from 'uuid';
 
 import type { BoardFields } from 'lib/focalboard/board';
+import type { CardFields } from 'lib/focalboard/card';
 import { NotFoundError, onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { isTruthy } from 'lib/utilities/types';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -64,8 +66,82 @@ async function syncRelationProperty(req: NextApiRequest, res: NextApiResponse<Bl
 
   if (action === 'create') {
     const connectedRelationPropertyId = v4();
+    const connectedBoardCards = await prisma.block.findMany({
+      where: {
+        type: 'card',
+        parentId: connectedBoard.id
+      },
+      select: {
+        fields: true,
+        id: true
+      }
+    });
+
+    const boardCards = await prisma.block.findMany({
+      where: {
+        type: 'card',
+        parentId: board.id
+      },
+      select: {
+        fields: true,
+        id: true
+      }
+    });
+
+    const boardCardPages = boardCards.length
+      ? await prisma.page.findMany({
+          where: {
+            id: {
+              in: boardCards.map((c) => c.id)
+            }
+          },
+          select: {
+            id: true
+          }
+        })
+      : [];
+
+    const connectedBoardCardsRelatedCardsRecord: Record<string, string[]> = {};
+
+    for (const boardCard of boardCards) {
+      const boardCardPage = boardCardPages.find((p) => p.id === boardCard.id);
+      const boardCardProperties = (boardCard.fields as unknown as CardFields).properties;
+      const boardCardRelationPropertyValue = boardCardProperties[relationProperty.id] as string[] | null;
+      if (boardCardPage && boardCardRelationPropertyValue) {
+        boardCardRelationPropertyValue.forEach((connectedCardId) => {
+          if (!connectedBoardCardsRelatedCardsRecord[connectedCardId]) {
+            connectedBoardCardsRelatedCardsRecord[connectedCardId] = [boardCardPage.id];
+          } else {
+            connectedBoardCardsRelatedCardsRecord[connectedCardId].push(boardCardPage.id);
+          }
+        });
+      }
+    }
 
     await prisma.$transaction([
+      ...Object.entries(connectedBoardCardsRelatedCardsRecord)
+        .map(([connectedCardId, connectedCardIds]) => {
+          const connectedCardFields = connectedBoardCards.find((c) => c.id === connectedCardId)?.fields as CardFields;
+          if (!connectedCardFields) {
+            return null;
+          }
+
+          return prisma.block.update({
+            data: {
+              fields: {
+                ...connectedCardFields,
+                properties: {
+                  ...connectedCardFields.properties,
+                  [connectedRelationPropertyId]: connectedCardIds
+                }
+              }
+            },
+            where: {
+              id: connectedCardId
+            }
+          });
+        })
+        .filter(isTruthy),
       prisma.block.update({
         data: {
           fields: {
