@@ -409,7 +409,6 @@ function CharmEditor({
           pageId,
           pagePermissions,
           postId,
-          snapshotProposalId,
           readOnly,
           deleteNode: () => {
             const view = props.view;
