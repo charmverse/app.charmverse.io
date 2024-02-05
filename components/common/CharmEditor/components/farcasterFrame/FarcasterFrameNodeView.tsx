@@ -1,4 +1,4 @@
-import { Stack, TextField } from '@mui/material';
+import { Alert, Stack, TextField } from '@mui/material';
 
 import { useGetFarcasterFrame } from 'charmClient/hooks/farcaster';
 import { Button } from 'components/common/Button';
@@ -18,9 +18,9 @@ export function FarcasterFrameNodeView({
   updateAttrs,
   readOnly
 }: CharmNodeViewProps) {
-  const { data: farcasterFrame, isLoading } = useGetFarcasterFrame(attrs.src);
+  const { data: farcasterFrame, isLoading, error } = useGetFarcasterFrame(attrs.src);
 
-  if (!isLoading) {
+  if (isLoading) {
     return <LoadingComponent minHeight={80} isLoading />;
   }
 
@@ -62,12 +62,32 @@ export function FarcasterFrameNodeView({
     );
   }
 
-  if (!farcasterFrame) {
-    return null;
+  if (!farcasterFrame || error) {
+    return (
+      <BlockAligner
+        onEdit={() => {
+          if (!readOnly) {
+            updateAttrs({ src: null });
+          }
+        }}
+        onDelete={deleteNode}
+        readOnly={readOnly}
+      >
+        <Alert severity='warning'>{error?.message ?? 'Failed to load Farcaster Frame'}</Alert>
+      </BlockAligner>
+    );
   }
 
   return (
-    <BlockAligner onDelete={deleteNode} readOnly={readOnly}>
+    <BlockAligner
+      onEdit={() => {
+        if (!readOnly) {
+          updateAttrs({ src: null });
+        }
+      }}
+      onDelete={deleteNode}
+      readOnly={readOnly}
+    >
       <Stack gap={1} my={1}>
         <img src={farcasterFrame.image} width='100%' style={{ objectFit: 'cover' }} />
         {farcasterFrame.inputText && <TextField type='text' placeholder={farcasterFrame.inputText} />}
