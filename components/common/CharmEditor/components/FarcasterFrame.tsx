@@ -42,12 +42,8 @@ export function farcasterFrameSpec() {
 export function FarcasterFrame({ selected, attrs, node, deleteNode, updateAttrs, readOnly }: CharmNodeViewProps) {
   const { data: farcasterFrame, isLoading } = useGetFarcasterFrame(attrs.src);
 
-  if (isLoading) {
-    return (
-      <Box my={5}>
-        <LoadingComponent isLoading />
-      </Box>
-    );
+  if (!isLoading) {
+    return <LoadingComponent minHeight={80} isLoading />;
   }
 
   if (!attrs.src) {
