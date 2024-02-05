@@ -281,15 +281,19 @@ jobs:
           use_existing_version_if_available: true # allows triggering re-deploys with same version
           wait_for_deployment: false # set to false to save sweet Github minutes
 
-      - name: Use datadog ci package to upload js maps
-        env:
-          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-        run: |
-          npm install -g @datadog/datadog-ci
-          datadog-ci sourcemaps upload .next/static       \
-            --service=webapp                              \
-            --release-version=${{ steps.get_build_id.outputs.build_id }}  \
-            --minified-path-prefix=https://cdn.charmverse.io/_next/static
+      - name: Deploy Websockets to Beanstalk
+        if: steps.pkg_websocket.outputs.deploy_websocket == 'true'
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: prd-charmverse-websockets
+          environment_name: prd-charmverse-websockets
+          version_label: ${{ github.sha }}
+          region: us-east-1
+          deployment_package: deploy_websockets.zip
+          use_existing_version_if_available: true # allows triggering re-deploys with same version
+          wait_for_deployment: false # set to false to save sweet Github
 
       - name: Deploy Background to Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
@@ -304,6 +308,16 @@ jobs:
           use_existing_version_if_available: true # allows triggering re-deploys with same version
           wait_for_deployment: false # set to false to save sweet Github minutes
 
+      - name: Use datadog ci package to upload js maps
+        env:
+          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+        run: |
+          npm install -g @datadog/datadog-ci
+          datadog-ci sourcemaps upload .next/static       \
+            --service=webapp                              \
+            --release-version=${{ steps.get_build_id.outputs.build_id }}  \
+            --minified-path-prefix=https://cdn.charmverse.io/_next/static
+
       - name: Deploy Ceramic to Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
         with:
@@ -316,20 +330,6 @@ jobs:
           deployment_package: deploy_ceramic.zip
           use_existing_version_if_available: true # allows triggering re-deploys with same version
           wait_for_deployment: false # set to false to save sweet Github minutes
-
-      - name: Deploy Websockets to Beanstalk
-        if: steps.pkg_websocket.outputs.deploy_websocket == 'true'
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: prd-charmverse-websockets
-          environment_name: prd-charmverse-websockets
-          version_label: ${{ github.sha }}
-          region: us-east-1
-          deployment_package: deploy_websockets.zip
-          use_existing_version_if_available: true # allows triggering re-deploys with same version
-          wait_for_deployment: false # set to false to save sweet Github
 
   #    if: github.ref == 'refs/heads/main' && failure()
   discord_alert:
