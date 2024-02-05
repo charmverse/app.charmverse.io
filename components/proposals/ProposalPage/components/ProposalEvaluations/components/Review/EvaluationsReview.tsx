@@ -1,4 +1,5 @@
 import { Collapse, Divider, Tooltip } from '@mui/material';
+import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -77,6 +78,11 @@ export function EvaluationsReview({
 
   const previousStepIndex = adjustedCurrentEvaluationIndex > 0 ? adjustedCurrentEvaluationIndex - 1 : null;
 
+  function openSettings(evaluation: ProposalEvaluationValues) {
+    // use clone deep to avoid changing deeply-nested objects like rubric criteria
+    setEvaluationInput(cloneDeep(evaluation));
+  }
+
   function closeSettings() {
     setEvaluationInput(null);
   }
@@ -153,7 +159,7 @@ export function EvaluationsReview({
                 proposalId={proposal?.id}
                 refreshProposal={refreshProposal}
                 evaluation={evaluation}
-                openSettings={() => setEvaluationInput({ ...evaluation })}
+                openSettings={() => openSettings(evaluation)}
               />
             }
           >
