@@ -1,45 +1,23 @@
-import type { DOMOutputSpec } from '@bangle.dev/pm';
-import { Box, Stack, TextField } from '@mui/material';
+import { Stack, TextField } from '@mui/material';
 
 import { useGetFarcasterFrame } from 'charmClient/hooks/farcaster';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import MultiTabs from 'components/common/MultiTabs';
 
-import type { BaseRawNodeSpec } from './@bangle.dev/core/specRegistry';
-import BlockAligner from './BlockAligner';
-import { MediaSelectionPopup } from './common/MediaSelectionPopup';
-import { MediaUrlInput } from './common/MediaUrlInput';
-import type { CharmNodeViewProps } from './nodeView/nodeView';
+import BlockAligner from '../BlockAligner';
+import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
+import { MediaUrlInput } from '../common/MediaUrlInput';
+import type { CharmNodeViewProps } from '../nodeView/nodeView';
 
-export function farcasterFrameSpec() {
-  const spec: BaseRawNodeSpec = {
-    name: 'farcasterFrame',
-    type: 'node',
-    schema: {
-      attrs: {
-        src: {
-          default: null
-        },
-        track: {
-          default: []
-        }
-      },
-      draggable: true,
-      group: 'block',
-      parseDOM: [{ tag: 'div.charm-farcaster-frame' }],
-      toDOM: (): DOMOutputSpec => {
-        return ['div.charm-farcaster-frame'];
-      }
-    },
-    markdown: {
-      toMarkdown: () => null
-    }
-  };
-  return spec;
-}
-
-export function FarcasterFrame({ selected, attrs, node, deleteNode, updateAttrs, readOnly }: CharmNodeViewProps) {
+export function FarcasterFrameNodeView({
+  selected,
+  attrs,
+  node,
+  deleteNode,
+  updateAttrs,
+  readOnly
+}: CharmNodeViewProps) {
   const { data: farcasterFrame, isLoading } = useGetFarcasterFrame(attrs.src);
 
   if (!isLoading) {
