@@ -1,4 +1,4 @@
-import { Alert, Stack, TextField } from '@mui/material';
+import { Alert, Stack, TextField, Typography } from '@mui/material';
 
 import charmClient from 'charmClient';
 import { useGetFarcasterFrame } from 'charmClient/hooks/farcaster';
@@ -120,13 +120,21 @@ export function FarcasterFrameNodeView({
             <Button
               disabled
               sx={{
-                flexGrow: 1
+                flexGrow: 1,
+                flexBasis: `${100 / (farcasterFrame.buttons?.length || 1)}%`
               }}
               variant='outlined'
               color='secondary'
               key={`${index.toString()}`}
             >
-              {label}
+              <Typography
+                variant='body2'
+                sx={{
+                  textWrap: 'wrap'
+                }}
+              >
+                {label}
+              </Typography>
               {action === 'post_redirect' ? ` ↗` : ''}
             </Button>
           ))}
