@@ -184,7 +184,7 @@ export function RelationPropertyEditOptions({
 
   const relatedPropertyUpdated =
     relationDataTemp?.showOnRelatedBoard !== relationData.showOnRelatedBoard ||
-    relatedProperty?.name !== relatedPropertyTitle;
+    (relatedProperty && relatedProperty?.name !== relatedPropertyTitle);
 
   useEffect(() => {
     setRelationDataTemp(relationData);
