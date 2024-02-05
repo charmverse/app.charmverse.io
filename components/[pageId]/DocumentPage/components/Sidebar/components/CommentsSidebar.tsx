@@ -220,12 +220,17 @@ function EditorCommentsSidebarComponent({
       userId: user?.id
     });
   }, [threads, threadFilter, user?.id]);
-
   const handleThreadClassChange: SelectProps['onChange'] = (event) => {
     setThreadFilter(event.target.value as any);
   };
 
+  useHighlightThreadBox({
+    openSidebar,
+    setThreadFilter,
+    threads: threads ? Object.values(threads).filter(isTruthy) : []
+  });
   const { view } = useCharmEditorView();
+  const { updateThreadPluginState } = useInlineComment(view);
 
   // view.state.doc stays the same (empty content) even when the document content changes
   const extractedThreadIds =
@@ -250,14 +255,9 @@ function EditorCommentsSidebarComponent({
   const sortedThreadList = inlineThreadsIds
     .filter((inlineThreadsId) => threadListSet.has(inlineThreadsId))
     .map((filteredThreadId) => threads && threads[filteredThreadId])
-    .filter(isTruthy);
-  const { updateThreadPluginState } = useInlineComment(view);
-
-  useHighlightThreadBox({
-    openSidebar,
-    setThreadFilter,
-    threads: threads ? Object.values(threads).filter(isTruthy) : []
-  });
+    .filter(isTruthy)
+    // sort these since we convert it to a map afer the server responds
+    .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
 
   return (
     <CommentsSidebar
