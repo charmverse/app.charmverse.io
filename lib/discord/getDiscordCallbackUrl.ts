@@ -2,7 +2,6 @@ import { getCallbackDomain } from 'lib/oauth/getCallbackDomain';
 import type { OauthFlowType } from 'lib/oauth/interfaces';
 
 const callbackPaths: Record<OauthFlowType, string> = {
-  page: '/api/discord/callback',
   popup: '/authenticate/discord'
 };
 

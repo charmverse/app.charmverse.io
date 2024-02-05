@@ -24,7 +24,7 @@ async function oauth(req: NextApiRequest, res: NextApiResponse) {
     authFlowType?: OauthFlowType;
   };
 
-  const authFlowType = query.authFlowType ?? 'page';
+  const authFlowType = query.authFlowType ?? 'popup';
   const host = req.headers.host;
   const redirect = getDiscordRedirectUrl(host, query.redirect);
   const callbackUrl = getDiscordCallbackUrl(host, authFlowType);
