@@ -10,8 +10,8 @@ import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 import { useRouter } from 'next/router';
 import type { EditorState } from 'prosemirror-state';
-import type { CSSProperties, ReactNode } from 'react';
-import { memo, useEffect, useRef, useState } from 'react';
+import type { CSSProperties } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import { useSWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
@@ -28,8 +28,9 @@ import { BangleEditor as ReactBangleEditor } from './components/@bangle.dev/reac
 import { useEditorState } from './components/@bangle.dev/react/useEditorState';
 import { BookmarkNodeView } from './components/bookmark/BookmarkNodeView';
 import Callout from './components/callout/components/Callout';
-import { CryptoPrice } from './components/CryptoPrice';
+import { CryptoPriceNodeView } from './components/cryptoPrice/CryptoPriceNodeView';
 import EmojiSuggest from './components/emojiSuggest/EmojiSuggest.component';
+import { FarcasterFrameNodeView } from './components/farcasterFrame/FarcasterFrameNodeView';
 import type { FrontendParticipant } from './components/fiduswriter/collab';
 import { getSelectedChanges } from './components/fiduswriter/state_plugins/track';
 import fiduswriterStyles from './components/fiduswriter/styles';
@@ -429,7 +430,7 @@ function CharmEditor({
           case 'cryptoPrice': {
             const attrs = props.attrs as { base: null | CryptoCurrency; quote: null | FiatCurrency };
             return (
-              <CryptoPrice
+              <CryptoPriceNodeView
                 view={allProps.view}
                 getPos={allProps.getPos}
                 readOnly={readOnly}
@@ -447,6 +448,9 @@ function CharmEditor({
                 }}
               />
             );
+          }
+          case 'farcasterFrame': {
+            return <FarcasterFrameNodeView {...allProps} pageId={pageId} />;
           }
           case 'blockquote': {
             return <Callout {...allProps}>{_children}</Callout>;

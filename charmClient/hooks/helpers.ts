@@ -1,3 +1,4 @@
+import type { SWRConfiguration } from 'swr';
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import useSWRMutation from 'swr/mutation';
@@ -7,7 +8,7 @@ import * as http from 'adapters/http';
 export type MaybeString = string | null | undefined;
 
 // eslint-disable-next-line default-param-last
-export function useGET<T = unknown>(path: string | undefined | null, query: any = {}, swrOptions?: any) {
+export function useGET<T = unknown>(path: string | undefined | null, query: any = {}, swrOptions?: SWRConfiguration) {
   const requestUrl = path ? path + getQueryString(query) : null;
   return useSWR<T>(requestUrl, http.GET, swrOptions);
 }

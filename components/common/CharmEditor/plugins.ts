@@ -187,6 +187,10 @@ export function charmEditorPlugins({
       containerDOM: ['div']
     }),
     NodeView.createPlugin({
+      name: 'farcasterFrame',
+      containerDOM: ['div']
+    }),
+    NodeView.createPlugin({
       name: 'quote',
       containerDOM: ['blockquote', { class: 'charm-quote' }],
       contentDOM: ['div']
