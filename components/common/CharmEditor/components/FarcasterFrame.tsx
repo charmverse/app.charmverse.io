@@ -1,5 +1,10 @@
 import type { DOMOutputSpec } from '@bangle.dev/pm';
+import { Box, Stack, TextField } from '@mui/material';
+import type { Frame } from 'frames.js';
+import { useEffect, useState } from 'react';
 
+import { useGetFarcasterFrame } from 'charmClient/hooks/farcaster';
+import { Button } from 'components/common/Button';
 import MultiTabs from 'components/common/MultiTabs';
 
 import type { BaseRawNodeSpec } from './@bangle.dev/core/specRegistry';
@@ -35,6 +40,17 @@ export function farcasterFrameSpec() {
 }
 
 export function FarcasterFrame({ selected, attrs, node, deleteNode, updateAttrs, readOnly }: CharmNodeViewProps) {
+  const [farcasterFrame, setFarcasterFrame] = useState<Frame | null>(null);
+  const { mutate } = useGetFarcasterFrame(attrs.src);
+
+  useEffect(() => {
+    if (attrs.src) {
+      mutate(attrs.src).then((frame) => {
+        setFarcasterFrame(frame ?? null);
+      });
+    }
+  }, [attrs.src]);
+
   if (!attrs.src) {
     if (readOnly) {
       return <div />;
@@ -73,5 +89,29 @@ export function FarcasterFrame({ selected, attrs, node, deleteNode, updateAttrs,
     );
   }
 
-  return <div>Farcaster frame</div>;
+  if (!farcasterFrame) {
+    return null;
+  }
+
+  return (
+    <Stack gap={1}>
+      <img src={farcasterFrame.image} width='100%' style={{ objectFit: 'cover' }} />
+      {farcasterFrame.inputText && <TextField type='text' placeholder={farcasterFrame.inputText} />}
+      <Stack flexDirection='row' gap={1}>
+        {farcasterFrame.buttons?.map(({ label, action }, index: number) => (
+          <Button
+            sx={{
+              flexGrow: 1
+            }}
+            variant='outlined'
+            color='secondary'
+            key={`${index.toString()}`}
+          >
+            {label}
+            {action === 'post_redirect' ? ` ↗` : ''}
+          </Button>
+        ))}
+      </Stack>
+    </Stack>
+  );
 }
