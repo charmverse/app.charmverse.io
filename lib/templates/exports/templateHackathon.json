@@ -16055,7 +16055,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": null,
         "publishToLens": null,
         "lensPostLink": null,
         "fields": {

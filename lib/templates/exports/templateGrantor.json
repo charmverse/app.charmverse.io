@@ -16818,7 +16818,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": null,
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {
@@ -18833,7 +18832,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": null,
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {
@@ -20848,7 +20846,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": null,
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {
@@ -22863,7 +22860,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": null,
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {
