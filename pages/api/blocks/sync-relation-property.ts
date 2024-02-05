@@ -18,7 +18,7 @@ handler.put(syncRelationProperty);
 export type SyncRelationPropertyPayload = {
   boardId: string;
   templateId: string;
-  action: 'create' | 'rename' | 'delete';
+  action: 'create' | 'rename' | 'delete' | 'delete-both';
   relatedPropertyTitle?: string;
 };
 
@@ -221,7 +221,7 @@ async function syncRelationProperty(req: NextApiRequest, res: NextApiResponse<Bl
         id: connectedBoard.id
       }
     });
-  } else if (action === 'delete') {
+  } else if (action === 'delete' || action === 'delete-both') {
     const connectedBoardProperty = connectedBoardProperties.find(
       (p) => p.relationData?.relatedPropertyId === templateId
     );
@@ -234,7 +234,21 @@ async function syncRelationProperty(req: NextApiRequest, res: NextApiResponse<Bl
         data: {
           fields: {
             ...(connectedBoard?.fields as any),
-            cardProperties: connectedBoardProperties.filter((cp) => cp.id !== connectedBoardProperty.id)
+            cardProperties:
+              action === 'delete-both'
+                ? connectedBoardProperties.filter((cp) => cp.id !== connectedBoardProperty.id)
+                : connectedBoardProperties.map((cp) => {
+                    if (cp.id === connectedBoardProperty.id) {
+                      return {
+                        ...cp,
+                        relationData: {
+                          ...cp.relationData,
+                          showOnRelatedBoard: false
+                        }
+                      };
+                    }
+                    return cp;
+                  })
           }
         },
         where: {

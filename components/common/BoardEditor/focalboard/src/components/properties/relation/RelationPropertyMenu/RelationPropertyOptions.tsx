@@ -9,7 +9,7 @@ import PopperPopup from 'components/common/PopperPopup';
 import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate, RelationPropertyData } from 'lib/focalboard/board';
 
-import { useAppSelector } from '../../../store/hooks';
+import { useAppSelector } from '../../../../store/hooks';
 
 import { StyledMenuItem } from './RelationPropertyMenu';
 

@@ -6,7 +6,7 @@ import { useState } from 'react';
 
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 
-import { LinkCharmVerseDatabase } from '../../../components/viewSidebar/viewSourceOptions/components/LinkCharmVerseDatabase';
+import { LinkCharmVerseDatabase } from '../../../viewSidebar/viewSourceOptions/components/LinkCharmVerseDatabase';
 
 import { RelationPropertyCreateOptions } from './RelationPropertyOptions';
 

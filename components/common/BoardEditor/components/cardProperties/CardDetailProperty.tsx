@@ -96,6 +96,7 @@ export function CardDetailProperty({
           </PropertyNameContainer>
           <Menu {...bindMenu(changePropertyPopupState)}>
             <PropertyMenu
+              board={board}
               onDelete={onDelete}
               deleteDisabled={deleteDisabledMessage?.length !== 0}
               property={property}
