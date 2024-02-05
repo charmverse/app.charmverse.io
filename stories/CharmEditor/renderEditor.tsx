@@ -27,7 +27,6 @@ export function renderEditorWithContent({ content, title }: { content?: PageCont
         pageType='page'
         pagePermissions={undefined}
         onConnectionEvent={() => {}}
-        snapshotProposalId={null}
         onParticipantUpdate={() => {}}
         style={{
           minHeight: '100px'

@@ -50,7 +50,6 @@ export type PageActionMeta = Pick<
   | 'parentId'
   | 'path'
   | 'proposalId'
-  | 'snapshotProposalId'
   | 'syncWithPageId'
   | 'title'
   | 'type'

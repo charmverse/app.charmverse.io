@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { prisma } from '@charmverse/core/prisma-client';
 import { createDefaultProposal } from 'lib/proposal/createDefaultProposal';
 import { upsertDefaultRewardsBoard } from 'lib/rewards/blocks/upsertDefaultRewardsBoard';

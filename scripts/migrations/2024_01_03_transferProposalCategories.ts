@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { prisma } from '@charmverse/core/prisma-client';
 import { getDefaultBoard, getDefaultTableView } from 'components/proposals/components/ProposalsBoard/utils/boardData';
 import { Block, blockToPrisma } from 'lib/focalboard/block';
@@ -14,7 +15,6 @@ async function transferProposalCategories() {
       proposals: {
         select: {
           id: true,
-          categoryId: true,
           fields: true
         }
       },

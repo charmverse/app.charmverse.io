@@ -174,6 +174,11 @@ describe('GET /api/v1/proposals/{proposalId}', () => {
           }
         ]),
         title: proposal.page.title,
+        currentStep: {
+          result: 'in_progress',
+          title: 'pass_fail',
+          type: 'pass_fail'
+        },
         status: proposal.status,
         url: `${baseUrl}/${space?.domain}/${proposal.page?.path}`,
         voteOptions: expect.arrayContaining(voteOptions)
@@ -216,7 +221,11 @@ describe('GET /api/v1/proposals/{proposalId}', () => {
             id: proposalReviewer.id
           }
         ]),
-
+        currentStep: {
+          result: 'in_progress',
+          title: 'pass_fail',
+          type: 'pass_fail'
+        },
         title: proposal.page.title,
         status: proposal.status,
         url: `${baseUrl}/${space?.domain}/${proposal.page?.path}`

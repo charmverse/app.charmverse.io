@@ -355,10 +355,6 @@ class CharmClient {
     return http.POST(`/api/pages/${pageId}/restrict-permissions`, {});
   }
 
-  updatePageSnapshotData(pageId: string, data: Pick<Page, 'snapshotProposalId'>): Promise<PageWithPermissions> {
-    return http.PUT(`/api/pages/${pageId}/snapshot`, data);
-  }
-
   createProposalSource({ pageId }: { pageId: string }) {
     return http.POST<void>(`/api/pages/${pageId}/proposal-source`);
   }

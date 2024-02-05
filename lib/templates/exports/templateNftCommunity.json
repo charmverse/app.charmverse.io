@@ -636,7 +636,6 @@
       "index": 2,
       "cardId": null,
       "proposalId": "0ce6c53a-a61d-4ed3-ac7d-8b382a8177ef",
-      "snapshotProposalId": null,
       "fullWidth": false,
       "fontFamily": "default",
       "fontSizeSmall": false,
@@ -655,7 +654,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": null,
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {
@@ -869,11 +867,7 @@
             "proposalId": "0ce6c53a-a61d-4ed3-ac7d-8b382a8177ef",
             "voteSettings": {
               "type": "Approval",
-              "options": [
-                "Yes",
-                "No",
-                "Abstain"
-              ],
+              "options": ["Yes", "No", "Abstain"],
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 5,
@@ -1739,7 +1733,6 @@
       "index": 3,
       "cardId": null,
       "proposalId": "5e03ee92-1b32-4a3e-83bb-0abf98994c55",
-      "snapshotProposalId": null,
       "fullWidth": false,
       "fontFamily": "default",
       "fontSizeSmall": false,
@@ -1758,7 +1751,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": null,
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {
@@ -1972,11 +1964,7 @@
             "proposalId": "5e03ee92-1b32-4a3e-83bb-0abf98994c55",
             "voteSettings": {
               "type": "Approval",
-              "options": [
-                "Yes",
-                "No",
-                "Abstain"
-              ],
+              "options": ["Yes", "No", "Abstain"],
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 5,
@@ -2820,7 +2808,6 @@
       "index": 7,
       "cardId": null,
       "proposalId": "9dff2dad-bdf0-400a-be58-508ed7f30190",
-      "snapshotProposalId": null,
       "fullWidth": false,
       "fontFamily": "default",
       "fontSizeSmall": false,
@@ -2839,7 +2826,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": null,
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {
@@ -3053,11 +3039,7 @@
             "proposalId": "9dff2dad-bdf0-400a-be58-508ed7f30190",
             "voteSettings": {
               "type": "Approval",
-              "options": [
-                "Yes",
-                "No",
-                "Abstain"
-              ],
+              "options": ["Yes", "No", "Abstain"],
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 5,
@@ -3636,7 +3618,6 @@
       "index": 0,
       "cardId": null,
       "proposalId": "8ff1d875-b00a-4666-8e2a-d747bab7099f",
-      "snapshotProposalId": null,
       "fullWidth": false,
       "fontFamily": "default",
       "fontSizeSmall": false,
@@ -3655,7 +3636,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": null,
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {
@@ -3869,11 +3849,7 @@
             "proposalId": "8ff1d875-b00a-4666-8e2a-d747bab7099f",
             "voteSettings": {
               "type": "Approval",
-              "options": [
-                "Yes",
-                "No",
-                "Abstain"
-              ],
+              "options": ["Yes", "No", "Abstain"],
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 5,
@@ -4650,7 +4626,6 @@
       "index": 4,
       "cardId": null,
       "proposalId": "227414b8-ea58-4dce-9fd7-ed7e29628113",
-      "snapshotProposalId": null,
       "fullWidth": false,
       "fontFamily": "default",
       "fontSizeSmall": false,
@@ -4669,7 +4644,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": null,
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {
@@ -4883,11 +4857,7 @@
             "proposalId": "227414b8-ea58-4dce-9fd7-ed7e29628113",
             "voteSettings": {
               "type": "Approval",
-              "options": [
-                "Yes",
-                "No",
-                "Abstain"
-              ],
+              "options": ["Yes", "No", "Abstain"],
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 5,
@@ -5861,7 +5831,6 @@
       "index": 5,
       "cardId": null,
       "proposalId": "423917d8-ebbb-415c-9d71-6ce90450f184",
-      "snapshotProposalId": null,
       "fullWidth": false,
       "fontFamily": "default",
       "fontSizeSmall": false,
@@ -5880,7 +5849,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": null,
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {
@@ -6094,11 +6062,7 @@
             "proposalId": "423917d8-ebbb-415c-9d71-6ce90450f184",
             "voteSettings": {
               "type": "Approval",
-              "options": [
-                "Yes",
-                "No",
-                "Abstain"
-              ],
+              "options": ["Yes", "No", "Abstain"],
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 5,
@@ -6808,7 +6772,6 @@
       "index": 1,
       "cardId": null,
       "proposalId": "53b3910d-9e72-48cb-aa16-664bfbbd428b",
-      "snapshotProposalId": null,
       "fullWidth": false,
       "fontFamily": "default",
       "fontSizeSmall": false,
@@ -6827,7 +6790,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": null,
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {
@@ -7041,11 +7003,7 @@
             "proposalId": "53b3910d-9e72-48cb-aa16-664bfbbd428b",
             "voteSettings": {
               "type": "Approval",
-              "options": [
-                "Yes",
-                "No",
-                "Abstain"
-              ],
+              "options": ["Yes", "No", "Abstain"],
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 5,
@@ -7889,7 +7847,6 @@
       "index": 6,
       "cardId": null,
       "proposalId": "9187e2ae-3c11-4dc7-b87d-c3e3f6a16d06",
-      "snapshotProposalId": null,
       "fullWidth": false,
       "fontFamily": "default",
       "fontSizeSmall": false,
@@ -7908,7 +7865,6 @@
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
-        "categoryId": null,
         "publishToLens": false,
         "lensPostLink": null,
         "fields": {
@@ -8122,11 +8078,7 @@
             "proposalId": "9187e2ae-3c11-4dc7-b87d-c3e3f6a16d06",
             "voteSettings": {
               "type": "Approval",
-              "options": [
-                "Yes",
-                "No",
-                "Abstain"
-              ],
+              "options": ["Yes", "No", "Abstain"],
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 5,
@@ -8961,7 +8913,6 @@
       "index": 11,
       "cardId": null,
       "proposalId": null,
-      "snapshotProposalId": null,
       "fullWidth": false,
       "fontFamily": "default",
       "fontSizeSmall": false,
@@ -11493,7 +11444,6 @@
       "index": 9,
       "cardId": null,
       "proposalId": null,
-      "snapshotProposalId": null,
       "fullWidth": false,
       "fontFamily": "default",
       "fontSizeSmall": false,
@@ -12356,7 +12306,6 @@
       "index": 10,
       "cardId": null,
       "proposalId": null,
-      "snapshotProposalId": null,
       "fullWidth": false,
       "fontFamily": "default",
       "fontSizeSmall": false,
@@ -12709,7 +12658,6 @@
           "index": 0,
           "cardId": null,
           "proposalId": null,
-          "snapshotProposalId": null,
           "fullWidth": false,
           "fontFamily": "default",
           "fontSizeSmall": false,
@@ -13358,7 +13306,6 @@
           "index": 1,
           "cardId": null,
           "proposalId": null,
-          "snapshotProposalId": null,
           "fullWidth": false,
           "fontFamily": "default",
           "fontSizeSmall": false,
@@ -13506,7 +13453,6 @@
           "index": 2,
           "cardId": null,
           "proposalId": null,
-          "snapshotProposalId": null,
           "fullWidth": false,
           "fontFamily": "default",
           "fontSizeSmall": false,
@@ -13687,7 +13633,6 @@
               "index": 0,
               "cardId": null,
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -13869,7 +13814,6 @@
               "index": 1,
               "cardId": null,
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -14051,7 +13995,6 @@
               "index": 2,
               "cardId": null,
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -14695,7 +14638,6 @@
           "index": 3,
           "cardId": null,
           "proposalId": null,
-          "snapshotProposalId": null,
           "fullWidth": false,
           "fontFamily": "default",
           "fontSizeSmall": false,
@@ -15188,7 +15130,6 @@
           "index": 4,
           "cardId": null,
           "proposalId": null,
-          "snapshotProposalId": null,
           "fullWidth": false,
           "fontFamily": "default",
           "fontSizeSmall": false,
@@ -16365,7 +16306,6 @@
           "index": 5,
           "cardId": null,
           "proposalId": null,
-          "snapshotProposalId": null,
           "fullWidth": false,
           "fontFamily": "default",
           "fontSizeSmall": false,
@@ -16427,7 +16367,6 @@
               "index": -1,
               "cardId": null,
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -16492,7 +16431,6 @@
           "index": 6,
           "cardId": null,
           "proposalId": null,
-          "snapshotProposalId": null,
           "fullWidth": false,
           "fontFamily": "default",
           "fontSizeSmall": false,
@@ -16574,7 +16512,6 @@
               "index": -1,
               "cardId": "3832cd1f-b95a-4325-b406-600836701460",
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -16685,7 +16622,6 @@
               "index": -1,
               "cardId": "60ff9ddf-0bc8-42ca-94b6-2405e34bf569",
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -16796,7 +16732,6 @@
               "index": -1,
               "cardId": "f6308ac2-9780-4d41-b19f-c9550646bd59",
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -16907,7 +16842,6 @@
               "index": -1,
               "cardId": "9105fd0a-9cd5-4943-a9ff-1158078196f6",
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -17018,7 +16952,6 @@
               "index": -1,
               "cardId": "fd826534-ba64-4f4a-af82-30cad103c655",
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -17129,7 +17062,6 @@
               "index": -1,
               "cardId": "666279fa-3d21-4d0a-aa44-f25456667d9a",
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -17240,7 +17172,6 @@
               "index": -1,
               "cardId": "4e8454ec-65bf-4275-b31f-a926fbc62d6c",
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -17436,10 +17367,7 @@
                   "collapsedOptionIds": [],
                   "columnCalculations": {},
                   "kanbanCalculations": {},
-                  "visiblePropertyIds": [
-                    "__title",
-                    "11eefd10-f082-40d6-abc0-0a8cec44fb90"
-                  ]
+                  "visiblePropertyIds": ["__title", "11eefd10-f082-40d6-abc0-0a8cec44fb90"]
                 }
               }
             ]
@@ -18511,7 +18439,6 @@
           "index": 7,
           "cardId": null,
           "proposalId": null,
-          "snapshotProposalId": null,
           "fullWidth": false,
           "fontFamily": "default",
           "fontSizeSmall": false,
@@ -18573,7 +18500,6 @@
               "index": 1000,
               "cardId": null,
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -18635,7 +18561,6 @@
                   "index": -1,
                   "cardId": null,
                   "proposalId": null,
-                  "snapshotProposalId": null,
                   "fullWidth": false,
                   "fontFamily": "default",
                   "fontSizeSmall": false,
@@ -18690,9 +18615,7 @@
                         "isTemplate": false,
                         "properties": {
                           "47b1aee8-dd7c-42e4-bd1e-9b14dd850015": "35bbea47-5c02-431b-89cd-ee7b796aba04",
-                          "c55a109e-a5b5-4cdd-9902-483ec65d58ee": [
-                            "d5b4e5db-868d-47b0-bc78-ebe9b5b2c835"
-                          ]
+                          "c55a109e-a5b5-4cdd-9902-483ec65d58ee": ["d5b4e5db-868d-47b0-bc78-ebe9b5b2c835"]
                         },
                         "headerImage": null,
                         "contentOrder": []
@@ -18736,7 +18659,6 @@
                   "index": -1,
                   "cardId": null,
                   "proposalId": null,
-                  "snapshotProposalId": null,
                   "fullWidth": false,
                   "fontFamily": "default",
                   "fontSizeSmall": false,
@@ -18791,9 +18713,7 @@
                         "isTemplate": false,
                         "properties": {
                           "47b1aee8-dd7c-42e4-bd1e-9b14dd850015": "35bbea47-5c02-431b-89cd-ee7b796aba04",
-                          "c55a109e-a5b5-4cdd-9902-483ec65d58ee": [
-                            "f7d47848-f993-4d16-8008-e1f5b23b8ad3"
-                          ]
+                          "c55a109e-a5b5-4cdd-9902-483ec65d58ee": ["f7d47848-f993-4d16-8008-e1f5b23b8ad3"]
                         },
                         "headerImage": null,
                         "contentOrder": []
@@ -18827,7 +18747,6 @@
                   "index": -1,
                   "cardId": null,
                   "proposalId": null,
-                  "snapshotProposalId": null,
                   "fullWidth": false,
                   "fontFamily": "default",
                   "fontSizeSmall": false,
@@ -18882,9 +18801,7 @@
                         "isTemplate": false,
                         "properties": {
                           "47b1aee8-dd7c-42e4-bd1e-9b14dd850015": "181ec031-6afc-4414-b1b8-87d2ecc74b82",
-                          "c55a109e-a5b5-4cdd-9902-483ec65d58ee": [
-                            "e5dba747-be62-49be-a7ba-71cf27b17174"
-                          ]
+                          "c55a109e-a5b5-4cdd-9902-483ec65d58ee": ["e5dba747-be62-49be-a7ba-71cf27b17174"]
                         },
                         "headerImage": null,
                         "contentOrder": []
@@ -18999,9 +18916,7 @@
                       "sortOptions": [],
                       "columnWidths": {},
                       "linkedSourceId": null,
-                      "hiddenOptionIds": [
-                        ""
-                      ],
+                      "hiddenOptionIds": [""],
                       "visibleOptionIds": [
                         "35bbea47-5c02-431b-89cd-ee7b796aba04",
                         "181ec031-6afc-4414-b1b8-87d2ecc74b82",
@@ -19011,9 +18926,7 @@
                       "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
-                      "visiblePropertyIds": [
-                        "c55a109e-a5b5-4cdd-9902-483ec65d58ee"
-                      ]
+                      "visiblePropertyIds": ["c55a109e-a5b5-4cdd-9902-483ec65d58ee"]
                     }
                   }
                 ]
@@ -19561,11 +19474,7 @@
         "type": "timezone",
         "options": null,
         "index": 8,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "required": false,
         "permissions": []
       },
@@ -19580,11 +19489,7 @@
         "type": "role",
         "options": [],
         "index": 2,
-        "enabledViews": [
-          "table",
-          "profile",
-          "gallery"
-        ],
+        "enabledViews": ["table", "profile", "gallery"],
         "required": false,
         "permissions": []
       },
@@ -19599,9 +19504,7 @@
         "type": "bio",
         "options": null,
         "index": 3,
-        "enabledViews": [
-          "profile"
-        ],
+        "enabledViews": ["profile"],
         "required": false,
         "permissions": []
       },
@@ -19616,10 +19519,7 @@
         "type": "discord",
         "options": null,
         "index": 4,
-        "enabledViews": [
-          "gallery",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "profile"],
         "required": false,
         "permissions": []
       },
@@ -19634,11 +19534,7 @@
         "type": "linked_in",
         "options": null,
         "index": 6,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "required": false,
         "permissions": []
       },
@@ -19653,11 +19549,7 @@
         "type": "profile_pic",
         "options": [],
         "index": 0,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "required": false,
         "permissions": []
       },
@@ -19672,11 +19564,7 @@
         "type": "text",
         "options": null,
         "index": 1,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "required": false,
         "permissions": []
       },
@@ -19706,11 +19594,7 @@
         "type": "github",
         "options": null,
         "index": 7,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "required": false,
         "permissions": []
       },
@@ -19725,11 +19609,7 @@
         "type": "text_multiline",
         "options": [],
         "index": 12,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "required": false,
         "permissions": []
       },
@@ -19829,11 +19709,7 @@
           }
         ],
         "index": 13,
-        "enabledViews": [
-          "gallery",
-          "table",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "table", "profile"],
         "required": false,
         "permissions": []
       },
@@ -19848,10 +19724,7 @@
         "type": "twitter",
         "options": null,
         "index": 5,
-        "enabledViews": [
-          "gallery",
-          "profile"
-        ],
+        "enabledViews": ["gallery", "profile"],
         "required": false,
         "permissions": []
       },

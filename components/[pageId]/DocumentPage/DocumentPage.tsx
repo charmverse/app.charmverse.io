@@ -426,7 +426,6 @@ function DocumentPageComponent({
                   pagePermissions={pagePermissions ?? undefined}
                   onConnectionEvent={onConnectionEvent}
                   setEditorState={setEditorState}
-                  snapshotProposalId={page.snapshotProposalId}
                   onParticipantUpdate={onParticipantUpdate}
                   setCharmEditorView={setCharmEditorView}
                   style={{
@@ -450,6 +449,7 @@ function DocumentPageComponent({
                     reviewers={proposal.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat()}
                     assignedSubmitters={proposal.authors.map((a) => a.userId)}
                     variant='solid_button'
+                    readOnly={!proposal.permissions.edit}
                     rewardIds={proposal.rewardIds || []}
                     onSave={(pendingReward) => {
                       const isExisting = proposal.fields?.pendingRewards?.find(
