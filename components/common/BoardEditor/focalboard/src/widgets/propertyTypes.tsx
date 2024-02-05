@@ -5,7 +5,7 @@ import { useIntl } from 'react-intl';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 
 import { iconForPropertyType } from './iconForPropertyType';
-import { RelationPropertyMenu } from './menu/RelationPropertyMenu';
+import { RelationPropertyMenu } from './menu/RelationPropertyMenu/RelationPropertyMenu';
 import { typeDisplayName } from './typeDisplayName';
 
 const propertyTypesList: PropertyType[] = [

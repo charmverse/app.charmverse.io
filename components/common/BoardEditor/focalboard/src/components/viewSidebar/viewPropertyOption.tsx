@@ -14,7 +14,7 @@ import { getPropertyName } from 'lib/focalboard/getPropertyName';
 import { defaultRewardPropertyIds } from 'lib/rewards/blocks/constants';
 
 import mutator from '../../mutator';
-import { RelationPropertyEditOptions } from '../../widgets/menu/RelationPropertyMenu';
+import { RelationPropertyEditOptions } from '../../widgets/menu/RelationPropertyMenu/RelationPropertyOptions';
 import { DEFAULT_BLOCK_IDS } from '../table/tableHeader';
 
 const StyledMenuItem = styled(MenuItem)`
