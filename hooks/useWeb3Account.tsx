@@ -9,6 +9,7 @@ import { useCallback, createContext, useContext, useEffect, useMemo, useState } 
 import { mutate } from 'swr';
 import useSWRMutation from 'swr/mutation';
 import { recoverMessageAddress, getAddress } from 'viem';
+import type { ConnectorData } from 'wagmi';
 import { useAccount, useConnect, useNetwork, useSignMessage } from 'wagmi';
 
 import charmClient from 'charmClient';
@@ -63,7 +64,7 @@ export const Web3Context = createContext<Readonly<IContext>>({
 // a wrapper around account and library from web3react
 export function Web3AccountProvider({ children }: { children: ReactNode }) {
   const { address: account, connector: activeConnector } = useAccount();
-  const { open: openVerifyOtpModal } = useVerifyLoginOtp();
+  const { open: openVerifyOtpModal, isOpen: isVerifyOtpModalOpen, close: closeVerifyOtpModal } = useVerifyLoginOtp();
   const router = useRouter();
   const { chain } = useNetwork();
   const chainId = chain?.id;
@@ -246,6 +247,24 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       setWalletAuthSignature(null);
     }
   }, [account]);
+
+  useEffect(() => {
+    const handleConnectorUpdate = ({ account: _acc }: ConnectorData) => {
+      // This runs every time the wallet account changes.
+      if (_acc) {
+        if (isVerifyOtpModalOpen) {
+          logoutWallet();
+          closeVerifyOtpModal();
+        }
+      }
+    };
+
+    activeConnector?.on('change', handleConnectorUpdate);
+
+    return () => {
+      activeConnector?.off('change', handleConnectorUpdate);
+    };
+  }, []);
 
   const { trigger: triggerDisconnectWallet, isMutating: isDisconnectingWallet } = useSWRMutation(
     '/profile/remove-wallet',
