@@ -9,7 +9,6 @@ type ExportedProposal = {
   proposalUrl: string;
   authors: string;
   title: string;
-  category: string;
   total: string | number;
   average: string | number;
   rubricResults: string;
@@ -21,7 +20,6 @@ const exportedFormat: Record<ExportKeys, string> = {
   authors: 'Author',
   proposalUrl: 'Proposal URL',
   title: 'Title',
-  category: 'Category',
   total: 'Total',
   average: 'Average',
   rubricResults: 'Rubric Results'
@@ -50,11 +48,6 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
       }
     },
     include: {
-      category: {
-        select: {
-          title: true
-        }
-      },
       rubricAnswers: true,
       rubricCriteria: {
         orderBy: {
@@ -142,7 +135,6 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
       authors: p.authors.map((a) => a.author.username).join(newLine),
       average: results.allScores.average ?? '-',
       total: results.allScores.sum ?? '-',
-      category: p.category?.title ?? 'Unnamed Category',
       title: p.page?.title ?? 'Proposal',
       proposalUrl: `https://app.charmverse.io/${domain}/${p.page?.path}`,
       rubricResults: rubricDetails?.trim() ? rubricDetails.trim() : '-'
