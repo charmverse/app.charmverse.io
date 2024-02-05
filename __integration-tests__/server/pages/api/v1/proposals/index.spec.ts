@@ -137,7 +137,7 @@ beforeAll(async () => {
         create: {
           type: 'pass_fail',
           index: 0,
-          title: 'pass_fail'
+          title: 'pass/fail'
         }
       }
     },
@@ -304,7 +304,11 @@ describe('GET /api/v1/proposals', () => {
             id: proposalReviewer.id
           }
         ]),
-
+        currentStep: {
+          title: 'pass/fail',
+          type: 'pass_fail',
+          result: 'in_progress'
+        },
         title: proposal.page.title,
         status: proposal.status,
         url: `${baseUrl}/${space?.domain}/${proposal.page?.path}`,
@@ -342,6 +346,11 @@ describe('GET /api/v1/proposals', () => {
             email: proposalAuthor.googleAccounts[0].email
           }
         ],
+        currentStep: {
+          title: 'pass/fail',
+          type: 'pass_fail',
+          result: 'in_progress'
+        },
         reviewers: expect.arrayContaining([
           {
             type: 'role',
