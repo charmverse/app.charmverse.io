@@ -451,7 +451,7 @@ function CharmEditor({
             );
           }
           case 'farcasterFrame': {
-            return <FarcasterFrameNodeView {...allProps} />;
+            return <FarcasterFrameNodeView {...allProps} pageId={pageId} />;
           }
           case 'blockquote': {
             return <Callout {...allProps}>{_children}</Callout>;

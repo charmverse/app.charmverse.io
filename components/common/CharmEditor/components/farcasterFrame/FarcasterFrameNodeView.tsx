@@ -16,9 +16,23 @@ export function FarcasterFrameNodeView({
   node,
   deleteNode,
   updateAttrs,
-  readOnly
-}: CharmNodeViewProps) {
-  const { data: farcasterFrame, isLoading, error } = useGetFarcasterFrame(attrs.src);
+  readOnly,
+  pageId
+}: CharmNodeViewProps & {
+  pageId?: string;
+}) {
+  const {
+    data: farcasterFrame,
+    isLoading,
+    error
+  } = useGetFarcasterFrame(
+    attrs.src
+      ? {
+          frameUrl: attrs.src,
+          pageId
+        }
+      : undefined
+  );
 
   if (isLoading) {
     return <LoadingComponent minHeight={80} isLoading />;
