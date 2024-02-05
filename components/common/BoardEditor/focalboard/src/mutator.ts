@@ -114,7 +114,6 @@ export class Mutator {
 
   async updateBlock(newBlock: Block, oldBlock: Block, description: string): Promise<void> {
     const [updatePatch, undoPatch] = createPatchesFromBlocks(newBlock, oldBlock);
-
     await undoManager.perform(
       async () => {
         await this.patchBlock(newBlock.id, updatePatch, publishIncrementalUpdate);

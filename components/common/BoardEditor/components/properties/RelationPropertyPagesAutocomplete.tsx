@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { useSyncRelationProperty, useSyncRelationPropertyValue } from 'charmClient/hooks/blocks';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import type { PageListItem } from 'components/common/PagesList';
 import { usePages } from 'hooks/usePages';
@@ -18,7 +19,9 @@ export function RelationPropertyPagesAutocomplete({
   displayType = 'details',
   emptyPlaceholderContent = 'Empty',
   showEmptyPlaceholder = true,
-  boardProperties
+  boardProperties,
+  boardId,
+  cardId
 }: {
   propertyTemplate: IPropertyTemplate;
   selectedPageListItemIds: string[];
@@ -29,8 +32,11 @@ export function RelationPropertyPagesAutocomplete({
   emptyPlaceholderContent?: string;
   showEmptyPlaceholder?: boolean;
   boardProperties: IPropertyTemplate[];
+  boardId: string;
+  cardId: string;
 }) {
   const { pages } = usePages();
+  const { trigger } = useSyncRelationPropertyValue();
 
   const relationPropertiesCardsRecord = useMemo(() => {
     return getRelationPropertiesCardsRecord({
@@ -41,7 +47,15 @@ export function RelationPropertyPagesAutocomplete({
 
   return (
     <PagesAutocomplete
-      onChange={onChange}
+      onChange={(pageListItemIds) => {
+        onChange(pageListItemIds);
+        trigger({
+          templateId: propertyTemplate.id,
+          connectedCardIds: pageListItemIds,
+          boardId,
+          cardId
+        });
+      }}
       selectedPageListItems={selectedPageListItemIds.map((id) => pages[id]).filter(isTruthy) as PageListItem[]}
       pageListItems={relationPropertiesCardsRecord[propertyTemplate.id] ?? []}
       readOnly={readOnly}

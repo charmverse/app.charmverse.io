@@ -296,6 +296,8 @@ function PropertyValueElement(props: Props) {
             showError(error);
           }
         }}
+        boardId={board.id}
+        cardId={card.id}
         readOnly={readOnly}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
       />

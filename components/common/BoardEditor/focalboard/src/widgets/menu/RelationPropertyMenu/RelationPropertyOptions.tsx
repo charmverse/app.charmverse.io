@@ -1,5 +1,5 @@
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import { MenuItem, MenuList, Stack, Switch, TextField, Typography } from '@mui/material';
+import { Divider, MenuItem, MenuList, Stack, Switch, TextField, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import { useSyncRelationProperty } from 'charmClient/hooks/blocks';
@@ -208,6 +208,7 @@ export function RelationPropertyEditOptions({
       />
       {(relatedProperty || relatedPropertyUpdated) && (
         <Stack my={1} gap={0.5}>
+          <Divider />
           {relationDataTemp.showOnRelatedBoard && (
             <>
               <Typography variant='subtitle2'>Related property on {selectedPage?.title || 'Untitled'}</Typography>

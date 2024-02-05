@@ -33,6 +33,7 @@ import { encodeFilename } from 'lib/utilities/encodeFilename';
 import type { SocketAuthResponse } from 'lib/websockets/interfaces';
 import type { LoggedInUser } from 'models';
 import type { SyncRelationPropertyPayload } from 'pages/api/blocks/sync-relation-property';
+import type { SyncRelationPropertyValuePayload } from 'pages/api/blocks/sync-relation-property-value';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
@@ -404,6 +405,10 @@ class CharmClient {
 
   syncRelationProperty(payload: SyncRelationPropertyPayload) {
     return http.PUT<void>('/api/blocks/sync-relation-property', payload);
+  }
+
+  syncRelationPropertyValue(payload: SyncRelationPropertyValuePayload) {
+    return http.PUT<void>('/api/blocks/sync-relation-property-value', payload);
   }
 }
 
