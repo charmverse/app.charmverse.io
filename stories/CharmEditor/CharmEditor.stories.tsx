@@ -55,7 +55,6 @@ export function FullPageEditor() {
         pagePermissions={undefined}
         onContentChange={onChange}
         onConnectionEvent={() => {}}
-        snapshotProposalId={null}
         onParticipantUpdate={() => {}}
         style={{
           minHeight: '100px'

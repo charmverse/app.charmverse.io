@@ -426,7 +426,6 @@ function DocumentPageComponent({
                   pagePermissions={pagePermissions ?? undefined}
                   onConnectionEvent={onConnectionEvent}
                   setEditorState={setEditorState}
-                  snapshotProposalId={page.snapshotProposalId}
                   onParticipantUpdate={onParticipantUpdate}
                   setCharmEditorView={setCharmEditorView}
                   style={{

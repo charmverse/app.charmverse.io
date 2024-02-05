@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { ButtonGroupButtonContext, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import type { AlertColor } from '@mui/material/Alert';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
@@ -24,7 +24,6 @@ import { LoadingIcon } from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
-import { usePages } from 'hooks/usePages';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import { getSnapshotClient } from 'lib/snapshot/getSnapshotClient';
@@ -64,8 +63,6 @@ export function PublishingForm({ onSubmit, pageId, proposalId, evaluationId }: P
   const [snapshotSpace, setSnapshotSpace] = useState<SnapshotSpace | null>(null);
   // Ensure we don't show any UI until we are done checking
   const [checksComplete, setChecksComplete] = useState(false);
-
-  const { mutatePage } = usePages();
 
   const [configurationError, setConfigurationError] = useState<SystemError | null>(null);
 
@@ -253,17 +250,10 @@ export function PublishingForm({ onSubmit, pageId, proposalId, evaluationId }: P
         getAddress(account as string),
         proposalParams
       )) as SnapshotReceipt;
-      if (evaluationId) {
-        await updateProposalEvaluation({
-          evaluationId,
-          snapshotProposalId: receipt.id
-        });
-      } else {
-        const updatedPage = await charmClient.updatePageSnapshotData(pageId, {
-          snapshotProposalId: receipt.id
-        });
-        mutatePage(updatedPage);
-      }
+      await updateProposalEvaluation({
+        evaluationId,
+        snapshotProposalId: receipt.id
+      });
       charmClient.track.trackAction('new_vote_created', {
         platform: 'snapshot',
         pageId,

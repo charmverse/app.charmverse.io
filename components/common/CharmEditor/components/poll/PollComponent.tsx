@@ -20,7 +20,6 @@ export function PollNodeView({
   readOnly,
   updateAttrs,
   pagePermissions,
-  snapshotProposalId,
   selected,
   deleteNode
 }: CharmNodeViewProps) {
