@@ -40,7 +40,7 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
         return <TextInputField {...fieldProps} ref={ref} multiline rows={3} />;
       }
       case 'number': {
-        return <NumberInputField {...fieldProps} ref={ref} />;
+        return <NumberInputField {...fieldProps} fullWidth ref={ref} />;
       }
 
       case 'date': {
