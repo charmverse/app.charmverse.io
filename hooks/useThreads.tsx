@@ -31,7 +31,18 @@ export function getThreadsKey(pageId: string) {
   return `pages/${pageId}/threads`;
 }
 
-export const ThreadsContext = createContext<Readonly<IContext> | null>(null);
+export const ThreadsContext = createContext<Readonly<IContext>>({
+  isLoading: true,
+  currentPageId: null,
+  threads: {},
+  // setThreads: () => undefined,
+  addComment: () => undefined as any,
+  editComment: () => undefined as any,
+  deleteComment: () => undefined as any,
+  resolveThread: () => undefined as any,
+  deleteThread: () => undefined as any,
+  refetchThreads: undefined as any
+});
 
 export type CommentThreadsMap = Record<string, ThreadWithComments | undefined>;
 
@@ -40,7 +51,7 @@ export function ThreadsProvider({ children }: { children: ReactNode }) {
   const { subscribe } = useWebSocketClient();
   const { spaceRole } = useCurrentSpace();
 
-  const { data, isLoading, mutate } = useSWR(
+  const { data, isValidating, mutate } = useSWR(
     () => (currentPageId ? getThreadsKey(currentPageId) : null),
     () => charmClient.comments.getThreads(currentPageId),
     { revalidateOnFocus: false }
@@ -128,20 +139,14 @@ export function ThreadsProvider({ children }: { children: ReactNode }) {
       resolveThread,
       deleteThread,
       currentPageId,
-      isLoading,
+      isLoading: isValidating,
       refetchThreads: mutate
     }),
     // we only update the result when threads changes, because it is set after everything else inside a useEffect() hook
-    [data, isLoading]
+    [data, isValidating]
   );
 
   return <ThreadsContext.Provider value={value}>{children}</ThreadsContext.Provider>;
 }
 
-export const useThreads = () => {
-  const context = useContext(ThreadsContext);
-  if (!context) {
-    throw new Error('useThreads must be used within a ThreadsProvider');
-  }
-  return context;
-};
+export const useThreads = () => useContext(ThreadsContext);
