@@ -39,6 +39,7 @@ export function useFarcasterFrame(args?: { pageId: string; frameUrl: string }) {
     }
 
     const frameAction = await triggerFrameAction({
+      pageId: args?.pageId,
       postType: button.action,
       frameAction: {
         untrustedData: {
