@@ -6,12 +6,13 @@ import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { CanvasQRCode } from 'components/settings/account/components/otp/components/CanvasQrCode';
 import { useFarcasterUser } from 'hooks/useFarcasterUser';
+import { useSmallScreen } from 'hooks/useMediaScreens';
 import FarcasterIcon from 'public/images/logos/farcaster.svg';
 
 export function FarcasterSigner() {
   const { address } = useAccount();
   const { farcasterUser, startFarcasterSignerProcess, loading: isLoadingFarcasterUser } = useFarcasterUser();
-
+  const isSmallScreen = useSmallScreen();
   if (!address) {
     return <OpenWalletSelectorButton label='Connect your wallet' />;
   } else if (farcasterUser?.status === 'pending_approval') {
@@ -33,10 +34,9 @@ export function FarcasterSigner() {
     return (
       <Stack gap={1} alignItems='center'>
         <Button
-          size='large'
           variant={!address ? 'outlined' : 'contained'}
           sx={{
-            p: 1.5,
+            p: isSmallScreen ? 1 : 1.5,
             width: 'fit-content',
             backgroundColor: '#855DCD',
             '&:hover': {

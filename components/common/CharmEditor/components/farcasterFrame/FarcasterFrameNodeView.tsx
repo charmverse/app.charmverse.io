@@ -14,6 +14,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useFarcasterFrame } from 'hooks/useFarcasterFrame';
 import { useFarcasterProfile } from 'hooks/useFarcasterProfile';
 import { useFarcasterUser } from 'hooks/useFarcasterUser';
+import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
 
 import BlockAligner from '../BlockAligner';
@@ -180,7 +181,14 @@ export function FarcasterFrameNodeView({
               disabled={readOnly}
             />
           )}
-          <Stack flexDirection='row' gap={1} mb={!readOnly ? 1 : 0}>
+          <Stack
+            flexDirection={{
+              xs: 'column',
+              md: 'row'
+            }}
+            gap={1}
+            mb={!readOnly ? 1 : 0}
+          >
             {farcasterFrame.buttons?.map(({ label, action }, index: number) => (
               <Tooltip
                 title={

@@ -12,10 +12,30 @@ export function FarcasterMiniProfile({
   farcasterProfile: FarcasterProfile;
 }) {
   return (
-    <Stack my={1} alignItems='center' flexDirection='row' justifyContent='space-between'>
-      <Stack flexDirection='row' gap={1} alignItems='center'>
+    <Stack
+      my={1}
+      alignItems='center'
+      flexDirection={{
+        xs: 'column',
+        md: 'row'
+      }}
+      justifyContent='space-between'
+    >
+      <Stack
+        flexDirection={{
+          xs: 'column',
+          md: 'row'
+        }}
+        gap={1}
+        alignItems='center'
+      >
         <Avatar avatar={farcasterProfile.body.avatarUrl} name={farcasterProfile.body.displayName} size='medium' />
-        <Stack alignItems='flex-start'>
+        <Stack
+          alignItems={{
+            xs: 'center',
+            md: 'flex-start'
+          }}
+        >
           <Typography variant='body2' fontWeight='bold'>
             {farcasterProfile.body.displayName}
           </Typography>
