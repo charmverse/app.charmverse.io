@@ -5,12 +5,12 @@ import { OpenWalletSelectorButton } from 'components/_app/Web3ConnectionManager/
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { CanvasQRCode } from 'components/settings/account/components/otp/components/CanvasQrCode';
-import { useFarcasterFrame } from 'hooks/useFarcasterFrame';
+import { useFarcasterUser } from 'hooks/useFarcasterUser';
 import FarcasterIcon from 'public/images/logos/farcaster.svg';
 
 export function FarcasterSigner() {
   const { address } = useAccount();
-  const { farcasterUser, startFarcasterSignerProcess, isLoadingFarcasterUser } = useFarcasterFrame();
+  const { farcasterUser, startFarcasterSignerProcess, loading: isLoadingFarcasterUser } = useFarcasterUser();
 
   if (!address) {
     return <OpenWalletSelectorButton label='Connect your wallet' />;

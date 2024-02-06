@@ -9,7 +9,7 @@ import { useSnackbar } from './useSnackbar';
 export function useFarcasterFrame(args?: { pageId: string; frameUrl: string }) {
   const { showMessage } = useSnackbar();
   const { trigger: triggerFrameAction, isMutating: isLoadingFrameAction } = useFarcasterFrameAction();
-  const { farcasterUser, startFarcasterSignerProcess, logout, loading: isLoadingFarcasterUser } = useFarcasterUser();
+  const { farcasterUser } = useFarcasterUser();
   const { data: farcasterFrame, isLoading: isLoadingFrame, mutate, error } = useGetFarcasterFrame(args);
 
   const submitOption = async ({ buttonIndex, inputText }: { buttonIndex: number; inputText: string }) => {
@@ -81,13 +81,9 @@ export function useFarcasterFrame(args?: { pageId: string; frameUrl: string }) {
 
   return {
     isLoadingFrameAction,
-    farcasterUser,
-    isLoadingFarcasterUser,
     farcasterFrame,
     isLoadingFrame,
     submitOption,
-    error,
-    startFarcasterSignerProcess,
-    logout
+    error
   };
 }

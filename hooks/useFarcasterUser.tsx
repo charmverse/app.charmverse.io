@@ -37,6 +37,7 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [farcasterUser, setFarcasterUser] = useLocalStorage<FarcasterUser | null>(farcasterUserLocalStorageKey, null);
   const { farcasterProfile } = useFarcasterProfile();
+  const [ongoingSignerProcess, setOngoingSignerProcess] = useState(false);
   const { showMessage } = useSnackbar();
   const { address: account } = useAccount();
   const { signTypedDataAsync } = useSignTypedData();
@@ -103,11 +104,25 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
     }
   }, [farcasterUser]);
 
+  // Trick to auto trigger the signer process after the network switch
+  useEffect(() => {
+    if (ongoingSignerProcess) {
+      createAndStoreSigner().finally(() => {
+        setOngoingSignerProcess(false);
+      });
+    }
+  }, [ongoingSignerProcess]);
+
   async function startFarcasterSignerProcess() {
     setLoading(true);
-    await switchActiveNetwork(optimism.id);
-    await createAndStoreSigner();
-    setLoading(false);
+    try {
+      await switchActiveNetwork(optimism.id);
+      setOngoingSignerProcess(true);
+    } catch (_) {
+      //
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function createAndStoreSigner() {

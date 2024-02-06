@@ -1,4 +1,3 @@
-import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import LinkIcon from '@mui/icons-material/Link';
 import { Alert, Paper, Stack, TextField, Tooltip, Typography, lighten } from '@mui/material';
@@ -53,7 +52,6 @@ export function FarcasterFrameNodeView({
   const [, copyToClipboard] = useCopyToClipboard();
   const { showMessage } = useSnackbar();
   const { farcasterProfile } = useFarcasterProfile();
-  const theme = useTheme();
 
   if (isLoadingFrame) {
     return (
