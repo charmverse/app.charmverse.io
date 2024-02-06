@@ -1,3 +1,6 @@
+import type { ReactNode } from 'react';
+import { memo } from 'react';
+
 import { PageSidebarProvider } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { ProposalsProvider } from 'components/proposals/hooks/useProposals';
 import { CharmEditorProvider } from 'hooks/useCharmEditor';

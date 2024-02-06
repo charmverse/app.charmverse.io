@@ -13,9 +13,6 @@ export const CharmEditorViewContext = createContext<IContext | null>(null);
 export function CharmEditorViewProvider({ children }: { children: ReactNode }) {
   const view = useRef<EditorView | null>(null);
 
-  // memoize the children so they do not re-render whenever context changes
-  const memoizedChildren = useMemo(() => children, []);
-
   // keep track of a counter so we can trigger re-render in React
   const [counter, setCounter] = useState(0);
 
@@ -36,7 +33,7 @@ export function CharmEditorViewProvider({ children }: { children: ReactNode }) {
     [counter, view, setView]
   );
 
-  return <CharmEditorViewContext.Provider value={value}>{memoizedChildren}</CharmEditorViewContext.Provider>;
+  return <CharmEditorViewContext.Provider value={value}>{children}</CharmEditorViewContext.Provider>;
 }
 
 export const useCharmEditorView = () => {
