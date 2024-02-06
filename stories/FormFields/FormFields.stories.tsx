@@ -65,7 +65,7 @@ export function FormFieldsInputs() {
   return (
     <GlobalContext>
       <CustomFormFieldsInput
-        isReviewer={false}
+        enableComments={true}
         formFields={formFieldTypes.map((formFieldType, index) => {
           const label = capitalize(formFieldType.replaceAll(/_/g, ' '));
           return {
@@ -88,7 +88,7 @@ export function FormFieldsInputsDisplay() {
   return (
     <GlobalContext>
       <CustomFormFieldsInput
-        isReviewer={false}
+        enableComments={true}
         disabled
         formFields={formFieldTypes.map((formFieldType, index) => {
           const label = capitalize(formFieldType.replaceAll(/_/g, ' '));

@@ -10,16 +10,16 @@ import { isTruthy } from 'lib/utilities/types';
 export function ProposalFormFieldsInput({
   proposalId,
   formFields,
+  enableComments,
   readOnly,
-  isReviewer,
   pageId,
   threads,
   isDraft
 }: {
   readOnly?: boolean;
+  enableComments: boolean;
   proposalId: string;
   formFields: FormField[];
-  isReviewer: boolean;
   pageId: string;
   threads: Record<string, ThreadWithComments | undefined>;
   isDraft?: boolean;
@@ -44,7 +44,7 @@ export function ProposalFormFieldsInput({
 
   return (
     <FormFieldsInput
-      isReviewer={isReviewer}
+      enableComments={enableComments}
       onSave={onSave}
       pageId={pageId}
       disabled={readOnly}

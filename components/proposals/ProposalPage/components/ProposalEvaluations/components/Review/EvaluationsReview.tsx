@@ -189,7 +189,6 @@ export function EvaluationsReview({
               <RubricEvaluation
                 key={evaluation.id}
                 proposal={proposal}
-                permissions={isCurrentEval ? proposal?.permissions : undefined}
                 isCurrent={isCurrent}
                 evaluation={evaluation}
                 refreshProposal={refreshProposal}

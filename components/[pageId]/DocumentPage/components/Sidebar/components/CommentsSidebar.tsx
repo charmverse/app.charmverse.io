@@ -140,13 +140,13 @@ function CommentsSidebar({
   onDeleteComment,
   onToggleResolve,
   scrollToThreadElement,
-  canCreateComments,
+  enableComments,
   isLoading
 }: {
   threadList: ThreadWithComments[];
   threadFilter: 'resolved' | 'open' | 'all' | 'you';
   handleThreadFilterChange: SelectProps['onChange'];
-  canCreateComments: boolean;
+  enableComments: boolean;
   onToggleResolve?: (threadId: string, remove: boolean) => void;
   onDeleteComment?: (threadId: string) => void;
   scrollToThreadElement?: (threadId: string) => void;
@@ -185,7 +185,7 @@ function CommentsSidebar({
             (resolvedThread) =>
               resolvedThread && (
                 <PageThread
-                  canCreateComments={canCreateComments}
+                  enableComments={enableComments}
                   showFindButton
                   key={resolvedThread.id}
                   threadId={resolvedThread.id}
@@ -202,12 +202,12 @@ function CommentsSidebar({
 }
 
 function EditorCommentsSidebarComponent({
-  canCreateComments,
+  enableComments,
   threads,
   openSidebar
 }: {
   threads?: CommentThreadsMap;
-  canCreateComments: boolean;
+  enableComments: boolean;
   openSidebar: (view: PageSidebarView) => void;
 }) {
   const { user } = useUser();
@@ -261,7 +261,7 @@ function EditorCommentsSidebarComponent({
 
   return (
     <CommentsSidebar
-      canCreateComments={canCreateComments}
+      enableComments={enableComments}
       handleThreadFilterChange={handleThreadClassChange}
       isLoading={!view || !threads}
       threadFilter={threadFilter}
@@ -289,7 +289,7 @@ function EditorCommentsSidebarComponent({
 }
 
 function FormCommentsSidebarComponent({
-  canCreateComments,
+  enableComments,
   threads,
   openSidebar,
   formFields
@@ -300,7 +300,7 @@ function FormCommentsSidebarComponent({
       })[]
     | null;
   threads?: CommentThreadsMap;
-  canCreateComments: boolean;
+  enableComments: boolean;
   openSidebar: (view: PageSidebarView) => void;
 }) {
   const { user } = useUser();
@@ -347,7 +347,7 @@ function FormCommentsSidebarComponent({
   return (
     <CommentsSidebar
       handleThreadFilterChange={handleThreadFilterChange}
-      canCreateComments={canCreateComments}
+      enableComments={enableComments}
       threadFilter={threadFilter}
       isLoading={!threads}
       threadList={threadList}

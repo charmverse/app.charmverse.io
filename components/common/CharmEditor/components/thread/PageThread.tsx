@@ -242,7 +242,7 @@ interface PageThreadProps {
   threadId: string;
   inline?: boolean;
   showFindButton?: boolean;
-  canCreateComments?: boolean;
+  enableComments?: boolean;
   onDeleteComment?: (threadId: string) => void;
   onToggleResolve?: (threadId: string, resolved: boolean) => void;
   sx?: SxProps<Theme>;
@@ -298,7 +298,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
       showFindButton = false,
       threadId,
       inline = false,
-      canCreateComments,
+      enableComments,
       scrollToThreadElement
     },
     ref
@@ -422,7 +422,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
                       {commentIndex === 0 && !isSmallScreen && (
                         <ThreadHeaderButton
                           text={thread.resolved ? 'Un-resolve' : 'Resolve'}
-                          disabled={isMutating || !canCreateComments}
+                          disabled={isMutating || !enableComments}
                           onClick={toggleResolved}
                         />
                       )}
@@ -525,7 +525,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
             </MenuItem>
           </Menu>
         </div>
-        {canCreateComments && !thread.resolved && (
+        {enableComments && !thread.resolved && (
           <AddCommentCharmEditor
             readOnly={Boolean(editedCommentId)}
             key={counter}

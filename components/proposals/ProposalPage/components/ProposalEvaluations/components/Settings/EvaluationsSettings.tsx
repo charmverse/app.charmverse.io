@@ -20,7 +20,6 @@ export type Props = {
   isTemplate?: boolean;
   onChangeEvaluation?: (evaluationId: string, updated: Partial<ProposalEvaluationValues>) => void;
   readOnly: boolean;
-  isReviewer: boolean;
   onChangeWorkflow: (workflow: ProposalWorkflowTyped) => void;
   onChangeRewardSettings?: RewardSettingsProps['onChange'];
   templateId?: string | null;
@@ -36,7 +35,6 @@ export function EvaluationsSettings({
   readOnly,
   onChangeWorkflow,
   onChangeRewardSettings,
-  isReviewer,
   templateId,
   requireWorkflowChangeConfirmation,
   expanded: expandedContainer,
@@ -80,7 +78,6 @@ export function EvaluationsSettings({
                 <EvaluationStepSettings
                   evaluation={evaluation}
                   evaluationTemplate={matchingTemplateStep}
-                  isReviewer={isReviewer}
                   readOnly={readOnly}
                   onChange={(updated) => {
                     onChangeEvaluation?.(evaluation.id, updated);

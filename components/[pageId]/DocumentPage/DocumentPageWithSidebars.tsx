@@ -124,7 +124,6 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
           isUnpublishedProposal={isUnpublishedProposal}
           readOnlyProposalPermissions={!proposal?.permissions.edit}
           isProposalTemplate={page.type === 'proposal_template'}
-          isReviewer={proposal?.permissions.evaluate}
           isStructuredProposal={isStructuredProposal}
           closeSidebar={closeSidebar}
           openSidebar={() => setActiveView('proposal_evaluation')}

@@ -327,7 +327,6 @@ function DocumentPageComponent({
               isUnpublishedProposal={isUnpublishedProposal}
               readOnlyProposalPermissions={!proposal?.permissions.edit}
               isProposalTemplate={page.type === 'proposal_template'}
-              isReviewer={proposal?.permissions.evaluate}
               isStructuredProposal={isStructuredProposal}
               proposal={proposal}
               proposalInput={proposal}
@@ -388,15 +387,15 @@ function DocumentPageComponent({
                     <FormFieldsEditor
                       readOnly={(!isAdmin && (!user || !proposalAuthors.includes(user.id))) || !!proposal?.archived}
                       proposalId={proposal.id}
-                      formFields={proposal?.form.formFields ?? []}
+                      formFields={proposal.form.formFields ?? []}
                     />
                   ) : (
                     <ProposalFormFieldsInput
                       pageId={page.id}
-                      isReviewer={(proposal?.permissions.evaluate || proposal?.permissions.review) ?? false}
+                      enableComments={proposal.permissions.comment}
                       proposalId={proposal.id}
-                      formFields={proposal?.form.formFields ?? []}
-                      readOnly={!user || !pagePermissions.edit_content || !!proposal?.archived}
+                      formFields={proposal.form.formFields ?? []}
+                      readOnly={!proposal.permissions.edit}
                       threads={threads}
                       isDraft={proposal?.status === 'draft'}
                     />
@@ -485,7 +484,7 @@ function DocumentPageComponent({
               {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') && (
                 <Box>
                   {/* add negative margin to offset height of .charm-empty-footer */}
-                  <PageComments page={page} canCreateComments={pagePermissions.comment} />
+                  <PageComments page={page} enableComments={pagePermissions.comment} />
                 </Box>
               )}
             </>

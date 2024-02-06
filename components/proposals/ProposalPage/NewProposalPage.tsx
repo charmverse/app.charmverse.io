@@ -449,6 +449,7 @@ export function NewProposalPage({
                     ) : (
                       <ControlledFormFieldsInput
                         control={proposalFormFieldControl}
+                        enableComments={false}
                         errors={proposalFormFieldErrors}
                         onFormChange={(updatedFormFields) => {
                           setFormInputs({

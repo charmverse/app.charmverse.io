@@ -14,17 +14,16 @@ import { RubricResults } from './RubricResults';
 
 export type Props = {
   proposal?: Pick<ProposalWithUsersAndRubric, 'id' | 'evaluations' | 'permissions' | 'status' | 'archived'>;
-  permissions?: ProposalWithUsersAndRubric['permissions'];
   evaluation: PopulatedEvaluation;
   isCurrent?: boolean;
   refreshProposal?: VoidFunction;
 };
 
-export function RubricEvaluation({ proposal, permissions, isCurrent, evaluation, refreshProposal }: Props) {
+export function RubricEvaluation({ proposal, isCurrent, evaluation, refreshProposal }: Props) {
   const [rubricView, setRubricView] = useState<number>(0);
   const isAdmin = useIsAdmin();
   const { user } = useUser();
-  const canAnswerRubric = permissions?.evaluate;
+  const canAnswerRubric = !!evaluation.isReviewer;
   const rubricCriteria = evaluation?.rubricCriteria;
   const myRubricAnswers = useMemo(
     () => evaluation?.rubricAnswers.filter((answer) => answer.userId === user?.id) || [],
