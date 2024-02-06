@@ -101,7 +101,7 @@ export function useFarcasterIdentity() {
     try {
       const keypairString = await createHexKeyPair();
       const fid = farcasterProfile.body.id;
-      const deadline = Math.floor(Date.now() / 1000) + 86400;
+      const deadline = Math.floor(Date.now() / 1000) + 86400 * 30; // 30 days
       const signature = await signTypedDataAsync({
         account: getAddress(account),
         message: {
