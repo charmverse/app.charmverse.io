@@ -82,6 +82,7 @@ export function InlineCommentInput({
           />
         </Box>
         <Button
+          data-test='save-new-inline-comment-button'
           disabled={isEmpty || isSubmitting}
           size='small'
           onClick={async (event: React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement, MouseEvent>) => {
