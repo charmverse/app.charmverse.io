@@ -1,4 +1,4 @@
-import { Stack, Typography } from '@mui/material';
+import { Stack, SvgIcon, Typography, darken } from '@mui/material';
 import QRCode from 'qrcode.react';
 import { useAccount } from 'wagmi';
 
@@ -6,6 +6,7 @@ import { OpenWalletSelectorButton } from 'components/_app/Web3ConnectionManager/
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useFarcasterFrame } from 'hooks/useFarcasterFrame';
+import FarcasterIcon from 'public/images/logos/farcaster.svg';
 
 export function FarcasterSigner() {
   const { address } = useAccount();
@@ -29,25 +30,35 @@ export function FarcasterSigner() {
           <>
             <Typography variant='body2'>Scan with your camera app</Typography>
             <QRCode value={farcasterUser.signerApprovalUrl} size={250} />
-            <Typography variant='body2'>Or</Typography>
-            <Button href={farcasterUser.signerApprovalUrl} target='_blank' rel='noopener noreferrer'>
-              Open url
-            </Button>
           </>
         )}
       </Stack>
     );
   } else if (!farcasterUser?.status) {
     return (
-      <Stack gap={1}>
+      <Stack gap={1} alignItems='center'>
         <Button
           size='large'
           variant={!address ? 'outlined' : 'contained'}
-          color={!address ? 'error' : 'primary'}
+          sx={{
+            width: 'fit-content',
+            backgroundColor: '#855DCD',
+            '&:hover': {
+              backgroundColor: darken('#855DCD', 0.1)
+            },
+            display: 'flex',
+            gap: 1,
+            justifyContent: 'center'
+          }}
           onClick={startFarcasterSignerProcess}
           loading={isLoadingFarcasterUser}
         >
-          {isLoadingFarcasterUser ? 'Loading...' : 'Sign in with farcaster'}
+          <SvgIcon viewBox='0 0 20 20' fontSize='small'>
+            <FarcasterIcon />
+          </SvgIcon>
+          <Typography fontWeight={600} variant='body2'>
+            {isLoadingFarcasterUser ? 'Loading...' : 'Sign in with Farcaster'}
+          </Typography>
         </Button>
       </Stack>
     );
