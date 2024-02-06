@@ -317,7 +317,7 @@ function CharmEditor({
         debouncedUpdate(view, prevDoc);
         sendPageEvent();
         if (setCharmEditorView) {
-          // setCharmEditorView(view);
+          setCharmEditorView(view);
         }
       },
       placeholderText,
