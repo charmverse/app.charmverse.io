@@ -1,12 +1,9 @@
-import type { Dispatch, ReactNode, SetStateAction } from 'react';
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import type { KeyedMutator } from 'swr';
+import type { ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useCurrentPage } from 'hooks/useCurrentPage';
-import { useMembers } from 'hooks/useMembers';
-import type { Member } from 'lib/members/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
@@ -24,7 +21,7 @@ type IContext = {
   deleteComment: (threadId: string, commentId: string) => Promise<void>;
   resolveThread: (threadId: string) => Promise<void>;
   deleteThread: (threadId: string) => Promise<void>;
-  refetchThreads: KeyedMutator<ThreadWithComments[]>;
+  refetchThreads: VoidFunction;
 };
 
 export function getThreadsKey(pageId: string) {
