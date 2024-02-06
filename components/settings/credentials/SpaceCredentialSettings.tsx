@@ -58,7 +58,7 @@ export function SpaceCredentialSettings() {
           }}
           disableElevation
           size='large'
-          disabled={isMutating || credentialLogo === space?.credentialLogo}
+          disabled={isMutating || credentialLogo === (space?.credentialLogo ?? '')}
           onClick={() => {
             trigger({ credentialLogo }).then(() => refreshCurrentSpace());
           }}

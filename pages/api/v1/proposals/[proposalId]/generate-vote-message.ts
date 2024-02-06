@@ -91,11 +91,6 @@ async function generateSnapshotVoteMessageHandler(
     },
     select: {
       status: true,
-      page: {
-        select: {
-          snapshotProposalId: true
-        }
-      },
       space: {
         select: {
           snapshotDomain: true

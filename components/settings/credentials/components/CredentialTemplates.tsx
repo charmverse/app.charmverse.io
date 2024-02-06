@@ -4,7 +4,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
-import { useGetCredentialTemplates } from 'charmClient/hooks/credentialHooks';
+import { useGetCredentialTemplates } from 'charmClient/hooks/credentials';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';

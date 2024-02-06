@@ -62,6 +62,8 @@ export function TokenGateNft() {
       )}
       {collectableOption === 'ERC721' && check === 'group' && (
         <NumberInputField
+          disableArrows
+          fullWidth
           label='Quantity'
           error={errors.quantity?.message}
           helperText={errors.quantity?.message}

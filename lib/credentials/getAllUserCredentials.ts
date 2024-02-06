@@ -3,7 +3,8 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
-import { getAllOnChainAttestations, type EASAttestationFromApi } from './external/getOnchainCredentials';
+import type { EASAttestationWithFavorite } from './external/getOnchainCredentials';
+import { getAllOnChainAttestations } from './external/getOnchainCredentials';
 import { getGitcoinCredentialsByWallets } from './getGitcoinCredentialsByWallets';
 import { getCharmverseCredentialsByWallets } from './queriesAndMutations';
 
@@ -16,7 +17,7 @@ const testWallets = [
   '0xe18B1dFb94BB3CEC3B47663F997D824D9cD0f4D2'
 ];
 
-export async function getAllUserCredentials({ userId }: { userId: string }): Promise<EASAttestationFromApi[]> {
+export async function getAllUserCredentials({ userId }: { userId: string }): Promise<EASAttestationWithFavorite[]> {
   if (!stringUtils.isUUID(userId)) {
     throw new InvalidInputError('userId is invalid');
   }
@@ -45,5 +46,5 @@ export async function getAllUserCredentials({ userId }: { userId: string }): Pro
     getAllOnChainAttestations({ wallets })
   ]).then((data) => data.flat());
 
-  return allCredentials;
+  return allCredentials.sort((a, b) => b.timeCreated - a.timeCreated);
 }

@@ -98,6 +98,8 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
     return <ErrorPage message={"Sorry, you don't have access to this page"} />;
   } else if (pageWithContentError === 'page_not_found') {
     return <ErrorPage message={"Sorry, that page doesn't exist"} />;
+  } else if (pageWithContentError === 'system_error') {
+    return <ErrorPage message='Sorry, there was an error loading this page' />;
   }
   // Wait for permission load
   else if (!page) {

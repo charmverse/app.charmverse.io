@@ -28,7 +28,6 @@ import IntlProvider from 'components/common/IntlProvider';
 import ReactDndProvider from 'components/common/ReactDndProvider';
 import RouteGuard from 'components/common/RouteGuard';
 import { UserProfileProvider } from 'components/members/hooks/useMemberDialog';
-import { ProposalsProvider } from 'components/proposals/hooks/useProposals';
 import { RewardsProvider } from 'components/rewards/hooks/useRewards';
 import { isDevEnv, isProdEnv } from 'config/constants';
 import { ConfirmationModalProvider } from 'hooks/useConfirmationModal';
