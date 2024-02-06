@@ -1,5 +1,7 @@
+import LinkIcon from '@mui/icons-material/Link';
 import { Alert, Paper, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import { useState } from 'react';
+import { useCopyToClipboard } from 'usehooks-ts';
 import { useAccount } from 'wagmi';
 
 import charmClient from 'charmClient';
@@ -8,6 +10,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import MultiTabs from 'components/common/MultiTabs';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useFarcasterFrame } from 'hooks/useFarcasterFrame';
+import { useSnackbar } from 'hooks/useSnackbar';
 
 import BlockAligner from '../BlockAligner';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
@@ -33,6 +36,8 @@ export function FarcasterFrameNodeView({
     useFarcasterFrame(attrs.src && pageId ? { frameUrl: attrs.src, pageId } : undefined);
   const [inputText, setInputText] = useState('');
   const isFarcasterUserAvailable = farcasterUser && farcasterUser.fid;
+  const [, copyToClipboard] = useCopyToClipboard();
+  const { showMessage } = useSnackbar();
 
   if (isLoadingFrame) {
     return <LoadingComponent minHeight={80} isLoading />;
@@ -109,6 +114,16 @@ export function FarcasterFrameNodeView({
             updateAttrs({ src: null });
           }
         }}
+        extraControls={[
+          {
+            onClick() {
+              copyToClipboard(node.attrs.src);
+              showMessage('Copied frame url', 'info');
+            },
+            Icon: LinkIcon,
+            tooltip: 'Copy frame url'
+          }
+        ]}
         onDelete={deleteNode}
         readOnly={readOnly}
       >
