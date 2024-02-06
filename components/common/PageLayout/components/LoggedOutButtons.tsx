@@ -37,7 +37,7 @@ export function LoggedOutButtons() {
           external // avoid space domain being added
         >
           <ListItemIcon>
-            <LoginOutlined fontSize='small' />
+            <LoginOutlined />
           </ListItemIcon>
           <ListItemText>Sign up or log in</ListItemText>
         </MenuItem>
@@ -49,7 +49,7 @@ export function LoggedOutButtons() {
           external // avoid space domain being added
         >
           <ListItemIcon>
-            <FlagOutlined color='error' fontSize='small' />
+            <FlagOutlined color='error' />
           </ListItemIcon>
           <ListItemText primaryTypographyProps={{ color: 'error' }}>Report page</ListItemText>
         </MenuItem>
