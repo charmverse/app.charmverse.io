@@ -8,6 +8,8 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { useFarcasterFrame } from 'hooks/useFarcasterFrame';
 import FarcasterIcon from 'public/images/logos/farcaster.svg';
 
+import { FarcasterMiniProfile } from './FarcasterMiniProfile';
+
 export function FarcasterSigner() {
   const { address } = useAccount();
   const { farcasterUser, startFarcasterSignerProcess, isLoadingFarcasterUser } = useFarcasterFrame();
@@ -16,9 +18,7 @@ export function FarcasterSigner() {
   }
 
   if (farcasterUser?.status === 'approved') {
-    return (
-      <Typography>{farcasterUser.fid ? `Signed in as ${farcasterUser?.fid}` : 'Something is wrong...'}</Typography>
-    );
+    return <FarcasterMiniProfile />;
   } else if (farcasterUser?.status === 'pending_approval') {
     return (
       <Stack alignItems='center' gap={2}>

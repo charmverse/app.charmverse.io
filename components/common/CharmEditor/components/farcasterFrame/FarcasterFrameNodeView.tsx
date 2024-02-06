@@ -1,5 +1,5 @@
 import LinkIcon from '@mui/icons-material/Link';
-import { Alert, Paper, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import { Alert, Paper, Stack, TextField, Tooltip, Typography, darken, lighten } from '@mui/material';
 import { useState } from 'react';
 import { useCopyToClipboard } from 'usehooks-ts';
 import { useAccount } from 'wagmi';
@@ -169,7 +169,12 @@ export function FarcasterFrameNodeView({
                       });
                     }}
                     sx={{
-                      width: '100%'
+                      width: '100%',
+                      border: `1px solid #855DCD`,
+                      color: '#855DCD',
+                      '&:hover': {
+                        backgroundColor: lighten('#855DCD', 0.9)
+                      }
                     }}
                     variant='outlined'
                     color='secondary'
