@@ -8,17 +8,12 @@ import { CanvasQRCode } from 'components/settings/account/components/otp/compone
 import { useFarcasterFrame } from 'hooks/useFarcasterFrame';
 import FarcasterIcon from 'public/images/logos/farcaster.svg';
 
-import { FarcasterMiniProfile } from './FarcasterMiniProfile';
-
 export function FarcasterSigner() {
   const { address } = useAccount();
   const { farcasterUser, startFarcasterSignerProcess, isLoadingFarcasterUser } = useFarcasterFrame();
+
   if (!address) {
     return <OpenWalletSelectorButton label='Connect your wallet' />;
-  }
-
-  if (farcasterUser?.status === 'approved') {
-    return <FarcasterMiniProfile />;
   } else if (farcasterUser?.status === 'pending_approval') {
     return (
       <Stack alignItems='center' gap={2}>

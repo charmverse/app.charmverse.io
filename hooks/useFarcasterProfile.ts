@@ -4,7 +4,7 @@ import * as http from 'adapters/http';
 
 import { useUser } from './useUser';
 
-type FarcasterProfile = {
+export type FarcasterProfile = {
   body: {
     id: number;
     address: string;

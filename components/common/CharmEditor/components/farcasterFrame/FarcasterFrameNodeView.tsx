@@ -1,5 +1,7 @@
+import { useTheme } from '@emotion/react';
+import styled from '@emotion/styled';
 import LinkIcon from '@mui/icons-material/Link';
-import { Alert, Paper, Stack, TextField, Tooltip, Typography, darken, lighten } from '@mui/material';
+import { Alert, Paper, Stack, TextField, Tooltip, Typography, lighten } from '@mui/material';
 import { useState } from 'react';
 import { useCopyToClipboard } from 'usehooks-ts';
 import { useAccount } from 'wagmi';
@@ -10,6 +12,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import MultiTabs from 'components/common/MultiTabs';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useFarcasterFrame } from 'hooks/useFarcasterFrame';
+import { useFarcasterProfile } from 'hooks/useFarcasterProfile';
 import { useSnackbar } from 'hooks/useSnackbar';
 
 import BlockAligner from '../BlockAligner';
@@ -17,7 +20,18 @@ import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
 import { MediaUrlInput } from '../common/MediaUrlInput';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 
+import { FarcasterMiniProfile } from './FarcasterMiniProfile';
 import { FarcasterSigner } from './FarcasterSigner';
+
+const StyledButton = styled(Button)(({ theme, disabled }) => ({
+  width: '100%',
+  border: disabled ? '' : `1px solid #855DCD`,
+  backgroundColor: theme.palette.mode === 'dark' ? lighten('#855DCD', 0.1) : 'transparent',
+  color: theme.palette.mode === 'dark' ? '#fff' : '#855DCD',
+  '&:hover': {
+    backgroundColor: theme.palette.mode === 'dark' ? '#855DCD' : lighten('#855DCD', 0.9)
+  }
+}));
 
 export function FarcasterFrameNodeView({
   selected,
@@ -32,15 +46,21 @@ export function FarcasterFrameNodeView({
 }) {
   const { address } = useAccount();
   const { space } = useCurrentSpace();
-  const { error, isLoadingFrame, farcasterFrame, submitOption, farcasterUser, isLoadingFrameAction } =
+  const { error, isLoadingFrame, farcasterFrame, logout, submitOption, farcasterUser, isLoadingFrameAction } =
     useFarcasterFrame(attrs.src && pageId ? { frameUrl: attrs.src, pageId } : undefined);
   const [inputText, setInputText] = useState('');
   const isFarcasterUserAvailable = farcasterUser && farcasterUser.fid;
   const [, copyToClipboard] = useCopyToClipboard();
   const { showMessage } = useSnackbar();
+  const { farcasterProfile } = useFarcasterProfile();
+  const theme = useTheme();
 
   if (isLoadingFrame) {
-    return <LoadingComponent minHeight={80} isLoading />;
+    return (
+      <Paper sx={{ p: 1, my: 2 }}>
+        <LoadingComponent minHeight={80} isLoading />
+      </Paper>
+    );
   }
 
   if (!attrs.src) {
@@ -90,7 +110,7 @@ export function FarcasterFrameNodeView({
 
   if (!farcasterFrame || error) {
     return (
-      <Paper sx={{ p: 1 }}>
+      <Paper sx={{ p: 1, my: 2 }}>
         <BlockAligner
           onEdit={() => {
             if (!readOnly) {
@@ -107,7 +127,7 @@ export function FarcasterFrameNodeView({
   }
 
   return (
-    <Paper sx={{ p: 1 }}>
+    <Paper sx={{ p: 1, my: 2 }}>
       <BlockAligner
         onEdit={() => {
           if (!readOnly) {
@@ -156,7 +176,7 @@ export function FarcasterFrameNodeView({
                     flexBasis: `${100 / (farcasterFrame.buttons?.length || 1)}%`
                   }}
                 >
-                  <Button
+                  <StyledButton
                     disabled={readOnly || !isFarcasterUserAvailable}
                     onClick={() => {
                       submitOption({
@@ -168,34 +188,31 @@ export function FarcasterFrameNodeView({
                         });
                       });
                     }}
-                    sx={{
-                      width: '100%',
-                      border: `1px solid #855DCD`,
-                      color: '#855DCD',
-                      '&:hover': {
-                        backgroundColor: lighten('#855DCD', 0.9)
-                      }
-                    }}
-                    variant='outlined'
-                    color='secondary'
                     loading={isLoadingFrameAction}
                   >
                     <Typography
-                      variant='body2'
+                      variant='body1'
                       sx={{
+                        fontWeight: 500,
                         textWrap: 'wrap'
                       }}
                     >
                       {label}
                     </Typography>
                     {action === 'post_redirect' ? ` ↗` : ''}
-                  </Button>
+                  </StyledButton>
                 </div>
               </Tooltip>
             ))}
           </Stack>
         </Stack>
-        {!readOnly ? <FarcasterSigner /> : null}
+        {!readOnly ? (
+          farcasterUser?.status === 'approved' && farcasterProfile ? (
+            <FarcasterMiniProfile logout={logout} farcasterProfile={farcasterProfile} />
+          ) : (
+            <FarcasterSigner />
+          )
+        ) : null}
       </BlockAligner>
     </Paper>
   );

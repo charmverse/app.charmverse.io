@@ -14,7 +14,7 @@ import { useFarcasterProfile } from './useFarcasterProfile';
 import { useLocalStorage } from './useLocalStorage';
 import { useSnackbar } from './useSnackbar';
 
-const farcasterUserLocalStorageKey = 'farcasterUser';
+export const farcasterUserLocalStorageKey = 'farcasterUser';
 
 export function useFarcasterIdentity() {
   const [loading, setLoading] = useState(false);
