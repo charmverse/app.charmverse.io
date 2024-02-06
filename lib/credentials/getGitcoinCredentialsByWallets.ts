@@ -90,7 +90,7 @@ export async function getGitcoinCredentialsByWallets({
   const favoriteCredentials = await prisma.favoriteCredential.findMany({
     where: {
       gitcoinWalletAddress: {
-        in: wallets
+        in: wallets.map((w) => w.toLowerCase())
       }
     },
     select: {

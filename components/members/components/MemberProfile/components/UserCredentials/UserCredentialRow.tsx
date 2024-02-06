@@ -93,6 +93,18 @@ export function UserCredentialRow({
         flexDirection='row'
         gap={1}
       >
+        {credential.verificationUrl && (
+          <Link
+            style={{
+              height: 20
+            }}
+            href={credential.verificationUrl}
+            external
+            target='_blank'
+          >
+            <LaunchIcon sx={{ alignSelf: 'center' }} fontSize='small' />
+          </Link>
+        )}
         {isUserRecipient && !readOnly && (
           <Tooltip title={isMutating ? '' : !credential.favoriteCredentialId ? 'Favorite' : 'Unfavorite'}>
             <div>
@@ -113,11 +125,6 @@ export function UserCredentialRow({
               </IconButton>
             </div>
           </Tooltip>
-        )}
-        {credential.verificationUrl && (
-          <Link href={credential.verificationUrl} external target='_blank'>
-            <LaunchIcon sx={{ alignSelf: 'center' }} fontSize='small' />
-          </Link>
         )}
       </Stack>
     ) : null;

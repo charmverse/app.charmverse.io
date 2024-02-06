@@ -34,10 +34,10 @@ async function addFavoriteCredential(req: NextApiRequest, res: NextApiResponse) 
       chainId: payload.chainId,
       issuedCredentialId: payload.issuedCredentialId,
       userId: req.session.user.id,
-      gitcoinWalletAddress: payload.gitcoinWalletAddress
+      gitcoinWalletAddress: payload.gitcoinWalletAddress?.toLowerCase()
     },
     where: {
-      gitcoinWalletAddress: payload.gitcoinWalletAddress,
+      gitcoinWalletAddress: payload.gitcoinWalletAddress?.toLowerCase(),
       attestationId: payload.attestationId,
       issuedCredentialId: payload.issuedCredentialId
     },
