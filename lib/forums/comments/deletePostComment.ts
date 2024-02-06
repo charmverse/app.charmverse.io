@@ -38,7 +38,7 @@ export async function deletePostComment({
       postId: postComment.post.id,
       resourceId: commentId,
       spaceId: postComment.post.spaceId,
-      userId: postComment.createdBy
+      userId
     });
   }
 
