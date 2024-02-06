@@ -1,10 +1,16 @@
 import type { Frame } from 'frames.js';
 
-import { useGET } from './helpers';
+import type { FrameActionRequest, FrameActionResponse } from 'pages/api/farcaster/frame-action';
+
+import { useGET, usePOST } from './helpers';
 
 export function useGetFarcasterFrame(query?: { frameUrl: string; pageId?: string }) {
   return useGET<Frame | null>(query ? '/api/farcaster/frame' : null, query, {
     revalidateOnFocus: false,
     shouldRetryOnError: false
   });
+}
+
+export function useFarcasterFrameAction() {
+  return usePOST<FrameActionRequest, FrameActionResponse>('/api/farcaster/frame-action');
 }

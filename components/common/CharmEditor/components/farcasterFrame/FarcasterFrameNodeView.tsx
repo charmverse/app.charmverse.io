@@ -1,16 +1,20 @@
-import { Alert, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Paper, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import { useState } from 'react';
+import { useAccount } from 'wagmi';
 
 import charmClient from 'charmClient';
-import { useGetFarcasterFrame } from 'charmClient/hooks/farcaster';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import MultiTabs from 'components/common/MultiTabs';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useFarcasterFrame } from 'hooks/useFarcasterFrame';
 
 import BlockAligner from '../BlockAligner';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
 import { MediaUrlInput } from '../common/MediaUrlInput';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
+
+import { FarcasterSigner } from './FarcasterSigner';
 
 export function FarcasterFrameNodeView({
   selected,
@@ -23,21 +27,14 @@ export function FarcasterFrameNodeView({
 }: CharmNodeViewProps & {
   pageId?: string;
 }) {
+  const { address } = useAccount();
   const { space } = useCurrentSpace();
-  const {
-    data: farcasterFrame,
-    isLoading,
-    error
-  } = useGetFarcasterFrame(
-    attrs.src
-      ? {
-          frameUrl: attrs.src,
-          pageId
-        }
-      : undefined
-  );
+  const { error, isLoadingFrame, farcasterFrame, submitOption, farcasterUser, isLoadingFrameAction } =
+    useFarcasterFrame(attrs.src && pageId ? { frameUrl: attrs.src, pageId } : undefined);
+  const [inputText, setInputText] = useState('');
+  const isFarcasterUserAvailable = farcasterUser && farcasterUser.fid;
 
-  if (isLoading) {
+  if (isLoadingFrame) {
     return <LoadingComponent minHeight={80} isLoading />;
   }
 
@@ -88,6 +85,24 @@ export function FarcasterFrameNodeView({
 
   if (!farcasterFrame || error) {
     return (
+      <Paper sx={{ p: 1 }}>
+        <BlockAligner
+          onEdit={() => {
+            if (!readOnly) {
+              updateAttrs({ src: null });
+            }
+          }}
+          onDelete={deleteNode}
+          readOnly={readOnly}
+        >
+          <Alert severity='warning'>{error?.message ?? 'Failed to load Farcaster Frame'}</Alert>
+        </BlockAligner>
+      </Paper>
+    );
+  }
+
+  return (
+    <Paper sx={{ p: 1 }}>
       <BlockAligner
         onEdit={() => {
           if (!readOnly) {
@@ -97,49 +112,71 @@ export function FarcasterFrameNodeView({
         onDelete={deleteNode}
         readOnly={readOnly}
       >
-        <Alert severity='warning'>{error?.message ?? 'Failed to load Farcaster Frame'}</Alert>
-      </BlockAligner>
-    );
-  }
-
-  return (
-    <BlockAligner
-      onEdit={() => {
-        if (!readOnly) {
-          updateAttrs({ src: null });
-        }
-      }}
-      onDelete={deleteNode}
-      readOnly={readOnly}
-    >
-      <Stack gap={1} my={1}>
-        <img src={farcasterFrame.image} width='100%' style={{ objectFit: 'cover' }} />
-        {farcasterFrame.inputText && <TextField type='text' placeholder={farcasterFrame.inputText} />}
-        <Stack flexDirection='row' gap={1}>
-          {farcasterFrame.buttons?.map(({ label, action }, index: number) => (
-            <Button
-              disabled
-              sx={{
-                flexGrow: 1,
-                flexBasis: `${100 / (farcasterFrame.buttons?.length || 1)}%`
-              }}
-              variant='outlined'
-              color='secondary'
-              key={`${index.toString()}`}
-            >
-              <Typography
-                variant='body2'
-                sx={{
-                  textWrap: 'wrap'
-                }}
+        <Stack gap={1}>
+          <img src={farcasterFrame.image} width='100%' style={{ objectFit: 'cover' }} />
+          {farcasterFrame.inputText && (
+            <TextField
+              type='text'
+              placeholder={farcasterFrame.inputText}
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              disabled={readOnly}
+            />
+          )}
+          <Stack flexDirection='row' gap={1} mb={1}>
+            {farcasterFrame.buttons?.map(({ label, action }, index: number) => (
+              <Tooltip
+                title={
+                  !address
+                    ? 'Please connect your wallet'
+                    : !isFarcasterUserAvailable
+                    ? 'Please sign in with Farcaster'
+                    : undefined
+                }
+                key={`${index.toString()}`}
               >
-                {label}
-              </Typography>
-              {action === 'post_redirect' ? ` ↗` : ''}
-            </Button>
-          ))}
+                <div
+                  style={{
+                    flexGrow: 1,
+                    flexBasis: `${100 / (farcasterFrame.buttons?.length || 1)}%`
+                  }}
+                >
+                  <Button
+                    disabled={readOnly || !isFarcasterUserAvailable}
+                    onClick={() => {
+                      submitOption({
+                        buttonIndex: index + 1,
+                        inputText
+                      }).then(() => {
+                        updateAttrs({
+                          src: farcasterFrame.postUrl
+                        });
+                      });
+                    }}
+                    sx={{
+                      width: '100%'
+                    }}
+                    variant='outlined'
+                    color='secondary'
+                    loading={isLoadingFrameAction}
+                  >
+                    <Typography
+                      variant='body2'
+                      sx={{
+                        textWrap: 'wrap'
+                      }}
+                    >
+                      {label}
+                    </Typography>
+                    {action === 'post_redirect' ? ` ↗` : ''}
+                  </Button>
+                </div>
+              </Tooltip>
+            ))}
+          </Stack>
         </Stack>
-      </Stack>
-    </BlockAligner>
+        {!readOnly ? <FarcasterSigner /> : null}
+      </BlockAligner>
+    </Paper>
   );
 }
