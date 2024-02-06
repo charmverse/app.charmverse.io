@@ -84,50 +84,49 @@ export function UserCredentialRow({
     return null;
   }
 
-  const favoriteAndVerificationIconsComponent =
-    (isUserRecipient && !readOnly) || credential.verificationUrl ? (
-      <Stack
-        flexBasis={isSmallScreen ? undefined : '30%'}
-        justifyContent='flex-end'
-        alignItems='center'
-        flexDirection='row'
-        gap={1}
-      >
-        {credential.verificationUrl && (
-          <Link
-            style={{
-              height: 20
-            }}
-            href={credential.verificationUrl}
-            external
-            target='_blank'
-          >
-            <LaunchIcon sx={{ alignSelf: 'center' }} fontSize='small' />
-          </Link>
-        )}
-        {isUserRecipient && !readOnly && (
-          <Tooltip title={isMutating ? '' : !credential.favoriteCredentialId ? 'Favorite' : 'Unfavorite'}>
-            <div>
-              <IconButton size='small' onClick={toggleFavorite} disabled={isMutating}>
-                {!credential.favoriteCredentialId ? (
-                  <StarBorderOutlinedIcon
-                    color={isMutating ? 'disabled' : 'primary'}
-                    fontSize='small'
-                    sx={{ alignSelf: 'center' }}
-                  />
-                ) : (
-                  <StarOutlinedIcon
-                    color={isMutating ? 'disabled' : 'primary'}
-                    fontSize='small'
-                    sx={{ alignSelf: 'center' }}
-                  />
-                )}
-              </IconButton>
-            </div>
-          </Tooltip>
-        )}
-      </Stack>
-    ) : null;
+  const favoriteAndVerificationIconsComponent = (
+    <Stack
+      flexBasis={isSmallScreen ? undefined : '30%'}
+      justifyContent='flex-end'
+      alignItems='center'
+      flexDirection='row'
+      gap={1}
+    >
+      {credential.verificationUrl && (
+        <Link
+          style={{
+            height: 20
+          }}
+          href={credential.verificationUrl}
+          external
+          target='_blank'
+        >
+          <LaunchIcon sx={{ alignSelf: 'center' }} fontSize='small' />
+        </Link>
+      )}
+      {isUserRecipient && !readOnly && (
+        <Tooltip title={isMutating ? '' : !credential.favoriteCredentialId ? 'Favorite' : 'Unfavorite'}>
+          <div>
+            <IconButton size='small' onClick={toggleFavorite} disabled={isMutating}>
+              {!credential.favoriteCredentialId ? (
+                <StarBorderOutlinedIcon
+                  color={isMutating ? 'disabled' : 'primary'}
+                  fontSize='small'
+                  sx={{ alignSelf: 'center' }}
+                />
+              ) : (
+                <StarOutlinedIcon
+                  color={isMutating ? 'disabled' : 'primary'}
+                  fontSize='small'
+                  sx={{ alignSelf: 'center' }}
+                />
+              )}
+            </IconButton>
+          </div>
+        </Tooltip>
+      )}
+    </Stack>
+  );
 
   const credentialOrganizationComponent = (
     <>
@@ -173,7 +172,7 @@ export function UserCredentialRow({
       <Box gap={1} display='flex' alignItems='center' justifyItems='flex-start' flexBasis='50%'>
         {credentialOrganizationComponent}
       </Box>
-      <Stack justifyContent='flex-end' alignItems='center' flexDirection='row' flexGrow={1}>
+      <Stack justifyContent='space-between' alignItems='center' flexDirection='row' flexGrow={1}>
         {attestationContentComponent}
         {favoriteAndVerificationIconsComponent}
       </Stack>

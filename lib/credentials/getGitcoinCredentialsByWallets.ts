@@ -104,7 +104,7 @@ export async function getGitcoinCredentialsByWallets({
     .map((wallet) => {
       const favoriteCredential = favoriteCredentials.find((f) => lowerCaseEqual(f.gitcoinWalletAddress, wallet));
       const gitcoinPassportScore = gitcoinPassportScores.find((score) => lowerCaseEqual(score.address, wallet));
-      if (!gitcoinPassportScore) {
+      if (!gitcoinPassportScore || gitcoinPassportScore.score === '0E-9') {
         return null;
       }
 
