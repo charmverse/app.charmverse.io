@@ -3,18 +3,13 @@ import type { ActionIndex } from 'frames.js';
 import { useFarcasterFrameAction, useGetFarcasterFrame } from 'charmClient/hooks/farcaster';
 import { createFrameActionMessageWithSignerKey } from 'lib/farcaster/createFrameActionMessageWithSignerKey';
 
-import { useFarcasterIdentity } from './useFarcasterIdentity';
+import { useFarcasterUser } from './useFarcasterUser';
 import { useSnackbar } from './useSnackbar';
 
 export function useFarcasterFrame(args?: { pageId: string; frameUrl: string }) {
   const { showMessage } = useSnackbar();
   const { trigger: triggerFrameAction, isMutating: isLoadingFrameAction } = useFarcasterFrameAction();
-  const {
-    farcasterUser,
-    startFarcasterSignerProcess,
-    logout,
-    loading: isLoadingFarcasterUser
-  } = useFarcasterIdentity();
+  const { farcasterUser, startFarcasterSignerProcess, logout, loading: isLoadingFarcasterUser } = useFarcasterUser();
   const { data: farcasterFrame, isLoading: isLoadingFrame, mutate, error } = useGetFarcasterFrame(args);
 
   const submitOption = async ({ buttonIndex, inputText }: { buttonIndex: number; inputText: string }) => {

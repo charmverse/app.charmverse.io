@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { SIGNED_KEY_REQUEST_TYPE, SIGNED_KEY_REQUEST_VALIDATOR_EIP_712_DOMAIN } from '@farcaster/core';
-import { useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { getAddress } from 'viem';
 import { optimism } from 'viem/chains';
 import { useAccount, useSignTypedData } from 'wagmi';
@@ -16,7 +17,23 @@ import { useSnackbar } from './useSnackbar';
 
 export const farcasterUserLocalStorageKey = 'farcasterUser';
 
-export function useFarcasterIdentity() {
+export type FarcasterUserContext = {
+  farcasterUser: FarcasterUser | null;
+  loading: boolean;
+  startFarcasterSignerProcess: () => Promise<void>;
+  logout: () => void;
+};
+
+export const FarcasterUserContext = createContext<FarcasterUserContext>({
+  farcasterUser: null,
+  loading: false,
+  startFarcasterSignerProcess: async () => {},
+  logout: () => {}
+});
+
+const deadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365 * 100; // 100 years
+
+export function FarcasterUserProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [farcasterUser, setFarcasterUser] = useLocalStorage<FarcasterUser | null>(farcasterUserLocalStorageKey, null);
   const { farcasterProfile } = useFarcasterProfile();
@@ -101,7 +118,6 @@ export function useFarcasterIdentity() {
     try {
       const keypairString = await createHexKeyPair();
       const fid = farcasterProfile.body.id;
-      const deadline = Math.floor(Date.now() / 1000) + 86400 * 30; // 30 days
       const signature = await signTypedDataAsync({
         account: getAddress(account),
         message: {
@@ -153,5 +169,23 @@ export function useFarcasterIdentity() {
     }
   }
 
-  return { farcasterUser, loading, startFarcasterSignerProcess, logout };
+  const value = useMemo(
+    () => ({
+      farcasterUser,
+      loading,
+      startFarcasterSignerProcess,
+      logout
+    }),
+    [farcasterUser, loading]
+  );
+
+  return <FarcasterUserContext.Provider value={value}>{children}</FarcasterUserContext.Provider>;
 }
+
+export const useFarcasterUser = () => {
+  const context = useContext(FarcasterUserContext);
+  if (!context) {
+    throw new Error('useFarcasterUser must be used within a FarcasterUserProvider');
+  }
+  return context;
+};

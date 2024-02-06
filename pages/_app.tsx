@@ -33,6 +33,7 @@ import { isDevEnv, isProdEnv } from 'config/constants';
 import { ConfirmationModalProvider } from 'hooks/useConfirmationModal';
 import { CurrentSpaceProvider } from 'hooks/useCurrentSpace';
 import { DiscordProvider } from 'hooks/useDiscordConnection';
+import { FarcasterUserProvider } from 'hooks/useFarcasterUser';
 import { PostCategoriesProvider } from 'hooks/useForumCategories';
 import { useInterval } from 'hooks/useInterval';
 import { IsSpaceMemberProvider } from 'hooks/useIsSpaceMember';
@@ -236,9 +237,11 @@ function DataProviders({ children }: { children: ReactNode }) {
                                     <RewardsProvider>
                                       <MemberPropertiesProvider>
                                         <LensProvider config={lensConfig}>
-                                          <UserProfileProvider>
-                                            <PageTitleProvider>{children}</PageTitleProvider>
-                                          </UserProfileProvider>
+                                          <FarcasterUserProvider>
+                                            <UserProfileProvider>
+                                              <PageTitleProvider>{children}</PageTitleProvider>
+                                            </UserProfileProvider>
+                                          </FarcasterUserProvider>
                                         </LensProvider>
                                       </MemberPropertiesProvider>
                                     </RewardsProvider>
