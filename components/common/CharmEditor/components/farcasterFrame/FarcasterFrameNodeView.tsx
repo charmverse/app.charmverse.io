@@ -163,7 +163,7 @@ export function FarcasterFrameNodeView({
               disabled={readOnly}
             />
           )}
-          <Stack flexDirection='row' gap={1} mb={1}>
+          <Stack flexDirection='row' gap={1} mb={!readOnly ? 1 : 0}>
             {farcasterFrame.buttons?.map(({ label, action }, index: number) => (
               <Tooltip
                 title={
