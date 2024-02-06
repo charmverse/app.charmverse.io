@@ -123,7 +123,10 @@ export async function getCharmverseCredentialsByWallets({
 }: {
   wallets: string[];
 }): Promise<EASAttestationWithFavorite[]> {
-  const credentialWalletAddress = new Wallet(credentialsWalletPrivateKey as string).address.toLowerCase();
+  if (typeof credentialsWalletPrivateKey !== 'string') {
+    return [];
+  }
+  const credentialWalletAddress = new Wallet(credentialsWalletPrivateKey).address.toLowerCase();
   if (!wallets.length) {
     return [];
   }
