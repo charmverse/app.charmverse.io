@@ -163,7 +163,7 @@ function CommentsSidebar({
           <MenuItem value='all'>All</MenuItem>
         </Select>
       </Box>
-      <StyledSidebar className='charm-inline-comment-sidebar' sx={{ height: '100%', px: 1 }}>
+      <StyledSidebar data-test='inline-comment-sidebar' sx={{ height: '100%', px: 1 }}>
         {isLoading ? (
           <LoadingComponent />
         ) : threadList.length === 0 ? (
@@ -385,7 +385,7 @@ export function NoCommentsMessage({
   children?: ReactNode;
 }) {
   return (
-    <EmptyThreadContainerBox>
+    <EmptyThreadContainerBox data-test='empty-message'>
       <Center id='center'>
         {icon}
         <Typography variant='subtitle1' color='secondary'>

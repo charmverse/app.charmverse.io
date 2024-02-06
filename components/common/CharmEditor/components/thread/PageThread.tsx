@@ -192,7 +192,7 @@ function EditCommentCharmEditor({
 
   return (
     <>
-      <Box onClick={onContainerClick} flex={1} width='100%'>
+      <Box data-test='comment-message' onClick={onContainerClick} flex={1} width='100%'>
         <Box sx={{ marginLeft: `${32 - 4}px`, paddingLeft: '4px', bgcolor: isEditable ? 'background.default' : '' }}>
           <InlineCharmEditor
             readOnly={!isEditable}

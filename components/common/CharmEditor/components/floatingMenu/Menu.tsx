@@ -23,15 +23,17 @@ export function Menu({
   children,
   type,
   noScroll,
-  inline
+  inline,
+  'data-test': dataTest
 }: {
   children: React.ReactNode;
   type?: SubMenu;
   noScroll?: boolean;
   inline?: boolean;
+  'data-test'?: string;
 }) {
   return (
-    <StyledMenu elevation={8} type={type} noScroll={noScroll} inline={inline}>
+    <StyledMenu elevation={8} type={type} noScroll={noScroll} inline={inline} data-test={dataTest}>
       {children}
     </StyledMenu>
   );
