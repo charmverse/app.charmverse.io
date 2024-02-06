@@ -19,7 +19,17 @@ export function LoggedOutButtons() {
   const router = useRouter();
   return (
     <Box display='flex'>
-      <ContextMenu popupId='user-menu'>
+      <ContextMenu
+        popupId='user-menu'
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center'
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'center'
+        }}
+      >
         <MenuItem
           component={Link}
           color='inherit'
