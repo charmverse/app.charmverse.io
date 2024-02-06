@@ -109,6 +109,7 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
     if (ongoingSignerProcess) {
       createAndStoreSigner().finally(() => {
         setOngoingSignerProcess(false);
+        setLoading(false);
       });
     }
   }, [ongoingSignerProcess]);
@@ -120,8 +121,6 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
       setOngoingSignerProcess(true);
     } catch (_) {
       //
-    } finally {
-      setLoading(false);
     }
   }
 

@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import CallMadeIcon from '@mui/icons-material/CallMade';
 import LinkIcon from '@mui/icons-material/Link';
 import { Alert, Paper, Stack, TextField, Tooltip, Typography, lighten } from '@mui/material';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useCopyToClipboard } from 'usehooks-ts';
 import { useAccount } from 'wagmi';
 
@@ -159,7 +159,24 @@ export function FarcasterFrameNodeView({
               type='text'
               placeholder={farcasterFrame.inputText}
               value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
+              // Prevent losing focus when clicking on the input
+              onMouseDown={(e) => {
+                e.stopPropagation();
+              }}
+              sx={{
+                '& fieldset': {
+                  borderColor: '#855DCD !important'
+                }
+              }}
+              // Prevent the typed text to replace the component
+              onKeyDown={(e) => {
+                e.preventDefault();
+              }}
+              onKeyDownCapture={(e) => {
+                if (e.key.length === 1) {
+                  setInputText((prevInputText) => prevInputText + e.key);
+                }
+              }}
               disabled={readOnly}
             />
           )}
