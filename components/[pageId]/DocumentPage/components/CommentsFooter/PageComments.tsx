@@ -17,10 +17,10 @@ import { setUrlWithoutRerender } from 'lib/utilities/browser';
 
 type Props = {
   page: PageWithContent;
-  canCreateComments: boolean;
+  enableComments: boolean;
 };
 
-export function PageComments({ page, canCreateComments }: Props) {
+export function PageComments({ page, enableComments }: Props) {
   const router = useRouter();
   const {
     comments,
@@ -38,9 +38,9 @@ export function PageComments({ page, canCreateComments }: Props) {
   const { data: proposal } = useGetProposalDetails(isProposal ? page.id : null);
   const [, setCreatedComment] = useState<PageCommentWithVote | null>(null);
   const commentPermissions: CommentPermissions = {
-    add_comment: canCreateComments ?? false,
-    upvote: canCreateComments ?? false,
-    downvote: canCreateComments ?? false,
+    add_comment: enableComments ?? false,
+    upvote: enableComments ?? false,
+    downvote: enableComments ?? false,
     delete_comments: isAdmin
   };
 
@@ -80,7 +80,7 @@ export function PageComments({ page, canCreateComments }: Props) {
     <>
       <Divider sx={{ my: 3 }} />
 
-      {canCreateComments && <CommentForm handleCreateComment={createComment} />}
+      {enableComments && <CommentForm handleCreateComment={createComment} />}
 
       {isLoadingComments ? (
         <Box height={100}>
@@ -114,7 +114,7 @@ export function PageComments({ page, canCreateComments }: Props) {
                 No Comments Yet
               </Typography>
 
-              {canCreateComments && <Typography color='secondary'>Be the first to share what you think!</Typography>}
+              {enableComments && <Typography color='secondary'>Be the first to share what you think!</Typography>}
             </Stack>
           )}
         </>

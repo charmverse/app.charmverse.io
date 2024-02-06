@@ -75,7 +75,7 @@ export function InlineCommentThread({
             {unResolvedThreads.map((resolvedThread) => (
               <ThreadContainer key={resolvedThread.id} elevation={4}>
                 <PageThread
-                  canCreateComments={permissions?.comment}
+                  enableComments={permissions?.comment}
                   inline={ids.length === 1}
                   key={resolvedThread.id}
                   threadId={resolvedThread?.id}
