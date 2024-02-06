@@ -1,10 +1,10 @@
 import { Stack, SvgIcon, Typography, darken } from '@mui/material';
-import QRCode from 'qrcode.react';
 import { useAccount } from 'wagmi';
 
 import { OpenWalletSelectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/OpenWalletSelectorButton';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { CanvasQRCode } from 'components/settings/account/components/otp/components/CanvasQrCode';
 import { useFarcasterFrame } from 'hooks/useFarcasterFrame';
 import FarcasterIcon from 'public/images/logos/farcaster.svg';
 
@@ -29,7 +29,7 @@ export function FarcasterSigner() {
         {farcasterUser.signerApprovalUrl && (
           <>
             <Typography variant='body2'>Scan with your camera app</Typography>
-            <QRCode value={farcasterUser.signerApprovalUrl} size={250} />
+            <CanvasQRCode uri={farcasterUser.signerApprovalUrl} size={250} />
           </>
         )}
       </Stack>
@@ -41,6 +41,7 @@ export function FarcasterSigner() {
           size='large'
           variant={!address ? 'outlined' : 'contained'}
           sx={{
+            p: 1.5,
             width: 'fit-content',
             backgroundColor: '#855DCD',
             '&:hover': {
