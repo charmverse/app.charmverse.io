@@ -3,6 +3,7 @@ import type { ActionIndex } from 'frames.js';
 import { useFarcasterFrameAction, useGetFarcasterFrame } from 'charmClient/hooks/farcaster';
 import { createFrameActionMessageWithSignerKey } from 'lib/farcaster/createFrameActionMessageWithSignerKey';
 
+import { useConfirmationModal } from './useConfirmationModal';
 import { useFarcasterUser } from './useFarcasterUser';
 import { useSnackbar } from './useSnackbar';
 
@@ -11,7 +12,7 @@ export function useFarcasterFrame(args?: { pageId: string; frameUrl: string }) {
   const { trigger: triggerFrameAction, isMutating: isLoadingFrameAction } = useFarcasterFrameAction();
   const { farcasterUser } = useFarcasterUser();
   const { data: farcasterFrame, isLoading: isLoadingFrame, mutate, error } = useGetFarcasterFrame(args);
-
+  const { showConfirmation } = useConfirmationModal();
   const submitOption = async ({ buttonIndex, inputText }: { buttonIndex: number; inputText: string }) => {
     if (!farcasterUser || !farcasterUser.fid || !farcasterFrame) {
       return;
@@ -66,10 +67,16 @@ export function useFarcasterFrame(args?: { pageId: string; frameUrl: string }) {
 
     if ('location' in frameAction) {
       const location = frameAction.location;
-      // TODO: Replace with a global modal action
-      if (window.confirm(`You are about to be redirected to ${location!}`)) {
-        window.location.href = location!;
-      }
+      await showConfirmation({
+        message: `You are about to be redirected to ${location!}`,
+        title: 'Leaving CharmVerse',
+        async onConfirm() {
+          if (location) {
+            window.open(location, '_blank');
+          }
+        }
+      });
+
       return null;
     } else {
       return mutate(frameAction.frame, {

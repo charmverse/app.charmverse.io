@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import CallMadeIcon from '@mui/icons-material/CallMade';
 import LinkIcon from '@mui/icons-material/Link';
 import { Alert, Paper, Stack, TextField, Tooltip, Typography, lighten } from '@mui/material';
 import { useState } from 'react';
@@ -12,6 +13,7 @@ import MultiTabs from 'components/common/MultiTabs';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useFarcasterFrame } from 'hooks/useFarcasterFrame';
 import { useFarcasterProfile } from 'hooks/useFarcasterProfile';
+import { useFarcasterUser } from 'hooks/useFarcasterUser';
 import { useSnackbar } from 'hooks/useSnackbar';
 
 import BlockAligner from '../BlockAligner';
@@ -45,8 +47,10 @@ export function FarcasterFrameNodeView({
 }) {
   const { address } = useAccount();
   const { space } = useCurrentSpace();
-  const { error, isLoadingFrame, farcasterFrame, logout, submitOption, farcasterUser, isLoadingFrameAction } =
-    useFarcasterFrame(attrs.src && pageId ? { frameUrl: attrs.src, pageId } : undefined);
+  const { error, isLoadingFrame, farcasterFrame, submitOption, isLoadingFrameAction } = useFarcasterFrame(
+    attrs.src && pageId ? { frameUrl: attrs.src, pageId } : undefined
+  );
+  const { farcasterUser, logout } = useFarcasterUser();
   const [inputText, setInputText] = useState('');
   const isFarcasterUserAvailable = farcasterUser && farcasterUser.fid;
   const [, copyToClipboard] = useCopyToClipboard();
@@ -106,10 +110,22 @@ export function FarcasterFrameNodeView({
     );
   }
 
+  const extraControls = [
+    {
+      onClick() {
+        copyToClipboard(node.attrs.src);
+        showMessage('Copied frame url', 'info');
+      },
+      Icon: LinkIcon,
+      tooltip: 'Copy frame url'
+    }
+  ];
+
   if (!farcasterFrame || error) {
     return (
       <Paper sx={{ p: 1, my: 2 }}>
         <BlockAligner
+          extraControls={extraControls}
           onEdit={() => {
             if (!readOnly) {
               updateAttrs({ src: null });
@@ -132,16 +148,7 @@ export function FarcasterFrameNodeView({
             updateAttrs({ src: null });
           }
         }}
-        extraControls={[
-          {
-            onClick() {
-              copyToClipboard(node.attrs.src);
-              showMessage('Copied frame url', 'info');
-            },
-            Icon: LinkIcon,
-            tooltip: 'Copy frame url'
-          }
-        ]}
+        extraControls={extraControls}
         onDelete={deleteNode}
         readOnly={readOnly}
       >
@@ -175,21 +182,17 @@ export function FarcasterFrameNodeView({
                   }}
                 >
                   <StyledButton
-                    disabled={readOnly || !isFarcasterUserAvailable}
+                    disabled={isLoadingFrameAction || readOnly || !isFarcasterUserAvailable}
                     onClick={() => {
                       submitOption({
                         buttonIndex: index + 1,
                         inputText
-                      }).then(() => {
-                        updateAttrs({
-                          src: farcasterFrame.postUrl
-                        });
                       });
                     }}
                     loading={isLoadingFrameAction}
                   >
                     <Typography
-                      variant='body1'
+                      variant='body2'
                       sx={{
                         fontWeight: 500,
                         textWrap: 'wrap'
@@ -197,7 +200,7 @@ export function FarcasterFrameNodeView({
                     >
                       {label}
                     </Typography>
-                    {action === 'post_redirect' ? ` ↗` : ''}
+                    {action === 'post_redirect' ? <CallMadeIcon sx={{ ml: 0.5, fontSize: 14 }} /> : null}
                   </StyledButton>
                 </div>
               </Tooltip>
