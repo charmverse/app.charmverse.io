@@ -122,14 +122,6 @@ export function getCard(cardId: string): (state: RootState) => Card | undefined 
   };
 }
 
-export const getCurrentBoardCards = createSelector(
-  (state: RootState) => state.boards.current,
-  getCards,
-  (boardId: string, cards: { [key: string]: Card }) => {
-    return Object.values(cards).filter((c) => c.parentId === boardId) as Card[];
-  }
-);
-
 function titleOrCreatedOrder(cardA: PageMeta, cardB: PageMeta) {
   const aValue = cardA.title;
   const bValue = cardB.title;
