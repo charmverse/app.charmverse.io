@@ -64,7 +64,7 @@ export function FarcasterSigner() {
         <Modal open={farcasterSignerModal.isOpen} onClose={farcasterSignerModal.close} title='Approve in Warpcast'>
           <Typography>Please scan the QR code and approve the request in your Farcaster app</Typography>
           {warpcastClientDeeplink && (
-            <Stack mt={2} gap={2} alignItems='center'>
+            <Stack mt={2} gap={1} alignItems='center'>
               <CanvasQRCode uri={warpcastClientDeeplink} />
               <Link href={warpcastClientDeeplink} target='_blank' rel='noreferrer'>
                 <Stack flexDirection='row' gap={0.5} alignItems='center' justifyContent='center'>
