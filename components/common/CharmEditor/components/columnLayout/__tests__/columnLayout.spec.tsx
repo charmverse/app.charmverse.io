@@ -4,6 +4,7 @@ import { jsonDoc, builders as _ } from 'testing/prosemirror/builders';
 
 jest.mock('components/common/CharmEditor/components/inlineDatabase/components/InlineDatabase', () => ({}));
 jest.mock('components/common/CharmEditor/components/poll/PollComponent', () => ({}));
+jest.mock('components/common/CharmEditor/components/farcasterFrame/components/FarcasterFrameNodeView', () => ({}));
 
 jest.mock('next/router', () => ({
   useRouter: () => ({
