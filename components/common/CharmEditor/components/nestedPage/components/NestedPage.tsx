@@ -3,11 +3,11 @@ import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
 import type { EditorView } from 'prosemirror-view';
 
+import { useGetPage } from 'charmClient/hooks/pages';
 import type { NodeViewProps } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import Link from 'components/common/Link';
 import { NoAccessPageIcon, PageIcon } from 'components/common/PageIcon';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { usePages } from 'hooks/usePages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
@@ -63,10 +63,17 @@ export default function NestedPage({ isLinkedPage = false, node, getPos }: NodeV
   const { getFeatureTitle, mappedFeatures } = useSpaceFeatures();
   const { categories } = useForumCategories();
 
-  const documentPage = pages[node.attrs.id];
-  const staticPage = STATIC_PAGES.find((c) => c.path === node.attrs.path && node.attrs.type === c.path);
   const forumCategoryPage = categories.find((c) => c.id === node.attrs.id && node.attrs.type === 'forum_category');
+  const staticPage = STATIC_PAGES.find((c) => c.path === node.attrs.path && node.attrs.type === c.path);
+  const isDocumentPath = !forumCategoryPage && !staticPage;
   const isProposalTemplate = node.attrs.type === 'proposal_template';
+
+  // retrieve the page directly if we are waiting for pages to load
+  const { data: sourcePage, isLoading: isPageLoading } = useGetPage(loadingPages && isDocumentPath && node.attrs.id);
+
+  const documentPage = sourcePage || pages[node.attrs.id];
+  const isLoading = isPageLoading && loadingPages;
+
   let pageTitle = '';
   if (staticPage) {
     pageTitle = mappedFeatures[staticPage.feature]?.title;
@@ -76,7 +83,7 @@ export default function NestedPage({ isLinkedPage = false, node, getPos }: NodeV
     pageTitle = documentPage?.title || 'Untitled';
   } else if (forumCategoryPage) {
     pageTitle = `${getFeatureTitle('Forum')} > ${forumCategoryPage?.name || 'Untitled'}`;
-  } else if (!loadingPages) {
+  } else if (!isLoading) {
     pageTitle = 'No access';
   }
 
@@ -121,12 +128,14 @@ export default function NestedPage({ isLinkedPage = false, node, getPos }: NodeV
       }}
     >
       <div>
-        <LinkIcon
-          isLinkedPage={isLinkedPage}
-          documentPage={documentPage}
-          staticPage={staticPage}
-          isCategoryPage={!!forumCategoryPage}
-        />
+        {!isLoading && (
+          <LinkIcon
+            isLinkedPage={isLinkedPage}
+            documentPage={documentPage}
+            staticPage={staticPage}
+            isCategoryPage={!!forumCategoryPage}
+          />
+        )}
       </div>
       <StyledTypography>{pageTitle}</StyledTypography>
     </NestedPageContainer>
