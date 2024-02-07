@@ -16,7 +16,7 @@ export function FarcasterMiniProfile({
   farcasterProfile
 }: {
   logout: VoidFunction;
-  farcasterProfile: FarcasterProfile;
+  farcasterProfile?: FarcasterProfile;
 }) {
   return (
     <StyledStackContainer
@@ -27,36 +27,38 @@ export function FarcasterMiniProfile({
         }
       }}
     >
-      <Tooltip title='View profile'>
-        <Stack
-          sx={{
-            gap: 1,
-            flexDirection: {
-              xs: 'column',
-              md: 'row'
-            },
-            alignItems: 'center'
-          }}
-          onClick={() => {
-            window.open(`https://warpcast.com/${farcasterProfile.body.username}`);
-          }}
-        >
-          <Avatar avatar={farcasterProfile.body.avatarUrl} name={farcasterProfile.body.displayName} size='medium' />
+      {farcasterProfile && (
+        <Tooltip title='View profile'>
           <Stack
-            alignItems={{
-              xs: 'center',
-              md: 'flex-start'
+            sx={{
+              gap: 1,
+              flexDirection: {
+                xs: 'column',
+                md: 'row'
+              },
+              alignItems: 'center'
+            }}
+            onClick={() => {
+              window.open(`https://warpcast.com/${farcasterProfile.body.username}`);
             }}
           >
-            <Typography variant='body2' fontWeight='bold'>
-              {farcasterProfile.body.displayName}
-            </Typography>
-            <Typography variant='subtitle1' color='secondary' component='span'>
-              @{farcasterProfile.body.username}
-            </Typography>
+            <Avatar avatar={farcasterProfile.body.avatarUrl} name={farcasterProfile.body.displayName} size='medium' />
+            <Stack
+              alignItems={{
+                xs: 'center',
+                md: 'flex-start'
+              }}
+            >
+              <Typography variant='body2' fontWeight='bold'>
+                {farcasterProfile.body.displayName}
+              </Typography>
+              <Typography variant='subtitle1' color='secondary' component='span'>
+                @{farcasterProfile.body.username}
+              </Typography>
+            </Stack>
           </Stack>
-        </Stack>
-      </Tooltip>
+        </Tooltip>
+      )}
       <Button color='secondary' variant='text' size='small' onClick={logout}>
         <LogoutIcon fontSize='small' sx={{ mr: 1 }} />
         Logout

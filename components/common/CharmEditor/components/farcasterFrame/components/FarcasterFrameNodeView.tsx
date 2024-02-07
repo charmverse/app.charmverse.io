@@ -22,17 +22,16 @@ import { MediaSelectionPopup } from '../../common/MediaSelectionPopup';
 import { MediaUrlInput } from '../../common/MediaUrlInput';
 import type { CharmNodeViewProps } from '../../nodeView/nodeView';
 
-import { farcasterBrandColor, farcasterBrandColorDark, farcasterBrandColorLight } from './constants';
 import { FarcasterMiniProfile } from './FarcasterMiniProfile';
 import { FarcasterSigner } from './FarcasterSigner';
 
 const StyledButton = styled(Button)(({ theme, disabled }) => ({
   width: '100%',
-  border: theme.palette.mode === 'dark' || disabled ? '' : `1px solid ${farcasterBrandColor}`,
-  backgroundColor: theme.palette.mode === 'dark' ? farcasterBrandColor : 'transparent',
-  color: theme.palette.mode === 'dark' ? '#fff' : farcasterBrandColor,
+  border: theme.palette.mode === 'dark' ? '' : `1px solid ${disabled ? 'transparent' : theme.palette.farcaster.main}`,
+  backgroundColor: theme.palette.mode === 'dark' ? theme.palette.farcaster.main : 'transparent',
+  color: theme.palette.mode === 'dark' ? '#fff' : theme.palette.farcaster.main,
   '&:hover': {
-    backgroundColor: theme.palette.mode === 'dark' ? farcasterBrandColorDark : farcasterBrandColorLight
+    backgroundColor: theme.palette.mode === 'dark' ? theme.palette.farcaster.dark : theme.palette.farcaster.light
   },
   height: '100%'
 }));
@@ -122,7 +121,7 @@ export function FarcasterFrameNodeView({
           />
         }
         isSelected={selected}
-        buttonText='Add Farcaster Frame'
+        buttonText='Add a Frame (Farcaster)'
         onDelete={deleteNode}
       >
         <MultiTabs
@@ -209,7 +208,7 @@ export function FarcasterFrameNodeView({
               }}
               sx={{
                 '& fieldset': {
-                  borderColor: `${farcasterBrandColor} !important`
+                  borderColor: (theme) => `${theme.palette.farcaster.main} !important`
                 }
               }}
               // Prevent the typed text to replace the component
@@ -271,9 +270,9 @@ export function FarcasterFrameNodeView({
           </Stack>
         </Stack>
         {!readOnly ? (
-          farcasterUser?.status === 'approved' && farcasterProfile ? (
+          farcasterUser?.status === 'approved' ? (
             <Box mt={1}>
-              <FarcasterMiniProfile logout={logout} farcasterProfile={farcasterProfile} />
+              <FarcasterMiniProfile logout={logout} farcasterProfile={farcasterProfile ?? undefined} />
             </Box>
           ) : (
             <FarcasterSigner />

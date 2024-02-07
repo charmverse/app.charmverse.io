@@ -1,19 +1,20 @@
 import { log } from '@charmverse/core/log';
-import { SIGNED_KEY_REQUEST_TYPE, SIGNED_KEY_REQUEST_VALIDATOR_EIP_712_DOMAIN } from '@farcaster/core';
+import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
+import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
+import { Stack, Typography } from '@mui/material';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { getAddress } from 'viem';
-import { optimism } from 'viem/chains';
-import { useAccount, useChainId, useSignTypedData } from 'wagmi';
 
 import * as http from 'adapters/http';
-import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
+import { useCreateFarcasterSigner } from 'charmClient/hooks/farcaster';
+import Link from 'components/common/Link';
+import Modal from 'components/common/Modal';
+import { CanvasQRCode } from 'components/settings/account/components/otp/components/CanvasQrCode';
 import { createHexKeyPair } from 'lib/farcaster/createHexKeyPair';
 import type { FarcasterUser, SignedKeyRequest } from 'lib/farcaster/interfaces';
 
-import { useFarcasterProfile } from './useFarcasterProfile';
 import { useLocalStorage } from './useLocalStorage';
 import { useSnackbar } from './useSnackbar';
 
@@ -21,155 +22,153 @@ export const farcasterUserLocalStorageKey = 'farcasterUser';
 
 export type FarcasterUserContext = {
   farcasterUser: FarcasterUser | null;
-  loading: boolean;
-  startFarcasterSignerProcess: () => Promise<void>;
+  isCreatingSigner: boolean;
+  createAndStoreSigner: () => Promise<void>;
   logout: () => void;
   farcasterSignerModal: PopupState;
 };
 
 export const FarcasterUserContext = createContext<FarcasterUserContext>({
   farcasterUser: null,
-  loading: false,
-  startFarcasterSignerProcess: async () => {},
+  isCreatingSigner: false,
+  createAndStoreSigner: async () => {},
   logout: () => {},
   farcasterSignerModal: {} as PopupState
 });
 
 const deadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365 * 100; // 100 years
 
-export function FarcasterUserProvider({ children }: { children: ReactNode }) {
-  const [loading, setLoading] = useState(false);
-  const chainId = useChainId();
-  const [farcasterUser, setFarcasterUser] = useLocalStorage<FarcasterUser | null>(farcasterUserLocalStorageKey, null);
-  const { farcasterProfile } = useFarcasterProfile();
-  const [ongoingSignerProcess, setOngoingSignerProcess] = useState(false);
+function FarcasterApprovalModal({
+  farcasterSignerModal,
+  farcasterUser,
+  setFarcasterUser,
+  logout
+}: {
+  farcasterSignerModal: PopupState;
+  farcasterUser: FarcasterUser;
+  setFarcasterUser: (user: FarcasterUser) => void;
+  logout: () => void;
+}) {
+  const warpcastClientDeeplink = farcasterUser?.signerApprovalUrl?.replace(
+    'farcaster://',
+    'https://client.warpcast.com/deeplinks/'
+  );
   const { showMessage } = useSnackbar();
-  const { address: account } = useAccount();
-  const { signTypedDataAsync } = useSignTypedData();
+
+  useEffect(() => {
+    let intervalId: any;
+
+    const startPolling = () => {
+      intervalId = setInterval(async () => {
+        try {
+          const fcSignerRequestResponse = await http.GET<{
+            result: { signedKeyRequest: SignedKeyRequest };
+          }>(
+            `https://api.warpcast.com/v2/signed-key-request?token=${farcasterUser.token}`,
+            {},
+            {
+              credentials: 'omit'
+            }
+          );
+          if (fcSignerRequestResponse.result.signedKeyRequest.state !== 'completed') {
+            return;
+          }
+          const user = {
+            ...farcasterUser,
+            ...fcSignerRequestResponse.result,
+            fid: fcSignerRequestResponse.result.signedKeyRequest.userFid,
+            status: 'approved' as const
+          };
+          setFarcasterUser(user);
+          farcasterSignerModal.close();
+          showMessage('Successfully logged in with Farcaster', 'success');
+          clearInterval(intervalId);
+        } catch (error) {
+          //
+        }
+      }, 2500);
+    };
+
+    const handleVisibilityChange = () => {
+      clearInterval(intervalId);
+      if (!document.hidden) {
+        startPolling();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Start the polling when the effect runs.
+    startPolling();
+
+    // Cleanup function to remove the event listener and clear interval.
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      clearInterval(intervalId);
+    };
+  }, [farcasterUser, farcasterSignerModal]);
+
+  return (
+    <Modal
+      open
+      onClose={() => {
+        farcasterSignerModal.close();
+        logout();
+      }}
+      title='Approve in Warpcast'
+    >
+      <Typography>Please scan the QR code and approve the request in your Farcaster app</Typography>
+      {warpcastClientDeeplink && (
+        <Stack mt={2} gap={1} alignItems='center'>
+          <CanvasQRCode uri={warpcastClientDeeplink} />
+          <Link external href={warpcastClientDeeplink} target='_blank' rel='noreferrer'>
+            <Stack flexDirection='row' gap={0.5} alignItems='center' justifyContent='center'>
+              <PhoneIphoneIcon fontSize='small' sx={{ fill: (theme) => theme.palette.farcaster.main }} />
+              <Typography
+                sx={{
+                  color: (theme) => theme.palette.farcaster.main
+                }}
+              >
+                I'm using my phone
+              </Typography>
+              <ArrowRightAltIcon fontSize='small' sx={{ fill: (theme) => theme.palette.farcaster.main }} />
+            </Stack>
+          </Link>
+        </Stack>
+      )}
+    </Modal>
+  );
+}
+
+export function FarcasterUserProvider({ children }: { children: ReactNode }) {
+  const [farcasterUser, setFarcasterUser] = useLocalStorage<FarcasterUser | null>(farcasterUserLocalStorageKey, null);
+  const { showMessage } = useSnackbar();
   const farcasterSignerModal = usePopupState({
     variant: 'popover',
     popupId: 'farcaster-signer'
   });
+  const [isCreatingSigner, setIsCreatingSigner] = useState(false);
+  const { trigger: createFarcasterSigner } = useCreateFarcasterSigner();
 
   function logout() {
     setFarcasterUser(null);
   }
 
-  useEffect(() => {
-    let intervalId: any;
-
-    if (farcasterUser && farcasterUser.status === 'pending_approval' && farcasterSignerModal.isOpen) {
-      const startPolling = () => {
-        intervalId = setInterval(async () => {
-          try {
-            const fcSignerRequestResponse = await http.GET<{
-              result: { signedKeyRequest: SignedKeyRequest };
-            }>(
-              `https://api.warpcast.com/v2/signed-key-request?token=${farcasterUser.token}`,
-              {},
-              {
-                credentials: 'omit'
-              }
-            );
-            if (fcSignerRequestResponse.result.signedKeyRequest.state !== 'completed') {
-              throw new Error('Signer request not completed');
-            }
-            const user = {
-              ...farcasterUser,
-              ...fcSignerRequestResponse.result,
-              fid: fcSignerRequestResponse.result.signedKeyRequest.userFid,
-              status: 'approved' as const
-            };
-            setFarcasterUser(user);
-            farcasterSignerModal.close();
-            showMessage('Successfully logged in with Farcaster', 'success');
-            clearInterval(intervalId);
-          } catch (error) {
-            log.error('Error polling for signer approval', {
-              error
-            });
-          }
-        }, 2500);
-      };
-
-      const stopPolling = () => {
-        clearInterval(intervalId);
-      };
-
-      const handleVisibilityChange = () => {
-        if (document.hidden) {
-          stopPolling();
-        }
-      };
-
-      document.addEventListener('visibilitychange', handleVisibilityChange);
-
-      // Start the polling when the effect runs.
-      startPolling();
-
-      // Cleanup function to remove the event listener and clear interval.
-      return () => {
-        document.removeEventListener('visibilitychange', handleVisibilityChange);
-        clearInterval(intervalId);
-      };
-    } else if (intervalId) {
-      clearInterval(intervalId);
-    }
-  }, [farcasterUser, farcasterSignerModal]);
-
-  useEffect(() => {
-    let timerId: NodeJS.Timeout;
-    if (ongoingSignerProcess && chainId === optimism.id) {
-      timerId = setTimeout(() => {
-        createAndStoreSigner().finally(() => {
-          setOngoingSignerProcess(false);
-          setLoading(false);
-          farcasterSignerModal.open();
-        });
-      }, 250);
-    }
-
-    // Clean up the timer
-    return () => {
-      if (timerId) {
-        clearTimeout(timerId);
-      }
-    };
-  }, [ongoingSignerProcess, chainId]);
-
-  async function startFarcasterSignerProcess() {
-    setLoading(true);
-    try {
-      await switchActiveNetwork(optimism.id);
-      setOngoingSignerProcess(true);
-    } catch (_) {
-      //
-    }
-  }
-
   async function createAndStoreSigner() {
-    if (!farcasterProfile || !account) {
-      return;
-    }
-
     try {
+      setIsCreatingSigner(true);
       const keypairString = await createHexKeyPair();
-      const fid = farcasterProfile.body.id;
-      const signature = await signTypedDataAsync({
-        account: getAddress(account),
-        message: {
-          requestFid: BigInt(fid),
-          key: (keypairString.publicKey.startsWith('0x')
-            ? keypairString.publicKey
-            : `0x${keypairString.publicKey}`) as `0x${string}`,
-          deadline: BigInt(deadline)
-        },
-        primaryType: 'SignedKeyRequest',
-        domain: SIGNED_KEY_REQUEST_VALIDATOR_EIP_712_DOMAIN,
-        types: {
-          SignedKeyRequest: SIGNED_KEY_REQUEST_TYPE
-        }
+      const farcasterSigner = await createFarcasterSigner({
+        publicKey: (keypairString.publicKey.startsWith('0x')
+          ? keypairString.publicKey
+          : `0x${keypairString.publicKey}`) as `0x${string}`
       });
+
+      if (!farcasterSigner) {
+        throw new Error('Error creating signer');
+      }
+
+      const { signature, requestFid } = farcasterSigner;
 
       const {
         result: { signedKeyRequest }
@@ -180,7 +179,7 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
         {
           key: keypairString.publicKey,
           signature,
-          requestFid: BigInt(fid).toString(),
+          requestFid: BigInt(requestFid).toString(),
           deadline: BigInt(deadline).toString()
         },
         {
@@ -198,26 +197,42 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
         status: 'pending_approval'
       };
       setFarcasterUser(user);
+      farcasterSignerModal.open();
     } catch (error: any) {
+      // err.shortMessage comes from viem
       showMessage(error.shortMessage || error.message || 'Something went wrong. Please try again', 'error');
       log.error('Error creating signer', {
         error
       });
+    } finally {
+      setIsCreatingSigner(false);
     }
   }
 
   const value = useMemo(
     () => ({
       farcasterUser,
-      loading,
-      startFarcasterSignerProcess,
+      isCreatingSigner,
+      createAndStoreSigner,
       logout,
       farcasterSignerModal
     }),
-    [farcasterUser, loading, farcasterSignerModal]
+    [farcasterUser, isCreatingSigner, farcasterSignerModal]
   );
 
-  return <FarcasterUserContext.Provider value={value}>{children}</FarcasterUserContext.Provider>;
+  return (
+    <FarcasterUserContext.Provider value={value}>
+      {children}
+      {farcasterSignerModal.isOpen && farcasterUser && farcasterUser.status === 'pending_approval' && (
+        <FarcasterApprovalModal
+          farcasterSignerModal={farcasterSignerModal}
+          farcasterUser={farcasterUser}
+          setFarcasterUser={setFarcasterUser}
+          logout={logout}
+        />
+      )}
+    </FarcasterUserContext.Provider>
+  );
 }
 
 export const useFarcasterUser = () => {
