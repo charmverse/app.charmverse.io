@@ -140,13 +140,13 @@ function CommentsSidebar({
   onDeleteComment,
   onToggleResolve,
   scrollToThreadElement,
-  canCreateComments,
+  enableComments,
   isLoading
 }: {
   threadList: ThreadWithComments[];
   threadFilter: 'resolved' | 'open' | 'all' | 'you';
   handleThreadFilterChange: SelectProps['onChange'];
-  canCreateComments: boolean;
+  enableComments: boolean;
   onToggleResolve?: (threadId: string, remove: boolean) => void;
   onDeleteComment?: (threadId: string) => void;
   scrollToThreadElement?: (threadId: string) => void;
@@ -163,7 +163,7 @@ function CommentsSidebar({
           <MenuItem value='all'>All</MenuItem>
         </Select>
       </Box>
-      <StyledSidebar className='charm-inline-comment-sidebar' sx={{ height: '100%', px: 1 }}>
+      <StyledSidebar data-test='inline-comment-sidebar' sx={{ height: '100%', px: 1 }}>
         {isLoading ? (
           <LoadingComponent />
         ) : threadList.length === 0 ? (
@@ -185,7 +185,7 @@ function CommentsSidebar({
             (resolvedThread) =>
               resolvedThread && (
                 <PageThread
-                  canCreateComments={canCreateComments}
+                  enableComments={enableComments}
                   showFindButton
                   key={resolvedThread.id}
                   threadId={resolvedThread.id}
@@ -202,12 +202,12 @@ function CommentsSidebar({
 }
 
 function EditorCommentsSidebarComponent({
-  canCreateComments,
+  enableComments,
   threads,
   openSidebar
 }: {
   threads?: CommentThreadsMap;
-  canCreateComments: boolean;
+  enableComments: boolean;
   openSidebar: (view: PageSidebarView) => void;
 }) {
   const { user } = useUser();
@@ -220,12 +220,17 @@ function EditorCommentsSidebarComponent({
       userId: user?.id
     });
   }, [threads, threadFilter, user?.id]);
-
   const handleThreadClassChange: SelectProps['onChange'] = (event) => {
     setThreadFilter(event.target.value as any);
   };
 
+  useHighlightThreadBox({
+    openSidebar,
+    setThreadFilter,
+    threads: threads ? Object.values(threads).filter(isTruthy) : []
+  });
   const { view } = useCharmEditorView();
+  const { updateThreadPluginState } = useInlineComment(view);
 
   // view.state.doc stays the same (empty content) even when the document content changes
   const extractedThreadIds =
@@ -250,18 +255,13 @@ function EditorCommentsSidebarComponent({
   const sortedThreadList = inlineThreadsIds
     .filter((inlineThreadsId) => threadListSet.has(inlineThreadsId))
     .map((filteredThreadId) => threads && threads[filteredThreadId])
-    .filter(isTruthy);
-  const { updateThreadPluginState } = useInlineComment(view);
-
-  useHighlightThreadBox({
-    openSidebar,
-    setThreadFilter,
-    threads: threads ? Object.values(threads).filter(isTruthy) : []
-  });
+    .filter(isTruthy)
+    // sort these since we convert it to a map afer the server responds
+    .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
 
   return (
     <CommentsSidebar
-      canCreateComments={canCreateComments}
+      enableComments={enableComments}
       handleThreadFilterChange={handleThreadClassChange}
       isLoading={!view || !threads}
       threadFilter={threadFilter}
@@ -289,7 +289,7 @@ function EditorCommentsSidebarComponent({
 }
 
 function FormCommentsSidebarComponent({
-  canCreateComments,
+  enableComments,
   threads,
   openSidebar,
   formFields
@@ -300,7 +300,7 @@ function FormCommentsSidebarComponent({
       })[]
     | null;
   threads?: CommentThreadsMap;
-  canCreateComments: boolean;
+  enableComments: boolean;
   openSidebar: (view: PageSidebarView) => void;
 }) {
   const { user } = useUser();
@@ -347,7 +347,7 @@ function FormCommentsSidebarComponent({
   return (
     <CommentsSidebar
       handleThreadFilterChange={handleThreadFilterChange}
-      canCreateComments={canCreateComments}
+      enableComments={enableComments}
       threadFilter={threadFilter}
       isLoading={!threads}
       threadList={threadList}
@@ -385,7 +385,7 @@ export function NoCommentsMessage({
   children?: ReactNode;
 }) {
   return (
-    <EmptyThreadContainerBox>
+    <EmptyThreadContainerBox data-test='empty-message'>
       <Center id='center'>
         {icon}
         <Typography variant='subtitle1' color='secondary'>
