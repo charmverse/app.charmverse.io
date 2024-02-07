@@ -191,13 +191,7 @@ export function FarcasterFrameNodeView({
           >
             {farcasterFrame.buttons?.map(({ label, action }, index: number) => (
               <Tooltip
-                title={
-                  !address
-                    ? 'Please connect your wallet'
-                    : !isFarcasterUserAvailable
-                    ? 'Please sign in with Farcaster'
-                    : undefined
-                }
+                title={!isFarcasterUserAvailable ? 'Please sign in with Farcaster' : undefined}
                 key={`${index.toString()}`}
               >
                 <div

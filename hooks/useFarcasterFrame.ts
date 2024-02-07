@@ -21,7 +21,7 @@ export function useFarcasterFrame(args?: { pageId: string; frameUrl: string }) {
     const button = farcasterFrame.buttons![buttonIndex - 1];
 
     const castId = {
-      fid: 1,
+      fid: farcasterUser.fid,
       hash: new Uint8Array(Buffer.from('0000000000000000000000000000000000000000', 'hex'))
     };
 
