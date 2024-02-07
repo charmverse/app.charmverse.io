@@ -54,7 +54,7 @@ jobs:
 
       - name: Save dependency and build using another cache key to do one step restore in subsequent jobs
         id: update_cache_build
-        uses: actions/cache/save@v3
+        uses: actions/cache/save@v4
         with:
           path: |
             .next
@@ -75,7 +75,7 @@ jobs:
           ref: ${{ needs.build-test-env.outputs.core_bump_commit_hash }}
       - name: Restore dependencies and build from cache
         id: update_cache_dependencies
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@v4
         with:
           path: |
             .next
@@ -105,7 +105,7 @@ jobs:
           ref: ${{ needs.build-test-env.outputs.core_bump_commit_hash }}
       - name: Restore dependencies and build from cache
         id: update_cache_dependencies
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@v4
         with:
           path: |
             .next
@@ -185,7 +185,7 @@ jobs:
 
       - name: Save dependency and build to another cache
         id: update_beanstalk_payload_cache
-        uses: actions/cache/save@v3
+        uses: actions/cache/save@v4
         with:
           path: |
             *.zip
@@ -221,7 +221,7 @@ jobs:
           ref: ${{ needs.build-test-env.outputs.core_bump_commit_hash }}
       - name: Restore beanstalk payload from cache
         id: restore_from_beanstalk_payload_cache
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@v4
         with:
           path: |
             *.zip
