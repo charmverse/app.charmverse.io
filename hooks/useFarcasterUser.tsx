@@ -6,7 +6,7 @@ import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { getAddress } from 'viem';
 import { optimism } from 'viem/chains';
-import { useAccount, useSignTypedData } from 'wagmi';
+import { useAccount, useChainId, useSignTypedData } from 'wagmi';
 
 import * as http from 'adapters/http';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
@@ -39,6 +39,7 @@ const deadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365 * 100; // 10
 
 export function FarcasterUserProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
+  const chainId = useChainId();
   const [farcasterUser, setFarcasterUser] = useLocalStorage<FarcasterUser | null>(farcasterUserLocalStorageKey, null);
   const { farcasterProfile } = useFarcasterProfile();
   const [ongoingSignerProcess, setOngoingSignerProcess] = useState(false);
@@ -116,24 +117,31 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
     }
   }, [farcasterUser, farcasterSignerModal]);
 
-  // Trick to auto trigger the signer process after the network switch
   useEffect(() => {
-    if (ongoingSignerProcess) {
-      createAndStoreSigner().finally(() => {
-        setOngoingSignerProcess(false);
-        setLoading(false);
-        farcasterSignerModal.open();
-      });
+    let timerId: NodeJS.Timeout;
+    if (ongoingSignerProcess && chainId === optimism.id) {
+      timerId = setTimeout(() => {
+        createAndStoreSigner().finally(() => {
+          setOngoingSignerProcess(false);
+          setLoading(false);
+          farcasterSignerModal.open();
+        });
+      }, 250);
     }
-  }, [ongoingSignerProcess]);
+
+    // Clean up the timer
+    return () => {
+      if (timerId) {
+        clearTimeout(timerId);
+      }
+    };
+  }, [ongoingSignerProcess, chainId]);
 
   async function startFarcasterSignerProcess() {
     setLoading(true);
     try {
       await switchActiveNetwork(optimism.id);
-      setTimeout(() => {
-        setOngoingSignerProcess(true);
-      }, 1000);
+      setOngoingSignerProcess(true);
     } catch (_) {
       //
     }
