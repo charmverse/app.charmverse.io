@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 
 import getPageLayout from 'components/common/PageLayout/getLayout';
 import type { ProposalPageAndPropertiesInput } from 'components/proposals/ProposalPage/NewProposalPage';
@@ -124,7 +125,7 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
   }
 });
 
-export default function PageView() {
+export default function PageView({ reload }: { reload?: boolean }) {
   const router = useRouter();
   const isTemplate = router.query.type === 'proposal_template';
   const selectedTemplate = router.query.template as string | undefined;
@@ -133,6 +134,12 @@ export default function PageView() {
   const proposalType = router.query.proposalType as ProposalPageAndPropertiesInput['proposalType'];
 
   const { isSpaceMember } = useIsSpaceMember();
+
+  useEffect(() => {
+    if (reload) {
+      window.location.reload();
+    }
+  }, [reload]);
 
   if (!isSpaceMember) {
     return null;
