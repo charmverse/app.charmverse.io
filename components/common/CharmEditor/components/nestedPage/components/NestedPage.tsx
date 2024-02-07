@@ -137,7 +137,7 @@ export default function NestedPage({ isLinkedPage = false, node, getPos }: NodeV
           />
         )}
       </div>
-      <StyledTypography>{pageTitle}</StyledTypography>
+      <StyledTypography>{pageTitle || ' '}</StyledTypography>
     </NestedPageContainer>
   );
 }
