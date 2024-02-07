@@ -1,8 +1,17 @@
+import styled from '@emotion/styled';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { Button, Stack, Typography } from '@mui/material';
+import { Button, Stack, Tooltip, Typography } from '@mui/material';
 
 import Avatar from 'components/common/Avatar';
 import type { FarcasterProfile } from 'hooks/useFarcasterProfile';
+
+const StyledStackContainer = styled(Stack)`
+  margin: ${({ theme }) => theme.spacing(1, 0)};
+  align-items: center;
+  cursor: pointer;
+  justify-content: space-between;
+  flex-direction: ${({ theme }) => (theme.breakpoints.up('md') ? 'row' : 'column')};
+`;
 
 export function FarcasterMiniProfile({
   logout,
@@ -12,42 +21,41 @@ export function FarcasterMiniProfile({
   farcasterProfile: FarcasterProfile;
 }) {
   return (
-    <Stack
-      my={1}
-      alignItems='center'
-      flexDirection={{
-        xs: 'column',
-        md: 'row'
-      }}
-      justifyContent='space-between'
-    >
-      <Stack
-        flexDirection={{
-          xs: 'column',
-          md: 'row'
-        }}
-        gap={1}
-        alignItems='center'
-      >
-        <Avatar avatar={farcasterProfile.body.avatarUrl} name={farcasterProfile.body.displayName} size='medium' />
+    <StyledStackContainer>
+      <Tooltip title='View profile'>
         <Stack
-          alignItems={{
-            xs: 'center',
-            md: 'flex-start'
+          sx={{
+            gap: 1,
+            flexDirection: {
+              xs: 'column',
+              md: 'row'
+            },
+            alignItems: 'center'
+          }}
+          onClick={() => {
+            window.open(`https://warpcast.com/${farcasterProfile.body.username}`);
           }}
         >
-          <Typography variant='body2' fontWeight='bold'>
-            {farcasterProfile.body.displayName}
-          </Typography>
-          <Typography variant='subtitle1' color='secondary' component='span'>
-            @{farcasterProfile.body.username}
-          </Typography>
+          <Avatar avatar={farcasterProfile.body.avatarUrl} name={farcasterProfile.body.displayName} size='medium' />
+          <Stack
+            alignItems={{
+              xs: 'center',
+              md: 'flex-start'
+            }}
+          >
+            <Typography variant='body2' fontWeight='bold'>
+              {farcasterProfile.body.displayName}
+            </Typography>
+            <Typography variant='subtitle1' color='secondary' component='span'>
+              @{farcasterProfile.body.username}
+            </Typography>
+          </Stack>
         </Stack>
-      </Stack>
+      </Tooltip>
       <Button color='secondary' variant='text' size='small' onClick={logout}>
         <LogoutIcon fontSize='small' sx={{ mr: 1 }} />
         Logout
       </Button>
-    </Stack>
+    </StyledStackContainer>
   );
 }

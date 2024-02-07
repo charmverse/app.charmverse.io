@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import CallMadeIcon from '@mui/icons-material/CallMade';
 import LinkIcon from '@mui/icons-material/Link';
-import { Alert, Paper, Stack, TextField, Tooltip, Typography, lighten } from '@mui/material';
+import { Alert, Paper, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { useCopyToClipboard } from 'usehooks-ts';
 
@@ -17,7 +17,7 @@ import { useFarcasterUser } from 'hooks/useFarcasterUser';
 import { useSnackbar } from 'hooks/useSnackbar';
 
 import BlockAligner from '../../BlockAligner';
-import { MediaSelectionPopup, MediaSelectionPopupNoButton } from '../../common/MediaSelectionPopup';
+import { MediaSelectionPopup } from '../../common/MediaSelectionPopup';
 import { MediaUrlInput } from '../../common/MediaUrlInput';
 import type { CharmNodeViewProps } from '../../nodeView/nodeView';
 
