@@ -21,7 +21,7 @@ jobs:
       matrix:
         function_name: ['webhook-queueWorker', 'webhookChecker']
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install dependencies
         uses: ./.github/actions/install
       - name: Populate env file
