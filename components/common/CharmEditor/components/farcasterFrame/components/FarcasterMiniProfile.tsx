@@ -6,11 +6,9 @@ import Avatar from 'components/common/Avatar';
 import type { FarcasterProfile } from 'hooks/useFarcasterProfile';
 
 const StyledStackContainer = styled(Stack)`
-  margin: ${({ theme }) => theme.spacing(1, 0)};
   align-items: center;
   cursor: pointer;
   justify-content: space-between;
-  flex-direction: ${({ theme }) => (theme.breakpoints.up('md') ? 'row' : 'column')};
 `;
 
 export function FarcasterMiniProfile({
@@ -21,7 +19,14 @@ export function FarcasterMiniProfile({
   farcasterProfile: FarcasterProfile;
 }) {
   return (
-    <StyledStackContainer>
+    <StyledStackContainer
+      sx={{
+        flexDirection: {
+          xs: 'column',
+          md: 'row'
+        }
+      }}
+    >
       <Tooltip title='View profile'>
         <Stack
           sx={{

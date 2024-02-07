@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import CallMadeIcon from '@mui/icons-material/CallMade';
 import LinkIcon from '@mui/icons-material/Link';
-import { Alert, Paper, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import { Alert, Box, Paper, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { useCopyToClipboard } from 'usehooks-ts';
 
@@ -268,7 +268,9 @@ export function FarcasterFrameNodeView({
         </Stack>
         {!readOnly ? (
           farcasterUser?.status === 'approved' && farcasterProfile ? (
-            <FarcasterMiniProfile logout={logout} farcasterProfile={farcasterProfile} />
+            <Box mt={1}>
+              <FarcasterMiniProfile logout={logout} farcasterProfile={farcasterProfile} />
+            </Box>
           ) : (
             <FarcasterSigner />
           )

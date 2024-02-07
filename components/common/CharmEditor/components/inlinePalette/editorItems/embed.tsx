@@ -9,7 +9,7 @@ import { EmbedIcon } from '../../iframe/components/EmbedIcon';
 import type { Embed, EmbedType } from '../../iframe/config';
 import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, embeds } from '../../iframe/config';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
-import type { EditorExecuteCommand, PaletteItemTypeNoGroup, PromisedCommand } from '../paletteItem';
+import type { PaletteItemTypeNoGroup, PromisedCommand } from '../paletteItem';
 
 const iconSize = 30;
 
@@ -97,8 +97,8 @@ export function items(): PaletteItemTypeNoGroup[] {
     iframeEmbedType('typeform'),
     {
       uid: 'farcasterFrame',
-      title: 'Farcaster Frame',
-      keywords: ['farcaster', 'frame'],
+      title: 'Frame (Farcaster)',
+      keywords: ['frame', 'farcaster'],
       icon: (
         <img
           style={{
@@ -114,7 +114,8 @@ export function items(): PaletteItemTypeNoGroup[] {
           nodeName: 'farcasterFrame',
           palettePluginKey
         });
-      }
+      },
+      priority: 1
     },
     {
       uid: 'price',

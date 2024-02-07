@@ -46,6 +46,11 @@ function getItemsAndHints(
     .filter((item) => (typeof item.hidden === 'function' ? !item.hidden(view.state) : !item.hidden))
     .filter((item) => queryMatch(item, query) && item.type === PALETTE_ITEM_REGULAR_TYPE)
     .map((item) => ({ ...item, _isItemDisabled: isItemDisabled(item) }));
+  if (query) {
+    return {
+      items: items.sort((a, b) => (b.priority || 0) - (a.priority || 0))
+    };
+  }
 
   return { items };
 }
