@@ -35,7 +35,9 @@ cron.schedule('*/30 * * * *', refreshBountyApplications);
 
 // Count blocks in all spaces
 cron.schedule('*/30 * * * *', countAllSpacesBlocksTask);
-cron.schedule('*/30 * * * *', updateSpacesMixpanelProfilesTask);
+
+// Update space mixpanel profiles once a day at 1am
+cron.schedule('0 1 * * *', updateSpacesMixpanelProfilesTask);
 
 // Sync summon space roles every day at midnight
 cron.schedule('0 0 * * *', syncSummonSpacesRoles);
