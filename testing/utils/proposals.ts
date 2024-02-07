@@ -1,16 +1,10 @@
 import type { Page, ProposalStatus } from '@charmverse/core/prisma';
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { v4 } from 'uuid';
 
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
+import type { ProposalWithUsers } from 'lib/proposal/interface';
 
 export type ProposalWithUsersAndPageMeta = ProposalWithUsers & { page: Pick<Page, 'title' | 'path'> };
-
-type ProposalReviewerInput = {
-  group: 'system_role' | 'role' | 'user';
-  id: string;
-  evaluationId?: string;
-};
 
 /**
  * Creates a proposal with the linked authors and reviewers

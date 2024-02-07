@@ -2,14 +2,12 @@ import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalReviewer } from '@charmverse/core/prisma';
 import { type FormField, type Proposal, type ProposalEvaluation } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { sortBy } from 'lodash';
 
 import { getProposalFormFields } from 'lib/proposal/form/getProposalFormFields';
 
 import { getCurrentStep } from './getCurrentStep';
-// import { getOldProposalStatus } from './getProposalEvaluationStatus';
-import type { ProposalFields, ProposalWithUsersAndRubric, ProposalWithUsersLite } from './interface';
+import type { ProposalFields, ProposalWithUsers, ProposalWithUsersAndRubric, ProposalWithUsersLite } from './interface';
 
 type FormFieldsIncludeType = {
   form: {

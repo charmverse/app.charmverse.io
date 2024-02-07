@@ -3,13 +3,15 @@ import type {
   FormField,
   Page,
   PageComment,
+  Proposal,
+  ProposalAuthor,
+  ProposalReviewer,
   ProposalEvaluation,
   ProposalEvaluationPermission,
   ProposalEvaluationResult,
   ProposalEvaluationType,
   Vote
 } from '@charmverse/core/prisma';
-import type { ProposalWithUsers as CoreProposalWithUsers } from '@charmverse/core/proposals';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import type { NewPageValues } from 'components/common/PageDialog/hooks/useNewPage';
@@ -63,8 +65,11 @@ type ProposalFormData = {
   };
 };
 
-export type ProposalWithUsers = Omit<CoreProposalWithUsers, 'fields'> & {
+export type ProposalWithUsers = Omit<Proposal, 'fields'> & {
+  authors: ProposalAuthor[];
   fields: ProposalFields | null;
+  reviewers: ProposalReviewer[];
+  rewardIds?: string[] | null;
 };
 
 export type ProposalWithUsersLite = ProposalWithUsers & {
