@@ -1,5 +1,5 @@
 import { lighten } from '@mui/material';
 
-export const farcasterBrandColor = '#855DCD';
+export const farcasterBrandColor = '#7c65c1';
 export const farcasterBrandColorLight = lighten(farcasterBrandColor, 0.9);
-export const farcasterBrandColorDark = lighten(farcasterBrandColor, 0.1);
+export const farcasterBrandColorDark = '#6944ba';

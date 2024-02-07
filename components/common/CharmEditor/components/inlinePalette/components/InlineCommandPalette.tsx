@@ -46,12 +46,13 @@ function getItemsAndHints(
     .filter((item) => (typeof item.hidden === 'function' ? !item.hidden(view.state) : !item.hidden))
     .filter((item) => queryMatch(item, query) && item.type === PALETTE_ITEM_REGULAR_TYPE)
     .map((item) => ({ ...item, _isItemDisabled: isItemDisabled(item) }));
+
   if (query) {
-    // Apply the sort only if the items are in the same group
+    // Apply the sort based on priority only if the items are in the same group and there is a search query
     return {
       items: items.sort((a, b) => {
         if (a.group === b.group) {
-          return (a.priority ?? 0) - (b.priority ?? 0);
+          return (b.priority ?? 0) - (a.priority ?? 0);
         }
         return 0;
       })

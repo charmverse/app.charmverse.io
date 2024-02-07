@@ -28,11 +28,11 @@ import { FarcasterSigner } from './FarcasterSigner';
 
 const StyledButton = styled(Button)(({ theme, disabled }) => ({
   width: '100%',
-  border: disabled ? '' : `1px solid ${farcasterBrandColor}`,
-  backgroundColor: theme.palette.mode === 'dark' ? farcasterBrandColorDark : 'transparent',
+  border: theme.palette.mode === 'dark' || disabled ? '' : `1px solid ${farcasterBrandColor}`,
+  backgroundColor: theme.palette.mode === 'dark' ? farcasterBrandColor : 'transparent',
   color: theme.palette.mode === 'dark' ? '#fff' : farcasterBrandColor,
   '&:hover': {
-    backgroundColor: theme.palette.mode === 'dark' ? farcasterBrandColor : farcasterBrandColorLight
+    backgroundColor: theme.palette.mode === 'dark' ? farcasterBrandColorDark : farcasterBrandColorLight
   },
   height: '100%'
 }));
@@ -209,7 +209,7 @@ export function FarcasterFrameNodeView({
               }}
               sx={{
                 '& fieldset': {
-                  borderColor: '#855DCD !important'
+                  borderColor: `${farcasterBrandColor} !important`
                 }
               }}
               // Prevent the typed text to replace the component
