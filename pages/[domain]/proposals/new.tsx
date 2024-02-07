@@ -9,6 +9,7 @@ import { NewProposalPage } from 'components/proposals/ProposalPage/NewProposalPa
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { withSessionSsr } from 'lib/session/withSession';
 import { customConditionJoinSpace } from 'lib/spaces/customConditionJoinSpace';
+import { getPagePath } from 'lib/utilities/domains/getPagePath';
 
 export const getServerSideProps: GetServerSideProps = withSessionSsr(async (context: GetServerSidePropsContext) => {
   const template = context.query?.template;
@@ -21,53 +22,106 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
 
   const sessionUserId = context.req.session?.user?.id;
 
-  if (sessionUserId && domainToUse && template) {
-    const space = await prisma.space.findFirst({
-      where: spaceDomainFromPath ? { domain: domainToUse } : { customDomain: domainToUse, isCustomDomainVerified: true }
-    });
+  /**
+   - Template
+    -- isLoggedIn
+    -- notLoggedIn
+    - isSpaceMember
+    - notIsMember
 
-    if (space) {
-      const redirect = {
-        redirect: {
-          destination: space.publicProposals ? `/${domainToUse}/proposals` : `/join?domain=${domainToUse}`,
-          permanent: false
-        }
-      };
+  - No Template
+    -- isLoggedIn
+    --- isSpaceMember
+   */
+  // Template
 
-      const spaceRole = await prisma.spaceRole.findFirst({
-        where: {
-          userId: sessionUserId,
-          spaceId: space.id
-        }
-      });
+  // No template
 
-      if (!spaceRole) {
-        if (!space.publicProposalTemplates) {
-          return redirect;
-        }
-
-        try {
-          await customConditionJoinSpace({
-            userId: sessionUserId,
-            spaceId: space.id,
-            params: { proposalTemplate: template as string }
-          });
-        } catch (err) {
-          log.error('User could not join space via template', {
-            template,
-            userId: sessionUserId,
-            spaceId: space.id,
-            err
-          });
-          return redirect;
-        }
+  if (!domainToUse) {
+    return {
+      redirect: {
+        destination: `/`,
+        permanent: false
       }
-    }
+    };
   }
 
-  return {
-    props: {}
-  };
+  const space = await prisma.space.findFirst({
+    where: spaceDomainFromPath ? { domain: domainToUse } : { customDomain: domainToUse, isCustomDomainVerified: true },
+    select: {
+      id: true,
+      publicProposalTemplates: true
+    }
+  });
+
+  const spaceRole =
+    sessionUserId && space
+      ? await prisma.spaceRole.findFirst({
+          where: {
+            userId: sessionUserId,
+            spaceId: space.id
+          }
+        })
+      : null;
+
+  // User is a member, early exit
+  if (spaceRole) {
+    return {
+      props: {}
+    };
+  }
+
+  // User is not a member, but space has not enabled public templates. Join via normal route
+  if (!space?.publicProposalTemplates || !template) {
+    return {
+      redirect: {
+        destination: `/join?domain=${domainToUse}`,
+        permanent: false
+      }
+    };
+  }
+
+  if (!sessionUserId) {
+    return {
+      redirect: {
+        destination: `/redirectUrl=?${getPagePath({
+          path: '/',
+          spaceDomain: domainToUse,
+          hostName: context.req.headers.host,
+          query: context.query
+        })}`,
+        permanent: false
+      }
+    };
+  }
+
+  try {
+    await customConditionJoinSpace({
+      userId: sessionUserId,
+      spaceId: space.id,
+      params: { proposalTemplate: template as string }
+    });
+
+    return {
+      props: {
+        reload: true
+      }
+    };
+  } catch (err) {
+    log.error('User could not join space via template', {
+      template,
+      userId: sessionUserId,
+      spaceId: space.id,
+      err
+    });
+
+    return {
+      redirect: {
+        destination: `/join?domain=${domainToUse}`,
+        permanent: false
+      }
+    };
+  }
 });
 
 export default function PageView() {
