@@ -1,61 +1,69 @@
-import { Stack, SvgIcon, Typography, darken } from '@mui/material';
+import styled from '@emotion/styled';
+import { Box, Stack, SvgIcon, Typography, darken } from '@mui/material';
 import { useAccount } from 'wagmi';
 
 import { OpenWalletSelectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/OpenWalletSelectorButton';
 import { Button } from 'components/common/Button';
-import LoadingComponent from 'components/common/LoadingComponent';
+import Modal from 'components/common/Modal';
 import { CanvasQRCode } from 'components/settings/account/components/otp/components/CanvasQrCode';
 import { useFarcasterUser } from 'hooks/useFarcasterUser';
-import { useSmallScreen } from 'hooks/useMediaScreens';
 import FarcasterIcon from 'public/images/logos/farcaster.svg';
+
+const StyledButton = styled(Button)`
+  background-color: #855dcd;
+  &:hover {
+    background-color: ${darken('#855DCD', 0.1)};
+  }
+  padding: ${({ theme }) => (theme.breakpoints.down('sm') ? theme.spacing(1) : theme.spacing(1.5))};
+  width: fit-content;
+  display: flex;
+  gap: ${({ theme }) => theme.spacing(1)};
+  justify-content: center;
+`;
 
 export function FarcasterSigner() {
   const { address } = useAccount();
-  const { farcasterUser, startFarcasterSignerProcess, loading: isLoadingFarcasterUser } = useFarcasterUser();
-  const isSmallScreen = useSmallScreen();
+  const {
+    farcasterSignerModal,
+    farcasterUser,
+    startFarcasterSignerProcess,
+    loading: isLoadingFarcasterUser
+  } = useFarcasterUser();
+
   if (!address) {
     return <OpenWalletSelectorButton label='Connect your wallet' />;
   } else if (farcasterUser?.status === 'pending_approval') {
     return (
-      <Stack alignItems='center' gap={2}>
-        <Typography variant='h5' fontWeight='bold'>
-          Approve in Warpcast
-        </Typography>
-        <LoadingComponent minHeight={20} size={20} />
-        {farcasterUser.signerApprovalUrl && (
-          <>
-            <Typography variant='body2'>Scan with your camera app</Typography>
-            <CanvasQRCode uri={farcasterUser.signerApprovalUrl} size={250} />
-          </>
-        )}
-      </Stack>
+      <>
+        <Stack alignItems='center' gap={2}>
+          <StyledButton onClick={farcasterSignerModal.open} loading={isLoadingFarcasterUser}>
+            <SvgIcon viewBox='0 0 20 20' fontSize='small'>
+              <FarcasterIcon />
+            </SvgIcon>
+            <Typography fontWeight={600} variant='body2'>
+              {isLoadingFarcasterUser ? 'Loading...' : 'Resume sign in with Farcaster'}
+            </Typography>
+          </StyledButton>
+        </Stack>
+        <Modal open={farcasterSignerModal.isOpen} onClose={farcasterSignerModal.close} title='Approve in Warpcast'>
+          <Typography>Please scan the QR code and approve the request in your Farcaster app</Typography>
+          <Box display='flex' justifyContent='center' my={2}>
+            {farcasterUser.signerApprovalUrl && <CanvasQRCode uri={farcasterUser.signerApprovalUrl} />}
+          </Box>
+        </Modal>
+      </>
     );
   } else if (!farcasterUser?.status) {
     return (
       <Stack gap={1} alignItems='center'>
-        <Button
-          variant={!address ? 'outlined' : 'contained'}
-          sx={{
-            p: isSmallScreen ? 1 : 1.5,
-            width: 'fit-content',
-            backgroundColor: '#855DCD',
-            '&:hover': {
-              backgroundColor: darken('#855DCD', 0.1)
-            },
-            display: 'flex',
-            gap: 1,
-            justifyContent: 'center'
-          }}
-          onClick={startFarcasterSignerProcess}
-          loading={isLoadingFarcasterUser}
-        >
+        <StyledButton onClick={startFarcasterSignerProcess} loading={isLoadingFarcasterUser}>
           <SvgIcon viewBox='0 0 20 20' fontSize='small'>
             <FarcasterIcon />
           </SvgIcon>
           <Typography fontWeight={600} variant='body2'>
             {isLoadingFarcasterUser ? 'Loading...' : 'Sign in with Farcaster'}
           </Typography>
-        </Button>
+        </StyledButton>
       </Stack>
     );
   }

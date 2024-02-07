@@ -1,5 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { SIGNED_KEY_REQUEST_TYPE, SIGNED_KEY_REQUEST_VALIDATOR_EIP_712_DOMAIN } from '@farcaster/core';
+import type { PopupState } from 'material-ui-popup-state/hooks';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { getAddress } from 'viem';
@@ -22,13 +24,15 @@ export type FarcasterUserContext = {
   loading: boolean;
   startFarcasterSignerProcess: () => Promise<void>;
   logout: () => void;
+  farcasterSignerModal: PopupState;
 };
 
 export const FarcasterUserContext = createContext<FarcasterUserContext>({
   farcasterUser: null,
   loading: false,
   startFarcasterSignerProcess: async () => {},
-  logout: () => {}
+  logout: () => {},
+  farcasterSignerModal: {} as PopupState
 });
 
 const deadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365 * 100; // 100 years
@@ -41,15 +45,19 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
   const { showMessage } = useSnackbar();
   const { address: account } = useAccount();
   const { signTypedDataAsync } = useSignTypedData();
+  const farcasterSignerModal = usePopupState({
+    variant: 'popover',
+    popupId: 'farcaster-signer'
+  });
 
   function logout() {
     setFarcasterUser(null);
   }
 
   useEffect(() => {
-    if (farcasterUser && farcasterUser.status === 'pending_approval') {
-      let intervalId: any;
+    let intervalId: any;
 
+    if (farcasterUser && farcasterUser.status === 'pending_approval' && farcasterSignerModal.isOpen) {
       const startPolling = () => {
         intervalId = setInterval(async () => {
           try {
@@ -72,6 +80,7 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
               status: 'approved' as const
             };
             setFarcasterUser(user);
+            farcasterSignerModal.close();
             clearInterval(intervalId);
           } catch (error) {
             log.error('Error polling for signer approval', {
@@ -101,8 +110,10 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
         document.removeEventListener('visibilitychange', handleVisibilityChange);
         clearInterval(intervalId);
       };
+    } else if (intervalId) {
+      clearInterval(intervalId);
     }
-  }, [farcasterUser]);
+  }, [farcasterUser, farcasterSignerModal]);
 
   // Trick to auto trigger the signer process after the network switch
   useEffect(() => {
@@ -110,6 +121,7 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
       createAndStoreSigner().finally(() => {
         setOngoingSignerProcess(false);
         setLoading(false);
+        farcasterSignerModal.open();
       });
     }
   }, [ongoingSignerProcess]);
@@ -118,7 +130,9 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     try {
       await switchActiveNetwork(optimism.id);
-      setOngoingSignerProcess(true);
+      setTimeout(() => {
+        setOngoingSignerProcess(true);
+      }, 1000);
     } catch (_) {
       //
     }
@@ -188,9 +202,10 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
       farcasterUser,
       loading,
       startFarcasterSignerProcess,
-      logout
+      logout,
+      farcasterSignerModal
     }),
-    [farcasterUser, loading]
+    [farcasterUser, loading, farcasterSignerModal]
   );
 
   return <FarcasterUserContext.Provider value={value}>{children}</FarcasterUserContext.Provider>;
