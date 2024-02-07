@@ -116,10 +116,6 @@ export const getSortedCards = createSelector(getCards, (cards) => {
 
 export const getTemplates = (state: RootState): { [key: string]: Card } => state.cards.templates;
 
-export const getSortedTemplates = createSelector(getTemplates, (templates) => {
-  return Object.values(templates).sort((a, b) => a.title.localeCompare(b.title)) as Card[];
-});
-
 export function getCard(cardId: string): (state: RootState) => Card | undefined {
   return (state: RootState): Card | undefined => {
     return state.cards.cards[cardId] || state.cards.templates[cardId];
@@ -131,19 +127,6 @@ export const getCurrentBoardCards = createSelector(
   getCards,
   (boardId: string, cards: { [key: string]: Card }) => {
     return Object.values(cards).filter((c) => c.parentId === boardId) as Card[];
-  }
-);
-
-export const getCurrentBoardTemplates = createSelector(
-  (state: RootState) => state.boards.current,
-  getTemplates,
-  (
-    boardId: string,
-    templates: {
-      [key: string]: Card;
-    }
-  ) => {
-    return Object.values(templates).filter((c) => c.parentId === boardId) as Card[];
   }
 );
 
@@ -396,5 +379,22 @@ export const makeSelectViewCardsSortedFilteredAndGrouped = () =>
         return CardFilter.applyFilterGroup(filter, board.fields.cardProperties, result);
       }
       return result;
+    }
+  );
+
+export const makeSelectBoardTemplates = () =>
+  createSelector(
+    (state: RootState, boardId: string) => {
+      const cards = getTemplates(state);
+      return {
+        cards,
+        boardId
+      };
+    },
+    ({ cards, boardId }) => {
+      if (!cards) {
+        return [];
+      }
+      return Object.values(cards).filter((c) => c.parentId === boardId) as Card[];
     }
   );
