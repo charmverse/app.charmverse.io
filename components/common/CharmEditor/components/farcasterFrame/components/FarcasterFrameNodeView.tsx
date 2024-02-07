@@ -14,6 +14,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useFarcasterFrame } from 'hooks/useFarcasterFrame';
 import { useFarcasterProfile } from 'hooks/useFarcasterProfile';
 import { useFarcasterUser } from 'hooks/useFarcasterUser';
+import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
 
 import BlockAligner from '../../BlockAligner';
@@ -58,7 +59,7 @@ export function FarcasterFrameNodeView({
   const { showMessage } = useSnackbar();
   const { farcasterProfile } = useFarcasterProfile();
   const [showEditPopup, setShowEditPopup] = useState(false);
-
+  const isSmallScreen = useSmallScreen();
   function openPopup() {
     setShowEditPopup(true);
   }
@@ -193,7 +194,10 @@ export function FarcasterFrameNodeView({
         readOnly={readOnly}
       >
         <Stack gap={1}>
-          <img src={farcasterFrame.image} width='100%' style={{ objectFit: 'cover' }} />
+          <img
+            src={farcasterFrame.image}
+            style={{ width: '100%', height: isSmallScreen ? 'fit-content' : 450, objectFit: 'cover' }}
+          />
           {farcasterFrame.inputText && (
             <TextField
               type='text'

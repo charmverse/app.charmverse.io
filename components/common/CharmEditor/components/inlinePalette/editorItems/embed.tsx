@@ -109,12 +109,11 @@ export function items(): PaletteItemTypeNoGroup[] {
         />
       ),
       description: 'Embed a Farcaster Frame',
-      editorExecuteCommand: ({ palettePluginKey }) => {
-        return handleCustomEmbed({
+      editorExecuteCommand: ({ palettePluginKey }) =>
+        handleCustomEmbed({
           nodeName: 'farcasterFrame',
           palettePluginKey
-        });
-      },
+        }),
       priority: 1
     },
     {
@@ -122,13 +121,12 @@ export function items(): PaletteItemTypeNoGroup[] {
       title: 'Crypto price',
       icon: <InsertChartIcon sx={{ fontSize: iconSize }} />,
       description: 'Display a crypto price',
-      editorExecuteCommand: ({ palettePluginKey }) => {
-        return handleCustomEmbed({
+      editorExecuteCommand: ({ palettePluginKey }) =>
+        handleCustomEmbed({
           nodeName: 'cryptoPrice',
           palettePluginKey,
           addTooltipMarker: false
-        });
-      }
+        })
     },
     {
       uid: 'nft',
@@ -136,12 +134,11 @@ export function items(): PaletteItemTypeNoGroup[] {
       keywords: ['web3', 'opensea'],
       icon: <EmbedIcon icon={RiNftLine} size='large' />,
       description: 'Embed an NFT',
-      editorExecuteCommand: ({ palettePluginKey }) => {
-        return handleCustomEmbed({
+      editorExecuteCommand: ({ palettePluginKey }) =>
+        handleCustomEmbed({
           nodeName: 'nft',
           palettePluginKey
-        });
-      }
+        })
     },
     {
       uid: 'tweet',
@@ -149,12 +146,11 @@ export function items(): PaletteItemTypeNoGroup[] {
       keywords: ['twitter', 'elon'],
       icon: <FaXTwitter style={{ fontSize: iconSize }} />,
       description: 'Embed a Tweet',
-      editorExecuteCommand: ({ palettePluginKey }) => {
-        return handleCustomEmbed({
+      editorExecuteCommand: ({ palettePluginKey }) =>
+        handleCustomEmbed({
           nodeName: 'tweet',
           palettePluginKey
-        });
-      }
+        })
     }
   ];
 }

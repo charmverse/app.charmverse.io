@@ -24,6 +24,7 @@ const StyledButton = styled(Button)`
   display: flex;
   gap: ${({ theme }) => theme.spacing(1)};
   justify-content: center;
+  white-space: normal;
 `;
 
 export function FarcasterSigner() {
