@@ -47,7 +47,8 @@ export async function getSummonProfile({
       summonApiUrl
     }));
 
-  if (!xpsEngineId) {
+  // Summon has a bug where it returns the wrong user profile when none exist
+  if (!xpsEngineId || xpsEngineId === '366899703492640833') {
     return null;
   }
 

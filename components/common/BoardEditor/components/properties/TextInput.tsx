@@ -3,6 +3,7 @@ import type { TextField } from '@mui/material';
 import { InputBase, Tooltip } from '@mui/material';
 import React, { forwardRef, useRef } from 'react';
 
+import { PopupFieldWrapper } from 'components/common/BoardEditor/components/properties/PopupFieldWrapper';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import PopperPopup from 'components/common/PopperPopup';
 
@@ -93,24 +94,22 @@ function Editable(
   }
 
   return (
-    <PopperPopup
-      style={{ width: '100%' }}
-      paperSx={{
-        width: 350,
-        p: 2,
-        height: memoizedHeight
-      }}
-      popoverProps={{
-        anchorOrigin: {
-          vertical: 'bottom',
-          horizontal: 'left'
-        },
-        transformOrigin: {
-          vertical: 'bottom',
-          horizontal: 'left'
-        }
-      }}
-      popupContent={
+    <PopupFieldWrapper
+      disabled={disablePopup || !!readOnlyMessage}
+      height={memoizedHeight}
+      paperSx={{ p: 1 }}
+      previewField={
+        <StyledInput
+          inputProps={{
+            ...inputProps,
+            className
+          }}
+          fullWidth={fullWidth}
+          {...props}
+          multiline={multiline}
+        />
+      }
+      activeField={
         <StyledInput
           inputProps={{
             ...inputProps,
@@ -124,18 +123,7 @@ function Editable(
           multiline
         />
       }
-      disablePopup={disablePopup}
-    >
-      <StyledInput
-        inputProps={{
-          ...inputProps,
-          className
-        }}
-        fullWidth={fullWidth}
-        {...props}
-        multiline={multiline}
-      />
-    </PopperPopup>
+    />
   );
 }
 

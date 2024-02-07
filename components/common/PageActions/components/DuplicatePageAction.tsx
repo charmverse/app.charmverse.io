@@ -7,10 +7,9 @@ import charmClient from 'charmClient';
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmRouter } from 'hooks/useCharmRouter';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 
-const excludedPageTypes: (PageType | undefined)[] = ['bounty_template', 'proposal_template'];
+const excludedPageTypes: (PageType | undefined)[] = ['bounty_template', 'proposal'];
 
 export function DuplicatePageAction({
   pageId,
@@ -25,16 +24,17 @@ export function DuplicatePageAction({
   onComplete?: VoidFunction;
   pagePermissions: PagePermissionFlags | undefined;
 }) {
-  const { space: currentSpace } = useCurrentSpace();
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const { navigateToSpacePath } = useCharmRouter();
   const { refreshReward } = useRewards();
-  const { refreshProposal } = useProposals();
 
   const disabled = !pagePermissions?.read || !userSpacePermissions?.createPage;
 
   async function duplicatePage() {
-    if (currentSpace) {
+    if (pageType === 'proposal_template') {
+      navigateToSpacePath(`/proposals/new`, { type: 'proposal_template', template: pageId });
+      onComplete?.();
+    } else {
       const duplicatePageResponse = await charmClient.pages.duplicatePage({
         pageId
       });
@@ -45,11 +45,9 @@ export function DuplicatePageAction({
       }
       if (pageType === 'bounty' || pageType === 'bounty_template') {
         refreshReward(duplicatePageResponse.rootPageId);
-      } else if (pageType === 'proposal') {
-        refreshProposal(duplicatePageResponse.rootPageId);
       }
-      onComplete?.();
     }
+    onComplete?.();
   }
 
   return (

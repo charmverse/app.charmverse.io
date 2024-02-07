@@ -3,7 +3,7 @@ import type { SpaceApiToken } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import type { PublicProposalApiPermissions } from 'pages/api/v1/proposals/[proposalId]/compute-permissions';
 import { generateSpaceApiKey, generateSuperApiKey } from 'testing/generators/apiKeys';
 import { baseUrl } from 'testing/mockApiCall';
@@ -20,9 +20,7 @@ let apiKey: SpaceApiToken;
 let superApiKey: SuperApiToken;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpace();
-  space = generated.space;
-  proposalAuthor = generated.user;
+  ({ space, user: proposalAuthor } = await testUtilsUser.generateUserAndSpace());
   spaceMember = await testUtilsUser.generateSpaceUser({
     spaceId: space.id
   });

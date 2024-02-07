@@ -27,6 +27,7 @@ type WorkspaceImportOptions = ImportParams & {
   oldNewRoleIdHashMap?: Record<string, string>;
   oldNewCustomProposalPropertyIdHashMap?: Record<string, string>;
   oldNewCustomRewardPropertyIdHashMap?: Record<string, string>;
+  oldNewProposalWorkflowIdHashMap?: Record<string, string>;
 };
 type UpdateRefs = {
   oldNewRecordIdHashMap: Record<string, string>;
@@ -123,7 +124,7 @@ type WorkspaceImportResult = {
   blockIds: string[];
 } & OldNewIdHashMap;
 
-export async function generateImportWorkspacePages({
+async function generateImportWorkspacePages({
   targetSpaceIdOrDomain,
   exportData,
   exportName,
@@ -132,7 +133,8 @@ export async function generateImportWorkspacePages({
   includePermissions,
   resetPaths,
   oldNewRoleIdHashMap,
-  importingToDifferentSpace
+  importingToDifferentSpace,
+  oldNewProposalWorkflowIdHashMap = {}
 }: WorkspaceImportOptions): Promise<
   {
     pageArgs: Prisma.PageCreateArgs[];
@@ -142,24 +144,23 @@ export async function generateImportWorkspacePages({
     bountyArgs: Prisma.BountyCreateManyArgs;
     bountyPermissionArgs: Prisma.BountyPermissionCreateManyArgs;
     proposalArgs: Prisma.ProposalCreateManyArgs;
-    proposalCategoryArgs: Prisma.ProposalCategoryCreateManyArgs;
-    proposalCategoryPermissionArgs: Prisma.ProposalCategoryPermissionCreateManyArgs;
+    proposalReviewerArgs: Prisma.ProposalReviewerCreateManyArgs;
+    proposalRubricCriteriaArgs: Prisma.ProposalRubricCriteriaCreateManyArgs;
+    proposalEvaluationArgs: Prisma.ProposalEvaluationCreateManyArgs;
+    proposalEvaluationPermissionArgs: Prisma.ProposalEvaluationPermissionCreateManyArgs;
   } & OldNewIdHashMap
 > {
   const isUuid = validate(targetSpaceIdOrDomain);
 
   const space = await prisma.space.findUniqueOrThrow({
-    where: isUuid ? { id: targetSpaceIdOrDomain } : { domain: targetSpaceIdOrDomain },
-    include: {
-      proposalCategories: true
-    }
+    where: isUuid ? { id: targetSpaceIdOrDomain } : { domain: targetSpaceIdOrDomain }
   });
 
-  const dataToImport = await getImportData({ exportData, exportName });
+  const { pages } = await getImportData({ exportData, exportName });
 
   const pageArgs: Prisma.PageCreateArgs[] = [];
 
-  const sourcePagesMap = (dataToImport.pages ?? []).reduce((acc, page) => {
+  const sourcePagesMap = (pages ?? []).reduce((acc, page) => {
     acc[page.id] = page;
     if (page.bountyId) {
       acc[page.bountyId] = page;
@@ -173,12 +174,15 @@ export async function generateImportWorkspacePages({
   const bountyArgs: Prisma.BountyCreateManyInput[] = [];
   const bountyPermissionArgs: Prisma.BountyPermissionCreateManyInput[] = [];
   const proposalArgs: Prisma.ProposalCreateManyInput[] = [];
-  const proposalCategoryArgs: Prisma.ProposalCategoryCreateManyInput[] = [];
-  const proposalCategoryPermissionArgs: Prisma.ProposalCategoryPermissionCreateManyInput[] = [];
+  const proposalReviewerArgs: Prisma.ProposalReviewerCreateManyInput[] = [];
+  const proposalEvaluationArgs: Prisma.ProposalEvaluationCreateManyInput[] = [];
+  const proposalRubricCriteriaArgs: Prisma.ProposalRubricCriteriaCreateManyInput[] = [];
+  const proposalEvaluationPermissionArgs: Prisma.ProposalEvaluationPermissionCreateManyInput[] = [];
 
   // 2 way hashmap to find link between new and old page ids
   const oldNewRecordIdHashMap: Record<string, string> = {};
-
+  // keep track of what has been processed
+  const processedNodes: Record<string, boolean> = {};
   /**
    * Mutates the pages, updating their ids
    */
@@ -197,9 +201,10 @@ export async function generateImportWorkspacePages({
     oldNewPermissionMap: Record<string, string>;
   }) {
     // Don't process duplicate nodes in the export
-    if (oldNewRecordIdHashMap[node.id]) {
+    if (processedNodes[node.id]) {
       return;
     }
+    processedNodes[node.id] = true;
 
     const existingNewPageId =
       node.type === 'page' || isBoardPageType(node.type) ? oldNewRecordIdHashMap[node.id] : undefined;
@@ -275,6 +280,8 @@ export async function generateImportWorkspacePages({
     const newPageContent: Prisma.PageCreateArgs = {
       data: {
         ...pageWithoutJoins,
+        // increase index by 1 for root pages so that Getting started appears first
+        index: !currentParentId ? pageWithoutJoins.index + 1 : pageWithoutJoins.index,
         title:
           parentId === rootParentId && updateTitle
             ? `${pageWithoutJoins.title || 'Untitled'} (Copy)`
@@ -446,37 +453,83 @@ export async function generateImportWorkspacePages({
       });
     } else if ((node.type === 'proposal' || node.type === 'proposal_template') && node.proposal) {
       // TODO: Handle cross space reviewers and authors
-      const { category, ...proposal } = node.proposal;
-      let categoryId: string | undefined;
-      if (category) {
-        categoryId =
-          space.proposalCategories.find((cat) => cat.title === category.title)?.id ||
-          proposalCategoryArgs.find((proposalCategoryArg) => proposalCategoryArg.title === category.title)?.id;
-        if (!categoryId) {
-          categoryId = uuid();
-          proposalCategoryArgs.push({
-            id: categoryId,
-            title: category.title,
-            color: category.color,
-            spaceId: space.id
-          });
-          proposalCategoryPermissionArgs.push({
-            permissionLevel: 'full_access',
-            proposalCategoryId: categoryId,
-            spaceId: space.id
-          });
-        }
-      }
+      const { evaluations, fields, ...proposal } = node.proposal;
+      const newProposalId = oldNewRecordIdHashMap[node.id];
       proposalArgs.push({
         ...proposal,
-        categoryId,
         reviewedBy: undefined,
         spaceId: space.id,
         createdBy: space.createdBy,
         status: 'draft',
-        id: oldNewRecordIdHashMap[node.id],
-        fields: proposal.fields || {}
+        id: newProposalId,
+        workflowId: importingToDifferentSpace
+          ? oldNewProposalWorkflowIdHashMap[proposal.workflowId!]
+          : proposal.workflowId,
+        fields: fields || {}
       });
+      proposalEvaluationArgs.push(
+        ...evaluations.map(({ id, rubricCriteria, reviewers, permissions: evaluationPermissions, ...evaluation }) => {
+          const newEvaluationId = uuid();
+
+          for (const reviewer of reviewers) {
+            if (importingToDifferentSpace && !reviewer.userId) {
+              proposalReviewerArgs.push({
+                ...reviewer,
+                id: uuid(),
+                roleId: reviewer.roleId ? oldNewRoleIdHashMap?.[reviewer.roleId] : undefined,
+                systemRole: reviewer.systemRole,
+                proposalId: newProposalId,
+                evaluationId: newEvaluationId
+              });
+            } else if (!importingToDifferentSpace) {
+              proposalReviewerArgs.push({
+                ...reviewer,
+                id: uuid(),
+                proposalId: newProposalId,
+                evaluationId: newEvaluationId
+              });
+            }
+          }
+
+          evaluationPermissions?.forEach((perm) => {
+            if (importingToDifferentSpace && !perm.userId) {
+              proposalEvaluationPermissionArgs.push({
+                evaluationId: newEvaluationId,
+                operation: perm.operation,
+                id: uuid(),
+                roleId: perm.roleId ? oldNewRoleIdHashMap?.[perm.roleId] : undefined,
+                systemRole: perm.systemRole
+              });
+            } else if (!importingToDifferentSpace) {
+              proposalEvaluationPermissionArgs.push({
+                evaluationId: newEvaluationId,
+                operation: perm.operation,
+                id: uuid(),
+                userId: perm.userId,
+                roleId: perm.roleId,
+                systemRole: perm.systemRole
+              });
+            }
+          });
+
+          proposalRubricCriteriaArgs.push(
+            ...rubricCriteria.map(({ id: _id, ...criteria }) => ({
+              ...criteria,
+              id: uuid(),
+              proposalId: newProposalId,
+              evaluationId: newEvaluationId,
+              parameters: criteria.parameters as any
+            }))
+          );
+          return {
+            ...evaluation,
+            decidedBy: importingToDifferentSpace ? undefined : evaluation.decidedBy,
+            id: newEvaluationId,
+            voteSettings: evaluation.voteSettings as any,
+            proposalId: newProposalId
+          };
+        })
+      );
       pageArgs.push(newPageContent);
     }
 
@@ -512,7 +565,7 @@ export async function generateImportWorkspacePages({
     }
   }
 
-  dataToImport.pages?.forEach((page) => {
+  pages?.forEach((page) => {
     recursivePagePrep({ node: page, newParentId: null, oldNewPermissionMap: {} });
   });
 
@@ -536,12 +589,19 @@ export async function generateImportWorkspacePages({
     proposalArgs: {
       data: proposalArgs
     },
-    proposalCategoryArgs: {
-      data: proposalCategoryArgs
+    proposalReviewerArgs: {
+      data: proposalReviewerArgs
     },
-    proposalCategoryPermissionArgs: {
-      data: proposalCategoryPermissionArgs
+    proposalRubricCriteriaArgs: {
+      data: proposalRubricCriteriaArgs
     },
+    proposalEvaluationPermissionArgs: {
+      data: proposalEvaluationPermissionArgs
+    },
+    proposalEvaluationArgs: {
+      data: proposalEvaluationArgs
+    },
+
     oldNewRecordIdHashMap
   };
 }
@@ -555,7 +615,8 @@ export async function importWorkspacePages({
   includePermissions,
   resetPaths,
   oldNewRoleIdHashMap,
-  importingToDifferentSpace
+  importingToDifferentSpace,
+  oldNewProposalWorkflowIdHashMap
 }: WorkspaceImportOptions): Promise<Omit<WorkspaceImportResult, 'bounties'>> {
   const _target = await getSpace(targetSpaceIdOrDomain);
 
@@ -566,8 +627,10 @@ export async function importWorkspacePages({
     voteArgs,
     voteOptionsArgs,
     proposalArgs,
-    proposalCategoryArgs,
-    proposalCategoryPermissionArgs,
+    proposalEvaluationArgs,
+    proposalReviewerArgs,
+    proposalRubricCriteriaArgs,
+    proposalEvaluationPermissionArgs,
     bountyPermissionArgs,
     oldNewRecordIdHashMap
   } = await generateImportWorkspacePages({
@@ -579,7 +642,8 @@ export async function importWorkspacePages({
     includePermissions,
     resetPaths,
     oldNewRoleIdHashMap,
-    importingToDifferentSpace
+    importingToDifferentSpace,
+    oldNewProposalWorkflowIdHashMap
   });
 
   const pagesToCreate = pageArgs.length;
@@ -591,9 +655,11 @@ export async function importWorkspacePages({
     prisma.block.createMany(blockArgs),
     prisma.bounty.createMany(bountyArgs),
     prisma.bountyPermission.createMany(bountyPermissionArgs),
-    prisma.proposalCategory.createMany(proposalCategoryArgs),
-    prisma.proposalCategoryPermission.createMany(proposalCategoryPermissionArgs),
     prisma.proposal.createMany(proposalArgs),
+    prisma.proposalEvaluation.createMany(proposalEvaluationArgs),
+    prisma.proposalEvaluationPermission.createMany(proposalEvaluationPermissionArgs),
+    prisma.proposalReviewer.createMany(proposalReviewerArgs),
+    prisma.proposalRubricCriteria.createMany(proposalRubricCriteriaArgs),
     ...pageArgs.map((p) => {
       totalCreatedPages += 1;
       log.debug(`Creating page ${totalCreatedPages}/${pagesToCreate}: ${p.data.type} // ${p.data.title}`);

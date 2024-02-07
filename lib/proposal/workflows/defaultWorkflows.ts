@@ -3,11 +3,15 @@ import { v4 as uuid } from 'uuid';
 
 import { getDefaultEvaluation, getDefaultFeedbackEvaluation } from './defaultEvaluation';
 
+export const defaultWorkflowTitle = 'Community Proposals';
+export const decisionMatrixWorkflowTitle = 'Decision Matrix';
+export const grantApplicationsWorkflowTitle = 'Grant Applications';
+
 export const getDefaultWorkflows: (spaceId: string) => ProposalWorkflowTyped[] = (spaceId) => [
   {
     id: uuid(),
     createdAt: new Date(),
-    title: 'Community Proposals',
+    title: defaultWorkflowTitle,
     evaluations: [
       getDefaultFeedbackEvaluation(),
       getDefaultEvaluation({
@@ -25,12 +29,11 @@ export const getDefaultWorkflows: (spaceId: string) => ProposalWorkflowTyped[] =
   {
     id: uuid(),
     createdAt: new Date(),
-    title: 'Decision Matrix',
+    title: decisionMatrixWorkflowTitle,
     evaluations: [
-      getDefaultFeedbackEvaluation(),
       getDefaultEvaluation({
-        title: 'Review',
-        type: 'pass_fail'
+        title: 'Feedback',
+        type: 'feedback'
       }),
       getDefaultEvaluation({
         title: 'Rubric evaluation',
@@ -43,9 +46,8 @@ export const getDefaultWorkflows: (spaceId: string) => ProposalWorkflowTyped[] =
   {
     id: uuid(),
     createdAt: new Date(),
-    title: 'Grant Applications',
+    title: grantApplicationsWorkflowTitle,
     evaluations: [
-      getDefaultFeedbackEvaluation(),
       getDefaultEvaluation({
         title: 'Rubric evaluation',
         type: 'rubric'

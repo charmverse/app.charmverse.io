@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-constructed-context-values */
 import { ThemeProvider } from '@mui/material/styles';
 import type { RenderOptions } from '@testing-library/react';
 import { render } from '@testing-library/react';
@@ -7,6 +8,7 @@ import { SWRConfig } from 'swr';
 import { PageSidebarContext } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { SnackbarContext } from 'hooks/useSnackbar';
 import { SpacesContext } from 'hooks/useSpaces';
+import { ThreadsContext } from 'hooks/useThreads';
 import type { IContext } from 'hooks/useUser';
 import { UserContext } from 'hooks/useUser';
 import { createThemeLightSensitive } from 'theme';
@@ -14,14 +16,13 @@ import { createThemeLightSensitive } from 'theme';
 import { createMockSpace } from './mocks/space';
 import { createMockUser } from './mocks/user';
 
-export const customRenderWithContext = (
-  ui: ReactNode,
-  { value, renderOptions }: { value?: Partial<IContext>; renderOptions?: RenderOptions }
-) => {
+export { render };
+
+export function MockDataProvider({ children, userContext }: { children: ReactNode; userContext?: Partial<IContext> }) {
   const theme = createThemeLightSensitive('light');
   const space = createMockSpace();
 
-  return render(
+  return (
     <SWRConfig
       value={{
         shouldRetryOnError(err) {
@@ -35,11 +36,10 @@ export const customRenderWithContext = (
             user: createMockUser(),
             setUser: () => {},
             updateUser: () => {},
-            setIsLoaded: () => {},
             refreshUser: async () => {},
             logoutUser: async () => {},
             isLoaded: true,
-            ...value
+            ...userContext
           }}
         >
           <SpacesContext.Provider
@@ -66,32 +66,40 @@ export const customRenderWithContext = (
                 setActions: () => {},
                 setSeverity: () => {},
                 setIsOpen: () => {},
-                setMessage: () => {}
+                setMessage: () => {},
+                showError: () => {}
               }}
             >
-              <PageSidebarContext.Provider
+              <ThreadsContext.Provider
                 value={{
-                  activeEvaluationId: null,
-                  activeView: null,
-                  setActiveView: () => {},
-                  persistedActiveView: null,
-                  openEvaluationSidebar: () => {},
-                  persistActiveView: () => {},
-                  closeSidebar: () => {}
+                  isLoading: true,
+                  threads: {},
+                  currentPageId: null,
+                  addComment: async () => {},
+                  editComment: async () => {},
+                  deleteComment: async () => {},
+                  resolveThread: async () => {},
+                  deleteThread: async () => {},
+                  refetchThreads: () => {}
                 }}
               >
-                {ui}
-              </PageSidebarContext.Provider>
+                <PageSidebarContext.Provider
+                  value={{
+                    activeView: null,
+                    setActiveView: () => {},
+                    closeSidebar: () => {}
+                  }}
+                >
+                  {children}
+                </PageSidebarContext.Provider>
+              </ThreadsContext.Provider>
             </SnackbarContext.Provider>
           </SpacesContext.Provider>
         </UserContext.Provider>
       </ThemeProvider>
-    </SWRConfig>,
-    renderOptions || {
-      hydrate: true
-    }
+    </SWRConfig>
   );
-};
+}
 
 export const renderWithTheme = (ui: ReactNode, renderOptions?: RenderOptions) => {
   const theme = createThemeLightSensitive('light');

@@ -6,8 +6,7 @@ import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import type { PagePermissionMeta } from 'lib/permissions/interfaces';
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
-import type { RewardWithUsers, RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
+import type { RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
 
 export type PageWithPermissionsMeta = Page & {
   permissions: PagePermissionMeta[];
@@ -44,13 +43,13 @@ export type PageWithContent = PageMeta &
     | 'icon'
     | 'parentId'
     | 'proposalId'
-    | 'snapshotProposalId'
     | 'spaceId'
     | 'title'
     | 'type'
     | 'updatedAt'
     | 'updatedBy'
     | 'syncWithPageId'
+    | 'sourceTemplateId'
   > & { permissionFlags: PagePermissionFlags };
 
 export type PageDetails = {

@@ -1,17 +1,12 @@
 import { MessageOutlined, RateReviewOutlined } from '@mui/icons-material';
-import { Box, IconButton, Slide, SvgIcon, Tooltip, Typography } from '@mui/material';
+import { SvgIcon } from '@mui/material';
 import { RiChatCheckLine } from 'react-icons/ri';
 
 export const SIDEBAR_VIEWS = {
   proposal_evaluation: {
     icon: <SvgIcon component={RiChatCheckLine} fontSize='small' sx={{ mb: '1px' }} />,
-    tooltip: 'View evaluation',
-    title: 'Evaluation'
-  },
-  proposal_evaluation_settings: {
-    icon: <SvgIcon component={RiChatCheckLine} fontSize='small' sx={{ mb: '1px' }} />,
-    tooltip: 'Manage reviewers, rubric, and vote options',
-    title: 'Evaluation settings'
+    tooltip: 'View evaluations',
+    title: 'Evaluations'
   },
   comments: {
     icon: <MessageOutlined fontSize='small' />,

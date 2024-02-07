@@ -16,7 +16,6 @@ inputs:
       If set core_pkg_version and commit_core_pkg_upgrade will be ignored.
       Add your branch to this variable below to install your custom branch.
     required: false
-    default:
 outputs:
   core_bump_commit_hash:
     description: |
@@ -45,7 +44,8 @@ runs:
     - name: Install npm dependencies
       shell: bash
       if: steps.restore_node_modules.outputs.cache-hit != 'true'
-      run: npm ci --no-audit --no-fund
+      # This is a temporary step while we figure out a way to ensure compatibility with lens protocol which currently needs ethers-v5
+      run: npm ci --no-audit --no-fund --force
 
     # If installing specific version of core via npmjs
     - name: Upgrade Core package to version ${{ inputs.core_pkg_version }}

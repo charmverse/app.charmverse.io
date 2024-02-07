@@ -5,7 +5,7 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
-import { List, ListItemButton, ListItemText, Switch } from '@mui/material';
+import { List, ListItemButton, ListItemIcon, ListItemText, Switch } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -15,9 +15,10 @@ import Typography from '@mui/material/Typography';
 import charmClient from 'charmClient';
 import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { Button } from 'components/common/Button';
-import { useProposalCategories } from 'components/proposals/hooks/useProposalCategories';
+import { SetAsHomePageAction } from 'components/common/PageActions/components/SetAsHomePageAction';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -34,7 +35,6 @@ import { DuplicatePageAction } from './DuplicatePageAction';
 import { ExportMarkdownAction } from './ExportMarkdownAction';
 import { ExportToPDFAction } from './ExportToPDFAction';
 import { RewardActions } from './RewardActions';
-import { PublishToSnapshot } from './SnapshotAction/PublishToSnapshot';
 import { UndoAction } from './UndoAction';
 
 export type PageActionMeta = Pick<
@@ -49,7 +49,8 @@ export type PageActionMeta = Pick<
   | 'id'
   | 'parentId'
   | 'path'
-  | 'snapshotProposalId'
+  | 'proposalId'
+  | 'syncWithPageId'
   | 'title'
   | 'type'
   | 'updatedAt'
@@ -83,12 +84,9 @@ function DeleteMenuItem({ disabled = false, onClick }: { disabled?: boolean; onC
     <Tooltip title={disabled ? "You don't have permission to delete this page" : ''}>
       <div>
         <ListItemButton data-test='header--delete-current-page' disabled={disabled} onClick={onClick}>
-          <DeleteOutlineOutlinedIcon
-            fontSize='small'
-            sx={{
-              mr: 1
-            }}
-          />
+          <ListItemIcon>
+            <DeleteOutlineOutlinedIcon fontSize='small' />
+          </ListItemIcon>
           <ListItemText primary='Delete' />
         </ListItemButton>
       </div>
@@ -103,29 +101,31 @@ type Props = {
   undoEditorChanges?: VoidFunction;
   onDelete?: VoidFunction;
   isInsideDialog?: boolean;
+  isStructuredProposal?: boolean;
 };
-
 export function DocumentPageActionList({
   isInsideDialog,
   page,
   onComplete,
   onDelete,
   pagePermissions,
-  undoEditorChanges
+  undoEditorChanges,
+  isStructuredProposal
 }: Props) {
   const pageId = page.id;
   const { navigateToSpacePath } = useCharmRouter();
   const { updatePage, deletePage } = usePages();
   const { rewards, mutateRewards: refreshRewards } = useRewards();
+  const [spacePermissions] = useCurrentSpacePermissions();
   const { showMessage } = useSnackbar();
   const { members } = useMembers();
   const { setActiveView } = usePageSidebar();
   const pageType = page.type;
   const isExportablePage = documentTypes.includes(pageType as PageType);
-  const { proposalCategoriesWithCreatePermission, getDefaultCreateCategory } = useProposalCategories();
-
-  const canCreateProposal = proposalCategoriesWithCreatePermission.length > 0;
   const basePageBounty = rewards?.find((r) => r.id === pageId);
+
+  const canCreateProposal = spacePermissions?.createProposals;
+
   function setPageProperty(prop: Partial<PageUpdates>) {
     updatePage({
       id: pageId,
@@ -173,12 +173,7 @@ export function DocumentPageActionList({
   const charmversePage = members.find((member) => member.id === page.createdBy);
 
   async function convertToProposal() {
-    const convertedProposal = await charmClient.pages.convertToProposal({
-      categoryId: getDefaultCreateCategory().id,
-      pageId
-    });
-    onComplete();
-    navigateToSpacePath(`/${convertedProposal.path}`);
+    navigateToSpacePath(`/proposals/new`, { sourcePageId: page.id });
   }
 
   return (
@@ -246,39 +241,39 @@ export function DocumentPageActionList({
         <>
           <Divider />
           <ListItemButton
+            data-test='view-comments-button'
             disabled={!pagePermissions?.comment}
             onClick={() => {
               setActiveView('comments');
               onComplete();
             }}
           >
-            <MessageOutlinedIcon
-              fontSize='small'
-              sx={{
-                mr: 1
-              }}
-            />
+            <ListItemIcon>
+              <MessageOutlinedIcon fontSize='small' />
+            </ListItemIcon>
             <ListItemText primary='View comments' />
           </ListItemButton>
-          <ListItemButton
-            onClick={() => {
-              setActiveView('suggestions');
-              onComplete();
-            }}
-          >
-            <RateReviewOutlinedIcon
-              fontSize='small'
-              sx={{
-                mr: 1
+          {!isStructuredProposal && (
+            <ListItemButton
+              onClick={() => {
+                setActiveView('suggestions');
+                onComplete();
               }}
-            />
-            <ListItemText primary='View suggestions' />
-          </ListItemButton>
+            >
+              <ListItemIcon>
+                <RateReviewOutlinedIcon fontSize='small' />
+              </ListItemIcon>
+              <ListItemText primary='View suggestions' />
+            </ListItemButton>
+          )}
         </>
       )}
       <Divider />
       {(page.type === 'card' || page.type === 'card_synced' || page.type === 'page') && (
-        <AddToFavoritesAction pageId={pageId} onComplete={onComplete} />
+        <>
+          <AddToFavoritesAction pageId={pageId} onComplete={onComplete} />
+          <SetAsHomePageAction pageId={pageId} onComplete={onComplete} />
+        </>
       )}
       {page && (
         <DuplicatePageAction
@@ -315,27 +310,13 @@ export function DocumentPageActionList({
         </>
       )}
 
-      <DeleteMenuItem onClick={onDeletePage} disabled={!pagePermissions?.delete || page.deletedAt !== null} />
-      {pageType === 'proposal' && pageId && <ArchiveProposalAction proposalId={pageId} refreshPageOnChange />}
-      {undoEditorChanges && (
-        <UndoAction
-          onClick={undoEditorChanges}
-          disabled={!pagePermissions?.edit_content}
-          // Ensure alignment of undo icon since internal structure is different
-          listItemStyle={{ mr: '-3px' }}
-        />
-      )}
-      <Divider />
-      <PublishToSnapshot
-        pageId={pageId}
-        snapshotProposalId={page.snapshotProposalId}
-        renderContent={({ label, onClick, icon }) => (
-          <ListItemButton onClick={onClick}>
-            {icon}
-            <ListItemText primary={label} />
-          </ListItemButton>
-        )}
+      <DeleteMenuItem
+        onClick={onDeletePage}
+        disabled={!pagePermissions?.delete || page.deletedAt !== null || !!page.syncWithPageId}
       />
+      {page.proposalId && <ArchiveProposalAction proposalId={page.proposalId} />}
+      {undoEditorChanges && <UndoAction onClick={undoEditorChanges} disabled={!pagePermissions?.edit_content} />}
+      <Divider />
       <ExportMarkdownAction disabled={!isExportablePage} onClick={exportMarkdownPage} />
       <ExportToPDFAction pdfTitle={page.title} onComplete={onComplete} />
       {pageType === 'bounty' && basePageBounty && (

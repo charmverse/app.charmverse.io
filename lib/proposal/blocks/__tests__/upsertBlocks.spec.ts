@@ -17,10 +17,6 @@ describe('proposal blocks - updateBlocks', () => {
       isAdmin: false
     });
 
-    const proposalCategory1 = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id
-    });
-
     const textPropertId = v4();
 
     const propertiesData = {
@@ -55,10 +51,9 @@ describe('proposal blocks - updateBlocks', () => {
     });
 
     const { page, ...proposal1 } = await testUtilsProposals.generateProposal({
-      categoryId: proposalCategory1.id,
       spaceId: space.id,
       userId: adminUser.id,
-      proposalStatus: 'discussion'
+      proposalStatus: 'published'
     });
 
     const propertiesUpdateData = {

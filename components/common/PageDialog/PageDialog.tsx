@@ -6,10 +6,10 @@ import { Box } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import { trackPageView } from 'charmClient/hooks/track';
-import DocumentPage from 'components/[pageId]/DocumentPage';
+import { DocumentPage } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { DocumentPageProviders } from 'components/[pageId]/DocumentPage/DocumentPageProviders';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
@@ -49,7 +49,7 @@ function PageDialogBase(props: Props) {
   const { editMode, resetPageProps, setPageProps } = useCharmEditor();
 
   const { updatePage } = usePages();
-  const { page, refreshPage } = usePage({ pageIdOrPath: pageId });
+  const { page } = usePage({ pageIdOrPath: pageId });
   const pagePermissions = page?.permissionFlags || new AvailablePagePermissions().full;
   const domain = router.query.domain as string;
   const fullPageUrl = page?.path
@@ -136,7 +136,6 @@ function PageDialogBase(props: Props) {
     }, 500),
     [page]
   );
-
   if (!popupState.isOpen) {
     return null;
   }
@@ -175,14 +174,7 @@ function PageDialogBase(props: Props) {
       onClose={close}
     >
       {page && contentType === 'page' && (
-        <DocumentPage
-          insideModal
-          page={page}
-          savePage={savePage}
-          refreshPage={refreshPage}
-          readOnly={readOnlyPage}
-          close={close}
-        />
+        <DocumentPage insideModal page={page} savePage={savePage} readOnly={readOnlyPage} />
       )}
       {contentType === 'application' && applicationContext && (
         <RewardApplicationPage

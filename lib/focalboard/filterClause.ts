@@ -78,6 +78,10 @@ export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
     datatype: 'date',
     conditions: DateDataTypeConditions
   },
+  relation: {
+    datatype: 'multi_select',
+    conditions: MultiSelectDataTypeConditions
+  },
   checkbox: {
     datatype: 'boolean',
     conditions: BooleanDataTypeConditions
@@ -134,13 +138,9 @@ export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
     datatype: 'text',
     conditions: TextDataTypeConditions
   },
-  proposalCategory: {
-    datatype: 'select',
-    conditions: SelectDataTypeConditions
-  },
   proposalStatus: {
-    datatype: 'select',
-    conditions: SelectDataTypeConditions
+    datatype: 'multi_select',
+    conditions: MultiSelectDataTypeConditions
   },
   proposalEvaluatedBy: {
     datatype: 'multi_select',
@@ -173,6 +173,10 @@ export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
   tokenChain: {
     datatype: 'multi_select',
     conditions: MultiSelectDataTypeConditions
+  },
+  proposalStep: {
+    datatype: 'select',
+    conditions: SelectDataTypeConditions
   }
 };
 

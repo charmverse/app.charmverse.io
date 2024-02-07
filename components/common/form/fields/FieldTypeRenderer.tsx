@@ -7,7 +7,7 @@ import type { ControlFieldProps, FieldProps, FieldType } from 'components/common
 
 import { CharmEditorInputField } from './CharmEditorInputField';
 import { DateInputField } from './DateInputField';
-import { FieldWrapper } from './FieldWrapper';
+import { LabelField } from './LabelField';
 import { PersonInputField } from './PersonInputField';
 
 type TextProps = {
@@ -34,13 +34,13 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
         return <TextInputField {...fieldProps} ref={ref} />;
       }
       case 'long_text': {
-        return <CharmEditorInputField {...fieldProps} ref={ref} />;
+        return <CharmEditorInputField {...fieldProps} />;
       }
       case 'text_multiline': {
         return <TextInputField {...fieldProps} ref={ref} multiline rows={3} />;
       }
       case 'number': {
-        return <NumberInputField {...fieldProps} ref={ref} />;
+        return <NumberInputField {...fieldProps} fullWidth ref={ref} />;
       }
 
       case 'date': {
@@ -52,30 +52,19 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
       }
 
       case 'label': {
-        return <FieldWrapper {...fieldProps} />;
+        return <LabelField {...fieldProps} />;
       }
 
+      case 'multiselect':
       case 'select': {
         return (
           <SelectField
             {...(fieldProps as SelectProps)}
-            value={fieldProps.value as string}
+            error={fieldProps.error || (options ?? []).length === 0 ? 'Atleast one option is required' : undefined}
             ref={ref}
-            options={options}
-            onCreateOption={onCreateOption}
-            onDeleteOption={onDeleteOption}
-            onUpdateOption={onUpdateOption}
-          />
-        );
-      }
-
-      case 'multiselect': {
-        return (
-          <SelectField
-            {...(fieldProps as SelectProps)}
-            ref={ref}
+            placeholder={(options ?? []).length === 0 ? 'Create an option' : fieldProps.placeholder}
             value={fieldProps.value as string[]}
-            multiselect
+            multiselect={type === 'multiselect'}
             options={options}
             onCreateOption={onCreateOption}
             onDeleteOption={onDeleteOption}

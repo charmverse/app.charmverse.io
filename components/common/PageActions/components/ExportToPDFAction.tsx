@@ -1,6 +1,6 @@
 import { useTheme } from '@emotion/react';
 import PrintIcon from '@mui/icons-material/PrintOutlined';
-import { ListItemText, ListItemButton } from '@mui/material';
+import { ListItemIcon, ListItemText, ListItemButton } from '@mui/material';
 import dynamic from 'next/dynamic';
 
 import { useCharmEditor } from 'hooks/useCharmEditor';
@@ -10,12 +10,9 @@ const ReactToPrint = dynamic(() => import('react-to-print'), { loading: PrintBut
 function PrintButton() {
   return (
     <ListItemButton dense>
-      <PrintIcon
-        fontSize='small'
-        sx={{
-          mr: 1
-        }}
-      />
+      <ListItemIcon>
+        <PrintIcon fontSize='small' />
+      </ListItemIcon>
       <ListItemText primary='Export to PDF' />
     </ListItemButton>
   );

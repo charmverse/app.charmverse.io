@@ -74,21 +74,9 @@ export function DefaultPagePermissions() {
     }
   }
 
-  async function updateSpaceRequireProposalTemplate() {
-    if (space && requireProposalTemplate !== space?.requireProposalTemplate) {
-      const updatedSpace = await charmClient.spaces.setRequireProposalTemplate({
-        requireProposalTemplate,
-        spaceId: space.id
-      });
-
-      setSpace(updatedSpace);
-    }
-  }
-
   function updateSpaceDefaults() {
     updateSpaceDefaultPagePermission();
     updateSpaceDefaultPublicPages();
-    updateSpaceRequireProposalTemplate();
     setTouched(false);
   }
 
@@ -150,29 +138,6 @@ export function DefaultPagePermissions() {
           </UpgradeWrapper>
         }
         label='Accessible to public'
-        labelPlacement='start'
-      />
-      <FormControlLabel
-        sx={{
-          margin: 0,
-          display: 'flex',
-          justifyContent: 'space-between'
-        }}
-        control={
-          <UpgradeWrapper upgradeContext='page_permissions' onClick={rolesInfoPopup.open}>
-            <Box display='flex' gap={5.5} alignItems='center'>
-              <Switch
-                disabled={!isAdmin || isFreeSpace}
-                onChange={(ev) => {
-                  setRequireProposalTemplate(ev.target.checked);
-                  setTouched(true);
-                }}
-                defaultChecked={requireProposalTemplate && !isFreeSpace}
-              />
-            </Box>
-          </UpgradeWrapper>
-        }
-        label='Require proposal template'
         labelPlacement='start'
       />
       {isAdmin && (

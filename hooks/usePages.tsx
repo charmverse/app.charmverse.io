@@ -6,6 +6,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef } fr
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { useTrashPages } from 'charmClient/hooks/pages';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { updateCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
@@ -16,7 +17,6 @@ import { isTruthy } from 'lib/utilities/types';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import { useCurrentSpace } from './useCurrentSpace';
-import { useIsCharmverseSpace } from './useIsCharmverseSpace';
 import { useUser } from './useUser';
 import { useWebSocketClient } from './useWebSocketClient';
 
@@ -56,8 +56,8 @@ export function PagesProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { user } = useUser();
   const dispatch = useAppDispatch();
-  const useProposalEvaluationPermissions = useIsCharmverseSpace();
   const { sendMessage, subscribe } = useWebSocketClient();
+  const { trigger: trashPages } = useTrashPages();
   const pagesDispatched = useRef(false);
   const {
     data,
@@ -70,7 +70,7 @@ export function PagesProvider({ children }: { children: ReactNode }) {
         return {};
       }
 
-      const pagesRes = await charmClient.pages.getPages({ spaceId: currentSpace.id, useProposalEvaluationPermissions });
+      const pagesRes = await charmClient.pages.getPages({ spaceId: currentSpace.id });
       const pagesDict: PagesContext['pages'] = {};
       pagesRes?.forEach((page) => {
         pagesDict[page.id] = page;
@@ -142,7 +142,11 @@ export function PagesProvider({ children }: { children: ReactNode }) {
           );
         }
       } else {
-        const { pageIds } = await charmClient.archivePage(page.id);
+        const result = await trashPages({ pageIds: [page.id], trash: true });
+        if (!result) {
+          return;
+        }
+        const pageIds = result.pageIds;
         let newPage: null | PageMeta = null;
         if (totalNonArchivedPages - pageIds.length === 0 && pageIds.length !== 0) {
           newPage = await charmClient.createPage(
@@ -152,22 +156,6 @@ export function PagesProvider({ children }: { children: ReactNode }) {
             })
           );
         }
-
-        // Delete the page associated with the card
-        _setPages((_pages) => {
-          pageIds.forEach((_pageId) => {
-            _pages[_pageId] = {
-              ..._pages[_pageId],
-              deletedBy: user.id,
-              deletedAt: new Date()
-            } as PageMeta;
-          });
-          // If a new page was created add that to state
-          if (newPage) {
-            _pages[newPage.id] = newPage;
-          }
-          return { ..._pages };
-        });
 
         return newPage;
       }

@@ -4,12 +4,12 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 
-import { getUnlockProtocolValidTokenGate } from './evaluateEligibility';
+import { getHypersubValidTokenGate, getUnlockProtocolValidTokenGate } from './evaluateEligibility';
 import type { TokenGateWithRoles } from './interfaces';
 
-export type TokenGateJwtResult = { jwt?: string; id: string; verified: boolean; grantedRoles: string[] };
+type TokenGateJwtResult = { jwt?: string; id: string; verified: boolean; grantedRoles: string[] };
 
-type TokenGateResult = TokenGateWithRoles & TokenGateJwtResult;
+export type TokenGateResult = TokenGateWithRoles & TokenGateJwtResult;
 
 type Props = {
   userId: string;
@@ -81,6 +81,17 @@ export async function verifyTokenGates({ spaceId, userId, tokens, walletAddress 
           }
         } else if (matchingTokenGate.type === 'unlock') {
           const valid = await getUnlockProtocolValidTokenGate(matchingTokenGate, walletAddress);
+
+          if (valid) {
+            return {
+              ...matchingTokenGate,
+              jwt: tk.signedToken,
+              verified: true,
+              grantedRoles: matchingTokenGate.tokenGateToRoles.map((tgr) => tgr.role.id)
+            };
+          }
+        } else if (matchingTokenGate.type === 'hypersub') {
+          const valid = await getHypersubValidTokenGate(matchingTokenGate, walletAddress);
 
           if (valid) {
             return {

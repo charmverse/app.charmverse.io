@@ -1,7 +1,7 @@
 import type { PageMeta } from '@charmverse/core/pages';
-import type { Page, Proposal, ProposalCategory, Space, User } from '@charmverse/core/prisma-client';
+import type { Page, Proposal, Space, User } from '@charmverse/core/prisma-client';
 import { testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
-import { arrayUtils, stringUtils } from '@charmverse/core/utilities';
+import { arrayUtils } from '@charmverse/core/utilities';
 import request from 'supertest';
 
 import { baseUrl, loginUser } from 'testing/mockApiCall';
@@ -15,13 +15,10 @@ describe('GET /api/spaces/[id]/pages - Get Pages in a space', () => {
   let normalMemberCookie: string;
   let reviewerUserCookie: string;
 
-  let proposalCategoryWithSpacePermission: ProposalCategory;
-
   let pageWithoutPermissions: Page;
   let pageWithSpacePermission: Page;
   let publicPage: Page;
 
-  let proposalVisibleInClassicModel: Proposal;
   let proposalVisibleInProposalsEvaluationPermissionsModel: Proposal;
 
   beforeAll(async () => {
@@ -52,27 +49,17 @@ describe('GET /api/spaces/[id]/pages - Get Pages in a space', () => {
       pagePermissions: [{ assignee: { group: 'public' }, permissionLevel: 'view', allowDiscovery: true }]
     });
 
-    proposalCategoryWithSpacePermission = await testUtilsProposals.generateProposalCategory({
-      spaceId: space.id,
-      proposalCategoryPermissions: [{ assignee: { group: 'space', id: space.id }, permissionLevel: 'full_access' }]
-    });
-
-    proposalVisibleInClassicModel = await testUtilsProposals.generateProposal({
-      spaceId: space.id,
-      userId: admin.id,
-      title: 'proposal visible in classic model',
-      proposalStatus: 'discussion',
-      categoryId: proposalCategoryWithSpacePermission.id
-    });
-
     proposalVisibleInProposalsEvaluationPermissionsModel = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: admin.id,
       title: 'proposal visible in evaluations model',
       proposalStatus: 'published',
-      categoryId: proposalCategoryWithSpacePermission.id,
       evaluationInputs: [
-        { evaluationType: 'vote', permissions: [], reviewers: [{ group: 'user', id: reviewerUser.id }] }
+        {
+          evaluationType: 'vote',
+          permissions: [{ operation: 'view', assignee: { group: 'space_member' } }],
+          reviewers: [{ group: 'user', id: reviewerUser.id }]
+        }
       ]
     });
   });
@@ -81,39 +68,17 @@ describe('GET /api/spaces/[id]/pages - Get Pages in a space', () => {
     const response = (
       await request(baseUrl).get(`/api/spaces/${space.id}/pages`).set('Cookie', normalMemberCookie).expect(200)
     ).body as PageMeta[];
+    const expectedPageIds = arrayUtils
+      .extractUuids([pageWithSpacePermission, proposalVisibleInProposalsEvaluationPermissionsModel, publicPage])
+      .sort();
 
-    const expectedPageIds = stringUtils.sortUuids(
-      arrayUtils.extractUuids([
-        pageWithSpacePermission,
-        publicPage,
-        proposalVisibleInClassicModel,
-        proposalVisibleInProposalsEvaluationPermissionsModel
-      ])
-    );
-    expect(stringUtils.sortUuids(arrayUtils.extractUuids(response))).toEqual(expectedPageIds);
+    expect(arrayUtils.extractUuids(response).sort()).toEqual(expectedPageIds);
   });
 
   it('should return public pages for a user outside the space and respond with status code 200', async () => {
     const response = (await request(baseUrl).get(`/api/spaces/${space.id}/pages`).expect(200)).body as PageMeta[];
 
     expect(arrayUtils.extractUuids(response)).toEqual([publicPage.id]);
-  });
-  it('should return pages a user can access based on the new proposal evaluations model and respond with status code 200', async () => {
-    const response = (
-      await request(baseUrl)
-        .get(`/api/spaces/${space.id}/pages?useProposalEvaluationPermissions=${true}`)
-        .set('Cookie', reviewerUserCookie)
-        .expect(200)
-    ).body as PageMeta[];
-
-    const expectedPageIds = stringUtils.sortUuids(
-      arrayUtils.extractUuids([
-        pageWithSpacePermission,
-        publicPage,
-        proposalVisibleInProposalsEvaluationPermissionsModel
-      ])
-    );
-    expect(stringUtils.sortUuids(arrayUtils.extractUuids(response))).toEqual(expectedPageIds);
   });
 
   // This test should be kept last as it mutates

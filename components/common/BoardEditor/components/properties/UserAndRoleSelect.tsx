@@ -1,10 +1,11 @@
 import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
-import { Alert, Autocomplete, Box, Chip, IconButton, Stack, TextField, Tooltip } from '@mui/material';
+import { Autocomplete, Box, Chip, IconButton, Stack, TextField, Tooltip } from '@mui/material';
+import type { ReactNode } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 
-import { useGetReviewerPool } from 'charmClient/hooks/proposals';
+import { PopupFieldWrapper } from 'components/common/BoardEditor/components/properties/PopupFieldWrapper';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import UserDisplay from 'components/common/UserDisplay';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
@@ -33,6 +34,8 @@ export type SelectOptionPopulated = RoleOptionPopulated | MemberOptionPopulated 
 type ContainerProps = {
   displayType?: PropertyValueDisplayType;
 };
+
+const renderDiv = (props: any & { children: ReactNode }) => <div>{props.children}</div>;
 
 const StyledAutocomplete = styled(Autocomplete<SelectOptionPopulated, true, boolean>)`
   min-width: 150px;
@@ -71,13 +74,15 @@ function SelectedOptions({
   isRequiredValue = () => false,
   readOnly,
   onRemove,
-  wrapColumn
+  wrapColumn,
+  errorValues
 }: {
   wrapColumn?: boolean;
   readOnly: boolean;
   value: SelectOptionPopulated[];
   isRequiredValue?: (option: SelectOptionPopulated) => boolean;
   onRemove: (reviewerId: string) => void;
+  errorValues?: string[];
 }) {
   return (
     <>
@@ -86,12 +91,17 @@ function SelectedOptions({
           <>
             {option.group === 'user' && (
               <Stack
+                mr={1}
+                my={0.25}
                 alignItems='center'
                 flexDirection='row'
                 key={option.id}
-                gap={0.5}
                 data-test='selected-user-or-role-option'
-                sx={wrapColumn ? { justifyContent: 'space-between', overflowX: 'hidden' } : { overflowX: 'hidden' }}
+                sx={
+                  wrapColumn
+                    ? { justifyContent: 'space-between', overflowX: 'hidden' }
+                    : { overflowX: 'hidden', minWidth: 'fit-content' }
+                }
               >
                 <UserDisplay fontSize={14} avatarSize='xSmall' userId={option.id} wrapName={wrapColumn} />
                 {!readOnly && !isRequiredValue(option) && (
@@ -110,7 +120,8 @@ function SelectedOptions({
             {option.group === 'role' && (
               <Chip
                 data-test='selected-user-or-role-option'
-                sx={{ px: 0.5, cursor: readOnly || isRequiredValue(option) ? 'text' : 'pointer' }}
+                color={errorValues?.includes?.(option.id) ? 'warning' : undefined}
+                sx={{ px: 0.5, cursor: readOnly || isRequiredValue(option) ? 'text' : 'pointer', mr: 1 }}
                 label={option.name}
                 // color={option.color}
                 key={option.id}
@@ -129,7 +140,8 @@ function SelectedOptions({
             {option.group === 'system_role' && (
               <Chip
                 data-test='selected-user-or-role-option'
-                sx={{ px: 0.5, cursor: readOnly || isRequiredValue(option) ? 'text' : 'pointer' }}
+                color={errorValues?.includes?.(option.id) ? 'warning' : undefined}
+                sx={{ px: 0.5, cursor: readOnly || isRequiredValue(option) ? 'text' : 'pointer', mr: 1 }}
                 label={option.label}
                 key={option.id}
                 icon={option.icon}
@@ -158,7 +170,6 @@ type Props<T> = {
   inputPlaceholder?: string; // placeholder for the editable input of outlined variant
   displayType?: PropertyValueDisplayType;
   onChange: (value: SelectOptionPopulated[]) => void;
-  proposalCategoryId?: string | null;
   readOnly?: boolean;
   readOnlyMessage?: string;
   showEmptyPlaceholder?: boolean;
@@ -169,12 +180,14 @@ type Props<T> = {
   'data-test'?: string;
   wrapColumn?: boolean;
   type?: 'role' | 'roleAndUser';
+  required?: boolean;
+  errorValues?: string[];
+  popupField?: boolean;
 };
 
 export function UserAndRoleSelect<T extends { id: string; group: string } = SelectOption>({
   displayType = 'details',
   onChange,
-  proposalCategoryId,
   readOnly,
   readOnlyMessage,
   inputPlaceholder,
@@ -186,14 +199,15 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
   isRequiredValue,
   'data-test': dataTest,
   wrapColumn,
-  type = 'roleAndUser'
+  type = 'roleAndUser',
+  required,
+  errorValues
 }: Props<T>): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(false);
   const { roles } = useRoles();
   const { members } = useMembers();
   const { isFreeSpace } = useIsFreeSpace();
-  // TODO: Make this component agnostic to 'reviewers' by defining the options outside of it
-  const { data: reviewerPool } = useGetReviewerPool(proposalCategoryId);
+
   const filteredMembers = members.filter((member) => !member.isBot);
   // For public spaces, we don't want to show reviewer roles
   const applicableValues = isFreeSpace
@@ -205,29 +219,9 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
     roles?.map((includedRole) => ({ ...includedRole, group: 'role' } as ListSpaceRolesResponse & { group: 'role' })) ??
     [];
 
-  // Avoid mapping through userIds all the time
-  const mappedEligibleProposalReviewers = useMemo(() => {
-    return (reviewerPool?.userIds ?? []).reduce((acc, userId) => {
-      acc[userId] = userId;
-      return acc;
-    }, {} as Record<string, string>);
-  }, [reviewerPool]);
-
   const filteredOptions = useMemo(() => {
     let _filteredOptions: SelectOptionPopulated[] = [];
-    if (proposalCategoryId && isFreeSpace) {
-      _filteredOptions = reviewerPool
-        ? mappedMembers.filter((member) => !!mappedEligibleProposalReviewers[member.id])
-        : [];
-      _filteredOptions = [..._filteredOptions, ...systemRoles];
-    } else if (proposalCategoryId && !isFreeSpace) {
-      _filteredOptions = [
-        // For proposals we only want current space members and roles that are allowed to review proposals
-        ...(reviewerPool ? mappedMembers.filter((member) => !!mappedEligibleProposalReviewers[member.id]) : []),
-        ...systemRoles,
-        ...mappedRoles.filter((role) => reviewerPool?.roleIds.includes(role.id))
-      ];
-    } else if (isFreeSpace) {
+    if (isFreeSpace) {
       // In public space, don't include custom roles
       _filteredOptions = type === 'role' ? [] : [...mappedMembers, ...systemRoles];
     } else {
@@ -241,12 +235,7 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
       }
     }
     return _filteredOptions;
-  }, [reviewerPool, systemRoles, isFreeSpace, filteredMembers, roles, proposalCategoryId, type]);
-
-  // Will only happen in the case of proposals
-  const noReviewersAvailable = Boolean(
-    proposalCategoryId && reviewerPool && reviewerPool.userIds.length === 0 && reviewerPool.roleIds.length === 0
-  );
+  }, [systemRoles, isFreeSpace, filteredMembers, roles, type]);
 
   const allOptions = useMemo(() => {
     if (isFreeSpace) {
@@ -283,36 +272,42 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
     return 'Search for a person or role...';
   }
 
-  // TODO: maybe we don't need a separate component for un-open state?
-  if (variant === 'standard' && !isOpen) {
-    return (
-      <SelectPreviewContainer
-        data-test={dataTest}
-        isHidden={isOpen}
-        displayType={displayType}
-        readOnly={readOnly}
-        onClick={onClickToEdit}
-      >
-        <Tooltip title={readOnlyMessage ?? null}>
-          <Box display='inline-flex' flexWrap='wrap' gap={0.5}>
-            {applicableValues.length === 0 ? (
-              showEmptyPlaceholder && <EmptyPlaceholder>{emptyPlaceholderContent}</EmptyPlaceholder>
-            ) : (
-              <SelectedOptions wrapColumn={wrapColumn} readOnly value={populatedValue} onRemove={removeOption} />
-            )}
-          </Box>
-        </Tooltip>
-      </SelectPreviewContainer>
-    );
-  }
+  const popupField = displayType === 'table';
 
-  return (
+  const previewField = (
+    <SelectPreviewContainer
+      data-test={dataTest}
+      isHidden={popupField ? false : isOpen}
+      displayType={displayType}
+      readOnly={readOnly}
+      onClick={onClickToEdit}
+    >
+      <Tooltip title={readOnlyMessage ?? null}>
+        <Box display='inline-flex' flexWrap={wrapColumn ? 'wrap' : 'nowrap'} gap={0.5}>
+          {applicableValues.length === 0 ? (
+            showEmptyPlaceholder && <EmptyPlaceholder>{emptyPlaceholderContent}</EmptyPlaceholder>
+          ) : (
+            <SelectedOptions
+              wrapColumn={wrapColumn}
+              readOnly
+              value={populatedValue}
+              onRemove={removeOption}
+              errorValues={errorValues}
+            />
+          )}
+        </Box>
+      </Tooltip>
+    </SelectPreviewContainer>
+  );
+
+  const activeField = (
     <Tooltip title={readOnlyMessage ?? null}>
-      <StyledUserPropertyContainer displayType='details'>
+      <StyledUserPropertyContainer displayType={displayType}>
         <StyledAutocomplete
+          PopperComponent={popupField ? renderDiv : undefined}
+          PaperComponent={popupField ? renderDiv : undefined}
           data-test={dataTest}
           autoHighlight
-          // disabled={!roles || (proposalId && !reviewerPool) || !noReviewersAvailable}
           disableClearable
           disableCloseOnSelect
           filterSelectedOptions
@@ -335,7 +330,7 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
             return `${group[0].toUpperCase() + group.slice(1)}s`;
           }}
           isOptionEqualToValue={(option, val) => option.id === val.id}
-          loading={!roles || filteredMembers.length === 0 || (!!proposalCategoryId && !reviewerPool)}
+          loading={!roles || filteredMembers.length === 0}
           multiple
           noOptionsText='No more options available'
           onChange={(e, value) => onChange(value)}
@@ -349,6 +344,8 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
               size='small'
               value={applicableValues}
               placeholder={populatedValue.length === 0 ? getPlaceholderLabel() : ''}
+              // kind of hacky but useful for proposal forms where its hard to see all required fields
+              error={required && populatedValue.length === 0}
               InputProps={{
                 ...params.InputProps,
                 ...(variant === 'standard' && { disableUnderline: true })
@@ -393,16 +390,24 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
               value={populatedValue}
               isRequiredValue={isRequiredValue}
               onRemove={removeOption}
+              errorValues={errorValues}
             />
           )}
+          disabled={!!readOnly}
           value={populatedValue}
         />
-        {noReviewersAvailable && (
-          <Alert severity='warning'>
-            No reviewers found: an admin must assign specific role(s) or all members as reviewers.
-          </Alert>
-        )}
       </StyledUserPropertyContainer>
     </Tooltip>
   );
+
+  if (displayType === 'table') {
+    return <PopupFieldWrapper disabled={readOnly} previewField={previewField} activeField={activeField} />;
+  }
+
+  // TODO: maybe we don't need a separate component for un-open state?
+  if (variant === 'standard' && !isOpen) {
+    return previewField;
+  }
+
+  return activeField;
 }

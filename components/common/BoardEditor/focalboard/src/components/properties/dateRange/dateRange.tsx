@@ -1,4 +1,4 @@
-import { Divider, Popover } from '@mui/material';
+import { Box, Divider, Popover } from '@mui/material';
 import { bindPopover, bindTrigger } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
@@ -17,11 +17,12 @@ import CheckboxOption from '../../../widgets/menu/checkboxOption';
 import 'react-day-picker/lib/style.css';
 
 type Props = {
-  className: string;
+  className?: string;
   value: string;
   showEmptyPlaceholder?: boolean;
   onChange: (value: string) => void;
   wrapColumn?: boolean;
+  centerContent?: boolean;
 };
 
 export type DateProperty = {
@@ -156,18 +157,20 @@ function DateRange(props: Props): JSX.Element {
 
   return (
     <div style={{ width: '100%' }}>
-      <div
+      <Box
+        display='flex'
+        alignItems={props.centerContent ? 'center' : 'flex-start'}
         className='octo-propertyvalue'
         data-testid='select-non-editable'
         {...bindTrigger(popupState)}
         style={{ minHeight: '20px', minWidth: '25px' }}
       >
         {displayValue || (!displayValue && !showEmptyPlaceholder) ? (
-          <span style={{ whiteSpace: props.wrapColumn ? 'break-spaces' : undefined }}>{displayValue}</span>
+          <span style={{ whiteSpace: props.wrapColumn ? 'break-spaces' : 'nowrap' }}>{displayValue}</span>
         ) : (
           <EmptyPlaceholder>Empty</EmptyPlaceholder>
         )}
-      </div>
+      </Box>
       <Popover {...bindPopover(popupState)} onClose={onClose} PaperProps={{ sx: { p: 2, fontSize: 14 } }}>
         <div className={`DateRange ${className}-overlayWrapper`}>
           <div className={`${className}-overlay`}>

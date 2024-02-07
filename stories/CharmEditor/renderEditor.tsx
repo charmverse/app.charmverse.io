@@ -4,27 +4,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 
 export function renderEditorWithContent({ content, title }: { content?: PageContent; title?: string }) {
   return (
-    <CharmEditorComponent
-      allowClickingFooter={true}
-      placeholderText='Custom placeholder... start typing / to see commands'
-      readOnly={false}
-      autoFocus={true}
-      pageId='123'
-      disablePageSpecificFeatures={false}
-      enableSuggestingMode={false}
-      enableVoting={true}
-      pageType='page'
-      pagePermissions={undefined}
-      onConnectionEvent={() => {}}
-      snapshotProposalId={null}
-      onParticipantUpdate={() => {}}
-      style={{
-        minHeight: '100px'
-      }}
-      disableNestedPages={true}
-      content={content}
-      isContentControlled={true}
-    >
+    <>
       <PageHeader
         headerImage=''
         icon=''
@@ -33,7 +13,28 @@ export function renderEditorWithContent({ content, title }: { content?: PageCont
         readOnly={false}
         setPage={() => {}}
         readOnlyTitle={false}
+        focusDocumentEditor={() => null}
       />
-    </CharmEditorComponent>
+      <CharmEditorComponent
+        allowClickingFooter={true}
+        placeholderText='Custom placeholder... start typing / to see commands'
+        readOnly={false}
+        autoFocus={true}
+        pageId='123'
+        disablePageSpecificFeatures={false}
+        enableSuggestingMode={false}
+        enableVoting={true}
+        pageType='page'
+        pagePermissions={undefined}
+        onConnectionEvent={() => {}}
+        onParticipantUpdate={() => {}}
+        style={{
+          minHeight: '100px'
+        }}
+        disableNestedPages={true}
+        content={content}
+        isContentControlled={true}
+      />
+    </>
   );
 }

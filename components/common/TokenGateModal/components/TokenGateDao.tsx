@@ -1,47 +1,38 @@
-import { yupResolver } from '@hookform/resolvers/yup';
-import { ListItemIcon, ListItemText, MenuItem } from '@mui/material';
-import { litDaoChains } from 'connectors/chains';
-import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import { builderDaoChains, litDaoChains } from 'connectors/chains';
 
+import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
-import TokenLogo from 'components/common/TokenLogo';
-import { isValidChainAddress } from 'lib/tokens/validation';
+import type { TokenGateConditions } from 'lib/tokenGates/interfaces';
 
+import type { FormValues } from '../hooks/useDaoForm';
+import { useDaoForm } from '../hooks/useDaoForm';
 import { useTokenGateModal } from '../hooks/useTokenGateModalContext';
 import { getDaoUnifiedAccessControlConditions } from '../utils/getDaoUnifiedAccessControlConditions';
+import { daoCheck } from '../utils/utils';
 
 import { TokenGateBlockchainSelect } from './TokenGateBlockchainSelect';
 import { TokenGateFooter } from './TokenGateFooter';
-
-const schema = yup.object({
-  chain: yup.string().required('Chain is required'),
-  contract: yup
-    .string()
-    .required('Contract is required')
-    .test('isAddress', 'Invalid address', (value) => isValidChainAddress(value))
-});
-
-export type FormValues = yup.InferType<typeof schema>;
 
 export function TokenGateDao() {
   const {
     register,
     getValues,
-    reset,
-    formState: { errors, isValid }
-  } = useForm<FormValues>({
-    resolver: yupResolver(schema),
-    mode: 'onChange',
-    defaultValues: { contract: '', chain: '' }
-  });
+    watch,
+    formState: { errors, isValid },
+    reset
+  } = useDaoForm();
+  const check = watch('check');
+  const chain = watch('chain');
 
-  const { setDisplayedPage, handleUnifiedAccessControlConditions } = useTokenGateModal();
+  const { setDisplayedPage, handleTokenGate } = useTokenGateModal();
 
   const onSubmit = async () => {
     const values = getValues();
     const valueProps = getDaoUnifiedAccessControlConditions(values) || [];
-    handleUnifiedAccessControlConditions(valueProps);
+    const _tokenGate: TokenGateConditions = { type: 'lit', conditions: { unifiedAccessControlConditions: valueProps } };
+    handleTokenGate(_tokenGate);
     setDisplayedPage('review');
   };
 
@@ -50,13 +41,33 @@ export function TokenGateDao() {
     reset();
   };
 
+  const chains = check === 'builder' ? builderDaoChains : litDaoChains;
+
   return (
     <>
+      <FieldWrapper label='Select a DAO Membership'>
+        <Select<FormValues['check']>
+          displayEmpty
+          fullWidth
+          renderValue={(selected) => daoCheck.find((c) => c.id === selected)?.name || selected || 'Select...'}
+          {...register('check', {
+            deps: ['chain']
+          })}
+        >
+          {daoCheck.map((type) => (
+            <MenuItem key={type.id} value={type.id}>
+              {type.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FieldWrapper>
       <TokenGateBlockchainSelect
         error={!!errors.chain?.message}
         helperMessage={errors.chain?.message}
-        chains={litDaoChains}
-        {...register('chain')}
+        chains={chains}
+        {...register('chain', {
+          deps: ['check']
+        })}
       />
       <TextInputField
         label='DAO Contract Address'

@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsUser } from '@charmverse/core/test';
+import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import { addComment } from 'lib/comments/addComment';
@@ -8,7 +8,6 @@ import { createForumPost } from 'lib/forums/posts/createForumPost';
 import { createNotificationsFromEvent } from 'lib/notifications/createNotificationsFromEvent';
 import { createPageComment } from 'lib/pages/comments/createPageComment';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
-import { updateProposalStatus } from 'lib/proposal/updateProposalStatus';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
 import { createReward } from 'lib/rewards/createReward';
@@ -29,7 +28,6 @@ import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { builders as _ } from 'testing/prosemirror/builders';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
-import { generateProposal, generateProposalCategory } from 'testing/utils/proposals';
 import { createRole } from 'testing/utils/roles';
 
 import { createDocumentNotifications } from '../createDocumentNotifications';
@@ -797,22 +795,12 @@ describe(`Test document events and notifications`, () => {
       spaceId: space.id
     });
 
-    const proposalCategory = await generateProposalCategory({
-      spaceId: space.id
-    });
-
-    const page = await generateProposal({
-      categoryId: proposalCategory.id,
+    const page = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: user.id,
       authors: [user.id],
-      reviewers: [{ group: 'user', id: user2.id }]
-    });
-
-    await updateProposalStatus({
-      newStatus: 'discussion',
-      proposalId: page.id,
-      userId: user.id
+      proposalStatus: 'published',
+      evaluationInputs: [{ evaluationType: 'rubric', permissions: [], reviewers: [{ group: 'user', id: user2.id }] }]
     });
 
     const mentionId = v4();

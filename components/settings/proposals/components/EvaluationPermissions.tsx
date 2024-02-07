@@ -1,17 +1,17 @@
-import { ProposalSystemRole, ProposalOperation } from '@charmverse/core/prisma';
+import { ProposalOperation, ProposalSystemRole, ProposalEvaluationType } from '@charmverse/core/prisma';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { Box, Card, Stack, Tooltip, Typography } from '@mui/material';
 import { capitalize } from 'lodash';
 
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
-import type {
-  SystemRoleOptionPopulated,
-  SelectOption
+import {
+  UserAndRoleSelect,
+  type SelectOption,
+  type SystemRoleOptionPopulated
 } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import { ProposalIcon, MembersIcon } from 'components/common/PageIcon';
+import { MembersIcon, ProposalIcon } from 'components/common/PageIcon';
 
-import { evaluationIcons, evaluateVerbs } from '../constants';
+import { evaluationIcons } from '../constants';
 
 import type { ContextMenuProps } from './EvaluationContextMenu';
 import { EvaluationContextMenu } from './EvaluationContextMenu';
@@ -20,6 +20,13 @@ import type { EvaluationTemplateFormItem } from './EvaluationDialog';
 type SupportedOperation = Extract<ProposalOperation, 'view' | 'comment' | 'edit' | 'move'>;
 
 export const proposalOperations: SupportedOperation[] = ['view', 'comment', 'edit', 'move'];
+
+// const evaluateVerbs = {
+//   [ProposalEvaluationType.feedback]: 'Move Forward',
+//   [ProposalEvaluationType.vote]: 'Move Forward (Vote)',
+//   [ProposalEvaluationType.rubric]: 'Move Forward (Evaluate)',
+//   [ProposalEvaluationType.pass_fail]: 'Move Forward (Review)'
+// };
 
 export const allMembersSystemRole = {
   group: 'system_role',
@@ -32,27 +39,37 @@ export const allMembersSystemRole = {
   label: 'All members'
 } as const;
 
+export const authorSystemRole = {
+  group: 'system_role',
+  icon: (
+    <Tooltip title='Author'>
+      <ProposalIcon color='secondary' fontSize='small' />
+    </Tooltip>
+  ),
+  id: ProposalSystemRole.author,
+  label: 'Author'
+} as const;
+
+const currentReviewerSystemRole = {
+  group: 'system_role',
+  icon: (
+    <Tooltip title='Reviewers selected for this evaluation'>
+      <ProposalIcon color='secondary' fontSize='small' />
+    </Tooltip>
+  ),
+  id: ProposalSystemRole.current_reviewer,
+  label: 'Reviewers (Current Step)'
+} as const;
+
+// a copy of current reviewer, with a different label for vote
+const currentVoterSystemRole = {
+  ...currentReviewerSystemRole,
+  label: 'Voters (Current Step)'
+};
+
 export const extraEvaluationRoles: SystemRoleOptionPopulated<ProposalSystemRole>[] = [
-  {
-    group: 'system_role',
-    icon: (
-      <Tooltip title='Author'>
-        <ProposalIcon color='secondary' fontSize='small' />
-      </Tooltip>
-    ),
-    id: ProposalSystemRole.author,
-    label: 'Author'
-  },
-  {
-    group: 'system_role',
-    icon: (
-      <Tooltip title='Reviewers selected for this evaluation'>
-        <ProposalIcon color='secondary' fontSize='small' />
-      </Tooltip>
-    ),
-    id: ProposalSystemRole.current_reviewer,
-    label: 'Current Reviewer'
-  },
+  authorSystemRole,
+  currentReviewerSystemRole,
   {
     group: 'system_role',
     icon: (
@@ -145,13 +162,14 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
     },
     {}
   );
+
   return (
     <>
       <Typography variant='body2'>Who can:</Typography>
 
       {proposalOperations.map((operation) => (
         <Box key={operation} className='octo-propertyrow'>
-          <PropertyLabel readOnly>{capitalize(operation)}</PropertyLabel>
+          <PropertyLabel readOnly>{operation === 'move' ? 'Move Backward' : capitalize(operation)}</PropertyLabel>
           <UserAndRoleSelect
             readOnly={readOnly}
             variant='outlined'
@@ -173,24 +191,14 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
 
       {/* show evaluation action which is uneditable */}
       <Box className='octo-propertyrow' display='flex' alignItems='center !important'>
-        <PropertyLabel readOnly>{evaluateVerbs[evaluation.type]}</PropertyLabel>
-        {evaluation.type === 'vote' ? (
-          <Typography color='secondary' variant='caption'>
-            Vote permissions are specified by Categories
-          </Typography>
-        ) : evaluation.type === 'feedback' ? (
-          <Typography color='secondary' variant='caption'>
-            There is no review step for Feedback
-          </Typography>
-        ) : (
-          <UserAndRoleSelect
-            readOnly
-            wrapColumn
-            value={[{ group: 'system_role', id: ProposalSystemRole.current_reviewer }]}
-            systemRoles={extraEvaluationRoles}
-            onChange={() => {}}
-          />
-        )}
+        <PropertyLabel readOnly>Move Forward</PropertyLabel>
+        <UserAndRoleSelect
+          readOnly
+          wrapColumn
+          value={[{ group: 'system_role', id: ProposalSystemRole.current_reviewer }]}
+          systemRoles={evaluation.type === 'vote' ? [currentVoterSystemRole] : [currentReviewerSystemRole]}
+          onChange={() => {}}
+        />
       </Box>
     </>
   );

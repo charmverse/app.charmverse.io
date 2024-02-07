@@ -1,4 +1,5 @@
-import { authSecret as _maybeAuthSecret, isTestEnv, baseUrl, cookieName } from 'config/constants';
+import type { IdentityType } from '@charmverse/core/prisma-client';
+
 import 'iron-session';
 
 declare module 'iron-session' {
@@ -9,14 +10,10 @@ declare module 'iron-session' {
     anonymousUserId?: string;
     // Used when logged is as a different user
     isRemote?: boolean;
+    // Used when not logged in and waiting for OTP to be validated
+    otpUser?: { id: string; method: IdentityType };
   }
 }
-
-if (!_maybeAuthSecret && !isTestEnv) {
-  throw new Error('The AUTH_SECRET env var is required to start server');
-}
-
-export const authSecret = _maybeAuthSecret as string;
 
 // a map of relationships we pull in for the logged-in user (try to keep this small)
 export const sessionUserRelations = {
@@ -56,9 +53,9 @@ export const sessionUserRelations = {
       id: true
     }
   },
-  unstoppableDomains: {
+  otp: {
     select: {
-      domain: true
+      activatedAt: true
     }
   },
   googleAccounts: {

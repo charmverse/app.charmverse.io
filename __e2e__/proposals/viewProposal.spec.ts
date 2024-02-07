@@ -1,4 +1,4 @@
-import type { Page, Proposal, ProposalCategory, Role, Space, User } from '@charmverse/core/prisma';
+import type { Page, Proposal, Role, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { test as base, expect } from '@playwright/test';
@@ -6,7 +6,7 @@ import { DocumentPage } from '__e2e__/po/document.po';
 import { PagePermissionsDialog } from '__e2e__/po/pagePermissions.po';
 import { ProposalsListPage } from '__e2e__/po/proposalsList.po';
 
-import { generateSpaceRole, generateUser, loginBrowserUser, logoutBrowserUser } from '../utils/mocks';
+import { generateUser, loginBrowserUser, logoutBrowserUser } from '../utils/mocks';
 
 type Fixtures = {
   proposalListPage: ProposalsListPage;
@@ -25,8 +25,6 @@ let spaceAdmin: User;
 let role: Role;
 let proposalReviewer: User;
 let proposalAuthor: User;
-let visibleProposalCategory: ProposalCategory;
-let hiddenProposalCategory: ProposalCategory;
 let draftProposal: Proposal;
 let discussionProposal: Proposal & { page: Page };
 let hiddenProposal: Proposal;
@@ -70,52 +68,35 @@ test.beforeAll(async () => {
     }
   });
 
-  hiddenProposalCategory = await testUtilsProposals.generateProposalCategory({
-    spaceId: space.id,
-    title: 'Invisible Proposals'
-  });
-
-  visibleProposalCategory = await testUtilsProposals.generateProposalCategory({
-    spaceId: space.id,
-    title: 'Proposals',
-    proposalCategoryPermissions: [
-      {
-        permissionLevel: 'full_access',
-        assignee: { group: 'space', id: space.id }
-      }
-    ]
-  });
-
   draftProposal = await testUtilsProposals.generateProposal({
     spaceId: space.id,
     userId: proposalAuthor.id,
-    proposalStatus: 'draft',
-    categoryId: visibleProposalCategory.id
+    proposalStatus: 'draft'
   });
 
   discussionProposal = await testUtilsProposals.generateProposal({
     spaceId: space.id,
     userId: proposalAuthor.id,
-    proposalStatus: 'discussion',
+    proposalStatus: 'published',
     evaluationInputs: [
       {
         evaluationType: 'feedback',
-        reviewers: [
-          { group: 'user', id: proposalReviewer.id },
-          { group: 'role', id: role.id },
-          { group: 'space_member' }
-        ],
-        permissions: []
+        reviewers: [],
+        permissions: [
+          { assignee: { group: 'space_member' }, operation: 'edit' },
+          {
+            assignee: { group: 'space_member' },
+            operation: 'view'
+          }
+        ]
       }
-    ],
-    categoryId: visibleProposalCategory.id
+    ]
   });
 
   hiddenProposal = await testUtilsProposals.generateProposal({
     spaceId: space.id,
     userId: spaceAdmin.id,
-    proposalStatus: 'discussion',
-    categoryId: hiddenProposalCategory.id
+    proposalStatus: 'published'
   });
 });
 
@@ -141,43 +122,6 @@ test.describe.serial('View proposal', () => {
     await expect(draftRow).toBeVisible();
     await expect(discussionRow).toBeVisible();
     await expect(hiddenRow).not.toBeVisible();
-
-    // Test to make sure the reviewers show up in the table
-    const discussionProposalReviewers = await proposalListPage.getProposalRowReviewersLocators(discussionProposal.id);
-
-    // 1 role reviewer + 1 user reviewer
-    expect(discussionProposalReviewers).toHaveLength(2);
-
-    for (const reviewer of discussionProposalReviewers) {
-      await expect(reviewer).toBeVisible();
-
-      const text = (await reviewer.allInnerTexts()).join('');
-
-      const showingReviewerRoleName = !!text.match(role.name);
-      const showingReviewerUserName = !!text.match(proposalReviewer.username);
-
-      expect(showingReviewerRoleName || showingReviewerUserName).toBe(true);
-    }
-  });
-
-  test('Space member can see visible proposal categories', async ({ proposalListPage, page }) => {
-    await loginBrowserUser({
-      browserPage: page,
-      userId: proposalAuthor.id
-    });
-
-    await proposalListPage.goToHomePage();
-
-    await proposalListPage.getSidebarLink('proposals').click();
-    await proposalListPage.waitForProposalsList();
-
-    await proposalListPage.openProposalCategoryList();
-
-    const visibleCategoryButton = proposalListPage.getProposalCategoryLocator(visibleProposalCategory.id);
-    const hiddenCategoryButton = proposalListPage.getProposalCategoryLocator(hiddenProposalCategory.id);
-
-    await expect(visibleCategoryButton).toBeVisible();
-    await expect(hiddenCategoryButton).not.toBeVisible();
   });
 
   test('Space member can see proposals but not drafts', async ({ proposalListPage }) => {
@@ -199,8 +143,8 @@ test.describe.serial('View proposal', () => {
     const feedbackRow = proposalListPage.getProposalRowLocator(discussionProposal.id);
     await expect(feedbackRow).toBeVisible();
 
-    const feedbackRowStatusBadge = feedbackRow.locator('data-test=proposal-status-badge');
-    await expect((await feedbackRowStatusBadge.allInnerTexts())[0]).toEqual('Feedback');
+    const feedbackRowStatusBadge = feedbackRow.filter({ hasText: 'In Progress' });
+    await expect(feedbackRowStatusBadge).toBeVisible();
   });
 
   test('Proposal can be edited by the author and made public', async ({

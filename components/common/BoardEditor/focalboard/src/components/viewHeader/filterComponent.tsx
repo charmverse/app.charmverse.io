@@ -8,6 +8,7 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { v4 } from 'uuid';
 
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useViewFilter } from 'hooks/useViewFilter';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
@@ -25,6 +26,7 @@ import FilterEntry from './filterEntry';
 type Props = {
   properties: IPropertyTemplate[];
   activeView: BoardView;
+  relationPropertiesCardsRecord: PageListItemsRecord;
 };
 
 const StyledFilterComponent = styled(Box)`
@@ -127,6 +129,7 @@ const FilterComponent = React.memo((props: Props) => {
                 conditionClicked={conditionClicked}
                 filter={filter}
                 currentFilter={currentFilter}
+                relationPropertiesCardsRecord={props.relationPropertiesCardsRecord}
               />
             </Stack>
           ))}

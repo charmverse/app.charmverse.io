@@ -20,7 +20,8 @@ beforeAll(async () => {
 
   page = await createPage({
     createdBy: user.id,
-    spaceId: space.id
+    spaceId: space.id,
+    pagePermissions: [{ permissionLevel: 'full_access', spaceId: space.id }]
   });
 
   vote = await createVote({

@@ -1,4 +1,3 @@
-import { UnauthorisedActionError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import Cookies from 'cookies';
@@ -49,14 +48,15 @@ async function createUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser
   }
 
   // Null out the anonmyous user id after successful login
-
   req.session.anonymousUserId = undefined;
+  req.session.otpUser = undefined;
   req.session.user = { id: user.id };
+  await req.session.save();
+
   await updateGuildRolesForUser(
     user.wallets.map((w) => w.address),
     user.spaceRoles
   );
-  await req.session.save();
 
   const cookies = new Cookies(req, res);
 

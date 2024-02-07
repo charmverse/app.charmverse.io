@@ -4,6 +4,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
+import { setPageUpdatedAt } from '../setPageUpdatedAt';
+
 import type { ProposalRubricCriteriaParams, ProposalRubricCriteriaWithTypedParams } from './interfaces';
 
 export type RubricDataInput<T extends ProposalRubricCriteriaType = ProposalRubricCriteriaType> = Pick<
@@ -14,15 +16,16 @@ export type RubricDataInput<T extends ProposalRubricCriteriaType = ProposalRubri
   Partial<Pick<ProposalRubricCriteria, 'description' | 'id'>>;
 export type RubricCriteriaUpsert = {
   proposalId: string;
-  evaluationId?: string | null;
+  evaluationId: string;
   rubricCriteria: RubricDataInput[];
 };
 
 export async function upsertRubricCriteria({
   proposalId,
   evaluationId,
-  rubricCriteria
-}: RubricCriteriaUpsert): Promise<ProposalRubricCriteriaWithTypedParams[]> {
+  rubricCriteria,
+  actorId
+}: RubricCriteriaUpsert & { actorId: string }): Promise<ProposalRubricCriteriaWithTypedParams[]> {
   if (!stringUtils.isUUID(proposalId)) {
     throw new InvalidInputError(`Valid proposalId is required`);
   } else if (!rubricCriteria || !Array.isArray(rubricCriteria)) {
@@ -109,6 +112,8 @@ export async function upsertRubricCriteria({
       }
     });
   });
+
+  await setPageUpdatedAt({ proposalId, userId: actorId });
 
   return updatedCriteria as ProposalRubricCriteriaWithTypedParams[];
 }

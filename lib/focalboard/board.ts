@@ -10,14 +10,14 @@ import type { Card, CardPage } from './card';
 export const proposalPropertyTypesList = [
   'proposalUrl',
   'proposalStatus',
-  'proposalCategory',
   'proposalEvaluatedBy',
   'proposalEvaluationTotal',
   'proposalEvaluationAverage',
   'proposalAuthor',
   'proposalReviewer',
   'proposalEvaluationType',
-  'proposalCreatedAt'
+  'proposalCreatedAt',
+  'proposalStep'
 ] as const;
 export type DatabaseProposalPropertyType = (typeof proposalPropertyTypesList)[number];
 
@@ -39,31 +39,24 @@ export type PropertyType =
   | 'updatedBy'
   | 'tokenAmount'
   | 'tokenChain'
+  | 'relation'
   | DatabaseProposalPropertyType;
-
-export const propertyTypesList: PropertyType[] = [
-  'text',
-  'number',
-  'email',
-  'phone',
-  'url',
-  'select',
-  'multiSelect',
-  'date',
-  'person',
-  'checkbox',
-  'createdTime',
-  'createdBy',
-  'updatedTime',
-  'updatedBy',
-  ...proposalPropertyTypesList
-];
 
 interface IPropertyOption<T = string> {
   id: T;
   value: string;
   color: string;
+  disabled?: boolean;
+  variant?: 'chip' | 'plain';
+  dropdownValue?: string; // the label to show in the dropdown, if its different from the normal value
 }
+
+export type RelationPropertyData = {
+  boardId: string;
+  limit: 'single_page' | 'multiple_page';
+  relatedPropertyId: string | null;
+  showOnRelatedBoard: boolean;
+};
 
 // A template for card properties attached to a board
 export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
@@ -72,6 +65,9 @@ export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
   type: T;
   options: IPropertyOption[];
   description?: string;
+  formFieldId?: string;
+  proposalFieldId?: string;
+  relationData?: RelationPropertyData;
 };
 
 export type DataSourceType = 'board_page' | 'google_form' | 'proposals';

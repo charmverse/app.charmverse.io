@@ -1,6 +1,6 @@
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
-import { MoreHoriz } from '@mui/icons-material';
-import { Box, IconButton, ListItemText, Menu, MenuItem } from '@mui/material';
+import { MoreHoriz, ContentCopyOutlined, DeleteOutlined, EditOutlined } from '@mui/icons-material';
+import { Box, IconButton, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
 import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
 
 export type ContextMenuProps = {
@@ -29,12 +29,21 @@ export function EvaluationContextMenu({ evaluation, onDelete, onDuplicate, onRen
     <>
       <Menu {...bindMenu(popupState)} onClick={popupState.close}>
         <MenuItem disabled={readOnly} onClick={renameEvaluation}>
+          <ListItemIcon>
+            <EditOutlined fontSize='small' />
+          </ListItemIcon>
           <ListItemText>Rename</ListItemText>
         </MenuItem>
         <MenuItem disabled={readOnly} onClick={duplicateEvaluation}>
+          <ListItemIcon>
+            <ContentCopyOutlined fontSize='small' />
+          </ListItemIcon>
           <ListItemText>Duplicate</ListItemText>
         </MenuItem>
         <MenuItem disabled={readOnly} onClick={deleteEvaluation}>
+          <ListItemIcon>
+            <DeleteOutlined fontSize='small' />
+          </ListItemIcon>
           <ListItemText>Delete</ListItemText>
         </MenuItem>
       </Menu>

@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 export function DatabaseContainer({ children }: { children: ReactNode }) {
   return (
     <div className='focalboard-body full-page'>
-      <Box className='BoardComponent'>{children}</Box>
+      <Box className='BoardComponent drag-area-container'>{children}</Box>
     </div>
   );
 }

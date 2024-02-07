@@ -1,13 +1,14 @@
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { IconButton, ListItemIcon, ListItemText, MenuItem, Typography, Stack } from '@mui/material';
+import { IconButton, ListItemIcon, ListItemText, MenuItem, Stack, Typography } from '@mui/material';
 import { useMemo } from 'react';
 
 import { Button } from 'components/common/Button';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { Constants } from 'lib/focalboard/constants';
+import { getPropertyName } from 'lib/focalboard/getPropertyName';
 
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
@@ -16,6 +17,7 @@ import { iconForPropertyType } from '../../widgets/iconForPropertyType';
 interface LayoutOptionsProps {
   properties: readonly IPropertyTemplate[];
   view: BoardView;
+  setSelectedProperty: (property: IPropertyTemplate) => void;
 }
 
 const titleProperty: IPropertyTemplate = {
@@ -30,8 +32,10 @@ function PropertyMenuItem({
   property,
   visibilityToggleDisabled,
   toggleVisibility,
-  onDrop
+  onDrop,
+  onClick
 }: {
+  onClick?: VoidFunction;
   property: IPropertyTemplate;
   isVisible: boolean;
   toggleVisibility: (propertyId: string) => void;
@@ -51,15 +55,27 @@ function PropertyMenuItem({
         backgroundColor: isOver ? 'var(--charmeditor-active)' : 'initial',
         flexDirection: 'row'
       }}
+      onClick={onClick}
     >
       <MenuItem dense className={isOver ? 'dragover' : ''} sx={{ width: '100%' }}>
         <DragIndicatorIcon color='secondary' fontSize='small' sx={{ mr: 1 }} />
         <ListItemIcon>{iconForPropertyType(property.type)}</ListItemIcon>
-        <ListItemText>{property.name}</ListItemText>
+        <ListItemText
+          sx={{
+            '& .MuiTypography-root': {
+              textOverflow: 'ellipsis',
+              overflow: 'hidden',
+              whiteSpace: 'nowrap'
+            }
+          }}
+        >
+          {getPropertyName(property)}
+        </ListItemText>
         <IconButton
           disabled={visibilityToggleDisabled}
           size='small'
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation();
             toggleVisibility(property.id);
           }}
         >
@@ -71,7 +87,7 @@ function PropertyMenuItem({
 }
 
 function PropertyOptions(props: LayoutOptionsProps) {
-  const { properties, view } = props;
+  const { properties, view, setSelectedProperty } = props;
 
   const { visiblePropertyIds } = view.fields;
   const titlePropertyIndex = visiblePropertyIds.indexOf(Constants.titleColumnId);
@@ -180,6 +196,7 @@ function PropertyOptions(props: LayoutOptionsProps) {
                 onDrop={onDrop}
                 visibilityToggleDisabled={property.id === Constants.titleColumnId}
                 isVisible
+                onClick={() => setSelectedProperty(property)}
                 property={property}
                 toggleVisibility={toggleVisibility}
                 key={property.id}
@@ -202,6 +219,7 @@ function PropertyOptions(props: LayoutOptionsProps) {
           <Stack>
             {hiddenProperties.map((property) => (
               <PropertyMenuItem
+                onClick={() => setSelectedProperty(property)}
                 onDrop={onDrop}
                 isVisible={false}
                 property={property}

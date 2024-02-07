@@ -1,9 +1,13 @@
 import { Add } from '@mui/icons-material';
 import { Typography, Box } from '@mui/material';
-import React, { useCallback } from 'react';
+import type { Dispatch, LegacyRef, ReactNode, SetStateAction } from 'react';
+import React, { forwardRef, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDrop } from 'react-dnd';
 
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
+import { SelectionContext, useAreaSelection } from 'hooks/useAreaSelection';
 import useEfficientDragLayer from 'hooks/useEffecientDragLayer';
+import useKeydownPress from 'hooks/useKeydownPress';
 import type { IPropertyOption, IPropertyTemplate, Board, BoardGroup } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
@@ -40,7 +44,27 @@ type Props = {
   expandSubRowsOnLoad?: boolean;
   rowExpansionLocalStoragePrefix?: string;
   subRowsEmptyValueContent?: React.ReactElement | string;
+  checkedIds?: string[];
+  setCheckedIds?: Dispatch<SetStateAction<string[]>>;
+  setSelectedPropertyId?: Dispatch<SetStateAction<string | null>>;
 };
+
+const TableRowsContainer = forwardRef<HTMLDivElement, { children: ReactNode }>(({ children }, ref) => {
+  return (
+    <div
+      ref={ref as LegacyRef<HTMLDivElement>}
+      className='table-row-container'
+      style={{
+        // Adding 2px margin top to show the drag and drop outline, otherwise the table header blocks it,
+        // it can also be achieved via position: relative, zIndex: 1
+        // but it changes the position from sticky which might have unknown side-effects
+        marginTop: 2
+      }}
+    >
+      {children}
+    </div>
+  );
+});
 
 function Table(props: Props): JSX.Element {
   const {
@@ -54,10 +78,35 @@ function Table(props: Props): JSX.Element {
     readOnly,
     readOnlyRows,
     rowExpansionLocalStoragePrefix,
-    subRowsEmptyValueContent
+    subRowsEmptyValueContent,
+    setCheckedIds,
+    checkedIds,
+    setSelectedPropertyId
   } = props;
   const isManualSort = activeView.fields.sortOptions?.length === 0;
   const dispatch = useAppDispatch();
+  const selectContainerRef = useRef<HTMLDivElement | null>(null);
+  const tableContainerRef = useRef<HTMLDivElement | null>(null);
+  const areaSelection = useAreaSelection({ readOnly, innerContainer: tableContainerRef });
+  const { resetState } = areaSelection;
+
+  useEffect(() => {
+    if (!tableContainerRef.current) {
+      tableContainerRef.current = document.querySelector('.drag-area-container');
+    }
+  }, []);
+
+  useKeydownPress(
+    () => {
+      setCheckedIds?.([]);
+      resetState();
+    },
+    {
+      ctrl: false,
+      key: 'Escape',
+      shift: false
+    }
+  );
 
   const { offset, resizingColumn } = useEfficientDragLayer((monitor) => {
     if (monitor.getItemType() === 'horizontalGrip') {
@@ -220,6 +269,7 @@ function Table(props: Props): JSX.Element {
     (srcCard: Card, dstCard: Card) => {
       Utils.log(`onDropToCard: ${dstCard.title}`);
       onDropToGroup(srcCard, dstCard.fields.properties[activeView.fields.groupById!] as string, dstCard.id);
+      resetState();
     },
     [activeView]
   );
@@ -230,6 +280,8 @@ function Table(props: Props): JSX.Element {
     },
     [board, groupByProperty]
   );
+
+  const selectionContextValue = useMemo(() => areaSelection, [areaSelection]);
 
   return (
     <div className='Table' ref={drop}>
@@ -243,62 +295,71 @@ function Table(props: Props): JSX.Element {
           resizingColumn={resizingColumn}
           columnRefs={columnRefs}
           readOnly={props.readOnly}
+          checkedIds={checkedIds}
+          setCheckedIds={setCheckedIds}
+          setSelectedPropertyId={setSelectedPropertyId}
         />
 
         {/* Table rows */}
-        <div className='table-row-container'>
-          {activeView.fields.groupById &&
-            visibleGroups.map((group) => {
-              return (
-                <TableGroup
-                  key={group.option.id}
-                  board={board}
-                  activeView={activeView}
-                  groupByProperty={groupByProperty}
-                  group={group}
-                  readOnly={props.readOnly}
-                  columnRefs={columnRefs}
-                  selectedCardIds={props.selectedCardIds}
-                  cardIdToFocusOnRender={props.cardIdToFocusOnRender}
-                  hideGroup={hideGroup}
-                  addCard={props.addCard}
-                  showCard={props.showCard}
-                  propertyNameChanged={propertyNameChanged}
-                  onCardClicked={props.onCardClicked}
-                  onDropToGroupHeader={onDropToGroupHeader}
-                  onDropToCard={onDropToCard}
-                  onDropToGroup={onDropToGroup}
-                  readOnlyTitle={props.readOnlyTitle}
-                  disableAddingCards={props.disableAddingCards}
-                  subRowsEmptyValueContent={subRowsEmptyValueContent}
-                />
-              );
-            })}
+        <SelectionContext.Provider value={selectionContextValue}>
+          <TableRowsContainer ref={selectContainerRef}>
+            {activeView.fields.groupById &&
+              visibleGroups.map((group) => {
+                return (
+                  <TableGroup
+                    key={group.option.id}
+                    board={board}
+                    activeView={activeView}
+                    groupByProperty={groupByProperty}
+                    group={group}
+                    readOnly={props.readOnly}
+                    columnRefs={columnRefs}
+                    selectedCardIds={props.selectedCardIds}
+                    cardIdToFocusOnRender={props.cardIdToFocusOnRender}
+                    hideGroup={hideGroup}
+                    addCard={props.addCard}
+                    showCard={props.showCard}
+                    propertyNameChanged={propertyNameChanged}
+                    onCardClicked={props.onCardClicked}
+                    onDropToGroupHeader={onDropToGroupHeader}
+                    onDropToCard={onDropToCard}
+                    onDropToGroup={onDropToGroup}
+                    readOnlyTitle={props.readOnlyTitle}
+                    disableAddingCards={props.disableAddingCards}
+                    subRowsEmptyValueContent={subRowsEmptyValueContent}
+                    checkedIds={checkedIds}
+                    setCheckedIds={setCheckedIds}
+                  />
+                );
+              })}
 
-          {/* No Grouping, Rows, one per card */}
-          {!activeView.fields.groupById && (
-            <TableRows
-              board={board}
-              activeView={activeView}
-              columnRefs={columnRefs}
-              cardPages={cardPages}
-              selectedCardIds={props.selectedCardIds}
-              readOnly={readOnly || !!readOnlyRows}
-              cardIdToFocusOnRender={props.cardIdToFocusOnRender}
-              offset={offset}
-              resizingColumn={resizingColumn}
-              showCard={props.showCard}
-              addCard={props.addCard}
-              onCardClicked={props.onCardClicked}
-              onDrop={onDropToCard}
-              onDeleteCard={props.onDeleteCard}
-              readOnlyTitle={props.readOnlyTitle}
-              expandSubRowsOnLoad={expandSubRowsOnLoad}
-              rowExpansionLocalStoragePrefix={rowExpansionLocalStoragePrefix}
-              subRowsEmptyValueContent={subRowsEmptyValueContent}
-            />
-          )}
-        </div>
+            {/* No Grouping, Rows, one per card */}
+            {!activeView.fields.groupById && (
+              <TableRows
+                board={board}
+                activeView={activeView}
+                columnRefs={columnRefs}
+                cardPages={cardPages}
+                selectedCardIds={props.selectedCardIds}
+                readOnly={readOnly || !!readOnlyRows}
+                cardIdToFocusOnRender={props.cardIdToFocusOnRender}
+                offset={offset}
+                resizingColumn={resizingColumn}
+                showCard={props.showCard}
+                addCard={props.addCard}
+                onCardClicked={props.onCardClicked}
+                onDrop={onDropToCard}
+                onDeleteCard={props.onDeleteCard}
+                readOnlyTitle={props.readOnlyTitle}
+                expandSubRowsOnLoad={expandSubRowsOnLoad}
+                rowExpansionLocalStoragePrefix={rowExpansionLocalStoragePrefix}
+                subRowsEmptyValueContent={subRowsEmptyValueContent}
+                checkedIds={checkedIds}
+                setCheckedIds={setCheckedIds}
+              />
+            )}
+          </TableRowsContainer>
+        </SelectionContext.Provider>
 
         {/* Add New row */}
         <div className='octo-table-footer'>

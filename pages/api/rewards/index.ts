@@ -7,8 +7,8 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { logUserFirstBountyEvents, logWorkspaceFirstBountyEvents } from 'lib/metrics/postToDiscord';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
-import { permissionsApiClient } from 'lib/permissions/api/routers';
 import { upsertDefaultRewardsBoard } from 'lib/rewards/blocks/upsertDefaultRewardsBoard';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import { createReward } from 'lib/rewards/createReward';
@@ -21,24 +21,7 @@ import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .get(
-    providePermissionClients({
-      key: 'spaceId',
-      location: 'query',
-      resourceIdType: 'space'
-    }),
-    getRewards
-  )
-  .use(requireUser)
-  .post(
-    providePermissionClients({
-      key: 'spaceId',
-      location: 'body',
-      resourceIdType: 'space'
-    }),
-    createRewardController
-  );
+handler.get(getRewards).use(requireUser).post(createRewardController);
 
 async function getRewards(req: NextApiRequest, res: NextApiResponse<RewardWithUsers[]>) {
   const spaceId = req.query.spaceId as string;
@@ -94,7 +77,7 @@ async function createRewardController(req: NextApiRequest, res: NextApiResponse<
 
   const { id: userId } = req.session.user;
 
-  const userPermissions = await req.basePermissionsClient.spaces.computeSpacePermissions({
+  const userPermissions = await permissionsApiClient.spaces.computeSpacePermissions({
     resourceId: spaceId as string,
     userId
   });

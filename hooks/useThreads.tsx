@@ -1,12 +1,9 @@
-import type { Dispatch, ReactNode, SetStateAction } from 'react';
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import type { KeyedMutator } from 'swr';
+import type { ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useCurrentPage } from 'hooks/useCurrentPage';
-import { useMembers } from 'hooks/useMembers';
-import type { Member } from 'lib/members/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
@@ -24,25 +21,14 @@ type IContext = {
   deleteComment: (threadId: string, commentId: string) => Promise<void>;
   resolveThread: (threadId: string) => Promise<void>;
   deleteThread: (threadId: string) => Promise<void>;
-  refetchThreads: KeyedMutator<ThreadWithComments[]>;
+  refetchThreads: VoidFunction;
 };
 
 export function getThreadsKey(pageId: string) {
   return `pages/${pageId}/threads`;
 }
 
-export const ThreadsContext = createContext<Readonly<IContext>>({
-  isLoading: true,
-  currentPageId: null,
-  threads: {},
-  // setThreads: () => undefined,
-  addComment: () => undefined as any,
-  editComment: () => undefined as any,
-  deleteComment: () => undefined as any,
-  resolveThread: () => undefined as any,
-  deleteThread: () => undefined as any,
-  refetchThreads: undefined as any
-});
+export const ThreadsContext = createContext<Readonly<IContext> | null>(null);
 
 export type CommentThreadsMap = Record<string, ThreadWithComments | undefined>;
 
@@ -51,7 +37,7 @@ export function ThreadsProvider({ children }: { children: ReactNode }) {
   const { subscribe } = useWebSocketClient();
   const { spaceRole } = useCurrentSpace();
 
-  const { data, isValidating, mutate } = useSWR(
+  const { data, isLoading, mutate } = useSWR(
     () => (currentPageId ? getThreadsKey(currentPageId) : null),
     () => charmClient.comments.getThreads(currentPageId),
     { revalidateOnFocus: false }
@@ -139,14 +125,20 @@ export function ThreadsProvider({ children }: { children: ReactNode }) {
       resolveThread,
       deleteThread,
       currentPageId,
-      isLoading: isValidating,
+      isLoading,
       refetchThreads: mutate
     }),
     // we only update the result when threads changes, because it is set after everything else inside a useEffect() hook
-    [data, isValidating]
+    [data, isLoading]
   );
 
   return <ThreadsContext.Provider value={value}>{children}</ThreadsContext.Provider>;
 }
 
-export const useThreads = () => useContext(ThreadsContext);
+export const useThreads = () => {
+  const context = useContext(ThreadsContext);
+  if (!context) {
+    throw new Error('useThreads must be used within a ThreadsProvider');
+  }
+  return context;
+};

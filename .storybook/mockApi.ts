@@ -1,4 +1,4 @@
-import type { ProposalPermissionFlags, ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
+import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import { rest } from 'msw';
 import type { BlockCountInfo } from 'lib/spaces/getSpaceBlockCount';
 import { getDefaultWorkflows } from 'lib/proposal/workflows/defaultWorkflows';
@@ -8,7 +8,6 @@ import {
   spaces,
   members,
   spaceRoles,
-  proposalCategories,
   proposalTemplates,
   userProfile,
   userMemberProfile
@@ -65,9 +64,6 @@ const pageHandlers = {
 };
 
 const proposalHandlers = {
-  proposalCategories: rest.get(`/api/spaces/:spaceId/proposal-categories`, (req, res, ctx) => {
-    return res(ctx.json(proposalCategories));
-  }),
   proposalTemplates: rest.get(`/api/spaces/:spaceId/proposal-templates`, (req, res, ctx) => {
     return res(ctx.json(proposalTemplates));
   }),
@@ -86,22 +82,6 @@ const proposalHandlers = {
   }),
   reviewerIds: rest.get(`/api/proposals/:pageId/get-user-reviewerids`, (req, res, ctx) => {
     return res(ctx.json([]));
-  }),
-  proposalPermissions: rest.post(`/api/permissions/proposals/compute-proposal-permissions`, (req, res, ctx) => {
-    const permissions: ProposalPermissionFlags = {
-      edit: true,
-      view: true,
-      delete: true,
-      create_vote: true,
-      vote: true,
-      comment: true,
-      review: true,
-      evaluate: true,
-      make_public: true,
-      archive: true,
-      unarchive: true
-    };
-    return res(ctx.json(permissions));
   })
 };
 

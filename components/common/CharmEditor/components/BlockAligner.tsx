@@ -55,7 +55,7 @@ const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props, ref) 
   }
 
   return (
-    <StyledBlockAligner onDragStart={onDragStart}>
+    <StyledBlockAligner onDragStart={onDragStart} ref={ref}>
       {children}
       {!readOnly && (
         <Controls className='controls'>

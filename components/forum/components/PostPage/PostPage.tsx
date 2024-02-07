@@ -12,6 +12,7 @@ import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import { handleImageFileDrop } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
+import { focusEventName } from 'components/common/CharmEditor/constants';
 import { Comment } from 'components/common/comments/Comment';
 import type { CommentSortType } from 'components/common/comments/CommentSort';
 import { CommentSort } from 'components/common/comments/CommentSort';
@@ -192,7 +193,7 @@ export function PostPage({
         isDraft: false
       });
       setIsPublishingDraftPost(false);
-      navigateToSpacePath(`/[domain]/forum/post/${draftPost.path}`);
+      navigateToSpacePath(`/forum/post/${draftPost.path}`);
     }
   }
 
@@ -297,6 +298,12 @@ export function PostPage({
     }
   }
 
+  function focusDocumentEditor() {
+    const focusEvent = new CustomEvent(focusEventName);
+    // TODO: use a ref passed down instead
+    document.querySelector(`.bangle-editor-core[data-post-id="${post?.id}"]`)?.dispatchEvent(focusEvent);
+  }
+
   useEffect(() => {
     const commentId = router.query.commentId;
     if (commentId && typeof window !== 'undefined' && !isValidating && postComments.length) {
@@ -354,7 +361,12 @@ export function PostPage({
                   href={`/forum/${postCategory?.path}`}
                 />
               )}
-              <PageTitleInput readOnly={!canEdit} value={formInputs.title} onChange={updateTitle} />
+              <PageTitleInput
+                readOnly={!canEdit}
+                value={formInputs.title}
+                onChange={updateTitle}
+                focusDocumentEditor={focusDocumentEditor}
+              />
               {createdBy && (
                 <UserDisplay showMiniProfile userId={createdBy.id} avatarSize='small' fontSize='medium' mt={2} mb={3} />
               )}

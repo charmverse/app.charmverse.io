@@ -1,7 +1,9 @@
 import styled from '@emotion/styled';
 import { Stack } from '@mui/material';
+import type { ReactNode } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 
+import { PopupFieldWrapper } from 'components/common/BoardEditor/components/properties/PopupFieldWrapper';
 import {
   mapPropertyOptionToSelectOption,
   mapSelectOptionToPropertyOption
@@ -18,16 +20,18 @@ type ContainerProps = {
   disableClearable?: boolean;
   isHidden?: boolean;
   readOnly?: boolean;
+  fluidWidth?: boolean;
 };
 export const SelectPreviewContainer = styled(Stack, {
-  shouldForwardProp: (prop: string) => prop !== 'displayType' && prop !== 'isHidden' && prop !== 'readOnly'
+  shouldForwardProp: (prop: string) =>
+    prop !== 'displayType' && prop !== 'isHidden' && prop !== 'readOnly' && prop !== 'fluidWidth'
 })<ContainerProps>`
   border-radius: ${({ theme }) => theme.spacing(0.5)};
-  display: ${({ isHidden }) => (isHidden ? 'none' : 'initial')};
-  width: 100%;
+  ${({ isHidden }) => (isHidden ? 'display: none;' : '')};
+  ${({ fluidWidth }) => (!fluidWidth ? 'width: 100%;' : '')}
   height: 100%;
-  justify-content: center;
-  padding: ${({ theme }) => theme.spacing(0.25, 0)};
+  justify-content: ${({ displayType }) => (displayType === 'table' ? 'flex-start' : 'center')}
+  padding: ${({ theme, displayType }) => theme.spacing(displayType === 'table' ? 0 : 0.25, 0)};
   transition: background-color 0.2s ease-in-out;
 
   ${({ displayType, theme }) => {
@@ -58,18 +62,9 @@ export const SelectPreviewContainer = styled(Stack, {
 `;
 
 const StyledSelect = styled(SelectField)<ContainerProps>`
-  flex-grow: 1;
+  ${({ fluidWidth }) => (!fluidWidth ? 'flex-grow: 1;' : '')}
   .MuiInputBase-root {
     background-color: ${({ theme }) => theme.palette.background.paper};
-
-    ${({ displayType, theme }) =>
-      displayType === 'table'
-        ? `
-        .MuiAutocomplete-input {
-          width: 100%;
-          border-top: 1px solid ${theme.palette.divider};
-        }`
-        : ''}
   }
 
   // override styles from focalboard
@@ -92,7 +87,8 @@ const StyledSelect = styled(SelectField)<ContainerProps>`
   ${({ disableClearable }) => (disableClearable ? '.MuiSvgIcon-root { display: none; }' : '')}
 `;
 
-type Props = {
+export type TagSelectProps = {
+  defaultOpened?: boolean;
   readOnly?: boolean;
   readOnlyMessage?: string;
   canEditOptions?: boolean; // TODO: allow editing options
@@ -109,6 +105,10 @@ type Props = {
   onDeleteOption?: (option: IPropertyOption) => void;
   wrapColumn?: boolean;
   'data-test'?: string;
+  fluidWidth?: boolean;
+  emptyMessage?: string;
+  showEmpty?: boolean;
+  dataTestActive?: string;
 };
 
 export function TagSelect({
@@ -126,10 +126,14 @@ export function TagSelect({
   displayType = 'details',
   noOptionsText,
   wrapColumn,
+  defaultOpened = false,
   disableClearable = false,
-  'data-test': dataTest
-}: Props) {
-  const [isOpened, setIsOpened] = useState(false);
+  fluidWidth,
+  showEmpty,
+  dataTestActive,
+  ...props
+}: TagSelectProps) {
+  const [isOpened, setIsOpened] = useState(defaultOpened);
 
   const onEdit = useCallback(() => {
     if (!readOnly) {
@@ -176,26 +180,12 @@ export function TagSelect({
   if (displayType === 'kanban' && isEmptyValue(selectValue)) {
     return null;
   }
-  if (!isOpened) {
-    return (
-      <SelectPreviewContainer data-test={dataTest} onClick={onEdit} displayType={displayType} readOnly={readOnly}>
-        <SelectPreview
-          readOnly={readOnly}
-          readOnlyMessage={readOnlyMessage}
-          sx={{ height: '100%' }}
-          wrapColumn={wrapColumn}
-          value={selectValue}
-          options={selectOptions}
-          size='small'
-          showEmpty={displayType === 'details'}
-        />
-      </SelectPreviewContainer>
-    );
-  }
 
-  return (
+  const showInsidePopup = displayType === 'table';
+
+  const activeField = (
     <StyledSelect
-      data-test={dataTest}
+      dataTest={dataTestActive}
       canEditOptions={canEditOptions}
       includeSelectedOptions={includeSelectedOptions}
       placeholder='Search for an option...'
@@ -213,6 +203,40 @@ export function TagSelect({
       onBlur={() => setIsOpened(false)}
       forcePopupIcon={false}
       displayType={displayType}
+      fluidWidth={fluidWidth}
+      disablePopper={showInsidePopup}
     />
   );
+
+  const previewField = (
+    <SelectPreviewContainer
+      data-test={props['data-test']}
+      onClick={onEdit}
+      displayType={displayType}
+      readOnly={readOnly}
+      fluidWidth={fluidWidth}
+    >
+      <SelectPreview
+        readOnly={readOnly}
+        readOnlyMessage={readOnlyMessage}
+        sx={{ height: '100%' }}
+        wrapColumn={wrapColumn}
+        value={selectValue}
+        options={selectOptions}
+        size='small'
+        emptyMessage={props.emptyMessage}
+        showEmpty={showEmpty || displayType === 'details'}
+      />
+    </SelectPreviewContainer>
+  );
+
+  if (showInsidePopup) {
+    return <PopupFieldWrapper previewField={previewField} activeField={activeField} disabled={readOnly} />;
+  }
+
+  if (!isOpened) {
+    return previewField;
+  }
+
+  return activeField;
 }

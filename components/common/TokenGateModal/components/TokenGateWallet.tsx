@@ -1,16 +1,16 @@
 import { isValidName } from 'ethers/lib/utils';
 
 import { TextInputField } from 'components/common/form/fields/TextInputField';
+import type { TokenGateConditions } from 'lib/tokenGates/interfaces';
 
 import { useTokenGateModal } from '../hooks/useTokenGateModalContext';
 import { useWalletForm, type FormValues } from '../hooks/useWalletForm';
 import { getWalletUnifiedAccessControlConditions } from '../utils/getWalletUnifiedAccessControlConditions';
 
-import { TokenGateBlockchainSelect } from './TokenGateBlockchainSelect';
 import { TokenGateFooter } from './TokenGateFooter';
 
 export function TokenGateWallet() {
-  const { setDisplayedPage, handleUnifiedAccessControlConditions } = useTokenGateModal();
+  const { setDisplayedPage, handleTokenGate } = useTokenGateModal();
 
   const {
     getValues,
@@ -24,11 +24,11 @@ export function TokenGateWallet() {
   const onSubmit = async () => {
     const initialValues = getValues();
     const values: FormValues = {
-      chain: initialValues.chain,
       contract: initialValues.ensWallet || initialValues.contract
     };
     const valueProps = getWalletUnifiedAccessControlConditions(values) || [];
-    handleUnifiedAccessControlConditions(valueProps);
+    const _tokenGate: TokenGateConditions = { type: 'lit', conditions: { unifiedAccessControlConditions: valueProps } };
+    handleTokenGate(_tokenGate);
     setDisplayedPage('review');
   };
 
@@ -56,13 +56,8 @@ export function TokenGateWallet() {
 
   return (
     <>
-      <TokenGateBlockchainSelect
-        error={!!errors.chain?.message}
-        helperMessage={errors.chain?.message}
-        {...register('chain')}
-      />
       <TextInputField
-        label='Contract Address'
+        label='Wallet address'
         error={errors.contract?.message}
         helperText={errors.contract?.message}
         onChange={onContractChange}

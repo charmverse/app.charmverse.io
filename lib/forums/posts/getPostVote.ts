@@ -1,8 +1,14 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { ForumVotes } from './interfaces';
+import type { ForumPostVotes } from './interfaces';
 
-export async function getPostVote({ pageId, userId }: { pageId: string; userId: string }): Promise<ForumVotes | null> {
+export async function getPostVote({
+  pageId,
+  userId
+}: {
+  pageId: string;
+  userId: string;
+}): Promise<ForumPostVotes | null> {
   const pageWithVotes = await prisma.post.findUnique({
     where: {
       id: pageId

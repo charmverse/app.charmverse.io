@@ -1,30 +1,32 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import type { ApplicationStatus } from '@charmverse/core/prisma-client';
+import styled from '@emotion/styled';
 import CollapseIcon from '@mui/icons-material/ArrowDropDown';
 import ExpandIcon from '@mui/icons-material/ArrowRight';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import { Box } from '@mui/material';
-import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
-import type { MouseEvent, ReactElement, ReactNode } from 'react';
+import { Box, Checkbox, Stack } from '@mui/material';
+import type { Dispatch, MouseEvent, ReactElement, ReactNode, SetStateAction } from 'react';
+import React, { memo, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { mutate } from 'swr';
 
+import { useTrashPages } from 'charmClient/hooks/pages';
 import { filterPropertyTemplates } from 'components/common/BoardEditor/utils/updateVisibilePropertyIds';
 import { PageActionsMenu } from 'components/common/PageActions/components/PageActionsMenu';
 import { PageIcon } from 'components/common/PageIcon';
 import { RewardApplicationStatusIcon } from 'components/rewards/components/RewardApplicationStatusChip';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { SelectionContext, useSelected } from 'hooks/useAreaSelection';
+import { useDragDrop } from 'hooks/useDragDrop';
 import { useSmallScreen } from 'hooks/useMediaScreens';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
 import { REWARD_STATUS_BLOCK_ID } from 'lib/rewards/blocks/constants';
 import { isTouchScreen } from 'lib/utilities/browser';
+import { mergeRefs } from 'lib/utilities/react';
 
 import { TextInput } from '../../../../components/properties/TextInput';
-import { useSortable } from '../../hooks/sortable';
-import mutator from '../../mutator';
 import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
 import PropertyValueElement from '../propertyValueElement';
@@ -36,6 +38,7 @@ export type CardPageWithCustomIcon = CardPage & {
 
 type Props = {
   hasContent?: boolean;
+  isStructuredProposal?: boolean;
   board: Board;
   activeView: BoardView;
   card: Card;
@@ -63,7 +66,28 @@ type Props = {
   expandSubRowsOnLoad?: boolean;
   subRowsEmptyValueContent?: ReactElement | string;
   emptySubPagesPlaceholder?: ReactNode;
+  isChecked?: boolean;
+  setCheckedIds?: Dispatch<SetStateAction<string[]>>;
+  proposal?: CardPage['proposal'];
 };
+
+export const StyledCheckbox = styled(Checkbox, {
+  shouldForwardProp(propName) {
+    return propName !== 'show';
+  }
+})<{ show?: boolean }>`
+  ${({ show }) => (!show ? `opacity: 0;` : '')}
+  transition: opacity 250ms ease-in-out;
+
+  &:hover {
+    opacity: 1;
+    transition: opacity 250ms ease-in-out;
+  }
+
+  padding: 0;
+  height: fit-content;
+  margin-left: ${({ theme }) => theme.spacing(0.5)};
+`;
 
 export const columnWidth = (
   resizingColumn: string,
@@ -78,10 +102,12 @@ export const columnWidth = (
 };
 
 function TableRow(props: Props) {
+  const cardRef = useRef<HTMLDivElement>(null);
   const {
     cardPage,
     hasContent,
     board,
+    isStructuredProposal,
     activeView,
     columnRefs,
     card,
@@ -95,31 +121,46 @@ function TableRow(props: Props) {
     isExpanded,
     indentTitle,
     isNested,
-    subRowsEmptyValueContent
+    subRowsEmptyValueContent,
+    isChecked,
+    setCheckedIds,
+    proposal
   } = props;
-  const { space } = useCurrentSpace();
+  const { showError } = useSnackbar();
+
+  const { trigger: trashPages } = useTrashPages();
   const isMobile = useSmallScreen();
   const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
   const [title, setTitle] = useState('');
   const isManualSort = activeView.fields.sortOptions.length === 0;
   const isGrouped = Boolean(activeView.fields.groupById);
-  const [isDragging, isOver, cardRef] = useSortable(
-    'card',
-    card,
-    !isTouchScreen() && !props.readOnly && (isManualSort || isGrouped),
-    props.onDrop
-  );
+
+  const enabled = !isTouchScreen() && !props.readOnly && (isManualSort || isGrouped);
+
+  const { drag, drop, preview, style } = useDragDrop({
+    item: card,
+    itemType: 'card',
+    onDrop: props.onDrop,
+    enabled
+  });
+
+  const { selection } = useContext(SelectionContext);
+  const isSelected = useSelected(cardRef, selection);
+
   const handleDeleteCard = async () => {
     if (!card) {
       Utils.assertFailure();
       return;
     }
-    if (onDeleteCard) {
-      await onDeleteCard(card.id);
-    } else {
-      await mutator.deleteBlock(card, 'delete card');
+    try {
+      if (onDeleteCard) {
+        await onDeleteCard(card.id);
+      } else {
+        await trashPages({ pageIds: [card.id], trash: true });
+      }
+    } catch (error) {
+      showError(error);
     }
-    mutate(`pages/${space?.id}`);
   };
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -136,6 +177,20 @@ function TableRow(props: Props) {
   }, []);
 
   useEffect(() => {
+    if (setCheckedIds && selection) {
+      setCheckedIds((checkedIds) => {
+        if (isSelected && !checkedIds.includes(card.id)) {
+          return Array.from(new Set([...checkedIds, card.id]));
+        } else if (!isSelected && checkedIds.includes(card.id)) {
+          return checkedIds.filter((checkedId) => checkedId !== card.id);
+        }
+
+        return checkedIds;
+      });
+    }
+  }, [isSelected, selection]);
+
+  useEffect(() => {
     setTitle(pageTitle);
   }, [pageTitle]);
 
@@ -144,9 +199,7 @@ function TableRow(props: Props) {
   }, [board.fields.cardProperties, activeView.fields.visiblePropertyIds]);
 
   let className = props.isSelected ? 'TableRow octo-table-row selected' : 'TableRow octo-table-row';
-  if (isOver) {
-    className += ' dragover';
-  }
+
   if (isGrouped) {
     const groupID = activeView.fields.groupById || '';
     const groupValue = (card.fields.properties[groupID] as string) || 'undefined';
@@ -171,19 +224,55 @@ function TableRow(props: Props) {
       data-test={`database-row-${card.id}`}
       className={className}
       onClick={(e) => props.onClick?.(e, card)}
-      ref={cardRef}
-      style={{ opacity: isDragging ? 0.5 : 1, backgroundColor: isNested ? 'var(--input-bg)' : 'transparent' }}
+      ref={mergeRefs([cardRef, preview, drop])}
+      style={{
+        backgroundColor: isNested ? 'var(--input-bg)' : 'transparent',
+        ...(isChecked && {
+          background: 'rgba(35, 131, 226, 0.14)',
+          zIndex: 85
+        }),
+        ...style
+      }}
     >
       {!props.readOnly && (
-        <Box className='icons row-actions' onClick={handleClick}>
-          <Box className='charm-drag-handle'>
-            <DragIndicatorIcon color='secondary' />
-          </Box>
-        </Box>
+        <Stack flexDirection='row' gap={1} alignItems='center'>
+          <div
+            className='icons row-actions'
+            onClick={handleClick}
+            ref={drag}
+            style={{
+              padding: 0
+            }}
+          >
+            <Box className='charm-drag-handle disable-drag-selection'>
+              <DragIndicatorIcon color='secondary' />
+            </Box>
+          </div>
+          {setCheckedIds && (
+            <StyledCheckbox
+              className='table-row-checkbox disable-drag-selection'
+              checked={isChecked}
+              show={isChecked}
+              onChange={() => {
+                setCheckedIds((checkedIds) => {
+                  if (!isChecked) {
+                    return Array.from(new Set([...checkedIds, card.id]));
+                  }
+
+                  return checkedIds.filter((checkedId) => checkedId !== card.id);
+                });
+              }}
+              size='small'
+              disableFocusRipple
+              disableRipple
+              disableTouchRipple
+            />
+          )}
+        </Stack>
       )}
 
       {/* Columns, one per property */}
-      {visiblePropertyTemplates.map((template, templateIndex) => {
+      {visiblePropertyTemplates.map((template) => {
         if (template.id === Constants.titleColumnId) {
           return (
             <Box
@@ -233,6 +322,7 @@ function TableRow(props: Props) {
                   )}
                   {card.customIconType !== 'applicationStatus' && card.customIconType !== 'reward' && (
                     <PageIcon
+                      isStructuredProposal={isStructuredProposal}
                       isEditorEmpty={!hasContent}
                       pageType={card.customIconType === 'reward' ? 'bounty' : 'page'}
                       icon={pageIcon}
@@ -269,6 +359,7 @@ function TableRow(props: Props) {
               readOnly={props.readOnly}
               syncWithPageId={cardPage?.syncWithPageId}
               card={card}
+              proposal={proposal}
               board={board}
               showEmptyPlaceholder={false}
               propertyTemplate={template}

@@ -1,9 +1,7 @@
-import { FormHelperText } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import { FormProvider } from 'react-hook-form';
 
-import { useReviewLock } from 'charmClient/hooks/tokenGates';
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 
 import type { FormValues } from '../hooks/useCollectablesForm';
@@ -16,8 +14,7 @@ import { TokenGateCollectableFields } from './TokenGateCollectableFields';
 import { TokenGateFooter } from './TokenGateFooter';
 
 export function TokenGateCollectables() {
-  const { setDisplayedPage, handleUnifiedAccessControlConditions, handleLock, flow } = useTokenGateModal();
-  const { trigger, isMutating, error } = useReviewLock();
+  const { setDisplayedPage, flow, handleTokenGate } = useTokenGateModal();
 
   const methods = useCollectablesForm();
   const {
@@ -31,16 +28,22 @@ export function TokenGateCollectables() {
     const values = getValues();
 
     if (values.collectableOption === 'UNLOCK' && values.chain && values.contract) {
-      const lock = await trigger({ contract: values.contract, chainId: Number(values.chain) });
-      if (lock) {
-        handleLock(lock);
-        setDisplayedPage('review');
-      }
+      handleTokenGate({
+        type: 'unlock',
+        conditions: { chainId: Number(values.chain), contract: values.contract }
+      });
+      setDisplayedPage('review');
+    } else if (values.collectableOption === 'HYPERSUB' && values.chain && values.contract) {
+      handleTokenGate({
+        type: 'hypersub',
+        conditions: { chainId: Number(values.chain), contract: values.contract }
+      });
+      setDisplayedPage('review');
     } else {
       const valueProps = getCollectablesUnifiedAccessControlConditions(values) || [];
 
       if (valueProps.length > 0) {
-        handleUnifiedAccessControlConditions(valueProps);
+        handleTokenGate({ type: 'lit', conditions: { unifiedAccessControlConditions: valueProps } });
         setDisplayedPage('review');
       }
     }
@@ -57,11 +60,13 @@ export function TokenGateCollectables() {
         <Select<FormValues['collectableOption']>
           displayEmpty
           fullWidth
-          renderValue={(selected) => selected || 'Select a collectible type'}
+          renderValue={(selected) =>
+            collectableOptions.find((op) => op.id === selected)?.name || selected || 'Select a collectible type'
+          }
           {...register('collectableOption')}
         >
           {collectableOptions
-            .filter((col) => !(col.id === 'UNLOCK' && flow !== 'single'))
+            .filter((col) => !((col.id === 'UNLOCK' || col.id === 'HYPERSUB') && flow !== 'single'))
             .map((type) => (
               <MenuItem key={type.id} value={type.id}>
                 {type.name}
@@ -70,8 +75,7 @@ export function TokenGateCollectables() {
         </Select>
       </FieldWrapper>
       <TokenGateCollectableFields />
-      {error?.message && <FormHelperText error={!!error.message}>{error.message}</FormHelperText>}
-      <TokenGateFooter onSubmit={onSubmit} onCancel={onCancel} isValid={isValid} loading={isMutating} />
+      <TokenGateFooter onSubmit={onSubmit} onCancel={onCancel} isValid={isValid} />
     </FormProvider>
   );
 }

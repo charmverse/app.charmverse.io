@@ -9,6 +9,7 @@ import { InvalidStateError } from 'lib/middleware';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 
+import { getHypersubDetails } from './hypersub/getHypersubDetails';
 import type { TokenGate, TokenGateWithRoles } from './interfaces';
 import { getLockDetails } from './unlock/getLockDetails';
 
@@ -89,21 +90,26 @@ export async function evaluateTokenGate({ authSig, tokenGates }: { authSig: Auth
 async function getTokenGateResults(tokenGate: TokenGateWithRoles, authSig: AuthSig) {
   if (tokenGate.type === 'unlock') {
     return getUnlockProtocolValidTokenGate(tokenGate, authSig.address);
-  } else {
+  } else if (tokenGate.type === 'hypersub') {
+    return getHypersubValidTokenGate(tokenGate, authSig.address);
+  } else if (tokenGate.type === 'lit') {
     return getLitValidTokenGate(tokenGate, authSig);
+  } else {
+    return null;
   }
 }
 
-export async function getUnlockProtocolValidTokenGate(tokenGate: TokenGateWithRoles<'unlock'>, walletAddress: string) {
+export async function getUnlockProtocolValidTokenGate<T extends TokenGate<'unlock'>>(
+  tokenGate: T,
+  walletAddress: string
+) {
   const result = await getLockDetails({
     walletAddress,
     contract: tokenGate.conditions.contract,
     chainId: tokenGate.conditions.chainId
   });
 
-  const now = new Date().getTime();
-
-  if (result.balanceOf === 1 && result.expirationTimestamp && result.expirationTimestamp > now) {
+  if (result.validKey) {
     return {
       signedToken: '',
       tokenGateId: tokenGate.id
@@ -122,7 +128,7 @@ async function getLitValidTokenGate(tokenGate: TokenGateWithRoles<'lit'>, authSi
           // note that we used to store 'chain' but now it is an array
           // TODO: migrate old token gate conditions to all be an array?
           chain: tokenGate.conditions.chains?.[0],
-          resourceId: tokenGate.resourceId as any,
+          resourceId: tokenGate.resourceId,
           ...tokenGate.conditions
         })
         .then((signedToken: string) => {
@@ -135,7 +141,8 @@ async function getLitValidTokenGate(tokenGate: TokenGateWithRoles<'lit'>, authSi
           if (error.errorCode === 'rpc_error') {
             log.warn('Network error when verifying token gate. Could be improper conditions configuration', {
               retryCount,
-              tokenGateId: tokenGate.id
+              tokenGateId: tokenGate.id,
+              spaceId: tokenGate.spaceId
             });
             retry(error);
           }
@@ -149,6 +156,23 @@ async function getLitValidTokenGate(tokenGate: TokenGateWithRoles<'lit'>, authSi
       retries: 5
     }
   );
+}
+
+export async function getHypersubValidTokenGate<T extends TokenGate<'hypersub'>>(tokenGate: T, walletAddress: string) {
+  const result = await getHypersubDetails({
+    walletAddress,
+    contract: tokenGate.conditions.contract,
+    chainId: tokenGate.conditions.chainId
+  });
+
+  if (result.validKey) {
+    return {
+      signedToken: '',
+      tokenGateId: tokenGate.id
+    };
+  }
+
+  return null;
 }
 
 async function validateSpaceWithTokenGates(spaceIdOrDomain: string) {

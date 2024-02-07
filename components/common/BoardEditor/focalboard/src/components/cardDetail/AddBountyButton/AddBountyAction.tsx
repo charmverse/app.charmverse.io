@@ -6,6 +6,7 @@ import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePages } from 'hooks/usePages';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useUser } from 'hooks/useUser';
 
 type Props = {
@@ -19,6 +20,7 @@ export default function AddBountyAction({ readOnly, cardId }: Props) {
   const [spacePermissions] = useCurrentSpacePermissions();
   const isSharedPage = router.route.startsWith('/share');
   const cardPage = pages[cardId];
+  const { getFeatureTitle } = useSpaceFeatures();
 
   const { user } = useUser();
   const { space } = useCurrentSpace();
@@ -26,7 +28,6 @@ export default function AddBountyAction({ readOnly, cardId }: Props) {
   const { setCreatingInlineReward, creatingInlineReward } = useRewards();
 
   const hasReward = !!cardPage?.bountyId;
-
   const canAddBounty =
     spacePermissions?.createBounty &&
     !isSharedPage &&
@@ -41,7 +42,7 @@ export default function AddBountyAction({ readOnly, cardId }: Props) {
 
   return canAddBounty ? (
     <AddAPropertyButton onClick={() => setCreatingInlineReward(true)}>
-      <FormattedMessage id='CardDetail.add-bounty' defaultMessage='+ Add a reward' />
+      <FormattedMessage id='CardDetail.add-bounty' defaultMessage={`+ Add a ${getFeatureTitle('reward')}`} />
     </AddAPropertyButton>
   ) : null;
 }

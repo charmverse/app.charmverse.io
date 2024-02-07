@@ -1,14 +1,25 @@
 import { rest } from 'msw';
 
-import { ProposalsPageWithProviders } from 'components/proposals/ProposalsPageWithProviders';
+import { ProposalsProvider } from 'components/proposals/hooks/useProposals';
+import { ProposalsBoardProvider } from 'components/proposals/hooks/useProposalsBoard';
+import { ProposalsPage } from 'components/proposals/ProposalsPage';
+import { ProposalBlocksProvider } from 'hooks/useProposalBlocks';
 import { createMockPage } from 'testing/mocks/page';
 import { createMockProposal } from 'testing/mocks/proposal';
 import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 
-import { members, proposalCategories, userProfile } from '../lib/mockData';
+import { members, userProfile } from '../lib/mockData';
 
 export function ProposalsPageStory() {
-  return <ProposalsPageWithProviders title='Proposals' />;
+  return (
+    <ProposalsProvider>
+      <ProposalBlocksProvider>
+        <ProposalsBoardProvider>
+          <ProposalsPage title='Proposals' />
+        </ProposalsBoardProvider>
+      </ProposalBlocksProvider>
+    </ProposalsProvider>
+  );
 }
 
 // Data and api mocks
@@ -17,30 +28,20 @@ export const proposals = [
   createMockProposal({
     authors: [{ proposalId: '', userId: members[0].id }],
     reviewers: [
-      { evaluationId: null, id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null },
-      { evaluationId: null, id: '2', proposalId: '', roleId: null, userId: members[0].id, systemRole: null }
+      { evaluationId: '1', id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null },
+      { evaluationId: '1', id: '2', proposalId: '', roleId: null, userId: members[0].id, systemRole: null }
     ],
-    categoryId: proposalCategories[0].id,
-    evaluationType: 'vote',
     status: 'draft'
   }),
   createMockProposal({
     authors: [{ proposalId: '', userId: members[1].id }],
-    reviewers: [
-      { evaluationId: null, id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null }
-    ],
-    categoryId: proposalCategories[1].id,
-    evaluationType: 'vote',
-    status: 'discussion'
+    reviewers: [{ evaluationId: '1', id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null }],
+    status: 'published'
   }),
   createMockProposal({
     authors: [{ proposalId: '', userId: members[2].id }],
-    reviewers: [
-      { evaluationId: null, id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null }
-    ],
-    categoryId: proposalCategories[2].id,
-    evaluationType: 'rubric',
-    status: 'review'
+    reviewers: [{ evaluationId: '1', id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null }],
+    status: 'published'
   })
 ];
 

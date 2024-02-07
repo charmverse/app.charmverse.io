@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { PageMeta } from '@charmverse/core/pages';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -6,7 +7,7 @@ import nc from 'next-connect';
 import { createCardsFromProposals } from 'lib/focalboard/createCardsFromProposals';
 import { updateCardsFromProposals } from 'lib/focalboard/updateCardsFromProposals';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { computePagePermissions } from 'lib/permissions/pages/computePagePermissions';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -36,7 +37,7 @@ async function createProposalSource(req: NextApiRequest, res: NextApiResponse<Pa
     throw new NotFoundError('The board page does not exist');
   }
 
-  const permissions = await computePagePermissions({
+  const permissions = await permissionsApiClient.pages.computePagePermissions({
     resourceId: pageId,
     userId
   });
@@ -69,7 +70,7 @@ async function updateProposalSource(req: NextApiRequest, res: NextApiResponse<Pa
     throw new NotFoundError('The board page does not exist');
   }
 
-  const permissions = await computePagePermissions({
+  const permissions = await permissionsApiClient.pages.computePagePermissions({
     resourceId: pageId,
     userId
   });
@@ -78,7 +79,16 @@ async function updateProposalSource(req: NextApiRequest, res: NextApiResponse<Pa
     throw new ActionNotPermittedError('You do not have permission to update this page');
   }
 
-  await updateCardsFromProposals({ boardId: pageId, spaceId: boardPage.spaceId, userId });
+  log.debug('Refresh cards for proposal-as-a-source board (started)', { pageId, spaceId: boardPage.spaceId, userId });
+
+  const result = await updateCardsFromProposals({ boardId: pageId, spaceId: boardPage.spaceId, userId });
+
+  log.debug('Refresh cards for proposal-as-a-source board (complete)', {
+    pageId,
+    spaceId: boardPage.spaceId,
+    userId,
+    result
+  });
 
   return res.status(200).end();
 }

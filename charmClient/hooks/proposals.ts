@@ -1,12 +1,7 @@
-import type {
-  ProposalCategoryWithPermissions,
-  ProposalFlowPermissionFlags,
-  ProposalPermissionsSwitch,
-  ProposalReviewerPool
-} from '@charmverse/core/permissions';
-import type { ProposalStatus } from '@charmverse/core/prisma-client';
-import type { ProposalWithUsers, ListProposalsRequest } from '@charmverse/core/proposals';
+import type { FormFieldAnswer } from '@charmverse/core/prisma-client';
+import type { ListProposalsRequest } from '@charmverse/core/proposals';
 
+import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
 import type {
   ProposalBlockInput,
   ProposalBlockUpdateInput,
@@ -15,15 +10,18 @@ import type {
 import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import type { RubricProposalsUserInfo } from 'lib/proposal/getProposalsEvaluatedByUser';
 import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { GoBackToStepRequest } from 'lib/proposal/goBackToStep';
+import type { ProposalWithUsersAndRubric, ProposalWithUsersLite } from 'lib/proposal/interface';
+import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers';
 import type { RubricCriteriaUpsert } from 'lib/proposal/rubric/upsertRubricCriteria';
+import type { ReviewEvaluationRequest } from 'lib/proposal/submitEvaluationResult';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import type { UpdateEvaluationRequest } from 'lib/proposal/updateProposalEvaluation';
 import type { UpdateProposalLensPropertiesRequest } from 'lib/proposal/updateProposalLensProperties';
 
 import type { MaybeString } from './helpers';
-import { useGET, usePOST, usePUT, useDELETE } from './helpers';
+import { useDELETE, useGET, usePOST, usePUT } from './helpers';
 
 // Getters
 
@@ -31,37 +29,15 @@ export function useGetProposalDetails(proposalId: MaybeString) {
   return useGET<ProposalWithUsersAndRubric>(proposalId ? `/api/proposals/${proposalId}` : null);
 }
 
-export function useGetAllReviewerUserIds(proposalId: MaybeString) {
-  return useGET<string[]>(proposalId ? `/api/proposals/${proposalId}/get-user-reviewerids` : null);
-}
-
 export function useGetIsReviewer(proposalId: MaybeString) {
   return useGET<boolean>(proposalId ? `/api/proposals/${proposalId}/is-reviewer` : null);
 }
-export function useGetReviewerPool(categoryId: MaybeString) {
-  return useGET<ProposalReviewerPool>(categoryId ? `/api/proposals/reviewer-pool?resourceId=${categoryId}` : null);
-}
-
-export function useGetProposalFlowFlags(proposalId: MaybeString) {
-  return useGET<ProposalFlowPermissionFlags>(proposalId ? `/api/proposals/${proposalId}/compute-flow-flags` : null);
-}
-export function useGetProposalsBySpace({
-  spaceId,
-  categoryIds,
-  useProposalEvaluationPermissions
-}: Partial<ListProposalsRequest & ProposalPermissionsSwitch>) {
-  return useGET<ProposalWithUsers[]>(spaceId ? `/api/spaces/${spaceId}/proposals` : null, {
-    categoryIds,
-    useProposalEvaluationPermissions
-  });
+export function useGetProposalsBySpace({ spaceId }: Partial<ListProposalsRequest>) {
+  return useGET<ProposalWithUsersLite[]>(spaceId ? `/api/spaces/${spaceId}/proposals` : null);
 }
 
 export function useGetProposalTemplatesBySpace(spaceId: MaybeString) {
   return useGET<ProposalTemplate[]>(spaceId ? `/api/spaces/${spaceId}/proposal-templates` : null);
-}
-
-export function useGetProposalCategories(spaceId?: string) {
-  return useGET<ProposalCategoryWithPermissions[]>(spaceId ? `/api/spaces/${spaceId}/proposal-categories` : null);
 }
 
 export function useGetProposalIdsEvaluatedByUser(spaceId: MaybeString) {
@@ -82,12 +58,20 @@ export function useUpdateProposal({ proposalId }: { proposalId: MaybeString }) {
   return usePUT<Omit<UpdateProposalRequest, 'proposalId'>>(`/api/proposals/${proposalId}`);
 }
 
-export function useUpdateProposalStatusOnly({ proposalId }: { proposalId: MaybeString }) {
-  return usePUT<{ newStatus: 'draft' | 'published' }>(`/api/proposals/${proposalId}/status-only`);
+export function usePublishProposal({ proposalId }: { proposalId: MaybeString }) {
+  return usePUT(`/api/proposals/${proposalId}/publish`);
 }
 
 export function useUpdateProposalEvaluation({ proposalId }: { proposalId: MaybeString }) {
   return usePUT<Partial<Omit<UpdateEvaluationRequest, 'proposalId'>>>(`/api/proposals/${proposalId}/evaluation`);
+}
+
+export function useSubmitEvaluationResult({ proposalId }: { proposalId: MaybeString }) {
+  return usePUT<Partial<Omit<ReviewEvaluationRequest, 'proposalId'>>>(`/api/proposals/${proposalId}/submit-result`);
+}
+
+export function useGoBackToStep({ proposalId }: { proposalId: MaybeString }) {
+  return usePUT<Partial<Omit<GoBackToStepRequest, 'proposalId'>>>(`/api/proposals/${proposalId}/back-to-step`);
 }
 
 export function useUpsertRubricCriteria({ proposalId }: { proposalId: MaybeString }) {
@@ -104,7 +88,7 @@ export function useUpsertDraftRubricCriteriaAnswers({ proposalId }: { proposalId
 }
 
 export function useDeleteRubricCriteriaAnswers({ proposalId }: { proposalId: MaybeString }) {
-  return useDELETE<{ isDraft: boolean; evaluationId?: string }>(`/api/proposals/${proposalId}/rubric-answers`);
+  return useDELETE<{ isDraft: boolean; evaluationId: string }>(`/api/proposals/${proposalId}/rubric-answers`);
 }
 
 export function useUpdateProposalLensProperties({ proposalId }: { proposalId: string }) {
@@ -123,6 +107,36 @@ export function useDeleteProposalBlocks(spaceId: string) {
   return useDELETE<string[]>(`/api/spaces/${spaceId}/proposals/blocks`);
 }
 
-export function useCreateProposalRewards(proposalId: string) {
+export function useCreateProposalRewards(proposalId: MaybeString) {
   return usePOST<undefined, ProposalWithUsersAndRubric>(`/api/proposals/${proposalId}/rewards`);
+}
+
+export function useUpdateProposalFormFields({ proposalId }: { proposalId: string }) {
+  return usePUT<{ formFields: FormFieldInput[] }, FormFieldInput[]>(`/api/proposals/${proposalId}/form`);
+}
+
+export function useGetProposalFormFieldAnswers({ proposalId }: { proposalId: string }) {
+  return useGET<FormFieldAnswer[]>(`/api/proposals/${proposalId}/form/answers`);
+}
+
+export function useUpdateProposalFormFieldAnswers({ proposalId }: { proposalId: string }) {
+  return usePUT<{ answers: FieldAnswerInput[] }, ProposalRubricCriteriaAnswerWithTypedResponse[]>(
+    `/api/proposals/${proposalId}/form/answers`
+  );
+}
+
+export function useUpdateSnapshotProposal({ proposalId }: { proposalId: MaybeString }) {
+  return usePUT<{ snapshotProposalId: string | null; evaluationId: string }>(`/api/proposals/${proposalId}/snapshot`);
+}
+
+export function useUpdateWorkflow({ proposalId }: { proposalId: MaybeString }) {
+  return usePUT<{ workflowId: string }>(`/api/proposals/${proposalId}/workflow`);
+}
+
+export function useArchiveProposal({ proposalId }: { proposalId: MaybeString }) {
+  return usePOST<{ archived: boolean }>(`/api/proposals/${proposalId}/archive`);
+}
+
+export function useArchiveProposals() {
+  return usePOST<{ archived: boolean; proposalIds: string[] }>(`/api/proposals/archive`);
 }

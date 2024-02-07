@@ -2,16 +2,15 @@ import { useEffect } from 'react';
 
 import { useGetProposalTemplatesBySpace } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
-import { useProposalCategories } from './useProposalCategories';
-
-export function useProposalTemplates({ load } = { load: true }) {
-  const { proposalCategoriesWithCreatePermission } = useProposalCategories();
+export function useProposalTemplates({ load = true }: { load?: boolean } = {}) {
   const { space } = useCurrentSpace();
   const isAdmin = useIsAdmin();
+  const [spacePermissions] = useCurrentSpacePermissions();
   const { subscribe } = useWebSocketClient();
   const {
     data: proposalTemplates,
@@ -19,11 +18,7 @@ export function useProposalTemplates({ load } = { load: true }) {
     isLoading: isLoadingTemplates
   } = useGetProposalTemplatesBySpace(load ? space?.id : null);
 
-  const usableTemplates = isAdmin
-    ? proposalTemplates
-    : proposalTemplates?.filter((template) =>
-        proposalCategoriesWithCreatePermission.some((c) => c.id === template.categoryId)
-      );
+  const usableTemplates = isAdmin || spacePermissions?.createProposals ? proposalTemplates : [];
 
   useEffect(() => {
     function handleDeleteEvent(value: WebSocketPayload<'pages_deleted'>) {
@@ -43,11 +38,30 @@ export function useProposalTemplates({ load } = { load: true }) {
       }
     }
 
+    function handleArchivedEvent(payload: WebSocketPayload<'proposals_archived'>) {
+      mutate(
+        (list) => {
+          if (!list) return list;
+          return list.map((proposal) => {
+            if (payload.proposalIds.includes(proposal.id)) {
+              return {
+                ...proposal,
+                archived: payload.archived
+              };
+            }
+            return proposal;
+          });
+        },
+        { revalidate: false }
+      );
+    }
     const unsubscribeFromPageDeletes = subscribe('pages_deleted', handleDeleteEvent);
     const unsubscribeFromPageCreated = subscribe('pages_created', handleCreateEvent);
+    const unsubscribeFromProposalArchived = subscribe('proposals_archived', handleArchivedEvent);
     return () => {
       unsubscribeFromPageDeletes();
       unsubscribeFromPageCreated();
+      unsubscribeFromProposalArchived();
     };
   }, [mutate, subscribe]);
 
@@ -56,4 +70,10 @@ export function useProposalTemplates({ load } = { load: true }) {
     proposalTemplatePages: usableTemplates?.map((t) => t.page),
     isLoadingTemplates
   };
+}
+
+// TODO:  add an endpoint for a single template or return it along with the proposal??
+export function useProposalTemplateById(id: undefined | string | null) {
+  const { proposalTemplates } = useProposalTemplates({ load: !!id });
+  return proposalTemplates?.find((template) => template.page.id === id);
 }

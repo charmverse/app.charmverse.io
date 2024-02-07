@@ -4,8 +4,9 @@ import type { ReactNode } from 'react';
 import type { Control, UseFormRegister } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { NotificationGroup } from 'lib/notifications/interfaces';
-import type { NotificationToggleOption } from 'lib/notifications/notificationToggles';
+import type { NotificationToggles, NotificationToggleOption } from 'lib/notifications/notificationToggles';
 
 import type { FormValues } from '../SpaceSettings';
 
@@ -13,18 +14,17 @@ type NotificationType = { label: string; type?: NotificationToggleOption };
 
 type ConfigurableGroups = Extract<NotificationGroup, 'rewards' | 'proposals' | 'polls'>;
 
-const notifications: Record<ConfigurableGroups, { title: string; types: NotificationType[][] }> = {
+const notificationTypes: Record<ConfigurableGroups, { title: string; types: NotificationType[][] }> = {
   rewards: {
     title: 'Rewards',
     types: [
       [
-        { label: 'Reward suggested (Admins only)' },
         { label: 'Application submitted (Reviewers only)' },
         { label: 'Application accepted (Applicants only)' },
-        { label: 'Application rejected (Applicants only)' }
+        { label: 'Application rejected (Applicants only)' },
+        { label: 'Work submitted (Reviewers only)' }
       ],
       [
-        { label: 'Work submitted (Reviewers only)' },
         { label: 'Submission approved (Applicants only)' },
         { label: 'Payment needed (Reviewers only)' },
         { label: 'Payment completed (Applicants only)' }
@@ -36,13 +36,15 @@ const notifications: Record<ConfigurableGroups, { title: string; types: Notifica
     types: [
       [
         { label: 'Feedback ready (All members)', type: 'proposals__start_discussion' },
-        { label: 'Review ready (Reviewers only)' },
-        { label: 'Review completed (Authors only)' }
+        { label: 'Review ready (Reviewers)', type: 'proposals__review_required' },
+        { label: 'Review completed (Authors)', type: 'proposals__step_passed' },
+        { label: 'Rewards published (Authors)', type: 'proposals__reward_published' }
       ],
       [
-        { label: 'Vote ready (All members)', type: 'proposals__vote' },
-        { label: 'Evaluation ready (Reviewers only)' },
-        { label: 'Evaluation completed (Authors only)' }
+        { label: 'Vote ready (Authors and Voters)', type: 'proposals__vote' },
+        { label: 'Vote passed (Authors and Voters)', type: 'proposals__vote_passed' },
+        { label: 'Proposal declined (Authors)', type: 'proposals__proposal_failed' },
+        { label: 'Proposal passed (Authors)', type: 'proposals__proposal_passed' }
       ]
     ]
   },
@@ -51,6 +53,25 @@ const notifications: Record<ConfigurableGroups, { title: string; types: Notifica
     types: [[{ label: 'Poll created (All members)' }]]
   }
 };
+
+// set all notifications to true by default
+export function getDefaultValues(toggles: NotificationToggles): NotificationToggles {
+  const defaultValues: NotificationToggles = {
+    rewards: toggles.rewards ?? true,
+    proposals: toggles.proposals ?? true,
+    polls: toggles.polls ?? true
+  };
+  Object.entries(notificationTypes).forEach(([, settings]) => {
+    settings.types.forEach((typeColumn) => {
+      typeColumn.forEach((type) => {
+        if (type.type) {
+          defaultValues[type.type] = toggles[type.type] ?? true;
+        }
+      });
+    });
+  });
+  return defaultValues;
+}
 
 export function NotificationTogglesInput({
   isAdmin,
@@ -65,6 +86,7 @@ export function NotificationTogglesInput({
   register: UseFormRegister<FormValues>;
   setValue: (name: `notificationToggles.${NotificationToggleOption}`, value: any) => void;
 }) {
+  const { getFeatureTitle } = useSpaceFeatures();
   const formValues = watch();
   // console.log(formValues);
   return (
@@ -76,8 +98,8 @@ export function NotificationTogglesInput({
             control={control}
             disabled={!isAdmin}
             enabled={formValues.notificationToggles?.rewards}
-            title={notifications.rewards.title}
-            types={notifications.rewards.types}
+            title={getFeatureTitle('Rewards')}
+            types={notificationTypes.rewards.types}
           />
         }
         disabled={!isAdmin}
@@ -91,8 +113,8 @@ export function NotificationTogglesInput({
             control={control}
             disabled={!isAdmin}
             enabled={formValues.notificationToggles?.proposals}
-            title={notifications.proposals.title}
-            types={notifications.proposals.types}
+            title={getFeatureTitle('Proposals')}
+            types={notificationTypes.proposals.types}
           />
         }
         disabled={!isAdmin}
@@ -106,8 +128,8 @@ export function NotificationTogglesInput({
             control={control}
             disabled={!isAdmin}
             enabled={formValues.notificationToggles?.polls}
-            title={notifications.polls.title}
-            types={notifications.polls.types}
+            title={notificationTypes.polls.title}
+            types={notificationTypes.polls.types}
           />
         }
         disabled={!isAdmin}
@@ -165,19 +187,19 @@ function NotificationRuleComponent({
   enabled,
   title,
   disabled,
-  types: listsOftypes
+  types: typeColumns
 }: {
   disabled: boolean;
   control: any;
   enabled?: boolean;
   title: string;
-  types: (typeof notifications)['rewards']['types'];
+  types: (typeof notificationTypes)['rewards']['types'];
 }) {
   return (
     <Box width='100%'>
       <Typography sx={{ my: 1 }}>{title}</Typography>
       <Grid container sx={{ mb: 2, maxWidth: 600 }}>
-        {listsOftypes.map((types) => (
+        {typeColumns.map((types) => (
           <Grid xs={12} md={6} item key={types.map((e) => e.label).join()}>
             <Typography variant='caption'>
               <Stack ml={1}>
@@ -195,7 +217,7 @@ function NotificationRuleComponent({
                             <Checkbox
                               checked={value}
                               onChange={onChange}
-                              disabled={disabled}
+                              disabled={disabled || !enabled}
                               sx={{ p: 1, '& .MuiSvgIcon-root': { fontSize: 12 } }}
                             />
                           }

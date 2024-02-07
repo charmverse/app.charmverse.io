@@ -4,10 +4,11 @@ import nc from 'next-connect';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { getPermissionsClient } from 'lib/permissions/api';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { ThreadWithComments } from 'lib/threads';
 import { toggleThreadStatus } from 'lib/threads';
+import { threadIncludeClause } from 'lib/threads/utils';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { relay } from 'lib/websockets/relay';
 
@@ -26,26 +27,17 @@ async function resolveThread(req: NextApiRequest, res: NextApiResponse<ThreadWit
     where: {
       id: threadId
     },
-    include: {
-      comments: {
-        include: {
-          user: true
-        }
-      }
-    }
+    include: threadIncludeClause()
   });
 
   if (!thread) {
     throw new DataNotFoundError(`Could not find thread with id ${threadId}`);
   }
 
-  const permissionSet = await getPermissionsClient({ resourceId: thread.pageId, resourceIdType: 'page' }).then(
-    ({ client }) =>
-      client.pages.computePagePermissions({
-        resourceId: thread.pageId,
-        userId
-      })
-  );
+  const permissionSet = await permissionsApiClient.pages.computePagePermissions({
+    resourceId: thread.pageId,
+    userId
+  });
 
   if (!permissionSet.comment) {
     throw new ActionNotPermittedError();
@@ -78,7 +70,7 @@ async function resolveThread(req: NextApiRequest, res: NextApiResponse<ThreadWit
   }
   // Empty update for now as we are only updating the resolved status
   else {
-    return res.status(200).json(thread);
+    return res.status(200).json(thread as unknown as ThreadWithComments);
   }
 }
 

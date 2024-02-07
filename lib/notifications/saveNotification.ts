@@ -62,6 +62,7 @@ export async function savePostNotification({
 type ProposalNotificationInput = NotificationInput & {
   type: ProposalNotificationType;
   proposalId: string;
+  evaluationId?: string | null;
 };
 
 export async function saveProposalNotification({
@@ -70,7 +71,8 @@ export async function saveProposalNotification({
   createdBy,
   spaceId,
   userId,
-  proposalId
+  proposalId,
+  evaluationId
 }: ProposalNotificationInput) {
   const notificationId = v4();
   const record = await prisma.proposalNotification.create({
@@ -86,6 +88,13 @@ export async function saveProposalNotification({
           userId
         }
       },
+      evaluation: evaluationId
+        ? {
+            connect: {
+              id: evaluationId
+            }
+          }
+        : undefined,
       proposal: {
         connect: {
           id: proposalId

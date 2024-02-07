@@ -1,6 +1,8 @@
+// @ts-nocheck
 import { prisma } from '@charmverse/core/prisma-client';
 
 export async function updateSnapshot(proposalId: string, snapshotProposalId: string) {
+  throw new Error('script has not been updated for new propsoal flow');
   return prisma.page.update({
     where: {
       id: proposalId
@@ -9,8 +11,7 @@ export async function updateSnapshot(proposalId: string, snapshotProposalId: str
       snapshotProposalId,
       proposal: {
         update: {
-          status: 'vote_active',
-          snapshotProposalExpiry: new Date(2023, 1, 26, 7, 22)
+          status: 'vote_active'
         }
       }
     },

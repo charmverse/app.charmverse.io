@@ -28,7 +28,6 @@ const StyledCard = styled(Card, {
 `;
 
 export function EvaluationRow({
-  key,
   evaluation,
   onDelete,
   onDuplicate,
@@ -36,7 +35,6 @@ export function EvaluationRow({
   onChangeOrder,
   readOnly
 }: {
-  key: string;
   evaluation: WorkflowEvaluationJson;
   onChangeOrder: (selectedId: WorkflowEvaluationJson, targetId: WorkflowEvaluationJson) => void;
   readOnly: boolean;

@@ -10,8 +10,8 @@ export const TextInputField = forwardRef<HTMLDivElement, Props>(
   (
     {
       label,
-      endAdornment,
-      fieldWrapperSx,
+      labelEndAdornment,
+      inputEndAdornment,
       iconLabel,
       inline,
       error,
@@ -24,8 +24,9 @@ export const TextInputField = forwardRef<HTMLDivElement, Props>(
   ) => {
     return (
       <FieldWrapper
-        sx={fieldWrapperSx}
-        endAdornment={endAdornment}
+        inputEndAdornmentAlignItems={multiline ? 'flex-start' : 'center'}
+        labelEndAdornment={labelEndAdornment}
+        inputEndAdornment={inputEndAdornment}
         description={description}
         required={required}
         label={label}

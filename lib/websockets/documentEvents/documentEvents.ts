@@ -4,9 +4,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { Socket } from 'socket.io';
 import { validate } from 'uuid';
 
-import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/constants';
-import { archivePages } from 'lib/pages/archivePages';
-import { getPermissionsClient } from 'lib/permissions/api';
+import { STATIC_PAGES } from 'lib/features/constants';
+import { trashPages } from 'lib/pages/trashPages';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { convertAndSavePage } from 'lib/prosemirror/conversions/convertOldListNodes';
@@ -270,14 +270,10 @@ export class DocumentEventHandler {
       if (!isValidPageId) {
         throw new Error(`Invalid page id: ${pageId}`);
       }
-      const permissions = await getPermissionsClient({ resourceId: pageId, resourceIdType: 'page' }).then(
-        ({ client }) =>
-          client.pages.computePagePermissions({
-            resourceId: pageId,
-            userId
-          })
-      );
-
+      const permissions = await permissionsApiClient.pages.computePagePermissions({
+        resourceId: pageId,
+        userId
+      });
       if (permissions.edit_content !== true && permissions.comment !== true) {
         log.warn('Denied permission to user', { permissions, pageId, userId });
         this.sendError('You do not have permission to edit this page');
@@ -508,21 +504,21 @@ export class DocumentEventHandler {
         }
 
         if (deletedPageIds.length && socketEvent !== 'page_reordered') {
-          await archivePages({
+          await trashPages({
             pageIds: deletedPageIds,
             userId: session.user.id,
             spaceId: room.doc.spaceId,
-            archive: true,
+            trash: true,
             relay: this.relay
           });
         }
 
         if (restoredPageIds.length && socketEvent !== 'page_reordered') {
-          await archivePages({
+          await trashPages({
             pageIds: restoredPageIds,
             userId: session.user.id,
             spaceId: room.doc.spaceId,
-            archive: false,
+            trash: false,
             relay: this.relay
           });
         }

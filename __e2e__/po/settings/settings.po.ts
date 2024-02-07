@@ -1,7 +1,7 @@
 // playwright-dev-page.ts
 import type { Locator, Page } from '@playwright/test';
 
-import type { SpaceSettingsSection } from 'components/settings/config';
+import type { AccountSettingsSection, SpaceSettingsSection } from 'components/settings/config';
 import { baseUrl } from 'config/constants';
 
 import { GlobalPage } from '../global.po';
@@ -33,11 +33,11 @@ export class SettingsModal extends GlobalPage {
     return this.page.locator(`[data-test-active-path=${activePath}]`);
   }
 
-  getSpaceSettingsSectionLocator(section: SpaceSettingsSection): Locator {
+  getSpaceSettingsSectionLocator(section: SpaceSettingsSection | AccountSettingsSection): Locator {
     return this.page.locator(`data-test=space-settings-tab-${section}`);
   }
 
-  async goToTab(section: SpaceSettingsSection) {
+  async goToTab(section: SpaceSettingsSection | AccountSettingsSection) {
     const tab = this.getSpaceSettingsSectionLocator(section);
     await tab.click();
   }

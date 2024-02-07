@@ -1,70 +1,57 @@
-import type { ProposalEvaluationType } from '@charmverse/core/prisma';
 import { Box } from '@mui/material';
 
+import { usePublishProposal } from 'charmClient/hooks/proposals';
 import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/components/StickyFooterContainer';
+import { Button } from 'components/common/Button';
+import { useSnackbar } from 'hooks/useSnackbar';
+import { getProposalErrors } from 'lib/proposal/getProposalErrors';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 
-import { evaluationTypesWithSidebar } from '../EvaluationSidebar/components/ProposalSidebarHeader';
-
-import { CompleteDraftButton } from './components/CompleteDraftButton';
-import { CompleteFeedbackButton } from './components/CompleteFeedbackButton';
-import { GoBackButton } from './components/GoBackButton';
-import { OpenEvaluationButton } from './components/OpenEvaluationButton';
-
-export type EvaluationTypeOrDraft = ProposalEvaluationType | 'draft';
-
-// Currently this is just used for proposals but there's no reason not to add logic for other page types here
 export function ProposalStickyFooter({
   proposal,
-  refreshProposal
+  page,
+  refreshProposal,
+  isStructuredProposal
 }: {
   proposal: ProposalWithUsersAndRubric;
+  page: { title: string };
   refreshProposal: VoidFunction;
+  isStructuredProposal: boolean;
 }) {
-  const currentEvaluation = proposal.evaluations.find((e) => e.id === proposal.currentEvaluationId);
-  const currentEvaluationIndex = proposal?.evaluations.findIndex((e) => e.id === currentEvaluation?.id) ?? -1;
+  const { showMessage } = useSnackbar();
+  const { trigger: publishProposal, isMutating } = usePublishProposal({ proposalId: proposal.id });
 
-  const previousStep = proposal.evaluations[currentEvaluationIndex - 1];
-  const nextStep = proposal.evaluations[currentEvaluationIndex + 1];
-
-  // determine which buttons we need
-  let evaluationTypeOrDraft: EvaluationTypeOrDraft | undefined;
-  if (currentEvaluation) {
-    evaluationTypeOrDraft = currentEvaluation?.type;
-  } else if (proposal?.status === 'draft') {
-    evaluationTypeOrDraft = 'draft';
+  async function onClick() {
+    try {
+      await publishProposal();
+    } catch (error) {
+      showMessage((error as Error).message, 'error');
+    }
+    refreshProposal();
   }
-
-  const hasSidebarEvaluation = evaluationTypesWithSidebar.includes(evaluationTypeOrDraft as ProposalEvaluationType);
+  const disabledTooltip = getProposalErrors({
+    proposal: {
+      type: 'proposal',
+      proposalType: isStructuredProposal ? 'structured' : 'free_form',
+      title: page.title,
+      ...proposal,
+      formFields: proposal.form?.formFields || undefined,
+      authors: proposal.authors.map((a) => a.userId)
+    }
+  }).join('\n');
 
   return (
     <StickyFooterContainer>
-      <Box display='flex' justifyContent='space-between' alignItems='center' width='100%'>
-        <GoBackButton
-          proposalId={proposal.id}
-          previousStep={previousStep}
-          isDraft={proposal.status === 'draft'}
-          disabled={!proposal.permissions.move}
-          onSubmit={refreshProposal}
-        />
-        {evaluationTypeOrDraft === 'draft' && (
-          <CompleteDraftButton proposalId={proposal.id} nextStep={nextStep} onSubmit={refreshProposal} />
-        )}
-        {evaluationTypeOrDraft === 'feedback' && (
-          <CompleteFeedbackButton
-            currentStep={currentEvaluation}
-            nextStep={nextStep}
-            proposalId={proposal.id}
-            onSubmit={refreshProposal}
-          />
-        )}
-        {hasSidebarEvaluation && (
-          <OpenEvaluationButton
-            disabled={!proposal.permissions.move}
-            isEvaluationSidebarOpen={false}
-            onClick={refreshProposal}
-          />
-        )}
+      <Box display='flex' justifyContent='flex-end' alignItems='center' width='100%'>
+        <Button
+          disabledTooltip={disabledTooltip}
+          disabled={!!disabledTooltip}
+          data-test='complete-draft-button'
+          loading={isMutating}
+          onClick={onClick}
+        >
+          Publish
+        </Button>
       </Box>
     </StickyFooterContainer>
   );

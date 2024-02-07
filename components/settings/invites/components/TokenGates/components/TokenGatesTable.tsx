@@ -11,6 +11,7 @@ import { useContext, useState } from 'react';
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import { useVerifyTokenGate } from 'charmClient/hooks/tokenGates';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
+import Loader from 'components/common/Loader';
 import TableRow from 'components/common/Table/TableRow';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
@@ -25,6 +26,7 @@ import { TokenGateTableRow } from './TokenGatesTableRow';
 
 interface Props {
   isAdmin: boolean;
+  isLoading: boolean;
   tokenGates: TokenGateWithRoles[];
   refreshTokenGates: () => Promise<void>;
 }
@@ -41,7 +43,7 @@ const StyledTableRow = styled(TableRow)`
 
 const padding = 32;
 
-export default function TokenGatesTable({ isAdmin, tokenGates, refreshTokenGates }: Props) {
+export default function TokenGatesTable({ isAdmin, isLoading, tokenGates, refreshTokenGates }: Props) {
   const { account, walletAuthSignature, requestSignature } = useWeb3Account();
   const isMobile = useSmallScreen();
   const [testResult, setTestResult] = useState<TestResult>({});
@@ -97,7 +99,7 @@ export default function TokenGatesTable({ isAdmin, tokenGates, refreshTokenGates
     }
   }
 
-  async function testUnlock(tokenGate: TokenGate<'unlock'>) {
+  async function testOthers(tokenGate: TokenGate<'unlock'> | TokenGate<'hypersub'>) {
     setTestResult({ status: 'loading' });
     if (space?.id && account) {
       await verifyTokenGate(
@@ -109,13 +111,10 @@ export default function TokenGatesTable({ isAdmin, tokenGates, refreshTokenGates
         },
         {
           onError: () => {
-            setTestResult({ message: 'Your address does not meet the requirements for this lock', status: 'error' });
+            setTestResult({ message: 'Your address does not meet the requirements', status: 'error' });
           },
           onSuccess: () => {
-            setTestResult({
-              message: `Your address does not meet requirements: ${shortenHex(account)}`,
-              status: 'success'
-            });
+            setTestResult({ status: 'success' });
           }
         }
       );
@@ -124,9 +123,9 @@ export default function TokenGatesTable({ isAdmin, tokenGates, refreshTokenGates
 
   async function testConnect(tokenGate: TokenGate) {
     if (account) {
-      if (tokenGate.type === 'unlock') {
-        await testUnlock(tokenGate);
-      } else if (litClient && tokenGate.type === 'lit') {
+      if (tokenGate.type === 'unlock' || tokenGate.type === 'hypersub') {
+        await testOthers(tokenGate);
+      } else if (tokenGate.type === 'lit') {
         await testLitTokenGate(tokenGate);
       }
     } else {
@@ -140,24 +139,23 @@ export default function TokenGatesTable({ isAdmin, tokenGates, refreshTokenGates
         <Table size='small' aria-label='Token gates table'>
           <TableHead>
             <StyledTableRow>
-              <TableCell sx={{ padding: '20px 16px' }}>
-                <Typography variant='body1' fontWeight='600' mr={6} display='inline-flex'>
+              <TableCell sx={{ padding: isMobile ? '20px 0 20px 16px' : '20px 16px' }} colSpan={isMobile ? 2 : 0}>
+                <Typography variant='body1' fontWeight='600'>
                   Token Gated Link
                 </Typography>
-                {isMobile && <CopyLink tokenGatesAvailable={tokenGates.length > 0} spaceDomain={space?.domain} />}
               </TableCell>
-              <TableCell sx={{ width: 150 }}></TableCell>
+              {!isMobile && <TableCell width={150} />}
               <TableCell sx={{ width: 90 + padding }} align='center'>
-                {!isMobile && <CopyLink tokenGatesAvailable={tokenGates.length > 0} spaceDomain={space?.domain} />}
+                <CopyLink tokenGatesAvailable={tokenGates.length > 0} spaceDomain={space?.domain} />
               </TableCell>
-              <TableCell sx={{ width: 30 + padding }}>{/** Delete */}</TableCell>
+              <TableCell sx={{ width: 30 + padding }} />
             </StyledTableRow>
           </TableHead>
           <TableBody>
             {tokenGates.length === 0 && (
               <TableRow>
                 <TableCell align='center' colSpan={4} sx={{ padding: '20px 16px' }}>
-                  This Space has no Token Gates
+                  {isLoading ? <Loader size={20} /> : 'This Space has no Token Gates'}
                 </TableCell>
               </TableRow>
             )}

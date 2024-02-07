@@ -11,15 +11,13 @@ import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPag
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
 import { useNotifications } from 'components/nexus/hooks/useNotifications';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { usePage } from 'hooks/usePage';
 import { usePageIdFromPath } from 'hooks/usePageFromPath';
 
 import { DocumentHeaderElements } from './components/DocumentHeaderElements';
-import PageTitleWithBreadcrumbs from './components/PageTitleWithBreadcrumbs';
+import { PageTitleWithBreadcrumbs } from './components/PageTitleWithBreadcrumbs';
 import ProposalShareButton from './components/ProposalsShareButton/ProposalsShareButton';
 import RewardsShareButton from './components/RewardsShareButton/RewardsShareButton';
-import { ToggleEvaluationButton } from './components/ToggleEvaluationButton';
 
 export const headerHeight = 56;
 
@@ -39,7 +37,6 @@ type HeaderProps = {
 };
 
 function HeaderComponent({ open, openSidebar }: HeaderProps) {
-  const isCharmVerse = useIsCharmverseSpace();
   const router = useRouter();
   const basePageId = usePageIdFromPath();
   const { space: currentSpace } = useCurrentSpace();
@@ -48,7 +45,6 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
     spaceId: currentSpace?.id
   });
   const { unreadNotifications } = useNotifications();
-
   // Post permissions hook will not make an API call if post ID is null. Since we can't conditionally render hooks, we pass null as the post ID. This is the reason for the 'null as any' statement
   const forumPostInfo = usePostByPath();
   const isRewardsList = router.route === '/[domain]/rewards';
@@ -83,15 +79,18 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         }}
       >
         <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          <PageTitleWithBreadcrumbs pageId={basePage?.id} pageType={basePage?.type} post={forumPostInfo?.forumPost} />
+          <PageTitleWithBreadcrumbs
+            pageId={basePage?.id}
+            pageMeta={basePage}
+            pageType={basePage?.type}
+            post={forumPostInfo?.forumPost}
+          />
         </div>
 
         <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1} gap={0.5}>
           {isRewardsList && <RewardsShareButton headerHeight={headerHeight} />}
           {isProposalsPage && <ProposalShareButton headerHeight={headerHeight} />}
-
           {basePage && <DocumentHeaderElements headerHeight={headerHeight} page={basePage} />}
-          {isNewProposalPage && isCharmVerse && <ToggleEvaluationButton />}
 
           <FullPageActionsMenuButton page={basePage} post={forumPostInfo?.forumPost} />
         </Box>

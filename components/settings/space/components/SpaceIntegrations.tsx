@@ -1,6 +1,6 @@
 import { Box, Stack } from '@mui/material';
 
-import ConnectSnapshot from 'components/common/PageActions/components/SnapshotAction/ConnectSnapshot';
+import ConnectSnapshot from 'components/proposals/ProposalPage/components/ProposalEvaluations/components/Review/components/VoteEvaluation/components/PublishToSnapshot/components/ConnectSnapshot';
 import Legend from 'components/settings/Legend';
 import { ConnectCollabland } from 'components/settings/space/components/ConnectCollabland';
 

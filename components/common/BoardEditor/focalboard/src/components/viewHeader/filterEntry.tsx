@@ -1,4 +1,3 @@
-import type { ProposalStatus } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -6,13 +5,13 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import type { SelectChangeEvent } from '@mui/material';
 import {
   Button,
+  Checkbox,
   Chip,
   ListItemIcon,
   Menu,
   MenuItem,
   Select,
   Stack,
-  Checkbox,
   TextField,
   Typography
 } from '@mui/material';
@@ -24,6 +23,10 @@ import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useEffect, useMemo, useState } from 'react';
 
+import { RelationPageListItemsContainer } from 'components/common/BoardEditor/components/properties/PagesAutocomplete';
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
+import { PageIcon } from 'components/common/PageIcon';
+import PageTitle from 'components/common/PageLayout/components/PageTitle';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
@@ -32,8 +35,11 @@ import type { FilterClause, FilterCondition } from 'lib/focalboard/filterClause'
 import { propertyConfigs } from 'lib/focalboard/filterClause';
 import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import { createFilterGroup } from 'lib/focalboard/filterGroup';
-import { PROPOSAL_REVIEWERS_BLOCK_ID, AUTHORS_BLOCK_ID } from 'lib/proposal/blocks/constants';
-import { PROPOSAL_STATUS_LABELS_WITH_ARCHIVED } from 'lib/proposal/proposalStatusTransition';
+import { getPropertyName } from 'lib/focalboard/getPropertyName';
+import { EVALUATION_STATUS_LABELS, PROPOSAL_STEP_LABELS } from 'lib/focalboard/proposalDbProperties';
+import { AUTHORS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposal/blocks/constants';
+import type { ProposalEvaluationStatus, ProposalEvaluationStep } from 'lib/proposal/interface';
+import { isTruthy } from 'lib/utilities/types';
 import { focalboardColorsMap } from 'theme/colors';
 
 import { iconForPropertyType } from '../../widgets/iconForPropertyType';
@@ -44,6 +50,7 @@ type Props = {
   filter: FilterClause;
   changeViewFilter: (filterGroup: FilterGroup) => void;
   currentFilter: FilterGroup;
+  relationPropertiesCardsRecord: PageListItemsRecord;
 };
 
 function formatCondition(condition: string) {
@@ -76,12 +83,14 @@ function FilterPropertyValue({
   properties,
   filter: initialFilter,
   changeViewFilter,
-  currentFilter
+  currentFilter,
+  relationPropertiesCardsRecord
 }: {
   filter: FilterClause;
   properties: IPropertyTemplate[];
   changeViewFilter: (filterGroup: FilterGroup) => void;
   currentFilter: FilterGroup;
+  relationPropertiesCardsRecord: PageListItemsRecord;
 }) {
   const [filter, setFilter] = useState(initialFilter);
 
@@ -91,10 +100,10 @@ function FilterPropertyValue({
   }, {});
   const { members } = useMembers();
   const isPropertyTypePerson =
-    propertyRecord[filter.propertyId].type.match(/person|createdBy|updatedBy/) ||
+    propertyRecord[filter.propertyId].type.match(/person|createdBy|updatedBy|proposalEvaluatedBy|proposalAuthor/) ||
     filter.propertyId === PROPOSAL_REVIEWERS_BLOCK_ID ||
     filter.propertyId === AUTHORS_BLOCK_ID;
-  const isPropertyTypeMultiSelect = propertyRecord[filter.propertyId].type === 'multiSelect';
+  const isPropertyTypeEvaluationType = propertyRecord[filter.propertyId].type === 'proposalEvaluationType';
   const isPropertyTypeTokenChain = propertyRecord[filter.propertyId].type === 'tokenChain';
   const property = propertyRecord[filter.propertyId];
 
@@ -191,52 +200,7 @@ function FilterPropertyValue({
   } else if (propertyDataType === 'boolean') {
     return <Checkbox checked={filter.values[0] === 'true'} onChange={updateBooleanValue} />;
   } else if (propertyDataType === 'multi_select') {
-    if (isPropertyTypeMultiSelect) {
-      return (
-        <Select<string[]>
-          size='small'
-          multiple
-          displayEmpty
-          value={filter.values}
-          onChange={updateMultiSelectValue}
-          renderValue={(selected) => {
-            return selected.length === 0 ? (
-              <Typography fontSize='small' color='secondary'>
-                Select an option
-              </Typography>
-            ) : (
-              <SelectMenuItemsContainer>
-                {selected.map((optionId) => {
-                  const foundOption = property.options?.find((o) => o.id === optionId);
-                  return foundOption ? (
-                    <Chip
-                      key={foundOption.id}
-                      size='small'
-                      label={foundOption.value}
-                      color={focalboardColorsMap[foundOption.color]}
-                    />
-                  ) : null;
-                })}
-              </SelectMenuItemsContainer>
-            );
-          }}
-        >
-          {property.options.length === 0 ? (
-            <Typography sx={{ mx: 1, textAlign: 'center' }} color='secondary' variant='subtitle1'>
-              No options available
-            </Typography>
-          ) : (
-            property.options?.map((option) => {
-              return (
-                <MenuItem key={option.id} value={option.id}>
-                  <Chip size='small' label={option.value} color={focalboardColorsMap[option.color]} />
-                </MenuItem>
-              );
-            })
-          )}
-        </Select>
-      );
-    } else if (isPropertyTypePerson) {
+    if (isPropertyTypePerson) {
       return (
         <Select<string[]>
           size='small'
@@ -302,6 +266,111 @@ function FilterPropertyValue({
           })}
         </Select>
       );
+    } else if (property.type === 'relation') {
+      const pageListItems = relationPropertiesCardsRecord[property.id];
+      return (
+        <Select<string[]>
+          size='small'
+          multiple
+          displayEmpty
+          value={filter.values}
+          onChange={updateMultiSelectValue}
+          renderValue={(pageListItemIds) => {
+            return pageListItemIds.length === 0 ? (
+              <Typography color='secondary' fontSize='small'>
+                Select a page
+              </Typography>
+            ) : (
+              <RelationPageListItemsContainer
+                pageListItems={pageListItemIds
+                  .map((pageListItemId) => {
+                    const pageListItem = pageListItems.find((_pageListItem) => _pageListItem.id === pageListItemId);
+                    return pageListItem;
+                  })
+                  .filter(isTruthy)}
+              />
+            );
+          }}
+        >
+          {pageListItems.map((pageListItem) => {
+            return (
+              <MenuItem
+                key={pageListItem.id}
+                value={pageListItem.id}
+                selected={!!filter.values.find((selectedPageListItemId) => selectedPageListItemId === pageListItem.id)}
+              >
+                <ListItemIcon>
+                  <PageIcon
+                    icon={pageListItem.icon}
+                    isEditorEmpty={!pageListItem.hasContent}
+                    pageType={pageListItem.type}
+                  />
+                </ListItemIcon>
+                <PageTitle hasContent={!pageListItem.title} sx={{ fontWeight: 'bold' }}>
+                  {pageListItem.title ? pageListItem.title : 'Untitled'}
+                </PageTitle>
+              </MenuItem>
+            );
+          })}
+        </Select>
+      );
+    } else {
+      return (
+        <Select<string[]>
+          size='small'
+          multiple
+          displayEmpty
+          value={filter.values}
+          onChange={updateMultiSelectValue}
+          renderValue={(selected) => {
+            return selected.length === 0 ? (
+              <Typography fontSize='small' color='secondary'>
+                Select an option
+              </Typography>
+            ) : (
+              <SelectMenuItemsContainer>
+                {selected.map((optionId) => {
+                  const foundOption = property.options?.find((o) => o.id === optionId);
+                  return foundOption ? (
+                    <Chip
+                      key={foundOption.id}
+                      size='small'
+                      label={
+                        property.type === 'proposalStatus'
+                          ? EVALUATION_STATUS_LABELS[foundOption.value as ProposalEvaluationStatus]
+                          : foundOption.value
+                      }
+                      color={focalboardColorsMap[foundOption.color]}
+                    />
+                  ) : null;
+                })}
+              </SelectMenuItemsContainer>
+            );
+          }}
+        >
+          {property.options.length === 0 ? (
+            <Typography sx={{ mx: 1, textAlign: 'center' }} color='secondary' variant='subtitle1'>
+              No options available
+            </Typography>
+          ) : (
+            property.options?.map((option) => {
+              return (
+                <MenuItem key={option.id} value={option.id}>
+                  <Chip
+                    size='small'
+                    label={
+                      property.type === 'proposalStatus'
+                        ? EVALUATION_STATUS_LABELS[option.value as ProposalEvaluationStatus]
+                        : option.value
+                    }
+                    color={focalboardColorsMap[option.color]}
+                  />
+                </MenuItem>
+              );
+            })
+          )}
+        </Select>
+      );
     }
   } else if (propertyDataType === 'select') {
     return (
@@ -314,10 +383,8 @@ function FilterPropertyValue({
             <Chip
               size='small'
               label={
-                property.type === 'proposalStatus'
-                  ? PROPOSAL_STATUS_LABELS_WITH_ARCHIVED[
-                      foundOption.value as Exclude<ProposalStatus, 'draft'> | 'archived'
-                    ]
+                isPropertyTypeEvaluationType
+                  ? PROPOSAL_STEP_LABELS[foundOption.value as ProposalEvaluationStep]
                   : foundOption.value
               }
               color={focalboardColorsMap[foundOption.color]}
@@ -340,10 +407,8 @@ function FilterPropertyValue({
                 <Chip
                   size='small'
                   label={
-                    property.type === 'proposalStatus'
-                      ? PROPOSAL_STATUS_LABELS_WITH_ARCHIVED[
-                          option.value as Exclude<ProposalStatus, 'draft'> | 'archived'
-                        ]
+                    isPropertyTypeEvaluationType
+                      ? PROPOSAL_STEP_LABELS[option.value as ProposalEvaluationStep]
                       : option.value
                   }
                   color={focalboardColorsMap[option.color]}
@@ -429,7 +494,7 @@ function FilterEntry(props: Props) {
                   sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}
                 >
                   {iconForPropertyType(template.type, { color: 'secondary' })}
-                  <EllipsisText fontSize='small'>{template.name}</EllipsisText>
+                  <EllipsisText fontSize='small'>{getPropertyName(template)}</EllipsisText>
                 </Stack>
               </Button>
               <Menu {...bindMenu(popupState)} sx={{ maxWidth: 350 }}>
@@ -454,7 +519,7 @@ function FilterEntry(props: Props) {
                     }}
                   >
                     <ListItemIcon>{iconForPropertyType(property.type)}</ListItemIcon>
-                    <EllipsisText fontSize='small'>{property.name}</EllipsisText>
+                    <EllipsisText fontSize='small'>{getPropertyName(property)}</EllipsisText>
                   </MenuItem>
                 ))}
               </Menu>
@@ -495,6 +560,7 @@ function FilterEntry(props: Props) {
         </PopupState>
         <FilterPropertyValue
           filter={filter}
+          relationPropertiesCardsRecord={props.relationPropertiesCardsRecord}
           properties={properties}
           changeViewFilter={changeViewFilter}
           currentFilter={currentFilter}

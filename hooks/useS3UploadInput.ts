@@ -7,6 +7,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 import type { ResizeType } from 'lib/file/constants';
 import { DEFAULT_MAX_FILE_SIZE_MB, FORM_DATA_FILE_PART_NAME, FORM_DATA_IMAGE_RESIZE_TYPE } from 'lib/file/constants';
+import { replaceS3Domain } from 'lib/utilities/url';
 
 export type UploadedFileInfo = { url: string; fileName: string; size?: number };
 export type UploadedFileCallback = (info: UploadedFileInfo) => void;
@@ -45,10 +46,10 @@ export const useS3UploadInput = ({
         formData.append(FORM_DATA_FILE_PART_NAME, file);
         formData.append(FORM_DATA_IMAGE_RESIZE_TYPE, resizeType);
         const { url } = await charmClient.resizeImage(formData);
-        onFileUpload({ url, fileName: file.name || '', size: file.size });
+        onFileUpload({ url: replaceS3Domain(url), fileName: file.name || '', size: file.size });
       } else {
         const { url } = await uploadToS3(file, { onUploadPercentageProgress: setProgress });
-        onFileUpload({ url, fileName: file.name || '', size: file.size });
+        onFileUpload({ url: replaceS3Domain(url), fileName: file.name || '', size: file.size });
       }
     } catch (error) {
       log.error('Error uploading image to s3', { error });

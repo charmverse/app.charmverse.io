@@ -1,4 +1,4 @@
-import type { ProposalStatus } from '@charmverse/core/prisma';
+import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
 import { getChainById } from 'connectors/chains';
 import { DateUtils } from 'react-day-picker';
 
@@ -10,9 +10,12 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
-import { PROPOSAL_STATUS_LABELS } from 'lib/proposal/proposalStatusTransition';
+import { PROPOSAL_RESULT_LABELS, PROPOSAL_STEP_LABELS } from 'lib/focalboard/proposalDbProperties';
+import type { ProposalEvaluationStep } from 'lib/proposal/interface';
 import { getAbsolutePath } from 'lib/utilities/browser';
 import { isTruthy } from 'lib/utilities/types';
+
+import type { PageListItemsRecord } from '../../interfaces';
 
 import { createCheckboxBlock } from './blocks/checkboxBlock';
 import { createImageBlock } from './blocks/imageBlock';
@@ -26,7 +29,6 @@ export type Formatters = {
 
 export type PropertyContext = {
   users: { [key: string]: { username: string } };
-  proposalCategories: { [key: string]: string };
   spaceDomain: string;
 };
 
@@ -36,13 +38,15 @@ class OctoUtils {
     propertyValue,
     propertyTemplate,
     formatters,
-    context
+    context,
+    relationPropertiesCardsRecord = {}
   }: {
     block: Block;
     propertyValue: string | string[] | undefined | number;
     propertyTemplate: IPropertyTemplate;
     formatters: Formatters;
     context?: PropertyContext;
+    relationPropertiesCardsRecord?: PageListItemsRecord;
   }) {
     const { date: formatDate, dateTime: formatDateTime } = formatters;
     let displayValue: string | string[] | undefined | number;
@@ -62,13 +66,18 @@ class OctoUtils {
         }
         break;
       }
-      case 'proposalCategory': {
-        displayValue = typeof propertyValue === 'string' ? context?.proposalCategories[propertyValue] : propertyValue;
+      case 'proposalStatus': {
+        displayValue = propertyValue
+          ? PROPOSAL_RESULT_LABELS[propertyValue as ProposalEvaluationResult]
+          : 'In Progress';
         break;
       }
-      case 'proposalStatus': {
-        const proposalStatus = propertyTemplate.options.find((o) => propertyValue === o.id)?.value;
-        displayValue = proposalStatus ? PROPOSAL_STATUS_LABELS[proposalStatus as ProposalStatus] : propertyValue;
+      case 'proposalStep': {
+        displayValue = propertyValue;
+        break;
+      }
+      case 'proposalEvaluationType': {
+        displayValue = PROPOSAL_STEP_LABELS[propertyValue as ProposalEvaluationStep];
         break;
       }
       case 'person':
@@ -84,6 +93,16 @@ class OctoUtils {
       case 'proposalUrl': {
         displayValue =
           typeof propertyValue === 'string' ? getAbsolutePath(`/${propertyValue}`, context?.spaceDomain) : '';
+        break;
+      }
+      case 'relation': {
+        const pageListItems = relationPropertiesCardsRecord[propertyTemplate.id];
+        if (pageListItems && Array.isArray(propertyValue)) {
+          displayValue = propertyValue.map((pageListItemId) => {
+            const pageListItem = pageListItems.find((item) => item.id === pageListItemId);
+            return pageListItem?.title || 'Untitled';
+          });
+        }
         break;
       }
       case 'createdTime': {

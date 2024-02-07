@@ -1,22 +1,21 @@
 import { UndesirableOperationError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { resolvePageTree } from '@charmverse/core/pages';
-import type { PermissionsClient } from '@charmverse/core/permissions';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { unsealData } from 'iron-session';
 import type { Socket } from 'socket.io';
 
-import { STATIC_PAGES } from 'components/common/PageLayout/components/Sidebar/constants';
+import { STATIC_PAGES } from 'lib/features/constants';
 import { ActionNotPermittedError } from 'lib/middleware';
-import { archivePages } from 'lib/pages/archivePages';
 import { createPage } from 'lib/pages/server/createPage';
-import { getPermissionsClient, permissionsApiClient } from 'lib/permissions/api/routers';
+import { trashPages } from 'lib/pages/trashPages';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { authSecret } from 'lib/session/config';
+import { authSecret } from 'lib/session/authSecret';
 import type { ClientMessage, SealedUserId } from 'lib/websockets/interfaces';
 
 import type { DocumentRoom } from './documentEvents/docRooms';
@@ -34,8 +33,6 @@ export class SpaceEventHandler {
   spaceId: string | null = null;
 
   private relay: AbstractWebsocketBroadcaster;
-
-  private permissionsClient?: PermissionsClient;
 
   constructor(
     relay: AbstractWebsocketBroadcaster,
@@ -103,11 +100,11 @@ export class SpaceEventHandler {
           event: 'page_deleted'
         });
       } else {
-        await archivePages({
+        await trashPages({
           pageIds: [pageId],
           userId: this.userId,
           spaceId: this.spaceId,
-          archive: true,
+          trash: true,
           relay: this.relay
         });
       }
@@ -162,17 +159,17 @@ export class SpaceEventHandler {
             await this.applyDiffAndSaveDocument({
               content,
               pageId: page.parentId,
-              diffs: SpaceEventHandler.generateInsertNestedPageDiffs({ pageId, pos: lastValidPos })
+              steps: SpaceEventHandler.generateInsertNestedPageDiffs({ pageId, pos: lastValidPos })
             });
           }
         }
 
         if (!unarchivedPage) {
-          await archivePages({
+          await trashPages({
             pageIds: [pageId],
             userId: this.userId,
             spaceId: this.spaceId,
-            archive: false,
+            trash: false,
             relay: this.relay
           });
         }
@@ -227,7 +224,7 @@ export class SpaceEventHandler {
             await this.applyDiffAndSaveDocument({
               content,
               pageId: createdPage.parentId,
-              diffs: SpaceEventHandler.generateInsertNestedPageDiffs({ pageId: createdPage.id, pos: lastValidPos })
+              steps: SpaceEventHandler.generateInsertNestedPageDiffs({ pageId: createdPage.id, pos: lastValidPos })
             });
           }
         }
@@ -345,7 +342,7 @@ export class SpaceEventHandler {
               await this.applyDiffAndSaveDocument({
                 content,
                 pageId: newParentId,
-                diffs: SpaceEventHandler.generateInsertNestedPageDiffs({
+                steps: SpaceEventHandler.generateInsertNestedPageDiffs({
                   pageId,
                   pos: lastValidPos,
                   path: pagePath,
@@ -453,7 +450,7 @@ export class SpaceEventHandler {
             await this.applyDiffAndSaveDocument({
               content,
               pageId: newParentId,
-              diffs: SpaceEventHandler.generateInsertNestedPageDiffs({
+              steps: SpaceEventHandler.generateInsertNestedPageDiffs({
                 pageId,
                 pos: lastValidPos,
                 path: pagePath,
@@ -583,7 +580,7 @@ export class SpaceEventHandler {
             await this.applyDiffAndSaveDocument({
               content,
               pageId: newParentId,
-              diffs: SpaceEventHandler.generateInsertNestedPageDiffs({
+              steps: SpaceEventHandler.generateInsertNestedPageDiffs({
                 pageId,
                 pos: lastValidPos,
                 isLinkedPage,
@@ -733,7 +730,7 @@ export class SpaceEventHandler {
           await this.applyDiffAndSaveDocument({
             content,
             pageId,
-            diffs: [
+            steps: [
               {
                 from: position,
                 to: position + 1,
@@ -745,11 +742,11 @@ export class SpaceEventHandler {
 
         // If the user is not in the document or the position of the page node is not found (present in sidebar)
         if (event === 'page_deleted') {
-          await archivePages({
+          await trashPages({
             pageIds: [childPageId],
             userId: this.userId!,
             spaceId: this.spaceId!,
-            archive: true,
+            trash: true,
             relay: this.relay
           });
         }
@@ -766,20 +763,7 @@ export class SpaceEventHandler {
   }
 
   async checkUserCanDeletePage({ pageId, parentId }: { pageId: string; parentId?: string | null }): Promise<void> {
-    const permissionsClient =
-      this.permissionsClient ??
-      (
-        await getPermissionsClient({
-          resourceId: pageId,
-          resourceIdType: 'page'
-        })
-      ).client;
-
-    if (!this.permissionsClient) {
-      this.permissionsClient = permissionsClient;
-    }
-
-    const childPagePermissions = await permissionsClient.pages.computePagePermissions({
+    const childPagePermissions = await permissionsApiClient.pages.computePagePermissions({
       resourceId: pageId,
       userId: this.userId as string
     });
@@ -787,7 +771,7 @@ export class SpaceEventHandler {
     let canDelete = childPagePermissions.edit_content || childPagePermissions.delete;
 
     if (!canDelete && parentId) {
-      const parentPagePermissions = await permissionsClient.pages.computePagePermissions({
+      const parentPagePermissions = await permissionsApiClient.pages.computePagePermissions({
         resourceId: parentId,
         userId: this.userId as string
       });
@@ -803,24 +787,50 @@ export class SpaceEventHandler {
   async applyDiffAndSaveDocument({
     content,
     pageId,
-    diffs
+    steps
   }: {
     content: PageContent;
     pageId: string;
-    diffs: ProsemirrorJSONStep[];
+    steps: ProsemirrorJSONStep[];
   }) {
     const pageNode = getNodeFromJson(content);
-    const updatedNode = applyStepsToNode(diffs, pageNode);
-    await prisma.page.update({
-      where: { id: pageId },
-      data: {
-        content: updatedNode.toJSON(),
-        contentText: updatedNode.textContent,
-        hasContent: updatedNode.textContent.length > 0,
-        updatedAt: new Date(),
-        updatedBy: this.userId!
+    const updatedNode = applyStepsToNode(steps, pageNode);
+    const page = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: pageId
+      },
+      select: {
+        version: true
       }
     });
+    await prisma.$transaction([
+      prisma.pageDiff.create({
+        data: {
+          createdBy: this.userId!,
+          data: {
+            rid: 0,
+            cid: 0,
+            type: 'diff',
+            ds: steps,
+            v: page.version
+          },
+          version: page.version,
+          createdAt: new Date(),
+          pageId
+        }
+      }),
+      prisma.page.update({
+        where: { id: pageId },
+        data: {
+          content: updatedNode.toJSON(),
+          contentText: updatedNode.textContent,
+          hasContent: updatedNode.textContent.length > 0,
+          updatedAt: new Date(),
+          updatedBy: this.userId!,
+          version: page.version + 1
+        }
+      })
+    ]);
   }
 
   static generateInsertNestedPageDiffs({

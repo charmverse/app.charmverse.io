@@ -1,54 +1,48 @@
-import type { ProposalEvaluationType } from '@charmverse/core/prisma-client';
-
 import type { AnswerData } from 'lib/proposal/rubric/aggregateResults';
 import { aggregateResults } from 'lib/proposal/rubric/aggregateResults';
 
-import type { Block } from './block';
-import type { Card } from './card';
-import type { ExtractedDatabaseProposalProperties } from './extractDatabaseProposalProperties';
+import type { IPropertyTemplate } from './board';
+import type { CardPropertyValue } from './card';
 
 export function generateResyncedProposalEvaluationForCard({
-  cardProps,
-  proposalEvaluationType,
-  databaseProperties,
+  properties,
+  templates,
   rubricAnswers,
-  rubricCriteria
+  rubricCriteria,
+  step
 }: {
-  cardProps: Pick<Block, 'fields'>;
-  proposalEvaluationType: ProposalEvaluationType;
-  databaseProperties: Partial<ExtractedDatabaseProposalProperties>;
+  properties: Record<string, CardPropertyValue>;
+  templates: IPropertyTemplate[];
   rubricCriteria: { id: string }[];
   rubricAnswers: AnswerData[];
-}): Pick<Block, 'fields'> {
-  if (proposalEvaluationType !== 'rubric') {
-    return cardProps;
-  }
-
-  const cardProperties = { ...(cardProps as Card).fields.properties };
-
+  step: { id: string; title: string };
+}): Record<string, CardPropertyValue> {
   const { allScores, reviewersResults } = aggregateResults({
-    answers: rubricAnswers,
-    criteria: rubricCriteria
+    answers: rubricAnswers.filter((a) => a.evaluationId === step.id),
+    criteria: rubricCriteria.filter((c) => c.id !== step.id)
   });
 
   const uniqueReviewers = Object.keys(reviewersResults);
 
-  if (databaseProperties.proposalEvaluationAverage) {
-    cardProperties[databaseProperties.proposalEvaluationAverage.id] = allScores.average ?? '';
+  const proposalEvaluatedByProp = templates.find((p) => p.type === 'proposalEvaluatedBy' && p.name === step.title);
+  const proposalEvaluationTotalProp = templates.find(
+    (p) => p.type === 'proposalEvaluationTotal' && p.name === step.title
+  );
+  const proposalEvaluationAverageProp = templates.find(
+    (p) => p.type === 'proposalEvaluationAverage' && p.name === step.title
+  );
+
+  if (proposalEvaluatedByProp) {
+    properties[proposalEvaluatedByProp.id] = uniqueReviewers;
   }
 
-  if (databaseProperties.proposalEvaluationTotal) {
-    cardProperties[databaseProperties.proposalEvaluationTotal.id] = allScores.sum ?? '';
+  if (proposalEvaluationTotalProp) {
+    properties[proposalEvaluationTotalProp.id] = allScores.sum ?? '';
   }
 
-  if (databaseProperties.proposalEvaluatedBy) {
-    cardProperties[databaseProperties.proposalEvaluatedBy.id] = uniqueReviewers;
+  if (proposalEvaluationAverageProp) {
+    properties[proposalEvaluationAverageProp.id] = allScores.average ?? '';
   }
 
-  return {
-    fields: {
-      ...cardProps.fields,
-      properties: cardProperties
-    }
-  };
+  return properties;
 }

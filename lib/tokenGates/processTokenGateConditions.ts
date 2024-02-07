@@ -34,13 +34,13 @@ export function processTokenGateConditions(tokenGate: TokenGate): {
     return { accessTypes, numberOfConditions, chainType, accesType };
   }
 
-  if (tokenGate.type === 'unlock') {
+  if (tokenGate.type === 'unlock' || tokenGate.type === 'hypersub') {
     if (tokenGate.conditions?.contract && tokenGate.conditions?.chainId) {
       const chain = getChainById(tokenGate.conditions.chainId)?.chainName;
       return {
         accessTypes: ['group_token_or_nft'],
         numberOfConditions: 1,
-        chainType: chain || 'etherum',
+        chainType: chain || 'ethereum',
         accesType: accessTypeDict.group_token_or_nft
       };
     } else {

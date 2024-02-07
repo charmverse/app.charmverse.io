@@ -6,6 +6,7 @@ import type { LoggedInUser } from 'models';
 export function createMockUser(user?: Partial<LoggedInUser>): LoggedInUser {
   const id = user?.id ?? uuid();
   return {
+    primaryWalletId: null,
     publishToLensDefault: false,
     id: uuid(),
     avatar: null,
@@ -32,7 +33,6 @@ export function createMockUser(user?: Partial<LoggedInUser>): LoggedInUser {
       }
     ],
     spaceRoles: [],
-    unstoppableDomains: [],
     favorites: [],
     googleAccounts: [],
     verifiedEmails: [],

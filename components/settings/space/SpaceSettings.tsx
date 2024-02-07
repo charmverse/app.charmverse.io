@@ -1,6 +1,7 @@
 import type { IdentityType, Prisma, Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
+import MedalIcon from '@mui/icons-material/WorkspacePremium';
 import {
   Box,
   FormHelperText,
@@ -34,7 +35,6 @@ import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import { PageIcon } from 'components/common/PageIcon';
-import type { Feature } from 'components/common/PageLayout/components/Sidebar/constants';
 import Legend from 'components/settings/Legend';
 import { SetupCustomDomain } from 'components/settings/space/components/SetupCustomDomain';
 import { SpaceIntegrations } from 'components/settings/space/components/SpaceIntegrations';
@@ -43,6 +43,7 @@ import { useMemberProfileTypes } from 'hooks/useMemberProfileTypes';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useSpaces } from 'hooks/useSpaces';
+import type { Feature } from 'lib/features/constants';
 import type { NotificationToggleOption, NotificationToggles } from 'lib/notifications/notificationToggles';
 import type { MemberProfileName } from 'lib/profile/memberProfiles';
 import { getSpaceUrl, getSubdomainPath } from 'lib/utilities/browser';
@@ -51,8 +52,9 @@ import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFrom
 import { IdentityIcon } from '../profile/components/IdentityIcon';
 
 import Avatar from './components/LargeAvatar';
-import { NotificationTogglesInput } from './components/NotificationToggles';
+import { NotificationTogglesInput, getDefaultValues } from './components/NotificationToggles';
 import { SettingsItem } from './components/SettingsItem';
+import { TwoFactorAuth } from './components/TwoFactorAuth';
 
 export type FormValues = {
   name: string;
@@ -60,6 +62,7 @@ export type FormValues = {
   spaceArtwork?: string | null;
   domain: string;
   notificationToggles: NotificationToggles;
+  requireMembersTwoFactorAuth: boolean;
 };
 
 const schema: yup.Schema<FormValues> = yup.object({
@@ -67,6 +70,7 @@ const schema: yup.Schema<FormValues> = yup.object({
   spaceImage: yup.string().nullable(),
   spaceArtwork: yup.string().nullable(),
   notificationToggles: yup.object(),
+  requireMembersTwoFactorAuth: yup.boolean().required(),
   domain: yup
     .string()
     .ensure()
@@ -162,7 +166,8 @@ export function SpaceSettings({
       domain: values.domain,
       primaryMemberIdentity,
       spaceImage: values.spaceImage,
-      spaceArtwork: values.spaceArtwork
+      spaceArtwork: values.spaceArtwork,
+      requireMembersTwoFactorAuth: values.requireMembersTwoFactorAuth
     });
 
     if (newDomain) {
@@ -265,6 +270,9 @@ export function SpaceSettings({
                 </Stack>
               </Stack>
             </Stack>
+          </Grid>
+          <Grid item>
+            <TwoFactorAuth control={control} isAdmin={isAdmin} />
           </Grid>
           <Grid item>
             <FieldLabel>Notifications</FieldLabel>
@@ -417,45 +425,52 @@ export function SpaceSettings({
             <Stack gap={1}>
               {memberProfileTypesInput
                 .filter((mp) => !mp.isHidden)
-                .map(({ id, title }) => (
-                  <DraggableListItem
-                    key={id}
-                    name='memberProfileItem'
-                    itemId={id}
-                    disabled={!isAdmin}
-                    changeOrderHandler={async (draggedProperty: string, droppedOnProperty: string) =>
-                      changeMembersOrder(draggedProperty as MemberProfileName, droppedOnProperty as MemberProfileName)
-                    }
-                  >
-                    <SettingsItem
-                      sx={{ gap: 0 }}
-                      data-test={`settings-profiles-item-${id}`}
-                      actions={[
-                        <MenuItem
-                          key='1'
-                          data-test='settings-profiles-option-hide'
-                          onClick={() => {
-                            setMemberProfileProperties((prevState) => {
-                              const newState = [...prevState];
-                              const index = newState.findIndex((prevMp) => prevMp.id === id);
-                              newState[index] = { id, title, isHidden: true };
-                              return [...newState];
-                            });
-                          }}
-                        >
-                          Hide
-                        </MenuItem>
-                      ]}
+                .map(({ id, title }) => {
+                  const profileWidgetLogo = getProfileWidgetLogo(id);
+                  return (
+                    <DraggableListItem
+                      key={id}
+                      name='memberProfileItem'
+                      itemId={id}
                       disabled={!isAdmin}
-                      text={
-                        <Box display='flex' alignItems='center' gap={1}>
-                          <Image width={25} height={25} alt={id} src={getProfileWidgetLogo(id)} />
-                          <Typography>{title}</Typography>
-                        </Box>
+                      changeOrderHandler={async (draggedProperty: string, droppedOnProperty: string) =>
+                        changeMembersOrder(draggedProperty as MemberProfileName, droppedOnProperty as MemberProfileName)
                       }
-                    />
-                  </DraggableListItem>
-                ))}
+                    >
+                      <SettingsItem
+                        sx={{ gap: 0 }}
+                        data-test={`settings-profiles-item-${id}`}
+                        actions={[
+                          <MenuItem
+                            key='1'
+                            data-test='settings-profiles-option-hide'
+                            onClick={() => {
+                              setMemberProfileProperties((prevState) => {
+                                const newState = [...prevState];
+                                const index = newState.findIndex((prevMp) => prevMp.id === id);
+                                newState[index] = { id, title, isHidden: true };
+                                return [...newState];
+                              });
+                            }}
+                          >
+                            Hide
+                          </MenuItem>
+                        ]}
+                        disabled={!isAdmin}
+                        text={
+                          <Box display='flex' alignItems='center' gap={1}>
+                            {typeof profileWidgetLogo === 'string' ? (
+                              <Image width={25} height={25} alt={id} src={profileWidgetLogo} />
+                            ) : (
+                              profileWidgetLogo
+                            )}
+                            <Typography>{title}</Typography>
+                          </Box>
+                        }
+                      />
+                    </DraggableListItem>
+                  );
+                })}
             </Stack>
             {isAdmin && memberProfileTypesInput.filter((mp) => mp.isHidden).length > 0 && (
               <Button
@@ -544,38 +559,45 @@ export function SpaceSettings({
         <List>
           {memberProfileTypesInput
             .filter((mp) => mp.isHidden)
-            .map(({ id, title }) => (
-              <ListItem
-                key={id}
-                secondaryAction={
-                  <Button
-                    data-test={`add-profile-button-${id}`}
-                    onClick={() => {
-                      setMemberProfileProperties((prevState) => {
-                        const prevMemberProfiles = [...prevState];
-                        const targetedMemberProfileIndex = prevMemberProfiles.findIndex((_mp) => _mp.id === id);
-                        prevMemberProfiles[targetedMemberProfileIndex] = {
-                          id,
-                          title,
-                          isHidden: false
-                        };
-                        if (prevMemberProfiles.every((_mp) => _mp.isHidden === false)) {
-                          memberProfilesPopupState.close();
-                        }
-                        return prevMemberProfiles;
-                      });
-                    }}
-                  >
-                    Add
-                  </Button>
-                }
-              >
-                <ListItemIcon>
-                  <Image width={25} height={25} alt={id} src={getProfileWidgetLogo(id)} />
-                </ListItemIcon>
-                <ListItemText primary={title} />
-              </ListItem>
-            ))}
+            .map(({ id, title }) => {
+              const profileWidgetLogo = getProfileWidgetLogo(id);
+              return (
+                <ListItem
+                  key={id}
+                  secondaryAction={
+                    <Button
+                      data-test={`add-profile-button-${id}`}
+                      onClick={() => {
+                        setMemberProfileProperties((prevState) => {
+                          const prevMemberProfiles = [...prevState];
+                          const targetedMemberProfileIndex = prevMemberProfiles.findIndex((_mp) => _mp.id === id);
+                          prevMemberProfiles[targetedMemberProfileIndex] = {
+                            id,
+                            title,
+                            isHidden: false
+                          };
+                          if (prevMemberProfiles.every((_mp) => _mp.isHidden === false)) {
+                            memberProfilesPopupState.close();
+                          }
+                          return prevMemberProfiles;
+                        });
+                      }}
+                    >
+                      Add
+                    </Button>
+                  }
+                >
+                  <ListItemIcon>
+                    {typeof profileWidgetLogo === 'string' ? (
+                      <Image width={25} height={25} alt={id} src={profileWidgetLogo} />
+                    ) : (
+                      profileWidgetLogo
+                    )}
+                  </ListItemIcon>
+                  <ListItemText primary={title} />
+                </ListItem>
+              );
+            })}
         </List>
       </Modal>
     </>
@@ -590,27 +612,23 @@ function getProfileWidgetLogo(name: MemberProfileName) {
     case 'ens':
       return '/images/logos/ens_logo.svg';
     case 'lens':
-      return '/images/logos/lens_logo.svg';
+      return '/images/logos/lens_logo.png';
     case 'summon':
       return '/images/logos/summon_dark_mark.svg';
+    case 'credentials':
+      return <MedalIcon />;
     default:
       return '';
   }
 }
 
 function _getFormValues(space: Space): FormValues {
-  const notificationToggles = { ...(space.notificationToggles as any) } as NotificationToggles;
-  // set all notifications to true by default. TODO: find a programmatic way to do this?
-  notificationToggles.proposals ??= true;
-  notificationToggles.polls ??= true;
-  notificationToggles.rewards ??= true;
-  notificationToggles.proposals__start_discussion ??= true;
-  notificationToggles.proposals__vote ??= true;
   return {
     name: space.name,
     spaceImage: space.spaceImage,
     spaceArtwork: space.spaceArtwork,
     domain: space.domain,
-    notificationToggles
+    requireMembersTwoFactorAuth: space.requireMembersTwoFactorAuth,
+    notificationToggles: getDefaultValues(space.notificationToggles as NotificationToggles)
   };
 }

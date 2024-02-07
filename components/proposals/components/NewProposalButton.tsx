@@ -1,22 +1,26 @@
 import styled from '@emotion/styled';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import FileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined';
 import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
-import { Box, ButtonGroup, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, ButtonGroup, MenuItem, Stack, Tooltip, Typography, ListItemIcon, ListItemText } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef } from 'react';
 
-import charmClient from 'charmClient';
+import { useTrashPages } from 'charmClient/hooks/pages';
 import { Button } from 'components/common/Button';
+import { DeleteIcon } from 'components/common/Icons/DeleteIcon';
+import { EditIcon } from 'components/common/Icons/EditIcon';
 import Modal from 'components/common/Modal';
-import { TemplatesMenu } from 'components/common/TemplatesMenu';
+import { ArchiveProposalAction } from 'components/common/PageActions/components/ArchiveProposalAction';
+import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
+import { TemplatesMenu } from 'components/common/TemplatesMenu/TemplatesMenu';
+import type { TemplateItem } from 'components/common/TemplatesMenu/TemplatesMenu';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
-import { usePages } from 'hooks/usePages';
-import { isTruthy } from 'lib/utilities/types';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
-import { useProposalCategories } from '../hooks/useProposalCategories';
 import { useProposalTemplates } from '../hooks/useProposalTemplates';
 import type { ProposalPageAndPropertiesInput } from '../ProposalPage/NewProposalPage';
 
@@ -31,37 +35,50 @@ const ProposalTemplateMenu = styled(Stack)`
     transition: background-color 0.2s ease-in-out;
   }
   gap: ${({ theme }) => theme.spacing(1)};
+  flex-direction: row;
+  align-items: center;
 `;
 
 export function NewProposalButton() {
   const { navigateToSpacePath } = useCharmRouter();
-
-  const { proposalCategoriesWithCreatePermission } = useProposalCategories();
+  const { getFeatureTitle } = useSpaceFeatures();
+  const [spacePermissions] = useCurrentSpacePermissions();
   const isAdmin = useIsAdmin();
-  const { pages } = usePages();
   const proposalTemplateCreateModalState = usePopupState({ variant: 'dialog' });
-  const isCharmverseSpace = useIsCharmverseSpace();
   // MUI Menu specific content
   const buttonRef = useRef<HTMLDivElement>(null);
   const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
   const { proposalTemplates, isLoadingTemplates } = useProposalTemplates();
+  const { trigger: trashPages } = useTrashPages();
 
-  const canCreateProposal = proposalCategoriesWithCreatePermission.length > 0;
-  // grab page data from context so that title is always up-to-date
-  const proposalTemplatePages = proposalTemplates?.map((template) => pages[template.page.id]).filter(isTruthy);
+  const canCreateProposal = spacePermissions?.createProposals;
+
+  const proposalTemplatePages: TemplateItem[] = (proposalTemplates || []).map((proposal) => ({
+    id: proposal.page.id,
+    title: proposal.page.title,
+    proposalId: proposal.id,
+    isStructuredProposal: !!proposal.formId,
+    archived: !!proposal.archived
+  }));
+
   function deleteProposalTemplate(pageId: string) {
-    return charmClient.deletePage(pageId);
+    return trashPages({ pageIds: [pageId], trash: true });
   }
 
   function editTemplate(pageId: string) {
     navigateToSpacePath(`/${pageId}`);
   }
+
   function createTemplate(proposalType: ProposalPageAndPropertiesInput['proposalType']) {
     navigateToSpacePath('/proposals/new', { type: 'proposal_template', proposalType });
   }
 
   function createFromTemplate(pageId: string) {
     navigateToSpacePath(`/proposals/new`, { template: pageId });
+  }
+
+  function duplicateTemplate(pageId: string) {
+    navigateToSpacePath(`/proposals/new`, { type: 'proposal_template', template: pageId });
   }
 
   return (
@@ -87,40 +104,81 @@ export function NewProposalButton() {
         isLoading={isLoadingTemplates}
         addPageFromTemplate={createFromTemplate}
         editTemplate={editTemplate}
-        pages={proposalTemplatePages}
-        createTemplate={() =>
-          !isCharmverseSpace ? createTemplate('free_form') : proposalTemplateCreateModalState.open()
-        }
+        templates={proposalTemplatePages}
+        createTemplate={proposalTemplateCreateModalState.open}
         deleteTemplate={deleteProposalTemplate}
         anchorEl={buttonRef.current as Element}
-        boardTitle='Proposals'
+        boardTitle={getFeatureTitle('Proposals')}
         popupState={popupState}
         enableItemOptions={isAdmin}
         enableNewTemplates={isAdmin}
+        // eslint-disable-next-line react/no-unstable-nested-components
+        pageActions={({ pageId, proposalId }) => (
+          <>
+            <MenuItem
+              data-test={`template-menu-edit-${pageId}`}
+              onClick={() => {
+                editTemplate(pageId);
+              }}
+            >
+              <ListItemIcon>
+                <EditIcon fontSize='small' />
+              </ListItemIcon>
+              <ListItemText>Edit</ListItemText>
+            </MenuItem>
+            {isAdmin && (
+              <CopyPageLinkAction
+                path={`/proposals/new?template=${pageId}`}
+                message='Link copied. NOTE: anyone can join your space using this link.'
+              />
+            )}
+
+            <MenuItem
+              onClick={() => {
+                duplicateTemplate(pageId);
+              }}
+            >
+              <ListItemIcon>
+                <FileCopyOutlinedIcon fontSize='small' />
+              </ListItemIcon>
+              <ListItemText>Duplicate</ListItemText>
+            </MenuItem>
+            <MenuItem
+              onClick={(e) => {
+                deleteProposalTemplate(pageId);
+              }}
+            >
+              <ListItemIcon>
+                <DeleteIcon fontSize='small' />
+              </ListItemIcon>
+              <ListItemText>Delete</ListItemText>
+            </MenuItem>
+            <span onClick={(e) => e.stopPropagation()}>
+              <ArchiveProposalAction proposalId={proposalId!} />
+            </span>
+          </>
+        )}
       />
 
       <Modal
-        size='fluid'
         title='Select a template type'
         open={proposalTemplateCreateModalState.isOpen}
         onClose={proposalTemplateCreateModalState.close}
       >
         <Stack spacing={2}>
-          <ProposalTemplateMenu onClick={() => createTemplate('structured')}>
-            <Stack flexDirection='row' gap={1} alignItems='center'>
-              <WidgetsOutlinedIcon fontSize='large' />
-              <Typography variant='h5'>Structured Form</Typography>
-            </Stack>
-            <Typography variant='body2'>
-              Create a template using Forms, creating a structured data format for each proposal to conform to.
-            </Typography>
+          <ProposalTemplateMenu
+            onClick={() => createTemplate('structured')}
+            data-test='structured-proposal-template-menu'
+          >
+            <WidgetsOutlinedIcon fontSize='large' />
+            <Typography variant='h6'>Form</Typography>
           </ProposalTemplateMenu>
-          <ProposalTemplateMenu onClick={() => createTemplate('free_form')}>
-            <Stack flexDirection='row' gap={1} alignItems='center'>
-              <DescriptionOutlinedIcon fontSize='large' />
-              <Typography variant='h5'>Free Form</Typography>
-            </Stack>
-            <Typography variant='body2'>Create a template using an open editor.</Typography>
+          <ProposalTemplateMenu
+            onClick={() => createTemplate('free_form')}
+            data-test='free_form-proposal-template-menu'
+          >
+            <DescriptionOutlinedIcon fontSize='large' />
+            <Typography variant='h6'>Document</Typography>
           </ProposalTemplateMenu>
         </Stack>
       </Modal>

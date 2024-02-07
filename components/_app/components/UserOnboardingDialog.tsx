@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 
 import { ConnectedAccounts } from 'components/_app/components/ConnectedAccounts';
 import { Button } from 'components/common/Button';
+import type { FormFieldValue } from 'components/common/form/interfaces';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { MemberPropertiesForm } from 'components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesForm';
 import { DialogContainer } from 'components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesFormDialog';
@@ -16,6 +17,7 @@ import {
   useRequiredMemberPropertiesForm,
   useRequiredUserDetailsForm
 } from 'components/members/hooks/useRequiredMemberProperties';
+import { SetupTwoFactorAuthGlobal } from 'components/settings/account/components/otp/components/SetupTwoFactorAuthGlobal';
 import Legend from 'components/settings/Legend';
 import { UserDetailsForm } from 'components/settings/profile/components/UserDetailsForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -85,12 +87,17 @@ function LoggedInUserOnboardingDialog({ user, space }: { space: Space; user: Log
     );
   }
 
+  if (!user.otp?.activatedAt && !!space?.requireMembersTwoFactorAuth) {
+    return <SetupTwoFactorAuthGlobal />;
+  }
+
   return null;
 }
 
 // Case 1: first time user: show email + terms first, then profile
 // Case 2: first time joining a space: show profile
 // Case 3: missing required information: show profile
+// In case the space has 2fa required and user doesn't have 2fa configured: show profile + show 2fa
 function UserOnboardingDialog({
   currentUser,
   completeOnboarding,
@@ -206,6 +213,7 @@ function UserOnboardingDialog({
         ) : null
       }
     >
+      <SetupTwoFactorAuthGlobal />
       {currentStep === 'email_step' ? (
         <OnboardingEmailForm onClick={goNextStep} spaceId={space.id} />
       ) : currentStep === 'profile_step' ? (
@@ -228,7 +236,9 @@ function UserOnboardingDialog({
             errors={memberPropertiesErrors}
             refreshPropertyValues={refreshPropertyValues}
             onChange={(values) =>
-              onMemberPropertiesChange(values.map(({ memberPropertyId, value }) => ({ id: memberPropertyId, value })))
+              onMemberPropertiesChange(
+                values.map(({ memberPropertyId, value }) => ({ id: memberPropertyId, value: value as FormFieldValue }))
+              )
             }
             userId={currentUser.id}
             showCollectionOptions

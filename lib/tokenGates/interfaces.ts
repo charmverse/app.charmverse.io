@@ -3,28 +3,36 @@ import type { HumanizedAccsProps } from '@lit-protocol/types';
 
 export type TokenGateJoinType = 'public_bounty_token_gate' | 'token_gate';
 
-type TokenGateFields = Pick<PrismaTokenGate, 'createdAt' | 'id' | 'spaceId'> & {
+export type TokenGateFields = Pick<PrismaTokenGate, 'createdAt' | 'id' | 'spaceId'> & {
   resourceId: any;
 };
 
 export type Lock = {
-  name: string; // lock name
+  name?: string; // lock name
   contract: string; // lock contract address
   chainId: number; // lock chain id
   image?: string; // lock image
-  description?: string; // lock description
-  balanceOf?: 1 | 0; // the number of valid keys owned by the walletAddress
-  expirationTimestamp?: number; // expiration date or 0 if the owner has never owned a key for this lock
+};
+
+export type Hypersub = {
+  name?: string; // hypersub name
+  contract: string; // hypersub contract address
+  chainId: number; // hypersub chain id
+  image?: string; // hypersub image
 };
 
 // TODO: Verify chains is being used by Lit, even tho its not on lit's types
 export type LitTokenGateConditions = HumanizedAccsProps & { chains?: string[] };
 
-type UnlockTokenGate = TokenGateFields & { conditions: Lock; type: 'unlock' };
+export type LockConditions = { conditions: Lock; type: 'unlock' };
 
-type LitTokenGate = TokenGateFields & { conditions: LitTokenGateConditions; type: 'lit' };
+export type HypersubConditions = { conditions: Hypersub; type: 'hypersub' };
 
-type TokenGateOptions = UnlockTokenGate | LitTokenGate;
+export type LitConditions = { conditions: LitTokenGateConditions; type: 'lit' };
+
+export type TokenGateConditions = LitConditions | LockConditions | HypersubConditions;
+
+type TokenGateOptions = TokenGateConditions & TokenGateFields;
 
 export type TokenGate<T extends TokenGateOptions['type'] | undefined = undefined> = T extends undefined
   ? TokenGateOptions
@@ -35,7 +43,6 @@ type WithRoles = {
 };
 
 export type TokenGateWithRoles<T extends TokenGateOptions['type'] | undefined = undefined> = TokenGate<T> & WithRoles;
-
 export type TokenGateAccessType =
   | 'individual_wallet'
   | 'individual_nft'

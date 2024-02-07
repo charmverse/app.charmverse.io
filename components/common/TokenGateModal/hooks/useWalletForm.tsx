@@ -9,7 +9,6 @@ import { useWeb3Account } from 'hooks/useWeb3Account';
 import { isValidChainAddress } from 'lib/tokens/validation';
 
 const schema = yup.object({
-  chain: yup.string().required('Chain is required'),
   contract: yup
     .string()
     .required('Contract is required')
@@ -25,7 +24,7 @@ const schema = yup.object({
 
 export type FormValues = yup.InferType<typeof schema>;
 
-const defaultValues: FormValues = { contract: '', chain: '', ensWallet: undefined };
+const defaultValues: FormValues = { contract: '', ensWallet: '' };
 
 export function useWalletForm() {
   const { provider } = useWeb3Account();

@@ -60,7 +60,6 @@ describe('components/viewHeader/newCardButton', () => {
             addCard={jest.fn()}
             addCardTemplate={jest.fn()}
             addCardFromTemplate={jest.fn()}
-            editCardTemplate={jest.fn()}
           />
         </ReduxProvider>
       )
@@ -79,7 +78,6 @@ describe('components/viewHeader/newCardButton', () => {
             addCard={mockFunction}
             addCardTemplate={jest.fn()}
             addCardFromTemplate={jest.fn()}
-            editCardTemplate={jest.fn()}
           />
         </ReduxProvider>
       )
@@ -104,7 +102,6 @@ describe('components/viewHeader/newCardButton', () => {
             addCard={jest.fn()}
             addCardTemplate={mockFunction}
             addCardFromTemplate={jest.fn()}
-            editCardTemplate={jest.fn()}
           />
         </ReduxProvider>
       )

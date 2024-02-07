@@ -4,13 +4,23 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { applyTokenGates } from 'lib/tokenGates/applyTokenGates';
 import { verifyTokenGateMembership } from 'lib/tokenGates/verifyTokenGateMembership';
 import type { UserToVerifyMembership } from 'lib/tokenGates/verifyTokenGateMemberships';
-import type { LoggedInUser } from 'models';
 import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
 import { verifiedJWTResponse } from 'testing/utils/litProtocol';
-import { addRoleToTokenGate, deleteTokenGate, generateTokenGate } from 'testing/utils/tokenGates';
+import {
+  addRoleToTokenGate,
+  deleteTokenGate,
+  generateHypersubTokenGate,
+  generateTokenGate,
+  generateUnlockTokenGate
+} from 'testing/utils/tokenGates';
+
+import { getPublicClient } from '../../blockchain/publicClient';
 
 // @ts-ignore
 let mockedLitSDK: jest.Mocked;
+
+jest.mock('../../blockchain/publicClient');
+const mockGetPublicClient = jest.mocked(getPublicClient);
 
 describe('verifyTokenGateMembership', () => {
   let user: User;
@@ -54,6 +64,8 @@ describe('verifyTokenGateMembership', () => {
   beforeEach(async () => {
     jest.mock('@lit-protocol/lit-node-client');
     mockedLitSDK = await import('@lit-protocol/lit-node-client');
+    mockGetPublicClient.mockClear();
+
     const { user: u, space: s } = await generateUserAndSpace(undefined);
     user = u;
     space = s;
@@ -121,6 +133,9 @@ describe('verifyTokenGateMembership', () => {
   it('should not verify and remove user with all token gates being not verified', async () => {
     const tokenGate1 = await generateTokenGate({ userId: user.id, spaceId: space.id });
     const tokenGate2 = await generateTokenGate({ userId: user.id, spaceId: space.id });
+    const tokenGate3 = await generateUnlockTokenGate({ userId: user.id, spaceId: space.id });
+    const tokenGate4 = await generateHypersubTokenGate({ userId: user.id, spaceId: space.id });
+
     mockedLitSDK.verifyJwt
       // verify to apply token gate
       .mockReturnValueOnce(
@@ -143,15 +158,25 @@ describe('verifyTokenGateMembership', () => {
         })
       );
 
+    mockGetPublicClient.mockReturnValueOnce({
+      readContract: jest.fn().mockReturnValueOnce('My New Lock').mockReturnValueOnce(true)
+    } as any);
+
+    mockGetPublicClient.mockReturnValueOnce({
+      readContract: jest.fn().mockReturnValueOnce('My New Hypersub').mockReturnValueOnce(true)
+    } as any);
+
     await applyTokenGates({
       spaceId: space.id,
       userId: user.id,
       commit: true,
       tokens: [
         { tokenGateId: tokenGate1.id, signedToken: 'jwt1' },
-        { tokenGateId: tokenGate2.id, signedToken: 'jwt2' }
+        { tokenGateId: tokenGate2.id, signedToken: 'jwt2' },
+        { tokenGateId: tokenGate3.id, signedToken: '' },
+        { tokenGateId: tokenGate4.id, signedToken: '' }
       ],
-      walletAddress: '0x123'
+      walletAddress: '0x1bd0d6edb387114b2fdf20d683366fa9f94a07f4'
     });
 
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
@@ -167,7 +192,7 @@ describe('verifyTokenGateMembership', () => {
     });
 
     const spaceUser = await getSpaceUser();
-    expect(verifyUser.user.userTokenGates.length).toBe(2);
+    expect(verifyUser.user.userTokenGates.length).toBe(4);
     expect(res).toEqual({ removedRoles: 0, verified: false });
     expect(spaceUser).toBeNull();
   });

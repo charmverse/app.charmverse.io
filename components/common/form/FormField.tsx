@@ -1,13 +1,12 @@
 import { type FormFieldType } from '@charmverse/core/prisma-client';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { MoreHoriz } from '@mui/icons-material';
-import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown';
-import ChevronRightIcon from '@mui/icons-material/ArrowRight';
+import { Edit, EditOff, MoreHoriz } from '@mui/icons-material';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import {
+  Box,
   Chip,
   Divider,
   IconButton,
@@ -20,6 +19,7 @@ import {
   TextField,
   Typography
 } from '@mui/material';
+import { useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 import { emptyDocument } from 'lib/prosemirror/constants';
@@ -34,7 +34,7 @@ import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
 import type { SelectOptionType } from './fields/Select/interfaces';
 import type { FormFieldInput } from './interfaces';
 
-const FormFieldContainer = styled(Stack, {
+export const FormFieldContainer = styled(Stack, {
   shouldForwardProp(propName) {
     return propName !== 'dragDirection';
   }
@@ -51,6 +51,7 @@ const FormFieldContainer = styled(Stack, {
   flex-direction: row;
   align-items: flex-start;
   width: 100%;
+  position: relative;
 `;
 
 export interface FormFieldProps {
@@ -62,6 +63,7 @@ export interface FormFieldProps {
   onCreateOption?: (option: SelectOptionType) => void;
   onDeleteOption?: (option: SelectOptionType) => void;
   onUpdateOption?: (option: SelectOptionType) => void;
+  shouldFocus?: boolean;
 }
 
 function ExpandedFormField({
@@ -71,13 +73,22 @@ function ExpandedFormField({
   updateFormField,
   onCreateOption,
   onDeleteOption,
-  onUpdateOption
+  onUpdateOption,
+  shouldFocus
 }: Omit<FormFieldProps, 'isCollapsed'>) {
   const theme = useTheme();
+  const titleTextFieldRef = useRef<HTMLInputElement | null>(null);
+
+  // Auto focus on title text field when expanded
+  useEffect(() => {
+    if (titleTextFieldRef.current && shouldFocus) {
+      titleTextFieldRef.current.querySelector('input')?.focus();
+    }
+  }, [titleTextFieldRef]);
 
   return (
     <>
-      <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
+      <Stack flexDirection='row' justifyContent='space-between' alignItems='center' pr={4}>
         <Select<FormFieldType>
           value={formField.type}
           onChange={(e) =>
@@ -121,7 +132,7 @@ function ExpandedFormField({
             </MenuList>
           }
         >
-          <IconButton size='small'>
+          <IconButton size='small' sx={{ mt: '-20px' }}>
             <MoreHoriz fontSize='small' />
           </IconButton>
         </PopperPopup>
@@ -131,6 +142,8 @@ function ExpandedFormField({
         onChange={(e) => updateFormField({ name: e.target.value, id: formField.id })}
         placeholder='Title (required)'
         error={!formField.name}
+        ref={titleTextFieldRef}
+        data-test='form-field-name-input'
       />
       <CharmEditor
         isContentControlled
@@ -151,6 +164,7 @@ function ExpandedFormField({
         disablePageSpecificFeatures
         disableRowHandles
         placeholderText='Add your description here (optional)'
+        focusOnInit={false}
       />
       <FieldTypeRenderer
         type={formField.type as any}
@@ -160,7 +174,6 @@ function ExpandedFormField({
         placeholder={fieldTypePlaceholderRecord[formField.type]}
         // Enable select and multiselect fields to be able to create options
         disabled={formField.type !== 'select' && formField.type !== 'multiselect'}
-        value={formField.type === 'date' ? new Date().toString() : ''}
         options={formField.options}
       />
       <Divider
@@ -172,6 +185,7 @@ function ExpandedFormField({
       {formField.type !== 'label' && (
         <Stack gap={0.5} flexDirection='row' alignItems='center'>
           <Switch
+            data-test='form-field-required-switch'
             size='small'
             checked={formField.required}
             onChange={(e) => updateFormField({ required: e.target.checked, id: formField.id })}
@@ -180,16 +194,14 @@ function ExpandedFormField({
         </Stack>
       )}
 
-      <Stack flexDirection='row' gap={0.5} alignItems='center'>
+      <Stack gap={0.5} flexDirection='row' alignItems='center'>
         <Switch
+          data-test='form-field-private-switch'
           size='small'
           checked={formField.private}
           onChange={(e) => updateFormField({ private: e.target.checked, id: formField.id })}
         />
-        <Stack>
-          <Typography>Private</Typography>
-          <Typography variant='caption'>Only Authors, Reviewers and Admins can see the input</Typography>
-        </Stack>
+        <Typography>Private (Authors & Reviewers can view)</Typography>
       </Stack>
     </>
   );
@@ -198,9 +210,17 @@ function ExpandedFormField({
 export function FormField(
   props: FormFieldProps & {
     isOpen?: boolean;
+    readOnly?: boolean;
+    forceFocus?: boolean;
   }
 ) {
-  const { isOpen, formField, toggleOpen, updateFormField } = props;
+  const { readOnly, isOpen, formField, toggleOpen, updateFormField, forceFocus } = props;
+  const prevIsOpen = useRef(isOpen);
+  const shouldFocus = (!prevIsOpen.current && isOpen) || forceFocus;
+
+  useEffect(() => {
+    prevIsOpen.current = isOpen;
+  }, [isOpen]);
 
   const [{ offset }, drag, dragPreview] = useDrag(() => ({
     type: 'item',
@@ -247,41 +267,65 @@ export function FormField(
   const isAdjacentActive = canDrop && isOverCurrent;
 
   return (
-    <Stack flexDirection='row' gap={0.5} alignItems='flex-start' ref={mergeRefs([dragPreview, drop])}>
-      <div ref={drag}>
-        <DragIndicatorIcon
-          fontSize='small'
-          color='secondary'
-          sx={{
-            cursor: 'pointer'
-          }}
-        />
-      </div>
+    <Stack
+      flexDirection='row'
+      gap={0.5}
+      alignItems='flex-start'
+      ref={readOnly ? null : mergeRefs([dragPreview, drop])}
+      sx={{
+        '&:hover .icons': {
+          opacity: 1
+        }
+      }}
+    >
+      {!readOnly && (
+        <div ref={readOnly ? null : drag}>
+          <DragIndicatorIcon
+            fontSize='small'
+            color='secondary'
+            sx={{
+              cursor: 'pointer'
+            }}
+          />
+        </div>
+      )}
       <FormFieldContainer dragDirection={isAdjacentActive ? ((offset?.y ?? 0) < 0 ? 'top' : 'bottom') : undefined}>
-        {isOpen ? (
-          <ExpandMoreIcon onClick={toggleOpen} sx={{ cursor: 'pointer', mt: 1 }} />
-        ) : (
-          <ChevronRightIcon onClick={toggleOpen} sx={{ cursor: 'pointer' }} />
-        )}
-        <Stack gap={1} width='100%'>
-          {!isOpen ? (
-            <FieldTypeRenderer
-              fieldWrapperSx={{
-                my: 0
-              }}
-              endAdornment={formField.private ? <Chip sx={{ mx: 1 }} label='Private' size='small' /> : undefined}
-              type={formField.type as any}
-              description={formField.description as PageContent}
-              disabled
-              label={formField.name}
-              required={formField.required}
-              options={formField.options}
-              placeholder={fieldTypePlaceholderRecord[formField.type]}
-            />
+        <Stack gap={1} width='100%' ml={1}>
+          {!isOpen || readOnly ? (
+            <div style={{ cursor: 'pointer' }} onClick={toggleOpen}>
+              <FieldTypeRenderer
+                labelEndAdornment={formField.private ? <Chip sx={{ mx: 1 }} label='Private' size='small' /> : undefined}
+                type={formField.type as any}
+                description={formField.description as PageContent}
+                disabled
+                label={formField.name}
+                required={formField.required}
+                options={formField.options}
+                placeholder={fieldTypePlaceholderRecord[formField.type]}
+              />
+            </div>
           ) : (
-            <ExpandedFormField {...props} />
+            <ExpandedFormField {...props} shouldFocus={shouldFocus} />
           )}
         </Stack>
+
+        {!readOnly ? (
+          <Box
+            className='icons'
+            data-test='toggle-form-field-button'
+            sx={{
+              position: 'absolute',
+              top: (theme) => theme.spacing(0.5),
+              right: (theme) => theme.spacing(0.5),
+              opacity: isOpen ? 1 : 0,
+              transition: 'opacity 0.2s ease'
+            }}
+          >
+            <IconButton size='small' onClick={toggleOpen}>
+              {isOpen ? <EditOff color='secondary' fontSize='small' /> : <Edit color='secondary' fontSize='small' />}
+            </IconButton>
+          </Box>
+        ) : null}
       </FormFieldContainer>
     </Stack>
   );

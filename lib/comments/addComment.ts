@@ -14,9 +14,14 @@ export async function addComment({ content, threadId, userId }: CommentCreate): 
     where: {
       id: threadId
     },
-    include: {
-      user: true,
-      page: true
+    select: {
+      spaceId: true,
+      pageId: true,
+      page: {
+        select: {
+          id: true
+        }
+      }
     }
   });
 

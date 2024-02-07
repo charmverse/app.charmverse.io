@@ -28,6 +28,7 @@ describe('getImportData', () => {
         memberProperties: [],
         notificationToggles: [],
         proposalBlocks: [],
+        proposalWorkflows: [],
         rewardBlocks: [],
         defaultPagePermissionGroup: space.defaultPagePermissionGroup,
         defaultPublicPages: space.defaultPublicPages,
@@ -39,9 +40,7 @@ describe('getImportData', () => {
       pages: [],
       roles: [],
       postCategories: [],
-      proposalCategories: [],
       permissions: {
-        proposalCategoryPermissions: [],
         spacePermissions: [],
         postCategoryPermissions: []
       }

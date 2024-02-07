@@ -9,6 +9,7 @@ import { DocumentPageIcon } from 'components/common/Icons/DocumentPageIcon';
 import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
 const StyledPageTemplateBanner = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'card'
@@ -27,16 +28,10 @@ type Props = {
   isNewPage?: boolean;
   parentId?: string | null;
   pageType?: PageMeta['type'];
+  customTitle?: string;
 };
 
-const templateTypes = {
-  proposal_template: 'proposal',
-  bounty_template: 'reward'
-};
-
-type RewardTemplateType = keyof typeof templateTypes;
-
-export function PageTemplateBanner({ isNewPage, pageType, parentId }: Props) {
+export function PageTemplateBanner({ isNewPage, pageType, parentId, customTitle }: Props) {
   const { space } = useCurrentSpace();
   const theme = useTheme();
   const { pages } = usePages();
@@ -46,6 +41,16 @@ export function PageTemplateBanner({ isNewPage, pageType, parentId }: Props) {
   const board = isShowingCard ? parentPage : undefined;
 
   const boardPath = board ? `/${space?.domain}/${board?.path}` : undefined;
+
+  if (customTitle) {
+    return (
+      <StyledPageTemplateBanner card={isShowingCard}>
+        <Grid item xs={8} display='flex' justifyContent='center'>
+          <span>{customTitle}</span>
+        </Grid>
+      </StyledPageTemplateBanner>
+    );
+  }
 
   if (!pageType?.match('template')) {
     return null;
@@ -63,9 +68,7 @@ export function PageTemplateBanner({ isNewPage, pageType, parentId }: Props) {
         </Grid>
         <Grid item xs={8} display='flex' justifyContent='center'>
           {!isShowingCard ? (
-            <span>
-              You're {isNewPage ? 'creating' : 'editing'} a {templateTypes[pageType as RewardTemplateType]} template
-            </span>
+            <span>You're {isNewPage ? 'creating' : 'editing'} a template</span>
           ) : (
             <>
               <span>You're editing a template in</span>

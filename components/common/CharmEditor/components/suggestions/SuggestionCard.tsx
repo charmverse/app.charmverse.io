@@ -3,8 +3,8 @@ import { Box, IconButton, Paper, Stack, Tooltip, Typography } from '@mui/materia
 import { memo, useMemo } from 'react';
 
 import charmClient from 'charmClient';
-import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import UserDisplay from 'components/common/UserDisplay';
+import { useCharmEditorView } from 'hooks/useCharmEditorView';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import type { Member } from 'lib/members/interfaces';
@@ -78,7 +78,7 @@ const containerNodeTypes = ['listItem', 'list_item', 'columnBlock', 'disclosureS
 type Props = TrackedEvent & { readOnly?: boolean; isOwner?: boolean; pageId: string; spaceId: string };
 
 function SuggestionCardComponent({ readOnly, isOwner, active, data, node, pos, type, pageId, spaceId }: Props) {
-  const view = useEditorViewContext();
+  const { view } = useCharmEditorView();
   const { getMemberById } = useMembers();
   const { pages } = usePages();
   let content = node.textContent;
@@ -95,16 +95,18 @@ function SuggestionCardComponent({ readOnly, isOwner, active, data, node, pos, t
 
   // get parentNode for lists
   const parentNode = useMemo(
-    () => (pos > 0 && pos < view.state.doc.nodeSize ? view.state.doc.nodeAt(pos - 1) : null),
+    () => view && (pos > 0 && pos < view.state.doc.nodeSize ? view.state.doc.nodeAt(pos - 1) : null),
     [pos]
   );
 
   function acceptOne(_type: string, _pos: number) {
+    if (!view) throw new Error('No editor view to accept suggestion');
     accept(_type, _pos, view);
     charmClient.track.trackAction('page_suggestion_accepted', { pageId, spaceId });
   }
 
   function rejectOne(_type: string, _pos: number) {
+    if (!view) throw new Error('No editor view to reject suggestion');
     reject(_type, _pos, view);
   }
 

@@ -1,8 +1,9 @@
 /* eslint-disable max-lines */
-import type { ReactElement } from 'react';
+import type { Dispatch, ReactElement, SetStateAction } from 'react';
 import React from 'react';
 import { useDrop } from 'react-dnd';
 
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import type { Board, IPropertyOption, IPropertyTemplate, BoardGroup } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
@@ -30,6 +31,8 @@ type Props = {
   disableAddingCards?: boolean;
   readOnlyTitle?: boolean;
   subRowsEmptyValueContent?: ReactElement | string;
+  checkedIds?: string[];
+  setCheckedIds?: Dispatch<SetStateAction<string[]>>;
 };
 
 const TableGroup = React.memo((props: Props): JSX.Element => {
@@ -89,6 +92,8 @@ const TableGroup = React.memo((props: Props): JSX.Element => {
           onDrop={props.onDropToCard}
           readOnlyTitle={props.readOnlyTitle}
           subRowsEmptyValueContent={props.subRowsEmptyValueContent}
+          checkedIds={props.checkedIds}
+          setCheckedIds={props.setCheckedIds}
         />
       )}
     </div>

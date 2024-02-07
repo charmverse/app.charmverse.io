@@ -6,6 +6,7 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import TuneIcon from '@mui/icons-material/Tune';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import type { PopoverProps } from '@mui/material';
 import {
@@ -22,24 +23,25 @@ import {
   Typography,
   Switch
 } from '@mui/material';
-import { bindPopover, bindToggle, usePopupState } from 'material-ui-popup-state/hooks';
-import React, { useMemo, useRef, useState } from 'react';
+import { bindPopover, bindToggle, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import type { Dispatch, SetStateAction } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useViewSortOptions } from 'hooks/useViewSortOptions';
-import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
+import { getPropertyName } from 'lib/focalboard/getPropertyName';
 import {
   AUTHORS_BLOCK_ID,
-  CATEGORY_BLOCK_ID,
   DEFAULT_BOARD_BLOCK_ID,
   DEFAULT_VIEW_BLOCK_ID,
-  EVALUATION_TYPE_BLOCK_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID,
-  STATUS_BLOCK_ID
+  PROPOSAL_STEP_BLOCK_ID,
+  PROPOSAL_STATUS_BLOCK_ID
 } from 'lib/proposal/blocks/constants';
 import { defaultRewardPropertyIds } from 'lib/rewards/blocks/constants';
 
@@ -54,31 +56,31 @@ import HorizontalGrip from './horizontalGrip';
 type Props = {
   readOnly: boolean;
   sorted: 'up' | 'down' | 'none';
-  name: string;
   board: Board;
   activeView: BoardView;
   cards: Card[];
   views: BoardView[];
   template: IPropertyTemplate;
   offset: number;
-  type: PropertyType;
   onDrop: (template: IPropertyTemplate, container: IPropertyTemplate) => void;
   onAutoSizeColumn: (columnID: string, headerWidth: number) => void;
+  setSelectedPropertyId?: Dispatch<SetStateAction<string | null>>;
 };
 
-const DEFAULT_BLOCK_IDS = [
+export const DEFAULT_BLOCK_IDS = [
   DEFAULT_BOARD_BLOCK_ID,
-  CATEGORY_BLOCK_ID,
   DEFAULT_VIEW_BLOCK_ID,
-  STATUS_BLOCK_ID,
-  EVALUATION_TYPE_BLOCK_ID,
+  PROPOSAL_STATUS_BLOCK_ID,
+  PROPOSAL_STEP_BLOCK_ID,
   AUTHORS_BLOCK_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID
 ];
 
 function TableHeader(props: Props): JSX.Element {
-  const { activeView, board, views, cards, sorted, name, type, template, readOnly } = props;
+  const { activeView, board, views, cards, sorted, template, readOnly } = props;
+  const { type } = template;
   const { id: templateId } = template;
+  const name = getPropertyName(template);
   const [isDragging, isOver, columnRef] = useSortable('column', props.template, !readOnly, props.onDrop);
   const columnWidth = (_templateId: string): number => {
     return Math.max(Constants.minColumnWidth, (activeView.fields.columnWidths[_templateId] || 0) + props.offset);
@@ -87,9 +89,13 @@ function TableHeader(props: Props): JSX.Element {
   const disableRename =
     proposalPropertyTypesList.includes(type as any) ||
     DEFAULT_BLOCK_IDS.includes(templateId) ||
-    defaultRewardPropertyIds.includes(templateId);
+    defaultRewardPropertyIds.includes(templateId) ||
+    !!template.formFieldId ||
+    !!template.proposalFieldId;
 
-  const [tempName, setTempName] = useState(props.name || '');
+  const [tempName, setTempName] = useState(name || '');
+  const addRelationPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-relation-property' });
+  const bindTriggerProps = bindTrigger(addRelationPropertyPopupState);
 
   const popupState = usePopupState({ variant: 'popper', popupId: 'iframe-selector' });
   const toggleRef = useRef(null);
@@ -109,6 +115,12 @@ function TableHeader(props: Props): JSX.Element {
       e.stopPropagation();
     }
   };
+
+  useEffect(() => {
+    if (template.name !== tempName) {
+      setTempName(template.name);
+    }
+  }, [template.name]);
 
   const popoverToggle = bindToggle(popupState);
   const popoverToggleProps: typeof popoverToggle = {
@@ -132,7 +144,7 @@ function TableHeader(props: Props): JSX.Element {
     mutator.changeViewSortOptions(activeView.id, sortOptions, newSortOptions);
   };
   async function renameColumn() {
-    if (tempName !== template.name) {
+    if (tempName !== name) {
       mutator.changePropertyTypeAndName(board, cards, template, type, tempName, views);
     }
     popupState.close();
@@ -150,7 +162,7 @@ function TableHeader(props: Props): JSX.Element {
     props.onAutoSizeColumn(_templateId, width);
   }, []);
 
-  let className = 'octo-table-cell header-cell';
+  let className = 'octo-table-cell header-cell disable-drag-selection';
   if (isOver) {
     className += ' dragover';
   }
@@ -169,6 +181,13 @@ function TableHeader(props: Props): JSX.Element {
     await mutator.toggleColumnWrap(activeView.id, templateId, columnWrappedIds);
   }
 
+  const isDisabled =
+    proposalPropertyTypesList.includes(type as any) ||
+    defaultRewardPropertyIds.includes(templateId) ||
+    template.id.startsWith('__') ||
+    !!template.formFieldId ||
+    !!template.proposalFieldId;
+
   const popupContent = (
     <Stack>
       <MenuList>
@@ -186,12 +205,28 @@ function TableHeader(props: Props): JSX.Element {
             autoFocus
             onKeyDown={(e) => {
               e.stopPropagation();
-              if (e.code === 'Enter' && tempName.length !== 0) {
+              if (e.code === 'Enter' && tempName.length !== 0 && tempName !== name) {
                 renameColumn();
               }
             }}
           />
         </Stack>
+        {template.id !== Constants.titleColumnId && (
+          <>
+            <MenuItem
+              {...bindTriggerProps}
+              onClick={() => {
+                props.setSelectedPropertyId?.(template.id);
+              }}
+            >
+              <ListItemIcon>
+                <TuneIcon fontSize='small' />
+              </ListItemIcon>
+              <Typography variant='subtitle1'>Edit property</Typography>
+            </MenuItem>
+            <Divider />
+          </>
+        )}
         <MenuItem
           onClick={() => {
             changeViewSortOptions([{ propertyId: templateId, reversed: false }]);
@@ -257,7 +292,7 @@ function TableHeader(props: Props): JSX.Element {
           </MenuItem>,
           <MenuItem
             key='duplicate'
-            disabled={proposalPropertyTypesList.includes(type as any) || defaultRewardPropertyIds.includes(templateId)}
+            disabled={isDisabled || template.type === 'relation'}
             onClick={() => {
               mutator.duplicatePropertyTemplate(board, activeView, templateId);
             }}
@@ -269,7 +304,7 @@ function TableHeader(props: Props): JSX.Element {
           </MenuItem>,
           <MenuItem
             key='delete'
-            disabled={proposalPropertyTypesList.includes(type as any) || defaultRewardPropertyIds.includes(templateId)}
+            disabled={isDisabled}
             onClick={() => {
               mutator.deleteProperty(board, views, cards, templateId);
             }}
@@ -339,7 +374,7 @@ function TableHeader(props: Props): JSX.Element {
         width: columnWidth(props.template.id),
         opacity: isDragging ? 0.5 : 1,
         transition: `background-color 150ms ease-in-out`,
-        backgroundColor: isOver ? 'var(--charmeditor-active)' : 'initial'
+        backgroundColor: isOver ? 'var(--charmeditor-active)' : ''
       }}
       ref={columnRef}
     >

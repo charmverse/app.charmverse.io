@@ -1,8 +1,10 @@
-import type { ProposalStatus } from '@charmverse/core/prisma';
+import type { ProposalEvaluationType, ProposalStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { InvalidStateError } from 'lib/middleware';
+import type { ProposalEvaluationResultExtended } from 'lib/proposal/interface';
 import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
 import { apiHandler } from 'lib/public-api/handler';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -76,15 +78,6 @@ type ProposalReviewer = {
  *          type: array
  *          items:
  *            $ref: '#/components/schemas/ProposalReviewer'
- *        status:
- *          type: string
- *          example: vote_active
- *          enum:
- *            - discussion
- *            - review
- *            - reviewed
- *            - vote_active
- *            - vote_closed
  *        title:
  *          type: string
  *          example: EIP-4361 Sign in with Ethereum
@@ -95,7 +88,28 @@ type ProposalReviewer = {
  *          type: array
  *          items:
  *            type: string
- *
+ *        currentStep:
+ *          type: object
+ *          properties:
+ *            title:
+ *              type: string
+ *              example: Vote
+ *            result:
+ *              type: string
+ *              example: in_progress
+ *              enum:
+ *                - in_progress
+ *                - pass
+ *                - fail
+ *            type:
+ *              type: string
+ *              example: vote
+ *              enum:
+ *                - draft
+ *                - vote
+ *                - rubric
+ *                - pass_fail
+ *                - feedback
  */
 export type PublicApiProposal = {
   id: string;
@@ -106,10 +120,15 @@ export type PublicApiProposal = {
   };
   authors: ProposalAuthor[];
   reviewers: ProposalReviewer[];
-  status: ProposalStatus;
+  status: ProposalStatus | 'vote_active';
   title: string;
   url: string;
   voteOptions?: string[];
+  currentStep: {
+    title: string;
+    result: ProposalEvaluationResultExtended;
+    type: ProposalEvaluationType | 'draft';
+  };
 };
 
 handler.get(listProposals);
@@ -158,6 +177,7 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
       select: {
         id: true,
         status: true,
+        evaluations: true,
         page: {
           select: {
             votes: {
@@ -221,6 +241,8 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
   }
 
   const publicApiProposalList: PublicApiProposal[] = proposals.map((proposal, index) => {
+    const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
+    const isActiveVote = currentEvaluation?.result === null && currentEvaluation?.type === 'vote';
     const apiProposal: PublicApiProposal = {
       id: proposal.id,
       createdAt: proposal.page?.createdAt as any,
@@ -230,7 +252,18 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
         text: proposal.page?.contentText ?? '',
         markdown: markdownTexts[index]
       },
-      status: proposal.status,
+      currentStep: currentEvaluation
+        ? {
+            result: currentEvaluation.result ?? 'in_progress',
+            title: currentEvaluation.title,
+            type: currentEvaluation.type
+          }
+        : {
+            result: 'in_progress',
+            title: 'Draft',
+            type: 'draft'
+          },
+      status: isActiveVote ? 'vote_active' : proposal.status,
       authors: proposal.authors.map((author) => ({
         userId: author.author?.id,
         address: author.author?.wallets[0]?.address,

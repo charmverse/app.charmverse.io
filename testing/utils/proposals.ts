@@ -1,48 +1,31 @@
-import type { Page, ProposalCategory, ProposalStatus } from '@charmverse/core/prisma';
-import { prisma } from '@charmverse/core/prisma-client';
+import type { Page, ProposalStatus } from '@charmverse/core/prisma';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { v4 } from 'uuid';
 
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
-import type { ProposalReviewerInput } from 'lib/proposal/interface';
-import { stringToColor } from 'lib/utilities/strings';
-
-export async function generateProposalCategory({
-  spaceId,
-  title = `Category-${Math.random()}`
-}: {
-  spaceId: string;
-  title?: string;
-}): Promise<Required<ProposalCategory>> {
-  return prisma.proposalCategory.create({
-    data: {
-      title,
-      space: { connect: { id: spaceId } },
-      color: stringToColor(title)
-    }
-  });
-}
 
 export type ProposalWithUsersAndPageMeta = ProposalWithUsers & { page: Pick<Page, 'title' | 'path'> };
+
+type ProposalReviewerInput = {
+  group: 'system_role' | 'role' | 'user';
+  id: string;
+  evaluationId?: string;
+};
 
 /**
  * Creates a proposal with the linked authors and reviewers
  */
 export async function generateProposal({
-  categoryId,
   userId,
   spaceId,
   proposalStatus = 'draft',
   authors = [],
-  reviewers = [],
   deletedAt = null
 }: {
   deletedAt?: Page['deletedAt'];
-  categoryId: string;
   userId: string;
   spaceId: string;
   authors?: string[];
-  reviewers?: ProposalReviewerInput[];
   proposalStatus?: ProposalStatus;
 }): Promise<ProposalWithUsersAndPageMeta> {
   const proposalId = v4();
@@ -68,7 +51,6 @@ export async function generateProposal({
       deletedAt,
       proposal: {
         create: {
-          category: { connect: { id: categoryId } },
           id: proposalId,
           createdBy: userId,
           status: proposalStatus,
@@ -83,18 +65,6 @@ export async function generateProposal({
                 createMany: {
                   data: authors.map((authorId) => ({ userId: authorId }))
                 }
-              },
-          reviewers: !reviewers.length
-            ? undefined
-            : {
-                createMany: {
-                  data: (reviewers ?? []).map((r) => {
-                    return {
-                      userId: r.group === 'user' ? r.id : undefined,
-                      roleId: r.group === 'role' ? r.id : undefined
-                    };
-                  })
-                }
               }
         }
       }
@@ -103,8 +73,7 @@ export async function generateProposal({
       proposal: {
         include: {
           authors: true,
-          reviewers: true,
-          category: true
+          reviewers: true
         }
       }
     }

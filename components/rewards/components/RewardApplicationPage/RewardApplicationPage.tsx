@@ -7,10 +7,10 @@ import { useState } from 'react';
 import { useGetReward, useGetRewardPermissions } from 'charmClient/hooks/rewards';
 import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
+import { RewardProperties } from 'components/[pageId]/DocumentPage/components/RewardProperties';
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import UserDisplay from 'components/common/UserDisplay';
-import { RewardProperties } from 'components/rewards/components/RewardProperties/RewardProperties';
 import type { WorkInput } from 'components/rewards/hooks/useApplication';
 import { useApplication } from 'components/rewards/hooks/useApplication';
 import { useNewWork } from 'components/rewards/hooks/useNewApplication';
@@ -125,7 +125,12 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
         <div className='document-print-container'>
           <Box display='flex' flexDirection='column'>
             <StyledContainer top={0}>
-              <PageTitleInput value={reward.page.title} readOnly onChange={() => null} />
+              <PageTitleInput
+                value={reward.page.title}
+                readOnly
+                onChange={() => null}
+                focusDocumentEditor={() => null}
+              />
               {!!query.id && (
                 <Button
                   onClick={goToReward}
@@ -133,7 +138,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
                   variant='text'
                   startIcon={<ArrowBack fontSize='small' />}
                 >
-                  <span>Back to reward</span>
+                  <span>Back</span>
                 </Button>
               )}
 

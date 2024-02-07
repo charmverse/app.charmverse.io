@@ -162,7 +162,7 @@ const createProposalNotification = ({
   status
 }: Pick<ProposalNotification, 'status' | 'spaceName' | 'pageTitle'>): ProposalNotification => {
   return {
-    type: 'reviewed',
+    type: 'proposal_passed',
     pagePath: randomName(),
     pageTitle,
     id: v4(),
@@ -175,7 +175,10 @@ const createProposalNotification = ({
     createdBy: dummyUser,
     archived: false,
     group: 'proposal',
-    read: false
+    read: false,
+    evaluation: {
+      title: 'Review'
+    }
   };
 };
 
@@ -213,63 +216,75 @@ const user: Pick<User, 'id' | 'avatar' | 'username' | 'email'> = {
 
 const templates = {
   'Notify the user about reward notifications': () => {
-    return emails.getPendingNotificationEmail(
-      createBountyNotification({
+    return emails.getPendingNotificationEmail({
+      notification: createBountyNotification({
         pageTitle: 'Create a new protocol',
         spaceName: 'Uniswap',
         status: 'open'
       }),
-      user
-    );
+      user,
+      spaceFeatures: [
+        {
+          id: 'rewards',
+          isHidden: false,
+          title: 'Rewards'
+        }
+      ]
+    });
   },
   'Notify the user about proposal notifications': () => {
-    return emails.getPendingNotificationEmail(
-      createProposalNotification({
+    return emails.getPendingNotificationEmail({
+      notification: createProposalNotification({
         pageTitle: 'Should Uniswap provide Rage Trade with an additional use grant',
         spaceName: 'Uniswap',
-        status: 'discussion'
+        status: 'published'
       }),
-      user
-    );
+      user,
+      spaceFeatures: []
+    });
   },
   'Notify the user about card notifications': () => {
-    return emails.getPendingNotificationEmail(
-      createCardNotification({
+    return emails.getPendingNotificationEmail({
+      notification: createCardNotification({
         pageTitle: 'Product Road Map',
         spaceName: 'CharmVerse'
       }),
-      user
-    );
+      user,
+      spaceFeatures: []
+    });
   },
   'Notify the user about document notifications': () => {
-    return emails.getPendingNotificationEmail(
-      createDocumentNotification({
+    return emails.getPendingNotificationEmail({
+      notification: createDocumentNotification({
         mentionText: 'Hey there, please respond to this message.',
         pageTitle: 'Attention please',
         spaceName: 'CharmVerse'
       }),
-      user
-    );
+      user,
+      spaceFeatures: []
+    });
   },
   'Notify the user about post notifications': () => {
-    return emails.getPendingNotificationEmail(
-      createPostNotification({
+    return emails.getPendingNotificationEmail({
+      notification: createPostNotification({
         postTitle: 'New idea. Let us discuss!',
         spaceName: 'CharmVerse'
       }),
-      user
-    );
+      user,
+      spaceFeatures: []
+    });
   },
   'Notify the user about vote notifications': () => {
-    return emails.getPendingNotificationEmail(
-      createVoteNotification({
+    return emails.getPendingNotificationEmail({
+      notification: createVoteNotification({
         deadline: new Date(Date.now() + 12 * 60 * 60 * 1000),
         pageTitle: 'This is a really really long vote title',
         spaceName: 'CharmVerse',
         voteTitle: 'Should we add this section? I think it can be a great addition but need all of your votes to decide'
       }),
-      user
-    );
+      user,
+      spaceFeatures: []
+    });
   }
 };
 

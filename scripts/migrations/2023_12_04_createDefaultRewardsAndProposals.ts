@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { prisma } from '@charmverse/core/prisma-client';
 import { createDefaultProposal } from 'lib/proposal/createDefaultProposal';
 import { upsertDefaultRewardsBoard } from 'lib/rewards/blocks/upsertDefaultRewardsBoard';
@@ -49,6 +50,7 @@ export async function createDefaultRewardsAndProposals() {
         await createDefaultProposal({
           spaceId: space.id,
           userId: space.createdBy,
+          // @ts-ignore
           categoryId: space.proposalCategories[0]?.id
         });
       }

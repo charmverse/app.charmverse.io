@@ -1,6 +1,5 @@
-import type { MemberPropertyType, FormFieldType } from '@charmverse/core/prisma';
-import type { FormField, Prisma } from '@charmverse/core/prisma-client';
-import type { SxProps } from '@mui/material';
+import type { FormFieldType, MemberPropertyType } from '@charmverse/core/prisma';
+import type { FormField } from '@charmverse/core/prisma-client';
 import type { ReactNode } from 'react';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
@@ -8,20 +7,17 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 
 export type FieldType = MemberPropertyType | FormFieldType;
 
-export interface TFormFieldInput {
-  id: string;
-  value:
-    | string
-    | string[]
-    | {
-        content: PageContent;
-        contentText: string;
-      };
-}
+export type FormFieldValue =
+  | string
+  | string[]
+  | {
+      content: PageContent;
+      contentText: string;
+    };
 
 export type ControlFieldProps = {
   onChange?: (value: any) => void;
-  value?: TFormFieldInput['value'];
+  value?: FormFieldValue;
 };
 
 export type SelectFieldProps = {
@@ -42,8 +38,9 @@ export type FieldProps = {
   required?: boolean;
   helperText?: ReactNode;
   description?: PageContent;
-  endAdornment?: ReactNode;
-  fieldWrapperSx?: SxProps;
+  labelEndAdornment?: ReactNode;
+  inputEndAdornment?: ReactNode;
+  inputEndAdornmentAlignItems?: React.CSSProperties['alignItems'];
 } & SelectFieldProps;
 
 export type FormFieldInput = Pick<
@@ -51,4 +48,10 @@ export type FormFieldInput = Pick<
   'id' | 'description' | 'name' | 'index' | 'required' | 'private' | 'type'
 > & {
   options?: SelectOptionType[];
+};
+
+export type FieldAnswerInput = {
+  id?: string;
+  fieldId: string;
+  value: FormFieldValue;
 };

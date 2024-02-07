@@ -1,66 +1,32 @@
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import type { ReactNode } from 'react';
-import { createContext, useCallback, useContext, useMemo } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo } from 'react';
 import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import { useGetProposalsBySpace } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { usePages } from 'hooks/usePages';
-import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';
+import { useWebSocketClient } from 'hooks/useWebSocketClient';
+import type { ProposalWithUsersLite } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
+import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 type ProposalsContextType = {
-  proposals: ProposalWithUsers[] | undefined;
-  mutateProposals: KeyedMutator<ProposalWithUsers[]>;
+  proposals: ProposalWithUsersLite[] | undefined;
+  mutateProposals: KeyedMutator<ProposalWithUsersLite[]>;
   isLoading: boolean;
-  archiveProposal: (input: ArchiveProposalRequest) => Promise<void>;
   updateProposal: (proposal: UpdateProposalRequest) => Promise<void>;
-  refreshProposal: (proposalId: string) => Promise<void>;
+  proposalsMap: Record<string, ProposalWithUsersLite | undefined>;
 };
 
-export const ProposalsContext = createContext<Readonly<ProposalsContextType>>({
-  proposals: undefined,
-  mutateProposals: async () => {
-    return undefined;
-  },
-  isLoading: false,
-  archiveProposal: () => Promise.resolve(),
-  updateProposal: () => Promise.resolve(),
-  refreshProposal: () => Promise.resolve()
-});
+export const ProposalsContext = createContext<ProposalsContextType | null>(null);
 
 export function ProposalsProvider({ children }: { children: ReactNode }) {
   const { loadingPages } = usePages();
   const { space } = useCurrentSpace();
+  const { subscribe } = useWebSocketClient();
 
-  const useProposalEvaluationPermissions = useIsCharmverseSpace();
-
-  const {
-    data: proposals,
-    mutate: mutateProposals,
-    isLoading
-  } = useGetProposalsBySpace({ spaceId: space?.id, useProposalEvaluationPermissions });
-
-  const archiveProposal = useCallback(
-    async (input: ArchiveProposalRequest) => {
-      if (space) {
-        const proposal = await charmClient.proposals.archiveProposal(input);
-        mutateProposals((oldProposals) => {
-          const proposalList = oldProposals ?? [];
-          const existingProposalIndex = proposalList.findIndex((p) => p.id === proposal.id);
-          if (existingProposalIndex < 0) {
-            proposalList.push(proposal);
-          } else {
-            proposalList[existingProposalIndex] = proposal;
-          }
-          return proposalList;
-        });
-      }
-    },
-    [mutateProposals, space]
-  );
+  const { data: proposals, mutate: mutateProposals, isLoading } = useGetProposalsBySpace({ spaceId: space?.id });
 
   const updateProposal = useCallback(
     async (proposal: UpdateProposalRequest) => {
@@ -73,41 +39,56 @@ export function ProposalsProvider({ children }: { children: ReactNode }) {
     [mutateProposals]
   );
 
-  const refreshProposal = useCallback(
-    async (proposalId: string) => {
-      const proposal = await charmClient.proposals.getProposal(proposalId);
-      mutateProposals((data) => {
-        const proposalList = data ?? [];
-        const proposalIndex = proposalList.findIndex((p) => p.id === proposalId);
+  const proposalsMap = useMemo(() => {
+    const map: Record<string, ProposalWithUsersLite> = {};
+    proposals?.forEach((proposal) => {
+      map[proposal.id] = proposal;
+    });
+    return map;
+  }, [proposals]);
 
-        if (proposalIndex >= 0) {
-          const existingProposal = proposalList[proposalIndex];
-          proposalList[proposalIndex] = {
-            ...existingProposal,
-            ...proposal
-          };
-        } else {
-          proposalList.push(proposal);
-        }
-        return proposalList;
-      });
-    },
-    [mutateProposals]
-  );
+  useEffect(() => {
+    function handleArchivedEvent(payload: WebSocketPayload<'proposals_archived'>) {
+      mutateProposals(
+        (list) => {
+          if (!list) return list;
+          return list.map((proposal) => {
+            if (payload.proposalIds.includes(proposal.id)) {
+              return {
+                ...proposal,
+                archived: payload.archived
+              };
+            }
+            return proposal;
+          });
+        },
+        { revalidate: false }
+      );
+    }
+    const unsubscribeFromProposalArchived = subscribe('proposals_archived', handleArchivedEvent);
+    return () => {
+      unsubscribeFromProposalArchived();
+    };
+  }, [mutateProposals, subscribe]);
 
   const value = useMemo(
     () => ({
       proposals,
       mutateProposals,
       isLoading: isLoading || loadingPages,
-      archiveProposal,
       updateProposal,
-      refreshProposal
+      proposalsMap
     }),
-    [archiveProposal, isLoading, loadingPages, mutateProposals, proposals, updateProposal, refreshProposal]
+    [isLoading, loadingPages, mutateProposals, proposals, updateProposal]
   );
 
   return <ProposalsContext.Provider value={value}>{children}</ProposalsContext.Provider>;
 }
 
-export const useProposals = () => useContext(ProposalsContext);
+export function useProposals() {
+  const context = useContext(ProposalsContext);
+  if (context === null) {
+    throw new Error('useProposals must be used within a ProposalsProvider');
+  }
+  return context;
+}

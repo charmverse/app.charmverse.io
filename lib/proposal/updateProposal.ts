@@ -1,65 +1,47 @@
-import type { ProposalEvaluationType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { InvalidStateError } from 'lib/middleware';
-import type { ProposalFields } from 'lib/proposal/blocks/interfaces';
+import type { ProposalFields } from 'lib/proposal/interface';
 
-import type { ProposalReviewerInput } from './interface';
+import { setPageUpdatedAt } from './setPageUpdatedAt';
 
 export type UpdateProposalRequest = {
   proposalId: string;
   authors?: string[];
-  reviewers?: ProposalReviewerInput[];
-  categoryId?: string | null;
-  evaluationType?: ProposalEvaluationType | null;
-  publishToLens?: boolean;
-  fields?: ProposalFields;
+  fields?: ProposalFields | null;
+  selectedCredentialTemplates?: string[];
 };
 
 export async function updateProposal({
   proposalId,
   authors,
-  reviewers,
-  categoryId,
-  evaluationType,
-  publishToLens,
-  fields
-}: UpdateProposalRequest) {
+  fields,
+  selectedCredentialTemplates,
+  actorId
+}: UpdateProposalRequest & { actorId: string }) {
   if (authors && authors.length === 0) {
-    throw new InvalidStateError('Proposal must have at least 1 author');
+    const page = await prisma.page.findUniqueOrThrow({
+      where: {
+        proposalId
+      },
+      select: {
+        type: true
+      }
+    });
+
+    if (page.type === 'proposal') {
+      throw new InvalidStateError('Proposal must have at least 1 author');
+    }
   }
 
   await prisma.$transaction(async (tx) => {
-    if (publishToLens !== undefined) {
+    if (selectedCredentialTemplates) {
       await tx.proposal.update({
         where: {
           id: proposalId
         },
         data: {
-          publishToLens
-        }
-      });
-    }
-
-    // Update category only when it is present in request payload
-    if (categoryId) {
-      await tx.proposal.update({
-        where: {
-          id: proposalId
-        },
-        data: {
-          categoryId
-        }
-      });
-    }
-    // Update evaluationType only when it is present in request payload
-    if (evaluationType) {
-      await tx.proposal.update({
-        where: {
-          id: proposalId
-        },
-        data: {
-          evaluationType
+          selectedCredentialTemplates
         }
       });
     }
@@ -87,21 +69,7 @@ export async function updateProposal({
         data: authors.map((author) => ({ proposalId, userId: author }))
       });
     }
-
-    // updatereviewers only when it is present in request payload
-    if (reviewers) {
-      await tx.proposalReviewer.deleteMany({
-        where: {
-          proposalId
-        }
-      });
-      await tx.proposalReviewer.createMany({
-        data: reviewers.map((reviewer) => ({
-          proposalId,
-          userId: reviewer.group === 'user' ? reviewer.id : null,
-          roleId: reviewer.group === 'role' ? reviewer.id : null
-        }))
-      });
-    }
   });
+
+  await setPageUpdatedAt({ proposalId, userId: actorId });
 }

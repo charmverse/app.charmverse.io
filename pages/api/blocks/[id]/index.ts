@@ -6,9 +6,9 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import type { BlockTypes } from 'lib/focalboard/block';
-import { ApiError, ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { ActionNotPermittedError, ApiError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
-import { getPermissionsClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 import { relay } from 'lib/websockets/relay';
 
@@ -26,9 +26,10 @@ async function getBlock(req: NextApiRequest, res: NextApiResponse<Block>) {
 
   const pageId = block.type === 'view' ? block.rootId : block.id;
 
-  const permissions = await getPermissionsClient({ resourceId: pageId, resourceIdType: 'page' }).then(({ client }) =>
-    client.pages.computePagePermissions({ resourceId: pageId, userId: req.session.user?.id })
-  );
+  const permissions = await permissionsApiClient.pages.computePagePermissions({
+    resourceId: pageId,
+    userId: req.session.user?.id
+  });
 
   if (!permissions.read) {
     throw new DataNotFoundError('Block not found');
@@ -65,18 +66,17 @@ async function deleteBlock(
 
   const pageId = isPageBlock ? rootBlock.id : rootBlock.rootId;
 
-  const permissionsSet = await getPermissionsClient({ resourceId: pageId, resourceIdType: 'page' }).then(({ client }) =>
-    client.pages.computePagePermissions({
-      resourceId: pageId,
-      userId
-    })
-  );
+  const permissionsSet = await permissionsApiClient.pages.computePagePermissions({
+    resourceId: pageId,
+    userId
+  });
+
   if (rootBlock.type === 'card' || rootBlock.type === 'card_template' || rootBlock.type === 'board') {
     if (!permissionsSet.delete) {
       throw new ActionNotPermittedError();
     }
 
-    const deletedChildPageIds = await modifyChildPages(blockId, userId, 'archive');
+    const deletedChildPageIds = await modifyChildPages(blockId, userId, 'trash');
     deletedCount = deletedChildPageIds.length;
     relay.broadcast(
       {

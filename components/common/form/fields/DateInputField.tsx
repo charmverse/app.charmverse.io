@@ -12,7 +12,8 @@ export const DateInputField = forwardRef<HTMLDivElement, Props>(
   (
     {
       label,
-      endAdornment,
+      labelEndAdornment,
+      inputEndAdornment,
       description,
       iconLabel,
       inline,
@@ -22,42 +23,50 @@ export const DateInputField = forwardRef<HTMLDivElement, Props>(
       error,
       helperText,
       disabled,
-      placeholder,
-      fieldWrapperSx
+      placeholder
     },
     ref
   ) => {
+    // Convert to luxon date
+    const dateValue =
+      typeof value === 'string' || typeof value === 'number' ? DateTime.fromJSDate(new Date(value)) : undefined;
+
     return (
       <FieldWrapper
-        endAdornment={endAdornment}
+        labelEndAdornment={labelEndAdornment}
         description={description}
         required={required}
         label={label}
         inline={inline}
         iconLabel={iconLabel}
-        sx={fieldWrapperSx}
+        inputEndAdornment={inputEndAdornment}
       >
         <DateTimePicker
-          value={typeof value === 'string' ? DateTime.fromJSDate(new Date(value)) : undefined}
+          value={dateValue}
           onChange={(_value) => {
+            // Convert to unix timestamp
             onChange?.(_value?.toJSDate().getTime());
           }}
           disabled={disabled}
-          renderInput={(props) => (
-            <TextField
-              {...props}
-              fullWidth
-              inputProps={{
-                ...props.inputProps,
-                readOnly: true,
-                placeholder
-              }}
-              disabled={disabled}
-              error={!!error}
-              ref={ref}
-              helperText={helperText}
-            />
-          )}
+          renderInput={(props) => {
+            return (
+              <TextField
+                {...props}
+                fullWidth
+                inputProps={{
+                  ...props.inputProps,
+                  readOnly: true,
+                  placeholder,
+                  // props.inputProps.value is always a date, either dateValue or current date
+                  value: dateValue ? props.inputProps?.value : undefined
+                }}
+                disabled={disabled}
+                error={!!error}
+                ref={ref}
+                helperText={helperText}
+              />
+            );
+          }}
         />
       </FieldWrapper>
     );

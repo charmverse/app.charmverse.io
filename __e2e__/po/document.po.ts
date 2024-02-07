@@ -14,6 +14,10 @@ export class DocumentPage extends GlobalPage {
     public page: Page,
     public header = new PageHeader(page),
     public archivedBanner = page.locator('data-test=archived-page-banner'),
+    public commentsSidebar = page.locator('data-test=inline-comment-sidebar'),
+    public commentsSidebarEmptyMessage = page.locator('data-test=inline-comment-sidebar >> data-test=empty-message'),
+    public contextMenuButton = page.locator('data-test=page-context-menu-button'),
+    public contextMenuViewCommentsButton = page.locator('data-test=view-comments-button'),
     public shareDialog = new PagePermissionsDialog(page),
     public trashToggle = page.locator('data-test=sidebar--trash-toggle'),
     public deletePermanentlyButton = page.locator('data-test=banner--permanently-delete'),
@@ -24,7 +28,8 @@ export class DocumentPage extends GlobalPage {
     public documentTitle = page.locator(`data-test=editor-page-title`),
     public openAsPageButton = page.locator('data-test=open-as-page'),
     public joinSpaceButton = page.locator('data-test=public-bounty-space-action'),
-    public cardDetailProperties = page.locator('data-test=card-detail-properties')
+    public cardDetailProperties = page.locator('data-test=card-detail-properties'),
+    public addCardPropertyButton = page.locator('data-test=add-custom-property')
   ) {
     super(page);
   }

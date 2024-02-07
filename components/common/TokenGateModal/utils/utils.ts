@@ -2,7 +2,8 @@ export const collectableOptions = [
   { id: 'ERC721', name: 'ERC-721 NFT' },
   { id: 'ERC1155', name: 'ERC-1155 NFT' },
   { id: 'POAP', name: 'POAPS' },
-  { id: 'UNLOCK', name: 'Unlock Protocol' }
+  { id: 'UNLOCK', name: 'Unlock Protocol' },
+  { id: 'HYPERSUB', name: 'Hypersub' }
 ] as const;
 
 export const poapTypes = [
@@ -23,4 +24,9 @@ export const tokenCheck = [
 export const nftCheck = [
   { id: 'group', name: 'Any NFT in this collection' },
   { id: 'individual', name: 'A specific token id' }
+] as const;
+
+export const daoCheck = [
+  { id: 'moloch', name: 'MolochDAOv2.1' },
+  { id: 'builder', name: 'Builder Protocol' }
 ] as const;

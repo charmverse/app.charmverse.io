@@ -1,6 +1,7 @@
-import { Chip, MenuItem, TextField, Typography, Stack } from '@mui/material';
+import { Button, Chip, MenuItem, TextField, Typography, Paper, Box } from '@mui/material';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
-import { forwardRef, useEffect, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
+import { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
 import { v4 } from 'uuid';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
@@ -29,6 +30,9 @@ type SelectProps = {
   className?: string;
   forcePopupIcon?: boolean | 'auto';
   required?: boolean;
+  fluidWidth?: boolean;
+  dataTest?: string;
+  disablePopper?: boolean;
 };
 
 type Props = Omit<ControlFieldProps, 'value'> & FieldProps & SelectProps;
@@ -37,7 +41,8 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
   (
     {
       description,
-      endAdornment,
+      labelEndAdornment,
+      inputEndAdornment,
       required,
       label,
       iconLabel,
@@ -57,7 +62,9 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
       forcePopupIcon = 'auto',
       noOptionsText,
       helperText,
-      fieldWrapperSx,
+      fluidWidth,
+      dataTest,
+      disablePopper,
       ...inputProps
     },
     ref
@@ -114,16 +121,16 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
 
     return (
       <FieldWrapper
-        endAdornment={endAdornment}
+        labelEndAdornment={labelEndAdornment}
         description={description}
         label={label}
         required={required}
         inline={inline}
         iconLabel={iconLabel}
-        sx={fieldWrapperSx}
+        inputEndAdornment={inputEndAdornment}
       >
         <Autocomplete
-          data-test='autocomplete'
+          data-test={dataTest || 'autocomplete'}
           className={className}
           onClose={() => setIsOpened(false)}
           onOpen={() => setIsOpened(true)}
@@ -136,8 +143,9 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
           clearOnBlur
           handleHomeEndKeys
           multiple
+          PopperComponent={disablePopper ? NoPopperComponent : undefined}
           filterSelectedOptions={!includeSelectedOptions}
-          sx={{ minWidth: 150, width: '100%', zIndex: 1 }}
+          sx={!fluidWidth ? { minWidth: 150, width: '100%', zIndex: 1 } : { zIndex: 1 }}
           options={options}
           autoHighlight
           clearIcon={null}
@@ -158,20 +166,19 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
               />
             );
           }}
-          renderTags={(value, getTagProps) => (
-            <Stack flexDirection='row' gap={1}>
-              {value.map((option, index) => (
-                // eslint-disable-next-line react/jsx-key
-                <Chip
-                  {...getTagProps({ index })}
-                  style={{ margin: 0 }} // margin is added when dropdown is open for some reason, making the input height increase
-                  size='small'
-                  label={option.name}
-                  color={option.color}
-                />
-              ))}
-            </Stack>
-          )}
+          renderTags={(value, getTagProps) =>
+            value.map((option, index) => (
+              // eslint-disable-next-line react/jsx-key
+              <Chip
+                {...getTagProps({ index })}
+                sx={{ px: 0.5 }}
+                style={{ margin: 0, marginRight: 8, marginBottom: 2, marginTop: 2 }} // margin is added when dropdown is open for some reason, making the input height increase
+                size='small'
+                label={option.name}
+                color={option.color}
+              />
+            ))
+          }
           noOptionsText={<Typography variant='caption'>{noOptionsText || 'No options available'}</Typography>}
           renderInput={(params) => (
             <TextField
@@ -219,3 +226,8 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
     );
   }
 );
+
+// We replace the Popper with a div when SelectField is inside another popup. See PopupFieldWrapper
+function NoPopperComponent(props: any & { children: ReactNode }) {
+  return <div>{props.children}</div>;
+}

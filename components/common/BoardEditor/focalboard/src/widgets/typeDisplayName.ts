@@ -38,10 +38,10 @@ export function typeDisplayName(intl: IntlShape, type: PropertyType): string {
       return intl.formatMessage({ id: 'PropertyType.Date', defaultMessage: 'Date' });
     case 'proposalUrl':
       return intl.formatMessage({ id: 'PropertyType.ProposalUrl', defaultMessage: 'Proposal Url' });
-    case 'proposalCategory':
-      return intl.formatMessage({ id: 'PropertyType.ProposalCategory', defaultMessage: 'Proposal Category' });
     case 'proposalStatus':
       return intl.formatMessage({ id: 'PropertyType.ProposalStatus', defaultMessage: 'Proposal Status' });
+    case 'relation':
+      return intl.formatMessage({ id: 'PropertyType.Relation', defaultMessage: 'Relation' });
     case 'proposalEvaluationAverage':
       return intl.formatMessage({
         id: 'PropertyType.ProposalEvaluationAverage',

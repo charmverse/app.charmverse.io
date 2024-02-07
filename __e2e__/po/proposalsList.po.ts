@@ -9,7 +9,10 @@ export class ProposalsListPage extends GlobalPage {
     page: Page,
     public emptyState = page.locator('data-test=empty-state'),
     public proposalTemplateSelect = page.locator('data-test=proposal-template-select'),
-    public createProposalButton = page.locator('data-test=new-proposal-button')
+    public addNewTemplate = page.locator('data-test=new-template-button'),
+    public createProposalButton = page.locator('data-test=new-proposal-button'),
+    public proposalTemplateFreeFormOption = page.locator('data-test=free_form-proposal-template-menu'),
+    public structuredProposalTemplateMenu = page.locator('data-test=structured-proposal-template-menu')
   ) {
     super(page);
   }
@@ -38,16 +41,8 @@ export class ProposalsListPage extends GlobalPage {
       .all();
   }
 
-  getProposalCategoryLocator(categoryId: string) {
-    return this.page.locator(`data-test=proposal-category-${categoryId}`);
-  }
-
   getProposalSidebarButtonLocator() {
     return this.page.locator(`data-test=view-header-actions-menu`);
-  }
-
-  getProposalCategorySidebarLocator() {
-    return this.page.locator(`data-test=view-sidebar-content`).getByText('Categories');
   }
 
   getTemplateOptionLocator(pageId: string) {
@@ -57,10 +52,5 @@ export class ProposalsListPage extends GlobalPage {
   async openProposalCard(proposalId: string) {
     await this.getProposalRowLocator(proposalId).hover();
     await this.getProposalRowOpenLocator(proposalId).click();
-  }
-
-  async openProposalCategoryList() {
-    await this.getProposalSidebarButtonLocator().click();
-    await this.getProposalCategorySidebarLocator().click();
   }
 }

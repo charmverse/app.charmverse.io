@@ -1,5 +1,4 @@
 /* eslint-disable max-lines */
-import type { ProposalStatus } from '@charmverse/core/prisma-client';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
@@ -14,7 +13,8 @@ import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
-import { PROPOSAL_STATUS_LABELS_WITH_ARCHIVED } from 'lib/proposal/proposalStatusTransition';
+import { EVALUATION_STATUS_LABELS } from 'lib/focalboard/proposalDbProperties';
+import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
 
 import mutator from '../../mutator';
 import IconButton from '../../widgets/buttons/iconButton';
@@ -93,7 +93,7 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
 
   const formattedGroupTitle =
     groupByProperty?.type === 'proposalStatus'
-      ? PROPOSAL_STATUS_LABELS_WITH_ARCHIVED[group.option.value as ProposalStatus]
+      ? EVALUATION_STATUS_LABELS[group.option.value as ProposalEvaluationStatus]
       : groupTitle;
 
   return (

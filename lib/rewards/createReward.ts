@@ -45,9 +45,7 @@ export async function createReward({
   allowMultipleApplications,
   proposalId
 }: RewardCreationData) {
-  if (!rewardAmount && !customReward) {
-    throw new InvalidInputError('A reward must have a reward amount or a custom reward assigned');
-  } else if (typeof rewardAmount === 'number' && rewardAmount < 0) {
+  if (typeof rewardAmount === 'number' && rewardAmount < 0) {
     throw new PositiveNumbersOnlyError();
   } else if (rewardAmount && (!chainId || !rewardToken)) {
     throw new InvalidInputError(`Reward amount must also have chainId and token`);

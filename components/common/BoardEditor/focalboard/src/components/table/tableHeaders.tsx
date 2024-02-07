@@ -1,10 +1,15 @@
 import { useTheme } from '@emotion/react';
 import AddIcon from '@mui/icons-material/Add';
+import CheckBoxOutlineBlankOutlinedIcon from '@mui/icons-material/CheckBoxOutlineBlankOutlined';
+import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
+import IndeterminateCheckBoxOutlinedIcon from '@mui/icons-material/IndeterminateCheckBoxOutlined';
 import { Box, Menu } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import type { Dispatch, SetStateAction } from 'react';
 import React, { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 
+import { useSyncRelationProperty } from 'charmClient/hooks/blocks';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useSmallScreen } from 'hooks/useMediaScreens';
@@ -24,6 +29,7 @@ import { PropertyTypes } from '../../widgets/propertyTypes';
 import { typeDisplayName } from '../../widgets/typeDisplayName';
 
 import TableHeader from './tableHeader';
+import { StyledCheckbox } from './tableRow';
 
 type Props = {
   board: Board;
@@ -34,13 +40,29 @@ type Props = {
   resizingColumn: string;
   offset: number;
   columnRefs: Map<string, React.RefObject<HTMLDivElement>>;
+  checkedIds?: string[];
+  setCheckedIds?: Dispatch<SetStateAction<string[]>>;
+  setSelectedPropertyId?: Dispatch<SetStateAction<string | null>>;
 };
 
 function TableHeaders(props: Props): JSX.Element {
-  const { board, cards, activeView, resizingColumn, views, offset, columnRefs } = props;
+  const {
+    board,
+    cards,
+    activeView,
+    resizingColumn,
+    views,
+    offset,
+    columnRefs,
+    setCheckedIds,
+    readOnly,
+    checkedIds = []
+  } = props;
   const intl = useIntl();
   const { formatDateTime, formatDate } = useDateFormatter();
   const addPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-property' });
+  const { trigger: syncRelationProperty } = useSyncRelationProperty();
+
   const isSmallScreen = useSmallScreen();
   const theme = useTheme();
   const sortOptions = useViewSortOptions(activeView);
@@ -165,15 +187,23 @@ function TableHeaders(props: Props): JSX.Element {
       activeView && (
         <PropertyTypes
           isMobile={isSmallScreen}
-          onClick={async (type) => {
+          onClick={async ({ type, relationData, name }) => {
             addPropertyPopupState.close();
             const template: IPropertyTemplate = {
               id: Utils.createGuid(IDType.BlockID),
-              name: typeDisplayName(intl, type),
+              name: name ?? typeDisplayName(intl, type),
               type,
-              options: []
+              options: [],
+              relationData
             };
             await mutator.insertPropertyTemplate(board, activeView, -1, template);
+            if (relationData?.showOnRelatedBoard) {
+              syncRelationProperty({
+                boardId: board.id,
+                created: true,
+                templateId: template.id
+              });
+            }
           }}
         />
       ),
@@ -182,6 +212,37 @@ function TableHeaders(props: Props): JSX.Element {
 
   return (
     <div className='octo-table-header TableHeaders' id='mainBoardHeader'>
+      {setCheckedIds && !readOnly && cards.length !== 0 && (
+        <StyledCheckbox
+          checked={checkedIds.length === cards.length}
+          className='disable-drag-selection'
+          onChange={() => {
+            if (checkedIds.length === cards.length) {
+              setCheckedIds([]);
+            } else {
+              setCheckedIds(cards.map((card) => card.id));
+            }
+          }}
+          icon={
+            checkedIds.length === cards.length ? (
+              <CheckBoxOutlinedIcon fontSize='small' />
+            ) : checkedIds.length === 0 ? (
+              <CheckBoxOutlineBlankOutlinedIcon fontSize='small' />
+            ) : (
+              <IndeterminateCheckBoxOutlinedIcon fontSize='small' />
+            )
+          }
+          show={checkedIds.length !== 0}
+          size='small'
+          disableFocusRipple
+          disableRipple
+          disableTouchRipple
+          sx={{
+            alignSelf: 'center'
+          }}
+        />
+      )}
+
       {visiblePropertyTemplates.map((template) => {
         let sorted: 'up' | 'down' | 'none' = 'none';
         const sortOption = sortOptions.find((o: ISortOption) => o.propertyId === template.id);
@@ -191,8 +252,6 @@ function TableHeaders(props: Props): JSX.Element {
         return (
           <TableHeader
             data-test={`table-property-${template.type}`}
-            type={template.type}
-            name={template.name}
             sorted={sorted}
             readOnly={props.readOnly}
             board={board}
@@ -204,11 +263,15 @@ function TableHeaders(props: Props): JSX.Element {
             offset={resizingColumn === template.id ? offset : 0}
             onDrop={onDropToColumn}
             onAutoSizeColumn={onAutoSizeColumn}
+            setSelectedPropertyId={props.setSelectedPropertyId}
           />
         );
       })}
       {/* empty column for actions */}
-      <div className='octo-table-cell header-cell' style={{ flexGrow: 1, borderRight: '0 none' }}>
+      <div
+        className='octo-table-cell header-cell disable-drag-selection'
+        style={{ flexGrow: 1, borderRight: '0 none' }}
+      >
         {!props.readOnly && (
           <>
             <Button {...bindTrigger(addPropertyPopupState)}>

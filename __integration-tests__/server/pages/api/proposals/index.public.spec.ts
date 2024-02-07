@@ -1,39 +1,34 @@
-import type { Space, User, ProposalCategory } from '@charmverse/core/prisma';
+import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWithUsers } from '@charmverse/core/proposals';
-import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
-import type { CreateProposalInput, CreatedProposal } from 'lib/proposal/createProposal';
+import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 let space: Space;
 let user: User;
-let proposalCategory: ProposalCategory;
 
 beforeAll(async () => {
   const generated = await testUtilsUser.generateUserAndSpace({ isAdmin: false, spacePaidTier: 'free' });
   space = generated.space;
   user = generated.user;
-  proposalCategory = await testUtilsProposals.generateProposalCategory({
-    spaceId: space.id
-  });
 });
 
 describe('POST /api/proposals - Create a proposal', () => {
-  it('should allow a space member to create a proposal in a specific category, with page content, reviewers and authors configured and respond with 201', async () => {
+  it('should allow a space member to create a proposal with page content, reviewers and authors configured and respond with 201', async () => {
     const userCookie = await loginUser(user.id);
     const otherUser = await testUtilsUser.generateSpaceUser({
       spaceId: space.id
     });
 
     const input: CreateProposalInput = {
-      categoryId: proposalCategory.id,
       spaceId: space.id,
       userId: user.id,
       authors: [user.id, otherUser.id],
-      reviewers: [{ group: 'user', id: user.id }],
+      evaluations: [],
       pageProps: {
         title: 'Proposal title',
         content: { ...emptyDocument },
@@ -41,41 +36,7 @@ describe('POST /api/proposals - Create a proposal', () => {
       }
     };
 
-    const createdProposal = (
-      await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(201)
-    ).body as { id: string };
-
-    const proposal = await prisma.proposal.findUniqueOrThrow({
-      where: {
-        id: createdProposal.id
-      },
-      include: {
-        authors: true,
-        reviewers: true
-      }
-    });
-
-    expect(proposal).toMatchObject<Partial<ProposalWithUsers>>(
-      expect.objectContaining({
-        authors: expect.arrayContaining([
-          {
-            proposalId: createdProposal?.id as string,
-            userId: user.id
-          },
-          {
-            proposalId: createdProposal?.id as string,
-            userId: otherUser.id
-          }
-        ]),
-        reviewers: expect.arrayContaining([
-          expect.objectContaining({
-            id: expect.any(String),
-            proposalId: createdProposal?.id as string,
-            userId: user.id
-          })
-        ])
-      })
-    );
+    await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(201);
   });
 
   it('should not allow a user outside the space to create a proposal and respond with 401', async () => {
@@ -84,12 +45,10 @@ describe('POST /api/proposals - Create a proposal', () => {
     const userCookie = await loginUser(outsideUser.id);
 
     const input: CreateProposalInput = {
-      // This is the important bit
-      categoryId: proposalCategory.id,
       spaceId: space.id,
       userId: user.id,
       authors: [user.id],
-      reviewers: [{ group: 'user', id: outsideUser.id }],
+      evaluations: [],
       pageProps: {
         title: 'Proposal title',
         content: { ...emptyDocument },

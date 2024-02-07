@@ -2,6 +2,8 @@ import LinkIcon from '@mui/icons-material/Link';
 import type { ReactNode } from 'react';
 import React from 'react';
 
+import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
+
 import { TextInput } from '../../../../../components/properties/TextInput';
 import { Utils } from '../../../utils';
 
@@ -14,6 +16,7 @@ type Props = {
   onSave: () => void;
   onCancel: () => void;
   validator: (newValue: string) => boolean;
+  displayType?: PropertyValueDisplayType;
 };
 
 function URLProperty(props: Props): JSX.Element {
@@ -22,7 +25,7 @@ function URLProperty(props: Props): JSX.Element {
   if (hasValue) {
     link = (
       <a
-        className='Link__button'
+        className={`Link__button ${props.displayType === 'table' ? 'table-cell' : ''}`}
         href={Utils.ensureProtocol(props.value.trim())}
         target='_blank'
         rel='noreferrer'

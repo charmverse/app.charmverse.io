@@ -20,7 +20,7 @@ export function mapSpacePermissionToAssignee(spacePermission: SpacePermission): 
   };
 }
 
-export function getPermissionAssignee(permission: SpacePermission): AssignedSpacePermission['assignee'] {
+function getPermissionAssignee(permission: SpacePermission): AssignedSpacePermission['assignee'] {
   if (permission.roleId) {
     return {
       group: 'role',

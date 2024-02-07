@@ -24,13 +24,17 @@ export function TokenGateNft() {
       <TokenGateBlockchainSelect
         error={!!errors.chain?.message}
         helperMessage={errors.chain?.message}
-        {...register('chain')}
+        {...register('chain', {
+          deps: ['contract']
+        })}
       />
       <TextInputField
         label='Contract Address'
         error={errors.contract?.message}
         helperText={errors.contract?.message}
-        {...register('contract')}
+        {...register('contract', {
+          deps: ['chain']
+        })}
       />
       {collectableOption === 'ERC721' && (
         <FieldWrapper label='Select how would you like to customize the nft token gate'>
@@ -58,6 +62,8 @@ export function TokenGateNft() {
       )}
       {collectableOption === 'ERC721' && check === 'group' && (
         <NumberInputField
+          disableArrows
+          fullWidth
           label='Quantity'
           error={errors.quantity?.message}
           helperText={errors.quantity?.message}

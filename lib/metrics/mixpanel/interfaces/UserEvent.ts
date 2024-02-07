@@ -32,6 +32,8 @@ export type UserLoginEvent = BaseEventWithoutGroup & {
   identityType: IdentityType;
 };
 
+export type UserOtp = BaseEventWithoutGroup;
+
 export type TokenGateVerificationEvent = BaseEvent & {
   roles?: string[];
   result: 'pass' | 'fail';
@@ -46,14 +48,27 @@ export type CreateNewSpace = BaseEvent & {
   source?: string;
 };
 
+export type ViewFarcasterFrame = BaseEvent & {
+  frameUrl: string;
+  pageId: string;
+};
+
+export type AddFarcasterFrame = ViewFarcasterFrame;
+
 export type AppLoaded = BaseEventWithoutGroup & { spaceId?: string };
 
 export interface UserEventMap {
   sign_up: UserSignupEvent;
   sign_in: UserLoginEvent;
+  sign_in_otp: UserLoginEvent;
+  sign_in_recovery_code: UserLoginEvent;
   load_a_workspace: BaseEvent;
   create_new_workspace: CreateNewSpace;
   join_a_workspace: SpaceJoined;
   token_gate_verification: TokenGateVerificationEvent;
   app_loaded: AppLoaded;
+  delete_otp: UserOtp;
+  add_otp: UserOtp;
+  add_farcaster_frame: AddFarcasterFrame;
+  view_farcaster_frame: ViewFarcasterFrame;
 }

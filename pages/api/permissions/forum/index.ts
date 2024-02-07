@@ -5,7 +5,7 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPermissionsSubscription';
-import { permissionsApiClient } from 'lib/permissions/api/routers';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import type { PermissionResource } from 'lib/permissions/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError } from 'lib/utilities/errors';

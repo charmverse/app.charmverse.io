@@ -53,17 +53,6 @@ export function IdentityIcon({ type, size = 'medium' }: { type: IdentityType | n
     case 'Telegram':
       return <TelegramIcon style={{ color: '#229ED9', height, width }} />;
 
-    case 'UnstoppableDomain':
-      return (
-        <img
-          src='/images/walletLogos/unstoppable-domains.png'
-          style={{
-            width,
-            height
-          }}
-        />
-      );
-
     case 'Google':
       return (
         <img
@@ -81,7 +70,7 @@ export function IdentityIcon({ type, size = 'medium' }: { type: IdentityType | n
     case 'Lens': {
       return (
         <img
-          src='/images/logos/lens_logo.svg'
+          src='/images/logos/lens_logo.png'
           style={{
             width,
             height

@@ -12,11 +12,12 @@ export const bountyNotificationTypes = [
 ] as const;
 
 export const proposalNotificationTypes = [
-  'start_review',
   'start_discussion',
-  'reviewed',
-  'needs_review',
+  'review_required',
   'vote',
-  'evaluation_active',
-  'evaluation_closed'
+  'vote_passed',
+  'reward_published',
+  'proposal_passed',
+  'step_passed',
+  'proposal_failed'
 ] as const;

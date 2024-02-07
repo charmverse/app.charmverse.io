@@ -10,7 +10,6 @@ import type {
   Page,
   Post,
   PostComment,
-  ProposalEvaluationType,
   ProposalStatus,
   Role,
   RoleSource,
@@ -21,20 +20,19 @@ import type {
   Vote
 } from '@charmverse/core/prisma';
 import { Prisma } from '@charmverse/core/prisma';
-import type { Application, PageType } from '@charmverse/core/prisma-client';
+import type { Application, PagePermission, PageType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import type { DataSourceType } from 'lib/focalboard/board';
 import type { IViewType } from 'lib/focalboard/boardView';
-import { generateDefaultPropertiesInput } from 'lib/members/generateDefaultPropertiesInput';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import type { NotificationToggles } from 'lib/notifications/notificationToggles';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import type { BountyPermissions } from 'lib/permissions/bounties';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
-import type { ProposalWithUsersAndRubric, ProposalReviewerInput } from 'lib/proposal/interface';
+import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { getRewardOrThrow } from 'lib/rewards/getReward';
 import type { ApplicationMeta } from 'lib/rewards/interfaces';
@@ -241,6 +239,7 @@ export async function generateUserAndSpace({
 }
 
 export async function generateBounty({
+  proposalId,
   content = undefined,
   contentText = '',
   spaceId,
@@ -263,6 +262,7 @@ export async function generateBounty({
     Pick<
       Bounty,
       | 'id'
+      | 'proposalId'
       | 'maxSubmissions'
       | 'chainId'
       | 'rewardAmount'
@@ -309,6 +309,7 @@ export async function generateBounty({
         createdBy,
         allowMultipleApplications,
         chainId,
+        proposalId,
         rewardAmount,
         rewardToken,
         status,
@@ -773,94 +774,6 @@ export async function createVote({
   });
 }
 
-export async function createProposalWithUsers({
-  proposalStatus = 'draft',
-  authors,
-  reviewers,
-  userId,
-  spaceId,
-  proposalCategoryId,
-  ...pageCreateInput
-}: {
-  authors: string[];
-  reviewers: (string | { type: 'role'; roleId: string })[];
-  spaceId: string;
-  userId: string;
-  proposalStatus?: ProposalStatus;
-  proposalCategoryId?: string;
-} & Partial<Prisma.PageCreateInput>): Promise<{ id: string; pageId: string }> {
-  const proposalId = v4();
-
-  const proposalCategoryIdToLink = !proposalCategoryId
-    ? (
-        await prisma.proposalCategory.create({
-          data: {
-            title: `Category - ${v4()}`,
-            color: `#ffffff`,
-            space: { connect: { id: spaceId } }
-          }
-        })
-      ).id
-    : proposalCategoryId;
-
-  const proposalPage = await createPageDb({
-    data: {
-      ...pageCreateInput,
-      id: proposalId,
-      author: {
-        connect: {
-          id: userId
-        }
-      },
-      space: {
-        connect: {
-          id: spaceId
-        }
-      },
-      updatedBy: userId,
-      title: 'Page Title',
-      path: 'page-path',
-      contentText: '',
-      type: 'proposal',
-      proposal: {
-        create: {
-          id: proposalId,
-          space: {
-            connect: {
-              id: spaceId
-            }
-          },
-          category: { connect: { id: proposalCategoryIdToLink } },
-          createdBy: userId,
-          status: proposalStatus,
-          authors: {
-            createMany: {
-              data: [
-                {
-                  userId
-                },
-                ...authors.map((author) => ({ userId: author }))
-              ]
-            }
-          },
-          reviewers: {
-            createMany: {
-              data: reviewers.map((reviewer) =>
-                typeof reviewer === 'string' ? { userId: reviewer } : { roleId: reviewer.roleId }
-              )
-            }
-          }
-        }
-      }
-    }
-  });
-
-  return {
-    id: proposalPage.proposalId!,
-    pageId: proposalPage.id
-  };
-}
-
 export async function generateCommentWithThreadAndPage({
   userId,
   spaceId,
@@ -957,49 +870,34 @@ export function createBlock(options: Partial<Block> & Pick<Block, 'createdBy' | 
 }
 
 type PageWithProposal = Page & { proposal: ProposalWithUsersAndRubric };
+
+type ProposalReviewerInput = {
+  group: 'system_role' | 'role' | 'user';
+  id: string;
+  evaluationId?: string;
+};
+
 /**
  * Creates a proposal with the linked authors and reviewers
  */
 export async function generateProposal({
-  categoryId,
   userId,
   spaceId,
   pageType = 'proposal',
   proposalStatus,
-  evaluationType,
   authors,
-  reviewers,
   deletedAt = null,
   title = 'Proposal'
 }: {
   deletedAt?: Page['deletedAt'];
-  categoryId?: string;
   userId: string;
   spaceId: string;
   authors: string[];
-  reviewers: ProposalReviewerInput[];
   pageType?: PageType;
   proposalStatus: ProposalStatus;
-  evaluationType?: ProposalEvaluationType;
   title?: string;
 }): Promise<PageWithProposal> {
   const proposalId = v4();
-
-  const colors = ['gray', 'orange', 'yellow', 'green', 'teal', 'blue', 'turquoise', 'purple', 'pink', 'red'];
-
-  const randomColor = colors[Math.floor(Math.random() * colors.length)];
-
-  const categoryIdToLink =
-    categoryId ??
-    (
-      await prisma.proposalCategory.create({
-        data: {
-          title: `Category - ${v4()}`,
-          color: randomColor,
-          space: { connect: { id: spaceId } }
-        }
-      })
-    ).id;
 
   const result = await createPageDb({
     data: {
@@ -1026,10 +924,8 @@ export async function generateProposal({
       deletedAt,
       proposal: {
         create: {
-          category: { connect: { id: categoryIdToLink } },
           id: proposalId,
           createdBy: userId,
-          evaluationType,
           status: proposalStatus,
           space: {
             connect: {
@@ -1040,16 +936,6 @@ export async function generateProposal({
             createMany: {
               data: authors.map((authorId) => ({ userId: authorId }))
             }
-          },
-          reviewers: {
-            createMany: {
-              data: (reviewers ?? []).map((r) => {
-                return {
-                  userId: r.group === 'user' ? r.id : undefined,
-                  roleId: r.group === 'role' ? r.id : undefined
-                };
-              })
-            }
           }
         }
       }
@@ -1058,8 +944,7 @@ export async function generateProposal({
       proposal: {
         include: {
           authors: true,
-          reviewers: true,
-          category: true
+          reviewers: true
         }
       }
     }
@@ -1086,7 +971,8 @@ export async function generateBoard({
   boardPageType,
   linkedSourceId,
   customProps,
-  deletedAt
+  deletedAt,
+  permissions
 }: {
   createdBy: string;
   spaceId: string;
@@ -1099,8 +985,10 @@ export async function generateBoard({
   addPageContent?: boolean;
   boardPageType?: Extract<PageType, 'board' | 'inline_board' | 'inline_linked_board' | 'linked_board'>;
   linkedSourceId?: string;
-  customProps?: CustomBoardProps;
+  customProps?: Partial<CustomBoardProps>;
   deletedAt?: null | Date;
+  permissions?: (Pick<PagePermission, 'permissionLevel'> &
+    Partial<Pick<PagePermission, 'roleId' | 'userId' | 'spaceId' | 'public' | 'allowDiscovery'>>)[];
 }): Promise<Page> {
   const { pageArgs, blockArgs } = boardWithCardsArgs({
     createdBy,
@@ -1118,16 +1006,38 @@ export async function generateBoard({
     deletedAt
   });
 
-  const pagePermissions = pageArgs.map((createArg) => ({
-    pageId: createArg.data.id as string,
-    permissionLevel: 'full_access' as const,
-    userId: createdBy
-  }));
-  const permissions = prisma.pagePermission.createMany({
-    data: pagePermissions
+  const permissionCreateArgs: Prisma.PagePermissionCreateManyInput[] = [];
+
+  pageArgs.forEach((createArg) => {
+    if (permissions) {
+      permissionCreateArgs.push(
+        ...permissions.map(
+          (p) =>
+            ({
+              pageId: createArg.data.id as string,
+              permissionLevel: p.permissionLevel,
+              allowDiscovery: p.allowDiscovery,
+              public: p.public,
+              roleId: p.roleId,
+              spaceId: p.spaceId,
+              userId: p.userId
+            } as Prisma.PagePermissionCreateManyInput)
+        )
+      );
+    } else {
+      permissionCreateArgs.push({
+        pageId: createArg.data.id as string,
+        permissionLevel: 'full_access' as const,
+        userId: createdBy
+      });
+    }
+  });
+
+  const permissionsToCreate = prisma.pagePermission.createMany({
+    data: permissionCreateArgs as any
   });
   return prisma
-    .$transaction([...pageArgs.map((p) => createPageDb(p)), prisma.block.createMany(blockArgs), permissions])
+    .$transaction([...pageArgs.map((p) => createPageDb(p)), prisma.block.createMany(blockArgs), permissionsToCreate])
     .then((result) => result[0] as Page);
 }
 

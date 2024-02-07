@@ -1,18 +1,27 @@
 import { getLogger } from '@charmverse/core/log';
-import type { Role, SpaceRoleToRole, TokenGate, TokenGateToRole, UserTokenGate } from '@charmverse/core/prisma';
+import type {
+  SpaceRoleToRole,
+  TokenGate as PrismaTokenGate,
+  TokenGateToRole,
+  UserTokenGate
+} from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+
+import { isTruthy } from 'lib/utilities/types';
+
+import { getHypersubValidTokenGate, getUnlockProtocolValidTokenGate } from './evaluateEligibility';
+import type { TokenGate } from './interfaces';
 
 const log = getLogger('tg-verification');
 
-type TokenGateWithRoles = {
+type InitialTokenGateWithRoles = {
   tokenGate:
-    | (TokenGate & {
-        tokenGateToRoles: TokenGateToRole[];
+    | (PrismaTokenGate & {
+        tokenGateToRoles?: TokenGateToRole[];
       })
     | null;
 };
-
-type UserTokenGateProp = Pick<UserTokenGate, 'id' | 'jwt' | 'grantedRoles' | 'tokenGateId'> & TokenGateWithRoles;
+type UserTokenGateProp = UserTokenGate & InitialTokenGateWithRoles;
 
 type VerifyTokenGateMembershipProps = {
   userTokenGates: UserTokenGateProp[];
@@ -35,22 +44,83 @@ export async function verifyTokenGateMembership({
 
   // We want to update only invalid token gates
   const tokenGateVerificationPromises = userTokenGates.map(async (userTokenGate) => {
-    if (!userTokenGate.jwt || !userTokenGate.tokenGate) {
-      return { id: userTokenGate.id, isVerified: false, roleIds: userTokenGate.grantedRoles };
+    const { jwt, tokenGate: tokenGateWithRoles, id, grantedRoles } = userTokenGate;
+
+    if (!tokenGateWithRoles) {
+      return { id, isVerified: false, roleIds: grantedRoles };
     }
 
-    const lit = await import('@lit-protocol/lit-node-client');
-    const result = lit.verifyJwt({ jwt: userTokenGate.jwt });
-    const isVerified = result.verified && (result.payload as any)?.orgId === spaceId;
+    const tokenGate = tokenGateWithRoles as TokenGate & { tokenGateToRoles: TokenGateToRole[] };
 
-    return {
-      id: userTokenGate.tokenGateId,
-      isVerified,
-      roleIds: userTokenGate.tokenGate.tokenGateToRoles.map((r) => r.roleId)
-    };
+    if (tokenGate.type === 'unlock') {
+      const wallets = await prisma.userWallet.findMany({
+        where: {
+          userId
+        }
+      });
+      const values = await Promise.all(
+        wallets.map(async (w) => {
+          const valid = await getUnlockProtocolValidTokenGate(tokenGate, w.address);
+          return valid;
+        })
+      );
+
+      return {
+        id: tokenGate.id,
+        isVerified: values.some((v) => !!v?.tokenGateId),
+        roleIds: tokenGate.tokenGateToRoles.map((r) => r.roleId)
+      };
+    } else if (tokenGate.type === 'hypersub') {
+      const wallets = await prisma.userWallet.findMany({
+        where: {
+          userId
+        }
+      });
+      const values = await Promise.all(
+        wallets.map(async (w) => {
+          const valid = await getHypersubValidTokenGate(tokenGate, w.address);
+          return valid;
+        })
+      );
+
+      return {
+        id: tokenGate.id,
+        isVerified: values.some((v) => !!v?.tokenGateId),
+        roleIds: tokenGate.tokenGateToRoles.map((r) => r.roleId)
+      };
+    } else if (tokenGate.type === 'lit') {
+      if (!jwt) {
+        return { id, isVerified: false, roleIds: grantedRoles };
+      }
+
+      const lit = await import('@lit-protocol/lit-node-client');
+      const result = lit.verifyJwt({ jwt });
+      const isVerified = result.verified && (result.payload as any)?.orgId === spaceId;
+
+      return {
+        id: tokenGate.id,
+        isVerified,
+        roleIds: tokenGate.tokenGateToRoles.map((r) => r.roleId)
+      };
+    }
+
+    return { id, isVerified: false, roleIds: tokenGateWithRoles?.tokenGateToRoles?.map((r) => r.roleId) || [] };
   });
 
-  const tokenGateVerificationResults = await Promise.all(tokenGateVerificationPromises);
+  const tokenGateVerificationResults = await Promise.allSettled(tokenGateVerificationPromises).then((_r) =>
+    _r
+      .map((r) => {
+        if (r.status === 'fulfilled') {
+          return r.value;
+        }
+        if (r.status === 'rejected') {
+          log.warn('Error verifying token gate', { error: r.reason });
+        }
+        return undefined;
+      })
+      .filter(isTruthy)
+  );
+
   const validTokenGates = tokenGateVerificationResults.filter((r) => r.isVerified);
   const invalidTokenGates = tokenGateVerificationResults.filter((r) => !r.isVerified);
 

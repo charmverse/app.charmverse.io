@@ -1,40 +1,38 @@
-import type { ProposalCategory } from '@charmverse/core/prisma';
+import { v4 } from 'uuid';
 
 import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
-import { mapMUIColorToProperty } from 'components/common/BoardEditor/utils/mapMUIColorToProperty';
-import { evaluationTypeOptions } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalEvaluationTypeSelect';
 import type { Block } from 'lib/focalboard/block';
+import type { Board } from 'lib/focalboard/board';
 import { createBoard } from 'lib/focalboard/board';
 import { Constants } from 'lib/focalboard/constants';
-import { proposalDbProperties, proposalStatusBoardColors } from 'lib/focalboard/proposalDbProperties';
+import {
+  EVALUATION_STATUS_LABELS,
+  proposalDbProperties,
+  proposalStatusColors
+} from 'lib/focalboard/proposalDbProperties';
 import { createTableView } from 'lib/focalboard/tableView';
 import {
   AUTHORS_BLOCK_ID,
-  CATEGORY_BLOCK_ID,
   CREATED_AT_ID,
   DEFAULT_BOARD_BLOCK_ID,
   DEFAULT_VIEW_BLOCK_ID,
-  EVALUATION_TYPE_BLOCK_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID,
-  STATUS_BLOCK_ID
+  PROPOSAL_STATUS_BLOCK_ID,
+  PROPOSAL_STEP_BLOCK_ID
 } from 'lib/proposal/blocks/constants';
 import type { ProposalBoardBlock } from 'lib/proposal/blocks/interfaces';
-import {
-  PROPOSAL_STATUS_LABELS_WITH_ARCHIVED,
-  type ProposalStatusWithArchived
-} from 'lib/proposal/proposalStatusTransition';
-import type { SupportedColor } from 'theme/colors';
+import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
 
-const proposalStatuses = Object.keys(PROPOSAL_STATUS_LABELS_WITH_ARCHIVED) as ProposalStatusWithArchived[];
+const proposalStatuses = Object.keys(EVALUATION_STATUS_LABELS) as ProposalEvaluationStatus[];
 
 export function getDefaultBoard({
   storedBoard,
-  categories = [],
-  customOnly = false
+  customOnly = false,
+  evaluationStepTitles
 }: {
-  storedBoard: ProposalBoardBlock | undefined;
-  categories: ProposalCategory[] | undefined;
+  storedBoard?: ProposalBoardBlock | undefined;
   customOnly?: boolean;
+  evaluationStepTitles: string[];
 }) {
   const block: Partial<Block> = storedBoard
     ? blockToFBBlock(storedBoard)
@@ -47,7 +45,7 @@ export function getDefaultBoard({
         }
       });
 
-  const cardProperties = [...getDefaultProperties({ categories }), ...(block.fields?.cardProperties || [])];
+  const cardProperties = [...getDefaultProperties({ evaluationStepTitles }), ...(block.fields?.cardProperties || [])];
 
   block.fields = {
     ...(block.fields || {}),
@@ -61,75 +59,78 @@ export function getDefaultBoard({
   return board;
 }
 
-function getDefaultProperties({ categories }: { categories: ProposalCategory[] | undefined }) {
+function getDefaultProperties({ evaluationStepTitles }: { evaluationStepTitles: string[] }) {
   return [
-    proposalDbProperties.proposalCreatedAt(CREATED_AT_ID),
-    getDefaultCategoryProperty(categories),
+    getDefaultStepProperty({ evaluationStepTitles }),
     getDefaultStatusProperty(),
-    getDefaultEvaluationTypeProperty(),
     proposalDbProperties.proposalAuthor(AUTHORS_BLOCK_ID, 'Author'),
-    proposalDbProperties.proposalReviewer(PROPOSAL_REVIEWERS_BLOCK_ID, 'Reviewer')
+    proposalDbProperties.proposalReviewer(PROPOSAL_REVIEWERS_BLOCK_ID, 'Reviewers'),
+    proposalDbProperties.proposalCreatedAt(CREATED_AT_ID),
+    {
+      id: `__createdTime`, // these properties are always re-generated so use a static id
+      name: 'Last updated time',
+      options: [],
+      type: 'updatedTime'
+    }
   ];
-}
-
-function getDefaultCategoryProperty(categories: ProposalCategory[] = []) {
-  return {
-    ...proposalDbProperties.proposalCategory(CATEGORY_BLOCK_ID, 'Category'),
-    options: categories.map((c) => ({
-      id: c.id,
-      value: c.title,
-      color: mapMUIColorToProperty(c.color as SupportedColor)
-    }))
-  };
 }
 
 export function getDefaultStatusProperty() {
   return {
-    ...proposalDbProperties.proposalStatus(STATUS_BLOCK_ID, 'Status'),
+    ...proposalDbProperties.proposalStatus(PROPOSAL_STATUS_BLOCK_ID, 'Status'),
     options: proposalStatuses.map((s) => ({
       id: s,
       value: s,
-      color: proposalStatusBoardColors[s]
+      color: `propColor${proposalStatusColors[s].charAt(0).toUpperCase() + proposalStatusColors[s].slice(1)}`
     }))
   };
 }
 
-function getDefaultEvaluationTypeProperty() {
+export function getDefaultStepProperty({ evaluationStepTitles }: { evaluationStepTitles: string[] }) {
   return {
-    ...proposalDbProperties.proposalEvaluationType(EVALUATION_TYPE_BLOCK_ID, 'Type'),
-    options: evaluationTypeOptions
+    ...proposalDbProperties.proposalStep(PROPOSAL_STEP_BLOCK_ID, 'Step'),
+    options: ['Draft', ...evaluationStepTitles, 'Rewards'].map((title) => ({
+      id: title,
+      value: title,
+      color: 'propColorGray'
+    }))
   };
 }
 
-export function getDefaultTableView({
-  storedBoard,
-  categories = []
-}: {
-  storedBoard: ProposalBoardBlock | undefined;
-  categories: ProposalCategory[] | undefined;
-}) {
-  const view = createTableView({
-    board: getDefaultBoard({ storedBoard, categories })
-  });
+export function getDefaultTableView({ board }: { board: Board }) {
+  const view = createTableView({ board });
 
   view.id = DEFAULT_VIEW_BLOCK_ID;
+  const updatedTimeProperty = board.fields.cardProperties.find((p) => p.type === 'updatedTime');
   view.fields.columnWidths = {
     [Constants.titleColumnId]: 400,
-    [CATEGORY_BLOCK_ID]: 200,
-    [STATUS_BLOCK_ID]: 150,
+    [PROPOSAL_STEP_BLOCK_ID]: 150,
+    [PROPOSAL_STATUS_BLOCK_ID]: 150,
     [AUTHORS_BLOCK_ID]: 150,
-    [PROPOSAL_REVIEWERS_BLOCK_ID]: 150
+    [PROPOSAL_REVIEWERS_BLOCK_ID]: 150,
+    [updatedTimeProperty!.id]: 180
   };
 
   // Default sorty by latest entries
   view.fields.sortOptions = [{ propertyId: CREATED_AT_ID, reversed: true }];
 
   // Hide createdAt by default
-  view.fields.visiblePropertyIds = view.fields.visiblePropertyIds
-    ? view.fields.visiblePropertyIds.filter((id) => id !== CREATED_AT_ID)
-    : [];
+  view.fields.visiblePropertyIds = view.fields.visiblePropertyIds.filter((id) => id !== CREATED_AT_ID);
 
   view.fields.openPageIn = 'full_page';
+
+  // Add default filter to hide archived proposals
+  if (!view.fields.filter.filters.length) {
+    view.fields.filter.filters = [
+      {
+        condition: 'does_not_contain',
+        filterId: v4(),
+        operation: 'and',
+        propertyId: PROPOSAL_STATUS_BLOCK_ID,
+        values: ['archived']
+      }
+    ];
+  }
 
   return view;
 }

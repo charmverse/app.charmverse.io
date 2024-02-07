@@ -26,18 +26,14 @@ import type { MouseEvent } from 'react';
 import { forwardRef, memo, useEffect, useRef, useState } from 'react';
 
 import { Button } from 'components/common/Button';
-import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import UserDisplay from 'components/common/UserDisplay';
 import { useDateFormatter } from 'hooks/useDateFormatter';
-import { useInlineComment } from 'hooks/useInlineComment';
 import { useMembers } from 'hooks/useMembers';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { removeInlineCommentMark } from 'lib/prosemirror/plugins/inlineComments/removeInlineCommentMark';
-import type { ThreadWithComments } from 'lib/threads/interfaces';
 
 import InlineCharmEditor from '../../InlineCharmEditor';
 import { scrollToThread } from '../inlineComment/inlineComment.utils';
@@ -196,7 +192,7 @@ function EditCommentCharmEditor({
 
   return (
     <>
-      <Box onClick={onContainerClick} flex={1} width='100%'>
+      <Box data-test='comment-message' onClick={onContainerClick} flex={1} width='100%'>
         <Box sx={{ marginLeft: `${32 - 4}px`, paddingLeft: '4px', bgcolor: isEditable ? 'background.default' : '' }}>
           <InlineCharmEditor
             readOnly={!isEditable}
@@ -246,7 +242,12 @@ interface PageThreadProps {
   threadId: string;
   inline?: boolean;
   showFindButton?: boolean;
-  canCreateComments?: boolean;
+  enableComments?: boolean;
+  onDeleteComment?: (threadId: string) => void;
+  onToggleResolve?: (threadId: string, resolved: boolean) => void;
+  sx?: SxProps<Theme>;
+  hideContext?: boolean;
+  scrollToThreadElement?: (threadId: string) => void;
 }
 
 export const RelativeDate = memo<{ createdAt: string | Date; prefix?: string; updatedAt?: string | Date | null }>(
@@ -288,7 +289,20 @@ export const RelativeDate = memo<{ createdAt: string | Date; prefix?: string; up
 );
 
 const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
-  ({ showFindButton = false, threadId, inline = false, canCreateComments }, ref) => {
+  (
+    {
+      hideContext = false,
+      sx,
+      onToggleResolve,
+      onDeleteComment,
+      showFindButton = false,
+      threadId,
+      inline = false,
+      enableComments,
+      scrollToThreadElement
+    },
+    ref
+  ) => {
     showFindButton = showFindButton ?? !inline;
     const { deleteThread, resolveThread, deleteComment, threads } = useThreads();
     const { user } = useUser();
@@ -297,9 +311,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
     const menuState = usePopupState({ variant: 'popover', popupId: 'comment-action' });
     const [actionComment, setActionComment] = useState<null | Comment>(null);
     const { members } = useMembers();
-    const { updateThreadPluginState } = useInlineComment();
 
-    const view = useEditorViewContext();
     const thread = threadId ? threads[threadId] : null;
     const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
     const [counter, setCounter] = useState(0);
@@ -327,11 +339,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
         if (thread.comments.length === 1) {
           setIsMutating(true);
           await deleteThread(threadId);
-          removeInlineCommentMark(view, thread.id, true);
-          updateThreadPluginState({
-            remove: true,
-            threadId
-          });
+          onDeleteComment?.(threadId);
           setIsMutating(false);
         } else {
           setIsMutating(true);
@@ -348,19 +356,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
     async function toggleResolved() {
       setIsMutating(true);
       await resolveThread(threadId);
-      removeInlineCommentMark(view, threadId);
-      setIsMutating(false);
-      if (thread?.resolved) {
-        updateThreadPluginState({
-          remove: false,
-          threadId
-        });
-      } else if (!thread?.resolved) {
-        updateThreadPluginState({
-          remove: true,
-          threadId
-        });
-      }
+      onToggleResolve?.(threadId, !thread?.resolved);
     }
 
     if (!thread) {
@@ -374,6 +370,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
         data-test={`thread.${threadId}`}
         id={`thread.${threadId}`}
         ref={ref}
+        sx={sx}
       >
         <div>
           {thread.comments.map((comment, commentIndex) => {
@@ -395,7 +392,11 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
                     gap={1}
                     onClick={() => {
                       if (showFindButton) {
-                        scrollToThread(threadId);
+                        if (scrollToThreadElement) {
+                          scrollToThreadElement(threadId);
+                        } else {
+                          scrollToThread(threadId);
+                        }
                       }
                     }}
                   >
@@ -421,7 +422,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
                       {commentIndex === 0 && !isSmallScreen && (
                         <ThreadHeaderButton
                           text={thread.resolved ? 'Un-resolve' : 'Resolve'}
-                          disabled={isMutating || !canCreateComments}
+                          disabled={isMutating || !enableComments}
                           onClick={toggleResolved}
                         />
                       )}
@@ -441,14 +442,18 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
                     </Box>
                   </div>
                 </Box>
-                {commentIndex === 0 && (
+                {commentIndex === 0 && !hideContext && (
                   <Box
                     pl={4}
                     pb={1}
                     display='flex'
                     onClick={() => {
                       if (showFindButton) {
-                        scrollToThread(threadId);
+                        if (scrollToThreadElement) {
+                          scrollToThreadElement(threadId);
+                        } else {
+                          scrollToThread(threadId);
+                        }
                       }
                     }}
                   >
@@ -475,7 +480,11 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
                   onContainerClick={() => {
                     // Shouldn't scroll if we are in comment edit mode
                     if (showFindButton && !isEditable) {
-                      scrollToThread(threadId);
+                      if (scrollToThreadElement) {
+                        scrollToThreadElement(threadId);
+                      } else {
+                        scrollToThread(threadId);
+                      }
                     }
                   }}
                   onSave={async (cb) => {
@@ -500,12 +509,14 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
                 <ListItemText>{thread.resolved ? 'Un-resolve' : 'Resolve'}</ListItemText>
               </MenuItem>
             )}
-            <MenuItem onClick={onClickEditComment}>
-              <ListItemIcon>
-                <EditIcon />
-              </ListItemIcon>
-              <ListItemText>Edit comment</ListItemText>
-            </MenuItem>
+            {!thread?.resolved && (
+              <MenuItem onClick={onClickEditComment}>
+                <ListItemIcon>
+                  <EditIcon />
+                </ListItemIcon>
+                <ListItemText>Edit comment</ListItemText>
+              </MenuItem>
+            )}
             <MenuItem onClick={onClickDeleteComment}>
               <ListItemIcon>
                 <DeleteOutlinedIcon />
@@ -514,7 +525,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
             </MenuItem>
           </Menu>
         </div>
-        {canCreateComments && (
+        {enableComments && !thread.resolved && (
           <AddCommentCharmEditor
             readOnly={Boolean(editedCommentId)}
             key={counter}

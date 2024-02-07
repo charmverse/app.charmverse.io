@@ -8,6 +8,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { usePages } from 'hooks/usePages';
 import { useUserPreferences } from 'hooks/useUserPreferences';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
@@ -156,12 +157,12 @@ function CalendarFullView(props: Props): JSX.Element | null {
                 board={board}
                 syncWithPageId={page?.syncWithPageId}
                 key={template.id}
-                readOnly={true}
+                readOnly
                 card={card}
                 updatedAt={page?.updatedAt.toString() ?? ''}
                 updatedBy={page?.updatedBy ?? ''}
                 propertyTemplate={template}
-                showEmptyPlaceholder={true}
+                showEmptyPlaceholder
                 showTooltip
                 displayType='calendar'
               />

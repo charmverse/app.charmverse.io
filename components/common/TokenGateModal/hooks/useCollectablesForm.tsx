@@ -1,7 +1,10 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import { readContract } from '@wagmi/core';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
+import { subscriptionTokenV1ABI } from 'lib/tokenGates/hypersub/abi';
+import { PublicLockV13 } from 'lib/tokenGates/unlock/abi';
 import { isValidChainAddress } from 'lib/tokens/validation';
 
 import { nftCheck, collectableOptions, poapNameMatch, poapTypes } from '../utils/utils';
@@ -20,18 +23,76 @@ const schema = yup.object({
     .oneOf(collectableOptionIds, 'Invalid collectable option')
     .test('empty-collectable-option-check', 'Selection is required', (option) => !!option),
   chain: yup.string().when('collectableOption', {
-    is: (val: CollectableOptionsId) => val === 'ERC721' || val === 'ERC1155' || val === 'UNLOCK',
+    is: (val: CollectableOptionsId) => val === 'ERC721' || val === 'ERC1155' || val === 'UNLOCK' || val === 'HYPERSUB',
     then: () => yup.string().required('Chain is required'),
     otherwise: () => yup.string()
   }),
-  contract: yup.string().when('collectableOption', {
-    is: (val: CollectableOptionsId) => val === 'ERC721' || val === 'ERC1155' || val === 'UNLOCK',
+  contract: yup.string<`0x${string}`>().when('collectableOption', {
+    is: (val: CollectableOptionsId) => val === 'ERC721' || val === 'ERC1155' || val === 'UNLOCK' || val === 'HYPERSUB',
     then: () =>
       yup
-        .string()
+        .string<`0x${string}`>()
         .required('Contract is required')
-        .test('isAddress', 'Invalid address', (value) => isValidChainAddress(value)),
-    otherwise: () => yup.string()
+        .test('isAddress', 'Invalid address', (value) => isValidChainAddress(value))
+        .test('isContract', 'Invalid contract or chain', async (value, context) => {
+          const collectableOption = context.parent.collectableOption;
+          const chain = context.parent.chain;
+
+          if (chain && collectableOption === 'UNLOCK') {
+            try {
+              await readContract({
+                address: value,
+                chainId: Number(chain),
+                abi: PublicLockV13,
+                functionName: 'publicLockVersion'
+              });
+              return true;
+            } catch (err) {
+              return false;
+            }
+          } else if (chain && collectableOption === 'HYPERSUB') {
+            try {
+              await readContract({
+                address: value,
+                chainId: Number(chain),
+                abi: subscriptionTokenV1ABI,
+                functionName: 'name'
+              });
+              return true;
+            } catch (err) {
+              return false;
+            }
+          } else if (chain && ['ERC721', 'ERC1155'].includes(collectableOption)) {
+            try {
+              await readContract({
+                address: value,
+                chainId: Number(chain),
+                abi: [
+                  {
+                    inputs: [],
+                    name: 'name',
+                    outputs: [
+                      {
+                        internalType: 'string',
+                        name: '',
+                        type: 'string'
+                      }
+                    ],
+                    stateMutability: 'view',
+                    type: 'function'
+                  }
+                ] as const,
+                functionName: 'name'
+              });
+              return true;
+            } catch (err) {
+              return false;
+            }
+          }
+
+          return true;
+        }),
+    otherwise: () => yup.string<`0x${string}`>()
   }),
   check: yup
     .string()
@@ -87,15 +148,15 @@ const schema = yup.object({
 export type FormValues = yup.InferType<typeof schema>;
 
 const defaultValues: FormValues = {
-  collectableOption: undefined,
+  collectableOption: '' as CollectableOptionsId,
   chain: '',
-  contract: '',
-  check: undefined,
+  contract: '' as `0x${string}`,
+  check: '' as NftCheck,
   quantity: '',
   tokenId: '',
   poapType: undefined,
   poapId: '',
-  poapName: undefined,
+  poapName: '',
   poapNameMatch: undefined
 };
 

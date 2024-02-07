@@ -1,10 +1,8 @@
 import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import type { ProposalBlock } from '@charmverse/core/prisma-client';
 
-import type { NewPageValues } from 'components/common/PageDialog/hooks/useNewPage';
 import type { BoardFields } from 'lib/focalboard/board';
 import type { BoardViewFields } from 'lib/focalboard/boardView';
-import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
 export type ProposalPropertyOption = { id: string; color: string; value: string };
 
@@ -27,12 +25,6 @@ export type ProposalPropertyValue = string | string[] | number | TargetPermissio
 export type ProposalPropertiesField = Record<string, ProposalPropertyValue>;
 
 export type ProposalPropertyValues = { properties: ProposalPropertiesField };
-
-export type ProposalPendingReward = { reward: UpdateableRewardFields; page: NewPageValues | null; draftId: string };
-
-export type ProposalFields = ProposalPropertyValues & { pendingRewards?: ProposalPendingReward[] };
-
-export type ProposalFieldsProp = { fields: ProposalFields };
 
 export type ProposalBlockInput = {
   id?: string;

@@ -4,6 +4,7 @@ import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPermissionsSubscription';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 import { UnauthorisedActionError } from 'lib/utilities/errors';
 
@@ -23,7 +24,7 @@ handler
 async function restrictPermissions(req: NextApiRequest, res: NextApiResponse<PageMeta>) {
   const pageId = req.query.id as string;
 
-  const computed = await req.basePermissionsClient.pages.computePagePermissions({
+  const computed = await permissionsApiClient.pages.computePagePermissions({
     resourceId: pageId,
     userId: req.session?.user?.id
   });

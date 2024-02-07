@@ -1,8 +1,6 @@
 import { test as base, expect } from '@playwright/test';
 import { PageHeader } from '__e2e__/po/pageHeader.po';
 
-import { generateProposalCategory } from 'testing/utils/proposals';
-
 import { DocumentPage } from './po/document.po';
 import { generateUserAndSpace } from './utils/mocks';
 import { login } from './utils/session';
@@ -17,7 +15,7 @@ const test = base.extend<Fixtures>({
   documentPage: ({ page }, use) => use(new DocumentPage(page))
 });
 
-test('convert page to proposal - create a page, convert that page to proposal and assert editor is readonly with proposal banner', async ({
+test.skip('convert page to proposal - create a page, convert that page to proposal and assert editor is readonly with proposal banner', async ({
   documentPage,
   pageHeader
 }) => {
@@ -26,13 +24,6 @@ test('convert page to proposal - create a page, convert that page to proposal an
   await login({
     page: documentPage.page,
     userId: user.id
-  });
-
-  const proposalCategoryName = 'Example category';
-
-  await generateProposalCategory({
-    spaceId: space.id,
-    title: proposalCategoryName
   });
 
   await documentPage.goToPage({

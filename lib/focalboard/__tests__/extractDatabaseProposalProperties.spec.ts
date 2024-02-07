@@ -7,24 +7,6 @@ import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { extractDatabaseProposalProperties } from '../extractDatabaseProposalProperties';
 import type { ExtractedDatabaseProposalProperties } from '../extractDatabaseProposalProperties';
 
-const categoryProp: IPropertyTemplate = {
-  id: uuid(),
-  name: 'Proposal Category',
-  type: 'proposalCategory',
-  options: [
-    {
-      id: uuid(),
-      color: 'propColorTeal',
-      value: 'General'
-    },
-    {
-      id: uuid(),
-      color: 'propColorTeal',
-      value: 'Admin-only'
-    }
-  ]
-};
-
 const statusProp: IPropertyTemplate = {
   id: uuid(),
   name: 'Proposal Status',
@@ -49,37 +31,10 @@ const urlProp: IPropertyTemplate = {
   type: 'proposalUrl',
   options: []
 };
-const evaluatedByProp: IPropertyTemplate = {
-  id: uuid(),
-  name: 'Proposal Evaluated By',
-  options: [],
-  type: 'proposalEvaluatedBy'
-};
-
-const evaluatedTotalProp: IPropertyTemplate = {
-  id: uuid(),
-  name: 'Proposal Evaluation Total',
-  options: [],
-  type: 'proposalEvaluationTotal'
-};
-
-const evaluatedAverageProp: IPropertyTemplate = {
-  id: uuid(),
-  name: 'Proposal Evaluation Average',
-  options: [],
-  type: 'proposalEvaluationAverage'
-};
 
 describe('extractDatabaseProposalProperties', () => {
   it('should extract database proposal properties', () => {
-    const exampleProperties: IPropertyTemplate[] = [
-      categoryProp,
-      statusProp,
-      urlProp,
-      evaluatedByProp,
-      evaluatedTotalProp,
-      evaluatedAverageProp
-    ];
+    const exampleProperties: IPropertyTemplate[] = [statusProp, urlProp];
 
     const extractedProps = extractDatabaseProposalProperties({
       boardBlock: {
@@ -90,17 +45,13 @@ describe('extractDatabaseProposalProperties', () => {
     });
 
     expect(extractedProps).toMatchObject<ExtractedDatabaseProposalProperties>({
-      proposalCategory: categoryProp,
       proposalStatus: statusProp,
-      proposalUrl: urlProp,
-      proposalEvaluatedBy: evaluatedByProp,
-      proposalEvaluationAverage: evaluatedAverageProp,
-      proposalEvaluationTotal: evaluatedTotalProp
+      proposalUrl: urlProp
     });
   });
 
   it('should work if only some properties are present', () => {
-    const exampleProperties: IPropertyTemplate[] = [categoryProp];
+    const exampleProperties: IPropertyTemplate[] = [];
 
     const extractedProps = extractDatabaseProposalProperties({
       boardBlock: {
@@ -110,8 +61,6 @@ describe('extractDatabaseProposalProperties', () => {
       }
     });
 
-    expect(extractedProps).toMatchObject<Partial<ExtractedDatabaseProposalProperties>>({
-      proposalCategory: categoryProp
-    });
+    expect(extractedProps).toMatchObject<Partial<ExtractedDatabaseProposalProperties>>({});
   });
 });

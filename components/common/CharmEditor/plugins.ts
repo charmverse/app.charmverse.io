@@ -99,7 +99,7 @@ export function charmEditorPlugins({
     // this trackPlugin should be called before the one below which calls onSelectionSet().
     // TODO: find a cleaner way to combine this logic?
     trackPlugins({ onSelectionSet, key: suggestionsPluginKey }),
-    linkPlugins({ key: linksPluginKey }),
+    linkPlugins({ key: linksPluginKey, readOnly }),
     pasteChecker.plugins({ onError }),
     new Plugin({
       view: () => {
@@ -184,6 +184,10 @@ export function charmEditorPlugins({
     }),
     NodeView.createPlugin({
       name: 'cryptoPrice',
+      containerDOM: ['div']
+    }),
+    NodeView.createPlugin({
+      name: 'farcasterFrame',
       containerDOM: ['div']
     }),
     NodeView.createPlugin({

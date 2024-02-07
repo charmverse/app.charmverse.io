@@ -1,32 +1,47 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import {
   useUpdateProposalEvaluation,
   useGetProposalDetails,
-  useUpsertRubricCriteria
+  useUpsertRubricCriteria,
+  useUpdateWorkflow,
+  useUpdateProposal
 } from 'charmClient/hooks/proposals';
-import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationSettings';
-import { evaluationTypesWithSidebar } from 'components/proposals/ProposalPage/components/EvaluationSidebar/components/ProposalSidebarHeader';
+import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/ProposalEvaluations/components/Settings/components/EvaluationStepSettings';
+import { useWebSocketClient } from 'hooks/useWebSocketClient';
+import type { ProposalFields } from 'lib/proposal/interface';
+import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 export function useProposal({ proposalId }: { proposalId?: string | null }) {
   const { data: proposal, mutate: refreshProposal } = useGetProposalDetails(proposalId);
+  const { trigger: updateProposal } = useUpdateProposal({ proposalId });
   const { trigger: updateProposalEvaluation } = useUpdateProposalEvaluation({ proposalId });
   const { trigger: upsertRubricCriteria } = useUpsertRubricCriteria({ proposalId });
+  const { trigger: updateProposalWorkflow } = useUpdateWorkflow({ proposalId });
+  const { subscribe } = useWebSocketClient();
 
-  // const evaluationToShowInSidebar = proposal?.permissions.evaluate && proposal?.currentEvaluationId;
-  let evaluationToShowInSidebar: string | undefined;
+  useEffect(() => {
+    function handleArchivedEvent(value: WebSocketPayload<'proposals_archived'>) {
+      if (value.proposalIds.some((id) => id === proposal?.id)) {
+        refreshProposal(
+          (prev) => ({
+            ...prev!,
+            archived: value.archived
+          }),
+          { revalidate: false }
+        );
+      }
+    }
+    const unsubscribeFromPageRestores = subscribe('proposals_archived', handleArchivedEvent);
+    return () => {
+      unsubscribeFromPageRestores();
+    };
+  }, [refreshProposal, subscribe, proposal?.id]);
 
-  const currentEvaluation = proposal?.evaluations.find((evaluation) => evaluation.id === proposal?.currentEvaluationId);
-  if (currentEvaluation && evaluationTypesWithSidebar.includes(currentEvaluation.type)) {
-    evaluationToShowInSidebar = currentEvaluation.id;
-  }
-
-  // console.log(proposal?.permissions);
   return useMemo(
     () => ({
       proposal,
       permissions: proposal?.permissions,
-      evaluationToShowInSidebar,
       refreshProposal: () => refreshProposal(), // wrap it in a function so click handlers dont pass in the event
       async onChangeEvaluation(evaluationId: string, updatedEvaluation: Partial<ProposalEvaluationValues>) {
         if (updatedEvaluation.rubricCriteria) {
@@ -34,15 +49,32 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
             evaluationId,
             rubricCriteria: updatedEvaluation.rubricCriteria
           });
-        } else {
+        }
+        const otherFields = Object.keys(updatedEvaluation).filter((key) => key !== 'rubricCriteria');
+        if (otherFields.length > 0) {
           await updateProposalEvaluation({
             evaluationId,
             ...updatedEvaluation
           });
         }
         await refreshProposal();
+      },
+      onChangeWorkflow: async ({ id }: { id: string }) => {
+        await updateProposalWorkflow({ workflowId: id });
+        await refreshProposal();
+      },
+      onChangeRewardSettings: async (values: Partial<ProposalFields>) => {
+        if (proposal) {
+          await updateProposal({
+            fields: {
+              ...proposal.fields,
+              ...values
+            }
+          });
+          await refreshProposal();
+        }
       }
     }),
-    [proposal, refreshProposal, evaluationToShowInSidebar, updateProposalEvaluation, upsertRubricCriteria]
+    [proposal, refreshProposal, updateProposalEvaluation, updateProposalWorkflow, upsertRubricCriteria, updateProposal]
   );
 }

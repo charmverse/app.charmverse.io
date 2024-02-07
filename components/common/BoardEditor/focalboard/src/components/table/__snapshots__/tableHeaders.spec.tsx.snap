@@ -10,7 +10,7 @@ exports[`components/table/TableHeaders should match snapshot 1`] = `
       id="mainBoardHeader"
     >
       <div
-        class="octo-table-cell header-cell"
+        class="octo-table-cell header-cell disable-drag-selection"
         draggable="true"
         style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
       >
@@ -33,7 +33,7 @@ exports[`components/table/TableHeaders should match snapshot 1`] = `
                     viewBox="0 0 24 24"
                   >
                     <path
-                      d="M14 17H4v2h10v-2zm6-8H4v2h16V9zM4 15h16v-2H4v2zM4 5v2h16V5H4z"
+                      d="M14 17H4v2h10zm6-8H4v2h16zM4 15h16v-2H4zM4 5v2h16V5z"
                     />
                   </svg>
                 </div>
@@ -62,7 +62,7 @@ exports[`components/table/TableHeaders should match snapshot 1`] = `
         />
       </div>
       <div
-        class="octo-table-cell header-cell"
+        class="octo-table-cell header-cell disable-drag-selection"
         style="flex-grow: 1;"
       >
         <button
@@ -79,7 +79,7 @@ exports[`components/table/TableHeaders should match snapshot 1`] = `
               viewBox="0 0 24 24"
             >
               <path
-                d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+                d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
               />
             </svg>
           </span>

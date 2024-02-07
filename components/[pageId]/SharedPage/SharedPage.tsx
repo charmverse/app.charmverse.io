@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 
 import { trackPageView } from 'charmClient/hooks/track';
 import { DatabasePage } from 'components/[pageId]/DatabasePage';
-import DocumentPage from 'components/[pageId]/DocumentPage';
+import { DocumentPageWithSidebars } from 'components/[pageId]/DocumentPage/DocumentPageWithSidebars';
 import { updateBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
 import { addCard } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
@@ -88,13 +88,7 @@ export function SharedPage({ publicPage }: Props) {
     <DatabasePage page={currentPage} setPage={() => null} readOnly />
   ) : (
     <Box sx={{ overflowY: 'auto' }}>
-      <DocumentPage
-        page={publicPage.page}
-        refreshPage={() => Promise.resolve()}
-        savePage={() => null}
-        readOnly
-        enableSidebar
-      />
+      <DocumentPageWithSidebars page={publicPage.page} savePage={() => null} readOnly />
     </Box>
   );
 }

@@ -7,7 +7,8 @@ import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useMemo, useRef, useState } from 'react';
 
-import { undoEventName } from 'components/common/CharmEditor/utils';
+import { useGetProposalDetails } from 'charmClient/hooks/proposals';
+import { undoEventName } from 'components/common/CharmEditor/constants';
 import { DatabasePageActionList } from 'components/common/PageActions/components/DatabasePageActionList';
 import type { PageActionMeta } from 'components/common/PageActions/components/DocumentPageActionList';
 import { DocumentPageActionList, documentTypes } from 'components/common/PageActions/components/DocumentPageActionList';
@@ -25,7 +26,13 @@ type Props = {
   isInsideDialog?: boolean;
 };
 
-export function FullPageActionsMenuButton({ isInsideDialog, pageId, page: pageProp, post, onDelete }: Props) {
+export function FullPageActionsMenuButton({
+  isInsideDialog,
+  page: pageProp,
+  pageId = pageProp?.id,
+  post,
+  onDelete
+}: Props) {
   let pageOptionsList: ReactNode = null;
   const router = useRouter();
   const { page: pageFromId } = usePage({ pageIdOrPath: pageId });
@@ -41,6 +48,7 @@ export function FullPageActionsMenuButton({ isInsideDialog, pageId, page: pagePr
     postIdOrPath: post?.id,
     isNewPost: !post
   });
+  const { data: proposalDetails } = useGetProposalDetails(pageMenuAnchorElement ? pageFromId?.proposalId : undefined);
   const currentPageOrPostId = pageId ?? pageProp?.id ?? post?.id;
 
   const page = pageFromId || pageProp;
@@ -81,6 +89,7 @@ export function FullPageActionsMenuButton({ isInsideDialog, pageId, page: pagePr
         onComplete={closeMenu}
         onDelete={onDelete}
         undoEditorChanges={undoEditorChanges}
+        isStructuredProposal={!!proposalDetails?.formId}
       />
     );
   } else if (isBasePageDatabase && page) {
@@ -103,6 +112,7 @@ export function FullPageActionsMenuButton({ isInsideDialog, pageId, page: pagePr
         <div>
           <Tooltip title='View comments, export content and more' arrow>
             <IconButton
+              data-test='page-context-menu-button'
               size={isLargeScreen ? 'small' : 'medium'}
               onClick={() => {
                 setPageMenuAnchorElement(pageMenuAnchor.current || null);

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { prisma } from '@charmverse/core/prisma-client';
 import { strict as assert } from 'node:assert';
 
@@ -6,6 +7,7 @@ import { strict as assert } from 'node:assert';
  * https://app.charmverse.io/charmverse/page-8245745086136205
  */
 async function reopenProposal(path: string, newDate: Date) {
+  throw new Error('This script does not support evaluation-based proposal flow');
   const spaceDomain = path.split('/')[0];
   const spacePagePath = path.split('/')[1];
 

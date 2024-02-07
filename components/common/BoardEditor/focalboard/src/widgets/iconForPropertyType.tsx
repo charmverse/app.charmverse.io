@@ -1,5 +1,6 @@
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
+import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
 import EventNoteIcon from '@mui/icons-material/EventNote';
@@ -11,7 +12,6 @@ import PersonIcon from '@mui/icons-material/Person';
 import PhoneIcon from '@mui/icons-material/Phone';
 import SubjectIcon from '@mui/icons-material/Subject';
 import type { SvgIconProps } from '@mui/material';
-import { SiChainlink } from 'react-icons/si';
 
 import type { PropertyType } from 'lib/focalboard/board';
 
@@ -41,7 +41,7 @@ export const iconForPropertyType = (propertyType: PropertyType, props?: SvgIconP
       return <PersonIcon fontSize='small' {...props} />;
     case 'phone':
       return <PhoneIcon fontSize='small' {...props} />;
-    case 'proposalCategory':
+    case 'proposalStep':
     case 'proposalStatus':
     case 'proposalEvaluationType':
     case 'select':
@@ -58,6 +58,8 @@ export const iconForPropertyType = (propertyType: PropertyType, props?: SvgIconP
     case 'url':
     case 'proposalUrl':
       return <LinkIcon fontSize='small' {...props} />;
+    case 'relation':
+      return <ArrowOutwardIcon fontSize='small' {...props} />;
     default:
       return null;
   }

@@ -8,9 +8,9 @@ import { InputSearchMemberMultiple } from '../InputSearchMember';
 type Props = ControlFieldProps & FieldProps;
 
 export const PersonInputField = forwardRef<HTMLDivElement, Props>(
-  ({ onChange, value, error, helperText, disabled, placeholder, fieldWrapperSx, ...inputProps }) => {
+  ({ onChange, value, error, helperText, disabled, placeholder, ...inputProps }, ref) => {
     return (
-      <FieldWrapper sx={fieldWrapperSx} {...inputProps}>
+      <FieldWrapper {...inputProps}>
         <InputSearchMemberMultiple
           onChange={(ids) => {
             onChange?.(ids);
@@ -19,7 +19,8 @@ export const PersonInputField = forwardRef<HTMLDivElement, Props>(
           error={!!error}
           disabled={disabled}
           placeholder={placeholder}
-          defaultValue={value as unknown as string[]}
+          ref={ref}
+          defaultValue={(value || []) as string[]}
         />
       </FieldWrapper>
     );
