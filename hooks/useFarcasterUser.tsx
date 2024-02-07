@@ -36,8 +36,6 @@ export const FarcasterUserContext = createContext<FarcasterUserContext>({
   farcasterSignerModal: {} as PopupState
 });
 
-const deadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365 * 100; // 100 years
-
 function FarcasterApprovalModal({
   farcasterSignerModal,
   farcasterUser,
@@ -168,7 +166,7 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
         throw new Error('Error creating signer');
       }
 
-      const { signature, requestFid } = farcasterSigner;
+      const { signature, requestFid, deadline } = farcasterSigner;
 
       const {
         result: { signedKeyRequest }
