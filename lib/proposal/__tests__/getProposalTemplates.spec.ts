@@ -1,6 +1,6 @@
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 
+import type { ProposalTemplate } from '../getProposalTemplates';
 import { getProposalTemplates } from '../getProposalTemplates';
 
 describe('getProposalTemplates', () => {
@@ -27,7 +27,7 @@ describe('getProposalTemplates', () => {
 
     expect(templates).toHaveLength(1);
     expect(templates[0]).toMatchObject(
-      expect.objectContaining<Partial<ProposalWithUsers>>({
+      expect.objectContaining<Partial<ProposalTemplate>>({
         authors: expect.any(Array),
         reviewers: expect.any(Array),
         createdBy: adminUser.id,

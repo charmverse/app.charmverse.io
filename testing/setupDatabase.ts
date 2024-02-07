@@ -871,12 +871,6 @@ export function createBlock(options: Partial<Block> & Pick<Block, 'createdBy' | 
 
 type PageWithProposal = Page & { proposal: ProposalWithUsersAndRubric };
 
-type ProposalReviewerInput = {
-  group: 'system_role' | 'role' | 'user';
-  id: string;
-  evaluationId?: string;
-};
-
 /**
  * Creates a proposal with the linked authors and reviewers
  */

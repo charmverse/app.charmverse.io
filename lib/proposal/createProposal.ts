@@ -2,7 +2,7 @@ import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page, ProposalReviewer, ProposalStatus } from '@charmverse/core/prisma';
 import type { Prisma, ProposalEvaluation } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWithUsers, ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
+import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { arrayUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
@@ -52,11 +52,6 @@ export type CreateProposalInput = {
   selectedCredentialTemplates?: string[];
   sourcePageId?: string;
   sourcePostId?: string;
-};
-
-export type CreatedProposal = {
-  page: PageWithPermissions;
-  proposal: ProposalWithUsers;
 };
 
 export async function createProposal({
