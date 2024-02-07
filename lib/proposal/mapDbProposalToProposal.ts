@@ -1,6 +1,6 @@
 import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalReviewer } from '@charmverse/core/prisma';
-import { type FormField, type Proposal, type ProposalEvaluation } from '@charmverse/core/prisma-client';
+import type { Prisma, FormField, Proposal, ProposalEvaluation } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { sortBy } from 'lodash';
 
@@ -75,7 +75,8 @@ export function mapDbProposalToProposalLite({
   proposal,
   permissions
 }: {
-  proposal: Omit<ProposalWithUsers, 'reviewers'> & {
+  proposal: Omit<ProposalWithUsers, 'reviewers' | 'fields'> & {
+    fields: Prisma.JsonValue | null;
     evaluations: (ProposalEvaluation & { reviewers: ProposalReviewer[] })[];
     rewards: { id: string }[];
   };
