@@ -36,12 +36,17 @@ export function FarcasterSigner() {
     return (
       <>
         <Stack alignItems='center' gap={2}>
-          <StyledButton onClick={farcasterSignerModal.open} loading={isLoadingFarcasterUser}>
+          <StyledButton
+            onClick={farcasterSignerModal.open}
+            loading={isLoadingFarcasterUser || farcasterSignerModal.isOpen}
+          >
             <SvgIcon viewBox='0 0 20 20' fontSize='small'>
               <FarcasterIcon />
             </SvgIcon>
             <Typography fontWeight={600} variant='body2'>
-              {isLoadingFarcasterUser ? 'Loading...' : 'Resume sign in with Farcaster'}
+              {isLoadingFarcasterUser || farcasterSignerModal.isOpen
+                ? 'Waiting for approval...'
+                : 'Resume sign in with Farcaster'}
             </Typography>
           </StyledButton>
         </Stack>

@@ -81,6 +81,7 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
             };
             setFarcasterUser(user);
             farcasterSignerModal.close();
+            showMessage('Successfully logged in with Farcaster', 'success');
             clearInterval(intervalId);
           } catch (error) {
             log.error('Error polling for signer approval', {
@@ -172,7 +173,7 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
           key: keypairString.publicKey,
           signature,
           requestFid: BigInt(fid).toString(),
-          deadline
+          deadline: BigInt(deadline).toString()
         },
         {
           credentials: 'omit'
