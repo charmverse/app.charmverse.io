@@ -10,7 +10,6 @@ import { NewProposalPage } from 'components/proposals/ProposalPage/NewProposalPa
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { withSessionSsr } from 'lib/session/withSession';
 import { customConditionJoinSpace } from 'lib/spaces/customConditionJoinSpace';
-import { getPagePath } from 'lib/utilities/domains/getPagePath';
 
 export const getServerSideProps: GetServerSideProps = withSessionSsr(async (context: GetServerSidePropsContext) => {
   const template = context.query?.template;
@@ -22,21 +21,6 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
   const domainToUse = (spaceDomainFromPath ?? customDomain) as string | undefined;
 
   const sessionUserId = context.req.session?.user?.id;
-
-  /**
-   - Template
-    -- isLoggedIn
-    -- notLoggedIn
-    - isSpaceMember
-    - notIsMember
-
-  - No Template
-    -- isLoggedIn
-    --- isSpaceMember
-   */
-  // Template
-
-  // No template
 
   if (!domainToUse) {
     return {
@@ -85,12 +69,7 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
   if (!sessionUserId) {
     return {
       redirect: {
-        destination: `/?redirectUrl=${getPagePath({
-          path: '/',
-          spaceDomain: domainToUse,
-          hostName: context.req.headers.host,
-          query: context.query
-        })}`,
+        destination: `/?returnUrl=${context.resolvedUrl}`,
         permanent: false
       }
     };
