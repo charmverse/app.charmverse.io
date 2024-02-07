@@ -84,7 +84,7 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
   if (!sessionUserId) {
     return {
       redirect: {
-        destination: `/redirectUrl=?${getPagePath({
+        destination: `/?redirectUrl=${getPagePath({
           path: '/',
           spaceDomain: domainToUse,
           hostName: context.req.headers.host,
