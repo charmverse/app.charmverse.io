@@ -27,6 +27,13 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
     });
 
     if (space) {
+      const redirect = {
+        redirect: {
+          destination: space.publicProposals ? `/${domainToUse}/proposals` : `/join?domain=${domainToUse}`,
+          permanent: false
+        }
+      };
+
       const spaceRole = await prisma.spaceRole.findFirst({
         where: {
           userId: sessionUserId,
@@ -35,18 +42,25 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
       });
 
       if (!spaceRole) {
-        await customConditionJoinSpace({
-          userId: sessionUserId,
-          spaceId: space.id,
-          params: { proposalTemplate: template as string }
-        }).catch((err) => {
+        if (!space.publicProposalTemplates) {
+          return redirect;
+        }
+
+        try {
+          await customConditionJoinSpace({
+            userId: sessionUserId,
+            spaceId: space.id,
+            params: { proposalTemplate: template as string }
+          });
+        } catch (err) {
           log.error('User could not join space via template', {
             template,
             userId: sessionUserId,
             spaceId: space.id,
             err
           });
-        });
+          return redirect;
+        }
       }
     }
   }

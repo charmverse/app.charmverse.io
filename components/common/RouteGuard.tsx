@@ -1,10 +1,12 @@
 import type { UrlObject } from 'url';
 
 import { log } from '@charmverse/core/log';
+import { space } from '@lens-protocol/metadata/*';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
+import charmClient from 'charmClient';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
@@ -21,8 +23,8 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { accessChecked, hasSharedPageAccess } = useSharedPage();
   const [authorized, setAuthorized] = useState(true);
-  const { user, isLoaded } = useUser();
-  const { spaces, isLoaded: isSpacesLoaded } = useSpaces();
+  const { user, isLoaded, refreshUser } = useUser();
+  const { spaces, isLoaded: isSpacesLoaded, setSpaces } = useSpaces();
   const isLoading = !isLoaded || !isSpacesLoaded || !accessChecked;
   const authorizedSpaceDomainRef = useRef('');
   const spaceDomain = (router.query.domain as string) || '';
@@ -104,6 +106,18 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
     // condition: trying to access a space without access
     else if (!isAvailableToLoggedInUsers && !!_spaceDomain && !filterSpaceByDomain(spaces, _spaceDomain)) {
       log.info('[RouteGuard]: send to join space page');
+
+      if (user) {
+        const refreshedSpaces = await charmClient.spaces.getSpaces();
+        setSpaces(refreshedSpaces);
+        if (refreshedSpaces.some((_space) => _space.domain === _spaceDomain)) {
+          // Spaces endpoint provides us with the latest user's spaces, but we also need updated profile to ensure the user is up to date
+          await refreshUser();
+
+          return { authorized: true };
+        }
+      }
+
       if (authorizedSpaceDomainRef.current === _spaceDomain) {
         authorizedSpaceDomainRef.current = '';
         return {
