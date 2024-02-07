@@ -3,7 +3,7 @@ import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import type { ProposalWithUsers } from 'lib/proposal/interface';
+import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
@@ -42,7 +42,7 @@ describe('GET /api/proposals/[id] - Get proposal - public space', () => {
     });
     // Unauthenticated request
     const proposal = (await request(baseUrl).get(`/api/proposals/${generatedProposal.id}`).expect(200))
-      .body as ProposalWithUsers;
+      .body as ProposalWithUsersAndRubric;
 
     expect(proposal).toMatchObject(
       expect.objectContaining({

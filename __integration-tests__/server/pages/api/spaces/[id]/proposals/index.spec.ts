@@ -3,7 +3,7 @@ import type { Proposal } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
-import type { ProposalWithUsers } from 'lib/proposal/interface';
+import type { ProposalWithUsersLite } from 'lib/proposal/interface';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 describe('GET /api/spaces/[id]/proposals - Get proposals in a space', () => {
@@ -88,7 +88,7 @@ describe('GET /api/spaces/[id]/proposals - Get proposals in a space', () => {
   it('Should return all proposals a user can access excluding templates, responding 200', async () => {
     const proposals = (await (
       await request(baseUrl).get(`/api/spaces/${space.id}/proposals`).set('Cookie', memberCookie).expect(200)
-    ).body) as ProposalWithUsers[];
+    ).body) as ProposalWithUsersLite[];
 
     expect(proposals).toHaveLength(1);
 
@@ -98,7 +98,7 @@ describe('GET /api/spaces/[id]/proposals - Get proposals in a space', () => {
   it('Should return all proposals for an admin, responding 200', async () => {
     const proposals = (await (
       await request(baseUrl).get(`/api/spaces/${space.id}/proposals`).set('Cookie', adminCookie).expect(200)
-    ).body) as ProposalWithUsers[];
+    ).body) as ProposalWithUsersLite[];
 
     expect(proposals).toHaveLength(3);
 
