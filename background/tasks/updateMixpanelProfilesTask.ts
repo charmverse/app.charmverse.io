@@ -1,14 +1,11 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import {
-  updateMixpanelGroupProfiles,
-  type SpaceWithMixpanelProfile
-} from 'lib/metrics/mixpanel/updateMixpanelGroupProfiles';
+import { batchUpdateSpaceProfiles, type SpaceWithMixpanelProfile } from 'lib/metrics/mixpanel/batchUpdateSpaceProfiles';
 import { getTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
 import { getSpaceBlockCount } from 'lib/spaces/getSpaceBlockCount';
 
 const perBatch = 1000;
-export async function updateSpacesMixpanelProfiles({ offset = 0 }: { offset?: number } = {}): Promise<void> {
+export async function updateMixpanelProfiles({ offset = 0 }: { offset?: number } = {}): Promise<void> {
   // Load limited number of spaces at a time
   const spaces = await prisma.space.findMany({
     skip: offset,
@@ -30,17 +27,17 @@ export async function updateSpacesMixpanelProfiles({ offset = 0 }: { offset?: nu
     }
 
     const profile = getTrackGroupProfile({ space, blockCount });
-    spaceProfiles.push({ space, profile });
+    spaceProfiles.push({ spaceId: space.id, profile });
   }
 
-  await updateMixpanelGroupProfiles(spaceProfiles);
+  await batchUpdateSpaceProfiles(spaceProfiles);
 
   if (spaces.length > 0) {
-    return updateSpacesMixpanelProfiles({ offset: offset + perBatch });
+    return updateMixpanelProfiles({ offset: offset + perBatch });
   }
 }
 
-export async function updateSpacesMixpanelProfilesTask(): Promise<void> {
+export async function updateMixpanelProfilesTask(): Promise<void> {
   // Wrapped function since Cron will call the method with the date
-  await updateSpacesMixpanelProfiles();
+  await updateMixpanelProfiles();
 }

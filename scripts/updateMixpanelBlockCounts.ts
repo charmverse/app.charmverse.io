@@ -1,9 +1,9 @@
-import { updateSpacesMixpanelProfilesTask } from "background/tasks/updateSpacesMixpanelProfilesTask";
+import { updateMixpanelProfilesTask } from 'background/tasks/updateMixpanelProfilesTask';
 
 export async function updateMixpanelBlockCounts() {
-  await updateSpacesMixpanelProfilesTask();
+  await updateMixpanelProfilesTask();
 }
 
 updateMixpanelBlockCounts().then(() => {
-  console.log('Done.')
-})
+  console.log('Done.');
+});
