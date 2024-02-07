@@ -1,21 +1,6 @@
-import type { IdentityType, Prisma, Space } from '@charmverse/core/prisma';
+import type { Space, IdentityType } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
-import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
-import MedalIcon from '@mui/icons-material/WorkspacePremium';
-import {
-  Box,
-  FormHelperText,
-  Grid,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  MenuItem,
-  Select,
-  Stack,
-  TextField,
-  Typography
-} from '@mui/material';
+import { Box, FormHelperText, Grid, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import isEqual from 'lodash/isEqual';
 import PopupState from 'material-ui-popup-state';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
@@ -23,21 +8,19 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
+import { useUpdateSpace } from 'charmClient/hooks/spaces';
 import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
 import { DraggableListItem } from 'components/common/DraggableListItem';
 import FieldLabel from 'components/common/form/FieldLabel';
-import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import { PageIcon } from 'components/common/PageIcon';
 import Legend from 'components/settings/Legend';
 import { SetupCustomDomain } from 'components/settings/space/components/SetupCustomDomain';
-import { SpaceIntegrations } from 'components/settings/space/components/SpaceIntegrations';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMemberProfileTypes } from 'hooks/useMemberProfileTypes';
 import { usePreventReload } from 'hooks/usePreventReload';
@@ -45,15 +28,19 @@ import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useSpaces } from 'hooks/useSpaces';
 import type { Feature } from 'lib/features/constants';
 import type { NotificationToggleOption, NotificationToggles } from 'lib/notifications/notificationToggles';
-import type { MemberProfileName } from 'lib/profile/memberProfiles';
+import type { MemberProfileJson, MemberProfileName } from 'lib/profile/memberProfiles';
+import { getSnapshotSpace } from 'lib/snapshot/getSpace';
 import { getSpaceUrl, getSubdomainPath } from 'lib/utilities/browser';
 import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFromHost';
+import { isValidDomainName } from 'lib/utilities/domains/isValidDomainName';
+import { isTruthy } from 'lib/utilities/types';
 
-import { IdentityIcon } from '../profile/components/IdentityIcon';
-
+import { AddMoreMemberProfilesModal, getProfileWidgetLogo } from './components/AddMoreMemberProfilesModal';
+import { ConnectCollabland } from './components/ConnectCollabland';
 import Avatar from './components/LargeAvatar';
 import { NotificationTogglesInput, getDefaultValues } from './components/NotificationToggles';
 import { SettingsItem } from './components/SettingsItem';
+import { SpacePrimaryIdentity } from './components/SpacePrimaryIdentity';
 import { TwoFactorAuth } from './components/TwoFactorAuth';
 
 export type FormValues = {
@@ -63,6 +50,9 @@ export type FormValues = {
   domain: string;
   notificationToggles: NotificationToggles;
   requireMembersTwoFactorAuth: boolean;
+  primaryMemberIdentity?: IdentityType | null;
+  customDomain?: string | null;
+  snapshotDomain?: string | null;
 };
 
 const schema: yup.Schema<FormValues> = yup.object({
@@ -71,13 +61,29 @@ const schema: yup.Schema<FormValues> = yup.object({
   spaceArtwork: yup.string().nullable(),
   notificationToggles: yup.object(),
   requireMembersTwoFactorAuth: yup.boolean().required(),
+  primaryMemberIdentity: yup.string<IdentityType>().nullable(),
   domain: yup
     .string()
     .ensure()
     .trim()
     .min(3, 'Domain must be at least 3 characters')
     .matches(/^[^!?@#$%^&*+=<>(){}.'"\\[\]|~/]*$/, 'The symbols you entered are not allowed')
-    .matches(/^\S*$/, 'Space is not allowed')
+    .matches(/^\S*$/, 'Space is not allowed'),
+  customDomain: yup
+    .string()
+    .nullable()
+    .test('isCusotmDomainValid', 'Please provide valid domain name.', (value) => !value || isValidDomainName(value)),
+  snapshotDomain: yup
+    .string()
+    .nullable()
+    .min(3, 'Snapshot domain must be at least 3 characters')
+    .test('checkDomain', 'Snapshot domain not found', async (domain) => {
+      if (domain) {
+        const foundSpace = await getSnapshotSpace(domain);
+        return isTruthy(foundSpace);
+      }
+      return true;
+    })
 });
 
 export function SpaceSettings({
@@ -97,8 +103,8 @@ export function SpaceSettings({
   const unsavedChangesModalState = usePopupState({ variant: 'popover', popupId: 'unsaved-changes' });
   const memberProfilesPopupState = usePopupState({ variant: 'popover', popupId: 'member-profiles' });
   const [featuresInput, setFeatures] = useState(currentFeatures);
-  const [primaryMemberIdentity, setPrimaryMemberIdentity] = useState<IdentityType | null>(space.primaryMemberIdentity);
   const [memberProfileTypesInput, setMemberProfileProperties] = useState(currentMemberProfileTypes);
+
   const {
     register,
     handleSubmit,
@@ -123,20 +129,7 @@ export function SpaceSettings({
   });
   const newTitle = watchNewTitle('newTitle');
 
-  const {
-    trigger: updateSpace,
-    error,
-    isMutating
-  } = useSWRMutation(
-    `/spaces/${space.id}`,
-    (_url, { arg }: Readonly<{ arg: Prisma.SpaceUpdateInput }>) => charmClient.spaces.updateSpace(arg),
-    {
-      onSuccess: (updatedSpace) => {
-        setSpace(updatedSpace);
-        reset(_getFormValues(updatedSpace));
-      }
-    }
-  );
+  const { trigger: updateSpace, error: updateSpaceError, isMutating: updateSpaceLoading } = useUpdateSpace(space.id);
 
   useTrackPageView({ type: 'settings/space' });
 
@@ -157,18 +150,28 @@ export function SpaceSettings({
 
     // reload with new subdomain
     const newDomain = space.domain !== values.domain;
-    await updateSpace({
-      id: space.id,
-      notificationToggles: notificationToggles as Prisma.InputJsonValue,
-      features: featuresInput,
-      memberProfiles: memberProfileTypesInput,
-      name: values.name,
-      domain: values.domain,
-      primaryMemberIdentity,
-      spaceImage: values.spaceImage,
-      spaceArtwork: values.spaceArtwork,
-      requireMembersTwoFactorAuth: values.requireMembersTwoFactorAuth
-    });
+
+    await updateSpace(
+      {
+        notificationToggles,
+        features: featuresInput,
+        memberProfiles: memberProfileTypesInput,
+        name: values.name,
+        domain: values.domain,
+        primaryMemberIdentity: values.primaryMemberIdentity || null,
+        spaceImage: values.spaceImage,
+        spaceArtwork: values.spaceArtwork,
+        requireMembersTwoFactorAuth: values.requireMembersTwoFactorAuth,
+        customDomain: values.customDomain,
+        snapshotDomain: values.snapshotDomain
+      },
+      {
+        onSuccess: (updatedSpace) => {
+          setSpace(updatedSpace);
+          reset(_getFormValues(updatedSpace));
+        }
+      }
+    );
 
     if (newDomain) {
       // add a delay so that the form resets and doesnt block user from reloading due to calling usePreventReload(isDirty)
@@ -181,6 +184,22 @@ export function SpaceSettings({
         }
       }, 100);
     }
+  }
+
+  function handleMemberProfileProperties(id: MemberProfileJson['id'], title: string) {
+    setMemberProfileProperties((prevState) => {
+      const prevMemberProfiles = [...prevState];
+      const targetedMemberProfileIndex = prevMemberProfiles.findIndex((_mp) => _mp.id === id);
+      prevMemberProfiles[targetedMemberProfileIndex] = {
+        id,
+        title,
+        isHidden: false
+      };
+      if (prevMemberProfiles.every((_mp) => _mp.isHidden === false)) {
+        memberProfilesPopupState.close();
+      }
+      return prevMemberProfiles;
+    });
   }
 
   function closeInviteLinkDeleteModal() {
@@ -210,10 +229,7 @@ export function SpaceSettings({
   }
 
   const dataChanged =
-    !isEqual(currentFeatures, featuresInput) ||
-    !isEqual(currentMemberProfileTypes, memberProfileTypesInput) ||
-    isDirty ||
-    space.primaryMemberIdentity !== primaryMemberIdentity;
+    !isEqual(currentFeatures, featuresInput) || !isEqual(currentMemberProfileTypes, memberProfileTypesInput) || isDirty;
 
   useEffect(() => {
     setUnsavedChanges(dataChanged);
@@ -266,7 +282,9 @@ export function SpaceSettings({
                     sx={{ mb: 1 }}
                     data-test='space-domain-input'
                   />
-                  {error && <FormHelperText error>{error?.message || error || 'Something went wrong'}</FormHelperText>}
+                  {updateSpaceError && (
+                    <FormHelperText error>{updateSpaceError?.message || 'Something went wrong'}</FormHelperText>
+                  )}
                 </Stack>
               </Stack>
             </Stack>
@@ -288,36 +306,7 @@ export function SpaceSettings({
             />
           </Grid>
           <Grid item>
-            <FieldLabel>Primary Identity</FieldLabel>
-            <Typography variant='caption' mb={1} component='p'>
-              Choose the primary identity for your space. This will be the required identity that your members will have
-              to provide when they first join and it will be used to display the member.
-            </Typography>
-            <Box display='flex' alignItems='center' gap={1}>
-              <Select
-                value={primaryMemberIdentity ?? 'none'}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setPrimaryMemberIdentity(value === 'none' ? null : (value as IdentityType));
-                }}
-                disabled={!isAdmin}
-              >
-                <MenuItem value='none'>
-                  <Stack flexDirection='row' alignItems='center' gap={1}>
-                    <PersonOutlinedIcon style={{ width: 18, height: 18 }} />
-                    <Typography variant='body2'>Member's choice</Typography>
-                  </Stack>
-                </MenuItem>
-                {(['Discord', 'Google', 'Telegram', 'Wallet'] as IdentityType[]).map((identity) => (
-                  <MenuItem key={identity} value={identity}>
-                    <Stack flexDirection='row' alignItems='center' gap={1}>
-                      <IdentityIcon size='xSmall' type={identity} />
-                      <Typography variant='body2'>{identity}</Typography>
-                    </Stack>
-                  </MenuItem>
-                ))}
-              </Select>
-            </Box>
+            <SpacePrimaryIdentity register={register} disabled={!isAdmin} />
           </Grid>
           <Grid item>
             <FieldLabel>Custom Artwork</FieldLabel>
@@ -483,38 +472,66 @@ export function SpaceSettings({
               </Button>
             )}
           </Grid>
-          {isAdmin && (
-            <Grid item display='flex' justifyContent='space-between'>
-              <Button
-                disableElevation
-                size='large'
-                data-test='submit-space-update'
-                disabled={isMutating || !dataChanged}
-                type='submit'
-                loading={isMutating}
-              >
-                Save
-              </Button>
-            </Grid>
+        </Grid>
+        <SetupCustomDomain space={space} errorMessage={errors.customDomain?.message} register={register} />
+        <Grid item>
+          <Legend mt={3}>Snapshot.org Integration</Legend>
+          <FieldLabel>Snapshot domain</FieldLabel>
+          {!space?.snapshotDomain && !isAdmin ? (
+            <Typography>No Snapshot domain connected yet. Only space admins can configure this.</Typography>
+          ) : (
+            <TextField
+              {...register('snapshotDomain')}
+              disabled={!isAdmin}
+              fullWidth
+              error={!!errors.snapshotDomain}
+              helperText={errors.snapshotDomain?.message}
+            />
           )}
         </Grid>
+        <Grid item>
+          <Legend mt={3}>Collab.land Integration</Legend>
+          <ConnectCollabland />
+        </Grid>
+        <Grid item>
+          <Legend mt={3} helperText={`Advanced settings for ${isAdmin ? 'deleting' : 'leaving'} a space.`}>
+            Warning
+          </Legend>
+          {isAdmin ? (
+            <Button variant='outlined' color='error' onClick={deleteWorkspace} data-test='submit-space-delete'>
+              Delete Space
+            </Button>
+          ) : (
+            <Button variant='outlined' color='error' onClick={workspaceLeaveModalState.open}>
+              Leave Space
+            </Button>
+          )}
+        </Grid>
+        {isAdmin && isDirty && (
+          <Box
+            sx={{
+              py: 2,
+              mt: 2,
+              position: 'sticky',
+              bottom: '0',
+              background: (theme) => theme.palette.background.paper,
+              justifyContent: 'flex-start'
+            }}
+          >
+            <Button
+              disableElevation
+              size='large'
+              data-test='submit-space-update'
+              sx={{ alignSelf: 'flex-start' }}
+              disabled={updateSpaceLoading || !dataChanged}
+              type='submit'
+              loading={updateSpaceLoading}
+            >
+              Save
+            </Button>
+          </Box>
+        )}
       </form>
-      <SetupCustomDomain space={space} />
-
-      <SpaceIntegrations />
-
-      <Legend mt={3} helperText={`Advanced settings for ${isAdmin ? 'deleting' : 'leaving'} a space.`}>
-        Warning
-      </Legend>
-      {isAdmin ? (
-        <Button variant='outlined' color='error' onClick={deleteWorkspace} data-test='submit-space-delete'>
-          Delete Space
-        </Button>
-      ) : (
-        <Button variant='outlined' color='error' onClick={workspaceLeaveModalState.open}>
-          Leave Space
-        </Button>
-      )}
       <ConfirmDeleteModal
         title='Delete space'
         onClose={closeInviteLinkDeleteModal}
@@ -549,77 +566,14 @@ export function SpaceSettings({
         question='Are you sure you want to discard unsaved changes'
         onConfirm={unsavedChangesModalState.close}
       />
-      <Modal
-        size='large'
-        open={memberProfilesPopupState.isOpen}
-        onClose={memberProfilesPopupState.close}
+      <AddMoreMemberProfilesModal
         title='Add more member profiles'
-        data-test='add-profiles-modal'
-      >
-        <List>
-          {memberProfileTypesInput
-            .filter((mp) => mp.isHidden)
-            .map(({ id, title }) => {
-              const profileWidgetLogo = getProfileWidgetLogo(id);
-              return (
-                <ListItem
-                  key={id}
-                  secondaryAction={
-                    <Button
-                      data-test={`add-profile-button-${id}`}
-                      onClick={() => {
-                        setMemberProfileProperties((prevState) => {
-                          const prevMemberProfiles = [...prevState];
-                          const targetedMemberProfileIndex = prevMemberProfiles.findIndex((_mp) => _mp.id === id);
-                          prevMemberProfiles[targetedMemberProfileIndex] = {
-                            id,
-                            title,
-                            isHidden: false
-                          };
-                          if (prevMemberProfiles.every((_mp) => _mp.isHidden === false)) {
-                            memberProfilesPopupState.close();
-                          }
-                          return prevMemberProfiles;
-                        });
-                      }}
-                    >
-                      Add
-                    </Button>
-                  }
-                >
-                  <ListItemIcon>
-                    {typeof profileWidgetLogo === 'string' ? (
-                      <Image width={25} height={25} alt={id} src={profileWidgetLogo} />
-                    ) : (
-                      profileWidgetLogo
-                    )}
-                  </ListItemIcon>
-                  <ListItemText primary={title} />
-                </ListItem>
-              );
-            })}
-        </List>
-      </Modal>
+        {...bindPopover(memberProfilesPopupState)}
+        memberProfileTypesInput={memberProfileTypesInput}
+        handleMemberProfileProperties={handleMemberProfileProperties}
+      />
     </>
   );
-}
-function getProfileWidgetLogo(name: MemberProfileName) {
-  switch (name) {
-    case 'charmverse':
-      return '/images/logos/charmverse_black.png';
-    case 'collection':
-      return '/images/template_icons/nft_ape_icon.svg';
-    case 'ens':
-      return '/images/logos/ens_logo.svg';
-    case 'lens':
-      return '/images/logos/lens_logo.png';
-    case 'summon':
-      return '/images/logos/summon_dark_mark.svg';
-    case 'credentials':
-      return <MedalIcon />;
-    default:
-      return '';
-  }
 }
 
 function _getFormValues(space: Space): FormValues {
@@ -629,6 +583,9 @@ function _getFormValues(space: Space): FormValues {
     spaceArtwork: space.spaceArtwork,
     domain: space.domain,
     requireMembersTwoFactorAuth: space.requireMembersTwoFactorAuth,
-    notificationToggles: getDefaultValues(space.notificationToggles as NotificationToggles)
+    notificationToggles: getDefaultValues(space.notificationToggles as NotificationToggles),
+    customDomain: space.customDomain,
+    snapshotDomain: space.snapshotDomain,
+    primaryMemberIdentity: space.primaryMemberIdentity
   };
 }

@@ -1,10 +1,15 @@
+import { log } from '@charmverse/core/log';
 import type { MemberPropertyType, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
 import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
 import { getSpaceDomainFromName } from 'lib/spaces/utils';
-import { DuplicateDataError, InvalidInputError } from 'lib/utilities/errors';
+import { updateCustomerStripeInfo } from 'lib/subscription/updateCustomerStripeInfo';
+import { DataNotFoundError, DuplicateDataError, InvalidInputError } from 'lib/utilities/errors';
+
+import { updateSnapshotDomain } from './updateSnapshotDomain';
+import { updateSpaceCustomDomain } from './updateSpaceCustomDomain';
 
 export type UpdateableSpaceFields = Partial<
   Pick<
@@ -21,6 +26,8 @@ export type UpdateableSpaceFields = Partial<
     | 'primaryMemberIdentity'
     | 'requireMembersTwoFactorAuth'
     | 'credentialLogo'
+    | 'customDomain'
+    | 'snapshotDomain'
   >
 >;
 
@@ -29,16 +36,39 @@ export async function updateSpace(spaceId: string, updates: UpdateableSpaceField
     throw new InvalidInputError('A space ID is required');
   }
 
-  const domain = updates?.domain ? getSpaceDomainFromName(updates?.domain) : undefined;
+  const existingSpace = await prisma.space.findUnique({
+    where: {
+      id: spaceId
+    },
+    select: {
+      domain: true,
+      customDomain: true,
+      snapshotDomain: true
+    }
+  });
+
+  if (!existingSpace) {
+    throw new DataNotFoundError(`Space with id ${spaceId} not found`);
+  }
+
+  const domain = updates.domain ? getSpaceDomainFromName(updates.domain) : undefined;
 
   if (domain) {
-    const existingSpace = await getSpaceByDomain(domain);
+    const existingDomainSpace = await getSpaceByDomain(domain);
 
-    if (existingSpace && existingSpace.id !== spaceId) {
+    if (existingDomainSpace && existingDomainSpace.id !== spaceId) {
       throw new DuplicateDataError(`A space with the domain ${domain} already exists`);
     }
   } else if (typeof domain !== 'undefined') {
     throw new InvalidInputError('Domain cannot be empty');
+  }
+
+  if (updates.customDomain !== undefined && updates.customDomain !== existingSpace.customDomain) {
+    await updateSpaceCustomDomain(spaceId, { customDomain: updates.customDomain });
+  }
+
+  if (updates.snapshotDomain !== undefined && updates.snapshotDomain !== existingSpace.snapshotDomain) {
+    await updateSnapshotDomain(spaceId, updates.snapshotDomain);
   }
 
   const primaryMemberIdentity = updates?.primaryMemberIdentity?.toLocaleLowerCase() ?? '';
@@ -77,7 +107,22 @@ export async function updateSpace(spaceId: string, updates: UpdateableSpaceField
     }
   });
 
-  updateTrackGroupProfile(updatedSpace);
+  await updateTrackGroupProfile(updatedSpace);
+
+  if (updatedSpace.domain !== existingSpace.domain) {
+    try {
+      await updateCustomerStripeInfo({
+        spaceId,
+        update: {
+          metadata: {
+            domain: updatedSpace.domain
+          }
+        }
+      });
+    } catch (err) {
+      log.error(`Error updating stripe customer details`, { spaceId, err });
+    }
+  }
 
   return updatedSpace;
 }

@@ -1,7 +1,6 @@
-import type { PaymentMethod, Prisma, Space } from '@charmverse/core/prisma';
+import type { PaymentMethod, Space } from '@charmverse/core/prisma';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 
-import type { CustomJoinParams } from 'lib/spaces/customConditionJoinSpace';
 import type { UpdateableSpaceFields } from 'lib/spaces/updateSpace';
 
 import type { MaybeString } from './helpers';

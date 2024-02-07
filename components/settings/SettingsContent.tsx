@@ -72,7 +72,7 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`vertical-tab-${index}`}
       {...other}
     >
-      {value === index && <DialogContent>{children}</DialogContent>}
+      {value === index && <DialogContent sx={{ overflowY: 'visible' }}>{children}</DialogContent>}
     </Box>
   );
 }

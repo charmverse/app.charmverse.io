@@ -92,10 +92,6 @@ export class SpacesApi {
     }>(`/api/spaces/${spaceId}/block-count`);
   }
 
-  updateCustomDomain({ spaceId, customDomain }: { spaceId: string; customDomain: string | null }) {
-    return http.PUT<UpdateCustomDomainResponse>(`/api/spaces/${spaceId}/custom-domain`, { customDomain });
-  }
-
   verifyCustomDomain(spaceId: string) {
     return http.GET<CustomDomainVerification>(`/api/spaces/${spaceId}/custom-domain`);
   }
