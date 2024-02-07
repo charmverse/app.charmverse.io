@@ -2,14 +2,14 @@ import styled from '@emotion/styled';
 import CallMadeIcon from '@mui/icons-material/CallMade';
 import LinkIcon from '@mui/icons-material/Link';
 import { Alert, Paper, Stack, TextField, Tooltip, Typography, lighten } from '@mui/material';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useCopyToClipboard } from 'usehooks-ts';
-import { useAccount } from 'wagmi';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import MultiTabs from 'components/common/MultiTabs';
+import PopperPopup from 'components/common/PopperPopup';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useFarcasterFrame } from 'hooks/useFarcasterFrame';
 import { useFarcasterProfile } from 'hooks/useFarcasterProfile';
@@ -17,7 +17,7 @@ import { useFarcasterUser } from 'hooks/useFarcasterUser';
 import { useSnackbar } from 'hooks/useSnackbar';
 
 import BlockAligner from '../../BlockAligner';
-import { MediaSelectionPopup } from '../../common/MediaSelectionPopup';
+import { MediaSelectionPopup, MediaSelectionPopupNoButton } from '../../common/MediaSelectionPopup';
 import { MediaUrlInput } from '../../common/MediaUrlInput';
 import type { CharmNodeViewProps } from '../../nodeView/nodeView';
 
@@ -47,7 +47,6 @@ export function FarcasterFrameNodeView({
 }: CharmNodeViewProps & {
   pageId?: string;
 }) {
-  const { address } = useAccount();
   const { space } = useCurrentSpace();
   const { error, isLoadingFrame, farcasterFrame, submitOption, isLoadingFrameAction } = useFarcasterFrame(
     attrs.src && pageId ? { frameUrl: attrs.src, pageId } : undefined
@@ -58,6 +57,44 @@ export function FarcasterFrameNodeView({
   const [, copyToClipboard] = useCopyToClipboard();
   const { showMessage } = useSnackbar();
   const { farcasterProfile } = useFarcasterProfile();
+  const [showEditPopup, setShowEditPopup] = useState(false);
+
+  function openPopup() {
+    setShowEditPopup(true);
+  }
+
+  function closePopup() {
+    setShowEditPopup(false);
+  }
+
+  const popupContent = useMemo(
+    () => (
+      <PopperPopup
+        popupContent={
+          <Paper sx={{ p: 2 }}>
+            <MediaUrlInput
+              onSubmit={(frameUrl) => {
+                updateAttrs({ src: frameUrl });
+                if (frameUrl && pageId && space) {
+                  charmClient.track.trackAction('add_farcaster_frame', {
+                    frameUrl,
+                    pageId,
+                    spaceId: space.id
+                  });
+                }
+                closePopup();
+              }}
+              initialValue={attrs.src}
+              placeholder='https://fc-polls.vercel.app/polls/...'
+            />
+          </Paper>
+        }
+        open={showEditPopup}
+        onClose={closePopup}
+      />
+    ),
+    [pageId, space, showEditPopup]
+  );
 
   if (isLoadingFrame) {
     return (
@@ -130,7 +167,7 @@ export function FarcasterFrameNodeView({
           extraControls={extraControls}
           onEdit={() => {
             if (!readOnly) {
-              updateAttrs({ src: null });
+              openPopup();
             }
           }}
           onDelete={deleteNode}
@@ -138,6 +175,7 @@ export function FarcasterFrameNodeView({
         >
           <Alert severity='warning'>{error?.message ?? 'Failed to load Farcaster Frame'}</Alert>
         </BlockAligner>
+        {showEditPopup && popupContent}
       </Paper>
     );
   }
@@ -147,7 +185,7 @@ export function FarcasterFrameNodeView({
       <BlockAligner
         onEdit={() => {
           if (!readOnly) {
-            updateAttrs({ src: null });
+            openPopup();
           }
         }}
         extraControls={extraControls}
@@ -236,6 +274,7 @@ export function FarcasterFrameNodeView({
           )
         ) : null}
       </BlockAligner>
+      {showEditPopup && popupContent}
     </Paper>
   );
 }
