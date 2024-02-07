@@ -1,6 +1,6 @@
 import { POST } from '@charmverse/core/http';
 
-import { apiKey } from './mixpanel';
+import { getApiKey } from './mixpanel';
 import type { GroupKeys } from './mixpanel';
 
 type GroupItem = {
@@ -12,14 +12,13 @@ type GroupItem = {
 
 type GroupData = { id: string };
 
-// Docs: https://developer.mixpanel.com/reference/group-batch-update
+// Mixpanel sdk does not support batch group updates so we need to build request manually
+// https://developer.mixpanel.com/reference/group-batch-update
 export function groupBatchUpdate<T extends GroupData>(groupKey: GroupKeys, groups: T[]) {
-  if (!apiKey) {
-    throw new Error('No Mixpanel api key found');
-  }
+  const apiKey = getApiKey();
   const groupData: GroupItem[] = groups.map(({ id, ...group }) => {
     return {
-      $token: apiKey as string,
+      $token: apiKey,
       $group_key: groupKey,
       $group_id: id,
       $set: group
