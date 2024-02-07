@@ -199,7 +199,7 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
       };
       setFarcasterUser(user);
     } catch (error: any) {
-      showMessage(error.message || 'Something went wrong. Please try again', 'error');
+      showMessage(error.shortMessage || error.message || 'Something went wrong. Please try again', 'error');
       log.error('Error creating signer', {
         error
       });

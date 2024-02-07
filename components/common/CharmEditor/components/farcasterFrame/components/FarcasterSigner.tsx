@@ -9,6 +9,7 @@ import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
 import { CanvasQRCode } from 'components/settings/account/components/otp/components/CanvasQrCode';
+import { useFarcasterProfile } from 'hooks/useFarcasterProfile';
 import { useFarcasterUser } from 'hooks/useFarcasterUser';
 import FarcasterIcon from 'public/images/logos/farcaster.svg';
 
@@ -35,6 +36,7 @@ export function FarcasterSigner() {
     startFarcasterSignerProcess,
     loading: isLoadingFarcasterUser
   } = useFarcasterUser();
+  const { farcasterProfile } = useFarcasterProfile();
 
   const warpcastClientDeeplink = farcasterUser?.signerApprovalUrl?.replace(
     'farcaster://',
@@ -43,6 +45,12 @@ export function FarcasterSigner() {
 
   if (!address) {
     return <OpenWalletSelectorButton label='Connect your wallet' />;
+  } else if (!farcasterProfile) {
+    return (
+      <Button variant='outlined' color='error' external target='_blank' href='https://warpcast.com/'>
+        <Typography variant='body2'>Please set up your Farcaster profile first</Typography>
+      </Button>
+    );
   } else if (farcasterUser?.status === 'pending_approval') {
     return (
       <>
@@ -66,7 +74,7 @@ export function FarcasterSigner() {
           {warpcastClientDeeplink && (
             <Stack mt={2} gap={1} alignItems='center'>
               <CanvasQRCode uri={warpcastClientDeeplink} />
-              <Link href={warpcastClientDeeplink} target='_blank' rel='noreferrer'>
+              <Link external href={warpcastClientDeeplink} target='_blank' rel='noreferrer'>
                 <Stack flexDirection='row' gap={0.5} alignItems='center' justifyContent='center'>
                   <PhoneIphoneIcon fontSize='small' sx={{ fill: farcasterBrandColor }} />
                   <Typography color={farcasterBrandColor}>I'm using my phone</Typography>
