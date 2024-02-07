@@ -1,6 +1,8 @@
 import { log } from '@charmverse/core/log';
 import cron from 'node-cron';
 
+import { updateSpacesMixpanelProfilesTask } from 'background/tasks/updateSpacesMixpanelProfilesTask';
+
 import app from './healthCheck/app';
 import { countAllSpacesBlocksTask } from './tasks/countAllSpacesBlocksTask';
 import { task as archiveTask } from './tasks/deleteArchivedPages';
@@ -33,6 +35,7 @@ cron.schedule('*/30 * * * *', refreshBountyApplications);
 
 // Count blocks in all spaces
 cron.schedule('*/30 * * * *', countAllSpacesBlocksTask);
+cron.schedule('*/30 * * * *', updateSpacesMixpanelProfilesTask);
 
 // Sync summon space roles every day at midnight
 cron.schedule('0 0 * * *', syncSummonSpacesRoles);
