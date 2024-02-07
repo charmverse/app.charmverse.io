@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import CallMadeIcon from '@mui/icons-material/CallMade';
 import LinkIcon from '@mui/icons-material/Link';
 import { Alert, Paper, Stack, TextField, Tooltip, Typography, lighten } from '@mui/material';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useCopyToClipboard } from 'usehooks-ts';
 import { useAccount } from 'wagmi';
 
@@ -14,24 +14,24 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useFarcasterFrame } from 'hooks/useFarcasterFrame';
 import { useFarcasterProfile } from 'hooks/useFarcasterProfile';
 import { useFarcasterUser } from 'hooks/useFarcasterUser';
-import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
 
-import BlockAligner from '../BlockAligner';
-import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
-import { MediaUrlInput } from '../common/MediaUrlInput';
-import type { CharmNodeViewProps } from '../nodeView/nodeView';
+import BlockAligner from '../../BlockAligner';
+import { MediaSelectionPopup } from '../../common/MediaSelectionPopup';
+import { MediaUrlInput } from '../../common/MediaUrlInput';
+import type { CharmNodeViewProps } from '../../nodeView/nodeView';
 
+import { farcasterBrandColor, farcasterBrandColorDark, farcasterBrandColorLight } from './constants';
 import { FarcasterMiniProfile } from './FarcasterMiniProfile';
 import { FarcasterSigner } from './FarcasterSigner';
 
 const StyledButton = styled(Button)(({ theme, disabled }) => ({
   width: '100%',
-  border: disabled ? '' : `1px solid #855DCD`,
-  backgroundColor: theme.palette.mode === 'dark' ? lighten('#855DCD', 0.1) : 'transparent',
-  color: theme.palette.mode === 'dark' ? '#fff' : '#855DCD',
+  border: disabled ? '' : `1px solid ${farcasterBrandColor}`,
+  backgroundColor: theme.palette.mode === 'dark' ? farcasterBrandColorDark : 'transparent',
+  color: theme.palette.mode === 'dark' ? '#fff' : farcasterBrandColor,
   '&:hover': {
-    backgroundColor: theme.palette.mode === 'dark' ? '#855DCD' : lighten('#855DCD', 0.9)
+    backgroundColor: theme.palette.mode === 'dark' ? farcasterBrandColor : farcasterBrandColorLight
   }
 }));
 
