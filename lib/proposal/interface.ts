@@ -110,7 +110,3 @@ export type ProposalWithUsersAndRubric = ProposalWithUsers &
         | null;
     };
   };
-
-export interface ProposalWithCommentsAndUsers extends ProposalWithUsers {
-  page: Page & { comments: PageComment[] };
-}
