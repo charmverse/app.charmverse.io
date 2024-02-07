@@ -32,7 +32,8 @@ const StyledButton = styled(Button)(({ theme, disabled }) => ({
   color: theme.palette.mode === 'dark' ? '#fff' : farcasterBrandColor,
   '&:hover': {
     backgroundColor: theme.palette.mode === 'dark' ? farcasterBrandColor : farcasterBrandColorLight
-  }
+  },
+  height: '100%'
 }));
 
 export function FarcasterFrameNodeView({
@@ -173,6 +174,7 @@ export function FarcasterFrameNodeView({
               onKeyDown={(e) => {
                 e.preventDefault();
               }}
+              // e.target.value is always empty, so we use the event key
               onKeyDownCapture={(e) => {
                 if (e.key.length === 1) {
                   setInputText((prevInputText) => prevInputText + e.key);
