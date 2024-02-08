@@ -29,6 +29,26 @@ export type FrameActionRequest = {
 
 const requestTimeout = 7500;
 
+async function trackFarcasterFrameInteractionEvent({ pageId, userId }: { pageId: string; userId?: string }) {
+  const space = await prisma.page.findUniqueOrThrow({
+    where: {
+      id: pageId
+    },
+    select: {
+      createdBy: true,
+      spaceId: true
+    }
+  });
+
+  const spaceId = space.spaceId;
+  trackUserAction('interact_farcaster_frame', {
+    // userId is undefined on public pages
+    userId: userId || space.createdBy,
+    spaceId,
+    pageId
+  });
+}
+
 async function getNextFrame(req: NextApiRequest, res: NextApiResponse<FrameActionResponse>) {
   const { frameAction, postType } = req.body as FrameActionRequest;
   const userId = req.session.user?.id;
@@ -58,28 +78,18 @@ async function getNextFrame(req: NextApiRequest, res: NextApiResponse<FrameActio
 
   const response = result as Response;
 
-  if (pageId) {
-    const space = await prisma.page.findUniqueOrThrow({
-      where: {
-        id: pageId
-      },
-      select: {
-        spaceId: true
-      }
-    });
-
-    const spaceId = space.spaceId;
-    trackUserAction('interact_farcaster_frame', {
-      userId,
-      spaceId,
-      pageId
-    });
-  }
-
   if (response.status === 302) {
+    if (pageId) {
+      await trackFarcasterFrameInteractionEvent({ pageId, userId });
+    }
     return res.status(302).json({
       location: response.headers.get('location')
     });
+  }
+
+  const contentType = response.headers.get('content-type');
+  if (!contentType || !contentType.includes('text/html')) {
+    throw new InvalidInputError('Invalid response: expected HTML document');
   }
 
   const htmlString = await response.text();
@@ -94,6 +104,10 @@ async function getNextFrame(req: NextApiRequest, res: NextApiResponse<FrameActio
 
   if (frameImage && frameImage.includes('svg')) {
     throw new InvalidInputError('Invalid Farcaster frame URL');
+  }
+
+  if (pageId) {
+    await trackFarcasterFrameInteractionEvent({ pageId, userId });
   }
 
   return res.status(200).json({ frame });

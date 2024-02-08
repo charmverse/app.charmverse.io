@@ -55,8 +55,10 @@ export type ViewFarcasterFrame = BaseEvent & {
 
 export type AddFarcasterFrame = ViewFarcasterFrame;
 
-export type InteractFarcasterFrame = BaseEvent & {
+export type InteractFarcasterFrame = {
   pageId: string;
+  userId?: string;
+  spaceId: string;
 };
 
 export type AppLoaded = BaseEventWithoutGroup & { spaceId?: string };
