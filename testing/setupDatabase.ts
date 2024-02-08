@@ -64,7 +64,7 @@ export async function generateSpaceUser({
       username: 'Username',
       wallets: {
         create: {
-          address: randomETHWalletAddress()
+          address: randomETHWalletAddress().toLowerCase()
         }
       },
       spaceRoles: {

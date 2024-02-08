@@ -9,7 +9,7 @@ import type { UserProfile } from 'lib/public-api/interfaces';
 import { searchUserProfile } from 'lib/public-api/searchUserProfile';
 import { withSessionRoute } from 'lib/session/withSession';
 import { addUserToSpace } from 'lib/summon/addUserToSpace';
-import { SUMMON_BASE_URL } from 'lib/summon/api';
+import { DEFAULT_TENANT_ID, DEFAULT_URL } from 'lib/summon/constants';
 import { syncSummonSpaceRoles } from 'lib/summon/syncSummonSpaceRoles';
 import { createUserFromWallet } from 'lib/users/createUser';
 
@@ -62,7 +62,9 @@ async function createSpaceMember(req: NextApiRequest, res: NextApiResponse<UserP
   const spaceId = req.query.spaceId as string;
   const payload = req.body as CreateSpaceMemberRequestBody;
   const spaceIds = req.spaceIdRange;
-  const summonApiUrl = (isTestEnv ? req.query.summonApiUrl ?? SUMMON_BASE_URL : SUMMON_BASE_URL) as string;
+  const summonTenantId = req.query.summonTenantId;
+  const summonApiUrl = (isTestEnv ? req.query.summonApiUrl ?? DEFAULT_URL : DEFAULT_URL) as string;
+  // For now, allow Api url to override
   if (!spaceIds || !spaceIds.length) {
     throw new UnauthorisedActionError("API key doesn't have access to any spaces");
   }

@@ -44,6 +44,7 @@ export async function syncSummonSpaceRoles({
     },
     select: {
       id: true,
+      spaceId: true,
       user: {
         select: {
           xpsEngineId: true,
@@ -108,7 +109,7 @@ export async function syncSummonSpaceRoles({
 
   for (const spaceRole of spaceRoles) {
     try {
-      const summonProfile = await getSummonProfile({ userId: spaceRole.user.id, summonApiUrl });
+      const summonProfile = await getSummonProfile({ userId: spaceRole.user.id, spaceId: spaceRole.spaceId });
       const userRank = summonProfile ? Math.floor(summonProfile.meta.rank) : null;
       if (summonProfile && userRank) {
         if (!spaceRole.user.xpsEngineId) {
