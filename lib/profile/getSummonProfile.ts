@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import * as api from 'lib/summon/api';
-import { PRODUCTION_URLS } from 'lib/summon/constants';
+import { TENANT_URLS } from 'lib/summon/constants';
 import type { SummonUserProfile } from 'lib/summon/interfaces';
 
 export async function getSummonProfile({
@@ -56,7 +56,7 @@ export async function getSummonProfile({
     log.debug('Space is not connected to Summon', { spaceId });
     return null;
   }
-  const summonApiUrl = summonTestUrl || PRODUCTION_URLS[spaceRole.space.xpsEngineId];
+  const summonApiUrl = summonTestUrl || TENANT_URLS[spaceRole.space.xpsEngineId];
 
   const discordUserAccount = user.discordUser?.account as { username: string } | null;
   const userEmail = user.googleAccounts[0]?.email;

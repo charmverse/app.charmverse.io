@@ -4,7 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
 
 import { findUserByIdentity, getUserSummonProfile } from './api';
-import { PRODUCTION_URLS } from './constants';
+import { TENANT_URLS } from './constants';
 
 export type VerificationResponse =
   | {
@@ -37,7 +37,7 @@ export async function verifyMembership({
       log.debug('Space does not have a Summon tenant ID', { spaceId });
       return { isVerified: false, reason: 'Space does not have a Summon tenant ID' };
     }
-    const summonApiUrl = PRODUCTION_URLS[space.xpsEngineId];
+    const summonApiUrl = TENANT_URLS[space.xpsEngineId];
     if (!summonApiUrl) {
       log.debug('Space does not have a Summon URL', { spaceId });
       return { isVerified: false, reason: 'Space does not have a Summon URL' };

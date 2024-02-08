@@ -2,13 +2,13 @@ import { prisma } from '@charmverse/core/prisma-client';
 import fetchMock from 'fetch-mock-jest';
 import { v4 } from 'uuid';
 
-import { PRODUCTION_URLS } from 'lib/summon/constants';
+import { TENANT_URLS } from 'lib/summon/constants';
 import { randomETHWalletAddress } from 'lib/utilities/blockchain';
 import { generateUserAndSpace, generateSpaceUser } from 'testing/setupDatabase';
 
 import { getSummonProfile } from '../getSummonProfile';
 
-const [DEFAULT_TENANT_ID, SUMMON_BASE_URL] = Object.entries(PRODUCTION_URLS)[0];
+const [DEFAULT_TENANT_ID, SUMMON_BASE_URL] = Object.entries(TENANT_URLS)[0];
 
 const mockSandbox = fetchMock.sandbox();
 
