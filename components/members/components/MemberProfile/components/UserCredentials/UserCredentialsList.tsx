@@ -101,20 +101,24 @@ export function UserCredentialsList({ userId, readOnly = false }: { readOnly?: b
     );
   }
 
+  const showFavorites = !!favoriteCredentials?.length;
+
   return (
     <Stack gap={2}>
-      {favoriteCredentials?.length ? (
+      {showFavorites && (
         <>
           <Typography variant='h6' fontWeight='bold'>
             Favorites
           </Typography>
           <UserFavoriteList credentials={favoriteCredentials} />
         </>
-      ) : null}
+      )}
       <>
-        <Typography variant='h6' fontWeight='bold'>
-          All
-        </Typography>
+        {showFavorites && (
+          <Typography variant='h6' fontWeight='bold'>
+            All
+          </Typography>
+        )}
         <UserAllCredentialsList readOnly={readOnly} credentials={userCredentials} />
       </>
     </Stack>
