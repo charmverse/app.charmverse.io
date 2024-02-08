@@ -7,10 +7,12 @@ import type { SummonUserProfile } from 'lib/summon/interfaces';
 
 export async function getSummonProfile({
   userId,
-  spaceId
+  spaceId,
+  summonTestUrl
 }: {
   spaceId: string;
   userId: string;
+  summonTestUrl?: string;
 }): Promise<null | SummonUserProfile> {
   const user = await prisma.user.findUnique({
     where: {
@@ -54,7 +56,7 @@ export async function getSummonProfile({
     log.debug('Space is not connected to Summon', { spaceId });
     return null;
   }
-  const summonApiUrl = PRODUCTION_URLS[spaceRole.space.xpsEngineId];
+  const summonApiUrl = summonTestUrl || PRODUCTION_URLS[spaceRole.space.xpsEngineId];
 
   const discordUserAccount = user.discordUser?.account as { username: string } | null;
   const userEmail = user.googleAccounts[0]?.email;

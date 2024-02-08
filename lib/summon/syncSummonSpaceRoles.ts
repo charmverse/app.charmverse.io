@@ -8,9 +8,9 @@ import { getSummonRoleLabel } from './getSummonRoleLabel';
 export async function syncSummonSpaceRoles({
   spaceId,
   userId,
-  summonApiUrl
+  summonTestUrl
 }: {
-  summonApiUrl?: string;
+  summonTestUrl?: string;
   userId?: string;
   spaceId: string;
 }) {
@@ -109,7 +109,11 @@ export async function syncSummonSpaceRoles({
 
   for (const spaceRole of spaceRoles) {
     try {
-      const summonProfile = await getSummonProfile({ userId: spaceRole.user.id, spaceId: spaceRole.spaceId });
+      const summonProfile = await getSummonProfile({
+        userId: spaceRole.user.id,
+        spaceId: spaceRole.spaceId,
+        summonTestUrl
+      });
       const userRank = summonProfile ? Math.floor(summonProfile.meta.rank) : null;
       if (summonProfile && userRank) {
         if (!spaceRole.xpsUserId) {
