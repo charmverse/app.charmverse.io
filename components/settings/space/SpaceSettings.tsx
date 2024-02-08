@@ -507,7 +507,7 @@ export function SpaceSettings({
             </Button>
           )}
         </Grid>
-        {isAdmin && isDirty && (
+        {isAdmin && dataChanged && (
           <Box
             sx={{
               py: 2,
