@@ -3,22 +3,22 @@ name: 'Build Docker Image'
 inputs:
   codebase_sha:
     description: "Your code base sha, if it's different from the sha of the github action event"
-    value: ""
+    value: ''
     required: false
 
 outputs:
   ecr-registry:
-    description: "ECR registry url"
+    description: 'ECR registry url'
     value: ${{ steps.login-ecr.outputs.registry }}
   img_tag:
-    description: "Image tag of the image"
-    value: "${{ steps.get_img_tag.outputs.version }}"
+    description: 'Image tag of the image'
+    value: '${{ steps.get_img_tag.outputs.version }}'
   img_repo:
-    description: "Image tag of the image"
-    value: "${{ steps.login-ecr.outputs.registry }}/charmverse-web3-workspace"
+    description: 'Image tag of the image'
+    value: '${{ steps.login-ecr.outputs.registry }}/charmverse-web3-workspace'
   full_image_name:
-    description: "Full image repo and tag"
-    value: "${{ steps.get_img_tag.outputs.tags }}"
+    description: 'Full image repo and tag'
+    value: '${{ steps.get_img_tag.outputs.tags }}'
 
 runs:
   using: 'composite'
@@ -54,7 +54,7 @@ runs:
           latest=${{ github.ref == 'refs/heads/main' }}
 
     - name: Build and push
-      uses: docker/build-push-action@v3
+      uses: docker/build-push-action@v5
       with:
         context: .
         push: true

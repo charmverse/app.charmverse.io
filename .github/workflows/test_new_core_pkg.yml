@@ -19,7 +19,7 @@ jobs:
           EVENT_CONTEXT: ${{ toJSON(github.event) }}
         run: |
           echo $EVENT_CONTEXT
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install dependencies
         uses: ./.github/actions/install
         with:
@@ -67,7 +67,7 @@ jobs:
             test_command: 'npm run test:ci -- --config="./lib/jest.config.ts" --shard 3/3'
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install

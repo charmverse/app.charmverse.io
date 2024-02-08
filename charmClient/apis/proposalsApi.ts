@@ -1,7 +1,7 @@
 import type { PageWithPermissions } from '@charmverse/core/pages';
 
 import * as http from 'adapters/http';
-import type { ProposalWithUsers, ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { ReviewEvaluationRequest } from 'lib/proposal/submitEvaluationResult';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
 import type { UpdateEvaluationRequest } from 'lib/proposal/updateProposalEvaluation';

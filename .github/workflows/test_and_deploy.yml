@@ -31,7 +31,7 @@ jobs:
         run: |
           echo "$workflow_event_context"
           echo "Workflow and code ref: ${{github.ref}}"
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -52,7 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-test-env
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -115,7 +115,7 @@ jobs:
             test_command: 'npm run serverless:start & sleep 10 && npm run test:serverless'
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
@@ -177,7 +177,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     needs: [test, integration-test]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 2
       - name: Inject slug/short variables

@@ -2,7 +2,7 @@ import { UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { createForumPost } from 'lib/forums/posts/createForumPost';
+import { createForumPost, trackCreateForumPostEvent } from 'lib/forums/posts/createForumPost';
 import { getPostVoteSummary, type ForumPostMeta } from 'lib/forums/posts/getPostMeta';
 import { listForumPosts } from 'lib/forums/posts/listForumPosts';
 import { requireKeys, InvalidStateError } from 'lib/middleware';
@@ -181,6 +181,11 @@ async function createPost(req: NextApiRequest, res: NextApiResponse<PublicApiFor
     isDraft: false,
     spaceId: space.id,
     title: payload.title
+  });
+
+  await trackCreateForumPostEvent({
+    post: createdFormPost,
+    userId: payload.userId
   });
 
   const { upDownVotes, ...post } = await prisma.post.findFirstOrThrow({
