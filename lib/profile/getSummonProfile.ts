@@ -64,15 +64,12 @@ export async function getSummonProfile({
 
   let xpsUserId = spaceRole?.xpsUserId;
   if (!xpsUserId) {
-    const _xpsUserId = await api.findUserXpsEngineId({
+    xpsUserId = await api.findUserXpsEngineId({
       discordUserAccount,
       userEmail,
       walletAddresses,
       summonApiUrl
     });
-    if (_xpsUserId) {
-      xpsUserId = _xpsUserId;
-    }
   }
 
   // Summon has a bug where it returns the wrong user profile when none exist
