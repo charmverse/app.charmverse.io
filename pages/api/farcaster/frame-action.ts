@@ -118,7 +118,7 @@ async function getNextFrame(req: NextApiRequest, res: NextApiResponse<FrameActio
 
   if (response.status === 302) {
     if (pageId) {
-      await trackFarcasterFrameInteractionEvent({ pageId, userId });
+      trackFarcasterFrameInteractionEvent({ pageId, userId });
     }
     return res.status(302).json({
       location: response.headers.get('location')
@@ -145,7 +145,7 @@ async function getNextFrame(req: NextApiRequest, res: NextApiResponse<FrameActio
   }
 
   if (pageId) {
-    await trackFarcasterFrameInteractionEvent({ pageId, userId });
+    trackFarcasterFrameInteractionEvent({ pageId, userId });
   }
 
   return res.status(200).json({ frame });

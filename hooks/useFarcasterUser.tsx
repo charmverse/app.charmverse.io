@@ -28,7 +28,7 @@ export type FarcasterUserContext = {
   isCreatingSigner: boolean;
   createAndStoreSigner: () => Promise<void>;
   logout: () => void;
-  farcasterSignerModal: PopupState;
+  signerApprovalModalPopupState: PopupState;
   farcasterProfile: FarcasterProfile['body'] | null;
 };
 
@@ -37,17 +37,17 @@ export const FarcasterUserContext = createContext<FarcasterUserContext>({
   isCreatingSigner: false,
   createAndStoreSigner: async () => {},
   logout: () => {},
-  farcasterSignerModal: {} as PopupState,
+  signerApprovalModalPopupState: {} as PopupState,
   farcasterProfile: null
 });
 
-function FarcasterApprovalModal({
-  farcasterSignerModal,
+function FarcasterSignerApprovalModal({
+  signerApprovalModalPopupState,
   farcasterUser,
   setFarcasterUser,
   logout
 }: {
-  farcasterSignerModal: PopupState;
+  signerApprovalModalPopupState: PopupState;
   farcasterUser: FarcasterUser;
   setFarcasterUser: (user: FarcasterUser) => void;
   logout: () => void;
@@ -79,11 +79,12 @@ function FarcasterApprovalModal({
 
           const user: FarcasterUser = {
             ...farcasterUser,
+            signerApprovalUrl: fcSignerRequestResponse.result.signedKeyRequest.deeplinkUrl,
             fid: fcSignerRequestResponse.result.signedKeyRequest.userFid,
             status: 'approved' as const
           };
           setFarcasterUser(user);
-          farcasterSignerModal.close();
+          signerApprovalModalPopupState.close();
           showMessage('Successfully logged in with Farcaster', 'success');
           clearInterval(intervalId);
         } catch (error) {
@@ -109,13 +110,13 @@ function FarcasterApprovalModal({
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       clearInterval(intervalId);
     };
-  }, [farcasterUser, farcasterSignerModal]);
+  }, [farcasterUser, signerApprovalModalPopupState]);
 
   return (
     <Modal
       open
       onClose={() => {
-        farcasterSignerModal.close();
+        signerApprovalModalPopupState.close();
         logout();
       }}
       title='Approve in Warpcast'
@@ -160,7 +161,7 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
   );
 
   const { trigger: createFarcasterSigner } = useCreateFarcasterSigner();
-  const farcasterSignerModal = usePopupState({
+  const signerApprovalModalPopupState = usePopupState({
     variant: 'popover',
     popupId: 'farcaster-signer'
   });
@@ -199,14 +200,13 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
 
       setFarcasterUser({
         publicKey,
-        signerApprovalUrl: signedKeyRequest.deeplinkUrl,
         privateKey,
         status: 'pending_approval',
         deadline,
         signature,
         token: signedKeyRequest.token
       });
-      farcasterSignerModal.open();
+      signerApprovalModalPopupState.open();
     } catch (error: any) {
       // err.shortMessage comes from viem
       showMessage(error.shortMessage || error.message || 'Something went wrong. Please try again', 'error');
@@ -224,18 +224,18 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
       isCreatingSigner,
       createAndStoreSigner,
       logout,
-      farcasterSignerModal,
+      signerApprovalModalPopupState,
       farcasterProfile: farcasterProfile ? farcasterProfile.body : null
     }),
-    [farcasterUser, farcasterProfile, isCreatingSigner, farcasterSignerModal]
+    [farcasterUser, farcasterProfile, isCreatingSigner, signerApprovalModalPopupState]
   );
 
   return (
     <FarcasterUserContext.Provider value={value}>
       {children}
-      {farcasterSignerModal.isOpen && farcasterUser && farcasterUser.status === 'pending_approval' && (
-        <FarcasterApprovalModal
-          farcasterSignerModal={farcasterSignerModal}
+      {signerApprovalModalPopupState.isOpen && farcasterUser && farcasterUser.status === 'pending_approval' && (
+        <FarcasterSignerApprovalModal
+          signerApprovalModalPopupState={signerApprovalModalPopupState}
           farcasterUser={farcasterUser}
           setFarcasterUser={setFarcasterUser}
           logout={logout}
