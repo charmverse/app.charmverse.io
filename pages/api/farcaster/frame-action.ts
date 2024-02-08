@@ -1,4 +1,4 @@
-import { InvalidInputError } from '@charmverse/core/errors';
+import { ExternalServiceError, InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { Frame, FrameActionPayload, FrameButton } from 'frames.js';
 import { getFrame } from 'frames.js';
@@ -27,7 +27,7 @@ export type FrameActionRequest = {
   pageId?: string;
 };
 
-const requestTimeout = 15000;
+const requestTimeout = 7500;
 
 async function getNextFrame(req: NextApiRequest, res: NextApiResponse<FrameActionResponse>) {
   const { frameAction, postType } = req.body as FrameActionRequest;
@@ -53,7 +53,7 @@ async function getNextFrame(req: NextApiRequest, res: NextApiResponse<FrameActio
   ]);
 
   if (result instanceof Error) {
-    throw new Error('Request timed out');
+    throw new ExternalServiceError('Request timed out');
   }
 
   const response = result as Response;
