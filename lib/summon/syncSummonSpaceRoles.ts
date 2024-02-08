@@ -119,7 +119,7 @@ export async function syncSummonSpaceRoles({
         if (!spaceRole.xpsUserId) {
           await prisma.spaceRole.update({
             where: {
-              id: spaceRole.user.id
+              id: spaceRole.id
             },
             data: {
               xpsUserId: summonProfile.id

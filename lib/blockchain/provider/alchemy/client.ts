@@ -82,7 +82,6 @@ export async function getNFTs({
   walletId: string;
 }): Promise<NFTData[]> {
   const url = `${getAlchemyBaseUrl(chainId, 'nft')}/getNFTs`;
-  const filterSpam = chainId === 1 || chainId === 137;
 
   const responses = await paginatedCall(
     (params) => {
