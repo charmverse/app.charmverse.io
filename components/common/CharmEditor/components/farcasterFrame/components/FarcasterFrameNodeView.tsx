@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import CallMadeIcon from '@mui/icons-material/CallMade';
 import LinkIcon from '@mui/icons-material/Link';
+import ReplayIcon from '@mui/icons-material/Replay';
 import { Alert, Box, Paper, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { useCopyToClipboard } from 'usehooks-ts';
@@ -48,15 +49,14 @@ export function FarcasterFrameNodeView({
   pageId?: string;
 }) {
   const { space } = useCurrentSpace();
-  const { error, isLoadingFrame, farcasterFrame, submitOption, isLoadingFrameAction } = useFarcasterFrame(
-    attrs.src && pageId ? { frameUrl: attrs.src, pageId } : undefined
-  );
+  const { error, isLoadingFrame, getFarcasterFrame, farcasterFrame, submitOption, isLoadingFrameAction } =
+    useFarcasterFrame(attrs.src && pageId ? { frameUrl: attrs.src, pageId } : undefined);
   const { farcasterUser, logout } = useFarcasterUser();
   const [inputText, setInputText] = useState('');
   const isFarcasterUserAvailable = farcasterUser && farcasterUser.fid;
   const [, copyToClipboard] = useCopyToClipboard();
   const { showMessage } = useSnackbar();
-  const { farcasterProfile } = useFarcasterProfile();
+  const { farcasterProfile } = useFarcasterProfile(farcasterUser?.fid);
   const [showEditPopup, setShowEditPopup] = useState(false);
   const isSmallScreen = useSmallScreen();
   function openPopup() {
@@ -150,13 +150,26 @@ export function FarcasterFrameNodeView({
   }
 
   const extraControls = [
+    ...(!farcasterFrame || error
+      ? [
+          {
+            onClick() {
+              getFarcasterFrame();
+            },
+            Icon: ReplayIcon,
+            tooltip: 'Refetch frame',
+            showOnReadonly: true
+          }
+        ]
+      : []),
     {
       onClick() {
         copyToClipboard(node.attrs.src);
         showMessage('Copied frame url', 'info');
       },
       Icon: LinkIcon,
-      tooltip: 'Copy frame url'
+      tooltip: 'Copy frame url',
+      showOnReadonly: true
     }
   ];
 
@@ -221,7 +234,6 @@ export function FarcasterFrameNodeView({
                   setInputText((prevInputText) => prevInputText + e.key);
                 }
               }}
-              disabled={readOnly}
             />
           )}
           <Stack
@@ -230,7 +242,7 @@ export function FarcasterFrameNodeView({
               md: 'row'
             }}
             gap={1}
-            mb={!readOnly ? 1 : 0}
+            mb={1}
           >
             {farcasterFrame.buttons?.map(({ label, action }, index: number) => (
               <Tooltip
@@ -244,7 +256,7 @@ export function FarcasterFrameNodeView({
                   }}
                 >
                   <StyledButton
-                    disabled={isLoadingFrameAction || readOnly || !isFarcasterUserAvailable}
+                    disabled={isLoadingFrameAction || !isFarcasterUserAvailable}
                     onClick={() => {
                       submitOption({
                         buttonIndex: index + 1,
@@ -269,15 +281,13 @@ export function FarcasterFrameNodeView({
             ))}
           </Stack>
         </Stack>
-        {!readOnly ? (
-          farcasterUser?.status === 'approved' ? (
-            <Box mt={1}>
-              <FarcasterMiniProfile logout={logout} farcasterProfile={farcasterProfile ?? undefined} />
-            </Box>
-          ) : (
-            <FarcasterSigner />
-          )
-        ) : null}
+        {farcasterUser?.status === 'approved' ? (
+          <Box mt={1}>
+            <FarcasterMiniProfile logout={logout} farcasterProfile={farcasterProfile ?? undefined} />
+          </Box>
+        ) : (
+          <FarcasterSigner />
+        )}
       </BlockAligner>
       {showEditPopup && popupContent}
     </Paper>

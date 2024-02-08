@@ -11,7 +11,12 @@ export function useFarcasterFrame(args?: { pageId: string; frameUrl: string }) {
   const { showMessage } = useSnackbar();
   const { trigger: triggerFrameAction, isMutating: isLoadingFrameAction } = useFarcasterFrameAction();
   const { farcasterUser } = useFarcasterUser();
-  const { data: farcasterFrame, isLoading: isLoadingFrame, mutate, error } = useGetFarcasterFrame(args);
+  const {
+    data: farcasterFrame,
+    isLoading: isLoadingFrame,
+    mutate: getFarcasterFrame,
+    error
+  } = useGetFarcasterFrame(args);
   const { showConfirmation } = useConfirmationModal();
   const submitOption = async ({ buttonIndex, inputText }: { buttonIndex: number; inputText: string }) => {
     if (!farcasterUser || !farcasterUser.fid || !farcasterFrame) {
@@ -80,7 +85,7 @@ export function useFarcasterFrame(args?: { pageId: string; frameUrl: string }) {
 
       return null;
     } else {
-      return mutate(frameAction.frame, {
+      return getFarcasterFrame(frameAction.frame, {
         revalidate: false,
         optimisticData: frameAction.frame
       });
@@ -92,6 +97,7 @@ export function useFarcasterFrame(args?: { pageId: string; frameUrl: string }) {
     farcasterFrame,
     isLoadingFrame,
     submitOption,
+    getFarcasterFrame,
     error
   };
 }
