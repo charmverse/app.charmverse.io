@@ -1,16 +1,15 @@
 import { Edit as EditIcon } from '@mui/icons-material';
 import { Box, IconButton, Tooltip } from '@mui/material';
 
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
-
-import type { ProposalEvaluationValues } from '../../Settings/components/EvaluationStepSettings';
+import { ResetPassFailButton } from 'components/proposals/ProposalPage/components/ProposalEvaluations/components/Review/components/ResetPassFailButton';
+import type { PopulatedEvaluation, ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 
 import { GoBackButton } from './GoBackButton';
 
 type Props = {
   proposalId?: string;
   permissions?: ProposalWithUsersAndRubric['permissions'];
-  evaluation?: ProposalEvaluationValues;
+  evaluation?: PopulatedEvaluation;
   isPreviousStep: boolean;
   refreshProposal?: VoidFunction;
   openSettings?: () => void;
@@ -30,6 +29,15 @@ export function EvaluationStepActions({
 }: Props) {
   return (
     <Box display='flex' gap={1} onClick={preventAccordionToggle}>
+      {evaluation?.type === 'pass_fail' && !isPreviousStep && (
+        <ResetPassFailButton
+          evaluation={evaluation}
+          proposalId={proposalId}
+          onSubmit={refreshProposal}
+          archived={archived}
+          hasMovePermission={!!permissions?.move}
+        />
+      )}
       {isPreviousStep && refreshProposal && proposalId && (
         <GoBackButton
           proposalId={proposalId}
