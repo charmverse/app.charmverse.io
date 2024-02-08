@@ -11,11 +11,6 @@ import { getPagePermalink } from 'lib/pages/getPagePermalink';
 import { signAndPublishCharmverseCredential } from './attest';
 import { credentialLabelMap } from './constants';
 
-const labels: Record<CredentialEventType, string> = {
-  proposal_approved: 'Proposal Approved',
-  proposal_created: 'Proposal Created'
-};
-
 const disablePublishedCredentials = process.env.DISABLE_PUBLISHED_CREDENTIALS === 'true';
 
 export async function issueProposalCredentialsIfNecessary({
