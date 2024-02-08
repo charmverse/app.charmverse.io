@@ -26,7 +26,7 @@ export const SettingsDialogContext = createContext<Readonly<IContext>>({
 
 export function SettingsDialogProvider({ children }: { children: ReactNode }) {
   const settingsModalState = usePopupState({ variant: 'dialog', popupId: 'settings-dialog' });
-  const [activePath, setActivePath] = useState<SettingsPath | undefined>('space');
+  const [activePath, setActivePath] = useState<SettingsPath | undefined>();
   const router = useRouter();
 
   function openSettings(_path?: SettingsPath, _section?: string) {
@@ -70,7 +70,7 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<IContext>(
     () => ({
-      isOpen: true,
+      isOpen: settingsModalState.isOpen,
       activePath,
       openSettings,
       onClose,
