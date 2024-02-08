@@ -143,14 +143,13 @@ function CredentialTemplateForm({
             />
           </Box>
           <ProposalCredentialPreview credential={getValues() as ProposalCredentialToPreview} />
-          <Stack flexDirection='row' gap={1} justifyContent='flex-start'>
+          <Stack flexDirection='row' gap={1} justifyContent='flex-end'>
             <Button loading={isSaving} size='large' type='submit' disabled={Object.keys(errors).length !== 0}>
               Save
             </Button>
           </Stack>
         </Stack>
       </form>
-      <Divider />
     </Box>
   );
 }
