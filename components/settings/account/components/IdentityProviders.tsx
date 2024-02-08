@@ -23,7 +23,6 @@ import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
 import { useSetPrimaryWallet } from 'charmClient/hooks/profile';
-import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/Web3ConnectionManager';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import Legend from 'components/settings/Legend';
 import { useDiscordConnection } from 'hooks/useDiscordConnection';
@@ -48,7 +47,6 @@ import { NewIdentityModal } from './NewIdentityModal';
 import { TelegramLoginIframe } from './TelegramLoginIframe';
 
 export function IdentityProviders() {
-  const { isConnectingIdentity } = useWeb3ConnectionManager();
   const { account, requestSignature, isSigning, verifiableWalletDetected, disconnectWallet } = useWeb3Account();
   const { user, setUser, updateUser } = useUser();
   const { showMessage } = useSnackbar();
@@ -203,12 +201,12 @@ export function IdentityProviders() {
             <IdentityProviderItem
               text={wallet.ensname || shortWalletAddress(wallet.address)}
               type='Wallet'
-              loading={isConnectingIdentity || isVerifyingWallet || isSigning || isSettingPrimaryWallet}
+              loading={isVerifyingWallet || isSigning || isSettingPrimaryWallet}
               disabled={cannotDisconnect}
               connected={true}
               primary={lowerCaseEqual(wallet.address, primaryWallet?.address)}
               actions={[
-                verifiableWalletDetected && !account && !isConnectingIdentity ? (
+                verifiableWalletDetected && !account ? (
                   <MenuItem key='verify' onClick={generateWalletAuth}>
                     Verify Wallet
                   </MenuItem>

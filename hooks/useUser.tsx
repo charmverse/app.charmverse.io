@@ -1,8 +1,7 @@
 import type { ReactNode } from 'react';
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo } from 'react';
 
-import charmClient from 'charmClient';
-import { useGetTriggerUser } from 'charmClient/hooks/profile';
+import { useGetTriggerUser, useLogout } from 'charmClient/hooks/profile';
 import type { LoggedInUser } from 'models';
 
 export type IContext = {
@@ -24,28 +23,24 @@ export const UserContext = createContext<Readonly<IContext>>({
 });
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<LoggedInUser | null>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const { trigger: getUser } = useGetTriggerUser();
+  const { data: user, trigger: getUser } = useGetTriggerUser();
+  const { trigger: logout } = useLogout();
+  const isLoaded = user !== undefined;
 
   async function logoutUser() {
-    await charmClient.logout();
+    await logout();
     window.location.href = window.location.origin;
   }
 
-  /**
-   * Used to sync current user with current web 3 account
-   *
-   * Logs out current user if the web 3 account is not the same as the current user, otherwise refreshes them
-   */
-  async function refreshUser() {
+  async function refreshUser(updates: Partial<LoggedInUser> = {}) {
     await getUser(undefined, {
-      onSuccess: (_user) => {
-        setUser(_user);
-        setIsLoaded(true);
+      optimisticData: (_user) => {
+        return _user ? { ..._user, ...updates } : null;
       },
-      onError: () => {
-        setIsLoaded(true);
+      onSuccess: async (_user) => {
+        if (_user?.deletedAt) {
+          await logoutUser();
+        }
       }
     });
   }
@@ -54,21 +49,12 @@ export function UserProvider({ children }: { children: ReactNode }) {
     refreshUser();
   }, []);
 
-  const updateUser = useCallback((updatedUser: Partial<LoggedInUser>) => {
-    setUser((u) => (u ? { ...u, ...updatedUser } : null));
-  }, []);
-
-  useEffect(() => {
-    if (user?.deletedAt) {
-      charmClient.logout().then(() => {
-        window.location.href = window.location.origin;
-      });
-    }
-  }, [user]);
+  const updateUser = (updatedUser: Partial<LoggedInUser>) => refreshUser(updatedUser);
+  const setUser = (updatedUser: Partial<LoggedInUser>) => refreshUser(updatedUser);
 
   const value = useMemo<IContext>(() => {
     return {
-      user,
+      user: user || null,
       setUser,
       isLoaded,
       updateUser,
