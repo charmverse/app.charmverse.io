@@ -14,6 +14,10 @@ let secondUser: User;
 
 let mockedMixpanelFn: jest.Mock;
 
+jest.mock('lib/snapshot/getSpace', () => ({
+  getSnapshotSpace: jest.fn().mockReturnValueOnce({})
+}));
+
 beforeAll(async () => {
   firstUser = await prisma.user.create({
     data: {
