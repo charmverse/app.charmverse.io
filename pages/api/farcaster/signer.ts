@@ -3,9 +3,12 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { mnemonicToAccount } from 'viem/accounts';
 
+import * as http from 'adapters/http';
 import { isProdEnv } from 'config/constants';
+import { createHexKeyPair } from 'lib/farcaster/createHexKeyPair';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { encryptData } from 'lib/utilities/dataEncryption';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -13,20 +16,23 @@ handler.post(createSigner);
 
 export type FarcasterSignerResponse = {
   signature: string;
-  requestFid: number;
+  privateKey: string;
+  publicKey: string;
   deadline: number;
-  requestSigner: string;
+  token: string;
+  deeplinkUrl: string;
 };
 
+const appFid = isProdEnv ? 1501 : 318061;
+const deadline = Math.floor(Date.now() / 1000) + 86400 * 365 * 1; // 1 year
+
 async function createSigner(req: NextApiRequest, res: NextApiResponse<FarcasterSignerResponse>) {
-  const { publicKey } = req.body as {
-    publicKey: `0x${string}`;
-  };
-
-  const appFid = isProdEnv ? 1501 : 318061;
   const account = mnemonicToAccount(process.env.FARCASTER_ACCOUNT_SEED_PHRASE!);
+  const keypairString = await createHexKeyPair();
+  const publicKey = (
+    keypairString.publicKey.startsWith('0x') ? keypairString.publicKey : `0x${keypairString.publicKey}`
+  ) as `0x${string}`;
 
-  const deadline = Math.floor(Date.now() / 1000) + 86400 * 365 * 50; // 50 years
   const signature = await account.signTypedData({
     domain: SIGNED_KEY_REQUEST_VALIDATOR_EIP_712_DOMAIN,
     types: {
@@ -40,11 +46,30 @@ async function createSigner(req: NextApiRequest, res: NextApiResponse<FarcasterS
     }
   });
 
+  const {
+    result: { signedKeyRequest }
+  } = await http.POST<{
+    result: { signedKeyRequest: { token: string; deeplinkUrl: string } };
+  }>(
+    `https://api.warpcast.com/v2/signed-key-requests`,
+    {
+      key: publicKey,
+      signature,
+      requestFid: BigInt(appFid).toString(),
+      deadline: BigInt(deadline).toString()
+    },
+    {
+      credentials: 'omit'
+    }
+  );
+
   return res.status(200).json({
-    signature,
-    requestFid: appFid,
+    signature: encryptData(signature),
+    publicKey,
+    privateKey: encryptData(keypairString.privateKey),
     deadline,
-    requestSigner: account.address
+    token: signedKeyRequest.token,
+    deeplinkUrl: signedKeyRequest.deeplinkUrl
   });
 }
 

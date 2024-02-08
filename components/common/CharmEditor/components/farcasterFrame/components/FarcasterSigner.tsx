@@ -19,9 +19,9 @@ const StyledButton = styled(Button)`
 `;
 
 export function FarcasterSigner() {
-  const { createAndStoreSigner, farcasterSignerModal, isCreatingSigner } = useFarcasterUser();
+  const { createAndStoreSigner, signerApprovalModalPopupState, isCreatingSigner } = useFarcasterUser();
 
-  const isButtonDisabled = isCreatingSigner || farcasterSignerModal.isOpen;
+  const isButtonDisabled = isCreatingSigner || signerApprovalModalPopupState.isOpen;
 
   return (
     <Stack gap={1} alignItems='center'>
@@ -37,7 +37,7 @@ export function FarcasterSigner() {
           <FarcasterIcon />
         </SvgIcon>
         <Typography fontWeight={600} variant='body2'>
-          {farcasterSignerModal.isOpen
+          {signerApprovalModalPopupState.isOpen
             ? 'Waiting for approval...'
             : isCreatingSigner
             ? 'Loading...'

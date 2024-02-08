@@ -3,6 +3,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { Button, Stack, Tooltip, Typography } from '@mui/material';
 
 import Avatar from 'components/common/Avatar';
+import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 
 const StyledStackContainer = styled(Stack)`
@@ -18,6 +19,7 @@ export function FarcasterMiniProfile({
   logout: VoidFunction;
   farcasterProfile: FarcasterProfile['body'];
 }) {
+  const { showConfirmation } = useConfirmationModal();
   return (
     <StyledStackContainer
       sx={{
@@ -57,7 +59,22 @@ export function FarcasterMiniProfile({
           </Stack>
         </Stack>
       </Tooltip>
-      <Button color='secondary' variant='text' size='small' onClick={logout}>
+      <Button
+        color='secondary'
+        variant='text'
+        size='small'
+        onClick={() => {
+          showConfirmation({
+            message:
+              'Are you sure you want to logout? You will need to sign in again to use Farcaster which will cost warps.',
+            title: 'Logout from Farcaster',
+            confirmButton: 'Logout',
+            onConfirm: async () => {
+              logout();
+            }
+          });
+        }}
+      >
         <LogoutIcon fontSize='small' sx={{ mr: 1 }} />
         Logout
       </Button>

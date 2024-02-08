@@ -49,7 +49,7 @@ export function FarcasterFrameNodeView({
 }) {
   const { space } = useCurrentSpace();
   const { error, isLoadingFrame, getFarcasterFrame, farcasterFrame, submitOption, isLoadingFrameAction } =
-    useFarcasterFrame(attrs.src && pageId ? { frameUrl: attrs.src, pageId } : undefined);
+    useFarcasterFrame(attrs.src ? { frameUrl: attrs.src, pageId } : undefined);
   const { farcasterUser, logout, farcasterProfile } = useFarcasterUser();
   const [inputText, setInputText] = useState('');
   const isFarcasterUserAvailable = farcasterUser && farcasterUser.fid;
@@ -242,41 +242,43 @@ export function FarcasterFrameNodeView({
             gap={1}
             mb={1}
           >
-            {farcasterFrame.buttons?.map(({ label, action }, index: number) => (
-              <Tooltip
-                title={!isFarcasterUserAvailable ? 'Please sign in with Farcaster' : undefined}
-                key={`${index.toString()}`}
-              >
-                <div
-                  style={{
-                    flexGrow: 1,
-                    flexBasis: `${100 / (farcasterFrame.buttons?.length || 1)}%`
-                  }}
+            {farcasterFrame.buttons
+              ?.filter(({ label }) => label)
+              .map(({ label, action }, index: number) => (
+                <Tooltip
+                  title={!isFarcasterUserAvailable ? 'Please sign in with Farcaster' : undefined}
+                  key={`${index.toString()}`}
                 >
-                  <StyledButton
-                    disabled={isLoadingFrameAction || !isFarcasterUserAvailable}
-                    onClick={() => {
-                      submitOption({
-                        buttonIndex: index + 1,
-                        inputText
-                      });
+                  <div
+                    style={{
+                      flexGrow: 1,
+                      flexBasis: `${100 / (farcasterFrame.buttons?.length || 1)}%`
                     }}
-                    loading={isLoadingFrameAction}
                   >
-                    <Typography
-                      variant='body2'
-                      sx={{
-                        fontWeight: 500,
-                        textWrap: 'wrap'
+                    <StyledButton
+                      disabled={isLoadingFrameAction || !isFarcasterUserAvailable}
+                      onClick={() => {
+                        submitOption({
+                          buttonIndex: index + 1,
+                          inputText
+                        });
                       }}
+                      loading={isLoadingFrameAction}
                     >
-                      {label}
-                    </Typography>
-                    {action === 'post_redirect' ? <CallMadeIcon sx={{ ml: 0.5, fontSize: 14 }} /> : null}
-                  </StyledButton>
-                </div>
-              </Tooltip>
-            ))}
+                      <Typography
+                        variant='body2'
+                        sx={{
+                          fontWeight: 500,
+                          textWrap: 'wrap'
+                        }}
+                      >
+                        {label}
+                      </Typography>
+                      {action === 'post_redirect' ? <CallMadeIcon sx={{ ml: 0.5, fontSize: 14 }} /> : null}
+                    </StyledButton>
+                  </div>
+                </Tooltip>
+              ))}
           </Stack>
         </Stack>
         {farcasterUser?.status === 'approved' && farcasterProfile ? (
