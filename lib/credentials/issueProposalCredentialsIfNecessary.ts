@@ -5,9 +5,11 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { optimism } from 'viem/chains';
 
+import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import { getPagePermalink } from 'lib/pages/getPagePermalink';
 
 import { signAndPublishCharmverseCredential } from './attest';
+import { credentialLabelMap } from './constants';
 
 const labels: Record<CredentialEventType, string> = {
   proposal_approved: 'Proposal Approved',
@@ -83,6 +85,7 @@ export async function issueProposalCredentialsIfNecessary({
       space: {
         select: {
           id: true,
+          features: true,
           credentialTemplates: {
             where: {
               credentialEvents: {
@@ -158,6 +161,13 @@ export async function issueProposalCredentialsIfNecessary({
     } else {
       try {
         for (const credentialTemplate of credentialsToGiveUser) {
+          const getLabel = credentialLabelMap[event];
+          if (!getLabel) {
+            throw new Error(`No label mapper found for event: ${event}`);
+          }
+          const statusLabel = getLabel((value) =>
+            getFeatureTitle(value, proposalWithSpaceConfig.space.features as any[])
+          );
           // Iterate through credentials one at a time so we can ensure they're properly created and tracked
           const publishedCredential = await signAndPublishCharmverseCredential({
             chainId: optimism.id,
@@ -168,8 +178,7 @@ export async function issueProposalCredentialsIfNecessary({
                 name: credentialTemplate.name,
                 description: credentialTemplate.description ?? '',
                 organization: credentialTemplate.organization,
-                // TODO - Add label mapping
-                status: labels[event],
+                status: statusLabel,
                 url: getPagePermalink({ pageId: proposalWithSpaceConfig.page.id })
               }
             }

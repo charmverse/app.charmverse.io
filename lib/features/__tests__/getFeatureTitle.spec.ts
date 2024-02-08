@@ -1,12 +1,5 @@
 import type { FeatureJson } from '../constants';
-import { constructFeaturesRecord } from '../constructFeaturesRecord';
-import type { FeatureTitleVariation } from '../getFeatureTitle';
-import { getFeatureTitle as _getFeatureTitle } from '../getFeatureTitle';
-
-function getFeatureTitle(featureTitle: FeatureTitleVariation, features?: FeatureJson[]) {
-  const { mappedFeatures } = constructFeaturesRecord(features || []);
-  return _getFeatureTitle({ featureTitle, mappedFeatures });
-}
+import { getFeatureTitle } from '../getFeatureTitle';
 
 describe('getFeatureTitle', () => {
   it('Maintains normal feature titles', () => {

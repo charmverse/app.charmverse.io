@@ -1,7 +1,8 @@
 import { capitalize } from 'lodash';
 
-import type { Feature, MappedFeature } from './constants';
+import type { FeatureJson, Feature } from './constants';
 import { STATIC_PAGES } from './constants';
+import { constructFeaturesRecord } from './constructFeaturesRecord';
 
 export type FeatureTitleVariation =
   | 'reward'
@@ -32,13 +33,8 @@ const featureTitleRecord: Record<FeatureTitleVariation, Feature> = {
   member_directory: 'member_directory'
 };
 
-export const getFeatureTitle = ({
-  featureTitle,
-  mappedFeatures
-}: {
-  featureTitle: FeatureTitleVariation;
-  mappedFeatures: Record<Feature, Pick<MappedFeature, 'title'>>;
-}) => {
+export const getFeatureTitle = (featureTitle: FeatureTitleVariation, features: FeatureJson[] = []) => {
+  const { mappedFeatures } = constructFeaturesRecord(features);
   const feature = featureTitleRecord[featureTitle];
   const featureCurrentTitle = mappedFeatures[feature]?.title;
   const staticPageFeature = STATIC_PAGES.find((page) => page.feature === feature)!;
