@@ -50,7 +50,6 @@ describe('updateSpace', () => {
       defaultPagePermissionGroup: 'view',
       updatedBy: secondUser.id,
       xpsEngineId: v4(),
-      snapshotDomain: `snapshot-domain-${v4()}`,
       deletedAt: new Date(),
       publicBountyBoard: false,
       defaultPostCategoryId: v4(),
