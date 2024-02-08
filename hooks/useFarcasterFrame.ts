@@ -7,7 +7,7 @@ import { useConfirmationModal } from './useConfirmationModal';
 import { useFarcasterUser } from './useFarcasterUser';
 import { useSnackbar } from './useSnackbar';
 
-export function useFarcasterFrame(args?: { pageId: string; frameUrl: string }) {
+export function useFarcasterFrame(args?: { pageId?: string; frameUrl: string }) {
   const { showMessage } = useSnackbar();
   const { trigger: triggerFrameAction, isMutating: isLoadingFrameAction } = useFarcasterFrameAction();
   const { farcasterUser } = useFarcasterUser();

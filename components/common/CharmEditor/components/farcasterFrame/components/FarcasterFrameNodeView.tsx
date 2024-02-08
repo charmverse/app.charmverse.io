@@ -49,7 +49,7 @@ export function FarcasterFrameNodeView({
 }) {
   const { space } = useCurrentSpace();
   const { error, isLoadingFrame, getFarcasterFrame, farcasterFrame, submitOption, isLoadingFrameAction } =
-    useFarcasterFrame(attrs.src && pageId ? { frameUrl: attrs.src, pageId } : undefined);
+    useFarcasterFrame(attrs.src ? { frameUrl: attrs.src, pageId } : undefined);
   const { farcasterUser, logout, farcasterProfile } = useFarcasterUser();
   const [inputText, setInputText] = useState('');
   const isFarcasterUserAvailable = farcasterUser && farcasterUser.fid;
