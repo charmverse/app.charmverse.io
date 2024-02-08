@@ -142,7 +142,7 @@ function CredentialTemplateForm({
               onChange={(events) => setValue('credentialEvents', events)}
             />
           </Box>
-          {isValid && <ProposalCredentialPreview credential={getValues() as ProposalCredentialToPreview} />}
+          <ProposalCredentialPreview credential={getValues() as ProposalCredentialToPreview} />
           <Stack flexDirection='row' gap={1} justifyContent='flex-start'>
             <Button loading={isSaving} size='large' type='submit' disabled={Object.keys(errors).length !== 0}>
               Save

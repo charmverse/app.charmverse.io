@@ -1,4 +1,6 @@
-import type { Feature, FeatureMap } from './constants';
+import { capitalize } from 'lodash';
+
+import type { Feature, MappedFeature } from './constants';
 import { STATIC_PAGES } from './constants';
 
 export type FeatureTitleVariation =
@@ -35,18 +37,25 @@ export const getFeatureTitle = ({
   mappedFeatures
 }: {
   featureTitle: FeatureTitleVariation;
-  mappedFeatures: FeatureMap;
+  mappedFeatures: Record<Feature, Pick<MappedFeature, 'title'>>;
 }) => {
-  const isCapitalized = featureTitle.charAt(0) === featureTitle.charAt(0).toUpperCase();
   const feature = featureTitleRecord[featureTitle];
-  const featureCurrentTitle = mappedFeatures[feature].title;
+  const featureCurrentTitle = mappedFeatures[feature]?.title;
   const staticPageFeature = STATIC_PAGES.find((page) => page.feature === feature)!;
+
+  let result: string = featureTitle;
   // Keep the current title without any modifications if its has been changed
-  if (featureCurrentTitle !== staticPageFeature.title) {
-    return isCapitalized
-      ? featureCurrentTitle.charAt(0).toUpperCase() + featureCurrentTitle.slice(1)
-      : featureCurrentTitle.toLowerCase();
+  if (featureCurrentTitle && featureCurrentTitle !== staticPageFeature.title) {
+    const isCapitalized = featureTitle.charAt(0) === featureTitle.charAt(0).toUpperCase();
+    const isPlural = featureTitle.charAt(featureTitle.length - 1) === 's';
+    result = featureCurrentTitle.toLocaleLowerCase();
+    if (isCapitalized) {
+      result = capitalize(featureCurrentTitle);
+    }
+    if (!isPlural && result.endsWith('s')) {
+      result = result.slice(0, -1);
+    }
   }
 
-  return featureTitle;
+  return result;
 };
