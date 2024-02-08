@@ -126,7 +126,15 @@ async function getNextFrame(req: NextApiRequest, res: NextApiResponse<FrameActio
   }
 
   const contentType = response.headers.get('content-type');
-  if (!contentType || !contentType.includes('text/html')) {
+  const isValidContentType =
+    contentType &&
+    (contentType.includes('text/html') ||
+      contentType.includes('application/xhtml+xml') ||
+      contentType.includes('application/xml') ||
+      contentType.includes('text/plain') ||
+      contentType.includes('text/xml'));
+
+  if (!isValidContentType) {
     throw new InvalidInputError('Invalid response: expected HTML document');
   }
 
