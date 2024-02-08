@@ -6,6 +6,7 @@ import type { PopupState } from 'material-ui-popup-state/hooks';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import useSWR from 'swr';
 
 import * as http from 'adapters/http';
 import { useCreateFarcasterSigner } from 'charmClient/hooks/farcaster';
@@ -13,10 +14,13 @@ import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
 import { CanvasQRCode } from 'components/settings/account/components/otp/components/CanvasQrCode';
 import { createHexKeyPair } from 'lib/farcaster/createHexKeyPair';
+import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
+import { getFarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 import type { FarcasterUser, SignedKeyRequest } from 'lib/farcaster/interfaces';
 
 import { useLocalStorage } from './useLocalStorage';
 import { useSnackbar } from './useSnackbar';
+import { useUser } from './useUser';
 
 export const farcasterUserLocalStorageKey = 'farcasterUser';
 
@@ -26,6 +30,7 @@ export type FarcasterUserContext = {
   createAndStoreSigner: () => Promise<void>;
   logout: () => void;
   farcasterSignerModal: PopupState;
+  farcasterProfile: FarcasterProfile['body'] | null;
 };
 
 export const FarcasterUserContext = createContext<FarcasterUserContext>({
@@ -33,7 +38,8 @@ export const FarcasterUserContext = createContext<FarcasterUserContext>({
   isCreatingSigner: false,
   createAndStoreSigner: async () => {},
   logout: () => {},
-  farcasterSignerModal: {} as PopupState
+  farcasterSignerModal: {} as PopupState,
+  farcasterProfile: null
 });
 
 function FarcasterApprovalModal({
@@ -141,12 +147,24 @@ function FarcasterApprovalModal({
 export function FarcasterUserProvider({ children }: { children: ReactNode }) {
   const [farcasterUser, setFarcasterUser] = useLocalStorage<FarcasterUser | null>(farcasterUserLocalStorageKey, null);
   const { showMessage } = useSnackbar();
+  const [isCreatingSigner, setIsCreatingSigner] = useState(false);
+  const { user } = useUser();
+  const { data: farcasterProfile } = useSWR(
+    (user && user.wallets.length !== 0) || farcasterUser
+      ? `farcaster/wallets=${user?.wallets[0].address}&fid=${farcasterUser?.fid}`
+      : null,
+    () =>
+      getFarcasterProfile({
+        wallets: user?.wallets?.map((wallet) => wallet.address),
+        fid: farcasterUser?.fid
+      })
+  );
+
+  const { trigger: createFarcasterSigner } = useCreateFarcasterSigner();
   const farcasterSignerModal = usePopupState({
     variant: 'popover',
     popupId: 'farcaster-signer'
   });
-  const [isCreatingSigner, setIsCreatingSigner] = useState(false);
-  const { trigger: createFarcasterSigner } = useCreateFarcasterSigner();
 
   function logout() {
     setFarcasterUser(null);
@@ -185,7 +203,7 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
         }
       );
 
-      const user: FarcasterUser = {
+      setFarcasterUser({
         signature,
         publicKey: keypairString.publicKey,
         deadline,
@@ -193,8 +211,7 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
         signerApprovalUrl: signedKeyRequest.deeplinkUrl,
         privateKey: keypairString.privateKey,
         status: 'pending_approval'
-      };
-      setFarcasterUser(user);
+      });
       farcasterSignerModal.open();
     } catch (error: any) {
       // err.shortMessage comes from viem
@@ -213,9 +230,10 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
       isCreatingSigner,
       createAndStoreSigner,
       logout,
-      farcasterSignerModal
+      farcasterSignerModal,
+      farcasterProfile: farcasterProfile ? farcasterProfile.body : null
     }),
-    [farcasterUser, isCreatingSigner, farcasterSignerModal]
+    [farcasterUser, farcasterProfile, isCreatingSigner, farcasterSignerModal]
   );
 
   return (
