@@ -45,9 +45,9 @@ export async function syncSummonSpaceRoles({
     select: {
       id: true,
       spaceId: true,
+      xpsUserId: true,
       user: {
         select: {
-          xpsEngineId: true,
           id: true,
           discordUser: {
             select: {
@@ -112,13 +112,13 @@ export async function syncSummonSpaceRoles({
       const summonProfile = await getSummonProfile({ userId: spaceRole.user.id, spaceId: spaceRole.spaceId });
       const userRank = summonProfile ? Math.floor(summonProfile.meta.rank) : null;
       if (summonProfile && userRank) {
-        if (!spaceRole.user.xpsEngineId) {
-          await prisma.user.update({
+        if (!spaceRole.xpsUserId) {
+          await prisma.spaceRole.update({
             where: {
               id: spaceRole.user.id
             },
             data: {
-              xpsEngineId: summonProfile.id
+              xpsUserId: summonProfile.id
             }
           });
         }
