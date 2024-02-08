@@ -161,11 +161,11 @@ export async function issueProposalCredentialsIfNecessary({
     } else {
       try {
         for (const credentialTemplate of credentialsToGiveUser) {
-          const getLabel = credentialLabelMap[event];
-          if (!getLabel) {
+          const getStatusLabel = credentialLabelMap[event];
+          if (!getStatusLabel) {
             throw new Error(`No label mapper found for event: ${event}`);
           }
-          const statusLabel = getLabel((value) =>
+          const statusLabel = getStatusLabel((value) =>
             getFeatureTitle(value, proposalWithSpaceConfig.space.features as any[])
           );
           // Iterate through credentials one at a time so we can ensure they're properly created and tracked
