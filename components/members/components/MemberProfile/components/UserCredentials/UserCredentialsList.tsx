@@ -13,75 +13,55 @@ import { UserCredentialRow } from './UserCredentialRow';
 
 export function UserFavoriteList({
   credentials,
-  hideTitle = false,
   readOnly = false,
   smallScreen
 }: {
   smallScreen?: boolean;
   credentials: EASAttestationWithFavorite[];
-  hideTitle?: boolean;
   readOnly?: boolean;
 }) {
   const { reorderFavorites } = useFavoriteCredentials();
+  if (credentials.length === 0) {
+    return null;
+  }
   return (
     <Stack gap={1}>
-      {!hideTitle && (
-        <Typography variant='h6' fontWeight='bold'>
-          Favorites
-        </Typography>
-      )}
-      {credentials.length === 0 ? (
-        <Card variant='outlined'>
-          <Box p={3} textAlign='center'>
-            <StarOutlinedIcon fontSize='large' color='secondary' />
-            <Typography color='secondary'>No credentials added to favorites</Typography>
-          </Box>
-        </Card>
-      ) : (
-        <Stack gap={1}>
-          {credentials.map((credential) =>
-            !readOnly ? (
-              <DraggableListItem
-                key={credential.id}
-                name='credentialItem'
-                itemId={credential.favoriteCredentialId!}
-                changeOrderHandler={reorderFavorites}
-              >
-                <UserCredentialRow smallScreen={smallScreen} credential={credential} />
-                <Divider sx={{ mt: 1 }} />
-              </DraggableListItem>
-            ) : (
-              <Box key={credential.id}>
-                <UserCredentialRow smallScreen={smallScreen} readOnly credential={credential} />
-                <Divider sx={{ mt: 1 }} />
-              </Box>
-            )
-          )}
-        </Stack>
-      )}
+      <Stack gap={1}>
+        {credentials.map((credential) =>
+          !readOnly ? (
+            <DraggableListItem
+              key={credential.id}
+              name='credentialItem'
+              itemId={credential.favoriteCredentialId!}
+              changeOrderHandler={reorderFavorites}
+            >
+              <UserCredentialRow smallScreen={smallScreen} credential={credential} />
+              <Divider sx={{ mt: 1 }} />
+            </DraggableListItem>
+          ) : (
+            <Box key={credential.id}>
+              <UserCredentialRow smallScreen={smallScreen} readOnly credential={credential} />
+              <Divider sx={{ mt: 1 }} />
+            </Box>
+          )
+        )}
+      </Stack>
     </Stack>
   );
 }
 
 export function UserAllCredentialsList({
   credentials,
-  hideTitle = false,
   readOnly = false,
   smallScreen
 }: {
   smallScreen?: boolean;
-  hideTitle?: boolean;
   credentials: EASAttestationWithFavorite[];
   readOnly?: boolean;
 }) {
   return (
     <Stack gap={1}>
-      {!hideTitle && (
-        <Typography variant='h6' fontWeight='bold'>
-          All
-        </Typography>
-      )}
-      {credentials?.map((credential) => (
+      {credentials.map((credential) => (
         <Box key={credential.id}>
           <UserCredentialRow smallScreen={smallScreen} readOnly={readOnly} credential={credential} />
           <Divider sx={{ mt: 1 }} />
@@ -98,19 +78,19 @@ export function UserCredentialsList({ userId, readOnly = false }: { readOnly?: b
     .slice(0, 5)
     .sort((a, b) => (a.index || 0) - (b.index || 0));
 
-  if (!userCredentials && isLoading) {
+  if (isLoading) {
     return (
       <Stack gap={1}>
-        <LoadingComponent />
+        <LoadingComponent minHeight={300} />
       </Stack>
     );
   }
 
-  if (error && !isLoading) {
+  if (error) {
     return <Alert severity='warning'>Error loading credentials</Alert>;
   }
 
-  if (userCredentials?.length === 0 && !isLoading) {
+  if (!userCredentials?.length) {
     return (
       <Card variant='outlined'>
         <Box p={3} textAlign='center'>
@@ -123,8 +103,20 @@ export function UserCredentialsList({ userId, readOnly = false }: { readOnly?: b
 
   return (
     <Stack gap={2}>
-      <UserFavoriteList credentials={favoriteCredentials ?? []} />
-      {userCredentials?.length ? <UserAllCredentialsList readOnly={readOnly} credentials={userCredentials} /> : null}
+      {favoriteCredentials?.length ? (
+        <>
+          <Typography variant='h6' fontWeight='bold'>
+            Favorites
+          </Typography>
+          <UserFavoriteList credentials={favoriteCredentials} />
+        </>
+      ) : null}
+      <>
+        <Typography variant='h6' fontWeight='bold'>
+          All
+        </Typography>
+        <UserAllCredentialsList readOnly={readOnly} credentials={userCredentials} />
+      </>
     </Stack>
   );
 }
