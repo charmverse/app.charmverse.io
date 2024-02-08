@@ -13,7 +13,6 @@ import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useFarcasterFrame } from 'hooks/useFarcasterFrame';
-import { useFarcasterProfile } from 'hooks/useFarcasterProfile';
 import { useFarcasterUser } from 'hooks/useFarcasterUser';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -51,12 +50,11 @@ export function FarcasterFrameNodeView({
   const { space } = useCurrentSpace();
   const { error, isLoadingFrame, getFarcasterFrame, farcasterFrame, submitOption, isLoadingFrameAction } =
     useFarcasterFrame(attrs.src && pageId ? { frameUrl: attrs.src, pageId } : undefined);
-  const { farcasterUser, logout } = useFarcasterUser();
+  const { farcasterUser, logout, farcasterProfile } = useFarcasterUser();
   const [inputText, setInputText] = useState('');
   const isFarcasterUserAvailable = farcasterUser && farcasterUser.fid;
   const [, copyToClipboard] = useCopyToClipboard();
   const { showMessage } = useSnackbar();
-  const { farcasterProfile } = useFarcasterProfile(farcasterUser?.fid);
   const [showEditPopup, setShowEditPopup] = useState(false);
   const isSmallScreen = useSmallScreen();
   function openPopup() {
@@ -281,9 +279,9 @@ export function FarcasterFrameNodeView({
             ))}
           </Stack>
         </Stack>
-        {farcasterUser?.status === 'approved' ? (
+        {farcasterUser?.status === 'approved' && farcasterProfile ? (
           <Box mt={1}>
-            <FarcasterMiniProfile logout={logout} farcasterProfile={farcasterProfile ?? undefined} />
+            <FarcasterMiniProfile logout={logout} farcasterProfile={farcasterProfile} />
           </Box>
         ) : (
           <FarcasterSigner />

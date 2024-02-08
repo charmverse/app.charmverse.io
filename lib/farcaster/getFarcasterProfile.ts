@@ -1,8 +1,4 @@
-import useSWR from 'swr';
-
 import * as http from 'adapters/http';
-
-import { useUser } from './useUser';
 
 export type FarcasterProfile = {
   body: {
@@ -56,21 +52,4 @@ export async function getFarcasterProfile({ wallets = [], fid }: { fid?: number;
   );
 
   return _farcasterProfile;
-}
-
-export function useFarcasterProfile(fid?: number) {
-  const { user } = useUser();
-  const { data: farcasterProfile, isLoading } = useSWR(
-    user && user.wallets.length !== 0 ? `farcaster/${user.wallets[0].address}` : fid ? `farcaster/${fid}` : null,
-    async () =>
-      getFarcasterProfile({
-        wallets: user?.wallets?.map((wallet) => wallet.address),
-        fid
-      })
-  );
-
-  return {
-    farcasterProfile,
-    isLoading
-  };
 }
