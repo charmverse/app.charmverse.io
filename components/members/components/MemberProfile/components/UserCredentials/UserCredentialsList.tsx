@@ -1,4 +1,3 @@
-import StarOutlinedIcon from '@mui/icons-material/StarOutlined';
 import MedalIcon from '@mui/icons-material/WorkspacePremium';
 import { Alert, Box, Card, Divider, Typography } from '@mui/material';
 import Stack from '@mui/material/Stack';
