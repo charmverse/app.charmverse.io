@@ -27,13 +27,15 @@ export type FrameActionRequest = {
   pageId?: string;
 };
 
+const requestTimeout = 15000;
+
 async function getNextFrame(req: NextApiRequest, res: NextApiResponse<FrameActionResponse>) {
   const { frameAction, postType } = req.body as FrameActionRequest;
   const userId = req.session.user?.id;
   const url = frameAction.untrustedData.url;
   const pageId = req.query.pageId as string | undefined;
 
-  const response = await fetch(url, {
+  const fetchPromise = fetch(url, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -42,6 +44,19 @@ async function getNextFrame(req: NextApiRequest, res: NextApiResponse<FrameActio
     redirect: postType === 'post_redirect' ? 'manual' : undefined,
     body: JSON.stringify(frameAction)
   });
+
+  const result = await Promise.race([
+    fetchPromise,
+    new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Request timed out')), requestTimeout);
+    })
+  ]);
+
+  if (result instanceof Error) {
+    throw new Error('Request timed out');
+  }
+
+  const response = result as Response;
 
   if (pageId) {
     const space = await prisma.page.findUniqueOrThrow({
