@@ -2,11 +2,13 @@ import { prisma } from '@charmverse/core/prisma-client';
 import fetchMock from 'fetch-mock-jest';
 import { v4 } from 'uuid';
 
-import { DEFAULT_TENANT_ID, DEFAULT_URL } from 'lib/summon/constants';
+import { PRODUCTION_URLS } from 'lib/summon/constants';
 import { randomETHWalletAddress } from 'lib/utilities/blockchain';
 import { generateUserAndSpace, generateSpaceUser } from 'testing/setupDatabase';
 
 import { getSummonProfile } from '../getSummonProfile';
+
+const [DEFAULT_TENANT_ID, SUMMON_BASE_URL] = Object.entries(PRODUCTION_URLS)[0];
 
 const mockSandbox = fetchMock.sandbox();
 
@@ -17,15 +19,13 @@ jest.mock('undici', () => {
 let spaceId: string;
 
 beforeAll(async () => {
-  const { space, user } = await generateUserAndSpace({ xpsEngineId: DEFAULT_TENANT_ID });
+  const { space } = await generateUserAndSpace({ xpsEngineId: DEFAULT_TENANT_ID });
   spaceId = space.id;
 });
 
 afterAll(() => {
   fetchMock.restore();
 });
-
-const SUMMON_BASE_URL = DEFAULT_URL;
 
 const summonIdentityErrorResponse = {
   data: {

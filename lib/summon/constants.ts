@@ -1,18 +1,17 @@
 export const API_TOKEN = process.env.XPS_API_TOKEN as string | undefined;
 
-export const DEFAULT_TENANT_ID = '355730745719783510';
-export const DEFAULT_URL = '355730745719783510';
-
+// These URLs could potentially be saved in the DB. But for now, we'll keep them here in case Summon changes their design
 export const PRODUCTION_URLS: Record<string, string> = {
   // game7
-  [DEFAULT_TENANT_ID]: DEFAULT_URL,
+  '355730745719783510': 'https://g7p.io',
   // ethdenver
   '355932655192113238': 'https://ethd-api.summon.xyz',
   // zksync
   '355932655192113587': 'https://zksync-api.summon.xyz'
 };
 
-export const STAGING_URLS: Record<string, string> = {
+// Just in case we need them...
+const STAGING_URLS: Record<string, string> = {
   // game7
   '355947552633258069': 'https://staging-g7-api.summon.xyz',
   // ethdenver

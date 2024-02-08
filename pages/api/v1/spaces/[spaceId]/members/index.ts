@@ -9,7 +9,6 @@ import type { UserProfile } from 'lib/public-api/interfaces';
 import { searchUserProfile } from 'lib/public-api/searchUserProfile';
 import { withSessionRoute } from 'lib/session/withSession';
 import { addUserToSpace } from 'lib/summon/addUserToSpace';
-import { PRODUCTION_URLS, DEFAULT_URL } from 'lib/summon/constants';
 import { syncSummonSpaceRoles } from 'lib/summon/syncSummonSpaceRoles';
 import { createUserFromWallet } from 'lib/users/createUser';
 
