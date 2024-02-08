@@ -13,7 +13,6 @@ import { useCreateFarcasterSigner } from 'charmClient/hooks/farcaster';
 import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
 import { CanvasQRCode } from 'components/settings/account/components/otp/components/CanvasQrCode';
-import { createHexKeyPair } from 'lib/farcaster/createHexKeyPair';
 import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 import { getFarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 import type { FarcasterUser, SignedKeyRequest } from 'lib/farcaster/interfaces';
@@ -77,9 +76,9 @@ function FarcasterApprovalModal({
           if (fcSignerRequestResponse.result.signedKeyRequest.state !== 'completed') {
             return;
           }
-          const user = {
+
+          const user: FarcasterUser = {
             ...farcasterUser,
-            ...fcSignerRequestResponse.result,
             fid: fcSignerRequestResponse.result.signedKeyRequest.userFid,
             status: 'approved' as const
           };
@@ -173,18 +172,13 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
   async function createAndStoreSigner() {
     try {
       setIsCreatingSigner(true);
-      const keypairString = await createHexKeyPair();
-      const farcasterSigner = await createFarcasterSigner({
-        publicKey: (keypairString.publicKey.startsWith('0x')
-          ? keypairString.publicKey
-          : `0x${keypairString.publicKey}`) as `0x${string}`
-      });
+      const farcasterSigner = await createFarcasterSigner();
 
       if (!farcasterSigner) {
         throw new Error('Error creating signer');
       }
 
-      const { signature, requestFid, deadline } = farcasterSigner;
+      const { signature, requestFid, deadline, privateKey, publicKey } = farcasterSigner;
 
       const {
         result: { signedKeyRequest }
@@ -193,7 +187,7 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
       }>(
         `https://api.warpcast.com/v2/signed-key-requests`,
         {
-          key: keypairString.publicKey,
+          key: publicKey,
           signature,
           requestFid: BigInt(requestFid).toString(),
           deadline: BigInt(deadline).toString()
@@ -204,13 +198,13 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
       );
 
       setFarcasterUser({
-        signature,
-        publicKey: keypairString.publicKey,
-        deadline,
-        token: signedKeyRequest.token,
+        publicKey,
         signerApprovalUrl: signedKeyRequest.deeplinkUrl,
-        privateKey: keypairString.privateKey,
-        status: 'pending_approval'
+        privateKey,
+        status: 'pending_approval',
+        deadline,
+        signature,
+        token: signedKeyRequest.token
       });
       farcasterSignerModal.open();
     } catch (error: any) {

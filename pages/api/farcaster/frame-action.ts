@@ -1,13 +1,15 @@
 import { ExternalServiceError, InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { Frame, FrameActionPayload, FrameButton } from 'frames.js';
+import type { ActionIndex, Frame, FrameButton } from 'frames.js';
 import { getFrame } from 'frames.js';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { createFrameActionMessageWithSignerKey } from 'lib/farcaster/createFrameActionMessageWithSignerKey';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { decryptData } from 'lib/utilities/dataEncryption';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -22,9 +24,13 @@ export type FrameActionResponse =
     };
 
 export type FrameActionRequest = {
-  frameAction: FrameActionPayload;
+  privateKey: string;
+  fid: number;
   postType: FrameButton['action'];
   pageId?: string;
+  postUrl: string;
+  buttonIndex: number;
+  inputText: string;
 };
 
 const requestTimeout = 10000;
@@ -50,18 +56,51 @@ async function trackFarcasterFrameInteractionEvent({ pageId, userId }: { pageId:
 }
 
 async function getNextFrame(req: NextApiRequest, res: NextApiResponse<FrameActionResponse>) {
-  const { frameAction, postType, pageId } = req.body as FrameActionRequest;
+  const { privateKey, buttonIndex, inputText, postUrl, fid, postType, pageId } = req.body as FrameActionRequest;
   const userId = req.session.user?.id;
-  const url = frameAction.untrustedData.url;
 
-  const fetchPromise = fetch(url, {
+  const castId = {
+    fid,
+    hash: new Uint8Array(Buffer.from('0000000000000000000000000000000000000000', 'hex'))
+  };
+
+  const { message, trustedBytes } = await createFrameActionMessageWithSignerKey(decryptData(privateKey) as string, {
+    fid,
+    buttonIndex,
+    castId,
+    url: Buffer.from(postUrl),
+    inputText: Buffer.from(inputText)
+  });
+
+  if (!message) {
+    throw new InvalidInputError('Error creating frame action message');
+  }
+
+  const fetchPromise = fetch(postUrl, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json'
     },
     redirect: postType === 'post_redirect' ? 'manual' : undefined,
-    body: JSON.stringify(frameAction)
+    body: JSON.stringify({
+      untrustedData: {
+        fid,
+        url: postUrl,
+        messageHash: `0x${Buffer.from(message.hash).toString('hex')}`,
+        timestamp: message.data.timestamp,
+        network: 1,
+        buttonIndex: Number(message.data.frameActionBody.buttonIndex) as ActionIndex,
+        castId: {
+          fid: castId.fid,
+          hash: `0x${Buffer.from(castId.hash).toString('hex')}`
+        },
+        inputText
+      },
+      trustedData: {
+        messageBytes: trustedBytes
+      }
+    })
   });
 
   const result = await Promise.race([
@@ -93,7 +132,7 @@ async function getNextFrame(req: NextApiRequest, res: NextApiResponse<FrameActio
 
   const htmlString = await response.text();
 
-  const frame = getFrame({ htmlString, url });
+  const frame = getFrame({ htmlString, url: postUrl });
 
   if (!frame) {
     throw new InvalidInputError('Invalid Farcaster frame URL');

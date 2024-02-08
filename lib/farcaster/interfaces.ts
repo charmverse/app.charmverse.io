@@ -5,7 +5,7 @@ export type FarcasterUser = {
   deadline: number;
   status: 'approved' | 'pending_approval';
   signerApprovalUrl?: string;
-  token?: any;
+  token: any;
   fid?: number;
 };
 
