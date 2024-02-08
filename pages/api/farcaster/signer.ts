@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { mnemonicToAccount } from 'viem/accounts';
 
+import * as http from 'adapters/http';
 import { isProdEnv } from 'config/constants';
 import { createHexKeyPair } from 'lib/farcaster/createHexKeyPair';
 import { onError, onNoMatch } from 'lib/middleware';
@@ -15,10 +16,11 @@ handler.post(createSigner);
 
 export type FarcasterSignerResponse = {
   signature: string;
-  requestFid: number;
   privateKey: string;
   publicKey: string;
   deadline: number;
+  token: string;
+  deeplinkUrl: string;
 };
 
 const appFid = isProdEnv ? 1501 : 318061;
@@ -44,12 +46,30 @@ async function createSigner(req: NextApiRequest, res: NextApiResponse<FarcasterS
     }
   });
 
+  const {
+    result: { signedKeyRequest }
+  } = await http.POST<{
+    result: { signedKeyRequest: { token: string; deeplinkUrl: string } };
+  }>(
+    `https://api.warpcast.com/v2/signed-key-requests`,
+    {
+      key: publicKey,
+      signature,
+      requestFid: BigInt(appFid).toString(),
+      deadline: BigInt(deadline).toString()
+    },
+    {
+      credentials: 'omit'
+    }
+  );
+
   return res.status(200).json({
     signature: encryptData(signature),
-    requestFid: appFid,
     publicKey,
     privateKey: encryptData(keypairString.privateKey),
-    deadline
+    deadline,
+    token: signedKeyRequest.token,
+    deeplinkUrl: signedKeyRequest.deeplinkUrl
   });
 }
 

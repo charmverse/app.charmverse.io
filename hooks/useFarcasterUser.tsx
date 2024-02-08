@@ -79,7 +79,6 @@ function FarcasterSignerApprovalModal({
 
           const user: FarcasterUser = {
             ...farcasterUser,
-            signerApprovalUrl: fcSignerRequestResponse.result.signedKeyRequest.deeplinkUrl,
             fid: fcSignerRequestResponse.result.signedKeyRequest.userFid,
             status: 'approved' as const
           };
@@ -179,24 +178,7 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
         throw new Error('Error creating signer');
       }
 
-      const { signature, requestFid, deadline, privateKey, publicKey } = farcasterSigner;
-
-      const {
-        result: { signedKeyRequest }
-      } = await http.POST<{
-        result: { signedKeyRequest: { token: string; deeplinkUrl: string } };
-      }>(
-        `https://api.warpcast.com/v2/signed-key-requests`,
-        {
-          key: publicKey,
-          signature,
-          requestFid: BigInt(requestFid).toString(),
-          deadline: BigInt(deadline).toString()
-        },
-        {
-          credentials: 'omit'
-        }
-      );
+      const { signature, deeplinkUrl, token, deadline, privateKey, publicKey } = farcasterSigner;
 
       setFarcasterUser({
         publicKey,
@@ -204,7 +186,8 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
         status: 'pending_approval',
         deadline,
         signature,
-        token: signedKeyRequest.token
+        token,
+        signerApprovalUrl: deeplinkUrl
       });
       signerApprovalModalPopupState.open();
     } catch (error: any) {
