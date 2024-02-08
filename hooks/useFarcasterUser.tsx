@@ -193,7 +193,7 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
     } catch (error: any) {
       // err.shortMessage comes from viem
       showMessage(error.shortMessage || error.message || 'Something went wrong. Please try again', 'error');
-      log.error('Error creating signer', {
+      log.error('Error creating farcaster signer', {
         error
       });
     } finally {

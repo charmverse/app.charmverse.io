@@ -1,4 +1,5 @@
 import { ExternalServiceError, InvalidInputError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ActionIndex, Frame, FrameButton } from 'frames.js';
 import { getFrame } from 'frames.js';
@@ -111,6 +112,10 @@ async function getNextFrame(req: NextApiRequest, res: NextApiResponse<FrameActio
   ]);
 
   if (result instanceof Error) {
+    log.error('Frame request timed out', {
+      error: result,
+      postUrl
+    });
     throw new ExternalServiceError('Request timed out');
   }
 
@@ -135,6 +140,10 @@ async function getNextFrame(req: NextApiRequest, res: NextApiResponse<FrameActio
       contentType.includes('text/xml'));
 
   if (!isValidContentType) {
+    log.error('Invalid response: expected HTML document', {
+      contentType,
+      postUrl
+    });
     throw new InvalidInputError('Invalid response: expected HTML document');
   }
 

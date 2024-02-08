@@ -1,3 +1,5 @@
+import { log } from '@charmverse/core/log';
+
 import { useFarcasterFrameAction, useGetFarcasterFrame } from 'charmClient/hooks/farcaster';
 
 import { useConfirmationModal } from './useConfirmationModal';
@@ -59,6 +61,10 @@ export function useFarcasterFrame(args?: { pageId?: string; frameUrl: string }) 
       }
     } catch (e) {
       showMessage('Error submitting frame action', 'error');
+      log.error('Error submitting frame action', {
+        error: e,
+        postUrl: farcasterFrame?.postUrl ?? args?.frameUrl
+      });
     }
   };
 
