@@ -1,5 +1,6 @@
 import { rest } from 'msw';
 import type { ReactNode } from 'react';
+import { v4 } from 'uuid';
 
 import { PageSidebarProvider } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { ProposalsProvider } from 'components/proposals/hooks/useProposals';
@@ -48,8 +49,7 @@ export const proposals = [
     reviewers: [
       { evaluationId: '1', id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null },
       { evaluationId: '1', id: '2', proposalId: '', roleId: null, userId: members[0].id, systemRole: null }
-    ],
-    status: 'draft'
+    ]
   }),
   createMockProposal({
     authors: [{ proposalId: '', userId: members[1].id }],
@@ -61,7 +61,16 @@ export const proposals = [
     reviewers: [{ evaluationId: '1', id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null }],
     status: 'published'
   })
-];
+].map((p) => ({
+  ...p,
+  currentStep: {
+    title: 'Feedback',
+    step: 'feedback',
+    result: 'in_progress',
+    id: v4(),
+    index: 1
+  }
+}));
 
 export const pages = proposals.map((p, i) =>
   createMockPage({
