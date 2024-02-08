@@ -1,5 +1,6 @@
 import { Box } from '@mui/material';
 import { rest } from 'msw';
+import { withCharmEditorProviders } from 'stories/CharmEditor/renderEditor';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 
 import { DocumentPageWithSidebars } from 'components/[pageId]/DocumentPage/DocumentPageWithSidebars';
@@ -12,11 +13,12 @@ import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 
 import { members, userProfile } from '../lib/mockData';
 
-import { ProposalsPageStory } from './ProposalsPageStory';
+import { ProposalStoryProviders, ProposalsPageStory, withProposalProviders } from './ProposalsPageStory';
 
 export default {
   title: 'Proposals/Views',
-  component: ProposalPageComponent
+  component: ProposalPageComponent,
+  decorators: [withProposalProviders, withCharmEditorProviders]
 };
 
 export function ProposalsPage() {

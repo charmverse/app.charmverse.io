@@ -1,5 +1,7 @@
 import { rest } from 'msw';
+import type { ReactNode } from 'react';
 
+import { PageSidebarProvider } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { ProposalsProvider } from 'components/proposals/hooks/useProposals';
 import { ProposalsBoardProvider } from 'components/proposals/hooks/useProposalsBoard';
 import { ProposalsPage } from 'components/proposals/ProposalsPage';
@@ -10,15 +12,31 @@ import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 
 import { members, userProfile } from '../lib/mockData';
 
-export function ProposalsPageStory() {
+export function ProposalStoryProviders({ children }: { children: ReactNode }) {
   return (
     <ProposalsProvider>
       <ProposalBlocksProvider>
         <ProposalsBoardProvider>
-          <ProposalsPage title='Proposals' />
+          <PageSidebarProvider>{children}</PageSidebarProvider>
         </ProposalsBoardProvider>
       </ProposalBlocksProvider>
     </ProposalsProvider>
+  );
+}
+
+export const withProposalProviders = (Story: any) => {
+  return (
+    <ProposalStoryProviders>
+      <Story />
+    </ProposalStoryProviders>
+  );
+};
+
+export function ProposalsPageStory() {
+  return (
+    <ProposalStoryProviders>
+      <ProposalsPage title='Proposals' />
+    </ProposalStoryProviders>
   );
 }
 

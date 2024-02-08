@@ -1,5 +1,6 @@
 import { capitalize } from 'lodash';
 import { useState } from 'react';
+import { withCharmEditorProviders } from 'stories/CharmEditor/renderEditor';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 import { members } from 'stories/lib/mockData';
 import { v4 } from 'uuid';
@@ -167,6 +168,7 @@ export function FormFieldsInputsDisplay() {
 }
 
 export default {
-  title: 'FormFields',
-  component: FormFieldsEditor
+  title: 'common/Structured Form',
+  component: FormFieldsEditor,
+  decorators: [withCharmEditorProviders]
 };
