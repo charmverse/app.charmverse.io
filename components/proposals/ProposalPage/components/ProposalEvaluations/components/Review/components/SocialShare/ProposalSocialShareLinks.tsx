@@ -51,7 +51,7 @@ export function ProposalSocialShareLinks({
         proposalId={proposalId}
         proposalLink={proposalLink}
         proposalTitle={proposalTitle}
-        canPublishToLens={isDisabled}
+        canPublishToLens={!isDisabled}
       />
       <ProposalSocialShareLink site='telegram' proposalTitle={proposalTitle} proposalLink={proposalLink} />
       <Tooltip title='Copy proposal link'>

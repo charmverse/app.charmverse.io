@@ -1,10 +1,10 @@
-import { ThreadsProvider } from 'hooks/useThreads';
 import { MockDataProvider, render } from 'testing/customRender';
 
 import { CommentForm } from '../CommentForm';
 
 jest.mock('components/common/CharmEditor/components/inlineDatabase/components/InlineDatabase', () => ({}));
 jest.mock('components/common/CharmEditor/components/poll/PollComponent', () => ({}));
+jest.mock('components/common/CharmEditor/components/farcasterFrame/components/FarcasterFrameNodeView', () => ({}));
 
 jest.mock('next/router', () => ({
   useRouter: () => ({

@@ -30,7 +30,7 @@ import { BookmarkNodeView } from './components/bookmark/BookmarkNodeView';
 import Callout from './components/callout/components/Callout';
 import { CryptoPriceNodeView } from './components/cryptoPrice/CryptoPriceNodeView';
 import EmojiSuggest from './components/emojiSuggest/EmojiSuggest.component';
-import { FarcasterFrameNodeView } from './components/farcasterFrame/FarcasterFrameNodeView';
+import { FarcasterFrameNodeView } from './components/farcasterFrame/components/FarcasterFrameNodeView';
 import type { FrontendParticipant } from './components/fiduswriter/collab';
 import { getSelectedChanges } from './components/fiduswriter/state_plugins/track';
 import fiduswriterStyles from './components/fiduswriter/styles';

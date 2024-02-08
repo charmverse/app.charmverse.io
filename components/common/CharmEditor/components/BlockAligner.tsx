@@ -2,7 +2,7 @@ import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import { ListItemButton } from '@mui/material';
+import { ListItemButton, Tooltip } from '@mui/material';
 import type { ReactNode, MouseEvent } from 'react';
 import { memo, forwardRef } from 'react';
 
@@ -12,6 +12,7 @@ interface BlockAlignerProps {
   onEdit?: () => void;
   readOnly?: boolean;
   onDragStart?: () => void;
+  extraControls?: { onClick?: VoidFunction; Icon: React.ElementType; tooltip?: string }[];
 }
 
 const StyledBlockAligner = styled.div`
@@ -59,6 +60,20 @@ const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props, ref) 
       {children}
       {!readOnly && (
         <Controls className='controls'>
+          {props.extraControls?.map((control, index) => (
+            <Tooltip title={control.tooltip} key={`${index.toString()}`}>
+              <ListItemButton
+                onClick={control.onClick}
+                sx={{
+                  padding: 1,
+                  backgroundColor: 'inherit',
+                  color: 'secondary'
+                }}
+              >
+                <control.Icon sx={{ fontSize: 14, color: theme.palette.text.primary }} />
+              </ListItemButton>
+            </Tooltip>
+          ))}
           {onEdit && (
             <ListItemButton
               onClick={handleEdit}

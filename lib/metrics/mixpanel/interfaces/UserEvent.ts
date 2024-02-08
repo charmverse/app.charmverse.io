@@ -55,6 +55,10 @@ export type ViewFarcasterFrame = BaseEvent & {
 
 export type AddFarcasterFrame = ViewFarcasterFrame;
 
+export type InteractFarcasterFrame = BaseEvent & {
+  pageId: string;
+};
+
 export type AppLoaded = BaseEventWithoutGroup & { spaceId?: string };
 
 export interface UserEventMap {
@@ -71,4 +75,5 @@ export interface UserEventMap {
   add_otp: UserOtp;
   add_farcaster_frame: AddFarcasterFrame;
   view_farcaster_frame: ViewFarcasterFrame;
+  interact_farcaster_frame: InteractFarcasterFrame;
 }

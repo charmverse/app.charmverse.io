@@ -4,7 +4,7 @@ import * as http from 'adapters/http';
 
 import { useUser } from './useUser';
 
-type FarcasterProfile = {
+export type FarcasterProfile = {
   body: {
     id: number;
     address: string;
@@ -27,13 +27,22 @@ export function useFarcasterProfile() {
     user && user.wallets.length !== 0 ? `farcaster/${user.wallets[0].address}` : null,
     async () => {
       for (const wallet of user!.wallets) {
-        const [_farcasterProfile] = await http.GET<FarcasterProfile[]>(
+        let [_farcasterProfile] = await http.GET<FarcasterProfile[]>(
           `https://searchcaster.xyz/api/profiles?connected_address=${wallet.address}`,
           {},
           {
             credentials: 'omit'
           }
         );
+        if (!_farcasterProfile) {
+          [_farcasterProfile] = await http.GET<FarcasterProfile[]>(
+            `https://searchcaster.xyz/api/profiles?address=${wallet.address}`,
+            {},
+            {
+              credentials: 'omit'
+            }
+          );
+        }
         if (_farcasterProfile) {
           return _farcasterProfile;
         }
