@@ -19,6 +19,6 @@ export class FormField extends DocumentPage {
   }
 
   getFormFieldInput(fieldId: string) {
-    return this.page.locator(`data-test=form-field-input-${fieldId} >> input`);
+    return this.page.locator(`data-test=form-field-input-${fieldId} >> textarea`).nth(0);
   }
 }
