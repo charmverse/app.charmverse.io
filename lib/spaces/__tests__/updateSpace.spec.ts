@@ -5,6 +5,7 @@ import { v4 } from 'uuid';
 import { DuplicateDataError, InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 import { uid } from 'lib/utilities/strings';
+import { generateUserAndSpace } from 'testing/setupDatabase';
 
 import type { UpdateableSpaceFields } from '../updateSpace';
 import { updateSpace } from '../updateSpace';
@@ -13,6 +14,10 @@ let firstUser: User;
 let secondUser: User;
 
 let mockedMixpanelFn: jest.Mock;
+
+jest.mock('lib/snapshot/getSpace', () => ({
+  getSnapshotSpace: jest.fn().mockReturnValueOnce({})
+}));
 
 beforeAll(async () => {
   firstUser = await prisma.user.create({
@@ -50,7 +55,6 @@ describe('updateSpace', () => {
       defaultPagePermissionGroup: 'view',
       updatedBy: secondUser.id,
       xpsEngineId: v4(),
-      snapshotDomain: `snapshot-domain-${v4()}`,
       deletedAt: new Date(),
       publicBountyBoard: false,
       defaultPostCategoryId: v4(),
@@ -87,6 +91,21 @@ describe('updateSpace', () => {
       expect(updatedSpace[key]).not.toEqual(droppedUpdate[key]);
     });
   });
+
+  it('should update the snapshot and customDomain', async () => {
+    const { space } = await generateUserAndSpace();
+
+    const update: UpdateableSpaceFields = {
+      customDomain: 'test.charmverse.fyi',
+      snapshotDomain: 'snapshot-domain'
+    };
+
+    const updatedSpace = await updateSpace(space.id, update);
+
+    expect(updatedSpace.customDomain).toEqual(update.customDomain);
+    expect(updatedSpace.snapshotDomain).toEqual(update.snapshotDomain);
+  });
+
   it('should throw an error if no space ID is provided', async () => {
     await expect(updateSpace(null as any, { name: 'New Space Name' })).rejects.toBeInstanceOf(InvalidInputError);
   });
