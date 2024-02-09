@@ -1,3 +1,4 @@
+import { withCharmEditorProviders } from 'stories/CharmEditor/renderEditor';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
@@ -7,7 +8,8 @@ import { useNewReward } from 'components/rewards/hooks/useNewReward';
 
 export default {
   title: 'Rewards/Views',
-  component: RewardPropertiesForm
+  component: RewardPropertiesForm,
+  decorators: [withCharmEditorProviders]
 };
 export function RewardsPage() {
   const { newPageValues, updateNewPageValues } = useNewPage();

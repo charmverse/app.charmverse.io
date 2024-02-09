@@ -1,10 +1,23 @@
 import PageHeader from 'components/[pageId]/DocumentPage/components/PageHeader';
 import CharmEditorComponent from 'components/common/CharmEditor/CharmEditor';
+import { CharmEditorProvider } from 'hooks/useCharmEditor';
+import { CharmEditorViewProvider } from 'hooks/useCharmEditorView';
+import { ThreadsProvider } from 'hooks/useThreads';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+
+export function CharmEditorStorybookProviders({ children }: { children: React.ReactNode }) {
+  return (
+    <CharmEditorViewProvider>
+      <ThreadsProvider>
+        <CharmEditorProvider>{children}</CharmEditorProvider>
+      </ThreadsProvider>
+    </CharmEditorViewProvider>
+  );
+}
 
 export function renderEditorWithContent({ content, title }: { content?: PageContent; title?: string }) {
   return (
-    <>
+    <CharmEditorStorybookProviders>
       <PageHeader
         headerImage=''
         icon=''
@@ -35,6 +48,14 @@ export function renderEditorWithContent({ content, title }: { content?: PageCont
         content={content}
         isContentControlled={true}
       />
-    </>
+    </CharmEditorStorybookProviders>
   );
 }
+
+export const withCharmEditorProviders = (Story: any) => {
+  return (
+    <CharmEditorStorybookProviders>
+      <Story />
+    </CharmEditorStorybookProviders>
+  );
+};
