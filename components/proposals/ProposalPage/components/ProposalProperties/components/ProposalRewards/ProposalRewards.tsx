@@ -279,7 +279,7 @@ export function ProposalRewards({
       {!pendingRewards?.length && <AttachRewardButton createNewReward={createNewReward} variant={variant} />}
 
       <NewPageDialog
-        contentUpdated={contentUpdated || isDirty}
+        contentUpdated={!readOnly && (contentUpdated || isDirty)}
         disabledTooltip={
           readOnly
             ? 'You cannot edit this reward'
