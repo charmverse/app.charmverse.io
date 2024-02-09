@@ -2,6 +2,7 @@
 import type { AttestationType } from '@charmverse/core/prisma';
 import type { SchemaItem } from '@ethereum-attestation-service/eas-sdk';
 import { SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
+import { optimism } from 'viem/chains';
 
 import type { EasSchemaChain } from './connectors';
 
@@ -47,7 +48,7 @@ export const credentialLabels: Record<AttestationType, string> = {
 
 export const attestationSchemaIds: Record<AttestationType, { [key in EasSchemaChain]: string }> = {
   proposal: {
-    10: '0x3d1afc69090e3133e65385364bd88f230d8df3e5e2c660fdc9206c0ce3e2e012'
+    [optimism.id]: '0x3d1afc69090e3133e65385364bd88f230d8df3e5e2c660fdc9206c0ce3e2e012'
   }
 };
 
