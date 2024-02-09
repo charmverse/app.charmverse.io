@@ -1,8 +1,8 @@
 import type { AccsDefaultParams } from '@lit-protocol/types';
 import { getChainById } from 'connectors/chains';
 
+import { LIT_CHAINS } from 'lib/tokenGates/chains';
 import type { LitConditions } from 'lib/tokenGates/interfaces';
-import { LIT_CHAINS } from 'lib/tokenGates/utils';
 import { getTokenMetadata } from 'lib/tokens/getTokenMetadata';
 
 import { getNFT } from './getNFTs';
