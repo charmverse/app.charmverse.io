@@ -43,6 +43,7 @@ export function ConfirmAuthCode({ onSubmit, errorMessage, loading, changeType }:
         <NumberInputField
           error={error}
           disabled={loading}
+          fullWidth
           helperText={error}
           data-test='confirm-auth-code-input'
           disableArrows

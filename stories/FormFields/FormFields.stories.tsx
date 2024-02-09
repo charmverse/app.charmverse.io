@@ -1,5 +1,6 @@
 import { capitalize } from 'lodash';
 import { useState } from 'react';
+import { withCharmEditorProviders } from 'stories/CharmEditor/renderEditor';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 import { members } from 'stories/lib/mockData';
 import { v4 } from 'uuid';
@@ -65,7 +66,7 @@ export function FormFieldsInputs() {
   return (
     <GlobalContext>
       <CustomFormFieldsInput
-        isReviewer={false}
+        enableComments={true}
         formFields={formFieldTypes.map((formFieldType, index) => {
           const label = capitalize(formFieldType.replaceAll(/_/g, ' '));
           return {
@@ -88,7 +89,7 @@ export function FormFieldsInputsDisplay() {
   return (
     <GlobalContext>
       <CustomFormFieldsInput
-        isReviewer={false}
+        enableComments={true}
         disabled
         formFields={formFieldTypes.map((formFieldType, index) => {
           const label = capitalize(formFieldType.replaceAll(/_/g, ' '));
@@ -167,6 +168,7 @@ export function FormFieldsInputsDisplay() {
 }
 
 export default {
-  title: 'FormFields',
-  component: FormFieldsEditor
+  title: 'common/Structured Form',
+  component: FormFieldsEditor,
+  decorators: [withCharmEditorProviders]
 };

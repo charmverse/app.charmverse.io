@@ -1,7 +1,7 @@
 import type { ProposalRubricCriteria, ProposalRubricCriteriaAnswer } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { Alert, Box, FormGroup, FormLabel, Stack, TextField, Rating, Typography } from '@mui/material';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, forwardRef } from 'react';
 import type { FieldArrayWithId, UseFormRegister } from 'react-hook-form';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 
@@ -12,6 +12,7 @@ import {
 } from 'charmClient/hooks/proposals';
 import { TextInput } from 'components/common/BoardEditor/components/properties/TextInput';
 import { Button } from 'components/common/Button';
+import { NumberInputField } from 'components/common/form/fields/NumberInputField';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { getNumberFromString } from 'lib/utilities/numbers';
 
@@ -393,7 +394,7 @@ function CriteriaInput({
                   }}
                 />
               ) : (
-                <Box display='flex' gap={1}>
+                <Box display='flex' gap={1} alignItems='center'>
                   <FormLabel>
                     <Typography noWrap variant='body2'>
                       Your score ({parameters.min} &ndash; {parameters.max}):
@@ -404,13 +405,17 @@ function CriteriaInput({
                       _field.onChange(score);
                     }}
                     disabled={disabled}
+                    error={
+                      _field.value &&
+                      (_field.value < parameters.min || _field.value > parameters.max) &&
+                      'Invalid score'
+                    }
                     inputProps={{
+                      placeholder: 'N/A',
                       min: parameters.min,
                       max: parameters.max
                     }}
-                    maxWidth={50}
                     value={_field.value}
-                    sx={{ display: 'block' }}
                   />
                 </Box>
               )
@@ -445,34 +450,24 @@ function convertActualToMUIRating(value: number, min: number) {
 function IntegerInput({
   value,
   onChange,
-  readOnly,
-  readOnlyMessage,
   inputProps,
   disabled,
-  maxWidth,
-  sx
+  error
 }: {
   value?: number | string | null;
   onChange: (num: number | null) => void;
-  readOnly?: boolean;
-  readOnlyMessage?: string;
+  error?: string;
   inputProps?: any;
   disabled?: boolean;
-  maxWidth?: number;
-  sx?: any;
 }) {
   return (
-    <TextInput
-      displayType='details'
-      fullWidth={!maxWidth}
-      inputProps={{ disabled, type: 'number', ...inputProps }}
-      onChange={(newValue) => onChange(getNumberFromString(newValue))}
-      readOnly={readOnly}
-      readOnlyMessage={readOnlyMessage}
-      sx={{
-        input: { textAlign: 'center', minWidth: '2.5em !important', maxWidth },
-        ...sx
-      }}
+    <NumberInputField
+      disableArrows
+      inline
+      error={error}
+      disabled={disabled}
+      onChange={(e) => onChange(getNumberFromString(e.target.value))}
+      inputProps={inputProps}
       value={value?.toString() || ''}
     />
   );

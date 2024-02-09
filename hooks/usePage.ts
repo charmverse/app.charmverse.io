@@ -19,7 +19,7 @@ type PageResult = {
   page?: PageWithContent;
   refreshPage: () => Promise<PageWithContent | undefined>;
   updatePage: (updates: PageUpdates) => Promise<void>;
-  error?: 'access_denied' | 'page_not_found';
+  error?: 'access_denied' | 'page_not_found' | 'system_error';
   isLoading?: boolean;
 };
 
@@ -86,6 +86,7 @@ export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
       updatePage
     };
   }
+
   if (pageWithContentError) {
     // An error will be thrown if page doesn't exist or if you dont have read permission for the page
     if (pageWithContentError.errorType === 'Access denied') {
@@ -94,10 +95,17 @@ export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
         refreshPage: noop,
         updatePage: noop
       };
-    } else {
+    } else if (pageWithContentError.errorType === 'Data not found') {
       // If the page doesn't exist an error will be thrown
       return {
         error: 'page_not_found',
+        refreshPage: noop,
+        updatePage: noop
+      };
+    } else {
+      // If the page doesn't exist an error will be thrown
+      return {
+        error: 'system_error',
         refreshPage: noop,
         updatePage: noop
       };

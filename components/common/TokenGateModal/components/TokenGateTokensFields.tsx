@@ -54,6 +54,7 @@ export function TokenGateTokenFields() {
       )}
       <NumberInputField
         label='Quantity'
+        fullWidth
         error={errors.quantity?.message}
         helperText={errors.quantity?.message}
         {...register('quantity')}

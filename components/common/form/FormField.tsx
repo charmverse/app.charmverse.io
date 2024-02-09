@@ -167,6 +167,8 @@ function ExpandedFormField({
         focusOnInit={false}
       />
       <FieldTypeRenderer
+        rows={undefined}
+        maxRows={10}
         type={formField.type as any}
         onCreateOption={onCreateOption}
         onDeleteOption={onDeleteOption}

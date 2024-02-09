@@ -29,7 +29,7 @@ jobs:
         run: |
           echo "$workflow_event_context"
           echo "Workflow and code ref: ${{github.ref}}"
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.x
 
@@ -54,7 +54,7 @@ jobs:
 
       - name: Save dependency and build using another cache key to do one step restore in subsequent jobs
         id: update_cache_build
-        uses: actions/cache/save@v3
+        uses: actions/cache/save@v4
         with:
           path: |
             .next
@@ -70,12 +70,12 @@ jobs:
     outputs:
       img_tag: '${{ steps.docker_build_push.outputs.img_tag }}'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ needs.build-test-env.outputs.core_bump_commit_hash }}
       - name: Restore dependencies and build from cache
         id: update_cache_dependencies
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@v4
         with:
           path: |
             .next
@@ -100,12 +100,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-test-env
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ needs.build-test-env.outputs.core_bump_commit_hash }}
       - name: Restore dependencies and build from cache
         id: update_cache_dependencies
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@v4
         with:
           path: |
             .next
@@ -139,7 +139,7 @@ jobs:
     outputs:
       deploy_websocket: ${{ steps.pkg_websocket.outputs.deploy_websocket }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ needs.build-test-env.outputs.core_bump_commit_hash }}
       - name: Set the docker compose env variables
@@ -185,7 +185,7 @@ jobs:
 
       - name: Save dependency and build to another cache
         id: update_beanstalk_payload_cache
-        uses: actions/cache/save@v3
+        uses: actions/cache/save@v4
         with:
           path: |
             *.zip
@@ -216,12 +216,12 @@ jobs:
             deployment_package: deploy.zip
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ needs.build-test-env.outputs.core_bump_commit_hash }}
       - name: Restore beanstalk payload from cache
         id: restore_from_beanstalk_payload_cache
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@v4
         with:
           path: |
             *.zip

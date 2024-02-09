@@ -77,17 +77,12 @@ export const getSortedBoards = createSelector(getBoards, (boards) => {
 
 export const getTemplates = (state: RootState): { [key: string]: Board } => state.boards.templates;
 
-export const getSortedTemplates = createSelector(getTemplates, (templates) => {
-  return Object.values(templates).sort((a, b) => a.title.localeCompare(b.title));
-});
-
 export const makeSelectBoard = () =>
   createSelector(
     getBoards,
-    getTemplates,
     (state: RootState, boardId: string) => boardId,
-    (boards, templates, boardId: string) => {
-      return boards[boardId] || templates[boardId];
+    (boards, boardId: string) => {
+      return boards[boardId];
     }
   );
 

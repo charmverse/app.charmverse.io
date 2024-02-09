@@ -137,16 +137,16 @@ function SidebarContents({
       {sidebarView === 'comments' &&
         (proposal?.formId ? (
           <FormCommentsSidebar
-            canCreateComments={!!proposal.permissions?.comment}
+            enableComments={!!proposal.permissions?.comment}
             openSidebar={openSidebar!}
             threads={threads}
-            formFields={proposal.form.formFields}
+            formFields={proposal.form?.formFields ?? []}
           />
         ) : (
           <EditorCommentsSidebar
             openSidebar={openSidebar!}
             threads={threads}
-            canCreateComments={!!pagePermissions?.comment}
+            enableComments={!!pagePermissions?.comment}
           />
         ))}
     </>

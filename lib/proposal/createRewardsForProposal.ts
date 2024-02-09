@@ -96,7 +96,6 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
     include: {
       authors: true,
       reviewers: true,
-      category: true,
       rubricAnswers: true,
       rubricCriteria: {
         orderBy: {

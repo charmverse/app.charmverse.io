@@ -1,6 +1,5 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { FormFieldAnswer, Space, User } from '@charmverse/core/prisma-client';
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { v4 } from 'uuid';
 
 import type { FormFieldInput } from 'components/common/form/interfaces';
@@ -10,7 +9,7 @@ import { generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposal } from 'testing/utils/proposals';
 
 describe('upsertFormAnswers', () => {
-  let proposal: ProposalWithUsers;
+  let proposal: Awaited<ReturnType<typeof generateProposal>>;
   let space: Space;
   let user: User;
 

@@ -1,4 +1,3 @@
-import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import { rest } from 'msw';
 import type { BlockCountInfo } from 'lib/spaces/getSpaceBlockCount';
 import { getDefaultWorkflows } from 'lib/proposal/workflows/defaultWorkflows';
@@ -66,19 +65,6 @@ const pageHandlers = {
 const proposalHandlers = {
   proposalTemplates: rest.get(`/api/spaces/:spaceId/proposal-templates`, (req, res, ctx) => {
     return res(ctx.json(proposalTemplates));
-  }),
-  proposalFlowFlags: rest.get(`/api/proposals/:pageId/compute-flow-flags`, (req, res, ctx) => {
-    const permissions: ProposalFlowPermissionFlags = {
-      draft: true,
-      discussion: true,
-      review: true,
-      reviewed: true,
-      vote_active: true,
-      vote_closed: true,
-      evaluation_active: true,
-      evaluation_closed: true
-    };
-    return res(ctx.json(permissions));
   }),
   reviewerIds: rest.get(`/api/proposals/:pageId/get-user-reviewerids`, (req, res, ctx) => {
     return res(ctx.json([]));

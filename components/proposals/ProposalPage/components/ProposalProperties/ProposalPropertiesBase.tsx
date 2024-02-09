@@ -3,7 +3,7 @@ import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Collapse, Divider, IconButton, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
-import { useGetCredentialTemplates } from 'charmClient/hooks/credentialHooks';
+import { useGetCredentialTemplates } from 'charmClient/hooks/credentials';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import { CredentialSelect } from 'components/credentials/CredentialsSelect';

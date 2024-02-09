@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { issueProposalCredentialsIfNecessary } from 'lib/credentials/issueProposalCredentialsIfNecessary';
+import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { permissionsApiClient } from 'lib/permissions/api/client';
@@ -116,6 +117,7 @@ async function createProposalController(req: NextApiRequest, res: NextApiRespons
       proposalId: proposalPage.proposal.id
     });
   }
+  updateTrackPageProfile(proposalPage.page.id);
 
   return res.status(201).json({ id: proposalPage.proposal.id });
 }

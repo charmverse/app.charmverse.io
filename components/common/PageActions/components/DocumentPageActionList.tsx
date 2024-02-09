@@ -50,7 +50,6 @@ export type PageActionMeta = Pick<
   | 'parentId'
   | 'path'
   | 'proposalId'
-  | 'snapshotProposalId'
   | 'syncWithPageId'
   | 'title'
   | 'type'
@@ -242,6 +241,7 @@ export function DocumentPageActionList({
         <>
           <Divider />
           <ListItemButton
+            data-test='view-comments-button'
             disabled={!pagePermissions?.comment}
             onClick={() => {
               setActiveView('comments');

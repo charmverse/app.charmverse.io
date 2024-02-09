@@ -39,18 +39,14 @@ export async function createPostComment({
     }
   });
 
-  const category = post.category;
-
-  if (category) {
-    trackUserAction('create_comment', {
-      categoryName: category.name,
-      commentedOn: parentId === postId ? 'post' : 'comment',
-      postId,
-      resourceId: comment.id,
-      spaceId: post.spaceId,
-      userId
-    });
-  }
+  trackUserAction('create_comment', {
+    categoryName: post.category.name,
+    commentedOn: parentId === postId ? 'post' : 'comment',
+    postId,
+    resourceId: comment.id,
+    spaceId: post.spaceId,
+    userId
+  });
 
   return comment;
 }

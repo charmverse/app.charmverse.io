@@ -1,10 +1,11 @@
 import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import * as http from 'adapters/http';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
 
-import type { EASAttestationFromApi } from './external/getOnchainCredentials';
+import type { EASAttestationWithFavorite } from './external/getOnchainCredentials';
 
 const GITCOIN_SCORER_BASE_URL = 'https://api.scorer.gitcoin.co';
 
@@ -84,17 +85,30 @@ export async function getGitcoinCredentialsByWallets({
   wallets
 }: {
   wallets: string[];
-}): Promise<EASAttestationFromApi[]> {
+}): Promise<EASAttestationWithFavorite[]> {
   const gitcoinPassportScores = await getGitcoinPassportScores(wallets);
+  const favoriteCredentials = await prisma.favoriteCredential.findMany({
+    where: {
+      gitcoinWalletAddress: {
+        in: wallets.map((w) => w.toLowerCase())
+      }
+    },
+    select: {
+      id: true,
+      index: true,
+      gitcoinWalletAddress: true
+    }
+  });
 
   return wallets
     .map((wallet) => {
+      const favoriteCredential = favoriteCredentials.find((f) => lowerCaseEqual(f.gitcoinWalletAddress, wallet));
       const gitcoinPassportScore = gitcoinPassportScores.find((score) => lowerCaseEqual(score.address, wallet));
-      if (!gitcoinPassportScore) {
+      if (!gitcoinPassportScore || gitcoinPassportScore.score === '0E-9') {
         return null;
       }
 
-      const mappedData: EASAttestationFromApi = {
+      const mappedData: EASAttestationWithFavorite = {
         id: `${wallet}-gitcoin-passport-score`,
         content: {
           passport_score: Number(gitcoinPassportScore.score)
@@ -106,7 +120,9 @@ export async function getGitcoinCredentialsByWallets({
         chainId: 10,
         type: 'gitcoin',
         verificationUrl: null,
-        iconUrl: null
+        iconUrl: null,
+        favoriteCredentialId: favoriteCredential?.id ?? null,
+        index: favoriteCredential?.index ?? -1
       };
 
       return mappedData;

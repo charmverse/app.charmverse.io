@@ -15,7 +15,6 @@ export type ProposalEvaluationsProps = {
   onChangeWorkflow: ProposalSettingsProps['onChangeWorkflow'];
   onChangeRewardSettings?: ProposalSettingsProps['onChangeRewardSettings'];
   refreshProposal?: VoidFunction;
-  isReviewer?: boolean; // TODO: we need to know the reviewer for each step instead
   pagePath?: string;
   pageTitle?: string;
   templateId?: string | null;
@@ -34,7 +33,6 @@ export function ProposalEvaluations({
   onChangeWorkflow,
   onChangeRewardSettings,
   refreshProposal,
-  isReviewer,
   pagePath,
   pageTitle,
   isUnpublishedProposal,
@@ -52,7 +50,6 @@ export function ProposalEvaluations({
         templateId={templateId}
         onChangeEvaluation={onChangeEvaluation}
         onChangeWorkflow={onChangeWorkflow}
-        isReviewer={!!isReviewer}
         requireWorkflowChangeConfirmation={isNotNewProposal}
         expanded={expanded}
         isTemplate={isProposalTemplate}

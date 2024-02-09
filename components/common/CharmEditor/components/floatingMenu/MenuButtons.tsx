@@ -73,10 +73,9 @@ export function InlineActionButton({
   hints = [],
   children,
   menuKey,
-  enable,
   subMenu,
   commandFn
-}: ButtonProps & { commandFn: () => Command; subMenu: SubMenu; menuKey: PluginKey; enable: boolean }) {
+}: ButtonProps & { commandFn: () => Command; subMenu: SubMenu; menuKey: PluginKey }) {
   const view = useEditorViewContext();
 
   const onClick = useCallback(
@@ -102,12 +101,7 @@ export function InlineActionButton({
   );
 
   return (
-    <MenuButton
-      onClick={onClick}
-      hints={hints}
-      // Figure out when the button will be disabled
-      isDisabled={!enable}
-    >
+    <MenuButton onClick={onClick} data-test='add-inline-comment-button' hints={hints}>
       {children}
     </MenuButton>
   );
@@ -120,17 +114,10 @@ export function InlineCommentButton({
       <MessageOutlinedIcon sx={{ fontSize: 14 }} />
     </ComponentIcon>
   ),
-  menuKey,
-  enableComments
-}: ButtonProps & { menuKey: PluginKey; enableComments: boolean }) {
+  menuKey
+}: ButtonProps & { menuKey: PluginKey }) {
   return (
-    <InlineActionButton
-      commandFn={createInlineComment}
-      enable={enableComments}
-      menuKey={menuKey}
-      hints={hints}
-      subMenu='inlineCommentSubMenu'
-    >
+    <InlineActionButton commandFn={createInlineComment} menuKey={menuKey} hints={hints} subMenu='inlineCommentSubMenu'>
       {children}
     </InlineActionButton>
   );

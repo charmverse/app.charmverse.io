@@ -2,17 +2,15 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import { deletePostComment } from 'lib/forums/comments/deletePostComment';
 import { requireKeys } from 'lib/middleware';
 import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
 import { superApiHandler } from 'lib/public-api/handler';
 import { getUserProfile, userProfileSelect } from 'lib/public-api/searchUserProfile';
 import { withSessionRoute } from 'lib/session/withSession';
+import { InvalidInputError } from 'lib/utilities/errors';
 
 import type { PublicApiPostComment } from '../../posts/[postId]/comments';
-
-const handler = superApiHandler();
-
-handler.delete(deletePostComment).put(requireKeys(['contentMarkdown'], 'body'), updatePostComment);
 
 /**
  * @swagger
@@ -29,8 +27,15 @@ handler.delete(deletePostComment).put(requireKeys(['contentMarkdown'], 'body'), 
  *         description: ID of the comment to update
  *
  */
-async function deletePostComment(req: NextApiRequest, res: NextApiResponse) {
+
+const handler = superApiHandler();
+handler.delete(deletePostComment).put(requireKeys(['contentMarkdown'], 'body'), updatePostCommentEndpoint);
+
+async function updatePostCommentEndpoint(req: NextApiRequest, res: NextApiResponse) {
   // This should never be undefined, but adding this safeguard for future proofing
+  if (!req.query.commentId) {
+    throw new InvalidInputError('Comment Id is undefined');
+  }
 
   const result = await prisma.postComment.findFirstOrThrow({
     where: {
@@ -44,17 +49,12 @@ async function deletePostComment(req: NextApiRequest, res: NextApiResponse) {
       }
     },
     select: {
-      id: true
+      id: true,
+      createdBy: true
     }
   });
 
-  if (result) {
-    await prisma.postComment.delete({
-      where: {
-        id: result.id
-      }
-    });
-  }
+  await deletePostComment({ commentId: result.id, userId: result.createdBy });
 
   log.debug('[public-api] Deleted comment', { query: req.query, result });
 

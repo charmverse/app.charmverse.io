@@ -126,7 +126,7 @@ function FormFieldAnswerThreads({
           {unResolvedThreads.map((resolvedThread) => (
             <ThreadContainer key={resolvedThread.id} elevation={4}>
               <PageThread
-                canCreateComments
+                enableComments
                 inline
                 key={resolvedThread.id}
                 threadId={resolvedThread?.id}
@@ -160,13 +160,13 @@ export function FormFieldAnswerInput({
   pageId,
   disabled,
   formFieldAnswer,
-  canCreateComments,
+  enableComments,
   formFieldName
 }: {
   disabled?: boolean;
   pageId: string;
   formFieldAnswer: FormFieldAnswer;
-  canCreateComments?: boolean;
+  enableComments?: boolean;
   formFieldName: string;
 }) {
   const { trigger: createThread } = useCreateThread();
@@ -190,7 +190,7 @@ export function FormFieldAnswerInput({
     setIsOpen(false);
   };
 
-  if (!canCreateComments) {
+  if (!enableComments) {
     return null;
   }
 
@@ -203,7 +203,7 @@ export function FormFieldAnswerInput({
       }}
       open={isOpen}
     >
-      <Tooltip title={!disabled ? 'Add a comment' : "You don't have permission to add a comment"}>
+      <Tooltip title='Add a comment'>
         <Box
           sx={{
             display: 'flex',
@@ -232,14 +232,14 @@ export function FormFieldAnswerComment({
   disabled,
   fieldAnswerThreads = [],
   formFieldAnswer,
-  canCreateComments,
+  enableComments,
   formFieldName
 }: {
   disabled?: boolean;
   pageId: string;
   fieldAnswerThreads?: ThreadWithComments[];
   formFieldAnswer: FormFieldAnswer;
-  canCreateComments?: boolean;
+  enableComments?: boolean;
   formFieldName: string;
 }) {
   return (
@@ -266,7 +266,7 @@ export function FormFieldAnswerComment({
           disabled={disabled}
           pageId={pageId}
           formFieldAnswer={formFieldAnswer}
-          canCreateComments={canCreateComments}
+          enableComments={enableComments}
         />
       </span>
     </Stack>
