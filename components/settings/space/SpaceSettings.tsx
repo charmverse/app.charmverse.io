@@ -243,9 +243,11 @@ export function SpaceSettings({
 
   return (
     <>
-      <Legend marginTop={0}>Overview</Legend>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <Grid container direction='column' spacing={3}>
+        <Grid container direction='column' spacing={3} p='20px 24px'>
+          <Grid item>
+            <Legend>Overview</Legend>
+          </Grid>
           <Grid item>
             <Stack direction={['column', 'row']} gap={3}>
               <Stack pt={0.5}>
@@ -472,49 +474,50 @@ export function SpaceSettings({
               </Button>
             )}
           </Grid>
-        </Grid>
-        <SetupCustomDomain space={space} errorMessage={errors.customDomain?.message} register={register} />
-        <Grid item>
-          <Legend mt={3}>Snapshot.org Integration</Legend>
-          <FieldLabel>Snapshot domain</FieldLabel>
-          {!space?.snapshotDomain && !isAdmin ? (
-            <Typography>No Snapshot domain connected yet. Only space admins can configure this.</Typography>
-          ) : (
-            <TextField
-              {...register('snapshotDomain')}
-              disabled={!isAdmin}
-              fullWidth
-              error={!!errors.snapshotDomain}
-              helperText={errors.snapshotDomain?.message}
-            />
-          )}
-        </Grid>
-        <Grid item>
-          <Legend mt={3}>Collab.land Integration</Legend>
-          <ConnectCollabland />
-        </Grid>
-        <Grid item>
-          <Legend mt={3} helperText={`Advanced settings for ${isAdmin ? 'deleting' : 'leaving'} a space.`}>
-            Warning
-          </Legend>
-          {isAdmin ? (
-            <Button variant='outlined' color='error' onClick={deleteWorkspace} data-test='submit-space-delete'>
-              Delete Space
-            </Button>
-          ) : (
-            <Button variant='outlined' color='error' onClick={workspaceLeaveModalState.open}>
-              Leave Space
-            </Button>
-          )}
+          <Grid item>
+            <SetupCustomDomain space={space} errorMessage={errors.customDomain?.message} register={register} />
+          </Grid>
+          <Grid item>
+            <Legend>Snapshot.org Integration</Legend>
+            <FieldLabel>Snapshot domain</FieldLabel>
+            {!space?.snapshotDomain && !isAdmin ? (
+              <Typography>No Snapshot domain connected yet. Only space admins can configure this.</Typography>
+            ) : (
+              <TextField
+                {...register('snapshotDomain')}
+                disabled={!isAdmin}
+                fullWidth
+                error={!!errors.snapshotDomain}
+                helperText={errors.snapshotDomain?.message}
+              />
+            )}
+          </Grid>
+          <Grid item>
+            <Legend>Collab.land Integration</Legend>
+            <ConnectCollabland />
+          </Grid>
+          <Grid item>
+            <Legend helperText={`Advanced settings for ${isAdmin ? 'deleting' : 'leaving'} a space.`}>Warning</Legend>
+            {isAdmin ? (
+              <Button variant='outlined' color='error' onClick={deleteWorkspace} data-test='submit-space-delete'>
+                Delete Space
+              </Button>
+            ) : (
+              <Button variant='outlined' color='error' onClick={workspaceLeaveModalState.open}>
+                Leave Space
+              </Button>
+            )}
+          </Grid>
         </Grid>
         {isAdmin && dataChanged && (
           <Box
             sx={{
-              p: 2,
-              mt: 2,
+              py: 1,
+              px: { xs: 5, md: 10 },
               position: 'sticky',
               bottom: '0',
               background: (theme) => theme.palette.background.paper,
+              borderTop: (theme) => `1px solid ${theme.palette.divider}`,
               textAlign: 'right'
             }}
           >

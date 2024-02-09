@@ -63,6 +63,7 @@ const spaceTabs: Record<SpaceSettingsTab['path'], typeof SpaceSettings> = {
 
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
+  const spaceStyles = value === 'space' ? { p: 0 } : undefined;
 
   return (
     <Box
@@ -72,7 +73,7 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`vertical-tab-${index}`}
       {...other}
     >
-      {value === index && <DialogContent sx={{ overflowY: 'visible' }}>{children}</DialogContent>}
+      {value === index && <DialogContent sx={{ overflowY: 'visible', ...spaceStyles }}>{children}</DialogContent>}
     </Box>
   );
 }

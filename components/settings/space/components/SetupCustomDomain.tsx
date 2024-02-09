@@ -60,7 +60,7 @@ export function SetupCustomDomain({
   } = useCustomDomainVerification();
 
   return (
-    <Stack mt={3}>
+    <Stack>
       <Stack direction='row' gap={1}>
         <FieldLabel>Custom space URL domain</FieldLabel>
         <Stack>
