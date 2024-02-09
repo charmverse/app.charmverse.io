@@ -114,6 +114,10 @@ type ProposalReviewer = {
  *              type: string
  *              format: date-time
  *              example: 2022-04-04T21:32:38.317Z
+ *            completedAt:
+ *              type: string
+ *              format: date-time
+ *              example: 2022-04-04T21:32:38.317Z
  */
 export type PublicApiProposal = {
   id: string;
@@ -133,6 +137,7 @@ export type PublicApiProposal = {
     result: ProposalEvaluationResultExtended;
     type: ProposalEvaluationType | 'draft';
     startedAt: string;
+    completedAt?: string;
   };
 };
 
@@ -263,6 +268,7 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
         ? {
             result: currentEvaluation.result ?? 'in_progress',
             startedAt: (previousEvaluation?.completedAt || proposal.page?.createdAt || new Date()).toISOString(),
+            completedAt: currentEvaluation?.completedAt?.toISOString(),
             title: currentEvaluation.title,
             type: currentEvaluation.type
           }
