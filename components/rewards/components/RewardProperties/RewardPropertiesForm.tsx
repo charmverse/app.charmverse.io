@@ -235,7 +235,7 @@ export function RewardPropertiesForm({
                   <Box display='flex' flex={1}>
                     <TemplateSelect
                       options={rewardTemplates.map((rewardTemplate) => rewardTemplate.page)}
-                      disabled={readOnlyTemplate}
+                      disabled={readOnlyTemplate || readOnly}
                       value={templateId ? { id: templateId } : null}
                       onChange={(templatePage) => {
                         if (!templatePage) {
