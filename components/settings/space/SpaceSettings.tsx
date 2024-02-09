@@ -162,7 +162,7 @@ export function SpaceSettings({
         spaceImage: values.spaceImage,
         spaceArtwork: values.spaceArtwork,
         requireMembersTwoFactorAuth: values.requireMembersTwoFactorAuth,
-        customDomain: values.customDomain,
+        customDomain: values.customDomain || null,
         snapshotDomain: values.snapshotDomain
       },
       {
@@ -510,17 +510,16 @@ export function SpaceSettings({
         {isAdmin && dataChanged && (
           <Box
             sx={{
-              py: 2,
+              p: 2,
               mt: 2,
               position: 'sticky',
               bottom: '0',
               background: (theme) => theme.palette.background.paper,
-              justifyContent: 'flex-start'
+              textAlign: 'right'
             }}
           >
             <Button
               disableElevation
-              size='large'
               data-test='submit-space-update'
               sx={{ alignSelf: 'flex-start' }}
               disabled={updateSpaceLoading || !dataChanged}
