@@ -50,6 +50,7 @@ export function FarcasterFrameNodeView({
   const { space } = useCurrentSpace();
   const { error, isLoadingFrame, getFarcasterFrame, farcasterFrame, submitOption, isLoadingFrameAction } =
     useFarcasterFrame(attrs.src ? { frameUrl: attrs.src, pageId } : undefined);
+  const [clickedButtonIndex, setClickedButtonIndex] = useState<null | number>(null);
   const { farcasterUser, logout, farcasterProfile } = useFarcasterUser();
   const [inputText, setInputText] = useState('');
   const isFarcasterUserAvailable = farcasterUser && farcasterUser.fid;
@@ -258,12 +259,15 @@ export function FarcasterFrameNodeView({
                     <StyledButton
                       disabled={isLoadingFrameAction || !isFarcasterUserAvailable}
                       onClick={() => {
+                        setClickedButtonIndex(index);
                         submitOption({
                           buttonIndex: index + 1,
                           inputText
+                        }).finally(() => {
+                          setClickedButtonIndex(null);
                         });
                       }}
-                      loading={isLoadingFrameAction}
+                      loading={index === clickedButtonIndex}
                     >
                       <Typography
                         variant='body2'
