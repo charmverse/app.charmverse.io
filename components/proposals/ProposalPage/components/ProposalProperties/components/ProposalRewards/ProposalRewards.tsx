@@ -1,5 +1,6 @@
 import type { ProposalReviewer } from '@charmverse/core/prisma';
 import { Delete, Edit } from '@mui/icons-material';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Box, Grid, Hidden, IconButton, Stack, Typography } from '@mui/material';
 import { uniqBy } from 'lodash';
 import { useState } from 'react';
@@ -217,7 +218,7 @@ export function ProposalRewards({
                 key={draftId}
                 flex={1}
               >
-                <SelectPreviewContainer readOnly={readOnly} displayType='details'>
+                <SelectPreviewContainer displayType='details'>
                   <Stack direction='row' justifyContent='space-between' alignItems='center' gap={1}>
                     <Grid container spacing={0.5}>
                       <Grid item xs={8} lg={5}>
@@ -243,22 +244,24 @@ export function ProposalRewards({
                         </Grid>
                       </Hidden>
 
-                      {!readOnly && (
-                        <Grid item xs={4} lg={2}>
-                          <Stack className='icons' sx={{ opacity: 0, transition: 'opacity 0.2s ease' }} direction='row'>
-                            <IconButton
-                              size='small'
-                              onClick={() => editReward({ reward, page, draftId })}
-                              disabled={readOnly}
-                            >
-                              <Edit color='secondary' fontSize='small' />
+                      <Grid item xs={4} lg={2}>
+                        <Stack className='icons' sx={{ opacity: 0, transition: 'opacity 0.2s ease' }} direction='row'>
+                          {readOnly ? (
+                            <IconButton size='small' onClick={() => editReward({ reward, page, draftId })}>
+                              <VisibilityIcon color='secondary' fontSize='small' />
                             </IconButton>
-                            <IconButton size='small' onClick={() => onDelete(draftId)} disabled={readOnly}>
-                              <Delete color='secondary' fontSize='small' />
-                            </IconButton>
-                          </Stack>
-                        </Grid>
-                      )}
+                          ) : (
+                            <>
+                              <IconButton size='small' onClick={() => editReward({ reward, page, draftId })}>
+                                <Edit color='secondary' fontSize='small' />
+                              </IconButton>
+                              <IconButton size='small' onClick={() => onDelete(draftId)} disabled={readOnly}>
+                                <Delete color='secondary' fontSize='small' />
+                              </IconButton>
+                            </>
+                          )}
+                        </Stack>
+                      </Grid>
                     </Grid>
                   </Stack>
                 </SelectPreviewContainer>
@@ -277,7 +280,11 @@ export function ProposalRewards({
 
       <NewPageDialog
         contentUpdated={contentUpdated || isDirty}
-        disabledTooltip={getDisabledTooltip({ newPageValues, rewardValues, isProposalTemplate: !!isProposalTemplate })}
+        disabledTooltip={
+          readOnly
+            ? 'You cannot edit this reward'
+            : getDisabledTooltip({ newPageValues, rewardValues, isProposalTemplate: !!isProposalTemplate })
+        }
         isOpen={!!newPageValues}
         onClose={closeDialog}
         onSave={saveForm}
