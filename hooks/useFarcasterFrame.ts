@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import type { FrameButton } from 'frames.js';
 
 import { useFarcasterFrameAction, useGetFarcasterFrame } from 'charmClient/hooks/farcaster';
 import { isValidUrl } from 'lib/utilities/isValidUrl';
@@ -18,13 +19,19 @@ export function useFarcasterFrame(args?: { pageId?: string; frameUrl: string }) 
     error
   } = useGetFarcasterFrame(args);
   const { showConfirmation } = useConfirmationModal();
-  const submitOption = async ({ buttonIndex, inputText }: { buttonIndex: number; inputText: string }) => {
+  const submitOption = async ({
+    button,
+    inputText,
+    index
+  }: {
+    index: number;
+    button: FrameButton;
+    inputText: string;
+  }) => {
     try {
       if (!farcasterUser || !farcasterUser.fid || !farcasterFrame) {
         return;
       }
-
-      const button = farcasterFrame.buttons ? farcasterFrame.buttons[buttonIndex - 1] : null;
 
       if (!button) {
         return;
@@ -45,12 +52,11 @@ export function useFarcasterFrame(args?: { pageId?: string; frameUrl: string }) 
 
       const frameAction = await triggerFrameAction({
         fid: farcasterUser.fid,
-        // according to spec, if the button has a target, use that, otherwise use the frame's postUrl
-        postUrl: button?.target ?? farcasterFrame.postUrl ?? args?.frameUrl,
+        postUrl: farcasterFrame.postUrl ?? args?.frameUrl,
         privateKey: farcasterUser.privateKey,
         pageId: args?.pageId,
         postType: button.action,
-        buttonIndex,
+        buttonIndex: index + 1,
         inputText
       });
 

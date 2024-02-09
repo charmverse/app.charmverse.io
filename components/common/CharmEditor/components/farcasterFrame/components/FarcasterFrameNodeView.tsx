@@ -189,7 +189,9 @@ export function FarcasterFrameNodeView({
     );
   }
 
-  const validFrameButtons = farcasterFrame.buttons?.filter(({ label }) => label) ?? [];
+  const frameButtons = (farcasterFrame.buttons ?? []).map((button, index) => ({ ...button, index }));
+  // Filter out buttons without label or with action "mint"
+  const validFrameButtons = frameButtons.filter(({ action, label, target }) => label && action !== 'mint');
 
   return (
     <Paper sx={{ p: 1, my: 2 }}>
@@ -216,6 +218,7 @@ export function FarcasterFrameNodeView({
             <TextField
               type='text'
               placeholder={farcasterFrame.inputText}
+              disabled={isLoadingFrameAction}
               value={inputText}
               // Prevent losing focus when clicking on the input
               onMouseDown={(e) => {
@@ -238,7 +241,7 @@ export function FarcasterFrameNodeView({
               }}
             />
           )}
-          {validFrameButtons.length && (
+          {validFrameButtons.length ? (
             <Stack
               flexDirection={{
                 xs: 'column',
@@ -247,10 +250,10 @@ export function FarcasterFrameNodeView({
               gap={1}
               mb={1}
             >
-              {validFrameButtons.map(({ label, action, target }, index: number) => (
+              {validFrameButtons.map((button) => (
                 <Tooltip
                   title={!isFarcasterUserAvailable ? 'Please sign in with Farcaster' : undefined}
-                  key={`${index.toString()}`}
+                  key={`${button.index.toString()}`}
                 >
                   <div
                     style={{
@@ -259,17 +262,20 @@ export function FarcasterFrameNodeView({
                     }}
                   >
                     <StyledButton
-                      disabled={isLoadingFrameAction || !isFarcasterUserAvailable}
+                      disabled={
+                        button.index === clickedButtonIndex || isLoadingFrameAction || !isFarcasterUserAvailable
+                      }
                       onClick={() => {
-                        setClickedButtonIndex(index);
+                        setClickedButtonIndex(button.index);
                         submitOption({
-                          buttonIndex: index + 1,
-                          inputText
+                          button,
+                          inputText,
+                          index: button.index
                         }).finally(() => {
                           setClickedButtonIndex(null);
                         });
                       }}
-                      loading={index === clickedButtonIndex}
+                      loading={button.index === clickedButtonIndex}
                     >
                       <Typography
                         variant='body2'
@@ -278,9 +284,9 @@ export function FarcasterFrameNodeView({
                           textWrap: 'wrap'
                         }}
                       >
-                        {label}
+                        {button.label}
                       </Typography>
-                      {action === 'post_redirect' || (action === 'link' && isValidUrl(target)) ? (
+                      {button.action === 'post_redirect' || (button.action === 'link' && isValidUrl(button.target)) ? (
                         <CallMadeIcon sx={{ ml: 0.5, fontSize: 14 }} />
                       ) : null}
                     </StyledButton>
@@ -288,7 +294,7 @@ export function FarcasterFrameNodeView({
                 </Tooltip>
               ))}
             </Stack>
-          )}
+          ) : null}
         </Stack>
         {farcasterUser?.status === 'approved' && farcasterProfile ? (
           <Box mt={1}>
