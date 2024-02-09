@@ -128,6 +128,8 @@ async function getProposal(req: NextApiRequest, res: NextApiResponse<PublicApiPr
     content: proposal.page?.content as any
   });
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
+  const previousEvaluation =
+    currentEvaluation && currentEvaluation.index > 0 ? proposal.evaluations[currentEvaluation.index - 1] : null;
   const isActiveVote = currentEvaluation?.result === null && currentEvaluation?.type === 'vote';
   const apiProposal: PublicApiProposal = {
     id: proposal.id,
@@ -142,9 +144,12 @@ async function getProposal(req: NextApiRequest, res: NextApiResponse<PublicApiPr
       ? {
           type: currentEvaluation.type,
           result: currentEvaluation.result || 'in_progress',
-          title: currentEvaluation.title
+          startedAt: (previousEvaluation?.completedAt || proposal.page?.createdAt || new Date()).toISOString(),
+          title: currentEvaluation.title,
+          completedAt: currentEvaluation.completedAt?.toISOString()
         }
       : {
+          startedAt: (proposal.page?.createdAt || new Date()).toISOString(),
           result: 'in_progress',
           title: 'Draft',
           type: 'draft'

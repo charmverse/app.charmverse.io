@@ -170,6 +170,7 @@ describe('GET /api/v1/proposals/{proposalId}', () => {
         ]),
         title: proposal.page.title,
         currentStep: {
+          startedAt: proposal.page.createdAt.toISOString(),
           result: 'in_progress',
           title: 'pass_fail',
           type: 'pass_fail'
@@ -217,6 +218,7 @@ describe('GET /api/v1/proposals/{proposalId}', () => {
           }
         ]),
         currentStep: {
+          startedAt: proposal.page.createdAt.toISOString(),
           result: 'in_progress',
           title: 'pass_fail',
           type: 'pass_fail'
