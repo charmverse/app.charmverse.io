@@ -2,18 +2,19 @@ import { Tooltip } from '@mui/material';
 
 import { useGoBackToStep } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
+import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/ProposalEvaluations/components/Settings/components/EvaluationStepSettings';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PopulatedEvaluation } from 'lib/proposal/interface';
 
-export function ResetPassFailButton({
+export function ResetResultButton({
   evaluation,
   proposalId,
   onSubmit,
   archived,
   hasMovePermission
 }: {
-  evaluation: PopulatedEvaluation;
+  evaluation: Pick<ProposalEvaluationValues, 'id' | 'type'>;
   archived?: boolean;
   proposalId?: string;
   onSubmit?: () => void;
@@ -25,12 +26,13 @@ export function ResetPassFailButton({
     proposalId
   });
 
-  const canReset =
-    !archived &&
-    evaluation?.type === 'pass_fail' &&
-    evaluation.result === 'fail' &&
-    evaluation.result !== null &&
-    (evaluation.isReviewer || hasMovePermission);
+  const disabledTooltip = !hasMovePermission
+    ? 'You do not have permission to move reset results of this proposal'
+    : evaluation.type === 'vote'
+    ? 'You cannot revert the results of a vote'
+    : archived
+    ? 'You cannot reset an archived proposal'
+    : '';
 
   async function resetStep() {
     try {
@@ -52,14 +54,17 @@ export function ResetPassFailButton({
     }
   }
 
-  if (!canReset) {
-    return null;
-  }
-
   return (
-    <Tooltip title='Reset evaluation result'>
+    <Tooltip title={disabledTooltip || 'Reset evaluation result'}>
       <span>
-        <Button color='secondary' loading={isSavingEvaluation} size='small' variant='outlined' onClick={onClick}>
+        <Button
+          color='secondary'
+          loading={isSavingEvaluation}
+          size='small'
+          variant='outlined'
+          onClick={onClick}
+          disabled={!!disabledTooltip}
+        >
           Reset
         </Button>
       </span>
