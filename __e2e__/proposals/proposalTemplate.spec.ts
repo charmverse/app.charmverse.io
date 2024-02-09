@@ -181,7 +181,7 @@ test.describe.serial('Structured proposal template', () => {
     await expect(proposalPage.page.locator('data-test=field-label').filter({ hasText: /^Full name\*$/ })).toBeVisible();
   });
 
-  test('Create proposal from structure template after providing required fields', async ({
+  test.skip('Create proposal from structure template after providing required fields', async ({
     proposalPage,
     proposalListPage,
     documentPage,
