@@ -17,10 +17,12 @@ export class ApolloClientWithRedisCache extends ApolloClient<any> {
 
   private cacheKeyPrefix: string;
 
+  private skipRedisCache: boolean;
+
   /**
    * @cacheKeyPrefix - A prefix to be added to the cache key. Useful when multiple different clients use the same cache and might have similar queries
    */
-  constructor(args: { uri: string; persistForSeconds: number; cacheKeyPrefix?: string }) {
+  constructor(args: { uri: string; persistForSeconds: number; cacheKeyPrefix?: string; skipRedisCache?: boolean }) {
     super({
       cache: new InMemoryCache(),
       uri: args.uri
@@ -28,6 +30,8 @@ export class ApolloClientWithRedisCache extends ApolloClient<any> {
     this.persistForSeconds = args.persistForSeconds;
 
     this.cacheKeyPrefix = args.cacheKeyPrefix || '';
+
+    this.skipRedisCache = !!args.skipRedisCache;
   }
 
   createCacheKey(json: object): string {
@@ -65,12 +69,12 @@ export class ApolloClientWithRedisCache extends ApolloClient<any> {
    * If no Redis Client is available, the query will be executed as usual
    */
   async query<T = any>(options: Pick<QueryOptions, 'query' | 'variables'>): Promise<ApolloQueryResult<T>> {
-    if (!this.redisClient || !this.redisClient.isOpen || !this.redisClient.isReady) {
-      return super.query(options);
-    }
-
     // Force bypassing the in-memory cache so that the query always executes
     (options as QueryOptions).fetchPolicy = 'no-cache';
+
+    if (this.skipRedisCache || !this.redisClient || !this.redisClient.isOpen || !this.redisClient.isReady) {
+      return super.query(options);
+    }
 
     const cacheKey = this.createCacheKey({ query: options.query, variables: options.variables });
 
