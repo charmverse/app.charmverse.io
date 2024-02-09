@@ -160,6 +160,8 @@ function FormFieldsInputBase({
               render={({ field }) => (
                 <FieldTypeRenderer
                   {...field}
+                  rows={undefined}
+                  maxRows={10}
                   value={(field.value ?? '') as FormFieldValue}
                   placeholder={fieldTypePlaceholderRecord[formField.type]}
                   labelEndAdornment={
@@ -193,7 +195,7 @@ function FormFieldsInputBase({
                   }
                   description={formField.description as PageContent}
                   disabled={disabled}
-                  type={formField.type}
+                  type={formField.type === 'short_text' ? 'text_multiline' : formField.type}
                   label={formField.name}
                   options={formField.options as SelectOptionType[]}
                   error={errors[formField.id] as any}

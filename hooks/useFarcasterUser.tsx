@@ -13,7 +13,6 @@ import { useCreateFarcasterSigner } from 'charmClient/hooks/farcaster';
 import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
 import { CanvasQRCode } from 'components/settings/account/components/otp/components/CanvasQrCode';
-import { createHexKeyPair } from 'lib/farcaster/createHexKeyPair';
 import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 import { getFarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 import type { FarcasterUser, SignedKeyRequest } from 'lib/farcaster/interfaces';
@@ -29,7 +28,7 @@ export type FarcasterUserContext = {
   isCreatingSigner: boolean;
   createAndStoreSigner: () => Promise<void>;
   logout: () => void;
-  farcasterSignerModal: PopupState;
+  signerApprovalModalPopupState: PopupState;
   farcasterProfile: FarcasterProfile['body'] | null;
 };
 
@@ -38,17 +37,17 @@ export const FarcasterUserContext = createContext<FarcasterUserContext>({
   isCreatingSigner: false,
   createAndStoreSigner: async () => {},
   logout: () => {},
-  farcasterSignerModal: {} as PopupState,
+  signerApprovalModalPopupState: {} as PopupState,
   farcasterProfile: null
 });
 
-function FarcasterApprovalModal({
-  farcasterSignerModal,
+function FarcasterSignerApprovalModal({
+  signerApprovalModalPopupState,
   farcasterUser,
   setFarcasterUser,
   logout
 }: {
-  farcasterSignerModal: PopupState;
+  signerApprovalModalPopupState: PopupState;
   farcasterUser: FarcasterUser;
   setFarcasterUser: (user: FarcasterUser) => void;
   logout: () => void;
@@ -77,14 +76,14 @@ function FarcasterApprovalModal({
           if (fcSignerRequestResponse.result.signedKeyRequest.state !== 'completed') {
             return;
           }
-          const user = {
+
+          const user: FarcasterUser = {
             ...farcasterUser,
-            ...fcSignerRequestResponse.result,
             fid: fcSignerRequestResponse.result.signedKeyRequest.userFid,
             status: 'approved' as const
           };
           setFarcasterUser(user);
-          farcasterSignerModal.close();
+          signerApprovalModalPopupState.close();
           showMessage('Successfully logged in with Farcaster', 'success');
           clearInterval(intervalId);
         } catch (error) {
@@ -110,13 +109,13 @@ function FarcasterApprovalModal({
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       clearInterval(intervalId);
     };
-  }, [farcasterUser, farcasterSignerModal]);
+  }, [farcasterUser, signerApprovalModalPopupState]);
 
   return (
     <Modal
       open
       onClose={() => {
-        farcasterSignerModal.close();
+        signerApprovalModalPopupState.close();
         logout();
       }}
       title='Approve in Warpcast'
@@ -161,7 +160,7 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
   );
 
   const { trigger: createFarcasterSigner } = useCreateFarcasterSigner();
-  const farcasterSignerModal = usePopupState({
+  const signerApprovalModalPopupState = usePopupState({
     variant: 'popover',
     popupId: 'farcaster-signer'
   });
@@ -173,50 +172,28 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
   async function createAndStoreSigner() {
     try {
       setIsCreatingSigner(true);
-      const keypairString = await createHexKeyPair();
-      const farcasterSigner = await createFarcasterSigner({
-        publicKey: (keypairString.publicKey.startsWith('0x')
-          ? keypairString.publicKey
-          : `0x${keypairString.publicKey}`) as `0x${string}`
-      });
+      const farcasterSigner = await createFarcasterSigner();
 
       if (!farcasterSigner) {
         throw new Error('Error creating signer');
       }
 
-      const { signature, requestFid, deadline } = farcasterSigner;
-
-      const {
-        result: { signedKeyRequest }
-      } = await http.POST<{
-        result: { signedKeyRequest: { token: string; deeplinkUrl: string } };
-      }>(
-        `https://api.warpcast.com/v2/signed-key-requests`,
-        {
-          key: keypairString.publicKey,
-          signature,
-          requestFid: BigInt(requestFid).toString(),
-          deadline: BigInt(deadline).toString()
-        },
-        {
-          credentials: 'omit'
-        }
-      );
+      const { signature, deeplinkUrl, token, deadline, privateKey, publicKey } = farcasterSigner;
 
       setFarcasterUser({
-        signature,
-        publicKey: keypairString.publicKey,
+        publicKey,
+        privateKey,
+        status: 'pending_approval',
         deadline,
-        token: signedKeyRequest.token,
-        signerApprovalUrl: signedKeyRequest.deeplinkUrl,
-        privateKey: keypairString.privateKey,
-        status: 'pending_approval'
+        signature,
+        token,
+        signerApprovalUrl: deeplinkUrl
       });
-      farcasterSignerModal.open();
+      signerApprovalModalPopupState.open();
     } catch (error: any) {
       // err.shortMessage comes from viem
       showMessage(error.shortMessage || error.message || 'Something went wrong. Please try again', 'error');
-      log.error('Error creating signer', {
+      log.error('Error creating farcaster signer', {
         error
       });
     } finally {
@@ -230,18 +207,18 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
       isCreatingSigner,
       createAndStoreSigner,
       logout,
-      farcasterSignerModal,
+      signerApprovalModalPopupState,
       farcasterProfile: farcasterProfile ? farcasterProfile.body : null
     }),
-    [farcasterUser, farcasterProfile, isCreatingSigner, farcasterSignerModal]
+    [farcasterUser, farcasterProfile, isCreatingSigner, signerApprovalModalPopupState]
   );
 
   return (
     <FarcasterUserContext.Provider value={value}>
       {children}
-      {farcasterSignerModal.isOpen && farcasterUser && farcasterUser.status === 'pending_approval' && (
-        <FarcasterApprovalModal
-          farcasterSignerModal={farcasterSignerModal}
+      {signerApprovalModalPopupState.isOpen && farcasterUser && farcasterUser.status === 'pending_approval' && (
+        <FarcasterSignerApprovalModal
+          signerApprovalModalPopupState={signerApprovalModalPopupState}
           farcasterUser={farcasterUser}
           setFarcasterUser={setFarcasterUser}
           logout={logout}
