@@ -6,7 +6,7 @@ import type { LoggedInUser } from 'models';
 
 export type IContext = {
   user: LoggedInUser | null;
-  setUser: (user: LoggedInUser | any) => void;
+  setUser: (user: Partial<LoggedInUser>) => void;
   updateUser: (user: Partial<LoggedInUser>) => void;
   isLoaded: boolean;
   refreshUser: () => Promise<void>;
