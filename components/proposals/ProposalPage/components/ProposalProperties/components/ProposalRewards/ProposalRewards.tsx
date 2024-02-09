@@ -1,6 +1,7 @@
 import type { ProposalReviewer } from '@charmverse/core/prisma';
 import { Delete, Edit } from '@mui/icons-material';
-import { Box, Grid, Hidden, IconButton, Stack, Typography } from '@mui/material';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import { Box, Grid, Hidden, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import { uniqBy } from 'lodash';
 import { useState } from 'react';
 import { v4 } from 'uuid';
@@ -116,9 +117,7 @@ export function ProposalRewards({
     setCurrentPendingId(v4());
   }
 
-  function editReward({ reward, page, draftId }: ProposalPendingReward) {
-    if (readOnly) return;
-
+  function showReward({ reward, page, draftId }: ProposalPendingReward) {
     setRewardValues(reward);
     openNewPage(page || undefined);
     setCurrentPendingId(draftId);
@@ -245,22 +244,30 @@ export function ProposalRewards({
                         </Grid>
                       </Hidden>
 
-                      {!readOnly && (
-                        <Grid item xs={4} lg={2}>
-                          <Stack className='icons' sx={{ opacity: 0, transition: 'opacity 0.2s ease' }} direction='row'>
-                            <IconButton
-                              size='small'
-                              onClick={() => editReward({ reward, page, draftId })}
-                              disabled={readOnly}
-                            >
-                              <Edit color='secondary' fontSize='small' />
-                            </IconButton>
-                            <IconButton size='small' onClick={() => onDelete(draftId)} disabled={readOnly}>
-                              <Delete color='secondary' fontSize='small' />
-                            </IconButton>
-                          </Stack>
-                        </Grid>
-                      )}
+                      <Grid item xs={4} lg={2}>
+                        <Stack className='icons' sx={{ opacity: 0, transition: 'opacity 0.2s ease' }} direction='row'>
+                          <Tooltip title={readOnly ? 'View' : 'Edit'}>
+                            <span>
+                              <IconButton size='small' onClick={() => showReward({ reward, page, draftId })}>
+                                {readOnly ? (
+                                  <VisibilityIcon color='secondary' fontSize='small' />
+                                ) : (
+                                  <Edit color='secondary' fontSize='small' />
+                                )}
+                              </IconButton>
+                            </span>
+                          </Tooltip>
+                          {!readOnly && (
+                            <Tooltip title='Delete'>
+                              <span>
+                                <IconButton size='small' onClick={() => onDelete(draftId)} disabled={readOnly}>
+                                  <Delete color='secondary' fontSize='small' />
+                                </IconButton>
+                              </span>
+                            </Tooltip>
+                          )}
+                        </Stack>
+                      </Grid>
                     </Grid>
                   </Stack>
                 </SelectPreviewContainer>
@@ -278,8 +285,13 @@ export function ProposalRewards({
       {!pendingRewards?.length && <AttachRewardButton createNewReward={createNewReward} variant={variant} />}
 
       <NewPageDialog
-        contentUpdated={contentUpdated || isDirty}
-        disabledTooltip={getDisabledTooltip({ newPageValues, rewardValues, isProposalTemplate: !!isProposalTemplate })}
+        contentUpdated={!readOnly && (contentUpdated || isDirty)}
+        disabledTooltip={getDisabledTooltip({
+          readOnly,
+          newPageValues,
+          rewardValues,
+          isProposalTemplate: !!isProposalTemplate
+        })}
         isOpen={!!newPageValues}
         onClose={closeDialog}
         onSave={saveForm}
@@ -296,6 +308,7 @@ export function ProposalRewards({
             onChange={setRewardValues}
             values={rewardValues}
             isNewReward
+            readOnly={readOnly}
             isTemplate={false}
             expandedByDefault
             forcedApplicationType='assigned'
