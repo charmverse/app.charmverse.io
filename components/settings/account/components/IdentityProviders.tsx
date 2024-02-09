@@ -23,7 +23,6 @@ import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
 import { useSetPrimaryWallet } from 'charmClient/hooks/profile';
-import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/Web3ConnectionManager';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import Legend from 'components/settings/Legend';
 import { useDiscordConnection } from 'hooks/useDiscordConnection';
@@ -38,7 +37,6 @@ import { countConnectableIdentities } from 'lib/users/countConnectableIdentities
 import { shortWalletAddress } from 'lib/utilities/blockchain';
 import randomName from 'lib/utilities/randomName';
 import { lowerCaseEqual } from 'lib/utilities/strings';
-import type { LoggedInUser } from 'models';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { useIdentityTypes } from '../hooks/useIdentityTypes';
@@ -48,9 +46,8 @@ import { NewIdentityModal } from './NewIdentityModal';
 import { TelegramLoginIframe } from './TelegramLoginIframe';
 
 export function IdentityProviders() {
-  const { isConnectingIdentity } = useWeb3ConnectionManager();
   const { account, requestSignature, isSigning, verifiableWalletDetected, disconnectWallet } = useWeb3Account();
-  const { user, setUser, updateUser } = useUser();
+  const { user, updateUser } = useUser();
   const { showMessage } = useSnackbar();
   const { disconnectVerifiedEmailAccount } = useFirebaseAuth();
   const { disconnectGoogleAccount } = useGoogleLogin();
@@ -93,8 +90,7 @@ export function IdentityProviders() {
   const onSetPrimaryWallet = async (walletId: string) => {
     try {
       await setPrimaryWallet({ walletId });
-      setUser({
-        ...user,
+      updateUser({
         primaryWalletId: walletId
       });
       showMessage('Primary wallet set successfully', 'success');
@@ -119,7 +115,7 @@ export function IdentityProviders() {
     error: disconnectTelegramError
   } = useSWRMutation(telegramAccount ? '/telegram/disconnect' : null, () => charmClient.disconnectTelegram(), {
     onSuccess(data) {
-      setUser((_user: LoggedInUser) => ({ ..._user, ...data, telegramUser: null }));
+      updateUser({ ...data, telegramUser: null });
     }
   });
 
@@ -128,7 +124,7 @@ export function IdentityProviders() {
     (_url, { arg }: Readonly<{ arg: TelegramAccount }>) => charmClient.connectTelegram(arg),
     {
       onSuccess(data) {
-        setUser((_user: LoggedInUser) => ({ ..._user, telegramUser: data }));
+        updateUser({ telegramUser: data });
       }
     }
   );
@@ -203,12 +199,12 @@ export function IdentityProviders() {
             <IdentityProviderItem
               text={wallet.ensname || shortWalletAddress(wallet.address)}
               type='Wallet'
-              loading={isConnectingIdentity || isVerifyingWallet || isSigning || isSettingPrimaryWallet}
+              loading={isVerifyingWallet || isSigning || isSettingPrimaryWallet}
               disabled={cannotDisconnect}
               connected={true}
               primary={lowerCaseEqual(wallet.address, primaryWallet?.address)}
               actions={[
-                verifiableWalletDetected && !account && !isConnectingIdentity ? (
+                verifiableWalletDetected && !account ? (
                   <MenuItem key='verify' onClick={generateWalletAuth}>
                     Verify Wallet
                   </MenuItem>

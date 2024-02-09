@@ -1,15 +1,15 @@
-import type { Page, ProposalStatus } from '@charmverse/core/prisma';
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
+import type { Page, Proposal, ProposalAuthor, ProposalReviewer, ProposalStatus } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
+import type { ProposalFields } from 'lib/proposal/interface';
 
-export type ProposalWithUsersAndPageMeta = ProposalWithUsers & { page: Pick<Page, 'title' | 'path'> };
-
-type ProposalReviewerInput = {
-  group: 'system_role' | 'role' | 'user';
-  id: string;
-  evaluationId?: string;
+export type ProposalWithUsersAndPageMeta = Omit<Proposal, 'fields'> & {
+  authors: ProposalAuthor[];
+  fields: ProposalFields | null;
+  reviewers: ProposalReviewer[];
+  rewardIds?: string[] | null;
+  page: Pick<Page, 'title' | 'path'>;
 };
 
 /**
@@ -30,7 +30,7 @@ export async function generateProposal({
 }): Promise<ProposalWithUsersAndPageMeta> {
   const proposalId = v4();
 
-  const result = await createPageDb<{ proposal: ProposalWithUsers; title: string; path: string }>({
+  const result = await createPageDb<{ proposal: ProposalWithUsersAndPageMeta; title: string; path: string }>({
     data: {
       id: proposalId,
       contentText: '',

@@ -16,7 +16,7 @@ import { ConnectorButton } from './components/ConnectorButton';
 import processConnectionError from './utils/processConnectionError';
 
 export function WalletSelector() {
-  const { closeWalletSelectorModal, isWalletSelectorModalOpen, isConnectingIdentity } = useWeb3ConnectionManager();
+  const { closeWalletSelectorModal, isWalletSelectorModalOpen } = useWeb3ConnectionManager();
   const { pendingConnector, error, isLoading, connectAsync, connectors } = useConnect();
   const { connector: activeConnector, isConnected } = useAccount();
 

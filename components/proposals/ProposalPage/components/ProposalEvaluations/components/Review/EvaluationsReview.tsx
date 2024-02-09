@@ -1,4 +1,5 @@
 import { Collapse, Divider, Tooltip } from '@mui/material';
+import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -77,6 +78,11 @@ export function EvaluationsReview({
 
   const previousStepIndex = adjustedCurrentEvaluationIndex > 0 ? adjustedCurrentEvaluationIndex - 1 : null;
 
+  function openSettings(evaluation: ProposalEvaluationValues) {
+    // use clone deep to avoid changing deeply-nested objects like rubric criteria
+    setEvaluationInput(cloneDeep(evaluation));
+  }
+
   function closeSettings() {
     setEvaluationInput(null);
   }
@@ -125,6 +131,7 @@ export function EvaluationsReview({
         actions={
           <EvaluationStepActions
             isPreviousStep={previousStepIndex === 0}
+            isCurrentStep={!proposal?.currentEvaluationId}
             permissions={proposal?.permissions}
             proposalId={proposal?.id}
             refreshProposal={refreshProposal}
@@ -148,12 +155,13 @@ export function EvaluationsReview({
             actions={
               <EvaluationStepActions
                 archived={proposal?.archived ?? false}
+                isCurrentStep={isCurrent}
                 isPreviousStep={previousStepIndex === index + 1}
                 permissions={proposal?.permissions}
                 proposalId={proposal?.id}
                 refreshProposal={refreshProposal}
                 evaluation={evaluation}
-                openSettings={() => setEvaluationInput({ ...evaluation })}
+                openSettings={() => openSettings(evaluation)}
               />
             }
           >
@@ -183,7 +191,6 @@ export function EvaluationsReview({
               <RubricEvaluation
                 key={evaluation.id}
                 proposal={proposal}
-                permissions={isCurrentEval ? proposal?.permissions : undefined}
                 isCurrent={isCurrent}
                 evaluation={evaluation}
                 refreshProposal={refreshProposal}

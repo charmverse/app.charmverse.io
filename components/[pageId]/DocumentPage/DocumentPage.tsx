@@ -11,7 +11,6 @@ import AddBountyButton from 'components/common/BoardEditor/focalboard/src/compon
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import { blockLoad, databaseViewsLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { CardPropertiesWrapper } from 'components/common/CharmEditor/CardPropertiesWrapper';
 import { handleImageFileDrop } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
@@ -328,7 +327,6 @@ function DocumentPageComponent({
               isUnpublishedProposal={isUnpublishedProposal}
               readOnlyProposalPermissions={!proposal?.permissions.edit}
               isProposalTemplate={page.type === 'proposal_template'}
-              isReviewer={proposal?.permissions.evaluate}
               isStructuredProposal={isStructuredProposal}
               proposal={proposal}
               proposalInput={proposal}
@@ -389,15 +387,15 @@ function DocumentPageComponent({
                     <FormFieldsEditor
                       readOnly={(!isAdmin && (!user || !proposalAuthors.includes(user.id))) || !!proposal?.archived}
                       proposalId={proposal.id}
-                      formFields={proposal?.form.formFields ?? []}
+                      formFields={proposal.form?.formFields ?? []}
                     />
                   ) : (
                     <ProposalFormFieldsInput
                       pageId={page.id}
-                      isReviewer={(proposal?.permissions.evaluate || proposal?.permissions.review) ?? false}
+                      enableComments={proposal.permissions.comment}
                       proposalId={proposal.id}
-                      formFields={proposal?.form.formFields ?? []}
-                      readOnly={!user || !pagePermissions.edit_content || !!proposal?.archived}
+                      formFields={proposal.form?.formFields ?? []}
+                      readOnly={!proposal.permissions.edit}
                       threads={threads}
                       isDraft={proposal?.status === 'draft'}
                     />
@@ -426,7 +424,6 @@ function DocumentPageComponent({
                   pagePermissions={pagePermissions ?? undefined}
                   onConnectionEvent={onConnectionEvent}
                   setEditorState={setEditorState}
-                  snapshotProposalId={page.snapshotProposalId}
                   onParticipantUpdate={onParticipantUpdate}
                   setCharmEditorView={setCharmEditorView}
                   style={{
@@ -451,6 +448,7 @@ function DocumentPageComponent({
                     reviewers={proposal.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat()}
                     assignedSubmitters={proposal.authors.map((a) => a.userId)}
                     variant='solid_button'
+                    readOnly={!proposal.permissions.edit}
                     rewardIds={proposal.rewardIds || []}
                     onSave={(pendingReward) => {
                       const isExisting = proposal.fields?.pendingRewards?.find(
@@ -487,7 +485,7 @@ function DocumentPageComponent({
               {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') && (
                 <Box>
                   {/* add negative margin to offset height of .charm-empty-footer */}
-                  <PageComments page={page} canCreateComments={pagePermissions.comment} />
+                  <PageComments page={page} enableComments={pagePermissions.comment} />
                 </Box>
               )}
             </>

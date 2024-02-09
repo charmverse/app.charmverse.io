@@ -22,14 +22,12 @@ type Props = {
   evaluationTemplate?: Pick<PopulatedEvaluation, 'reviewers' | 'rubricCriteria' | 'voteSettings'>;
   onChange: (criteria: Partial<ProposalEvaluationValues>) => void;
   readOnly: boolean;
-  isReviewer?: boolean;
   isPublishedProposal?: boolean;
 };
 
 export function EvaluationStepSettings({
   evaluation,
   evaluationTemplate,
-  isReviewer,
   isPublishedProposal,
   onChange,
   readOnly
@@ -38,7 +36,7 @@ export function EvaluationStepSettings({
   // reviewers are also readOnly when using a template with reviewers pre-selected
   const readOnlyReviewers = readOnly || (!isAdmin && !!evaluationTemplate?.reviewers?.length);
   // rubric criteria should also be editable by reviewers, and not if a template with rubric critera was used
-  const readOnlyRubricCriteria = (readOnly && !isReviewer) || (!isAdmin && !!evaluationTemplate?.rubricCriteria.length);
+  const readOnlyRubricCriteria = readOnly || (!isAdmin && !!evaluationTemplate?.rubricCriteria.length);
   // vote settings are also readonly when using a template with vote settings pre-selected
   const readOnlyVoteSettings = readOnly || (!isAdmin && !!evaluationTemplate?.voteSettings);
   const reviewerOptions = evaluation.reviewers.map((reviewer) => ({

@@ -7,7 +7,7 @@ import { credentialsWalletPrivateKey, graphQlServerEndpoint } from 'config/const
 
 import { ApolloClientWithRedisCache } from './apolloClientWithRedisCache';
 import type { EasSchemaChain } from './connectors';
-import type { EASAttestationFromApi } from './external/getOnchainCredentials';
+import type { EASAttestationFromApi, EASAttestationWithFavorite } from './external/getOnchainCredentials';
 import type { ExternalCredentialChain } from './external/schemas';
 import type { ProposalCredential } from './schemas';
 
@@ -122,8 +122,11 @@ export async function getCharmverseCredentialsByWallets({
   wallets
 }: {
   wallets: string[];
-}): Promise<EASAttestationFromApi[]> {
-  const credentialWalletAddress = new Wallet(credentialsWalletPrivateKey as string).address.toLowerCase();
+}): Promise<EASAttestationWithFavorite[]> {
+  if (typeof credentialsWalletPrivateKey !== 'string') {
+    return [];
+  }
+  const credentialWalletAddress = new Wallet(credentialsWalletPrivateKey).address.toLowerCase();
   if (!wallets.length) {
     return [];
   }
@@ -168,12 +171,40 @@ export async function getCharmverseCredentialsByWallets({
     }
   });
 
+  const favoriteCredentials = await prisma.favoriteCredential.findMany({
+    where: {
+      issuedCredentialId: {
+        in: issuedCredentials.map((a) => a.id)
+      }
+    },
+    select: {
+      index: true,
+      issuedCredentialId: true,
+      id: true
+    }
+  });
+
   return charmverseCredentials.map((credential) => {
     const issuedCredential = issuedCredentials.find((ic) => ic.ceramicId === credential.id);
+    const favoriteCredential = favoriteCredentials.find((fc) => fc.issuedCredentialId === issuedCredential?.id);
+    const iconUrl = issuedCredential?.proposal.space.credentialLogo ?? issuedCredential?.proposal.space.spaceArtwork;
+
+    if (favoriteCredential) {
+      return {
+        ...credential,
+        iconUrl,
+        favoriteCredentialId: favoriteCredential.id,
+        index: favoriteCredential.index,
+        issuedCredentialId: issuedCredential?.id
+      };
+    }
 
     return {
       ...credential,
-      iconUrl: issuedCredential?.proposal.space.credentialLogo ?? issuedCredential?.proposal.space.spaceArtwork
+      iconUrl,
+      favoriteCredentialId: null,
+      index: -1,
+      issuedCredentialId: issuedCredential?.id
     };
   });
 }

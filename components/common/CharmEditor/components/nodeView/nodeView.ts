@@ -5,7 +5,6 @@ import type { NodeViewProps } from 'components/common/CharmEditor/components/@ba
 export type CharmNodeViewProps = {
   pageId?: string;
   postId?: string;
-  snapshotProposalId?: string | null;
   readOnly: boolean;
   pagePermissions?: PagePermissionFlags;
   deleteNode: () => void;

@@ -21,7 +21,7 @@ jobs:
       matrix:
         function_name: ['webhook-queueWorker', 'webhookChecker']
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install dependencies
         uses: ./.github/actions/install
       - name: Populate env file
@@ -64,7 +64,7 @@ jobs:
         run: node copyPrismaFiles.js
           ls -lA ./serverless/
       - name: serverless deploy ${{ matrix.function_name }}
-        uses: serverless/github-action@v3.1
+        uses: serverless/github-action@v3.2
         with:
           args: deploy --force --function ${{ matrix.function_name }}
         env:

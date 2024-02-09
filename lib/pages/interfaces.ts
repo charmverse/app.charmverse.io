@@ -43,7 +43,6 @@ export type PageWithContent = PageMeta &
     | 'icon'
     | 'parentId'
     | 'proposalId'
-    | 'snapshotProposalId'
     | 'spaceId'
     | 'title'
     | 'type'

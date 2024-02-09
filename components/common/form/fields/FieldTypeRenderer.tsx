@@ -10,6 +10,11 @@ import { DateInputField } from './DateInputField';
 import { LabelField } from './LabelField';
 import { PersonInputField } from './PersonInputField';
 
+type TextInputConfig = {
+  rows?: number;
+  maxRows?: number;
+};
+
 type TextProps = {
   type: Exclude<FieldType, 'select' | 'multiselect'>;
 } & FieldProps &
@@ -20,7 +25,10 @@ type SelectProps = {
 } & FieldProps &
   Required<ControlFieldProps>;
 
-type Props = TextProps | SelectProps;
+type Props = (Omit<TextProps, 'type'> | Omit<SelectProps, 'type'>) & {
+  type: FieldType;
+  textInputConfig?: TextInputConfig;
+} & TextInputConfig;
 
 export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
   ({ type, options, onCreateOption, onDeleteOption, onUpdateOption, ...fieldProps }: Props, ref) => {
@@ -31,16 +39,16 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
       case 'phone':
       case 'short_text':
       case 'wallet': {
-        return <TextInputField {...fieldProps} ref={ref} />;
+        return <TextInputField rows={1} maxRows={1} {...fieldProps} ref={ref} multiline />;
       }
       case 'long_text': {
         return <CharmEditorInputField {...fieldProps} />;
       }
       case 'text_multiline': {
-        return <TextInputField {...fieldProps} ref={ref} multiline rows={3} />;
+        return <TextInputField rows={3} {...fieldProps} ref={ref} multiline />;
       }
       case 'number': {
-        return <NumberInputField {...fieldProps} ref={ref} />;
+        return <NumberInputField {...fieldProps} fullWidth ref={ref} />;
       }
 
       case 'date': {

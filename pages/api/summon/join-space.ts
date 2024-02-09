@@ -32,7 +32,7 @@ async function joinSpaceEndpoint(req: NextApiRequest, res: NextApiResponse) {
     throw new InvalidInputError('You are not a member of this space');
   }
 
-  await addUserToSpace({ spaceId, userId, userXpsEngineId: result.summonUserId });
+  await addUserToSpace({ spaceId, userId, xpsUserId: result.summonUserId });
 
   trackUserAction('join_a_workspace', {
     spaceId,

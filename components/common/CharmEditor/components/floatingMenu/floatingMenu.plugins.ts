@@ -5,7 +5,7 @@ import { floatingMenu } from './floating-menu';
 
 // Components that should not trigger floating menu
 const blacklistedComponents =
-  'nft embed video image cryptoPrice iframe page pdf mention tabIndent codeBlock inlineDatabase poll bookmark tableOfContents file poll';
+  'nft embed video image cryptoPrice farcasterFrame iframe page pdf mention tabIndent codeBlock inlineDatabase poll bookmark tableOfContents file poll';
 
 export function plugins({
   key,

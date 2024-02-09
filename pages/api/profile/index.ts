@@ -80,7 +80,7 @@ export async function handleNoProfile(req: NextApiRequest, res: NextApiResponse)
 }
 
 // Endpoint for a user to retrieve their own profile
-async function getUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
+async function getUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser>) {
   if (!req.session?.user?.id) {
     return handleNoProfile(req, res);
   }

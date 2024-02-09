@@ -18,7 +18,7 @@ import type { LoggedInUser } from 'models';
 import useNotificationsState from '../hooks/useNotificationsState';
 
 export default function SnoozeButton() {
-  const { setUser } = useUser();
+  const { updateUser, user, setUser } = useUser();
   const { isLoading, snoozedForDate, snoozedMessage, mutate: mutateNotifications } = useNotificationsState();
   const { formatDate, formatDateTime } = useDateFormatter();
 
@@ -66,13 +66,13 @@ export default function SnoozeButton() {
       snoozeFor: null,
       snoozeMessage: null
     });
-    setUser((user: LoggedInUser) => ({
-      ...user,
+    updateUser({
       notificationState: {
         snoozedUntil: null,
-        snoozeMessage: null
+        snoozeMessage: null,
+        userId: user?.id || ''
       }
-    }));
+    });
     await mutateNotifications();
     setShowLoading(false);
   }
@@ -106,13 +106,14 @@ export default function SnoozeButton() {
       snoozeFor: newSnoozedForDate.toJSDate(),
       snoozeMessage: _snoozeMessage
     });
-    setUser((user: LoggedInUser) => ({
-      ...user,
+    updateUser({
       notificationState: {
+        // @ts-ignore We need to send it as a string
         snoozedUntil: newSnoozedForDate.toString(),
-        snoozeMessage: _snoozeMessage
+        snoozeMessage: _snoozeMessage,
+        userId: user?.id || ''
       }
-    }));
+    });
     await mutateNotifications();
     setShowLoading(false);
   }

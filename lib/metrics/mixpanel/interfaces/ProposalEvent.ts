@@ -18,4 +18,7 @@ export interface ProposalEventMap {
   new_proposal_stage: ProposalStatusUpdatedEvent;
   new_vote_created: ProposalVoteEvent;
   user_cast_a_vote: ProposalVoteEvent;
+  create_proposal_comment: ProposalEvent;
+  upvote_proposal_comment: ProposalEvent;
+  downvote_proposal_comment: ProposalEvent;
 }

@@ -5,17 +5,9 @@ import Typography from '@mui/material/Typography';
 import { Controller } from 'react-hook-form';
 import type { Control } from 'react-hook-form';
 
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
-
 import type { FormValues } from '../SpaceSettings';
 
 export function TwoFactorAuth({ isAdmin, control }: { isAdmin: boolean; control: Control<FormValues> }) {
-  const isCharmverse = useIsCharmverseSpace();
-
-  if (!isCharmverse) {
-    return null;
-  }
-
   if (!isAdmin) {
     return null;
   }

@@ -117,6 +117,7 @@ function CenterPanel(props: Props) {
   } else if (activeView?.fields.sourceType === 'google_form') {
     activeBoardId = activeView?.fields.sourceData?.boardId;
   }
+
   const { page: activePage } = usePage({ pageIdOrPath: activeBoardId, spaceId: space?.id });
 
   const { keys } = useApiPageKeys(props.page?.id);

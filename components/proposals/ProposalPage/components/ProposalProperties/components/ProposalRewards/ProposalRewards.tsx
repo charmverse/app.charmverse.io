@@ -1,6 +1,5 @@
 import type { ProposalReviewer } from '@charmverse/core/prisma';
 import { Delete, Edit } from '@mui/icons-material';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Box, Grid, Hidden, IconButton, Stack, Typography } from '@mui/material';
 import { uniqBy } from 'lodash';
 import { useState } from 'react';
@@ -244,17 +243,22 @@ export function ProposalRewards({
                         </Grid>
                       </Hidden>
 
-                      <Grid item xs={4} lg={2}>
-                        <Stack className='icons' sx={{ opacity: 0, transition: 'opacity 0.2s ease' }} direction='row'>
-                          <IconButton size='small' onClick={() => editReward({ reward, page, draftId })}>
-                            {readOnly ? (
-                              <VisibilityIcon color='secondary' fontSize='small' />
-                            ) : (
+                      {!readOnly && (
+                        <Grid item xs={4} lg={2}>
+                          <Stack className='icons' sx={{ opacity: 0, transition: 'opacity 0.2s ease' }} direction='row'>
+                            <IconButton
+                              size='small'
+                              onClick={() => editReward({ reward, page, draftId })}
+                              disabled={readOnly}
+                            >
                               <Edit color='secondary' fontSize='small' />
-                            )}
-                          </IconButton>
-                        </Stack>
-                      </Grid>
+                            </IconButton>
+                            <IconButton size='small' onClick={() => onDelete(draftId)} disabled={readOnly}>
+                              <Delete color='secondary' fontSize='small' />
+                            </IconButton>
+                          </Stack>
+                        </Grid>
+                      )}
                     </Grid>
                   </Stack>
                 </SelectPreviewContainer>
@@ -273,8 +277,8 @@ export function ProposalRewards({
 
       <NewPageDialog
         contentUpdated={contentUpdated || isDirty}
-        disabledTooltip={getDisabledTooltip({ newPageValues, rewardValues, isProposalTemplate })}
-        isOpen={!!currentPendingId}
+        disabledTooltip={getDisabledTooltip({ newPageValues, rewardValues, isProposalTemplate: !!isProposalTemplate })}
+        isOpen={!!newPageValues}
         onClose={closeDialog}
         onSave={saveForm}
         onCancel={closeDialog}
