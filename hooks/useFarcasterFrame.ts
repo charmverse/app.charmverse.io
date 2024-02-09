@@ -74,7 +74,9 @@ export function useFarcasterFrame(args?: { pageId?: string; frameUrl: string }) 
         });
 
         return null;
-      } else {
+      }
+      // Sometimes the returned frame is not complete, if so use the existing frame
+      else if (frameAction.frame && frameAction.frame.postUrl && frameAction.frame.version) {
         return getFarcasterFrame(frameAction.frame, {
           revalidate: false,
           optimisticData: frameAction.frame
