@@ -21,7 +21,7 @@ export async function issueProposalCredentialsIfNecessary({
   event: CredentialEventType;
 }): Promise<void> {
   if (disablePublishedCredentials) {
-    log.info('Published credentials are disabled');
+    log.warn('Published credentials are disabled');
     return;
   }
   const baseProposal = await prisma.proposal.findFirstOrThrow({
@@ -112,11 +112,12 @@ export async function issueProposalCredentialsIfNecessary({
 
   for (const author of proposalWithSpaceConfig.authors) {
     proposalWithSpaceConfig.selectedCredentialTemplates.forEach((credentialTemplateId) => {
+      const userHasNotReceivedCredential = !issuedCredentials.some(
+        (issuedCredential) =>
+          issuedCredential.credentialTemplateId === credentialTemplateId && issuedCredential.userId === author.userId
+      );
       if (
-        !issuedCredentials.some(
-          (issuedCredential) =>
-            issuedCredential.credentialTemplateId === credentialTemplateId && issuedCredential.userId === author.userId
-        ) &&
+        userHasNotReceivedCredential &&
         // Only credentials which match the event will have been returned by the query
         proposalWithSpaceConfig.space.credentialTemplates.some((t) => t.id === credentialTemplateId)
       ) {
@@ -149,6 +150,7 @@ export async function issueProposalCredentialsIfNecessary({
 
     if (!targetWallet) {
       log.error(`User ${authorUserId} has no wallet to issue credentials to`, {
+        pageId: proposalWithSpaceConfig.page.id,
         userId: authorUserId,
         proposalId,
         credentialsToIssue
@@ -188,9 +190,22 @@ export async function issueProposalCredentialsIfNecessary({
               user: { connect: { id: authorUserId } }
             }
           });
+          log.info('Issued credential', {
+            pageId: proposalWithSpaceConfig.page.id,
+            event,
+            proposalId,
+            userId: authorUserId,
+            credentialTemplateId: credentialTemplate.id
+          });
         }
       } catch (e) {
-        log.error('Failed to issue credential', { proposalId, authorUserId, credentialsToGiveUser, error: e });
+        log.error('Failed to issue credential', {
+          pageId: proposalWithSpaceConfig.page.id,
+          proposalId,
+          userId: authorUserId,
+          credentialsToGiveUser,
+          error: e
+        });
       }
     }
   }
