@@ -265,7 +265,7 @@ export function FarcasterFrameNodeView({
                   <div
                     style={{
                       flexGrow: 1,
-                      width: `${100 / validFrameButtons.length}%`
+                      width: isSmallScreen ? '100%' : `${100 / validFrameButtons.length}%`
                     }}
                   >
                     <StyledButton
