@@ -509,7 +509,7 @@ export function SpaceSettings({
             )}
           </Grid>
         </Grid>
-        {isAdmin && dataChanged && (
+        {isAdmin && (
           <Box
             sx={{
               py: 1,
@@ -521,10 +521,21 @@ export function SpaceSettings({
               textAlign: 'right'
             }}
           >
+            {dataChanged && (
+              <Button
+                disableElevation
+                variant='outlined'
+                data-test='reset-space-update'
+                disabled={updateSpaceLoading || !dataChanged}
+                onClick={() => reset(_getFormValues(space))}
+                sx={{ mr: 2 }}
+              >
+                Cancel
+              </Button>
+            )}
             <Button
               disableElevation
               data-test='submit-space-update'
-              sx={{ alignSelf: 'flex-start' }}
               disabled={updateSpaceLoading || !dataChanged}
               type='submit'
               loading={updateSpaceLoading}
