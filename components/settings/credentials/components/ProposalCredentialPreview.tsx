@@ -3,6 +3,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
+import { optimism } from 'viem/chains';
 
 import Link from 'components/common/Link';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
@@ -19,7 +20,7 @@ type Props = {
 export function ProposalCredentialPreview({ credential }: Props) {
   const { getFeatureTitle } = useSpaceFeatures();
   const proposalSchemaUrl = `${getEasConnector(10).attestationExplorerUrl}/schema/view/${
-    attestationSchemaIds.proposal[10]
+    attestationSchemaIds.proposal[optimism.id]
   }`;
   return (
     <Card sx={{ minWidth: 275 }}>
