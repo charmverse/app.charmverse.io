@@ -1,5 +1,4 @@
-import { ExternalServiceError, InvalidInputError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
+import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ActionIndex, Frame, FrameButton } from 'frames.js';
 import { getFrame } from 'frames.js';
@@ -33,8 +32,6 @@ export type FrameActionRequest = {
   buttonIndex: number;
   inputText: string;
 };
-
-const requestTimeout = 10000;
 
 async function trackFarcasterFrameInteractionEvent({ pageId, userId }: { pageId: string; userId?: string }) {
   const space = await prisma.page.findUniqueOrThrow({
@@ -77,7 +74,7 @@ async function getNextFrame(req: NextApiRequest, res: NextApiResponse<FrameActio
     throw new InvalidInputError('Error creating frame action message');
   }
 
-  const fetchPromise = fetch(postUrl, {
+  const response = await fetch(postUrl, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -104,23 +101,6 @@ async function getNextFrame(req: NextApiRequest, res: NextApiResponse<FrameActio
     })
   });
 
-  const result = await Promise.race([
-    fetchPromise,
-    new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Request timed out')), requestTimeout);
-    })
-  ]);
-
-  if (result instanceof Error) {
-    log.error('Frame request timed out', {
-      error: result,
-      postUrl
-    });
-    throw new ExternalServiceError('Request timed out');
-  }
-
-  const response = result as Response;
-
   if (response.status === 302) {
     if (pageId) {
       trackFarcasterFrameInteractionEvent({ pageId, userId });
@@ -130,34 +110,11 @@ async function getNextFrame(req: NextApiRequest, res: NextApiResponse<FrameActio
     });
   }
 
-  const contentType = response.headers.get('content-type');
-  const isValidContentType =
-    contentType &&
-    (contentType.includes('text/html') ||
-      contentType.includes('application/xhtml+xml') ||
-      contentType.includes('application/xml') ||
-      contentType.includes('text/plain') ||
-      contentType.includes('text/xml'));
-
-  if (!isValidContentType) {
-    log.error('Invalid response: expected HTML document', {
-      contentType,
-      postUrl
-    });
-    throw new InvalidInputError('Invalid response: expected HTML document');
-  }
-
   const htmlString = await response.text();
 
-  const frame = getFrame({ htmlString, url: postUrl });
+  const { frame } = getFrame({ htmlString, url: postUrl });
 
   if (!frame) {
-    throw new InvalidInputError('Invalid Farcaster frame URL');
-  }
-
-  const frameImage = frame.image;
-
-  if (frameImage && frameImage.includes('svg')) {
     throw new InvalidInputError('Invalid Farcaster frame URL');
   }
 
