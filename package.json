@@ -184,7 +184,7 @@
     "firebase-admin": "^11.10.1",
     "form-data": "^4.0.0",
     "formidable": "^3.5.0",
-    "frames.js": "^0.0.4",
+    "frames.js": "^0.4.2",
     "gaxios": "^5.0.2",
     "google-auth-library": "^8.7.0",
     "graphql": "^16.8.1",
