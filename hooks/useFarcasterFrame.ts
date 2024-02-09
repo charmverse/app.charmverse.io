@@ -45,7 +45,8 @@ export function useFarcasterFrame(args?: { pageId?: string; frameUrl: string }) 
 
       const frameAction = await triggerFrameAction({
         fid: farcasterUser.fid,
-        postUrl: farcasterFrame.postUrl ?? args?.frameUrl,
+        // according to spec, if the button has a target, use that, otherwise use the frame's postUrl
+        postUrl: button?.target ?? farcasterFrame.postUrl ?? args?.frameUrl,
         privateKey: farcasterUser.privateKey,
         pageId: args?.pageId,
         postType: button.action,
@@ -77,8 +78,8 @@ export function useFarcasterFrame(args?: { pageId?: string; frameUrl: string }) 
           optimisticData: frameAction.frame
         });
       }
-    } catch (e) {
-      showMessage('Error submitting frame action', 'error');
+    } catch (e: any) {
+      showMessage(e.message ?? 'Error submitting frame action', 'error');
       log.error('Error submitting frame action', {
         error: e,
         postUrl: farcasterFrame?.postUrl ?? args?.frameUrl

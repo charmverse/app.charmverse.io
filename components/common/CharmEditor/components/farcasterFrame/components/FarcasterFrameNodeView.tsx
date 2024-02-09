@@ -93,7 +93,7 @@ export function FarcasterFrameNodeView({
         onClose={closePopup}
       />
     ),
-    [pageId, space, showEditPopup]
+    [pageId, space, showEditPopup, attrs.src]
   );
 
   if (isLoadingFrame) {
@@ -150,18 +150,14 @@ export function FarcasterFrameNodeView({
   }
 
   const extraControls = [
-    ...(!farcasterFrame || error
-      ? [
-          {
-            onClick() {
-              getFarcasterFrame();
-            },
-            Icon: ReplayIcon,
-            tooltip: 'Refetch frame',
-            showOnReadonly: true
-          }
-        ]
-      : []),
+    {
+      onClick() {
+        getFarcasterFrame();
+      },
+      Icon: ReplayIcon,
+      tooltip: 'Refetch frame',
+      showOnReadonly: true
+    },
     {
       onClick() {
         copyToClipboard(node.attrs.src);
@@ -193,6 +189,8 @@ export function FarcasterFrameNodeView({
     );
   }
 
+  const validFrameButtons = farcasterFrame.buttons?.filter(({ label }) => label) ?? [];
+
   return (
     <Paper sx={{ p: 1, my: 2 }}>
       <BlockAligner
@@ -210,7 +208,7 @@ export function FarcasterFrameNodeView({
             src={farcasterFrame.image}
             style={{
               width: '100%',
-              height: isSmallScreen ? 'fit-content' : 450,
+              maxHeight: isSmallScreen ? 'fit-content' : 450,
               objectFit: 'cover'
             }}
           />
@@ -240,17 +238,16 @@ export function FarcasterFrameNodeView({
               }}
             />
           )}
-          <Stack
-            flexDirection={{
-              xs: 'column',
-              md: 'row'
-            }}
-            gap={1}
-            mb={1}
-          >
-            {farcasterFrame.buttons
-              ?.filter(({ label }) => label)
-              .map(({ label, action, target }, index: number) => (
+          {validFrameButtons.length && (
+            <Stack
+              flexDirection={{
+                xs: 'column',
+                md: 'row'
+              }}
+              gap={1}
+              mb={1}
+            >
+              {validFrameButtons.map(({ label, action, target }, index: number) => (
                 <Tooltip
                   title={!isFarcasterUserAvailable ? 'Please sign in with Farcaster' : undefined}
                   key={`${index.toString()}`}
@@ -264,6 +261,7 @@ export function FarcasterFrameNodeView({
                     <StyledButton
                       disabled={isLoadingFrameAction || !isFarcasterUserAvailable}
                       onClick={() => {
+                        setClickedButtonIndex(index);
                         submitOption({
                           buttonIndex: index + 1,
                           inputText
@@ -289,7 +287,8 @@ export function FarcasterFrameNodeView({
                   </div>
                 </Tooltip>
               ))}
-          </Stack>
+            </Stack>
+          )}
         </Stack>
         {farcasterUser?.status === 'approved' && farcasterProfile ? (
           <Box mt={1}>

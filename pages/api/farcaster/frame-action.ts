@@ -1,4 +1,4 @@
-import { InvalidInputError } from '@charmverse/core/errors';
+import { ExternalServiceError, InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ActionIndex, Frame, FrameButton } from 'frames.js';
 import { getFrame } from 'frames.js';
@@ -10,6 +10,7 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { decryptData } from 'lib/utilities/dataEncryption';
+import { isValidUrl } from 'lib/utilities/isValidUrl';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -32,6 +33,8 @@ export type FrameActionRequest = {
   buttonIndex: number;
   inputText: string;
 };
+
+const requestTimeout = 60000; // 1 minute
 
 async function trackFarcasterFrameInteractionEvent({ pageId, userId }: { pageId: string; userId?: string }) {
   const space = await prisma.page.findUniqueOrThrow({
@@ -74,7 +77,7 @@ async function getNextFrame(req: NextApiRequest, res: NextApiResponse<FrameActio
     throw new InvalidInputError('Error creating frame action message');
   }
 
-  const response = await fetch(postUrl, {
+  const fetchPromise = fetch(postUrl, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -101,9 +104,26 @@ async function getNextFrame(req: NextApiRequest, res: NextApiResponse<FrameActio
     })
   });
 
+  const result = await Promise.race([
+    fetchPromise,
+    new Promise((_, reject) => {
+      setTimeout(() => reject(new ExternalServiceError('Request timed out')), requestTimeout);
+    })
+  ]);
+
+  if (result instanceof Error) {
+    throw result;
+  }
+
+  const response = result as Response;
+
   if (response.status === 302) {
     if (pageId) {
       trackFarcasterFrameInteractionEvent({ pageId, userId });
+    }
+    const location = response.headers.get('location');
+    if (!location || !isValidUrl(location)) {
+      throw new InvalidInputError('Invalid redirect URL');
     }
     return res.status(302).json({
       location: response.headers.get('location')
