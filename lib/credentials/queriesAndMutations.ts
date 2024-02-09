@@ -3,7 +3,7 @@ import { log } from '@charmverse/core/log';
 import { prisma, type AttestationType } from '@charmverse/core/prisma-client';
 import { Wallet } from 'ethers';
 
-import { credentialsWalletPrivateKey, graphQlServerEndpoint } from 'config/constants';
+import { credentialsWalletPrivateKey, graphQlServerEndpoint, isStagingEnv } from 'config/constants';
 
 import { ApolloClientWithRedisCache } from './apolloClientWithRedisCache';
 import type { EasSchemaChain } from './connectors';
@@ -13,7 +13,9 @@ import type { ProposalCredential } from './schemas';
 
 const ceramicGraphQlClient = new ApolloClientWithRedisCache({
   uri: graphQlServerEndpoint,
-  persistForSeconds: 300,
+  // Allows us to bypass native
+  persistForSeconds: isStagingEnv ? 5 : 300,
+  skipRedisCache: isStagingEnv,
   cacheKeyPrefix: 'ceramic'
 });
 
