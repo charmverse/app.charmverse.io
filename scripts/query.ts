@@ -1,23 +1,45 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { prettyPrint } from 'lib/utilities/strings';
 
 /**
  * Use this script to perform database searches.
  */
 
 async function search() {
-  const acc = await prisma.page.findMany({
+  const acc = await prisma.proposal.findMany({
     where: {
-      type: 'bounty_template'
+      selectedCredentialTemplates: {
+        isEmpty: false
+      }
     },
-    select: { createdAt: true, space: true, bounty: { include: { permissions: true } } }
-  });
+    select: {
+      status: true,
+      selectedCredentialTemplates: true,
+      space: {
+        select: {
+          domain: true,
+          credentialTemplates: {
+            select: {
+              id: true,
+              name: true,
+            }
+          }
+        }
+      },
+      authors: {
+        select: {
+          author: {
+            select: {
+              id: true,
+              username: true
+            }
+          }
+        }
+      }
+    }
+  })
 
-  console.log('Acc', acc.length);
-  console.log('Acc', acc.filter((a) => !a.bounty?.permissions.some((p) => p.permissionLevel === 'reviewer')).length);
-  console.log(
-    'Acc',
-    acc.filter((a) => !a.bounty?.permissions.some((p) => p.permissionLevel === 'reviewer')).map((a) => a.createdAt)
-  );
+  prettyPrint(acc); 
 }
 
 search().then(() => console.log('Done'));
