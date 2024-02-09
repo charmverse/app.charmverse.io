@@ -26,10 +26,7 @@ export async function issueProposalCredentialsIfNecessary({
   }
   const baseProposal = await prisma.proposal.findFirstOrThrow({
     where: {
-      id: proposalId,
-      page: {
-        type: 'proposal'
-      }
+      id: proposalId
     },
     select: {
       selectedCredentialTemplates: true,
@@ -149,7 +146,7 @@ export async function issueProposalCredentialsIfNecessary({
     const targetWallet = author.primaryWallet ?? author.wallets[0];
 
     if (!targetWallet) {
-      log.error(`User ${authorUserId} has no wallet to issue credentials to`, {
+      log.debug(`User has no wallet to issue credentials to`, {
         pageId: proposalWithSpaceConfig.page.id,
         userId: authorUserId,
         proposalId,
