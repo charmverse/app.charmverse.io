@@ -59,7 +59,7 @@ export function UserCredentialRow({
           title: credential.content.name,
           subtitle: credential.content.organization,
           iconUrl: credential.iconUrl ?? '/images/logo_black_lightgrey.png',
-          attestationContent: [{ name: 'status', value: credential.content.status }]
+          attestationContent: [{ name: 'Event', value: credential.content.Event }]
         }
       : credential.type === 'gitcoin'
       ? {
