@@ -438,7 +438,7 @@ const RPC: Record<string, IChainDetails> = {
 export type Blockchain = keyof typeof RPC;
 
 export const RPCList = Object.values(RPC)
-  // filter out testnets in prod, except for Goerli
+  // filter out testnets in prod, except for Goerli and Sepolia
   .filter((chain) => !isProdEnv || !chain.testnet || chain.chainId === goerli.id || chain.chainId === sepolia.id);
 
 export function getChainShortname(chainId: string | number): string {
