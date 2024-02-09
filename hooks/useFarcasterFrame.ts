@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 
 import { useFarcasterFrameAction, useGetFarcasterFrame } from 'charmClient/hooks/farcaster';
+import { isValidUrl } from 'lib/utilities/isValidUrl';
 
 import { useConfirmationModal } from './useConfirmationModal';
 import { useFarcasterUser } from './useFarcasterUser';
@@ -25,12 +26,29 @@ export function useFarcasterFrame(args?: { pageId?: string; frameUrl: string }) 
 
       const button = farcasterFrame.buttons ? farcasterFrame.buttons[buttonIndex - 1] : null;
 
+      if (!button) {
+        return;
+      }
+
+      if (button.action === 'link' && isValidUrl(button.target)) {
+        await showConfirmation({
+          message: `You are about to be redirected to ${button.target}`,
+          title: 'Leaving CharmVerse',
+          async onConfirm() {
+            if (button.target) {
+              window.open(button.target, '_blank');
+            }
+          }
+        });
+        return;
+      }
+
       const frameAction = await triggerFrameAction({
         fid: farcasterUser.fid,
         postUrl: farcasterFrame.postUrl ?? args?.frameUrl,
         privateKey: farcasterUser.privateKey,
         pageId: args?.pageId,
-        postType: button?.action,
+        postType: button.action,
         buttonIndex,
         inputText
       });
@@ -43,7 +61,7 @@ export function useFarcasterFrame(args?: { pageId?: string; frameUrl: string }) 
       if ('location' in frameAction) {
         const location = frameAction.location;
         await showConfirmation({
-          message: `You are about to be redirected to ${location!}`,
+          message: `You are about to be redirected to ${location}`,
           title: 'Leaving CharmVerse',
           async onConfirm() {
             if (location) {

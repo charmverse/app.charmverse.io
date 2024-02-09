@@ -16,6 +16,7 @@ import { useFarcasterFrame } from 'hooks/useFarcasterFrame';
 import { useFarcasterUser } from 'hooks/useFarcasterUser';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { isValidUrl } from 'lib/utilities/isValidUrl';
 
 import BlockAligner from '../../BlockAligner';
 import { MediaSelectionPopup } from '../../common/MediaSelectionPopup';
@@ -207,7 +208,11 @@ export function FarcasterFrameNodeView({
         <Stack gap={1}>
           <img
             src={farcasterFrame.image}
-            style={{ width: '100%', height: isSmallScreen ? 'fit-content' : 450, objectFit: 'cover' }}
+            style={{
+              width: '100%',
+              height: isSmallScreen ? 'fit-content' : 450,
+              objectFit: 'cover'
+            }}
           />
           {farcasterFrame.inputText && (
             <TextField
@@ -245,7 +250,7 @@ export function FarcasterFrameNodeView({
           >
             {farcasterFrame.buttons
               ?.filter(({ label }) => label)
-              .map(({ label, action }, index: number) => (
+              .map(({ label, action, target }, index: number) => (
                 <Tooltip
                   title={!isFarcasterUserAvailable ? 'Please sign in with Farcaster' : undefined}
                   key={`${index.toString()}`}
@@ -259,7 +264,6 @@ export function FarcasterFrameNodeView({
                     <StyledButton
                       disabled={isLoadingFrameAction || !isFarcasterUserAvailable}
                       onClick={() => {
-                        setClickedButtonIndex(index);
                         submitOption({
                           buttonIndex: index + 1,
                           inputText
@@ -278,7 +282,9 @@ export function FarcasterFrameNodeView({
                       >
                         {label}
                       </Typography>
-                      {action === 'post_redirect' ? <CallMadeIcon sx={{ ml: 0.5, fontSize: 14 }} /> : null}
+                      {action === 'post_redirect' || (action === 'link' && isValidUrl(target)) ? (
+                        <CallMadeIcon sx={{ ml: 0.5, fontSize: 14 }} />
+                      ) : null}
                     </StyledButton>
                   </div>
                 </Tooltip>
