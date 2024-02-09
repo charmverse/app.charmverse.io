@@ -6,26 +6,26 @@ import { SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
 import type { EasSchemaChain } from './connectors';
 
 export type ProposalCredential = {
-  name: string;
-  description: string;
-  organization: string;
-  url: string;
-  status: string;
+  Name: string;
+  Description: string;
+  Organization: string;
+  URL: string;
+  Event: string;
 };
 
 type TypedSchemaItem<T> = SchemaItem & { name: keyof T };
 
 export const proposalCredentialSchemaDefinition =
-  'string name,string organization,string description,string url,string status';
+  'string Name,string Organization,string Description,string URL,string Event';
 
-export function encodeProposalCredential({ description, name, organization, status, url }: ProposalCredential) {
+export function encodeProposalCredential({ Description, Name, Organization, Event, URL }: ProposalCredential) {
   const encoder = new SchemaEncoder(proposalCredentialSchemaDefinition);
   const encodedData = encoder.encodeData([
-    { name: 'name', value: name, type: 'string' },
-    { name: 'organization', value: organization, type: 'string' },
-    { name: 'description', value: description, type: 'string' },
-    { name: 'url', value: url, type: 'string' },
-    { name: 'status', value: status, type: 'string' }
+    { name: 'Name', value: Name, type: 'string' },
+    { name: 'Organization', value: Organization, type: 'string' },
+    { name: 'Description', value: Description, type: 'string' },
+    { name: 'URL', value: URL, type: 'string' },
+    { name: 'Event', value: Event, type: 'string' }
   ] as TypedSchemaItem<ProposalCredential>[]);
 
   return encodedData;
@@ -47,7 +47,7 @@ export const credentialLabels: Record<AttestationType, string> = {
 
 export const attestationSchemaIds: Record<AttestationType, { [key in EasSchemaChain]: string }> = {
   proposal: {
-    10: '0x20770d8c0a19668aa843240ddf6d57025334b346171c28dfed1a7ddb16928b89'
+    10: '0x3d1afc69090e3133e65385364bd88f230d8df3e5e2c660fdc9206c0ce3e2e012'
   }
 };
 
