@@ -23,9 +23,9 @@ export const UserContext = createContext<Readonly<IContext>>({
 });
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const { data: user, trigger: getUser } = useGetTriggerUser();
+  const { data: user, trigger: getUser, error: userError } = useGetTriggerUser();
   const { trigger: logout } = useLogout();
-  const isLoaded = user !== undefined;
+  const isLoaded = user !== undefined || !!userError;
 
   async function logoutUser() {
     await logout();
