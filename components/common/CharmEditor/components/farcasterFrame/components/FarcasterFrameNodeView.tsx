@@ -3,7 +3,9 @@ import CallMadeIcon from '@mui/icons-material/CallMade';
 import LinkIcon from '@mui/icons-material/Link';
 import ReplayIcon from '@mui/icons-material/Replay';
 import { Alert, Box, Paper, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import { getTokenFromUrl } from 'frames.js';
 import { useMemo, useState } from 'react';
+import { GiDiamonds } from 'react-icons/gi';
 import { useCopyToClipboard } from 'usehooks-ts';
 
 import charmClient from 'charmClient';
@@ -190,8 +192,7 @@ export function FarcasterFrameNodeView({
   }
 
   const frameButtons = (farcasterFrame.buttons ?? []).map((button, index) => ({ ...button, index }));
-  // Filter out buttons without label or with action "mint"
-  const validFrameButtons = frameButtons.filter(({ action, label, target }) => label && action !== 'mint');
+  const validFrameButtons = frameButtons.filter(({ label }) => label);
 
   return (
     <Paper sx={{ p: 1, my: 2 }}>
@@ -252,7 +253,13 @@ export function FarcasterFrameNodeView({
             >
               {validFrameButtons.map((button) => (
                 <Tooltip
-                  title={!isFarcasterUserAvailable ? 'Please sign in with Farcaster' : undefined}
+                  title={
+                    button.action === 'mint'
+                      ? `Minting is not supported yet`
+                      : !isFarcasterUserAvailable
+                      ? 'Please sign in with Farcaster'
+                      : undefined
+                  }
                   key={`${button.index.toString()}`}
                 >
                   <div
@@ -263,7 +270,10 @@ export function FarcasterFrameNodeView({
                   >
                     <StyledButton
                       disabled={
-                        button.index === clickedButtonIndex || isLoadingFrameAction || !isFarcasterUserAvailable
+                        button.action === 'mint' ||
+                        button.index === clickedButtonIndex ||
+                        isLoadingFrameAction ||
+                        !isFarcasterUserAvailable
                       }
                       onClick={() => {
                         setClickedButtonIndex(button.index);
@@ -277,6 +287,9 @@ export function FarcasterFrameNodeView({
                       }}
                       loading={button.index === clickedButtonIndex}
                     >
+                      {button.action === 'mint' && button.target && getTokenFromUrl(button.target) ? (
+                        <GiDiamonds style={{ marginRight: 4, fontSize: 14 }} />
+                      ) : null}
                       <Typography
                         variant='body2'
                         sx={{

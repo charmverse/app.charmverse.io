@@ -33,10 +33,6 @@ export function useFarcasterFrame(args?: { pageId?: string; frameUrl: string }) 
         return;
       }
 
-      if (!button) {
-        return;
-      }
-
       if (button.action === 'link' && isValidUrl(button.target)) {
         await showConfirmation({
           message: `You are about to be redirected to ${button.target}`,
