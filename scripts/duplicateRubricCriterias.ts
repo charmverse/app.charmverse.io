@@ -5,12 +5,9 @@ import { Prisma, prisma } from '@charmverse/core/prisma-client';
  */
 
 async function duplicateRubricCriterias() {
-  const sourceProposalTemplateId = "9a90cb1e-44e9-407e-81e9-8fe252e9ad74";
+  const sourceProposalTemplateId = "9a90cb1e-44e9-407e-81e9-7fe252e9ad74";
   const destinationProposalTemplateIds = [
-    "e3edf64f-c6e0-4958-93ca-a3775d1ffab2",
-    "976f70f3-94c8-4526-987e-55fc18071b6a",
-    "8b2a4b4d-2f8e-4ece-aa34-5625b484a4b9",
-    "4e261347-dc04-49b7-979e-df9b936d882c"
+    "e3edf64f-c6e0-4958-93ca-a3775d1ffab1"
   ]
 
   const proposalTemplate = await prisma.proposal.findFirstOrThrow({
@@ -28,9 +25,13 @@ async function duplicateRubricCriterias() {
     try {
       const rubricEvaluation = await prisma.proposalEvaluation.findFirstOrThrow({
         where: {
-          proposalId: templateId,
+          proposal: {
+            page: {
+              id: templateId
+            },
+          },
           type: "rubric",
-          title: "Preliminary and Final review"
+          title: "Rubric"
         }
       })
   
