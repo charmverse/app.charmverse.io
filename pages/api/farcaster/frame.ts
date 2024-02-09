@@ -27,7 +27,7 @@ async function extractFarcasterMetadataFromUrl(
     throw new InvalidInputError('Invalid Farcaster frame URL');
   }
   const unparsedFrameHtml = await http.GET<string>(frameUrl);
-  const frame = getFrame({
+  const { frame } = getFrame({
     htmlString: unparsedFrameHtml,
     url: frameUrl
   });
