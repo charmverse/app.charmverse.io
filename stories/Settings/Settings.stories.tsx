@@ -5,6 +5,7 @@ import { GlobalContext } from 'stories/lib/GlobalContext';
 
 import { SettingsContent } from 'components/settings/SettingsContent';
 import type { SettingsPath } from 'hooks/useSettingsDialog';
+import { VerifyLoginOtpProvider } from 'hooks/useVerifyLoginOtp';
 
 import { spaces as _spaces } from '../lib/mockData';
 
@@ -22,21 +23,23 @@ function ShowSettingsProfile({ path }: { path: SettingsPath }) {
   function setUnsavedChanges() {}
   return (
     <GlobalContext currentSpace={space}>
-      <Box maxWidth='lg'>
-        <Paper
-          sx={{
-            maxHeight: 800,
-            height: { md: '90vh' }
-          }}
-        >
-          <SettingsContent
-            activePath={activePath}
-            onSelectPath={setActivePath}
-            onClose={onClose}
-            setUnsavedChanges={setUnsavedChanges}
-          />
-        </Paper>
-      </Box>
+      <VerifyLoginOtpProvider>
+        <Box maxWidth='lg'>
+          <Paper
+            sx={{
+              maxHeight: 800,
+              height: { md: '90vh' }
+            }}
+          >
+            <SettingsContent
+              activePath={activePath}
+              onSelectPath={setActivePath}
+              onClose={onClose}
+              setUnsavedChanges={setUnsavedChanges}
+            />
+          </Paper>
+        </Box>
+      </VerifyLoginOtpProvider>
     </GlobalContext>
   );
 }

@@ -43,13 +43,15 @@ export async function getFarcasterProfile({ wallets = [], fid }: { fid?: number;
     }
   }
 
-  [_farcasterProfile] = await http.GET<FarcasterProfile[]>(
-    `${profileApiUrl}?fid=${fid}`,
-    {},
-    {
-      credentials: 'omit'
-    }
-  );
+  if (fid) {
+    [_farcasterProfile] = await http.GET<FarcasterProfile[]>(
+      `${profileApiUrl}?fid=${fid}`,
+      {},
+      {
+        credentials: 'omit'
+      }
+    );
+  }
 
   return _farcasterProfile;
 }

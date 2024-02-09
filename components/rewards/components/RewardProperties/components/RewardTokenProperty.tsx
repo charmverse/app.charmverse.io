@@ -204,7 +204,7 @@ export function RewardTokenProperty({ onChange, currentReward, readOnly }: Props
                   disabled={readOnly || !isTruthy(watchChainId)}
                   readOnly={readOnly}
                   cryptoList={availableCryptos}
-                  chainId={currentReward?.chainId ?? undefined}
+                  chainId={currentReward?.chainId ?? watchChainId}
                   defaultValue={value ?? undefined}
                   value={value ?? undefined}
                   hideBackdrop={true}

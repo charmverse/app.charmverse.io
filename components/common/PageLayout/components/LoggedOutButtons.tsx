@@ -20,6 +20,7 @@ export function LoggedOutButtons() {
   return (
     <Box display='flex'>
       <ContextMenu
+        iconSize='small'
         popupId='user-menu'
         anchorOrigin={{
           vertical: 'bottom',
