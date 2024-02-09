@@ -8,7 +8,7 @@ import { optimism } from 'viem/chains';
 import Link from 'components/common/Link';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { getEasConnector } from 'lib/credentials/connectors';
-import { credentialLabelMap } from 'lib/credentials/constants';
+import { credentialEventLabels } from 'lib/credentials/constants';
 import { attestationSchemaIds } from 'lib/credentials/schemas';
 
 export type ProposalCredentialToPreview = Pick<CredentialTemplate, 'name' | 'description' | 'organization'>;
@@ -56,7 +56,7 @@ export function ProposalCredentialPreview({ credential }: Props) {
           </Grid>
           <Grid item xs>
             <Typography variant='body2'>
-              <b>Status:</b> {credentialLabelMap.proposal_approved?.(getFeatureTitle)}
+              <b>Event:</b> {credentialEventLabels.proposal_approved?.(getFeatureTitle)}
             </Typography>
           </Grid>
           <Grid item xs>

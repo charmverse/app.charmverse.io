@@ -9,7 +9,7 @@ import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import { getPagePermalink } from 'lib/pages/getPagePermalink';
 
 import { signAndPublishCharmverseCredential } from './attest';
-import { credentialLabelMap } from './constants';
+import { credentialEventLabels } from './constants';
 
 const disablePublishedCredentials = process.env.DISABLE_PUBLISHED_CREDENTIALS === 'true';
 
@@ -156,11 +156,11 @@ export async function issueProposalCredentialsIfNecessary({
     } else {
       try {
         for (const credentialTemplate of credentialsToGiveUser) {
-          const getStatusLabel = credentialLabelMap[event];
-          if (!getStatusLabel) {
+          const getEventLabel = credentialEventLabels[event];
+          if (!getEventLabel) {
             throw new Error(`No label mapper found for event: ${event}`);
           }
-          const statusLabel = getStatusLabel((value) =>
+          const eventLabel = getEventLabel((value) =>
             getFeatureTitle(value, proposalWithSpaceConfig.space.features as any[])
           );
           // Iterate through credentials one at a time so we can ensure they're properly created and tracked
@@ -170,11 +170,11 @@ export async function issueProposalCredentialsIfNecessary({
             credential: {
               type: 'proposal',
               data: {
-                name: credentialTemplate.name,
-                description: credentialTemplate.description ?? '',
-                organization: credentialTemplate.organization,
-                status: statusLabel,
-                url: getPagePermalink({ pageId: proposalWithSpaceConfig.page.id })
+                Name: credentialTemplate.name,
+                Description: credentialTemplate.description ?? '',
+                Organization: credentialTemplate.organization,
+                Event: eventLabel,
+                URL: getPagePermalink({ pageId: proposalWithSpaceConfig.page.id })
               }
             }
           });

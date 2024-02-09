@@ -3,7 +3,7 @@ import { Box, FormControlLabel, Switch } from '@mui/material';
 
 import { Typography } from 'components/common/Typography';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import { credentialLabelMap } from 'lib/credentials/constants';
+import { credentialEventLabels } from 'lib/credentials/constants';
 import type { FeatureTitleVariation } from 'lib/features/getFeatureTitle';
 
 export type CredentialToggled = {
@@ -48,7 +48,7 @@ export function CredentialEventToggle({ checked, onChange, disabled, credentialE
         }
         label={
           <Typography fontWeight='bold' sx={{ minWidth: '100px' }}>
-            {credentialLabelMap[credentialEvent]?.(getFeatureTitle)}
+            {credentialEventLabels[credentialEvent]?.(getFeatureTitle)}
           </Typography>
         }
         labelPlacement='end'
