@@ -209,7 +209,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       const storedWalletSignature = getStoredSignature(account);
       setSignature(account, storedWalletSignature);
     }
-    // Case 2: user is switching wallets
+    // Case 3: user is switching wallets
     else if (
       account &&
       // storedAccount means they logged in with a different wallet previously
