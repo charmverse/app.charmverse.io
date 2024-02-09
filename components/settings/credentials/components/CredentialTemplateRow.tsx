@@ -11,7 +11,7 @@ import { ContextMenu } from 'components/common/ContextMenu';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import { credentialLabelMap } from 'lib/credentials/constants';
+import { credentialEventLabels } from 'lib/credentials/constants';
 
 export function CredentialTemplateRow({
   template,
@@ -41,7 +41,7 @@ export function CredentialTemplateRow({
         {template.name}
         <Box sx={{ ml: 2 }} gap={2} display='flex'>
           {template.credentialEvents.map((ev) => (
-            <Chip key={ev} label={credentialLabelMap[ev]?.(getFeatureTitle)} variant='outlined' size='small' />
+            <Chip key={ev} label={credentialEventLabels[ev]?.(getFeatureTitle)} variant='outlined' size='small' />
           ))}
         </Box>
       </Box>
