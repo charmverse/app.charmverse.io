@@ -31,7 +31,7 @@ import {
 import type { ProposalPropertyValue } from 'lib/proposal/blocks/interfaces';
 import type { ProposalFields, ProposalWithUsersLite } from 'lib/proposal/interface';
 
-export type BoardProposal = { spaceId?: string; id?: string; fields: ProposalFields | null };
+export type BoardProposal = { createdAt: string; spaceId?: string; id?: string; fields: ProposalFields | null };
 
 export function useProposalsBoardAdapter() {
   const [boardProposal, setBoardProposal] = useState<BoardProposal | null>(null);
@@ -43,7 +43,16 @@ export function useProposalsBoardAdapter() {
   const proposalPage = pages[boardProposal?.id || ''];
   const proposalData = proposals?.find((p) => p.id === boardProposal?.id);
 
-  const proposal = {
+  const proposal: ProposalWithUsersLite = {
+    authors: [],
+    currentStep: { title: '', step: 'draft', id: '', index: 0, result: 'in_progress' },
+    reviewers: [],
+    evaluations: [],
+    id: '',
+    createdAt: '',
+    createdBy: '',
+    status: 'draft',
+    spaceId: '',
     ...boardProposal,
     ...proposalData,
     fields: {
@@ -52,7 +61,8 @@ export function useProposalsBoardAdapter() {
         ...proposalData?.fields?.properties,
         ...boardProposal?.fields?.properties
       }
-    }
+    },
+    rewardIds: []
   };
   const isLoading = isProposalsLoading || isPagesLoading;
 
@@ -165,11 +175,12 @@ export function useProposalsBoardAdapter() {
   });
 
   // card from current proposal
-  const card: Card<ProposalPropertyValue> = mapProposalToCardPage({
-    proposal: proposal as ProposalWithUsersLite,
+  const { card } = mapProposalToCardPage({
+    proposal,
     proposalPage,
-    spaceId: space?.id
-  }).card;
+    createdAt: proposalPage?.createdAt?.toString() || boardProposal?.createdAt,
+    spaceId: space?.id || ''
+  });
 
   // each proposal with fields reflects a card
   const cards: Card[] = cardPages.map((cp) => cp.card);
@@ -196,10 +207,12 @@ export function useProposalsBoardAdapter() {
 function mapProposalToCardPage({
   proposal,
   proposalPage,
+  createdAt = new Date().toString(),
   spaceId
 }: {
   proposal: ProposalWithUsersLite | null;
   proposalPage?: PageMeta;
+  createdAt?: string;
   spaceId?: string;
 }) {
   const proposalFields: ProposalFields = proposal?.fields || { properties: {} };
@@ -223,10 +236,9 @@ function mapProposalToCardPage({
           )
         : []
   };
-
   const card: Card<ProposalPropertyValue> = {
     id: proposal?.id || '',
-    spaceId: proposalSpaceId,
+    spaceId: '',
     parentId: '',
     schema: 1,
     title: proposalPage?.title || '',
@@ -234,8 +246,8 @@ function mapProposalToCardPage({
     type: 'card' as BlockTypes,
     updatedBy: proposalPage?.updatedBy || '',
     createdBy: proposalPage?.createdBy || '',
-    createdAt: proposalPage?.createdAt ? new Date(proposalPage?.createdAt).getTime() : Date.now(),
-    updatedAt: proposalPage?.updatedAt ? new Date(proposalPage?.updatedAt).getTime() : Date.now(),
+    createdAt: new Date(createdAt).getTime(),
+    updatedAt: proposalPage?.updatedAt ? new Date(proposalPage?.updatedAt).getTime() : 0,
     deletedAt: null,
     fields: { properties: {}, ...proposalFields, contentOrder: [] }
   };

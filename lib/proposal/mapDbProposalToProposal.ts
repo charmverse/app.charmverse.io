@@ -101,8 +101,13 @@ export function mapDbProposalToProposalLite({
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
   const fields = (rest.fields as ProposalFields) ?? null;
 
-  const proposalWithUsers = {
-    ...rest,
+  const proposalWithUsers: ProposalWithUsersLite = {
+    id: rest.id,
+    createdBy: rest.createdBy,
+    authors: proposal.authors,
+    archived: proposal.archived || undefined,
+    formId: rest.formId || undefined,
+    spaceId: rest.spaceId,
     evaluations: sortBy(proposal.evaluations, 'index').map((e) => ({
       title: e.title,
       index: e.index,
@@ -120,7 +125,7 @@ export function mapDbProposalToProposalLite({
     currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
     status: proposal.status,
     reviewers: (proposal.status !== 'draft' && currentEvaluation?.reviewers) || [],
-    rewardIds: rewards.map((r) => r.id) || null,
+    rewardIds: rewards.map((r) => r.id),
     fields
   };
 

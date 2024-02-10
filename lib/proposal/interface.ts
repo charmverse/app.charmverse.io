@@ -52,11 +52,24 @@ export type ProposalFields = {
   enableRewards?: boolean; // used by form templates to enable rewards for new proposals
 };
 
-export type ProposalWithUsersLite = Omit<Proposal, 'fields'> & {
+export type ProposalWithUsersLite = Omit<
+  Proposal,
+  | 'fields'
+  | 'archived'
+  | 'reviewedBy'
+  | 'formId'
+  | 'reviewedAt'
+  | 'publishToLens'
+  | 'lensPostLink'
+  | 'selectedCredentialTemplates'
+  | 'workflowId'
+> & {
+  archived?: boolean;
   authors: ProposalAuthor[];
   fields: ProposalFields | null;
+  formId?: string;
   reviewers: ProposalReviewer[];
-  rewardIds?: string[] | null;
+  rewardIds: string[];
   currentEvaluationId?: string;
   permissions?: ProposalPermissionFlags;
   evaluations: {

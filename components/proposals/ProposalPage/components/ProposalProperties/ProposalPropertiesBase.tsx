@@ -17,6 +17,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ProposalEvaluationValues } from '../ProposalEvaluations/components/Settings/components/EvaluationStepSettings';
 
 export type ProposalPropertiesInput = {
+  createdAt: string; // this is necessary for Created Time custom property
   content?: PageContent | null;
   contentText?: string; // required to know if we can overwrite content when selecting a template
   authors: string[];
