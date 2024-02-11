@@ -5,7 +5,7 @@ import { listIsTight } from 'components/common/CharmEditor/components/listItem/l
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-const charmParser = new MarkdownParser(specRegistry.schema, markdownit('commonmark', { html: false }), {
+export const charmParser = new MarkdownParser(specRegistry.schema, markdownit('commonmark', { html: true }), {
   blockquote: { block: 'blockquote' },
   paragraph: { block: 'paragraph' },
   list_item: { block: 'list_item', node: 'list_item' },
