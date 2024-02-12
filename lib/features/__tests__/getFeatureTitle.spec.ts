@@ -21,4 +21,26 @@ describe('getFeatureTitle', () => {
     expect(getFeatureTitle('proposals', customFeatures)).toBe('grants');
     expect(getFeatureTitle('Proposals', customFeatures)).toBe('Grants');
   });
+
+  it('Handles plurals that end in ies', () => {
+    const customFeatures: FeatureJson[] = [
+      {
+        id: 'proposals',
+        title: 'Bounties',
+        isHidden: false
+      }
+    ];
+    expect(getFeatureTitle('proposal', customFeatures)).toBe('bounty');
+  });
+
+  it('Handles plurals that do not end in s', () => {
+    const customFeatures: FeatureJson[] = [
+      {
+        id: 'proposals',
+        title: 'Moose',
+        isHidden: false
+      }
+    ];
+    expect(getFeatureTitle('proposal', customFeatures)).toBe('moose');
+  });
 });
