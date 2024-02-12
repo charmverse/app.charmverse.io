@@ -131,6 +131,7 @@ export function EvaluationsReview({
         actions={
           <EvaluationStepActions
             isPreviousStep={previousStepIndex === 0}
+            isCurrentStep={!proposal?.currentEvaluationId}
             permissions={proposal?.permissions}
             proposalId={proposal?.id}
             refreshProposal={refreshProposal}
@@ -154,6 +155,7 @@ export function EvaluationsReview({
             actions={
               <EvaluationStepActions
                 archived={proposal?.archived ?? false}
+                isCurrentStep={isCurrent}
                 isPreviousStep={previousStepIndex === index + 1}
                 permissions={proposal?.permissions}
                 proposalId={proposal?.id}

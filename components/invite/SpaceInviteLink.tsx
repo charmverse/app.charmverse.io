@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
+import { useCreateUser } from 'charmClient/hooks/profile';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { SpaceBanModal } from 'components/common/SpaceAccessGate/SpaceBanModal';
 import { LoginButton } from 'components/login/components/LoginButton';
@@ -27,11 +28,11 @@ export default function InvitationPage({ invite, space }: Props) {
   const { walletAuthSignature, verifiableWalletDetected } = useWeb3Account();
   const { showMessage } = useSnackbar();
   const [isBannedFromSpace, setIsBannedFromSpace] = useState(false);
+  const { trigger: createUser } = useCreateUser();
   async function joinSpace() {
-    let loggedInUser = user;
     try {
       if (!user && verifiableWalletDetected && walletAuthSignature) {
-        loggedInUser = await charmClient.createUser({
+        await createUser({
           address: walletAuthSignature.address,
           walletSignature: walletAuthSignature
         });
@@ -54,7 +55,7 @@ export default function InvitationPage({ invite, space }: Props) {
       log.error('Error accepting invite', {
         inviteId: invite.id,
         spaceId: space.id,
-        userId: loggedInUser?.id,
+        userId: user?.id,
         error
       });
     }

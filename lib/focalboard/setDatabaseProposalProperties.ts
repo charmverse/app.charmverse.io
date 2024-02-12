@@ -43,12 +43,32 @@ export async function setDatabaseProposalProperties({
       }
     },
     select: {
+      proposal: {
+        orderBy: {
+          page: {
+            createdAt: 'asc'
+          }
+        },
+        select: {
+          page: {
+            select: {
+              createdAt: true
+            }
+          }
+        }
+      },
       id: true,
-      formFields: true
+      formFields: {
+        orderBy: {
+          index: 'asc'
+        }
+      }
     }
   });
 
-  const formFields = forms.flatMap((p) => p.formFields);
+  const formFields = forms
+    .sort((a, b) => (a.proposal[0]?.page?.createdAt.getTime() ?? 0) - (b.proposal[0]?.page?.createdAt.getTime() ?? 0))
+    .flatMap((p) => p.formFields);
   const proposals = await prisma.proposal.findMany({
     where: {
       spaceId: boardBlock.spaceId

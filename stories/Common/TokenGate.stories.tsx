@@ -8,8 +8,8 @@ import { mockTokenGateResult, mockTokenGates } from 'stories/lib/mockTokenGataDa
 import { TokenGate as TokenGateComponent } from 'components/common/SpaceAccessGate/components/TokenGate/TokenGate';
 import { TokenGateModalProvider } from 'components/common/TokenGateModal/hooks/useTokenGateModalContext';
 import TokenGateModal from 'components/common/TokenGateModal/TokenGateModal';
+import { LIT_CHAINS } from 'lib/tokenGates/chains';
 import type { TokenGate } from 'lib/tokenGates/interfaces';
-import { LIT_CHAINS } from 'lib/tokenGates/utils';
 import { TokenGateContainer } from 'pages/join';
 
 export default {

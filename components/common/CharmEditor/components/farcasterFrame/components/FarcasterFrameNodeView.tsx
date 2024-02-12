@@ -3,7 +3,9 @@ import CallMadeIcon from '@mui/icons-material/CallMade';
 import LinkIcon from '@mui/icons-material/Link';
 import ReplayIcon from '@mui/icons-material/Replay';
 import { Alert, Box, Paper, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import { getTokenFromUrl } from 'frames.js';
 import { useMemo, useState } from 'react';
+import { GiDiamonds } from 'react-icons/gi';
 import { useCopyToClipboard } from 'usehooks-ts';
 
 import charmClient from 'charmClient';
@@ -16,6 +18,7 @@ import { useFarcasterFrame } from 'hooks/useFarcasterFrame';
 import { useFarcasterUser } from 'hooks/useFarcasterUser';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { isValidUrl } from 'lib/utilities/isValidUrl';
 
 import BlockAligner from '../../BlockAligner';
 import { MediaSelectionPopup } from '../../common/MediaSelectionPopup';
@@ -50,6 +53,7 @@ export function FarcasterFrameNodeView({
   const { space } = useCurrentSpace();
   const { error, isLoadingFrame, getFarcasterFrame, farcasterFrame, submitOption, isLoadingFrameAction } =
     useFarcasterFrame(attrs.src ? { frameUrl: attrs.src, pageId } : undefined);
+  const [clickedButtonIndex, setClickedButtonIndex] = useState<null | number>(null);
   const { farcasterUser, logout, farcasterProfile } = useFarcasterUser();
   const [inputText, setInputText] = useState('');
   const isFarcasterUserAvailable = farcasterUser && farcasterUser.fid;
@@ -91,7 +95,7 @@ export function FarcasterFrameNodeView({
         onClose={closePopup}
       />
     ),
-    [pageId, space, showEditPopup]
+    [pageId, space, showEditPopup, attrs.src]
   );
 
   if (isLoadingFrame) {
@@ -148,18 +152,14 @@ export function FarcasterFrameNodeView({
   }
 
   const extraControls = [
-    ...(!farcasterFrame || error
-      ? [
-          {
-            onClick() {
-              getFarcasterFrame();
-            },
-            Icon: ReplayIcon,
-            tooltip: 'Refetch frame',
-            showOnReadonly: true
-          }
-        ]
-      : []),
+    {
+      onClick() {
+        getFarcasterFrame();
+      },
+      Icon: ReplayIcon,
+      tooltip: 'Refetch frame',
+      showOnReadonly: true
+    },
     {
       onClick() {
         copyToClipboard(node.attrs.src);
@@ -191,6 +191,9 @@ export function FarcasterFrameNodeView({
     );
   }
 
+  const frameButtons = (farcasterFrame.buttons ?? []).map((button, index) => ({ ...button, index }));
+  const validFrameButtons = frameButtons.filter(({ label }) => label);
+
   return (
     <Paper sx={{ p: 1, my: 2 }}>
       <BlockAligner
@@ -206,12 +209,17 @@ export function FarcasterFrameNodeView({
         <Stack gap={1}>
           <img
             src={farcasterFrame.image}
-            style={{ width: '100%', height: isSmallScreen ? 'fit-content' : 450, objectFit: 'cover' }}
+            style={{
+              width: '100%',
+              maxHeight: isSmallScreen ? 'fit-content' : 450,
+              objectFit: 'cover'
+            }}
           />
           {farcasterFrame.inputText && (
             <TextField
               type='text'
               placeholder={farcasterFrame.inputText}
+              disabled={isLoadingFrameAction}
               value={inputText}
               // Prevent losing focus when clicking on the input
               onMouseDown={(e) => {
@@ -234,37 +242,54 @@ export function FarcasterFrameNodeView({
               }}
             />
           )}
-          <Stack
-            flexDirection={{
-              xs: 'column',
-              md: 'row'
-            }}
-            gap={1}
-            mb={1}
-          >
-            {farcasterFrame.buttons
-              ?.filter(({ label }) => label)
-              .map(({ label, action }, index: number) => (
+          {validFrameButtons.length ? (
+            <Stack
+              flexDirection={{
+                xs: 'column',
+                md: 'row'
+              }}
+              gap={1}
+              mb={1}
+            >
+              {validFrameButtons.map((button) => (
                 <Tooltip
-                  title={!isFarcasterUserAvailable ? 'Please sign in with Farcaster' : undefined}
-                  key={`${index.toString()}`}
+                  title={
+                    button.action === 'mint'
+                      ? `Minting is not supported yet`
+                      : !isFarcasterUserAvailable
+                      ? 'Please sign in with Farcaster'
+                      : undefined
+                  }
+                  key={`${button.index.toString()}`}
                 >
                   <div
                     style={{
                       flexGrow: 1,
-                      flexBasis: `${100 / (farcasterFrame.buttons?.length || 1)}%`
+                      width: isSmallScreen ? '100%' : `${100 / validFrameButtons.length}%`
                     }}
                   >
                     <StyledButton
-                      disabled={isLoadingFrameAction || !isFarcasterUserAvailable}
+                      disabled={
+                        button.action === 'mint' ||
+                        button.index === clickedButtonIndex ||
+                        isLoadingFrameAction ||
+                        !isFarcasterUserAvailable
+                      }
                       onClick={() => {
+                        setClickedButtonIndex(button.index);
                         submitOption({
-                          buttonIndex: index + 1,
-                          inputText
+                          button,
+                          inputText,
+                          index: button.index
+                        }).finally(() => {
+                          setClickedButtonIndex(null);
                         });
                       }}
-                      loading={isLoadingFrameAction}
+                      loading={button.index === clickedButtonIndex}
                     >
+                      {button.action === 'mint' && button.target && getTokenFromUrl(button.target) ? (
+                        <GiDiamonds style={{ marginRight: 4, fontSize: 14 }} />
+                      ) : null}
                       <Typography
                         variant='body2'
                         sx={{
@@ -272,14 +297,17 @@ export function FarcasterFrameNodeView({
                           textWrap: 'wrap'
                         }}
                       >
-                        {label}
+                        {button.label}
                       </Typography>
-                      {action === 'post_redirect' ? <CallMadeIcon sx={{ ml: 0.5, fontSize: 14 }} /> : null}
+                      {button.action === 'post_redirect' || (button.action === 'link' && isValidUrl(button.target)) ? (
+                        <CallMadeIcon sx={{ ml: 0.5, fontSize: 14 }} />
+                      ) : null}
                     </StyledButton>
                   </div>
                 </Tooltip>
               ))}
-          </Stack>
+            </Stack>
+          ) : null}
         </Stack>
         {farcasterUser?.status === 'approved' && farcasterProfile ? (
           <Box mt={1}>

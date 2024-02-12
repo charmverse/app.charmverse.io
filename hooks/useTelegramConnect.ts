@@ -2,14 +2,13 @@ import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
 import { loginWithTelegram } from 'components/settings/account/components/TelegramLoginIframe';
-import type { LoggedInUser } from 'models';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { useSnackbar } from './useSnackbar';
 import { useUser } from './useUser';
 
 export function useTelegramConnect() {
-  const { setUser } = useUser();
+  const { updateUser } = useUser();
   const { showMessage } = useSnackbar();
 
   const { trigger: connectToTelegram, isMutating: isConnectingToTelegram } = useSWRMutation(
@@ -17,7 +16,7 @@ export function useTelegramConnect() {
     (_url, { arg }: Readonly<{ arg: TelegramAccount }>) => charmClient.connectTelegram(arg),
     {
       onSuccess(data) {
-        setUser((_user: LoggedInUser) => ({ ..._user, telegramUser: data }));
+        updateUser({ telegramUser: data });
       },
       onError(err) {
         showMessage((err as any).message ?? 'Something went wrong', 'error');

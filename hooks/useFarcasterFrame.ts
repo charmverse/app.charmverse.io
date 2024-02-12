@@ -1,6 +1,8 @@
 import { log } from '@charmverse/core/log';
+import type { FrameButton } from 'frames.js';
 
 import { useFarcasterFrameAction, useGetFarcasterFrame } from 'charmClient/hooks/farcaster';
+import { isValidUrl } from 'lib/utilities/isValidUrl';
 
 import { useConfirmationModal } from './useConfirmationModal';
 import { useFarcasterUser } from './useFarcasterUser';
@@ -17,21 +19,40 @@ export function useFarcasterFrame(args?: { pageId?: string; frameUrl: string }) 
     error
   } = useGetFarcasterFrame(args);
   const { showConfirmation } = useConfirmationModal();
-  const submitOption = async ({ buttonIndex, inputText }: { buttonIndex: number; inputText: string }) => {
+  const submitOption = async ({
+    button,
+    inputText,
+    index
+  }: {
+    index: number;
+    button: FrameButton;
+    inputText: string;
+  }) => {
     try {
       if (!farcasterUser || !farcasterUser.fid || !farcasterFrame) {
         return;
       }
 
-      const button = farcasterFrame.buttons ? farcasterFrame.buttons[buttonIndex - 1] : null;
+      if (button.action === 'link' && isValidUrl(button.target)) {
+        await showConfirmation({
+          message: `You are about to be redirected to ${button.target}`,
+          title: 'Leaving CharmVerse',
+          async onConfirm() {
+            if (button.target) {
+              window.open(button.target, '_blank');
+            }
+          }
+        });
+        return;
+      }
 
       const frameAction = await triggerFrameAction({
         fid: farcasterUser.fid,
         postUrl: farcasterFrame.postUrl ?? args?.frameUrl,
         privateKey: farcasterUser.privateKey,
         pageId: args?.pageId,
-        postType: button?.action,
-        buttonIndex,
+        postType: button.action,
+        buttonIndex: index + 1,
         inputText
       });
 
@@ -43,7 +64,7 @@ export function useFarcasterFrame(args?: { pageId?: string; frameUrl: string }) 
       if ('location' in frameAction) {
         const location = frameAction.location;
         await showConfirmation({
-          message: `You are about to be redirected to ${location!}`,
+          message: `You are about to be redirected to ${location}`,
           title: 'Leaving CharmVerse',
           async onConfirm() {
             if (location) {
@@ -53,14 +74,16 @@ export function useFarcasterFrame(args?: { pageId?: string; frameUrl: string }) 
         });
 
         return null;
-      } else {
+      }
+      // Sometimes the returned frame is not complete, if so use the existing frame
+      else if (frameAction.frame && frameAction.frame.postUrl && frameAction.frame.version) {
         return getFarcasterFrame(frameAction.frame, {
           revalidate: false,
           optimisticData: frameAction.frame
         });
       }
-    } catch (e) {
-      showMessage('Error submitting frame action', 'error');
+    } catch (e: any) {
+      showMessage(e.message ?? 'Error submitting frame action', 'error');
       log.error('Error submitting frame action', {
         error: e,
         postUrl: farcasterFrame?.postUrl ?? args?.frameUrl
