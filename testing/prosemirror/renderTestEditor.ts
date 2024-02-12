@@ -35,7 +35,7 @@ export function renderTestEditor(
   const container = document.body.appendChild(document.createElement('div'));
   container.setAttribute('data-testid', testId);
 
-  return (testDoc: any) => {
+  return (testDoc?: any) => {
     const editorProps = {
       // include bangle-editor-core to support prosemirror-tables fork
       attributes: { class: 'bangle-editor content bangle-editor-core' }
@@ -47,10 +47,8 @@ export function renderTestEditor(
     const view = editor.view;
     mountedEditors.add(editor);
 
-    let posLabels;
-
     if (testDoc) {
-      posLabels = updateDoc(testDoc);
+      updateDoc(testDoc);
     }
 
     function updateDoc(doc: Node) {
@@ -75,7 +73,6 @@ export function renderTestEditor(
       editorState: view.state as EditorState,
       schema: view.state.schema,
       selection: view.state.selection as Selection,
-      posLabels,
       updateDoc,
       destroy: () => {
         editor?.destroy();

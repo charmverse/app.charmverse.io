@@ -24,28 +24,34 @@ export function expectNodesAreEqual(a: Node, b: Node) {
  */
 export function dispatchPasteEvent(
   editorView: EditorView,
-  content: { types?: any[]; files?: any[]; items?: any[]; html?: string; plain?: string }
+  content: {
+    types?: any[];
+    files?: DataTransfer['files'];
+    items?: DataTransfer['items'];
+    html?: string;
+    plain?: string;
+  }
 ) {
   const event = createEvent('paste');
-  const clipboardData = {
+  const clipboardData: Partial<DataTransfer> = {
     getData(type: any) {
       if (type === 'text/plain') {
-        return content.plain;
+        return content.plain || '';
       }
       if (type === 'text/html') {
-        return content.html;
+        return content.html || '';
       }
+      return '';
     },
     types: content.types || [],
-    files: content.files || [],
-    items: content.items || null
+    files: content.files || ([] as unknown as DataTransfer['files']),
+    items: content.items || ([] as unknown as DataTransfer['items'])
   };
   // Reason: https://github.com/ProseMirror/prosemirror-view/blob/9d2295d03c2d17357213371e4d083f0213441a7e/bangle-play/input.js#L379-L384
   if ((browser.ie && browser.ie_version < 15) || browser.ios) {
     return false;
   }
   Object.defineProperty(event, 'clipboardData', { value: clipboardData });
-
   (editorView as any).dispatchEvent(event);
   return event;
 }
