@@ -25,7 +25,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
+import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
 import { getSnapshotClient } from 'lib/snapshot/getSnapshotClient';
 import { getSnapshotSpace } from 'lib/snapshot/getSpace';
 import type { SnapshotReceipt, SnapshotSpace, SnapshotVotingStrategy } from 'lib/snapshot/interfaces';
