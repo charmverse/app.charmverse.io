@@ -25,12 +25,12 @@ describe('getFeatureTitle', () => {
   it('Handles plurals that end in ies', () => {
     const customFeatures: FeatureJson[] = [
       {
-        id: 'proposals',
+        id: 'rewards',
         title: 'Bounties',
         isHidden: false
       }
     ];
-    expect(getFeatureTitle('proposal', customFeatures)).toBe('bounty');
+    expect(getFeatureTitle('reward', customFeatures)).toBe('bounty');
   });
 
   it('Handles plurals that do not end in s', () => {
