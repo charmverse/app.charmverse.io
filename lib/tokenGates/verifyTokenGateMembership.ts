@@ -11,6 +11,7 @@ import { isTruthy } from 'lib/utilities/types';
 
 import { getHypersubValidTokenGate, getUnlockProtocolValidTokenGate } from './evaluateEligibility';
 import type { TokenGate } from './interfaces';
+import { litNodeClient } from './litProtocol/litNodeClientNodeJs';
 
 const log = getLogger('tg-verification');
 
@@ -93,8 +94,12 @@ export async function verifyTokenGateMembership({
         return { id, isVerified: false, roleIds: grantedRoles };
       }
 
+      if (!litNodeClient.ready) {
+        await litNodeClient.connect();
+      }
+
       const lit = await import('@lit-protocol/lit-node-client');
-      const result = lit.verifyJwt({ jwt });
+      const result = lit.verifyJwt({ jwt, publicKey: litNodeClient.networkPubKey || '' });
       const isVerified = result.verified && (result.payload as any)?.orgId === spaceId;
 
       return {

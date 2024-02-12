@@ -43,7 +43,7 @@ export async function verifyTokenGateMemberships() {
     }
   });
 
-  const spaceRoleQuery = userTokenGates.map((userTokenGate) => ({
+  const spaceRoleQuery = userTokenGates.splice(0, 10).map((userTokenGate) => ({
     userId: userTokenGate.userId,
     spaceId: userTokenGate.spaceId
   }));

@@ -1,6 +1,5 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { LitNodeClient } from '@lit-protocol/lit-node-client';
 import type { AuthSig } from '@lit-protocol/types';
 import promiseRetry from 'promise-retry';
 import { validate } from 'uuid';
@@ -11,16 +10,13 @@ import { isTruthy } from 'lib/utilities/types';
 
 import { getHypersubDetails } from './hypersub/getHypersubDetails';
 import type { TokenGate, TokenGateWithRoles } from './interfaces';
+import { litNodeClient } from './litProtocol/litNodeClientNodeJs';
 import { getLockDetails } from './unlock/getLockDetails';
 
 type TokenGateJwt = {
   signedToken: string;
   tokenGateId: string;
 };
-
-const litClient = new LitNodeClient({
-  debug: false
-} as any);
 
 export type TokenGateEvaluationAttempt = {
   authSig: AuthSig;
@@ -47,13 +43,13 @@ export async function evaluateTokenGateEligibility({
 }
 
 export async function evaluateTokenGate({ authSig, tokenGates }: { authSig: AuthSig; tokenGates: TokenGate[] }) {
-  if (!litClient.ready) {
-    await litClient.connect().catch((err) => {
-      log.debug('Error connecting to lit node', err);
+  if (!litNodeClient.ready) {
+    await litNodeClient.connect().catch((error: Error) => {
+      log.debug('Error connecting to lit node', { error });
     });
   }
 
-  if (!litClient.ready) {
+  if (!litNodeClient.ready) {
     throw new InvalidStateError('Lit client is not available');
   }
 
@@ -122,13 +118,10 @@ export async function getUnlockProtocolValidTokenGate<T extends TokenGate<'unloc
 async function getLitValidTokenGate(tokenGate: TokenGateWithRoles<'lit'>, authSig: AuthSig) {
   return promiseRetry<{ tokenGateId: string; signedToken: string } | null>(
     async (retry, retryCount): Promise<{ tokenGateId: string; signedToken: string } | null> => {
-      return litClient
+      return litNodeClient
         .getSignedToken({
           authSig,
-          // note that we used to store 'chain' but now it is an array
-          // TODO: migrate old token gate conditions to all be an array?
-          chain: tokenGate.conditions.chains?.[0],
-          resourceId: tokenGate.resourceId,
+          chain: tokenGate.conditions.chains?.[0], // Check if this is correct
           ...tokenGate.conditions
         })
         .then((signedToken: string) => {
@@ -137,7 +130,7 @@ async function getLitValidTokenGate(tokenGate: TokenGateWithRoles<'lit'>, authSi
             tokenGateId: tokenGate.id
           };
         })
-        .catch((error) => {
+        .catch((error: any) => {
           if (error.errorCode === 'rpc_error') {
             log.warn('Network error when verifying token gate. Could be improper conditions configuration', {
               retryCount,

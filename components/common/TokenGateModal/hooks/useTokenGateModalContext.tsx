@@ -1,11 +1,11 @@
-import type { AuthSig, JsonSigningResourceId, JsonStoreSigningRequest } from '@lit-protocol/types';
+import type { AuthSig, JsonSigningResourceId, UnifiedAccessControlConditions } from '@lit-protocol/types';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
 import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
-import { useSaveSigningCondition, useCreateTokenGate } from 'charmClient/hooks/tokenGates';
+import { useCreateTokenGate } from 'charmClient/hooks/tokenGates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { TokenGateConditions } from 'lib/tokenGates/interfaces';
@@ -16,7 +16,8 @@ import { createAuthSigs, getAllChains } from '../utils/helpers';
 export type DisplayedPage = 'tokens' | 'collectables' | 'home' | 'review' | 'wallet' | 'dao' | 'unlock' | 'hypersub';
 export type Flow = 'single' | 'multiple_all' | 'multiple_one';
 
-export type ConditionsModalResult = Pick<JsonStoreSigningRequest, 'unifiedAccessControlConditions'> & {
+export type ConditionsModalResult = {
+  unifiedAccessControlConditions: UnifiedAccessControlConditions;
   authSigTypes: string[];
   chains: string[];
   permanent: true;
@@ -65,7 +66,6 @@ export function TokenGateModalProvider({
   const [tokenGate, setTokenGate] = useState<TokenGateConditions>();
   const litClient = useLitProtocol();
   const { error: tokenError, isMutating: tokenLoading, trigger: createTokenGate } = useCreateTokenGate();
-  const { error: litError, isMutating: litLoading, trigger: saveSigningCondition } = useSaveSigningCondition(litClient);
   const [flow, setFlow] = useState<Flow>('single');
   const { walletAuthSignature, requestSignature } = useWeb3Account();
   const { space } = useCurrentSpace();
@@ -119,39 +119,26 @@ export function TokenGateModalProvider({
         authSigTypes
       };
 
-      const tokenGateId = uuid();
-      const resourceId: JsonSigningResourceId = {
-        baseUrl: 'https://app.charmverse.io',
-        path: `${Math.random()}`,
-        orgId: spaceId,
-        role: 'member',
-        extraData: JSON.stringify({
-          tokenGateId
-        })
-      };
+      // const authSig: AuthSig = walletAuthSignature ?? (await requestSignature());
 
-      const authSig: AuthSig = walletAuthSignature ?? (await requestSignature());
+      // if (!authSig || !authSigTypes[0]) {
+      //   return;
+      // }
 
-      if (!authSig || !authSigTypes[0]) {
-        return;
-      }
+      // I think we should not use this anymore
+      // const jwt = await litClient?.getSignedToken({
+      //   unifiedAccessControlConditions: conditions.unifiedAccessControlConditions,
+      //   chain: authSigTypes[0],
+      //   authSig
+      // });
+      // console.log(jwt);
 
-      const litSuccess = await saveSigningCondition({
-        unifiedAccessControlConditions: conditions.unifiedAccessControlConditions,
-        chain: authSigTypes[0], // ethereum or solana
-        authSig,
-        resourceId
+      // We don't store the jwt yet
+      await createTokenGate({
+        conditions,
+        spaceId,
+        type: 'lit'
       });
-
-      if (litSuccess) {
-        await createTokenGate({
-          conditions,
-          resourceId,
-          spaceId,
-          type: 'lit',
-          id: tokenGateId
-        });
-      }
 
       onSuccess();
     }
@@ -247,18 +234,16 @@ export function TokenGateModalProvider({
       displayedPage,
       tokenGate,
       flow,
-      loadingToken: tokenLoading || litLoading,
-      error: tokenError?.message || typeof litError?.message === 'string' ? litError?.message : undefined
+      loadingToken: tokenLoading,
+      error: tokenError?.message ? tokenError?.message : undefined
     }),
     [
       flow,
       displayedPage,
       tokenLoading,
-      litLoading,
       tokenGate,
       popupState,
       tokenError?.message,
-      litError?.message,
       resetModal,
       onDelete,
       handleTokenGate

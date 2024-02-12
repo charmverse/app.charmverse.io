@@ -1,7 +1,5 @@
 import type { TokenGateToRole } from '@charmverse/core/prisma-client';
-import type { LitNodeClient } from '@lit-protocol/lit-node-client';
-import type { AuthSig, JsonStoreSigningRequest } from '@lit-protocol/types';
-import useSWRMutation from 'swr/mutation';
+import type { AuthSig } from '@lit-protocol/types';
 
 import type { TokenGateVerificationRequest } from 'lib/tokenGates/applyTokenGates';
 import type { TokenGateEvaluationAttempt, TokenGateEvaluationResult } from 'lib/tokenGates/evaluateEligibility';
@@ -29,12 +27,6 @@ export function useUpdateTokenGateRoles(tokenGateId?: string) {
 
 export function useReviewTokenGate() {
   return usePOST<TokenGateConditions, TokenGateConditions[]>('/api/token-gates/review');
-}
-
-export function useSaveSigningCondition(litClient: LitNodeClient | null) {
-  return useSWRMutation('litClient', (_url: string, { arg }: { arg: JsonStoreSigningRequest }) =>
-    litClient?.saveSigningCondition(arg)
-  );
 }
 
 export function useEvaluateTokenGateEligibility() {

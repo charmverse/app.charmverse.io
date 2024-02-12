@@ -2,13 +2,16 @@ import { log } from '@charmverse/core/log';
 import * as LitJsSdk from '@lit-protocol/lit-node-client';
 import { useEffect, useMemo, useState } from 'react';
 
+import { litNetwork } from 'lib/tokenGates/litProtocol/config';
+
 function useLitProtocol() {
   const [litClient, setClient] = useState<LitJsSdk.LitNodeClient | null>(null);
   const client = useMemo(
     () =>
       new LitJsSdk.LitNodeClient({
         alertWhenUnauthorized: false,
-        debug: false
+        litNetwork,
+        debug: true
       }),
     []
   );

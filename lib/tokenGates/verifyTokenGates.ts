@@ -6,6 +6,7 @@ import { isTruthy } from 'lib/utilities/types';
 
 import { getHypersubValidTokenGate, getUnlockProtocolValidTokenGate } from './evaluateEligibility';
 import type { TokenGateWithRoles } from './interfaces';
+import { litNodeClient } from './litProtocol/litNodeClientNodeJs';
 
 type TokenGateJwtResult = { jwt?: string; id: string; verified: boolean; grantedRoles: string[] };
 
@@ -59,25 +60,20 @@ export async function verifyTokenGates({ spaceId, userId, tokens, walletAddress 
         }
 
         if (matchingTokenGate.type === 'lit' && tk.signedToken) {
+          if (!litNodeClient.ready) {
+            await litNodeClient.connect();
+          }
           const { verifyJwt } = await import('@lit-protocol/lit-node-client');
-          const result = verifyJwt({ jwt: tk.signedToken });
-          const payload = result?.payload as any;
+          const result = verifyJwt({ jwt: tk.signedToken, publicKey: litNodeClient.networkPubKey || '' });
+          const payload = result?.payload;
 
-          if (
-            // Perform additional checks here as per https://github.com/LIT-Protocol/lit-minimal-jwt-example/blob/main/server.js
-            result?.verified &&
-            payload?.orgId === space.id
-          ) {
-            const embeddedTokenGateId = JSON.parse(payload.extraData).tokenGateId;
-
-            if (embeddedTokenGateId === tk.tokenGateId) {
-              return {
-                ...matchingTokenGate,
-                jwt: tk.signedToken,
-                verified: true,
-                grantedRoles: matchingTokenGate.tokenGateToRoles.map((tgr) => tgr.role.id)
-              };
-            }
+          if (result?.verified) {
+            return {
+              ...matchingTokenGate,
+              jwt: tk.signedToken,
+              verified: true,
+              grantedRoles: matchingTokenGate.tokenGateToRoles.map((tgr) => tgr.role.id)
+            };
           }
         } else if (matchingTokenGate.type === 'unlock') {
           const valid = await getUnlockProtocolValidTokenGate(matchingTokenGate, walletAddress);

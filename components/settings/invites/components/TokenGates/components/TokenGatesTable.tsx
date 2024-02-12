@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
 import styled from '@emotion/styled';
+import { checkAndSignAuthMessage } from '@lit-protocol/lit-node-client';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -55,15 +56,23 @@ export default function TokenGatesTable({ isAdmin, isLoading, tokenGates, refres
   async function testLitTokenGate(tokenGate: TokenGate<'lit'>) {
     setTestResult({ status: 'loading' });
     try {
-      if (!litClient) {
+      if (!litClient?.ready) {
+        await litClient?.connect();
+      }
+      if (!litClient?.ready) {
         throw new Error('Lit Protocol client not initialized');
       }
-      const authSig = walletAuthSignature ?? (await requestSignature());
+      const nonce = litClient.getLatestBlockhash() || '';
+
+      const authSig = await checkAndSignAuthMessage({
+        chain: tokenGate.conditions.chains?.[0] || 'ethereum',
+        nonce,
+        expiration: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString()
+      });
+
       const jwt = await litClient.getSignedToken({
-        resourceId: tokenGate.resourceId,
         authSig,
         chain: tokenGate.conditions.chains?.[0],
-        // chain: (tokenGate.conditions).chain || 'ethereum',
         ...tokenGate.conditions
       });
 
