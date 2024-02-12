@@ -50,6 +50,7 @@ export function ProposalProperties({
       : [];
 
   const proposalFormInputs: ProposalPropertiesInput = {
+    createdAt: proposalPage.createdAt.toString(),
     archived: proposal?.archived ?? false,
     authors: proposal?.authors.map((author) => author.userId) ?? [],
     evaluations: proposal?.evaluations ?? [],
