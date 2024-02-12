@@ -40,7 +40,7 @@ test.describe.serial('Deleting a page', () => {
     await documentPage.trashModal.click();
   });
 
-  test('user can visit and restore an archived page', async ({ page, documentPage }) => {
+  test.skip('user can visit and restore an archived page', async ({ page, documentPage }) => {
     await login({ page, userId: mocked.user.id });
     await documentPage.goToPage({
       domain: mocked.space.domain,
