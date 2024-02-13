@@ -22,25 +22,16 @@ handler
 async function recordSnapshotInfo(req: NextApiRequest, res: NextApiResponse<PageMeta>) {
   const { snapshotProposalId, evaluationId } = req.body;
 
-  const pageId = req.query.id as string;
+  const proposalId = req.query.id as string;
 
-  const page = await getPage(pageId);
+  const page = await getPage(proposalId);
 
   if (!page) {
     throw new DataNotFoundError();
   }
 
-  const { error } = await hasAccessToSpace({
-    spaceId: page.spaceId as string,
-    userId: req.session.user.id
-  });
-
-  if (error) {
-    throw error;
-  }
-
   const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
-    resourceId: pageId,
+    resourceId: proposalId,
     userId: req.session.user.id
   });
 

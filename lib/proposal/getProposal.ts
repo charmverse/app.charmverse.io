@@ -12,11 +12,9 @@ type PermissionsMap = Awaited<
 
 export async function getProposal({
   id,
-  canAccessPrivateFormFields,
   permissionsByStep
 }: {
   id: string;
-  canAccessPrivateFormFields: boolean;
   permissionsByStep: PermissionsMap;
 }): Promise<ProposalWithUsersAndRubric> {
   const proposal = await prisma.proposal.findUniqueOrThrow({
@@ -71,7 +69,6 @@ export async function getProposal({
   return mapDbProposalToProposal({
     proposal,
     permissions: currentPermissions,
-    permissionsByStep,
-    canAccessPrivateFormFields
+    permissionsByStep
   });
 }

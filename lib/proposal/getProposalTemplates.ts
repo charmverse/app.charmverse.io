@@ -92,7 +92,6 @@ export async function getProposalTemplates({ spaceId, userId }: SpaceResourcesRe
   const res = templates.map((proposal) => {
     const mappedProposal = mapDbProposalToProposal({
       proposal,
-      canAccessPrivateFormFields: true,
       permissions: mockPermissions
     });
     return {

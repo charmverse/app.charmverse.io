@@ -40,19 +40,13 @@ async function getProposalFormAnswersHandler(req: NextApiRequest, res: NextApiRe
   });
 
   if (permissions.view !== true) {
-    const pagePermissions = proposal?.page?.id
-      ? await permissionsApiClient.pages.computePagePermissions({
-          resourceId: proposal.page.id,
-          userId
-        })
-      : null;
-
-    if (!pagePermissions?.read) {
-      throw new NotFoundError();
-    }
+    throw new NotFoundError();
   }
 
-  const answers = await getProposalFormAnswers({ proposalId, userId });
+  const answers = await getProposalFormAnswers({
+    proposalId,
+    canViewPrivateFields: permissions.view_private_fields
+  });
 
   return res.status(200).json(answers);
 }
