@@ -3,8 +3,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireKeys, requireUser, ActionNotPermittedError } from 'lib/middleware';
 import { getPage } from 'lib/pages/server';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getSnapshotProposal } from 'lib/snapshot/getProposal';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
@@ -36,6 +37,15 @@ async function recordSnapshotInfo(req: NextApiRequest, res: NextApiResponse<Page
 
   if (error) {
     throw error;
+  }
+
+  const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
+    resourceId: pageId,
+    userId: req.session.user.id
+  });
+
+  if (!permissions.create_vote) {
+    throw new ActionNotPermittedError(`You can't create a vote on this proposal.`);
   }
 
   const snapshotProposal = snapshotProposalId ? await getSnapshotProposal(snapshotProposalId) : null;
