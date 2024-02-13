@@ -60,8 +60,14 @@ export class ProposalPage extends DocumentPage {
       page.locator('data-test=evaluation-vote-settings').locator('data-test=delete-vote-option').nth(index),
     public pageTopLevelMenu = page.locator('data-test=header--show-page-actions'),
     public archiveProposalAction = page.locator('data-test=header--archive-current-proposal'),
-    public moveFromFeedbackEvaluation = page.locator('data-test=move-from-feedback-evaluation'),
-    public addReward = page.locator('data-test=add-reward')
+    public addReward = page.locator('data-test=add-reward'),
+    public passFeedbackEvaluation = page.locator('data-test=pass-feedback-evaluation'),
+    public failEvaluationButton = page.locator('data-test=evaluation-fail-button'),
+    public passEvaluationButton = page.locator('data-test=evaluation-pass-button'),
+    public goBackButton = page.locator('data-test=evaluation-go-back-button'),
+    public rubricCriteriaScore = page.locator('data-test=rubric-criteria-score-input >> input'),
+    public rubricCriteriaComment = page.locator('data-test=rubric-criteria-score-comment >> textarea').first(),
+    public saveRubricAnswers = page.locator('data-test=save-rubric-answers')
   ) {
     super(page);
   }

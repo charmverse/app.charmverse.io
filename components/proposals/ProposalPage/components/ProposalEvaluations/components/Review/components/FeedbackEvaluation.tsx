@@ -80,7 +80,7 @@ export function FeedbackEvaluation({
             onClick={onMoveForward}
             disabled={!!disabledTooltip}
             disabledTooltip={disabledTooltip}
-            data-test='move-from-feedback-evaluation'
+            data-test='pass-feedback-evaluation'
           >
             {nextStep ? `Move to ${nextStep.title}` : `Complete ${evaluation.title}`}
           </Button>

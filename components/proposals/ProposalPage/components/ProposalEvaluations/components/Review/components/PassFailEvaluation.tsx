@@ -104,6 +104,7 @@ export function PassFailEvaluation({
             </FormLabel>
             <Box display='flex' justifyContent='flex-end' gap={1}>
               <Button
+                data-test='evaluation-fail-button'
                 onClick={() => onSubmitReview('fail')}
                 disabled={!!disabledTooltip}
                 disabledTooltip={disabledTooltip}
@@ -112,6 +113,7 @@ export function PassFailEvaluation({
                 Decline
               </Button>
               <Button
+                data-test='evaluation-pass-button'
                 onClick={() => onSubmitReview('pass')}
                 disabled={!!disabledTooltip}
                 disabledTooltip={disabledTooltip}
