@@ -160,7 +160,9 @@ export function useFormFields({
                   return false;
                 }
 
-                return value && 'content' in value ? !checkIsContentEmpty(value.content as PageContent) : true;
+                return isRequired && value && 'content' in value
+                  ? !checkIsContentEmpty(value.content as PageContent)
+                  : true;
               });
               break;
             }
