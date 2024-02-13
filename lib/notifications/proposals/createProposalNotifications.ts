@@ -104,7 +104,7 @@ export async function createProposalNotifications(webhookData: {
         }
 
         const isAuthor = proposalAuthorIds.includes(spaceRole.userId);
-        const isReviewer = proposalPermissions.review || proposalPermissions.evaluate;
+        const isReviewer = proposalPermissions.evaluate;
         // New proposal permissions .vote is invalid
         const isVoter = proposalPermissions.evaluate;
         const canComment = proposalPermissions.comment && proposalPermissions.view;

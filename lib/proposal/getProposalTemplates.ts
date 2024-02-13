@@ -14,12 +14,11 @@ export type ProposalTemplate = Omit<ProposalWithUsersAndRubric, 'permissions'> &
 // mock permissions since they dont actually matter
 const mockPermissions: ProposalPermissionFlags = {
   evaluate: true,
-  review: true,
-  vote: true,
   comment: true,
   edit: true,
   delete: true,
   view: false,
+  view_private_fields: false,
   create_vote: false,
   make_public: false,
   archive: false,
