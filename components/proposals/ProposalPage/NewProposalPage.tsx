@@ -449,14 +449,19 @@ export function NewProposalPage({
                     ) : (
                       <ControlledFormFieldsInput
                         control={proposalFormFieldControl}
+                        enableComments={false}
                         errors={proposalFormFieldErrors}
                         onFormChange={(updatedFormFields) => {
                           setFormInputs({
                             formAnswers: formAnswersRef.current?.map((formAnswer) => {
                               const updatedFormField = updatedFormFields.find((f) => f.id === formAnswer.fieldId);
+
+                              if (!updatedFormField) {
+                                return formAnswer;
+                              }
                               return {
                                 ...formAnswer,
-                                value: updatedFormField?.value ?? formAnswer.value
+                                value: updatedFormField.value
                               };
                             })
                           });

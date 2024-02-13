@@ -1,5 +1,6 @@
 import { rafCommandExec } from '@bangle.dev/utils';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
+import type { PluginKey } from 'prosemirror-state';
 import { FaXTwitter } from 'react-icons/fa6';
 import { RiNftLine } from 'react-icons/ri';
 
@@ -8,7 +9,7 @@ import { EmbedIcon } from '../../iframe/components/EmbedIcon';
 import type { Embed, EmbedType } from '../../iframe/config';
 import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, embeds } from '../../iframe/config';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
-import type { PaletteItemTypeNoGroup } from '../paletteItem';
+import type { PaletteItemTypeNoGroup, PromisedCommand } from '../paletteItem';
 
 const iconSize = 30;
 
@@ -55,6 +56,35 @@ function iframeEmbedType(type: EmbedType): PaletteItemTypeNoGroup {
   };
 }
 
+function handleCustomEmbed({
+  palettePluginKey,
+  addTooltipMarker = true,
+  nodeName
+}: {
+  addTooltipMarker?: boolean;
+  palettePluginKey: PluginKey;
+  nodeName: string;
+}): PromisedCommand {
+  return (state, dispatch, view) => {
+    if (view) {
+      // Execute the animation
+      rafCommandExec(view!, (_state, _dispatch) => {
+        // let the node view know to show the tooltip by default
+        const node = addTooltipMarker
+          ? _state.schema.nodes[nodeName].create(undefined, undefined, [_state.schema.mark('tooltip-marker')])
+          : _state.schema.nodes[nodeName].create();
+
+        if (_dispatch && isAtBeginningOfLine(_state)) {
+          _dispatch(_state.tr.replaceSelectionWith(node, false));
+          return true;
+        }
+        return insertNode(_state, _dispatch, node);
+      });
+    }
+    return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
+  };
+}
+
 export function items(): PaletteItemTypeNoGroup[] {
   return [
     iframeEmbedType('embed'),
@@ -66,27 +96,37 @@ export function items(): PaletteItemTypeNoGroup[] {
     iframeEmbedType('odysee'),
     iframeEmbedType('typeform'),
     {
+      uid: 'farcasterFrame',
+      title: 'Frame (Farcaster)',
+      keywords: ['frame', 'farcaster'],
+      icon: (
+        <img
+          style={{
+            width: 25,
+            height: 25
+          }}
+          src='/images/logos/farcaster_logo_grayscale.png'
+        />
+      ),
+      description: 'Embed a Farcaster Frame',
+      editorExecuteCommand: ({ palettePluginKey }) =>
+        handleCustomEmbed({
+          nodeName: 'farcasterFrame',
+          palettePluginKey
+        }),
+      priority: 1
+    },
+    {
       uid: 'price',
       title: 'Crypto price',
       icon: <InsertChartIcon sx={{ fontSize: iconSize }} />,
       description: 'Display a crypto price',
-      editorExecuteCommand: ({ palettePluginKey }) => {
-        return (state, dispatch, view) => {
-          if (view) {
-            // Execute the animation
-            rafCommandExec(view!, (_state, _dispatch) => {
-              const node = _state.schema.nodes.cryptoPrice.create();
-
-              if (_dispatch && isAtBeginningOfLine(_state)) {
-                _dispatch(_state.tr.replaceSelectionWith(node));
-                return true;
-              }
-              return insertNode(_state, _dispatch, node);
-            });
-          }
-          return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
-        };
-      }
+      editorExecuteCommand: ({ palettePluginKey }) =>
+        handleCustomEmbed({
+          nodeName: 'cryptoPrice',
+          palettePluginKey,
+          addTooltipMarker: false
+        })
     },
     {
       uid: 'nft',
@@ -94,24 +134,11 @@ export function items(): PaletteItemTypeNoGroup[] {
       keywords: ['web3', 'opensea'],
       icon: <EmbedIcon icon={RiNftLine} size='large' />,
       description: 'Embed an NFT',
-      editorExecuteCommand: ({ palettePluginKey }) => {
-        return (state, dispatch, view) => {
-          if (view) {
-            // Execute the animation
-            rafCommandExec(view!, (_state, _dispatch) => {
-              // let the node view know to show the tooltip by default
-              const tooltipMark = _state.schema.mark('tooltip-marker');
-              const node = _state.schema.nodes.nft.create(undefined, undefined, [tooltipMark]);
-              if (_dispatch && isAtBeginningOfLine(_state)) {
-                _dispatch(_state.tr.replaceSelectionWith(node, false));
-                return true;
-              }
-              return insertNode(_state, _dispatch, node, false);
-            });
-          }
-          return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
-        };
-      }
+      editorExecuteCommand: ({ palettePluginKey }) =>
+        handleCustomEmbed({
+          nodeName: 'nft',
+          palettePluginKey
+        })
     },
     {
       uid: 'tweet',
@@ -119,25 +146,11 @@ export function items(): PaletteItemTypeNoGroup[] {
       keywords: ['twitter', 'elon'],
       icon: <FaXTwitter style={{ fontSize: iconSize }} />,
       description: 'Embed a Tweet',
-      editorExecuteCommand: ({ palettePluginKey }) => {
-        return (state, dispatch, view) => {
-          if (view) {
-            // Execute the animation
-            rafCommandExec(view!, (_state, _dispatch) => {
-              // let the node view know to show the tooltip by default
-              const tooltipMark = _state.schema.mark('tooltip-marker');
-              const node = _state.schema.nodes.tweet.create(undefined, undefined, [tooltipMark]);
-
-              if (_dispatch && isAtBeginningOfLine(_state)) {
-                _dispatch(_state.tr.replaceSelectionWith(node, false));
-                return true;
-              }
-              return insertNode(_state, _dispatch, node);
-            });
-          }
-          return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
-        };
-      }
+      editorExecuteCommand: ({ palettePluginKey }) =>
+        handleCustomEmbed({
+          nodeName: 'tweet',
+          palettePluginKey
+        })
     }
   ];
 }

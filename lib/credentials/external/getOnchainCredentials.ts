@@ -1,6 +1,7 @@
 import type { ApolloClient } from '@apollo/client';
 import { gql } from '@apollo/client';
 import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { SchemaDecodedItem } from '@ethereum-attestation-service/eas-sdk';
 import { getAddress } from 'viem';
 import { arbitrum, base, optimism } from 'viem/chains';
@@ -47,6 +48,13 @@ export type EASAttestationFromApi<T = any> = {
   type: 'onchain' | 'charmverse' | 'gitcoin';
   verificationUrl: string | null;
   iconUrl?: string | null;
+  issuedCredentialId?: string;
+};
+
+export type EASAttestationWithFavorite<T = any> = EASAttestationFromApi<T> & {
+  index: number;
+  // If its favorite then the value is non null
+  favoriteCredentialId: string | null;
 };
 
 const GET_EXTERNAL_CREDENTIALS = gql`
@@ -95,7 +103,7 @@ function getTrackedOnChainCredentials({
         (attestation: any) =>
           ({
             ...attestation,
-            type: 'external',
+            type: 'onchain',
             chainId,
             content: JSON.parse(attestation.decodedDataJson).reduce((acc: any, val: SchemaDecodedItem) => {
               acc[val.name] = val.value.value;
@@ -108,7 +116,11 @@ function getTrackedOnChainCredentials({
     });
 }
 
-export async function getAllOnChainAttestations({ wallets }: { wallets: string[] }): Promise<EASAttestationFromApi[]> {
+export async function getAllOnChainAttestations({
+  wallets
+}: {
+  wallets: string[];
+}): Promise<EASAttestationWithFavorite[]> {
   if (!wallets.length) {
     return [];
   }
@@ -126,5 +138,33 @@ export async function getAllOnChainAttestations({ wallets }: { wallets: string[]
     )
   ).then((results) => results.flat());
 
-  return attestations;
+  const favoriteCredentials = await prisma.favoriteCredential.findMany({
+    where: {
+      attestationId: {
+        in: attestations.map((a) => a.id)
+      }
+    },
+    select: {
+      index: true,
+      attestationId: true,
+      id: true
+    }
+  });
+
+  return attestations.map((attestation) => {
+    const favoriteCredential = favoriteCredentials.find((f) => f.attestationId === attestation.id);
+    if (favoriteCredential) {
+      return {
+        ...attestation,
+        index: favoriteCredential.index,
+        favoriteCredentialId: favoriteCredential.id
+      };
+    }
+
+    return {
+      ...attestation,
+      index: -1,
+      favoriteCredentialId: null
+    };
+  });
 }

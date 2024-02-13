@@ -39,7 +39,7 @@ export function WalletSign({
   onClick,
   children
 }: Props) {
-  const { isConnectingIdentity, connectWallet, isWalletSelectorModalOpen } = useWeb3ConnectionManager();
+  const { connectWallet, isWalletSelectorModalOpen } = useWeb3ConnectionManager();
   const { account, requestSignature, isSigning, walletAuthSignature, verifiableWalletDetected } = useWeb3Account();
   const { showMessage } = useSnackbar();
   const [isVerifyingWallet, setIsVerifyingWallet] = useState(false);
@@ -47,7 +47,7 @@ export function WalletSign({
 
   useEffect(() => {
     // Do not trigger signature if user is on a mobile device
-    if (!isTouchScreen() && !isSigning && enableAutosign && verifiableWalletDetected && !isConnectingIdentity) {
+    if (!isTouchScreen() && !isSigning && enableAutosign && verifiableWalletDetected) {
       generateWalletAuth();
     }
   }, [verifiableWalletDetected]);
@@ -72,13 +72,13 @@ export function WalletSign({
     }
   }
 
-  if (!verifiableWalletDetected || isConnectingIdentity) {
+  if (!verifiableWalletDetected) {
     return (
       <ButtonComponent
         data-test='connect-wallet-button'
         sx={buttonStyle}
         size={buttonSize ?? 'large'}
-        loading={isWalletSelectorModalOpen || isConnectingIdentity}
+        loading={isWalletSelectorModalOpen}
         onClick={() => {
           onClick?.();
           connectWallet();
@@ -88,7 +88,7 @@ export function WalletSign({
       >
         {children
           ? typeof children === 'function'
-            ? children({ needsVerification: false, isLoading: isWalletSelectorModalOpen || isConnectingIdentity })
+            ? children({ needsVerification: false, isLoading: isWalletSelectorModalOpen })
             : children
           : 'Connect a wallet'}
       </ButtonComponent>

@@ -6,7 +6,6 @@ import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
-import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -33,6 +32,7 @@ type FormFieldsInputProps = {
     formFieldAnswer?: FormFieldAnswer | null;
   })[];
   disabled?: boolean;
+  enableComments: boolean;
   errors: FieldErrors<Record<string, FormFieldValue>>;
   control: Control<Record<string, FormFieldValue>, any>;
   onFormChange: (
@@ -45,57 +45,20 @@ type FormFieldsInputProps = {
   values?: Record<string, FormFieldValue>;
   pageId?: string;
   isDraft?: boolean;
+  threads?: Record<string, ThreadWithComments | undefined>;
 };
 
-export function ControlledFormFieldsInput({
-  formFields,
-  disabled,
-  control,
-  errors,
-  onFormChange
-}: Omit<FormFieldsInputProps, 'onSave'>) {
-  return (
-    <FormFieldsInputBase
-      control={control}
-      errors={errors}
-      formFields={formFields}
-      onFormChange={onFormChange}
-      disabled={disabled}
-      isReviewer={false}
-    />
-  );
+export function ControlledFormFieldsInput(props: Omit<FormFieldsInputProps, 'onSave'>) {
+  return <FormFieldsInputBase {...props} />;
 }
 
-export function FormFieldsInput({
-  formFields,
-  disabled,
-  onSave,
-  isReviewer,
-  pageId,
-  threads,
-  isDraft
-}: Omit<FormFieldsInputProps, 'control' | 'errors' | 'onFormChange'> & {
-  isReviewer: boolean;
-  threads?: Record<string, ThreadWithComments | undefined>;
-}) {
+export function FormFieldsInput(props: Omit<FormFieldsInputProps, 'control' | 'errors' | 'onFormChange'>) {
   const { control, errors, onFormChange, values } = useFormFields({
-    fields: formFields
+    fields: props.formFields
   });
 
   return (
-    <FormFieldsInputBase
-      control={control}
-      errors={errors}
-      formFields={formFields}
-      onFormChange={onFormChange}
-      disabled={disabled}
-      onSave={onSave}
-      values={values}
-      isReviewer={isReviewer}
-      pageId={pageId}
-      threads={threads}
-      isDraft={isDraft}
-    />
+    <FormFieldsInputBase {...props} control={control} errors={errors} onFormChange={onFormChange} values={values} />
   );
 }
 
@@ -112,18 +75,15 @@ function FormFieldsInputBase({
   formFields,
   values,
   disabled,
+  enableComments,
   control,
   errors,
   onFormChange,
-  isReviewer,
   pageId,
-  isDraft,
   threads = {}
 }: FormFieldsInputProps & {
-  isReviewer: boolean;
   threads?: Record<string, ThreadWithComments | undefined>;
 }) {
-  const isAdmin = useIsAdmin();
   const { user } = useUser();
   const [isFormDirty, setIsFormDirty] = useState(false);
   const { showMessage } = useSnackbar();
@@ -199,6 +159,8 @@ function FormFieldsInputBase({
               render={({ field }) => (
                 <FieldTypeRenderer
                   {...field}
+                  rows={undefined}
+                  maxRows={10}
                   value={(field.value ?? '') as FormFieldValue}
                   placeholder={fieldTypePlaceholderRecord[formField.type]}
                   labelEndAdornment={
@@ -225,14 +187,14 @@ function FormFieldsInputBase({
                           formFieldName={formField.name}
                           disabled={disabled}
                           fieldAnswerThreads={fieldAnswerThreads}
-                          canCreateComments={(isAdmin || isReviewer) && !isDraft}
+                          enableComments={enableComments}
                         />
                       </Box>
                     )
                   }
                   description={formField.description as PageContent}
                   disabled={disabled}
-                  type={formField.type}
+                  type={formField.type === 'short_text' ? 'text_multiline' : formField.type}
                   label={formField.name}
                   options={formField.options as SelectOptionType[]}
                   error={errors[formField.id] as any}

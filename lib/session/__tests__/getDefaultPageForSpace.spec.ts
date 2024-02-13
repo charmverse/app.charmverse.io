@@ -1,5 +1,6 @@
 import type { UserSpaceAction } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
 
 import { createPage, createPost, generateUserAndSpace } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
@@ -159,6 +160,73 @@ describe('getDefaultPageForSpace()', () => {
     });
     const url = await getDefaultPageForSpace({ space, userId: user.id });
     expect(url).toEqual(`/${space.domain}/${page.path}`);
+  });
+});
+
+describe('getDefaultPageForSpace - non logged in user', () => {
+  it('should return the home page if it is public', async () => {
+    const { space, user } = await testUtilsUser.generateUserAndSpace();
+
+    const publicHomePage = await testUtilsPages.generatePage({
+      createdBy: user.id,
+      spaceId: space.id,
+      pagePermissions: [{ permissionLevel: 'view', assignee: { group: 'public' } }]
+    });
+
+    const updatedSpace = await prisma.space.update({
+      where: {
+        id: space.id
+      },
+      data: {
+        homePageId: publicHomePage.id
+      }
+    });
+
+    const redirect = await getDefaultPageForSpace({ space: updatedSpace, userId: undefined });
+
+    expect(redirect).toEqual(`/${space.domain}/${publicHomePage.path}`);
+  });
+
+  it('should return the join page if the home page is not public', async () => {
+    const { space, user } = await testUtilsUser.generateUserAndSpace();
+
+    const publicHomePage = await testUtilsPages.generatePage({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    const updatedSpace = await prisma.space.update({
+      where: {
+        id: space.id
+      },
+      data: {
+        homePageId: publicHomePage.id
+      }
+    });
+
+    const redirect = await getDefaultPageForSpace({ space: updatedSpace, userId: undefined });
+
+    expect(redirect).toEqual(null);
+  });
+
+  it('should return the join page if there is no home page', async () => {
+    const { space, user } = await testUtilsUser.generateUserAndSpace();
+
+    const redirect = await getDefaultPageForSpace({ space, userId: undefined });
+
+    expect(redirect).toEqual(null);
+  });
+
+  it('should return main custom domain page (login) if there is no homepage', async () => {
+    const { space, user } = await testUtilsUser.generateUserAndSpace();
+    const updatedSpace = await prisma.space.update({
+      where: { id: space.id },
+      data: { customDomain: 'test.charm.fyi' }
+    });
+
+    const redirect = await getDefaultPageForSpace({ space: updatedSpace, userId: undefined, host: 'test.charm.fyi' });
+
+    expect(redirect).toEqual(null);
   });
 });
 

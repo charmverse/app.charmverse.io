@@ -1,22 +1,31 @@
-import type { SxProps, Theme } from '@mui/material';
+import styled from '@emotion/styled';
+import type { SxProps, Theme, TextFieldProps } from '@mui/material';
 import { TextField } from '@mui/material';
 import { forwardRef } from 'react';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import type { ControlFieldProps, FieldProps } from 'components/common/form/interfaces';
 
-type Props = ControlFieldProps & FieldProps & { disableArrows?: boolean };
+type Props = ControlFieldProps &
+  FieldProps & { disableArrows?: boolean } & Pick<TextFieldProps, 'fullWidth' | 'inputProps' | 'sx'>;
 
-const disabledArrows: SxProps<Theme> = {
-  '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
-    WebkitAppearance: 'none',
-    margin: 0
-  },
-  '& input[type=number]': {
-    MozAppearance: 'textfield',
-    coco: '2'
-  }
-};
+const StyledTextField = styled(TextField)<{ disableArrows: boolean }>`
+  ${({ disableArrows }) =>
+    disableArrows
+      ? `
+      /* Chrome, Safari, Edge, Opera */
+      input::-webkit-outer-spin-button,
+      input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      /* Firefox */
+      input[type=number] {
+        -moz-appearance: textfield;
+      }`
+      : ''}
+`;
 
 export const NumberInputField = forwardRef<HTMLDivElement, Props>(
   (
@@ -31,7 +40,7 @@ export const NumberInputField = forwardRef<HTMLDivElement, Props>(
       placeholder,
       disableArrows = false,
       inputEndAdornment,
-      ...inputProps
+      ...textFieldProps
     }: Props,
     ref
   ) => {
@@ -45,15 +54,14 @@ export const NumberInputField = forwardRef<HTMLDivElement, Props>(
         inline={inline}
         iconLabel={iconLabel}
       >
-        <TextField
-          fullWidth
+        <StyledTextField
           error={!!error}
           required={required}
           placeholder={placeholder}
-          sx={{ ...(disableArrows ? disabledArrows : {}) }}
-          {...inputProps}
+          disableArrows={disableArrows}
           ref={ref}
           type='number'
+          {...textFieldProps}
         />
       </FieldWrapper>
     );

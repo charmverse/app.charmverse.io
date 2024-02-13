@@ -3,7 +3,7 @@ import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Collapse, Divider, IconButton, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
-import { useGetCredentialTemplates } from 'charmClient/hooks/credentialHooks';
+import { useGetCredentialTemplates } from 'charmClient/hooks/credentials';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import { CredentialSelect } from 'components/credentials/CredentialsSelect';
@@ -17,6 +17,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ProposalEvaluationValues } from '../ProposalEvaluations/components/Settings/components/EvaluationStepSettings';
 
 export type ProposalPropertiesInput = {
+  createdAt: string; // this is necessary for Created Time custom property
   content?: PageContent | null;
   contentText?: string; // required to know if we can overwrite content when selecting a template
   authors: string[];

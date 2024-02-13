@@ -4,7 +4,7 @@ import { forwardRef } from 'react';
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import type { ControlFieldProps, FieldProps } from 'components/common/form/interfaces';
 
-type Props = ControlFieldProps & FieldProps & { multiline?: boolean; rows?: number };
+type Props = ControlFieldProps & FieldProps & { multiline?: boolean; rows?: number; maxRows?: number };
 
 export const TextInputField = forwardRef<HTMLDivElement, Props>(
   (

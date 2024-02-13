@@ -31,7 +31,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
 
-  const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow } = useProposal({
+  const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow, onChangeRewardSettings } = useProposal({
     proposalId
   });
 
@@ -124,7 +124,6 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
           isUnpublishedProposal={isUnpublishedProposal}
           readOnlyProposalPermissions={!proposal?.permissions.edit}
           isProposalTemplate={page.type === 'proposal_template'}
-          isReviewer={proposal?.permissions.evaluate}
           isStructuredProposal={isStructuredProposal}
           closeSidebar={closeSidebar}
           openSidebar={() => setActiveView('proposal_evaluation')}
@@ -134,6 +133,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
           onChangeEvaluation={onChangeEvaluation}
           refreshProposal={refreshProposal}
           onChangeWorkflow={onChangeWorkflow}
+          onChangeRewardSettings={onChangeRewardSettings}
         />
       )}
     </DocumentColumnLayout>

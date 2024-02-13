@@ -71,11 +71,11 @@ describe('GET /api/space/[id]/members - Get list of members in a space', () => {
       expect.arrayContaining<Partial<Member>>([
         expect.objectContaining({
           id: adminUser.id,
-          username: expect.not.stringContaining(adminUser.username)
+          username: expect.stringContaining(adminUser.username)
         }),
         expect.objectContaining({
           id: nonAdminUser.id,
-          username: expect.not.stringContaining(nonAdminUser.username)
+          username: expect.stringContaining(nonAdminUser.username)
         })
       ])
     );

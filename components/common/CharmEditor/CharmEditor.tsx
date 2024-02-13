@@ -10,8 +10,8 @@ import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 import { useRouter } from 'next/router';
 import type { EditorState } from 'prosemirror-state';
-import type { CSSProperties, ReactNode } from 'react';
-import { memo, useEffect, useRef, useState } from 'react';
+import type { CSSProperties } from 'react';
+import { memo, useEffect, useMemo, useRef } from 'react';
 import { useSWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
@@ -28,8 +28,9 @@ import { BangleEditor as ReactBangleEditor } from './components/@bangle.dev/reac
 import { useEditorState } from './components/@bangle.dev/react/useEditorState';
 import { BookmarkNodeView } from './components/bookmark/BookmarkNodeView';
 import Callout from './components/callout/components/Callout';
-import { CryptoPrice } from './components/CryptoPrice';
+import { CryptoPriceNodeView } from './components/cryptoPrice/CryptoPriceNodeView';
 import EmojiSuggest from './components/emojiSuggest/EmojiSuggest.component';
+import { FarcasterFrameNodeView } from './components/farcasterFrame/components/FarcasterFrameNodeView';
 import type { FrontendParticipant } from './components/fiduswriter/collab';
 import { getSelectedChanges } from './components/fiduswriter/state_plugins/track';
 import fiduswriterStyles from './components/fiduswriter/styles';
@@ -176,7 +177,6 @@ type CharmEditorProps = {
   postId?: string;
   containerWidth?: number;
   pageType?: PageType | 'post';
-  snapshotProposalId?: string | null;
   pagePermissions?: PagePermissionFlags;
   onParticipantUpdate?: (participants: FrontendParticipant[]) => void;
   placeholderText?: string;
@@ -209,7 +209,6 @@ function CharmEditor({
   containerWidth,
   pageType,
   setEditorState,
-  snapshotProposalId,
   pagePermissions,
   placeholderText,
   focusOnInit,
@@ -257,32 +256,40 @@ function CharmEditor({
     }
   }, 1000);
 
-  const sendPageEvent = throttle(() => {
-    if (currentSpace && pageType && pageId) {
-      if (enableSuggestingMode) {
-        charmClient.track.trackAction('page_suggestion_created', {
-          pageId,
-          spaceId: currentSpace.id
-        });
-      } else {
-        charmClient.track.trackAction('edit_page', {
-          pageId,
-          spaceId: currentSpace.id
-        });
-      }
-    }
-  }, 1000);
+  const sendPageEvent = useMemo(
+    () =>
+      throttle(() => {
+        if (currentSpace && pageType && pageId) {
+          if (enableSuggestingMode) {
+            charmClient.track.trackAction('page_suggestion_created', {
+              pageId,
+              spaceId: currentSpace.id
+            });
+          } else {
+            charmClient.track.trackAction('edit_page', {
+              pageId,
+              spaceId: currentSpace.id
+            });
+          }
+        }
+      }, 1000),
+    [currentSpace, pageType, pageId, enableSuggestingMode]
+  );
 
-  const debouncedUpdate = debounce((view: EditorView, prevDoc?: EditorState['doc']) => {
-    const doc = view.state.doc.toJSON() as PageContent;
-    const rawText = view.state.doc.textContent as string;
-    if (pageId && prevDoc) {
-      onThreadResolveDebounced(pageId, view.state.doc, prevDoc);
-    }
-    if (onContentChange) {
-      onContentChange({ doc, rawText });
-    }
-  }, 100);
+  const debouncedUpdate = useMemo(
+    () =>
+      debounce((view: EditorView, prevDoc?: EditorState['doc']) => {
+        const doc = view.state.doc.toJSON() as PageContent;
+        const rawText = view.state.doc.textContent as string;
+        if (pageId && prevDoc) {
+          onThreadResolveDebounced(pageId, view.state.doc, prevDoc);
+        }
+        if (onContentChange) {
+          onContentChange({ doc, rawText });
+        }
+      }, 100),
+    [onContentChange, pageId, onThreadResolveDebounced]
+  );
 
   const editorRef = useRef<HTMLDivElement>(null);
 
@@ -309,6 +316,9 @@ function CharmEditor({
       onContentChange: (view: EditorView, prevDoc: Node) => {
         debouncedUpdate(view, prevDoc);
         sendPageEvent();
+        if (setCharmEditorView) {
+          setCharmEditorView(view);
+        }
       },
       placeholderText,
       onError(err) {
@@ -409,7 +419,6 @@ function CharmEditor({
           pageId,
           pagePermissions,
           postId,
-          snapshotProposalId,
           readOnly,
           deleteNode: () => {
             const view = props.view;
@@ -430,7 +439,7 @@ function CharmEditor({
           case 'cryptoPrice': {
             const attrs = props.attrs as { base: null | CryptoCurrency; quote: null | FiatCurrency };
             return (
-              <CryptoPrice
+              <CryptoPriceNodeView
                 view={allProps.view}
                 getPos={allProps.getPos}
                 readOnly={readOnly}
@@ -448,6 +457,9 @@ function CharmEditor({
                 }}
               />
             );
+          }
+          case 'farcasterFrame': {
+            return <FarcasterFrameNodeView {...allProps} pageId={pageId} />;
           }
           case 'blockquote': {
             return <Callout {...allProps}>{_children}</Callout>;

@@ -18,7 +18,11 @@ export function ProfileTabs(props: { user: Member | PublicUser | LoggedInUser; r
 
   const tabs: TabConfig[] = useMemo(() => {
     const _tabs = [
-      ['Profile', <ProfileWidgets key='profile' readOnly={readOnly} userId={props.user.id} />, { sx: { px: 0 } }],
+      [
+        'Profile',
+        <ProfileWidgets setActiveTab={setActiveTab} key='profile' readOnly={readOnly} userId={props.user.id} />,
+        { sx: { px: 0 } }
+      ],
       [
         'Organizations',
         <Stack key='organizations'>

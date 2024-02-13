@@ -120,29 +120,6 @@ class CharmClient {
     return http.GET<SocketAuthResponse>('/api/socket');
   }
 
-  async login({ address, walletSignature }: Web3LoginRequest) {
-    const user = await http.POST<LoggedInUser | { otpRequired: true }>('/api/session/login', {
-      address,
-      walletSignature
-    });
-    return user;
-  }
-
-  async logout() {
-    await http.POST('/api/session/logout');
-  }
-
-  getUser() {
-    return http.GET<LoggedInUser>('/api/profile');
-  }
-
-  createUser({ address, walletSignature }: Web3LoginRequest) {
-    return http.POST<LoggedInUser>('/api/profile', {
-      address,
-      walletSignature
-    });
-  }
-
   updateUser(data: Partial<User> & { addressesToAdd?: AuthSig[] }) {
     return http.PUT<LoggedInUser>('/api/profile', data);
   }
@@ -161,10 +138,6 @@ class CharmClient {
 
   addUserWallets(data: AuthSig[]) {
     return http.POST<User>('/api/profile/add-wallets', { addressesToAdd: data });
-  }
-
-  removeUserWallet(address: Pick<UserWallet, 'address'>) {
-    return http.POST<LoggedInUser>('/api/profile/remove-wallet', address);
   }
 
   getPublicPageByViewId(viewId: string) {
@@ -354,10 +327,6 @@ class CharmClient {
 
   restrictPagePermissions({ pageId }: { pageId: string }): Promise<PageWithPermissions> {
     return http.POST(`/api/pages/${pageId}/restrict-permissions`, {});
-  }
-
-  updatePageSnapshotData(pageId: string, data: Pick<Page, 'snapshotProposalId'>): Promise<PageWithPermissions> {
-    return http.PUT(`/api/pages/${pageId}/snapshot`, data);
   }
 
   createProposalSource({ pageId }: { pageId: string }) {

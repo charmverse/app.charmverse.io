@@ -1,10 +1,11 @@
 import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import * as http from 'adapters/http';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
 
-import type { EASAttestationFromApi } from './external/getOnchainCredentials';
+import type { EASAttestationWithFavorite } from './external/getOnchainCredentials';
 
 const GITCOIN_SCORER_BASE_URL = 'https://api.scorer.gitcoin.co';
 
@@ -32,66 +33,82 @@ type ScoreItem = {
   stamp_scores: Record<string, unknown>;
 };
 
+const cachedTime = 60 * 60 * 1000; // 1 hour
+
 async function getGitcoinPassportScores(wallets: string[]) {
-  try {
-    const scoreItems = await Promise.all(
-      wallets.map(async (wallet) => {
-        try {
-          let score = await http.GET<ScoreItem>(
-            `${GITCOIN_SCORER_BASE_URL}/registry/score/${GITCOIN_SCORER_ID}/${wallet}`,
-            undefined,
-            {
-              credentials: 'omit',
-              headers: GITCOIN_API_HEADERS
-            }
-          );
-
-          if (!score) {
-            score = await http.POST<ScoreItem>(
-              `${GITCOIN_SCORER_BASE_URL}/registry/submit-passport`,
-              {
-                address: wallet,
-                scorer_id: GITCOIN_SCORER_ID
-              },
-              {
-                credentials: 'omit',
-                headers: GITCOIN_API_HEADERS
-              }
-            );
-          }
-
-          return score;
-        } catch (_) {
+  const scoreItems = await Promise.all(
+    wallets.map(async (wallet) => {
+      const registryScore = await http
+        .GET<ScoreItem>(`${GITCOIN_SCORER_BASE_URL}/registry/score/${GITCOIN_SCORER_ID}/${wallet}`, undefined, {
+          credentials: 'omit',
+          headers: GITCOIN_API_HEADERS
+        })
+        .catch(() => {
+          log.error('Error getting Gitcoin Passport scores from score registry', {
+            wallet
+          });
           return null;
-        }
-      })
-    );
+        });
 
-    return scoreItems.filter(isTruthy);
-  } catch (error: any) {
-    log.error('Error getting Gitcoin Passport scores', {
-      error: error.message,
-      wallets
-    });
-    return [];
-  }
+      const currentTime = new Date().getTime();
+
+      if (registryScore && currentTime - new Date(registryScore.last_score_timestamp).getTime() < cachedTime) {
+        return registryScore;
+      }
+
+      const passportScore = await http
+        .POST<ScoreItem>(
+          `${GITCOIN_SCORER_BASE_URL}/registry/submit-passport`,
+          {
+            address: wallet,
+            scorer_id: GITCOIN_SCORER_ID
+          },
+          {
+            credentials: 'omit',
+            headers: GITCOIN_API_HEADERS
+          }
+        )
+        .catch(() => {
+          log.error('Error submitting wallet for passport score', {
+            wallet
+          });
+          return null;
+        });
+      return passportScore;
+    })
+  );
+
+  return scoreItems.filter(isTruthy);
 }
 
 export async function getGitcoinCredentialsByWallets({
   wallets
 }: {
   wallets: string[];
-}): Promise<EASAttestationFromApi[]> {
+}): Promise<EASAttestationWithFavorite[]> {
   const gitcoinPassportScores = await getGitcoinPassportScores(wallets);
+  const favoriteCredentials = await prisma.favoriteCredential.findMany({
+    where: {
+      gitcoinWalletAddress: {
+        in: wallets.map((w) => w.toLowerCase())
+      }
+    },
+    select: {
+      id: true,
+      index: true,
+      gitcoinWalletAddress: true
+    }
+  });
 
   return wallets
     .map((wallet) => {
+      const favoriteCredential = favoriteCredentials.find((f) => lowerCaseEqual(f.gitcoinWalletAddress, wallet));
       const gitcoinPassportScore = gitcoinPassportScores.find((score) => lowerCaseEqual(score.address, wallet));
-      if (!gitcoinPassportScore) {
+      if (!gitcoinPassportScore || gitcoinPassportScore.score === '0E-9') {
         return null;
       }
 
-      const mappedData: EASAttestationFromApi = {
+      const mappedData: EASAttestationWithFavorite = {
         id: `${wallet}-gitcoin-passport-score`,
         content: {
           passport_score: Number(gitcoinPassportScore.score)
@@ -103,7 +120,9 @@ export async function getGitcoinCredentialsByWallets({
         chainId: 10,
         type: 'gitcoin',
         verificationUrl: null,
-        iconUrl: null
+        iconUrl: null,
+        favoriteCredentialId: favoriteCredential?.id ?? null,
+        index: favoriteCredential?.index ?? -1
       };
 
       return mappedData;

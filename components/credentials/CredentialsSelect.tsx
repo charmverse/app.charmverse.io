@@ -1,4 +1,4 @@
-import { useGetCredentialTemplates } from 'charmClient/hooks/credentialHooks';
+import { useGetCredentialTemplates } from 'charmClient/hooks/credentials';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { IPropertyOption } from 'lib/focalboard/board';
@@ -25,6 +25,10 @@ export function CredentialSelect({ onChange, selectedCredentialTemplates, readOn
   }
 
   if (!credentialTemplates) {
+    return null;
+  }
+
+  if (readOnly && !selectedCredentialTemplates?.length) {
     return null;
   }
 

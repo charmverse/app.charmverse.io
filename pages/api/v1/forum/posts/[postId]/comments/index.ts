@@ -3,10 +3,11 @@ import type { PostComment } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import { createPostComment } from 'lib/forums/comments/createPostComment';
 import type { PostCommentVote } from 'lib/forums/comments/interface';
 import { InvalidStateError, requireApiKey, requireKeys, requireSuperApiKey } from 'lib/middleware';
-import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
-import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
+import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
+import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
 import { defaultHandler, logApiRequest } from 'lib/public-api/handler';
 import type { UserProfile } from 'lib/public-api/interfaces';
 import type { UserInfo } from 'lib/public-api/searchUserProfile';
@@ -17,7 +18,12 @@ const handler = defaultHandler();
 
 handler.get(requireApiKey, logApiRequest, getPostComments);
 
-handler.post(requireSuperApiKey, logApiRequest, requireKeys(['userId', 'contentMarkdown'], 'body'), createPostComment);
+handler.post(
+  requireSuperApiKey,
+  logApiRequest,
+  requireKeys(['userId', 'contentMarkdown'], 'body'),
+  createPostCommentEndpoint
+);
 
 /**
  * @swagger
@@ -287,7 +293,7 @@ async function getPostComments(req: NextApiRequest, res: NextApiResponse<PublicA
  *                $ref: '#/components/schemas/ForumPostComment'
  *
  */
-async function createPostComment(req: NextApiRequest, res: NextApiResponse<PublicApiPostComment>) {
+async function createPostCommentEndpoint(req: NextApiRequest, res: NextApiResponse<PublicApiPostComment>) {
   // This should never be undefined, but adding this safeguard for future proofing
   if (!req.spaceIdRange) {
     throw new InvalidStateError('Space ID is undefined');
@@ -322,14 +328,12 @@ async function createPostComment(req: NextApiRequest, res: NextApiResponse<Publi
 
   const commentContent = parseMarkdown(req.body.contentMarkdown);
 
-  const postComment = await prisma.postComment.create({
-    data: {
-      post: { connect: { id: postId } },
-      parentId: req.body.parentId,
-      contentText: req.body.contentMarkdown,
-      user: { connect: { id: userId } },
-      content: commentContent
-    }
+  const result = await createPostComment({
+    postId,
+    userId,
+    content: commentContent,
+    contentText: req.body.contentMarkdown,
+    parentId: req.body.parentId
   });
 
   const user = await prisma.user.findUniqueOrThrow({
@@ -343,8 +347,8 @@ async function createPostComment(req: NextApiRequest, res: NextApiResponse<Publi
   });
 
   const apiComment: PublicApiPostComment = {
-    id: postComment.id,
-    createdAt: postComment.createdAt.toISOString(),
+    id: result.id,
+    createdAt: result.createdAt.toISOString(),
     content: {
       markdown: req.body.contentMarkdown,
       text: req.body.contentMarkdown
@@ -352,7 +356,7 @@ async function createPostComment(req: NextApiRequest, res: NextApiResponse<Publi
     author: getUserProfile(user),
     downvotes: 0,
     upvotes: 0,
-    parentId: postComment.parentId,
+    parentId: result.parentId,
     children: []
   };
 

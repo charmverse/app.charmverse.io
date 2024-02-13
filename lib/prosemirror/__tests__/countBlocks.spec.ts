@@ -37,6 +37,7 @@ describe('countBlocks() - all nodes', () => {
     columnBlock: 0,
     cryptoPrice: 1,
     date: 0,
+    farcasterFrame: 1,
     deletion: 0,
     disclosure: 0,
     disclosureDetails: 1,

@@ -4,7 +4,6 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 
-import charmClient from 'charmClient';
 import { useUpdateSnapshotProposal } from 'charmClient/hooks/proposals';
 import Link from 'components/common/Link';
 import { LoadingIcon } from 'components/common/LoadingComponent';
@@ -42,17 +41,10 @@ export function PublishToSnapshot({
   async function verifyProposal(snapshotId: string) {
     const _snapshotProposal = await getSnapshotProposal(snapshotId);
     if (!_snapshotProposal) {
-      if (evaluationId) {
-        await updateProposalEvaluation({
-          evaluationId,
-          snapshotProposalId: null
-        });
-      } else {
-        await charmClient.updatePageSnapshotData(pageId, {
-          snapshotProposalId: null
-        });
-      }
-      await charmClient.updatePageSnapshotData(pageId, { snapshotProposalId: null });
+      await updateProposalEvaluation({
+        evaluationId,
+        snapshotProposalId: null
+      });
     }
     return _snapshotProposal;
   }

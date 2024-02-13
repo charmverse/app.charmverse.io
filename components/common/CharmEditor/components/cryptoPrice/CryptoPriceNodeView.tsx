@@ -18,48 +18,14 @@ import { getTokenInfo } from 'lib/tokens/tokenData';
 import { formatMoney } from 'lib/utilities/formatting';
 import { isTruthy } from 'lib/utilities/types';
 
-import { enableDragAndDrop } from '../utils';
+import { enableDragAndDrop } from '../../utils';
 
 /**
  * Simple utility as the Crypto Price component allows selecting the base or quote
  */
 type OptionListName = Extract<keyof IPairQuote, 'base' | 'quote'>;
 
-/**
- * TODO - Implement spec
- * @returns
- */
-export function cryptoPriceSpec() {
-  const spec: BaseRawNodeSpec = {
-    name: 'cryptoPrice',
-    type: 'node',
-    schema: {
-      attrs: {
-        base: {
-          default: null
-        },
-        quote: {
-          default: null
-        },
-        track: {
-          default: []
-        }
-      },
-      draggable: true,
-      group: 'block',
-      parseDOM: [{ tag: 'div.charm-crypto-price' }],
-      toDOM: (): DOMOutputSpec => {
-        return ['div.charm-crypto-price'];
-      }
-    },
-    markdown: {
-      toMarkdown: () => null
-    }
-  };
-  return spec;
-}
-
-export function CryptoPrice({
+export function CryptoPriceNodeView({
   base,
   quote,
   onQuoteCurrencyChange,

@@ -1,12 +1,10 @@
 import type { Space } from '@charmverse/core/prisma';
-import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireKeys, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { getSnapshotSpace } from 'lib/snapshot/getSpace';
-import { DataNotFoundError } from 'lib/utilities/errors';
+import { updateSnapshotDomain } from 'lib/spaces/updateSnapshotDomain';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -20,20 +18,8 @@ async function updateSnapshotConnection(req: NextApiRequest, res: NextApiRespons
 
   const spaceId = req.query.id as string;
 
-  const snapshotSpace = await getSnapshotSpace(snapshotDomain);
+  const space = await updateSnapshotDomain(spaceId, snapshotDomain);
 
-  if (!snapshotSpace) {
-    throw new DataNotFoundError(`No snapshot domain ${snapshotDomain} was found`);
-  }
-
-  const space = await prisma.space.update({
-    where: {
-      id: spaceId
-    },
-    data: {
-      snapshotDomain
-    }
-  });
   return res.status(200).json(space);
 }
 

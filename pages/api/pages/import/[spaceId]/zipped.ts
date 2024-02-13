@@ -11,7 +11,7 @@ import { getRequestLanguage } from 'lib/middleware/getRequestLanguage';
 import { getPagePath } from 'lib/pages';
 import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
 import { pageMetaSelect } from 'lib/pages/server/pageMetaSelect';
-import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
+import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { formatDateTime } from 'lib/utilities/dates';

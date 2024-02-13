@@ -112,6 +112,7 @@ export function FullPageActionsMenuButton({
         <div>
           <Tooltip title='View comments, export content and more' arrow>
             <IconButton
+              data-test='page-context-menu-button'
               size={isLargeScreen ? 'small' : 'medium'}
               onClick={() => {
                 setPageMenuAnchorElement(pageMenuAnchor.current || null);

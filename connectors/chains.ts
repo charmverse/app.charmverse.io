@@ -95,7 +95,6 @@ const RPC: Record<string, IChainDetails> = {
     alchemyUrl: 'https://eth-goerli.g.alchemy.com',
     rpcUrls: ['https://goerli-light.eth.linkpool.io/'],
     blockExplorerUrls: ['https://goerli.etherscan.io/'],
-    gnosisUrl: 'https://safe-transaction-goerli.safe.global',
     iconUrl: '/images/cryptoLogos/ethereum-eth-logo.svg',
     testnet: true,
     shortName: 'gor',
@@ -439,8 +438,8 @@ const RPC: Record<string, IChainDetails> = {
 export type Blockchain = keyof typeof RPC;
 
 export const RPCList = Object.values(RPC)
-  // filter out testnets in prod, except for Goerli
-  .filter((chain) => !isProdEnv || !chain.testnet || chain.chainId === goerli.id);
+  // filter out testnets in prod, except for Goerli and Sepolia
+  .filter((chain) => !isProdEnv || !chain.testnet || chain.chainId === goerli.id || chain.chainId === sepolia.id);
 
 export function getChainShortname(chainId: string | number): string {
   const parsedChainId = parseInt(chainId.toString());

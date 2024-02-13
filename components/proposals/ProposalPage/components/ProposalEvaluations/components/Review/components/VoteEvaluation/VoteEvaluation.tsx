@@ -8,6 +8,7 @@ import { NoCommentsMessage } from 'components/[pageId]/DocumentPage/components/S
 import { Button } from 'components/common/Button';
 import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/components/VoteDetail';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { useCharmEditorView } from 'hooks/useCharmEditorView';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposal/interface';
 
@@ -28,6 +29,7 @@ export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation, refres
   const isReviewer = isCurrent && proposal.permissions.evaluate;
   const vote = votes?.find((v) => v.id === evaluation.voteId);
   const hasVote = !!vote;
+  const { view } = useCharmEditorView();
 
   async function castVote(voteId: string, choices: string[]) {
     try {
@@ -133,6 +135,7 @@ export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation, refres
       detailed={false}
       isProposal={true}
       disableVote={!isReviewer || !!proposal?.archived}
+      view={view}
     />
   );
 }
