@@ -1,8 +1,13 @@
+import type { PageType } from '@charmverse/core/prisma-client';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { Divider, MenuItem, MenuList, Stack, Switch, TextField, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-import { useSyncRelationProperty } from 'charmClient/hooks/blocks';
+import {
+  useRemoveRelationProperty,
+  useRenameRelationProperty,
+  useSyncRelationProperty
+} from 'charmClient/hooks/blocks';
 import { Button } from 'components/common/Button';
 import { PageIcon } from 'components/common/PageIcon';
 import PopperPopup from 'components/common/PopperPopup';
@@ -25,7 +30,52 @@ function RelationPropertyOptions({
   onChange: (relationData: RelationPropertyData) => void;
 }) {
   const { pages } = usePages();
-  const selectedPage = relationData ? pages[relationData.boardId] : null;
+
+  const selectedPage = useMemo(() => {
+    const relatedBoardId = relationData?.boardId ?? null;
+    if (!relatedBoardId) {
+      return null;
+    }
+    const _selectedPage = pages[relatedBoardId];
+    if (_selectedPage) {
+      return {
+        title: _selectedPage.title,
+        icon: _selectedPage.icon,
+        type: _selectedPage.type,
+        hasContent: _selectedPage.hasContent,
+        id: _selectedPage.id,
+        path: _selectedPage.path
+      };
+    }
+
+    const isProposalsBoard = relatedBoardId.endsWith('-proposalsBoard');
+
+    if (isProposalsBoard) {
+      return {
+        title: 'Proposals Board',
+        icon: '',
+        type: 'board' as PageType,
+        hasContent: false,
+        id: relatedBoardId,
+        path: ''
+      };
+    }
+
+    const isRewardsBoard = relatedBoardId.endsWith('-rewardsBoard');
+
+    if (isRewardsBoard) {
+      return {
+        title: 'Rewards Board',
+        icon: '',
+        type: 'board' as PageType,
+        hasContent: false,
+        id: relatedBoardId,
+        path: ''
+      };
+    }
+
+    return null;
+  }, [relationData, pages]);
 
   if (!selectedPage || !relationData) {
     return null;
@@ -170,13 +220,17 @@ export function RelationPropertyEditOptions({
   board: Board;
 }) {
   const [relationDataTemp, setRelationDataTemp] = useState(relationData);
-  const { trigger: syncRelationProperty, isMutating } = useSyncRelationProperty();
+  const { trigger: syncRelationProperty, isMutating: isSyncingRelationProperty } = useSyncRelationProperty();
+  const { trigger: renameRelationProperty, isMutating: isRenamingRelationProperty } = useRenameRelationProperty();
+  const { trigger: removeRelationProperty, isMutating: isUnsyncingRelationProperty } = useRemoveRelationProperty();
   const { pages } = usePages();
   const selectedPage = relationData ? pages[relationData.boardId] : null;
   const relatedBoard = useAppSelector((state) => state.boards.boards[relationData.boardId]);
   const relatedProperty = relatedBoard?.fields.cardProperties.find(
     (property) => property.id === relationData.relatedPropertyId
   );
+
+  const isMutating = isSyncingRelationProperty || isRenamingRelationProperty || isUnsyncingRelationProperty;
 
   const [relatedPropertyTitle, setRelatedPropertyTitle] = useState(
     relatedProperty?.name ?? `Related to ${board.title || 'Untitled'}`
@@ -231,18 +285,29 @@ export function RelationPropertyEditOptions({
                 const action =
                   relationDataTemp.showOnRelatedBoard !== relationData.showOnRelatedBoard
                     ? relationDataTemp.showOnRelatedBoard
-                      ? 'create'
-                      : 'delete'
+                      ? 'sync'
+                      : 'remove'
                     : relatedProperty && relatedPropertyTitle !== relatedProperty.name
                     ? 'rename'
                     : null;
 
-                if (action) {
+                if (action === 'sync') {
                   syncRelationProperty({
                     boardId: board.id,
-                    action,
                     templateId: propertyId,
                     relatedPropertyTitle: relatedPropertyTitle || `Related to ${board.title ?? 'Untitled'}`
+                  });
+                } else if (action === 'rename') {
+                  renameRelationProperty({
+                    boardId: board.id,
+                    templateId: propertyId,
+                    relatedPropertyTitle
+                  });
+                } else if (action === 'remove') {
+                  removeRelationProperty({
+                    boardId: board.id,
+                    templateId: propertyId,
+                    removeBoth: false
                   });
                 }
               }}
