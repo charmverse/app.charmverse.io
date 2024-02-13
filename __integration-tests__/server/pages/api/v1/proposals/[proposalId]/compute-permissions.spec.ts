@@ -52,9 +52,6 @@ describe('GET /api/v1/proposals/{proposalId}/compute-permissions', () => {
       userId: proposalAuthor.id
     });
 
-    // This value will be true in a later test when we look for base proposal permissions only
-    expect(authorResponse.permissions.vote).toBe(false);
-
     expect(authorResponse).toMatchObject<PublicProposalApiPermissions>({
       proposalId: proposal.id,
       userId: proposalAuthor.id,

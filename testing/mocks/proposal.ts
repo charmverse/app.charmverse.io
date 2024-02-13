@@ -28,8 +28,7 @@ export function createMockProposal(
     },
     permissions: {
       view: true,
-      review: true,
-      vote: true,
+      view_private_fields: true,
       comment: true,
       edit: true,
       delete: true,

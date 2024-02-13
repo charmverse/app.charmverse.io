@@ -4,7 +4,6 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { canAccessPrivateFields } from 'lib/proposal/form/canAccessPrivateFields';
 import { getProposal } from 'lib/proposal/getProposal';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
@@ -26,10 +25,8 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
     resourceId: proposalId,
     userId
   });
-  // If we are viewing a proposal template, we can see all private fields since the user might be creating a proposal
-  const canAccessPrivateFormFields = await canAccessPrivateFields({ userId, proposalId });
 
-  const proposal = await getProposal({ id: proposalId, canAccessPrivateFormFields, permissionsByStep });
+  const proposal = await getProposal({ id: proposalId, permissionsByStep });
 
   if (!proposal.permissions?.view) {
     throw new NotFoundError();

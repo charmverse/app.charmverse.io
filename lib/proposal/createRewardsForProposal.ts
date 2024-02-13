@@ -55,7 +55,7 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
     userId
   });
 
-  if (!permissions.evaluate && !permissions.review) {
+  if (!permissions.evaluate) {
     throw new InvalidStateError('Only reviewers can create rewards for a proposal');
   }
 
