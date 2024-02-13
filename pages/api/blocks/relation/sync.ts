@@ -4,12 +4,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { v4 } from 'uuid';
 
-import type { BoardFields, IPropertyTemplate } from 'lib/focalboard/board';
 import type { CardFields } from 'lib/focalboard/card';
-import { NotFoundError, onError, onNoMatch } from 'lib/middleware';
-import { upsertBlock } from 'lib/proposal/blocks/upsertBlock';
+import { getRelationData } from 'lib/focalboard/getRelationData';
+import { onError, onNoMatch } from 'lib/middleware';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/rewards/blocks/constants';
-import { defaultRewardViews } from 'lib/rewards/blocks/views';
 import { withSessionRoute } from 'lib/session/withSession';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -17,114 +15,140 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.post(syncRelationProperty);
 
-export type SyncRelationPropertyPayload = {
-  boardId: string;
+export type SyncRelationPropertyPayload = (
+  | {
+      boardId: string;
+    }
+  | {
+      boardType: 'rewards' | 'proposals';
+      spaceId: string;
+    }
+) & {
   templateId: string;
   relatedPropertyTitle?: string;
 };
 
 async function syncRelationProperty(req: NextApiRequest, res: NextApiResponse<Block[] | { error: string }>) {
-  const { relatedPropertyTitle, boardId, templateId } = req.body as SyncRelationPropertyPayload;
+  const payload = req.body as SyncRelationPropertyPayload;
+  const { relatedPropertyTitle, templateId } = payload;
   const userId = req.session.user.id;
 
-  const board = await prisma.block.findUniqueOrThrow({
-    where: {
-      id: boardId
-    },
-    select: {
-      id: true,
-      fields: true
-    }
+  const {
+    sourceBoard,
+    connectedBoard,
+    connectedBoardProperties,
+    isProposalsBoardConnected,
+    isRewardsBoardConnected,
+    sourceBoardRelationProperty,
+    spaceId,
+    sourceBoardProperties
+  } = await getRelationData({
+    ...payload,
+    templateId,
+    userId
   });
 
-  const boardPage = await prisma.page.findFirstOrThrow({
-    where: {
-      boardId
-    },
-    select: {
-      id: true,
-      title: true
-    }
-  });
+  const boardPage =
+    'boardType' in payload
+      ? payload.boardType === 'proposals'
+        ? {
+            title: 'Proposals Board'
+          }
+        : {
+            title: 'Rewards Board'
+          }
+      : await prisma.page.findFirstOrThrow({
+          where: {
+            boardId: payload.boardId
+          },
+          select: {
+            title: true
+          }
+        });
 
-  const boardProperties = (board.fields as unknown as BoardFields).cardProperties;
-
-  const relationProperty = boardProperties.find((p) => p.id === templateId);
-  if (!boardPage || !relationProperty || !relationProperty.relationData) {
-    throw new NotFoundError('Relation type board property not found');
-  }
-
-  const connectedBoardId = relationProperty.relationData.boardId;
-  const isProposalsBoardConnected = connectedBoardId.endsWith('-proposalsBoard');
-  const isRewardsBoardConnected = connectedBoardId.endsWith('-rewardsBoard');
-
-  if (isRewardsBoardConnected) {
-    const spaceId = connectedBoardId.split('-rewardsBoard')[0];
-    // safety check - if default board exists, do not override existing fields
-    const existingBlock = await prisma.rewardBlock.findUnique({
-      where: {
-        id_spaceId: {
-          id: DEFAULT_BOARD_BLOCK_ID,
-          spaceId
-        }
-      }
-    });
-
-    let fields = { viewIds: defaultRewardViews, cardProperties: [] as IPropertyTemplate[] } as BoardFields;
-    if (existingBlock) {
-      const existingFields = existingBlock.fields as unknown as BoardFields;
-      const viewIds = existingFields?.viewIds?.length ? existingFields?.viewIds : defaultRewardViews;
-      const cardProperties = existingFields?.cardProperties?.length ? existingFields?.cardProperties : [];
-
-      fields = { ...(existingBlock.fields as unknown as BoardFields), cardProperties, viewIds };
-    }
-
-    // generate / update existing board with 3 default views
-    await upsertBlock({
-      spaceId,
-      userId,
-      data: {
-        type: 'board',
-        id: DEFAULT_BOARD_BLOCK_ID,
-        fields
-      }
-    });
-  }
-
-  const connectedBoard = await prisma.block.findUniqueOrThrow({
-    where: {
-      id: relationProperty.relationData.boardId
-    },
-    select: {
-      id: true,
-      fields: true
-    }
-  });
-
-  const connectedBoardProperties = (connectedBoard.fields as unknown as BoardFields).cardProperties;
+  const boardPageTitle = boardPage.title;
 
   const connectedRelationPropertyId = v4();
-  const connectedBoardCards = await prisma.block.findMany({
-    where: {
-      type: 'card',
-      parentId: connectedBoard.id
-    },
-    select: {
-      fields: true,
-      id: true
-    }
-  });
 
-  const boardCards = await prisma.block.findMany({
-    where: {
-      type: 'card',
-      parentId: board.id
-    },
-    select: {
-      fields: true,
-      id: true
-    }
-  });
+  let connectedBoardCards: {
+    id: string;
+    fields: Block['fields'];
+  }[] = [];
+  let boardCards: { id: string; fields: Block['fields'] }[] = [];
+
+  if (isProposalsBoardConnected) {
+    connectedBoardCards = await prisma.proposalBlock.findMany({
+      where: {
+        type: 'card',
+        parentId: DEFAULT_BOARD_BLOCK_ID,
+        spaceId
+      },
+      select: {
+        id: true,
+        fields: true
+      }
+    });
+  } else if (isRewardsBoardConnected) {
+    connectedBoardCards = await prisma.rewardBlock.findMany({
+      where: {
+        type: 'card',
+        parentId: DEFAULT_BOARD_BLOCK_ID,
+        spaceId
+      },
+      select: {
+        id: true,
+        fields: true
+      }
+    });
+  } else {
+    connectedBoardCards = await prisma.block.findMany({
+      where: {
+        type: 'card',
+        parentId: connectedBoard.id
+      },
+      select: {
+        fields: true,
+        id: true
+      }
+    });
+  }
+
+  if (!('boardType' in payload)) {
+    boardCards = await prisma.block.findMany({
+      where: {
+        type: 'card',
+        parentId: sourceBoard.id
+      },
+      select: {
+        fields: true,
+        id: true
+      }
+    });
+  } else if (payload.boardType === 'rewards') {
+    boardCards = await prisma.rewardBlock.findMany({
+      where: {
+        type: 'card',
+        parentId: DEFAULT_BOARD_BLOCK_ID,
+        spaceId
+      },
+      select: {
+        id: true,
+        fields: true
+      }
+    });
+  } else if (payload.boardType === 'proposals') {
+    boardCards = await prisma.proposalBlock.findMany({
+      where: {
+        type: 'card',
+        parentId: DEFAULT_BOARD_BLOCK_ID,
+        spaceId
+      },
+      select: {
+        id: true,
+        fields: true
+      }
+    });
+  }
 
   const boardCardPages = boardCards.length
     ? await prisma.page.findMany({
@@ -144,7 +168,7 @@ async function syncRelationProperty(req: NextApiRequest, res: NextApiResponse<Bl
   for (const boardCard of boardCards) {
     const boardCardPage = boardCardPages.find((p) => p.id === boardCard.id);
     const boardCardProperties = (boardCard.fields as unknown as CardFields).properties;
-    const boardCardRelationPropertyValue = boardCardProperties[relationProperty.id] as string[] | null;
+    const boardCardRelationPropertyValue = boardCardProperties[sourceBoardRelationProperty.id] as string[] | null;
     if (boardCardPage && boardCardRelationPropertyValue) {
       boardCardRelationPropertyValue.forEach((connectedCardId) => {
         if (!connectedBoardCardsRelatedCardsRecord[connectedCardId]) {
@@ -156,6 +180,41 @@ async function syncRelationProperty(req: NextApiRequest, res: NextApiResponse<Bl
     }
   }
 
+  const sourceBoardUpdatedFields = {
+    ...(sourceBoard?.fields as any),
+    cardProperties: sourceBoardProperties.map((cp) => {
+      if (cp.id === templateId) {
+        return {
+          ...sourceBoardRelationProperty,
+          relationData: {
+            ...sourceBoardRelationProperty.relationData,
+            showOnRelatedBoard: true,
+            relatedPropertyId: connectedRelationPropertyId
+          }
+        };
+      }
+      return cp;
+    })
+  };
+
+  const connectedBoardUpdatedFields = {
+    ...(connectedBoard?.fields as any),
+    cardProperties: [
+      ...connectedBoardProperties,
+      {
+        id: connectedRelationPropertyId,
+        type: 'relation',
+        name: relatedPropertyTitle ?? `Related to ${boardPageTitle ?? 'Untitled'}`,
+        relationData: {
+          limit: sourceBoardRelationProperty.relationData.limit,
+          relatedPropertyId: templateId,
+          showOnRelatedBoard: true,
+          boardId: sourceBoard.id
+        }
+      }
+    ]
+  };
+
   await prisma.$transaction([
     ...Object.entries(connectedBoardCardsRelatedCardsRecord)
       .map(([connectedCardId, connectedCardIds]) => {
@@ -164,15 +223,43 @@ async function syncRelationProperty(req: NextApiRequest, res: NextApiResponse<Bl
           return null;
         }
 
-        return prisma.block.update({
-          data: {
-            fields: {
-              ...connectedCardFields,
-              properties: {
-                ...connectedCardFields.properties,
-                [connectedRelationPropertyId]: connectedCardIds
+        const connectedCardUpdatedFields = {
+          ...connectedCardFields,
+          properties: {
+            ...connectedCardFields.properties,
+            [connectedRelationPropertyId]: connectedCardIds
+          }
+        };
+
+        if (isProposalsBoardConnected) {
+          return prisma.proposalBlock.update({
+            data: {
+              fields: connectedCardUpdatedFields
+            },
+            where: {
+              id_spaceId: {
+                id: connectedCardId,
+                spaceId
               }
             }
+          });
+        } else if (isRewardsBoardConnected) {
+          return prisma.rewardBlock.update({
+            data: {
+              fields: connectedCardUpdatedFields
+            },
+            where: {
+              id_spaceId: {
+                id: connectedCardId,
+                spaceId
+              }
+            }
+          });
+        }
+
+        return prisma.block.update({
+          data: {
+            fields: connectedCardUpdatedFields
           },
           where: {
             id: connectedCardId
@@ -180,53 +267,71 @@ async function syncRelationProperty(req: NextApiRequest, res: NextApiResponse<Bl
         });
       })
       .filter(isTruthy),
-    prisma.block.update({
-      data: {
-        fields: {
-          ...(connectedBoard?.fields as any),
-          cardProperties: [
-            ...connectedBoardProperties,
-            {
-              id: connectedRelationPropertyId,
-              type: 'relation',
-              name: relatedPropertyTitle ?? `Related to ${boardPage.title || 'Untitled'}`,
-              relationData: {
-                limit: relationProperty.relationData.limit,
-                relatedPropertyId: templateId,
-                showOnRelatedBoard: true,
-                boardId: board.id
-              }
+    isProposalsBoardConnected
+      ? prisma.proposalBlock.update({
+          data: {
+            fields: connectedBoardUpdatedFields
+          },
+          where: {
+            id_spaceId: {
+              id: DEFAULT_BOARD_BLOCK_ID,
+              spaceId
             }
-          ]
-        }
-      },
-      where: {
-        id: connectedBoard.id
-      }
-    }),
-    prisma.block.update({
-      data: {
-        fields: {
-          ...(board?.fields as any),
-          cardProperties: boardProperties.map((cp) => {
-            if (cp.id === templateId) {
-              return {
-                ...relationProperty,
-                relationData: {
-                  ...relationProperty.relationData,
-                  showOnRelatedBoard: true,
-                  relatedPropertyId: connectedRelationPropertyId
-                }
-              };
+          }
+        })
+      : isRewardsBoardConnected
+      ? prisma.rewardBlock.update({
+          data: {
+            fields: connectedBoardUpdatedFields
+          },
+          where: {
+            id_spaceId: {
+              id: DEFAULT_BOARD_BLOCK_ID,
+              spaceId
             }
-            return cp;
-          })
-        }
-      },
-      where: {
-        id: board.id
-      }
-    })
+          }
+        })
+      : prisma.block.update({
+          data: {
+            fields: connectedBoardUpdatedFields
+          },
+          where: {
+            id: connectedBoard.id
+          }
+        }),
+
+    !('boardType' in payload)
+      ? prisma.block.update({
+          data: {
+            fields: sourceBoardUpdatedFields
+          },
+          where: {
+            id: sourceBoard.id
+          }
+        })
+      : payload.boardType === 'proposals'
+      ? prisma.proposalBlock.update({
+          data: {
+            fields: sourceBoardUpdatedFields
+          },
+          where: {
+            id_spaceId: {
+              id: DEFAULT_BOARD_BLOCK_ID,
+              spaceId
+            }
+          }
+        })
+      : prisma.rewardBlock.update({
+          data: {
+            fields: sourceBoardUpdatedFields
+          },
+          where: {
+            id_spaceId: {
+              id: DEFAULT_BOARD_BLOCK_ID,
+              spaceId
+            }
+          }
+        })
   ]);
 
   res.status(200).end();
