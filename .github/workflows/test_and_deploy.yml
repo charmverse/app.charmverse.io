@@ -21,9 +21,11 @@ env:
   SELECTED_PERMISSION_API_TAG: latest
 
 jobs:
-  build-test-env:
-    name: Build test env
+  build-app:
+    name: Build app
     runs-on: ubuntu-latest
+    outputs:
+      head-commit-message: ${{ steps.get_head_commit_message.outputs.commit_message }}
     steps:
       - name: Print Triggering event context payload
         env:
@@ -46,11 +48,15 @@ jobs:
         uses: ./.github/actions/build
         with:
           save_cache: true
+      # source https://github.com/orgs/community/discussions/28474
+      - name: Print head git commit message
+        id: get_head_commit_message
+        run: echo "commit_message=$(git show -s --format=%s)" >> "$GITHUB_OUTPUT"
 
   test:
     name: Validate code
     runs-on: ubuntu-latest
-    needs: build-test-env
+    needs: build-app
     steps:
       - uses: actions/checkout@v4
         with:
@@ -66,10 +72,11 @@ jobs:
       - run: npm run lint
       - run: npm run verifydeps
 
-  integration-test:
+  text-matrix:
     name: Tests
     runs-on: ubuntu-latest
-    needs: build-test-env
+    needs: build-app
+    if: ${{ !contains(needs.build-app.outputs.head-commit-message, 'skip-tests') }}
     # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
     services:
       postgres:
@@ -175,7 +182,7 @@ jobs:
     name: Deploy to production
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    needs: [test, integration-test]
+    needs: [test, text-matrix]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -336,7 +343,7 @@ jobs:
     name: Notify discord of failure
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && failure()
-    needs: [build-test-env, test, integration-test, deploy]
+    needs: [build-app, test, text-matrix, deploy]
     steps:
       - name: If any of prev jobs failed notify discord
         if: contains(needs.*.result, 'failure')
