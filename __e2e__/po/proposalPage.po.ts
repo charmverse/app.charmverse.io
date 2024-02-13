@@ -19,12 +19,22 @@ export class ProposalPage extends DocumentPage {
     public completeDraftButton = page.locator('data-test=complete-draft-button'),
     public evaluationSettingsSidebar = page.locator('data-test=evaluation-settings-sidebar'),
     public addRubricCriteriaButton = page.locator('data-test=add-rubric-criteria-button'),
+    // Simple utility for editing the first rubric criteria
     public editRubricCriteriaLabel = page.locator('data-test=edit-rubric-criteria-label >> textarea').first(),
     public editRubricCriteriaDescription = page
       .locator('data-test=edit-rubric-criteria-description >> textarea')
       .first(),
     public editRubricCriteriaMinScore = page.locator('data-test=edit-rubric-criteria-min-score >> input').first(),
     public editRubricCriteriaMaxScore = page.locator('data-test=edit-rubric-criteria-max-score >> input').first(),
+    // Edit additional criteria
+    public editNthRubricCriteriaLabel = (index: number) =>
+      page.locator('data-test=edit-rubric-criteria-label >> textarea').nth(index),
+    public editNthRubricCriteriaDescription = (index: number) =>
+      page.locator('data-test=edit-rubric-criteria-description >> textarea').nth(index),
+    public editNthRubricCriteriaMinScore = (index: number) =>
+      page.locator('data-test=edit-rubric-criteria-min-score >> input').nth(index),
+    public editNthRubricCriteriaMaxScore = (index: number) =>
+      page.locator('data-test=edit-rubric-criteria-max-score >> input').nth(index),
     public evaluationVoteDurationInput = page
       .locator('data-test=evaluation-vote-settings')
       .locator('data-test=vote-duration')
@@ -33,6 +43,21 @@ export class ProposalPage extends DocumentPage {
       .locator('data-test=evaluation-vote-settings')
       .locator('data-test=vote-pass-threshold')
       .locator('data-test=numeric-field >> input'),
+    public evaluationVoteTypeApproval = page
+      .locator('data-test=evaluation-vote-settings')
+      .locator('data-test=vote-type-approval'),
+    public evaluationVoteTypeCustomOptions = page
+      .locator('data-test=evaluation-vote-settings')
+      .locator('data-test=vote-type-custom-options'),
+    public voteOption = (index: number) =>
+      page
+        .locator('data-test=evaluation-vote-settings')
+        .locator('data-test=inline-vote-option')
+        .nth(index)
+        .locator('input'),
+    public addVoteOption = page.locator('data-test=evaluation-vote-settings').locator('data-test=add-vote-option'),
+    public deleteVoteOption = (index: number) =>
+      page.locator('data-test=evaluation-vote-settings').locator('data-test=delete-vote-option').nth(index),
     public pageTopLevelMenu = page.locator('data-test=header--show-page-actions'),
     public archiveProposalAction = page.locator('data-test=header--archive-current-proposal'),
     public moveFromFeedbackEvaluation = page.locator('data-test=move-from-feedback-evaluation')
