@@ -12,6 +12,8 @@ import { Button } from 'components/common/Button';
 import { PageIcon } from 'components/common/PageIcon';
 import PopperPopup from 'components/common/PopperPopup';
 import { usePages } from 'hooks/usePages';
+import { useProposalBlocks } from 'hooks/useProposalBlocks';
+import { useRewardBlocks } from 'hooks/useRewardBlocks';
 import type { Board, IPropertyTemplate, RelationPropertyData } from 'lib/focalboard/board';
 
 import { useAppSelector } from '../../../../store/hooks';
@@ -52,7 +54,7 @@ function RelationPropertyOptions({
 
     if (isProposalsBoard) {
       return {
-        title: 'Proposals Board',
+        title: 'Proposals',
         icon: '',
         type: 'board' as PageType,
         hasContent: false,
@@ -65,7 +67,7 @@ function RelationPropertyOptions({
 
     if (isRewardsBoard) {
       return {
-        title: 'Rewards Board',
+        title: 'Rewards',
         icon: '',
         type: 'board' as PageType,
         hasContent: false,
@@ -177,13 +179,6 @@ export function RelationPropertyCreateOptions({
   onChange: (relationData?: IPropertyTemplate['relationData']) => void;
   onButtonClick: () => void;
 }) {
-  const { pages } = usePages();
-  const selectedPage = relationData ? pages[relationData.boardId] : null;
-
-  if (!selectedPage || !relationData) {
-    return null;
-  }
-
   return (
     <>
       <RelationPropertyOptions
@@ -224,11 +219,23 @@ export function RelationPropertyEditOptions({
   const { trigger: renameRelationProperty, isMutating: isRenamingRelationProperty } = useRenameRelationProperty();
   const { trigger: removeRelationProperty, isMutating: isUnsyncingRelationProperty } = useRemoveRelationProperty();
   const { pages } = usePages();
-  const selectedPage = relationData ? pages[relationData.boardId] : null;
-  const relatedBoard = useAppSelector((state) => state.boards.boards[relationData.boardId]);
-  const relatedProperty = relatedBoard?.fields.cardProperties.find(
-    (property) => property.id === relationData.relatedPropertyId
-  );
+  const selectedPageTitle = relationData
+    ? relationData.boardId.endsWith('-proposalsBoard')
+      ? 'Proposals'
+      : relationData.boardId.endsWith('-rewardsBoard')
+      ? 'Rewards'
+      : pages[relationData.boardId]?.title
+    : null;
+
+  const connectedBoard = useAppSelector((state) => state.boards.boards[relationData.boardId]);
+  const { proposalBoardBlock } = useProposalBlocks();
+  const { rewardBoardBlock } = useRewardBlocks();
+
+  const relatedProperty = relationData.boardId.endsWith('-proposalsBoard')
+    ? proposalBoardBlock?.fields.cardProperties.find((property) => property.id === relationData.relatedPropertyId)
+    : relationData.boardId.endsWith('-rewardsBoard')
+    ? rewardBoardBlock?.fields.cardProperties.find((property) => property.id === relationData.relatedPropertyId)
+    : connectedBoard?.fields.cardProperties.find((property) => property.id === relationData.relatedPropertyId);
 
   const isMutating = isSyncingRelationProperty || isRenamingRelationProperty || isUnsyncingRelationProperty;
 
@@ -243,10 +250,6 @@ export function RelationPropertyEditOptions({
   useEffect(() => {
     setRelationDataTemp(relationData);
   }, [relationData]);
-
-  if (!selectedPage || !relationData) {
-    return null;
-  }
 
   return (
     <>
@@ -265,7 +268,7 @@ export function RelationPropertyEditOptions({
           <Divider />
           {relationDataTemp.showOnRelatedBoard && (
             <>
-              <Typography variant='subtitle2'>Related property on {selectedPage?.title || 'Untitled'}</Typography>
+              <Typography variant='subtitle2'>Related property on {selectedPageTitle ?? 'Untitled'}</Typography>
               <TextField
                 value={relatedPropertyTitle}
                 fullWidth

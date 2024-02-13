@@ -52,10 +52,10 @@ async function syncRelationProperty(req: NextApiRequest, res: NextApiResponse<Bl
     'boardType' in payload
       ? payload.boardType === 'proposals'
         ? {
-            title: 'Proposals Board'
+            title: 'Proposals'
           }
         : {
-            title: 'Rewards Board'
+            title: 'Rewards'
           }
       : await prisma.page.findFirstOrThrow({
           where: {

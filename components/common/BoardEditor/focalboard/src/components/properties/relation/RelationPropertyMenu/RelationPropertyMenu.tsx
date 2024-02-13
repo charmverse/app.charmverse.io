@@ -69,7 +69,7 @@ export function RelationPropertyMenu({
               icon: '',
               id: `${space?.id}-proposalsBoard`,
               path: '',
-              title: 'Proposals Board',
+              title: 'Proposals',
               type: 'board'
             },
             {
@@ -77,7 +77,7 @@ export function RelationPropertyMenu({
               icon: '',
               id: `${space?.id}-rewardsBoard`,
               path: '',
-              title: 'Rewards Board',
+              title: 'Rewards',
               type: 'board'
             },
             ...Object.values(pages).filter(isTruthy)
