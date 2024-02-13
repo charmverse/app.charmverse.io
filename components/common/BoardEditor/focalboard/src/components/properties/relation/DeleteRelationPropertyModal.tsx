@@ -1,6 +1,6 @@
 import { Stack, Typography } from '@mui/material';
 
-import { useSyncRelationProperty } from 'charmClient/hooks/blocks';
+import { useRemoveRelationProperty } from 'charmClient/hooks/blocks';
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { usePages } from 'hooks/usePages';
@@ -20,7 +20,7 @@ export function DeleteRelationPropertyModal({
   const { pages } = usePages();
   const relationData = template.relationData;
   const connectedBoardPage = relationData ? pages[relationData.boardId] : null;
-  const { trigger } = useSyncRelationProperty();
+  const { trigger: removeRelationProperty } = useRemoveRelationProperty();
 
   return (
     <Modal size='500px' open title='Delete relation property' onClose={onClose}>
@@ -33,11 +33,12 @@ export function DeleteRelationPropertyModal({
             color='error'
             variant='outlined'
             onClick={() => {
-              trigger({
-                action: 'delete-both',
+              removeRelationProperty({
+                removeBoth: true,
                 boardId: board.id,
                 templateId: template.id
               }).then(() => {
+                // Delete the related property after has been unsynced
                 onDelete();
               });
               onClose();
@@ -49,8 +50,8 @@ export function DeleteRelationPropertyModal({
             color='error'
             variant='contained'
             onClick={() => {
-              trigger({
-                action: 'delete',
+              removeRelationProperty({
+                removeBoth: false,
                 boardId: board.id,
                 templateId: template.id
               }).then(() => {

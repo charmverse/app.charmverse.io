@@ -4,7 +4,10 @@ import { bindMenu } from 'material-ui-popup-state';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePages } from 'hooks/usePages';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import { isTruthy } from 'lib/utilities/types';
 
 import { LinkCharmVerseDatabase } from '../../../viewSidebar/viewSourceOptions/components/LinkCharmVerseDatabase';
 
@@ -31,6 +34,8 @@ export function RelationPropertyMenu({
   }) => void;
   relationData?: IPropertyTemplate['relationData'];
 }) {
+  const { pages } = usePages();
+  const { space } = useCurrentSpace();
   const bindMenuProps = bindMenu(popupState);
   const [relationPropertyData, setRelationPropertyData] = useState<IPropertyTemplate['relationData'] | null>(
     relationData ?? null
@@ -58,6 +63,25 @@ export function RelationPropertyMenu({
       {showSelectDatabaseMenu ? (
         <LinkCharmVerseDatabase
           placeholder='Link to a database'
+          pages={[
+            {
+              hasContent: false,
+              icon: '',
+              id: `${space?.id}-proposalsBoard`,
+              path: '',
+              title: 'Proposals Board',
+              type: 'board'
+            },
+            {
+              hasContent: false,
+              icon: '',
+              id: `${space?.id}-rewardsBoard`,
+              path: '',
+              title: 'Rewards Board',
+              type: 'board'
+            },
+            ...Object.values(pages).filter(isTruthy)
+          ]}
           onSelectLinkedDatabase={({ sourceDatabaseId, pageTitle = 'Untitled' }) => {
             setRelationPropertyData(
               relationPropertyData
