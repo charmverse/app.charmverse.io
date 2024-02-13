@@ -140,7 +140,7 @@ function SidebarContents({
             enableComments={!!proposal.permissions?.comment}
             openSidebar={openSidebar!}
             threads={threads}
-            formFields={proposal.form.formFields}
+            formFields={proposal.form?.formFields ?? []}
           />
         ) : (
           <EditorCommentsSidebar

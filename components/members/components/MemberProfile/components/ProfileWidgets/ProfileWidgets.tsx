@@ -42,8 +42,9 @@ export function ProfileWidgets({
     charmClient.publicProfile.getEnsProfile(userId)
   );
 
-  const { data: summonProfile, isLoading: isLoadingSummonProfile } = useSWR(`public/profile/${userId}/summon`, () =>
-    charmClient.publicProfile.getSummonProfile(userId)
+  const { data: summonProfile, isLoading: isLoadingSummonProfile } = useSWR(
+    space && `public/profile/${userId}/summon`,
+    () => charmClient.publicProfile.getSummonProfile(userId, space!.id)
   );
 
   const { isFetchingNfts, isFetchingPoaps, mutateNfts, nfts, nftsError, poaps, poapsError } = useMemberCollections({

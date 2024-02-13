@@ -455,9 +455,13 @@ export function NewProposalPage({
                           setFormInputs({
                             formAnswers: formAnswersRef.current?.map((formAnswer) => {
                               const updatedFormField = updatedFormFields.find((f) => f.id === formAnswer.fieldId);
+
+                              if (!updatedFormField) {
+                                return formAnswer;
+                              }
                               return {
                                 ...formAnswer,
-                                value: updatedFormField?.value ?? formAnswer.value
+                                value: updatedFormField.value
                               };
                             })
                           });

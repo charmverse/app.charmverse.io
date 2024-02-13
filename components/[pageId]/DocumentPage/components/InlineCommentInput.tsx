@@ -41,7 +41,7 @@ export function InlineCommentInput({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   return (
-    <Box p={1}>
+    <Box p={1} width='100%'>
       {pageType === 'proposal' && (
         <Stack height='fit-content' gap={0.5}>
           <Stack flexDirection='row' gap={0.5} alignItems='center'>

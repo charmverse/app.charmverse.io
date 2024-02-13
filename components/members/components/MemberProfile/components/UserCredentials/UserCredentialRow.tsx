@@ -12,6 +12,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { EASAttestationWithFavorite } from 'lib/credentials/external/getOnchainCredentials';
 import { trackedSchemas } from 'lib/credentials/external/schemas';
+import type { ProposalCredential } from 'lib/credentials/schemas';
 import { lowerCaseEqual } from 'lib/utilities/strings';
 
 export function UserCredentialRow({
@@ -48,6 +49,7 @@ export function UserCredentialRow({
     }
   }
 
+  const charmCredential = credential.content as ProposalCredential;
   const credentialInfo: {
     title: string;
     subtitle: string;
@@ -56,10 +58,10 @@ export function UserCredentialRow({
   } =
     credential.type === 'charmverse'
       ? {
-          title: credential.content.name,
-          subtitle: credential.content.organization,
+          title: charmCredential.Name,
+          subtitle: charmCredential.Organization,
           iconUrl: credential.iconUrl ?? '/images/logo_black_lightgrey.png',
-          attestationContent: [{ name: 'status', value: credential.content.status }]
+          attestationContent: [{ name: 'Event', value: charmCredential.Event }]
         }
       : credential.type === 'gitcoin'
       ? {

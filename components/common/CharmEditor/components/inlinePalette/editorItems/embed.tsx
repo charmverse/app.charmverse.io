@@ -9,7 +9,7 @@ import { EmbedIcon } from '../../iframe/components/EmbedIcon';
 import type { Embed, EmbedType } from '../../iframe/config';
 import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT, embeds } from '../../iframe/config';
 import { replaceSuggestionMarkWith } from '../inlinePalette';
-import type { EditorExecuteCommand, PaletteItemTypeNoGroup, PromisedCommand } from '../paletteItem';
+import type { PaletteItemTypeNoGroup, PromisedCommand } from '../paletteItem';
 
 const iconSize = 30;
 
@@ -97,8 +97,8 @@ export function items(): PaletteItemTypeNoGroup[] {
     iframeEmbedType('typeform'),
     {
       uid: 'farcasterFrame',
-      title: 'Farcaster Frame',
-      keywords: ['farcaster', 'frame'],
+      title: 'Frame (Farcaster)',
+      keywords: ['frame', 'farcaster'],
       icon: (
         <img
           style={{
@@ -109,25 +109,24 @@ export function items(): PaletteItemTypeNoGroup[] {
         />
       ),
       description: 'Embed a Farcaster Frame',
-      editorExecuteCommand: ({ palettePluginKey }) => {
-        return handleCustomEmbed({
+      editorExecuteCommand: ({ palettePluginKey }) =>
+        handleCustomEmbed({
           nodeName: 'farcasterFrame',
           palettePluginKey
-        });
-      }
+        }),
+      priority: 1
     },
     {
       uid: 'price',
       title: 'Crypto price',
       icon: <InsertChartIcon sx={{ fontSize: iconSize }} />,
       description: 'Display a crypto price',
-      editorExecuteCommand: ({ palettePluginKey }) => {
-        return handleCustomEmbed({
+      editorExecuteCommand: ({ palettePluginKey }) =>
+        handleCustomEmbed({
           nodeName: 'cryptoPrice',
           palettePluginKey,
           addTooltipMarker: false
-        });
-      }
+        })
     },
     {
       uid: 'nft',
@@ -135,12 +134,11 @@ export function items(): PaletteItemTypeNoGroup[] {
       keywords: ['web3', 'opensea'],
       icon: <EmbedIcon icon={RiNftLine} size='large' />,
       description: 'Embed an NFT',
-      editorExecuteCommand: ({ palettePluginKey }) => {
-        return handleCustomEmbed({
+      editorExecuteCommand: ({ palettePluginKey }) =>
+        handleCustomEmbed({
           nodeName: 'nft',
           palettePluginKey
-        });
-      }
+        })
     },
     {
       uid: 'tweet',
@@ -148,12 +146,11 @@ export function items(): PaletteItemTypeNoGroup[] {
       keywords: ['twitter', 'elon'],
       icon: <FaXTwitter style={{ fontSize: iconSize }} />,
       description: 'Embed a Tweet',
-      editorExecuteCommand: ({ palettePluginKey }) => {
-        return handleCustomEmbed({
+      editorExecuteCommand: ({ palettePluginKey }) =>
+        handleCustomEmbed({
           nodeName: 'tweet',
           palettePluginKey
-        });
-      }
+        })
     }
   ];
 }

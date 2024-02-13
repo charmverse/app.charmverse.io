@@ -28,6 +28,10 @@ export function CredentialSelect({ onChange, selectedCredentialTemplates, readOn
     return null;
   }
 
+  if (readOnly && !selectedCredentialTemplates?.length) {
+    return null;
+  }
+
   return (
     <TagSelect
       onChange={_onChange}

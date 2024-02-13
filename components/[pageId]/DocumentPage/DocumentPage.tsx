@@ -387,14 +387,14 @@ function DocumentPageComponent({
                     <FormFieldsEditor
                       readOnly={(!isAdmin && (!user || !proposalAuthors.includes(user.id))) || !!proposal?.archived}
                       proposalId={proposal.id}
-                      formFields={proposal.form.formFields ?? []}
+                      formFields={proposal.form?.formFields ?? []}
                     />
                   ) : (
                     <ProposalFormFieldsInput
                       pageId={page.id}
                       enableComments={proposal.permissions.comment}
                       proposalId={proposal.id}
-                      formFields={proposal.form.formFields ?? []}
+                      formFields={proposal.form?.formFields ?? []}
                       readOnly={!proposal.permissions.edit}
                       threads={threads}
                       isDraft={proposal?.status === 'draft'}

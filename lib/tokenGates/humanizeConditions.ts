@@ -5,8 +5,8 @@ import { formatEther, isAddress } from 'viem';
 import { shortWalletAddress } from 'lib/utilities/blockchain';
 import { isTruthy } from 'lib/utilities/types';
 
+import { ALL_LIT_CHAINS } from './chains';
 import type { TokenGate, TokenGateConditions } from './interfaces';
-import { ALL_LIT_CHAINS } from './utils';
 
 const humanizeComparator = (comparator: string) => {
   const list: Record<string, string> = {

@@ -8,6 +8,7 @@ import type { PageEventMap, StaticPageType } from 'lib/metrics/mixpanel/interfac
 import { filterVisiblePages } from 'lib/pages/filterVisiblePages';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { fullyDecodeURI, getSpaceUrl, getSubdomainPath } from 'lib/utilities/browser';
+import { getCustomDomainFromHost } from 'lib/utilities/domains/getCustomDomainFromHost';
 
 type ViewMeta = PageEventMap['page_view']['meta'];
 
@@ -34,7 +35,7 @@ export async function getDefaultPageForSpace({
     : getDefaultPageForSpaceWithNonLoggedInUser({ space, host }));
   // encode to handle Japanese characters
   // call fullyDecodeURI to handle cases where we saved the pathname with encoded characters
-  return encodeURI(fullyDecodeURI(defaultPage));
+  return defaultPage ? encodeURI(fullyDecodeURI(defaultPage)) : null;
 }
 
 async function getDefaultPageForSpaceWithNonLoggedInUser({
@@ -43,12 +44,9 @@ async function getDefaultPageForSpaceWithNonLoggedInUser({
 }: {
   space: Pick<Space, 'id' | 'domain' | 'customDomain' | 'homePageId'>;
   host?: string;
-}): Promise<string> {
-  const defaultReturnValue = `join?domain=${space.domain}`;
-  const defaultSpaceUrl = getSpaceUrl(space, host);
-
+}): Promise<string | null> {
   if (!space.homePageId) {
-    return defaultReturnValue;
+    return null;
   }
 
   const page = await prisma.page.findFirst({
@@ -63,10 +61,11 @@ async function getDefaultPageForSpaceWithNonLoggedInUser({
   });
 
   if (page) {
+    const defaultSpaceUrl = getSpaceUrl(space, host);
     return `${defaultSpaceUrl}/${page.path}`;
-  } else {
-    return defaultReturnValue;
   }
+
+  return null;
 }
 
 // get default page when we have a space domain

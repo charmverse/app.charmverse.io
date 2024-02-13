@@ -102,6 +102,7 @@ services:
       - '3002:3000'
     environment:
       - REACT_APP_APP_ENV=staging
+      - PERMISSIONS_API_URL=http://permissions-api:3001
     profiles:
       - stg-sockets
       - stg-webapp

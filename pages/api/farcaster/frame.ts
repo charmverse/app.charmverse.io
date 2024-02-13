@@ -19,7 +19,7 @@ async function extractFarcasterMetadataFromUrl(
   req: NextApiRequest,
   res: NextApiResponse<Frame | null | { error: string }>
 ) {
-  const userId = req.session.user.id;
+  const userId = req.session.user?.id;
   const frameUrl = req.query.frameUrl as string;
   const pageId = req.query.pageId as string | undefined;
   const localhostUrl = isLocalhostUrl(frameUrl);
@@ -27,7 +27,7 @@ async function extractFarcasterMetadataFromUrl(
     throw new InvalidInputError('Invalid Farcaster frame URL');
   }
   const unparsedFrameHtml = await http.GET<string>(frameUrl);
-  const frame = getFrame({
+  const { frame } = getFrame({
     htmlString: unparsedFrameHtml,
     url: frameUrl
   });

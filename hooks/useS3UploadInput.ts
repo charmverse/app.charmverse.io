@@ -41,7 +41,9 @@ export const useS3UploadInput = ({
     setFileName(file.name || '');
 
     try {
-      if (resizeType) {
+      // dont resize SVG images
+      const isSVGImage = file.type === 'image/svg+xml';
+      if (resizeType && !isSVGImage) {
         const formData = new FormData();
         formData.append(FORM_DATA_FILE_PART_NAME, file);
         formData.append(FORM_DATA_IMAGE_RESIZE_TYPE, resizeType);

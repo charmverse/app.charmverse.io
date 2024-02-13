@@ -6,7 +6,6 @@ import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
-import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -160,6 +159,8 @@ function FormFieldsInputBase({
               render={({ field }) => (
                 <FieldTypeRenderer
                   {...field}
+                  rows={undefined}
+                  maxRows={10}
                   value={(field.value ?? '') as FormFieldValue}
                   placeholder={fieldTypePlaceholderRecord[formField.type]}
                   labelEndAdornment={
@@ -193,7 +194,7 @@ function FormFieldsInputBase({
                   }
                   description={formField.description as PageContent}
                   disabled={disabled}
-                  type={formField.type}
+                  type={formField.type === 'short_text' ? 'text_multiline' : formField.type}
                   label={formField.name}
                   options={formField.options as SelectOptionType[]}
                   error={errors[formField.id] as any}
