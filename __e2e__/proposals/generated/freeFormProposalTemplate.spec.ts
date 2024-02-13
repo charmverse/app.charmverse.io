@@ -301,6 +301,10 @@ test.describe.serial('Create and use Proposal Template', async () => {
 
     await expect(proposalPage.documentTitleInput).toBeVisible();
 
+    // Check that configuration fields are readonly and user cannot edit proposal
+    await expect(proposalPage.reviewerSelect).toBeDisabled();
+    await expect(proposalPage.editRubricCriteriaLabel).toBeDisabled();
+
     // We only need to use to title. The content should come through from the template
     await proposalPage.documentTitleInput.fill(userProposalConfig.title);
 

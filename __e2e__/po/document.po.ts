@@ -39,6 +39,10 @@ export class DocumentPage extends GlobalPage {
     return this.page.goto(`${baseUrl}/${domain}/${path}`);
   }
 
+  getLinkedPage(pageId: string) {
+    return this.page.locator(`data-test=linked-page-${pageId}`);
+  }
+
   getSelectProperties() {
     return this.cardDetailProperties.locator('data-test=closed-select-input').all();
   }
