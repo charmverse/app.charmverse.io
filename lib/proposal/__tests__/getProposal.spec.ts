@@ -18,7 +18,9 @@ describe('getProposal', () => {
     const result = await getProposal({
       id: proposal.id,
       canAccessPrivateFormFields: true,
-      permissionsByStep: {}
+      permissionsByStep: {
+        draft: {} as any
+      }
     });
     expect(result).toMatchObject(
       expect.objectContaining<Partial<ProposalWithUsersAndRubric>>({
