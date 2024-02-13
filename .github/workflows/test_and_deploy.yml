@@ -182,7 +182,8 @@ jobs:
   deploy:
     name: Deploy to production
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    # run whether previous jobs were successful or skipped
+    if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
     needs: [test, text-matrix]
     steps:
       - uses: actions/checkout@v4
@@ -339,12 +340,11 @@ jobs:
           use_existing_version_if_available: true # allows triggering re-deploys with same version
           wait_for_deployment: false # set to false to save sweet Github minutes
 
-  #    if: github.ref == 'refs/heads/main' && failure()
   discord_alert:
     name: Notify discord of failure
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && failure()
-    needs: [build-app, test, text-matrix, deploy]
+    needs: [deploy]
     steps:
       - name: If any of prev jobs failed notify discord
         if: contains(needs.*.result, 'failure')
