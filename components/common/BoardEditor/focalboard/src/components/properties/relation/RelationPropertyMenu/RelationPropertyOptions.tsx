@@ -101,7 +101,16 @@ function RelationPropertyOptions({
             isEditorEmpty={selectedPage.hasContent === false}
             pageType={selectedPage.type}
           />
-          <Typography variant='subtitle1' color='secondary' m={0} component='div'>
+          <Typography
+            variant='subtitle1'
+            color='secondary'
+            m={0}
+            component='div'
+            maxWidth={80}
+            overflow='hidden'
+            textOverflow='ellipsis'
+            whiteSpace='nowrap'
+          >
             {selectedPage.title ?? 'Untitled'}
           </Typography>
           <KeyboardArrowRightIcon color='secondary' fontSize='small' />
@@ -160,7 +169,9 @@ function RelationPropertyOptions({
           });
         }}
       >
-        <Typography mr={3}>Show on {selectedPage.title ?? 'Untitled'}</Typography>
+        <Typography mr={3} component='div' maxWidth={200} overflow='hidden' textOverflow='ellipsis' whiteSpace='nowrap'>
+          Show on {selectedPage.title ?? 'Untitled'}
+        </Typography>
         <Switch size='small' checked={relationData.showOnRelatedBoard} />
       </StyledMenuItem>
     </>
