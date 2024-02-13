@@ -56,6 +56,7 @@ export type RelationPropertyData = {
   limit: 'single_page' | 'multiple_page';
   relatedPropertyId: string | null;
   showOnRelatedBoard: boolean;
+  boardType?: 'proposals' | 'rewards';
 };
 
 // A template for card properties attached to a board

@@ -8,6 +8,7 @@ import type { BoardViewFields } from 'lib/focalboard/boardView';
 import { onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
+import { isUUID } from 'lib/utilities/strings';
 import { isTruthy } from 'lib/utilities/types';
 
 // TODO: frontend should tell us which space to use
@@ -48,6 +49,8 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<Block[]
       (boardBlock.fields as unknown as BoardFields).cardProperties
         .filter((cardProperty) => cardProperty.type === 'relation' && cardProperty.relationData)
         .map((cardProperty) => cardProperty.relationData?.boardId)
+        // TODO: It might be connected to proposals and rewards board which doesn't have a uuid as boardId
+        .filter((boardId) => boardId && isUUID(boardId))
     )
     .flat()
     .filter(isTruthy);

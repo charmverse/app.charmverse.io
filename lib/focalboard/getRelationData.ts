@@ -72,9 +72,8 @@ export async function getRelationData(
     throw new NotFoundError('Relation type board property not found');
   }
 
-  const connectedBoardId = sourceBoardRelationProperty.relationData.boardId;
-  const isProposalsBoardConnected = connectedBoardId.endsWith('-proposalsBoard');
-  const isRewardsBoardConnected = connectedBoardId.endsWith('-rewardsBoard');
+  const isProposalsBoardConnected = sourceBoardRelationProperty.relationData.boardType === 'proposals';
+  const isRewardsBoardConnected = sourceBoardRelationProperty.relationData.boardType === 'rewards';
 
   if (isRewardsBoardConnected) {
     const existingBlock = await prisma.rewardBlock.findUnique({
@@ -158,7 +157,7 @@ export async function getRelationData(
   } else {
     connectedBoard = await prisma.block.findUniqueOrThrow({
       where: {
-        id: connectedBoardId
+        id: sourceBoardRelationProperty.relationData.boardId
       },
       select: {
         id: true,

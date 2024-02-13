@@ -35,11 +35,12 @@ function RelationPropertyOptions({
   const { pages } = usePages();
 
   const selectedPage = useMemo(() => {
-    const relatedBoardId = relationData?.boardId ?? null;
+    const relatedBoardId = relationData?.boardId;
     if (!relatedBoardId) {
       return null;
     }
     const _selectedPage = pages[relatedBoardId];
+
     if (_selectedPage) {
       return {
         title: _selectedPage.title,
@@ -51,9 +52,7 @@ function RelationPropertyOptions({
       };
     }
 
-    const isProposalsBoard = relatedBoardId.endsWith('-proposalsBoard');
-
-    if (isProposalsBoard) {
+    if (relationData.boardType === 'proposals') {
       return {
         title: 'Proposals',
         icon: '',
@@ -62,11 +61,7 @@ function RelationPropertyOptions({
         id: relatedBoardId,
         path: ''
       };
-    }
-
-    const isRewardsBoard = relatedBoardId.endsWith('-rewardsBoard');
-
-    if (isRewardsBoard) {
+    } else if (relationData.boardType === 'rewards') {
       return {
         title: 'Rewards',
         icon: '',
@@ -106,7 +101,7 @@ function RelationPropertyOptions({
             color='secondary'
             m={0}
             component='div'
-            maxWidth={80}
+            maxWidth={100}
             overflow='hidden'
             textOverflow='ellipsis'
             whiteSpace='nowrap'
@@ -234,23 +229,23 @@ export function RelationPropertyEditOptions({
   const { trigger: renameRelationProperty, isMutating: isRenamingRelationProperty } = useRenameRelationProperty();
   const { trigger: removeRelationProperty, isMutating: isUnsyncingRelationProperty } = useRemoveRelationProperty();
   const { pages } = usePages();
-  const selectedPageTitle = relationData
-    ? relationData.boardId.endsWith('-proposalsBoard')
+  const selectedPageTitle =
+    relationData.boardType === 'proposals'
       ? 'Proposals'
-      : relationData.boardId.endsWith('-rewardsBoard')
+      : relationData.boardType === 'rewards'
       ? 'Rewards'
-      : pages[relationData.boardId]?.title
-    : null;
+      : pages[relationData.boardId]?.title;
 
   const connectedBoard = useAppSelector((state) => state.boards.boards[relationData.boardId]);
   const { proposalBoardBlock } = useProposalBlocks();
   const { rewardBoardBlock } = useRewardBlocks();
 
-  const relatedProperty = relationData.boardId.endsWith('-proposalsBoard')
-    ? proposalBoardBlock?.fields.cardProperties.find((property) => property.id === relationData.relatedPropertyId)
-    : relationData.boardId.endsWith('-rewardsBoard')
-    ? rewardBoardBlock?.fields.cardProperties.find((property) => property.id === relationData.relatedPropertyId)
-    : connectedBoard?.fields.cardProperties.find((property) => property.id === relationData.relatedPropertyId);
+  const relatedProperty =
+    relationData.boardType === 'proposals'
+      ? proposalBoardBlock?.fields.cardProperties.find((property) => property.id === relationData.relatedPropertyId)
+      : relationData.boardType === 'rewards'
+      ? rewardBoardBlock?.fields.cardProperties.find((property) => property.id === relationData.relatedPropertyId)
+      : connectedBoard?.fields.cardProperties.find((property) => property.id === relationData.relatedPropertyId);
 
   const isMutating = isSyncingRelationProperty || isRenamingRelationProperty || isUnsyncingRelationProperty;
 

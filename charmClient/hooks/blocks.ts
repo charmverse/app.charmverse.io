@@ -3,7 +3,7 @@ import type { RenameRelationPropertyPayload } from 'pages/api/blocks/relation/re
 import type { SyncRelationPropertyPayload } from 'pages/api/blocks/relation/sync';
 import type { SyncRelationPropertyValuePayload } from 'pages/api/blocks/sync-relation-property-value';
 
-import { useDELETE, usePOST, usePUT } from './helpers';
+import { usePOST, usePUT } from './helpers';
 
 export function useSyncRelationProperty() {
   return usePOST<SyncRelationPropertyPayload>('/api/blocks/relation/sync');

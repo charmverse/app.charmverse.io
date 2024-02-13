@@ -202,7 +202,7 @@ function TableHeaders(props: Props): JSX.Element {
                       templateId: template.id
                     }
                   : {
-                      boardId: board.id,
+                      boardType,
                       templateId: template.id,
                       spaceId: space.id
                     }

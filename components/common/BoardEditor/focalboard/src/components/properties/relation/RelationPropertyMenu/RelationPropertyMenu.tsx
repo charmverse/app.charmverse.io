@@ -4,9 +4,9 @@ import { bindMenu } from 'material-ui-popup-state';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import { DEFAULT_BOARD_BLOCK_ID } from 'lib/focalboard/customBlocks/constants';
 import { isTruthy } from 'lib/utilities/types';
 
 import { LinkCharmVerseDatabase } from '../../../viewSidebar/viewSourceOptions/components/LinkCharmVerseDatabase';
@@ -35,7 +35,6 @@ export function RelationPropertyMenu({
   relationData?: IPropertyTemplate['relationData'];
 }) {
   const { pages } = usePages();
-  const { space } = useCurrentSpace();
   const bindMenuProps = bindMenu(popupState);
   const [relationPropertyData, setRelationPropertyData] = useState<IPropertyTemplate['relationData'] | null>(
     relationData ?? null
@@ -67,7 +66,7 @@ export function RelationPropertyMenu({
             {
               hasContent: false,
               icon: '',
-              id: `${space?.id}-proposalsBoard`,
+              id: `proposals`,
               path: '',
               title: 'Proposals',
               type: 'board'
@@ -75,7 +74,8 @@ export function RelationPropertyMenu({
             {
               hasContent: false,
               icon: '',
-              id: `${space?.id}-rewardsBoard`,
+              // Temporary id to distinguish between reward and regular board
+              id: `rewards`,
               path: '',
               title: 'Rewards',
               type: 'board'
@@ -83,17 +83,21 @@ export function RelationPropertyMenu({
             ...Object.values(pages).filter(isTruthy)
           ]}
           onSelectLinkedDatabase={({ sourceDatabaseId, pageTitle = 'Untitled' }) => {
+            const boardType =
+              sourceDatabaseId === 'proposals' ? 'proposals' : sourceDatabaseId === 'rewards' ? 'rewards' : undefined;
             setRelationPropertyData(
               relationPropertyData
                 ? {
                     ...relationPropertyData,
-                    boardId: sourceDatabaseId
+                    boardType,
+                    boardId: boardType === undefined ? sourceDatabaseId : DEFAULT_BOARD_BLOCK_ID
                   }
                 : {
-                    boardId: sourceDatabaseId,
                     limit: 'single_page',
                     relatedPropertyId: null,
-                    showOnRelatedBoard: false
+                    showOnRelatedBoard: false,
+                    boardType,
+                    boardId: boardType === undefined ? sourceDatabaseId : DEFAULT_BOARD_BLOCK_ID
                   }
             );
             setPropertyTitle(`Related to ${pageTitle}`);
