@@ -60,7 +60,8 @@ export class ProposalPage extends DocumentPage {
       page.locator('data-test=evaluation-vote-settings').locator('data-test=delete-vote-option').nth(index),
     public pageTopLevelMenu = page.locator('data-test=header--show-page-actions'),
     public archiveProposalAction = page.locator('data-test=header--archive-current-proposal'),
-    public moveFromFeedbackEvaluation = page.locator('data-test=move-from-feedback-evaluation')
+    public moveFromFeedbackEvaluation = page.locator('data-test=move-from-feedback-evaluation'),
+    public addReward = page.locator('data-test=add-reward')
   ) {
     super(page);
   }

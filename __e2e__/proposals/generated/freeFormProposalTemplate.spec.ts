@@ -1,27 +1,43 @@
-import { prisma } from '@charmverse/core/prisma-client';
 import type {
+  Page,
   Proposal,
+  ProposalEvaluation,
   ProposalEvaluationPermission,
+  ProposalReviewer,
   Role,
   Space,
-  User,
-  VoteOptions
+  User
 } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
-import { testUtilsMembers } from '@charmverse/core/test';
+import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
 import { generateUserAndSpace, loginBrowserUser } from '__e2e__/utils/mocks';
-import { test, expect } from '__e2e__/utils/test';
+import { expect, test } from '__e2e__/utils/test';
+import { optimism, mainnet } from 'viem/chains';
 
 import { generateProposalWorkflow } from 'testing/utils/proposals';
 
-test.describe('Create Proposal Template', async () => {
+test.describe.serial('Create and use Proposal Template', async () => {
   let space: Space;
-  let user: User;
+  let admin: User;
+  let member: User;
   let proposalWorkflow: ProposalWorkflowTyped;
+
   let secondProposalWorkflow: ProposalWorkflowTyped;
   let role: Role;
 
-  const pageContent = {
+  // This will be established once the admin creates the template in the first proposal
+  let savedProposalTemplate: Page & {
+    proposal: Proposal & {
+      evaluations: (ProposalEvaluation & {
+        reviewers: ProposalReviewer[];
+        permissions: ProposalEvaluationPermission[];
+        vote: null;
+      })[];
+    };
+  };
+
+  const templatePageContent = {
     title: 'Proposal template for E2E',
     description: 'This is some proposal content that should show in the template'
   };
@@ -46,21 +62,59 @@ test.describe('Create Proposal Template', async () => {
     customOptions: ['Awesome', 'Maybe', 'Never']
   };
 
-  test.beforeAll(async () => {
-    // Generate a user and a space for the test
-    ({ user, space } = await generateUserAndSpace({ isAdmin: true }));
+  const rewardConfig = {
+    title: 'First reward',
+    description: 'First reward description',
+    chain: mainnet.id,
+    token: 'ETH',
+    amount: 10
+  };
 
+  const secondRewardConfig = {
+    title: 'Second reward',
+    description: 'Second reward description',
+    chain: optimism.id,
+    token: 'ETH',
+    amount: 10
+  };
+
+  test.beforeAll(async () => {
+    // Generate a admin and a space for the test
+    ({ user: admin, space } = await generateUserAndSpace({
+      isAdmin: true,
+      memberSpacePermissions: ['createProposals', 'reviewProposals']
+    }));
+
+    member = await testUtilsUser.generateSpaceUser({ spaceId: space.id, isAdmin: false });
+    await prisma.spaceRole.update({
+      where: {
+        spaceUser: {
+          userId: member.id,
+          spaceId: space.id
+        }
+      },
+      data: {
+        onboarded: true
+      }
+    });
     proposalWorkflow = await generateProposalWorkflow({ spaceId: space.id, title: 'First workflow' });
     secondProposalWorkflow = await generateProposalWorkflow({ spaceId: space.id, title: 'Second workflow' });
     role = await testUtilsMembers.generateRole({
-      createdBy: user.id,
+      createdBy: admin.id,
       spaceId: space.id
     });
   });
 
-  test('Create template and configure', async ({ page, proposalPage, rewardPage, proposalListPage, globalPage }) => {
-    // Log in the browser user
-    await loginBrowserUser({ browserPage: page, userId: user.id });
+  test('Create a freeform proposal template with custom rewards', async ({
+    page,
+    proposalPage,
+    rewardPage,
+    proposalListPage,
+    globalPage,
+    documentPage
+  }) => {
+    // Log in the browser admin
+    await loginBrowserUser({ browserPage: page, userId: admin.id });
 
     await proposalListPage.goToProposals(space.domain);
 
@@ -112,19 +166,29 @@ test.describe('Create Proposal Template', async () => {
     // Set the value for the third option
     await proposalPage.voteOption(2).fill(voteSettings.customOptions[2]);
 
-    // Configure the proposal settings
-    await proposalPage.documentTitleInput.fill(pageContent.title);
+    // Edit the proposal title
+    await proposalPage.documentTitleInput.fill(templatePageContent.title);
+
+    // Edit the proposal content
     await proposalPage.charmEditor.click();
-    await page.keyboard.type(pageContent.description);
+    await page.keyboard.type(templatePageContent.description);
+
+    // Add a new reward
+    // TODO - FIX Once we have rewards set up
+    // await proposalPage.addReward.click();
+
+    // await documentPage.documentTitleInput.fill(rewardConfig.title);
+
+    // await page.pause();
 
     await proposalPage.saveDraftButton.click();
 
     await page.waitForResponse('**/api/proposals**');
 
     // Check the actual data
-    const savedProposal = await prisma.page.findFirstOrThrow({
+    savedProposalTemplate = (await prisma.page.findFirstOrThrow({
       where: {
-        title: pageContent.title,
+        title: templatePageContent.title,
         spaceId: space.id
       },
       include: {
@@ -143,34 +207,34 @@ test.describe('Create Proposal Template', async () => {
           }
         }
       }
-    });
+    })) as any;
 
-    expect(savedProposal).toMatchObject(
+    expect(savedProposalTemplate).toMatchObject(
       expect.objectContaining({
-        ...savedProposal,
-        title: pageContent.title,
+        ...savedProposalTemplate,
+        title: templatePageContent.title,
         content: {
           type: 'doc',
           content: [
             {
               type: 'paragraph',
               attrs: { track: [] },
-              content: [{ text: pageContent.description, type: 'text' }]
+              content: [{ text: templatePageContent.description, type: 'text' }]
             }
           ]
         } as any,
         proposal: expect.objectContaining({
-          ...(savedProposal.proposal as Proposal),
+          ...(savedProposalTemplate.proposal as Proposal),
           status: 'draft',
           evaluations: [
             {
-              ...savedProposal.proposal?.evaluations[0],
-              permissions: [],
+              ...savedProposalTemplate.proposal?.evaluations[0],
+              permissions: [] as any,
               reviewers: [
                 {
-                  evaluationId: savedProposal.proposal?.evaluations[0].id,
-                  id: savedProposal.proposal?.evaluations[0].reviewers[0].id,
-                  proposalId: savedProposal.proposal?.id,
+                  evaluationId: savedProposalTemplate.proposal?.evaluations[0].id,
+                  id: savedProposalTemplate.proposal?.evaluations[0].reviewers[0].id,
+                  proposalId: savedProposalTemplate.proposal?.id,
                   roleId: null,
                   systemRole: 'author',
                   userId: null
@@ -178,13 +242,13 @@ test.describe('Create Proposal Template', async () => {
               ]
             },
             {
-              ...savedProposal.proposal?.evaluations[1],
-              permissions: [],
+              ...savedProposalTemplate.proposal?.evaluations[1],
+              permissions: [] as any,
               reviewers: [
                 {
-                  evaluationId: savedProposal.proposal?.evaluations[1].id,
-                  id: savedProposal.proposal?.evaluations[1].reviewers[0].id,
-                  proposalId: savedProposal.proposal?.id,
+                  evaluationId: savedProposalTemplate.proposal?.evaluations[1].id,
+                  id: savedProposalTemplate.proposal?.evaluations[1].reviewers[0].id,
+                  proposalId: savedProposalTemplate.proposal?.id,
                   roleId: role.id,
                   systemRole: null,
                   userId: null
@@ -192,8 +256,8 @@ test.describe('Create Proposal Template', async () => {
               ]
             },
             {
-              ...savedProposal.proposal?.evaluations[2],
-              permissions: [],
+              ...savedProposalTemplate.proposal?.evaluations[2],
+              permissions: [] as any,
               voteSettings: {
                 threshold: voteSettings.threshold,
                 type: 'SingleChoice',
@@ -206,9 +270,9 @@ test.describe('Create Proposal Template', async () => {
               vote: null,
               reviewers: [
                 {
-                  evaluationId: savedProposal.proposal?.evaluations[2].id,
-                  id: savedProposal.proposal?.evaluations[2].reviewers[0].id,
-                  proposalId: savedProposal.proposal?.id,
+                  evaluationId: savedProposalTemplate.proposal?.evaluations[2].id,
+                  id: savedProposalTemplate.proposal?.evaluations[2].reviewers[0].id,
+                  proposalId: savedProposalTemplate.proposal?.id,
                   roleId: null,
                   systemRole: 'space_member',
                   userId: null
@@ -217,35 +281,156 @@ test.describe('Create Proposal Template', async () => {
             }
           ],
           spaceId: space.id
-        } as (typeof savedProposal)['proposal'] as any)
-      } as typeof savedProposal)
+        } as (typeof savedProposalTemplate)['proposal'] as any)
+      } as typeof savedProposalTemplate)
+    );
+  });
+
+  test('Create a proposal from a template', async ({ proposalListPage, proposalPage, page }) => {
+    const userProposalConfig = {
+      title: 'User created proposal',
+      content: 'This is what I am proposing'
+    };
+
+    await loginBrowserUser({ browserPage: page, userId: member.id });
+    await proposalListPage.goToProposals(space.domain);
+
+    await proposalListPage.proposalTemplateSelect.click();
+    await proposalListPage.getTemplateOptionLocator(savedProposalTemplate.id).click();
+    await proposalPage.waitForNewProposalPage(space.domain);
+
+    await expect(proposalPage.documentTitleInput).toBeVisible();
+
+    // We only need to use to title. The content should come through from the template
+    await proposalPage.documentTitleInput.fill(userProposalConfig.title);
+
+    const content = (await proposalPage.charmEditor.allInnerTexts())[0];
+
+    expect(content.trim()).toEqual(templatePageContent.description);
+
+    await proposalPage.saveDraftButton.click();
+
+    await page.waitForResponse('**/api/proposals**');
+
+    const savedUserProposalFromTemplate = await prisma.page.findFirstOrThrow({
+      where: {
+        title: userProposalConfig.title,
+        spaceId: space.id,
+        createdBy: member.id
+      },
+      include: {
+        proposal: {
+          include: {
+            authors: true,
+            evaluations: {
+              include: {
+                reviewers: true,
+                permissions: {
+                  orderBy: {
+                    id: 'asc'
+                  }
+                },
+                vote: true
+              },
+              orderBy: {
+                index: 'asc'
+              }
+            }
+          }
+        }
+      }
+    });
+
+    const userProposalEvaluations = savedUserProposalFromTemplate.proposal?.evaluations;
+
+    expect(savedUserProposalFromTemplate).toMatchObject(
+      expect.objectContaining({
+        ...savedUserProposalFromTemplate,
+        title: userProposalConfig.title,
+        content: {
+          type: 'doc',
+          content: [
+            {
+              type: 'paragraph',
+              attrs: { track: [] },
+              content: [{ text: templatePageContent.description, type: 'text' }]
+            }
+          ]
+        } as any,
+        proposal: expect.objectContaining({
+          ...(savedUserProposalFromTemplate.proposal as Proposal),
+          authors: [{ proposalId: savedUserProposalFromTemplate.proposal?.id, userId: member.id }],
+          status: 'draft',
+          evaluations: [
+            {
+              ...userProposalEvaluations?.[0],
+              reviewers: [
+                {
+                  evaluationId: userProposalEvaluations?.[0].id,
+                  id: userProposalEvaluations?.[0].reviewers[0].id,
+                  proposalId: savedUserProposalFromTemplate.proposal?.id,
+                  roleId: null,
+                  systemRole: 'author',
+                  userId: null
+                }
+              ]
+            },
+            {
+              ...userProposalEvaluations?.[1],
+              reviewers: [
+                {
+                  evaluationId: userProposalEvaluations?.[1].id,
+                  id: userProposalEvaluations?.[1].reviewers[0].id,
+                  proposalId: savedUserProposalFromTemplate.proposal?.id,
+                  roleId: role.id,
+                  systemRole: null,
+                  userId: null
+                }
+              ]
+            },
+            {
+              ...savedUserProposalFromTemplate.proposal?.evaluations[2],
+              voteSettings: {
+                threshold: voteSettings.threshold,
+                type: 'SingleChoice',
+                options: voteSettings.customOptions,
+                maxChoices: 1,
+                publishToSnapshot: false,
+                durationDays: voteSettings.duration
+              },
+              // We just want to save settings, but not create an actual vote
+              vote: null,
+              reviewers: [
+                {
+                  evaluationId: savedUserProposalFromTemplate.proposal?.evaluations[2].id,
+                  id: savedUserProposalFromTemplate.proposal?.evaluations[2].reviewers[0].id,
+                  proposalId: savedUserProposalFromTemplate.proposal?.id,
+                  roleId: null,
+                  systemRole: 'space_member',
+                  userId: null
+                }
+              ]
+            }
+          ],
+          spaceId: space.id
+        } as (typeof savedUserProposalFromTemplate)['proposal'] as any)
+      } as typeof savedUserProposalFromTemplate)
     );
 
-    // // Configure rubric
-    // await proposalPage.rubricCriteriaNameInput.fill('Rubric Criteria Name');
-    // await proposalPage.rubricCriteriaDescriptionInput.fill('Description');
-    // await proposalPage.rubricCriteriaRangeMinInput.fill('1');
-    // await proposalPage.rubricCriteriaRangeMaxInput.fill('5');
-
-    // // Configure vote settings
-    // await proposalPage.voteDurationInput.fill('7'); // 7 days for example
-    // await proposalPage.voteThresholdInput.fill('60'); // 60% for example
-
-    // // Add some custom rewards (assuming a button to add and fields to fill)
-    // await rewardPage.addRewardButton.click();
-    // await rewardPage.rewardNameInput.fill('Custom Reward Name');
-    // await rewardPage.rewardValueInput.fill('100');
-
-    // // Submit the proposal template creation
-    // await proposalPage.createTemplateButton.click();
-
-    // // Ensure data is as expected by checking the existence of the created template
-    // // This step highly depends on how the application confirms the creation of a template
-    // // Here is an example of checking the confirmation message
-    // await expect(page.locator('text=Template created successfully')).toBeVisible();
-
-    // // Optionally, navigate to where the template is listed and verify its presence
-    // await page.goto('/proposal-templates');
-    // await expect(page.locator('text=Specific Workflow Name')).toBeVisible();
+    // Manually compare permissions since playwright matchers can be limited for highly nested objects
+    for (let i = 0; i < userProposalEvaluations!.length; i++) {
+      const evaluation = userProposalEvaluations![i];
+      for (const workFlowPermission of secondProposalWorkflow.evaluations[i].permissions) {
+        expect(
+          evaluation.permissions.some(
+            (p) =>
+              p.operation === workFlowPermission.operation &&
+              (p.systemRole === workFlowPermission.systemRole ||
+                p.userId === workFlowPermission.userId ||
+                p.roleId === workFlowPermission.roleId)
+          )
+        ).toBe(true);
+      }
+    }
   });
 });
