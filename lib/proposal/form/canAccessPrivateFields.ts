@@ -46,5 +46,5 @@ export async function canAccessPrivateFields({
   });
 
   // reviewers can view private fields
-  return permissions.review || permissions.evaluate;
+  return permissions.evaluate;
 }

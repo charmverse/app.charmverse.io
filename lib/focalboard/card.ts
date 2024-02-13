@@ -2,7 +2,8 @@ import type { PageMeta } from '@charmverse/core/pages';
 
 import type { Block } from 'lib/focalboard/block';
 import { createBlock } from 'lib/focalboard/block';
-import type { ProposalEvaluationStatus, ProposalWithUsersLite } from 'lib/proposal/interface';
+import type { ProposalWithUsersLite } from 'lib/proposal/getProposals';
+import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
 
 export type CardPropertyValue = string | string[] | number;
 

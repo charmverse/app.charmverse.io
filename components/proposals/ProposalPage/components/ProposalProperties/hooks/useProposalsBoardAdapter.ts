@@ -29,7 +29,8 @@ import {
   PROPOSAL_EVALUATION_TYPE_ID
 } from 'lib/proposal/blocks/constants';
 import type { ProposalPropertyValue } from 'lib/proposal/blocks/interfaces';
-import type { ProposalFields, ProposalWithUsersLite } from 'lib/proposal/interface';
+import type { ProposalWithUsersLite } from 'lib/proposal/getProposals';
+import type { ProposalFields } from 'lib/proposal/interface';
 
 export type BoardProposal = { createdAt: string; spaceId?: string; id?: string; fields: ProposalFields | null };
 
