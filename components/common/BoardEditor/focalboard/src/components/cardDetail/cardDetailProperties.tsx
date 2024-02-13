@@ -8,6 +8,7 @@ import { useSyncRelationProperty } from 'charmClient/hooks/blocks';
 import { CardDetailProperty } from 'components/common/BoardEditor/components/cardProperties/CardDetailProperty';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { type RelationPropertyData, type Board, type IPropertyTemplate, type PropertyType } from 'lib/focalboard/board';
@@ -39,6 +40,7 @@ type Props = {
   mutator?: Mutator;
   readOnlyProperties?: string[];
   disableEditPropertyOption?: boolean;
+  boardType?: 'proposals' | 'rewards';
 };
 
 function CardDetailProperties(props: Props) {
@@ -52,7 +54,8 @@ function CardDetailProperties(props: Props) {
     pageUpdatedBy,
     syncWithPageId,
     mutator = defaultMutator,
-    disableEditPropertyOption
+    disableEditPropertyOption,
+    boardType
   } = props;
   const [newTemplateId, setNewTemplateId] = useState('');
   const intl = useIntl();
@@ -60,6 +63,7 @@ function CardDetailProperties(props: Props) {
   const { trigger: syncRelationProperty } = useSyncRelationProperty();
   const { showMessage } = useSnackbar();
   const theme = useTheme();
+  const { space } = useCurrentSpace();
   const isSmallScreen = useSmallScreen();
 
   useEffect(() => {
@@ -255,11 +259,19 @@ function CardDetailProperties(props: Props) {
               relationData
             };
             const templateId = await mutator.insertPropertyTemplate(board, activeView, -1, template);
-            if (relationData?.showOnRelatedBoard) {
-              syncRelationProperty({
-                boardId: board.id,
-                templateId
-              });
+            if (space && relationData?.showOnRelatedBoard) {
+              syncRelationProperty(
+                !boardType
+                  ? {
+                      boardId: board.id,
+                      templateId
+                    }
+                  : {
+                      boardType,
+                      templateId,
+                      spaceId: space.id
+                    }
+              );
             }
             setNewTemplateId(templateId);
             addPropertyPopupState.close();

@@ -33,7 +33,8 @@ function ViewPropertyOption({
   cards,
   views,
   view,
-  goBackStep
+  goBackStep,
+  boardType
 }: {
   property: IPropertyTemplate;
   cards: Card[];
@@ -41,6 +42,7 @@ function ViewPropertyOption({
   views: BoardView[];
   view: BoardView;
   goBackStep: VoidFunction;
+  boardType?: 'proposals' | 'rewards';
 }) {
   const name = getPropertyName(property);
   const [tempName, setTempName] = useState(name || '');
@@ -115,6 +117,7 @@ function ViewPropertyOption({
                 relationData
               });
             }}
+            boardType={boardType}
             propertyId={property.id}
             relationData={property.relationData}
             board={board}

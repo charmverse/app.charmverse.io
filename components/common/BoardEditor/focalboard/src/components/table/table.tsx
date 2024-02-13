@@ -47,6 +47,7 @@ type Props = {
   checkedIds?: string[];
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
   setSelectedPropertyId?: Dispatch<SetStateAction<string | null>>;
+  boardType?: 'proposals' | 'rewards';
 };
 
 const TableRowsContainer = forwardRef<HTMLDivElement, { children: ReactNode }>(({ children }, ref) => {
@@ -298,6 +299,7 @@ function Table(props: Props): JSX.Element {
           checkedIds={checkedIds}
           setCheckedIds={setCheckedIds}
           setSelectedPropertyId={setSelectedPropertyId}
+          boardType={props.boardType}
         />
 
         {/* Table rows */}

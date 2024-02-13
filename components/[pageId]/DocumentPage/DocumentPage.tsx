@@ -353,6 +353,13 @@ function DocumentPageComponent({
                       readOnly={readOnly}
                       pageUpdatedAt={page.updatedAt.toString()}
                       pageUpdatedBy={page.updatedBy}
+                      boardType={
+                        page.type === 'proposal' || page.type === 'proposal_template'
+                          ? 'proposals'
+                          : page.type === 'bounty' || page.type === 'bounty_template'
+                          ? 'rewards'
+                          : undefined
+                      }
                     />
                     <AddBountyButton readOnly={readOnly} cardId={page.id} />
                   </>

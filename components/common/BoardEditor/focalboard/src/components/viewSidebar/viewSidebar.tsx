@@ -38,6 +38,7 @@ interface Props {
   selectedPropertyId: string | null;
   setSelectedPropertyId: Dispatch<SetStateAction<string | null>>;
   sidebarView?: SidebarView;
+  boardType?: 'proposals' | 'rewards';
 }
 
 function getDefaultView(hasBoardView: boolean): SidebarView {
@@ -129,6 +130,7 @@ function ViewSidebar(props: Props) {
                     view={props.view}
                     cards={props.cards}
                     property={selectedProperty}
+                    boardType={props.boardType}
                   />
                 </>
               )}

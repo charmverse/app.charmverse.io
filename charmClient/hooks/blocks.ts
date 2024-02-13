@@ -14,7 +14,7 @@ export function useRenameRelationProperty() {
 }
 
 export function useRemoveRelationProperty() {
-  return useDELETE<RemoveRelationPropertyPayload>('/api/blocks/relation/remove');
+  return usePOST<RemoveRelationPropertyPayload>('/api/blocks/relation/remove');
 }
 
 export function useSyncRelationPropertyValue() {

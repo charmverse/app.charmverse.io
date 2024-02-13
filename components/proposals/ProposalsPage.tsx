@@ -44,7 +44,6 @@ export function ProposalsPage({ title }: { title: string }) {
   const [showSidebar, setShowSidebar] = useState(false);
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
-
   const { trigger: trashPages } = useTrashPages();
   const groupByProperty = useMemo(() => {
     let _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
@@ -164,6 +163,7 @@ export function ProposalsPage({ title }: { title: string }) {
                     setSelectedPropertyId(_setSelectedPropertyId);
                     setShowSidebar(true);
                   }}
+                  boardType='proposals'
                   board={activeBoard}
                   activeView={activeView}
                   cardPages={cardPages}
@@ -199,6 +199,7 @@ export function ProposalsPage({ title }: { title: string }) {
               sidebarView={selectedPropertyId && showSidebar ? 'card-property' : undefined}
               cards={cards}
               views={views}
+              boardType='proposals'
               board={activeBoard}
               rootBoard={activeBoard}
               view={activeView}
@@ -211,8 +212,6 @@ export function ProposalsPage({ title }: { title: string }) {
               hideGroupOptions
               hidePropertiesRow={!isAdmin}
               groupByProperty={groupByProperty}
-              page={undefined}
-              pageId={undefined}
               showView={() => {}}
             />
           </Stack>

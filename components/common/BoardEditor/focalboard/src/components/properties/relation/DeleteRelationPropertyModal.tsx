@@ -3,6 +3,7 @@ import { Stack, Typography } from '@mui/material';
 import { useRemoveRelationProperty } from 'charmClient/hooks/blocks';
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 
@@ -10,8 +11,10 @@ export function DeleteRelationPropertyModal({
   board,
   onClose,
   template,
-  onDelete
+  onDelete,
+  boardType
 }: {
+  boardType?: 'proposals' | 'rewards';
   onClose: () => void;
   board: Board;
   template: IPropertyTemplate;
@@ -21,6 +24,7 @@ export function DeleteRelationPropertyModal({
   const relationData = template.relationData;
   const connectedBoardPage = relationData ? pages[relationData.boardId] : null;
   const { trigger: removeRelationProperty } = useRemoveRelationProperty();
+  const { space } = useCurrentSpace();
 
   return (
     <Modal size='500px' open title='Delete relation property' onClose={onClose}>
@@ -33,14 +37,25 @@ export function DeleteRelationPropertyModal({
             color='error'
             variant='outlined'
             onClick={() => {
-              removeRelationProperty({
-                removeBoth: true,
-                boardId: board.id,
-                templateId: template.id
-              }).then(() => {
-                // Delete the related property after has been unsynced
-                onDelete();
-              });
+              if (space) {
+                removeRelationProperty(
+                  boardType
+                    ? {
+                        boardType,
+                        removeBoth: true,
+                        spaceId: space.id,
+                        templateId: template.id
+                      }
+                    : {
+                        removeBoth: true,
+                        boardId: board.id,
+                        templateId: template.id
+                      }
+                ).then(() => {
+                  // Delete the related property after has been unsynced
+                  onDelete();
+                });
+              }
               onClose();
             }}
           >
@@ -50,13 +65,24 @@ export function DeleteRelationPropertyModal({
             color='error'
             variant='contained'
             onClick={() => {
-              removeRelationProperty({
-                removeBoth: false,
-                boardId: board.id,
-                templateId: template.id
-              }).then(() => {
-                onDelete();
-              });
+              if (space) {
+                removeRelationProperty(
+                  boardType
+                    ? {
+                        boardType,
+                        removeBoth: false,
+                        spaceId: space.id,
+                        templateId: template.id
+                      }
+                    : {
+                        removeBoth: false,
+                        boardId: board.id,
+                        templateId: template.id
+                      }
+                ).then(() => {
+                  onDelete();
+                });
+              }
               onClose();
             }}
           >

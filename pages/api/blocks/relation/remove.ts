@@ -10,7 +10,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.delete(removeRelationProperty);
+handler.post(removeRelationProperty);
 
 export type RemoveRelationPropertyPayload = (
   | {

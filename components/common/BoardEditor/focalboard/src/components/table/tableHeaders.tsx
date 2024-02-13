@@ -11,6 +11,7 @@ import { useIntl } from 'react-intl';
 
 import { useSyncRelationProperty } from 'charmClient/hooks/blocks';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useViewSortOptions } from 'hooks/useViewSortOptions';
@@ -43,6 +44,7 @@ type Props = {
   checkedIds?: string[];
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
   setSelectedPropertyId?: Dispatch<SetStateAction<string | null>>;
+  boardType?: 'proposals' | 'rewards';
 };
 
 function TableHeaders(props: Props): JSX.Element {
@@ -56,13 +58,14 @@ function TableHeaders(props: Props): JSX.Element {
     columnRefs,
     setCheckedIds,
     readOnly,
-    checkedIds = []
+    checkedIds = [],
+    boardType
   } = props;
   const intl = useIntl();
   const { formatDateTime, formatDate } = useDateFormatter();
   const addPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-property' });
   const { trigger: syncRelationProperty } = useSyncRelationProperty();
-
+  const { space } = useCurrentSpace();
   const isSmallScreen = useSmallScreen();
   const theme = useTheme();
   const sortOptions = useViewSortOptions(activeView);
@@ -176,12 +179,6 @@ function TableHeaders(props: Props): JSX.Element {
     );
   };
 
-  const titleSortOption = sortOptions?.find((o) => o.propertyId === Constants.titleColumnId);
-  let titleSorted: 'up' | 'down' | 'none' = 'none';
-  if (titleSortOption) {
-    titleSorted = titleSortOption.reversed ? 'down' : 'up';
-  }
-
   const propertyTypes = useMemo(
     () =>
       activeView && (
@@ -197,16 +194,24 @@ function TableHeaders(props: Props): JSX.Element {
               relationData
             };
             await mutator.insertPropertyTemplate(board, activeView, -1, template);
-            if (relationData?.showOnRelatedBoard) {
-              syncRelationProperty({
-                boardId: board.id,
-                templateId: template.id
-              });
+            if (relationData?.showOnRelatedBoard && space) {
+              syncRelationProperty(
+                !boardType
+                  ? {
+                      boardId: board.id,
+                      templateId: template.id
+                    }
+                  : {
+                      boardId: board.id,
+                      templateId: template.id,
+                      spaceId: space.id
+                    }
+              );
             }
           }}
         />
       ),
-    [mutator, board, activeView, isSmallScreen]
+    [mutator, board, activeView, isSmallScreen, boardType]
   );
 
   return (
@@ -250,6 +255,7 @@ function TableHeaders(props: Props): JSX.Element {
         }
         return (
           <TableHeader
+            boardType={boardType}
             data-test={`table-property-${template.type}`}
             sorted={sorted}
             readOnly={props.readOnly}

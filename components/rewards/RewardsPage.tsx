@@ -243,6 +243,7 @@ export function RewardsPage({ title }: { title: string }) {
                       setSelectedPropertyId(_setSelectedPropertyId);
                       setShowSidebar(true);
                     }}
+                    boardType='rewards'
                     board={activeBoard}
                     activeView={activeView}
                     cardPages={cardPages as CardPage[]}
@@ -315,6 +316,7 @@ export function RewardsPage({ title }: { title: string }) {
                 selectedPropertyId={selectedPropertyId}
                 cards={cards as Card[]}
                 views={views}
+                boardType='rewards'
                 board={activeBoard}
                 rootBoard={activeBoard}
                 view={activeView}

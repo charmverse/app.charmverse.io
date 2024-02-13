@@ -27,6 +27,7 @@ import { bindPopover, bindToggle, bindTrigger, usePopupState } from 'material-ui
 import type { Dispatch, SetStateAction } from 'react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
+import { useRemoveRelationProperty } from 'charmClient/hooks/blocks';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useViewSortOptions } from 'hooks/useViewSortOptions';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
@@ -66,6 +67,7 @@ type Props = {
   onDrop: (template: IPropertyTemplate, container: IPropertyTemplate) => void;
   onAutoSizeColumn: (columnID: string, headerWidth: number) => void;
   setSelectedPropertyId?: Dispatch<SetStateAction<string | null>>;
+  boardType?: 'proposals' | 'rewards';
 };
 
 export const DEFAULT_BLOCK_IDS = [
@@ -78,7 +80,7 @@ export const DEFAULT_BLOCK_IDS = [
 ];
 
 function TableHeader(props: Props): JSX.Element {
-  const { activeView, board, views, cards, sorted, template, readOnly } = props;
+  const { boardType, activeView, board, views, cards, sorted, template, readOnly } = props;
   const { type } = template;
   const { id: templateId } = template;
   const name = getPropertyName(template);
@@ -86,6 +88,7 @@ function TableHeader(props: Props): JSX.Element {
   const columnWidth = (_templateId: string): number => {
     return Math.max(Constants.minColumnWidth, (activeView.fields.columnWidths[_templateId] || 0) + props.offset);
   };
+  const { trigger: removeRelationProperty } = useRemoveRelationProperty();
 
   const disableRename =
     proposalPropertyTypesList.includes(type as any) ||
@@ -401,6 +404,7 @@ function TableHeader(props: Props): JSX.Element {
       {showRelationPropertyDeletePopup.isOpen && (
         <DeleteRelationPropertyModal
           board={board}
+          boardType={boardType}
           onDelete={() => {
             mutator.deleteProperty(board, views, cards, template.id);
           }}

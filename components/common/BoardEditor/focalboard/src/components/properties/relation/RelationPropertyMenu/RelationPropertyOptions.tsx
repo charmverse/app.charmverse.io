@@ -11,6 +11,7 @@ import {
 import { Button } from 'components/common/Button';
 import { PageIcon } from 'components/common/PageIcon';
 import PopperPopup from 'components/common/PopperPopup';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useProposalBlocks } from 'hooks/useProposalBlocks';
 import { useRewardBlocks } from 'hooks/useRewardBlocks';
@@ -207,13 +208,16 @@ export function RelationPropertyEditOptions({
   relationData,
   onChange,
   propertyId,
-  board
+  board,
+  boardType
 }: {
+  boardType?: 'proposals' | 'rewards';
   relationData: RelationPropertyData;
   propertyId: string;
   onChange: (relationData: RelationPropertyData) => void;
   board: Board;
 }) {
+  const { space } = useCurrentSpace();
   const [relationDataTemp, setRelationDataTemp] = useState(relationData);
   const { trigger: syncRelationProperty, isMutating: isSyncingRelationProperty } = useSyncRelationProperty();
   const { trigger: renameRelationProperty, isMutating: isRenamingRelationProperty } = useRenameRelationProperty();
@@ -282,7 +286,7 @@ export function RelationPropertyEditOptions({
               />
             </>
           )}
-          {relatedPropertyUpdated && (
+          {relatedPropertyUpdated && space && (
             <Button
               onClick={() => {
                 const action =
@@ -294,21 +298,23 @@ export function RelationPropertyEditOptions({
                     ? 'rename'
                     : null;
 
+                const boardIdentifierPayload = boardType ? { spaceId: space.id, boardType } : { boardId: board.id };
+
                 if (action === 'sync') {
                   syncRelationProperty({
-                    boardId: board.id,
+                    ...boardIdentifierPayload,
                     templateId: propertyId,
                     relatedPropertyTitle: relatedPropertyTitle || `Related to ${board.title ?? 'Untitled'}`
                   });
                 } else if (action === 'rename') {
                   renameRelationProperty({
-                    boardId: board.id,
+                    ...boardIdentifierPayload,
                     templateId: propertyId,
                     relatedPropertyTitle
                   });
                 } else if (action === 'remove') {
                   removeRelationProperty({
-                    boardId: board.id,
+                    ...boardIdentifierPayload,
                     templateId: propertyId,
                     removeBoth: false
                   });
