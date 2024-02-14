@@ -21,6 +21,7 @@ import {
   sepolia,
   zkSync,
   zkSyncTestnet,
+  kyoto,
   zora,
   taikoJolnir,
   taikoTestnetSepolia
