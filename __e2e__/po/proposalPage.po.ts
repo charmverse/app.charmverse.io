@@ -89,6 +89,10 @@ export class ProposalPage extends DocumentPage {
     return this.page.locator(`data-test=proposal-${evaluationType}-select`);
   }
 
+  async getSelectedReviewers() {
+    return this.page.locator('data-test=selected-user-or-role-option');
+  }
+
   /**
    * @param assignee Either a system role, or a user or role id
    */

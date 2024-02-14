@@ -12,7 +12,6 @@ import type { RoleOption } from 'components/common/BoardEditor/components/proper
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import Checkbox from 'components/common/BoardEditor/focalboard/src/widgets/checkbox';
-import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { TemplateSelect } from 'components/proposals/ProposalPage/components/TemplateSelect';
 import { RewardApplicationType } from 'components/rewards/components/RewardProperties/components/RewardApplicationType';
 import { RewardPropertiesHeader } from 'components/rewards/components/RewardProperties/components/RewardPropertiesHeader';

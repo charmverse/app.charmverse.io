@@ -168,6 +168,7 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
               type='text'
               size='small'
               fullWidth
+              data-test='custom-token-contract-address'
               error={!!errors.contractAddress?.message}
               helperText={errors.contractAddress?.message}
               InputProps={{
@@ -235,6 +236,7 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
                 <Grid item xs={validTokenLogoAddressFormat ? 8 : 12}>
                   <InputLabel>Token logo URL</InputLabel>
                   <TextField
+                    data-test='custom-token-logo-url'
                     {...register('tokenLogo')}
                     type='text'
                     size='small'
@@ -275,7 +277,11 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
             </Grid>
           )}
           <Grid item>
-            <Button type='submit' disabled={!isValid || values.contractAddress === ''}>
+            <Button
+              data-test='create-token-payment-method'
+              type='submit'
+              disabled={!isValid || values.contractAddress === ''}
+            >
               Create payment method
             </Button>
           </Grid>

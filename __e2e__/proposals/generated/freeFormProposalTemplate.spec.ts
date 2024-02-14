@@ -11,10 +11,12 @@ import type {
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
+import { expect, test } from '__e2e__/testWithFixtures';
 import { generateUserAndSpace, loginBrowserUser } from '__e2e__/utils/mocks';
-import { expect, test } from '__e2e__/utils/test';
 import { optimism, mainnet } from 'viem/chains';
 
+import type { ProposalPendingReward } from 'lib/proposal/interface';
+import { prettyPrint } from 'lib/utilities/strings';
 import { generateProposalWorkflow } from 'testing/utils/proposals';
 
 test.describe.serial('Create and use Proposal Template', async () => {
@@ -65,9 +67,10 @@ test.describe.serial('Create and use Proposal Template', async () => {
   const rewardConfig = {
     title: 'First reward',
     description: 'First reward description',
-    chain: mainnet.id,
-    token: 'ETH',
-    amount: 10
+    chain: optimism.id,
+    //  USDC Contract Address on OP;
+    token: '0x7F5c764cBc14f9669B88837ca1490cCa17c31607',
+    amount: 22
   };
 
   const secondRewardConfig = {
@@ -109,19 +112,21 @@ test.describe.serial('Create and use Proposal Template', async () => {
     page,
     proposalPage,
     rewardPage,
-    proposalListPage,
+    dialogRewardPage,
+    dialogDocumentPage,
+    proposalsListPage,
     globalPage,
     documentPage
   }) => {
     // Log in the browser admin
     await loginBrowserUser({ browserPage: page, userId: admin.id });
 
-    await proposalListPage.goToProposals(space.domain);
+    await proposalsListPage.goToProposals(space.domain);
 
     // Go to create proposal template page (Assuming the URL or navigation step to reach there)
-    await proposalListPage.proposalTemplateSelect.click();
-    await proposalListPage.addNewTemplate.click();
-    await proposalListPage.proposalTemplateFreeFormOption.click();
+    await proposalsListPage.proposalTemplateSelect.click();
+    await proposalsListPage.addNewTemplate.click();
+    await proposalsListPage.proposalTemplateFreeFormOption.click();
 
     // Select a workflow
     await proposalPage.selectWorkflow(secondProposalWorkflow.id);
@@ -174,12 +179,40 @@ test.describe.serial('Create and use Proposal Template', async () => {
     await page.keyboard.type(templatePageContent.description);
 
     // Add a new reward
-    // TODO - FIX Once we have rewards set up
-    // await proposalPage.addReward.click();
+    await proposalPage.addReward.click();
 
-    // await documentPage.documentTitleInput.fill(rewardConfig.title);
+    // Set reward title and description
+    await dialogDocumentPage.documentTitleInput.fill(rewardConfig.title);
+    await dialogDocumentPage.charmEditor.click();
+    await page.keyboard.type(rewardConfig.description);
 
-    // await page.pause();
+    // Open reward token settings
+    await dialogRewardPage.openRewardValueDialog.click();
+
+    const USDCLogoUrl = 'https://optimistic.etherscan.io/token/images/usdc_32.png';
+
+    await expect(dialogRewardPage.rewardPropertyChain).toBeVisible();
+
+    await dialogRewardPage.selectRewardChain(rewardConfig.chain);
+
+    await dialogRewardPage.rewardPropertyToken.click();
+    await dialogRewardPage.addCustomToken.click();
+
+    await dialogRewardPage.customTokenContractAddressInput.fill(rewardConfig.token);
+    await expect(dialogRewardPage.customTokenLogoUrl).toBeVisible();
+
+    await dialogRewardPage.customTokenLogoUrl.fill(USDCLogoUrl);
+
+    await dialogRewardPage.rewardPropertyAmount.fill(rewardConfig.amount.toString());
+
+    await dialogRewardPage.saveTokenPaymentMethod.click();
+
+    await dialogRewardPage.saveRewardValue.click();
+
+    await dialogDocumentPage.saveNewPage.click();
+
+    // Give React some time to set form values before we save
+    await page.waitForTimeout(200);
 
     await proposalPage.saveDraftButton.click();
 
@@ -209,6 +242,8 @@ test.describe.serial('Create and use Proposal Template', async () => {
       }
     })) as any;
 
+    const pendingReward = (savedProposalTemplate.proposal?.fields as any).pendingRewards[0];
+
     expect(savedProposalTemplate).toMatchObject(
       expect.objectContaining({
         ...savedProposalTemplate,
@@ -226,6 +261,77 @@ test.describe.serial('Create and use Proposal Template', async () => {
         proposal: expect.objectContaining({
           ...(savedProposalTemplate.proposal as Proposal),
           status: 'draft',
+          fields: {
+            ...(savedProposalTemplate.proposal.fields as any),
+            pendingRewards: [
+              {
+                page: {
+                  icon: null,
+                  type: 'bounty',
+                  title: rewardConfig.title,
+                  content: {
+                    type: 'doc',
+                    content: [
+                      {
+                        type: 'paragraph',
+                        attrs: {
+                          track: []
+                        },
+                        content: [
+                          {
+                            text: rewardConfig.description,
+                            type: 'text'
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  updatedAt: pendingReward.page.updatedAt,
+                  contentText: rewardConfig.description,
+                  headerImage: null
+                },
+                reward: {
+                  fields: {
+                    isAssigned: false,
+                    properties: {
+                      __limit: '',
+                      __title: '',
+                      __rewarder: '',
+                      __available: '-',
+                      __createdAt: '',
+                      __reviewers: [
+                        {
+                          id: role.id,
+                          group: 'role'
+                        }
+                      ],
+                      __applicants: [],
+                      __rewardChain: rewardConfig.chain.toString(),
+                      __rewardToken: rewardConfig.token,
+                      __rewardAmount: rewardConfig.amount,
+                      __rewardStatus: '',
+                      __rewardCustomValue: '',
+                      __rewardProposalLink: '',
+                      __rewardApplicantsCount: '0'
+                    }
+                  },
+                  chainId: rewardConfig.chain,
+                  reviewers: [
+                    {
+                      // Reviewer should be auto-assigned from workflow-configured reviewers
+                      id: role.id,
+                      group: 'role'
+                    }
+                  ],
+                  rewardToken: rewardConfig.token,
+                  customReward: null,
+                  rewardAmount: rewardConfig.amount,
+                  assignedSubmitters: []
+                },
+                draftId: pendingReward.draftId
+              }
+            ] as ProposalPendingReward[]
+          },
           evaluations: [
             {
               ...savedProposalTemplate.proposal?.evaluations[0],
@@ -286,27 +392,31 @@ test.describe.serial('Create and use Proposal Template', async () => {
     );
   });
 
-  test('Create a proposal from a template', async ({ proposalListPage, proposalPage, page }) => {
+  test('Create a proposal from a template', async ({ proposalsListPage, proposalPage, page }) => {
     const userProposalConfig = {
       title: 'User created proposal',
       content: 'This is what I am proposing'
     };
 
     await loginBrowserUser({ browserPage: page, userId: member.id });
-    await proposalListPage.goToProposals(space.domain);
+    await proposalsListPage.goToProposals(space.domain);
 
-    await proposalListPage.proposalTemplateSelect.click();
-    await proposalListPage.getTemplateOptionLocator(savedProposalTemplate.id).click();
+    await proposalsListPage.proposalTemplateSelect.click();
+    await proposalsListPage.getTemplateOptionLocator(savedProposalTemplate.id).click();
     await proposalPage.waitForNewProposalPage(space.domain);
 
+    // We only need to use to title. The content should come through from the template
     await expect(proposalPage.documentTitleInput).toBeVisible();
+    await proposalPage.documentTitleInput.fill(userProposalConfig.title);
 
     // Check that configuration fields are readonly and user cannot edit proposal
-    await expect(proposalPage.reviewerSelect).toBeDisabled();
-    await expect(proposalPage.editRubricCriteriaLabel).toBeDisabled();
+    const reviewerInput = (await proposalPage.getSelectedReviewers()).nth(1);
 
-    // We only need to use to title. The content should come through from the template
-    await proposalPage.documentTitleInput.fill(userProposalConfig.title);
+    const value = (await reviewerInput.allInnerTexts())[0].trim();
+
+    expect(value).toEqual(role.name);
+
+    await expect(proposalPage.editRubricCriteriaLabel).toBeDisabled();
 
     const content = (await proposalPage.charmEditor.allInnerTexts())[0];
 
@@ -347,6 +457,8 @@ test.describe.serial('Create and use Proposal Template', async () => {
 
     const userProposalEvaluations = savedUserProposalFromTemplate.proposal?.evaluations;
 
+    const pendingReward = (savedUserProposalFromTemplate.proposal?.fields as any).pendingRewards[0];
+
     expect(savedUserProposalFromTemplate).toMatchObject(
       expect.objectContaining({
         ...savedUserProposalFromTemplate,
@@ -363,6 +475,78 @@ test.describe.serial('Create and use Proposal Template', async () => {
         } as any,
         proposal: expect.objectContaining({
           ...(savedUserProposalFromTemplate.proposal as Proposal),
+          fields: {
+            ...(savedUserProposalFromTemplate as any).proposal.fields,
+            pendingRewards: [
+              {
+                page: {
+                  icon: null,
+                  type: 'bounty',
+                  title: rewardConfig.title,
+                  content: {
+                    type: 'doc',
+                    content: [
+                      {
+                        type: 'paragraph',
+                        attrs: {
+                          track: []
+                        },
+                        content: [
+                          {
+                            text: rewardConfig.description,
+                            type: 'text'
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  updatedAt: pendingReward.page.updatedAt,
+                  contentText: rewardConfig.description,
+                  headerImage: null
+                },
+                reward: {
+                  fields: {
+                    isAssigned: false,
+                    properties: {
+                      __limit: '',
+                      __title: '',
+                      __rewarder: '',
+                      __available: '-',
+                      __createdAt: '',
+                      __reviewers: [
+                        {
+                          id: role.id,
+                          group: 'role'
+                        }
+                      ],
+                      __applicants: [],
+                      __rewardChain: rewardConfig.chain.toString(),
+                      __rewardToken: rewardConfig.token,
+                      __rewardAmount: rewardConfig.amount,
+                      __rewardStatus: '',
+                      __rewardCustomValue: '',
+                      __rewardProposalLink: '',
+                      __rewardApplicantsCount: '0'
+                    }
+                  },
+                  chainId: rewardConfig.chain,
+                  reviewers: [
+                    {
+                      // Reviewer should be auto-assigned from workflow-configured reviewers
+                      id: role.id,
+                      group: 'role'
+                    }
+                  ],
+                  rewardToken: rewardConfig.token,
+                  customReward: null,
+                  rewardAmount: rewardConfig.amount,
+                  // The author should be auto-assigned as a submitter
+                  assignedSubmitters: [member.id]
+                },
+                draftId: pendingReward.draftId
+              }
+            ] as ProposalPendingReward[]
+          },
           authors: [{ proposalId: savedUserProposalFromTemplate.proposal?.id, userId: member.id }],
           status: 'draft',
           evaluations: [
