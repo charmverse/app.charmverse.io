@@ -1,13 +1,15 @@
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
-import { Autocomplete, Box, IconButton, ListItemIcon, MenuItem, Stack, TextField } from '@mui/material';
+import { Autocomplete, Box, IconButton, ListItemIcon, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 import React, { useCallback, useMemo, useState } from 'react';
 
 import { PageIcon } from 'components/common/PageIcon';
 import PageTitle from 'components/common/PageLayout/components/PageTitle';
 import type { PageListItem } from 'components/common/PagesList';
-import type { RelationPropertyData } from 'lib/focalboard/board';
+import { useCharmRouter } from 'hooks/useCharmRouter';
+import { usePages } from 'hooks/usePages';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { PropertyValueDisplayType } from '../../interfaces';
@@ -80,10 +82,10 @@ function PagesAutocompleteBase({
   displayType = 'details',
   emptyPlaceholderContent = 'Empty',
   showEmptyPlaceholder = true,
-  selectionLimit,
-  variant = 'standard'
+  variant = 'standard',
+  relationTemplate
 }: {
-  selectionLimit: RelationPropertyData['limit'];
+  relationTemplate: IPropertyTemplate;
   displayType?: PropertyValueDisplayType;
   readOnly?: boolean;
   pageListItems: PageListItem[];
@@ -94,6 +96,12 @@ function PagesAutocompleteBase({
   showEmptyPlaceholder?: boolean;
   variant?: 'outlined' | 'standard';
 }) {
+  const { navigateToSpacePath } = useCharmRouter();
+  const selectionLimit = relationTemplate.relationData?.limit ?? 'single_page';
+  const { pages } = usePages();
+  const connectedBoard = relationTemplate.relationData?.boardId
+    ? pages[relationTemplate.relationData.boardId]
+    : undefined;
   const [isOpen, setIsOpen] = useState(false);
   const selectedPageListItems =
     selectionLimit === 'single_page' ? _selectedPageListItems.slice(0, 1) : _selectedPageListItems;
@@ -171,6 +179,46 @@ function PagesAutocompleteBase({
             placeholder={selectedPageListItems.length === 0 ? 'Link a page' : ''}
             InputProps={{
               ...params.InputProps,
+              endAdornment: connectedBoard ? (
+                <Stack flexDirection='row'>
+                  <Typography variant='subtitle1' color='secondary' mr={0.5}>
+                    In
+                  </Typography>
+                  <Stack
+                    onClick={() => {
+                      navigateToSpacePath(`/${connectedBoard.path}`);
+                    }}
+                    sx={{
+                      flexDirection: 'row',
+                      px: 0.5,
+                      alignItems: 'center',
+                      cursor: 'pointer',
+                      borderRadius: (theme) => theme.spacing(0.25),
+                      transition: (theme) =>
+                        theme.transitions.create('background-color', {
+                          duration: theme.transitions.duration.shortest
+                        }),
+                      '&:hover': {
+                        backgroundColor: (theme) => theme.palette.action.hover,
+                        transition: (theme) =>
+                          theme.transitions.create('background-color', {
+                            duration: theme.transitions.duration.shortest
+                          })
+                      }
+                    }}
+                  >
+                    <PageIcon
+                      size='small'
+                      icon={connectedBoard.icon}
+                      isEditorEmpty={!connectedBoard.hasContent}
+                      pageType={connectedBoard.type}
+                    />
+                    <PageTitle hasContent={!connectedBoard.title} sx={{ fontWeight: 'bold' }}>
+                      {connectedBoard.title || 'Untitled'}
+                    </PageTitle>
+                  </Stack>
+                </Stack>
+              ) : null,
               ...(variant === 'standard' && { disableUnderline: true })
             }}
             variant={variant}
@@ -214,7 +262,16 @@ function PagesAutocompleteBase({
   );
 
   if (displayType === 'table') {
-    return <PopupFieldWrapper disabled={readOnly} previewField={previewField} activeField={activeField} />;
+    return (
+      <PopupFieldWrapper
+        paperSx={{
+          width: 500
+        }}
+        disabled={readOnly}
+        previewField={previewField}
+        activeField={activeField}
+      />
+    );
   }
 
   if (variant === 'standard' && !isOpen) {

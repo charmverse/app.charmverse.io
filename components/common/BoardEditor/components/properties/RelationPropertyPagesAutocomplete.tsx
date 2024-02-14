@@ -46,9 +46,9 @@ export function RelationPropertyPagesAutocomplete({
       readOnly={readOnly}
       wrapColumn={wrapColumn}
       displayType={displayType}
+      relationTemplate={propertyTemplate}
       emptyPlaceholderContent={emptyPlaceholderContent}
       showEmptyPlaceholder={showEmptyPlaceholder}
-      selectionLimit={propertyTemplate.relationData?.limit ?? 'single_page'}
       variant='standard'
     />
   );
