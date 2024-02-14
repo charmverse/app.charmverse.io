@@ -3,11 +3,13 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { prismaToBlock } from 'lib/focalboard/block';
 import type { RenameRelationPropertyPayload } from 'lib/focalboard/relationProperty/renameRelationProperty';
 import { renameRelationProperty } from 'lib/focalboard/relationProperty/renameRelationProperty';
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
+import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -33,12 +35,20 @@ async function renameRelationPropertyHandler(req: NextApiRequest, res: NextApiRe
     throw new UnauthorisedActionError();
   }
 
-  await renameRelationProperty({
+  const updatedBlock = await renameRelationProperty({
     boardId,
     relatedPropertyTitle,
     templateId,
     userId
   });
+
+  relay.broadcast(
+    {
+      type: 'blocks_updated',
+      payload: [prismaToBlock(updatedBlock)]
+    },
+    updatedBlock.spaceId
+  );
 
   res.status(200).end();
 }

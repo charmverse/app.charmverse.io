@@ -1,4 +1,4 @@
-import type { Prisma } from '@charmverse/core/prisma-client';
+import type { Block, Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { NotFoundError } from 'lib/middleware';
@@ -29,7 +29,7 @@ export async function removeRelationProperty(payload: RemoveRelationPropertyPayl
     throw new NotFoundError('Connected relation property not found');
   }
 
-  const prismaPromises: Prisma.PrismaPromise<any>[] = [];
+  const prismaPromises: Prisma.Prisma__BlockClient<Block, never>[] = [];
 
   if (sourceBoard.id === connectedBoard.id) {
     const updatedCardProperties = sourceBoardProperties.filter((cp) => cp.id !== sourceRelationProperty.id);
@@ -104,5 +104,5 @@ export async function removeRelationProperty(payload: RemoveRelationPropertyPayl
     );
   }
 
-  await prisma.$transaction(prismaPromises);
+  return prisma.$transaction(prismaPromises);
 }

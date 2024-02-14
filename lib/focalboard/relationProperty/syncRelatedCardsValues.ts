@@ -1,4 +1,4 @@
-import type { Prisma } from '@charmverse/core/prisma-client';
+import type { Block, Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { NotFoundError } from 'lib/middleware';
@@ -86,7 +86,7 @@ export async function syncRelatedCardsValues(
     }
   });
 
-  const { connectedRelationProperty, sourceBoard, sourceRelationProperty } = await getRelationData({
+  const { connectedRelationProperty, sourceBoard } = await getRelationData({
     boardId,
     templateId
   });
@@ -101,7 +101,7 @@ export async function syncRelatedCardsValues(
   const connectedPageIds = pageIds.filter((id) => !cardRelationPropertyValue.includes(id));
   const disconnectedPageIds = cardRelationPropertyValue.filter((id) => !pageIds.includes(id));
 
-  const prismaPromises: Prisma.PrismaPromise<any>[] = [];
+  const prismaPromises: Prisma.Prisma__BlockClient<Block, never>[] = [];
 
   if (connectedPageIds.length) {
     prismaPromises.push(
@@ -129,7 +129,7 @@ export async function syncRelatedCardsValues(
     );
   }
 
-  await prisma.$transaction([
+  return prisma.$transaction([
     ...prismaPromises,
     prisma.block.update({
       where: {

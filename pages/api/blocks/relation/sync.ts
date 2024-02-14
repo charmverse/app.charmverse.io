@@ -3,11 +3,13 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { prismaToBlock } from 'lib/focalboard/block';
 import type { SyncRelationPropertyPayload } from 'lib/focalboard/relationProperty/syncRelationProperty';
 import { syncRelationProperty } from 'lib/focalboard/relationProperty/syncRelationProperty';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
+import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -32,10 +34,20 @@ async function syncRelationPropertyHandler(req: NextApiRequest, res: NextApiResp
     throw new UnauthorisedActionError();
   }
 
-  await syncRelationProperty({
+  const updatedBlocks = await syncRelationProperty({
     ...payload,
     userId: req.session.user.id
   });
+
+  if (updatedBlocks.length) {
+    relay.broadcast(
+      {
+        type: 'blocks_updated',
+        payload: updatedBlocks.map((block) => prismaToBlock(block))
+      },
+      updatedBlocks[0].spaceId
+    );
+  }
 
   res.status(200).end();
 }

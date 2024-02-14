@@ -22,7 +22,7 @@ export async function renameRelationProperty(
     throw new NotFoundError('Connected relation property not found');
   }
 
-  await prisma.block.update({
+  return prisma.block.update({
     data: {
       fields: {
         ...(connectedBoard?.fields as any),

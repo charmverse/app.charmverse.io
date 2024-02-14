@@ -177,12 +177,6 @@ function TableHeaders(props: Props): JSX.Element {
     );
   };
 
-  const titleSortOption = sortOptions?.find((o) => o.propertyId === Constants.titleColumnId);
-  let titleSorted: 'up' | 'down' | 'none' = 'none';
-  if (titleSortOption) {
-    titleSorted = titleSortOption.reversed ? 'down' : 'up';
-  }
-
   const propertyTypes = useMemo(
     () =>
       activeView && (

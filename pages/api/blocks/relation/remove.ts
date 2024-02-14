@@ -3,11 +3,13 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { prismaToBlock } from 'lib/focalboard/block';
 import type { RemoveRelationPropertyPayload } from 'lib/focalboard/relationProperty/removeRelationProperty';
 import { removeRelationProperty } from 'lib/focalboard/relationProperty/removeRelationProperty';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
+import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -32,10 +34,20 @@ async function removeRelationPropertyHandler(req: NextApiRequest, res: NextApiRe
     throw new UnauthorisedActionError();
   }
 
-  await removeRelationProperty({
+  const updatedBlocks = await removeRelationProperty({
     ...payload,
     userId: req.session.user.id
   });
+
+  if (updatedBlocks.length) {
+    relay.broadcast(
+      {
+        type: 'blocks_updated',
+        payload: updatedBlocks.map((block) => prismaToBlock(block))
+      },
+      updatedBlocks[0].spaceId
+    );
+  }
 
   res.status(200).end();
 }

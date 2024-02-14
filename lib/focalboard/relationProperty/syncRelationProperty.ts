@@ -1,4 +1,4 @@
-import type { Prisma } from '@charmverse/core/prisma-client';
+import type { Block, Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
@@ -85,7 +85,7 @@ export async function syncRelationProperty(
     }
   }
 
-  const prismaPromises: Prisma.PrismaPromise<any>[] = [
+  const prismaPromises: Prisma.Prisma__BlockClient<Block, never>[] = [
     ...Object.entries(connectedBoardCardsRelatedCardsRecord)
       .map(([connectedCardId, connectedCardIds]) => {
         const connectedCardFields = connectedBoardCards.find((c) => c.id === connectedCardId)?.fields as CardFields;
@@ -205,5 +205,5 @@ export async function syncRelationProperty(
     );
   }
 
-  await prisma.$transaction(prismaPromises);
+  return prisma.$transaction(prismaPromises);
 }
