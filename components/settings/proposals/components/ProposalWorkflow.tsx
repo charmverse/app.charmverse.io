@@ -209,7 +209,7 @@ export function ProposalWorkflowItem({
           {({ value }) => (
             <Box pt={2}>
               {value === 'Steps' &&
-                workflow.evaluations.map((evaluation) => (
+                workflow.evaluations.map((evaluation, index) => (
                   <EvaluationRow
                     key={evaluation.id}
                     evaluation={evaluation}

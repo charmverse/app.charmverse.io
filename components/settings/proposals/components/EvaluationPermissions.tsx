@@ -129,10 +129,12 @@ export function EvaluationPermissionsRow({
 
 export function EvaluationPermissions<T extends EvaluationTemplateFormItem | WorkflowEvaluationJson>({
   evaluation,
+  isFirstEvaluation,
   onChange,
   readOnly
 }: {
   evaluation: T;
+  isFirstEvaluation: boolean; // use a default Move permission for the first evaluation in a workflow
   onChange: (evaluation: T) => void;
   readOnly?: boolean;
 }) {
@@ -170,22 +172,32 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
       {proposalOperations.map((operation) => (
         <Box key={operation} className='octo-propertyrow'>
           <PropertyLabel readOnly>{operation === 'move' ? 'Move Backward' : capitalize(operation)}</PropertyLabel>
-          <UserAndRoleSelect
-            readOnly={readOnly}
-            variant='outlined'
-            wrapColumn
-            // required values cannot be removed
-            isRequiredValue={(option) => {
-              if (operation === 'view') {
-                return option.id === ProposalSystemRole.author || option.id === ProposalSystemRole.current_reviewer;
-              }
-              return false;
-            }}
-            value={valuesByOperation[operation] || []}
-            systemRoles={extraEvaluationRoles}
-            inputPlaceholder={permissionOperationPlaceholders[operation]}
-            onChange={async (options) => updatePermissionOperation(operation, options)}
-          />
+          {isFirstEvaluation && operation === 'move' ? (
+            <UserAndRoleSelect
+              readOnly
+              wrapColumn
+              value={[{ group: 'system_role', id: ProposalSystemRole.author }]}
+              systemRoles={[authorSystemRole]}
+              onChange={() => {}}
+            />
+          ) : (
+            <UserAndRoleSelect
+              readOnly={readOnly}
+              variant='outlined'
+              wrapColumn
+              // required values cannot be removed
+              isRequiredValue={(option) => {
+                if (operation === 'view') {
+                  return option.id === ProposalSystemRole.author || option.id === ProposalSystemRole.current_reviewer;
+                }
+                return false;
+              }}
+              value={valuesByOperation[operation] || []}
+              systemRoles={extraEvaluationRoles}
+              inputPlaceholder={permissionOperationPlaceholders[operation]}
+              onChange={async (options) => updatePermissionOperation(operation, options)}
+            />
+          )}
         </Box>
       ))}
 
