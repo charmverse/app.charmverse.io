@@ -48,7 +48,7 @@ export function DeleteRelationPropertyModal({
           </Button>
           <Button
             color='error'
-            variant='contained'
+            variant='outlined'
             onClick={() => {
               removeRelationProperty({
                 removeBoth: false,

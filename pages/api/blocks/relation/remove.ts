@@ -11,7 +11,7 @@ import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.delete(removeRelationPropertyHandler);
+handler.post(removeRelationPropertyHandler);
 
 async function removeRelationPropertyHandler(req: NextApiRequest, res: NextApiResponse) {
   const payload = req.body as RemoveRelationPropertyPayload;

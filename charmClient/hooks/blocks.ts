@@ -3,7 +3,7 @@ import type { RenameRelationPropertyPayload } from 'lib/focalboard/relationPrope
 import type { SyncRelatedCardsValuesPayload } from 'lib/focalboard/relationProperty/syncRelatedCardsValues';
 import type { SyncRelationPropertyPayload } from 'lib/focalboard/relationProperty/syncRelationProperty';
 
-import { useDELETE, usePOST, usePUT } from './helpers';
+import { usePOST, usePUT } from './helpers';
 
 export function useSyncRelationProperty() {
   return usePOST<SyncRelationPropertyPayload>('/api/blocks/relation/sync');
@@ -14,7 +14,7 @@ export function useRenameRelationProperty() {
 }
 
 export function useRemoveRelationProperty() {
-  return useDELETE<RemoveRelationPropertyPayload>('/api/blocks/relation/remove');
+  return usePOST<RemoveRelationPropertyPayload>('/api/blocks/relation/remove');
 }
 
 export function useSyncRelationPropertyValue() {
