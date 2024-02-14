@@ -19,7 +19,6 @@ import { UserAndRoleSelect } from 'components/common/BoardEditor/components/prop
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import { BreadcrumbPageTitle } from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
-import type { PageListItem } from 'components/common/PagesList';
 import { ProposalStatusSelect } from 'components/proposals/components/ProposalStatusSelect';
 import { ProposalStepSelect } from 'components/proposals/components/ProposalStepSelect';
 import {
@@ -291,18 +290,15 @@ function PropertyValueElement(props: Props) {
         displayType={displayType}
         emptyPlaceholderContent={emptyDisplayValue}
         showEmptyPlaceholder={showEmptyPlaceholder}
-        onChange={async (pageListItemIds) => {
-          try {
-            await mutator.changePropertyValue(card, propertyTemplate.id, pageListItemIds);
-            await syncRelationPropertyValue({
-              templateId: propertyTemplate.id,
-              pageIds: pageListItemIds,
-              boardId: board.id,
-              cardId: card.id
-            });
-          } catch (error) {
+        onChange={(pageListItemIds) => {
+          syncRelationPropertyValue({
+            templateId: propertyTemplate.id,
+            pageIds: pageListItemIds,
+            boardId: board.id,
+            cardId: card.id
+          }).catch((error) => {
             showError(error);
-          }
+          });
         }}
         readOnly={readOnly}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
