@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { deletePostComment } from 'lib/forums/comments/deletePostComment';
 import { requireKeys } from 'lib/middleware';
-import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
+import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
 import { superApiHandler } from 'lib/public-api/handler';
 import { getUserProfile, userProfileSelect } from 'lib/public-api/searchUserProfile';
 import { withSessionRoute } from 'lib/session/withSession';

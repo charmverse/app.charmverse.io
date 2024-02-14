@@ -48,10 +48,18 @@ export const getFeatureTitle = (featureTitle: FeatureTitleVariation, features: F
     if (isCapitalized) {
       result = capitalize(featureCurrentTitle);
     }
-    if (!isPlural && result.endsWith('s')) {
-      result = result.slice(0, -1);
+    if (!isPlural) {
+      result = singular(result);
     }
   }
 
   return result;
 };
+
+// Handles only s and ies word. A more thorough solution can be found on Stackoverflow: https://stackoverflow.com/a/57129703/1304395
+function singular(word: string) {
+  if (word.endsWith('ies')) {
+    return word.replace(/ies$/, 'y');
+  }
+  return word.replace(/s$/, '');
+}

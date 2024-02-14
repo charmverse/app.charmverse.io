@@ -6,8 +6,8 @@ import { createForumPost, trackCreateForumPostEvent } from 'lib/forums/posts/cre
 import { getPostVoteSummary, type ForumPostMeta } from 'lib/forums/posts/getPostMeta';
 import { listForumPosts } from 'lib/forums/posts/listForumPosts';
 import { requireKeys, InvalidStateError } from 'lib/middleware';
-import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
-import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
+import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
+import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
 import { apiHandler } from 'lib/public-api/handler';
 import type { UserProfile } from 'lib/public-api/interfaces';
 import type { UserInfo } from 'lib/public-api/searchUserProfile';

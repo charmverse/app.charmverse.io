@@ -18,10 +18,6 @@ export class ProposalsApi {
     return http.GET<ProposalWithUsersAndRubric>(`/api/proposals/${proposalId}`);
   }
 
-  updateProposalLensProperties({ proposalId, ...rest }: UpdateProposalLensPropertiesRequest) {
-    return http.PUT(`/api/proposals/${proposalId}/update-lens-properties`, rest);
-  }
-
   deleteProposalTemplate({ proposalTemplateId }: { proposalTemplateId: string }): Promise<PageWithPermissions> {
     return http.DELETE(`/api/proposals/templates/${proposalTemplateId}`);
   }

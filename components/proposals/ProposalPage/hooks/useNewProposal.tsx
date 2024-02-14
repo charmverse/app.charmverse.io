@@ -95,6 +95,7 @@ function emptyState({
   ...inputs
 }: Partial<ProposalPageAndPropertiesInput> & { userId?: string } = {}): ProposalPageAndPropertiesInput {
   return {
+    createdAt: new Date().toISOString(),
     proposalType: 'free_form',
     content: null,
     contentText: '',

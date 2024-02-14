@@ -5,8 +5,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
 import { prismaToBlock } from 'lib/focalboard/block';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposal/blocks/constants';
-import { canAccessPrivateFields } from 'lib/proposal/form/canAccessPrivateFields';
 import { getCurrentStep } from 'lib/proposal/getCurrentStep';
 import type { ProposalFields } from 'lib/proposal/interface';
 import type {
@@ -278,12 +278,11 @@ export async function createCardsFromProposals({
     const formFields = pageProposal.proposal?.form?.formFields ?? [];
     const boardBlockCardProperties = boardBlock.fields.cardProperties ?? [];
 
-    const accessPrivateFields = await canAccessPrivateFields({
-      userId,
-      proposal: pageProposal.proposal ?? undefined,
-      proposalId: pageProposal.proposal!.id
+    const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
+      resourceId: pageProposal.proposal!.id,
+      userId
     });
-
+    const accessPrivateFields = permissions.view_private_fields;
     const formFieldProperties = await updateCardFormFieldPropertiesValue({
       accessPrivateFields,
       cardProperties: boardBlockCardProperties,

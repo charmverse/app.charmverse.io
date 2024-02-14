@@ -5,7 +5,7 @@ import { getForumPost } from 'lib/forums/posts/getForumPost';
 import { getPostVoteSummary } from 'lib/forums/posts/getPostMeta';
 import { updateForumPost } from 'lib/forums/posts/updateForumPost';
 import { InvalidStateError } from 'lib/middleware';
-import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
+import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
 import { apiHandler } from 'lib/public-api/handler';
 import { getUserProfile, userProfileSelect } from 'lib/public-api/searchUserProfile';
 import { withSessionRoute } from 'lib/session/withSession';

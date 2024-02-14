@@ -25,20 +25,7 @@ export type ProposalsBoardContextType = {
   setBoardProposal: (boardProposal: BoardProposal | null) => void;
 };
 
-export const ProposalsBoardContext = createContext<Readonly<ProposalsBoardContextType>>({
-  board: {} as Board,
-  boardCustomProperties: {} as Board,
-  card: {} as Card,
-  cards: [],
-  cardPages: [],
-  activeView: {} as BoardView,
-  views: [],
-  proposalPage: undefined,
-  isLoading: true,
-  refreshProposals: () => {},
-  boardProposal: null,
-  setBoardProposal: () => {}
-});
+export const ProposalsBoardContext = createContext<Readonly<ProposalsBoardContextType | null>>(null);
 
 export function ProposalsBoardProvider({ children }: { children: ReactNode }) {
   const boardContext = useProposalsBoardAdapter();
@@ -46,4 +33,10 @@ export function ProposalsBoardProvider({ children }: { children: ReactNode }) {
   return <ProposalsBoardContext.Provider value={boardContext}>{children}</ProposalsBoardContext.Provider>;
 }
 
-export const useProposalsBoard = () => useContext(ProposalsBoardContext);
+export const useProposalsBoard = () => {
+  const context = useContext(ProposalsBoardContext);
+  if (!context) {
+    throw new Error('useProposalsBoard must be used within a ProposalsBoardProvider');
+  }
+  return context;
+};
