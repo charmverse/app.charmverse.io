@@ -1,3 +1,4 @@
+import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { NotFoundError } from 'lib/middleware';
@@ -28,44 +29,80 @@ export async function removeRelationProperty(payload: RemoveRelationPropertyPayl
     throw new NotFoundError('Connected relation property not found');
   }
 
-  await prisma.$transaction([
-    prisma.block.update({
-      data: {
-        fields: {
-          ...(sourceBoard?.fields as any),
-          cardProperties: sourceBoardProperties.filter((cp) => cp.id !== sourceRelationProperty.id)
+  const prismaPromises: Prisma.PrismaPromise<any>[] = [];
+
+  if (sourceBoard.id === connectedBoard.id) {
+    const updatedCardProperties = sourceBoardProperties.filter((cp) => cp.id !== sourceRelationProperty.id);
+    prismaPromises.push(
+      prisma.block.update({
+        data: {
+          fields: {
+            ...(sourceBoard?.fields as any),
+            cardProperties: removeBoth
+              ? updatedCardProperties.filter((cp) => cp.id !== connectedRelationProperty.id)
+              : updatedCardProperties.map((cp) => {
+                  if (cp.id === connectedRelationProperty.id) {
+                    return {
+                      ...cp,
+                      relationData: {
+                        ...cp.relationData,
+                        relatedPropertyId: null,
+                        showOnRelatedBoard: false
+                      }
+                    };
+                  }
+                  return cp;
+                })
+          },
+          updatedBy: userId
         },
-        updatedBy: userId
-      },
-      where: {
-        id: sourceBoard.id
-      }
-    }),
-    prisma.block.update({
-      data: {
-        fields: {
-          ...(connectedBoard?.fields as any),
-          cardProperties: removeBoth
-            ? connectedBoardProperties.filter((cp) => cp.id !== connectedRelationProperty.id)
-            : connectedBoardProperties.map((cp) => {
-                if (cp.id === connectedRelationProperty.id) {
-                  return {
-                    ...cp,
-                    relationData: {
-                      ...cp.relationData,
-                      relatedPropertyId: null,
-                      showOnRelatedBoard: false
-                    }
-                  };
-                }
-                return cp;
-              })
+        where: {
+          id: sourceBoard.id
+        }
+      })
+    );
+  } else {
+    prismaPromises.push(
+      prisma.block.update({
+        data: {
+          fields: {
+            ...(sourceBoard?.fields as any),
+            cardProperties: sourceBoardProperties.filter((cp) => cp.id !== sourceRelationProperty.id)
+          },
+          updatedBy: userId
         },
-        updatedBy: userId
-      },
-      where: {
-        id: connectedBoard.id
-      }
-    })
-  ]);
+        where: {
+          id: sourceBoard.id
+        }
+      }),
+      prisma.block.update({
+        data: {
+          fields: {
+            ...(connectedBoard?.fields as any),
+            cardProperties: removeBoth
+              ? connectedBoardProperties.filter((cp) => cp.id !== connectedRelationProperty.id)
+              : connectedBoardProperties.map((cp) => {
+                  if (cp.id === connectedRelationProperty.id) {
+                    return {
+                      ...cp,
+                      relationData: {
+                        ...cp.relationData,
+                        relatedPropertyId: null,
+                        showOnRelatedBoard: false
+                      }
+                    };
+                  }
+                  return cp;
+                })
+          },
+          updatedBy: userId
+        },
+        where: {
+          id: connectedBoard.id
+        }
+      })
+    );
+  }
+
+  await prisma.$transaction(prismaPromises);
 }

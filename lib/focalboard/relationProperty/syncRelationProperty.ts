@@ -1,3 +1,4 @@
+import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
@@ -84,7 +85,7 @@ export async function syncRelationProperty(
     }
   }
 
-  await prisma.$transaction([
+  const prismaPromises: Prisma.PrismaPromise<any>[] = [
     ...Object.entries(connectedBoardCardsRelatedCardsRecord)
       .map(([connectedCardId, connectedCardIds]) => {
         const connectedCardFields = connectedBoardCards.find((c) => c.id === connectedCardId)?.fields as CardFields;
@@ -107,55 +108,102 @@ export async function syncRelationProperty(
           }
         });
       })
-      .filter(isTruthy),
-    prisma.block.update({
-      data: {
-        fields: {
-          ...(connectedBoard?.fields as any),
-          cardProperties: [
-            ...connectedBoardProperties,
-            {
-              id: connectedRelationPropertyId,
-              type: 'relation',
-              name: relatedPropertyTitle ?? `Related to ${sourceBoardPage.title || 'Untitled'}`,
-              relationData: {
-                limit: 'multiple_page',
-                relatedPropertyId: templateId,
-                showOnRelatedBoard: true,
-                boardId: sourceBoard.id
-              }
-            }
-          ]
-        },
-        updatedBy: userId
-      },
-      where: {
-        id: connectedBoard.id
-      }
-    }),
-    prisma.block.update({
-      data: {
-        fields: {
-          ...(sourceBoard.fields as any),
-          cardProperties: sourceBoardProperties.map((cp) => {
-            if (cp.id === templateId) {
-              return {
-                ...sourceRelationProperty,
-                relationData: {
-                  ...sourceRelationProperty.relationData,
-                  showOnRelatedBoard: true,
-                  relatedPropertyId: connectedRelationPropertyId
+      .filter(isTruthy)
+  ];
+
+  if (sourceBoard.id === connectedBoard.id) {
+    prismaPromises.push(
+      prisma.block.update({
+        data: {
+          fields: {
+            ...(sourceBoard.fields as any),
+            cardProperties: [
+              ...sourceBoardProperties.map((cp) => {
+                if (cp.id === templateId) {
+                  return {
+                    ...sourceRelationProperty,
+                    relationData: {
+                      ...sourceRelationProperty.relationData,
+                      showOnRelatedBoard: true,
+                      relatedPropertyId: connectedRelationPropertyId
+                    }
+                  };
                 }
-              };
-            }
-            return cp;
-          })
+                return cp;
+              }),
+              {
+                id: connectedRelationPropertyId,
+                type: 'relation',
+                name: relatedPropertyTitle ?? `Related to ${sourceBoardPage.title || 'Untitled'}`,
+                relationData: {
+                  limit: 'multiple_page',
+                  relatedPropertyId: templateId,
+                  showOnRelatedBoard: true,
+                  boardId: sourceBoard.id
+                }
+              }
+            ]
+          },
+          updatedBy: userId
         },
-        updatedBy: userId
-      },
-      where: {
-        id: sourceBoard.id
-      }
-    })
-  ]);
+        where: {
+          id: sourceBoard.id
+        }
+      })
+    );
+  } else {
+    prismaPromises.push(
+      prisma.block.update({
+        data: {
+          fields: {
+            ...(connectedBoard?.fields as any),
+            cardProperties: [
+              ...connectedBoardProperties,
+              {
+                id: connectedRelationPropertyId,
+                type: 'relation',
+                name: relatedPropertyTitle ?? `Related to ${sourceBoardPage.title || 'Untitled'}`,
+                relationData: {
+                  limit: 'multiple_page',
+                  relatedPropertyId: templateId,
+                  showOnRelatedBoard: true,
+                  boardId: sourceBoard.id
+                }
+              }
+            ]
+          },
+          updatedBy: userId
+        },
+        where: {
+          id: connectedBoard.id
+        }
+      }),
+      prisma.block.update({
+        data: {
+          fields: {
+            ...(sourceBoard.fields as any),
+            cardProperties: sourceBoardProperties.map((cp) => {
+              if (cp.id === templateId) {
+                return {
+                  ...sourceRelationProperty,
+                  relationData: {
+                    ...sourceRelationProperty.relationData,
+                    showOnRelatedBoard: true,
+                    relatedPropertyId: connectedRelationPropertyId
+                  }
+                };
+              }
+              return cp;
+            })
+          },
+          updatedBy: userId
+        },
+        where: {
+          id: sourceBoard.id
+        }
+      })
+    );
+  }
+
+  await prisma.$transaction(prismaPromises);
 }
