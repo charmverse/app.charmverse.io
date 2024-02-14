@@ -22,7 +22,7 @@ import type { UpdateEvaluationRequest } from 'lib/proposal/updateProposalEvaluat
 import type { UpdateProposalLensPropertiesRequest } from 'lib/proposal/updateProposalLensProperties';
 
 import type { MaybeString } from './helpers';
-import { useDELETE, useGET, usePOST, usePUT } from './helpers';
+import { useDELETE, useGET, useGETtrigger, usePOST, usePUT } from './helpers';
 
 // Getters
 
@@ -44,6 +44,10 @@ export function useGetProposalIdsEvaluatedByUser(spaceId: MaybeString) {
 
 export function useGetProposalBlocks(spaceId?: string) {
   return useGET<ProposalBlockWithTypedFields[]>(spaceId ? `/api/spaces/${spaceId}/proposals/blocks` : null);
+}
+
+export function useGetOrCreateProposalNotesId({ proposalId }: { proposalId: MaybeString }) {
+  return useGETtrigger<undefined, { pageId: string }>(`/api/proposals/${proposalId}/reviewer-notes`);
 }
 
 // Mutative requests
