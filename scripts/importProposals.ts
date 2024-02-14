@@ -13,7 +13,7 @@ import { createProposal } from 'lib/proposal/createProposal';
 const templateId = '23630cb0-8a55-4bea-acf5-0f65579302e4';
 const csvFile = './TEST_Charmverse_Grants.csv';
 // set this to override the proposal author
-const authorEmailOverride = 'matt.casey@charmverse.io';
+const authorEmailOverride = ''; // 'matt.casey@charmverse.io';
 
 const csvColumnToQuestion: Record<string, string> = {
   // unused
@@ -21,8 +21,6 @@ const csvColumnToQuestion: Record<string, string> = {
   'Conversion Date': 'Conversion Date',
   'Conversion Page': 'Conversion Page',
   'Conversion Title': 'Conversion Title',
-  'Grant Description': 'Grant Description',
-  'Grant Goals': 'Grant Goals',
 
   // used to create a user
   Email: 'Point of contact email address',
@@ -35,11 +33,15 @@ const csvColumnToQuestion: Record<string, string> = {
   'Website URL': 'Website URL',
   'Litepaper/Whitepaper': 'Litepaper/Whitepaper',
 
+  // these combine to "Describe the goals of the grant and how the funds will be used"
+  'Grant Description': 'Grant Description',
+  'Grant Goals': 'Grant Goals',
+
   // match a list of options
   'Funding Request': 'Funding Request: Tell us how much USD you require for your project?',
 
   Title: 'Project Name',
-  'About You': 'Project Description',
+  'About You': 'Describe the project.',
   'Grant Category': 'Grant Category',
   'Positive Impact Measurement':
     'If applicable; Please provide information regarding how you will measure the positive impact your project will generate. (Tools, Metrics,etc)',
@@ -171,7 +173,10 @@ async function importCSVToSpace() {
         let valueStr = (row[field.name] || '').trim() as string;
 
         // handle fields that combine multiple columns
-        if (field.name === 'Name of primary point of contact') {
+        if (
+          field.name === 'Name of primary point of contact' ||
+          field.name === 'Please name all founders, developers and team members of this project.'
+        ) {
           valueStr = row['First name'] || '';
           if (row['Last name']) {
             valueStr += ' ' + row['Last name'];
@@ -187,6 +192,12 @@ async function importCSVToSpace() {
           valueStr = row['Website URL'] || '';
           if (row['Litepaper/Whitepaper']) {
             valueStr += '\n' + row['Litepaper/Whitepaper'];
+            valueStr = valueStr.trim();
+          }
+        } else if (field.name === 'Describe the goals of the grant and how the funds will be used') {
+          valueStr = row['Grant Goals'] || '';
+          if (row['Grant Description']) {
+            valueStr += '\n\n' + row['Grant Description'];
             valueStr = valueStr.trim();
           }
         }
@@ -231,17 +242,18 @@ async function importCSVToSpace() {
       userId,
       spaceId: page.spaceId,
       pageProps: {
-        title: 'TEST ' + row['Project Name'],
+        title: 'TEST: ' + row['Project Name'],
         type: 'proposal',
         sourceTemplateId: page.id
       },
+      fields: page.proposal?.fields as any,
       authors: [userId],
       evaluations: page.proposal!.evaluations as PopulatedEvaluation[],
       workflowId: page.proposal!.workflowId || undefined,
       formId: page.proposal!.form!.id,
       formAnswers
     });
-    console.log('Uploaded proposal for ', row['Email'], 'with user id', userId);
+    console.log('Uploaded proposal for ', row['Point of contact email address'], 'with user id', userId);
     console.log('CSV Values:', row);
   }
 }
@@ -259,6 +271,7 @@ function templateQuery() {
       proposal: {
         include: {
           evaluations: true,
+          reviewers: true,
           rubricCriteria: true,
           form: {
             include: {
@@ -299,7 +312,7 @@ async function importTemplate() {
   template.proposal!.spaceId = space.id;
   template.proposal!.workflowId = null;
   const { proposal: proposalTemplate, ...page } = template;
-  const { evaluations, rubricCriteria, form: formTemplate, ...proposal } = proposalTemplate!;
+  const { evaluations, rubricCriteria, form: formTemplate, reviewers, ...proposal } = proposalTemplate!;
   const { formFields, ...form } = formTemplate!;
 
   // remove old versions
@@ -341,10 +354,10 @@ async function importTemplate() {
 }
 
 // run against production
-downloadTemplate().catch((e) => console.error(e));
+//downloadTemplate().catch((e) => console.error(e));
 
 // run this on Dev
-//importTemplate().catch((e) => console.error(e));
+// importTemplate().catch((e) => console.error(e));
 
 // final step!
-//importCSVToSpace().catch((e) => console.error(e));
+importCSVToSpace().catch((e) => console.error(e));

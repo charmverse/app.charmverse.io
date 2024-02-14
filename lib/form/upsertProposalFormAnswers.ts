@@ -27,14 +27,14 @@ export async function upsertProposalFormAnswers({ answers, formId, proposalId }:
     .map((a) => {
       const field = form.formFields.find((f) => f.id === a.fieldId);
 
-      // if (!field) {
-      //   throw new InvalidInputError(`Could not find field ${a.fieldId} for proposal ${proposalId}`);
-      // }
+      if (!field) {
+        throw new InvalidInputError(`Could not find field ${a.fieldId} for proposal ${proposalId}`);
+      }
 
       // // do not save answers for labels
-      // if (field.type === 'label') {
-      //   return null;
-      // }
+      if (field.type === 'label') {
+        return null;
+      }
 
       // if (field.required && !a.value) {
       //   throw new InvalidInputError(`Value for field ${field.name} is required`);
