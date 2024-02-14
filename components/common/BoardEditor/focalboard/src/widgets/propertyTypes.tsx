@@ -30,7 +30,8 @@ const propertyTypesList: PropertyType[] = [
 export function PropertyTypes({
   selectedTypes = [],
   onClick,
-  isMobile
+  isMobile,
+  boardType
 }: {
   selectedTypes?: PropertyType[];
   onClick: (property: {
@@ -39,6 +40,7 @@ export function PropertyTypes({
     name?: IPropertyTemplate['name'];
   }) => void;
   isMobile?: boolean;
+  boardType?: 'proposals' | 'rewards';
 }) {
   const addRelationPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-relation-property' });
   const bindTriggerProps = bindTrigger(addRelationPropertyPopupState);
@@ -55,23 +57,25 @@ export function PropertyTypes({
             <Divider />
           </>
         )}
-        {propertyTypesList.map((type) => {
-          return (
-            <MenuItem
-              selected={selectedTypes.includes(type)}
-              data-test={`select-property-${type}`}
-              key={type}
-              {...(type === 'relation'
-                ? bindTriggerProps
-                : {
-                    onClick: () => onClick({ type })
-                  })}
-            >
-              <ListItemIcon>{iconForPropertyType(type)}</ListItemIcon>
-              <Typography>{typeDisplayName(intl, type)}</Typography>
-            </MenuItem>
-          );
-        })}
+        {(boardType !== undefined ? propertyTypesList.filter((ptl) => ptl !== 'relation') : propertyTypesList).map(
+          (type) => {
+            return (
+              <MenuItem
+                selected={selectedTypes.includes(type)}
+                data-test={`select-property-${type}`}
+                key={type}
+                {...(type === 'relation'
+                  ? bindTriggerProps
+                  : {
+                      onClick: () => onClick({ type })
+                    })}
+              >
+                <ListItemIcon>{iconForPropertyType(type)}</ListItemIcon>
+                <Typography>{typeDisplayName(intl, type)}</Typography>
+              </MenuItem>
+            );
+          }
+        )}
       </Stack>
       <RelationPropertyMenu onClick={onClick} popupState={addRelationPropertyPopupState} />
     </>

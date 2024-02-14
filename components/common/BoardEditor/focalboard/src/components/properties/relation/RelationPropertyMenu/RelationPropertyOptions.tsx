@@ -79,9 +79,6 @@ function RelationPropertyOptions({
               alignItems: 'center',
               cursor: 'pointer'
             }}
-            onClick={() => {
-              navigateToSpacePath(`/${connectedBoard.path}`);
-            }}
           >
             {connectedBoardComponent}
           </Stack>

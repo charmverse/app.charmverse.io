@@ -43,6 +43,7 @@ type Props = {
   checkedIds?: string[];
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
   setSelectedPropertyId?: Dispatch<SetStateAction<string | null>>;
+  boardType?: 'proposals' | 'rewards';
 };
 
 function TableHeaders(props: Props): JSX.Element {
@@ -186,6 +187,7 @@ function TableHeaders(props: Props): JSX.Element {
     () =>
       activeView && (
         <PropertyTypes
+          boardType={props.boardType}
           isMobile={isSmallScreen}
           onClick={async ({ type, relationData, name }) => {
             addPropertyPopupState.close();
@@ -206,7 +208,7 @@ function TableHeaders(props: Props): JSX.Element {
           }}
         />
       ),
-    [mutator, board, activeView, isSmallScreen]
+    [mutator, props.boardType, board, activeView, isSmallScreen]
   );
 
   return (
