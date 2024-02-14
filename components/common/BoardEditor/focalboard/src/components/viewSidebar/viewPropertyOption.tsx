@@ -71,6 +71,10 @@ function ViewPropertyOption({
   };
 
   const deleteProperty = () => {
+    if (property.type === 'relation' && property.relationData?.showOnRelatedBoard) {
+      showRelationPropertyDeletePopup.open();
+      return;
+    }
     mutator.deleteProperty(board, views, cards, property.id);
     goBackStep();
   };
@@ -141,9 +145,6 @@ function ViewPropertyOption({
         <DeleteRelationPropertyModal
           board={board}
           template={property}
-          onDelete={() => {
-            mutator.deleteProperty(board, views, cards, property.id);
-          }}
           onClose={showRelationPropertyDeletePopup.close}
         />
       )}

@@ -401,9 +401,6 @@ function TableHeader(props: Props): JSX.Element {
       {showRelationPropertyDeletePopup.isOpen && (
         <DeleteRelationPropertyModal
           board={board}
-          onDelete={() => {
-            mutator.deleteProperty(board, views, cards, template.id);
-          }}
           onClose={showRelationPropertyDeletePopup.close}
           template={template}
         />

@@ -12,7 +12,14 @@ export type RemoveRelationPropertyPayload = {
 
 export async function removeRelationProperty(payload: RemoveRelationPropertyPayload & { userId: string }) {
   const { userId, boardId, templateId, removeBoth } = payload;
-  const { connectedBoard, connectedBoardProperties, connectedRelationProperty } = await getRelationData({
+  const {
+    sourceBoard,
+    sourceBoardProperties,
+    sourceRelationProperty,
+    connectedBoard,
+    connectedBoardProperties,
+    connectedRelationProperty
+  } = await getRelationData({
     boardId,
     templateId
   });
@@ -21,30 +28,44 @@ export async function removeRelationProperty(payload: RemoveRelationPropertyPayl
     throw new NotFoundError('Connected relation property not found');
   }
 
-  await prisma.block.update({
-    data: {
-      fields: {
-        ...(connectedBoard?.fields as any),
-        cardProperties: removeBoth
-          ? connectedBoardProperties.filter((cp) => cp.id !== connectedRelationProperty.id)
-          : connectedBoardProperties.map((cp) => {
-              if (cp.id === connectedRelationProperty.id) {
-                return {
-                  ...cp,
-                  relationData: {
-                    ...cp.relationData,
-                    relatedPropertyId: null,
-                    showOnRelatedBoard: false
-                  }
-                };
-              }
-              return cp;
-            })
+  await prisma.$transaction([
+    prisma.block.update({
+      data: {
+        fields: {
+          ...(sourceBoard?.fields as any),
+          cardProperties: sourceBoardProperties.filter((cp) => cp.id !== sourceRelationProperty.id)
+        },
+        updatedBy: userId
       },
-      updatedBy: userId
-    },
-    where: {
-      id: connectedBoard.id
-    }
-  });
+      where: {
+        id: sourceBoard.id
+      }
+    }),
+    prisma.block.update({
+      data: {
+        fields: {
+          ...(connectedBoard?.fields as any),
+          cardProperties: removeBoth
+            ? connectedBoardProperties.filter((cp) => cp.id !== connectedRelationProperty.id)
+            : connectedBoardProperties.map((cp) => {
+                if (cp.id === connectedRelationProperty.id) {
+                  return {
+                    ...cp,
+                    relationData: {
+                      ...cp.relationData,
+                      relatedPropertyId: null,
+                      showOnRelatedBoard: false
+                    }
+                  };
+                }
+                return cp;
+              })
+        },
+        updatedBy: userId
+      },
+      where: {
+        id: connectedBoard.id
+      }
+    })
+  ]);
 }

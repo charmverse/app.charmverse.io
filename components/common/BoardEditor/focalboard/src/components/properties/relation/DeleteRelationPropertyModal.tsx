@@ -9,13 +9,11 @@ import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 export function DeleteRelationPropertyModal({
   board,
   onClose,
-  template,
-  onDelete
+  template
 }: {
   onClose: () => void;
   board: Board;
   template: IPropertyTemplate;
-  onDelete: () => void;
 }) {
   const { pages } = usePages();
   const relationData = template.relationData;
@@ -37,9 +35,6 @@ export function DeleteRelationPropertyModal({
                 removeBoth: true,
                 boardId: board.id,
                 templateId: template.id
-              }).then(() => {
-                // Delete the related property after has been unsynced
-                onDelete();
               });
               onClose();
             }}
@@ -54,8 +49,6 @@ export function DeleteRelationPropertyModal({
                 removeBoth: false,
                 boardId: board.id,
                 templateId: template.id
-              }).then(() => {
-                onDelete();
               });
               onClose();
             }}

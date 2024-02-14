@@ -321,8 +321,8 @@ export function RelationPropertyEditOptions({
                   });
                 } else if (action === 'remove') {
                   removeRelationProperty({
-                    boardId: board.id,
-                    templateId: propertyId,
+                    boardId: connectedBoard.id,
+                    templateId: relationData.relatedPropertyId!,
                     removeBoth: false
                   });
                 }

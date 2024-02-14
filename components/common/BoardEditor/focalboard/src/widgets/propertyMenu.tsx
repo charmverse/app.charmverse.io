@@ -99,9 +99,6 @@ const PropertyMenu = React.memo((props: Props) => {
         <DeleteRelationPropertyModal
           board={props.board}
           template={props.property}
-          onDelete={() => {
-            props.onDelete(propertyId);
-          }}
           onClose={showRelationPropertyDeletePopup.close}
         />
       )}
