@@ -18,7 +18,8 @@ export function RelationPropertyPagesAutocomplete({
   displayType = 'details',
   emptyPlaceholderContent = 'Empty',
   showEmptyPlaceholder = true,
-  boardProperties
+  boardProperties,
+  showCard
 }: {
   propertyTemplate: IPropertyTemplate;
   selectedPageListItemIds: string[];
@@ -29,6 +30,7 @@ export function RelationPropertyPagesAutocomplete({
   emptyPlaceholderContent?: string;
   showEmptyPlaceholder?: boolean;
   boardProperties: IPropertyTemplate[];
+  showCard?: (cardId: string | null, isTemplate?: boolean) => void;
 }) {
   const { pages } = usePages();
   const relationPropertiesCardsRecord = useMemo(() => {
@@ -40,6 +42,7 @@ export function RelationPropertyPagesAutocomplete({
 
   return (
     <PagesAutocomplete
+      showCard={showCard}
       onChange={onChange}
       selectedPageListItems={selectedPageListItemIds.map((id) => pages[id]).filter(isTruthy) as PageListItem[]}
       pageListItems={relationPropertiesCardsRecord[propertyTemplate.id] ?? []}

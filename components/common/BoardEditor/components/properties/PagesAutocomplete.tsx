@@ -1,6 +1,18 @@
 import styled from '@emotion/styled';
+import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
-import { Autocomplete, Box, IconButton, ListItemIcon, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import RemoveIcon from '@mui/icons-material/Remove';
+import {
+  Autocomplete,
+  Box,
+  IconButton,
+  ListItemIcon,
+  MenuItem,
+  Stack,
+  TextField,
+  Tooltip,
+  Typography
+} from '@mui/material';
 import type { ReactNode } from 'react';
 import React, { useCallback, useMemo, useState } from 'react';
 
@@ -19,7 +31,7 @@ import { PopupFieldWrapper } from './PopupFieldWrapper';
 import { SelectPreviewContainer } from './TagSelect/TagSelect';
 import { StyledUserPropertyContainer } from './UserAndRoleSelect';
 
-const StyledAutocomplete = styled(Autocomplete<PageListItem, true, boolean>)`
+const StyledAutocomplete = styled(Autocomplete<PageListItem & { selected: boolean }, true, boolean>)`
   min-width: 150px;
   .MuiAutocomplete-inputRoot {
     gap: 4px;
@@ -83,7 +95,8 @@ function PagesAutocompleteBase({
   emptyPlaceholderContent = 'Empty',
   showEmptyPlaceholder = true,
   variant = 'standard',
-  relationTemplate
+  relationTemplate,
+  showCard
 }: {
   relationTemplate: IPropertyTemplate;
   displayType?: PropertyValueDisplayType;
@@ -95,6 +108,7 @@ function PagesAutocompleteBase({
   emptyPlaceholderContent?: string;
   showEmptyPlaceholder?: boolean;
   variant?: 'outlined' | 'standard';
+  showCard?: (cardId: string | null) => void;
 }) {
   const { navigateToSpacePath } = useCharmRouter();
   const selectionLimit = relationTemplate.relationData?.limit ?? 'single_page';
@@ -103,23 +117,31 @@ function PagesAutocompleteBase({
     ? pages[relationTemplate.relationData.boardId]
     : undefined;
   const [isOpen, setIsOpen] = useState(false);
-  const selectedPageListItems =
-    selectionLimit === 'single_page' ? _selectedPageListItems.slice(0, 1) : _selectedPageListItems;
-  const sortedPages = useMemo(() => {
-    return pageListItems
-      .filter(isTruthy)
-      .sort((pageA, pageB) => ((pageA.title || 'Untitled') > (pageB.title || 'Untitled') ? 1 : -1));
-  }, [pageListItems]);
+
+  const { sortedPages, selectedPageListItems } = useMemo(() => {
+    const __selectedPageListItems = (
+      selectionLimit === 'single_page' ? _selectedPageListItems.slice(0, 1) : _selectedPageListItems
+    ).map((selectedPage) => ({ ...selectedPage, selected: true }));
+    const selectedPageIds = __selectedPageListItems.map((v) => v.id);
+
+    return {
+      selectedPageListItems: __selectedPageListItems,
+      sortedPages: pageListItems
+        .filter(isTruthy)
+        .map((pageA) => ({ ...pageA, selected: selectedPageIds.includes(pageA.id) }))
+        .sort(
+          (pageA, pageB) =>
+            (pageB.selected ? 1 : 0) - (pageA.selected ? 1 : 0) ||
+            ((pageA.title || 'Untitled') > (pageB.title || 'Untitled') ? 1 : -1)
+        )
+    };
+  }, [pageListItems, _selectedPageListItems, selectionLimit]);
 
   const onClickToEdit = useCallback(() => {
     if (!readOnly) {
       setIsOpen(true);
     }
   }, [readOnly]);
-
-  function removeOption(idToRemove: string) {
-    onChange(selectedPageListItems.filter(({ id }) => id !== idToRemove).map(({ id }) => id));
-  }
 
   const popupField = displayType === 'table';
 
@@ -149,24 +171,13 @@ function PagesAutocompleteBase({
       <StyledAutocomplete
         PopperComponent={popupField ? renderDiv : undefined}
         PaperComponent={popupField ? renderDiv : undefined}
-        autoHighlight
         disableClearable
-        disableCloseOnSelect
-        filterSelectedOptions
         forcePopupIcon={false}
         fullWidth
+        groupBy={(option) => (option.selected ? 'Linked page' : 'Link another page')}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         multiple
         noOptionsText='No pages found'
-        onChange={(_, _pageListItems) => {
-          if (selectionLimit === 'single_page') {
-            const selectedPageItem = _pageListItems[1] ?? _pageListItems[0];
-            if (selectedPageItem) {
-              _pageListItems = [selectedPageItem];
-            }
-          }
-          return onChange(_pageListItems.map((v) => v.id) ?? []);
-        }}
         onClose={() => setIsOpen(false)}
         openOnFocus
         options={sortedPages}
@@ -176,7 +187,7 @@ function PagesAutocompleteBase({
             autoFocus={variant === 'standard'}
             size='small'
             value={selectedPageListItems}
-            placeholder={selectedPageListItems.length === 0 ? 'Link a page' : ''}
+            placeholder='Link a page'
             InputProps={{
               ...params.InputProps,
               endAdornment: connectedBoard ? (
@@ -229,32 +240,54 @@ function PagesAutocompleteBase({
             <MenuItem
               key={pageListItem.id}
               data-test={`page-option-${pageListItem.id}`}
-              selected={
-                !!selectedPageListItems.find((selectedPageListItem) => selectedPageListItem.id === pageListItem.id)
-              }
-              {...props}
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                width: '100%',
+                flexDirection: 'row'
+              }}
+              onClick={() => {
+                if (!pageListItem.selected) {
+                  if (selectionLimit === 'single_page') {
+                    return onChange([pageListItem.id]);
+                  } else {
+                    return onChange([pageListItem, ...selectedPageListItems].map((v) => v.id));
+                  }
+                } else {
+                  showCard?.(pageListItem.id);
+                }
+              }}
             >
-              <ListItemIcon>
-                <PageIcon
-                  icon={pageListItem.icon}
-                  isEditorEmpty={!pageListItem.hasContent}
-                  pageType={pageListItem.type}
-                />
-              </ListItemIcon>
-              <PageTitle hasContent={!pageListItem.title} sx={{ fontWeight: 'bold' }}>
-                {pageListItem.title || 'Untitled'}
-              </PageTitle>
+              <Stack flexDirection='row' gap={0.5}>
+                <ListItemIcon>
+                  <PageIcon
+                    icon={pageListItem.icon}
+                    isEditorEmpty={!pageListItem.hasContent}
+                    pageType={pageListItem.type}
+                  />
+                </ListItemIcon>
+                <PageTitle hasContent={!pageListItem.title} sx={{ fontWeight: 'bold' }}>
+                  {pageListItem.title || 'Untitled'}
+                </PageTitle>
+              </Stack>
+              {pageListItem.selected ? (
+                <Tooltip title='Unlink page'>
+                  <RemoveIcon
+                    fontSize='small'
+                    color='secondary'
+                    onClick={() =>
+                      onChange(selectedPageListItems.filter((v) => v.id !== pageListItem.id).map((v) => v.id))
+                    }
+                  />
+                </Tooltip>
+              ) : (
+                <AddIcon fontSize='small' color='secondary' />
+              )}
             </MenuItem>
           );
         }}
-        renderTags={(_pageListItems) => (
-          <RelationPageListItemsContainer
-            readOnly={readOnly}
-            onRemove={removeOption}
-            wrapColumn={wrapColumn}
-            pageListItems={_pageListItems}
-          />
-        )}
+        renderTags={() => null}
         disabled={!!readOnly}
         value={selectedPageListItems}
       />
