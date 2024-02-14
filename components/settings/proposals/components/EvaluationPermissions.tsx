@@ -180,13 +180,15 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
         <Box key={operation} className='octo-propertyrow'>
           <PropertyLabel readOnly>{operation === 'move' ? 'Move Backward' : capitalize(operation)}</PropertyLabel>
           {isFirstEvaluation && operation === 'move' ? (
-            <UserAndRoleSelect
-              readOnly
-              wrapColumn
-              value={[{ group: 'system_role', id: ProposalSystemRole.author }]}
-              systemRoles={[authorSystemRole]}
-              onChange={() => {}}
-            />
+            <Tooltip title='Only authors can move back to Draft'>
+              <UserAndRoleSelect
+                readOnly
+                wrapColumn
+                value={[{ group: 'system_role', id: ProposalSystemRole.author }]}
+                systemRoles={[authorSystemRole]}
+                onChange={() => {}}
+              />
+            </Tooltip>
           ) : (
             <UserAndRoleSelect
               readOnly={readOnly}
