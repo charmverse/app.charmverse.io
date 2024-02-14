@@ -6,6 +6,7 @@ import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { optimism } from 'viem/chains';
 
 import { getFeatureTitle } from 'lib/features/getFeatureTitle';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { getPagePermalink } from 'lib/pages/getPagePermalink';
 
 import { signAndPublishCharmverseCredential } from './attest';
@@ -187,6 +188,13 @@ export async function issueProposalCredentialsIfNecessary({
               user: { connect: { id: authorUserId } }
             }
           });
+
+          trackUserAction('credential_issued', {
+            userId: authorUserId,
+            spaceId: credentialTemplate.spaceId,
+            event
+          });
+
           log.info('Issued credential', {
             pageId: proposalWithSpaceConfig.page.id,
             event,
