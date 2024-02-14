@@ -180,6 +180,7 @@ function PagesAutocompleteBase({
           return (
             <MenuItem
               key={pageListItem.id}
+              data-test={`page-option-${pageListItem.id}`}
               selected={
                 !!selectedPageListItems.find((selectedPageListItem) => selectedPageListItem.id === pageListItem.id)
               }

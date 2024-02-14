@@ -352,6 +352,7 @@ function TableRow(props: Props) {
               width: columnWidth(props.resizingColumn, props.activeView.fields.columnWidths, props.offset, template.id),
               overflowX: 'hidden'
             }}
+            data-test={`database-row-${card.id}-column-${template.id}`}
             ref={columnRef}
             onPaste={(e) => e.stopPropagation()}
           >

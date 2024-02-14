@@ -156,6 +156,7 @@ function RelationPropertyOptions({
             showOnRelatedBoard: !relationData.showOnRelatedBoard
           });
         }}
+        data-test='show-on-related-board-button'
       >
         <Typography mr={3}>Show on {selectedPage.title ?? 'Untitled'}</Typography>
         <Switch size='small' checked={relationData.showOnRelatedBoard} />
@@ -201,6 +202,7 @@ export function RelationPropertyCreateOptions({
         sx={{
           mt: 1
         }}
+        data-test='add-relation-button'
       >
         Add relation
       </Button>

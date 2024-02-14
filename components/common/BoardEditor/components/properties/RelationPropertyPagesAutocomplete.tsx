@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { useSyncRelationProperty, useSyncRelationPropertyValue } from 'charmClient/hooks/blocks';
+import { useSyncRelationPropertyValue } from 'charmClient/hooks/blocks';
 import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import type { PageListItem } from 'components/common/PagesList';
 import { usePages } from 'hooks/usePages';
@@ -51,7 +51,7 @@ export function RelationPropertyPagesAutocomplete({
         onChange(pageListItemIds);
         trigger({
           templateId: propertyTemplate.id,
-          cardIds: pageListItemIds,
+          pageIds: pageListItemIds,
           boardId,
           cardId
         });

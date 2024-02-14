@@ -1,7 +1,7 @@
-import type { RemoveRelationPropertyPayload } from 'pages/api/blocks/relation/remove';
-import type { RenameRelationPropertyPayload } from 'pages/api/blocks/relation/rename';
-import type { SyncRelationPropertyPayload } from 'pages/api/blocks/relation/sync';
-import type { SyncRelationPropertyValuePayload } from 'pages/api/blocks/sync-relation-property-value';
+import type { RemoveRelationPropertyPayload } from 'lib/focalboard/relationProperty/removeRelationProperty';
+import type { RenameRelationPropertyPayload } from 'lib/focalboard/relationProperty/renameRelationProperty';
+import type { SyncRelatedCardsValuesPayload } from 'lib/focalboard/relationProperty/syncRelatedCardsValues';
+import type { SyncRelationPropertyPayload } from 'lib/focalboard/relationProperty/syncRelationProperty';
 
 import { useDELETE, usePOST, usePUT } from './helpers';
 
@@ -18,5 +18,5 @@ export function useRemoveRelationProperty() {
 }
 
 export function useSyncRelationPropertyValue() {
-  return usePUT<SyncRelationPropertyValuePayload>('/api/blocks/sync-relation-property-value');
+  return usePUT<SyncRelatedCardsValuesPayload>('/api/blocks/relation/sync-values');
 }
