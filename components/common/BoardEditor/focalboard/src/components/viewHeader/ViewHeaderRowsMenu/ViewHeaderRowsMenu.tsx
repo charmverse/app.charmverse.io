@@ -5,6 +5,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import { useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
+import { useSyncRelationPropertyValue } from 'charmClient/hooks/blocks';
 import { useTrashPages } from 'charmClient/hooks/pages';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -53,7 +54,8 @@ const validPropertyTypes = [
   'proposalAuthor',
   'proposalReviewer',
   'proposalStep',
-  'proposalStatus'
+  'proposalStatus',
+  'relation'
 ] as PropertyType[];
 
 export type ViewHeaderRowsMenuProps = {
@@ -98,6 +100,7 @@ export function ViewHeaderRowsMenu({
   const { trigger: trashPages } = useTrashPages();
   const { showConfirmation } = useConfirmationModal();
   const { showError } = useSnackbar();
+  const { trigger: syncRelationPropertyValue } = useSyncRelationPropertyValue();
 
   const showTrashIcon = !board.fields.sourceType; // dont allow deleting cards for proposals-as-a-source
 
@@ -136,7 +139,7 @@ export function ViewHeaderRowsMenu({
     try {
       await mutator.changePropertyValues(checkedCards, propertyTemplate.id, userIds);
     } catch (error) {
-      showError(error, 'There was an error updating properties');
+      showError(error, 'There was an error updating person property');
     }
     const previousValue = propertyValue
       ? typeof propertyValue === 'string'
@@ -165,6 +168,29 @@ export function ViewHeaderRowsMenu({
     });
   }
 
+  const onRelationPropertyChange = async ({
+    checkedCards,
+    pageListItemIds,
+    propertyTemplate
+  }: {
+    checkedCards: Card[];
+    pageListItemIds: string[];
+    propertyTemplate: IPropertyTemplate;
+  }) => {
+    try {
+      for (const card of checkedCards) {
+        await syncRelationPropertyValue({
+          cardId: card.id,
+          templateId: propertyTemplate.id,
+          boardId: board.id,
+          pageIds: pageListItemIds
+        });
+      }
+    } catch (err) {
+      showError(err, 'There was an error updating relation property');
+    }
+  };
+
   const filteredPropertyTemplates = useMemo(() => {
     return propertyTemplates.filter(
       (propertyTemplate) =>
@@ -191,6 +217,7 @@ export function ViewHeaderRowsMenu({
             <PropertyTemplateMenu
               isAdmin={isAdmin}
               board={board}
+              onRelationPropertyChange={onRelationPropertyChange}
               checkedIds={checkedIds}
               cards={cards}
               propertyTemplate={propertyTemplate}

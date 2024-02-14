@@ -1,3 +1,4 @@
+import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { NotFoundError } from 'lib/middleware';
@@ -20,9 +21,7 @@ async function syncRelatedCards({
   relationProperty,
   operation,
   userId,
-  spaceId,
-  cardFields,
-  sourceRelationProperty
+  spaceId
 }: {
   affectedCardPageIds: string[];
   sourceCardId: string;
@@ -30,8 +29,6 @@ async function syncRelatedCards({
   operation: 'remove' | 'add';
   userId: string;
   spaceId: string;
-  cardFields: CardFields;
-  sourceRelationProperty: IPropertyTemplate;
 }) {
   const cards = await prisma.block.findMany({
     where: {
@@ -46,48 +43,31 @@ async function syncRelatedCards({
     }
   });
 
-  await prisma.$transaction([
-    prisma.block.update({
-      where: {
-        id: sourceCardId
-      },
+  return cards.map((card) => {
+    const connectedRelationPropertyValue = (card.fields as CardFields).properties[relationProperty.id] as
+      | string[]
+      | undefined;
+    const connectedCardIds = Array.from(
+      new Set(connectedRelationPropertyValue ? [sourceCardId, ...connectedRelationPropertyValue] : [sourceCardId])
+    );
+
+    return prisma.block.update({
       data: {
         fields: {
-          ...(cardFields as any),
+          ...(card.fields as any),
           properties: {
-            ...(cardFields as CardFields).properties,
-            [sourceRelationProperty.id]: affectedCardPageIds
+            ...(card.fields as CardFields).properties,
+            [relationProperty.id]:
+              operation === 'remove' ? connectedCardIds.filter((id) => id !== sourceCardId) : connectedCardIds
           }
         },
         updatedBy: userId
+      },
+      where: {
+        id: card.id
       }
-    }),
-    ...cards.map((card) => {
-      const connectedRelationPropertyValue = (card.fields as CardFields).properties[relationProperty.id] as
-        | string[]
-        | undefined;
-      const connectedCardIds = Array.from(
-        new Set(connectedRelationPropertyValue ? [sourceCardId, ...connectedRelationPropertyValue] : [sourceCardId])
-      );
-
-      return prisma.block.update({
-        data: {
-          fields: {
-            ...(card.fields as any),
-            properties: {
-              ...(card.fields as CardFields).properties,
-              [relationProperty.id]:
-                operation === 'remove' ? connectedCardIds.filter((id) => id !== sourceCardId) : connectedCardIds
-            }
-          },
-          updatedBy: userId
-        },
-        where: {
-          id: card.id
-        }
-      });
-    })
-  ]);
+    });
+  });
 }
 
 export async function syncRelatedCardsValues(
@@ -121,29 +101,50 @@ export async function syncRelatedCardsValues(
   const connectedPageIds = pageIds.filter((id) => !cardRelationPropertyValue.includes(id));
   const disconnectedPageIds = cardRelationPropertyValue.filter((id) => !pageIds.includes(id));
 
+  const prismaPromises: Prisma.PrismaPromise<any>[] = [];
+
   if (connectedPageIds.length) {
-    await syncRelatedCards({
-      operation: 'add',
-      affectedCardPageIds: connectedPageIds,
-      relationProperty: connectedRelationProperty,
-      sourceCardId: cardId,
-      userId: payload.userId,
-      spaceId: sourceBoard.spaceId,
-      cardFields,
-      sourceRelationProperty
-    });
+    prismaPromises.push(
+      ...(await syncRelatedCards({
+        operation: 'add',
+        affectedCardPageIds: connectedPageIds,
+        relationProperty: connectedRelationProperty,
+        sourceCardId: cardId,
+        userId: payload.userId,
+        spaceId: sourceBoard.spaceId
+      }))
+    );
   }
 
   if (disconnectedPageIds.length) {
-    await syncRelatedCards({
-      operation: 'remove',
-      affectedCardPageIds: disconnectedPageIds,
-      relationProperty: connectedRelationProperty,
-      sourceCardId: cardId,
-      userId: payload.userId,
-      spaceId: sourceBoard.spaceId,
-      cardFields,
-      sourceRelationProperty
-    });
+    prismaPromises.push(
+      ...(await syncRelatedCards({
+        operation: 'remove',
+        affectedCardPageIds: disconnectedPageIds,
+        relationProperty: connectedRelationProperty,
+        sourceCardId: cardId,
+        userId: payload.userId,
+        spaceId: sourceBoard.spaceId
+      }))
+    );
   }
+
+  await prisma.$transaction([
+    ...prismaPromises,
+    prisma.block.update({
+      where: {
+        id: cardId
+      },
+      data: {
+        fields: {
+          ...(cardFields as any),
+          properties: {
+            ...(cardFields as CardFields).properties,
+            [templateId]: pageIds
+          }
+        },
+        updatedBy: payload.userId
+      }
+    })
+  ]);
 }

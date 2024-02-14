@@ -10,6 +10,7 @@ import { useIntl } from 'react-intl';
 import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
+import { useSyncRelationPropertyValue } from 'charmClient/hooks/blocks';
 import { useUpdateProposalEvaluation } from 'charmClient/hooks/proposals';
 import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
 import { RelationPropertyPagesAutocomplete } from 'components/common/BoardEditor/components/properties/RelationPropertyPagesAutocomplete';
@@ -140,6 +141,7 @@ function PropertyValueElement(props: Props) {
     proposal
   } = props;
   const { trigger } = useUpdateProposalEvaluation({ proposalId: proposal?.id });
+  const { trigger: syncRelationPropertyValue } = useSyncRelationPropertyValue();
 
   const isAdmin = useIsAdmin();
   const intl = useIntl();
@@ -292,12 +294,16 @@ function PropertyValueElement(props: Props) {
         onChange={async (pageListItemIds) => {
           try {
             await mutator.changePropertyValue(card, propertyTemplate.id, pageListItemIds);
+            await syncRelationPropertyValue({
+              templateId: propertyTemplate.id,
+              pageIds: pageListItemIds,
+              boardId: board.id,
+              cardId: card.id
+            });
           } catch (error) {
             showError(error);
           }
         }}
-        boardId={board.id}
-        cardId={card.id}
         readOnly={readOnly}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
       />
