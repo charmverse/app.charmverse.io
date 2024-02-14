@@ -1,3 +1,4 @@
+import styled from '@emotion/styled';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { Divider, MenuItem, MenuList, Stack, Switch, TextField, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
@@ -16,7 +17,13 @@ import type { Board, IPropertyTemplate, RelationPropertyData } from 'lib/focalbo
 
 import { useAppSelector } from '../../../../store/hooks';
 
-import { StyledMenuItem } from './RelationPropertyMenu';
+export const StyledMenuItem = styled(MenuItem)`
+  padding: ${({ theme }) => theme.spacing(0, 1)};
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+`;
 
 function RelationPropertyOptions({
   relationData,

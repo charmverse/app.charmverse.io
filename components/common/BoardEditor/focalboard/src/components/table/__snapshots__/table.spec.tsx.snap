@@ -363,6 +363,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-row-card-id-1-column-property1"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -400,6 +401,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-row-card-id-1-column-property2"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -427,6 +429,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-row-card-id-1-column-3f0014cf-6e06-42ef-adb3-f901d36d8a23"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -524,6 +527,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-row-card-id-2-column-property1"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -561,6 +565,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-row-card-id-2-column-property2"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -588,6 +593,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-row-card-id-2-column-3f0014cf-6e06-42ef-adb3-f901d36d8a23"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -1089,6 +1095,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-row-card-id-1-column-property1"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -1126,6 +1133,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-row-card-id-1-column-property2"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -1153,6 +1161,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-row-card-id-1-column-d5cc361c-fb64-4d45-927f-48b277df9f88"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             />
             <div
@@ -1244,6 +1253,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-row-card-id-2-column-property1"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -1281,6 +1291,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-row-card-id-2-column-property2"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -1308,6 +1319,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-row-card-id-2-column-d5cc361c-fb64-4d45-927f-48b277df9f88"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             />
             <div
@@ -1806,6 +1818,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-row-card-id-1-column-property1"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -1843,6 +1856,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-row-card-id-1-column-property2"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -1870,6 +1884,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-row-card-id-1-column-118341f3-592f-40de-8c09-b5c3abb10706"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -1967,6 +1982,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-row-card-id-2-column-property1"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -2004,6 +2020,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-row-card-id-2-column-property2"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -2031,6 +2048,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-row-card-id-2-column-118341f3-592f-40de-8c09-b5c3abb10706"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -2532,6 +2550,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-row-card-id-1-column-property1"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -2569,6 +2588,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-row-card-id-1-column-property2"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -2596,6 +2616,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-row-card-id-1-column-2074ac2e-2247-449d-a03a-84cc79167f5c"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             />
             <div
@@ -2687,6 +2708,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-row-card-id-2-column-property1"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -2724,6 +2746,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-row-card-id-2-column-property2"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -2751,6 +2774,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-row-card-id-2-column-2074ac2e-2247-449d-a03a-84cc79167f5c"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             />
             <div

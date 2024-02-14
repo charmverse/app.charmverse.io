@@ -12,14 +12,6 @@ import { LinkCharmVerseDatabase } from '../../../viewSidebar/viewSourceOptions/c
 
 import { RelationPropertyCreateOptions } from './RelationPropertyOptions';
 
-export const StyledMenuItem = styled(MenuItem)`
-  padding: ${({ theme }) => theme.spacing(0, 1)};
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-direction: row;
-`;
-
 export function RelationPropertyMenu({
   onClick,
   popupState,

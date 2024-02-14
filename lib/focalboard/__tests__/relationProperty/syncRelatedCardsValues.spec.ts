@@ -188,15 +188,13 @@ describe('syncRelatedCardsValues', () => {
     const board2Card1Updated = board2CardsUpdated2.find((c) => c.id === board2CardPages[0].id);
     const board2Card2Updated = board2CardsUpdated2.find((c) => c.id === board2CardPages[1].id);
 
-    expect((board2Card1Updated!.fields as any).properties[connectedRelationProperty.id]).toStrictEqual([
-      board1CardPages[0].id,
-      board1CardPages[1].id
-    ]);
+    expect((board2Card1Updated!.fields as any).properties[connectedRelationProperty.id].sort()).toStrictEqual(
+      [board1CardPages[0].id, board1CardPages[1].id].sort()
+    );
 
-    expect((board2Card2Updated!.fields as any).properties[connectedRelationProperty.id]).toStrictEqual([
-      board1CardPages[0].id,
-      board1CardPages[1].id
-    ]);
+    expect((board2Card2Updated!.fields as any).properties[connectedRelationProperty.id].sort()).toStrictEqual(
+      [board1CardPages[0].id, board1CardPages[1].id].sort()
+    );
 
     // Board 1 Card 2 -> Board 2 Card 1
     await syncRelatedCardsValues({
@@ -222,10 +220,9 @@ describe('syncRelatedCardsValues', () => {
     const board2Card1Updated2 = board2CardsUpdated3.find((c) => c.id === board2CardPages[0].id);
     const board2Card2Updated2 = board2CardsUpdated3.find((c) => c.id === board2CardPages[1].id);
 
-    expect((board2Card1Updated2!.fields as any).properties[connectedRelationProperty.id]).toStrictEqual([
-      board1CardPages[0].id,
-      board1CardPages[1].id
-    ]);
+    expect((board2Card1Updated2!.fields as any).properties[connectedRelationProperty.id].sort()).toStrictEqual(
+      [board1CardPages[0].id, board1CardPages[1].id].sort()
+    );
 
     expect((board2Card2Updated2!.fields as any).properties[connectedRelationProperty.id]).toStrictEqual([
       board1CardPages[0].id

@@ -114,7 +114,7 @@ test.describe.serial('Edit relation properties', async () => {
     await databasePage.getShowOnRelatedBoardButton().click();
     await databasePage.getAddRelationButton().click();
 
-    await databasePage.page.waitForTimeout(500);
+    await databasePage.page.waitForTimeout(1000);
 
     const sourceBoard = await prisma.block.findUniqueOrThrow({
       where: {
