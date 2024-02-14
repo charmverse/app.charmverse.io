@@ -31,7 +31,7 @@ export async function upsertProposalFormAnswers({ answers, formId, proposalId }:
         throw new InvalidInputError(`Could not find field ${a.fieldId} for proposal ${proposalId}`);
       }
 
-      // // do not save answers for labels
+      // do not save answers for labels
       if (field.type === 'label') {
         return null;
       }

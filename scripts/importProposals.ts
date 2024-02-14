@@ -238,7 +238,7 @@ async function importCSVToSpace() {
         };
       })
       .filter(isTruthy);
-    await createProposal({
+    const result = await createProposal({
       userId,
       spaceId: page.spaceId,
       pageProps: {
@@ -253,7 +253,7 @@ async function importCSVToSpace() {
       formId: page.proposal!.form!.id,
       formAnswers
     });
-    console.log('Uploaded proposal for ', row['Point of contact email address'], 'with user id', userId);
+    console.log('Uploaded proposal for ', row['Point of contact email address'], { pageId: result.page.id, userId });
     console.log('CSV Values:', row);
   }
 }
