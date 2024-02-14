@@ -55,7 +55,7 @@ export function ProposalFormFieldsInput({
           const proposalFormFieldAnswer = proposalFormFieldAnswers.find(
             (_proposalFormFieldAnswer) => _proposalFormFieldAnswer.fieldId === formField.id
           );
-          if (!proposalFormFieldAnswer) {
+          if (!proposalFormFieldAnswer && formField.type !== 'label') {
             return null;
           }
           return {
