@@ -96,11 +96,13 @@ export function EvaluationPermissionsRow({
   onDuplicate,
   onRename,
   onChange,
-  readOnly
+  readOnly,
+  isFirstEvaluation
 }: {
   evaluation: WorkflowEvaluationJson;
   onChange: (evaluation: WorkflowEvaluationJson) => void;
   readOnly: boolean;
+  isFirstEvaluation: boolean;
 } & ContextMenuProps) {
   return (
     <Card variant='outlined' key={evaluation.id} sx={{ mb: 1 }}>
@@ -120,7 +122,12 @@ export function EvaluationPermissionsRow({
         </Box>
 
         <Stack flex={1} className='CardDetail content'>
-          <EvaluationPermissions evaluation={evaluation} onChange={onChange} readOnly={readOnly} />
+          <EvaluationPermissions
+            isFirstEvaluation={isFirstEvaluation}
+            evaluation={evaluation}
+            onChange={onChange}
+            readOnly={readOnly}
+          />
         </Stack>
       </Box>
     </Card>
