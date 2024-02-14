@@ -8,10 +8,11 @@ import type {
   ProposalBlockWithTypedFields
 } from 'lib/proposal/blocks/interfaces';
 import type { CreateProposalInput } from 'lib/proposal/createProposal';
+import type { ProposalWithUsersLite } from 'lib/proposal/getProposals';
 import type { RubricProposalsUserInfo } from 'lib/proposal/getProposalsEvaluatedByUser';
 import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
 import type { GoBackToStepRequest } from 'lib/proposal/goBackToStep';
-import type { ProposalWithUsersAndRubric, ProposalWithUsersLite } from 'lib/proposal/interface';
+import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
 import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers';
 import type { RubricCriteriaUpsert } from 'lib/proposal/rubric/upsertRubricCriteria';
@@ -29,9 +30,6 @@ export function useGetProposalDetails(proposalId: MaybeString) {
   return useGET<ProposalWithUsersAndRubric>(proposalId ? `/api/proposals/${proposalId}` : null);
 }
 
-export function useGetIsReviewer(proposalId: MaybeString) {
-  return useGET<boolean>(proposalId ? `/api/proposals/${proposalId}/is-reviewer` : null);
-}
 export function useGetProposalsBySpace({ spaceId }: Partial<ListProposalsRequest>) {
   return useGET<ProposalWithUsersLite[]>(spaceId ? `/api/spaces/${spaceId}/proposals` : null);
 }

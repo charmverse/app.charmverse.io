@@ -16,7 +16,6 @@ import type { NewPageValues } from 'components/common/PageDialog/hooks/useNewPag
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
 import type { ProposalPropertiesField } from './blocks/interfaces';
-import type { ProposalStep } from './getCurrentStep';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   ProposalRubricCriteriaWithTypedParams
@@ -50,36 +49,6 @@ export type ProposalFields = {
   pendingRewards?: ProposalPendingReward[];
   rewardsTemplateId?: string; // require a particular template to be used for rewards
   enableRewards?: boolean; // used by form templates to enable rewards for new proposals
-};
-
-export type ProposalWithUsersLite = Omit<
-  Proposal,
-  | 'fields'
-  | 'archived'
-  | 'reviewedBy'
-  | 'formId'
-  | 'reviewedAt'
-  | 'publishToLens'
-  | 'lensPostLink'
-  | 'selectedCredentialTemplates'
-  | 'workflowId'
-> & {
-  archived?: boolean;
-  authors: ProposalAuthor[];
-  fields: ProposalFields | null;
-  formId?: string;
-  reviewers: ProposalReviewer[];
-  rewardIds: string[];
-  currentEvaluationId?: string;
-  permissions?: ProposalPermissionFlags;
-  evaluations: {
-    title: string;
-    type: ProposalEvaluationType;
-    id: string;
-    result: ProposalEvaluationResult | null;
-    index: number;
-  }[];
-  currentStep: ProposalStep;
 };
 
 export type PopulatedEvaluation = Omit<ProposalEvaluation, 'voteSettings'> & {

@@ -9,7 +9,7 @@ import { ControlledProposalStepSelect } from 'components/proposals/components/Pr
 import { allMembersSystemRole, authorSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card, CardPropertyValue } from 'lib/focalboard/card';
-import type { ProposalWithUsersLite } from 'lib/proposal/interface';
+import type { ProposalWithUsersLite } from 'lib/proposal/getProposals';
 
 import mutator from '../../../../mutator';
 
