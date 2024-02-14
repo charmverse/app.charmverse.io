@@ -3,36 +3,36 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { SyncRelationPropertyPayload } from 'lib/focalboard/relationProperty/syncRelationProperty';
-import { syncRelationProperty } from 'lib/focalboard/relationProperty/syncRelationProperty';
+import type { SyncRelatedCardsValuesPayload } from 'lib/focalboard/relationProperty/syncRelatedCardsValues';
+import { syncRelatedCardsValues } from 'lib/focalboard/relationProperty/syncRelatedCardsValues';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.post(syncRelationPropertyHandler);
+handler.put(syncRelatedCardsValuesHandler);
 
-async function syncRelationPropertyHandler(req: NextApiRequest, res: NextApiResponse) {
-  const payload = req.body as SyncRelationPropertyPayload;
+async function syncRelatedCardsValuesHandler(req: NextApiRequest, res: NextApiResponse) {
+  const payload = req.body as SyncRelatedCardsValuesPayload;
 
-  const sourceBoard = await prisma.block.findUniqueOrThrow({
+  const card = await prisma.block.findFirstOrThrow({
     where: {
-      id: payload.boardId
+      id: payload.cardId
     },
     select: {
       spaceId: true
     }
   });
 
-  const spaceId = sourceBoard.spaceId;
+  const spaceId = card.spaceId;
 
   const { error } = await hasAccessToSpace({ userId: req.session.user.id, spaceId });
   if (error) {
     throw new UnauthorisedActionError();
   }
 
-  await syncRelationProperty({
+  await syncRelatedCardsValues({
     ...payload,
     userId: req.session.user.id
   });

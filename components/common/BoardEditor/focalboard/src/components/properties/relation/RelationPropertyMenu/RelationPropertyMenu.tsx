@@ -91,7 +91,7 @@ export function RelationPropertyMenu({
                   }
                 : {
                     boardId: sourceDatabaseId,
-                    limit: 'single_page',
+                    limit: 'multiple_page',
                     relatedPropertyId: null,
                     showOnRelatedBoard: false
                   }

@@ -1,92 +1,43 @@
-import { InvalidInputError } from '@charmverse/core/errors';
-import type { Block } from '@charmverse/core/prisma';
+import { UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { BoardFields } from 'lib/focalboard/board';
-import { NotFoundError, onError, onNoMatch } from 'lib/middleware';
+import type { RenameRelationPropertyPayload } from 'lib/focalboard/relationProperty/renameRelationProperty';
+import { renameRelationProperty } from 'lib/focalboard/relationProperty/renameRelationProperty';
+import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-
-import type { SyncRelationPropertyPayload } from './sync';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.put(renameRelationProperty);
+handler.use(requireKeys(['relatedPropertyTitle'], 'body')).put(renameRelationPropertyHandler);
 
-export type RenameRelationPropertyPayload = SyncRelationPropertyPayload;
-
-async function renameRelationProperty(req: NextApiRequest, res: NextApiResponse<Block[] | { error: string }>) {
+async function renameRelationPropertyHandler(req: NextApiRequest, res: NextApiResponse) {
   const { relatedPropertyTitle, boardId, templateId } = req.body as RenameRelationPropertyPayload;
   const userId = req.session.user.id;
 
-  const board = await prisma.block.findUniqueOrThrow({
+  const sourceBoard = await prisma.block.findUniqueOrThrow({
     where: {
       id: boardId
     },
     select: {
-      id: true,
-      fields: true
+      spaceId: true
     }
   });
 
-  const boardPage = await prisma.page.findFirstOrThrow({
-    where: {
-      boardId
-    },
-    select: {
-      id: true,
-      title: true
-    }
-  });
+  const spaceId = sourceBoard.spaceId;
 
-  const boardProperties = (board.fields as unknown as BoardFields).cardProperties;
-
-  const relationProperty = boardProperties.find((p) => p.id === templateId);
-  if (!boardPage || !relationProperty || !relationProperty.relationData) {
-    throw new NotFoundError('Relation type board property not found');
+  const { error } = await hasAccessToSpace({ userId: req.session.user.id, spaceId });
+  if (error) {
+    throw new UnauthorisedActionError();
   }
 
-  const connectedBoard = await prisma.block.findUniqueOrThrow({
-    where: {
-      id: relationProperty.relationData.boardId
-    },
-    select: {
-      id: true,
-      fields: true
-    }
-  });
-
-  const connectedBoardProperties = (connectedBoard.fields as unknown as BoardFields).cardProperties;
-
-  const connectedBoardProperty = connectedBoardProperties.find((p) => p.relationData?.relatedPropertyId === templateId);
-  if (!connectedBoardProperty) {
-    throw new NotFoundError('Connected relation property not found');
-  }
-
-  if (!relatedPropertyTitle) {
-    throw new InvalidInputError('Please provide a new title for the related property');
-  }
-
-  await prisma.block.update({
-    data: {
-      fields: {
-        ...(connectedBoard?.fields as any),
-        cardProperties: connectedBoardProperties.map((cp) => {
-          if (cp.id === connectedBoardProperty.id) {
-            return {
-              ...cp,
-              name: relatedPropertyTitle
-            };
-          }
-          return cp;
-        })
-      },
-      updatedBy: userId
-    },
-    where: {
-      id: connectedBoard.id
-    }
+  await renameRelationProperty({
+    boardId,
+    relatedPropertyTitle,
+    templateId,
+    userId
   });
 
   res.status(200).end();
