@@ -112,7 +112,12 @@ export function useProposalsBoardAdapter() {
           const page = pages[p?.id];
           const isStructuredProposal = !!p.formId;
           return {
-            ...mapProposalToCardPage({ proposal: p, proposalPage: page, spaceId: space?.id }),
+            ...mapProposalToCardPage({
+              proposal: p,
+              proposalPage: page,
+              spaceId: space?.id,
+              createdAt: page?.createdAt.toString()
+            }),
             isStructuredProposal,
             proposal: {
               archived: p.archived,
