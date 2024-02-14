@@ -192,7 +192,8 @@ export async function issueProposalCredentialsIfNecessary({
           trackUserAction('credential_issued', {
             userId: authorUserId,
             spaceId: credentialTemplate.spaceId,
-            event
+            trigger: event,
+            credentialTemplateId: credentialTemplate.id
           });
 
           log.info('Issued credential', {
