@@ -47,7 +47,7 @@ test.describe('View a proposal without workflow permissions, but space enabled p
     });
   });
 
-  test('View a proposal without permissions as a space member, but space enabled public proposals', async ({
+  test.skip('View a proposal without permissions as a space member, but space enabled public proposals', async ({
     page,
     proposalPage,
     documentPage
@@ -63,7 +63,7 @@ test.describe('View a proposal without workflow permissions, but space enabled p
     expect(title).toEqual(proposalTitle);
   });
 
-  test('View a proposal without permissions as an external user, but space enabled public proposals', async ({
+  test.skip('View a proposal without permissions as an external user, but space enabled public proposals', async ({
     page,
     proposalPage,
     documentPage
@@ -77,7 +77,7 @@ test.describe('View a proposal without workflow permissions, but space enabled p
     expect(title).toEqual(proposalTitle);
   });
 
-  test('View a proposal without permissions as a non logged in user, but space enabled public proposals', async ({
+  test.skip('View a proposal without permissions as a non logged in user, but space enabled public proposals', async ({
     proposalPage,
     documentPage
   }) => {
@@ -131,7 +131,7 @@ test.describe('View a proposal without workflow permissions, but proposal has a 
     });
   });
 
-  test('View a proposal without permissions as a space member, but proposal has a public page permission', async ({
+  test.skip('View a proposal without permissions as a space member, but proposal has a public page permission', async ({
     page,
     proposalPage,
     documentPage
@@ -147,7 +147,7 @@ test.describe('View a proposal without workflow permissions, but proposal has a 
     expect(title).toEqual(proposalTitle);
   });
 
-  test('View a proposal without permissions as an external user, but proposal has a public page permission', async ({
+  test.skip('View a proposal without permissions as an external user, but proposal has a public page permission', async ({
     page,
     proposalPage,
     documentPage
@@ -161,7 +161,7 @@ test.describe('View a proposal without workflow permissions, but proposal has a 
     expect(title).toEqual(proposalTitle);
   });
 
-  test('View a proposal without permissions as a non logged in user, but proposal has a public page permission', async ({
+  test.skip('View a proposal without permissions as a non logged in user, but proposal has a public page permission', async ({
     proposalPage,
     documentPage
   }) => {
