@@ -127,7 +127,12 @@ export function RewardTokenProperty({ onChange, currentReward, readOnly }: Props
 
   return (
     <>
-      <SelectPreviewContainer readOnly={readOnly} displayType='details' onClick={openTokenSettings}>
+      <SelectPreviewContainer
+        data-test='open-reward-value-dialog'
+        readOnly={readOnly}
+        displayType='details'
+        onClick={openTokenSettings}
+      >
         <Box>
           <RewardAmount
             reward={{
@@ -145,6 +150,7 @@ export function RewardTokenProperty({ onChange, currentReward, readOnly }: Props
 
       <Dialog
         open={isOpen}
+        data-test='reward-value-configuration'
         onClose={handleClose}
         title='Reward token details'
         footerActions={
@@ -162,6 +168,7 @@ export function RewardTokenProperty({ onChange, currentReward, readOnly }: Props
 
             <Button
               disabled={!isValid}
+              data-test='save-reward-value'
               onClick={handleSubmit(onSubmit)}
               sx={{
                 alignSelf: 'flex-start'

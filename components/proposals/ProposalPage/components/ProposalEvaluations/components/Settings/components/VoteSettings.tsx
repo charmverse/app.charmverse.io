@@ -134,11 +134,13 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
               value={VoteType.Approval}
               control={<Radio />}
               label='Yes / No / Abstain'
+              data-test='vote-type-approval'
             />
             <FormControlLabel
               disabled={readOnly}
               value={VoteType.SingleChoice}
               control={<Radio />}
+              data-test='vote-type-custom-options'
               label='Custom Options'
               sx={{ mr: 0 }}
             />
@@ -202,6 +204,7 @@ function InlineVoteOptions({ options, setOptions }: InlineVoteOptionsProps) {
           >
             <TextField
               // Disable changing text for No change option
+              data-test='inline-vote-option'
               fullWidth
               placeholder={`Option ${index + 1}`}
               value={option}
@@ -215,6 +218,7 @@ function InlineVoteOptions({ options, setOptions }: InlineVoteOptionsProps) {
                 <IconButton
                   disabled={options.length <= 2}
                   size='small'
+                  data-test='delete-vote-option'
                   onClick={() => {
                     setOptions([...options.slice(0, index), ...options.slice(index + 1)]);
                   }}
@@ -232,6 +236,7 @@ function InlineVoteOptions({ options, setOptions }: InlineVoteOptionsProps) {
           variant='outlined'
           color='secondary'
           size='small'
+          data-test='add-vote-option'
           onClick={() => {
             setOptions([...options, '']);
           }}

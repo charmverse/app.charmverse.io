@@ -5,6 +5,7 @@ import { forwardRef } from 'react';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import type { ControlFieldProps, FieldProps } from 'components/common/form/interfaces';
+import type { NestedDataTest } from 'testing/e2eType';
 
 type Props = ControlFieldProps &
   FieldProps & { disableArrows?: boolean } & Pick<TextFieldProps, 'fullWidth' | 'inputProps' | 'sx'>;
@@ -27,7 +28,7 @@ const StyledTextField = styled(TextField)<{ disableArrows: boolean }>`
       : ''}
 `;
 
-export const NumberInputField = forwardRef<HTMLDivElement, Props>(
+export const NumberInputField = forwardRef<HTMLDivElement, Props & NestedDataTest>(
   (
     {
       label,
@@ -40,8 +41,9 @@ export const NumberInputField = forwardRef<HTMLDivElement, Props>(
       placeholder,
       disableArrows = false,
       inputEndAdornment,
+      dataTest,
       ...textFieldProps
-    }: Props,
+    }: Props & NestedDataTest,
     ref
   ) => {
     return (
@@ -55,6 +57,7 @@ export const NumberInputField = forwardRef<HTMLDivElement, Props>(
         iconLabel={iconLabel}
       >
         <StyledTextField
+          data-test={dataTest}
           error={!!error}
           required={required}
           placeholder={placeholder}
