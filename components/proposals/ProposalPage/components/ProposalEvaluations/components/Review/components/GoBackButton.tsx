@@ -63,6 +63,7 @@ export function GoBackButton({
     <Tooltip title={`Move back to ${previousStep?.title || 'Draft'}`}>
       <span>
         <Button
+          data-test='evaluation-go-back-button'
           color='secondary'
           loading={isSavingEvaluation}
           size='small'

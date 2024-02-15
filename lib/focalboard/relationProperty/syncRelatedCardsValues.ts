@@ -1,8 +1,6 @@
 import type { Block, Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { NotFoundError } from 'lib/middleware';
-
 import type { IPropertyTemplate } from '../board';
 import type { CardFields } from '../card';
 
@@ -91,42 +89,40 @@ export async function syncRelatedCardsValues(
     templateId
   });
 
-  if (!connectedRelationProperty) {
-    throw new NotFoundError('Connected relation type board property not found');
-  }
-
   const cardFields = card.fields as CardFields;
-  const cardRelationPropertyValue = (cardFields.properties[templateId] ?? []) as string[];
-
-  const connectedPageIds = pageIds.filter((id) => !cardRelationPropertyValue.includes(id));
-  const disconnectedPageIds = cardRelationPropertyValue.filter((id) => !pageIds.includes(id));
-
   const prismaPromises: Prisma.Prisma__BlockClient<Block, never>[] = [];
 
-  if (connectedPageIds.length) {
-    prismaPromises.push(
-      ...(await syncRelatedCards({
-        operation: 'add',
-        affectedCardPageIds: connectedPageIds,
-        relationProperty: connectedRelationProperty,
-        sourceCardId: cardId,
-        userId: payload.userId,
-        spaceId: sourceBoard.spaceId
-      }))
-    );
-  }
+  if (connectedRelationProperty) {
+    const cardRelationPropertyValue = (cardFields.properties[templateId] ?? []) as string[];
 
-  if (disconnectedPageIds.length) {
-    prismaPromises.push(
-      ...(await syncRelatedCards({
-        operation: 'remove',
-        affectedCardPageIds: disconnectedPageIds,
-        relationProperty: connectedRelationProperty,
-        sourceCardId: cardId,
-        userId: payload.userId,
-        spaceId: sourceBoard.spaceId
-      }))
-    );
+    const connectedPageIds = pageIds.filter((id) => !cardRelationPropertyValue.includes(id));
+    const disconnectedPageIds = cardRelationPropertyValue.filter((id) => !pageIds.includes(id));
+
+    if (connectedPageIds.length) {
+      prismaPromises.push(
+        ...(await syncRelatedCards({
+          operation: 'add',
+          affectedCardPageIds: connectedPageIds,
+          relationProperty: connectedRelationProperty,
+          sourceCardId: cardId,
+          userId: payload.userId,
+          spaceId: sourceBoard.spaceId
+        }))
+      );
+    }
+
+    if (disconnectedPageIds.length) {
+      prismaPromises.push(
+        ...(await syncRelatedCards({
+          operation: 'remove',
+          affectedCardPageIds: disconnectedPageIds,
+          relationProperty: connectedRelationProperty,
+          sourceCardId: cardId,
+          userId: payload.userId,
+          spaceId: sourceBoard.spaceId
+        }))
+      );
+    }
   }
 
   return prisma.$transaction([

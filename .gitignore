@@ -37,6 +37,7 @@ playwright-report
 scripts/exportData/exports
 
 jsonoutputs
+exported-knowledge
 
 # cdk
 cdk.out
