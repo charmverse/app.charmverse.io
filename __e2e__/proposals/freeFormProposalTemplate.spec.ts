@@ -67,18 +67,21 @@ test.describe.serial('Create and use Proposal Template', async () => {
     title: 'First reward',
     description: 'First reward description',
     chain: optimism.id,
-    //  USDC Contract Address on OP;
-    token: '0x7F5c764cBc14f9669B88837ca1490cCa17c31607',
-    amount: 22
+    //  USDC Contract Address on OP; Changed last digit to 6 instead of 7 so we get an empty response and fill the fields manually
+    token: '0x7F5c764cBc14f9669B88837ca1490cCa17c31606',
+    amount: 22,
+    tokenName: 'USDC Coin',
+    tokenSymbol: 'USDC',
+    tokenDecimals: 6
   };
 
-  const secondRewardConfig = {
-    title: 'Second reward',
-    description: 'Second reward description',
-    chain: optimism.id,
-    token: 'ETH',
-    amount: 10
-  };
+  // const secondRewardConfig = {
+  //   title: 'Second reward',
+  //   description: 'Second reward description',
+  //   chain: optimism.id,
+  //   token: 'ETH',
+  //   amount: 10
+  // };
 
   test.beforeAll(async () => {
     // Generate a admin and a space for the test
@@ -197,13 +200,22 @@ test.describe.serial('Create and use Proposal Template', async () => {
     await dialogRewardPage.addCustomToken.click();
 
     await dialogRewardPage.customTokenContractAddressInput.fill(rewardConfig.token);
+
     await expect(dialogRewardPage.customTokenLogoUrl).toBeVisible();
+
+    await dialogRewardPage.customTokenDecimals.fill(rewardConfig.tokenDecimals.toString());
+
+    await dialogRewardPage.customTokenSymbol.fill(rewardConfig.tokenSymbol);
+
+    await dialogRewardPage.customTokenName.fill(rewardConfig.tokenName);
 
     await dialogRewardPage.customTokenLogoUrl.fill(USDCLogoUrl);
 
-    await dialogRewardPage.rewardPropertyAmount.fill(rewardConfig.amount.toString());
-
+    // Save the payment methods
     await dialogRewardPage.saveTokenPaymentMethod.click();
+
+    // Fill in the reward amount
+    await dialogRewardPage.rewardPropertyAmount.fill(rewardConfig.amount.toString());
 
     // Reduce flakiness
     await expect(dialogRewardPage.saveRewardValue).toBeVisible();

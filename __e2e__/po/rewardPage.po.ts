@@ -44,6 +44,12 @@ export class RewardPage extends GlobalPage {
 
   readonly customTokenLogoUrl: Locator;
 
+  readonly customTokenDecimals: Locator;
+
+  readonly customTokenSymbol: Locator;
+
+  readonly customTokenName: Locator;
+
   rootSelector: { locator: Locator['locator'] };
 
   constructor(page: Page, rootSelector?: string) {
@@ -73,6 +79,9 @@ export class RewardPage extends GlobalPage {
       'data-test=custom-token-contract-address >> input'
     );
     this.customTokenLogoUrl = this.customTokenFormContainer.locator('data-test=custom-token-logo-url >> input');
+    this.customTokenDecimals = this.customTokenFormContainer.locator('data-test=custom-token-decimals >> input');
+    this.customTokenSymbol = this.customTokenFormContainer.locator('data-test=custom-token-symbol >> input');
+    this.customTokenName = this.customTokenFormContainer.locator('data-test=custom-token-name >> input');
     this.saveTokenPaymentMethod = this.customTokenFormContainer.locator('data-test=create-token-payment-method');
   }
 
