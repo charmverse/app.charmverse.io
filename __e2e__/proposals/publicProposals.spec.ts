@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { test, expect } from '__e2e__/utils/test';
 
-import { generateUser, generateUserAndSpace, loginBrowserUser, logoutBrowserUser } from '../../utils/mocks';
+import { generateUser, generateUserAndSpace, loginBrowserUser, logoutBrowserUser } from '../utils/mocks';
 
 test.describe('View a proposal without workflow permissions, but space enabled public proposals', () => {
   let space: Space;

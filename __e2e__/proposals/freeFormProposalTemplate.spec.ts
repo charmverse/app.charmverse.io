@@ -13,10 +13,9 @@ import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
 import { expect, test } from '__e2e__/testWithFixtures';
 import { generateUserAndSpace, loginBrowserUser } from '__e2e__/utils/mocks';
-import { optimism, mainnet } from 'viem/chains';
+import { optimism } from 'viem/chains';
 
 import type { ProposalPendingReward } from 'lib/proposal/interface';
-import { prettyPrint } from 'lib/utilities/strings';
 import { generateProposalWorkflow } from 'testing/utils/proposals';
 
 test.describe.serial('Create and use Proposal Template', async () => {
