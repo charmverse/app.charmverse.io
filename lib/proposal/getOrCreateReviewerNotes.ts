@@ -35,6 +35,7 @@ export async function getOrCreateReviewerNotes({
     data: {
       createdBy: userId,
       updatedBy: userId,
+      parentId: proposalPage.id,
       contentText: '',
       title: 'Reviewer Notes', // not for display, but just for analytics, etc.
       path: `reviewer-notes-${Math.random().toString(36).substring(7)}`,

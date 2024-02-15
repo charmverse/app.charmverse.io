@@ -30,14 +30,9 @@ export function ProposalNotesLink({ proposalId }: { proposalId?: string }) {
   }
 
   return (
-    <Box className='octo-propertyrow' mb='0 !important' pr={2} display='flex' justifyContent='space-between'>
-      <PropertyLabel readOnly highlighted>
-        Reviewer notes
-      </PropertyLabel>
-      <StyledLink onClick={onClickInternalLink}>
-        <PageIcon pageType='page' />
-        <StyledTypography>Notes</StyledTypography>
-      </StyledLink>
-    </Box>
+    <StyledLink onClick={onClickInternalLink}>
+      <PageIcon pageType='page' />
+      <StyledTypography variant='caption'>Reviewer Notes</StyledTypography>
+    </StyledLink>
   );
 }
