@@ -11,7 +11,7 @@ import { createProposal } from 'lib/proposal/createProposal';
 
 // Import rows from a CSV that answer questions on a proposal template
 const templateId = '23630cb0-8a55-4bea-acf5-0f65579302e4';
-const csvFile = './TEST_Charmverse_Grants.csv';
+const csvFile = './KyotoFinal.csv';
 // set this to override the proposal author
 const authorEmailOverride = ''; // 'matt.casey@charmverse.io';
 
@@ -21,9 +21,13 @@ const csvColumnToQuestion: Record<string, string> = {
   'Conversion Date': 'Conversion Date',
   'Conversion Page': 'Conversion Page',
   'Conversion Title': 'Conversion Title',
+  'Grant Category': 'Grant Category',
 
   // used to create a user
   Email: 'Point of contact email address',
+
+  // page Title
+  Title: 'Title',
 
   // these go to "Name of primary point of contact"
   'First name': 'First name',
@@ -39,10 +43,8 @@ const csvColumnToQuestion: Record<string, string> = {
 
   // match a list of options
   'Funding Request': 'Funding Request: Tell us how much USD you require for your project?',
-
-  Title: 'Project Name',
+  'Name of project you are looking to secure a grant for': 'Project Name',
   'About You': 'Describe the project.',
-  'Grant Category': 'Grant Category',
   'Positive Impact Measurement':
     'If applicable; Please provide information regarding how you will measure the positive impact your project will generate. (Tools, Metrics,etc)',
   'Budget Breakdown': 'Describe how the funds will be used',
@@ -238,23 +240,23 @@ async function importCSVToSpace() {
         };
       })
       .filter(isTruthy);
-    const result = await createProposal({
-      userId,
-      spaceId: page.spaceId,
-      pageProps: {
-        title: 'TEST: ' + row['Project Name'],
-        type: 'proposal',
-        sourceTemplateId: page.id
-      },
-      fields: page.proposal?.fields as any,
-      authors: [userId],
-      evaluations: page.proposal!.evaluations as PopulatedEvaluation[],
-      workflowId: page.proposal!.workflowId || undefined,
-      formId: page.proposal!.form!.id,
-      formAnswers
-    });
-    console.log('Uploaded proposal for ', row['Point of contact email address'], { pageId: result.page.id, userId });
-    console.log('CSV Values:', row);
+    // const result = await createProposal({
+    //   userId,
+    //   spaceId: page.spaceId,
+    //   pageProps: {
+    //     title: row['Title'],
+    //     type: 'proposal',
+    //     sourceTemplateId: page.id
+    //   },
+    //   fields: page.proposal?.fields as any,
+    //   authors: [userId],
+    //   evaluations: page.proposal!.evaluations as PopulatedEvaluation[],
+    //   workflowId: page.proposal!.workflowId || undefined,
+    //   formId: page.proposal!.form!.id,
+    //   formAnswers
+    // });
+    console.log('Uploaded proposal for ', row['Point of contact email address']); //, { pageId: result.page.id, userId });
+    //console.log('CSV Values:', row);
   }
 }
 
