@@ -4,6 +4,7 @@ import { BountyBoardPage } from './po/bountyBoard.po';
 import { BountyPage } from './po/bountyPage.po';
 import { DatabasePage } from './po/databasePage.po';
 import { DocumentPage } from './po/document.po';
+import { FormField } from './po/formField.po';
 import { ForumHomePage } from './po/forumHome.po';
 import { ForumPostPage } from './po/forumPost.po';
 import { GlobalPage } from './po/global.po';
@@ -42,6 +43,7 @@ type Fixtures = {
   pagePermissionsDialog: PagePermissionsDialog;
   pagesSidebar: PagesSidebarPage;
   proposalPage: ProposalPage;
+  proposalFormFieldPage: FormField;
   proposalsListPage: ProposalsListPage;
   settingsModal: SettingsModal;
   apiSettings: ApiSettings;
@@ -74,6 +76,7 @@ export const test = base.extend<Fixtures>({
   pagePermissionsDialog: async ({ page }, use) => use(new PagePermissionsDialog(page)),
   pagesSidebar: async ({ page }, use) => use(new PagesSidebarPage(page)),
   proposalPage: async ({ page }, use) => use(new ProposalPage(page)),
+  proposalFormFieldPage: async ({ page }, use) => use(new FormField(page)),
   proposalsListPage: async ({ page }, use) => use(new ProposalsListPage(page)),
   settingsModal: async ({ page }, use) => use(new SettingsModal(page)),
   apiSettings: async ({ page }, use) => use(new ApiSettings(page)),

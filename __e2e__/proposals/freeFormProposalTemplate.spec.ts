@@ -426,8 +426,6 @@ test.describe.serial('Create and use Proposal Template', async () => {
     await expect(proposalPage.documentTitleInput).toBeVisible();
     await proposalPage.documentTitleInput.fill(userProposalConfig.title);
 
-    await page.pause();
-
     // Check that configuration fields are readonly and user cannot edit proposal
     const reviewerInput = (await proposalPage.getSelectedReviewers()).nth(1);
 

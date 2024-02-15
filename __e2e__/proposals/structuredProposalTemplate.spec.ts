@@ -1,39 +1,50 @@
-import type { Space, User } from '@charmverse/core/prisma';
+import type { FormFieldType, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { testUtilsUser } from '@charmverse/core/test';
-import { test as base, expect } from '@playwright/test';
-import { DatabasePage } from '__e2e__/po/databasePage.po';
-import { DocumentPage } from '__e2e__/po/document.po';
-import { FormField } from '__e2e__/po/formField.po';
-import { ProposalPage } from '__e2e__/po/proposalPage.po';
-import { ProposalsListPage } from '__e2e__/po/proposalsList.po';
+import { expect, test } from '__e2e__/testWithFixtures';
 import { v4 } from 'uuid';
 
 import { getDefaultWorkflows } from 'lib/proposal/workflows/defaultWorkflows';
 
 import { loginBrowserUser } from '../utils/mocks';
 
-type Fixtures = {
-  proposalListPage: ProposalsListPage;
-  documentPage: DocumentPage;
-  databasePage: DatabasePage;
-  proposalPage: ProposalPage;
-  formField: FormField;
-};
-
-const test = base.extend<Fixtures>({
-  proposalListPage: ({ page }, use) => use(new ProposalsListPage(page)),
-  documentPage: ({ page }, use) => use(new DocumentPage(page)),
-  databasePage: ({ page }, use) => use(new DatabasePage(page)),
-  proposalPage: ({ page }, use) => use(new ProposalPage(page)),
-  formField: ({ page }, use) => use(new FormField(page))
-});
-
 let space: Space;
 let spaceAdmin: User;
 let spaceMember: User;
 let defaultWorkflows: ProposalWorkflowTyped[];
+
+type TestedFormFieldTypes = Exclude<FormFieldType, 'select' | 'multiselect' | 'person' | 'image' | 'file'>;
+
+// Skip testing some types to save time
+const testedFormFieldTypes: TestedFormFieldTypes[] = [
+  'short_text',
+  'long_text',
+  'number',
+  'phone',
+  'url',
+  'email',
+  // 'select',
+  // 'multiselect',
+  'wallet',
+  'date',
+  // 'person',
+  'label'
+  // 'image',
+  // 'file'
+];
+
+const testValues: Record<TestedFormFieldTypes, string> = {
+  short_text: 'Short text',
+  long_text: 'Long text',
+  number: '123',
+  phone: '+1234567890',
+  url: 'https://charmverse.com',
+  email: 'test@charmverse.io',
+  wallet: '0x888888CfAebbEd5554c3F36BfBD233f822e9455f',
+  date: '2022-12-31',
+  label: 'Label'
+};
 
 test.beforeAll(async () => {
   // Initial setup
@@ -71,48 +82,71 @@ test.beforeAll(async () => {
 });
 
 test.describe.serial('Structured proposal template', () => {
-  test('User creates a structured proposal template with required and non-required fields', async ({
+  test('User creates a structured proposal template with required, non-required and private fields', async ({
     databasePage,
     proposalPage,
-    proposalListPage,
+    proposalsListPage,
     documentPage,
-    formField
+    proposalFormFieldPage,
+    page
   }) => {
     await loginBrowserUser({
-      browserPage: proposalListPage.page,
+      browserPage: proposalsListPage.page,
       userId: spaceAdmin.id
     });
-    await proposalListPage.goToHomePage();
+    // Initial test setup
+    await proposalsListPage.goToHomePage();
 
-    await proposalListPage.getSidebarLink('proposals').click();
+    await proposalsListPage.getSidebarLink('proposals').click();
 
-    await proposalListPage.waitForProposalsList();
+    await proposalsListPage.waitForProposalsList();
 
-    await proposalListPage.proposalTemplateSelect.click();
+    await proposalsListPage.proposalTemplateSelect.click();
 
     await databasePage.getNewTemplateButton().click();
 
-    await proposalListPage.structuredProposalTemplateMenu.click();
+    await proposalsListPage.structuredProposalTemplateMenu.click();
 
     await proposalPage.waitForNewProposalPage(space.domain);
 
     await expect(documentPage.charmEditor).not.toBeVisible();
 
-    await expect(formField.addNewFormFieldButton).toBeVisible();
+    await expect(proposalFormFieldPage.addNewFormFieldButton).toBeVisible();
 
     await expect(proposalPage.saveDraftButton).toBeDisabled();
 
-    await formField.getFormFieldNameInput().fill('Name');
-
-    await formField.addNewFormFieldButton.click();
-
+    // Set the title
     await documentPage.documentTitle.getByPlaceholder('Title (required)').fill('Structured proposal template');
 
-    await formField.getFormFieldNameInput(1).fill('Nickname');
+    // Start from a fresh state
+    await proposalFormFieldPage.fieldMoreOptions.click();
+    await proposalFormFieldPage.deleteField.click();
 
-    await formField.formFieldRequiredSwitch.nth(1).click();
+    await expect(proposalFormFieldPage.fieldMoreOptions).not.toBeVisible();
 
-    await formField.formFieldPrivateSwitch.nth(1).click();
+    // Start configuring the form fields
+    for (let i = 0; i < testedFormFieldTypes.length; i++) {
+      const fieldType = testedFormFieldTypes[i];
+      await proposalFormFieldPage.addNewFormFieldButton.click();
+      await proposalFormFieldPage.selectFormFieldType({ index: i, fieldType });
+      await proposalFormFieldPage.getFormFieldNameInput(i).fill(fieldType);
+
+      await expect(proposalFormFieldPage.fieldMoreOptions.nth(i)).toBeVisible();
+
+      if (i === 0) {
+        // Make first field private and leave default required
+        await proposalFormFieldPage.formFieldPrivateSwitch.nth(i).click();
+      } else if (i === 1) {
+        // Make second field private but not required
+        await proposalFormFieldPage.formFieldPrivateSwitch.nth(i).click();
+        await proposalFormFieldPage.formFieldRequiredSwitch.nth(i).click();
+      } else if (i === 2) {
+        // Leave third field required and don't untick required option
+      } else if (fieldType !== 'label') {
+        // Make other fields optional
+        await proposalFormFieldPage.formFieldRequiredSwitch.nth(i).click();
+      }
+    }
 
     await proposalPage.selectEvaluationReviewer('pass_fail', spaceAdmin.id);
     await proposalPage.selectEvaluationReviewer('vote', 'space_member');
@@ -124,12 +158,12 @@ test.describe.serial('Structured proposal template', () => {
   test('Visit structured proposal template and edit/add fields', async ({
     databasePage,
     proposalPage,
-    proposalListPage,
+    proposalsListPage,
     documentPage,
-    formField
+    proposalFormFieldPage
   }) => {
     await loginBrowserUser({
-      browserPage: proposalListPage.page,
+      browserPage: proposalsListPage.page,
       userId: spaceAdmin.id
     });
 
@@ -147,11 +181,11 @@ test.describe.serial('Structured proposal template', () => {
       }
     });
 
-    await proposalListPage.goToProposals(space.domain);
+    await proposalsListPage.goToProposals(space.domain);
 
-    await proposalListPage.waitForProposalsList();
+    await proposalsListPage.waitForProposalsList();
 
-    await proposalListPage.proposalTemplateSelect.click();
+    await proposalsListPage.proposalTemplateSelect.click();
 
     await databasePage.getTemplateMenu({ pageId: proposalTemplate.page!.id }).click();
 
@@ -162,33 +196,39 @@ test.describe.serial('Structured proposal template', () => {
       path: proposalTemplate.page!.path
     });
 
-    await expect(formField.addNewFormFieldButton).toBeVisible();
+    // Add a field
+    await proposalFormFieldPage.addNewFormFieldButton.click();
 
-    await formField.toggleFormFieldButton.nth(0).click();
-
-    // Rename first field
-    await formField.getFormFieldNameInput().fill('Full name');
-
-    await formField.addNewFormFieldButton.click();
-
-    await formField.getFormFieldNameInput(1).fill('Surname');
+    await expect(proposalFormFieldPage.fieldMoreOptions.nth(testedFormFieldTypes.length + 1)).toBeVisible();
 
     await proposalPage.page.waitForTimeout(500);
 
     await proposalPage.page.reload();
 
-    // Reload the page to ensure the changes were saved
-    await expect(proposalPage.page.locator('data-test=field-label').filter({ hasText: /^Full name\*$/ })).toBeVisible();
+    // Expect new field to be visible after reloading
+    await expect(proposalFormFieldPage.fieldMoreOptions.nth(testedFormFieldTypes.length + 1)).toBeVisible();
+
+    // Delete this new additional field
+    await proposalFormFieldPage.fieldMoreOptions.nth(testedFormFieldTypes.length + 1).click();
+    await proposalFormFieldPage.deleteField.click();
+
+    await proposalPage.page.waitForTimeout(500);
+
+    await proposalPage.page.reload();
+
+    // Make sure the field was deleted
+    await expect(proposalFormFieldPage.fieldMoreOptions.nth(testedFormFieldTypes.length + 1)).not.toBeVisible();
   });
 
   test('Create proposal from structure template after providing required fields', async ({
     proposalPage,
-    proposalListPage,
+    proposalsListPage,
     documentPage,
-    formField
+    page,
+    proposalFormFieldPage
   }) => {
     await loginBrowserUser({
-      browserPage: proposalListPage.page,
+      browserPage: proposalsListPage.page,
       userId: spaceAdmin.id
     });
 
@@ -220,11 +260,11 @@ test.describe.serial('Structured proposal template', () => {
 
     const formFieldIds = proposalTemplate.form!.formFields.map((_formField) => _formField.id);
 
-    await proposalListPage.goToProposals(space.domain);
+    await proposalsListPage.goToProposals(space.domain);
 
-    await proposalListPage.waitForProposalsList();
+    await proposalsListPage.waitForProposalsList();
 
-    await proposalListPage.proposalTemplateSelect.click();
+    await proposalsListPage.proposalTemplateSelect.click();
 
     await proposalPage.getSelectOption(proposalTemplate.page!.id).click();
 
@@ -233,10 +273,10 @@ test.describe.serial('Structured proposal template', () => {
     // Should be disabled as the required fields are not filled
     await expect(proposalPage.saveDraftButton).toBeDisabled();
 
-    await documentPage.documentTitle.getByPlaceholder('Title (required)').fill('Proposal 1');
-
-    await formField.getFormFieldInput(formFieldIds[0]).fill('John');
-    await formField.getFormFieldInput(formFieldIds[2]).fill('Doe');
+    for (let i = 0; i < testedFormFieldTypes.length; i++) {
+      const fieldType = testedFormFieldTypes[i];
+      await proposalFormFieldPage.getFormFieldInput(formFieldIds[i]).fill(testValues[fieldType]);
+    }
 
     proposalPage.saveDraftButton.click();
 
@@ -245,12 +285,12 @@ test.describe.serial('Structured proposal template', () => {
 
   test('Visit structured proposal and edit form field answers as an author', async ({
     proposalPage,
-    proposalListPage,
+    proposalsListPage,
     documentPage,
-    formField
+    proposalFormFieldPage
   }) => {
     await loginBrowserUser({
-      browserPage: proposalListPage.page,
+      browserPage: proposalsListPage.page,
       userId: spaceAdmin.id
     });
 
@@ -291,7 +331,7 @@ test.describe.serial('Structured proposal template', () => {
       path: proposal.page!.path
     });
 
-    await formField.getFormFieldInput(formFieldIds[1]).fill('John Doe');
+    await proposalFormFieldPage.getFormFieldInput(formFieldIds[1]).fill('John Doe');
 
     await proposalPage.completeDraftButton.click();
 
@@ -300,16 +340,16 @@ test.describe.serial('Structured proposal template', () => {
     await proposalPage.page.reload();
 
     // Reload the page to ensure the changes were saved
-    await expect(formField.getFormFieldInput(formFieldIds[1])).toHaveValue('John Doe');
+    await expect(proposalFormFieldPage.getFormFieldInput(formFieldIds[1])).toHaveValue('John Doe');
   });
 
   test('Visit structured proposal and view only public form fields as a space member', async ({
-    proposalListPage,
+    proposalsListPage,
     documentPage,
-    formField
+    proposalFormFieldPage
   }) => {
     await loginBrowserUser({
-      browserPage: proposalListPage.page,
+      browserPage: proposalsListPage.page,
       userId: spaceMember.id
     });
 
@@ -334,8 +374,14 @@ test.describe.serial('Structured proposal template', () => {
       path: proposal.page!.path
     });
 
-    await expect(formField.page.locator('data-test=field-label').filter({ hasText: 'Full name' })).toBeVisible();
-    await expect(formField.page.locator('data-test=field-label').filter({ hasText: 'Surname' })).toBeVisible();
-    await expect(formField.page.locator('data-test=field-label').filter({ hasText: 'Nickname' })).not.toBeVisible();
+    await expect(
+      proposalFormFieldPage.page.locator('data-test=field-label').filter({ hasText: 'Full name' })
+    ).toBeVisible();
+    await expect(
+      proposalFormFieldPage.page.locator('data-test=field-label').filter({ hasText: 'Surname' })
+    ).toBeVisible();
+    await expect(
+      proposalFormFieldPage.page.locator('data-test=field-label').filter({ hasText: 'Nickname' })
+    ).not.toBeVisible();
   });
 });
