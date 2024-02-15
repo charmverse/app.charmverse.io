@@ -18,7 +18,7 @@ const mockPermissions: ProposalPermissionFlags = {
   edit: true,
   delete: true,
   view: false,
-  view_private_fields: false,
+  view_private_fields: true,
   create_vote: false,
   make_public: false,
   archive: false,
