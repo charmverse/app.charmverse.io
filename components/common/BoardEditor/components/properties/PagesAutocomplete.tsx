@@ -276,9 +276,10 @@ function PagesAutocompleteBase({
                   <RemoveIcon
                     fontSize='small'
                     color='secondary'
-                    onClick={() =>
-                      onChange(selectedPageListItems.filter((v) => v.id !== pageListItem.id).map((v) => v.id))
-                    }
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onChange(selectedPageListItems.filter((v) => v.id !== pageListItem.id).map((v) => v.id));
+                    }}
                   />
                 </Tooltip>
               ) : (
