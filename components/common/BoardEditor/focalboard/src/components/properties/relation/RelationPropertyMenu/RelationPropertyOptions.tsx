@@ -245,11 +245,12 @@ export function RelationPropertyEditOptions({
   const relatedProperty = relatedBoard?.fields.cardProperties.find(
     (property) => property.id === relationData.relatedPropertyId
   );
+  const boardPage = Object.values(pages).find((page) => page && page.boardId === board.id);
 
   const isMutating = isSyncingRelationProperty || isRenamingRelationProperty || isUnsyncingRelationProperty;
 
   const [relatedPropertyTitle, setRelatedPropertyTitle] = useState(
-    relatedProperty?.name ?? `Related to ${board.title || 'Untitled'}`
+    relatedProperty?.name ?? `Related to ${boardPage?.title ?? 'Untitled'}`
   );
 
   const relatedPropertyUpdated =
@@ -260,7 +261,7 @@ export function RelationPropertyEditOptions({
     setRelationDataTemp(relationData);
   }, [relationData]);
 
-  if (!connectedBoard || !relationData) {
+  if (!connectedBoard || !relationData || !boardPage) {
     return null;
   }
 
@@ -290,7 +291,7 @@ export function RelationPropertyEditOptions({
                   e.stopPropagation();
                   setRelatedPropertyTitle(e.target.value);
                 }}
-                placeholder={`Related to ${board.title || 'Untitled'}`}
+                placeholder={`Related to ${boardPage.title || 'Untitled'}`}
                 autoFocus
               />
             </>
@@ -311,7 +312,7 @@ export function RelationPropertyEditOptions({
                   syncRelationProperty({
                     boardId: board.id,
                     templateId: propertyId,
-                    relatedPropertyTitle: relatedPropertyTitle || `Related to ${board.title ?? 'Untitled'}`
+                    relatedPropertyTitle: relatedPropertyTitle || `Related to ${boardPage?.title ?? 'Untitled'}`
                   });
                 } else if (action === 'rename') {
                   renameRelationProperty({

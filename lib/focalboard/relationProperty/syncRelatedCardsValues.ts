@@ -1,8 +1,6 @@
 import type { Block, Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { NotFoundError } from 'lib/middleware';
-
 import type { IPropertyTemplate } from '../board';
 import type { CardFields } from '../card';
 
