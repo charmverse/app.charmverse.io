@@ -110,12 +110,10 @@ test.describe.serial('Create and use Proposal Template', async () => {
   test('Create a freeform proposal template with custom rewards', async ({
     page,
     proposalPage,
-    rewardPage,
     dialogRewardPage,
     dialogDocumentPage,
-    proposalsListPage,
-    globalPage,
-    documentPage
+    documentPage,
+    proposalsListPage
   }) => {
     // Log in the browser admin
     await loginBrowserUser({ browserPage: page, userId: admin.id });
@@ -174,16 +172,15 @@ test.describe.serial('Create and use Proposal Template', async () => {
     await proposalPage.documentTitleInput.fill(templatePageContent.title);
 
     // Edit the proposal content
-    await proposalPage.charmEditor.click();
-    await page.keyboard.type(templatePageContent.description);
+    await documentPage.typeText(templatePageContent.description);
 
     // Add a new reward
     await proposalPage.addReward.click();
 
     // Set reward title and description
     await dialogDocumentPage.documentTitleInput.fill(rewardConfig.title);
-    await dialogDocumentPage.charmEditor.click();
-    await page.keyboard.type(rewardConfig.description);
+
+    await dialogDocumentPage.typeText(rewardConfig.description);
 
     // Open reward token settings
     await dialogRewardPage.openRewardValueDialog.click();
@@ -407,6 +404,8 @@ test.describe.serial('Create and use Proposal Template', async () => {
     // We only need to use to title. The content should come through from the template
     await expect(proposalPage.documentTitleInput).toBeVisible();
     await proposalPage.documentTitleInput.fill(userProposalConfig.title);
+
+    await page.pause();
 
     // Check that configuration fields are readonly and user cannot edit proposal
     const reviewerInput = (await proposalPage.getSelectedReviewers()).nth(1);
