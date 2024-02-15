@@ -149,6 +149,7 @@ function FormFieldsInputBase({
           (formField.formFieldAnswer ? fieldAnswerIdThreadRecord[formField.formFieldAnswer.id] : []) ?? [];
         return (
           <StyledStack
+            sx={{ my: 2 }}
             key={formField.id}
             className='proposal-form-field-answer'
             data-thread-ids={fieldAnswerThreads.map((fieldAnswerThread) => fieldAnswerThread.id).join(',')}
