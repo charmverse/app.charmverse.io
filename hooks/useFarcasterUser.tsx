@@ -29,7 +29,7 @@ export type FarcasterUserContext = {
   createAndStoreSigner: () => Promise<void>;
   logout: () => void;
   signerApprovalModalPopupState: PopupState;
-  farcasterProfile: FarcasterProfile['body'] | null;
+  farcasterProfile: (FarcasterProfile['body'] & { connectedAddresses: string[] }) | null;
 };
 
 export const FarcasterUserContext = createContext<FarcasterUserContext>({
@@ -208,7 +208,17 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
       createAndStoreSigner,
       logout,
       signerApprovalModalPopupState,
-      farcasterProfile: farcasterProfile ? farcasterProfile.body : null
+      farcasterProfile: farcasterProfile
+        ? {
+            ...farcasterProfile.body,
+            connectedAddresses: Array.from(
+              new Set([
+                ...(farcasterProfile.connectedAddresses || []),
+                ...(farcasterProfile.connectedAddress ? [farcasterProfile.connectedAddress] : [])
+              ])
+            )
+          }
+        : null
     }),
     [farcasterUser, farcasterProfile, isCreatingSigner, signerApprovalModalPopupState]
   );

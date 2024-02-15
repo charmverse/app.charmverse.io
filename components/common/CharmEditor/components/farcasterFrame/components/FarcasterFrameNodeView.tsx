@@ -38,7 +38,6 @@ export function FarcasterFrameNodeView({
 }: CharmNodeViewProps & {
   pageId?: string;
 }) {
-  const { mintNFT } = useReservoir();
   const { space } = useCurrentSpace();
   const { error, isLoadingFrame, getFarcasterFrame, farcasterFrame, submitOption, isLoadingFrameAction } =
     useFarcasterFrame(attrs.src ? { frameUrl: attrs.src, pageId } : undefined);
@@ -256,6 +255,7 @@ export function FarcasterFrameNodeView({
                         item={button}
                         isFarcasterUserAvailable={isFarcasterUserAvailable}
                         isLoadingFrameAction={isLoadingFrameAction}
+                        takerAddress={farcasterProfile?.connectedAddresses[0] || farcasterProfile?.address || ''}
                       />
                     ) : (
                       <FarcasterButton

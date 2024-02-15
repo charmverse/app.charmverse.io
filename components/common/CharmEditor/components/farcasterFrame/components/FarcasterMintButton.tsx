@@ -18,9 +18,10 @@ type Props = {
   item: FrameButtonMint;
   isLoadingFrameAction: boolean;
   isFarcasterUserAvailable: boolean;
+  takerAddress: string;
 };
 
-export function FarcasterMintButton({ item, isFarcasterUserAvailable, isLoadingFrameAction }: Props) {
+export function FarcasterMintButton({ item, isFarcasterUserAvailable, isLoadingFrameAction, takerAddress }: Props) {
   const { mintNFT } = useReservoir();
   const { user } = useUser();
   const { openSettings } = useSettingsDialog();
@@ -40,8 +41,7 @@ export function FarcasterMintButton({ item, isFarcasterUserAvailable, isLoadingF
   const onClickMint = async () => {
     setIsLoading(true);
     try {
-      // pass farcaster wallet address to mint
-      const minted = await mintNFT(tokenToMint, '0x464fEcdb86cA7275c74bc65Fe95E72AA549Fa7ba');
+      const minted = await mintNFT(tokenToMint, takerAddress);
       if (minted && (minted.txHash || minted.res === true)) {
         showMessage('NFT minted successfully!');
       }
@@ -102,7 +102,7 @@ export function FarcasterMintButton({ item, isFarcasterUserAvailable, isLoadingF
       <FarcasterButton
         onClick={button.onClick}
         loading={isLoading}
-        disabled={isLoading || !isFarcasterUserAvailable || isLoadingFrameAction}
+        disabled={isLoading || !isFarcasterUserAvailable || isLoadingFrameAction || !takerAddress}
       >
         {button.icon}
         <Typography
