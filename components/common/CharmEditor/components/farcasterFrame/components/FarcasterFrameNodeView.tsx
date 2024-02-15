@@ -256,6 +256,9 @@ export function FarcasterFrameNodeView({
                         isFarcasterUserAvailable={isFarcasterUserAvailable}
                         isLoadingFrameAction={isLoadingFrameAction}
                         takerAddress={farcasterProfile?.connectedAddresses[0] || farcasterProfile?.address || ''}
+                        pageId={pageId}
+                        spaceId={space?.id}
+                        frameUrl={node.attrs.src}
                       />
                     ) : (
                       <FarcasterButton

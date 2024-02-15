@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { GiDiamonds } from 'react-icons/gi';
 import { useAccount, useNetwork } from 'wagmi';
 
+import charmClient from 'charmClient';
 import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/Web3ConnectionManager';
 import { FarcasterButton } from 'components/common/CharmEditor/components/farcasterFrame/components/FarcasterButton';
 import { useReservoir } from 'hooks/useReservoir';
@@ -19,9 +20,20 @@ type Props = {
   isLoadingFrameAction: boolean;
   isFarcasterUserAvailable: boolean;
   takerAddress: string;
+  frameUrl: string;
+  pageId?: string;
+  spaceId?: string;
 };
 
-export function FarcasterMintButton({ item, isFarcasterUserAvailable, isLoadingFrameAction, takerAddress }: Props) {
+export function FarcasterMintButton({
+  item,
+  isFarcasterUserAvailable,
+  isLoadingFrameAction,
+  takerAddress,
+  spaceId,
+  frameUrl,
+  pageId
+}: Props) {
   const { mintNFT } = useReservoir();
   const { user } = useUser();
   const { openSettings } = useSettingsDialog();
@@ -41,8 +53,23 @@ export function FarcasterMintButton({ item, isFarcasterUserAvailable, isLoadingF
   const onClickMint = async () => {
     setIsLoading(true);
     try {
+      if (frameUrl && pageId && spaceId) {
+        charmClient.track.trackAction('frame_mint_start', {
+          frameUrl,
+          pageId,
+          spaceId
+        });
+      }
+
       const minted = await mintNFT(tokenToMint, takerAddress);
       if (minted && (minted.txHash || minted.res === true)) {
+        if (frameUrl && pageId && spaceId) {
+          charmClient.track.trackAction('frame_mint_success', {
+            frameUrl,
+            pageId,
+            spaceId
+          });
+        }
         showMessage('NFT minted successfully!');
       }
     } catch (error) {

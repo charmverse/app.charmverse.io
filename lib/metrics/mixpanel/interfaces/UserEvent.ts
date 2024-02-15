@@ -48,17 +48,6 @@ export type CreateNewSpace = BaseEvent & {
   source?: string;
 };
 
-export type ViewFarcasterFrame = BaseEvent & {
-  frameUrl: string;
-  pageId: string;
-};
-
-export type AddFarcasterFrame = ViewFarcasterFrame;
-
-export type InteractFarcasterFrame = BaseEvent & {
-  pageId: string;
-};
-
 export type AppLoaded = BaseEventWithoutGroup & { spaceId?: string };
 
 export interface UserEventMap {
@@ -73,7 +62,4 @@ export interface UserEventMap {
   app_loaded: AppLoaded;
   delete_otp: UserOtp;
   add_otp: UserOtp;
-  add_farcaster_frame: AddFarcasterFrame;
-  view_farcaster_frame: ViewFarcasterFrame;
-  interact_farcaster_frame: InteractFarcasterFrame;
 }
