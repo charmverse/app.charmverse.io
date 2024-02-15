@@ -150,7 +150,7 @@ function DocumentPageComponent({
 
   const enableComments = !isSharedPage && !enableSuggestingMode && !isPageTemplate && !!pagePermissions?.comment;
 
-  const isStructuredProposal = Boolean(proposal && proposal.formId);
+  const isStructuredProposal = Boolean(proposal?.formId);
   const isUnpublishedProposal = proposal?.status === 'draft' || page.type === 'proposal_template';
 
   // create a key that updates when edit mode changes - default to 'editing' so we dont close sockets immediately
@@ -382,25 +382,23 @@ function DocumentPageComponent({
                 {creatingInlineReward && !readOnly && <NewInlineReward pageId={page.id} />}
               </CardPropertiesWrapper>
               {proposal && proposal.formId ? (
-                <Box mb={10}>
-                  {page.type === 'proposal_template' ? (
-                    <FormFieldsEditor
-                      readOnly={(!isAdmin && (!user || !proposalAuthors.includes(user.id))) || !!proposal?.archived}
-                      proposalId={proposal.id}
-                      formFields={proposal.form?.formFields ?? []}
-                    />
-                  ) : (
-                    <ProposalFormFieldsInput
-                      pageId={page.id}
-                      enableComments={proposal.permissions.comment}
-                      proposalId={proposal.id}
-                      formFields={proposal.form?.formFields ?? []}
-                      readOnly={!proposal.permissions.edit}
-                      threads={threads}
-                      isDraft={proposal?.status === 'draft'}
-                    />
-                  )}
-                </Box>
+                page.type === 'proposal_template' ? (
+                  <FormFieldsEditor
+                    readOnly={(!isAdmin && (!user || !proposalAuthors.includes(user.id))) || !!proposal?.archived}
+                    proposalId={proposal.id}
+                    formFields={proposal.form?.formFields ?? []}
+                  />
+                ) : (
+                  <ProposalFormFieldsInput
+                    pageId={page.id}
+                    enableComments={proposal.permissions.comment}
+                    proposalId={proposal.id}
+                    formFields={proposal.form?.formFields ?? []}
+                    readOnly={!proposal.permissions.edit}
+                    threads={threads}
+                    isDraft={proposal?.status === 'draft'}
+                  />
+                )
               ) : (
                 <CharmEditor
                   placeholderText={
@@ -437,7 +435,7 @@ function DocumentPageComponent({
               )}
 
               {isStructuredProposal && proposal?.fields?.enableRewards && (
-                <>
+                <Box mb={10}>
                   <Box my={1}>
                     <Typography variant='h5'>{getFeatureTitle('Rewards')}</Typography>
                   </Box>
@@ -478,7 +476,7 @@ function DocumentPageComponent({
                       });
                     }}
                   />
-                </>
+                </Box>
               )}
 
               {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') && (
