@@ -103,7 +103,7 @@ test.describe.serial('Archive Proposal', () => {
 
     expect(updatedProposal.archived).toBe(true);
 
-    await expect(proposalPage.moveFromFeedbackEvaluation).toBeDisabled();
+    await expect(proposalPage.passFeedbackEvaluation).toBeDisabled();
 
     // Visit proposals list page and assert archived proposal is not visible
 
@@ -137,7 +137,7 @@ test.describe.serial('Archive Proposal', () => {
     });
 
     expect(updatedProposal2.archived).toBe(false);
-    await expect(proposalPage.moveFromFeedbackEvaluation).not.toBeDisabled();
+    await expect(proposalPage.passFeedbackEvaluation).not.toBeDisabled();
     await expect(documentPage.charmEditor).toHaveAttribute('contenteditable', 'true');
   });
 });

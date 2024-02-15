@@ -86,6 +86,7 @@ type Props = {
   mutator?: Mutator;
   subRowsEmptyValueContent?: ReactElement | string;
   proposal?: CardPage['proposal'];
+  showCard?: (cardId: string | null) => void;
 };
 
 export const validatePropertyValue = (propType: string, val: string): boolean => {
@@ -287,6 +288,7 @@ function PropertyValueElement(props: Props) {
         selectedPageListItemIds={
           typeof propertyValue === 'string' ? [propertyValue] : (propertyValue as string[]) ?? []
         }
+        showCard={props.showCard}
         displayType={displayType}
         emptyPlaceholderContent={emptyDisplayValue}
         showEmptyPlaceholder={showEmptyPlaceholder}

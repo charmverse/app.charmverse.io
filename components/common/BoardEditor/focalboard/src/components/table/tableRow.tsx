@@ -357,6 +357,7 @@ function TableRow(props: Props) {
             onPaste={(e) => e.stopPropagation()}
           >
             <PropertyValueElement
+              showCard={(cardId) => cardId && props.showCard(cardId)}
               readOnly={props.readOnly}
               syncWithPageId={cardPage?.syncWithPageId}
               card={card}
