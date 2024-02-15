@@ -205,7 +205,13 @@ test.describe.serial('Create and use Proposal Template', async () => {
 
     await dialogRewardPage.saveTokenPaymentMethod.click();
 
+    // Reduce flakiness
+    await expect(dialogRewardPage.saveRewardValue).toBeVisible();
+
     await dialogRewardPage.saveRewardValue.click();
+
+    // Reduce flakiness
+    await expect(dialogRewardPage.saveRewardValue).toBeVisible();
 
     await dialogDocumentPage.saveNewPage.click();
 
