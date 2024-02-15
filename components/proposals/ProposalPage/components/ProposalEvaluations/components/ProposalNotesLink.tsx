@@ -1,16 +1,20 @@
-import { Box } from '@mui/material';
+import styled from '@emotion/styled';
 import type { MouseEvent } from 'react';
 
 import { useGetOrCreateProposalNotesId } from 'charmClient/hooks/proposals';
-import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import {
   StyledLink,
   StyledTypography
 } from 'components/common/CharmEditor/components/nestedPage/components/NestedPage';
-import Link from 'components/common/Link';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { PageIcon } from 'components/common/PageIcon';
 import { useSnackbar } from 'hooks/useSnackbar';
+
+const StyledIcon = styled(StyledLink)`
+  svg {
+    font-size: 20px;
+  }
+`;
 
 export function ProposalNotesLink({ proposalId }: { proposalId?: string }) {
   const { showPage } = usePageDialog();
@@ -30,9 +34,9 @@ export function ProposalNotesLink({ proposalId }: { proposalId?: string }) {
   }
 
   return (
-    <StyledLink onClick={onClickInternalLink}>
+    <StyledIcon onClick={onClickInternalLink}>
       <PageIcon pageType='page' />
       <StyledTypography variant='caption'>Reviewer Notes</StyledTypography>
-    </StyledLink>
+    </StyledIcon>
   );
 }
