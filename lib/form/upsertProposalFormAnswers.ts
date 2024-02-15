@@ -36,9 +36,9 @@ export async function upsertProposalFormAnswers({ answers, formId, proposalId }:
         return null;
       }
 
-      // if (field.required && !a.value) {
-      //   throw new InvalidInputError(`Value for field ${field.name} is required`);
-      // }
+      if (field.required && !a.value) {
+        throw new InvalidInputError(`Value for field ${field.name} is required`);
+      }
 
       return a;
     })
@@ -48,9 +48,9 @@ export async function upsertProposalFormAnswers({ answers, formId, proposalId }:
     (f) => !f.required || answersToSave.some((a) => a.fieldId === f.id && !!a.value)
   );
 
-  // if (!hasAllRequiredAnswers) {
-  //   throw new InvalidInputError(`All required fields must be answered`);
-  // }
+  if (!hasAllRequiredAnswers) {
+    throw new InvalidInputError(`All required fields must be answered`);
+  }
 
   const res = await prisma.$transaction([
     ...answersToSave.map((a) => {
