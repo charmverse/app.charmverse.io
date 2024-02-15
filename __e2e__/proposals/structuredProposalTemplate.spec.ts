@@ -71,7 +71,7 @@ test.beforeAll(async () => {
 });
 
 test.describe.serial('Structured proposal template', () => {
-  test.skip('User creates a structured proposal template with required and non-required fields', async ({
+  test('User creates a structured proposal template with required and non-required fields', async ({
     databasePage,
     proposalPage,
     proposalListPage,
@@ -121,7 +121,7 @@ test.describe.serial('Structured proposal template', () => {
     await proposalPage.page.waitForResponse(/\/api\/proposals/);
   });
 
-  test.skip('Visit structured proposal template and edit/add fields', async ({
+  test('Visit structured proposal template and edit/add fields', async ({
     databasePage,
     proposalPage,
     proposalListPage,
@@ -181,7 +181,7 @@ test.describe.serial('Structured proposal template', () => {
     await expect(proposalPage.page.locator('data-test=field-label').filter({ hasText: /^Full name\*$/ })).toBeVisible();
   });
 
-  test.skip('Create proposal from structure template after providing required fields', async ({
+  test('Create proposal from structure template after providing required fields', async ({
     proposalPage,
     proposalListPage,
     documentPage,
@@ -243,7 +243,7 @@ test.describe.serial('Structured proposal template', () => {
     await proposalPage.page.waitForResponse(/\/api\/proposals/);
   });
 
-  test.skip('Visit structured proposal and edit form field answers as an author', async ({
+  test('Visit structured proposal and edit form field answers as an author', async ({
     proposalPage,
     proposalListPage,
     documentPage,
@@ -303,7 +303,7 @@ test.describe.serial('Structured proposal template', () => {
     await expect(formField.getFormFieldInput(formFieldIds[1])).toHaveValue('John Doe');
   });
 
-  test.skip('Visit structured proposal and view only public form fields as a space member', async ({
+  test('Visit structured proposal and view only public form fields as a space member', async ({
     proposalListPage,
     documentPage,
     formField

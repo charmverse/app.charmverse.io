@@ -107,7 +107,7 @@ test.describe.serial('Create and use Proposal Template', async () => {
     });
   });
 
-  test.skip('Create a freeform proposal template with custom rewards', async ({
+  test('Create a freeform proposal template with custom rewards', async ({
     page,
     proposalPage,
     rewardPage,
@@ -391,7 +391,7 @@ test.describe.serial('Create and use Proposal Template', async () => {
     );
   });
 
-  test.skip('Create a proposal from a template', async ({ proposalsListPage, proposalPage, page }) => {
+  test('Create a proposal from a template', async ({ proposalsListPage, proposalPage, page }) => {
     const userProposalConfig = {
       title: 'User created proposal',
       content: 'This is what I am proposing'

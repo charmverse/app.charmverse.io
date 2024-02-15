@@ -4,7 +4,7 @@ import { NumberInputField } from 'components/common/form/fields/NumberInputField
 import { SelectField } from 'components/common/form/fields/SelectField';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 import type { ControlFieldProps, FieldProps, FieldType } from 'components/common/form/interfaces';
-import { ImageUploadButton } from 'components/common/ImageSelector/ImageUploadButton';
+import type { UploadedFileInfo } from 'hooks/useS3UploadInput';
 
 import { CharmEditorInputField } from './CharmEditorInputField';
 import { DateInputField } from './DateInputField';
@@ -89,7 +89,7 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
       }
 
       case 'file': {
-        return <FileField {...fieldProps} />;
+        return <FileField {...fieldProps} value={fieldProps.value as UploadedFileInfo} />;
       }
 
       default: {
