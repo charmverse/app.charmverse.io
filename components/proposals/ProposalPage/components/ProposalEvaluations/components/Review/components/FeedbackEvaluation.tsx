@@ -13,14 +13,14 @@ export type Props = {
   proposalId?: string;
   evaluation: Pick<PopulatedEvaluation, 'id' | 'completedAt' | 'reviewers' | 'result' | 'title'>;
   isCurrent: boolean;
-  hasMovePermission: boolean;
+  hasEvaluatePermission: boolean;
   nextStep?: { title: string };
   onSubmit?: VoidFunction;
   archived?: boolean;
 };
 
 export function FeedbackEvaluation({
-  hasMovePermission,
+  hasEvaluatePermission,
   proposalId,
   evaluation,
   isCurrent,
@@ -38,10 +38,10 @@ export function FeedbackEvaluation({
   const completedDate = evaluation.completedAt ? getRelativeTimeInThePast(new Date(evaluation.completedAt)) : null;
   const disabledTooltip = !isCurrent
     ? 'This evaluation step is not active'
-    : !hasMovePermission
-    ? 'You do not have permission to move this proposal'
+    : !hasEvaluatePermission
+    ? 'You do not have permission to pass or reject this proposal'
     : archived
-    ? 'You cannot move an archived proposal'
+    ? 'You cannot pass or reject an archived proposal'
     : null;
 
   async function onMoveForward() {

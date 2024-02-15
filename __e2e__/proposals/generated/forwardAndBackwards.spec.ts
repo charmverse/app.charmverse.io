@@ -1,10 +1,9 @@
 import type { Page, Proposal, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { generateUserAndSpace, loginBrowserUser } from '__e2e__/utils/mocks';
 import { expect, test } from '__e2e__/utils/test';
-
-import type { VoteSettings } from 'lib/proposal/interface';
 
 test.describe('Go through full proposal flow', async () => {
   let space: Space;
@@ -35,7 +34,7 @@ test.describe('Go through full proposal flow', async () => {
       evaluationInputs: [
         {
           evaluationType: 'feedback',
-          permissions: [{ assignee: { group: 'current_reviewer' }, operation: 'move' }],
+          permissions: [],
           reviewers: [{ group: 'user', id: reviewer.id }]
         },
         {
@@ -108,19 +107,23 @@ test.describe('Go through full proposal flow', async () => {
 
     await page.waitForTimeout(500);
 
-    await proposalPage.goBackButton.click();
-    await proposalPage.confirmStatusButton.click();
-
-    await page.waitForTimeout(500);
+    await expect(proposalPage.goBackButton).toBeDisabled();
 
     const proposalAfterUpdate = await prisma.proposal.findFirstOrThrow({
       where: {
         id: proposal.id
+      },
+      select: {
+        evaluations: {
+          orderBy: {
+            index: 'asc'
+          }
+        }
       }
     });
 
-    await page.pause();
+    const current = getCurrentEvaluation(proposalAfterUpdate.evaluations);
 
-    expect(proposalAfterUpdate?.status).toBe('draft');
+    expect(current?.index).toEqual(0);
   });
 });
