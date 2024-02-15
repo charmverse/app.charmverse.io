@@ -22,7 +22,7 @@ export function ImageField({ value, ...props }: Props) {
     <FieldWrapper {...props}>
       <ImageSelector onImageSelect={(newValue) => (props.onChange && newValue ? props.onChange(newValue) : null)}>
         <Button sx={{ my: 2 }} color='primary'>
-          {value ? 'Change uploaded' : 'Upload'} image
+          Choose image
         </Button>
         {value && <Image width={300} height={300} src={value as string} alt='user submission' />}
       </ImageSelector>

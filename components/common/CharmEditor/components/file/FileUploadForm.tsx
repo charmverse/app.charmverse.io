@@ -29,7 +29,7 @@ export function FileUploadForm({ onComplete, align = 'center' }: Props) {
       <input type='file' hidden onChange={onFileChange} ref={inputRef} />
 
       <Box height='40px'>
-        {isUploading || progress > 0 ? (
+        {isUploading || (progress > 0 && progress !== 100) ? (
           <Box display='flex' alignItems={align} gap={1}>
             <Typography color='secondary' variant='subtitle1'>
               Uploading: {fileName || ''}
@@ -48,7 +48,7 @@ export function FileUploadForm({ onComplete, align = 'center' }: Props) {
         )}
       </Box>
 
-      <Button component='label' variant='contained' onClick={openFilePicker}>
+      <Button loading={isUploading} component='label' variant='contained' onClick={openFilePicker}>
         Choose a file
       </Button>
     </Box>
