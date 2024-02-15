@@ -18,7 +18,7 @@ type Props = {
 export function DocumentHeaderElements({ headerHeight, page }: Props) {
   const { deletedAt, id, type } = page;
   const isBasePageDocument = documentTypes.includes(type as PageType);
-  const enableShare = deletedAt && type !== 'proposal_notes';
+  const enableShare = !deletedAt && type !== 'proposal_notes';
   return (
     <>
       {isBasePageDocument && <DocumentParticipants />}
