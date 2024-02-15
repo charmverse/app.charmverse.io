@@ -22,8 +22,21 @@ export class FormField extends DocumentPage {
     return this.formFieldNameInput.getByPlaceholder('Title (required)').nth(index);
   }
 
-  getFormFieldInput(fieldId: string) {
-    return this.page.locator(`data-test=form-field-input-${fieldId} >> textarea`).nth(0);
+  getFormFieldInput(fieldId: string, fieldType: FormFieldType) {
+    const baseLocator = this.page.locator(`data-test=form-field-input-${fieldId}`);
+
+    switch (fieldType) {
+      case 'wallet':
+      case 'email':
+      case 'url':
+      case 'phone':
+      case 'short_text':
+        return baseLocator.locator('textarea').first();
+      case 'date':
+      case 'number':
+      default:
+        return baseLocator.locator('input').first();
+    }
   }
 
   async selectFormFieldType({ index, fieldType }: { index: number; fieldType: FormFieldType }) {
