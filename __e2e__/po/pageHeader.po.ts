@@ -15,13 +15,16 @@ export class PageHeader {
 
   readonly convertProposalAction: Locator;
 
-  constructor(page: Page) {
+  public rootSelector: { locator: Locator['locator'] };
+
+  constructor(page: Page, rootSelector?: string) {
     this.page = page;
-    this.pageTopLevelMenu = this.page.locator('data-test=header--show-page-actions');
-    this.forumPostActions = this.page.locator('data-test=header--forum-post-actions');
-    this.pageActionsMenu = this.page.locator('data-test=header--page-actions');
-    this.deleteCurrentPage = this.page.locator('data-test=header--delete-current-page');
-    this.convertProposalAction = this.page.locator('data-test=convert-proposal-action');
+    this.rootSelector = rootSelector ? this.page.locator(rootSelector) : this.page;
+    this.pageTopLevelMenu = this.rootSelector.locator('data-test=header--show-page-actions');
+    this.forumPostActions = this.rootSelector.locator('data-test=header--forum-post-actions');
+    this.pageActionsMenu = this.rootSelector.locator('data-test=header--page-actions');
+    this.deleteCurrentPage = this.rootSelector.locator('data-test=header--delete-current-page');
+    this.convertProposalAction = this.rootSelector.locator('data-test=convert-proposal-action');
   }
 
   async convertToProposal() {

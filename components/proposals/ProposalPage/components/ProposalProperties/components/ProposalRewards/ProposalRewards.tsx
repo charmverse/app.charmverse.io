@@ -18,6 +18,7 @@ import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalPendingReward } from 'lib/proposal/interface';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 import type { RewardReviewer } from 'lib/rewards/interfaces';
@@ -60,6 +61,7 @@ export function ProposalRewards({
   const { rewards: allRewards } = useRewards();
   const { templates } = useRewardTemplates({ load: !!requiredTemplateId });
 
+  const { getFeatureTitle } = useSpaceFeatures();
   const {
     updateURLQuery,
     navigateToSpacePath,
@@ -300,7 +302,7 @@ export function ProposalRewards({
       >
         <NewDocumentPage
           key={newPageValues?.templateId}
-          titlePlaceholder='Reward title (required)'
+          titlePlaceholder={`${getFeatureTitle('Reward')} title (required)`}
           values={newPageValues}
           onChange={updateNewPageValues}
         >

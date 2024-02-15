@@ -173,7 +173,7 @@ export function EvaluationsReview({
                 proposalId={proposal?.id}
                 isCurrent={isCurrent}
                 nextStep={proposal.evaluations[index + 1]}
-                hasMovePermission={proposal.permissions.move}
+                hasEvaluatePermission={proposal.permissions.evaluate}
                 onSubmit={refreshProposal}
               />
             )}
