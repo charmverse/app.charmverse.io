@@ -85,6 +85,9 @@ test.describe('View a proposal without workflow permissions, but space enabled p
   }) => {
     // Test logged out user
     await documentPage.goToPage({ domain: space.domain, path: proposal.page.path });
+
+    await expect(proposalPage.documentTitle).toBeVisible();
+
     const title = (await proposalPage.documentTitle.allInnerTexts())[0];
 
     expect(title).toEqual(proposalTitle);
@@ -158,6 +161,8 @@ test.describe('View a proposal without workflow permissions, but proposal has a 
     await loginBrowserUser({ browserPage: page, userId: externalUser.id });
     await documentPage.goToPage({ domain: space.domain, path: proposal.page.path });
 
+    await expect(proposalPage.documentTitle).toBeVisible();
+
     const title = (await proposalPage.documentTitle.allInnerTexts())[0];
 
     expect(title).toEqual(proposalTitle);
@@ -169,6 +174,9 @@ test.describe('View a proposal without workflow permissions, but proposal has a 
   }) => {
     // Test logged out user
     await documentPage.goToPage({ domain: space.domain, path: proposal.page.path });
+
+    await expect(proposalPage.documentTitle).toBeVisible();
+
     const title = (await proposalPage.documentTitle.allInnerTexts())[0];
 
     expect(title).toEqual(proposalTitle);

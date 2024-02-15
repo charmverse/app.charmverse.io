@@ -441,7 +441,8 @@ test.describe.serial('Create and use Proposal Template', async () => {
 
     await proposalPage.saveDraftButton.click();
 
-    await page.waitForResponse('**/api/proposals**');
+    // Sometimes waiting for API times out. This should fix it
+    await page.waitForTimeout(1000);
 
     const savedUserProposalFromTemplate = await prisma.page.findFirstOrThrow({
       where: {
