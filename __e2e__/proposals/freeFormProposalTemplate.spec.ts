@@ -125,6 +125,8 @@ test.describe.serial('Create and use Proposal Template', async () => {
     await proposalsListPage.addNewTemplate.click();
     await proposalsListPage.proposalTemplateFreeFormOption.click();
 
+    await expect(proposalPage.workflowSelect).toBeVisible();
+
     // Select a workflow
     await proposalPage.selectWorkflow(secondProposalWorkflow.id);
 
@@ -212,7 +214,8 @@ test.describe.serial('Create and use Proposal Template', async () => {
 
     await proposalPage.saveDraftButton.click();
 
-    await page.waitForResponse('**/api/proposals**');
+    // We were waiting for API response, but this was flaky. This should allow the request to complete
+    await page.waitForTimeout(1000);
 
     // Check the actual data
     savedProposalTemplate = (await prisma.page.findFirstOrThrow({
