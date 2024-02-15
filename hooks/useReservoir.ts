@@ -7,6 +7,8 @@ import { reservoirClient } from 'lib/blockchain/reservoirClient';
 
 const log = getLogger('reservoir');
 
+const REFERRER_ADDRESS = '0x1cD919942a8EF3e867Fe9C0813BC4851090cF037'; // charmverse.eth
+
 export type TokenToMint = {
   namespace: string;
   chainId: number;
@@ -33,7 +35,9 @@ export function useReservoir() {
       return;
     }
 
-    const mintItem = tokenId ? { token: `${address}:${tokenId}`, quantity: 1 } : { collection: address, quantity: 1 };
+    const mintItem = tokenId
+      ? { token: `${address}:${tokenId}`, quantity: 1, referrer: REFERRER_ADDRESS }
+      : { collection: address, quantity: 1, referrer: REFERRER_ADDRESS };
 
     try {
       let txHash = '';
