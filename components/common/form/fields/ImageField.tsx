@@ -14,9 +14,9 @@ type Props = FieldWrapperProps & {
 export function ImageField({ description, label, ...props }: Props) {
   return (
     <FieldWrapperContainer {...props}>
-      <ImageSelector onImageSelect={}>
+      {/* <ImageSelector onImageSelect={}>
         <div>content</div>
-      </ImageSelector>
+      </ImageSelector> */}
       {label && <Typography variant='h1'>{label}</Typography>}
       <ReadonlyCharmContent content={description} />
     </FieldWrapperContainer>
