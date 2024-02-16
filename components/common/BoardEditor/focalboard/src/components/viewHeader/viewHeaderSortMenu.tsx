@@ -20,7 +20,9 @@ type Props = {
 };
 const ViewHeaderSortMenu = React.memo((props: Props) => {
   const { properties, activeView, orderedCards } = props;
-  const sortDisplayOptions = properties?.map((o) => ({ id: o.id, name: getPropertyName(o) }));
+  const sortDisplayOptions = properties
+    ?.filter((o) => o.type !== 'proposalReviewerNotes')
+    ?.map((o) => ({ id: o.id, name: getPropertyName(o) }));
   sortDisplayOptions?.unshift({ id: Constants.titleColumnId, name: 'Name' });
   const localViewSettings = useLocalDbViewSettings();
 

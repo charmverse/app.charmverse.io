@@ -21,6 +21,7 @@ import type { PropertyValueDisplayType } from 'components/common/BoardEditor/int
 import { BreadcrumbPageTitle } from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
 import { ProposalStatusSelect } from 'components/proposals/components/ProposalStatusSelect';
 import { ProposalStepSelect } from 'components/proposals/components/ProposalStepSelect';
+import { ProposalNotesLink } from 'components/proposals/ProposalPage/components/ProposalEvaluations/components/ProposalNotesLink';
 import {
   REWARD_APPLICATION_STATUS_LABELS,
   RewardApplicationStatusChip
@@ -183,6 +184,8 @@ function PropertyValueElement(props: Props) {
       return <RewardApplicationStatusChip status={propertyValue as ApplicationStatus} />;
     }
     return <RewardStatusChip status={propertyValue as RewardStatus} showIcon={false} />;
+  } else if (propertyTemplate.type === 'proposalReviewerNotes') {
+    return <ProposalNotesLink pageId={props.card.id} />;
   }
   // Proposals as datasource use proposalStatus column, whereas the actual proposals table uses STATUS_BLOCK_ID
   // We should migrate over the proposals as datasource blocks to the same format as proposals table
