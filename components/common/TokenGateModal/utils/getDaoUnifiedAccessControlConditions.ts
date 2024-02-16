@@ -1,40 +1,35 @@
-import type { UnifiedAccessControlConditions } from '@lit-protocol/types';
-import { getChainById } from 'connectors/chains';
+import type { AccessControlCondition } from 'lib/tokenGates/interfaces';
 
 import type { FormValues } from '../hooks/useDaoForm';
 
-export function getDaoUnifiedAccessControlConditions(values: FormValues): UnifiedAccessControlConditions | undefined {
+export function getDaoUnifiedAccessControlConditions(values: FormValues): AccessControlCondition[] | undefined {
   const { chain, contract, check } = values;
-  const chainName = getChainById(Number(chain))?.litNetwork || 'ethereum';
+  const chainId = Number(chain);
 
   if (check === 'moloch') {
     return [
       {
-        conditionType: 'evmBasic',
+        condition: 'evm',
         contractAddress: contract,
-        standardContractType: 'MolochDAOv2.1',
-        chain: chainName,
+        type: 'MolochDAOv2.1',
+        chain: chainId,
         method: 'members',
-        parameters: [':userAddress'],
-        returnValueTest: {
-          comparator: '=',
-          value: 'true'
-        }
+        tokenIds: [],
+        comparator: '=',
+        quantity: '1'
       }
     ];
   } else if (check === 'builder') {
     return [
       {
-        conditionType: 'evmBasic' as const,
+        condition: 'evm' as const,
         contractAddress: contract,
-        standardContractType: 'ERC721',
-        chain: 'ethereum',
+        type: 'ERC721',
+        chain: chainId,
         method: 'balanceOf',
-        parameters: [':userAddress'],
-        returnValueTest: {
-          comparator: '>=',
-          value: '1'
-        }
+        tokenIds: [],
+        comparator: '>=',
+        quantity: '1'
       }
     ];
   }

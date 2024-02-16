@@ -5,13 +5,20 @@ import { uniq } from 'lodash';
  */
 
 async function search() {
-  const acc = await prisma.user.findMany({
+  const acc = await prisma.tokenGate.findMany({
     where: {
-      xpsEngineId: {
-        not: null
-      }
+      type: 'lit'
+    },
+    select: {
+      id: true,
+      space: true,
+      conditions: true
     }
   });
+  const found = acc.find((a) =>
+    a.conditions?.unifiedAccessControlConditions?.find((u) => u.standardContractType === 'MolochDAOv2.1')
+  );
+  console.log('xxx', found?.conditions.unifiedAccessControlConditions, found?.space.name);
 }
 
 search().then(() => console.log('Done'));

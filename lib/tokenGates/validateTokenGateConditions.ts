@@ -1,17 +1,6 @@
-import { InvalidInputError } from '@charmverse/core/errors';
-import * as yup from 'yup';
-
-import { isValidChainAddress } from 'lib/tokens/validation';
+import yup from 'yup';
 
 import type { TokenGate } from './interfaces';
-
-const StandardProtocolSchema = yup.object().shape({
-  contract: yup
-    .string()
-    .required()
-    .test('isAddress', 'Invalid address', (value) => isValidChainAddress(value)),
-  chainId: yup.number().required()
-});
 
 const AccConditions = yup.object().shape({
   chain: yup.string().required(),
@@ -26,34 +15,19 @@ const AccConditions = yup.object().shape({
   standardContractType: yup.string()
 });
 
-const OperatorConditions = yup.object().shape({
-  operator: yup.string().required()
-});
-
-const LitProtocolSchema = yup.object().shape({
-  unifiedAccessControlConditions: yup
+const TokenGateConditionsSchema = yup.object().shape({
+  accessControlConditions: yup
     .array()
     .min(1, 'At least one condition is required')
     .required()
     .of(
       yup.object().test('isValidCondition', 'Invalid object', async (value) => {
-        if ('operator' in value) {
-          await OperatorConditions.validate(value);
-          return true;
-        } else {
-          await AccConditions.validate(value);
-          return true;
-        }
+        await AccConditions.validate(value);
+        return true;
       })
     )
 });
 
 export async function validateTokenGateConditions(tokenGate: TokenGate) {
-  if (tokenGate.type === 'unlock' || tokenGate.type === 'hypersub') {
-    await StandardProtocolSchema.validate(tokenGate.conditions);
-  } else if (tokenGate.type === 'lit') {
-    await LitProtocolSchema.validate(tokenGate.conditions);
-  } else {
-    throw new InvalidInputError('Invalid token gate type');
-  }
+  await TokenGateConditionsSchema.validate(tokenGate.conditions);
 }

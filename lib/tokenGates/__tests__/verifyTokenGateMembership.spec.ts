@@ -5,7 +5,6 @@ import { applyTokenGates } from 'lib/tokenGates/applyTokenGates';
 import { verifyTokenGateMembership } from 'lib/tokenGates/verifyTokenGateMembership';
 import type { UserToVerifyMembership } from 'lib/tokenGates/verifyTokenGateMemberships';
 import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
-import { verifiedJWTResponse } from 'testing/utils/litProtocol';
 import {
   addRoleToTokenGate,
   deleteTokenGate,
@@ -15,9 +14,6 @@ import {
 } from 'testing/utils/tokenGates';
 
 import { getPublicClient } from '../../blockchain/publicClient';
-
-// @ts-ignore
-let mockedLitSDK: jest.Mocked;
 
 jest.mock('../../blockchain/publicClient');
 const mockGetPublicClient = jest.mocked(getPublicClient);
@@ -62,8 +58,6 @@ describe('verifyTokenGateMembership', () => {
   }
 
   beforeEach(async () => {
-    jest.mock('@lit-protocol/lit-node-client');
-    mockedLitSDK = await import('@lit-protocol/lit-node-client');
     mockGetPublicClient.mockClear();
 
     const { user: u, space: s } = await generateUserAndSpace(undefined);
@@ -72,7 +66,6 @@ describe('verifyTokenGateMembership', () => {
   });
 
   afterEach(async () => {
-    mockedLitSDK.verifyJwt.mockClear();
     jest.resetModules();
   });
 
@@ -95,21 +88,11 @@ describe('verifyTokenGateMembership', () => {
   it('should not verify and remove user connected via deleted token gate', async () => {
     const tokenGate = await generateTokenGate({ userId: user.id, spaceId: space.id });
 
-    mockedLitSDK.verifyJwt.mockReturnValue(
-      verifiedJWTResponse({
-        verified: true,
-        payload: {
-          orgId: space.id,
-          extraData: `{ "tokenGateId": "${tokenGate.id}" }`
-        }
-      })
-    );
-
     await applyTokenGates({
       spaceId: space.id,
       userId: user.id,
       commit: true,
-      tokens: [{ tokenGateId: tokenGate.id, signedToken: 'jwt1' }],
+      tokenGateIds: [tokenGate.id],
       walletAddress: '0x123'
     });
     await deleteTokenGate(tokenGate.id);
@@ -136,28 +119,6 @@ describe('verifyTokenGateMembership', () => {
     const tokenGate3 = await generateUnlockTokenGate({ userId: user.id, spaceId: space.id });
     const tokenGate4 = await generateHypersubTokenGate({ userId: user.id, spaceId: space.id });
 
-    mockedLitSDK.verifyJwt
-      // verify to apply token gate
-      .mockReturnValueOnce(
-        verifiedJWTResponse({
-          verified: true,
-          payload: {
-            orgId: space.id,
-            extraData: `{ "tokenGateId": "${tokenGate1.id}" }`
-          }
-        })
-      )
-      // verify to apply token gate
-      .mockReturnValueOnce(
-        verifiedJWTResponse({
-          verified: true,
-          payload: {
-            orgId: space.id,
-            extraData: `{ "tokenGateId": "${tokenGate2.id}" }`
-          }
-        })
-      );
-
     mockGetPublicClient.mockReturnValueOnce({
       readContract: jest.fn().mockReturnValueOnce('My New Lock').mockReturnValueOnce(true)
     } as any);
@@ -170,19 +131,11 @@ describe('verifyTokenGateMembership', () => {
       spaceId: space.id,
       userId: user.id,
       commit: true,
-      tokens: [
-        { tokenGateId: tokenGate1.id, signedToken: 'jwt1' },
-        { tokenGateId: tokenGate2.id, signedToken: 'jwt2' },
-        { tokenGateId: tokenGate3.id, signedToken: '' },
-        { tokenGateId: tokenGate4.id, signedToken: '' }
-      ],
+      tokenGateIds: [tokenGate1.id, tokenGate2.id, tokenGate3.id, tokenGate4.id],
       walletAddress: '0x1bd0d6edb387114b2fdf20d683366fa9f94a07f4'
     });
 
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
-
-    // do not verify token gates anymore
-    mockedLitSDK.verifyJwt.mockReturnValue(verifiedJWTResponse({ verified: false }));
 
     const res = await verifyTokenGateMembership({
       userTokenGates: verifyUser.user.userTokenGates,
@@ -201,54 +154,15 @@ describe('verifyTokenGateMembership', () => {
     const tokenGate1 = await generateTokenGate({ userId: user.id, spaceId: space.id });
     const tokenGate2 = await generateTokenGate({ userId: user.id, spaceId: space.id });
 
-    mockedLitSDK.verifyJwt
-      // verify to apply token gate
-      .mockReturnValueOnce(
-        verifiedJWTResponse({
-          verified: true,
-          payload: {
-            orgId: space.id,
-            extraData: `{ "tokenGateId": "${tokenGate1.id}" }`
-          }
-        })
-      )
-      // verify to apply token gate
-      .mockReturnValueOnce(
-        verifiedJWTResponse({
-          verified: true,
-          payload: {
-            orgId: space.id,
-            extraData: `{ "tokenGateId": "${tokenGate2.id}" }`
-          }
-        })
-      );
-
     await applyTokenGates({
       spaceId: space.id,
       userId: user.id,
       commit: true,
-      tokens: [
-        { tokenGateId: tokenGate1.id, signedToken: 'jwt1' },
-        { tokenGateId: tokenGate2.id, signedToken: 'jwt2' }
-      ],
+      tokenGateIds: [tokenGate1.id, tokenGate2.id],
       walletAddress: '0x123'
     });
 
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
-
-    mockedLitSDK.verifyJwt.mockImplementation(({ jwt }: { jwt: string }) => {
-      // verify only one of token gates
-      if (jwt === 'jwt1') {
-        return verifiedJWTResponse({
-          verified: true,
-          payload: {
-            orgId: space.id
-          }
-        });
-      }
-
-      return verifiedJWTResponse({ verified: false });
-    });
 
     const res = await verifyTokenGateMembership({
       userTokenGates: verifyUser.user.userTokenGates,
@@ -273,42 +187,15 @@ describe('verifyTokenGateMembership', () => {
     await addRoleToTokenGate({ tokenGateId: tokenGate1.id, roleId: role.id });
     await addRoleToTokenGate({ tokenGateId: tokenGate2.id, roleId: role2.id });
 
-    mockedLitSDK.verifyJwt
-      // verify to apply token gate
-      .mockReturnValueOnce(
-        verifiedJWTResponse({
-          verified: true,
-          payload: {
-            orgId: space.id,
-            extraData: `{ "tokenGateId": "${tokenGate1.id}" }`
-          }
-        })
-      )
-      // verify to apply token gate
-      .mockReturnValueOnce(
-        verifiedJWTResponse({
-          verified: true,
-          payload: {
-            orgId: space.id,
-            extraData: `{ "tokenGateId": "${tokenGate2.id}" }`
-          }
-        })
-      );
-
     await applyTokenGates({
       spaceId: space.id,
       userId: user.id,
       commit: true,
-      tokens: [
-        { tokenGateId: tokenGate1.id, signedToken: 'jwt1' },
-        { tokenGateId: tokenGate2.id, signedToken: 'jwt2' }
-      ],
+      tokenGateIds: [tokenGate1.id],
       walletAddress: '0x123'
     });
 
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
-
-    mockedLitSDK.verifyJwt.mockReturnValue(verifiedJWTResponse({ verified: false }));
 
     const res = await verifyTokenGateMembership({
       userTokenGates: verifyUser.user.userTokenGates,
@@ -336,51 +223,16 @@ describe('verifyTokenGateMembership', () => {
     await addRoleToTokenGate({ tokenGateId: tokenGate1.id, roleId: role.id });
     await addRoleToTokenGate({ tokenGateId: tokenGate2.id, roleId: role2.id });
 
-    mockedLitSDK.verifyJwt
-      // verify to apply token gate
-      .mockReturnValueOnce(
-        verifiedJWTResponse({
-          verified: true,
-          payload: {
-            orgId: space.id,
-            extraData: `{ "tokenGateId": "${tokenGate1.id}" }`
-          }
-        })
-      )
-      // verify to apply token gate
-      .mockReturnValueOnce(
-        verifiedJWTResponse({
-          verified: true,
-          payload: {
-            orgId: space.id,
-            extraData: `{ "tokenGateId": "${tokenGate2.id}" }`
-          }
-        })
-      );
-
     await applyTokenGates({
       spaceId: space.id,
       userId: user.id,
       commit: true,
-      tokens: [
-        { tokenGateId: tokenGate1.id, signedToken: 'jwt1' },
-        { tokenGateId: tokenGate2.id, signedToken: 'jwt2' }
-      ],
+      tokenGateIds: [tokenGate1.id],
       walletAddress: '0x123'
     });
     await deleteTokenGate(tokenGate1.id);
 
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
-
-    mockedLitSDK.verifyJwt.mockReturnValueOnce(
-      verifiedJWTResponse({
-        verified: true,
-        payload: {
-          orgId: space.id,
-          extraData: `{ "tokenGateId": "${tokenGate2.id}" }`
-        }
-      })
-    );
 
     const res = await verifyTokenGateMembership({
       userTokenGates: verifyUser.user.userTokenGates,
@@ -412,54 +264,15 @@ describe('verifyTokenGateMembership', () => {
     await addRoleToTokenGate({ tokenGateId: tokenGate2.id, roleId: role2.id });
     await addRoleToTokenGate({ tokenGateId: tokenGate2.id, roleId: role3.id });
 
-    mockedLitSDK.verifyJwt
-      // verify to apply token gate
-      .mockReturnValueOnce(
-        verifiedJWTResponse({
-          verified: true,
-          payload: {
-            orgId: space.id,
-            extraData: `{ "tokenGateId": "${tokenGate1.id}" }`
-          }
-        })
-      )
-      // verify to apply token gate
-      .mockReturnValueOnce(
-        verifiedJWTResponse({
-          verified: true,
-          payload: {
-            orgId: space.id,
-            extraData: `{ "tokenGateId": "${tokenGate2.id}" }`
-          }
-        })
-      );
-
     await applyTokenGates({
       spaceId: space.id,
       userId: user.id,
       commit: true,
-      tokens: [
-        { tokenGateId: tokenGate1.id, signedToken: 'jwt1' },
-        { tokenGateId: tokenGate2.id, signedToken: 'jwt2' }
-      ],
+      tokenGateIds: [tokenGate1.id, tokenGate2.id],
       walletAddress: '0x123'
     });
 
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
-
-    mockedLitSDK.verifyJwt.mockImplementation(({ jwt }: { jwt: string }) => {
-      // verify only one of token gates
-      if (jwt === 'jwt2') {
-        return verifiedJWTResponse({
-          verified: true,
-          payload: {
-            orgId: space.id
-          }
-        });
-      }
-
-      return verifiedJWTResponse({ verified: false });
-    });
 
     const res = await verifyTokenGateMembership({
       userTokenGates: verifyUser.user.userTokenGates,

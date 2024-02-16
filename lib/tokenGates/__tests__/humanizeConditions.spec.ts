@@ -18,7 +18,7 @@ describe('humanizeConditions', () => {
           chain: 'ethereum',
           method: '',
           parameters: [':userAddress'],
-          conditionType: 'evmBasic' as const,
+          conditionType: 'evm' as const,
           contractAddress: '',
           returnValueTest: {
             value: walletAddress,
@@ -44,7 +44,7 @@ describe('humanizeConditions', () => {
           chain: 'ethereum',
           method: '',
           parameters: [':userAddress'],
-          conditionType: 'evmBasic' as const,
+          conditionType: 'evm' as const,
           contractAddress: '',
           returnValueTest: {
             value: walletAddress,
@@ -70,7 +70,7 @@ describe('humanizeConditions', () => {
           chain: 'optimism',
           method: 'eth_getBalance',
           parameters: [':userAddress', 'latest'],
-          conditionType: 'evmBasic' as const,
+          conditionType: 'evm' as const,
           contractAddress: '',
           returnValueTest: {
             value: '1000000000000000000',
@@ -96,7 +96,7 @@ describe('humanizeConditions', () => {
           chain: 'bsc',
           method: 'eth_getBalance',
           parameters: [':userAddress', 'latest'],
-          conditionType: 'evmBasic' as const,
+          conditionType: 'evm' as const,
           contractAddress: '',
           returnValueTest: {
             value: '12000000000000000000',
@@ -122,7 +122,7 @@ describe('humanizeConditions', () => {
           chain: 'ethereum',
           method: 'eth_getBalance',
           parameters: [':userAddress', 'latest'],
-          conditionType: 'evmBasic' as const,
+          conditionType: 'evm' as const,
           contractAddress: '',
           returnValueTest: {
             value: '100000000000',
@@ -148,7 +148,7 @@ describe('humanizeConditions', () => {
           chain: 'ethereum',
           method: 'balanceOf',
           parameters: [':userAddress'],
-          conditionType: 'evmBasic' as const,
+          conditionType: 'evm' as const,
           contractAddress: '0x6982508145454Ce325dDbE47a25d4ec3d2311933',
           returnValueTest: {
             value: '12000000000000000000',
@@ -175,7 +175,7 @@ describe('humanizeConditions', () => {
           chain: 'xdai',
           method: 'tokenURI',
           parameters: [],
-          conditionType: 'evmBasic' as const,
+          conditionType: 'evm' as const,
           contractAddress: '0x22C1f6050E56d2876009903609a2cC3fEf83B415',
           returnValueTest: {
             value: 'ETHDenver',
@@ -191,7 +191,7 @@ describe('humanizeConditions', () => {
           chain: 'ethereum',
           method: 'tokenURI',
           parameters: [],
-          conditionType: 'evmBasic' as const,
+          conditionType: 'evm' as const,
           contractAddress: '0x22C1f6050E56d2876009903609a2cC3fEf83B415',
           returnValueTest: {
             value: 'ETHDenver',
@@ -217,7 +217,7 @@ describe('humanizeConditions', () => {
           chain: 'ethereum',
           method: 'balanceOf',
           parameters: [],
-          conditionType: 'evmBasic' as const,
+          conditionType: 'evm' as const,
           contractAddress: '0x22C1f6050E56d2876009903609a2cC3fEf83B415',
           returnValueTest: {
             value: '0',
@@ -243,7 +243,7 @@ describe('humanizeConditions', () => {
           chain: 'ethereum',
           method: 'members',
           parameters: [':userAddress'],
-          conditionType: 'evmBasic' as const,
+          conditionType: 'evm' as const,
           contractAddress: '0x38064F40B20347d58b326E767791A6f79cdEddCe',
           returnValueTest: {
             value: 'true',
@@ -269,7 +269,7 @@ describe('humanizeConditions', () => {
           chain: 'optimism',
           method: 'balanceOf',
           parameters: [':userAddress'],
-          conditionType: 'evmBasic' as const,
+          conditionType: 'evm' as const,
           contractAddress: '0xfd22bfe1bc51e21fd5e212680e22fa2503fee6c8',
           returnValueTest: {
             value: '1',
@@ -296,7 +296,7 @@ describe('humanizeConditions', () => {
           chain: 'optimism',
           method: 'ownerOf',
           parameters: ['71'],
-          conditionType: 'evmBasic' as const,
+          conditionType: 'evm' as const,
           contractAddress: '0xfd22bfe1bc51e21fd5e212680e22fa2503fee6c8',
           returnValueTest: {
             value: ':userAddress',
@@ -313,31 +313,6 @@ describe('humanizeConditions', () => {
     expect(result).toBe('Owner of Charmed & Optimistic 71 NFT with token id 71 on Optimism');
   });
 
-  it('should return the cask condition', () => {
-    const conditions = {
-      chains: ['optimism'],
-      permanent: true,
-      authSigTypes: ['ethereum'],
-      unifiedAccessControlConditions: [
-        {
-          chain: 'ethereum',
-          method: 'getActiveSubscriptionCount',
-          parameters: [':userAddress', 'test', '5467'],
-          conditionType: 'evmBasic' as const,
-          contractAddress: '0xfd22bfe1bc51e21fd5e212680e22fa2503fee6c8',
-          returnValueTest: {
-            value: ':userAddress',
-            comparator: '='
-          },
-          standardContractType: 'CASK'
-        }
-      ]
-    };
-    const data = humanizeLitConditionsData({ ...conditions, myWalletAddress: '' });
-    const result = humanizeConditions(data);
-    expect(result).toBe('Cask subscriber to provider test for plan 5467 on Ethereum');
-  });
-
   it('should return an erc1155 condition', () => {
     const conditions = {
       chains: ['ethereum'],
@@ -348,7 +323,7 @@ describe('humanizeConditions', () => {
           chain: 'ethereum',
           method: 'balanceOf',
           parameters: [':userAddress', '72'],
-          conditionType: 'evmBasic' as const,
+          conditionType: 'evm' as const,
           contractAddress: '0x6982508145454Ce325dDbE47a25d4ec3d2311933',
           returnValueTest: {
             value: '1',

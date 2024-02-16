@@ -1,4 +1,4 @@
-import { SiweMessage } from 'lit-siwe';
+import { SiweMessage } from 'siwe';
 import { getAddress, recoverMessageAddress } from 'viem';
 
 import { InvalidInputError } from '../utilities/errors';
@@ -45,7 +45,7 @@ export type SignatureVerification = {
 };
 
 /**
- * Use this for
+ * Use this for validating wallet signatures
  */
 export async function isValidWalletSignature({ address, host, signature }: SignatureVerification): Promise<boolean> {
   if (!address || !host || !signature) {

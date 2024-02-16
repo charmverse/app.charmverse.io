@@ -6,7 +6,7 @@ export async function generateTokenGate({ userId, spaceId }: { spaceId: string; 
       conditions: {
         unifiedAccessControlConditions: [
           {
-            conditionType: 'evmBasic',
+            conditionType: 'evm',
             contractAddress: '',
             standardContractType: '',
             chain: 'ethereum',
@@ -105,18 +105,15 @@ export function addUserTokenGate({
   tokenGateId,
   grantedRoles,
   spaceId,
-  userId,
-  jwt
+  userId
 }: {
   tokenGateId: string;
   spaceId: string;
   userId: string;
   grantedRoles: string[];
-  jwt: string;
 }) {
   return prisma.userTokenGate.create({
     data: {
-      jwt,
       tokenGateConnectedDate: new Date(),
       space: {
         connect: { id: spaceId }

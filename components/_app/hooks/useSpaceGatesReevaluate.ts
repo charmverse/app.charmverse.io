@@ -19,7 +19,6 @@ export function useSpaceGatesReevaluate() {
 
         const newRoles = await reevaluateRoles({
           spaceId: currentSpace.id,
-          userId: user.id,
           authSig
         });
 

@@ -1,6 +1,6 @@
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import { builderDaoChains, litDaoChains } from 'connectors/chains';
+import { builderDaoChains, daoChains } from 'connectors/chains';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
@@ -31,7 +31,7 @@ export function TokenGateDao() {
   const onSubmit = async () => {
     const values = getValues();
     const valueProps = getDaoUnifiedAccessControlConditions(values) || [];
-    const _tokenGate: TokenGateConditions = { type: 'lit', conditions: { unifiedAccessControlConditions: valueProps } };
+    const _tokenGate: TokenGateConditions = { type: 'lit', conditions: { accessControlConditions: valueProps } };
     handleTokenGate(_tokenGate);
     setDisplayedPage('review');
   };
@@ -41,7 +41,7 @@ export function TokenGateDao() {
     reset();
   };
 
-  const chains = check === 'builder' ? builderDaoChains : litDaoChains;
+  const chains = check === 'builder' ? builderDaoChains : daoChains;
 
   return (
     <>

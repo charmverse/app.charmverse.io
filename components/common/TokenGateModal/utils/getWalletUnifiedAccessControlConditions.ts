@@ -1,24 +1,20 @@
-import type { UnifiedAccessControlConditions } from '@lit-protocol/types';
+import type { AccessControlCondition } from 'lib/tokenGates/interfaces';
 
 import type { FormValues } from '../hooks/useWalletForm';
 
-export function getWalletUnifiedAccessControlConditions(
-  values: FormValues
-): UnifiedAccessControlConditions | undefined {
+export function getWalletUnifiedAccessControlConditions(values: FormValues): AccessControlCondition[] | undefined {
   const { contract } = values;
 
   return [
     {
-      conditionType: 'evmBasic',
-      contractAddress: '',
-      standardContractType: '',
-      chain: 'ethereum',
-      method: '',
-      parameters: [':userAddress'],
-      returnValueTest: {
-        comparator: '=',
-        value: contract
-      }
+      condition: 'evm',
+      contractAddress: contract,
+      chain: 1,
+      method: 'ownerOf',
+      type: 'Wallet',
+      tokenIds: [],
+      comparator: '=',
+      quantity: '1'
     }
   ];
 }

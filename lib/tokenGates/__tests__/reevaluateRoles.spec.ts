@@ -1,42 +1,19 @@
 import type { Space } from '@charmverse/core/prisma';
-import * as litSDK from '@lit-protocol/lit-node-client';
 
 import { assignRole } from 'lib/roles';
 import { updateTokenGateRoles } from 'lib/tokenGates/updateTokenGateRoles';
 import type { LoggedInUser } from 'models';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { verifiedJWTResponse } from 'testing/utils/litProtocol';
 import { generateTokenGate } from 'testing/utils/tokenGates';
-
-jest.mock('@lit-protocol/lit-node-client');
-
-// @ts-ignore
-const mockedLitSDK: jest.Mocked<typeof litSDK> = litSDK;
 
 describe('reevaluateRoles', () => {
   let user: LoggedInUser;
   let space: Space;
 
-  beforeAll(() => {
-    // @ts-ignore didnt want to add 45 more properties we dont use to make this compile
-    mockedLitSDK.LitNodeClient.mockImplementation(() => ({
-      ready: true,
-      connect: () => Promise.resolve(),
-      getSignedToken: () => Promise.resolve('signedToken-test'),
-      saveSigningCondition: () => Promise.resolve(true),
-      connectedNodes: []
-    }));
-  });
-
   beforeEach(async () => {
     const { user: u, space: s } = await generateUserAndSpaceWithApiToken(undefined, true);
     user = u;
     space = s;
-  });
-
-  afterEach(() => {
-    mockedLitSDK.verifyJwt.mockClear();
-    mockedLitSDK.LitNodeClient.mockClear();
   });
 
   it('should not add any roles if space does not have any token gate', async () => {
@@ -57,17 +34,8 @@ describe('reevaluateRoles', () => {
     const tokenGate = await generateTokenGate({ userId: user.id, spaceId: space.id });
     const role1 = await generateRole({ spaceId: space.id, createdBy: user.id });
     const role2 = await generateRole({ spaceId: space.id, createdBy: user.id });
-    await updateTokenGateRoles([role1.id, role2.id], tokenGate.id);
 
-    mockedLitSDK.verifyJwt.mockReturnValue(
-      verifiedJWTResponse({
-        verified: true,
-        payload: {
-          orgId: space.id,
-          extraData: `{ "tokenGateId": "${tokenGate.id}" }`
-        }
-      })
-    );
+    await updateTokenGateRoles([role1.id, role2.id], tokenGate.id);
 
     const res = await reevaluateRoles({
       spaceId: space.id,
@@ -86,16 +54,6 @@ describe('reevaluateRoles', () => {
     const role2 = await generateRole({ spaceId: space.id, createdBy: user.id });
     await updateTokenGateRoles([role1.id, role2.id], tokenGate.id);
     await assignRole({ roleId: role1.id, userId: user.id });
-
-    mockedLitSDK.verifyJwt.mockReturnValue(
-      verifiedJWTResponse({
-        verified: true,
-        payload: {
-          orgId: space.id,
-          extraData: `{ "tokenGateId": "${tokenGate.id}" }`
-        }
-      })
-    );
 
     const res = await reevaluateRoles({
       spaceId: space.id,

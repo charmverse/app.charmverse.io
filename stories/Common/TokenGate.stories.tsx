@@ -8,7 +8,6 @@ import { mockTokenGateResult, mockTokenGates } from 'stories/lib/mockTokenGataDa
 import { TokenGate as TokenGateComponent } from 'components/common/SpaceAccessGate/components/TokenGate/TokenGate';
 import { TokenGateModalProvider } from 'components/common/TokenGateModal/hooks/useTokenGateModalContext';
 import TokenGateModal from 'components/common/TokenGateModal/TokenGateModal';
-import { LIT_CHAINS } from 'lib/tokenGates/chains';
 import type { TokenGate } from 'lib/tokenGates/interfaces';
 import { TokenGateContainer } from 'pages/join';
 
@@ -49,9 +48,9 @@ Modal.parameters = {
         const unifiedAccessControlConditions =
           data.type === 'lit'
             ? {
-                unifiedAccessControlConditions: data.conditions.unifiedAccessControlConditions?.map((cond) => ({
+                unifiedAccessControlConditions: data.conditions.accessControlConditions?.map((cond) => ({
                   ...cond,
-                  ...('chain' in cond && { image: getChainById(LIT_CHAINS[cond.chain].chainId)?.iconUrl })
+                  ...('chain' in cond && { image: getChainById(cond.chain)?.iconUrl })
                 }))
               }
             : undefined;

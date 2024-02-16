@@ -82,7 +82,7 @@ export function useTokenGates({
       await verifyTokenGateAndJoin({
         commit: true,
         spaceId: space.id,
-        tokens: tokenGateResult?.eligibleGates ?? [],
+        tokenGateIds: tokenGateResult?.eligibleGates ?? [],
         joinType,
         walletAddress: account || ''
       });

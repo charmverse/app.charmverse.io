@@ -7,7 +7,7 @@ import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import type { FormValues } from '../hooks/useCollectablesForm';
 import { useCollectablesForm } from '../hooks/useCollectablesForm';
 import { useTokenGateModal } from '../hooks/useTokenGateModalContext';
-import { getCollectablesUnifiedAccessControlConditions } from '../utils/getCollectablesUnifiedAccessControlConditions';
+import { getCollectablesAccessControlConditions } from '../utils/getCollectablesAccessControlConditions';
 import { collectableOptions } from '../utils/utils';
 
 import { TokenGateCollectableFields } from './TokenGateCollectableFields';
@@ -40,10 +40,10 @@ export function TokenGateCollectables() {
       });
       setDisplayedPage('review');
     } else {
-      const valueProps = getCollectablesUnifiedAccessControlConditions(values) || [];
+      const valueProps = getCollectablesAccessControlConditions(values) || [];
 
       if (valueProps.length > 0) {
-        handleTokenGate({ type: 'lit', conditions: { unifiedAccessControlConditions: valueProps } });
+        handleTokenGate({ type: 'lit', conditions: { accessControlConditions: valueProps } });
         setDisplayedPage('review');
       }
     }

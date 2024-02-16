@@ -29,7 +29,7 @@ export function TokenGateReview() {
 
   useEffect(() => {
     if (tokenGate?.conditions) {
-      reviewTokenGate(tokenGate, {
+      reviewTokenGate(tokenGate.conditions, {
         onError: () => showMessage('Something went wrong. Please review your conditions.', 'error')
       });
     }
@@ -66,8 +66,8 @@ export function TokenGateReview() {
           </CardContent>
         </Card>
       )}
-      {data?.type === 'lit' && flow === 'single' && <TokenGateAddMultipleButton onClick={handleMultipleConditions} />}
-      {data?.type === 'lit' && flow !== 'single' && (
+      {flow === 'single' && <TokenGateAddMultipleButton onClick={handleMultipleConditions} />}
+      {flow !== 'single' && (
         <Button variant='outlined' onClick={goToHome}>
           Add a condition
         </Button>
