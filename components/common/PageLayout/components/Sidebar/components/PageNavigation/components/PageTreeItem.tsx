@@ -11,7 +11,7 @@ import Menu from '@mui/material/Menu';
 import Tooltip from '@mui/material/Tooltip';
 import type { Identifier } from 'dnd-core';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import type { ReactNode, SyntheticEvent } from 'react';
+import type { ReactNode, DragEvent, SyntheticEvent } from 'react';
 import React, { forwardRef, memo, useCallback, useMemo, useState } from 'react';
 import useSWRImmutable from 'swr/immutable';
 
@@ -149,6 +149,13 @@ const PageAnchor = styled(Link)`
   padding: 2px 0;
   position: relative;
 
+  .page-icon {
+    font-size: 14px;
+  }
+  svg {
+    font-size: 20px;
+  }
+
   .page-actions {
     display: flex;
     gap: 4px;
@@ -239,6 +246,14 @@ export function PageLink({
     event.stopPropagation();
     event.preventDefault();
   }, []);
+
+  const onDragStart = useCallback(
+    (event: DragEvent) => {
+      event.dataTransfer.setData('sidebar-page', JSON.stringify({ pageId, pageType }));
+    },
+    [pageId, pageType]
+  );
+
   const triggerState = bindTrigger(popupState);
 
   function handleIconClicked(ev: any) {
@@ -247,15 +262,8 @@ export function PageLink({
   }
 
   return (
-    <PageAnchor
-      href={href}
-      onClick={stopPropagation}
-      color='inherit'
-      onDragStart={(event) => {
-        event.dataTransfer.setData('sidebar-page', JSON.stringify({ pageId, pageType }));
-      }}
-    >
-      <span onClick={preventDefault}>
+    <PageAnchor href={href} onClick={stopPropagation} color='inherit' onDragStart={onDragStart}>
+      <span className='page-icon' onClick={preventDefault}>
         <PageIcon
           pageType={pageType}
           isEditorEmpty={isEmptyContent}

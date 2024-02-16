@@ -39,8 +39,8 @@ import { fontClassName } from 'theme/fonts';
 
 import { AlertContainer } from './components/AlertContainer';
 import { PageComments } from './components/CommentsFooter/PageComments';
+import { ConnectionErrorBanner } from './components/ConnectionErrorBanner';
 import PageBanner from './components/PageBanner';
-import { PageConnectionBanner } from './components/PageConnectionBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
 import { PageEditorContainer } from './components/PageEditorContainer';
 import PageHeader, { getPageTop } from './components/PageHeader';
@@ -48,6 +48,7 @@ import { PageTemplateBanner } from './components/PageTemplateBanner';
 import { PageTitleInput } from './components/PageTitleInput';
 import { ProposalArchivedBanner } from './components/ProposalArchivedBanner';
 import { ProposalBanner } from './components/ProposalBanner';
+import { ProposalNotesBaner } from './components/ProposalNotesBanner';
 import { ProposalProperties } from './components/ProposalProperties';
 import { SyncedPageBanner } from './components/SyncedPageBanner';
 import type { IPageSidebarContext } from './hooks/usePageSidebar';
@@ -133,7 +134,8 @@ function DocumentPageComponent({
 
   const activeBoardView = boardViews[0];
 
-  const showPageBanner = page.type !== 'proposal' && page.type !== 'proposal_template';
+  const showPageBanner =
+    page.type !== 'proposal' && page.type !== 'proposal_template' && page.type !== 'proposal_notes';
   const pageTop = showPageBanner ? getPageTop(page) : defaultPageTop;
 
   const { threads, currentPageId: threadsPageId } = useThreads();
@@ -150,8 +152,14 @@ function DocumentPageComponent({
 
   const enableComments = !isSharedPage && !enableSuggestingMode && !isPageTemplate && !!pagePermissions?.comment;
 
-  const isStructuredProposal = Boolean(proposal && proposal.formId);
+  const isStructuredProposal = Boolean(proposal?.formId);
   const isUnpublishedProposal = proposal?.status === 'draft' || page.type === 'proposal_template';
+  const readOnlyTitle =
+    readOnly ||
+    !!enableSuggestingMode ||
+    !!page.syncWithPageId ||
+    !!proposal?.archived ||
+    page.type === 'proposal_notes';
 
   // create a key that updates when edit mode changes - default to 'editing' so we dont close sockets immediately
   const editorKey = page.id + (editMode || 'editing') + pagePermissions.edit_content + !!proposal?.archived;
@@ -231,7 +239,7 @@ function DocumentPageComponent({
         })}
       >
         {/* show either deleted banner or archived, but not both */}
-        {page?.deletedAt ? (
+        {page.deletedAt ? (
           <AlertContainer>
             <PageDeleteBanner pageType={page.type} pageId={page.id} />
           </AlertContainer>
@@ -244,10 +252,10 @@ function DocumentPageComponent({
         )}
         {connectionError && (
           <AlertContainer>
-            <PageConnectionBanner />
+            <ConnectionErrorBanner />
           </AlertContainer>
         )}
-        {page?.convertedProposalId && (
+        {page.convertedProposalId && (
           <AlertContainer>
             <ProposalBanner type='page' proposalId={page.convertedProposalId} />
           </AlertContainer>
@@ -255,6 +263,11 @@ function DocumentPageComponent({
         {board?.fields.sourceType && (
           <AlertContainer>
             <SyncedPageBanner pageId={page.syncWithPageId} source={board.fields.sourceType} />
+          </AlertContainer>
+        )}
+        {page.type === 'proposal_notes' && (
+          <AlertContainer>
+            <ProposalNotesBaner />
           </AlertContainer>
         )}
         <PageTemplateBanner parentId={page.parentId} pageType={page.type} />
@@ -292,7 +305,7 @@ function DocumentPageComponent({
               focusDocumentEditor={focusDocumentEditor}
               updatedAt={page.updatedAt.toString()}
               onChange={(updates) => savePage(updates as { title: string; updatedAt: any })}
-              readOnly={readOnly || !!enableSuggestingMode || !!page.syncWithPageId || !!proposal?.archived}
+              readOnly={readOnlyTitle}
             />
           )}
           {proposalId && !isMdScreen && (
@@ -382,25 +395,23 @@ function DocumentPageComponent({
                 {creatingInlineReward && !readOnly && <NewInlineReward pageId={page.id} />}
               </CardPropertiesWrapper>
               {proposal && proposal.formId ? (
-                <Box mb={10}>
-                  {page.type === 'proposal_template' ? (
-                    <FormFieldsEditor
-                      readOnly={(!isAdmin && (!user || !proposalAuthors.includes(user.id))) || !!proposal?.archived}
-                      proposalId={proposal.id}
-                      formFields={proposal.form?.formFields ?? []}
-                    />
-                  ) : (
-                    <ProposalFormFieldsInput
-                      pageId={page.id}
-                      enableComments={proposal.permissions.comment}
-                      proposalId={proposal.id}
-                      formFields={proposal.form?.formFields ?? []}
-                      readOnly={!proposal.permissions.edit}
-                      threads={threads}
-                      isDraft={proposal?.status === 'draft'}
-                    />
-                  )}
-                </Box>
+                page.type === 'proposal_template' ? (
+                  <FormFieldsEditor
+                    readOnly={(!isAdmin && (!user || !proposalAuthors.includes(user.id))) || !!proposal?.archived}
+                    proposalId={proposal.id}
+                    formFields={proposal.form?.formFields ?? []}
+                  />
+                ) : (
+                  <ProposalFormFieldsInput
+                    pageId={page.id}
+                    enableComments={proposal.permissions.comment}
+                    proposalId={proposal.id}
+                    formFields={proposal.form?.formFields ?? []}
+                    readOnly={!proposal.permissions.edit}
+                    threads={threads}
+                    isDraft={proposal?.status === 'draft'}
+                  />
+                )
               ) : (
                 <CharmEditor
                   placeholderText={
@@ -437,7 +448,7 @@ function DocumentPageComponent({
               )}
 
               {isStructuredProposal && proposal?.fields?.enableRewards && (
-                <>
+                <Box mb={10}>
                   <Box my={1}>
                     <Typography variant='h5'>{getFeatureTitle('Rewards')}</Typography>
                   </Box>
@@ -478,7 +489,7 @@ function DocumentPageComponent({
                       });
                     }}
                   />
-                </>
+                </Box>
               )}
 
               {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') && (

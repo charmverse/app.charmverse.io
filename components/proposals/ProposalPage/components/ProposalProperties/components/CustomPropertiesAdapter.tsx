@@ -45,6 +45,7 @@ export function CustomPropertiesAdapter({ proposal, onChange, readOnly, readOnly
       mutator={mutator ?? undefined}
       readOnlyProperties={readOnlyProperties}
       disableEditPropertyOption={!isAdmin}
+      boardType='proposals'
     />
   );
 }
