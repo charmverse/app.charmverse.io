@@ -71,8 +71,8 @@ const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props, ref) 
     onDelete();
   }
 
-  if (readOnly) {
-    const extraControls = props.extraControls?.filter((control) => control.showOnReadonly) ?? [];
+  if (readOnly && props.extraControls) {
+    const extraControls = props.extraControls.filter((control) => control.showOnReadonly);
     if (!extraControls.length) {
       return null;
     }
