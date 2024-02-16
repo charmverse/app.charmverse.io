@@ -81,7 +81,7 @@ export type PublicApiForumPost = {
 
 /**
  * @swagger
- * components
+ * components:
  *  schemas:
  *    CreateForumPostInput:
  *      type: object
