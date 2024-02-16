@@ -20,12 +20,15 @@ type Props = ControlFieldProps &
 export function ImageField({ value, ...props }: Props) {
   return (
     <FieldWrapper {...props}>
-      <ImageSelector onImageSelect={(newValue) => (props.onChange && newValue ? props.onChange(newValue) : null)}>
-        <Button sx={{ my: 2 }} color='primary'>
+      <ImageSelector
+        closeOnImageSelect
+        onImageSelect={(newValue) => (props.onChange && newValue ? props.onChange(newValue) : null)}
+      >
+        <Button disabled={props.disabled} sx={{ my: 2 }} color='primary'>
           Choose image
         </Button>
-        {value && <Image width={300} height={300} src={value as string} alt='user submission' />}
       </ImageSelector>
+      {value && <img style={{ maxWidth: '100%' }} src={value as string} alt='user submission' />}
     </FieldWrapper>
   );
 }

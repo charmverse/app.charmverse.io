@@ -8,9 +8,10 @@ import { useS3UploadInput } from 'hooks/useS3UploadInput';
 type Props = {
   onComplete: UploadedFileCallback;
   align?: 'start' | 'center' | 'end';
+  disabled?: boolean;
 };
 
-export function FileUploadForm({ onComplete, align = 'center' }: Props) {
+export function FileUploadForm({ onComplete, align = 'center', disabled }: Props) {
   const { inputRef, openFilePicker, onFileChange, isUploading, progress, fileName, sizeLimit } = useS3UploadInput({
     onFileUpload: onComplete
   });
@@ -48,7 +49,7 @@ export function FileUploadForm({ onComplete, align = 'center' }: Props) {
         )}
       </Box>
 
-      <Button loading={isUploading} component='label' variant='contained' onClick={openFilePicker}>
+      <Button disabled={disabled} loading={isUploading} component='label' variant='contained' onClick={openFilePicker}>
         Choose a file
       </Button>
     </Box>
