@@ -17,7 +17,7 @@ import { STATIC_PAGES } from 'lib/features/constants';
 import { enableDragAndDrop } from '../../../utils';
 import { pageNodeDropPluginKey } from '../../prosemirror/prosemirror-dropcursor/dropcursor';
 
-const NestedPageContainer = styled(Link)`
+export const StyledLink = styled(Link)`
   align-items: center;
   cursor: pointer;
   display: flex;
@@ -42,7 +42,7 @@ const NestedPageContainer = styled(Link)`
   }
 `;
 
-const StyledTypography = styled(Typography)`
+export const StyledTypography = styled(Typography)`
   font-weight: 600;
   border-bottom: 0.05em solid var(--link-underline);
 `;
@@ -100,7 +100,7 @@ export default function NestedPage({ isLinkedPage = false, node, getPos }: NodeV
   const fullPath = `${window.location.origin}/${appPath}`;
 
   return (
-    <NestedPageContainer
+    <StyledLink
       data-test={`${isLinkedPage ? 'linked-page' : 'nested-page'}-${pageId}`}
       data-page-type={node.attrs.type ?? documentPage?.type}
       href={appPath}
@@ -138,7 +138,7 @@ export default function NestedPage({ isLinkedPage = false, node, getPos }: NodeV
         )}
       </div>
       <StyledTypography>{pageTitle || ' '}</StyledTypography>
-    </NestedPageContainer>
+    </StyledLink>
   );
 }
 

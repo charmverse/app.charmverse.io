@@ -46,7 +46,7 @@ exports[`components/table/TableRow should match snapshot 1`] = `
             style="align-self: flex-start; align-items: flex-start;"
           >
             <div
-              class="css-jm1ma0"
+              class="css-1s68mph"
             >
               <svg
                 aria-hidden="true"
@@ -150,7 +150,7 @@ exports[`components/table/TableRow should match snapshot, collapsed tree 1`] = `
             style="align-self: flex-start; align-items: flex-start;"
           >
             <div
-              class="css-jm1ma0"
+              class="css-1s68mph"
             >
               <svg
                 aria-hidden="true"
@@ -254,7 +254,7 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
             style="align-self: flex-start; align-items: flex-start;"
           >
             <div
-              class="css-jm1ma0"
+              class="css-1s68mph"
             >
               <svg
                 aria-hidden="true"
@@ -424,7 +424,7 @@ exports[`components/table/TableRow should match snapshot, isSelected 1`] = `
             style="align-self: flex-start; align-items: flex-start;"
           >
             <div
-              class="css-jm1ma0"
+              class="css-1s68mph"
             >
               <svg
                 aria-hidden="true"
@@ -503,7 +503,7 @@ exports[`components/table/TableRow should match snapshot, read-only 1`] = `
             style="align-self: flex-start; align-items: flex-start;"
           >
             <div
-              class="css-jm1ma0"
+              class="css-1s68mph"
             >
               <svg
                 aria-hidden="true"
@@ -608,7 +608,7 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
             style="align-self: flex-start; align-items: flex-start;"
           >
             <div
-              class="css-jm1ma0"
+              class="css-1s68mph"
             >
               <svg
                 aria-hidden="true"

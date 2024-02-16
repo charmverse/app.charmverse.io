@@ -27,7 +27,6 @@ export async function getProposalFormAnswers({
   });
 
   const allAnswers = proposal.formAnswers;
-
   if (!allAnswers) {
     return [];
   }

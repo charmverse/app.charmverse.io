@@ -63,7 +63,8 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
 
   // error can be a string or instance of Error
   function showError(error: any, defaultMessage?: string) {
-    const errorMessage = error?.message || error || defaultMessage;
+    // error?.errorType is from our webapp api, ex 404 response
+    const errorMessage = error?.message || error?.errorType || (typeof error === 'string' ? error : defaultMessage);
     showMessage(errorMessage, 'error');
   }
 

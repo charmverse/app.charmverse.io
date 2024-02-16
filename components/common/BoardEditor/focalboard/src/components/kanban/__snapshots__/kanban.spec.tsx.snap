@@ -220,7 +220,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
                 >
                   <div>
                     <div
-                      class="css-jm1ma0"
+                      class="css-1s68mph"
                     >
                       <img
                         src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -275,7 +275,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
                 >
                   <div>
                     <div
-                      class="css-jm1ma0"
+                      class="css-1s68mph"
                     >
                       <img
                         src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -652,7 +652,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
                 >
                   <div>
                     <div
-                      class="css-jm1ma0"
+                      class="css-1s68mph"
                     >
                       <img
                         src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -707,7 +707,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
                 >
                   <div>
                     <div
-                      class="css-jm1ma0"
+                      class="css-1s68mph"
                     >
                       <img
                         src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -792,7 +792,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
                 >
                   <div>
                     <div
-                      class="css-jm1ma0"
+                      class="css-1s68mph"
                     >
                       <img
                         src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"

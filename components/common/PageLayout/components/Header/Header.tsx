@@ -49,7 +49,6 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const forumPostInfo = usePostByPath();
   const isRewardsList = router.route === '/[domain]/rewards';
   const isProposalsPage = router.route === '/[domain]/proposals';
-  const isNewProposalPage = router.route === '/[domain]/proposals/new';
 
   return (
     <StyledToolbar variant='dense'>
@@ -79,12 +78,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         }}
       >
         <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          <PageTitleWithBreadcrumbs
-            pageId={basePage?.id}
-            pageMeta={basePage}
-            pageType={basePage?.type}
-            post={forumPostInfo?.forumPost}
-          />
+          <PageTitleWithBreadcrumbs pageId={basePage?.id} pageMeta={basePage} pageType={basePage?.type} />
         </div>
 
         <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1} gap={0.5}>
