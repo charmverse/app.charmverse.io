@@ -46,7 +46,8 @@ export function CardDetailProperty({
   onDrop,
   syncWithPageId,
   mutator,
-  disableEditPropertyOption
+  disableEditPropertyOption,
+  showCard
 }: {
   syncWithPageId?: string | null;
   readOnly: boolean;
@@ -61,6 +62,7 @@ export function CardDetailProperty({
   mutator: Mutator;
   disableEditPropertyOption?: boolean;
   onDrop: (template: IPropertyTemplate, container: IPropertyTemplate) => void;
+  showCard?: (cardId: string | null) => void;
 }) {
   const [isDragging, isOver, columnRef] = useSortable('column', property, !readOnly, onDrop);
   const changePropertyPopupState = usePopupState({ variant: 'popover', popupId: 'card-property' });
@@ -96,6 +98,7 @@ export function CardDetailProperty({
           </PropertyNameContainer>
           <Menu {...bindMenu(changePropertyPopupState)}>
             <PropertyMenu
+              board={board}
               onDelete={onDelete}
               deleteDisabled={deleteDisabledMessage?.length !== 0}
               property={property}
@@ -108,6 +111,7 @@ export function CardDetailProperty({
         </Box>
       )}
       <PropertyValueElement
+        showCard={showCard}
         readOnly={readOnly}
         syncWithPageId={syncWithPageId}
         card={card}

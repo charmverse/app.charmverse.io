@@ -17,7 +17,7 @@ const handler = apiHandler();
 
 /**
  * @swagger
- * components
+ * components:
  *  schemas:
  *    UpdateForumPostInput:
  *      type: object

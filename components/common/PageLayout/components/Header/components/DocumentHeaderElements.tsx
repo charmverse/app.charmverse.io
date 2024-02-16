@@ -13,17 +13,17 @@ type Props = {
     id: string;
     type: PageType;
   };
-  isInsideDialog?: boolean;
 };
 
-export function DocumentHeaderElements({ headerHeight, isInsideDialog, page }: Props) {
+export function DocumentHeaderElements({ headerHeight, page }: Props) {
   const { deletedAt, id, type } = page;
   const isBasePageDocument = documentTypes.includes(type as PageType);
+  const enableShare = !deletedAt && type !== 'proposal_notes';
   return (
     <>
       {isBasePageDocument && <DocumentParticipants />}
       {isBasePageDocument && <EditingModeToggle />}
-      {!deletedAt && <ShareButton pageType={type} headerHeight={headerHeight} pageId={id} />}
+      {enableShare && <ShareButton pageType={type} headerHeight={headerHeight} pageId={id} />}
     </>
   );
 }

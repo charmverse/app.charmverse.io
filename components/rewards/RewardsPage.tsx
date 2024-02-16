@@ -239,6 +239,7 @@ export function RewardsPage({ title }: { title: string }) {
               <Box width='100%'>
                 {activeView.fields.viewType === 'table' && (
                   <Table
+                    boardType='rewards'
                     setSelectedPropertyId={(_setSelectedPropertyId) => {
                       setSelectedPropertyId(_setSelectedPropertyId);
                       setShowSidebar(true);

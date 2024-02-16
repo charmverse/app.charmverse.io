@@ -6,7 +6,7 @@ import { prismaToBlock } from 'lib/focalboard/block';
 import { extractCardProposalProperties } from 'lib/focalboard/extractCardProposalProperties';
 import { extractDatabaseProposalProperties } from 'lib/focalboard/extractDatabaseProposalProperties';
 import { InvalidStateError } from 'lib/middleware';
-import { canAccessPrivateFields } from 'lib/proposal/form/canAccessPrivateFields';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { getCurrentStep } from 'lib/proposal/getCurrentStep';
 import type { ProposalFields } from 'lib/proposal/interface';
 import type {
@@ -345,12 +345,12 @@ export async function updateCardsFromProposals({
   for (const pageWithProposal of proposalPages) {
     const card = existingSyncedCardsWithBlocks[pageWithProposal.id];
 
-    const accessPrivateFields = await canAccessPrivateFields({
+    const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
+      resourceId: pageWithProposal.proposal!.id,
       // Use the board creator to check if private fields are accessible
-      userId: boardBlock.createdBy,
-      proposal: pageWithProposal.proposal ?? undefined,
-      proposalId: pageWithProposal.proposal!.id
+      userId: boardBlock.createdBy
     });
+    const accessPrivateFields = permissions.view_private_fields;
 
     const currentStep = pageWithProposal.proposal
       ? getCurrentStep({

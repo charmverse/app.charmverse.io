@@ -24,8 +24,7 @@ type FormFieldsIncludeType = {
 export function mapDbProposalToProposal({
   proposal,
   permissions,
-  permissionsByStep,
-  canAccessPrivateFormFields
+  permissionsByStep
 }: {
   proposal: Proposal &
     FormFieldsIncludeType & {
@@ -40,11 +39,10 @@ export function mapDbProposalToProposal({
     };
   permissions: ProposalPermissionFlags;
   permissionsByStep?: Record<string, ProposalPermissionFlags>;
-  canAccessPrivateFormFields?: boolean;
 }): ProposalWithUsersAndRubric {
   const { rewards, form, evaluations, fields, ...rest } = proposal;
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
-  const formFields = getProposalFormFields(form?.formFields, !!canAccessPrivateFormFields);
+  const formFields = getProposalFormFields(form?.formFields, !!permissions.view_private_fields);
   const mappedEvaluations = proposal.evaluations.map((evaluation) => {
     const stepPermissions = permissionsByStep?.[evaluation.id];
     if (!stepPermissions?.evaluate) {
@@ -64,7 +62,6 @@ export function mapDbProposalToProposal({
     permissions,
     currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
     status: proposal.status,
-    // reviewers: currentEvaluation?.reviewers || [],
     rewardIds: rewards.map((r) => r.id) || null,
     form: form
       ? {

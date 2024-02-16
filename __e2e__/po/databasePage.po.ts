@@ -122,4 +122,16 @@ export class DatabasePage extends GlobalPage {
   getTemplateMenuEditOption({ pageId }: { pageId: string }) {
     return this.page.locator(`data-test=template-menu-edit-${pageId}`);
   }
+
+  getShowOnRelatedBoardButton() {
+    return this.page.locator('data-test=show-on-related-board-button');
+  }
+
+  getAddRelationButton() {
+    return this.page.locator('data-test=add-relation-button');
+  }
+
+  getDatabaseTableCell({ templateId, cardId }: { templateId: string; cardId: string }) {
+    return this.page.locator(`data-test=database-card-${cardId}-column-${templateId}`);
+  }
 }

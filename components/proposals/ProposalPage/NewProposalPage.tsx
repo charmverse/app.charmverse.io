@@ -486,7 +486,7 @@ export function NewProposalPage({
                     />
                   )}
                   {isStructured && formInputs.fields?.enableRewards && (
-                    <>
+                    <Box mb={10}>
                       <Box my={1}>
                         <Typography variant='h5'>{getFeatureTitle('Rewards')}</Typography>
                       </Box>
@@ -534,7 +534,7 @@ export function NewProposalPage({
                           });
                         }}
                       />
-                    </>
+                    </Box>
                   )}
                 </Box>
               </StyledContainer>

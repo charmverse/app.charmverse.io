@@ -214,24 +214,21 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
                       <svg
                         aria-hidden="true"
                         class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-fatq9v-MuiSvgIcon-root"
-                        data-testid="AccessTimeIcon"
+                        data-testid="FormatListBulletedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
                       >
                         <path
-                          d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2M12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8"
-                        />
-                        <path
-                          d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"
+                          d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5m0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5m0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5M7 19h14v-2H7zm0-6h14v-2H7zm0-8v2h14V5z"
                         />
                       </svg>
                     </div>
                     <span
-                      aria-label="Date Created"
+                      aria-label="Property 3"
                       class="MuiTypography-root MuiTypography-subtitle1 css-1to5392-MuiTypography-root"
                       data-mui-internal-clone-element="true"
                     >
-                      Date Created
+                      Property 3
                     </span>
                     <button
                       class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-10xxybu-MuiButtonBase-root-MuiIconButton-root"
@@ -320,7 +317,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
                   style="align-self: flex-start; align-items: flex-start;"
                 >
                   <div
-                    class="css-jm1ma0"
+                    class="css-1s68mph"
                   >
                     <img
                       src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -363,6 +360,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-card-card-id-1-column-property1"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -400,6 +398,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-card-card-id-1-column-property2"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -427,12 +426,30 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-card-card-id-1-column-property3"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="octo-propertyvalue readonly MuiBox-root css-yl62nh"
+                style="width: 100%; height: 100%;"
               >
-                6/15/21, 4:22 PM
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             <div
@@ -481,7 +498,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
                   style="align-self: flex-start; align-items: flex-start;"
                 >
                   <div
-                    class="css-jm1ma0"
+                    class="css-1s68mph"
                   >
                     <img
                       src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -524,6 +541,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-card-card-id-2-column-property1"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -561,6 +579,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-card-card-id-2-column-property2"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -588,12 +607,30 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-card-card-id-2-column-property3"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="octo-propertyvalue readonly MuiBox-root css-yl62nh"
+                style="width: 100%; height: 100%;"
               >
-                6/15/21, 4:22 PM
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             <div
@@ -943,21 +980,21 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
                       <svg
                         aria-hidden="true"
                         class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-fatq9v-MuiSvgIcon-root"
-                        data-testid="PersonIcon"
+                        data-testid="FormatListBulletedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
                       >
                         <path
-                          d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4m0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4"
+                          d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5m0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5m0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5M7 19h14v-2H7zm0-6h14v-2H7zm0-8v2h14V5z"
                         />
                       </svg>
                     </div>
                     <span
-                      aria-label="Created By"
+                      aria-label="Property 3"
                       class="MuiTypography-root MuiTypography-subtitle1 css-1to5392-MuiTypography-root"
                       data-mui-internal-clone-element="true"
                     >
-                      Created By
+                      Property 3
                     </span>
                     <button
                       class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-10xxybu-MuiButtonBase-root-MuiIconButton-root"
@@ -1046,7 +1083,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
                   style="align-self: flex-start; align-items: flex-start;"
                 >
                   <div
-                    class="css-jm1ma0"
+                    class="css-1s68mph"
                   >
                     <img
                       src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -1089,6 +1126,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-card-card-id-1-column-property1"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -1126,6 +1164,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-card-card-id-1-column-property2"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -1153,8 +1192,32 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-card-card-id-1-column-property3"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
-            />
+            >
+              <div
+                style="width: 100%; height: 100%;"
+              >
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             <div
               class="octo-table-cell"
               style="flex-grow: 1;"
@@ -1201,7 +1264,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
                   style="align-self: flex-start; align-items: flex-start;"
                 >
                   <div
-                    class="css-jm1ma0"
+                    class="css-1s68mph"
                   >
                     <img
                       src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -1244,6 +1307,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-card-card-id-2-column-property1"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -1281,6 +1345,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-card-card-id-2-column-property2"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -1308,8 +1373,32 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-card-card-id-2-column-property3"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
-            />
+            >
+              <div
+                style="width: 100%; height: 100%;"
+              >
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             <div
               class="octo-table-cell"
               style="flex-grow: 1;"
@@ -1657,24 +1746,21 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
                       <svg
                         aria-hidden="true"
                         class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-fatq9v-MuiSvgIcon-root"
-                        data-testid="AccessTimeIcon"
+                        data-testid="FormatListBulletedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
                       >
                         <path
-                          d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2M12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8"
-                        />
-                        <path
-                          d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"
+                          d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5m0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5m0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5M7 19h14v-2H7zm0-6h14v-2H7zm0-8v2h14V5z"
                         />
                       </svg>
                     </div>
                     <span
-                      aria-label="Date Updated"
+                      aria-label="Property 3"
                       class="MuiTypography-root MuiTypography-subtitle1 css-1to5392-MuiTypography-root"
                       data-mui-internal-clone-element="true"
                     >
-                      Date Updated
+                      Property 3
                     </span>
                     <button
                       class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-10xxybu-MuiButtonBase-root-MuiIconButton-root"
@@ -1763,7 +1849,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
                   style="align-self: flex-start; align-items: flex-start;"
                 >
                   <div
-                    class="css-jm1ma0"
+                    class="css-1s68mph"
                   >
                     <img
                       src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -1806,6 +1892,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-card-card-id-1-column-property1"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -1843,6 +1930,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-card-card-id-1-column-property2"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -1870,12 +1958,30 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-card-card-id-1-column-property3"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="octo-propertyvalue readonly MuiBox-root css-yl62nh"
+                style="width: 100%; height: 100%;"
               >
-                9/14/22, 2:13 PM
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             <div
@@ -1924,7 +2030,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
                   style="align-self: flex-start; align-items: flex-start;"
                 >
                   <div
-                    class="css-jm1ma0"
+                    class="css-1s68mph"
                   >
                     <img
                       src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -1967,6 +2073,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-card-card-id-2-column-property1"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -2004,6 +2111,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-card-card-id-2-column-property2"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -2031,12 +2139,30 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-card-card-id-2-column-property3"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
-                class="octo-propertyvalue readonly MuiBox-root css-yl62nh"
+                style="width: 100%; height: 100%;"
               >
-                9/14/22, 2:13 PM
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             <div
@@ -2386,21 +2512,21 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
                       <svg
                         aria-hidden="true"
                         class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-fatq9v-MuiSvgIcon-root"
-                        data-testid="PersonIcon"
+                        data-testid="FormatListBulletedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
                       >
                         <path
-                          d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4m0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4"
+                          d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5m0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5m0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5M7 19h14v-2H7zm0-6h14v-2H7zm0-8v2h14V5z"
                         />
                       </svg>
                     </div>
                     <span
-                      aria-label="Last Modified By"
+                      aria-label="Property 3"
                       class="MuiTypography-root MuiTypography-subtitle1 css-1to5392-MuiTypography-root"
                       data-mui-internal-clone-element="true"
                     >
-                      Last Modified By
+                      Property 3
                     </span>
                     <button
                       class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-10xxybu-MuiButtonBase-root-MuiIconButton-root"
@@ -2489,7 +2615,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
                   style="align-self: flex-start; align-items: flex-start;"
                 >
                   <div
-                    class="css-jm1ma0"
+                    class="css-1s68mph"
                   >
                     <img
                       src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -2532,6 +2658,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-card-card-id-1-column-property1"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -2569,6 +2696,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-card-card-id-1-column-property2"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -2596,8 +2724,32 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-card-card-id-1-column-property3"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
-            />
+            >
+              <div
+                style="width: 100%; height: 100%;"
+              >
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             <div
               class="octo-table-cell"
               style="flex-grow: 1;"
@@ -2644,7 +2796,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
                   style="align-self: flex-start; align-items: flex-start;"
                 >
                   <div
-                    class="css-jm1ma0"
+                    class="css-1s68mph"
                   >
                     <img
                       src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -2687,6 +2839,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-card-card-id-2-column-property1"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -2724,6 +2877,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-card-card-id-2-column-property2"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -2751,8 +2905,32 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             </div>
             <div
               class="octo-table-cell"
+              data-test="database-card-card-id-2-column-property3"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
-            />
+            >
+              <div
+                style="width: 100%; height: 100%;"
+              >
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             <div
               class="octo-table-cell"
               style="flex-grow: 1;"

@@ -64,12 +64,10 @@ export type PopulatedEvaluation = Omit<ProposalEvaluation, 'voteSettings'> & {
 export type ProposalWithUsersAndRubric = Omit<Proposal, 'fields'> & {
   authors: ProposalAuthor[];
   rewardIds?: string[] | null;
-  // currentStep: ProposalStep;
   evaluations: PopulatedEvaluation[];
   fields: ProposalFields | null;
   page?: { sourceTemplateId: string | null } | null;
   permissions: ProposalPermissionFlags;
-  reviewers?: ProposalReviewer[];
   currentEvaluationId?: string;
   form: {
     id: string;

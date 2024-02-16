@@ -17,7 +17,6 @@ describe('getProposal', () => {
 
     const result = await getProposal({
       id: proposal.id,
-      canAccessPrivateFormFields: true,
       permissionsByStep: {
         draft: {} as any
       }

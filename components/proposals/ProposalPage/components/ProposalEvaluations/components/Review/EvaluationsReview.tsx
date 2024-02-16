@@ -116,7 +116,7 @@ export function EvaluationsReview({
   return (
     <LoadingComponent isLoading={!proposal}>
       <Collapse in={expandedContainer}>
-        <Tooltip title='Workflow can be changed in Draft step'>
+        <Tooltip title='Workflow can only be changed in Draft step'>
           <span>
             <WorkflowSelect value={proposal?.workflowId} readOnly />
           </span>
@@ -173,7 +173,6 @@ export function EvaluationsReview({
                 proposalId={proposal?.id}
                 isCurrent={isCurrent}
                 nextStep={proposal.evaluations[index + 1]}
-                hasMovePermission={proposal.permissions.move}
                 onSubmit={refreshProposal}
               />
             )}
