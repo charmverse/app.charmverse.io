@@ -447,17 +447,19 @@ function FilterEntry(props: Props) {
   const deleteFilterClausePopupState = usePopupState({ variant: 'popover' });
   const { properties: viewProperties, filter, changeViewFilter, currentFilter } = props;
   const containsTitleProperty = viewProperties.find((property) => property.id === Constants.titleColumnId);
-  const properties: IPropertyTemplate[] = containsTitleProperty
-    ? viewProperties
-    : [
-        {
-          id: Constants.titleColumnId,
-          name: 'Title',
-          type: 'text',
-          options: []
-        },
-        ...viewProperties
-      ];
+  const properties: IPropertyTemplate[] = (
+    containsTitleProperty
+      ? viewProperties
+      : [
+          {
+            id: Constants.titleColumnId,
+            name: 'Title',
+            type: 'text',
+            options: []
+          },
+          ...viewProperties
+        ]
+  ).filter((prop) => prop.type !== 'proposalReviewerNotes') as IPropertyTemplate[];
 
   const template = properties.find((o: IPropertyTemplate) => o.id === filter.propertyId);
 
