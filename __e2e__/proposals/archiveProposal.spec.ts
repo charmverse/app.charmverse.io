@@ -9,7 +9,8 @@ test.describe.serial('Archive Proposal', () => {
   test('Archive proposal and assert all actions are disabled, and proposal is not visible in the proposals list', async ({
     proposalListPage,
     documentPage,
-    proposalPage
+    proposalPage,
+    page
   }) => {
     const { space, user: admin } = await generateUserAndSpace({
       isAdmin: true,
@@ -88,7 +89,7 @@ test.describe.serial('Archive Proposal', () => {
 
     await expect(documentPage.charmEditor).toBeVisible();
 
-    await proposalPage.toggleArchiveProposal();
+    await Promise.all([page.waitForResponse('**/api/proposals/*/archive'), proposalPage.toggleArchiveProposal()]);
 
     await expect(documentPage.charmEditor).toHaveAttribute('contenteditable', 'false');
 

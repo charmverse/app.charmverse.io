@@ -67,18 +67,21 @@ test.describe.serial('Create and use Proposal Template', async () => {
     title: 'First reward',
     description: 'First reward description',
     chain: optimism.id,
-    //  USDC Contract Address on OP;
-    token: '0x7F5c764cBc14f9669B88837ca1490cCa17c31607',
-    amount: 22
+    //  USDC Contract Address on OP; Changed last digit to 6 instead of 7 so we get an empty response and fill the fields manually
+    token: '0x7F5c764cBc14f9669B88837ca1490cCa17c31606',
+    amount: 22,
+    tokenName: 'USDC Coin',
+    tokenSymbol: 'USDC',
+    tokenDecimals: 6
   };
 
-  const secondRewardConfig = {
-    title: 'Second reward',
-    description: 'Second reward description',
-    chain: optimism.id,
-    token: 'ETH',
-    amount: 10
-  };
+  // const secondRewardConfig = {
+  //   title: 'Second reward',
+  //   description: 'Second reward description',
+  //   chain: optimism.id,
+  //   token: 'ETH',
+  //   amount: 10
+  // };
 
   test.beforeAll(async () => {
     // Generate a admin and a space for the test
@@ -107,15 +110,13 @@ test.describe.serial('Create and use Proposal Template', async () => {
     });
   });
 
-  test.skip('Create a freeform proposal template with custom rewards', async ({
+  test('Create a freeform proposal template with custom rewards', async ({
     page,
     proposalPage,
-    rewardPage,
     dialogRewardPage,
     dialogDocumentPage,
-    proposalsListPage,
-    globalPage,
-    documentPage
+    documentPage,
+    proposalsListPage
   }) => {
     // Log in the browser admin
     await loginBrowserUser({ browserPage: page, userId: admin.id });
@@ -126,6 +127,8 @@ test.describe.serial('Create and use Proposal Template', async () => {
     await proposalsListPage.proposalTemplateSelect.click();
     await proposalsListPage.addNewTemplate.click();
     await proposalsListPage.proposalTemplateFreeFormOption.click();
+
+    await expect(proposalPage.workflowSelect).toBeVisible();
 
     // Select a workflow
     await proposalPage.selectWorkflow(secondProposalWorkflow.id);
@@ -174,16 +177,15 @@ test.describe.serial('Create and use Proposal Template', async () => {
     await proposalPage.documentTitleInput.fill(templatePageContent.title);
 
     // Edit the proposal content
-    await proposalPage.charmEditor.click();
-    await page.keyboard.type(templatePageContent.description);
+    await documentPage.typeText(templatePageContent.description);
 
     // Add a new reward
     await proposalPage.addReward.click();
 
     // Set reward title and description
     await dialogDocumentPage.documentTitleInput.fill(rewardConfig.title);
-    await dialogDocumentPage.charmEditor.click();
-    await page.keyboard.type(rewardConfig.description);
+
+    await dialogDocumentPage.typeText(rewardConfig.description);
 
     // Open reward token settings
     await dialogRewardPage.openRewardValueDialog.click();
@@ -198,24 +200,32 @@ test.describe.serial('Create and use Proposal Template', async () => {
     await dialogRewardPage.addCustomToken.click();
 
     await dialogRewardPage.customTokenContractAddressInput.fill(rewardConfig.token);
+
     await expect(dialogRewardPage.customTokenLogoUrl).toBeVisible();
+
+    await dialogRewardPage.customTokenDecimals.fill(rewardConfig.tokenDecimals.toString());
+
+    await dialogRewardPage.customTokenSymbol.fill(rewardConfig.tokenSymbol);
+
+    await dialogRewardPage.customTokenName.fill(rewardConfig.tokenName);
 
     await dialogRewardPage.customTokenLogoUrl.fill(USDCLogoUrl);
 
-    await dialogRewardPage.rewardPropertyAmount.fill(rewardConfig.amount.toString());
-
+    // Save the payment methods
     await dialogRewardPage.saveTokenPaymentMethod.click();
+
+    // Fill in the reward amount
+    await dialogRewardPage.rewardPropertyAmount.fill(rewardConfig.amount.toString());
 
     await dialogRewardPage.saveRewardValue.click();
 
+    // Reduce flakiness
     await dialogDocumentPage.saveNewPage.click();
 
     // Give React some time to set form values before we save
     await page.waitForTimeout(200);
 
-    await proposalPage.saveDraftButton.click();
-
-    await page.waitForResponse('**/api/proposals**');
+    await Promise.all([page.waitForResponse('**/api/proposals'), proposalPage.saveDraftButton.click()]);
 
     // Check the actual data
     savedProposalTemplate = (await prisma.page.findFirstOrThrow({
@@ -391,7 +401,7 @@ test.describe.serial('Create and use Proposal Template', async () => {
     );
   });
 
-  test.skip('Create a proposal from a template', async ({ proposalsListPage, proposalPage, page }) => {
+  test('Create a proposal from a template', async ({ proposalsListPage, proposalPage, page }) => {
     const userProposalConfig = {
       title: 'User created proposal',
       content: 'This is what I am proposing'
@@ -421,9 +431,7 @@ test.describe.serial('Create and use Proposal Template', async () => {
 
     expect(content.trim()).toEqual(templatePageContent.description);
 
-    await proposalPage.saveDraftButton.click();
-
-    await page.waitForResponse('**/api/proposals**');
+    await Promise.all([page.waitForResponse('**/api/proposals'), proposalPage.saveDraftButton.click()]);
 
     const savedUserProposalFromTemplate = await prisma.page.findFirstOrThrow({
       where: {

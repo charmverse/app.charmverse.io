@@ -30,7 +30,7 @@ export const formFieldTypes = [
   'label',
   'image',
   'file'
-] as const;
+] as FormFieldType[];
 
 export const fieldTypeLabelRecord: Record<FormFieldType, string> = {
   date: 'Date',
