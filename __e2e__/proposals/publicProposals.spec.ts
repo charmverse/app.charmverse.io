@@ -72,7 +72,7 @@ test.describe('View a proposal without workflow permissions, but space enabled p
     await loginBrowserUser({ browserPage: page, userId: externalUser.id });
     await documentPage.goToPage({ domain: space.domain, path: proposal.page.path });
 
-    await expect(documentPage.documentTitleInput).toBeVisible();
+    await expect(documentPage.documentTitle).toBeVisible();
 
     const title = (await proposalPage.documentTitle.allInnerTexts())[0];
 

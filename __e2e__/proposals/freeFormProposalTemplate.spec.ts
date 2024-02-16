@@ -217,23 +217,15 @@ test.describe.serial('Create and use Proposal Template', async () => {
     // Fill in the reward amount
     await dialogRewardPage.rewardPropertyAmount.fill(rewardConfig.amount.toString());
 
-    // Reduce flakiness
-    await expect(dialogRewardPage.saveRewardValue).toBeVisible();
-
     await dialogRewardPage.saveRewardValue.click();
 
     // Reduce flakiness
-    await expect(dialogRewardPage.saveRewardValue).toBeVisible();
-
     await dialogDocumentPage.saveNewPage.click();
 
     // Give React some time to set form values before we save
     await page.waitForTimeout(200);
 
-    await proposalPage.saveDraftButton.click();
-
-    // We were waiting for API response, but this was flaky. This should allow the request to complete
-    await page.waitForTimeout(1000);
+    await Promise.all([page.waitForResponse('**/api/proposals'), proposalPage.saveDraftButton.click()]);
 
     // Check the actual data
     savedProposalTemplate = (await prisma.page.findFirstOrThrow({
@@ -439,10 +431,7 @@ test.describe.serial('Create and use Proposal Template', async () => {
 
     expect(content.trim()).toEqual(templatePageContent.description);
 
-    await proposalPage.saveDraftButton.click();
-
-    // Sometimes waiting for API times out. This should fix it
-    await page.waitForTimeout(1000);
+    await Promise.all([page.waitForResponse('**/api/proposals'), proposalPage.saveDraftButton.click()]);
 
     const savedUserProposalFromTemplate = await prisma.page.findFirstOrThrow({
       where: {

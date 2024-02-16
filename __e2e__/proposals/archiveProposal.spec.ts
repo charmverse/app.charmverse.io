@@ -89,9 +89,7 @@ test.describe.serial('Archive Proposal', () => {
 
     await expect(documentPage.charmEditor).toBeVisible();
 
-    await proposalPage.toggleArchiveProposal();
-
-    await page.waitForTimeout(1000);
+    await Promise.all([page.waitForResponse('**/api/proposals/*/archive'), proposalPage.toggleArchiveProposal()]);
 
     await expect(documentPage.charmEditor).toHaveAttribute('contenteditable', 'false');
 
