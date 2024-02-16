@@ -141,6 +141,13 @@ export function getBoardProperties({
   const proposalAuthorProp = generateUpdatedProposalAuthorProperty({ boardProperties });
   const proposalReviewerNotes = generateUpdatedProposalReviewerNotesProperty({ boardProperties });
 
+  const existingReviewerNotesPropIndex = boardProperties.findIndex((p) => p.type === 'proposalReviewerNotes');
+  if (existingReviewerNotesPropIndex > -1) {
+    boardProperties[existingReviewerNotesPropIndex] = proposalReviewerNotes;
+  } else {
+    boardProperties.push(proposalReviewerNotes);
+  }
+
   const existingAuthorPropIndex = boardProperties.findIndex((p) => p.type === 'proposalAuthor');
 
   if (existingAuthorPropIndex > -1) {
@@ -163,13 +170,6 @@ export function getBoardProperties({
     boardProperties[existingUrlPropIndex] = proposalUrlProp;
   } else {
     boardProperties.push(proposalUrlProp);
-  }
-
-  const existingReviewerNotesPropIndex = boardProperties.findIndex((p) => p.type === 'proposalReviewerNotes');
-  if (existingReviewerNotesPropIndex > -1) {
-    boardProperties[existingReviewerNotesPropIndex] = proposalReviewerNotes;
-  } else {
-    boardProperties.push(proposalReviewerNotes);
   }
 
   const existingEvaluationTypePropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluationType');
