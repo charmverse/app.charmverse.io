@@ -40,6 +40,7 @@ export function PropertyTypes({
     name?: IPropertyTemplate['name'];
   }) => void;
   isMobile?: boolean;
+  // This indicates what type of board (proposals, rewards or regular) this component is being used in
   boardType?: 'proposals' | 'rewards';
 }) {
   const addRelationPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-relation-property' });

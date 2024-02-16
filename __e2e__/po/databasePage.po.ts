@@ -132,6 +132,6 @@ export class DatabasePage extends GlobalPage {
   }
 
   getDatabaseTableCell({ templateId, cardId }: { templateId: string; cardId: string }) {
-    return this.page.locator(`data-test=database-row-${cardId}-column-${templateId}`);
+    return this.page.locator(`data-test=database-card-${cardId}-column-${templateId}`);
   }
 }

@@ -1,11 +1,8 @@
-import styled from '@emotion/styled';
-import { Box, Divider, Menu, MenuItem, TextField } from '@mui/material';
+import { Box, Divider, Menu, TextField } from '@mui/material';
 import { bindMenu } from 'material-ui-popup-state';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { usePages } from 'hooks/usePages';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 
 import { LinkCharmVerseDatabase } from '../../../viewSidebar/viewSourceOptions/components/LinkCharmVerseDatabase';
@@ -25,8 +22,6 @@ export function RelationPropertyMenu({
   }) => void;
   relationData?: IPropertyTemplate['relationData'];
 }) {
-  const { pages } = usePages();
-  const { space } = useCurrentSpace();
   const bindMenuProps = bindMenu(popupState);
   const [relationPropertyData, setRelationPropertyData] = useState<IPropertyTemplate['relationData'] | null>(
     relationData ?? null

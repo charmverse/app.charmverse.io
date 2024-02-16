@@ -166,8 +166,8 @@ test.describe.serial('Database with proposals as datasource', async () => {
 
     // Make sure the UI only displays 3 cards
     const firstRow = databasePage.getTableRowByIndex({ index: 0 });
-    const secondRow = databasePage.getTableRowByIndex({ index: 0 });
-    const thirdRow = databasePage.getTableRowByIndex({ index: 0 });
+    const secondRow = databasePage.getTableRowByIndex({ index: 1 });
+    const thirdRow = databasePage.getTableRowByIndex({ index: 2 });
 
     await expect(firstRow).toBeVisible();
     await expect(secondRow).toBeVisible();

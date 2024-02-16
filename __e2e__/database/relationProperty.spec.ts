@@ -138,16 +138,10 @@ test.describe.serial('Edit relation properties', async () => {
       .click();
 
     await databasePage.page.locator(`data-test=page-option-${connectedBoardCards[0].id}`).click();
-
-    await databasePage
-      .getDatabaseTableCell({
-        cardId: sourceBoardCards[0].id,
-        templateId: sourceRelationProperty.id
-      })
-      .click();
-
+    await databasePage.page.waitForTimeout(250);
     await databasePage.page.locator(`data-test=page-option-${connectedBoardCards[1].id}`).click();
 
+    await databasePage.page.locator("div[role='presentation']").click();
     await databasePage
       .getDatabaseTableCell({
         cardId: sourceBoardCards[1].id,
@@ -219,7 +213,10 @@ test.describe.serial('Edit relation properties', async () => {
       })
       .click();
 
-    await databasePage.page.keyboard.press('Backspace');
+    await databasePage.page
+      .locator(`data-test=page-option-${sourceBoardCards[0].id}`)
+      .getByTestId('RemoveIcon')
+      .click();
 
     await document.goToPage({
       domain: space.domain,

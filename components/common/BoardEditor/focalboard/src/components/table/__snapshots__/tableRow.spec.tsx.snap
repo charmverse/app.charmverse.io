@@ -305,7 +305,7 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
       </div>
       <div
         class="octo-table-cell"
-        data-test="database-row-card-1-column-property1"
+        data-test="database-card-card-1-column-property1"
         style="align-items: flex-start; width: 100px; overflow-x: hidden;"
       >
         <div
@@ -343,7 +343,7 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
       </div>
       <div
         class="octo-table-cell"
-        data-test="database-row-card-1-column-property2"
+        data-test="database-card-card-1-column-property2"
         style="align-items: flex-start; width: 100px; overflow-x: hidden;"
       >
         <div
@@ -659,7 +659,7 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
       </div>
       <div
         class="octo-table-cell"
-        data-test="database-row-card-1-column-property1"
+        data-test="database-card-card-1-column-property1"
         style="align-items: flex-start; width: 100px; overflow-x: hidden;"
       >
         <div
@@ -697,7 +697,7 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
       </div>
       <div
         class="octo-table-cell"
-        data-test="database-row-card-1-column-property2"
+        data-test="database-card-card-1-column-property2"
         style="align-items: flex-start; width: 100px; overflow-x: hidden;"
       >
         <div

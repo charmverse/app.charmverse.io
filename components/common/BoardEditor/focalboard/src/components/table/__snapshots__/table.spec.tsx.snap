@@ -360,7 +360,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             </div>
             <div
               class="octo-table-cell"
-              data-test="database-row-card-id-1-column-property1"
+              data-test="database-card-card-id-1-column-property1"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -398,7 +398,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             </div>
             <div
               class="octo-table-cell"
-              data-test="database-row-card-id-1-column-property2"
+              data-test="database-card-card-id-1-column-property2"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -426,7 +426,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             </div>
             <div
               class="octo-table-cell"
-              data-test="database-row-card-id-1-column-property3"
+              data-test="database-card-card-id-1-column-property3"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -541,7 +541,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             </div>
             <div
               class="octo-table-cell"
-              data-test="database-row-card-id-2-column-property1"
+              data-test="database-card-card-id-2-column-property1"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -579,7 +579,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             </div>
             <div
               class="octo-table-cell"
-              data-test="database-row-card-id-2-column-property2"
+              data-test="database-card-card-id-2-column-property2"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -607,7 +607,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
             </div>
             <div
               class="octo-table-cell"
-              data-test="database-row-card-id-2-column-property3"
+              data-test="database-card-card-id-2-column-property3"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -1126,7 +1126,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             </div>
             <div
               class="octo-table-cell"
-              data-test="database-row-card-id-1-column-property1"
+              data-test="database-card-card-id-1-column-property1"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -1164,7 +1164,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             </div>
             <div
               class="octo-table-cell"
-              data-test="database-row-card-id-1-column-property2"
+              data-test="database-card-card-id-1-column-property2"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -1192,7 +1192,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             </div>
             <div
               class="octo-table-cell"
-              data-test="database-row-card-id-1-column-property3"
+              data-test="database-card-card-id-1-column-property3"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -1307,7 +1307,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             </div>
             <div
               class="octo-table-cell"
-              data-test="database-row-card-id-2-column-property1"
+              data-test="database-card-card-id-2-column-property1"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -1345,7 +1345,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             </div>
             <div
               class="octo-table-cell"
-              data-test="database-row-card-id-2-column-property2"
+              data-test="database-card-card-id-2-column-property2"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -1373,7 +1373,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
             </div>
             <div
               class="octo-table-cell"
-              data-test="database-row-card-id-2-column-property3"
+              data-test="database-card-card-id-2-column-property3"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -1892,7 +1892,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             </div>
             <div
               class="octo-table-cell"
-              data-test="database-row-card-id-1-column-property1"
+              data-test="database-card-card-id-1-column-property1"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -1930,7 +1930,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             </div>
             <div
               class="octo-table-cell"
-              data-test="database-row-card-id-1-column-property2"
+              data-test="database-card-card-id-1-column-property2"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -1958,7 +1958,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             </div>
             <div
               class="octo-table-cell"
-              data-test="database-row-card-id-1-column-property3"
+              data-test="database-card-card-id-1-column-property3"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -2073,7 +2073,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             </div>
             <div
               class="octo-table-cell"
-              data-test="database-row-card-id-2-column-property1"
+              data-test="database-card-card-id-2-column-property1"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -2111,7 +2111,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             </div>
             <div
               class="octo-table-cell"
-              data-test="database-row-card-id-2-column-property2"
+              data-test="database-card-card-id-2-column-property2"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -2139,7 +2139,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
             </div>
             <div
               class="octo-table-cell"
-              data-test="database-row-card-id-2-column-property3"
+              data-test="database-card-card-id-2-column-property3"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -2658,7 +2658,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             </div>
             <div
               class="octo-table-cell"
-              data-test="database-row-card-id-1-column-property1"
+              data-test="database-card-card-id-1-column-property1"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -2696,7 +2696,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             </div>
             <div
               class="octo-table-cell"
-              data-test="database-row-card-id-1-column-property2"
+              data-test="database-card-card-id-1-column-property2"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -2724,7 +2724,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             </div>
             <div
               class="octo-table-cell"
-              data-test="database-row-card-id-1-column-property3"
+              data-test="database-card-card-id-1-column-property3"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -2839,7 +2839,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             </div>
             <div
               class="octo-table-cell"
-              data-test="database-row-card-id-2-column-property1"
+              data-test="database-card-card-id-2-column-property1"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -2877,7 +2877,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             </div>
             <div
               class="octo-table-cell"
-              data-test="database-row-card-id-2-column-property2"
+              data-test="database-card-card-id-2-column-property2"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
@@ -2905,7 +2905,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
             </div>
             <div
               class="octo-table-cell"
-              data-test="database-row-card-id-2-column-property3"
+              data-test="database-card-card-id-2-column-property3"
               style="align-items: flex-start; width: 100px; overflow-x: hidden;"
             >
               <div
