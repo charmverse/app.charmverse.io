@@ -98,6 +98,10 @@ export type PublicApiForumPost = {
  *        categoryId:
  *          type: string
  *          format: uuid
+ *      required:
+ *        - userId
+ *        - contentMarkdown
+ *        - title
  */
 
 interface CreateForumPostInput {

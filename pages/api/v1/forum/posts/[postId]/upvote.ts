@@ -51,7 +51,7 @@ handler.post(requireKeys(['userId', 'upvoted'], 'body'), upvoteDownvotePost);
 
 /**
  * @swagger
- * components
+ * components:
  *   schemas:
  *     UpvoteInput:
  *       type: object
