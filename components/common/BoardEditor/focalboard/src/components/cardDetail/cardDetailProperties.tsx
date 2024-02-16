@@ -39,6 +39,7 @@ type Props = {
   mutator?: Mutator;
   readOnlyProperties?: string[];
   disableEditPropertyOption?: boolean;
+  boardType?: 'proposals' | 'rewards';
 };
 
 function CardDetailProperties(props: Props) {
@@ -245,6 +246,7 @@ function CardDetailProperties(props: Props) {
     () =>
       activeView && (
         <PropertyTypes
+          boardType={props.boardType}
           isMobile={isSmallScreen}
           onClick={async ({ type, relationData, name }) => {
             const template: IPropertyTemplate = {
@@ -258,7 +260,6 @@ function CardDetailProperties(props: Props) {
             if (relationData?.showOnRelatedBoard) {
               syncRelationProperty({
                 boardId: board.id,
-                created: true,
                 templateId
               });
             }
@@ -267,7 +268,7 @@ function CardDetailProperties(props: Props) {
           }}
         />
       ),
-    [mutator, board, activeView, isSmallScreen]
+    [mutator, props.boardType, board, activeView, isSmallScreen]
   );
 
   return (

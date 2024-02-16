@@ -10,6 +10,7 @@ import { useIntl } from 'react-intl';
 import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
+import { useSyncRelationPropertyValue } from 'charmClient/hooks/blocks';
 import { useUpdateProposalEvaluation } from 'charmClient/hooks/proposals';
 import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
 import { RelationPropertyPagesAutocomplete } from 'components/common/BoardEditor/components/properties/RelationPropertyPagesAutocomplete';
@@ -86,6 +87,7 @@ type Props = {
   mutator?: Mutator;
   subRowsEmptyValueContent?: ReactElement | string;
   proposal?: CardPage['proposal'];
+  showCard?: (cardId: string | null) => void;
 };
 
 export const validatePropertyValue = (propType: string, val: string): boolean => {
@@ -140,6 +142,7 @@ function PropertyValueElement(props: Props) {
     proposal
   } = props;
   const { trigger } = useUpdateProposalEvaluation({ proposalId: proposal?.id });
+  const { trigger: syncRelationPropertyValue } = useSyncRelationPropertyValue();
 
   const isAdmin = useIsAdmin();
   const intl = useIntl();
@@ -288,15 +291,19 @@ function PropertyValueElement(props: Props) {
         selectedPageListItemIds={
           typeof propertyValue === 'string' ? [propertyValue] : (propertyValue as string[]) ?? []
         }
+        showCard={props.showCard}
         displayType={displayType}
         emptyPlaceholderContent={emptyDisplayValue}
         showEmptyPlaceholder={showEmptyPlaceholder}
-        onChange={async (pageListItemIds) => {
-          try {
-            await mutator.changePropertyValue(card, propertyTemplate.id, pageListItemIds);
-          } catch (error) {
+        onChange={(pageListItemIds) => {
+          syncRelationPropertyValue({
+            templateId: propertyTemplate.id,
+            pageIds: pageListItemIds,
+            boardId: board.id,
+            cardId: card.id
+          }).catch((error) => {
             showError(error);
-          }
+          });
         }}
         readOnly={readOnly}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}

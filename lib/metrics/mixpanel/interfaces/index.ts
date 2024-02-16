@@ -1,3 +1,5 @@
+import type { FarcasterEventMap } from 'lib/metrics/mixpanel/interfaces/FarcasterEvents';
+
 import type { ApiEventMap } from './ApiEvent';
 import type { BountyEventMap } from './BountyEvent';
 import type { CredentialEventMap } from './CredentialEvent';
@@ -30,6 +32,7 @@ export type MixpanelEventMap = UserEventMap &
   ForumEventMap &
   SubscriptionEventMap &
   ApiEventMap &
-  CredentialEventMap;
+  CredentialEventMap &
+  FarcasterEventMap;
 export type MixpanelEvent = MixpanelEventMap[keyof MixpanelEventMap];
 export type MixpanelEventName = keyof MixpanelEventMap;

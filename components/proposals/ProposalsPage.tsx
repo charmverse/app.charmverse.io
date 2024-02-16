@@ -160,6 +160,7 @@ export function ProposalsPage({ title }: { title: string }) {
             {cardPages.length > 0 ? (
               <Box width='100%'>
                 <Table
+                  boardType='proposals'
                   setSelectedPropertyId={(_setSelectedPropertyId) => {
                     setSelectedPropertyId(_setSelectedPropertyId);
                     setShowSidebar(true);

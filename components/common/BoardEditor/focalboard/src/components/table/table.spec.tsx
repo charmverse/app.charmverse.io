@@ -1,7 +1,6 @@
-import '@testing-library/jest-dom';
 import type { PageMeta } from '@charmverse/core/pages';
+import '@testing-library/jest-dom';
 import { render } from '@testing-library/react';
-import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 
@@ -12,7 +11,6 @@ import { FetchMock } from '../../test/fetchMock';
 import { TestBlockFactory } from '../../test/testBlockFactory';
 import { wrapDNDIntl } from '../../testUtils';
 import type { IUser } from '../../user';
-import { Utils, IDType } from '../../utils';
 
 import Table from './table';
 
@@ -184,7 +182,7 @@ describe('components/table/Table extended', () => {
   test('should match snapshot with CreatedBy', async () => {
     const board = TestBlockFactory.createBoard();
 
-    const dateCreatedId = Utils.createGuid(IDType.User);
+    const dateCreatedId = 'property3';
     board.fields.cardProperties.push({
       id: dateCreatedId,
       name: 'Date Created',
@@ -262,7 +260,7 @@ describe('components/table/Table extended', () => {
   test('should match snapshot with UpdatedAt', async () => {
     const board = TestBlockFactory.createBoard();
 
-    const dateUpdatedId = Utils.createGuid(IDType.User);
+    const dateUpdatedId = 'property3';
     board.fields.cardProperties.push({
       id: dateUpdatedId,
       name: 'Date Updated',
@@ -352,7 +350,7 @@ describe('components/table/Table extended', () => {
   test('should match snapshot with CreatedBy', async () => {
     const board = TestBlockFactory.createBoard();
 
-    const createdById = Utils.createGuid(IDType.User);
+    const createdById = 'property3';
     board.fields.cardProperties.push({
       id: createdById,
       name: 'Created By',
@@ -431,7 +429,7 @@ describe('components/table/Table extended', () => {
   test('should match snapshot with UpdatedBy', async () => {
     const board = TestBlockFactory.createBoard();
 
-    const updatedById = Utils.createGuid(IDType.User);
+    const updatedById = 'property3';
     board.fields.cardProperties.push({
       id: updatedById,
       name: 'Last Modified By',

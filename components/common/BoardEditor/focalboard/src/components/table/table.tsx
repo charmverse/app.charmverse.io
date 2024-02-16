@@ -47,6 +47,7 @@ type Props = {
   checkedIds?: string[];
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
   setSelectedPropertyId?: Dispatch<SetStateAction<string | null>>;
+  boardType?: 'proposals' | 'rewards';
 };
 
 const TableRowsContainer = forwardRef<HTMLDivElement, { children: ReactNode }>(({ children }, ref) => {
@@ -81,7 +82,8 @@ function Table(props: Props): JSX.Element {
     subRowsEmptyValueContent,
     setCheckedIds,
     checkedIds,
-    setSelectedPropertyId
+    setSelectedPropertyId,
+    boardType
   } = props;
   const isManualSort = activeView.fields.sortOptions?.length === 0;
   const dispatch = useAppDispatch();
@@ -298,6 +300,7 @@ function Table(props: Props): JSX.Element {
           checkedIds={checkedIds}
           setCheckedIds={setCheckedIds}
           setSelectedPropertyId={setSelectedPropertyId}
+          boardType={boardType}
         />
 
         {/* Table rows */}

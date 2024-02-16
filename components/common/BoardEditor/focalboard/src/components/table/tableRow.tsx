@@ -352,10 +352,12 @@ function TableRow(props: Props) {
               width: columnWidth(props.resizingColumn, props.activeView.fields.columnWidths, props.offset, template.id),
               overflowX: 'hidden'
             }}
+            data-test={`database-card-${card.id}-column-${template.id}`}
             ref={columnRef}
             onPaste={(e) => e.stopPropagation()}
           >
             <PropertyValueElement
+              showCard={(cardId) => cardId && props.showCard(cardId)}
               readOnly={props.readOnly}
               syncWithPageId={cardPage?.syncWithPageId}
               card={card}
