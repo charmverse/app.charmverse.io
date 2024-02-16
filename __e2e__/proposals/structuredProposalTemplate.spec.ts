@@ -180,76 +180,76 @@ test.describe.serial('Structured proposal template', () => {
     await proposalPage.page.waitForResponse(/\/api\/proposals/);
   });
 
-  // test('Visit structured proposal template and edit/add fields', async ({
-  //   databasePage,
-  //   proposalPage,
-  //   proposalsListPage,
-  //   documentPage,
-  //   proposalFormFieldPage,
-  //   page
-  // }) => {
-  //   await loginBrowserUser({
-  //     browserPage: proposalsListPage.page,
-  //     userId: spaceAdmin.id
-  //   });
+  test('Visit structured proposal template and edit/add fields', async ({
+    databasePage,
+    proposalPage,
+    proposalsListPage,
+    documentPage,
+    proposalFormFieldPage,
+    page
+  }) => {
+    await loginBrowserUser({
+      browserPage: proposalsListPage.page,
+      userId: spaceAdmin.id
+    });
 
-  //   const proposalTemplate = await prisma.proposal.findFirstOrThrow({
-  //     where: {
-  //       spaceId: space.id
-  //     },
-  //     select: {
-  //       page: {
-  //         select: {
-  //           id: true,
-  //           path: true
-  //         }
-  //       }
-  //     }
-  //   });
+    const proposalTemplate = await prisma.proposal.findFirstOrThrow({
+      where: {
+        spaceId: space.id
+      },
+      select: {
+        page: {
+          select: {
+            id: true,
+            path: true
+          }
+        }
+      }
+    });
 
-  //   await proposalsListPage.goToProposals(space.domain);
+    await proposalsListPage.goToProposals(space.domain);
 
-  //   await proposalsListPage.waitForProposalsList();
+    await proposalsListPage.waitForProposalsList();
 
-  //   await proposalsListPage.proposalTemplateSelect.click();
+    await proposalsListPage.proposalTemplateSelect.click();
 
-  //   await databasePage.getTemplateMenu({ pageId: proposalTemplate.page!.id }).click();
+    await databasePage.getTemplateMenu({ pageId: proposalTemplate.page!.id }).click();
 
-  //   await databasePage.getTemplateMenuEditOption({ pageId: proposalTemplate.page!.id }).click();
+    await databasePage.getTemplateMenuEditOption({ pageId: proposalTemplate.page!.id }).click();
 
-  //   await documentPage.waitForDocumentPage({
-  //     domain: space.domain,
-  //     path: proposalTemplate.page!.path
-  //   });
+    await documentPage.waitForDocumentPage({
+      domain: space.domain,
+      path: proposalTemplate.page!.path
+    });
 
-  //   // Add a field
-  //   await proposalFormFieldPage.addNewFormFieldButton.click();
+    // Add a field
+    await proposalFormFieldPage.addNewFormFieldButton.click();
 
-  //   // Index selector uses 0-based index. We use length of the testedFormFieldTypes array as it represents 0 - n + 1 added field
-  //   await expect(proposalFormFieldPage.toggleFormFieldButton.nth(testedFormFieldTypes.length)).toBeVisible();
+    // Index selector uses 0-based index. We use length of the testedFormFieldTypes array as it represents 0 - n + 1 added field
+    await expect(proposalFormFieldPage.toggleFormFieldButton.nth(testedFormFieldTypes.length)).toBeVisible();
 
-  //   // Field will be autoexpanded since this form already exists
-  //   await proposalFormFieldPage.getFormFieldNameInput(0).fill('New field');
+    // Field will be autoexpanded since this form already exists
+    await proposalFormFieldPage.getFormFieldNameInput(0).fill('New field');
 
-  //   await proposalPage.page.waitForTimeout(500);
+    await proposalPage.page.waitForTimeout(500);
 
-  //   await proposalPage.page.reload();
+    await proposalPage.page.reload();
 
-  //   // Click edit on new field after reloading
-  //   await proposalFormFieldPage.toggleFormFieldButton.nth(testedFormFieldTypes.length).click();
+    // Click edit on new field after reloading
+    await proposalFormFieldPage.toggleFormFieldButton.nth(testedFormFieldTypes.length).click();
 
-  //   // Delete this new additional field
-  //   await proposalFormFieldPage.fieldMoreOptions.click();
+    // Delete this new additional field
+    await proposalFormFieldPage.fieldMoreOptions.click();
 
-  //   await proposalFormFieldPage.deleteField.click();
+    await proposalFormFieldPage.deleteField.click();
 
-  //   await proposalPage.page.waitForTimeout(500);
+    await proposalPage.page.waitForTimeout(500);
 
-  //   await proposalPage.page.reload();
+    await proposalPage.page.reload();
 
-  //   // Make sure the field was deleted
-  //   await expect(proposalFormFieldPage.toggleFormFieldButton.nth(testedFormFieldTypes.length)).not.toBeVisible();
-  // });
+    // Make sure the field was deleted
+    await expect(proposalFormFieldPage.toggleFormFieldButton.nth(testedFormFieldTypes.length)).not.toBeVisible();
+  });
 
   test('Create proposal from structure template after providing required fields', async ({
     proposalPage,
@@ -330,7 +330,8 @@ test.describe.serial('Structured proposal template', () => {
     proposalPage,
     proposalsListPage,
     documentPage,
-    proposalFormFieldPage
+    proposalFormFieldPage,
+    page
   }) => {
     await loginBrowserUser({
       browserPage: proposalsListPage.page,
@@ -379,11 +380,18 @@ test.describe.serial('Structured proposal template', () => {
 
     const valueToSet = 'John Doe';
 
+    await expect(proposalFormFieldPage.getFormFieldInput(shortTextField.id, 'short_text')).toBeVisible();
+
+    // Give some time for value to populate
+    await page.waitForTimeout(200);
+
+    await proposalFormFieldPage.getFormFieldInput(shortTextField.id, 'short_text').clear();
     await proposalFormFieldPage.getFormFieldInput(shortTextField.id, 'short_text').fill(valueToSet);
 
-    await proposalPage.completeDraftButton.click();
+    // Leave some time for the changes to be saved
+    await page.waitForTimeout(200);
 
-    await proposalPage.page.waitForTimeout(500);
+    await Promise.all([page.waitForResponse('**/api/proposals/**/publish'), proposalPage.completeDraftButton.click()]);
 
     await proposalPage.page.reload();
 
