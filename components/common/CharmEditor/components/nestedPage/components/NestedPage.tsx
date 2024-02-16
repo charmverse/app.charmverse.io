@@ -2,6 +2,8 @@ import type { PageMeta } from '@charmverse/core/pages';
 import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
 import type { EditorView } from 'prosemirror-view';
+import { useCallback } from 'react';
+import { useDrag } from 'react-dnd';
 
 import { useGetPage } from 'charmClient/hooks/pages';
 import type { NodeViewProps } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
@@ -13,6 +15,7 @@ import { usePages } from 'hooks/usePages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { StaticPage } from 'lib/features/constants';
 import { STATIC_PAGES } from 'lib/features/constants';
+import { mergeRefs } from 'lib/utilities/react';
 
 import { enableDragAndDrop } from '../../../utils';
 import { pageNodeDropPluginKey } from '../../prosemirror/prosemirror-dropcursor/dropcursor';
@@ -62,7 +65,6 @@ export default function NestedPage({ isLinkedPage = false, node, getPos }: NodeV
   const { pages, loadingPages } = usePages();
   const { getFeatureTitle, mappedFeatures } = useSpaceFeatures();
   const { categories } = useForumCategories();
-
   const forumCategoryPage = categories.find((c) => c.id === node.attrs.id && node.attrs.type === 'forum_category');
   const staticPage = STATIC_PAGES.find((c) => c.path === node.attrs.path && node.attrs.type === c.path);
   const isDocumentPath = !forumCategoryPage && !staticPage;
@@ -73,6 +75,11 @@ export default function NestedPage({ isLinkedPage = false, node, getPos }: NodeV
 
   const documentPage = sourcePage || pages[node.attrs.id];
   const isLoading = isPageLoading && loadingPages;
+
+  const [_, drag, dragPreview] = useDrag(() => ({
+    type: 'item',
+    documentPage
+  }));
 
   let pageTitle = '';
   if (staticPage) {
@@ -99,6 +106,18 @@ export default function NestedPage({ isLinkedPage = false, node, getPos }: NodeV
 
   const fullPath = `${window.location.origin}/${appPath}`;
 
+  const focusListener = useCallback(
+    (elt: any) => {
+      elt?.addEventListener('focusin', (e: any) => {
+        // Disable Treeview focus system which make draggable on TreeIten unusable
+        // see https://github.com/mui-org/material-ui/issues/29518
+        e.stopImmediatePropagation();
+      });
+      drag(elt);
+    },
+    [drag]
+  );
+
   return (
     <StyledLink
       data-test={`${isLinkedPage ? 'linked-page' : 'nested-page'}-${pageId}`}
@@ -114,6 +133,7 @@ export default function NestedPage({ isLinkedPage = false, node, getPos }: NodeV
           enableDragAndDrop(view, pos);
         }
       }}
+      ref={mergeRefs([drag, dragPreview, focusListener])}
       data-type={node.attrs.type}
       // Only works for firefox
       onDragExitCapture={() => {

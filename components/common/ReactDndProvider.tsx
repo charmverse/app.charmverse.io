@@ -45,7 +45,8 @@ const HTML5toTouch: MultiBackendOptions = {
   backends: [
     {
       id: 'html5',
-      backend: ModifiedHTML5Backend,
+      // Using the standard HTML5 backend to force it to trigger the drag events in the charm editor
+      backend: HTML5Backend,
       transition: MouseTransition
     },
     {
