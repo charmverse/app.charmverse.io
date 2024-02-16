@@ -43,26 +43,32 @@ export function mapDbProposalToProposal({
   const { rewards, form, evaluations, fields, ...rest } = proposal;
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
   const formFields = getProposalFormFields(form?.formFields, !!permissions.view_private_fields);
+  let canViewNotes = false;
   const mappedEvaluations = proposal.evaluations.map((evaluation) => {
     const stepPermissions = permissionsByStep?.[evaluation.id];
     if (!stepPermissions?.evaluate) {
       evaluation.draftRubricAnswers = [];
       evaluation.rubricAnswers = [];
+    } else if (['rubric', 'feedback', 'pass_fail'].includes(evaluation.type)) {
+      canViewNotes = true;
     }
     return {
       ...evaluation,
       isReviewer: !!stepPermissions?.evaluate
     } as unknown as PopulatedEvaluation;
   });
+  const currentPermissions = {
+    ...permissions,
+    view_notes: canViewNotes
+  };
 
   const proposalWithUsers: ProposalWithUsersAndRubric = {
     ...rest,
     fields: fields as ProposalFields,
     evaluations: mappedEvaluations,
-    permissions,
+    permissions: currentPermissions,
     currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
     status: proposal.status,
-    // reviewers: currentEvaluation?.reviewers || [],
     rewardIds: rewards.map((r) => r.id) || null,
     form: form
       ? {
