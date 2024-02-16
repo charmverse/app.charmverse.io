@@ -1,6 +1,7 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
 import { Box } from '@mui/material';
 
+import { RelationPropertyPagesAutocomplete } from 'components/common/BoardEditor/components/properties/RelationPropertyPagesAutocomplete';
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { ControlledProposalStatusSelect } from 'components/proposals/components/ProposalStatusSelect';
@@ -29,6 +30,11 @@ export type PropertyTemplateMenuProps = {
   onChangeProposalsReviewers?: (pageIds: string[], options: SelectOption[]) => Promise<void>;
   onChangeProposalsSteps?: (pageIds: string[], evaluationId: string, moveForward: boolean) => Promise<void>;
   onChangeProposalsStatuses?: (pageIds: string[], result: ProposalEvaluationResult | null) => Promise<void>;
+  onRelationPropertyChange: (a: {
+    checkedCards: Card[];
+    pageListItemIds: string[];
+    propertyTemplate: IPropertyTemplate;
+  }) => Promise<void>;
   onPersonPropertyChange: (a: {
     checkedCards: Card[];
     propertyTemplate: IPropertyTemplate;
@@ -52,6 +58,7 @@ export function PropertyTemplateMenu({
   onChangeProposalsSteps,
   onChangeProposalsStatuses,
   onPersonPropertyChange,
+  onRelationPropertyChange,
   firstCheckedProposal,
   disabledTooltip,
   lastChild
@@ -190,6 +197,29 @@ export function PropertyTemplateMenu({
         );
       }
       return null;
+    }
+
+    case 'relation': {
+      return (
+        <PropertyMenu lastChild={lastChild} disabledTooltip={disabledTooltip} propertyTemplate={propertyTemplate}>
+          <Box px={1}>
+            <RelationPropertyPagesAutocomplete
+              boardProperties={board.fields.cardProperties}
+              displayType='table'
+              onChange={(pageListItemIds) => {
+                onRelationPropertyChange({
+                  checkedCards,
+                  pageListItemIds,
+                  propertyTemplate
+                });
+              }}
+              propertyTemplate={propertyTemplate}
+              selectedPageListItemIds={(propertyValue ?? []) as string[]}
+              wrapColumn={false}
+            />
+          </Box>
+        </PropertyMenu>
+      );
     }
 
     case 'proposalStep': {

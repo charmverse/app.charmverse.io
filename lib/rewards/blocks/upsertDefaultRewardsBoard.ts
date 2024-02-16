@@ -1,12 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { BoardFields, IPropertyTemplate } from 'lib/focalboard/board';
-import {
-  DEFAULT_BOARD_BLOCK_ID,
-  DEFAULT_BOARD_VIEW_BLOCK_ID,
-  DEFAULT_CALENDAR_VIEW_BLOCK_ID,
-  DEFAULT_TABLE_VIEW_BLOCK_ID
-} from 'lib/focalboard/customBlocks/constants';
+import { DEFAULT_BOARD_BLOCK_ID } from 'lib/focalboard/customBlocks/constants';
 import { upsertBlock } from 'lib/rewards/blocks/upsertBlock';
 import {
   defaultRewardViews,

@@ -36,6 +36,7 @@ export function CustomPropertiesAdapter({ reward, onChange, readOnly }: Props) {
       pageUpdatedBy={rewardPage?.updatedBy || user?.id || ''}
       mutator={mutator ?? undefined}
       disableEditPropertyOption={!isAdmin}
+      boardType='rewards'
     />
   );
 }
