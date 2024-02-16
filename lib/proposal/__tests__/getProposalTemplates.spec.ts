@@ -34,7 +34,6 @@ describe('getProposalTemplates', () => {
     expect(templates[0]).toMatchObject(
       expect.objectContaining<Partial<ProposalTemplate>>({
         authors: expect.any(Array),
-        reviewers: expect.any(Array),
         createdBy: adminUser.id,
         id: expect.any(String)
       })

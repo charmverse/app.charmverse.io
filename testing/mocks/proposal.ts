@@ -3,9 +3,11 @@ import { v4 as uuid } from 'uuid';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { OptionalNullable } from 'lib/utilities/types';
 
-export function createMockProposal(
-  input: Partial<ProposalWithUsersAndRubric> = {}
-): OptionalNullable<ProposalWithUsersAndRubric> {
+type ProposalInput = Partial<Omit<ProposalWithUsersAndRubric, 'evaluations'>> & {
+  evaluations?: Partial<ProposalWithUsersAndRubric['evaluations'][number]>[];
+};
+
+export function createMockProposal(input: ProposalInput = {}): OptionalNullable<ProposalWithUsersAndRubric> {
   const id = uuid();
   return {
     lensPostLink: null,
@@ -15,8 +17,6 @@ export function createMockProposal(
     selectedCredentialTemplates: [],
     id,
     authors: [],
-    reviewers: [],
-    evaluations: [],
     reviewedAt: null,
     reviewedBy: null,
     spaceId: '',
@@ -28,6 +28,7 @@ export function createMockProposal(
     },
     permissions: {
       view: true,
+      view_notes: true,
       view_private_fields: true,
       comment: true,
       edit: true,
@@ -39,6 +40,20 @@ export function createMockProposal(
       unarchive: true,
       move: true
     },
-    ...input
+    ...input,
+    evaluations: (input.evaluations || []).map((evaluation) => ({
+      id: uuid(),
+      index: 0,
+      proposalId: id,
+      type: 'rubric',
+      title: 'Rubric',
+      result: null,
+      rubricAnswers: [],
+      draftRubricAnswers: [],
+      rubricCriteria: [],
+      reviewers: [],
+      permissions: [],
+      ...evaluation
+    }))
   };
 }

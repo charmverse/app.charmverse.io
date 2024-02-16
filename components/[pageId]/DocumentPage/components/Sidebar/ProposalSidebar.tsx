@@ -42,7 +42,7 @@ function SidebarComponent(props: SidebarProps) {
               <Typography flexGrow={1} fontWeight={600} fontSize={20}>
                 {SIDEBAR_VIEWS.proposal_evaluation.title}
               </Typography>
-              {props.proposal?.id && <ProposalNotesLink proposalId={props.proposal.id} />}
+              {props.proposal?.permissions.view_notes && <ProposalNotesLink proposalId={props.proposal.id} />}
             </>
           )}
         </SidebarHeader>

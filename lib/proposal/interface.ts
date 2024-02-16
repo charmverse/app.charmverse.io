@@ -68,8 +68,8 @@ export type ProposalWithUsersAndRubric = Omit<Proposal, 'fields'> & {
   evaluations: PopulatedEvaluation[];
   fields: ProposalFields | null;
   page?: { sourceTemplateId: string | null } | null;
-  permissions: ProposalPermissionFlags;
-  reviewers?: ProposalReviewer[];
+  permissions: ProposalPermissionFlags & { view_notes: boolean };
+  // reviewers?: ProposalReviewer[];
   currentEvaluationId?: string;
   form: {
     id: string;

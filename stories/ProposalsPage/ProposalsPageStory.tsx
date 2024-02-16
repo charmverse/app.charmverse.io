@@ -46,19 +46,35 @@ export function ProposalsPageStory() {
 export const proposals = [
   createMockProposal({
     authors: [{ proposalId: '', userId: members[0].id }],
-    reviewers: [
-      { evaluationId: '1', id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null },
-      { evaluationId: '1', id: '2', proposalId: '', roleId: null, userId: members[0].id, systemRole: null }
+    evaluations: [
+      {
+        reviewers: [
+          { evaluationId: '1', id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null },
+          { evaluationId: '1', id: '2', proposalId: '', roleId: null, userId: members[0].id, systemRole: null }
+        ]
+      }
     ]
   }),
   createMockProposal({
     authors: [{ proposalId: '', userId: members[1].id }],
-    reviewers: [{ evaluationId: '1', id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null }],
+    evaluations: [
+      {
+        reviewers: [
+          { evaluationId: '1', id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null }
+        ]
+      }
+    ],
     status: 'published'
   }),
   createMockProposal({
     authors: [{ proposalId: '', userId: members[2].id }],
-    reviewers: [{ evaluationId: '1', id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null }],
+    evaluations: [
+      {
+        reviewers: [
+          { evaluationId: '1', id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null }
+        ]
+      }
+    ],
     status: 'published'
   })
 ].map((p) => ({
