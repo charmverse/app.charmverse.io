@@ -283,7 +283,7 @@ export async function createCardsFromProposals({
       userId
     });
     const accessPrivateFields = permissions.view_private_fields;
-    const formFieldProperties = await updateCardFormFieldPropertiesValue({
+    const formFieldProperties = updateCardFormFieldPropertiesValue({
       accessPrivateFields,
       cardProperties: boardBlockCardProperties,
       formFields,
