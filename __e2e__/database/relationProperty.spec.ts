@@ -108,7 +108,10 @@ test.describe.serial('Edit relation properties', async () => {
     });
 
     await databasePage.addTablePropButton().click();
-    await databasePage.getPropertyTypeOptionLocator({ type: 'relation' }).click();
+    await databasePage.page.waitForTimeout(500);
+    const relationPropertyType = databasePage.getPropertyTypeOptionLocator({ type: 'relation' });
+    expect(relationPropertyType).toBeVisible();
+    await relationPropertyType.click();
     await databasePage.page.keyboard.type('Connected Board');
     await databasePage.linkedDatabaseOption({ sourceBoardId: connectedBoardPage.id }).click();
     await databasePage.getShowOnRelatedBoardButton().click();
