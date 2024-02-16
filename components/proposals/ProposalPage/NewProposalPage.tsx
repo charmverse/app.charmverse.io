@@ -32,12 +32,10 @@ import { getInitialFormFieldValue, useFormFields } from 'components/common/form/
 import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
-import { ProposalRewards } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewards';
 import { authorSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useMdScreen } from 'hooks/useMediaScreens';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
@@ -50,6 +48,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
 import { getNewCriteria } from './components/ProposalEvaluations/components/Settings/components/RubricCriteriaSettings';
+import { ProposalRewardsTable } from './components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import type { ProposalPropertiesInput } from './components/ProposalProperties/ProposalPropertiesBase';
 import { ProposalPropertiesBase } from './components/ProposalProperties/ProposalPropertiesBase';
 import { TemplateSelect } from './components/TemplateSelect';
@@ -490,7 +489,7 @@ export function NewProposalPage({
                       <Box my={1}>
                         <Typography variant='h5'>{getFeatureTitle('Rewards')}</Typography>
                       </Box>
-                      <ProposalRewards
+                      <ProposalRewardsTable
                         pendingRewards={pendingRewards}
                         requiredTemplateId={formInputs.fields?.rewardsTemplateId}
                         reviewers={formInputs.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat()}

@@ -20,7 +20,7 @@ import { focusEventName } from 'components/common/CharmEditor/constants';
 import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import { ProposalEvaluations } from 'components/proposals/ProposalPage/components/ProposalEvaluations/ProposalEvaluations';
 import { ProposalFormFieldsInput } from 'components/proposals/ProposalPage/components/ProposalFormFieldsInput';
-import { ProposalRewards } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewards';
+import { ProposalRewardsTable } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
@@ -452,7 +452,7 @@ function DocumentPageComponent({
                   <Box my={1}>
                     <Typography variant='h5'>{getFeatureTitle('Rewards')}</Typography>
                   </Box>
-                  <ProposalRewards
+                  <ProposalRewardsTable
                     pendingRewards={proposal.fields.pendingRewards || []}
                     requiredTemplateId={proposal.fields.rewardsTemplateId}
                     reviewers={proposal.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat()}
