@@ -1,5 +1,5 @@
 import type { ProposalReviewer } from '@charmverse/core/prisma';
-import { Delete, Edit } from '@mui/icons-material';
+import { Delete, Edit, Add } from '@mui/icons-material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Box, Grid, Hidden, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import { uniqBy } from 'lodash';
@@ -155,6 +155,32 @@ export function ProposalRewardsTable({
       });
     }
   }
+
+  return;
+  <div className='Table'>
+    <div className='octo-table-body'>
+      <div className='table-row-container'></div>
+      {/* Add New row */}
+      <div className='octo-table-footer'>
+        {!readOnly && (
+          <div
+            data-test='table-add-card'
+            className='octo-table-cell'
+            onClick={() => {
+              addCard('');
+            }}
+          >
+            <Box display='flex' gap={1} alignItems='center'>
+              <Add fontSize='small' />
+              <Typography fontSize='small' id='TableComponent.plus-new'>
+                New
+              </Typography>
+            </Box>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>;
 
   if (rewards.length) {
     return (
