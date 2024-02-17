@@ -71,7 +71,7 @@ export async function createCardPage(
           id: cardBlock.id
         }
       },
-      content: pageInfo.content || { type: 'doc', content: [] },
+      content: pageInfo.content || undefined,
       hasContent: !!pageInfo.hasContent,
       contentText: pageInfo.contentText || '',
       path: getPagePath(),
