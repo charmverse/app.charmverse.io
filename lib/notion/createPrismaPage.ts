@@ -8,15 +8,7 @@ import type { CreatePageInput } from './types';
 
 export async function createPrismaPage({
   id,
-  content = {
-    type: 'doc',
-    content: [
-      {
-        type: 'paragraph',
-        content: []
-      }
-    ]
-  },
+  content,
   headerImage = null,
   icon,
   spaceId,
