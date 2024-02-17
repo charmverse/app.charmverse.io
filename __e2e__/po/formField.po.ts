@@ -1,4 +1,4 @@
-import type { FormFieldType } from '@charmverse/core/dist/cjs/prisma-client';
+import type { FormFieldType } from '@charmverse/core/prisma';
 import type { Page } from '@playwright/test';
 
 import { DocumentPage } from './document.po';

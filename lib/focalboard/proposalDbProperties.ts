@@ -14,7 +14,7 @@ export const proposalDbProperties: {
 } = {
   proposalReviewerNotes: (id?: string, name?: string) => ({
     id: id || uuid(),
-    name: name || 'Proposal Reviewer Notes',
+    name: name || 'Reviewer Notes',
     options: [],
     type: 'proposalReviewerNotes'
   }),
