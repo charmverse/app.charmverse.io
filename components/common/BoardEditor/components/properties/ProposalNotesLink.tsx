@@ -9,9 +9,18 @@ import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 
 const StyledPageLink = styled.div`
+  display: flex;
+  width: 100%;
+  overflow: hidden;
   svg {
     font-size: 20px;
   }
+`;
+
+const Typography = styled(StyledTypography)`
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 export function ProposalNotesLink({ pageId }: { pageId: string }) {
@@ -37,7 +46,7 @@ export function ProposalNotesLink({ pageId }: { pageId: string }) {
   return (
     <StyledPageLink onClick={onClickInternalLink}>
       <PageIcon pageType='page' />
-      <StyledTypography variant='caption'>Reviewer Notes</StyledTypography>
+      <Typography variant='caption'>Reviewer Notes</Typography>
     </StyledPageLink>
   );
 }
