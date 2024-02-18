@@ -1,3 +1,4 @@
+import { InvalidInputError } from '@charmverse/core/errors';
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page, ProposalReviewer, ProposalStatus } from '@charmverse/core/prisma';
 import type { Prisma, ProposalEvaluation } from '@charmverse/core/prisma-client';
@@ -16,6 +17,7 @@ import type { ProposalFields } from 'lib/proposal/interface';
 import { getPagePath } from '../pages';
 
 import { createVoteIfNecessary } from './createVoteIfNecessary';
+import { getProposalErrors } from './getProposalErrors';
 import type { VoteSettings } from './interface';
 import type { RubricDataInput } from './rubric/upsertRubricCriteria';
 import { upsertRubricCriteria } from './rubric/upsertRubricCriteria';
@@ -53,7 +55,6 @@ export type CreateProposalInput = {
   sourcePageId?: string;
   sourcePostId?: string;
 };
-
 export async function createProposal({
   userId,
   spaceId,
@@ -89,6 +90,23 @@ export async function createProposal({
   const evaluationPermissionsToCreate: Prisma.ProposalEvaluationPermissionCreateManyInput[] = [];
 
   const reviewersInput: Prisma.ProposalReviewerCreateManyInput[] = [];
+
+  const errors = getProposalErrors({
+    proposal: {
+      type: pageProps.type,
+      proposalType: formId ? 'structured' : 'free_form',
+      title: pageProps?.title ?? '',
+      authors: authorsList,
+      isDraft,
+      formFields,
+      evaluations
+    },
+    requireTemplates: false
+  });
+
+  if (errors.length > 0) {
+    throw new InvalidInputError(errors.join('\n'));
+  }
 
   // retrieve permissions and apply evaluation ids to reviewers
   evaluations.forEach(({ id: evaluationId, permissions: providedPermissions, reviewers: evalReviewers }, index) => {
