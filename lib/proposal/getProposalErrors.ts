@@ -8,14 +8,18 @@ export function getProposalErrors({
   proposal,
   requireTemplates
 }: {
-  proposal: Pick<CreateProposalInput, 'authors' | 'proposalTemplateId' | 'formFields' | 'evaluations'> &
+  proposal: Pick<CreateProposalInput, 'authors' | 'proposalTemplateId' | 'formFields' | 'evaluations' | 'isDraft'> &
     Pick<CreateProposalInput['pageProps'], 'title' | 'type'> & {
       content?: any | null;
       proposalType: 'structured' | 'free_form';
     };
-  requireTemplates?: boolean;
+  requireTemplates: boolean;
 }) {
-  const errors = [];
+  const errors: string[] = [];
+  // ignore validation for draft proposals
+  if (proposal.isDraft) {
+    return errors;
+  }
   if (!proposal.title) {
     errors.push('Title is required');
   }
@@ -28,7 +32,10 @@ export function getProposalErrors({
   }
 
   if (proposal.proposalType === 'structured') {
-    errors.push(checkFormFieldErrors(proposal.formFields ?? []));
+    const fieldsError = checkFormFieldErrors(proposal.formFields ?? []);
+    if (fieldsError) {
+      errors.push(fieldsError);
+    }
   } else if (
     proposal.proposalType === 'free_form' &&
     proposal.type === 'proposal_template' &&
