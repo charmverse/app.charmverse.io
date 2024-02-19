@@ -1,9 +1,9 @@
 import type { Page, Proposal, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
-import { test, expect } from '__e2e__/utils/test';
+import { expect, test } from '__e2e__/utils/test';
 
-import { generateUser, generateUserAndSpace, loginBrowserUser, logoutBrowserUser } from '../utils/mocks';
+import { generateUser, generateUserAndSpace, loginBrowserUser } from '../utils/mocks';
 
 test.describe('View a proposal without workflow permissions, but space enabled public proposals', () => {
   let space: Space;
@@ -57,10 +57,7 @@ test.describe('View a proposal without workflow permissions, but space enabled p
 
     await documentPage.goToPage({ domain: space.domain, path: proposal.page.path });
 
-    await expect(proposalPage.documentTitle).toBeVisible();
-    const title = (await proposalPage.documentTitle.allInnerTexts())[0];
-
-    expect(title).toEqual(proposalTitle);
+    await expect(proposalPage.documentTitle).toHaveText(proposalTitle);
   });
 
   test('View a proposal without permissions as an external user, but space enabled public proposals', async ({
@@ -72,11 +69,7 @@ test.describe('View a proposal without workflow permissions, but space enabled p
     await loginBrowserUser({ browserPage: page, userId: externalUser.id });
     await documentPage.goToPage({ domain: space.domain, path: proposal.page.path });
 
-    await expect(documentPage.documentTitle).toBeVisible();
-
-    const title = (await proposalPage.documentTitle.allInnerTexts())[0];
-
-    expect(title).toEqual(proposalTitle);
+    await expect(proposalPage.documentTitle).toHaveText(proposalTitle);
   });
 
   test('View a proposal without permissions as a non logged in user, but space enabled public proposals', async ({
@@ -86,11 +79,7 @@ test.describe('View a proposal without workflow permissions, but space enabled p
     // Test logged out user
     await documentPage.goToPage({ domain: space.domain, path: proposal.page.path });
 
-    await expect(proposalPage.documentTitle).toBeVisible();
-
-    const title = (await proposalPage.documentTitle.allInnerTexts())[0];
-
-    expect(title).toEqual(proposalTitle);
+    await expect(proposalPage.documentTitle).toHaveText(proposalTitle);
   });
 });
 
@@ -146,10 +135,7 @@ test.describe('View a proposal without workflow permissions, but proposal has a 
 
     await documentPage.goToPage({ domain: space.domain, path: proposal.page.path });
 
-    await expect(proposalPage.documentTitle).toBeVisible();
-    const title = (await proposalPage.documentTitle.allInnerTexts())[0];
-
-    expect(title).toEqual(proposalTitle);
+    await expect(proposalPage.documentTitle).toHaveText(proposalTitle);
   });
 
   test('View a proposal without permissions as an external user, but proposal has a public page permission', async ({
@@ -161,11 +147,7 @@ test.describe('View a proposal without workflow permissions, but proposal has a 
     await loginBrowserUser({ browserPage: page, userId: externalUser.id });
     await documentPage.goToPage({ domain: space.domain, path: proposal.page.path });
 
-    await expect(proposalPage.documentTitle).toBeVisible();
-
-    const title = (await proposalPage.documentTitle.allInnerTexts())[0];
-
-    expect(title).toEqual(proposalTitle);
+    await expect(proposalPage.documentTitle).toHaveText(proposalTitle);
   });
 
   test('View a proposal without permissions as a non logged in user, but proposal has a public page permission', async ({
@@ -175,10 +157,6 @@ test.describe('View a proposal without workflow permissions, but proposal has a 
     // Test logged out user
     await documentPage.goToPage({ domain: space.domain, path: proposal.page.path });
 
-    await expect(proposalPage.documentTitle).toBeVisible();
-
-    const title = (await proposalPage.documentTitle.allInnerTexts())[0];
-
-    expect(title).toEqual(proposalTitle);
+    await expect(proposalPage.documentTitle).toHaveText(proposalTitle);
   });
 });

@@ -17,7 +17,7 @@ async function getOrCreateReviewerNotesId(req: NextApiRequest, res: NextApiRespo
   const { pageId, proposalId: queryProposalId } = req.query as { pageId?: string; proposalId?: string };
   let proposalId = queryProposalId as string;
   const userId = req.session.user.id;
-  if (pageId && !queryProposalId) {
+  if (pageId && !proposalId) {
     const { proposalId: pageProposalId } = await prisma.page.findUniqueOrThrow({
       where: {
         id: pageId
@@ -27,7 +27,7 @@ async function getOrCreateReviewerNotesId(req: NextApiRequest, res: NextApiRespo
       }
     });
     proposalId = pageProposalId!;
-  } else {
+  } else if (!proposalId) {
     throw new InvalidInputError('Missing pageId or proposalId');
   }
   // A proposal can only be updated when its in draft or discussion status and only the proposal author can update it
