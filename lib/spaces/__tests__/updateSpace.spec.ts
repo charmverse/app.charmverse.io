@@ -2,6 +2,7 @@ import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
+import { generateDefaultPropertiesInput } from 'lib/members/generateDefaultPropertiesInput';
 import { DuplicateDataError, InvalidInputError } from 'lib/utilities/errors';
 import { typedKeys } from 'lib/utilities/objects';
 import { uid } from 'lib/utilities/strings';
@@ -90,6 +91,43 @@ describe('updateSpace', () => {
     typedKeys(droppedUpdate).forEach((key) => {
       expect(updatedSpace[key]).not.toEqual(droppedUpdate[key]);
     });
+  });
+
+  it('should reset required status of previous identity specific member property', async () => {
+    const update: UpdateableSpaceFields = {
+      primaryMemberIdentity: 'Discord'
+    };
+
+    const { space, user } = await generateUserAndSpace();
+    await prisma.memberProperty.createMany({
+      data: generateDefaultPropertiesInput({ userId: user.id, spaceId: space.id, addNameProperty: true })
+    });
+
+    await updateSpace(space.id, update);
+    const memberProperty = await prisma.memberProperty.findFirstOrThrow({
+      where: {
+        spaceId: space.id,
+        type: 'discord'
+      }
+    });
+
+    expect(memberProperty.required).toBe(true);
+
+    await updateSpace(space.id, { primaryMemberIdentity: 'Google' });
+    const updatedMemberProperty = await prisma.memberProperty.findFirstOrThrow({
+      where: {
+        spaceId: space.id,
+        type: 'discord'
+      }
+    });
+    const newMemberProperty = await prisma.memberProperty.findFirstOrThrow({
+      where: {
+        spaceId: space.id,
+        type: 'google'
+      }
+    });
+    expect(updatedMemberProperty.required).toBe(false);
+    expect(newMemberProperty.required).toBe(true);
   });
 
   it('should update the snapshot and customDomain', async () => {
