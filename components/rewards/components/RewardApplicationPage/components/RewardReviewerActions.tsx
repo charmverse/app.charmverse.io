@@ -11,7 +11,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
 import { getGnosisTransactionUrl } from 'lib/gnosis/utils';
 import type { BountyPermissionFlags } from 'lib/permissions/bounties';
-import type { ApplicationWithTransactions, RewardWithUsers } from 'lib/rewards/interfaces';
+import type { ApplicationWithTransactions, RewardWithUsers, RewardType } from 'lib/rewards/interfaces';
 import type { ReviewDecision } from 'lib/rewards/reviewApplication';
 
 import { AcceptOrRejectButtons } from './AcceptOrRejectButtons';
@@ -23,7 +23,7 @@ type Props = {
   application: ApplicationWithTransactions;
   refreshApplication: () => void;
   reviewApplication: (input: { decision: ReviewDecision }) => Promise<void>;
-  hasCustomReward: boolean;
+  rewardType: RewardType;
   hasApplicationSlots: boolean;
 };
 export function RewardReviewerActions({
@@ -32,7 +32,7 @@ export function RewardReviewerActions({
   refreshApplication,
   rewardPermissions,
   reviewApplication,
-  hasCustomReward,
+  rewardType,
   hasApplicationSlots
 }: Props) {
   const { showMessage } = useSnackbar();
@@ -97,7 +97,7 @@ export function RewardReviewerActions({
           hasApplicationSlots={hasApplicationSlots}
         />
       )}
-      {application.status === 'complete' && !hasCustomReward && rewardPermissions?.review && (
+      {application.status === 'complete' && rewardType === 'token' && rewardPermissions?.review && (
         <RewardPaymentButton
           amount={String(reward.rewardAmount)}
           chainIdToUse={reward.chainId as number}
@@ -111,7 +111,7 @@ export function RewardReviewerActions({
         />
       )}
 
-      {application.status === 'complete' && hasCustomReward && rewardPermissions?.review && (
+      {application.status === 'complete' && rewardType === 'custom' && rewardPermissions?.review && (
         <Button onClick={open}>Mark as paid</Button>
       )}
 

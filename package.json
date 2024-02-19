@@ -5,7 +5,7 @@
     "defaults"
   ],
   "scripts": {
-    "testgen": "python scripts/make_tests.py",
+    "testgen": "python scripts/testgen/make_tests.py",
     "ceramic:local": "CERAMIC_ENABLE_EXPERIMENTAL_COMPOSE_DB='true' npx ceramic daemon",
     "ceramic:graphql": "npx dotenv -e .env.local --  tsx background/ceramicServer/ceramic-client.ts",
     "build": "NODE_OPTIONS=\"--max_old_space_size=4096\" npx next build && npm run esbuild",
