@@ -148,7 +148,6 @@ export function RubricAnswersForm({
     defaultValues: {
       answers: showDraftAnswers ? mapAnswersToFormValues(draftAnswers) : mapAnswersToFormValues(answers)
     }
-    // resolver: yupResolver(schema(hasCustomReward))
   });
 
   const { fields } = useFieldArray({ control, name: 'answers' });

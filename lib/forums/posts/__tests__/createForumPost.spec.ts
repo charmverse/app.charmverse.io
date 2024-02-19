@@ -24,7 +24,7 @@ describe('createForumPost', () => {
       spaceId: space.id
     });
     const createdPage = await createForumPost({
-      content: {},
+      content: null,
       contentText: '',
       createdBy: user.id,
       spaceId: space.id,
@@ -51,7 +51,7 @@ describe('createForumPost', () => {
 
     await expect(
       createForumPost({
-        content: {},
+        content: null,
         contentText: '',
         createdBy: user.id,
         spaceId: space.id,
