@@ -21,7 +21,6 @@ import type { PropertyValueDisplayType } from 'components/common/BoardEditor/int
 import { BreadcrumbPageTitle } from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
 import { ProposalStatusSelect } from 'components/proposals/components/ProposalStatusSelect';
 import { ProposalStepSelect } from 'components/proposals/components/ProposalStepSelect';
-import { ProposalNotesLink } from 'components/proposals/ProposalPage/components/ProposalEvaluations/components/ProposalNotesLink';
 import {
   REWARD_APPLICATION_STATUS_LABELS,
   RewardApplicationStatusChip
@@ -56,6 +55,7 @@ import type { RewardStatus } from 'lib/rewards/interfaces';
 import { getAbsolutePath } from 'lib/utilities/browser';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
+import { ProposalNotesLink } from '../../../components/properties/ProposalNotesLink';
 import { TextInput } from '../../../components/properties/TextInput';
 import type { Mutator } from '../mutator';
 import defaultMutator from '../mutator';

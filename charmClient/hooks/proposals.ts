@@ -46,8 +46,10 @@ export function useGetProposalBlocks(spaceId?: string) {
   return useGET<ProposalBlockWithTypedFields[]>(spaceId ? `/api/spaces/${spaceId}/proposals/blocks` : null);
 }
 
-export function useGetOrCreateProposalNotesId({ proposalId }: { proposalId: MaybeString }) {
-  return useGETtrigger<undefined, { pageId: string }>(`/api/proposals/${proposalId}/reviewer-notes`);
+export function useGetOrCreateProposalNotesId() {
+  return useGETtrigger<{ proposalId?: MaybeString; pageId?: MaybeString }, { pageId: string }>(
+    `/api/proposals/reviewer-notes`
+  );
 }
 
 // Mutative requests

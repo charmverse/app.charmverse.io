@@ -28,7 +28,7 @@ describe('GET /api/public/pages/[pageId] - Load public page', () => {
       spaceId: nonAdminUserSpace.id,
       contentText: exampleText,
       path: pagePath,
-      content: {},
+      content: null,
       pagePermissions: [
         {
           permissionLevel: 'view',
@@ -53,7 +53,7 @@ describe('GET /api/public/pages/[pageId] - Load public page', () => {
       spaceId: nonAdminUserSpace.id,
       contentText: exampleText,
       path: pagePath,
-      content: {},
+      content: null,
       pagePermissions: [
         {
           permissionLevel: 'view',
@@ -81,7 +81,7 @@ describe('GET /api/public/pages/[pageId] - Load public page', () => {
       spaceId: nonAdminUserSpace.id,
       contentText: exampleText,
       path: pagePath,
-      content: {}
+      content: null
     });
 
     await request(baseUrl).get(`/api/public/pages/${page.id}`).expect(404);

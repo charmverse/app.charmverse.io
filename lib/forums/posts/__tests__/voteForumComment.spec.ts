@@ -25,7 +25,7 @@ describe('voteForumPost', () => {
     });
 
     const comment = await createPostComment({
-      content: {} as any,
+      content: null as any,
       contentText: '',
       postId: createdPost.id!,
       userId: user.id
@@ -55,7 +55,7 @@ describe('voteForumPost', () => {
     });
 
     const comment = await createPostComment({
-      content: {} as any,
+      content: null as any,
       contentText: '',
       postId: createdPost.id!,
       userId: user.id
@@ -95,7 +95,7 @@ describe('voteForumPost', () => {
     });
 
     const comment = await createPostComment({
-      content: {} as any,
+      content: null as any,
       contentText: '',
       postId: createdPost.id!,
       userId: user.id

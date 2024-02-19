@@ -114,7 +114,7 @@ describe('POST /api/forums/posts/[postId]/comments - Create a comment', () => {
     await request(baseUrl)
       .post(`/api/forums/posts/${post.id}/comments`)
       .send({
-        content: {},
+        content: null,
         contentText: '',
         parentId: v4()
       })

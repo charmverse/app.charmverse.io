@@ -47,7 +47,7 @@ describe('deletePostCategory', () => {
     });
 
     await createForumPost({
-      content: {},
+      content: null,
       spaceId: space.id,
       categoryId: category.id,
       title: 'Test Post',

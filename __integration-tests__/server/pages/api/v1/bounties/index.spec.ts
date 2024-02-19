@@ -136,8 +136,7 @@ describe('GET /api/v1/bounties', () => {
           path: `bounty-${v4()}`,
           type: 'bounty',
           updatedBy: space2User.id,
-          contentText: 'Bounty content',
-          content: {}
+          contentText: 'Bounty content'
         }
       }
     };
