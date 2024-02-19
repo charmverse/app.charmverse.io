@@ -55,6 +55,7 @@ describe('reward blocks - updateBlocks', () => {
       spaceId: space.id,
       userId: adminUser.id,
       customReward: 't-shirt',
+      rewardType: 'custom',
       fields: {
         properties: {
           [textPropertId]: 'test1',

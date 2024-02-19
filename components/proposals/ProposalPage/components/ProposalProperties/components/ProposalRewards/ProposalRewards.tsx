@@ -20,11 +20,12 @@ import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates'
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalPendingReward } from 'lib/proposal/interface';
+import { getRewardErrors } from 'lib/rewards/getRewardErrors';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 import type { RewardReviewer } from 'lib/rewards/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 
-import { AttachRewardButton, getDisabledTooltip } from './AttachRewardButton';
+import { AttachRewardButton } from './AttachRewardButton';
 
 type Props = {
   pendingRewards: ProposalPendingReward[] | undefined;
@@ -155,6 +156,36 @@ export function ProposalRewards({
       });
     }
   }
+
+  const newRewardErrors = getRewardErrors({
+    page: newPageValues,
+    reward: rewardValues,
+    rewardType: rewardValues.rewardType
+  }).join(', ');
+  // export function getDisabledTooltip({
+  //   readOnly,
+  //   newPageValues,
+  //   rewardValues,
+  //   isProposalTemplate
+  // }: {
+  //   readOnly?: boolean;
+  //   newPageValues: NewPageValues | null;
+  //   rewardValues: UpdateableRewardFields;
+  //   isProposalTemplate: boolean;
+  // }) {
+  //   let disabledTooltip: string | undefined;
+  //   if (readOnly) {
+  //     disabledTooltip = 'You do not have permission to edit';
+  //   } else if (!newPageValues?.title) {
+  //     disabledTooltip = 'Page title is required';
+  //   } else if (!rewardValues.reviewers?.length) {
+  //     disabledTooltip = 'Reviewer is required';
+  //   } else if (rewardValues.assignedSubmitters && rewardValues.assignedSubmitters.length === 0 && !isProposalTemplate) {
+  //     disabledTooltip = 'You need to assign at least one submitter';
+  //   }
+
+  //   return disabledTooltip;
+  // }
 
   if (rewards.length) {
     return (
@@ -288,12 +319,7 @@ export function ProposalRewards({
 
       <NewPageDialog
         contentUpdated={!readOnly && (contentUpdated || isDirty)}
-        disabledTooltip={getDisabledTooltip({
-          readOnly,
-          newPageValues,
-          rewardValues,
-          isProposalTemplate: !!isProposalTemplate
-        })}
+        disabledTooltip={newRewardErrors}
         isOpen={!!newPageValues}
         onClose={closeDialog}
         onSave={saveForm}
