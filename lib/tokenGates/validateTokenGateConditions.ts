@@ -1,8 +1,8 @@
-import yup from 'yup';
+import * as yup from 'yup';
 
 import type { TokenGate, AccessType, ConditionType, Method } from './interfaces';
 
-const schema = yup.object().shape({
+const AccessControlSchema = yup.object().shape({
   chain: yup.number().required(),
   condition: yup.string<ConditionType>().required(),
   type: yup.string<AccessType>(),
@@ -19,7 +19,7 @@ const TokenGateConditionsSchema = yup.object().shape({
     .required()
     .of(
       yup.object().test('isValidCondition', 'Invalid object', async (value) => {
-        await schema.validate(value);
+        await AccessControlSchema.validate(value);
         return true;
       })
     )
