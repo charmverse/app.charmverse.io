@@ -49,7 +49,7 @@ export async function createReward({
 }: RewardCreationData) {
   const errors = getRewardErrors({
     page: pageProps || null,
-    reward: { rewardAmount, rewardToken, chainId, customReward },
+    reward: { assignedSubmitters, rewardAmount, rewardToken, chainId, customReward, reviewers },
     rewardType: getRewardType({ rewardAmount, rewardToken, chainId, customReward })
   });
   if (errors.length > 0) {
