@@ -12,7 +12,9 @@ For writing tests,
 
 These common generators can help you.
 
-When generating IDs always use a v4 uuid as the generator
+When generating IDs always use a v4 uuid as the generator.
+
+For generating an id for a nonExistent record, just generated a uuid.
 
 import {v4 as uuid} from 'uuid';
 import { testUtilsMembers, testUtilsRandom, testUtilsUser } from '@charmverse/core/test';
