@@ -98,9 +98,17 @@ describe('updateSpace', () => {
       primaryMemberIdentity: 'Discord'
     };
 
-    const { space } = await generateUserAndSpace();
+    const { space, user } = await generateUserAndSpace();
+    await prisma.memberProperty.createMany({
+      data: generateDefaultPropertiesInput({
+        userId: user.id,
+        spaceId: space.id,
+        addNameProperty: true
+      })
+    });
 
     await updateSpace(space.id, update);
+
     const memberProperty = await prisma.memberProperty.findFirstOrThrow({
       where: {
         spaceId: space.id,
