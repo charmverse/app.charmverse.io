@@ -10,6 +10,8 @@ export type ApplicationMeta = Pick<
 
 export type RewardStatus = BountyStatus;
 
+export type RewardType = 'token' | 'custom' | 'none';
+
 export type Reward = Bounty;
 
 export type RewardWithUsers = Bounty & {
