@@ -2,7 +2,6 @@ import type { PageMeta } from '@charmverse/core/pages';
 import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
 import type { EditorView } from 'prosemirror-view';
-import { useCallback } from 'react';
 import { useDrag } from 'react-dnd';
 
 import { useGetPage } from 'charmClient/hooks/pages';
@@ -20,7 +19,7 @@ import { mergeRefs } from 'lib/utilities/react';
 import { enableDragAndDrop } from '../../../utils';
 import { pageNodeDropPluginKey } from '../../prosemirror/prosemirror-dropcursor/dropcursor';
 
-export const StyledLink = styled(Link)`
+export const StyledLink = styled.a`
   align-items: center;
   cursor: pointer;
   display: flex;
@@ -28,19 +27,13 @@ export const StyledLink = styled(Link)`
   position: relative;
   transition: background 20ms ease-in 0s;
   margin: ${({ theme }) => `${theme.spacing(0.5)} 0px`};
+  color: inherit;
+  text-decoration: none;
 
   // disable hover UX on ios which converts first click to a hover event
   @media (pointer: fine) {
-    .actions-menu {
-      opacity: 0;
-    }
-
     &:hover {
       background-color: ${({ theme }) => theme.palette.background.light};
-
-      .actions-menu {
-        opacity: 1;
-      }
     }
   }
 `;
@@ -75,10 +68,9 @@ export default function NestedPage({ isLinkedPage = false, node, getPos }: NodeV
 
   const documentPage = sourcePage || pages[node.attrs.id];
   const isLoading = isPageLoading && loadingPages;
-
   const [_, drag, dragPreview] = useDrag(() => ({
     type: 'item',
-    documentPage
+    item: documentPage
   }));
 
   let pageTitle = '';
@@ -106,18 +98,6 @@ export default function NestedPage({ isLinkedPage = false, node, getPos }: NodeV
 
   const fullPath = `${window.location.origin}/${appPath}`;
 
-  const focusListener = useCallback(
-    (elt: any) => {
-      elt?.addEventListener('focusin', (e: any) => {
-        // Disable Treeview focus system which make draggable on TreeIten unusable
-        // see https://github.com/mui-org/material-ui/issues/29518
-        e.stopImmediatePropagation();
-      });
-      drag(elt);
-    },
-    [drag]
-  );
-
   return (
     <StyledLink
       data-test={`${isLinkedPage ? 'linked-page' : 'nested-page'}-${pageId}`}
@@ -133,7 +113,7 @@ export default function NestedPage({ isLinkedPage = false, node, getPos }: NodeV
           enableDragAndDrop(view, pos);
         }
       }}
-      ref={mergeRefs([drag, dragPreview, focusListener])}
+      ref={mergeRefs([drag, dragPreview])}
       data-type={node.attrs.type}
       // Only works for firefox
       onDragExitCapture={() => {

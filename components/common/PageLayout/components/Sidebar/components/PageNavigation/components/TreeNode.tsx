@@ -249,6 +249,6 @@ function DraggableTreeNode({
   );
 }
 
-const MemoizedTreeNode = memo(DraggableTreeNode);
+const MemoizedTreeNode = DraggableTreeNode;
 
 export default MemoizedTreeNode;

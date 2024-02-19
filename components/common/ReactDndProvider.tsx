@@ -10,7 +10,11 @@ import { TouchBackend } from 'react-dnd-touch-backend';
 function shouldIgnoreTarget(domNode: HTMLElement) {
   const isInsideProsemirror = domNode.closest?.('.bangle-editor-core');
   const isOutOfDom = !domNode.parentNode;
-  return isOutOfDom || Boolean(isInsideProsemirror && !domNode.closest?.('.focalboard-body'));
+  return (
+    !domNode.closest?.('.MuiTreeItem-content') ||
+    isOutOfDom ||
+    Boolean(isInsideProsemirror && !domNode.closest?.('.focalboard-body'))
+  );
 }
 // Prevent react-dnd from messing with prosemirror dnd. see: https://github.com/react-dnd/react-dnd-html5-backend/issues/7
 function ModifiedHTML5Backend(...args: any) {
@@ -46,7 +50,7 @@ const HTML5toTouch: MultiBackendOptions = {
     {
       id: 'html5',
       // Using the standard HTML5 backend to force it to trigger the drag events in the charm editor
-      backend: HTML5Backend,
+      backend: ModifiedHTML5Backend,
       transition: MouseTransition
     },
     {
