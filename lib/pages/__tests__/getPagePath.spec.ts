@@ -9,6 +9,15 @@ describe('getPathPath', () => {
 });
 
 describe('generatePagePathFromExistingPath', () => {
+  it('should generate a path for a new title', () => {
+    const newPageTitle = 'Team Tortilla Tournament';
+
+    const generatedPath = generatePagePathFromPathAndTitle({
+      title: newPageTitle
+    });
+    expect(generatedPath).toMatch(/^team-tortilla-tournament-/);
+  });
+
   it('should generate an updated page path with the same number suffix, and a URL-safe title', () => {
     const pagePath = 'page-987654321120';
 

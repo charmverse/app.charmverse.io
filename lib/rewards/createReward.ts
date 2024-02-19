@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { NotFoundError } from 'lib/middleware';
-import { getPagePath } from 'lib/pages/utils';
+import { generatePagePathFromPathAndTitle } from 'lib/pages/utils';
 import { InvalidInputError } from 'lib/utilities/errors';
 
 import { getRewardOrThrow } from './getReward';
@@ -35,8 +35,8 @@ export async function createReward({
   linkedPageId,
   approveSubmitters = false,
   maxSubmissions,
-  rewardAmount = 0.1,
-  rewardToken = 'ETH',
+  rewardAmount,
+  rewardToken,
   customReward = null,
   allowedSubmitterRoles,
   assignedSubmitters,
@@ -49,6 +49,7 @@ export async function createReward({
 }: RewardCreationData) {
   const errors = getRewardErrors({
     page: pageProps || null,
+    linkedPageId,
     reward: { assignedSubmitters, rewardAmount, rewardToken, chainId, customReward, reviewers },
     rewardType: getRewardType({ rewardAmount, rewardToken, chainId, customReward })
   });
@@ -166,7 +167,7 @@ export async function createReward({
               }
             },
             id: rewardId,
-            path: getPagePath(),
+            path: generatePagePathFromPathAndTitle({ title: pageProps?.title || '' }),
             space: {
               connect: {
                 id: spaceId

@@ -13,7 +13,7 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { createPage } from 'lib/pages/server/createPage';
 import type { ProposalFields } from 'lib/proposal/interface';
 
-import { getPagePath } from '../pages';
+import { generatePagePathFromPathAndTitle } from '../pages';
 
 import { createVoteIfNecessary } from './createVoteIfNecessary';
 import type { VoteSettings } from './interface';
@@ -183,7 +183,7 @@ export async function createProposal({
         headerImage: pageProps?.headerImage,
         icon: pageProps?.icon,
         id: proposalId,
-        path: getPagePath(),
+        path: generatePagePathFromPathAndTitle({ title: pageProps?.title ?? '' }),
         proposalId,
         sourceTemplateId: pageProps?.sourceTemplateId,
         title: pageProps?.title ?? '',

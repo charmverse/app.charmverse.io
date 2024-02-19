@@ -13,10 +13,11 @@ type ValidationInput = {
       reviewers: any[];
     }
   >;
+  linkedPageId?: string | null; // the page a bounty is attached to
   rewardType: RewardType;
 };
 
-export function getRewardErrors({ page, reward, rewardType }: ValidationInput): string[] {
+export function getRewardErrors({ page, linkedPageId, reward, rewardType }: ValidationInput): string[] {
   const errors: string[] = [];
   if (typeof reward.rewardAmount === 'number' && reward.rewardAmount < 0) {
     errors.push('Reward amount must be a positive number');
@@ -28,7 +29,7 @@ export function getRewardErrors({ page, reward, rewardType }: ValidationInput): 
     errors.push('Token information is required');
   }
   const isTemplate = page?.type === 'bounty_template';
-  if (!page?.title) {
+  if (!page?.title && !linkedPageId) {
     errors.push('Page title is required');
   }
   if (!isTemplate) {

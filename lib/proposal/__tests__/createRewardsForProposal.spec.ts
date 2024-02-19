@@ -1,5 +1,6 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 as uuid } from 'uuid';
 
 import { createRewardsForProposal } from 'lib/proposal/createRewardsForProposal';
@@ -30,44 +31,23 @@ describe('Creates rewards for proposal with pending rewards', () => {
 
     const pageTitle = 'page title 124';
 
-    const { proposal } = await createProposal({
-      pageProps: {
-        contentText: '',
-        title: pageTitle
-      },
+    const proposal = await testUtilsProposals.generateProposal({
+      title: pageTitle,
       userId: user.id,
       spaceId: space.id,
-      evaluations: [
+      proposalStatus: 'published',
+      evaluationInputs: [
         {
           id: uuid(),
           index: 0,
-          reviewers: [{ userId: reviewerUser.id }],
+          reviewers: [{ group: 'user', id: reviewerUser.id }],
           rubricCriteria: [],
           title: 'Example step',
-          type: 'rubric',
+          evaluationType: 'rubric',
           permissions: []
         }
       ],
-      authors: [user.id, extraUser.id],
-      fields: {
-        pendingRewards: [
-          {
-            draftId: '1',
-            reward: {
-              chainId: 1,
-              rewardAmount: 1337,
-              rewardToken: 'ETH'
-            },
-            page: {
-              title: 'milestone reward 1',
-              contentText: '',
-              content: null,
-              type: 'bounty'
-            }
-          }
-        ],
-        properties: {}
-      }
+      authors: [user.id, extraUser.id]
     });
 
     await prisma.proposal.update({
@@ -75,7 +55,26 @@ describe('Creates rewards for proposal with pending rewards', () => {
         id: proposal.id
       },
       data: {
-        status: 'published'
+        fields: {
+          pendingRewards: [
+            {
+              draftId: '1',
+              reward: {
+                chainId: 1,
+                rewardAmount: 1337,
+                rewardToken: 'ETH',
+                reviewers: [{ group: 'user', id: reviewerUser.id }]
+              },
+              page: {
+                title: 'milestone reward 1',
+                contentText: '',
+                content: null,
+                type: 'bounty'
+              }
+            }
+          ],
+          properties: {}
+        }
       }
     });
 
@@ -88,43 +87,43 @@ describe('Creates rewards for proposal with pending rewards', () => {
   });
 
   it('Should not allow to create rewards if user is not reviewer', async () => {
-    const reviewerUser = await generateSpaceUser({
-      isAdmin: false,
-      spaceId: space.id
-    });
-
     const extraUser = await generateSpaceUser({
       isAdmin: false,
       spaceId: space.id
     });
 
-    const { proposal } = await createProposal({
-      pageProps: {
-        contentText: '',
-        title: 'proposal 2'
-      },
-      evaluations: [],
+    const proposal = await testUtilsProposals.generateProposal({
+      title: 'proposal 2',
+      evaluationInputs: [],
       userId: user.id,
       spaceId: space.id,
-      authors: [user.id, extraUser.id],
-      fields: {
-        pendingRewards: [
-          {
-            draftId: '1',
-            reward: {
-              chainId: 1,
-              rewardAmount: 1337,
-              rewardToken: 'ETH'
-            },
-            page: {
-              title: 'milestone reward 1',
-              contentText: '',
-              content: null,
-              type: 'bounty'
+      authors: [user.id, extraUser.id]
+    });
+
+    await prisma.proposal.update({
+      where: {
+        id: proposal.id
+      },
+      data: {
+        fields: {
+          pendingRewards: [
+            {
+              draftId: '1',
+              reward: {
+                chainId: 1,
+                rewardAmount: 1337,
+                rewardToken: 'ETH'
+              },
+              page: {
+                title: 'milestone reward 1',
+                contentText: '',
+                content: null,
+                type: 'bounty'
+              }
             }
-          }
-        ],
-        properties: {}
+          ],
+          properties: {}
+        }
       }
     });
 
