@@ -1,9 +1,11 @@
 import { InvalidInputError } from '@charmverse/core/errors';
+import { getChainById } from 'connectors/chains';
 import flatten from 'lodash/flatten';
 
 import { accessTypeDict } from 'lib/metrics/mixpanel/constants';
 
 import type { TokenGate, TokenGateAccessType } from './interfaces';
+import { getAccessTypes } from './utils';
 
 export function processTokenGateConditions(tokenGate: TokenGate): {
   accessTypes: TokenGateAccessType[];
@@ -14,9 +16,13 @@ export function processTokenGateConditions(tokenGate: TokenGate): {
   // Flatten to get all nested conditions in the same flat array
   const conditionsArr = flatten(tokenGate.conditions?.accessControlConditions);
   const conditions = conditionsArr.filter((c) => Boolean(c.chain));
-  const chains = tokenGate.conditions?.accessControlConditions.map((c) => c.chain) || [];
+  const chains =
+    tokenGate.conditions?.accessControlConditions.map((c) => {
+      const chainName = getChainById(c.chain)?.chainName;
+      return chainName || '';
+    }) || [];
   const numberOfConditions = conditions.length;
-  const accessTypes = conditions.map((c) => c.type);
+  const accessTypes = getAccessTypes(conditions);
 
   // Make sure token gate has at least 1 condition.
   if (numberOfConditions < 1) {

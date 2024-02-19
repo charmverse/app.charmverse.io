@@ -15,7 +15,6 @@ export function getDaoUnifiedAccessControlConditions(values: FormValues): Access
         chain: chainId,
         method: 'members',
         tokenIds: [],
-        comparator: '=',
         quantity: '1'
       }
     ];
@@ -28,7 +27,6 @@ export function getDaoUnifiedAccessControlConditions(values: FormValues): Access
         chain: chainId,
         method: 'balanceOf',
         tokenIds: [],
-        comparator: '>=',
         quantity: '1'
       }
     ];

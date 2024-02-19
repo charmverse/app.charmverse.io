@@ -27,8 +27,7 @@ export function TokenGateWallet() {
       contract: initialValues.ensWallet || initialValues.contract
     };
     const valueProps = getWalletUnifiedAccessControlConditions(values) || [];
-    const _tokenGate: TokenGateConditions = { type: 'lit', conditions: { unifiedAccessControlConditions: valueProps } };
-    handleTokenGate(_tokenGate);
+    handleTokenGate({ conditions: { accessControlConditions: valueProps } });
     setDisplayedPage('review');
   };
 

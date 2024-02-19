@@ -25,7 +25,7 @@ export function TokenGateReview() {
   const { trigger: reviewTokenGate, data: initialData, isMutating } = useReviewTokenGate();
   const data = initialData?.[0];
 
-  const conditionsData = data ? humanizeConditionsData(data, account || '') : null;
+  const conditionsData = data ? humanizeConditionsData(data) : null;
 
   useEffect(() => {
     if (tokenGate?.conditions) {

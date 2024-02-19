@@ -6,9 +6,7 @@ import type { AuthSig } from 'lib/blockchain/interfaces';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 
-import { getHypersubDetails } from './hypersub/getHypersubDetails';
 import type { TokenGate, TokenGateWithRoles } from './interfaces';
-import { getLockDetails } from './unlock/getLockDetails';
 import { validateTokenGateCondition } from './validateTokenGateCondition';
 
 export type TokenGateEvaluationAttempt = {

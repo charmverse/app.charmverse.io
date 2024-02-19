@@ -1,18 +1,15 @@
 import yup from 'yup';
 
-import type { TokenGate } from './interfaces';
+import type { TokenGate, AccessType, ConditionType, Method } from './interfaces';
 
-const AccConditions = yup.object().shape({
-  chain: yup.string().required(),
-  method: yup.string(),
-  parameters: yup.array().of(yup.string()),
-  conditionType: yup.string().required(),
+const schema = yup.object().shape({
+  chain: yup.number().required(),
+  condition: yup.string<ConditionType>().required(),
+  type: yup.string<AccessType>(),
   contractAddress: yup.string(),
-  returnValueTest: yup.object().shape({
-    value: yup.string().required(),
-    comparator: yup.string().required()
-  }),
-  standardContractType: yup.string()
+  method: yup.string<Method>(),
+  tokenIds: yup.array().of(yup.string()),
+  quantity: yup.string()
 });
 
 const TokenGateConditionsSchema = yup.object().shape({
@@ -22,7 +19,7 @@ const TokenGateConditionsSchema = yup.object().shape({
     .required()
     .of(
       yup.object().test('isValidCondition', 'Invalid object', async (value) => {
-        await AccConditions.validate(value);
+        await schema.validate(value);
         return true;
       })
     )

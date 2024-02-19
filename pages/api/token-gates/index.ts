@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { updateTokenGatesDetails } from 'lib/blockchain/updateTokenGateDetails';
+import { updateTokenGateDetails } from 'lib/blockchain/updateTokenGateDetails';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys, requireSpaceMembership } from 'lib/middleware';
 import requireValidation from 'lib/middleware/requireValidation';
@@ -83,9 +83,9 @@ async function getTokenGates(req: NextApiRequest, res: NextApiResponse<TokenGate
         }
       }
     }
-  })) as TokenGateWithRoles[];
+  })) as any as TokenGateWithRoles[];
 
-  const tokenGatesWithDetails = await updateTokenGatesDetails(result);
+  const tokenGatesWithDetails = await updateTokenGateDetails(result);
 
   res.status(200).json(tokenGatesWithDetails);
 }

@@ -76,7 +76,7 @@ function Condition({
   const isOperator = condition.content.some((c) => c.type === 'operator');
   const isExternalImage = !!condition.image?.startsWith('http');
   const imageFittingType = isExternalImage ? 'cover' : 'contain!important';
-  const contractType = condition.standardContractType || '';
+  const contractType = condition.type || '';
 
   return (
     <Box display='flex' alignItems='center' my={isOperator ? 2 : undefined}>

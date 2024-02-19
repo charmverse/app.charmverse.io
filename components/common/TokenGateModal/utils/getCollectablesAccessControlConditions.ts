@@ -16,8 +16,7 @@ export function getCollectablesAccessControlConditions(values: FormValues): Acce
           chain: chainId,
           method: 'ownerOf',
           tokenIds: [tokenId],
-          quantity: '1',
-          comparator: '='
+          quantity: '1'
         }
       ];
     }
@@ -31,7 +30,6 @@ export function getCollectablesAccessControlConditions(values: FormValues): Acce
           chain: chainId,
           method: 'balanceOf',
           tokenIds: [],
-          comparator: '>=',
           quantity
         }
       ];
@@ -46,7 +44,6 @@ export function getCollectablesAccessControlConditions(values: FormValues): Acce
         chain: chainId,
         method: 'balanceOf',
         tokenIds: [tokenId],
-        comparator: '=',
         quantity: '1'
       }
     ];
@@ -61,7 +58,6 @@ export function getCollectablesAccessControlConditions(values: FormValues): Acce
           chain: 100,
           method: 'eventId',
           tokenIds: [poapId],
-          comparator: '=',
           quantity: '1'
         },
         {
@@ -71,7 +67,6 @@ export function getCollectablesAccessControlConditions(values: FormValues): Acce
           chain: 1,
           method: 'eventId',
           tokenIds: [poapId],
-          comparator: '=',
           quantity: '1'
         }
       ];
@@ -84,7 +79,6 @@ export function getCollectablesAccessControlConditions(values: FormValues): Acce
           chain: 100,
           method: 'eventName',
           tokenIds: [poapName],
-          comparator: poapNameMatch === 'contains' ? poapNameMatch : '=',
           quantity: '1'
         },
         {
@@ -94,7 +88,6 @@ export function getCollectablesAccessControlConditions(values: FormValues): Acce
           chain: 1,
           method: 'eventName',
           tokenIds: [poapName],
-          comparator: poapNameMatch === 'contains' ? poapNameMatch : '=',
           quantity: '1'
         }
       ];

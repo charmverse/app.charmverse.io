@@ -13,7 +13,6 @@ export function getWalletUnifiedAccessControlConditions(values: FormValues): Acc
       method: 'ownerOf',
       type: 'Wallet',
       tokenIds: [],
-      comparator: '=',
       quantity: '1'
     }
   ];

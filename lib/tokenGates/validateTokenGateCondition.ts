@@ -123,17 +123,3 @@ export async function validateTokenGateCondition(
     }
   }
 }
-
-// validateTokenGateCondition(
-//   {
-//     chain: 1,
-//     type: 'Guildxyz',
-//     contractAddress: '0x38064F40B20347d58b326E767791A6f79cdEddCe',
-//     quantity: '1',
-//     tokenIds: ['zksync-era'],
-//     condition: 'evm',
-//     method: 'ownerOf',
-//     comparator: '='
-//   },
-//   '0x5A4d8d2F5de4D6ae29A91EE67E3adAedb53B0081'
-// );

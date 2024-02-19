@@ -19,7 +19,6 @@ export type AccessType =
   | 'Guildxyz';
 export type Operator = 'AND' | 'OR';
 export type Method = 'ownerOf' | 'balanceOf' | 'getBalance' | 'members' | 'balanceOfBatch' | 'eventId' | 'eventName';
-export type Comparator = '>=' | '>' | '=' | '<' | '<=' | 'contains';
 
 export type AccessControlCondition = {
   /** Chain id. */
@@ -34,8 +33,6 @@ export type AccessControlCondition = {
   method: Method;
   /** Value of any type of token gate. */
   tokenIds: string[];
-  /** Used for comparing an asset against users wallet. */
-  comparator: Comparator;
   /** The quantity of an asset. e.g. 2 ETH */
   quantity: string;
   /** Optional Name of the asset */

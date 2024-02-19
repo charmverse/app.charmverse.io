@@ -18,7 +18,6 @@ export function getTokensUnifiedAccessControlConditions(values: FormValues): Acc
         method: 'balanceOf',
         type: 'ERC20',
         tokenIds: [],
-        comparator: '>=',
         quantity: amount
       }
     ];
@@ -33,7 +32,6 @@ export function getTokensUnifiedAccessControlConditions(values: FormValues): Acc
         type: 'ERC20',
         method: 'balanceOf',
         tokenIds: [],
-        comparator: '>=',
         quantity: amount
       }
     ];

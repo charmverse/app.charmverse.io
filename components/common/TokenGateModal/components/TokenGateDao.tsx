@@ -4,7 +4,6 @@ import { builderDaoChains, daoChains } from 'connectors/chains';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
-import type { TokenGateConditions } from 'lib/tokenGates/interfaces';
 
 import type { FormValues } from '../hooks/useDaoForm';
 import { useDaoForm } from '../hooks/useDaoForm';
@@ -31,8 +30,7 @@ export function TokenGateDao() {
   const onSubmit = async () => {
     const values = getValues();
     const valueProps = getDaoUnifiedAccessControlConditions(values) || [];
-    const _tokenGate: TokenGateConditions = { type: 'lit', conditions: { accessControlConditions: valueProps } };
-    handleTokenGate(_tokenGate);
+    handleTokenGate({ conditions: { accessControlConditions: valueProps } });
     setDisplayedPage('review');
   };
 

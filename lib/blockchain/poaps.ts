@@ -69,3 +69,14 @@ export async function getPOAPs(wallets: UserWallet[]): Promise<ExtendedPoap[]> {
 
   return poaps;
 }
+
+export async function getPoapByEventId(eventId: string) {
+  if (typeof apiKey !== 'string' || !apiKey) {
+    log.debug('No API key for POAPs');
+    return null;
+  }
+
+  return GET<PoapEvent>(`https://api.poap.tech/events/id/${eventId}`, undefined, {
+    headers: { 'X-API-Key': apiKey }
+  });
+}

@@ -26,26 +26,11 @@ export function TokenGateCollectables() {
 
   const onSubmit = async () => {
     const values = getValues();
+    const valueProps = getCollectablesAccessControlConditions(values) || [];
 
-    if (values.collectableOption === 'UNLOCK' && values.chain && values.contract) {
-      handleTokenGate({
-        type: 'unlock',
-        conditions: { chainId: Number(values.chain), contract: values.contract }
-      });
+    if (valueProps.length > 0) {
+      handleTokenGate({ conditions: { accessControlConditions: valueProps } });
       setDisplayedPage('review');
-    } else if (values.collectableOption === 'HYPERSUB' && values.chain && values.contract) {
-      handleTokenGate({
-        type: 'hypersub',
-        conditions: { chainId: Number(values.chain), contract: values.contract }
-      });
-      setDisplayedPage('review');
-    } else {
-      const valueProps = getCollectablesAccessControlConditions(values) || [];
-
-      if (valueProps.length > 0) {
-        handleTokenGate({ type: 'lit', conditions: { accessControlConditions: valueProps } });
-        setDisplayedPage('review');
-      }
     }
   };
 

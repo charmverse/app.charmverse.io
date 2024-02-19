@@ -19,7 +19,7 @@ interface Props {
 export function TokenGateOption({ tokenGate, isVerified, isVerifying }: Props) {
   const { account } = useWeb3Account();
 
-  const conditions = humanizeConditionsData(tokenGate.conditions, account || '');
+  const conditions = humanizeConditionsData(tokenGate.conditions);
 
   return (
     <GateOption isVerified={isVerified} isVerifying={isVerifying}>
