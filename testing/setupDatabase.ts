@@ -26,6 +26,7 @@ import { v4 } from 'uuid';
 
 import type { DataSourceType } from 'lib/focalboard/board';
 import type { IViewType } from 'lib/focalboard/boardView';
+import { generateDefaultPropertiesInput } from 'lib/members/generateDefaultPropertiesInput';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import type { NotificationToggles } from 'lib/notifications/notificationToggles';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
@@ -231,6 +232,14 @@ export async function generateUserAndSpace({
   });
 
   const { spaceRoles, ...userResult } = newUser;
+
+  await prisma.memberProperty.createMany({
+    data: generateDefaultPropertiesInput({
+      userId: userResult.id,
+      spaceId: spaceRoles[0].space.id,
+      addNameProperty: true
+    })
+  });
 
   return {
     user: userResult,
