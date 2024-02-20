@@ -22,7 +22,6 @@ import {
   polygonMumbai,
   sepolia,
   zkSync,
-  zkSyncSepoliaTestnet,
   zora,
   taikoJolnir,
   taikoTestnetSepolia
@@ -443,17 +442,6 @@ const RPC: Record<string, IChainDetails> = {
     iconUrl: '/images/cryptoLogos/zksync-era-logo.svg',
     shortName: zkSync.name,
     unlockNetwork: true
-  },
-  ZKSYNC_DEV: {
-    ...EVM_DEFAULT,
-    chainId: zkSyncSepoliaTestnet.id,
-    viem: zkSyncSepoliaTestnet,
-    chainName: zkSyncSepoliaTestnet.name,
-    rpcUrls: zkSyncSepoliaTestnet.rpcUrls.public.http,
-    blockExplorerUrls: [zkSyncSepoliaTestnet.blockExplorers.default.url],
-    iconUrl: '/images/cryptoLogos/zksync-era-logo.svg',
-    shortName: zkSyncSepoliaTestnet.network,
-    testnet: true
   }
 } as const;
 
