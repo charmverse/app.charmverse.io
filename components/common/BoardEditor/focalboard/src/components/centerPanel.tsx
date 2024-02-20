@@ -711,6 +711,7 @@ function CenterPanel(props: Props) {
                 {activeBoard && activeView?.fields.viewType === 'gallery' && (
                   <Gallery
                     board={activeBoard}
+                    cardPages={cardPages}
                     cards={cards}
                     activeView={activeView}
                     readOnly={props.readOnly}
