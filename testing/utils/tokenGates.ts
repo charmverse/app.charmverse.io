@@ -4,24 +4,22 @@ export async function generateTokenGate({ userId, spaceId }: { spaceId: string; 
   return prisma.tokenGate.create({
     data: {
       conditions: {
-        unifiedAccessControlConditions: [
+        accessControlConditions: [
           {
-            conditionType: 'evm',
+            chain: 1,
+            method: 'balanceOf',
+            tokenIds: ['0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2'],
+            type: 'Wallet',
             contractAddress: '',
-            standardContractType: '',
-            chain: 'ethereum',
-            method: '',
-            parameters: [':userAddress'],
-            returnValueTest: {
-              comparator: '=',
-              value: '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2'
-            }
+            quantity: '1',
+            condition: 'evm',
+            image: '/images/cryptoLogos/ethereum-eth-logo.svg'
           }
-        ]
+        ],
+        operator: 'OR'
       },
       createdBy: userId,
       resourceId: {},
-      type: 'lit',
       space: {
         connect: {
           id: spaceId

@@ -67,7 +67,8 @@ export async function getValidTokenGateId(tokenGate: TokenGate, walletAddress: s
 
   const allConditionsAreValid = tokenGate.conditions.operator === 'AND' && tokenGatesValid.every((v) => v);
 
-  const someConditionsAreValid = tokenGate.conditions.operator === 'OR' && tokenGatesValid.some((v) => v);
+  const someConditionsAreValid =
+    (tokenGate.conditions.operator === 'OR' || !tokenGate.conditions.operator) && tokenGatesValid.some((v) => v);
 
   if (someConditionsAreValid || allConditionsAreValid) {
     return tokenGate.id;

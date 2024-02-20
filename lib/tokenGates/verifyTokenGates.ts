@@ -47,7 +47,6 @@ export async function verifyTokenGates({
     trackUserAction('token_gate_verification', { result: 'fail', spaceId, userId });
     throw new DataNotFoundError('No token gates were found for this space.');
   }
-
   const verifiedTokenGates: TokenGateResult[] = (
     await Promise.all(
       tokenGateIds.map(async (tkId) => {
@@ -58,6 +57,10 @@ export async function verifyTokenGates({
         }
 
         const verified = await getValidTokenGateId(matchingTokenGate, walletAddress);
+
+        if (!verified) {
+          return null;
+        }
 
         return {
           ...matchingTokenGate,

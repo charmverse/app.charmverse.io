@@ -1,9 +1,10 @@
+import type { Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { applyTokenGates } from 'lib/tokenGates/applyTokenGates';
 import { verifyTokenGateMemberships } from 'lib/tokenGates/verifyTokenGateMemberships';
 import { generateUserAndSpace } from 'testing/setupDatabase';
-import { deleteTokenGate, generateTokenGate } from 'testing/utils/tokenGates';
+import { clearTokenGateData, deleteTokenGate, generateTokenGate } from 'testing/utils/tokenGates';
 
 async function getSpaceUser({ spaceId, userId }: { spaceId: string; userId: string }) {
   return prisma.spaceRole.findUnique({
@@ -16,10 +17,27 @@ async function getSpaceUser({ spaceId, userId }: { spaceId: string; userId: stri
   });
 }
 
-const { user, space } = await generateUserAndSpace(undefined);
-const { user: user2, space: space2 } = await generateUserAndSpace(undefined);
-
 describe('verifyTokenGateMemberships', () => {
+  let user: User;
+  let user2: User;
+  let space: Space;
+  let space2: Space;
+  const walletAddress = '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2';
+
+  beforeEach(async () => {
+    await clearTokenGateData();
+    const { user: u, space: s } = await generateUserAndSpace();
+    const { user: u2, space: s2 } = await generateUserAndSpace();
+    user = u;
+    space = s;
+    user2 = u2;
+    space2 = s2;
+  });
+
+  afterEach(async () => {
+    jest.resetModules();
+  });
+
   it('should not remove users without token gates', async () => {
     const res = await verifyTokenGateMemberships();
 
@@ -39,7 +57,7 @@ describe('verifyTokenGateMemberships', () => {
       userId: user.id,
       commit: true,
       tokenGateIds: [tokenGate.id],
-      walletAddress: '0x123'
+      walletAddress
     });
     await deleteTokenGate(tokenGate.id);
 
@@ -50,7 +68,7 @@ describe('verifyTokenGateMemberships', () => {
       userId: user2.id,
       commit: true,
       tokenGateIds: [tokenGate2.id],
-      walletAddress: '0x123'
+      walletAddress
     });
 
     const res = await verifyTokenGateMemberships();
@@ -71,7 +89,7 @@ describe('verifyTokenGateMemberships', () => {
       userId: user.id,
       commit: true,
       tokenGateIds: [tokenGate.id],
-      walletAddress: '0x123'
+      walletAddress
     });
     await deleteTokenGate(tokenGate.id);
 
@@ -82,7 +100,7 @@ describe('verifyTokenGateMemberships', () => {
       userId: user.id,
       commit: true,
       tokenGateIds: [tokenGate2.id],
-      walletAddress: '0x123'
+      walletAddress
     });
 
     const res = await verifyTokenGateMemberships();
