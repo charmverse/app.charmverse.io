@@ -15,9 +15,16 @@ type ValidationInput = {
   >;
   linkedPageId?: string | null; // the page a bounty is attached to
   rewardType: RewardType;
+  isProposalTemplate?: boolean;
 };
 
-export function getRewardErrors({ page, linkedPageId, reward, rewardType }: ValidationInput): string[] {
+export function getRewardErrors({
+  page,
+  linkedPageId,
+  reward,
+  rewardType,
+  isProposalTemplate
+}: ValidationInput): string[] {
   const errors: string[] = [];
   if (typeof reward.rewardAmount === 'number' && reward.rewardAmount < 0) {
     errors.push('Reward amount must be a positive number');
@@ -36,7 +43,7 @@ export function getRewardErrors({ page, linkedPageId, reward, rewardType }: Vali
     // these values are not required for templates
     if (!reward.reviewers?.length) {
       errors.push('Reviewer is required');
-    } else if (reward.assignedSubmitters && reward.assignedSubmitters.length === 0) {
+    } else if (reward.assignedSubmitters && reward.assignedSubmitters.length === 0 && !isProposalTemplate) {
       errors.push('You need to assign at least one submitter');
     }
   }
