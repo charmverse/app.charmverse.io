@@ -335,7 +335,8 @@ test.describe.serial('Create and use Proposal Template', async () => {
                   rewardToken: rewardConfig.token,
                   customReward: null,
                   rewardAmount: rewardConfig.amount,
-                  assignedSubmitters: []
+                  assignedSubmitters: [],
+                  rewardType: 'token'
                 },
                 draftId: pendingReward.draftId
               }
@@ -547,6 +548,7 @@ test.describe.serial('Create and use Proposal Template', async () => {
                   rewardToken: rewardConfig.token,
                   customReward: null,
                   rewardAmount: rewardConfig.amount,
+                  rewardType: 'token',
                   // The author should be auto-assigned as a submitter
                   assignedSubmitters: [member.id]
                 },

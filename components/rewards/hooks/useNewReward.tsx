@@ -6,7 +6,10 @@ import { EMPTY_PAGE_VALUES } from 'components/common/PageDialog/hooks/useNewPage
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { RewardPageProps } from 'lib/rewards/createReward';
+import type { RewardType } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
+
+export type UpdateableRewardFieldsWithType = Omit<UpdateableRewardFields, 'rewardType'> & { rewardType: RewardType };
 
 export function useNewReward() {
   const { showMessage } = useSnackbar();
@@ -14,7 +17,7 @@ export function useNewReward() {
 
   const [contentUpdated, setContentUpdated] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [rewardValues, setRewardValuesRaw] = useState<UpdateableRewardFields>(emptyState());
+  const [rewardValues, setRewardValuesRaw] = useState<UpdateableRewardFieldsWithType>(emptyState());
   const { trigger: createRewardTrigger } = useCreateReward();
 
   const setRewardValues = useCallback(
@@ -85,9 +88,10 @@ export function useNewReward() {
 export function emptyState({
   userId,
   ...inputs
-}: Partial<UpdateableRewardFields> & { userId?: string } = {}): UpdateableRewardFields {
+}: Partial<UpdateableRewardFieldsWithType> & { userId?: string } = {}): UpdateableRewardFieldsWithType {
   return {
     fields: { properties: {} },
+    rewardType: 'token',
     ...inputs
   };
 }
