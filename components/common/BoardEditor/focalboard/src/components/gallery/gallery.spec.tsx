@@ -52,7 +52,6 @@ describe('src/components/gallery/Gallery', () => {
             addCard={jest.fn()}
             selectedCardIds={[card.id]}
             onCardClicked={jest.fn()}
-            cardPages={[]}
           />
         </ReduxProvider>
       )
@@ -73,7 +72,6 @@ describe('src/components/gallery/Gallery', () => {
             addCard={mockAddCard}
             selectedCardIds={[card.id]}
             onCardClicked={jest.fn()}
-            cardPages={[]}
           />
         </ReduxProvider>
       )
@@ -98,7 +96,6 @@ describe('src/components/gallery/Gallery', () => {
             addCard={jest.fn()}
             selectedCardIds={[card.id]}
             onCardClicked={jest.fn()}
-            cardPages={[]}
           />
         </ReduxProvider>
       )
@@ -120,7 +117,6 @@ describe('src/components/gallery/Gallery', () => {
                 addCard={jest.fn()}
                 selectedCardIds={[]}
                 onCardClicked={jest.fn()}
-                cardPages={[]}
               />
             </ReduxProvider>
           </AppThemeProvider>

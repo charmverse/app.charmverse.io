@@ -242,7 +242,6 @@ function Table(props: Props): JSX.Element {
         await changeCardGroupProperty(srcCard, groupID);
       }
 
-      let changeCardOrder = !hasSort;
       let cardOrder = hasSort
         ? cardPages.map((o) => o.card.id)
         : Array.from(new Set([...activeView.fields.cardOrder, ...cardPages.map((o) => o.card.id)]));
@@ -251,7 +250,7 @@ function Table(props: Props): JSX.Element {
       cardOrder = cardOrder.filter((id) => !draggedCardIds.includes(id));
 
       if (hasSort) {
-        const { confirmed } = await showConfirmation({
+        const { confirmed, cancelled } = await showConfirmation({
           message: 'Would you like to remove sorting?'
         });
 
@@ -261,43 +260,44 @@ function Table(props: Props): JSX.Element {
           if (activeView.fields.groupById !== undefined && groupByProperty) {
             await changeCardGroupProperty(srcCard, groupID);
           }
-          changeCardOrder = true;
+        }
+
+        if (cancelled) {
+          return;
         }
       }
 
       // Update dstCard order
-      if (changeCardOrder) {
-        if (dstCardID) {
-          cardOrder.splice(destIndex, 0, ...draggedCardIds);
+      if (dstCardID) {
+        cardOrder.splice(destIndex, 0, ...draggedCardIds);
+      } else {
+        // Find index of first group item
+        const firstCard = cardPages.find(
+          ({ card }) => card.fields.properties[activeView.fields.groupById!] === groupID
+        );
+        if (firstCard) {
+          cardOrder.splice(cardOrder.indexOf(firstCard.card.id), 0, ...draggedCardIds);
         } else {
-          // Find index of first group item
-          const firstCard = cardPages.find(
-            ({ card }) => card.fields.properties[activeView.fields.groupById!] === groupID
-          );
-          if (firstCard) {
-            cardOrder.splice(cardOrder.indexOf(firstCard.card.id), 0, ...draggedCardIds);
-          } else {
-            // if not found, this is the only item in group.
-            return;
-          }
+          // if not found, this is the only item in group.
+          return;
         }
-
-        await mutator.performAsUndoGroup(async () => {
-          await mutator.changeViewCardOrder(
-            hasSort
-              ? {
-                  ...activeView,
-                  fields: {
-                    ...activeView.fields,
-                    sortOptions: []
-                  }
-                }
-              : activeView,
-            cardOrder,
-            description
-          );
-        });
       }
+
+      await mutator.performAsUndoGroup(async () => {
+        await mutator.changeViewCardOrder(
+          hasSort
+            ? {
+                ...activeView,
+                fields: {
+                  ...activeView.fields,
+                  sortOptions: []
+                }
+              }
+            : activeView,
+          cardOrder,
+          description
+        );
+      });
     },
     [cardPages, props.selectedCardIds, groupByProperty]
   );
