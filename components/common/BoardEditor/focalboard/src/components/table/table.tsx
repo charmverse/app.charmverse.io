@@ -1,19 +1,18 @@
 import { Add } from '@mui/icons-material';
-import { Typography, Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import type { Dispatch, LegacyRef, ReactNode, SetStateAction } from 'react';
 import React, { forwardRef, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDrop } from 'react-dnd';
 
-import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { SelectionContext, useAreaSelection } from 'hooks/useAreaSelection';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import useEfficientDragLayer from 'hooks/useEffecientDragLayer';
 import useKeydownPress from 'hooks/useKeydownPress';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
-import type { IPropertyOption, IPropertyTemplate, Board, BoardGroup } from 'lib/focalboard/board';
+import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
-import type { CardPage, Card } from 'lib/focalboard/card';
+import type { Card, CardPage } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
 
 import mutator from '../../mutator';
@@ -205,6 +204,33 @@ function Table(props: Props): JSX.Element {
     [activeView, visibleGroups]
   );
 
+  const changeCardGroupProperty = async (srcCard: Card, groupID: string) => {
+    const { selectedCardIds } = props;
+    const draggedCardIds = Array.from(new Set(selectedCardIds).add(srcCard.id));
+    const description = draggedCardIds.length > 1 ? `drag ${draggedCardIds.length} cards` : 'drag card';
+    const cardsById = cardPages.reduce<{ [key: string]: Card }>((acc, card) => {
+      acc[card.card.id] = card.card;
+      return acc;
+    }, {});
+    const draggedCards: Card[] = draggedCardIds.map((o: string) => cardsById[o]);
+
+    const awaits = [];
+    for (const draggedCard of draggedCards) {
+      Utils.log(`draggedCard: ${draggedCard.title}, column: ${draggedCard.fields.properties}`);
+      Utils.log(`droppedColumn:  ${groupID}`);
+      const oldOptionId = draggedCard.fields.properties[groupByProperty!.id];
+      Utils.log(`ondrop. oldValue: ${oldOptionId}`);
+
+      if (groupID !== oldOptionId) {
+        awaits.push(mutator.changePropertyValue(draggedCard, groupByProperty!.id, groupID, description));
+      }
+    }
+
+    if (awaits.length) {
+      await Promise.all(awaits);
+    }
+  };
+
   const onDropToGroup = useCallback(
     async (srcCard: Card, groupID: string, dstCardID: string) => {
       Utils.log(`onDropToGroup: ${srcCard.title}`);
@@ -212,28 +238,8 @@ function Table(props: Props): JSX.Element {
       const draggedCardIds = Array.from(new Set(selectedCardIds).add(srcCard.id));
       const description = draggedCardIds.length > 1 ? `drag ${draggedCardIds.length} cards` : 'drag card';
       const hasSort = activeView.fields.sortOptions?.length !== 0;
-      if (activeView.fields.groupById !== undefined) {
-        const cardsById = cardPages.reduce<{ [key: string]: Card }>((acc, card) => {
-          acc[card.card.id] = card.card;
-          return acc;
-        }, {});
-        const draggedCards: Card[] = draggedCardIds.map((o: string) => cardsById[o]);
-
-        mutator.performAsUndoGroup(async () => {
-          // Update properties of dragged cards
-          const awaits = [];
-          for (const draggedCard of draggedCards) {
-            Utils.log(`draggedCard: ${draggedCard.title}, column: ${draggedCard.fields.properties}`);
-            Utils.log(`droppedColumn:  ${groupID}`);
-            const oldOptionId = draggedCard.fields.properties[groupByProperty!.id];
-            Utils.log(`ondrop. oldValue: ${oldOptionId}`);
-
-            if (groupID !== oldOptionId) {
-              awaits.push(mutator.changePropertyValue(draggedCard, groupByProperty!.id, groupID, description));
-            }
-          }
-          await Promise.all(awaits);
-        });
+      if (activeView.fields.groupById !== undefined && groupByProperty && !hasSort) {
+        await changeCardGroupProperty(srcCard, groupID);
       }
 
       let changeCardOrder = !hasSort;
@@ -241,8 +247,7 @@ function Table(props: Props): JSX.Element {
         ? cardPages.map((o) => o.card.id)
         : Array.from(new Set([...activeView.fields.cardOrder, ...cardPages.map((o) => o.card.id)]));
 
-      let destIndex = cardOrder.indexOf(dstCardID);
-      const srcIndex = cardOrder.indexOf(srcCard.id);
+      const destIndex = cardOrder.indexOf(dstCardID);
       cardOrder = cardOrder.filter((id) => !draggedCardIds.includes(id));
 
       if (hasSort) {
@@ -253,6 +258,9 @@ function Table(props: Props): JSX.Element {
         if (confirmed && localViewSettings) {
           await mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, []);
           localViewSettings.setLocalSort(null);
+          if (activeView.fields.groupById !== undefined && groupByProperty) {
+            await changeCardGroupProperty(srcCard, groupID);
+          }
           changeCardOrder = true;
         }
       }
@@ -260,10 +268,6 @@ function Table(props: Props): JSX.Element {
       // Update dstCard order
       if (changeCardOrder) {
         if (dstCardID) {
-          const isDraggingDown = srcIndex <= destIndex;
-          if (isDraggingDown) {
-            destIndex += 1;
-          }
           cardOrder.splice(destIndex, 0, ...draggedCardIds);
         } else {
           // Find index of first group item
