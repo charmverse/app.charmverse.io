@@ -22,7 +22,7 @@ export async function validateTokenGateCondition(
     // ERC721 Collection or ERC20 Custom Token quantity
     case condition.type === 'Builder' && !!contractAddress && !!condition.quantity:
     case condition.type === 'ERC721' && !!contractAddress && !!condition.quantity:
-    case condition.type === 'ERC20' && !!contractAddress: {
+    case condition.type === 'ERC20' && !!contractAddress && !!condition.quantity: {
       const minimumQuantity = BigInt(condition.quantity);
       const balance = await publicClient.readContract({
         abi: ercAbi,

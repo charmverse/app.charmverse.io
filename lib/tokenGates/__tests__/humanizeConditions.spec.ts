@@ -29,7 +29,7 @@ describe('humanizeConditions', () => {
       accessControlConditions: [
         {
           chain: 10,
-          method: 'getBalance',
+          method: 'eth_getBalance',
           tokenIds: [],
           type: 'ERC20',
           condition: 'evm',
@@ -50,7 +50,7 @@ describe('humanizeConditions', () => {
       accessControlConditions: [
         {
           chain: 56,
-          method: 'getBalance',
+          method: 'eth_getBalance',
           tokenIds: [],
           condition: 'evm',
           contractAddress: '',
@@ -70,7 +70,7 @@ describe('humanizeConditions', () => {
       accessControlConditions: [
         {
           chain: 1,
-          method: 'getBalance',
+          method: 'eth_getBalance',
           tokenIds: [],
           condition: 'evm',
           contractAddress: '',
@@ -90,7 +90,7 @@ describe('humanizeConditions', () => {
       accessControlConditions: [
         {
           chain: 1,
-          method: 'getBalance',
+          method: 'eth_getBalance',
           tokenIds: [],
           condition: 'evm',
           contractAddress: '0x6982508145454Ce325dDbE47a25d4ec3d2311933',

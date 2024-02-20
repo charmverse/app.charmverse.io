@@ -18,7 +18,14 @@ export type AccessType =
   | 'GitcoinPassport'
   | 'Guildxyz';
 export type Operator = 'AND' | 'OR';
-export type Method = 'ownerOf' | 'balanceOf' | 'getBalance' | 'members' | 'balanceOfBatch' | 'eventId' | 'eventName';
+export type Method =
+  | 'ownerOf'
+  | 'balanceOf'
+  | 'eth_getBalance'
+  | 'members'
+  | 'balanceOfBatch'
+  | 'eventId'
+  | 'eventName';
 
 export type AccessControlCondition = {
   /** Chain id. */

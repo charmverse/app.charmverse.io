@@ -21,7 +21,7 @@ const ownsWalletCondition: AccessControlCondition[] = [
 const ownedEVMTokenCondition: AccessControlCondition[] = [
   {
     chain: 10,
-    method: 'getBalance',
+    method: 'eth_getBalance',
     tokenIds: [],
     type: 'ERC20',
     condition: 'evm',
@@ -35,7 +35,7 @@ const ownedEVMTokenCondition: AccessControlCondition[] = [
 const ownedTokenSupportedBlockchain: AccessControlCondition[] = [
   {
     chain: 56,
-    method: 'getBalance',
+    method: 'eth_getBalance',
     tokenIds: [],
     condition: 'evm',
     contractAddress: '',
@@ -48,7 +48,7 @@ const ownedTokenSupportedBlockchain: AccessControlCondition[] = [
 const ownedEth: AccessControlCondition[] = [
   {
     chain: 1,
-    method: 'getBalance',
+    method: 'eth_getBalance',
     tokenIds: [],
     condition: 'evm',
     contractAddress: '',
@@ -61,7 +61,7 @@ const ownedEth: AccessControlCondition[] = [
 const ownedCustomToken: AccessControlCondition[] = [
   {
     chain: 1,
-    method: 'getBalance',
+    method: 'eth_getBalance',
     tokenIds: [],
     condition: 'evm',
     contractAddress: '0x6982508145454Ce325dDbE47a25d4ec3d2311933',
