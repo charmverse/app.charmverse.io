@@ -1,5 +1,5 @@
 import type { PageMeta } from '@charmverse/core/pages';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import { sortCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
@@ -10,7 +10,6 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
-import { usePages } from 'hooks/usePages';
 import type { BlockTypes } from 'lib/focalboard/block';
 import type { BoardView, IViewType } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
@@ -18,7 +17,6 @@ import { CardFilter } from 'lib/focalboard/cardFilter';
 import { Constants } from 'lib/focalboard/constants';
 import { viewTypeToBlockId } from 'lib/focalboard/customBlocks/constants';
 import type { Member } from 'lib/members/interfaces';
-import type { PagesMap } from 'lib/pages';
 import {
   REWARDS_APPLICANTS_BLOCK_ID,
   CREATED_AT_ID,
@@ -35,12 +33,13 @@ import {
   REWARD_APPLICANTS_COUNT,
   REWARD_PROPOSAL_LINK
 } from 'lib/rewards/blocks/constants';
-import type { RewardFields, RewardFieldsProp, RewardPropertyValue } from 'lib/rewards/blocks/interfaces';
+import type { RewardFields, RewardFieldsProp } from 'lib/rewards/blocks/interfaces';
 import { getDefaultView } from 'lib/rewards/blocks/views';
 import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmissionSlots';
 import type { ApplicationMeta, RewardWithUsers } from 'lib/rewards/interfaces';
+import { isTruthy } from 'lib/utilities/types';
 
-type BoardReward = { spaceId?: string; id?: string } & RewardFieldsProp;
+type BoardReward = { id?: string } & RewardFieldsProp;
 
 export function useRewardsBoardAdapter() {
   const { space } = useCurrentSpace();
@@ -49,7 +48,6 @@ export function useRewardsBoardAdapter() {
   const { rewardsBoardBlock: board, rewardBlocks } = useRewardBlocks();
   const { getRewardPage } = useRewardPage();
   const hasMilestoneRewards = useMemo(() => rewards?.some((r) => !!r.proposalId), [rewards]);
-  const { pages } = usePages();
 
   const {
     router: { query }
@@ -105,21 +103,20 @@ export function useRewardsBoardAdapter() {
     return boardView;
   }, [views, activeViewId, space?.id]);
 
-  const cardPages: CardPage[] = useMemo(() => {
-    let cards =
-      rewards
-        ?.map((p) => {
-          const page = getRewardPage(p.id);
+  const cardPages = useMemo(() => {
+    let cards = (rewards || [])
+      .map((reward) => {
+        const page = getRewardPage(reward.id);
+        if (!page || !space) return null;
 
-          return mapRewardToCardPage({
-            reward: p,
-            rewardPage: page,
-            spaceId: space?.id,
-            members: membersRecord,
-            pages
-          });
-        })
-        .filter((cp): cp is CardPage => !!cp.card && !!cp.page) || [];
+        return mapRewardToCardPage({
+          reward,
+          spaceId: space.id,
+          rewardPage: page,
+          members: membersRecord
+        });
+      })
+      .filter(isTruthy);
 
     const filter = localViewSettings?.localFilters || activeView?.fields.filter;
     // filter cards by active view filter
@@ -143,13 +140,12 @@ export function useRewardsBoardAdapter() {
     localViewSettings?.localFilters,
     localViewSettings?.localSort,
     membersRecord,
-    pages,
     rewards,
-    space?.id
+    space
   ]);
 
   // each reward with fields reflects a card
-  const cards: Card[] = cardPages.map((cp) => cp.card) || [];
+  const cards = cardPages.map((cp) => cp.card);
 
   return {
     board,
@@ -165,24 +161,22 @@ export function mapRewardToCardPage({
   reward,
   rewardPage,
   spaceId,
-  members,
-  pages
+  members
 }: {
-  reward: BoardReward | RewardWithUsers | null;
-  rewardPage?: PageMeta;
-  spaceId?: string;
-  members: Record<string, Member>;
-  pages: PagesMap;
-}): Omit<CardPage<RewardPropertyValue>, 'page'> & Partial<Pick<CardPage, 'page'>> {
-  const rewardFields = (reward?.fields || { properties: {} }) as RewardFields;
-  const rewardSpaceId = reward?.spaceId || spaceId || '';
+  reward: BoardReward | RewardWithUsers;
+  rewardPage: PageMeta;
+  spaceId: string;
+  members?: Record<string, Member>;
+}): CardPage {
+  const rewardFields = (reward.fields || { properties: {} }) as RewardFields;
   const validApplications =
     reward && 'applications' in reward
-      ? reward.applications.filter((application) => members[application.createdBy])
+      ? members
+        ? reward.applications.filter((application) => members[application.createdBy])
+        : reward.applications
       : [];
 
-  const proposalPage = reward && 'proposalId' in reward && reward.proposalId ? pages[reward.proposalId] : null;
-  const proposalLinkValue = proposalPage ? [proposalPage.title, `/${proposalPage.path}`] : '';
+  const proposalLinkValue = rewardPage ? [rewardPage.title, `/${rewardPage.path}`] : '';
   const assignedSubmitters =
     reward && 'assignedSubmitters' in reward && reward.assignedSubmitters ? reward.assignedSubmitters : null;
   const isAssignedReward = !!assignedSubmitters && assignedSubmitters.length > 0;
@@ -218,21 +212,21 @@ export function mapRewardToCardPage({
     [REWARD_PROPOSAL_LINK]: proposalLinkValue
   };
 
-  const card: Card<RewardPropertyValue> = {
+  const card: Card = {
     // use page id as card id - kanban board is based on usePages
     id: rewardPage?.id || '',
-    spaceId: rewardSpaceId,
+    spaceId,
     parentId: '',
     schema: 1,
     title: rewardPage?.title || '',
-    rootId: rewardSpaceId,
+    rootId: spaceId,
     type: 'card' as BlockTypes,
     updatedBy: rewardPage?.updatedBy || '',
     createdBy: rewardPage?.createdBy || '',
     createdAt: rewardPage?.createdAt ? new Date(rewardPage?.createdAt).getTime() : 0,
     updatedAt: rewardPage?.updatedAt ? new Date(rewardPage?.updatedAt).getTime() : 0,
     deletedAt: null,
-    fields: { ...rewardFields, contentOrder: [] },
+    fields: { ...rewardFields, contentOrder: [] } as any,
     customIconType: 'reward'
   };
 
@@ -242,12 +236,11 @@ export function mapRewardToCardPage({
     subPages:
       rewardPage && reward && 'applications' in reward
         ? reward.applications
-            .filter((application) => members[application.createdBy])
+            .filter((application) => (members ? members[application.createdBy] : true))
             .map((application) =>
               mapApplicationToCardPage({
                 application,
                 rewardPage,
-                spaceId,
                 reward,
                 members
               })
@@ -261,17 +254,15 @@ function mapApplicationToCardPage({
   application,
   rewardPage,
   reward,
-  spaceId,
   members
 }: {
   application: ApplicationMeta;
   rewardPage: PageMeta;
   reward: RewardWithUsers;
-  spaceId?: string;
-  members: Record<string, Member>;
+  members?: Record<string, Member>;
 }) {
   const applicationFields = { properties: {} };
-  const applicationSpaceId = rewardPage?.spaceId || spaceId || '';
+  const applicationSpaceId = rewardPage.spaceId;
 
   applicationFields.properties = {
     ...applicationFields.properties,
@@ -285,7 +276,7 @@ function mapApplicationToCardPage({
     [REWARD_APPLICANTS_COUNT]: null
   };
 
-  const card: Card<RewardPropertyValue> = {
+  const card: Card = {
     id: application.id || '',
     spaceId: applicationSpaceId,
     parentId: reward.id,
@@ -301,10 +292,10 @@ function mapApplicationToCardPage({
     deletedAt: null,
     fields: { ...applicationFields, contentOrder: [] }
   };
-  const authorName = members[application.createdBy]?.username;
+  const authorName = members?.[application.createdBy]?.username;
   const applicationPage: PageMeta = {
     id: application.id || '',
-    spaceId: rewardPage?.spaceId || '',
+    spaceId: applicationSpaceId,
     boardId: null,
     bountyId: rewardPage?.id || '',
     title: `Application ${authorName ? `from ${authorName}` : ''}`,

@@ -36,8 +36,6 @@ export type RewardFields = RewardPropertyValues & { isAssigned?: boolean };
 
 export type RewardFieldsProp = { fields: RewardFields };
 
-export type RewardCard = Card<RewardPropertyValue>;
-
 export type RewardBlockInput = {
   id?: string;
   type: string;

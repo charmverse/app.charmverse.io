@@ -451,9 +451,6 @@ function DocumentPageComponent({
                 proposal?.fields?.enableRewards &&
                 (!!proposal.fields.pendingRewards?.length || !readOnly) && (
                   <Box mb={10}>
-                    <Box my={1}>
-                      <Typography variant='h5'>{getFeatureTitle('Rewards')}</Typography>
-                    </Box>
                     <ProposalRewardsTable
                       pendingRewards={proposal.fields.pendingRewards || []}
                       requiredTemplateId={proposal.fields.rewardsTemplateId}

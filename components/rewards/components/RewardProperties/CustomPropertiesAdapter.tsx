@@ -6,7 +6,6 @@ import { useRewardsBoardAndBlocks } from 'components/rewards/hooks/useRewardsBoa
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
-import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 import type { RewardFieldsProp, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 
@@ -14,10 +13,10 @@ import { mapRewardToCardPage } from '../../hooks/useRewardsBoardAdapter';
 
 import { usePropertiesMutator } from './hooks/useRewardsMutator';
 
-type BoardReward = { spaceId?: string; id?: string } & RewardFieldsProp;
+type BoardReward = { spaceId: string; id?: string } & RewardFieldsProp;
 
 type Props = {
-  reward: { spaceId?: string; id?: string } & RewardFieldsProp;
+  reward: { spaceId: string; id?: string } & RewardFieldsProp;
   onChange?: (properties: RewardPropertiesField) => void;
   readOnly?: boolean;
 };
@@ -25,7 +24,6 @@ export function CustomPropertiesAdapter({ reward, onChange, readOnly }: Props) {
   const { user } = useUser();
   const { space } = useCurrentSpace();
   const isAdmin = useIsAdmin();
-  const { pages } = usePages();
   const { getRewardPage } = useRewardPage();
   const { membersRecord } = useMembers();
   const [boardReward, setBoardReward] = useState<BoardReward | null>(null);
@@ -34,13 +32,16 @@ export function CustomPropertiesAdapter({ reward, onChange, readOnly }: Props) {
 
   // card from current reward
   const rewardPage = getRewardPage(boardReward?.id);
-  const card = mapRewardToCardPage({
-    reward: boardReward,
-    rewardPage,
-    spaceId: space?.id,
-    members: membersRecord,
-    pages
-  }).card;
+  const card =
+    boardReward &&
+    rewardPage &&
+    space &&
+    mapRewardToCardPage({
+      reward: boardReward,
+      rewardPage,
+      spaceId: space.id,
+      members: membersRecord
+    }).card;
 
   useEffect(() => {
     setBoardReward(reward);
@@ -61,7 +62,7 @@ export function CustomPropertiesAdapter({ reward, onChange, readOnly }: Props) {
     return board;
   }, [board]);
 
-  if (!boardCustomProperties) {
+  if (!boardCustomProperties || !card) {
     return null;
   }
 

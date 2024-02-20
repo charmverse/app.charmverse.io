@@ -15,10 +15,11 @@ import { useNewReward } from 'components/rewards/hooks/useNewReward';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
-import { RewardsBoardProvider } from 'components/rewards/hooks/useRewardsBoardAndBlocks';
+import { mapRewardToCardPage } from 'components/rewards/hooks/useRewardsBoardAdapter';
 import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalPendingReward } from 'lib/proposal/interface';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
@@ -39,11 +40,6 @@ type Props = {
   variant?: 'solid_button' | 'card_property'; // solid_button is used for form proposals
   isProposalTemplate?: boolean;
 };
-type RewardRow = {
-  id: string;
-  title: string;
-  isPending: boolean;
-};
 
 const rewardQueryKey = 'rewardId';
 
@@ -59,6 +55,7 @@ export function ProposalRewardsTable({
   variant,
   isProposalTemplate
 }: Props) {
+  const { space } = useCurrentSpace();
   const { defaultView, boardBlock, isLoading } = useRewardsBoard();
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
   const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, isSavingReward } = useNewReward();
@@ -173,14 +170,64 @@ export function ProposalRewardsTable({
     }
   }
 
-  const rows: RewardRow[] =
-    pendingRewards?.map(({ reward, page, draftId }) => {
-      return {
+  const cardPages = (pendingRewards || [])?.map(({ reward, page, draftId }) => {
+    return mapRewardToCardPage({
+      spaceId: space?.id || '',
+      reward: {
+        // add fields to satisfy PageMeta type. TODO: We dont need all fields on PageMeta for cards
+        applications: [],
+        assignedSubmitters: [],
+        allowMultipleApplications: false,
+        allowedSubmitterRoles: [],
+        approveSubmitters: false,
+        chainId: null,
+        createdAt: new Date(),
+        createdBy: '',
+        customReward: null,
+        fields: {},
+        dueDate: null,
         id: draftId,
-        title: page.title || '',
-        isPending: true
-      };
-    }) || [];
+        maxSubmissions: null,
+        proposalId: null,
+        reviewers: [],
+        rewardAmount: null,
+        rewardToken: null,
+        spaceId: '',
+        status: 'open',
+        submissionsLocked: false,
+        suggestedBy: null,
+        updatedAt: new Date(),
+        ...reward
+      },
+      rewardPage: {
+        id: draftId,
+        // add fields to satisfy PageMeta type. TODO: We dont need all fields on PageMeta for cards
+        boardId: null,
+        bountyId: null,
+        createdAt: new Date(),
+        createdBy: '',
+        deletedAt: null,
+        deletedBy: null,
+        hasContent: false,
+        headerImage: '',
+        icon: null,
+        type: 'bounty',
+        galleryImage: '',
+        syncWithPageId: null,
+        index: 0,
+        cardId: null,
+        path: '',
+        parentId: null,
+        sourceTemplateId: null,
+        proposalId: null,
+        spaceId: '',
+        title: '',
+        updatedAt: new Date(),
+        updatedBy: '',
+        ...page
+      }
+    });
+  });
 
   const loadingData = isLoading;
 
@@ -199,30 +246,32 @@ export function ProposalRewardsTable({
           <LoadingComponent height={500} isLoading size={50} />
         </Grid>
       ) : (
-        <Box className='container-container'>
-          <Stack>
-            <Box width='100%'>
-              <Table
-                boardType='rewards'
-                setSelectedPropertyId={() => {}}
-                board={boardBlock!}
-                activeView={defaultView}
-                cardPages={[]}
-                views={[]}
-                visibleGroups={[]}
-                selectedCardIds={[]}
-                readOnly={true}
-                disableAddingCards
-                showCard={showRewardCard}
-                readOnlyTitle
-                readOnlyRows
-                cardIdToFocusOnRender=''
-                addCard={async () => {}}
-                onCardClicked={() => {}}
-                onDeleteCard={() => Promise.resolve()}
-              />
-            </Box>
-          </Stack>
+        <Box sx={{ overflowX: 'auto' }}>
+          <Box className='container-container'>
+            <Stack>
+              <Box width='100%'>
+                <Table
+                  boardType='rewards'
+                  setSelectedPropertyId={() => {}}
+                  board={boardBlock!}
+                  activeView={defaultView}
+                  cardPages={cardPages}
+                  views={[]}
+                  visibleGroups={[]}
+                  selectedCardIds={[]}
+                  readOnly={true}
+                  disableAddingCards
+                  showCard={showRewardCard}
+                  readOnlyTitle
+                  readOnlyRows
+                  cardIdToFocusOnRender=''
+                  addCard={async () => {}}
+                  onCardClicked={() => {}}
+                  onDeleteCard={() => Promise.resolve()}
+                />
+              </Box>
+            </Stack>
+          </Box>
         </Box>
       )}
       <NewPageDialog

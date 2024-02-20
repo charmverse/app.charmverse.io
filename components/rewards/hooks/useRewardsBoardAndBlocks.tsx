@@ -2,15 +2,15 @@ import type { ReactNode } from 'react';
 import { createContext, useContext } from 'react';
 
 import type { BoardView } from 'lib/focalboard/boardView';
-import type { CardPage } from 'lib/focalboard/card';
-import type { RewardCard, RewardPropertyValue, RewardsBoardFFBlock } from 'lib/rewards/blocks/interfaces';
+import type { CardPage, Card } from 'lib/focalboard/card';
+import type { RewardsBoardFFBlock } from 'lib/rewards/blocks/interfaces';
 
 import { useRewardsBoardAdapter } from './useRewardsBoardAdapter';
 
 type RewardsBoardContextType = {
   board: RewardsBoardFFBlock;
-  cards: RewardCard[];
-  cardPages: CardPage<RewardPropertyValue>[];
+  cards: Card[];
+  cardPages: CardPage[];
   activeView: BoardView;
   views: BoardView[];
 };
