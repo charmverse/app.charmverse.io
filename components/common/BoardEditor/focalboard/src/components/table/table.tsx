@@ -6,8 +6,10 @@ import { useDrop } from 'react-dnd';
 
 import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { SelectionContext, useAreaSelection } from 'hooks/useAreaSelection';
+import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import useEfficientDragLayer from 'hooks/useEffecientDragLayer';
 import useKeydownPress from 'hooks/useKeydownPress';
+import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import type { IPropertyOption, IPropertyTemplate, Board, BoardGroup } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
@@ -85,12 +87,13 @@ function Table(props: Props): JSX.Element {
     setSelectedPropertyId,
     boardType
   } = props;
-  const isManualSort = activeView.fields.sortOptions?.length === 0;
   const dispatch = useAppDispatch();
   const selectContainerRef = useRef<HTMLDivElement | null>(null);
   const tableContainerRef = useRef<HTMLDivElement | null>(null);
   const areaSelection = useAreaSelection({ readOnly, innerContainer: tableContainerRef });
   const { resetState } = areaSelection;
+  const { showConfirmation } = useConfirmationModal();
+  const localViewSettings = useLocalDbViewSettings(activeView.id);
 
   useEffect(() => {
     if (!tableContainerRef.current) {
@@ -203,13 +206,12 @@ function Table(props: Props): JSX.Element {
   );
 
   const onDropToGroup = useCallback(
-    (srcCard: Card, groupID: string, dstCardID: string) => {
+    async (srcCard: Card, groupID: string, dstCardID: string) => {
       Utils.log(`onDropToGroup: ${srcCard.title}`);
       const { selectedCardIds } = props;
-
       const draggedCardIds = Array.from(new Set(selectedCardIds).add(srcCard.id));
       const description = draggedCardIds.length > 1 ? `drag ${draggedCardIds.length} cards` : 'drag card';
-
+      const hasSort = activeView.fields.sortOptions?.length !== 0;
       if (activeView.fields.groupById !== undefined) {
         const cardsById = cardPages.reduce<{ [key: string]: Card }>((acc, card) => {
           acc[card.card.id] = card.card;
@@ -234,13 +236,31 @@ function Table(props: Props): JSX.Element {
         });
       }
 
+      let changeCardOrder = !hasSort;
+      let cardOrder = hasSort
+        ? cardPages.map((o) => o.card.id)
+        : Array.from(new Set([...activeView.fields.cardOrder, ...cardPages.map((o) => o.card.id)]));
+
+      let destIndex = cardOrder.indexOf(dstCardID);
+      const srcIndex = cardOrder.indexOf(srcCard.id);
+      cardOrder = cardOrder.filter((id) => !draggedCardIds.includes(id));
+
+      if (hasSort) {
+        const { confirmed } = await showConfirmation({
+          message: 'Would you like to remove sorting?'
+        });
+
+        if (confirmed && localViewSettings) {
+          await mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, []);
+          localViewSettings.setLocalSort(null);
+          changeCardOrder = true;
+        }
+      }
+
       // Update dstCard order
-      if (isManualSort) {
-        let cardOrder = Array.from(new Set([...activeView.fields.cardOrder, ...cardPages.map((o) => o.card.id)]));
+      if (changeCardOrder) {
         if (dstCardID) {
-          const isDraggingDown = cardOrder.indexOf(srcCard.id) <= cardOrder.indexOf(dstCardID);
-          cardOrder = cardOrder.filter((id) => !draggedCardIds.includes(id));
-          let destIndex = cardOrder.indexOf(dstCardID);
+          const isDraggingDown = srcIndex <= destIndex;
           if (isDraggingDown) {
             destIndex += 1;
           }
@@ -251,30 +271,38 @@ function Table(props: Props): JSX.Element {
             ({ card }) => card.fields.properties[activeView.fields.groupById!] === groupID
           );
           if (firstCard) {
-            const destIndex = cardOrder.indexOf(firstCard.card.id);
-            cardOrder.splice(destIndex, 0, ...draggedCardIds);
+            cardOrder.splice(cardOrder.indexOf(firstCard.card.id), 0, ...draggedCardIds);
           } else {
             // if not found, this is the only item in group.
             return;
           }
         }
 
-        mutator.performAsUndoGroup(async () => {
-          await mutator.changeViewCardOrder(activeView, cardOrder, description);
+        await mutator.performAsUndoGroup(async () => {
+          await mutator.changeViewCardOrder(
+            hasSort
+              ? {
+                  ...activeView,
+                  fields: {
+                    ...activeView.fields,
+                    sortOptions: []
+                  }
+                }
+              : activeView,
+            cardOrder,
+            description
+          );
         });
       }
     },
-    [activeView, cardPages, props.selectedCardIds, groupByProperty]
+    [cardPages, props.selectedCardIds, groupByProperty]
   );
 
-  const onDropToCard = useCallback(
-    (srcCard: Card, dstCard: Card) => {
-      Utils.log(`onDropToCard: ${dstCard.title}`);
-      onDropToGroup(srcCard, dstCard.fields.properties[activeView.fields.groupById!] as string, dstCard.id);
-      resetState();
-    },
-    [activeView]
-  );
+  const onDropToCard = async (srcCard: Card, dstCard: Card) => {
+    Utils.log(`onDropToCard: ${dstCard.title}`);
+    await onDropToGroup(srcCard, dstCard.fields.properties[activeView.fields.groupById!] as string, dstCard.id);
+    resetState();
+  };
 
   const propertyNameChanged = useCallback(
     async (option: IPropertyOption, text: string): Promise<void> => {

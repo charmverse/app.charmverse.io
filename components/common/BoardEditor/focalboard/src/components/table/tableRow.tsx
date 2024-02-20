@@ -10,12 +10,15 @@ import React, { memo, useContext, useEffect, useMemo, useRef, useState } from 'r
 import { FormattedMessage } from 'react-intl';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
+import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { filterPropertyTemplates } from 'components/common/BoardEditor/utils/updateVisibilePropertyIds';
 import { PageActionsMenu } from 'components/common/PageActions/components/PageActionsMenu';
 import { PageIcon } from 'components/common/PageIcon';
 import { RewardApplicationStatusIcon } from 'components/rewards/components/RewardApplicationStatusChip';
 import { SelectionContext, useSelected } from 'hooks/useAreaSelection';
+import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useDragDrop } from 'hooks/useDragDrop';
+import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board } from 'lib/focalboard/board';
@@ -132,10 +135,8 @@ function TableRow(props: Props) {
   const isMobile = useSmallScreen();
   const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
   const [title, setTitle] = useState('');
-  const isManualSort = activeView.fields.sortOptions.length === 0;
   const isGrouped = Boolean(activeView.fields.groupById);
-
-  const enabled = !isTouchScreen() && !props.readOnly && (isManualSort || isGrouped);
+  const enabled = !isTouchScreen() && !props.readOnly;
 
   const { drag, drop, preview, style } = useDragDrop({
     item: card,
