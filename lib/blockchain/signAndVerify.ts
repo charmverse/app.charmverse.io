@@ -1,4 +1,4 @@
-import { SiweMessage } from 'siwe';
+import { SiweMessage } from 'lit-siwe';
 import { getAddress, recoverMessageAddress } from 'viem';
 
 import { InvalidInputError } from '../utilities/errors';

@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 
 import type { Page as BrowserPage } from '@playwright/test';
 import { getChainById } from 'connectors/chains';
-import { SiweMessage } from 'siwe';
+import { SiweMessage } from 'lit-siwe';
 import { createWalletClient, http } from 'viem';
 import { privateKeyToAccount, generatePrivateKey } from 'viem/accounts';
 
