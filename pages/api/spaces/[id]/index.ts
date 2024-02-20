@@ -1,4 +1,3 @@
-import { DataNotFoundError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
@@ -10,7 +9,6 @@ import { SpaceNotFoundError } from 'lib/public-api';
 import { withSessionRoute } from 'lib/session/withSession';
 import { updateSpace } from 'lib/spaces/updateSpace';
 import { deleteProSubscription } from 'lib/subscription/deleteProSubscription';
-import { updateCustomerStripeInfo } from 'lib/subscription/updateCustomerStripeInfo';
 import { replaceS3Domain } from 'lib/utilities/url';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

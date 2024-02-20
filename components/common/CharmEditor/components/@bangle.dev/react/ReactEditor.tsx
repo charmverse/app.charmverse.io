@@ -344,19 +344,20 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
           <div contentEditable='false' className='charm-empty-footer' onMouseDown={onClickEditorBottom} />
         )}
       </div>
-      {nodeViews.map((nodeView) => {
-        return nodeView.containerDOM
-          ? reactDOM.createPortal(
-              <NodeViewWrapper
-                nodeViewUpdateStore={nodeViewUpdateStore}
-                nodeView={nodeView}
-                renderNodeViews={renderNodeViews!}
-              />,
-              nodeView.containerDOM,
-              objectUid.get(nodeView)
-            )
-          : null;
-      })}
+      {editor?.view &&
+        nodeViews.map((nodeView) => {
+          return nodeView.containerDOM
+            ? reactDOM.createPortal(
+                <NodeViewWrapper
+                  nodeViewUpdateStore={nodeViewUpdateStore}
+                  nodeView={nodeView}
+                  renderNodeViews={renderNodeViews!}
+                />,
+                nodeView.containerDOM,
+                objectUid.get(nodeView)
+              )
+            : null;
+        })}
     </EditorViewContext.Provider>
   );
 });

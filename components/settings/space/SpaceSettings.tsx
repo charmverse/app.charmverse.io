@@ -136,6 +136,7 @@ export function SpaceSettings({
   const watchName = watch('name');
   const watchSpaceImage = watch('spaceImage');
   const watchSpaceArtwork = watch('spaceArtwork');
+  const watchPrimaryMemberIdentity = watch('primaryMemberIdentity') ?? undefined;
 
   async function onSubmit(values: FormValues) {
     if (!isAdmin || !values.domain) return;
@@ -308,7 +309,11 @@ export function SpaceSettings({
             />
           </Grid>
           <Grid item>
-            <SpacePrimaryIdentity register={register} disabled={!isAdmin} />
+            <SpacePrimaryIdentity
+              primaryIdentity={watchPrimaryMemberIdentity}
+              register={register}
+              disabled={!isAdmin}
+            />
           </Grid>
           <Grid item>
             <FieldLabel>Custom Artwork</FieldLabel>
