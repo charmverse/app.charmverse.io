@@ -136,9 +136,9 @@ export function ProposalRewards({
       navigateToSpacePath(`/${getRewardPage(rewardId)?.path || ''}`);
       return;
     }
+    const pageIdToOpen = getRewardPage(rewardId)?.id;
 
-    const pageId = getRewardPage(rewardId)?.id || rewardId;
-    updateURLQuery({ [rewardQueryKey]: pageId });
+    updateURLQuery({ [rewardQueryKey]: pageIdToOpen });
   }
 
   function selectTemplate(template: RewardTemplate | null) {

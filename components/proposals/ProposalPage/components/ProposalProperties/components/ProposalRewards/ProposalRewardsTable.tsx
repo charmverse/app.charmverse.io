@@ -64,7 +64,6 @@ export function ProposalRewardsTable({
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
   const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, isSavingReward } = useNewReward();
   const [currentPendingId, setCurrentPendingId] = useState<null | string>(null);
-  const { getRewardPage } = useRewardPage();
   const { rewards: allRewards } = useRewards();
   const { templates } = useRewardTemplates({ load: !!requiredTemplateId });
 
@@ -244,7 +243,7 @@ export function ProposalRewardsTable({
                 <Typography variant='h5'>{getFeatureTitle('Rewards')}</Typography>
               </Box>
               <div>
-                <AttachRewardButton createNewReward={createNewReward} variant={variant} />
+                {canCreatePendingRewards && <AttachRewardButton createNewReward={createNewReward} variant={variant} />}
               </div>
             </Box>
           </DatabaseStickyHeader>

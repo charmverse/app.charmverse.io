@@ -70,7 +70,6 @@ function getRewardType(values: UpdateableRewardFields, isNewReward: boolean, isF
     ? 'Token'
     : 'None';
 }
-
 export function RewardPropertiesForm({
   onChange,
   values,

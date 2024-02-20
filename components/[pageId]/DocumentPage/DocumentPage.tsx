@@ -29,7 +29,6 @@ import { useCharmEditorView } from 'hooks/useCharmEditorView';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMdScreen } from 'hooks/useMediaScreens';
-import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import type { PageWithContent } from 'lib/pages/interfaces';

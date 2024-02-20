@@ -55,6 +55,7 @@ function CardDetailProperties(props: Props) {
     mutator = defaultMutator,
     disableEditPropertyOption
   } = props;
+
   const [newTemplateId, setNewTemplateId] = useState('');
   const intl = useIntl();
   const addPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-property' });

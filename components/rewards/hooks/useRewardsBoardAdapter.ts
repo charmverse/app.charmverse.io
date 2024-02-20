@@ -114,7 +114,7 @@ export function useRewardsBoardAdapter() {
           spaceId: space.id,
           rewardPage: page,
           members: membersRecord
-        });
+        }) as CardPage;
       })
       .filter(isTruthy);
 
@@ -164,7 +164,7 @@ export function mapRewardToCardPage({
   members
 }: {
   reward: BoardReward | RewardWithUsers;
-  rewardPage: PageMeta;
+  rewardPage?: PageMeta;
   spaceId: string;
   members?: Record<string, Member>;
 }): CardPage {
@@ -212,19 +212,47 @@ export function mapRewardToCardPage({
     [REWARD_PROPOSAL_LINK]: proposalLinkValue
   };
 
+  // Create dummy rewardPage for new rewards
+  const _rewardPage = rewardPage || {
+    id: '',
+    // add fields to satisfy PageMeta type. TODO: We dont need all fields on PageMeta for cards
+    boardId: null,
+    bountyId: null,
+    createdAt: new Date(),
+    createdBy: '',
+    deletedAt: null,
+    deletedBy: null,
+    hasContent: false,
+    headerImage: '',
+    icon: null,
+    type: 'bounty',
+    galleryImage: '',
+    syncWithPageId: null,
+    index: 0,
+    cardId: null,
+    path: '',
+    parentId: null,
+    sourceTemplateId: null,
+    proposalId: null,
+    spaceId: '',
+    title: '',
+    updatedAt: new Date(),
+    updatedBy: ''
+  };
+
   const card: Card = {
     // use page id as card id - kanban board is based on usePages
-    id: rewardPage?.id || '',
+    id: _rewardPage.id,
     spaceId,
     parentId: '',
     schema: 1,
-    title: rewardPage?.title || '',
+    title: _rewardPage.title || '',
     rootId: spaceId,
     type: 'card' as BlockTypes,
-    updatedBy: rewardPage?.updatedBy || '',
-    createdBy: rewardPage?.createdBy || '',
-    createdAt: rewardPage?.createdAt ? new Date(rewardPage?.createdAt).getTime() : 0,
-    updatedAt: rewardPage?.updatedAt ? new Date(rewardPage?.updatedAt).getTime() : 0,
+    updatedBy: _rewardPage.updatedBy,
+    createdBy: _rewardPage.createdBy,
+    createdAt: _rewardPage.createdAt ? new Date(_rewardPage.createdAt).getTime() : 0,
+    updatedAt: _rewardPage.updatedAt ? new Date(_rewardPage.updatedAt).getTime() : 0,
     deletedAt: null,
     fields: { ...rewardFields, contentOrder: [] } as any,
     customIconType: 'reward'
@@ -232,7 +260,7 @@ export function mapRewardToCardPage({
 
   return {
     card,
-    page: rewardPage,
+    page: _rewardPage,
     subPages:
       rewardPage && reward && 'applications' in reward
         ? reward.applications
