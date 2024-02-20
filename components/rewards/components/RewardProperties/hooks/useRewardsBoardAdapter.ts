@@ -3,7 +3,6 @@ import { useMemo, useState } from 'react';
 
 import { sortCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
-import { getDefaultBoard, getDefaultView } from 'components/rewards/components/RewardsBoard/utils/boardData';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmRouter } from 'hooks/useCharmRouter';
@@ -13,7 +12,6 @@ import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useRewardBlocks } from 'hooks/useRewardBlocks';
 import type { BlockTypes } from 'lib/focalboard/block';
-import type { Board } from 'lib/focalboard/board';
 import type { BoardView, IViewType } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
@@ -38,6 +36,7 @@ import {
   REWARD_PROPOSAL_LINK
 } from 'lib/rewards/blocks/constants';
 import type { RewardFields, RewardFieldsProp, RewardPropertyValue } from 'lib/rewards/blocks/interfaces';
+import { getDefaultView } from 'lib/rewards/blocks/views';
 import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmissionSlots';
 import type { ApplicationMeta, RewardWithUsers } from 'lib/rewards/interfaces';
 
@@ -48,7 +47,7 @@ export function useRewardsBoardAdapter() {
   const { space } = useCurrentSpace();
   const { membersRecord } = useMembers();
   const { rewards } = useRewards();
-  const { rewardBoardBlock, rewardBlocks } = useRewardBlocks();
+  const { rewardsBoardBlock: board, rewardBlocks } = useRewardBlocks();
   const { getRewardPage } = useRewardPage();
   const hasMilestoneRewards = useMemo(() => rewards?.some((r) => !!r.proposalId), [rewards]);
   const { pages } = usePages();
@@ -58,14 +57,8 @@ export function useRewardsBoardAdapter() {
   } = useCharmRouter();
   const rewardPage = getRewardPage(boardReward?.id);
 
-  // board with all reward properties and default properties
-  const board: Board = getDefaultBoard({
-    storedBoard: rewardBoardBlock,
-    hasMilestoneRewards
-  });
-
   const views = useMemo(() => {
-    return board.fields.viewIds
+    return (board?.fields.viewIds || [])
       .map((vId) => rewardBlocks?.find((b) => b.id === vId) as BoardView)
       .filter(Boolean)
       .map((v) => {
@@ -87,21 +80,21 @@ export function useRewardsBoardAdapter() {
 
         return view;
       });
-  }, [board.fields.viewIds, hasMilestoneRewards, rewardBlocks]);
+  }, [board?.fields.viewIds, hasMilestoneRewards, rewardBlocks]);
   const queryViewType =
     viewTypeToBlockId[query?.viewId?.toString() as IViewType] || query?.viewId?.toString() || DEFAULT_VIEW_BLOCK_ID;
 
-  const activeViewId = board.fields.viewIds?.find((vid) => vid === queryViewType)
+  const activeViewId = board?.fields.viewIds?.find((vid) => vid === queryViewType)
     ? queryViewType
-    : board.fields.viewIds?.[0];
+    : board?.fields.viewIds?.[0];
 
   const localViewSettings = useLocalDbViewSettings(`rewards-${space?.id}-${activeViewId}`);
 
   const activeView = useMemo(() => {
     const viewBlock = views?.find((v) => v.id === activeViewId);
 
-    if (!viewBlock) {
-      return getDefaultView({ viewType: activeViewId, spaceId: space?.id || '' });
+    if (!viewBlock && activeViewId) {
+      return getDefaultView({ spaceId: space?.id });
     }
 
     const boardView = blockToFBBlock(viewBlock as any) as BoardView;
@@ -132,7 +125,7 @@ export function useRewardsBoardAdapter() {
 
     const filter = localViewSettings?.localFilters || activeView?.fields.filter;
     // filter cards by active view filter
-    if (activeView?.fields.filter) {
+    if (activeView.fields.filter && board) {
       const cardsRaw = cards.map((cp) => cp.card);
       const filteredCardsIds = CardFilter.applyFilterGroup(filter, board.fields.cardProperties, cardsRaw).map(
         (c) => c.id
@@ -140,7 +133,7 @@ export function useRewardsBoardAdapter() {
 
       cards = cards.filter((cp) => filteredCardsIds.includes(cp.card.id));
     }
-    const sortedCardPages = activeView
+    const sortedCardPages = board
       ? sortCards(cards, board, activeView, membersRecord, {}, localViewSettings?.localSort)
       : [];
 
@@ -157,11 +150,6 @@ export function useRewardsBoardAdapter() {
     space?.id
   ]);
 
-  const boardCustomProperties: Board = getDefaultBoard({
-    storedBoard: rewardBoardBlock,
-    customOnly: true
-  });
-
   // card from current reward
   const card = mapRewardToCardPage({
     reward: boardReward,
@@ -176,7 +164,6 @@ export function useRewardsBoardAdapter() {
 
   return {
     board,
-    boardCustomProperties,
     card,
     cards,
     cardPages,

@@ -447,50 +447,52 @@ function DocumentPageComponent({
                 />
               )}
 
-              {isStructuredProposal && proposal?.fields?.enableRewards && (
-                <Box mb={10}>
-                  <Box my={1}>
-                    <Typography variant='h5'>{getFeatureTitle('Rewards')}</Typography>
-                  </Box>
-                  <ProposalRewardsTable
-                    pendingRewards={proposal.fields.pendingRewards || []}
-                    requiredTemplateId={proposal.fields.rewardsTemplateId}
-                    reviewers={proposal.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat()}
-                    assignedSubmitters={proposal.authors.map((a) => a.userId)}
-                    variant='solid_button'
-                    readOnly={!proposal.permissions.edit}
-                    rewardIds={proposal.rewardIds || []}
-                    onSave={(pendingReward) => {
-                      const isExisting = proposal.fields?.pendingRewards?.find(
-                        (r) => r.draftId === pendingReward.draftId
-                      );
-                      if (!isExisting) {
+              {isStructuredProposal &&
+                proposal?.fields?.enableRewards &&
+                (!!proposal.fields.pendingRewards?.length || !readOnly) && (
+                  <Box mb={10}>
+                    <Box my={1}>
+                      <Typography variant='h5'>{getFeatureTitle('Rewards')}</Typography>
+                    </Box>
+                    <ProposalRewardsTable
+                      pendingRewards={proposal.fields.pendingRewards || []}
+                      requiredTemplateId={proposal.fields.rewardsTemplateId}
+                      reviewers={proposal.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat()}
+                      assignedSubmitters={proposal.authors.map((a) => a.userId)}
+                      variant='solid_button'
+                      readOnly={!proposal.permissions.edit}
+                      rewardIds={proposal.rewardIds || []}
+                      onSave={(pendingReward) => {
+                        const isExisting = proposal.fields?.pendingRewards?.find(
+                          (r) => r.draftId === pendingReward.draftId
+                        );
+                        if (!isExisting) {
+                          onChangeRewardSettings({
+                            pendingRewards: [...(proposal.fields?.pendingRewards || []), pendingReward]
+                          });
+
+                          return;
+                        }
+
                         onChangeRewardSettings({
-                          pendingRewards: [...(proposal.fields?.pendingRewards || []), pendingReward]
+                          pendingRewards: [...(proposal.fields?.pendingRewards || [])].map((draft) => {
+                            if (draft.draftId === pendingReward.draftId) {
+                              return pendingReward;
+                            }
+                            return draft;
+                          })
                         });
-
-                        return;
-                      }
-
-                      onChangeRewardSettings({
-                        pendingRewards: [...(proposal.fields?.pendingRewards || [])].map((draft) => {
-                          if (draft.draftId === pendingReward.draftId) {
-                            return pendingReward;
-                          }
-                          return draft;
-                        })
-                      });
-                    }}
-                    onDelete={(draftId: string) => {
-                      onChangeRewardSettings({
-                        pendingRewards: [...(proposal.fields?.pendingRewards || [])].filter(
-                          (draft) => draft.draftId !== draftId
-                        )
-                      });
-                    }}
-                  />
-                </Box>
-              )}
+                      }}
+                      onDelete={(draftId: string) => {
+                        onChangeRewardSettings({
+                          pendingRewards: [...(proposal.fields?.pendingRewards || [])].filter(
+                            (draft) => draft.draftId !== draftId
+                          )
+                        });
+                      }}
+                    />
+                  </Box>
+                )}
 
               {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') && (
                 <Box>

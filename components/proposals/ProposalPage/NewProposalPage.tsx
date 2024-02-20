@@ -84,7 +84,6 @@ export function NewProposalPage({
   sourcePageId?: string;
   sourcePostId?: string;
 }) {
-  const { getFeatureTitle } = useSpaceFeatures();
   const { navigateToSpacePath } = useCharmRouter();
   const { space: currentSpace } = useCurrentSpace();
   const { data: sourcePage } = useGetPage(sourcePageId);
@@ -486,9 +485,6 @@ export function NewProposalPage({
                   )}
                   {isStructured && formInputs.fields?.enableRewards && (
                     <Box mb={10}>
-                      <Box my={1}>
-                        <Typography variant='h5'>{getFeatureTitle('Rewards')}</Typography>
-                      </Box>
                       <ProposalRewardsTable
                         pendingRewards={pendingRewards}
                         requiredTemplateId={formInputs.fields?.rewardsTemplateId}
@@ -513,7 +509,7 @@ export function NewProposalPage({
                           setFormInputs({
                             fields: {
                               ...formInputs.fields,
-                              pendingRewards: [...(formInputs.fields?.pendingRewards || [])].map((draft) => {
+                              pendingRewards: (formInputs.fields?.pendingRewards || []).map((draft) => {
                                 if (draft.draftId === pendingReward.draftId) {
                                   return pendingReward;
                                 }
@@ -526,7 +522,7 @@ export function NewProposalPage({
                           setFormInputs({
                             fields: {
                               ...formInputs.fields,
-                              pendingRewards: [...(formInputs.fields?.pendingRewards || [])].filter(
+                              pendingRewards: (formInputs.fields?.pendingRewards || []).filter(
                                 (draft) => draft.draftId !== draftId
                               )
                             }

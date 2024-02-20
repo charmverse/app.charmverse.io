@@ -1,11 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import { usePropertiesMutator } from 'components/rewards/components/RewardProperties/hooks/useRewardsMutator';
 import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
-import type { RewardCard, RewardFieldsProp, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
+import type { RewardFieldsProp, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 
 type Props = {
   reward: { spaceId?: string; id?: string } & RewardFieldsProp;
@@ -16,7 +16,7 @@ type Props = {
 export function CustomPropertiesAdapter({ reward, onChange, readOnly }: Props) {
   const { user } = useUser();
   const isAdmin = useIsAdmin();
-  const { boardCustomProperties, card, cards, activeView, views, rewardPage, setBoardReward } = useRewardsBoard();
+  const { board, card, cards, activeView, views, rewardPage, setBoardReward } = useRewardsBoard();
   const mutator = usePropertiesMutator({ reward, onChange });
 
   useEffect(() => {
@@ -24,10 +24,28 @@ export function CustomPropertiesAdapter({ reward, onChange, readOnly }: Props) {
     return () => setBoardReward(null);
   }, [reward, setBoardReward]);
 
+  const boardCustomProperties = useMemo(() => {
+    if (board) {
+      return {
+        ...board,
+        fields: {
+          ...board.fields,
+          // extract non-custom properties
+          cardProperties: board.fields.cardProperties.filter((p) => !p.id.startsWith('__'))
+        }
+      };
+    }
+    return board;
+  }, [board]);
+
+  if (!boardCustomProperties) {
+    return null;
+  }
+
   return (
     <CardDetailProperties
       board={boardCustomProperties}
-      card={card as RewardCard}
+      card={card}
       cards={cards}
       activeView={activeView}
       views={views}

@@ -77,8 +77,10 @@ export function ProposalRewards({
   }
 
   async function saveForm() {
-    onSave({ reward: rewardValues, page: newPageValues, draftId: currentPendingId || '' });
-    closeDialog();
+    if (newPageValues) {
+      onSave({ reward: rewardValues, page: newPageValues, draftId: currentPendingId || '' });
+      closeDialog();
+    }
   }
 
   function createNewReward() {

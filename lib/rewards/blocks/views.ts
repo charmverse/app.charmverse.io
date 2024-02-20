@@ -1,3 +1,5 @@
+import { v4 as uuid } from 'uuid';
+
 import { getDefaultRewardProperties } from 'components/rewards/components/RewardsBoard/utils/getDefaultRewardProperties';
 import type { IViewType } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
@@ -29,11 +31,16 @@ export const defaultRewardViews = [
 
 export const supportedRewardViewTypes: IViewType[] = ['calendar', 'board', 'table'];
 
+export function getDefaultView({ spaceId }: { spaceId?: string }) {
+  // default to table view
+  return generateDefaultTableView({ spaceId });
+}
+
 export function generateDefaultCalendarView({
   spaceId,
   dateDisplayPropertyId = DUE_DATE_ID
 }: {
-  spaceId: string;
+  spaceId?: string;
   dateDisplayPropertyId?: string;
 }) {
   const view = createBoardView();
@@ -41,7 +48,7 @@ export function generateDefaultCalendarView({
   view.fields.viewType = 'calendar';
   view.id = DEFAULT_CALENDAR_VIEW_BLOCK_ID;
   view.parentId = DEFAULT_BOARD_BLOCK_ID;
-  view.rootId = spaceId;
+  view.rootId = spaceId || uuid();
   view.fields.visiblePropertyIds = [Constants.titleColumnId, REWARD_AMOUNT];
   view.fields.cardOrder = [];
 
@@ -51,26 +58,26 @@ export function generateDefaultCalendarView({
   return view;
 }
 
-export function generateDefaultBoardView({ spaceId }: { spaceId: string }) {
+export function generateDefaultBoardView({ spaceId }: { spaceId?: string }) {
   const view = createBoardView();
   view.title = '';
   view.fields.viewType = 'board';
   view.id = DEFAULT_BOARD_VIEW_BLOCK_ID;
   view.parentId = DEFAULT_BOARD_BLOCK_ID;
-  view.rootId = spaceId;
+  view.rootId = spaceId || uuid();
   view.fields.visiblePropertyIds = [Constants.titleColumnId, REWARD_AMOUNT, REWARD_APPLICANTS_COUNT];
   view.fields.cardOrder = [];
 
   return view;
 }
 
-export function generateDefaultTableView({ spaceId }: { spaceId: string }) {
+export function generateDefaultTableView({ spaceId }: { spaceId?: string }) {
   const view = createBoardView();
   view.title = '';
   view.fields.viewType = 'table';
   view.id = DEFAULT_TABLE_VIEW_BLOCK_ID;
   view.parentId = DEFAULT_BOARD_BLOCK_ID;
-  view.rootId = spaceId;
+  view.rootId = spaceId || uuid();
   view.fields.visiblePropertyIds = [Constants.titleColumnId, ...getDefaultRewardProperties().map((p) => p.id)];
   view.fields.cardOrder = [];
 

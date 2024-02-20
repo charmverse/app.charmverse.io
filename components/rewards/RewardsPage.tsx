@@ -132,7 +132,7 @@ export function RewardsPage({ title }: { title: string }) {
     updateURLQuery({ viewId });
   };
 
-  if (isLoadingAccess) {
+  if (isLoadingAccess || !activeBoard) {
     return null;
   }
 

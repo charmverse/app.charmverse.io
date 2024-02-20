@@ -7,9 +7,15 @@ import { useState } from 'react';
 import { v4 } from 'uuid';
 
 import { SelectPreviewContainer } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
+import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
+import TableHeader from 'components/common/BoardEditor/focalboard/src/components/table/tableHeader';
+import TableRow from 'components/common/BoardEditor/focalboard/src/components/table/tableRow';
+import { Button } from 'components/common/Button';
+import LoadingComponent from 'components/common/LoadingComponent';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
 import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
+import { PageIcon } from 'components/common/PageIcon';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { RewardAmount } from 'components/rewards/components/RewardStatusBadge';
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
@@ -18,7 +24,9 @@ import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useRewardsBoard } from 'hooks/useRewardsBoard';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
+import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { ProposalPendingReward } from 'lib/proposal/interface';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 import type { RewardReviewer } from 'lib/rewards/interfaces';
@@ -39,6 +47,12 @@ type Props = {
   isProposalTemplate?: boolean;
 };
 
+type RewardRow = {
+  id: string;
+  title: string;
+  isPending: boolean;
+};
+
 const rewardQueryKey = 'rewardId';
 
 export function ProposalRewardsTable({
@@ -53,6 +67,7 @@ export function ProposalRewardsTable({
   variant,
   isProposalTemplate
 }: Props) {
+  const { defaultView, boardBlock, isLoading } = useRewardsBoard();
   useRewardsNavigation(rewardQueryKey);
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
   const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, isSavingReward } = useNewReward();
@@ -77,8 +92,10 @@ export function ProposalRewardsTable({
   }
 
   async function saveForm() {
-    onSave({ reward: rewardValues, page: newPageValues, draftId: currentPendingId || '' });
-    closeDialog();
+    if (newPageValues) {
+      onSave({ reward: rewardValues, page: newPageValues, draftId: currentPendingId || '' });
+      closeDialog();
+    }
   }
 
   function createNewReward() {
@@ -119,10 +136,10 @@ export function ProposalRewardsTable({
     setCurrentPendingId(v4());
   }
 
-  function showReward({ reward, page, draftId }: ProposalPendingReward) {
-    setRewardValues(reward);
-    openNewPage(page || undefined);
-    setCurrentPendingId(draftId);
+  function showRewardCard(id: string) {
+    // setRewardValues(reward);
+    // openNewPage(page || undefined);
+    // setCurrentPendingId(draftId);
   }
 
   function openReward(rewardId: string | null) {
@@ -155,163 +172,59 @@ export function ProposalRewardsTable({
       });
     }
   }
+  const headers: IPropertyTemplate[] = [];
+  const rows: RewardRow[] =
+    pendingRewards?.map(({ reward, page, draftId }) => {
+      return {
+        id: draftId,
+        title: page.title || '',
+        isPending: true
+      };
+    }) || [];
 
-  return;
-  <div className='Table'>
-    <div className='octo-table-body'>
-      <div className='table-row-container'></div>
-      {/* Add New row */}
-      <div className='octo-table-footer'>
-        {!readOnly && (
-          <div
-            data-test='table-add-card'
-            className='octo-table-cell'
-            onClick={() => {
-              addCard('');
-            }}
-          >
-            <Box display='flex' gap={1} alignItems='center'>
-              <Add fontSize='small' />
-              <Typography fontSize='small' id='TableComponent.plus-new'>
-                New
-              </Typography>
-            </Box>
-          </div>
-        )}
-      </div>
-    </div>
-  </div>;
-
-  if (rewards.length) {
-    return (
-      <Stack gap={0.5} flex={1} width='500px' maxWidth='100%'>
-        {rewards.map((reward) => {
-          return (
-            <Stack
-              alignItems='center'
-              gap={1}
-              direction='row'
-              sx={{
-                '&:hover .icons': {
-                  opacity: 1
-                }
-              }}
-              key={reward.id}
-              flex={1}
-            >
-              <SelectPreviewContainer displayType='details' onClick={() => openReward(reward.id)}>
-                <Stack direction='row' justifyContent='space-between' alignItems='center'>
-                  <Typography component='span' variant='subtitle1' fontWeight='normal'>
-                    {getRewardPage(reward.id)?.title || 'Untitled'}
-                  </Typography>
-                  <Hidden mdDown>
-                    <Stack alignItems='center' direction='row' height='100%'>
-                      <RewardAmount
-                        reward={{
-                          chainId: reward.chainId || null,
-                          customReward: reward.customReward || null,
-                          rewardAmount: reward.rewardAmount || null,
-                          rewardToken: reward.rewardToken || null
-                        }}
-                        truncate={true}
-                        truncatePrecision={2}
-                        typographyProps={{ variant: 'body2', fontWeight: 'normal', fontSize: 'normal' }}
-                      />
-                    </Stack>
-                  </Hidden>
-                </Stack>
-              </SelectPreviewContainer>
-            </Stack>
-          );
-        })}
-      </Stack>
-    );
-  }
+  const loadingData = isLoading;
 
   return (
     <>
-      {!!pendingRewards?.length && (
-        <Stack gap={0.5} flex={1} width='500px' maxWidth='100%'>
-          {pendingRewards.map(({ reward, page, draftId }) => {
-            return (
-              <Stack
-                alignItems='center'
-                gap={1}
-                direction='row'
-                sx={{
-                  '&:hover .icons': {
-                    opacity: 1
-                  }
-                }}
-                key={draftId}
-                flex={1}
-              >
-                <SelectPreviewContainer readOnly={readOnly} displayType='details'>
-                  <Stack direction='row' justifyContent='space-between' alignItems='center' gap={1}>
-                    <Grid container spacing={0.5}>
-                      <Grid item xs={8} lg={5}>
-                        <Typography component='span' variant='subtitle1' fontWeight='normal'>
-                          {page?.title || 'Untitled'}
-                        </Typography>
-                      </Grid>
-                      <Hidden lgDown>
-                        <Grid item xs={5}>
-                          <Stack alignItems='center' direction='row' height='100%'>
-                            <RewardAmount
-                              reward={{
-                                chainId: reward.chainId || null,
-                                customReward: reward.customReward || null,
-                                rewardAmount: reward.rewardAmount || null,
-                                rewardToken: reward.rewardToken || null
-                              }}
-                              truncate={true}
-                              truncatePrecision={2}
-                              typographyProps={{ variant: 'body2', fontWeight: 'normal', fontSize: 'normal' }}
-                            />
-                          </Stack>
-                        </Grid>
-                      </Hidden>
-
-                      <Grid item xs={4} lg={2}>
-                        <Stack className='icons' sx={{ opacity: 0, transition: 'opacity 0.2s ease' }} direction='row'>
-                          <Tooltip title={readOnly ? 'View' : 'Edit'}>
-                            <span>
-                              <IconButton size='small' onClick={() => showReward({ reward, page, draftId })}>
-                                {readOnly ? (
-                                  <VisibilityIcon color='secondary' fontSize='small' />
-                                ) : (
-                                  <Edit color='secondary' fontSize='small' />
-                                )}
-                              </IconButton>
-                            </span>
-                          </Tooltip>
-                          {!readOnly && (
-                            <Tooltip title='Delete'>
-                              <span>
-                                <IconButton size='small' onClick={() => onDelete(draftId)} disabled={readOnly}>
-                                  <Delete color='secondary' fontSize='small' />
-                                </IconButton>
-                              </span>
-                            </Tooltip>
-                          )}
-                        </Stack>
-                      </Grid>
-                    </Grid>
-                  </Stack>
-                </SelectPreviewContainer>
-              </Stack>
-            );
-          })}
-
-          {canCreatePendingRewards && (
-            <Box>
-              <AttachRewardButton createNewReward={createNewReward} variant={variant} />
+      <Box display='flex' justifyContent='space-between' alignItems='center'>
+        <Box my={1}>
+          <Typography variant='h5'>{getFeatureTitle('Rewards')}</Typography>
+        </Box>
+        <div>
+          <AttachRewardButton createNewReward={createNewReward} variant={variant} />
+        </div>
+      </Box>
+      {loadingData ? (
+        <Grid item xs={12} sx={{ mt: 12 }}>
+          <LoadingComponent height={500} isLoading size={50} />
+        </Grid>
+      ) : (
+        <Box className='container-container'>
+          <Stack>
+            <Box width='100%'>
+              <Table
+                boardType='rewards'
+                setSelectedPropertyId={() => {}}
+                board={boardBlock!}
+                activeView={defaultView}
+                cardPages={[]}
+                views={[]}
+                visibleGroups={[]}
+                selectedCardIds={[]}
+                readOnly={true}
+                disableAddingCards
+                showCard={showRewardCard}
+                readOnlyTitle
+                readOnlyRows
+                cardIdToFocusOnRender=''
+                addCard={async () => {}}
+                onCardClicked={() => {}}
+                onDeleteCard={() => Promise.resolve()}
+              />
             </Box>
-          )}
-        </Stack>
+          </Stack>
+        </Box>
       )}
-      {!pendingRewards?.length && <AttachRewardButton createNewReward={createNewReward} variant={variant} />}
-
       <NewPageDialog
         contentUpdated={!readOnly && (contentUpdated || isDirty)}
         disabledTooltip={getDisabledTooltip({
