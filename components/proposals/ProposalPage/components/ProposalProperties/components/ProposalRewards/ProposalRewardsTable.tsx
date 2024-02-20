@@ -134,9 +134,8 @@ export function ProposalRewardsTable({
     } else {
       const pending = pendingRewards?.find((r) => r.draftId === id);
       if (pending) {
-        const page = getRewardPage(id);
         setRewardValues(pending.reward);
-        openNewPage(page || undefined);
+        openNewPage(pending.page);
         setCurrentPendingId(id);
       }
     }
