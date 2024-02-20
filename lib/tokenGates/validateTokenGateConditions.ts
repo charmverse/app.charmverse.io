@@ -13,16 +13,17 @@ const AccessControlSchema = yup.object().shape({
 });
 
 const TokenGateConditionsSchema = yup.object().shape({
-  accessControlConditions: yup
-    .array()
-    .min(1, 'At least one condition is required')
-    .required()
-    .of(
-      yup.object().test('isValidCondition', 'Invalid object', async (value) => {
-        await AccessControlSchema.validate(value);
-        return true;
-      })
-    )
+  conditions: yup.object().shape({
+    accessControlConditions: yup
+      .array()
+      .min(1, 'At least one condition is required')
+      .of(
+        yup.object().test('isValidCondition', 'Invalid object', async (value) => {
+          await AccessControlSchema.validate(value);
+          return true;
+        })
+      )
+  })
 });
 
 export async function validateTokenGateConditions(tokenGate: TokenGate) {

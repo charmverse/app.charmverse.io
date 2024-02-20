@@ -23,7 +23,7 @@ export function TokenGateOption({ tokenGate, isVerified, isVerifying }: Props) {
 
   return (
     <GateOption isVerified={isVerified} isVerifying={isVerifying}>
-      <ConditionsGroup conditions={conditions} />
+      <ConditionsGroup conditions={conditions} operator={tokenGate.conditions.operator} />
       {tokenGate.tokenGateToRoles.length > 0 && (
         <Box mt={1}>
           <Typography sx={{ mr: 1 }} variant='caption'>

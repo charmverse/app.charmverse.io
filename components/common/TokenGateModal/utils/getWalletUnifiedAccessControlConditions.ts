@@ -8,11 +8,11 @@ export function getWalletUnifiedAccessControlConditions(values: FormValues): Acc
   return [
     {
       condition: 'evm',
-      contractAddress: contract,
+      contractAddress: '',
       chain: 1,
       method: 'ownerOf',
       type: 'Wallet',
-      tokenIds: [],
+      tokenIds: [contract],
       quantity: '1'
     }
   ];

@@ -20,16 +20,26 @@ import { TokenGateFooter } from './TokenGateFooter';
 export function TokenGateReview() {
   const { account } = useWeb3Account();
   const { showMessage } = useSnackbar();
-  const { resetModal, onSubmit, loadingToken, error, flow, setFlow, setDisplayedPage, tokenGate, onDelete } =
-    useTokenGateModal();
+  const {
+    resetModal,
+    onSubmit,
+    loadingToken,
+    error,
+    flow,
+    setFlow,
+    setDisplayedPage,
+    tokenGate,
+    onDelete,
+    handleTokenGate
+  } = useTokenGateModal();
   const { trigger: reviewTokenGate, data: initialData, isMutating } = useReviewTokenGate();
-  const data = initialData?.[0];
+  const data = initialData?.conditions;
 
   const conditionsData = data ? humanizeConditionsData(data) : null;
 
   useEffect(() => {
     if (tokenGate?.conditions) {
-      reviewTokenGate(tokenGate.conditions, {
+      reviewTokenGate(tokenGate, {
         onError: () => showMessage('Something went wrong. Please review your conditions.', 'error')
       });
     }
@@ -47,6 +57,7 @@ export function TokenGateReview() {
   };
 
   const handleMultipleConditions = (_flow: Flow) => {
+    handleTokenGate({ conditions: { operator: _flow === 'multiple_all' ? 'AND' : 'OR', accessControlConditions: [] } });
     setFlow(_flow);
     setDisplayedPage('home');
   };
@@ -62,7 +73,12 @@ export function TokenGateReview() {
       {conditionsData && (
         <Card variant='outlined' color='default'>
           <CardContent>
-            <ConditionsGroup conditions={conditionsData} onDelete={handleDelete} isLoading={isMutating} />
+            <ConditionsGroup
+              conditions={conditionsData}
+              operator={data?.operator}
+              onDelete={handleDelete}
+              isLoading={isMutating}
+            />
           </CardContent>
         </Card>
       )}

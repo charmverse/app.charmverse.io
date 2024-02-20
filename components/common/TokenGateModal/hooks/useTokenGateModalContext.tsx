@@ -65,7 +65,7 @@ export function TokenGateModalProvider({
         conditions: {
           accessControlConditions: [
             ...(prevState?.conditions.accessControlConditions || []),
-            ...(_tokenGate?.conditions.accessControlConditions || [])
+            ..._tokenGate.conditions.accessControlConditions
           ],
           operator: _tokenGate.conditions.operator || prevState?.conditions.operator || 'OR'
         }

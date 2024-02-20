@@ -30,6 +30,7 @@ async function saveTokenGate(req: NextApiRequest, res: NextApiResponse<void>) {
   const result = await prisma.tokenGate.create({
     data: {
       createdBy: req.session.user.id,
+      resourceId: {},
       ...req.body
     }
   });

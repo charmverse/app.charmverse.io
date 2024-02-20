@@ -25,8 +25,8 @@ export function useUpdateTokenGateRoles(tokenGateId?: string) {
   );
 }
 
-export function useReviewTokenGate() {
-  return usePOST<TokenGateConditions, TokenGateConditions[]>('/api/token-gates/review');
+export function useReviewTokenGate<T = Pick<TokenGate, 'conditions'>>() {
+  return usePOST<T, T>('/api/token-gates/review');
 }
 
 export function useEvaluateTokenGateEligibility() {

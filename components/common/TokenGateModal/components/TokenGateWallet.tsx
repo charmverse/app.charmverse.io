@@ -1,7 +1,6 @@
 import { isValidName } from 'ethers/lib/utils';
 
 import { TextInputField } from 'components/common/form/fields/TextInputField';
-import type { TokenGateConditions } from 'lib/tokenGates/interfaces';
 
 import { useTokenGateModal } from '../hooks/useTokenGateModalContext';
 import { useWalletForm, type FormValues } from '../hooks/useWalletForm';

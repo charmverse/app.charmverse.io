@@ -56,14 +56,15 @@ export async function evaluateTokenGate({ authSig, tokenGates }: { authSig: Auth
   };
 }
 
+// TODO - Remove the ? from the condition.accessControlConditions?.map
 export async function getValidTokenGateId(tokenGate: TokenGate, walletAddress: string) {
   const tokenGatesValid = await Promise.all(
-    tokenGate.conditions.accessControlConditions.map(async (condition) =>
+    tokenGate.conditions.accessControlConditions?.map(async (condition) =>
       validateTokenGateCondition(condition, walletAddress).catch((error) => {
         log.debug(`Error validating token gate condition: ${condition}`, error);
         return false;
       })
-    )
+    ) || []
   );
 
   const allConditionsAreValid = tokenGate.conditions.operator === 'AND' && tokenGatesValid.every((v) => v);

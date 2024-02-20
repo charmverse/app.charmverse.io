@@ -7,7 +7,7 @@ import { isTruthy } from 'lib/utilities/types';
 import { getValidTokenGateId } from './evaluateEligibility';
 import type { TokenGateWithRoles } from './interfaces';
 
-export type TokenGateResult = TokenGateWithRoles & { id: string; verified: boolean; grantedRoles: string[] };
+export type TokenGateResult = TokenGateWithRoles & { grantedRoles: string[]; verified: boolean };
 
 type Props = {
   userId: string;
@@ -61,11 +61,9 @@ export async function verifyTokenGates({
 
         return {
           ...matchingTokenGate,
-          verified: true,
+          verified: !!verified,
           grantedRoles: matchingTokenGate.tokenGateToRoles.map((tgr) => tgr.role.id)
         };
-
-        return null;
       })
     )
   ).filter(isTruthy);

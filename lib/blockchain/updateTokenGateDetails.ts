@@ -16,8 +16,8 @@ export async function updateTokenGateDetails<T extends TokenGate>(tokenGates: T[
 
 async function getConditionMetadata<T extends TokenGate>(gate: T): Promise<T> {
   const gateConditions = gate.conditions;
-  const initialAccessControlConditions = gateConditions.accessControlConditions;
-  const accessControlConditions = await Promise.all(initialAccessControlConditions.map(getAccessControlMetaData));
+  const initialAccessControlConditions = gateConditions?.accessControlConditions || [];
+  const accessControlConditions = await Promise.all(initialAccessControlConditions?.map(getAccessControlMetaData)); // @TODO THE GET WILL ERORR BECAUSE accessControlConditions is undefined
 
   return { ...gate, conditions: { ...gateConditions, accessControlConditions } };
 }
