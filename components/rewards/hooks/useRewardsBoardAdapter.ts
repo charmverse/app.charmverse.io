@@ -39,7 +39,7 @@ import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmiss
 import type { ApplicationMeta, RewardWithUsers } from 'lib/rewards/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 
-type BoardReward = { id?: string } & RewardFieldsProp;
+export type BoardReward = { id?: string } & RewardFieldsProp;
 
 export function useRewardsBoardAdapter() {
   const { space } = useCurrentSpace();

@@ -14,9 +14,9 @@ import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
 import { DatabaseStickyHeader } from 'components/common/PageLayout/components/DatabasePageContent';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
-import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
+import type { BoardReward } from 'components/rewards/hooks/useRewardsBoardAdapter';
 import { mapRewardToCardPage } from 'components/rewards/hooks/useRewardsBoardAdapter';
 import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
@@ -177,7 +177,7 @@ export function ProposalRewardsTable({
       spaceId: space?.id || '',
       reward: {
         // add fields to satisfy PageMeta type. TODO: We dont need all fields on PageMeta for cards
-        applications: [],
+        // applications: [], // dont pass in applications or the expanded arrow icons will appear in tableRow
         assignedSubmitters: [],
         allowMultipleApplications: false,
         allowedSubmitterRoles: [],
@@ -186,7 +186,7 @@ export function ProposalRewardsTable({
         createdAt: new Date(),
         createdBy: '',
         customReward: null,
-        fields: {},
+        fields: { properties: {} },
         dueDate: null,
         id: draftId,
         maxSubmissions: null,
@@ -200,7 +200,7 @@ export function ProposalRewardsTable({
         suggestedBy: null,
         updatedAt: new Date(),
         ...reward
-      },
+      } as BoardReward,
       rewardPage: {
         id: draftId,
         // add fields to satisfy PageMeta type. TODO: We dont need all fields on PageMeta for cards
@@ -257,6 +257,7 @@ export function ProposalRewardsTable({
                 <Box width='100%'>
                   <Table
                     boardType='rewards'
+                    hideCalculations
                     setSelectedPropertyId={() => {}}
                     board={boardBlock!}
                     activeView={defaultView}
@@ -272,7 +273,7 @@ export function ProposalRewardsTable({
                     cardIdToFocusOnRender=''
                     addCard={async () => {}}
                     onCardClicked={() => {}}
-                    onDeleteCard={() => Promise.resolve()}
+                    onDeleteCard={async (cardId) => onDelete(cardId)}
                   />
                 </Box>
               </Stack>
