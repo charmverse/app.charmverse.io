@@ -9,7 +9,16 @@ import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { TokenGate } from 'lib/tokenGates/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 
-export type DisplayedPage = 'tokens' | 'collectables' | 'home' | 'review' | 'wallet' | 'dao' | 'unlock' | 'hypersub';
+export type DisplayedPage =
+  | 'tokens'
+  | 'collectables'
+  | 'home'
+  | 'review'
+  | 'wallet'
+  | 'dao'
+  | 'unlock'
+  | 'hypersub'
+  | 'gitcoin';
 export type Flow = 'single' | 'multiple_all' | 'multiple_one';
 
 type IContext = {

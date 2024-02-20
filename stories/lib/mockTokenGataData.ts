@@ -5,199 +5,161 @@ import { createMockTokenGate } from 'testing/mocks/tokenGate';
 import { spaces as _spaces, spaceRoles } from '../lib/mockData';
 
 const walletAddress = '0x1bd0d6edb387114b2fdf20d683366fa9f94a07f4';
-const ownsWalletCondition = [
+const ownsWalletCondition: AccessControlCondition[] = [
   {
-    chain: 'ethereum',
-    method: '',
-    parameters: [':userAddress'],
-    conditionType: 'evm' as const,
+    chain: 1,
+    method: 'balanceOf',
+    tokenIds: [walletAddress],
+    type: 'Wallet',
     contractAddress: '',
-    returnValueTest: {
-      value: walletAddress,
-      comparator: '='
-    },
-    standardContractType: '',
+    quantity: '1',
+    condition: 'evm',
     image: '/images/cryptoLogos/ethereum-eth-logo.svg'
   }
 ];
 
-const ownedEVMTokenCondition = [
+const ownedEVMTokenCondition: AccessControlCondition[] = [
   {
-    chain: 'optimism',
-    method: 'eth_getBalance',
-    parameters: [':userAddress', 'latest'],
-    conditionType: 'evm' as const,
+    chain: 10,
+    method: 'getBalance',
+    tokenIds: [],
+    type: 'ERC20',
+    condition: 'evm',
     contractAddress: '',
-    returnValueTest: {
-      value: '1000000000000000000',
-      comparator: '>='
-    },
-    standardContractType: '',
+    quantity: '1000000000000000000',
+    name: 'Optimism',
     image: '/images/cryptoLogos/optimism.svg'
   }
 ];
 
-const ownedTokenSupportedBlockchain = [
+const ownedTokenSupportedBlockchain: AccessControlCondition[] = [
   {
-    chain: 'bsc',
-    method: 'eth_getBalance',
-    parameters: [':userAddress', 'latest'],
-    conditionType: 'evm' as const,
+    chain: 56,
+    method: 'getBalance',
+    tokenIds: [],
+    condition: 'evm',
     contractAddress: '',
-    returnValueTest: {
-      value: '12000000000000000000',
-      comparator: '>='
-    },
-    standardContractType: '',
+    quantity: '12000000000000000000',
+    type: 'ERC20',
     image: '/images/cryptoLogos/binance-coin-bnb-logo.svg'
   }
 ];
 
-const ownedEth = [
+const ownedEth: AccessControlCondition[] = [
   {
-    chain: 'ethereum',
-    method: 'eth_getBalance',
-    parameters: [':userAddress', 'latest'],
-    conditionType: 'evm' as const,
+    chain: 1,
+    method: 'getBalance',
+    tokenIds: [],
+    condition: 'evm',
     contractAddress: '',
-    returnValueTest: {
-      value: '100000000000',
-      comparator: '>='
-    },
-    standardContractType: '',
+    quantity: '100000000000',
+    type: 'ERC20',
     image: '/images/cryptoLogos/ethereum-eth-logo.svg'
   }
 ];
 
-const ownedCustomToken = [
+const ownedCustomToken: AccessControlCondition[] = [
   {
-    chain: 'ethereum',
-    method: 'balanceOf',
-    parameters: [':userAddress'],
-    conditionType: 'evm' as const,
+    chain: 1,
+    method: 'getBalance',
+    tokenIds: [],
+    condition: 'evm',
     contractAddress: '0x6982508145454Ce325dDbE47a25d4ec3d2311933',
-    returnValueTest: {
-      value: '12000000000000000000',
-      comparator: '>='
-    },
-    standardContractType: 'ERC20',
+    quantity: '12000000000000000000',
+    type: 'ERC20',
     name: 'Pepe',
     image: 'https://static.alchemyapi.io/images/assets/24478.png'
   }
 ];
 
-const ownsSpecificPoap = [
+const ownsSpecificPoap: AccessControlCondition[] = [
   {
-    chain: 'xdai',
-    method: 'tokenURI',
-    parameters: [],
-    conditionType: 'evm' as const,
+    chain: 100,
+    method: 'eventName',
+    tokenIds: ['ETHDenver'],
+    condition: 'evm' as const,
     contractAddress: '0x22C1f6050E56d2876009903609a2cC3fEf83B415',
-    returnValueTest: {
-      value: 'ETHDenver',
-      comparator: 'contains'
-    },
-    standardContractType: 'POAP',
+    quantity: '1',
+    type: 'POAP',
     image: '/images/cryptoLogos/gnosis-logo.svg'
   },
   {
-    operator: 'or'
-  },
-  {
-    chain: 'ethereum',
-    method: 'tokenURI',
-    parameters: [],
-    conditionType: 'evm' as const,
+    chain: 1,
+    method: 'eventName',
+    tokenIds: ['ETHDenver'],
+    condition: 'evm' as const,
     contractAddress: '0x22C1f6050E56d2876009903609a2cC3fEf83B415',
-    returnValueTest: {
-      value: 'ETHDenver',
-      comparator: 'contains'
-    },
-    standardContractType: 'POAP',
-    image: '/images/cryptoLogos/ethereum-eth-logo.svg'
+    quantity: '1',
+    type: 'POAP',
+    image: '/images/cryptoLogos/gnosis-logo.svg'
   }
 ];
 
-const ownsAnyPoap = [
+const ownsAnyPoap: AccessControlCondition[] = [
   {
-    chain: 'ethereum',
+    chain: 1,
     method: 'balanceOf',
-    parameters: [],
-    conditionType: 'evm' as const,
+    tokenIds: [],
+    condition: 'evm',
     contractAddress: '0x22C1f6050E56d2876009903609a2cC3fEf83B415',
-    returnValueTest: {
-      value: '0',
-      comparator: '>'
-    },
-    standardContractType: 'ERC721',
+    quantity: '1',
+    type: 'ERC721',
     image: '/images/cryptoLogos/ethereum-eth-logo.svg'
   }
 ];
 
-const daoMember = [
+const daoMember: AccessControlCondition[] = [
   {
-    chain: 'ethereum',
+    chain: 1,
     method: 'members',
-    parameters: [':userAddress'],
-    conditionType: 'evm' as const,
+    tokenIds: [],
+    condition: 'evm',
     contractAddress: '0x38064F40B20347d58b326E767791A6f79cdEddCe',
-    returnValueTest: {
-      value: 'true',
-      comparator: '='
-    },
-    standardContractType: 'MolochDAOv2.1',
+    quantity: '1',
+    type: 'MolochDAOv2.1',
     image: '/images/cryptoLogos/ethereum-eth-logo.svg'
   }
 ];
 
-const nftCollectionOwner = [
+const nftCollectionOwner: AccessControlCondition[] = [
   {
-    chain: 'optimism',
+    chain: 10,
     method: 'balanceOf',
-    parameters: [':userAddress'],
-    conditionType: 'evm' as const,
+    tokenIds: [],
+    condition: 'evm',
     contractAddress: '0xfd22bfe1bc51e21fd5e212680e22fa2503fee6c8',
-    returnValueTest: {
-      value: '1',
-      comparator: '>='
-    },
-    standardContractType: 'ERC721',
+    quantity: '1',
+    type: 'ERC721',
     name: 'Charmed & Optimistic',
     image: 'https://nft-cdn.alchemy.com/opt-mainnet/15fbbfc26e8d7d51b9b7031faff07333'
   }
 ];
 
-const specificNftOwner = [
+const specificNftOwner: AccessControlCondition[] = [
   {
-    chain: 'optimism',
+    chain: 10,
     method: 'ownerOf',
-    parameters: ['71'],
-    conditionType: 'evm' as const,
+    tokenIds: ['71'],
+    condition: 'evm',
     contractAddress: '0xfd22bfe1bc51e21fd5e212680e22fa2503fee6c8',
-    returnValueTest: {
-      value: ':userAddress',
-      comparator: '='
-    },
-    standardContractType: 'ERC721',
+    quantity: '1',
+    type: 'ERC721',
     name: 'Charmed & Optimistic 71',
     image: 'https://nft-cdn.alchemy.com/opt-mainnet/5bad9b012e2980c9880dbce2e5642167'
   }
 ];
 
-const multipleErc = [
+const multipleErc: AccessControlCondition[] = [
   {
-    chain: 'ethereum',
+    chain: 1,
     method: 'balanceOf',
-    parameters: [':userAddress', '72'],
-    conditionType: 'evm' as const,
+    tokenIds: ['72'],
+    condition: 'evm',
     contractAddress: '0x6982508145454Ce325dDbE47a25d4ec3d2311933',
-    returnValueTest: {
-      value: '1',
-      comparator: '>='
-    },
-    standardContractType: 'ERC1155',
-    name: 'Pepe',
-    image: 'https://static.alchemyapi.io/images/assets/24478.png'
+    quantity: '1',
+    type: 'ERC1155',
+    name: 'Charmed & Optimistic 71',
+    image: 'https://nft-cdn.alchemy.com/opt-mainnet/5bad9b012e2980c9880dbce2e5642167'
   }
 ];
 
@@ -223,7 +185,6 @@ export const mockTokenGateResult: TokenGateEvaluationResult = {
 
 function mockTokenGate(gate: AccessControlCondition[]) {
   return createMockTokenGate({
-    type: 'lit',
     conditions: {
       accessControlConditions: gate
     },

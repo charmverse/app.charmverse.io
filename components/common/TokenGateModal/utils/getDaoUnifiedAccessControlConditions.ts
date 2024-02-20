@@ -3,10 +3,22 @@ import type { AccessControlCondition } from 'lib/tokenGates/interfaces';
 import type { FormValues } from '../hooks/useDaoForm';
 
 export function getDaoUnifiedAccessControlConditions(values: FormValues): AccessControlCondition[] | undefined {
-  const { chain, contract, check } = values;
+  const { chain = '1', contract = '', check, guild = '' } = values;
   const chainId = Number(chain);
 
-  if (check === 'moloch') {
+  if (check === 'guild') {
+    return [
+      {
+        condition: 'evm',
+        contractAddress: '',
+        type: 'Guildxyz',
+        chain: 1,
+        method: 'members',
+        tokenIds: [guild],
+        quantity: '1'
+      }
+    ];
+  } else if (check === 'moloch') {
     return [
       {
         condition: 'evm',

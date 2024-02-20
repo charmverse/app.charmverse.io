@@ -23,7 +23,6 @@ export function TokenGateDao() {
     reset
   } = useDaoForm();
   const check = watch('check');
-  const chain = watch('chain');
 
   const { setDisplayedPage, handleTokenGate } = useTokenGateModal();
 
@@ -59,20 +58,32 @@ export function TokenGateDao() {
           ))}
         </Select>
       </FieldWrapper>
-      <TokenGateBlockchainSelect
-        error={!!errors.chain?.message}
-        helperMessage={errors.chain?.message}
-        chains={chains}
-        {...register('chain', {
-          deps: ['check']
-        })}
-      />
-      <TextInputField
-        label='DAO Contract Address'
-        error={errors.contract?.message}
-        helperText={errors.contract?.message}
-        {...register('contract')}
-      />
+      {check === 'guild' ? (
+        <TextInputField
+          label='Guild Id or Url'
+          error={errors.guild?.message}
+          helperText={errors.guild?.message}
+          {...register('guild')}
+        />
+      ) : (
+        <>
+          <TokenGateBlockchainSelect
+            error={!!errors.chain?.message}
+            helperMessage={errors.chain?.message}
+            chains={chains}
+            {...register('chain', {
+              deps: ['check']
+            })}
+          />
+          <TextInputField
+            label='DAO Contract Address'
+            error={errors.contract?.message}
+            helperText={errors.contract?.message}
+            {...register('contract')}
+          />
+        </>
+      )}
+
       <TokenGateFooter onSubmit={onSubmit} onCancel={onCancel} isValid={isValid} />
     </>
   );
