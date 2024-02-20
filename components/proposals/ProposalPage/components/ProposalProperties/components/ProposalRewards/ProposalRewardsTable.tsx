@@ -1,32 +1,25 @@
 import type { ProposalReviewer } from '@charmverse/core/prisma';
-import { Delete, Edit, Add } from '@mui/icons-material';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import { Box, Grid, Hidden, IconButton, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, Grid, Stack, Typography } from '@mui/material';
 import { uniqBy } from 'lodash';
 import { useState } from 'react';
 import { v4 } from 'uuid';
 
-import { SelectPreviewContainer } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
-import TableHeader from 'components/common/BoardEditor/focalboard/src/components/table/tableHeader';
-import TableRow from 'components/common/BoardEditor/focalboard/src/components/table/tableRow';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
 import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
-import { PageIcon } from 'components/common/PageIcon';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
-import { RewardAmount } from 'components/rewards/components/RewardStatusBadge';
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
+import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
+import { RewardsBoardProvider } from 'components/rewards/hooks/useRewardsBoardAndBlocks';
 import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import { useCharmRouter } from 'hooks/useCharmRouter';
-import { useRewardsBoard } from 'hooks/useRewardsBoard';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { ProposalPendingReward } from 'lib/proposal/interface';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 import type { RewardReviewer } from 'lib/rewards/interfaces';
@@ -46,7 +39,6 @@ type Props = {
   variant?: 'solid_button' | 'card_property'; // solid_button is used for form proposals
   isProposalTemplate?: boolean;
 };
-
 type RewardRow = {
   id: string;
   title: string;
@@ -68,7 +60,6 @@ export function ProposalRewardsTable({
   isProposalTemplate
 }: Props) {
   const { defaultView, boardBlock, isLoading } = useRewardsBoard();
-  useRewardsNavigation(rewardQueryKey);
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
   const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, isSavingReward } = useNewReward();
   const [currentPendingId, setCurrentPendingId] = useState<null | string>(null);
@@ -82,7 +73,10 @@ export function ProposalRewardsTable({
     navigateToSpacePath,
     router: { query }
   } = useCharmRouter();
-  const rewards = rewardIds?.map((rId) => allRewards?.find((r) => r.id === rId)).filter(isTruthy) || [];
+
+  useRewardsNavigation(rewardQueryKey);
+
+  const publishedRewards = rewardIds?.map((rId) => allRewards?.find((r) => r.id === rId)).filter(isTruthy) || [];
   const canCreatePendingRewards = !readOnly && !rewardIds?.length;
 
   function closeDialog() {
@@ -136,23 +130,29 @@ export function ProposalRewardsTable({
     setCurrentPendingId(v4());
   }
 
-  function showRewardCard(id: string) {
-    // setRewardValues(reward);
-    // openNewPage(page || undefined);
-    // setCurrentPendingId(draftId);
+  function showRewardCard(id: string | null) {
+    const isPublished = publishedRewards.some((r) => r.id === id);
+    if (id && isPublished) {
+      openPublishedReward(id);
+    } else {
+      const pending = pendingRewards?.find((r) => r.draftId === id);
+      if (pending) {
+        const page = getRewardPage(id);
+        setRewardValues(pending.reward);
+        openNewPage(page || undefined);
+        setCurrentPendingId(id);
+      }
+    }
   }
 
-  function openReward(rewardId: string | null) {
-    if (!rewardId) return;
+  function openPublishedReward(pageId: string) {
+    // const modalView = !!query.id;
 
-    const modalView = !!query.id;
+    // if (!modalView) {
+    //   navigateToSpacePath(`/${pageId}`);
+    //   return;
+    // }
 
-    if (!modalView) {
-      navigateToSpacePath(`/${getRewardPage(rewardId)?.path || ''}`);
-      return;
-    }
-
-    const pageId = getRewardPage(rewardId)?.id || rewardId;
     updateURLQuery({ [rewardQueryKey]: pageId });
   }
 
@@ -172,7 +172,7 @@ export function ProposalRewardsTable({
       });
     }
   }
-  const headers: IPropertyTemplate[] = [];
+
   const rows: RewardRow[] =
     pendingRewards?.map(({ reward, page, draftId }) => {
       return {

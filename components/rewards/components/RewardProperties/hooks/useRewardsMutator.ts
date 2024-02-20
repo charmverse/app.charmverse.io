@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 
-import { RewardsMutator } from 'components/rewards/components/RewardProperties/rewardsMutator';
-import { useRewardBlocks } from 'hooks/useRewardBlocks';
+import { useRewardBlocks } from 'components/rewards/hooks/useRewardBlocks';
 import type { RewardFieldsProp, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
+
+import { RewardsMutator } from '../rewardsMutator';
 
 type Props = {
   reward: { spaceId?: string; id?: string } & RewardFieldsProp;

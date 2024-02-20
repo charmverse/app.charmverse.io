@@ -243,31 +243,30 @@ function CardDetailProperties(props: Props) {
   }
 
   const propertyTypes = useMemo(
-    () =>
-      activeView && (
-        <PropertyTypes
-          boardType={props.boardType}
-          isMobile={isSmallScreen}
-          onClick={async ({ type, relationData, name }) => {
-            const template: IPropertyTemplate = {
-              id: Utils.createGuid(IDType.BlockID),
-              name: name ?? typeDisplayName(intl, type),
-              type,
-              options: [],
-              relationData
-            };
-            const templateId = await mutator.insertPropertyTemplate(board, activeView, -1, template);
-            if (relationData?.showOnRelatedBoard) {
-              syncRelationProperty({
-                boardId: board.id,
-                templateId
-              });
-            }
-            setNewTemplateId(templateId);
-            addPropertyPopupState.close();
-          }}
-        />
-      ),
+    () => (
+      <PropertyTypes
+        boardType={props.boardType}
+        isMobile={isSmallScreen}
+        onClick={async ({ type, relationData, name }) => {
+          const template: IPropertyTemplate = {
+            id: Utils.createGuid(IDType.BlockID),
+            name: name ?? typeDisplayName(intl, type),
+            type,
+            options: [],
+            relationData
+          };
+          const templateId = await mutator.insertPropertyTemplate(board, activeView, -1, template);
+          if (relationData?.showOnRelatedBoard) {
+            syncRelationProperty({
+              boardId: board.id,
+              templateId
+            });
+          }
+          setNewTemplateId(templateId);
+          addPropertyPopupState.close();
+        }}
+      />
+    ),
     [mutator, props.boardType, board, activeView, isSmallScreen]
   );
 
@@ -322,7 +321,7 @@ function CardDetailProperties(props: Props) {
         />
       )}
 
-      {!props.readOnly && !disableEditPropertyOption && activeView && (
+      {!props.readOnly && !disableEditPropertyOption && (
         <>
           <div className='octo-propertyname add-property'>
             <Button {...bindTrigger(addPropertyPopupState)} dataTest='add-custom-property'>

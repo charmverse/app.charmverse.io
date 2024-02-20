@@ -1,7 +1,7 @@
 /* eslint-disable default-param-last */
 import { Mutator } from 'components/common/BoardEditor/focalboard/src/mutator';
 import { IDType, Utils } from 'components/common/BoardEditor/focalboard/src/utils';
-import type { RewardBlocksContextType } from 'hooks/useRewardBlocks';
+import type { RewardBlocksContextType } from 'components/rewards/hooks/useRewardBlocks';
 import type { Block } from 'lib/focalboard/block';
 import type {
   Board,

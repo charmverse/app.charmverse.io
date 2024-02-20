@@ -13,7 +13,7 @@ export type RewardBoardFields = {
 };
 
 // Properties block with typed fields
-export type RewardsBoardBlock = Omit<RewardBlock, 'fields' | 'type'> & {
+export type RewardsBoardBlock = RewardBlock & {
   fields: RewardBoardFields & BoardFields;
   type: 'board';
 };

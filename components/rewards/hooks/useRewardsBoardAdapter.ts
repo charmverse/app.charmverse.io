@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 
 import { sortCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
+import { useRewardBlocks } from 'components/rewards/hooks/useRewardBlocks';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmRouter } from 'hooks/useCharmRouter';
@@ -10,7 +11,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
-import { useRewardBlocks } from 'hooks/useRewardBlocks';
 import type { BlockTypes } from 'lib/focalboard/block';
 import type { BoardView, IViewType } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
@@ -40,10 +40,9 @@ import { getDefaultView } from 'lib/rewards/blocks/views';
 import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmissionSlots';
 import type { ApplicationMeta, RewardWithUsers } from 'lib/rewards/interfaces';
 
-export type BoardReward = { spaceId?: string; id?: string } & RewardFieldsProp;
+type BoardReward = { spaceId?: string; id?: string } & RewardFieldsProp;
 
 export function useRewardsBoardAdapter() {
-  const [boardReward, setBoardReward] = useState<BoardReward | null>(null);
   const { space } = useCurrentSpace();
   const { membersRecord } = useMembers();
   const { rewards } = useRewards();
@@ -55,7 +54,6 @@ export function useRewardsBoardAdapter() {
   const {
     router: { query }
   } = useCharmRouter();
-  const rewardPage = getRewardPage(boardReward?.id);
 
   const views = useMemo(() => {
     return (board?.fields.viewIds || [])
@@ -150,33 +148,20 @@ export function useRewardsBoardAdapter() {
     space?.id
   ]);
 
-  // card from current reward
-  const card = mapRewardToCardPage({
-    reward: boardReward,
-    rewardPage,
-    spaceId: space?.id,
-    members: membersRecord,
-    pages
-  }).card;
-
   // each reward with fields reflects a card
   const cards: Card[] = cardPages.map((cp) => cp.card) || [];
 
   return {
     board,
-    card,
     cards,
     cardPages,
     activeView,
-    views,
-    rewardPage,
-    boardReward,
-    setBoardReward
+    views
   };
 }
 
 // build mock card from reward and page data
-function mapRewardToCardPage({
+export function mapRewardToCardPage({
   reward,
   rewardPage,
   spaceId,
