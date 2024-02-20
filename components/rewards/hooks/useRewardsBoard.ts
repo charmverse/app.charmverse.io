@@ -20,10 +20,6 @@ export function useRewardsBoard() {
   const { trigger: updateRewardBlocks } = useUpdateRewardBlocks(space?.id || '');
   const { showError } = useSnackbar();
 
-  const defaultView = useMemo(() => {
-    return getDefaultView({ spaceId: space?.id });
-  }, [space?.id]);
-
   const boardBlock = useMemo(() => {
     const block = boardBlocks?.find((b): b is RewardsBoardBlock => b.type === 'board');
     if (block && !block.fields.cardProperties) {
@@ -34,6 +30,13 @@ export function useRewardsBoard() {
     }) as RewardsBoardFFBlock;
     return board;
   }, [boardBlocks]);
+
+  const defaultView = useMemo(() => {
+    const view = getDefaultView({ spaceId: space?.id });
+    // all properties are visible by default
+    view.fields.visiblePropertyIds = boardBlock.fields.cardProperties.map((p) => p.id);
+    return view;
+  }, [space?.id, boardBlock]);
 
   const createProperty = useCallback(
     async (propertyTemplate: IPropertyTemplate) => {
