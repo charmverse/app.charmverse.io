@@ -272,7 +272,7 @@
     "uint8arrays": "^5.0.1",
     "undici": "^5.28.3",
     "unique-names-generator": "^4.7.1",
-    "usehooks-ts": "^2.6.0",
+    "usehooks-ts": "^2.14.0",
     "uuid": "^8.3.2",
     "viem": "^1.18.3",
     "wagmi": "^1.4.5",

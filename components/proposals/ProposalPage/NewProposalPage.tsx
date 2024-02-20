@@ -5,7 +5,7 @@ import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { Box, Divider, useMediaQuery, Stack, Typography } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
-import { useElementSize } from 'usehooks-ts';
+import { useResizeObserver } from 'usehooks-ts';
 import { v4 as uuid } from 'uuid';
 
 import { useForumPost } from 'charmClient/hooks/forum';
@@ -108,7 +108,8 @@ export function NewProposalPage({
   });
   const [submittedDraft, setSubmittedDraft] = useState<boolean>(false);
 
-  const [, { width: containerWidth }] = useElementSize();
+  const containerWidthRef = useRef<HTMLDivElement>(null);
+  const { width: containerWidth = 0 } = useResizeObserver({ ref: containerWidthRef });
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const isAdmin = useIsAdmin();
 
@@ -369,6 +370,7 @@ export function NewProposalPage({
               overflow='auto'
               flexGrow={1}
             >
+              <Box ref={containerWidthRef} width='100%' />
               <PageTemplateBanner pageType={formInputs.type} isNewPage />
               {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
               <StyledContainer data-test='page-charmeditor' top={defaultPageTop} fullWidth={isSmallScreen}>
@@ -485,6 +487,7 @@ export function NewProposalPage({
                   {isStructured && formInputs.fields?.enableRewards && (
                     <Box mb={10}>
                       <ProposalRewardsTable
+                        containerWidth={containerWidth}
                         pendingRewards={pendingRewards}
                         requiredTemplateId={formInputs.fields?.rewardsTemplateId}
                         reviewers={formInputs.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat()}

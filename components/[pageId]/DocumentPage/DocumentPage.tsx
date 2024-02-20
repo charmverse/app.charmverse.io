@@ -1,10 +1,10 @@
 import type { Page } from '@charmverse/core/prisma';
 import type { Theme } from '@mui/material';
-import { Box, Tab, Tabs, Typography, useMediaQuery } from '@mui/material';
+import { Box, Tab, Tabs, useMediaQuery } from '@mui/material';
 import dynamic from 'next/dynamic';
 import type { EditorState } from 'prosemirror-state';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
-import { useElementSize } from 'usehooks-ts';
+import { useResizeObserver } from 'usehooks-ts';
 
 import { useGetReward } from 'charmClient/hooks/rewards';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
@@ -81,14 +81,12 @@ function DocumentPageComponent({
 }: DocumentPageProps) {
   const { user } = useUser();
   const { router } = useCharmRouter();
-  const { getFeatureTitle } = useSpaceFeatures();
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
   const { setView: setCharmEditorView } = useCharmEditorView();
   const [connectionError, setConnectionError] = useState<Error | null>(null);
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const dispatch = useAppDispatch();
   const [currentTab, setCurrentTab] = useState<number>(0);
-  const [containerRef, { width: containerWidth }] = useElementSize();
   const { creatingInlineReward } = useRewards();
   const isMdScreen = useMdScreen();
   const isAdmin = useIsAdmin();
@@ -215,6 +213,8 @@ function DocumentPageComponent({
     }
   }, [printRef, _printRef]);
 
+  const containerWidthRef = useRef<HTMLDivElement>(null);
+  const { width: containerWidth = 0 } = useResizeObserver({ ref: containerWidthRef });
   function focusDocumentEditor() {
     const focusEvent = new CustomEvent(focusEventName);
     // TODO: use a ref passed down instead
@@ -224,7 +224,7 @@ function DocumentPageComponent({
   const proposalAuthors = proposal ? [proposal.createdBy, ...proposal.authors.map((author) => author.userId)] : [];
 
   return (
-    <Box ref={containerRef} id='file-drop-container' display='flex' flexDirection='column' height='100%'>
+    <Box id='file-drop-container' display='flex' flexDirection='column' height='100%'>
       <Box
         ref={printRef}
         className={`document-print-container ${fontClassName} drag-area-container`}
@@ -238,6 +238,8 @@ function DocumentPageComponent({
           parentElementId: 'file-drop-container'
         })}
       >
+        {/** we need a reference for width to handle inline dbs */}
+        <Box ref={containerWidthRef} width='100%' />
         {/* show either deleted banner or archived, but not both */}
         {page.deletedAt ? (
           <AlertContainer>
@@ -452,6 +454,7 @@ function DocumentPageComponent({
                 (!!proposal.fields.pendingRewards?.length || !readOnly) && (
                   <Box mb={10}>
                     <ProposalRewardsTable
+                      containerWidth={containerWidth}
                       pendingRewards={proposal.fields.pendingRewards || []}
                       requiredTemplateId={proposal.fields.rewardsTemplateId}
                       reviewers={proposal.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat()}

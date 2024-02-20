@@ -24,7 +24,7 @@ const CenterPanel = dynamic(() => import('components/common/BoardEditor/focalboa
   ssr: false
 });
 
-const StylesContainer = styled.div<{ containerWidth?: number }>`
+export const StylesContainer = styled.div<{ containerWidth?: number }>`
   .BoardComponent {
     overflow: visible;
   }
@@ -33,13 +33,11 @@ const StylesContainer = styled.div<{ containerWidth?: number }>`
     padding: 0;
   }
 
-  .container-container {
+  .BoardComponent > .container-container {
     min-width: unset;
     overflow-x: auto;
     padding: 0;
     // offset padding around document
-    margin: 0 -24px;
-    padding: 0 24px;
     ${({ theme }) => theme.breakpoints.up('md')} {
       --side-margin: ${({ containerWidth }) => `calc((${containerWidth}px - 100%) / 2)`};
       margin: 0 calc(-1 * var(--side-margin));

@@ -1,8 +1,9 @@
 import { Box, Paper } from '@mui/material';
 import { rest } from 'msw';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { withCharmEditorProviders } from 'stories/CharmEditor/renderEditor';
 import { GlobalContext } from 'stories/lib/GlobalContext';
+import { useResizeObserver } from 'usehooks-ts';
 
 import { ProposalRewardsTable } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import { RewardBlocksProvider } from 'components/rewards/hooks/useRewardBlocks';
@@ -23,6 +24,8 @@ export default {
 };
 
 export function ProposalRewards() {
+  const containerWidthRef = useRef<HTMLDivElement>(null);
+  const { width: containerWidth = 0 } = useResizeObserver({ ref: containerWidthRef });
   const [pendingRewards, setPendingRewards] = useState<ProposalPendingReward[]>([]);
   const page = createMockPage({
     title: 'A simple proposition',
@@ -35,8 +38,9 @@ export function ProposalRewards() {
     <GlobalContext>
       <RewardBlocksProvider>
         <RewardsBoardProvider>
-          <Paper sx={{ p: 4, maxWidth: 800, overflowY: 'auto' }}>
+          <Paper ref={containerWidthRef} sx={{ p: 4, maxWidth: 800, overflowY: 'auto' }}>
             <ProposalRewardsTable
+              containerWidth={containerWidth}
               pendingRewards={pendingRewards}
               reviewers={[]}
               assignedSubmitters={[]}

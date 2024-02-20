@@ -6,10 +6,12 @@ import { v4 } from 'uuid';
 
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
 import { Button } from 'components/common/Button';
+import { StylesContainer } from 'components/common/CharmEditor/components/inlineDatabase/components/InlineDatabase';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
 import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
+import { DatabaseStickyHeader } from 'components/common/PageLayout/components/DatabasePageContent';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
@@ -29,6 +31,7 @@ import { isTruthy } from 'lib/utilities/types';
 import { AttachRewardButton, getDisabledTooltip } from './AttachRewardButton';
 
 type Props = {
+  containerWidth: number;
   pendingRewards: ProposalPendingReward[] | undefined;
   rewardIds: string[];
   readOnly?: boolean;
@@ -44,6 +47,7 @@ type Props = {
 const rewardQueryKey = 'rewardId';
 
 export function ProposalRewardsTable({
+  containerWidth,
   pendingRewards,
   readOnly,
   onSave,
@@ -232,47 +236,51 @@ export function ProposalRewardsTable({
 
   return (
     <>
-      <Box display='flex' justifyContent='space-between' alignItems='center'>
-        <Box my={1}>
-          <Typography variant='h5'>{getFeatureTitle('Rewards')}</Typography>
-        </Box>
-        <div>
-          <AttachRewardButton createNewReward={createNewReward} variant={variant} />
-        </div>
-      </Box>
-      {loadingData ? (
-        <Grid item xs={12} sx={{ mt: 12 }}>
-          <LoadingComponent height={500} isLoading size={50} />
-        </Grid>
-      ) : (
-        <Box sx={{ overflowX: 'auto' }}>
-          <Box className='container-container'>
-            <Stack>
-              <Box width='100%'>
-                <Table
-                  boardType='rewards'
-                  setSelectedPropertyId={() => {}}
-                  board={boardBlock!}
-                  activeView={defaultView}
-                  cardPages={cardPages}
-                  views={[]}
-                  visibleGroups={[]}
-                  selectedCardIds={[]}
-                  readOnly={true}
-                  disableAddingCards
-                  showCard={showRewardCard}
-                  readOnlyTitle
-                  readOnlyRows
-                  cardIdToFocusOnRender=''
-                  addCard={async () => {}}
-                  onCardClicked={() => {}}
-                  onDeleteCard={() => Promise.resolve()}
-                />
+      <StylesContainer className='focalboard-body' containerWidth={containerWidth}>
+        <div className='BoardComponent drag-area-container'>
+          <DatabaseStickyHeader>
+            <Box display='flex' justifyContent='space-between' alignItems='center'>
+              <Box my={1}>
+                <Typography variant='h5'>{getFeatureTitle('Rewards')}</Typography>
               </Box>
-            </Stack>
-          </Box>
-        </Box>
-      )}
+              <div>
+                <AttachRewardButton createNewReward={createNewReward} variant={variant} />
+              </div>
+            </Box>
+          </DatabaseStickyHeader>
+          {loadingData ? (
+            <Grid item xs={12} sx={{ mt: 12 }}>
+              <LoadingComponent height={500} isLoading size={50} />
+            </Grid>
+          ) : (
+            <Box className='container-container'>
+              <Stack>
+                <Box width='100%'>
+                  <Table
+                    boardType='rewards'
+                    setSelectedPropertyId={() => {}}
+                    board={boardBlock!}
+                    activeView={defaultView}
+                    cardPages={cardPages}
+                    views={[]}
+                    visibleGroups={[]}
+                    selectedCardIds={[]}
+                    readOnly={true}
+                    disableAddingCards
+                    showCard={showRewardCard}
+                    readOnlyTitle
+                    readOnlyRows
+                    cardIdToFocusOnRender=''
+                    addCard={async () => {}}
+                    onCardClicked={() => {}}
+                    onDeleteCard={() => Promise.resolve()}
+                  />
+                </Box>
+              </Stack>
+            </Box>
+          )}
+        </div>
+      </StylesContainer>
       <NewPageDialog
         contentUpdated={!readOnly && (contentUpdated || isDirty)}
         disabledTooltip={getDisabledTooltip({
