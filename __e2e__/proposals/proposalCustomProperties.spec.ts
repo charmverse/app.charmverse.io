@@ -6,11 +6,10 @@ import { expect, test } from '__e2e__/testWithFixtures';
 import { v4 as uuid } from 'uuid';
 
 import type { ProposalFields } from 'lib/proposal/interface';
-import { prettyPrint } from 'lib/utilities/strings';
 
 import { generateUser, generateUserAndSpace, loginBrowserUser } from '../utils/mocks';
 
-test.describe.serial('Proposal Evaluation', () => {
+test.describe.serial('Proposal custom properties', () => {
   let space: Space;
   let admin: User;
   let member: User;
@@ -165,7 +164,7 @@ test.describe.serial('Proposal Evaluation', () => {
     await expect(textInputOnFirstReload).toBeVisible();
 
     // Ensure the value loaded
-    await expect(textInputOnFirstReload).toHaveText(settingsToTest.testTextValue);
+    await expect(textInputOnFirstReload).toHaveValue(settingsToTest.testTextValue);
 
     // Set the second value
     await textInputOnFirstReload.fill(settingsToTest.secondTextValue);
@@ -177,7 +176,7 @@ test.describe.serial('Proposal Evaluation', () => {
 
     const textInputOnSecondLoad = databasePage.getCardDetailsTextInput();
 
-    await expect(textInputOnSecondLoad).toHaveText(settingsToTest.secondTextValue);
+    await expect(textInputOnSecondLoad).toHaveValue(settingsToTest.secondTextValue);
   });
 
   test('A member can set values in their proposal for custom properties created by the admin', async ({
