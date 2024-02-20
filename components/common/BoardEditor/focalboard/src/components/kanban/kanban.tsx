@@ -7,6 +7,8 @@ import type { IntlShape } from 'react-intl';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { KanbanGroupColumn } from 'components/common/BoardEditor/components/kanban/KanbanGroupColumn';
+import { useConfirmationModal } from 'hooks/useConfirmationModal';
+import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
@@ -83,8 +85,8 @@ function Kanban(props: Props) {
   const visiblePropertyTemplates = activeView.fields.visiblePropertyIds
     .map((id) => board.fields.cardProperties.find((t) => t.id === id))
     .filter((i) => isTruthy(i) && i.id !== Constants.titleColumnId) as IPropertyTemplate[];
-
-  const isManualSort = activeView.fields.sortOptions.length === 0;
+  const { showConfirmation } = useConfirmationModal();
+  const localViewSettings = useLocalDbViewSettings(activeView.id);
 
   const propertyNameChanged = useCallback(
     async (option: IPropertyOption, text: string): Promise<void> => {
@@ -132,10 +134,24 @@ function Kanban(props: Props) {
     async (option: IPropertyOption, card?: Card, dstOption?: IPropertyOption) => {
       const { selectedCardIds } = props;
       const optionId = option ? option.id : undefined;
+      const hasSort = activeView.fields.sortOptions?.length !== 0;
 
       let draggedCardIds = selectedCardIds;
       if (card) {
         draggedCardIds = Array.from(new Set(selectedCardIds).add(card.id));
+      }
+
+      if (hasSort) {
+        const { confirmed, cancelled } = await showConfirmation({
+          message: 'Would you like to remove sorting?'
+        });
+
+        if (confirmed && localViewSettings) {
+          localViewSettings.setLocalSort(null);
+          await mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, []);
+        } else if (cancelled) {
+          return;
+        }
       }
 
       if (draggedCardIds.length > 0) {
@@ -158,7 +174,21 @@ function Kanban(props: Props) {
             }
           }
           const newOrder = orderAfterMoveToColumn(draggedCardIds, optionId);
-          awaits.push(mutator.changeViewCardOrder(activeView, newOrder, description));
+          awaits.push(
+            mutator.changeViewCardOrder(
+              hasSort
+                ? {
+                    ...activeView,
+                    fields: {
+                      ...activeView.fields,
+                      sortOptions: []
+                    }
+                  }
+                : activeView,
+              newOrder,
+              description
+            )
+          );
           await Promise.all(awaits);
         });
       } else if (dstOption) {
@@ -201,6 +231,21 @@ function Kanban(props: Props) {
       ) {
         return;
       }
+      const hasSort = activeView.fields.sortOptions?.length !== 0;
+
+      if (hasSort) {
+        const { confirmed, cancelled } = await showConfirmation({
+          message: 'Would you like to remove sorting?'
+        });
+
+        if (confirmed && localViewSettings) {
+          localViewSettings.setLocalSort(null);
+          await mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, []);
+        } else if (cancelled) {
+          return;
+        }
+      }
+
       Utils.log(`onDropToCard: ${dstCard.title}`);
       const { selectedCardIds } = props;
       const optionId = dstCard.fields.properties[groupByProperty.id];
@@ -240,7 +285,22 @@ function Kanban(props: Props) {
             );
           }
         }
-        blockUpdates.push(mutator.changeViewCardOrder(activeView, cardOrder, description, false) as BlockChange);
+        blockUpdates.push(
+          mutator.changeViewCardOrder(
+            hasSort
+              ? {
+                  ...activeView,
+                  fields: {
+                    ...activeView.fields,
+                    sortOptions: []
+                  }
+                }
+              : activeView,
+            cardOrder,
+            description,
+            false
+          ) as BlockChange
+        );
         await mutator.updateBlocks(
           blockUpdates.map((b) => b.newBlock),
           blockUpdates.map((b) => b.block),
@@ -350,7 +410,6 @@ function Kanban(props: Props) {
               key={group.option.id || 'empty'}
               readOnly={props.readOnly}
               onDropToCard={props.disableDnd ? undefined : onDropToCard}
-              isManualSort={isManualSort}
               selectedCardIds={props.selectedCardIds}
               addCard={props.addCard}
               onDropToColumn={onDropToColumn}

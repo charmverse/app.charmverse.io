@@ -32,7 +32,6 @@ type Props = {
   onDrop?: (srcCard: Card, dstCard: Card) => void;
   // eslint-disable-next-line
   showCard: (cardId: string | null) => void;
-  isManualSort: boolean;
   hideLinkedBounty?: boolean;
 };
 
@@ -75,7 +74,7 @@ const KanbanCard = React.memo((props: Props) => {
   );
   const visiblePropertyTemplates = props.visiblePropertyTemplates || [];
   let className = props.isSelected ? 'KanbanCard selected' : 'KanbanCard';
-  if (props.isManualSort && isOver) {
+  if (isOver) {
     className += ' dragover';
   }
 
