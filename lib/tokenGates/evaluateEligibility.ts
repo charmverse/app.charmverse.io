@@ -6,7 +6,7 @@ import type { AuthSig } from 'lib/blockchain/interfaces';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 
-import type { TokenGate, TokenGateWithRoles } from './interfaces';
+import type { TokenGate } from './interfaces';
 import { validateTokenGateCondition } from './validateTokenGateCondition';
 
 export type TokenGateEvaluationAttempt = {
@@ -27,7 +27,6 @@ export async function evaluateTokenGateEligibility({
   authSig,
   spaceIdOrDomain
 }: TokenGateEvaluationAttempt): Promise<TokenGateEvaluationResult> {
-  // @TODO validate authSig
   const tokenGates = await validateSpaceWithTokenGates(spaceIdOrDomain);
   const result = await evaluateTokenGate({ authSig, tokenGates });
 
@@ -56,7 +55,6 @@ export async function evaluateTokenGate({ authSig, tokenGates }: { authSig: Auth
   };
 }
 
-// TODO - Remove the ? from the condition.accessControlConditions?.map
 export async function getValidTokenGateId(tokenGate: TokenGate, walletAddress: string) {
   const tokenGatesValid = await Promise.all(
     tokenGate.conditions.accessControlConditions?.map(async (condition) =>

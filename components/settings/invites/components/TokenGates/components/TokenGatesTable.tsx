@@ -60,7 +60,7 @@ export default function TokenGatesTable({ isAdmin, isLoading, tokenGates, refres
           commit: false,
           spaceId: space?.id || '',
           tokenGateIds: [tokenGate.id],
-          authSig, // @TODO: Token gates - need to see if we need authSig
+          authSig,
           walletAddress: account || ''
         },
         {

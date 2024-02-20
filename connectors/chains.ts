@@ -519,7 +519,7 @@ export const daoChains = RPCList.filter((chain) =>
 
 export const builderDaoChains = RPCList.filter((chain) =>
   ['ethereum', 'base', 'optimism', 'zora'].includes(chain.chainName.toLowerCase())
-); // @TODO Check what to do with ZORA if no Alchemy url for it
+);
 
 export const unlockChains = RPCList.filter((chain) => !!chain.unlockNetwork).sort(sortChainList);
 
