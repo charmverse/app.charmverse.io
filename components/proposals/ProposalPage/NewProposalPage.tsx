@@ -563,6 +563,7 @@ export function NewProposalPage({
                     Save draft
                   </Button>
                   <Button
+                    data-test='publish-new-proposal-button'
                     disabled={Boolean(disabledTooltip) || isCreatingProposal}
                     disabledTooltip={disabledTooltip}
                     onClick={() => saveForm()}
