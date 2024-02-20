@@ -17,6 +17,7 @@ import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import { getRewardErrors } from 'lib/rewards/getRewardErrors';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 
 import { useRewardTemplates } from '../hooks/useRewardTemplates';
@@ -93,19 +94,16 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
     setSelectedTemplate(template);
   }
 
-  let disabledTooltip: string | undefined;
-
   const isTemplate = newPageValues?.type === 'bounty_template';
-  if (!newPageValues?.title) {
-    disabledTooltip = 'Page title is required';
-  } else if (!isTemplate) {
-    // these values are not required for templates
-    if (!rewardValues.reviewers?.length) {
-      disabledTooltip = 'Reviewer is required';
-    } else if (rewardValues.assignedSubmitters && rewardValues.assignedSubmitters.length === 0) {
-      disabledTooltip = 'You need to assign at least one submitter';
+  const errors = getRewardErrors({
+    reward: rewardValues,
+    rewardType: rewardValues.rewardType,
+    page: {
+      title: newPageValues?.title || '',
+      type: newPageValues?.type || 'bounty'
     }
-  }
+  });
+  const disabledTooltip = errors.join(', ');
 
   useEffect(() => {
     if (router.query.new) {

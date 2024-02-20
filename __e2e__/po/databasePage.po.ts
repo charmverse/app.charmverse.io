@@ -134,4 +134,8 @@ export class DatabasePage extends GlobalPage {
   getDatabaseTableCell({ templateId, cardId }: { templateId: string; cardId: string }) {
     return this.page.locator(`data-test=database-card-${cardId}-column-${templateId}`);
   }
+
+  getCardDetailsTextInput() {
+    return this.page.locator('data-test=card-detail-properties').locator('textarea.octo-propertyvalue').first();
+  }
 }

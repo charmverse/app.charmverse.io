@@ -5,7 +5,7 @@
     "defaults"
   ],
   "scripts": {
-    "testgen": "python scripts/make_tests.py",
+    "testgen": "python scripts/testgen/make_tests.py",
     "ceramic:local": "CERAMIC_ENABLE_EXPERIMENTAL_COMPOSE_DB='true' npx ceramic daemon",
     "ceramic:graphql": "npx dotenv -e .env.local --  tsx background/ceramicServer/ceramic-client.ts",
     "build": "NODE_OPTIONS=\"--max_old_space_size=4096\" npx next build && npm run esbuild",
@@ -94,7 +94,7 @@
     "@bangle.dev/utils": "^0.31.6",
     "@beam-australia/react-env": "^3.1.1",
     "@ceramicnetwork/http-client": "^3.2.0",
-    "@charmverse/core": "^0.32.7",
+    "@charmverse/core": "^0.32.8",
     "@column-resizer/core": "^1.0.2",
     "@datadog/browser-logs": "^4.42.2",
     "@datadog/browser-rum": "^4.42.2",

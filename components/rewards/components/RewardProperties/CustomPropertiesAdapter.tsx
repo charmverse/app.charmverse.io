@@ -1,5 +1,4 @@
-import type { PageMeta } from '@charmverse/core/pages';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
@@ -8,14 +7,15 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
-import type { RewardFieldsProp, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
+import type { RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 
 import { mapRewardToCardPage } from '../../hooks/useRewardsBoardAdapter';
+import type { BoardReward } from '../../hooks/useRewardsBoardAdapter';
 
 import { usePropertiesMutator } from './hooks/useRewardsMutator';
 
 type Props = {
-  reward: { spaceId: string; id?: string } & RewardFieldsProp;
+  reward: BoardReward;
   onChange?: (properties: RewardPropertiesField) => void;
   readOnly?: boolean;
 };
@@ -26,7 +26,8 @@ export function CustomPropertiesAdapter({ reward, onChange, readOnly }: Props) {
   const { getRewardPage } = useRewardPage();
   const { membersRecord } = useMembers();
   const { board, cards, activeView, views } = useRewardsBoardAndBlocks();
-  const mutator = usePropertiesMutator({ reward, onChange });
+
+  const mutator = usePropertiesMutator({ onChange });
 
   // card from current reward
   const rewardPage = getRewardPage(reward?.id);

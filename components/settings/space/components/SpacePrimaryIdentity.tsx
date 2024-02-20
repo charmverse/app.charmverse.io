@@ -11,9 +11,10 @@ import type { FormValues } from '../SpaceSettings';
 type Props = {
   disabled?: boolean;
   register: UseFormRegister<FormValues>;
+  primaryIdentity?: IdentityType;
 };
 
-export function SpacePrimaryIdentity({ register, disabled }: Props) {
+export function SpacePrimaryIdentity({ primaryIdentity, register, disabled }: Props) {
   return (
     <>
       <FieldLabel>Primary Identity</FieldLabel>
@@ -24,6 +25,7 @@ export function SpacePrimaryIdentity({ register, disabled }: Props) {
       <Box display='flex' alignItems='center' gap={1}>
         <Select<IdentityType | undefined>
           {...register('primaryMemberIdentity')}
+          value={primaryIdentity}
           displayEmpty
           disabled={disabled}
           renderValue={(selected) => {
