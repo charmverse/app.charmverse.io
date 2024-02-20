@@ -4,7 +4,7 @@ import type { RewardType } from './interfaces';
 
 // TODO: this should be stored on the reward table
 export function getRewardType(
-  reward: Pick<Bounty, 'chainId' | 'customReward' | 'rewardToken' | 'rewardAmount'>
+  reward: Partial<Pick<Bounty, 'chainId' | 'customReward' | 'rewardToken' | 'rewardAmount'>>
 ): RewardType {
   return reward.customReward
     ? 'custom'

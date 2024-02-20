@@ -10,10 +10,10 @@ export function generatePagePathFromPathAndTitle({
   existingPagePath,
   title
 }: {
-  existingPagePath: string;
+  existingPagePath?: string;
   title: string;
 }) {
-  const split = existingPagePath.split('-');
+  const split = (existingPagePath || '').split('-');
   let suffix = split[split.length - 1]?.trim();
 
   if (!suffix || !suffix.match(/^\d{8,}$/)) {

@@ -17,7 +17,7 @@ import { isTruthy } from 'lib/utilities/types';
 import { RewardStatusChip } from './RewardChip';
 
 export interface IRewardBadgeProps {
-  reward: Reward;
+  reward: Partial<Pick<Reward, 'rewardAmount' | 'rewardToken' | 'chainId' | 'customReward' | 'status'>>;
   truncate?: boolean;
   hideStatus?: boolean;
   showEmptyStatus?: boolean;
@@ -52,7 +52,7 @@ export function RewardAmount({
   truncatePrecision = 4,
   typographyProps
 }: {
-  reward: Pick<Reward, 'rewardAmount' | 'rewardToken' | 'chainId' | 'customReward'>;
+  reward: Partial<Pick<Reward, 'rewardAmount' | 'rewardToken' | 'chainId' | 'customReward'>>;
   truncate?: boolean;
   truncatePrecision?: number;
   typographyProps?: TypographyProps;

@@ -32,6 +32,7 @@ export async function createDefaultReward({ spaceId, userId }: { spaceId: string
     chainId: null,
     rewardAmount: null,
     rewardToken: null,
+    rewardType: 'none',
     fields: {
       properties: {
         [REWARDS_APPLICANTS_BLOCK_ID]: [],

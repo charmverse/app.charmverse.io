@@ -20,11 +20,12 @@ import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates'
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalPendingReward } from 'lib/proposal/interface';
+import { getRewardErrors } from 'lib/rewards/getRewardErrors';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 import type { RewardReviewer } from 'lib/rewards/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 
-import { AttachRewardButton, getDisabledTooltip } from './AttachRewardButton';
+import { AttachRewardButton } from './AttachRewardButton';
 
 type Props = {
   pendingRewards: ProposalPendingReward[] | undefined;
@@ -155,6 +156,13 @@ export function ProposalRewards({
       });
     }
   }
+
+  const newRewardErrors = getRewardErrors({
+    page: newPageValues,
+    reward: rewardValues,
+    rewardType: rewardValues.rewardType,
+    isProposalTemplate
+  }).join(', ');
 
   if (rewards.length) {
     return (
@@ -288,12 +296,7 @@ export function ProposalRewards({
 
       <NewPageDialog
         contentUpdated={!readOnly && (contentUpdated || isDirty)}
-        disabledTooltip={getDisabledTooltip({
-          readOnly,
-          newPageValues,
-          rewardValues,
-          isProposalTemplate: !!isProposalTemplate
-        })}
+        disabledTooltip={newRewardErrors}
         isOpen={!!newPageValues}
         onClose={closeDialog}
         onSave={saveForm}

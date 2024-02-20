@@ -13,26 +13,29 @@ import { UserAndRoleSelect } from 'components/common/BoardEditor/components/prop
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import Checkbox from 'components/common/BoardEditor/focalboard/src/widgets/checkbox';
 import { TemplateSelect } from 'components/proposals/ProposalPage/components/TemplateSelect';
-import { RewardApplicationType } from 'components/rewards/components/RewardProperties/components/RewardApplicationType';
-import { RewardPropertiesHeader } from 'components/rewards/components/RewardProperties/components/RewardPropertiesHeader';
-import type { RewardTokenDetails } from 'components/rewards/components/RewardProperties/components/RewardTokenProperty';
-import { RewardTokenProperty } from 'components/rewards/components/RewardProperties/components/RewardTokenProperty';
-import type { RewardType } from 'components/rewards/components/RewardProperties/components/RewardTypeSelect';
-import { RewardTypeSelect } from 'components/rewards/components/RewardProperties/components/RewardTypeSelect';
-import { CustomPropertiesAdapter } from 'components/rewards/components/RewardProperties/CustomPropertiesAdapter';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { RewardFieldsProp, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
+import type { RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
-import type { Reward, RewardReviewer, RewardWithUsers } from 'lib/rewards/interfaces';
+import type { Reward, RewardReviewer, RewardWithUsers, RewardType } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { isTruthy } from 'lib/utilities/types';
 
+import type { UpdateableRewardFieldsWithType } from '../../hooks/useNewReward';
+
+import { RewardApplicationType } from './components/RewardApplicationType';
+import { RewardPropertiesHeader } from './components/RewardPropertiesHeader';
+import { RewardTokenProperty } from './components/RewardTokenProperty';
+import type { RewardTokenDetails } from './components/RewardTokenProperty';
+import { RewardTypeSelect } from './components/RewardTypeSelect';
+import { CustomPropertiesAdapter } from './CustomPropertiesAdapter';
+import type { BoardReward } from './hooks/useRewardsBoardAdapter';
+
 type Props = {
-  onChange: (values: Partial<UpdateableRewardFields>) => void;
-  values: UpdateableRewardFields;
+  onChange: (values: Partial<UpdateableRewardFieldsWithType>) => void;
+  values: UpdateableRewardFieldsWithType;
   readOnly?: boolean;
   pageId?: string;
   refreshPermissions?: VoidFunction;
@@ -61,14 +64,16 @@ function getApplicationType(values: UpdateableRewardFields, forcedApplicationTyp
   return applicationType;
 }
 
-function getRewardType(values: UpdateableRewardFields, isNewReward: boolean, isFromTemplate: boolean) {
+// If it is a new reward and not using a template, use Token
+// If neither rewardToken nor customReward is set, use None
+function getRewardType(values: UpdateableRewardFields, isNewReward: boolean, isFromTemplate: boolean): RewardType {
   return values.customReward
-    ? 'Custom'
+    ? 'custom'
     : values.rewardToken
-    ? 'Token'
+    ? 'token'
     : isNewReward && !isFromTemplate
-    ? 'Token'
-    : 'None';
+    ? 'token'
+    : 'none';
 }
 
 export function RewardPropertiesForm({
@@ -94,10 +99,6 @@ export function RewardPropertiesForm({
   const isAdmin = useIsAdmin();
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(!!expandedByDefault);
-  // Token type rules:
-  // If it is a new reward and not using a template, use Token
-  // If neither rewardToken nor customReward is set, use None
-  const [rewardType, setRewardType] = useState<RewardType>(() => getRewardType(values, isNewReward, !!templateId));
 
   const allowedSubmittersValue: RoleOption[] = (values.allowedSubmitterRoles ?? []).map((id) => ({
     id,
@@ -127,6 +128,21 @@ export function RewardPropertiesForm({
     onChange(updates);
   }
 
+  function setRewardType(rewardType: RewardType) {
+    if (rewardType === 'none' && rewardStatus !== 'paid') {
+      applyUpdates({
+        rewardAmount: null,
+        chainId: null,
+        rewardToken: null,
+        customReward: null
+      });
+    }
+
+    onChange({
+      rewardType
+    });
+  }
+
   const setRewardApplicationType = useCallback((updatedType: RewardApplicationType) => {
     if (updatedType === 'direct_submission') {
       applyUpdates({
@@ -144,17 +160,6 @@ export function RewardPropertiesForm({
 
     setRewardApplicationTypeRaw(updatedType);
   }, []);
-
-  useEffect(() => {
-    if (rewardType === 'None' && rewardStatus !== 'paid') {
-      applyUpdates({
-        rewardAmount: null,
-        chainId: null,
-        rewardToken: null,
-        customReward: null
-      });
-    }
-  }, [rewardType, rewardStatus]);
 
   async function onRewardTokenUpdate(rewardToken: RewardTokenDetails | null) {
     if (rewardToken) {
@@ -216,7 +221,7 @@ export function RewardPropertiesForm({
         <Divider />
 
         <RewardPropertiesHeader
-          reward={values as RewardWithUsers}
+          reward={values}
           pageId={pageId || ''}
           isExpanded={isExpanded}
           toggleExpanded={() => setIsExpanded((v) => !v)}
@@ -407,13 +412,13 @@ export function RewardPropertiesForm({
                 </PropertyLabel>
                 <Box display='flex' flex={1}>
                   <UserSelect
-                    memberIds={values?.assignedSubmitters ?? []}
+                    memberIds={values.assignedSubmitters ?? []}
                     readOnly={readOnly}
                     onChange={updateAssignedSubmitters}
                     wrapColumn
                     showEmptyPlaceholder
                     error={
-                      !isNewReward && !values?.assignedSubmitters?.length && !readOnly
+                      !isNewReward && !values.assignedSubmitters?.length && !readOnly
                         ? 'Requires at least one assignee'
                         : undefined
                     }
@@ -426,10 +431,10 @@ export function RewardPropertiesForm({
               <PropertyLabel readOnly highlighted>
                 Type
               </PropertyLabel>
-              <RewardTypeSelect readOnly={readOnlyProperties} value={rewardType} onChange={setRewardType} />
+              <RewardTypeSelect readOnly={readOnlyProperties} value={values.rewardType} onChange={setRewardType} />
             </Box>
 
-            {rewardType === 'Token' && (
+            {values.rewardType === 'token' && (
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
                 <PropertyLabel readOnly highlighted required={isNewReward && !isTemplate}>
                   Token
@@ -442,7 +447,7 @@ export function RewardPropertiesForm({
               </Box>
             )}
 
-            {rewardType === 'Custom' && (
+            {values.rewardType === 'custom' && (
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
                 <PropertyLabel readOnly highlighted required={isNewReward && !isTemplate}>
                   Custom {getFeatureTitle('Reward')}
@@ -471,7 +476,7 @@ export function RewardPropertiesForm({
 
             <CustomPropertiesAdapter
               readOnly={readOnly}
-              reward={values as RewardWithUsers & RewardFieldsProp}
+              reward={values as unknown as BoardReward}
               onChange={(properties: RewardPropertiesField) => {
                 applyUpdates({
                   fields: { properties: properties ? { ...properties } : {} } as Reward['fields']
