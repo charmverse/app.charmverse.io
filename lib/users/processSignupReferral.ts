@@ -30,6 +30,12 @@ export async function processSignupReferral({ code, userId }: { code?: string; u
     actionTrigger: CharmActionTrigger.referral
   });
 
+  await addCharms({
+    recipient: { userId },
+    amount: charmActionRewards[CharmActionTrigger.referralReferee],
+    actionTrigger: CharmActionTrigger.referralReferee
+  });
+
   // TODO: add mixpanel tracking
 
   log.info(`Referral code used`, { code, userId, referrerId: referralCode.userId });
