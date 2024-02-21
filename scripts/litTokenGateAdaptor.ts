@@ -33,11 +33,129 @@ export function transformToTokenGateCondition(conditions: JsonAccsRequest): Toke
         Array.isArray(condition) ||
         'functionName' in condition ||
         'pdaInterface' in condition ||
-        'path' in condition
+        'path' in condition ||
+        !('standardContractType' in condition)
       ) {
         return null;
       }
       const chainId = RPCList.find((chain) => chain.litNetwork === condition.chain)?.chainId || 1;
+
+      if (
+        condition.standardContractType === 'ERC1155' &&
+        condition.contractAddress &&
+        condition.method === 'balanceOf'
+      ) {
+        return {
+          contractAddress: condition.contractAddress,
+          type: condition.standardContractType,
+          chain: chainId,
+          condition: 'evm',
+          method: condition.method,
+          tokenIds: [condition.parameters[1] || condition.parameters[0] || null].filter(isTruthy),
+          quantity: condition.returnValueTest.value || '1'
+        };
+      } else if (
+        condition.standardContractType === 'ERC1155' &&
+        condition.contractAddress &&
+        condition.method === 'balanceOfBatch'
+      ) {
+        return {
+          contractAddress: condition.contractAddress,
+          type: condition.standardContractType,
+          chain: chainId,
+          condition: 'evm',
+          method: condition.method,
+          tokenIds: [(condition.parameters[1] || condition.parameters[0] || '').split(',')].filter(isTruthy),
+          quantity: condition.returnValueTest.value || '1'
+        };
+      } else if (
+        condition.standardContractType === 'ERC721' &&
+        condition.contractAddress &&
+        condition.method === 'ownerOf'
+      ) {
+        return {
+          contractAddress: condition.contractAddress,
+          type: condition.standardContractType,
+          chain: chainId,
+          condition: 'evm',
+          method: condition.method,
+          tokenIds: [condition.parameters[0]],
+          quantity: '1'
+        };
+      } else if (
+        condition.standardContractType === 'ERC721' &&
+        condition.contractAddress &&
+        condition.method === 'balanceOf'
+      ) {
+        return {
+          contractAddress: condition.contractAddress,
+          type: condition.standardContractType,
+          chain: chainId,
+          condition: 'evm',
+          method: condition.method,
+          tokenIds: [],
+          quantity: condition.returnValueTest?.value || '1'
+        };
+      } else if (condition.standardContractType === 'ERC20' && condition.method === 'eth_getBalance') {
+        return {
+          contractAddress: '',
+          type: condition.standardContractType,
+          chain: chainId,
+          condition: 'evm',
+          method: condition.method,
+          tokenIds: [],
+          quantity: condition.returnValueTest?.value || '1'
+        };
+      } else if (
+        condition.standardContractType === 'ERC20' &&
+        condition.contractAddress &&
+        condition.method === 'balanceOf'
+      ) {
+        return {
+          contractAddress: condition.contractAddress,
+          type: condition.standardContractType,
+          chain: chainId,
+          condition: 'evm',
+          method: condition.method,
+          tokenIds: [],
+          quantity: condition.returnValueTest?.value || '1'
+        };
+      } else if (condition.standardContractType === 'MolochDAOv2.1') {
+        return {
+          contractAddress: condition.contractAddress,
+          type: condition.standardContractType,
+          chain: chainId,
+          condition: 'evm',
+          method: condition.method,
+          tokenIds: [],
+          quantity: '1'
+        };
+      } else if (
+        !condition.contractAddress &&
+        !condition.standardContractType &&
+        !condition.method &&
+        condition.returnValueTest?.value
+      ) {
+        return {
+          contractAddress: condition.contractAddress,
+          type: condition.standardContractType,
+          chain: chainId,
+          condition: 'evm',
+          method: condition.method,
+          tokenIds: [condition.returnValueTest?.value],
+          quantity: '1'
+        };
+      } else if (condition.standardContractType === 'CASK') {
+        return {
+          contractAddress: condition.contractAddress,
+          type: condition.standardContractType,
+          chain: chainId,
+          condition: 'evm',
+          method: condition.method,
+          tokenIds: [],
+          quantity: condition.returnValueTest?.value || '1'
+        };
+      }
 
       return {
         contractAddress: condition.contractAddress,
@@ -98,7 +216,7 @@ async function logNow() {
               type: 'Hypersub',
               contractAddress: item.conditions?.contract || '',
               method: 'balanceOf',
-              tokenIds: ['0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2'],
+              tokenIds: [],
               quantity: '1'
             }
           ]
@@ -115,10 +233,10 @@ async function logNow() {
             {
               chain: Number(item.conditions?.chainId) || 1,
               condition: 'evm',
-              type: 'Hypersub',
+              type: 'Unlock',
               contractAddress: item.conditions?.contract || '',
               method: 'balanceOf',
-              tokenIds: ['0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2'],
+              tokenIds: [],
               quantity: '1'
             }
           ]
@@ -128,6 +246,17 @@ async function logNow() {
 
     return item;
   });
+
+  // for (const tk of payload) {
+  //   await prisma.tokenGate.update({
+  //     where: {
+  //       id: tk.id
+  //     },
+  //     data: {
+  //       conditions: tk.conditions
+  //     }
+  //   });
+  // }
 
   //   await writeFile(path, JSON.stringify({ tokenGates: payload }, null, 2), (error) => {
   //     if (error) {

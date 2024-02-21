@@ -41,8 +41,13 @@ describe('verifyTokenGateMemberships', () => {
 
   afterEach(async () => {
     await clearTokenGateData();
-    await prisma.user.deleteMany({});
-    await prisma.space.deleteMany({});
+    await prisma.user.deleteMany({
+      where: {
+        id: {
+          in: [user.id, user2.id]
+        }
+      }
+    });
     jest.resetModules();
   });
 
