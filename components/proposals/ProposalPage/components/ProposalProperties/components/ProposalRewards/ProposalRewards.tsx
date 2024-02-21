@@ -106,7 +106,7 @@ export function ProposalRewards({
       : assignedSubmitters;
 
     const reward = { ...template?.reward, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters };
-    setRewardValues({ ...reward, rewardType: getRewardType(reward) }, { skipDirty: true });
+    setRewardValues({ rewardType: getRewardType(reward), ...reward }, { skipDirty: true });
 
     openNewPage({
       ...template?.page,
