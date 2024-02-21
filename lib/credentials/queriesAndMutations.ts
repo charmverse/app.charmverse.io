@@ -10,8 +10,8 @@ import { ApolloClientWithRedisCache } from './apolloClientWithRedisCache';
 import type { EasSchemaChain } from './connectors';
 import type { EASAttestationFromApi, EASAttestationWithFavorite } from './external/getOnchainCredentials';
 import type { ExternalCredentialChain } from './external/schemas';
+import type { CredentialData } from './schemas';
 import { attestationSchemaIds } from './schemas';
-import type { ProposalCredential } from './schemas';
 
 const ceramicGraphQlClient = new ApolloClientWithRedisCache({
   uri: graphQlServerEndpoint,
@@ -37,8 +37,11 @@ type CredentialFromCeramic = {
 /**
  * @content - The actual keymap values of the credential created using EAS
  */
-export type PublishedSignedCredential = Omit<CredentialFromCeramic, 'content'> & {
-  content: ProposalCredential;
+export type PublishedSignedCredential<T extends AttestationType = AttestationType> = Omit<
+  CredentialFromCeramic,
+  'content'
+> & {
+  content: CredentialData<T>['data'];
 };
 
 const CREATE_SIGNED_CREDENTIAL_MUTATION = gql`
@@ -141,7 +144,7 @@ export async function getCharmverseCredentialsByWallets({
       variables: {
         filter: {
           where: {
-            schemaId: { equalTo: attestationSchemaIds.proposal[optimism.id] },
+            schemaId: { in: [attestationSchemaIds.proposal[optimism.id], attestationSchemaIds.reward[optimism.id]] },
             recipient: { in: wallets.map((w) => w.toLowerCase()) },
             issuer: { equalTo: credentialWalletAddress }
           }
