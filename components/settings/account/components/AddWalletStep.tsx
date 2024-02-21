@@ -1,10 +1,10 @@
-import type { AuthSig } from '@lit-protocol/types';
 import { Typography, Stack } from '@mui/material';
 
 import PrimaryButton from 'components/common/PrimaryButton';
 import { WalletSign } from 'components/login/components/WalletSign';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
+import type { AuthSig } from 'lib/blockchain/interfaces';
 
 type Props = {
   isConnectingWallet: boolean;

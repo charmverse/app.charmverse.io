@@ -21,3 +21,7 @@ export const rpcApis: SupportedChainId[] = [5000];
 export const supportedMainnets: SupportedChainId[] = [56, 250, 43114, 5000];
 
 export const advancedAPIEndpoint = `https://rpc.ankr.com/multichain/${process.env.ANKR_API_ID}`;
+
+export function isAnkrChain(chainId: number): chainId is SupportedChainId {
+  return supportedChainIds.includes(chainId as SupportedChainId);
+}
