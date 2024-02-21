@@ -1,13 +1,12 @@
-// @ts-nocheck
 import { writeFile } from 'node:fs';
 
-import { prisma } from '@charmverse/core/prisma-client';
+import { TokenGate, prisma } from '@charmverse/core/prisma-client';
 import type { JsonAccsRequest } from '@lit-protocol/types';
 import { RPCList } from 'connectors/chains';
 
 import type { Operator, TokenGateConditions } from 'lib/tokenGates/interfaces';
-import { isNumber } from 'lib/utilities/numbers';
 import { isTruthy } from 'lib/utilities/types';
+import { validateTokenGateConditions } from 'lib/tokenGates/validateTokenGateConditions';
 
 const path = './config.json';
 
@@ -96,7 +95,7 @@ export function transformToTokenGateCondition(conditions: JsonAccsRequest): Toke
           tokenIds: [],
           quantity: condition.returnValueTest?.value || '1'
         };
-      } else if (condition.standardContractType === 'ERC20' && condition.method === 'eth_getBalance') {
+      } else if (!condition.standardContractType && condition.method === 'eth_getBalance') {
         return {
           contractAddress: '',
           type: condition.standardContractType,
@@ -165,24 +164,19 @@ export function transformToTokenGateCondition(conditions: JsonAccsRequest): Toke
           tokenIds: [],
           quantity: '1'
         };
+      } else if (condition.standardContractType === 'POAP') {
+        return {
+          contractAddress: condition.contractAddress,
+          type: condition.standardContractType,
+          chain: chainId,
+          condition: 'evm',
+          method: condition.method === 'tokenURI' ? 'eventName' : 'eventId',
+          tokenIds: [condition.returnValueTest?.value].filter(isTruthy),
+          quantity: '1'
+        };
       }
-
-      return {
-        contractAddress: condition.contractAddress,
-        type: condition.standardContractType,
-        chain: chainId,
-        condition: 'evm',
-        method: condition.method,
-        tokenIds: condition.parameters
-          .map((param) => {
-            if (isNumber(Number(param))) {
-              return param;
-            }
-            return null;
-          })
-          .filter(isTruthy),
-        quantity: condition.returnValueTest.value
-      };
+      console.log('no conditions met', condition, condition.returnValueTest);
+      return null;
     })
     .filter(isTruthy);
 
@@ -205,7 +199,7 @@ async function logNow() {
   // const found = data?.filter((i) => !!i.conditions?.unifiedAccessControlConditions?.find((c) => c.parameters));
   // console.log('found', found.length, found?.conditions?.unifiedAccessControlConditions);
   // return;
-  const payload = data.map((item) => {
+  const payload: Pick<TokenGate, 'conditions' | 'id' | 'spaceId' | 'type'>[] = data.map((item) => {
     if (item.type === 'lit') {
       const cond = transformToTokenGateCondition(item.conditions as any as JsonAccsRequest);
       return {
@@ -257,6 +251,10 @@ async function logNow() {
     return item;
   });
 
+  for (const tk of payload) {
+    await validateTokenGateConditions(tk as any as TokenGate);
+  }
+
   // for (const tk of payload) {
   //   await prisma.tokenGate.update({
   //     where: {
@@ -268,13 +266,12 @@ async function logNow() {
   //   });
   // }
 
-  //   await writeFile(path, JSON.stringify({ tokenGates: payload }, null, 2), (error) => {
-  //     if (error) {
-  //       console.log('An error has occurred ', error);
-  //       return;
-  //     }
-  //     console.log('Data written successfully to disk');
-  //   });
-  // }
+  // await writeFile(path, JSON.stringify({ tokenGates: payload }, null, 2), (error) => {
+  //   if (error) {
+  //     console.log('An error has occurred ', error);
+  //     return;
+  //   }
+  //   console.log('Data written successfully to disk');
+  // });
 }
-logNow().then(() => console.log('DOne'));
+logNow().then(() => console.log('Done'));

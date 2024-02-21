@@ -15,7 +15,7 @@ export async function validateTokenGateCondition(
   walletAddress: string
 ): Promise<boolean> {
   const userAddress = getAddress(walletAddress);
-  const contractAddress = condition.contractAddress ? getAddress(condition.contractAddress) : '';
+  const contractAddress = condition.contractAddress ? getAddress(condition.contractAddress) : ('' as `0x${string}`);
   const publicClient = getPublicClient(Number(condition.chain));
 
   switch (true) {
