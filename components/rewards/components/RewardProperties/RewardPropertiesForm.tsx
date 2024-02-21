@@ -1,10 +1,11 @@
 import type { BountyStatus } from '@charmverse/core/prisma-client';
-import { Box, Collapse, Divider, Stack, Tooltip } from '@mui/material';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import styled from '@emotion/styled';
+import type { TextFieldProps } from '@mui/material';
+import { Box, Collapse, Divider, Stack, TextField, Tooltip } from '@mui/material';
 import clsx from 'clsx';
 import { DateTime } from 'luxon';
 import type { ChangeEvent } from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { StyledFocalboardTextInput } from 'components/common/BoardEditor/components/properties/TextInput';
@@ -12,6 +13,7 @@ import type { RoleOption } from 'components/common/BoardEditor/components/proper
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import Checkbox from 'components/common/BoardEditor/focalboard/src/widgets/checkbox';
+import { DateTimePicker } from 'components/common/DateTimePicker';
 import { TemplateSelect } from 'components/proposals/ProposalPage/components/TemplateSelect';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -38,7 +40,6 @@ type Props = {
   values: UpdateableRewardFieldsWithType;
   readOnly?: boolean;
   pageId?: string;
-  refreshPermissions?: VoidFunction;
   isNewReward?: boolean;
   isTemplate?: boolean;
   expandedByDefault?: boolean;
@@ -97,7 +98,6 @@ export function RewardPropertiesForm({
 
   const { getFeatureTitle } = useSpaceFeatures();
   const isAdmin = useIsAdmin();
-  const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(!!expandedByDefault);
 
   const allowedSubmittersValue: RoleOption[] = (values.allowedSubmitterRoles ?? []).map((id) => ({
@@ -281,34 +281,17 @@ export function RewardPropertiesForm({
               </PropertyLabel>
 
               <DateTimePicker
+                variant='card_property'
                 minDate={DateTime.fromMillis(Date.now())}
-                value={values?.dueDate || null}
-                disableMaskedInput
+                value={values?.dueDate ? DateTime.fromISO(values.dueDate.toString()) : null}
                 disabled={readOnlyDueDate}
+                disablePast
                 onAccept={async (value) => {
                   updateRewardDueDate(value);
                 }}
                 onChange={(value) => {
                   updateRewardDueDate(value);
                 }}
-                renderInput={(_props) => (
-                  <StyledFocalboardTextInput
-                    {..._props}
-                    inputProps={{
-                      ..._props.inputProps,
-                      readOnly: true,
-                      className: clsx('Editable octo-propertyvalue', { readonly: readOnly }),
-                      placeholder: 'Empty'
-                    }}
-                    fullWidth
-                    onClick={() => {
-                      setIsDateTimePickerOpen((v) => !v);
-                    }}
-                    placeholder='Empty'
-                  />
-                )}
-                onClose={() => setIsDateTimePickerOpen(false)}
-                open={isDateTimePickerOpen}
               />
             </Box>
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
