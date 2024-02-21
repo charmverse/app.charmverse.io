@@ -2,9 +2,7 @@ import { Typography } from '@mui/material';
 
 import { AddAPropertyButton } from 'components/common/BoardEditor/components/properties/AddAProperty';
 import { Button } from 'components/common/Button';
-import type { NewPageValues } from 'components/common/PageDialog/hooks/useNewPage';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
 export function AttachRewardButton({
   createNewReward,
@@ -24,7 +22,7 @@ export function AttachRewardButton({
     return (
       <Button size='small' onClick={createNewReward}>
         <Typography fontWeight={700} variant='subtitle1'>
-          New
+          + Add a {getFeatureTitle('reward')}
         </Typography>
       </Button>
     );

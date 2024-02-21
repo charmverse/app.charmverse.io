@@ -245,13 +245,15 @@ export function ProposalRewardsTable({
       <InlineDatabaseContainer className='focalboard-body' containerWidth={containerWidth}>
         <div className='BoardComponent drag-area-container'>
           <DatabaseStickyHeader>
-            <Box display='flex' justifyContent='space-between' alignItems='center'>
+            <Box display={cardPages.length ? 'flex' : 'block'} justifyContent='space-between' alignItems='center'>
               <Box my={1}>
                 <Typography variant='h5'>{getFeatureTitle('Rewards')}</Typography>
               </Box>
-              <div>
-                {canCreatePendingRewards && <AttachRewardButton createNewReward={createNewReward} variant={variant} />}
-              </div>
+              <Box my={1}>
+                {canCreatePendingRewards && !loadingData && (
+                  <AttachRewardButton createNewReward={createNewReward} variant={variant} />
+                )}
+              </Box>
             </Box>
           </DatabaseStickyHeader>
           {loadingData ? (
