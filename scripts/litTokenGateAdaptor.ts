@@ -151,9 +151,19 @@ export function transformToTokenGateCondition(conditions: JsonAccsRequest): Toke
           type: condition.standardContractType,
           chain: chainId,
           condition: 'evm',
-          method: condition.method,
+          method: 'balanceOf',
           tokenIds: [],
           quantity: condition.returnValueTest?.value || '1'
+        };
+      } else if (condition.standardContractType === 'CASK') {
+        return {
+          contractAddress: condition.contractAddress,
+          type: condition.standardContractType,
+          chain: chainId,
+          condition: 'evm',
+          method: 'balanceOf',
+          tokenIds: [],
+          quantity: '1'
         };
       }
 

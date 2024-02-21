@@ -89,7 +89,7 @@ async function getAccessControlMetaData(condition: AccessControlCondition) {
     case 'MolochDAOv2.1':
     case 'Wallet':
     default: {
-      return condition;
+      return { ...condition, image: chainDetails?.iconUrl };
     }
   }
 }

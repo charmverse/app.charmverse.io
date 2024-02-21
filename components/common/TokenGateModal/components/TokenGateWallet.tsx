@@ -1,5 +1,3 @@
-import { isValidName } from 'ethers/lib/utils';
-
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 
 import { useTokenGateModal } from '../hooks/useTokenGateModalContext';
@@ -17,7 +15,7 @@ export function TokenGateWallet() {
     setValue,
     register,
     formState: { errors, isValid },
-    provider
+    resolveEnsAddress
   } = useWalletForm();
 
   const onSubmit = async () => {
@@ -40,8 +38,8 @@ export function TokenGateWallet() {
   const onContractChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange(e);
     const value = e.target.value;
-    if (value.endsWith('.eth') && isValidName(value)) {
-      const address = await provider?.resolveName(value);
+    if (value.endsWith('.eth')) {
+      const address = await resolveEnsAddress(value);
       if (address) {
         setValue('ensWallet', address);
       } else {
