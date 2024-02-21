@@ -1,7 +1,7 @@
 import type { ProposalReviewer } from '@charmverse/core/prisma';
 import { Box, Grid, Stack, Typography } from '@mui/material';
 import { uniqBy } from 'lodash';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { v4 } from 'uuid';
 
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
@@ -23,9 +23,11 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalPendingReward } from 'lib/proposal/interface';
+import { getProposalRewardsView } from 'lib/rewards/blocks/views';
 import { getRewardErrors } from 'lib/rewards/getRewardErrors';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
-import type { RewardReviewer } from 'lib/rewards/interfaces';
+import { getRewardType } from 'lib/rewards/getRewardType';
+import type { RewardType, RewardReviewer } from 'lib/rewards/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 
 import { AttachRewardButton } from './AttachRewardButton';
@@ -60,7 +62,8 @@ export function ProposalRewardsTable({
   isProposalTemplate
 }: Props) {
   const { space } = useCurrentSpace();
-  const { defaultView, boardBlock, isLoading } = useRewardsBoard();
+  const { boardBlock, isLoading } = useRewardsBoard();
+
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
   const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, isSavingReward } = useNewReward();
   const [currentPendingId, setCurrentPendingId] = useState<null | string>(null);
@@ -179,64 +182,84 @@ export function ProposalRewardsTable({
     isProposalTemplate
   }).join(', ');
 
-  const cardPages = (pendingRewards || [])?.map(({ reward, page, draftId }) => {
-    return mapRewardToCardPage({
-      spaceId: space?.id || '',
-      reward: {
-        // add fields to satisfy PageMeta type. TODO: We dont need all fields on PageMeta for cards
-        // applications: [], // dont pass in applications or the expanded arrow icons will appear in tableRow
-        assignedSubmitters: [],
-        allowMultipleApplications: false,
-        allowedSubmitterRoles: [],
-        approveSubmitters: false,
-        chainId: null,
-        createdAt: new Date(),
-        createdBy: '',
-        customReward: null,
-        fields: { properties: {} },
-        dueDate: null,
-        id: draftId,
-        maxSubmissions: null,
-        proposalId: null,
-        reviewers: [],
-        rewardAmount: null,
-        rewardToken: null,
-        spaceId: '',
-        status: 'open',
-        submissionsLocked: false,
-        suggestedBy: null,
-        updatedAt: new Date(),
-        ...reward
-      } as BoardReward,
-      rewardPage: {
-        id: draftId,
-        // add fields to satisfy PageMeta type. TODO: We dont need all fields on PageMeta for cards
-        boardId: null,
-        bountyId: null,
-        createdAt: new Date(),
-        createdBy: '',
-        deletedAt: null,
-        deletedBy: null,
-        hasContent: false,
-        headerImage: '',
-        icon: null,
-        type: 'bounty',
-        galleryImage: '',
-        syncWithPageId: null,
-        index: 0,
-        cardId: null,
-        path: '',
-        parentId: null,
-        sourceTemplateId: null,
-        proposalId: null,
-        spaceId: '',
-        title: '',
-        updatedAt: new Date(),
-        updatedBy: '',
-        ...page
+  const cardPages = useMemo(
+    () =>
+      (pendingRewards || [])?.map(({ reward, page, draftId }) => {
+        return mapRewardToCardPage({
+          spaceId: space?.id || '',
+          reward: {
+            // add fields to satisfy PageMeta type. TODO: We dont need all fields on PageMeta for cards
+            // applications: [], // dont pass in applications or the expanded arrow icons will appear in tableRow
+            assignedSubmitters: [],
+            allowMultipleApplications: false,
+            allowedSubmitterRoles: [],
+            approveSubmitters: false,
+            chainId: null,
+            createdAt: new Date(),
+            createdBy: '',
+            customReward: null,
+            fields: { properties: {} },
+            dueDate: null,
+            id: draftId,
+            maxSubmissions: null,
+            proposalId: null,
+            reviewers: [],
+            rewardAmount: null,
+            rewardToken: null,
+            spaceId: '',
+            status: 'open',
+            submissionsLocked: false,
+            suggestedBy: null,
+            updatedAt: new Date(),
+            ...reward
+          } as BoardReward,
+          rewardPage: {
+            id: draftId,
+            // add fields to satisfy PageMeta type. TODO: We dont need all fields on PageMeta for cards
+            boardId: null,
+            bountyId: null,
+            createdAt: new Date(),
+            createdBy: '',
+            deletedAt: null,
+            deletedBy: null,
+            hasContent: false,
+            headerImage: '',
+            icon: null,
+            type: 'bounty',
+            galleryImage: '',
+            syncWithPageId: null,
+            index: 0,
+            cardId: null,
+            path: '',
+            parentId: null,
+            sourceTemplateId: null,
+            proposalId: null,
+            spaceId: '',
+            title: '',
+            updatedAt: new Date(),
+            updatedBy: '',
+            ...page
+          }
+        });
+      }),
+    [pendingRewards, space?.id]
+  );
+
+  const rewardTypes = useMemo(() => {
+    const typesSet = (pendingRewards || []).reduce<Set<RewardType>>((acc, page) => {
+      const rewardType = getRewardType(page.reward);
+      if (rewardType) {
+        acc.add(rewardType);
       }
-    });
-  });
+      return acc;
+    }, new Set());
+    return [...typesSet];
+  }, [pendingRewards]);
+
+  const tableView = useMemo(
+    () => getProposalRewardsView({ board: boardBlock, spaceId: space?.id, rewardTypes }),
+    [space?.id, boardBlock, rewardTypes]
+  );
 
   const loadingData = isLoading;
 
@@ -267,7 +290,7 @@ export function ProposalRewardsTable({
                     hideCalculations
                     setSelectedPropertyId={() => {}}
                     board={boardBlock!}
-                    activeView={defaultView}
+                    activeView={tableView}
                     cardPages={cardPages}
                     views={[]}
                     visibleGroups={[]}

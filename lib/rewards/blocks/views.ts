@@ -1,6 +1,7 @@
 import { v4 as uuid } from 'uuid';
 
 import { getDefaultRewardProperties } from 'components/rewards/components/RewardsBoard/utils/getDefaultRewardProperties';
+import type { Block as FBBlock } from 'lib/focalboard/block';
 import type { IViewType } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
 import { Constants } from 'lib/focalboard/constants';
@@ -10,6 +11,8 @@ import {
   DEFAULT_CALENDAR_VIEW_BLOCK_ID,
   DEFAULT_TABLE_VIEW_BLOCK_ID
 } from 'lib/focalboard/customBlocks/constants';
+import type { RewardType } from 'lib/rewards/interfaces';
+
 import {
   REWARDS_APPLICANTS_BLOCK_ID,
   CREATED_AT_ID,
@@ -20,8 +23,9 @@ import {
   REWARD_CUSTOM_VALUE,
   REWARD_REVIEWERS_BLOCK_ID,
   REWARD_STATUS_BLOCK_ID,
-  REWARD_APPLICANTS_COUNT
-} from 'lib/rewards/blocks/constants';
+  REWARD_APPLICANTS_COUNT,
+  defaultRewardPropertyIds
+} from './constants';
 
 export const defaultRewardViews = [
   DEFAULT_TABLE_VIEW_BLOCK_ID,
@@ -105,5 +109,43 @@ export function generateDefaultTableView({ spaceId }: { spaceId?: string }) {
     ? view.fields.visiblePropertyIds.filter((id) => id !== CREATED_AT_ID)
     : [];
 
+  return view;
+}
+
+export function getProposalRewardsView({
+  board,
+  spaceId,
+  rewardTypes
+}: {
+  board: FBBlock;
+  spaceId?: string;
+  includeStatus?: boolean;
+  rewardTypes: RewardType[];
+}) {
+  const view = getDefaultView({ spaceId });
+
+  // all custom properties are visible by default
+  view.fields.visiblePropertyIds = (board.fields.cardProperties as { id: string }[])
+    .map((p) => p.id)
+    .filter((id: string) => {
+      if (rewardTypes.includes('custom') && id === REWARD_CUSTOM_VALUE) {
+        return true;
+      } else if (rewardTypes.includes('token') && (id === REWARD_AMOUNT || id === REWARD_CHAIN)) {
+        return true;
+      } else {
+        return !defaultRewardPropertyIds.includes(id);
+      }
+    });
+
+  view.fields.columnWidths = {
+    ...view.fields.columnWidths,
+    [Constants.titleColumnId]: 300
+  };
+  // set larger than normal width for all custom properties
+  view.fields.visiblePropertyIds.forEach((id) => {
+    if (!view.fields.columnWidths[id]) {
+      view.fields.columnWidths[id] = 200;
+    }
+  });
   return view;
 }

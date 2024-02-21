@@ -12,7 +12,7 @@ import type {
   RewardsBoardBlock,
   RewardsBoardFFBlock
 } from 'lib/rewards/blocks/interfaces';
-import { defaultRewardViews, getDefaultView } from 'lib/rewards/blocks/views';
+import { defaultRewardViews } from 'lib/rewards/blocks/views';
 
 export function useRewardsBoard() {
   const { space } = useCurrentSpace();
@@ -30,13 +30,6 @@ export function useRewardsBoard() {
     }) as RewardsBoardFFBlock;
     return board;
   }, [boardBlocks]);
-
-  const defaultView = useMemo(() => {
-    const view = getDefaultView({ spaceId: space?.id });
-    // all properties are visible by default
-    view.fields.visiblePropertyIds = boardBlock.fields.cardProperties.map((p) => p.id);
-    return view;
-  }, [space?.id, boardBlock]);
 
   const createProperty = useCallback(
     async (propertyTemplate: IPropertyTemplate) => {
@@ -132,7 +125,6 @@ export function useRewardsBoard() {
   );
 
   return {
-    defaultView,
     boardBlock,
     isLoading,
     createProperty,
