@@ -16,10 +16,10 @@ import { v4 as uuid } from 'uuid';
  */
 
 // Details for production environment
-const originalPagePath = 'page-7220252559428284';
+const originalPagePath = 'phi-wallet-ripple-internal-5513363048264384';
 
 // Detais for developer environment
-const destinationSpaceDomain = 'cute-azure-mastodon';
+const destinationSpaceDomain = 'binding-amaranth-manatee';
 const destinationUserName = 'mattcasey.eth';
 
 const fileName = `./page-backup-05-22.json`;

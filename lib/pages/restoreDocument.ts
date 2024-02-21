@@ -21,17 +21,17 @@ export function replayDocumentHistory(diffs: PageDiff[]): PageContent {
     // Make sure diffs are in correct order
     .sort((a, b) => a.version - b.version)
     // Extract prosemirror change step
-    .map((diff) => (diff.data as any).ds as ProsemirrorJSONStep)
+    .map((diff) => (diff.data as { ds: ProsemirrorJSONStep[] }).ds)
     // Diff ds is stored as an array, unwind this
     .flat()
     // Just in case there are some null diffs
     .filter((diff) => !!diff);
 
-  const pageNode = getNodeFromJson(basePageContent);
+  const firstDiff = sortedDiffs.shift();
+  let pageNode = getNodeFromJson({ type: 'doc', content: firstDiff!.slice });
+  pageNode = applyStepsToNode(sortedDiffs, pageNode);
 
-  const contentAfterReplay = applyStepsToNode(sortedDiffs, pageNode);
-
-  return contentAfterReplay as any;
+  return pageNode.toJSON();
 }
 
 export async function restoreDocument({ pageId, version }: RestoreInput): Promise<Page> {
