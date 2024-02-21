@@ -4,7 +4,7 @@ import { TextInputField } from 'components/common/form/fields/TextInputField';
 
 import { useTokenGateModal } from '../hooks/useTokenGateModalContext';
 import { useWalletForm, type FormValues } from '../hooks/useWalletForm';
-import { getWalletUnifiedAccessControlConditions } from '../utils/getWalletUnifiedAccessControlConditions';
+import { getWalletAccessControlConditions } from '../utils/getWalletAccessControlConditions';
 
 import { TokenGateFooter } from './TokenGateFooter';
 
@@ -25,7 +25,7 @@ export function TokenGateWallet() {
     const values: FormValues = {
       contract: initialValues.ensWallet || initialValues.contract
     };
-    const valueProps = getWalletUnifiedAccessControlConditions(values) || [];
+    const valueProps = getWalletAccessControlConditions(values) || [];
     handleTokenGate({ conditions: { accessControlConditions: valueProps } });
     setDisplayedPage('review');
   };

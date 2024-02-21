@@ -2,7 +2,7 @@ import type { AccessControlCondition } from 'lib/tokenGates/interfaces';
 
 import type { FormValues } from '../hooks/useWalletForm';
 
-export function getWalletUnifiedAccessControlConditions(values: FormValues): AccessControlCondition[] | undefined {
+export function getWalletAccessControlConditions(values: FormValues): AccessControlCondition[] | undefined {
   const { contract } = values;
 
   return [

@@ -73,7 +73,7 @@ async function getAccessControlMetaData(condition: AccessControlCondition) {
     }
     case 'POAP': {
       const poapDetails = await getPoapByEventId(condition.tokenIds.at(0) || '').catch((_err) => null);
-      return { ...condition, name: poapDetails?.name, image: poapDetails?.image_url };
+      return { ...condition, name: poapDetails?.name, image: poapDetails?.image_url || '/images/logos/poap_logo.svg' };
     }
     case 'Guildxyz': {
       const guildDetails = await getGuildDetails(condition.tokenIds.at(0) || '').catch((_err) => null);

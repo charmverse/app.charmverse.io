@@ -8,7 +8,7 @@ import { TextInputField } from 'components/common/form/fields/TextInputField';
 import type { FormValues } from '../hooks/useDaoForm';
 import { useDaoForm } from '../hooks/useDaoForm';
 import { useTokenGateModal } from '../hooks/useTokenGateModalContext';
-import { getDaoUnifiedAccessControlConditions } from '../utils/getDaoUnifiedAccessControlConditions';
+import { getDaoAccessControlConditions } from '../utils/getDaoAccessControlConditions';
 import { daoCheck } from '../utils/utils';
 
 import { TokenGateBlockchainSelect } from './TokenGateBlockchainSelect';
@@ -28,7 +28,7 @@ export function TokenGateDao() {
 
   const onSubmit = async () => {
     const values = getValues();
-    const valueProps = getDaoUnifiedAccessControlConditions(values) || [];
+    const valueProps = getDaoAccessControlConditions(values) || [];
     handleTokenGate({ conditions: { accessControlConditions: valueProps } });
     setDisplayedPage('review');
   };
@@ -42,7 +42,7 @@ export function TokenGateDao() {
 
   return (
     <>
-      <FieldWrapper label='Select a DAO Membership'>
+      <FieldWrapper label='Select Community Membership'>
         <Select<FormValues['check']>
           displayEmpty
           fullWidth
@@ -65,7 +65,7 @@ export function TokenGateDao() {
           helperText={errors.guild?.message}
           {...register('guild')}
         />
-      ) : (
+      ) : check ? (
         <>
           <TokenGateBlockchainSelect
             error={!!errors.chain?.message}
@@ -82,7 +82,7 @@ export function TokenGateDao() {
             {...register('contract')}
           />
         </>
-      )}
+      ) : null}
 
       <TokenGateFooter onSubmit={onSubmit} onCancel={onCancel} isValid={isValid} />
     </>

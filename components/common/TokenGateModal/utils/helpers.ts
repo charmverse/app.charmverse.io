@@ -13,11 +13,13 @@ export function getTitle(page: DisplayedPage) {
     case 'wallet':
       return 'Wallet Condition';
     case 'dao':
-      return 'DAO Condition';
+      return 'Communities Condition';
     case 'unlock':
       return 'Unlock Protocol Condition';
     case 'hypersub':
       return 'Hypersub Condition';
+    case 'gitcoin':
+      return 'Gitcoin Passport Condition';
     default:
       return 'Select Condition';
   }

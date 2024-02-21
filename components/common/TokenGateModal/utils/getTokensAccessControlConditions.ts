@@ -4,7 +4,7 @@ import type { AccessControlCondition } from 'lib/tokenGates/interfaces';
 
 import type { FormValues } from '../hooks/useTokensForm';
 
-export function getTokensUnifiedAccessControlConditions(values: FormValues): AccessControlCondition[] | undefined {
+export function getTokensAccessControlConditions(values: FormValues): AccessControlCondition[] | undefined {
   const { chain, contract, quantity, check } = values;
   const chainId = Number(chain);
   const amount = parseEther(quantity).toString();
@@ -23,7 +23,7 @@ export function getTokensUnifiedAccessControlConditions(values: FormValues): Acc
     ];
   }
 
-  if (check === 'token' && contract) {
+  if (check === 'token') {
     return [
       {
         chain: chainId,

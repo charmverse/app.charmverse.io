@@ -2,7 +2,7 @@ import type { AccessControlCondition } from 'lib/tokenGates/interfaces';
 
 import type { FormValues } from '../hooks/useDaoForm';
 
-export function getDaoUnifiedAccessControlConditions(values: FormValues): AccessControlCondition[] | undefined {
+export function getDaoAccessControlConditions(values: FormValues): AccessControlCondition[] | undefined {
   const { chain = '1', contract = '', check, guild = '' } = values;
   const chainId = Number(chain);
 

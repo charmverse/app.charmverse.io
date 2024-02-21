@@ -4,8 +4,8 @@ import { createMockTokenGate } from 'testing/mocks/tokenGate';
 
 import { spaces as _spaces, spaceRoles } from '../lib/mockData';
 
-const walletAddress = '0x1bd0d6edb387114b2fdf20d683366fa9f94a07f4';
-const ownsWalletCondition: AccessControlCondition[] = [
+export const walletAddress = '0x1bd0d6edb387114b2fdf20d683366fa9f94a07f4';
+export const ownsWalletCondition: AccessControlCondition[] = [
   {
     chain: 1,
     method: 'balanceOf',
@@ -18,7 +18,7 @@ const ownsWalletCondition: AccessControlCondition[] = [
   }
 ];
 
-const ownedEVMTokenCondition: AccessControlCondition[] = [
+export const ownedEVMTokenCondition: AccessControlCondition[] = [
   {
     chain: 10,
     method: 'eth_getBalance',
@@ -32,7 +32,7 @@ const ownedEVMTokenCondition: AccessControlCondition[] = [
   }
 ];
 
-const ownedTokenSupportedBlockchain: AccessControlCondition[] = [
+export const ownedTokenSupportedBlockchain: AccessControlCondition[] = [
   {
     chain: 56,
     method: 'eth_getBalance',
@@ -45,7 +45,7 @@ const ownedTokenSupportedBlockchain: AccessControlCondition[] = [
   }
 ];
 
-const ownedEth: AccessControlCondition[] = [
+export const ownedEth: AccessControlCondition[] = [
   {
     chain: 1,
     method: 'eth_getBalance',
@@ -58,7 +58,7 @@ const ownedEth: AccessControlCondition[] = [
   }
 ];
 
-const ownedCustomToken: AccessControlCondition[] = [
+export const ownedCustomToken: AccessControlCondition[] = [
   {
     chain: 1,
     method: 'eth_getBalance',
@@ -72,7 +72,7 @@ const ownedCustomToken: AccessControlCondition[] = [
   }
 ];
 
-const ownsSpecificPoap: AccessControlCondition[] = [
+export const ownsSpecificPoap: AccessControlCondition[] = [
   {
     chain: 100,
     method: 'eventName',
@@ -95,7 +95,7 @@ const ownsSpecificPoap: AccessControlCondition[] = [
   }
 ];
 
-const ownsAnyPoap: AccessControlCondition[] = [
+export const ownsAnyPoap: AccessControlCondition[] = [
   {
     chain: 1,
     method: 'balanceOf',
@@ -108,7 +108,7 @@ const ownsAnyPoap: AccessControlCondition[] = [
   }
 ];
 
-const daoMember: AccessControlCondition[] = [
+export const daoMember: AccessControlCondition[] = [
   {
     chain: 1,
     method: 'members',
@@ -121,7 +121,7 @@ const daoMember: AccessControlCondition[] = [
   }
 ];
 
-const nftCollectionOwner: AccessControlCondition[] = [
+export const nftCollectionOwner: AccessControlCondition[] = [
   {
     chain: 10,
     method: 'balanceOf',
@@ -135,7 +135,7 @@ const nftCollectionOwner: AccessControlCondition[] = [
   }
 ];
 
-const specificNftOwner: AccessControlCondition[] = [
+export const specificNftOwner: AccessControlCondition[] = [
   {
     chain: 10,
     method: 'ownerOf',
@@ -149,7 +149,7 @@ const specificNftOwner: AccessControlCondition[] = [
   }
 ];
 
-const multipleErc: AccessControlCondition[] = [
+export const multipleErc: AccessControlCondition[] = [
   {
     chain: 1,
     method: 'balanceOf',
@@ -160,6 +160,60 @@ const multipleErc: AccessControlCondition[] = [
     type: 'ERC1155',
     name: 'Charmed & Optimistic 71',
     image: 'https://nft-cdn.alchemy.com/opt-mainnet/5bad9b012e2980c9880dbce2e5642167'
+  }
+];
+
+export const unlockProtocolCondition: AccessControlCondition[] = [
+  {
+    chain: 1,
+    method: 'balanceOf',
+    tokenIds: [],
+    condition: 'evm',
+    contractAddress: '0x1f98431c8ad12323631ae4a59f267346ea31f984',
+    quantity: '1',
+    type: 'Unlock',
+    name: 'The Cool One',
+    image: 'https://nft-cdn.alchemy.com/opt-mainnet/5bad9b012e2980c9880dbce2e5642167'
+  }
+];
+
+export const hypersubCondition: AccessControlCondition[] = [
+  {
+    chain: 1,
+    method: 'balanceOf',
+    tokenIds: [],
+    condition: 'evm',
+    contractAddress: '0x1f98431c8ad12323631ae4a59f267346ea31f984',
+    quantity: '1',
+    type: 'Hypersub',
+    name: 'The Cool One',
+    image: 'https://nft-cdn.alchemy.com/opt-mainnet/5bad9b012e2980c9880dbce2e5642167'
+  }
+];
+
+export const guildCondition: AccessControlCondition[] = [
+  {
+    chain: 1,
+    method: 'balanceOf',
+    tokenIds: ['charmverse-guild'],
+    condition: 'evm',
+    contractAddress: '',
+    quantity: '1',
+    type: 'Guildxyz',
+    image: '/images/logos/guild_logo.svg'
+  }
+];
+
+export const gitcoinCondition: AccessControlCondition[] = [
+  {
+    chain: 1,
+    method: 'balanceOf',
+    tokenIds: [],
+    condition: 'evm',
+    contractAddress: '',
+    quantity: '1',
+    type: 'GitcoinPassport',
+    image: '/images/logos/gitcoin_passport.svg'
   }
 ];
 
@@ -174,11 +228,15 @@ export const mockTokenGates: TokenGateWithRoles[] = [
   mockTokenGate(daoMember),
   mockTokenGate(nftCollectionOwner),
   mockTokenGate(specificNftOwner),
-  mockTokenGate(multipleErc)
+  mockTokenGate(multipleErc),
+  mockTokenGate(unlockProtocolCondition),
+  mockTokenGate(hypersubCondition),
+  mockTokenGate(guildCondition),
+  mockTokenGate(gitcoinCondition)
 ];
 
 export const mockTokenGateResult: TokenGateEvaluationResult = {
-  walletAddress: '0x1234',
+  walletAddress,
   canJoinSpace: true,
   eligibleGates: mockTokenGates.map((tokenGate) => tokenGate.id)
 };
