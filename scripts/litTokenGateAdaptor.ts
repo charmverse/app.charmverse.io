@@ -98,7 +98,7 @@ async function logNow() {
               contractAddress: item.conditions?.contract || '',
               method: 'balanceOf',
               tokenIds: ['0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2'],
-              quantity: '1',
+              quantity: '1'
             }
           ]
         }
@@ -118,7 +118,7 @@ async function logNow() {
               contractAddress: item.conditions?.contract || '',
               method: 'balanceOf',
               tokenIds: ['0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2'],
-              quantity: '1',
+              quantity: '1'
             }
           ]
         }
@@ -128,13 +128,13 @@ async function logNow() {
     return item;
   });
 
-
-//   await writeFile(path, JSON.stringify({ tokenGates: payload }, null, 2), (error) => {
-//     if (error) {
-//       console.log('An error has occurred ', error);
-//       return;
-//     }
-//     console.log('Data written successfully to disk');
-//   });
-// }
+  //   await writeFile(path, JSON.stringify({ tokenGates: payload }, null, 2), (error) => {
+  //     if (error) {
+  //       console.log('An error has occurred ', error);
+  //       return;
+  //     }
+  //     console.log('Data written successfully to disk');
+  //   });
+  // }
+}
 logNow().then(() => console.log('DOne'));
