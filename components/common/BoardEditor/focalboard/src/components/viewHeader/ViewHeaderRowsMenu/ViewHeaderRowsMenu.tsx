@@ -15,6 +15,7 @@ import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/boar
 import type { Card, CardPropertyValue } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
 import type { CreateEventPayload } from 'lib/notifications/interfaces';
+import { defaultRewardPropertyIds } from 'lib/rewards/blocks/constants';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import mutator from '../../../mutator';
@@ -57,6 +58,8 @@ const validPropertyTypes = [
   'proposalStatus',
   'relation'
 ] as PropertyType[];
+
+const invalidPropertyIds = [...defaultRewardPropertyIds];
 
 export type ViewHeaderRowsMenuProps = {
   board: Board;
@@ -196,7 +199,8 @@ export function ViewHeaderRowsMenu({
       (propertyTemplate) =>
         !propertyTemplate.formFieldId &&
         validPropertyTypes.includes(propertyTemplate.type) &&
-        propertyTemplate.id !== Constants.titleColumnId
+        propertyTemplate.id !== Constants.titleColumnId &&
+        !invalidPropertyIds.includes(propertyTemplate.id)
     );
   }, [propertyTemplates]);
 

@@ -261,6 +261,8 @@ export function RewardsPage({ title }: { title: string }) {
                       setSelectedPropertyId(_setSelectedPropertyId);
                       setShowSidebar(true);
                     }}
+                    setCheckedIds={setCheckedIds}
+                    checkedIds={checkedIds}
                     board={activeBoard}
                     activeView={activeView}
                     cardPages={cardPages as CardPage[]}
@@ -272,7 +274,6 @@ export function RewardsPage({ title }: { title: string }) {
                     disableAddingCards
                     showCard={showRewardOrApplication}
                     readOnlyTitle
-                    readOnlyRows
                     cardIdToFocusOnRender=''
                     addCard={async () => {}}
                     onCardClicked={() => {}}
