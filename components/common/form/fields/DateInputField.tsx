@@ -8,38 +8,13 @@ import type { ControlFieldProps, FieldProps } from 'components/common/form/inter
 type Props = ControlFieldProps & FieldProps;
 
 export const DateInputField = forwardRef<HTMLDivElement, Props>(
-  (
-    {
-      label,
-      labelEndAdornment,
-      inputEndAdornment,
-      description,
-      iconLabel,
-      inline,
-      required,
-      onChange,
-      value,
-      error,
-      helperText,
-      disabled,
-      placeholder
-    },
-    ref
-  ) => {
+  ({ onChange, value, error, helperText, disabled, placeholder, ...props }, ref) => {
     // Convert to luxon date
     const dateValue =
       typeof value === 'string' || typeof value === 'number' ? DateTime.fromJSDate(new Date(value)) : undefined;
 
     return (
-      <FieldWrapper
-        labelEndAdornment={labelEndAdornment}
-        description={description}
-        required={required}
-        label={label}
-        inline={inline}
-        iconLabel={iconLabel}
-        inputEndAdornment={inputEndAdornment}
-      >
+      <FieldWrapper {...props}>
         <DateTimePicker
           value={dateValue}
           onChange={(_value) => {

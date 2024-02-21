@@ -161,6 +161,7 @@ function FormFieldsInputBase({
                   {...field}
                   rows={undefined}
                   maxRows={10}
+                  sx={{ mb: 2 }}
                   value={(field.value ?? '') as FormFieldValue}
                   placeholder={fieldTypePlaceholderRecord[formField.type]}
                   labelEndAdornment={

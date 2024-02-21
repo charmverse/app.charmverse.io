@@ -1,3 +1,4 @@
+import type { SxProps } from '@mui/material';
 import { forwardRef } from 'react';
 
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
@@ -29,6 +30,7 @@ type SelectProps = {
   Required<ControlFieldProps>;
 
 type Props = (Omit<TextProps, 'type'> | Omit<SelectProps, 'type'>) & {
+  sx?: SxProps;
   type: FieldType;
   textInputConfig?: TextInputConfig;
 } & TextInputConfig;
