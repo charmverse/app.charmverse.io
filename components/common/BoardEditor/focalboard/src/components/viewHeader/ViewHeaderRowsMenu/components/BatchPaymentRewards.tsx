@@ -1,20 +1,33 @@
 import type { Application } from '@charmverse/core/prisma-client';
-import { useMemo } from 'react';
+import PaymentIcon from '@mui/icons-material/Payment';
+import { Tooltip } from '@mui/material';
+import { getChainById } from 'connectors/chains';
+import { useMemo, useState } from 'react';
 
+import { OpenWalletSelectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/OpenWalletSelectorButton';
 import { Button } from 'components/common/Button';
-import { MultiRewardPaymentButton } from 'components/rewards/components/RewardApplicationPage/components/MultiRewardPaymentButton';
+import LoadingComponent from 'components/common/LoadingComponent';
+import { GnosisSafesList } from 'components/rewards/components/RewardApplicationPage/components/GnosisSafesList';
 import { useRewards } from 'components/rewards/hooks/useRewards';
+import { useGnosisSafes } from 'hooks/useGnosisSafes';
 import { usePages } from 'hooks/usePages';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import { getRewardType } from 'lib/rewards/getRewardType';
-import type { ApplicationMeta, RewardWithUsers } from 'lib/rewards/interfaces';
+import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { isTruthy } from 'lib/utilities/types';
+
+import { PropertyMenu } from './PropertyMenu';
 
 type ApplicationLite = Pick<Application, 'id' | 'walletAddress' | 'bountyId' | 'createdBy'>;
 
 export function BatchPaymentRewards({ checkedIds }: { checkedIds: string[] }) {
   const { pages } = usePages();
   const { rewards, mutateRewards } = useRewards();
-  const selectedRewards = useMemo(() => {
+  const { account, chainId, signer } = useWeb3Account();
+  const safesRecord = useGnosisSafes();
+  const [isMutating, setIsMutating] = useState(false);
+
+  const filteredRewards = useMemo(() => {
     const rewardsRecord =
       rewards?.filter(isTruthy)?.reduce<
         Record<
@@ -35,7 +48,7 @@ export function BatchPaymentRewards({ checkedIds }: { checkedIds: string[] }) {
         return acc;
       }, {}) ?? {};
 
-    const _selectedRewards = (checkedIds
+    const _filteredRewards = (checkedIds
       ?.map((pageId) => {
         const page = pages[pageId];
         if (page && page.type === 'bounty' && page.bountyId) {
@@ -43,32 +56,83 @@ export function BatchPaymentRewards({ checkedIds }: { checkedIds: string[] }) {
         }
         return null;
       })
-      .filter((reward) => isTruthy(reward) && getRewardType(reward) === 'token') ?? []) as (RewardWithUsers & {
+      .filter(
+        (reward) =>
+          isTruthy(reward) &&
+          getRewardType(reward) === 'token' &&
+          reward.chainId === chainId &&
+          reward.submissions.length
+      ) ?? []) as (RewardWithUsers & {
       submissions: ApplicationLite[];
     })[];
 
-    return _selectedRewards;
-  }, [pages, rewards, checkedIds]);
+    return _filteredRewards;
+  }, [pages, rewards, checkedIds, chainId]);
 
-  const firstReward = selectedRewards[0];
-  const disabledTooltip =
-    checkedIds.length === 0
-      ? 'No rewards selected'
-      : !firstReward
-      ? `Selected rewards either doesn't have completed submissions or are not token rewards`
-      : undefined;
+  if (!account || !chainId || !signer) {
+    return (
+      <Tooltip title='Your wallet must be unlocked to pay for rewards'>
+        <OpenWalletSelectorButton size='small' label='Unlock Wallet' />
+      </Tooltip>
+    );
+  }
 
-  return firstReward ? (
-    <MultiRewardPaymentButton
-      chainIdToUse={firstReward.chainId as number}
-      rewards={selectedRewards}
-      tokenSymbolOrAddress={firstReward.rewardToken as string}
-      refreshSubmissions={mutateRewards}
-      buttonVariant='outlined'
-    />
-  ) : (
-    <Button color='secondary' size='small' variant='outlined' disabled disabledTooltip={disabledTooltip}>
-      Send Payment
-    </Button>
+  const safesInChain = Object.values(safesRecord).filter((safe) => safe.chainId === chainId);
+
+  const firstReward = filteredRewards[0];
+  const submissions = filteredRewards.flatMap((reward) => reward.submissions);
+
+  let disabledTooltip = '';
+
+  if (safesInChain.length === 0) {
+    disabledTooltip = `No safes found on the ${getChainById(chainId)?.chainName} network`;
+  } else if (checkedIds.length === 0) {
+    disabledTooltip = 'No rewards selected';
+  } else if (!firstReward) {
+    disabledTooltip = `Selected rewards are not token rewards or are not on the ${
+      getChainById(chainId)?.chainName
+    } network`;
+  } else if (submissions.length === 0) {
+    disabledTooltip = `Selected rewards don't have any completed submissions`;
+  }
+
+  if (disabledTooltip) {
+    return (
+      <Button color='secondary' size='small' variant='outlined' disabled disabledTooltip={disabledTooltip}>
+        Send Payment
+      </Button>
+    );
+  }
+
+  return (
+    <PropertyMenu
+      disabledTooltip={isMutating ? 'Processing...' : ''}
+      lastChild={false}
+      propertyTemplate={{
+        icon: isMutating ? <LoadingComponent size={15} /> : <PaymentIcon sx={{ fontSize: '16px !important' }} />,
+        name: isMutating ? 'Completing payment' : `Send payment (${submissions.length})`
+      }}
+    >
+      {({ closeMenu }) => {
+        return (
+          <GnosisSafesList
+            onClick={() => {
+              setIsMutating(true);
+            }}
+            disabled={isMutating}
+            refreshSubmissions={mutateRewards}
+            rewards={filteredRewards}
+            onSuccess={() => {
+              setIsMutating(false);
+              closeMenu();
+            }}
+            onError={() => {
+              setIsMutating(false);
+              closeMenu();
+            }}
+          />
+        );
+      }}
+    </PropertyMenu>
   );
 }

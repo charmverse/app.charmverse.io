@@ -15,14 +15,14 @@ export function useGnosisSafes(chainIdToUse?: number) {
   const { user } = useUser();
   const { data: existingSafesData, mutate: refreshSafes } = useMultiWalletSigs();
   const { account, chainId } = useWeb3Account();
-  const _chainId = chainIdToUse ?? chainId;
+  const _chainId = chainIdToUse ?? chainId ?? 1;
 
   const safeApiClient = useMemo(() => {
     return getSafeApiClient({ chainId: _chainId });
   }, [_chainId]);
 
   const { data: safeInfos } = useSWR(
-    account ? `/connected-gnosis-safes/${account}/${_chainId}` : null,
+    account && _chainId ? `/connected-gnosis-safes/${account}/${_chainId}` : null,
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     () =>
       safeApiClient

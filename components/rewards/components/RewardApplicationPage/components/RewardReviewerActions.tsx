@@ -15,7 +15,7 @@ import type { ApplicationWithTransactions, RewardWithUsers, RewardType } from 'l
 import type { ReviewDecision } from 'lib/rewards/reviewApplication';
 
 import { AcceptOrRejectButtons } from './AcceptOrRejectButtons';
-import { MultiRewardPaymentButton } from './MultiRewardPaymentButton';
+import { RewardPaymentButton } from './RewardPaymentButton';
 
 type Props = {
   reward: RewardWithUsers;
@@ -36,7 +36,7 @@ export function RewardReviewerActions({
   hasApplicationSlots
 }: Props) {
   const { open, isOpen, close } = usePopupState({ variant: 'dialog', popupId: 'confirm-mark-submission-paid' });
-
+  const { showMessage } = useSnackbar();
   const [pendingSafeTransactionUrl, setPendingSafeTransactionUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -62,6 +62,20 @@ export function RewardReviewerActions({
     refreshApplication();
   }
 
+  async function recordTransaction(transactionId: string, chainId: number) {
+    try {
+      await charmClient.rewards.recordTransaction({
+        applicationId: application.id,
+        chainId: chainId.toString(),
+        transactionId
+      });
+      await charmClient.rewards.markSubmissionAsPaid(application.id);
+      refreshApplication();
+    } catch (err: any) {
+      showMessage(err.message || err, 'error');
+    }
+  }
+
   return (
     <div>
       {/** This section contains all possible reviewer actions */}
@@ -82,16 +96,16 @@ export function RewardReviewerActions({
         />
       )}
       {application.status === 'complete' && rewardType === 'token' && rewardPermissions?.review && (
-        <MultiRewardPaymentButton
+        <RewardPaymentButton
+          amount={String(reward.rewardAmount)}
           chainIdToUse={reward.chainId as number}
-          rewards={[
-            {
-              ...reward,
-              submissions: [application]
-            }
-          ]}
+          receiver={application.walletAddress as string}
+          reward={reward}
           tokenSymbolOrAddress={reward.rewardToken as string}
-          refreshSubmissions={refreshApplication}
+          onSuccess={recordTransaction}
+          onError={(message) => showMessage(message, 'warning')}
+          submission={application}
+          refreshSubmission={refreshApplication}
         />
       )}
 
