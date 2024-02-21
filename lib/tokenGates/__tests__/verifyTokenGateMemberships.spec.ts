@@ -1,5 +1,6 @@
 import type { Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { walletAddress } from 'stories/lib/mockTokenGataData';
 
 import { applyTokenGates } from 'lib/tokenGates/applyTokenGates';
 import { verifyTokenGateMemberships } from 'lib/tokenGates/verifyTokenGateMemberships';
@@ -17,17 +18,21 @@ async function getSpaceUser({ spaceId, userId }: { spaceId: string; userId: stri
   });
 }
 
+jest.mock('lib/tokenGates/validateTokenGateCondition', () => ({
+  validateTokenGateCondition: jest.fn().mockResolvedValue(true)
+}));
+
 describe('verifyTokenGateMemberships', () => {
   let user: User;
   let user2: User;
   let space: Space;
   let space2: Space;
-  const walletAddress = '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2';
 
   beforeEach(async () => {
-    await clearTokenGateData();
-    const { user: u, space: s } = await generateUserAndSpace();
-    const { user: u2, space: s2 } = await generateUserAndSpace();
+    const { user: u, space: s } = await generateUserAndSpace({ walletAddress });
+    const { user: u2, space: s2 } = await generateUserAndSpace({
+      walletAddress: '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2'
+    });
     user = u;
     space = s;
     user2 = u2;
@@ -35,6 +40,9 @@ describe('verifyTokenGateMemberships', () => {
   });
 
   afterEach(async () => {
+    await clearTokenGateData();
+    await prisma.user.deleteMany();
+    await prisma.space.deleteMany();
     jest.resetModules();
   });
 

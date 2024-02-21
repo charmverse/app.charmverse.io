@@ -3,11 +3,11 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { validate } from 'uuid';
 
 import type { AuthSig } from 'lib/blockchain/interfaces';
+import { validateTokenGateCondition } from 'lib/tokenGates/validateTokenGateCondition';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { TokenGate } from './interfaces';
-import { validateTokenGateCondition } from './validateTokenGateCondition';
 
 export type TokenGateEvaluationAttempt = {
   authSig: AuthSig;

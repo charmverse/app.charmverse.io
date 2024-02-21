@@ -1,10 +1,15 @@
 import type { Space } from '@charmverse/core/prisma';
+import { walletAddress } from 'stories/lib/mockTokenGataData';
 
 import { assignRole } from 'lib/roles';
 import { updateTokenGateRoles } from 'lib/tokenGates/updateTokenGateRoles';
 import type { LoggedInUser } from 'models';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generateTokenGate } from 'testing/utils/tokenGates';
+
+jest.mock('lib/tokenGates/validateTokenGateCondition', () => ({
+  validateTokenGateCondition: jest.fn().mockResolvedValue(true)
+}));
 
 describe('reevaluateRoles', () => {
   let user: LoggedInUser;
@@ -40,7 +45,7 @@ describe('reevaluateRoles', () => {
     const res = await reevaluateRoles({
       spaceId: space.id,
       userId: user.id,
-      authSig: {} as any
+      authSig: { address: walletAddress } as any
     });
 
     expect(res.length).toBe(2);
@@ -58,7 +63,7 @@ describe('reevaluateRoles', () => {
     const res = await reevaluateRoles({
       spaceId: space.id,
       userId: user.id,
-      authSig: {} as any
+      authSig: { address: walletAddress } as any
     });
 
     expect(res.length).toBe(1);

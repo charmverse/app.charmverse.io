@@ -1,22 +1,21 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { walletAddress } from 'stories/lib/mockTokenGataData';
 
 import { applyTokenGates } from 'lib/tokenGates/applyTokenGates';
+import { validateTokenGateCondition } from 'lib/tokenGates/validateTokenGateCondition';
 import { verifyTokenGateMembership } from 'lib/tokenGates/verifyTokenGateMembership';
 import type { UserToVerifyMembership } from 'lib/tokenGates/verifyTokenGateMemberships';
 import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
-import {
-  addRoleToTokenGate,
-  deleteTokenGate,
-  generateHypersubTokenGate,
-  generateTokenGate,
-  generateUnlockTokenGate
-} from 'testing/utils/tokenGates';
+import { addRoleToTokenGate, deleteTokenGate, generateTokenGate } from 'testing/utils/tokenGates';
 
 import { getPublicClient } from '../../blockchain/publicClient';
 
 jest.mock('../../blockchain/publicClient');
 const mockGetPublicClient = jest.mocked(getPublicClient);
+
+jest.mock('lib/tokenGates/validateTokenGateCondition');
+const mockValidateTokenGateCondition = jest.mocked(validateTokenGateCondition);
 
 describe('verifyTokenGateMembership', () => {
   let user: User;
@@ -59,14 +58,17 @@ describe('verifyTokenGateMembership', () => {
 
   beforeEach(async () => {
     mockGetPublicClient.mockClear();
+    mockValidateTokenGateCondition.mockClear();
 
-    const { user: u, space: s } = await generateUserAndSpace(undefined);
+    const { user: u, space: s } = await generateUserAndSpace({ walletAddress });
     user = u;
     space = s;
   });
 
   afterEach(async () => {
     jest.resetModules();
+    await prisma.user.deleteMany();
+    await prisma.space.deleteMany();
   });
 
   it('should return true if user does not have any token gate connected', async () => {
@@ -81,12 +83,16 @@ describe('verifyTokenGateMembership', () => {
 
     const spaceUser = await getSpaceUser();
 
+    mockValidateTokenGateCondition.mockReturnValue(Promise.resolve(true));
+
     expect(res).toEqual({ removedRoles: 0, verified: true });
     expect(spaceUser).not.toBeNull();
   });
 
   it('should not verify and remove user connected via deleted token gate', async () => {
     const tokenGate = await generateTokenGate({ userId: user.id, spaceId: space.id });
+
+    mockValidateTokenGateCondition.mockReturnValue(Promise.resolve(true));
 
     await applyTokenGates({
       spaceId: space.id,
@@ -116,16 +122,18 @@ describe('verifyTokenGateMembership', () => {
   it('should not verify and remove user with all token gates being not verified', async () => {
     const tokenGate1 = await generateTokenGate({ userId: user.id, spaceId: space.id });
     const tokenGate2 = await generateTokenGate({ userId: user.id, spaceId: space.id });
-    const tokenGate3 = await generateUnlockTokenGate({ userId: user.id, spaceId: space.id });
-    const tokenGate4 = await generateHypersubTokenGate({ userId: user.id, spaceId: space.id });
+    const tokenGate3 = await generateTokenGate({
+      userId: user.id,
+      spaceId: space.id,
+      extraDetails: { type: 'Unlock' }
+    });
+    const tokenGate4 = await generateTokenGate({
+      userId: user.id,
+      spaceId: space.id,
+      extraDetails: { type: 'Hypersub' }
+    });
 
-    mockGetPublicClient.mockReturnValueOnce({
-      readContract: jest.fn().mockReturnValueOnce('My New Lock').mockReturnValueOnce(true)
-    } as any);
-
-    mockGetPublicClient.mockReturnValueOnce({
-      readContract: jest.fn().mockReturnValueOnce('My New Hypersub').mockReturnValueOnce(true)
-    } as any);
+    mockValidateTokenGateCondition.mockReturnValue(Promise.resolve(true));
 
     await applyTokenGates({
       spaceId: space.id,
@@ -136,6 +144,9 @@ describe('verifyTokenGateMembership', () => {
     });
 
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
+
+    // do not verify token gates anymore
+    mockValidateTokenGateCondition.mockReturnValue(Promise.resolve(false));
 
     const res = await verifyTokenGateMembership({
       userTokenGates: verifyUser.user.userTokenGates,
@@ -153,13 +164,14 @@ describe('verifyTokenGateMembership', () => {
   it('should verify user with at least one valid token gate', async () => {
     const tokenGate1 = await generateTokenGate({ userId: user.id, spaceId: space.id });
     const tokenGate2 = await generateTokenGate({ userId: user.id, spaceId: space.id });
+    mockValidateTokenGateCondition.mockReturnValue(Promise.resolve(true));
 
     await applyTokenGates({
       spaceId: space.id,
       userId: user.id,
       commit: true,
       tokenGateIds: [tokenGate1.id, tokenGate2.id],
-      walletAddress: '0x123'
+      walletAddress
     });
 
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
@@ -187,15 +199,19 @@ describe('verifyTokenGateMembership', () => {
     await addRoleToTokenGate({ tokenGateId: tokenGate1.id, roleId: role.id });
     await addRoleToTokenGate({ tokenGateId: tokenGate2.id, roleId: role2.id });
 
+    mockValidateTokenGateCondition.mockReturnValue(Promise.resolve(true));
+
     await applyTokenGates({
       spaceId: space.id,
       userId: user.id,
       commit: true,
-      tokenGateIds: [tokenGate1.id],
-      walletAddress: '0x123'
+      tokenGateIds: [tokenGate1.id, tokenGate2.id],
+      walletAddress
     });
 
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
+
+    mockValidateTokenGateCondition.mockReturnValue(Promise.resolve(false));
 
     const res = await verifyTokenGateMembership({
       userTokenGates: verifyUser.user.userTokenGates,
@@ -223,12 +239,14 @@ describe('verifyTokenGateMembership', () => {
     await addRoleToTokenGate({ tokenGateId: tokenGate1.id, roleId: role.id });
     await addRoleToTokenGate({ tokenGateId: tokenGate2.id, roleId: role2.id });
 
+    mockValidateTokenGateCondition.mockReturnValue(Promise.resolve(true));
+
     await applyTokenGates({
       spaceId: space.id,
       userId: user.id,
       commit: true,
-      tokenGateIds: [tokenGate1.id],
-      walletAddress: '0x123'
+      tokenGateIds: [tokenGate1.id, tokenGate2.id],
+      walletAddress
     });
     await deleteTokenGate(tokenGate1.id);
 
@@ -264,15 +282,20 @@ describe('verifyTokenGateMembership', () => {
     await addRoleToTokenGate({ tokenGateId: tokenGate2.id, roleId: role2.id });
     await addRoleToTokenGate({ tokenGateId: tokenGate2.id, roleId: role3.id });
 
+    mockValidateTokenGateCondition.mockReturnValue(Promise.resolve(true));
+
     await applyTokenGates({
       spaceId: space.id,
       userId: user.id,
       commit: true,
       tokenGateIds: [tokenGate1.id, tokenGate2.id],
-      walletAddress: '0x123'
+      walletAddress
     });
+    await deleteTokenGate(tokenGate1.id);
 
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
+
+    mockValidateTokenGateCondition.mockReturnValueOnce(Promise.resolve(true));
 
     const res = await verifyTokenGateMembership({
       userTokenGates: verifyUser.user.userTokenGates,
