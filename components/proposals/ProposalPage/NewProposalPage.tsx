@@ -485,7 +485,7 @@ export function NewProposalPage({
                     />
                   )}
                   {isStructured && formInputs.fields?.enableRewards && (
-                    <Box mb={10}>
+                    <Box mt={1} mb={10}>
                       <ProposalRewardsTable
                         containerWidth={containerWidth}
                         pendingRewards={pendingRewards}

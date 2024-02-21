@@ -38,7 +38,7 @@ export function ProposalRewards() {
     <GlobalContext>
       <RewardBlocksProvider>
         <RewardsBoardProvider>
-          <Paper ref={containerWidthRef} sx={{ p: 4, maxWidth: 800, overflowY: 'auto' }}>
+          <Paper ref={containerWidthRef} sx={{ p: 4, maxWidth: 800, overflowY: 'auto', mb: 10 }}>
             <ProposalRewardsTable
               containerWidth={containerWidth}
               pendingRewards={pendingRewards}

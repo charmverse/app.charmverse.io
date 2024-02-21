@@ -255,10 +255,8 @@ export function ProposalRewardsTable({
             </Box>
           </DatabaseStickyHeader>
           {loadingData ? (
-            <Grid item xs={12} sx={{ mt: 12 }}>
-              <LoadingComponent height={500} isLoading size={50} />
-            </Grid>
-          ) : (
+            <LoadingComponent height={500} isLoading />
+          ) : cardPages.length ? (
             <Box className='container-container'>
               <Stack>
                 <Box width='100%'>
@@ -285,7 +283,7 @@ export function ProposalRewardsTable({
                 </Box>
               </Stack>
             </Box>
-          )}
+          ) : null}
         </div>
       </InlineDatabaseContainer>
       <NewPageDialog
