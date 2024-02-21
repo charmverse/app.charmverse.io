@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { writeFile } from 'node:fs';
 
 import { TokenGate, prisma } from '@charmverse/core/prisma-client';
