@@ -48,24 +48,20 @@ export const DateInputField = forwardRef<HTMLDivElement, Props>(
             onChange?.(_value?.toJSDate().getTime());
           }}
           disabled={disabled}
-          renderInput={(props) => {
-            return (
-              <TextField
-                {...props}
-                fullWidth
-                inputProps={{
-                  ...props.inputProps,
-                  readOnly: true,
-                  placeholder,
-                  // props.inputProps.value is always a date, either dateValue or current date
-                  value: dateValue ? props.inputProps?.value : undefined
-                }}
-                disabled={disabled}
-                error={!!error}
-                ref={ref}
-                helperText={helperText}
-              />
-            );
+          slotProps={{
+            textField: {
+              fullWidth: true,
+              inputProps: {
+                readOnly: true,
+                placeholder
+                // props.inputProps.value is always a date, either dateValue or current date
+                // value: dateValue ? props.inputProps?.value : undefined
+              },
+              disabled,
+              error: !!error,
+              ref,
+              helperText
+            }
           }}
         />
       </FieldWrapper>

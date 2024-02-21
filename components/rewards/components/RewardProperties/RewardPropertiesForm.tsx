@@ -1,10 +1,13 @@
 import type { BountyStatus } from '@charmverse/core/prisma-client';
-import { Box, Collapse, Divider, Stack, Tooltip } from '@mui/material';
+import styled from '@emotion/styled';
+import type { TextFieldProps } from '@mui/material';
+import { Box, Collapse, Divider, Stack, TextField, Tooltip } from '@mui/material';
+import type { DateTimePickerProps } from '@mui/x-date-pickers/DateTimePicker';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import clsx from 'clsx';
 import { DateTime } from 'luxon';
 import type { ChangeEvent } from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { StyledFocalboardTextInput } from 'components/common/BoardEditor/components/properties/TextInput';
@@ -38,7 +41,6 @@ type Props = {
   values: UpdateableRewardFieldsWithType;
   readOnly?: boolean;
   pageId?: string;
-  refreshPermissions?: VoidFunction;
   isNewReward?: boolean;
   isTemplate?: boolean;
   expandedByDefault?: boolean;
@@ -97,7 +99,6 @@ export function RewardPropertiesForm({
 
   const { getFeatureTitle } = useSpaceFeatures();
   const isAdmin = useIsAdmin();
-  const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(!!expandedByDefault);
 
   const allowedSubmittersValue: RoleOption[] = (values.allowedSubmitterRoles ?? []).map((id) => ({
@@ -280,35 +281,21 @@ export function RewardPropertiesForm({
                 Due date
               </PropertyLabel>
 
-              <DateTimePicker
+              <DatePickerOpenOnInput
                 minDate={DateTime.fromMillis(Date.now())}
-                value={values?.dueDate || null}
-                disableMaskedInput
+                value={values?.dueDate ? DateTime.fromISO(values.dueDate.toString()) : null}
                 disabled={readOnlyDueDate}
+                disablePast
                 onAccept={async (value) => {
                   updateRewardDueDate(value);
                 }}
                 onChange={(value) => {
                   updateRewardDueDate(value);
                 }}
-                renderInput={(_props) => (
-                  <StyledFocalboardTextInput
-                    {..._props}
-                    inputProps={{
-                      ..._props.inputProps,
-                      readOnly: true,
-                      className: clsx('Editable octo-propertyvalue', { readonly: readOnly }),
-                      placeholder: 'Empty'
-                    }}
-                    fullWidth
-                    onClick={() => {
-                      setIsDateTimePickerOpen((v) => !v);
-                    }}
-                    placeholder='Empty'
-                  />
-                )}
-                onClose={() => setIsDateTimePickerOpen(false)}
-                open={isDateTimePickerOpen}
+                slots={{
+                  // eslint-disable-next-line react/no-unstable-nested-components
+                  textField: CustomTextField
+                }}
               />
             </Box>
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
@@ -488,4 +475,54 @@ export function RewardPropertiesForm({
       </Stack>
     </Box>
   );
+}
+
+function DatePickerOpenOnInput<T>(props: DateTimePickerProps<T>) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ position: 'relative' }}>
+      <DateTimePicker
+        open={open}
+        // default media query just checks for cursor input
+        desktopModeMediaQuery='(min-width: 600px)'
+        // disableOpenPicker - this optoin messes up the picker for some reason
+        onClose={() => setOpen(false)}
+        {...props}
+        slots={{
+          ...props.slots,
+          // hide the calendar picker icon
+          openPickerButton: HiddenElement
+        }}
+        slotProps={{
+          field: { clearable: true },
+          textField: { onClick: () => setOpen(true) }
+        }}
+      />
+    </div>
+  );
+}
+
+const StyledTextField = styled(TextField)`
+  .MuiInputBase-root {
+    background: transparent;
+  }
+  .octo-propertyvalue {
+    box-sizing: border-box; // copy from focalboard
+  }
+  fieldset {
+    border: 0 none;
+  }
+`;
+
+function CustomTextField(props: TextFieldProps) {
+  if (props.inputProps) {
+    props.inputProps.className = 'octo-propertyvalue';
+  }
+  // dont show the default placeholder from Datepicker
+  const actualValue = props.value !== props.placeholder ? props.value : '';
+  return <StyledTextField {...props} value={actualValue} placeholder='Empty' />;
+}
+
+function HiddenElement() {
+  return <div />;
 }

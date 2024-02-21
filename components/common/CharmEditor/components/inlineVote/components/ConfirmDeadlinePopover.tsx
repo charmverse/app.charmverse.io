@@ -35,7 +35,6 @@ export default function ConfirmDeadlinePopover({
             await updateDeadline(value.toJSDate());
           }
         }}
-        renderInput={(params) => <TextField {...params} />}
       />
     </Popover>
   );

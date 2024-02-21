@@ -18,7 +18,7 @@ import {
 import { DatePicker } from '@mui/x-date-pickers';
 import { RPCList, getChainById } from 'connectors/chains';
 import { debounce } from 'lodash';
-import type { DateTime } from 'luxon';
+import { DateTime } from 'luxon';
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -422,20 +422,18 @@ function FilterPropertyValue({
   } else if (propertyDataType === 'date') {
     return (
       <DatePicker
-        value={new Date(Number(filter.values[0]))}
+        value={DateTime.fromISO(filter.values[0])}
         onChange={updateDateValue}
-        renderInput={(props) => (
-          <TextField
-            {...props}
-            inputProps={{
-              ...props.inputProps,
+        slotProps={{
+          textField: {
+            disabled: true,
+            inputProps: {
               sx: { fontSize: 'small' },
               readOnly: true,
               placeholder: 'Select a date'
-            }}
-            disabled
-          />
-        )}
+            }
+          }
+        }}
       />
     );
   }

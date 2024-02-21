@@ -41,7 +41,6 @@ interface Props {
   pageId: string;
   proposalId: string;
   evaluationId: string;
-  durationDays?: number;
 }
 
 const MAX_SNAPSHOT_PROPOSAL_CHARACTERS = 20000;
@@ -380,10 +379,10 @@ export function PublishingForm({ onSubmit, pageId, proposalId, evaluationId }: P
                   value={startDate}
                   onChange={(value) => {
                     if (value instanceof DateTime) {
-                      setStartDate(value as DateTime);
+                      setStartDate(value);
                     }
                   }}
-                  renderInput={(props) => <TextField fullWidth {...props} />}
+                  slotProps={{ textField: { fullWidth: true } }}
                 />
               </div>
 
@@ -405,19 +404,18 @@ export function PublishingForm({ onSubmit, pageId, proposalId, evaluationId }: P
                     value={endDate}
                     onChange={(value) => {
                       if (value instanceof DateTime) {
-                        setEndDate(value as DateTime);
+                        setEndDate(value);
                       }
                     }}
                     disabled={!!snapshotSpace.voting.period}
-                    renderInput={(props) => (
-                      <TextField
-                        fullWidth
-                        disabled={!!snapshotSpace.voting.period}
-                        {...props}
-                        error={!endDateAfterStart}
-                        helperText={!endDateAfterStart ? 'End date must be after start date' : null}
-                      />
-                    )}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        disabled: !!snapshotSpace.voting.period,
+                        error: !endDateAfterStart,
+                        helperText: !endDateAfterStart ? 'End date must be after start date' : null
+                      }
+                    }}
                   />
                 </div>
               </Tooltip>

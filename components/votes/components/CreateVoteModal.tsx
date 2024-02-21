@@ -180,7 +180,6 @@ export function CreateVoteModal({
               <DateTimePicker
                 minDate={DateTime.fromMillis(Date.now())}
                 value={deadline}
-                disableMaskedInput
                 onAccept={async (value) => {
                   if (value) {
                     setDeadline(value);
@@ -191,19 +190,17 @@ export function CreateVoteModal({
                     setDeadline(value);
                   }
                 }}
-                renderInput={(props) => (
-                  <TextField
-                    {...props}
-                    inputProps={{
-                      ...props.inputProps,
+                slotProps={{
+                  textField: {
+                    inputProps: {
                       readOnly: true
-                    }}
-                    fullWidth
-                    onClick={() => {
+                    },
+                    fullWidth: true,
+                    onClick: () => {
                       setIsDateTimePickerOpen((_isDateTimePickerOpen) => !_isDateTimePickerOpen);
-                    }}
-                  />
-                )}
+                    }
+                  }
+                }}
                 onClose={() => setIsDateTimePickerOpen(false)}
                 open={isDateTimePickerOpen}
               />
