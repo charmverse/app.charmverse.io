@@ -2,8 +2,6 @@ import type { BountyStatus } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import type { TextFieldProps } from '@mui/material';
 import { Box, Collapse, Divider, Stack, TextField, Tooltip } from '@mui/material';
-import type { DateTimePickerProps } from '@mui/x-date-pickers/DateTimePicker';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import clsx from 'clsx';
 import { DateTime } from 'luxon';
 import type { ChangeEvent } from 'react';
@@ -15,6 +13,7 @@ import type { RoleOption } from 'components/common/BoardEditor/components/proper
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import Checkbox from 'components/common/BoardEditor/focalboard/src/widgets/checkbox';
+import { DateTimePicker } from 'components/common/DateTimePicker';
 import { TemplateSelect } from 'components/proposals/ProposalPage/components/TemplateSelect';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -281,7 +280,8 @@ export function RewardPropertiesForm({
                 Due date
               </PropertyLabel>
 
-              <DatePickerOpenOnInput
+              <DateTimePicker
+                variant='card_property'
                 minDate={DateTime.fromMillis(Date.now())}
                 value={values?.dueDate ? DateTime.fromISO(values.dueDate.toString()) : null}
                 disabled={readOnlyDueDate}
@@ -291,10 +291,6 @@ export function RewardPropertiesForm({
                 }}
                 onChange={(value) => {
                   updateRewardDueDate(value);
-                }}
-                slots={{
-                  // eslint-disable-next-line react/no-unstable-nested-components
-                  textField: CustomTextField
                 }}
               />
             </Box>
@@ -475,54 +471,4 @@ export function RewardPropertiesForm({
       </Stack>
     </Box>
   );
-}
-
-function DatePickerOpenOnInput<T>(props: DateTimePickerProps<T>) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div style={{ position: 'relative' }}>
-      <DateTimePicker
-        open={open}
-        // default media query just checks for cursor input
-        desktopModeMediaQuery='(min-width: 600px)'
-        // disableOpenPicker - this optoin messes up the picker for some reason
-        onClose={() => setOpen(false)}
-        {...props}
-        slots={{
-          ...props.slots,
-          // hide the calendar picker icon
-          openPickerButton: HiddenElement
-        }}
-        slotProps={{
-          field: { clearable: true },
-          textField: { onClick: () => setOpen(true) }
-        }}
-      />
-    </div>
-  );
-}
-
-const StyledTextField = styled(TextField)`
-  .MuiInputBase-root {
-    background: transparent;
-  }
-  .octo-propertyvalue {
-    box-sizing: border-box; // copy from focalboard
-  }
-  fieldset {
-    border: 0 none;
-  }
-`;
-
-function CustomTextField(props: TextFieldProps) {
-  if (props.inputProps) {
-    props.inputProps.className = 'octo-propertyvalue';
-  }
-  // dont show the default placeholder from Datepicker
-  const actualValue = props.value !== props.placeholder ? props.value : '';
-  return <StyledTextField {...props} value={actualValue} placeholder='Empty' />;
-}
-
-function HiddenElement() {
-  return <div />;
 }

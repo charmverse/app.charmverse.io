@@ -20,8 +20,8 @@ export default function ConfirmDeadlinePopover({
   return (
     <Popover anchorOrigin={{ vertical: 'top', horizontal: 'right' }} {...restProps}>
       <StaticDateTimePicker
+        disablePast
         openTo='day'
-        displayStaticWrapperAs='desktop'
         minDate={DateTime.now()}
         minTime={deadline.day === DateTime.now().day ? DateTime.now() : undefined}
         value={deadline}

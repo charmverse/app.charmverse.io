@@ -178,6 +178,7 @@ export function CreateVoteModal({
             {/* This as any statement is to save time. We are providing an official adapter from MUI Library as outlined here https://mui.com/x/react-date-pickers/date-picker/#basic-usage */}
             <Stack>
               <DateTimePicker
+                disablePast
                 minDate={DateTime.fromMillis(Date.now())}
                 value={deadline}
                 onAccept={async (value) => {

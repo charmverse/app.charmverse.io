@@ -15,7 +15,6 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers';
 import { RPCList, getChainById } from 'connectors/chains';
 import { debounce } from 'lodash';
 import { DateTime } from 'luxon';
@@ -25,6 +24,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import { RelationPageListItemsContainer } from 'components/common/BoardEditor/components/properties/PagesAutocomplete';
 import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
+import { DatePicker } from 'components/common/DatePicker';
 import { PageIcon } from 'components/common/PageIcon';
 import PageTitle from 'components/common/PageLayout/components/PageTitle';
 import UserDisplay from 'components/common/UserDisplay';
@@ -422,15 +422,13 @@ function FilterPropertyValue({
   } else if (propertyDataType === 'date') {
     return (
       <DatePicker
-        value={DateTime.fromISO(filter.values[0])}
+        value={DateTime.fromMillis(parseInt(filter.values[0]))}
         onChange={updateDateValue}
         slotProps={{
           textField: {
-            disabled: true,
+            placeholder: 'Select a date',
             inputProps: {
-              sx: { fontSize: 'small' },
-              readOnly: true,
-              placeholder: 'Select a date'
+              sx: { fontSize: 'small' }
             }
           }
         }}
