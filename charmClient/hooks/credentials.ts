@@ -11,6 +11,20 @@ export function useGetUserCredentials({ userId }: { userId: MaybeString }) {
 }
 
 export function useGetCredentialTemplates({ spaceId }: { spaceId: MaybeString }) {
+  const { data: credentialTemplates, mutate: refreshCredentialTemplates } = useGET<CredentialTemplate[]>(
+    spaceId ? '/api/credentials/templates' : null,
+    { spaceId }
+  );
+
+  return {
+    credentialTemplates,
+    proposalCredentialTemplates: credentialTemplates?.filter((t) => t.schemaType === 'proposal'),
+    rewardCredentialTemplates: credentialTemplates?.filter((t) => t.schemaType === 'reward'),
+    refreshCredentialTemplates
+  };
+}
+
+export function useCredentialTemplates({ spaceId }: { spaceId: MaybeString }) {
   return useGET<CredentialTemplate[]>(spaceId ? '/api/credentials/templates' : null, { spaceId });
 }
 

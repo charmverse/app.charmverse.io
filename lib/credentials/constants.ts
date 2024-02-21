@@ -8,5 +8,5 @@ type LabelFn = (getFeatureTitle: (featureWord: FeatureTitleVariation) => string)
 export const credentialEventLabels: Partial<Record<CredentialEventType, LabelFn>> = {
   proposal_created: (map) => `Published ${map('Proposal')}`,
   proposal_approved: (map) => `${map('Proposal')} Approved`,
-  reward_submission_approved: (map) => `${map('Reward')} Approved`
+  reward_submission_approved: (map) => `${map('Reward')} submission Approved`
 };

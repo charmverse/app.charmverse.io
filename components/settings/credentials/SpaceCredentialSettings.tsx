@@ -24,12 +24,6 @@ export function SpaceCredentialSettings() {
     <>
       <Legend>Credentials</Legend>
       <Typography variant='h6'>Credentials (EAS Attestations)</Typography>
-      <Box display='flex' flexDirection='column' alignItems='left' mb={2}>
-        <Typography variant='body1'>
-          Create credentials with EAS attestations to be awarded during the {getFeatureTitle('Proposals').toLowerCase()}{' '}
-          process
-        </Typography>
-      </Box>
 
       <Box mb={2}>
         <CredentialTemplates />

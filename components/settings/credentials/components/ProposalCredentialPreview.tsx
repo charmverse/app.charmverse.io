@@ -1,4 +1,4 @@
-import type { CredentialTemplate } from '@charmverse/core/prisma-client';
+import type { AttestationType, CredentialTemplate } from '@charmverse/core/prisma-client';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Grid from '@mui/material/Grid';
@@ -15,12 +15,13 @@ export type ProposalCredentialToPreview = Pick<CredentialTemplate, 'name' | 'des
 
 type Props = {
   credential: ProposalCredentialToPreview;
+  credentialTemplateType: AttestationType;
 };
 
-export function ProposalCredentialPreview({ credential }: Props) {
+export function ProposalCredentialPreview({ credential, credentialTemplateType }: Props) {
   const { getFeatureTitle } = useSpaceFeatures();
   const proposalSchemaUrl = `${getEasConnector(10).attestationExplorerUrl}/schema/view/${
-    attestationSchemaIds.proposal[optimism.id]
+    attestationSchemaIds[credentialTemplateType]?.[optimism.id]
   }`;
   return (
     <Card sx={{ minWidth: 275 }}>
@@ -56,12 +57,15 @@ export function ProposalCredentialPreview({ credential }: Props) {
           </Grid>
           <Grid item xs>
             <Typography variant='body2'>
-              <b>Event:</b> {credentialEventLabels.proposal_approved?.(getFeatureTitle)}
+              <b>Event:</b>{' '}
+              {credentialTemplateType === 'proposal'
+                ? credentialEventLabels.proposal_approved?.(getFeatureTitle)
+                : credentialEventLabels.reward_submission_approved?.(getFeatureTitle)}
             </Typography>
           </Grid>
           <Grid item xs>
             <Typography variant='body2'>
-              <b>URL:</b> [Link to {getFeatureTitle('proposal')}]
+              <b>URL:</b> [Link to {getFeatureTitle(credentialTemplateType === 'proposal' ? 'proposal' : 'reward')}]
             </Typography>
           </Grid>
         </Grid>
