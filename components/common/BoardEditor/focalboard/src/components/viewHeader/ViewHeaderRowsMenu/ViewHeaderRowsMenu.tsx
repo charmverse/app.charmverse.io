@@ -80,6 +80,7 @@ export type ViewHeaderRowsMenuProps = {
   onChangeProposalsStatuses?: PropertyTemplateMenuProps['onChangeProposalsStatuses'];
   onChangeProposalsSteps?: PropertyTemplateMenuProps['onChangeProposalsSteps'];
   showRewardsBatchPaymentButton?: boolean;
+  showTrashIcon?: boolean;
 };
 
 export function ViewHeaderRowsMenu({
@@ -98,7 +99,8 @@ export function ViewHeaderRowsMenu({
   onChangeProposalsReviewers,
   onChangeProposalsStatuses,
   onChangeProposalsSteps,
-  showRewardsBatchPaymentButton
+  showRewardsBatchPaymentButton,
+  showTrashIcon = !board.fields.sourceType
 }: ViewHeaderRowsMenuProps) {
   const isAdmin = useIsAdmin();
   const { space } = useCurrentSpace();
@@ -107,8 +109,6 @@ export function ViewHeaderRowsMenu({
   const { showConfirmation } = useConfirmationModal();
   const { showError } = useSnackbar();
   const { trigger: syncRelationPropertyValue } = useSyncRelationPropertyValue();
-
-  const showTrashIcon = !board.fields.sourceType; // dont allow deleting cards for proposals-as-a-source
 
   async function deleteCheckedCards() {
     if (checkedIds.length > 1) {

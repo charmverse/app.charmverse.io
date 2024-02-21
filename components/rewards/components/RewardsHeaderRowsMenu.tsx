@@ -35,6 +35,7 @@ export function RewardsHeaderRowsMenu({
       propertyTemplates={propertyTemplates}
       onChange={refreshRewards}
       showRewardsBatchPaymentButton
+      showTrashIcon={false}
     />
   );
 }
