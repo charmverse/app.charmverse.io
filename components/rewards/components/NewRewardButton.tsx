@@ -19,6 +19,7 @@ import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { getRewardErrors } from 'lib/rewards/getRewardErrors';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
+import { getRewardType } from 'lib/rewards/getRewardType';
 
 import { useRewardTemplates } from '../hooks/useRewardTemplates';
 
@@ -74,7 +75,10 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
       type: 'bounty',
       templateId: template.page.id
     });
-    setRewardValues(template.reward);
+    setRewardValues({
+      rewardType: getRewardType(template.reward),
+      ...template.reward
+    });
   }
 
   function selectTemplate(template: RewardTemplate | null) {

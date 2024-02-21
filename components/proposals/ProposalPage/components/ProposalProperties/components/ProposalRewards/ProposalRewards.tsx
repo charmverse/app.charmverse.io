@@ -141,7 +141,8 @@ export function ProposalRewards({
 
   function selectTemplate(template: RewardTemplate | null) {
     if (template) {
-      setRewardValues(template.reward);
+      const rewardType = getRewardType(template.reward);
+      setRewardValues({ rewardType, ...template.reward });
       updateNewPageValues({
         ...template.page,
         content: template.page.content as any,
