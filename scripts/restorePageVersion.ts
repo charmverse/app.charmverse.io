@@ -1,7 +1,7 @@
 import { restoreDocument } from 'lib/pages/restoreDocument';
 import { prisma } from '@charmverse/core/prisma-client';
 
-const pagePath = 'phi-wallet-ripple-internal-5513363048264384-restored-1708476897036';
+const pagePath = 'phi-wallet-ripple-internal-5513363048264384';
 const version = 504;
 
 async function restore() {
