@@ -65,17 +65,19 @@ function SafeMenuItem({
       .filter(isTruthy)
   });
 
-  async function onPaymentSuccess(results: GnosisProposeTransactionResult[]) {
-    for (const result of results) {
-      await charmClient.rewards.recordTransaction({
-        applicationId: result.transaction.applicationId,
-        transactionId: result.txHash,
-        safeTxHash: result.txHash,
-        chainId: safeInfo.chainId.toString()
-      });
-    }
+  async function onPaymentSuccess(result: GnosisProposeTransactionResult) {
+    await Promise.all(
+      result.transactions.map((transaction) =>
+        charmClient.rewards.recordTransaction({
+          applicationId: transaction.applicationId,
+          transactionId: result.txHash,
+          safeTxHash: result.txHash,
+          chainId: safeInfo.chainId.toString()
+        })
+      )
+    );
 
-    showMessage(`Transaction${results.length > 1 ? 's' : ''} added to your Safe`, 'success');
+    showMessage(`Transaction${result.transactions.length > 1 ? 's' : ''} added to your Safe`, 'success');
 
     refreshSubmissions();
 

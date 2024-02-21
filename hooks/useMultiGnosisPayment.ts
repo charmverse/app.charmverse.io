@@ -12,28 +12,27 @@ import { useWeb3Account } from 'hooks/useWeb3Account';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import { isMantleChain, proposeMantleSafeTransaction } from 'lib/gnosis/mantleClient';
 import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
+import { isTruthy } from 'lib/utilities/types';
 
 import { useCreateSafes } from './useCreateSafes';
-import { useSnackbar } from './useSnackbar';
 
 export type MetaTransactionDataWithApplicationId = MetaTransactionData & { applicationId: string };
 
 export type GnosisProposeTransactionResult = {
   safeAddress: string;
-  transaction: MetaTransactionDataWithApplicationId;
+  transactions: MetaTransactionDataWithApplicationId[];
   txHash: string;
 };
 
 export type GnosisPaymentProps = {
   chainId?: number;
-  onSuccess: (results: GnosisProposeTransactionResult[]) => void;
+  onSuccess: (results: GnosisProposeTransactionResult) => void;
   safeAddress: string;
   transactions: MetaTransactionDataWithApplicationId[];
 };
 
 export function useMultiGnosisPayment({ chainId, safeAddress, transactions, onSuccess }: GnosisPaymentProps) {
   const { account, chainId: connectedChainId, signer } = useWeb3Account();
-  const { showMessage } = useSnackbar();
   const [safe] = useCreateSafes([safeAddress]);
   const network = chainId ? getChainById(chainId) : null;
   if (chainId && !network?.gnosisUrl) {
@@ -58,82 +57,83 @@ export function useMultiGnosisPayment({ chainId, safeAddress, transactions, onSu
 
     const txNonce = nonce + pendingTx.results.length;
 
-    const results: GnosisProposeTransactionResult[] = [];
+    const transactionsWithRecipients = (
+      await Promise.all(
+        transactions.map(async (transaction) => {
+          const recipientAddress =
+            transaction.to.endsWith('.eth') && ethers.utils.isValidName(transaction.to)
+              ? await charmClient.resolveEnsName(transaction.to)
+              : transaction.to;
 
-    for (const transaction of transactions) {
-      const recipientAddress =
-        transaction.to.endsWith('.eth') && ethers.utils.isValidName(transaction.to)
-          ? await charmClient.resolveEnsName(transaction.to)
-          : transaction.to;
-
-      if (!recipientAddress) {
-        showMessage('Invalid recipient address', 'error');
-        return;
-      }
-
-      const safeTransaction = await safe.createTransaction({
-        safeTransactionData: [
-          {
-            data: transaction.data,
-            to: recipientAddress,
-            value: transaction.value,
-            operation: transaction.operation
+          if (recipientAddress) {
+            return {
+              ...transaction,
+              to: recipientAddress
+            };
           }
-        ],
-        options: {
-          nonce: txNonce
-        }
-      });
+          return null;
+        })
+      )
+    ).filter(isTruthy);
 
-      const txHash = await safe.getTransactionHash(safeTransaction);
-      const senderSignature = await safe.signTransactionHash(txHash);
-      const ethAdapter = new EthersAdapter({
-        ethers,
-        signerOrProvider: signer
-      });
-
-      const senderAddress = getAddress(account);
-
-      const safeService = new SafeServiceClient({ txServiceUrl: network.gnosisUrl, ethAdapter });
-      if (isMantleChain(chainId)) {
-        await proposeMantleSafeTransaction({
-          safeTransactionData: {
-            ...safeTransaction.data,
-            // Need to convert to string because mantle doesn't support big numbers
-            // @ts-ignore
-            baseGas: safeTransaction.data.baseGas.toString(),
-            // @ts-ignore
-            gasPrice: safeTransaction.data.gasPrice.toString(),
-            // @ts-ignore
-            nonce: safeTransaction.data.nonce.toString(),
-            // @ts-ignore
-            safeTxGas: safeTransaction.data.safeTxGas.toString()
-          },
-          txHash,
-          senderAddress,
-          safeAddress,
-          signature: senderSignature.data,
-          chainId
-        });
-      } else {
-        await safeService.proposeTransaction({
-          safeAddress,
-          safeTransactionData: safeTransaction.data,
-          safeTxHash: txHash,
-          senderAddress,
-          senderSignature: senderSignature.data,
-          origin
-        });
+    const safeTransaction = await safe.createTransaction({
+      safeTransactionData: transactionsWithRecipients.map((transaction) => ({
+        data: transaction.data,
+        to: transaction.to,
+        value: transaction.value,
+        operation: transaction.operation
+      })),
+      options: {
+        nonce: txNonce
       }
+    });
 
-      results.push({
+    const txHash = await safe.getTransactionHash(safeTransaction);
+    const senderSignature = await safe.signTransactionHash(txHash);
+    const ethAdapter = new EthersAdapter({
+      ethers,
+      signerOrProvider: signer
+    });
+
+    const senderAddress = getAddress(account);
+
+    const safeService = new SafeServiceClient({ txServiceUrl: network.gnosisUrl, ethAdapter });
+    if (isMantleChain(chainId)) {
+      await proposeMantleSafeTransaction({
+        safeTransactionData: {
+          ...safeTransaction.data,
+          // Need to convert to string because mantle doesn't support big numbers
+          // @ts-ignore
+          baseGas: safeTransaction.data.baseGas.toString(),
+          // @ts-ignore
+          gasPrice: safeTransaction.data.gasPrice.toString(),
+          // @ts-ignore
+          nonce: safeTransaction.data.nonce.toString(),
+          // @ts-ignore
+          safeTxGas: safeTransaction.data.safeTxGas.toString()
+        },
+        txHash,
+        senderAddress,
         safeAddress,
-        transaction,
-        txHash
+        signature: senderSignature.data,
+        chainId
+      });
+    } else {
+      await safeService.proposeTransaction({
+        safeAddress,
+        safeTransactionData: safeTransaction.data,
+        safeTxHash: txHash,
+        senderAddress,
+        senderSignature: senderSignature.data,
+        origin
       });
     }
 
-    onSuccess(results);
+    onSuccess({
+      safeAddress,
+      transactions,
+      txHash
+    });
   }
 
   async function makePaymentWithErrorParser() {
