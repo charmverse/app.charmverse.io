@@ -94,13 +94,14 @@ export function useProposalsBoardAdapter() {
     const viewBlock = proposalBlocks?.find((b) => b.id === DEFAULT_VIEW_BLOCK_ID);
 
     if (!viewBlock) {
-      return getDefaultTableView({ board });
+      const boardView = getDefaultTableView({ board });
+      // sort by created at desc by default
+      if (!boardView.fields.sortOptions?.length) {
+        boardView.fields.sortOptions = [{ propertyId: CREATED_AT_ID, reversed: true }];
+      }
+      return boardView;
     }
     const boardView = blockToFBBlock(viewBlock) as BoardView;
-    // sort by created at desc by default
-    if (!boardView.fields.sortOptions?.length) {
-      boardView.fields.sortOptions = [{ propertyId: CREATED_AT_ID, reversed: true }];
-    }
 
     return boardView;
   }, [board, proposalBlocks]);

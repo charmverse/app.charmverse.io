@@ -11,8 +11,6 @@ import { DEFAULT_PAGE_SIZE, usePaginatedData } from 'hooks/usePaginatedData';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 
-import type { PageListItemsRecord } from '../../interfaces';
-
 type Props = {
   group: BoardGroup;
   board: Board;
@@ -24,7 +22,6 @@ type Props = {
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
   onDropToCard?: (srcCard: Card, dstCard: Card) => Promise<void>;
   showCard: (cardId: string | null) => void;
-  isManualSort: boolean;
   disableAddingCards?: boolean;
   hideLinkedBounty?: boolean;
 };
@@ -40,7 +37,6 @@ export function KanbanGroupColumn({
   selectedCardIds,
   onDropToCard,
   showCard,
-  isManualSort,
   disableAddingCards,
   hideLinkedBounty
 }: Props) {
@@ -61,7 +57,6 @@ export function KanbanGroupColumn({
           }}
           onDrop={onDropToCard}
           showCard={showCard}
-          isManualSort={isManualSort}
           hideLinkedBounty={hideLinkedBounty}
         />
       ))}
