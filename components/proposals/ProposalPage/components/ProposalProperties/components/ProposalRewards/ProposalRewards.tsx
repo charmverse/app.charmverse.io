@@ -20,11 +20,13 @@ import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates'
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalPendingReward } from 'lib/proposal/interface';
+import { getRewardErrors } from 'lib/rewards/getRewardErrors';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
+import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardReviewer } from 'lib/rewards/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 
-import { AttachRewardButton, getDisabledTooltip } from './AttachRewardButton';
+import { AttachRewardButton } from './AttachRewardButton';
 
 type Props = {
   pendingRewards: ProposalPendingReward[] | undefined;
@@ -103,10 +105,11 @@ export function ProposalRewards({
       ? template.reward.allowedSubmitterRoles
       : assignedSubmitters;
 
-    setRewardValues(
-      { ...template?.reward, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters },
-      { skipDirty: true }
-    );
+    const reward = { ...template?.reward, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters };
+    if (template?.reward) {
+      (reward as any).rewardType = getRewardType(template.reward);
+    }
+    setRewardValues(reward, { skipDirty: true });
 
     openNewPage({
       ...template?.page,
@@ -141,7 +144,8 @@ export function ProposalRewards({
 
   function selectTemplate(template: RewardTemplate | null) {
     if (template) {
-      setRewardValues(template.reward);
+      const rewardType = getRewardType(template.reward);
+      setRewardValues({ rewardType, ...template.reward });
       updateNewPageValues({
         ...template.page,
         content: template.page.content as any,
@@ -155,6 +159,13 @@ export function ProposalRewards({
       });
     }
   }
+
+  const newRewardErrors = getRewardErrors({
+    page: newPageValues,
+    reward: rewardValues,
+    rewardType: rewardValues.rewardType,
+    isProposalTemplate
+  }).join(', ');
 
   if (rewards.length) {
     return (
@@ -288,12 +299,7 @@ export function ProposalRewards({
 
       <NewPageDialog
         contentUpdated={!readOnly && (contentUpdated || isDirty)}
-        disabledTooltip={getDisabledTooltip({
-          readOnly,
-          newPageValues,
-          rewardValues,
-          isProposalTemplate: !!isProposalTemplate
-        })}
+        disabledTooltip={newRewardErrors}
         isOpen={!!newPageValues}
         onClose={closeDialog}
         onSave={saveForm}

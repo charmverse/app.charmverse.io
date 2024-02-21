@@ -101,7 +101,7 @@ describe('POST /api/rewards - createRewardController', () => {
     const reviewers: TargetPermissionGroup<'role' | 'user'>[] = [{ id: user.id, group: 'user' }];
     const submitterRole = await testUtilsMembers.generateRole({ createdBy: user.id, spaceId: space.id });
 
-    const rewardData: Partial<RewardCreationData> = {
+    const rewardData: RewardCreationData = {
       spaceId: space.id,
       userId: user.id,
       chainId: 2,
@@ -112,6 +112,9 @@ describe('POST /api/rewards - createRewardController', () => {
       dueDate: new Date(),
       customReward: 'Special Badge',
       fields: { fieldName: 'sampleField', type: 'text' },
+      pageProps: {
+        title: 'Some reward'
+      },
       reviewers,
       allowedSubmitterRoles: [submitterRole.id]
     };
@@ -127,6 +130,23 @@ describe('POST /api/rewards - createRewardController', () => {
       allowedSubmitterRoles: rewardData.allowedSubmitterRoles,
       reviewers
     });
+  });
+
+  it('should return a status code 400 when missing fields', async () => {
+    const anotherUser = await testUtilsUser.generateUser(); // Assuming this user doesn't have permission to create a reward.
+    const anotherUserCookie = await loginUser(anotherUser.id);
+
+    const rewardData = {
+      spaceId: space.id,
+      title: 'Random Text',
+      description: 'Random Text'
+    };
+
+    await request(baseUrl)
+      .post(`/api/rewards?spaceId=${space.id}`)
+      .set('Cookie', userCookie)
+      .send(rewardData)
+      .expect(400);
   });
 
   it('should return a status code 401 when the user does not have permission to create a reward', async () => {

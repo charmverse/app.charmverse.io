@@ -30,7 +30,6 @@ type Props = {
   visibleTitle: boolean;
   isSelected: boolean;
   readOnly: boolean;
-  isManualSort: boolean;
   onDrop: (srcCard: Card, dstCard: Card) => void;
 };
 
@@ -39,12 +38,7 @@ const GalleryCard = React.memo((props: Props) => {
   const { pages } = usePages();
   const { trigger: trashPages } = useTrashPages();
   const { showError } = useSnackbar();
-  const [isDragging, isOver, cardRef] = useSortable(
-    'card',
-    card,
-    props.isManualSort && !props.readOnly && !isTouchScreen(),
-    props.onDrop
-  );
+  const [isDragging, isOver, cardRef] = useSortable('card', card, !props.readOnly && !isTouchScreen(), props.onDrop);
   const cardPage = pages[card.id];
 
   const visiblePropertyTemplates = (props.visiblePropertyTemplates || []).filter(

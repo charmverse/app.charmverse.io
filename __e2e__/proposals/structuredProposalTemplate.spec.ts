@@ -385,8 +385,12 @@ test.describe.serial('Structured proposal template', () => {
     // Give some time for value to populate
     await page.waitForTimeout(200);
 
-    await proposalFormFieldPage.getFormFieldInput(shortTextField.id, 'short_text').clear();
-    await proposalFormFieldPage.getFormFieldInput(shortTextField.id, 'short_text').fill(valueToSet);
+    const input = proposalFormFieldPage.getFormFieldInput(shortTextField.id, 'short_text');
+
+    await input.clear();
+    await expect(input).toHaveValue('');
+    await input.fill(valueToSet);
+    await expect(input).toHaveValue(valueToSet);
 
     // Leave some time for the changes to be saved
     await page.waitForTimeout(200);
