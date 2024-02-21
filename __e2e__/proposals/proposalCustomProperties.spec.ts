@@ -148,7 +148,7 @@ test.describe.serial('Proposal custom properties', () => {
     });
   });
 
-  test('Admin can edit custom properties', async ({ documentPage, databasePage }) => {
+  test('Admin can edit custom properties', async ({ documentPage, databasePage, page }) => {
     await loginBrowserUser({
       browserPage: documentPage.page,
       userId: admin.id
@@ -167,10 +167,12 @@ test.describe.serial('Proposal custom properties', () => {
     await expect(textInputOnFirstReload).toHaveValue(settingsToTest.testTextValue);
 
     // Set the second value
-    await textInputOnFirstReload.fill(settingsToTest.secondTextValue);
-
-    // We need to click elsewhere for the input value to propagate
-    await documentPage.documentTitle.click();
+    await Promise.all([
+      page.waitForResponse('**/api/proposals/**'),
+      textInputOnFirstReload.fill(settingsToTest.secondTextValue),
+      // We need to click elsewhere for the input value to propagate
+      documentPage.documentTitle.click()
+    ]);
 
     await documentPage.page.reload({ waitUntil: 'domcontentloaded' });
 
