@@ -7,7 +7,6 @@ import { useCallback, useState } from 'react';
 import useSWR from 'swr';
 import { getAddress, parseUnits } from 'viem';
 
-import { useRewards } from 'components/rewards/hooks/useRewards';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { SafeData } from 'lib/gnosis';

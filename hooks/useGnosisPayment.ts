@@ -26,12 +26,12 @@ export type GnosisProposeTransactionResult = {
 
 export type GnosisPaymentProps = {
   chainId?: number;
-  onSuccess: (result: GnosisProposeTransactionResult) => void;
+  onSuccess: (results: GnosisProposeTransactionResult[]) => void;
   safeAddress: string;
-  transaction: MetaTransactionDataWithApplicationId;
+  transactions: MetaTransactionDataWithApplicationId[];
 };
 
-export function useGnosisPayment({ chainId, safeAddress, transaction, onSuccess }: GnosisPaymentProps) {
+export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess }: GnosisPaymentProps) {
   const { account, chainId: connectedChainId, signer } = useWeb3Account();
   const { showMessage } = useSnackbar();
   const [safe] = useGnosisSafes([safeAddress]);
@@ -58,71 +58,82 @@ export function useGnosisPayment({ chainId, safeAddress, transaction, onSuccess 
 
     const txNonce = nonce + pendingTx.results.length;
 
-    const recipientAddress =
-      transaction.to.endsWith('.eth') && ethers.utils.isValidName(transaction.to)
-        ? await charmClient.resolveEnsName(transaction.to)
-        : transaction.to;
+    const results: GnosisProposeTransactionResult[] = [];
 
-    if (!recipientAddress) {
-      showMessage('Invalid recipient address', 'error');
-      return;
-    }
+    for (const transaction of transactions) {
+      const recipientAddress =
+        transaction.to.endsWith('.eth') && ethers.utils.isValidName(transaction.to)
+          ? await charmClient.resolveEnsName(transaction.to)
+          : transaction.to;
 
-    const safeTransaction = await safe.createTransaction({
-      safeTransactionData: [
-        {
-          data: transaction.data,
-          to: recipientAddress,
-          value: transaction.value,
-          operation: transaction.operation
-        }
-      ],
-      options: {
-        nonce: txNonce
+      if (!recipientAddress) {
+        showMessage('Invalid recipient address', 'error');
+        return;
       }
-    });
 
-    const txHash = await safe.getTransactionHash(safeTransaction);
-    const senderSignature = await safe.signTransactionHash(txHash);
-    const ethAdapter = new EthersAdapter({
-      ethers,
-      signerOrProvider: signer
-    });
-
-    const senderAddress = getAddress(account);
-
-    const safeService = new SafeServiceClient({ txServiceUrl: network.gnosisUrl, ethAdapter });
-    if (isMantleChain(chainId)) {
-      await proposeMantleSafeTransaction({
-        safeTransactionData: {
-          ...safeTransaction.data,
-          // Need to convert to string because mantle doesn't support big numbers
-          // @ts-ignore
-          baseGas: safeTransaction.data.baseGas.toString(),
-          // @ts-ignore
-          gasPrice: safeTransaction.data.gasPrice.toString(),
-          // @ts-ignore
-          nonce: safeTransaction.data.nonce.toString(),
-          // @ts-ignore
-          safeTxGas: safeTransaction.data.safeTxGas.toString()
-        },
-        txHash,
-        senderAddress,
-        safeAddress,
-        signature: senderSignature.data,
-        chainId
+      const safeTransaction = await safe.createTransaction({
+        safeTransactionData: [
+          {
+            data: transaction.data,
+            to: recipientAddress,
+            value: transaction.value,
+            operation: transaction.operation
+          }
+        ],
+        options: {
+          nonce: txNonce
+        }
       });
-    } else {
-      await safeService.proposeTransaction({
+
+      const txHash = await safe.getTransactionHash(safeTransaction);
+      const senderSignature = await safe.signTransactionHash(txHash);
+      const ethAdapter = new EthersAdapter({
+        ethers,
+        signerOrProvider: signer
+      });
+
+      const senderAddress = getAddress(account);
+
+      const safeService = new SafeServiceClient({ txServiceUrl: network.gnosisUrl, ethAdapter });
+      if (isMantleChain(chainId)) {
+        await proposeMantleSafeTransaction({
+          safeTransactionData: {
+            ...safeTransaction.data,
+            // Need to convert to string because mantle doesn't support big numbers
+            // @ts-ignore
+            baseGas: safeTransaction.data.baseGas.toString(),
+            // @ts-ignore
+            gasPrice: safeTransaction.data.gasPrice.toString(),
+            // @ts-ignore
+            nonce: safeTransaction.data.nonce.toString(),
+            // @ts-ignore
+            safeTxGas: safeTransaction.data.safeTxGas.toString()
+          },
+          txHash,
+          senderAddress,
+          safeAddress,
+          signature: senderSignature.data,
+          chainId
+        });
+      } else {
+        await safeService.proposeTransaction({
+          safeAddress,
+          safeTransactionData: safeTransaction.data,
+          safeTxHash: txHash,
+          senderAddress,
+          senderSignature: senderSignature.data,
+          origin
+        });
+      }
+
+      results.push({
         safeAddress,
-        safeTransactionData: safeTransaction.data,
-        safeTxHash: txHash,
-        senderAddress,
-        senderSignature: senderSignature.data,
-        origin
+        transaction,
+        txHash
       });
     }
-    onSuccess({ safeAddress, transaction, txHash });
+
+    onSuccess(results);
   }
 
   async function makePaymentWithErrorParser() {

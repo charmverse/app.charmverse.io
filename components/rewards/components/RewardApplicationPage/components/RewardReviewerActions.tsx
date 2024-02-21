@@ -99,14 +99,12 @@ export function RewardReviewerActions({
       )}
       {application.status === 'complete' && rewardType === 'token' && rewardPermissions?.review && (
         <RewardPaymentButton
-          amount={String(reward.rewardAmount)}
           chainIdToUse={reward.chainId as number}
-          receiver={application.walletAddress as string}
-          reward={reward}
+          rewards={[reward]}
           tokenSymbolOrAddress={reward.rewardToken as string}
           onSuccess={recordTransaction}
           onError={(message) => showMessage(message, 'warning')}
-          submission={application}
+          submissions={[application]}
           refreshSubmission={refreshApplication}
         />
       )}
