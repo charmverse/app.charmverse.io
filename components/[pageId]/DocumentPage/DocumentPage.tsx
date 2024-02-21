@@ -451,7 +451,7 @@ function DocumentPageComponent({
               {isStructuredProposal &&
                 proposal?.fields?.enableRewards &&
                 (!!proposal.fields.pendingRewards?.length || !readOnly) && (
-                  <Box mt={1} mb={10}>
+                  <Box mt={1}>
                     <ProposalRewardsTable
                       containerWidth={containerWidth}
                       pendingRewards={proposal.fields.pendingRewards || []}
