@@ -67,8 +67,8 @@ describe('verifyTokenGateMembership', () => {
 
   afterEach(async () => {
     jest.resetModules();
-    await prisma.user.deleteMany();
-    await prisma.space.deleteMany();
+    await prisma.user.deleteMany({});
+    await prisma.space.deleteMany({});
   });
 
   it('should return true if user does not have any token gate connected', async () => {
