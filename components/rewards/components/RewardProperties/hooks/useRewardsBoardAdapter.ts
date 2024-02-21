@@ -101,16 +101,17 @@ export function useRewardsBoardAdapter() {
     const viewBlock = views?.find((v) => v.id === activeViewId);
 
     if (!viewBlock) {
-      return getDefaultView({ viewType: activeViewId, spaceId: space?.id || '' });
+      const boardView = getDefaultView({ viewType: activeViewId, spaceId: space?.id || '' });
+
+      // sort by created at desc by default
+      if (!boardView.fields.sortOptions?.length) {
+        boardView.fields.sortOptions = [{ propertyId: CREATED_AT_ID, reversed: true }];
+      }
+
+      return boardView;
     }
 
     const boardView = blockToFBBlock(viewBlock as any) as BoardView;
-
-    // sort by created at desc by default
-    if (!boardView.fields.sortOptions?.length) {
-      boardView.fields.sortOptions = [{ propertyId: CREATED_AT_ID, reversed: true }];
-    }
-
     return boardView;
   }, [views, activeViewId, space?.id]);
 

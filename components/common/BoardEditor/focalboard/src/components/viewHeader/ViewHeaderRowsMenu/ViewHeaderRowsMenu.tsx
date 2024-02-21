@@ -21,6 +21,7 @@ import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import mutator from '../../../mutator';
 
 import { ArchiveProposals } from './components/ArchiveProposals';
+import { BatchPaymentRewards } from './components/BatchPaymentRewards';
 import { StyledMenuItem } from './components/PropertyMenu';
 import type { PropertyTemplateMenuProps } from './components/PropertyTemplateMenu';
 import { PropertyTemplateMenu } from './components/PropertyTemplateMenu';
@@ -78,6 +79,7 @@ export type ViewHeaderRowsMenuProps = {
   onChangeProposalsReviewers?: PropertyTemplateMenuProps['onChangeProposalsReviewers'];
   onChangeProposalsStatuses?: PropertyTemplateMenuProps['onChangeProposalsStatuses'];
   onChangeProposalsSteps?: PropertyTemplateMenuProps['onChangeProposalsSteps'];
+  onBatchPaymentRewards?: () => void;
 };
 
 export function ViewHeaderRowsMenu({
@@ -95,7 +97,8 @@ export function ViewHeaderRowsMenu({
   onChangeProposalsAuthors,
   onChangeProposalsReviewers,
   onChangeProposalsStatuses,
-  onChangeProposalsSteps
+  onChangeProposalsSteps,
+  onBatchPaymentRewards
 }: ViewHeaderRowsMenuProps) {
   const isAdmin = useIsAdmin();
   const { space } = useCurrentSpace();
@@ -247,6 +250,7 @@ export function ViewHeaderRowsMenu({
           ))
         : null}
       {onArchiveProposals && <ArchiveProposals onChange={onArchiveProposals} />}
+      {onBatchPaymentRewards && <BatchPaymentRewards onClick={onBatchPaymentRewards} />}
       {showTrashIcon && (
         <StyledMenuItem lastChild onClick={deleteCheckedCards} disabled={isDeleting}>
           <Tooltip title='Delete'>
