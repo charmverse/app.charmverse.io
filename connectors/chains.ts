@@ -83,7 +83,7 @@ const RPC: Record<string, IChainDetails> = {
     gnosisUrl: 'https://safe-transaction-mainnet.safe.global',
     iconUrl: '/images/cryptoLogos/ethereum-eth-logo.svg',
     rpcUrls: mainnet.rpcUrls.public.http,
-    shortName: mainnet.nativeCurrency.name,
+    shortName: 'eth',
     litNetwork: 'ethereum',
     unlockNetwork: true,
     hypersubNetwork: true
