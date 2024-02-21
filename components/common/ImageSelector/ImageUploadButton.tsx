@@ -38,7 +38,6 @@ export function ImageUploadButton({
         loadingMessage='Uploading image'
         disabled={isUploading}
         component='label'
-        size='small'
         variant={variant}
         onClick={(e: any) => {
           // This is necessary to prevent the file picker to open multiple times (this happens in the sidebar)
