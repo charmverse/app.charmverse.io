@@ -5,8 +5,7 @@ import { useState } from 'react';
 import { v4 } from 'uuid';
 
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
-import { Button } from 'components/common/Button';
-import { StylesContainer } from 'components/common/CharmEditor/components/inlineDatabase/components/InlineDatabase';
+import { InlineDatabaseContainer } from 'components/common/CharmEditor/components/inlineDatabase/components/InlineDatabaseContainer';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
 import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
@@ -243,7 +242,7 @@ export function ProposalRewardsTable({
 
   return (
     <>
-      <StylesContainer className='focalboard-body' containerWidth={containerWidth}>
+      <InlineDatabaseContainer className='focalboard-body' containerWidth={containerWidth}>
         <div className='BoardComponent drag-area-container'>
           <DatabaseStickyHeader>
             <Box display='flex' justifyContent='space-between' alignItems='center'>
@@ -288,7 +287,7 @@ export function ProposalRewardsTable({
             </Box>
           )}
         </div>
-      </StylesContainer>
+      </InlineDatabaseContainer>
       <NewPageDialog
         contentUpdated={!readOnly && (contentUpdated || isDirty)}
         disabledTooltip={newRewardErrors}
