@@ -17,6 +17,7 @@ export function SingleChoiceForm({ value, onChange, voteOptions, disabled, total
     <RadioGroup value={value} onChange={(e, v) => onChange(v)}>
       {voteOptions.map((voteOption) => (
         <FormControlLabel
+          data-test={`current-vote-${voteOption.name}`}
           key={voteOption.name}
           control={<Radio size='small' />}
           disabled={disabled}

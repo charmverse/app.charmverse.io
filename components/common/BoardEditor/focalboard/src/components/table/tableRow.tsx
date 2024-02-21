@@ -132,10 +132,8 @@ function TableRow(props: Props) {
   const isMobile = useSmallScreen();
   const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
   const [title, setTitle] = useState('');
-  const isManualSort = activeView.fields.sortOptions.length === 0;
   const isGrouped = Boolean(activeView.fields.groupById);
-
-  const enabled = !isTouchScreen() && !props.readOnly && (isManualSort || isGrouped);
+  const enabled = !isTouchScreen() && !props.readOnly;
 
   const { drag, drop, preview, style } = useDragDrop({
     item: card,
