@@ -13,7 +13,7 @@ import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import { isMantleChain, proposeMantleSafeTransaction } from 'lib/gnosis/mantleClient';
 import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
 
-import useGnosisSafes from './useGnosisSafes';
+import { useCreateSafes } from './useCreateSafes';
 import { useSnackbar } from './useSnackbar';
 
 export type MetaTransactionDataWithApplicationId = MetaTransactionData & { applicationId: string };
@@ -31,10 +31,10 @@ export type GnosisPaymentProps = {
   transactions: MetaTransactionDataWithApplicationId[];
 };
 
-export function useGnosisPayment({ chainId, safeAddress, transactions, onSuccess }: GnosisPaymentProps) {
+export function useMultiGnosisPayment({ chainId, safeAddress, transactions, onSuccess }: GnosisPaymentProps) {
   const { account, chainId: connectedChainId, signer } = useWeb3Account();
   const { showMessage } = useSnackbar();
-  const [safe] = useGnosisSafes([safeAddress]);
+  const [safe] = useCreateSafes([safeAddress]);
   const network = chainId ? getChainById(chainId) : null;
   if (chainId && !network?.gnosisUrl) {
     throw new Error(`Unsupported Gnosis network: ${chainId}`);

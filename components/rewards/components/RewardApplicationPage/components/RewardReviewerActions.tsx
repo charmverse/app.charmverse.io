@@ -15,7 +15,7 @@ import type { ApplicationWithTransactions, RewardWithUsers, RewardType } from 'l
 import type { ReviewDecision } from 'lib/rewards/reviewApplication';
 
 import { AcceptOrRejectButtons } from './AcceptOrRejectButtons';
-import { RewardPaymentButton } from './RewardPaymentButton';
+import { MultiRewardPaymentButton } from './MultiRewardPaymentButton';
 
 type Props = {
   reward: RewardWithUsers;
@@ -35,8 +35,6 @@ export function RewardReviewerActions({
   rewardType,
   hasApplicationSlots
 }: Props) {
-  const { showMessage } = useSnackbar();
-
   const { open, isOpen, close } = usePopupState({ variant: 'dialog', popupId: 'confirm-mark-submission-paid' });
 
   const [pendingSafeTransactionUrl, setPendingSafeTransactionUrl] = useState<string | null>(null);
@@ -57,20 +55,6 @@ export function RewardReviewerActions({
       }
     }
   }, [application.status, application.transactions.length]);
-
-  async function recordTransaction(transactionId: string, chainId: number) {
-    try {
-      await charmClient.rewards.recordTransaction({
-        applicationId: application.id,
-        chainId: chainId.toString(),
-        transactionId
-      });
-      await charmClient.rewards.markSubmissionAsPaid(application.id);
-      refreshApplication();
-    } catch (err: any) {
-      showMessage(err.message || err, 'error');
-    }
-  }
 
   async function markAsPaid() {
     await charmClient.rewards.markSubmissionAsPaid(application.id);
@@ -98,14 +82,16 @@ export function RewardReviewerActions({
         />
       )}
       {application.status === 'complete' && rewardType === 'token' && rewardPermissions?.review && (
-        <RewardPaymentButton
+        <MultiRewardPaymentButton
           chainIdToUse={reward.chainId as number}
-          rewards={[reward]}
+          rewards={[
+            {
+              ...reward,
+              submissions: [application]
+            }
+          ]}
           tokenSymbolOrAddress={reward.rewardToken as string}
-          onSuccess={recordTransaction}
-          onError={(message) => showMessage(message, 'warning')}
-          submissions={[application]}
-          refreshSubmission={refreshApplication}
+          refreshSubmissions={refreshApplication}
         />
       )}
 

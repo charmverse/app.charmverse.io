@@ -79,7 +79,7 @@ export type ViewHeaderRowsMenuProps = {
   onChangeProposalsReviewers?: PropertyTemplateMenuProps['onChangeProposalsReviewers'];
   onChangeProposalsStatuses?: PropertyTemplateMenuProps['onChangeProposalsStatuses'];
   onChangeProposalsSteps?: PropertyTemplateMenuProps['onChangeProposalsSteps'];
-  onBatchPaymentRewards?: () => void;
+  showRewardsBatchPaymentButton?: boolean;
 };
 
 export function ViewHeaderRowsMenu({
@@ -98,7 +98,7 @@ export function ViewHeaderRowsMenu({
   onChangeProposalsReviewers,
   onChangeProposalsStatuses,
   onChangeProposalsSteps,
-  onBatchPaymentRewards
+  showRewardsBatchPaymentButton
 }: ViewHeaderRowsMenuProps) {
   const isAdmin = useIsAdmin();
   const { space } = useCurrentSpace();
@@ -250,7 +250,7 @@ export function ViewHeaderRowsMenu({
           ))
         : null}
       {onArchiveProposals && <ArchiveProposals onChange={onArchiveProposals} />}
-      {onBatchPaymentRewards && <BatchPaymentRewards onClick={onBatchPaymentRewards} />}
+      {showRewardsBatchPaymentButton && <BatchPaymentRewards checkedIds={checkedIds} />}
       {showTrashIcon && (
         <StyledMenuItem lastChild onClick={deleteCheckedCards} disabled={isDeleting}>
           <Tooltip title='Delete'>
