@@ -6,7 +6,6 @@ import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
 import Legend from '../Legend';
 import Avatar from '../space/components/LargeAvatar';
@@ -14,7 +13,6 @@ import Avatar from '../space/components/LargeAvatar';
 import { CredentialTemplates } from './components/CredentialTemplates';
 
 export function SpaceCredentialSettings() {
-  const { getFeatureTitle } = useSpaceFeatures();
   const { space, refreshCurrentSpace } = useCurrentSpace();
   useTrackPageView({ type: 'settings/credentials' });
   const isAdmin = useIsAdmin();

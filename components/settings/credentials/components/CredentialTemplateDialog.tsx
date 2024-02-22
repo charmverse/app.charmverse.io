@@ -37,10 +37,17 @@ type Props = {
   onClose: () => void;
 };
 
+const defaultEventValues: Record<AttestationType, CredentialEventType[]> = {
+  proposal: ['proposal_created', 'proposal_approved'],
+  reward: ['reward_submission_approved']
+};
+
 function CredentialTemplateForm({ credentialTemplate, refreshTemplates, newCredentialTemplateType, onClose }: Props) {
   const { space } = useCurrentSpace();
   const [isSaving, setIsSaving] = useState(false);
   const { showMessage } = useSnackbar();
+
+  const templateType = credentialTemplate?.schemaType ?? (newCredentialTemplateType as AttestationType);
 
   const {
     register,
@@ -55,11 +62,13 @@ function CredentialTemplateForm({ credentialTemplate, refreshTemplates, newCrede
       organization: credentialTemplate?.organization ?? space?.name,
       name: credentialTemplate?.name,
       description: credentialTemplate?.description,
-      credentialEvents: credentialTemplate?.credentialEvents ?? []
+      credentialEvents: credentialTemplate?.credentialEvents ?? defaultEventValues[templateType]
     },
     // mode: 'onChange',
     resolver: yupResolver(schema)
   });
+
+  const selectedCredentialEvents = watch('credentialEvents');
 
   const onChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -93,10 +102,6 @@ function CredentialTemplateForm({ credentialTemplate, refreshTemplates, newCrede
     }
     setIsSaving(false);
   }
-
-  const selectedCredentialEvents = watch('credentialEvents');
-
-  const templateType = credentialTemplate?.schemaType ?? (newCredentialTemplateType as AttestationType);
 
   return (
     <Box sx={{ width: '100%' }}>
