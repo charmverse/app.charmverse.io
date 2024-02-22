@@ -320,7 +320,6 @@ function getCardsFromPendingRewards(pendingRewards: ProposalPendingReward[], spa
         ...reward
       } as BoardReward,
       rewardPage: {
-        id: draftId,
         // add fields to satisfy PageMeta type. TODO: We dont need all fields on PageMeta for cards
         boardId: null,
         bountyId: null,
@@ -344,7 +343,8 @@ function getCardsFromPendingRewards(pendingRewards: ProposalPendingReward[], spa
         title: '',
         updatedAt: new Date(),
         updatedBy: '',
-        ...page
+        ...page,
+        id: draftId
       }
     });
   });
