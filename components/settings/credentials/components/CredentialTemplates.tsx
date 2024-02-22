@@ -69,9 +69,7 @@ export function CredentialTemplates() {
       </Typography>
       <Box>
         <Box display='flex' alignItems='center' flexDirection='row' justifyContent='space-between'>
-          <Typography variant='subtitle1' sx={{ alignSelf: 'center' }}>
-            {capitalize(getFeatureTitle('proposals'))}
-          </Typography>
+          <Typography variant='subtitle1'>{capitalize(getFeatureTitle('proposals'))}</Typography>
           <Tooltip title={!isAdmin ? 'Only space admins can create credentials' : ''} arrow>
             <Button
               onClick={() => openDialog({ newTemplateType: 'proposal' })}
@@ -95,9 +93,7 @@ export function CredentialTemplates() {
       </Box>
       <Box>
         <Box display='flex' alignItems='center' flexDirection='row' justifyContent='space-between'>
-          <Typography variant='subtitle1' sx={{ alignSelf: 'center' }}>
-            {capitalize(getFeatureTitle('rewards'))}
-          </Typography>
+          <Typography variant='subtitle1'>{capitalize(getFeatureTitle('rewards'))}</Typography>
           <Tooltip title={!isAdmin ? 'Only space admins can create credentials' : ''} arrow>
             <Button
               onClick={() => openDialog({ newTemplateType: 'reward' })}
