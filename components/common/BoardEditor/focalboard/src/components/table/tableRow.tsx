@@ -361,7 +361,7 @@ function TableRow(props: Props) {
           >
             <PropertyValueElement
               showCard={(cardId) => cardId && props.showCard(cardId)}
-              readOnly={props.readOnly}
+              readOnly={props.readOnly || !!isNested}
               syncWithPageId={cardPage?.syncWithPageId}
               card={card}
               proposal={proposal}
