@@ -11,7 +11,8 @@ import { allMembersSystemRole, authorSystemRole } from 'components/settings/prop
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card, CardPropertyValue } from 'lib/focalboard/card';
 import type { ProposalWithUsersLite } from 'lib/proposal/getProposals';
-import { DUE_DATE_ID } from 'lib/rewards/blocks/constants';
+import { DUE_DATE_ID, REWARD_REVIEWERS_BLOCK_ID } from 'lib/rewards/blocks/constants';
+import type { RewardReviewer } from 'lib/rewards/interfaces';
 
 import mutator from '../../../../mutator';
 
@@ -32,8 +33,9 @@ export type PropertyTemplateMenuProps = {
   onChangeProposalsAuthors?: (pageIds: string[], userIds: string[]) => Promise<void>;
   onChangeProposalsReviewers?: (pageIds: string[], options: SelectOption[]) => Promise<void>;
   onChangeProposalsSteps?: (pageIds: string[], evaluationId: string, moveForward: boolean) => Promise<void>;
-  onChangeRewardsDueDate?: (pageIds: string[], dueDate: DateTime | null) => Promise<void>;
   onChangeProposalsStatuses?: (pageIds: string[], result: ProposalEvaluationResult | null) => Promise<void>;
+  onChangeRewardsDueDate?: (pageIds: string[], dueDate: DateTime | null) => Promise<void>;
+  onChangeRewardsReviewers?: (pageIds: string[], options: SelectOption[]) => Promise<void>;
   onRelationPropertyChange: (a: {
     checkedCards: Card[];
     pageListItemIds: string[];
@@ -64,6 +66,7 @@ export function PropertyTemplateMenu({
   onPersonPropertyChange,
   onRelationPropertyChange,
   onChangeRewardsDueDate,
+  onChangeRewardsReviewers,
   firstCheckedProposal,
   disabledTooltip,
   lastChild
@@ -108,6 +111,21 @@ export function PropertyTemplateMenu({
     }
 
     case 'person': {
+      if (propertyTemplate.id === REWARD_REVIEWERS_BLOCK_ID) {
+        return (
+          <PropertyMenu lastChild={lastChild} disabledTooltip={disabledTooltip} propertyTemplate={propertyTemplate}>
+            <UserAndRoleSelect
+              onChange={async (options) => {
+                await onChangeRewardsReviewers?.(checkedIds, options);
+                if (onChange) {
+                  onChange();
+                }
+              }}
+              value={(propertyValue ?? []) as unknown as RewardReviewer[]}
+            />
+          </PropertyMenu>
+        );
+      }
       return (
         <PersonPropertyTemplateMenu
           lastChild={lastChild}

@@ -93,6 +93,7 @@ export type ViewHeaderRowsMenuProps = {
   onChangeProposalsStatuses?: PropertyTemplateMenuProps['onChangeProposalsStatuses'];
   onChangeProposalsSteps?: PropertyTemplateMenuProps['onChangeProposalsSteps'];
   onChangeRewardsDueDate?: PropertyTemplateMenuProps['onChangeRewardsDueDate'];
+  onChangeRewardsReviewers?: PropertyTemplateMenuProps['onChangeRewardsReviewers'];
   showRewardsBatchPaymentButton?: boolean;
   showTrashIcon?: boolean;
 };
@@ -114,6 +115,7 @@ export function ViewHeaderRowsMenu({
   onChangeProposalsStatuses,
   onChangeProposalsSteps,
   onChangeRewardsDueDate,
+  onChangeRewardsReviewers,
   showRewardsBatchPaymentButton,
   showTrashIcon = !board.fields.sourceType
 }: ViewHeaderRowsMenuProps) {
@@ -237,7 +239,6 @@ export function ViewHeaderRowsMenu({
       {cards.length !== 0
         ? filteredPropertyTemplates.map((propertyTemplate, index) => (
             <PropertyTemplateMenu
-              onChangeRewardsDueDate={onChangeRewardsDueDate}
               isAdmin={isAdmin}
               board={board}
               onRelationPropertyChange={onRelationPropertyChange}
@@ -251,6 +252,8 @@ export function ViewHeaderRowsMenu({
               onChangeProposalsReviewers={onChangeProposalsReviewers}
               onChangeProposalsStatuses={onChangeProposalsStatuses}
               onChangeProposalsSteps={onChangeProposalsSteps}
+              onChangeRewardsDueDate={onChangeRewardsDueDate}
+              onChangeRewardsReviewers={onChangeRewardsReviewers}
               onPersonPropertyChange={onPersonPropertyChange}
               lastChild={!showTrashIcon && index === filteredPropertyTemplates.length - 1}
               disabledTooltip={

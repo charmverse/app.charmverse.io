@@ -27,6 +27,7 @@ import {
   RewardApplicationStatusChip
 } from 'components/rewards/components/RewardApplicationStatusChip';
 import { RewardStatusChip } from 'components/rewards/components/RewardChip';
+import { useRewards } from 'components/rewards/hooks/useRewards';
 import { allMembersSystemRole, authorSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -53,7 +54,7 @@ import {
   REWARD_STATUS_BLOCK_ID,
   REWARD_TOKEN
 } from 'lib/rewards/blocks/constants';
-import type { RewardStatus } from 'lib/rewards/interfaces';
+import type { RewardReviewer, RewardStatus } from 'lib/rewards/interfaces';
 import { getAbsolutePath } from 'lib/utilities/browser';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
@@ -131,6 +132,7 @@ function PropertyValueElement(props: Props) {
   const [value, setValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const [serverValue, setServerValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const { formatDateTime, formatDate } = useDateFormatter();
+  const { updateReward } = useRewards();
   const { showError } = useSnackbar();
   const {
     card,
@@ -279,11 +281,22 @@ function PropertyValueElement(props: Props) {
     return (
       <UserAndRoleSelect
         displayType={displayType}
-        data-test='selected-reviewers'
         readOnly={readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any)}
-        onChange={() => null}
-        systemRoles={[allMembersSystemRole, authorSystemRole]}
-        value={propertyValue as any}
+        onChange={(options) => {
+          if (!reward) {
+            return;
+          }
+          const reviewerOptions = options.filter(
+            (option) => option.group === 'role' || option.group === 'user'
+          ) as RewardReviewer[];
+          updateReward({
+            rewardId: reward.id,
+            updateContent: {
+              reviewers: reviewerOptions.map((option) => ({ group: option.group, id: option.id }))
+            }
+          });
+        }}
+        value={(propertyValue ?? []) as unknown as RewardReviewer[]}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
       />
     );
@@ -485,7 +498,18 @@ function PropertyValueElement(props: Props) {
       );
     } else if (propertyTemplate.id === DUE_DATE_ID && reward?.id) {
       propertyValueElement = (
-        <RewardsDueDatePicker rewardId={reward.id} value={value as string} disabled={props.readOnly} />
+        <RewardsDueDatePicker
+          value={value as string}
+          disabled={props.readOnly}
+          onChange={(_value) => {
+            updateReward({
+              rewardId: reward.id,
+              updateContent: {
+                dueDate: _value?.toJSDate() || undefined
+              }
+            });
+          }}
+        />
       );
     } else {
       propertyValueElement = (
