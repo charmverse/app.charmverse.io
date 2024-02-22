@@ -1,4 +1,10 @@
-import type { Block, Page, ProposalRubricCriteria, ProposalRubricCriteriaAnswer } from '@charmverse/core/prisma-client';
+import type {
+  Block,
+  Page,
+  Prisma,
+  ProposalRubricCriteria,
+  ProposalRubricCriteriaAnswer
+} from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import _ from 'lodash';
 
@@ -26,6 +32,91 @@ import { DEFAULT_BOARD_BLOCK_ID } from './customBlocks/constants';
 import { generateResyncedProposalEvaluationForCard } from './generateResyncedProposalEvaluationForCard';
 import { setDatabaseProposalProperties } from './setDatabaseProposalProperties';
 import { updateCardFormFieldPropertiesValue } from './updateCardFormFieldPropertiesValue';
+
+const pageSelectObject = {
+  id: true,
+  title: true,
+  hasContent: true,
+  content: true,
+  contentText: true,
+  createdAt: true,
+  deletedAt: true,
+  path: true,
+  spaceId: true,
+  proposal: {
+    select: {
+      status: true,
+      archived: true,
+      createdBy: true,
+      formId: true,
+      authors: true,
+      spaceId: true,
+      id: true,
+      evaluations: {
+        select: {
+          id: true,
+          title: true,
+          index: true,
+          result: true,
+          type: true
+        },
+        orderBy: {
+          index: 'asc'
+        }
+      },
+      rewards: {
+        select: {
+          id: true
+        }
+      },
+      fields: true,
+      form: {
+        select: {
+          id: true
+        }
+      }
+    }
+  }
+} as const;
+
+type PagePayload = Prisma.PageGetPayload<{ select: typeof pageSelectObject }>;
+
+async function fetchProposalPages({
+  cursor = null,
+  spaceId
+}: {
+  cursor?: string | null;
+  spaceId: string;
+}): Promise<PagePayload[]> {
+  const batchSize = 100;
+  const proposalPages = await prisma.page.findMany({
+    where: {
+      spaceId,
+      type: 'proposal',
+      proposal: {
+        status: {
+          not: 'draft'
+        }
+      }
+    },
+    take: batchSize,
+    skip: cursor ? 1 : undefined,
+    cursor: cursor ? { id: cursor } : undefined,
+    select: pageSelectObject
+  });
+
+  if (proposalPages.length === batchSize) {
+    const nextCursor = proposalPages[proposalPages.length - 1].id;
+    return proposalPages.concat(
+      await fetchProposalPages({
+        cursor: nextCursor,
+        spaceId
+      })
+    );
+  } else {
+    return proposalPages;
+  }
+}
 
 export async function updateCardsFromProposals({
   boardId,
@@ -198,89 +289,43 @@ export async function updateCardsFromProposals({
     throw new InvalidStateError('Database not configured to use proposals as a source');
   }
 
-  const [proposalPages, existingCardPages] = await Promise.all([
-    prisma.page.findMany({
-      where: {
-        spaceId,
-        type: 'proposal',
-        proposal: {
-          status: {
-            not: 'draft'
-          }
-        }
-      },
-      select: {
-        id: true,
-        title: true,
-        hasContent: true,
-        content: true,
-        contentText: true,
-        createdAt: true,
-        deletedAt: true,
-        path: true,
-        spaceId: true,
-        proposal: {
-          select: {
-            status: true,
-            archived: true,
-            createdBy: true,
-            formId: true,
-            authors: true,
-            spaceId: true,
-            id: true,
-            evaluations: {
-              select: {
-                id: true,
-                title: true,
-                index: true,
-                result: true,
-                type: true
-              },
-              orderBy: {
-                index: 'asc'
-              }
-            },
-            rewards: {
-              select: {
-                id: true
-              }
-            },
-            fields: true,
-            form: {
-              select: {
-                formFields: {
-                  select: {
-                    id: true,
-                    type: true,
-                    private: true,
-                    answers: {
-                      select: {
-                        proposalId: true,
-                        value: true
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+  const proposalPages = await fetchProposalPages({
+    spaceId
+  });
+
+  const existingCardPages = await prisma.page.findMany({
+    where: {
+      type: 'card',
+      parentId: boardId,
+      spaceId,
+      syncWithPageId: {
+        not: null
+      }
+    },
+    include: {
+      card: true
+    }
+  });
+
+  const formFields = await prisma.formField.findMany({
+    where: {
+      formId: {
+        in: Array.from(new Set(proposalPages.map((p) => p.proposal?.formId))).filter(isTruthy)
+      }
+    },
+    select: {
+      formId: true,
+      id: true,
+      type: true,
+      private: true,
+      answers: {
+        select: {
+          proposalId: true,
+          value: true
         }
       }
-    }),
-    prisma.page.findMany({
-      where: {
-        type: 'card',
-        parentId: boardId,
-        spaceId,
-        syncWithPageId: {
-          not: null
-        }
-      },
-      include: {
-        card: true
-      }
-    })
-  ]);
+    }
+  });
 
   // Synced pages with a key referencing the proposal they belong to
   const existingSyncedCardsWithBlocks = existingCardPages.reduce<Record<string, Page & { block: Block }>>(
@@ -519,12 +564,12 @@ export async function updateCardsFromProposals({
         }
       });
 
-      const formFields = pageWithProposal.proposal?.form?.formFields ?? [];
+      const proposalFormFields = formFields.filter((f) => f.formId === pageWithProposal.proposal?.form?.id);
 
       const formFieldProperties = updateCardFormFieldPropertiesValue({
         accessPrivateFields,
         cardProperties: boardBlockCardProperties,
-        formFields,
+        formFields: proposalFormFields,
         proposalId: pageWithProposal.proposal!.id
       });
 
