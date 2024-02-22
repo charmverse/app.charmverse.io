@@ -233,7 +233,7 @@ export async function createProposal({
 
   const proposalFormAnswers =
     formId && formAnswers?.length && page.type === 'proposal'
-      ? await upsertProposalFormAnswers({ formId, proposalId, answers: formAnswers })
+      ? await upsertProposalFormAnswers({ proposalId, answers: formAnswers })
       : null;
 
   await createVoteIfNecessary({

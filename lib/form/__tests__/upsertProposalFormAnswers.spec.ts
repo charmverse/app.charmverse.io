@@ -1,4 +1,5 @@
 import { InvalidInputError } from '@charmverse/core/errors';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { FormFieldAnswer, Space, User } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
@@ -22,7 +23,7 @@ describe('upsertFormAnswers', () => {
     user = generated.user;
 
     proposal = await generateProposal({
-      proposalStatus: 'draft',
+      proposalStatus: 'published',
       spaceId: space.id,
       userId: user.id
     });
@@ -54,12 +55,20 @@ describe('upsertFormAnswers', () => {
 
     const formId = await createForm(fieldsInput);
 
+    await prisma.proposal.update({
+      where: { id: proposal.id },
+      data: { formId }
+    });
+
     const answer1 = {
       fieldId: fieldsInput[0].id,
       value: 'John Doe'
     };
 
-    const updated1 = await upsertProposalFormAnswers({ proposalId: proposal.id, formId, answers: [answer1] });
+    const updated1 = await upsertProposalFormAnswers({
+      proposalId: proposal.id,
+      answers: [answer1]
+    });
     expect(updated1).toBeDefined();
 
     expect(updated1).toEqual<FormFieldAnswer[]>(
@@ -73,7 +82,10 @@ describe('upsertFormAnswers', () => {
       value: 'John Wick'
     };
 
-    const updated2 = await upsertProposalFormAnswers({ proposalId: proposal.id, formId, answers: [answer2] });
+    const updated2 = await upsertProposalFormAnswers({
+      proposalId: proposal.id,
+      answers: [answer2]
+    });
     expect(updated2).toBeDefined();
 
     expect(updated2).toEqual<FormFieldAnswer[]>(
@@ -110,6 +122,11 @@ describe('upsertFormAnswers', () => {
 
     const formId = await createForm(fieldsInput);
 
+    await prisma.proposal.update({
+      where: { id: proposal.id },
+      data: { formId }
+    });
+
     const answer1 = {
       fieldId: fieldsInput[0].id,
       value: 'John Doe'
@@ -120,7 +137,10 @@ describe('upsertFormAnswers', () => {
       value: 'John Wick'
     };
 
-    const updated1 = await upsertProposalFormAnswers({ proposalId: proposal.id, formId, answers: [answer1, answer2] });
+    const updated1 = await upsertProposalFormAnswers({
+      proposalId: proposal.id,
+      answers: [answer1, answer2]
+    });
     expect(updated1).toBeDefined();
 
     expect(updated1).toEqual<FormFieldAnswer[]>(
@@ -157,12 +177,20 @@ describe('upsertFormAnswers', () => {
 
     const formId = await createForm(fieldsInput);
 
+    await prisma.proposal.update({
+      where: { id: proposal.id },
+      data: { formId }
+    });
+
     const answer1 = {
       fieldId: fieldsInput[0].id,
       value: 'John Doe'
     };
 
-    const updated1 = await upsertProposalFormAnswers({ proposalId: proposal.id, formId, answers: [answer1] });
+    const updated1 = await upsertProposalFormAnswers({
+      proposalId: proposal.id,
+      answers: [answer1]
+    });
     expect(updated1).toBeDefined();
 
     expect(updated1).toEqual<FormFieldAnswer[]>(
@@ -176,7 +204,10 @@ describe('upsertFormAnswers', () => {
       value: 'John Wick'
     };
 
-    const updated2 = await upsertProposalFormAnswers({ proposalId: proposal.id, formId, answers: [updatedAnswer] });
+    const updated2 = await upsertProposalFormAnswers({
+      proposalId: proposal.id,
+      answers: [updatedAnswer]
+    });
     expect(updated2).toBeDefined();
 
     expect(updated2).toEqual<FormFieldAnswer[]>(
@@ -218,10 +249,14 @@ describe('upsertFormAnswers', () => {
 
     const formId = await createForm(fieldsInput);
 
+    await prisma.proposal.update({
+      where: { id: proposal.id },
+      data: { formId }
+    });
+
     await expect(
       upsertProposalFormAnswers({
         proposalId: proposal.id,
-        formId,
         answers: [{ fieldId: fieldsInput[0].id, value: '123' }]
       })
     ).rejects.toBeInstanceOf(InvalidInputError);
@@ -253,13 +288,59 @@ describe('upsertFormAnswers', () => {
 
     const formId = await createForm(fieldsInput);
 
+    await prisma.proposal.update({
+      where: { id: proposal.id },
+      data: { formId }
+    });
+
     await expect(
       upsertProposalFormAnswers({
         proposalId: proposal.id,
-        formId,
         answers: [{ fieldId: fieldsInput[0].id, value: '123' }]
       })
     ).rejects.toBeInstanceOf(InvalidInputError);
+  });
+
+  it('should not throw an error if proposal is a draft', async () => {
+    const fieldsInput: FormFieldInput[] = [
+      {
+        id: v4(),
+        type: 'short_text',
+        name: 'name',
+        description: 'description',
+        index: 0,
+        options: [],
+        private: false,
+        required: true
+      }
+    ];
+
+    const formId = await createForm(fieldsInput);
+
+    await prisma.proposal.update({
+      where: { id: proposal.id },
+      data: { formId }
+    });
+
+    await expect(
+      upsertProposalFormAnswers({
+        proposalId: proposal.id,
+        answers: []
+      })
+    ).rejects.toBeInstanceOf(InvalidInputError);
+
+    // set it to a draft
+    const r = await prisma.proposal.update({
+      where: { id: proposal.id },
+      data: { status: 'draft' }
+    });
+
+    await expect(
+      upsertProposalFormAnswers({
+        proposalId: proposal.id,
+        answers: []
+      })
+    ).resolves.toBeTruthy();
   });
 
   it('should throw an error if invalid fieldId was provided', async () => {
@@ -278,10 +359,14 @@ describe('upsertFormAnswers', () => {
 
     const formId = await createForm(fieldsInput);
 
+    await prisma.proposal.update({
+      where: { id: proposal.id },
+      data: { formId }
+    });
+
     await expect(
       upsertProposalFormAnswers({
         proposalId: proposal.id,
-        formId,
         answers: [{ fieldId: v4(), value: '123' }]
       })
     ).rejects.toBeInstanceOf(InvalidInputError);

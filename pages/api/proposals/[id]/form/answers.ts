@@ -66,15 +66,9 @@ async function upsertProposalFormAnswersHandler(
     throw new ActionNotPermittedError(`You can't update this proposal.`);
   }
 
-  const proposal = await prisma.proposal.findUniqueOrThrow({ where: { id: proposalId }, select: { formId: true } });
-
-  if (!proposal.formId) {
-    throw new InvalidInputError(`Proposal ${proposalId} does not have a form`);
-  }
-
   const { answers } = req.body as { answers: FieldAnswerInput[] };
 
-  await upsertProposalFormAnswers({ answers, formId: proposal.formId, proposalId });
+  await upsertProposalFormAnswers({ answers, proposalId });
 
   res.status(200).end();
 }
