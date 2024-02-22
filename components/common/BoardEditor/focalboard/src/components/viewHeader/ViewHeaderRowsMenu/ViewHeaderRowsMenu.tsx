@@ -15,11 +15,13 @@ import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/boar
 import type { Card, CardPropertyValue } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
 import type { CreateEventPayload } from 'lib/notifications/interfaces';
+import { defaultRewardPropertyIds } from 'lib/rewards/blocks/constants';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import mutator from '../../../mutator';
 
 import { ArchiveProposals } from './components/ArchiveProposals';
+import { BatchPaymentRewards } from './components/BatchPaymentRewards';
 import { StyledMenuItem } from './components/PropertyMenu';
 import type { PropertyTemplateMenuProps } from './components/PropertyTemplateMenu';
 import { PropertyTemplateMenu } from './components/PropertyTemplateMenu';
@@ -58,6 +60,8 @@ const validPropertyTypes = [
   'relation'
 ] as PropertyType[];
 
+const invalidPropertyIds = [...defaultRewardPropertyIds];
+
 export type ViewHeaderRowsMenuProps = {
   board: Board;
   cards: Card[];
@@ -75,6 +79,8 @@ export type ViewHeaderRowsMenuProps = {
   onChangeProposalsReviewers?: PropertyTemplateMenuProps['onChangeProposalsReviewers'];
   onChangeProposalsStatuses?: PropertyTemplateMenuProps['onChangeProposalsStatuses'];
   onChangeProposalsSteps?: PropertyTemplateMenuProps['onChangeProposalsSteps'];
+  showRewardsBatchPaymentButton?: boolean;
+  showTrashIcon?: boolean;
 };
 
 export function ViewHeaderRowsMenu({
@@ -92,7 +98,9 @@ export function ViewHeaderRowsMenu({
   onChangeProposalsAuthors,
   onChangeProposalsReviewers,
   onChangeProposalsStatuses,
-  onChangeProposalsSteps
+  onChangeProposalsSteps,
+  showRewardsBatchPaymentButton,
+  showTrashIcon = !board.fields.sourceType
 }: ViewHeaderRowsMenuProps) {
   const isAdmin = useIsAdmin();
   const { space } = useCurrentSpace();
@@ -101,8 +109,6 @@ export function ViewHeaderRowsMenu({
   const { showConfirmation } = useConfirmationModal();
   const { showError } = useSnackbar();
   const { trigger: syncRelationPropertyValue } = useSyncRelationPropertyValue();
-
-  const showTrashIcon = !board.fields.sourceType; // dont allow deleting cards for proposals-as-a-source
 
   async function deleteCheckedCards() {
     if (checkedIds.length > 1) {
@@ -196,7 +202,8 @@ export function ViewHeaderRowsMenu({
       (propertyTemplate) =>
         !propertyTemplate.formFieldId &&
         validPropertyTypes.includes(propertyTemplate.type) &&
-        propertyTemplate.id !== Constants.titleColumnId
+        propertyTemplate.id !== Constants.titleColumnId &&
+        !invalidPropertyIds.includes(propertyTemplate.id)
     );
   }, [propertyTemplates]);
 
@@ -243,6 +250,7 @@ export function ViewHeaderRowsMenu({
           ))
         : null}
       {onArchiveProposals && <ArchiveProposals onChange={onArchiveProposals} />}
+      {showRewardsBatchPaymentButton && <BatchPaymentRewards checkedIds={checkedIds} />}
       {showTrashIcon && (
         <StyledMenuItem lastChild onClick={deleteCheckedCards} disabled={isDeleting}>
           <Tooltip title='Delete'>

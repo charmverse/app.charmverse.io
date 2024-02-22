@@ -12,29 +12,29 @@ import { useWeb3Account } from 'hooks/useWeb3Account';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import { isMantleChain, proposeMantleSafeTransaction } from 'lib/gnosis/mantleClient';
 import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
+import { isTruthy } from 'lib/utilities/types';
 
-import useGnosisSafes from './useGnosisSafes';
-import { useSnackbar } from './useSnackbar';
+import { useCreateSafes } from './useCreateSafes';
 
 export type MetaTransactionDataWithApplicationId = MetaTransactionData & { applicationId: string };
 
 export type GnosisProposeTransactionResult = {
   safeAddress: string;
-  transaction: MetaTransactionDataWithApplicationId;
+  transactions: MetaTransactionDataWithApplicationId[];
   txHash: string;
 };
 
 export type GnosisPaymentProps = {
   chainId?: number;
-  onSuccess: (result: GnosisProposeTransactionResult) => void;
+  onSuccess: (results: GnosisProposeTransactionResult) => void;
   safeAddress: string;
-  transaction: MetaTransactionDataWithApplicationId;
+  transactions: MetaTransactionDataWithApplicationId[];
+  onError?: (error: SystemError) => void;
 };
 
-export function useGnosisPayment({ chainId, safeAddress, transaction, onSuccess }: GnosisPaymentProps) {
+export function useMultiGnosisPayment({ onError, chainId, safeAddress, transactions, onSuccess }: GnosisPaymentProps) {
   const { account, chainId: connectedChainId, signer } = useWeb3Account();
-  const { showMessage } = useSnackbar();
-  const [safe] = useGnosisSafes([safeAddress]);
+  const [safe] = useCreateSafes([safeAddress]);
   const network = chainId ? getChainById(chainId) : null;
   if (chainId && !network?.gnosisUrl) {
     throw new Error(`Unsupported Gnosis network: ${chainId}`);
@@ -58,25 +58,43 @@ export function useGnosisPayment({ chainId, safeAddress, transaction, onSuccess 
 
     const txNonce = nonce + pendingTx.results.length;
 
-    const recipientAddress =
-      transaction.to.endsWith('.eth') && ethers.utils.isValidName(transaction.to)
-        ? await charmClient.resolveEnsName(transaction.to)
-        : transaction.to;
+    const transactionsWithRecipients = (
+      await Promise.all(
+        transactions.map(async (transaction) => {
+          const recipientAddress =
+            transaction.to.endsWith('.eth') && ethers.utils.isValidName(transaction.to)
+              ? await charmClient.resolveEnsName(transaction.to)
+              : transaction.to;
 
-    if (!recipientAddress) {
-      showMessage('Invalid recipient address', 'error');
+          if (recipientAddress) {
+            return {
+              ...transaction,
+              to: recipientAddress
+            };
+          }
+          return null;
+        })
+      )
+    ).filter(isTruthy);
+
+    if (transactionsWithRecipients.length === 0) {
+      onError?.(
+        new SystemError({
+          errorType: 'External service',
+          severity: 'error',
+          message: 'No valid recipients found'
+        })
+      );
       return;
     }
 
     const safeTransaction = await safe.createTransaction({
-      safeTransactionData: [
-        {
-          data: transaction.data,
-          to: recipientAddress,
-          value: transaction.value,
-          operation: transaction.operation
-        }
-      ],
+      safeTransactionData: transactionsWithRecipients.map((transaction) => ({
+        data: transaction.data,
+        to: transaction.to,
+        value: transaction.value,
+        operation: transaction.operation
+      })),
       options: {
         nonce: txNonce
       }
@@ -122,7 +140,12 @@ export function useGnosisPayment({ chainId, safeAddress, transaction, onSuccess 
         origin
       });
     }
-    onSuccess({ safeAddress, transaction, txHash });
+
+    onSuccess({
+      safeAddress,
+      transactions,
+      txHash
+    });
   }
 
   async function makePaymentWithErrorParser() {

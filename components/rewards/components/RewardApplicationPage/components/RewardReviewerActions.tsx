@@ -35,10 +35,8 @@ export function RewardReviewerActions({
   rewardType,
   hasApplicationSlots
 }: Props) {
-  const { showMessage } = useSnackbar();
-
   const { open, isOpen, close } = usePopupState({ variant: 'dialog', popupId: 'confirm-mark-submission-paid' });
-
+  const { showMessage } = useSnackbar();
   const [pendingSafeTransactionUrl, setPendingSafeTransactionUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -58,6 +56,12 @@ export function RewardReviewerActions({
     }
   }, [application.status, application.transactions.length]);
 
+  async function markAsPaid() {
+    await charmClient.rewards.markSubmissionAsPaid(application.id);
+    close();
+    refreshApplication();
+  }
+
   async function recordTransaction(transactionId: string, chainId: number) {
     try {
       await charmClient.rewards.recordTransaction({
@@ -70,12 +74,6 @@ export function RewardReviewerActions({
     } catch (err: any) {
       showMessage(err.message || err, 'error');
     }
-  }
-
-  async function markAsPaid() {
-    await charmClient.rewards.markSubmissionAsPaid(application.id);
-    close();
-    refreshApplication();
   }
 
   return (

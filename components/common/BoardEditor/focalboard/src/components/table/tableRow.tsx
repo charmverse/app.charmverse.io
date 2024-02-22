@@ -235,19 +235,23 @@ function TableRow(props: Props) {
     >
       {!props.readOnly && (
         <Stack flexDirection='row' gap={1} alignItems='center'>
-          <div
-            className='icons row-actions'
-            onClick={handleClick}
-            ref={drag}
-            style={{
-              padding: 0
-            }}
-          >
-            <Box className='charm-drag-handle disable-drag-selection'>
-              <DragIndicatorIcon color='secondary' />
-            </Box>
-          </div>
-          {setCheckedIds && (
+          {!isNested && (
+            <div
+              className='icons row-actions'
+              onClick={handleClick}
+              ref={drag}
+              style={{
+                padding: 0
+              }}
+            >
+              <Box className='charm-drag-handle disable-drag-selection'>
+                <DragIndicatorIcon color='secondary' />
+              </Box>
+            </div>
+          )}
+          {isNested ? (
+            <div style={{ marginLeft: 24 }} />
+          ) : setCheckedIds ? (
             <StyledCheckbox
               className='table-row-checkbox disable-drag-selection'
               checked={isChecked}
@@ -266,7 +270,7 @@ function TableRow(props: Props) {
               disableRipple
               disableTouchRipple
             />
-          )}
+          ) : null}
         </Stack>
       )}
 
@@ -412,6 +416,8 @@ function ExpandableTableRow(props: Props & { isNested?: boolean; subPages?: Card
                 subPages={subPage.subPages}
                 indentTitle={30}
                 isNested
+                // Don't allow subrows to be selected
+                setCheckedIds={() => {}}
                 subRowsEmptyValueContent={props.subRowsEmptyValueContent}
               />
             )))}
