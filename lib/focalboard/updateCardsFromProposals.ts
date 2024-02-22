@@ -69,12 +69,7 @@ const pageSelectObject = {
           id: true
         }
       },
-      fields: true,
-      form: {
-        select: {
-          id: true
-        }
-      }
+      fields: true
     }
   }
 } as const;
@@ -96,10 +91,11 @@ async function fetchAndProcessProposalPages({
       spaceId,
       type: 'proposal',
       proposal: {
-        status: {
-          not: 'draft'
-        }
+        status: 'published'
       }
+    },
+    orderBy: {
+      createdAt: 'asc'
     },
     take: batchSize,
     skip: cursor ? 1 : undefined,
@@ -129,33 +125,35 @@ export async function updateCardsFromProposals({
   spaceId: string;
   userId: string;
 }) {
-  const board = await prisma.block.findFirstOrThrow({
-    where: {
-      id: boardId,
-      spaceId
-    }
-  });
-
-  const rootPagePermissions = await prisma.page.findFirstOrThrow({
-    where: {
-      id: boardId
-    },
-    select: {
-      permissions: true
-    }
-  });
-
-  const proposalBoardBlock = (await prisma.proposalBlock.findUnique({
-    where: {
-      id_spaceId: {
-        id: DEFAULT_BOARD_BLOCK_ID,
+  const [board, rootPagePermissions, proposalBoardBlock] = await prisma.$transaction([
+    prisma.block.findFirstOrThrow({
+      where: {
+        id: boardId,
         spaceId
       }
-    },
-    select: {
-      fields: true
-    }
-  })) as null | { fields: BoardFields };
+    }),
+    prisma.page.findFirstOrThrow({
+      where: {
+        id: boardId
+      },
+      select: {
+        permissions: true
+      }
+    }),
+    prisma.proposalBlock.findUnique({
+      where: {
+        id_spaceId: {
+          id: DEFAULT_BOARD_BLOCK_ID,
+          spaceId
+        }
+      },
+      select: {
+        fields: true
+      }
+    })
+  ]);
+
+  const boardBlockFields = (proposalBoardBlock as null | { fields: BoardFields })?.fields;
 
   const boardBlock = await setDatabaseProposalProperties({
     boardId,
@@ -170,12 +168,12 @@ export async function updateCardsFromProposals({
 
   // Get the newly added proposal properties
   const newBoardProposalCustomProperties =
-    proposalBoardBlock?.fields.cardProperties.filter((prop) => !boardBlockCardPropertiesRecord[prop.id]) ?? [];
+    boardBlockFields?.cardProperties.filter((prop) => !boardBlockCardPropertiesRecord[prop.id]) ?? [];
 
   // Looping through proposal board block properties since its the source of truth for the properties
   const proposalBoardPropertiesUpdated =
     (newBoardProposalCustomProperties.length > 0 ||
-      proposalBoardBlock?.fields.cardProperties.some((cardProperty) => {
+      boardBlockFields?.cardProperties.some((cardProperty) => {
         const boardBlockCardProperty = boardBlockCardPropertiesRecord[cardProperty.id];
         // If a new property was added to the proposal board block, we need to update the board block
         if (!boardBlockCardProperty) {
@@ -205,7 +203,7 @@ export async function updateCardsFromProposals({
     // Existing custom properties that are not proposal properties
     const nonProposalCustomProperties = boardBlock.fields.cardProperties.filter((prop) => !prop.proposalFieldId);
     // Add the new proposal properties
-    proposalBoardBlock?.fields.cardProperties.forEach((cardProperty) => {
+    boardBlockFields?.cardProperties.forEach((cardProperty) => {
       nonProposalCustomProperties.push({
         ...cardProperty,
         proposalFieldId: cardProperty.id
@@ -592,7 +590,7 @@ export async function updateCardsFromProposals({
             }
           });
 
-          const proposalFormFields = formFields.filter((f) => f.formId === pageWithProposal.proposal?.form?.id);
+          const proposalFormFields = formFields.filter((f) => f.formId === pageWithProposal.proposal?.formId);
 
           const formFieldProperties = updateCardFormFieldPropertiesValue({
             accessPrivateFields,
