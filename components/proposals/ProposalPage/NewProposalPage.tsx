@@ -3,13 +3,14 @@ import type { PageType } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
-import { Box, Divider, useMediaQuery, Stack, Typography } from '@mui/material';
+import { Box, Divider, useMediaQuery } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { useResizeObserver } from 'usehooks-ts';
 import { v4 as uuid } from 'uuid';
 
 import { useForumPost } from 'charmClient/hooks/forum';
 import { useGetPage } from 'charmClient/hooks/pages';
+import { useGetProposalDetails } from 'charmClient/hooks/proposals';
 import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
 import { DocumentColumnLayout, DocumentColumn } from 'components/[pageId]/DocumentPage/components/DocumentColumnLayout';
 import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
@@ -40,7 +41,8 @@ import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
-import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
+import type { ProposalTemplateMeta } from 'lib/proposal/getProposalTemplates';
+import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposal/rubric/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -106,14 +108,13 @@ export function NewProposalPage({
   } = useNewProposal({
     newProposal: { type: proposalPageType, proposalType }
   });
+  const { data: sourceTemplate } = useGetProposalDetails(formInputs.proposalTemplateId);
   const [submittedDraft, setSubmittedDraft] = useState<boolean>(false);
 
   const containerWidthRef = useRef<HTMLDivElement>(null);
   const { width: containerWidth = 0 } = useResizeObserver({ ref: containerWidthRef });
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const isAdmin = useIsAdmin();
-
-  const sourceTemplate = proposalTemplates?.find((template) => template.page.id === formInputs.proposalTemplateId);
 
   const isStructured = formInputs.proposalType === 'structured' || !!formInputs.formId;
   const pendingRewards = formInputs.fields?.pendingRewards || [];
@@ -157,7 +158,10 @@ export function NewProposalPage({
   usePreventReload(contentUpdated);
 
   const isTemplateRequired = Boolean(currentSpace?.requireProposalTemplate);
-  const templatePageOptions = (proposalTemplates || []).map((template) => template.page);
+  const templatePageOptions = (proposalTemplates || []).map((template) => ({
+    id: template.proposalId,
+    title: template.title
+  }));
   const { pages } = usePages();
 
   const proposalTemplatePage = formInputs.proposalTemplateId ? pages[formInputs.proposalTemplateId] : null;
@@ -183,49 +187,51 @@ export function NewProposalPage({
     document.querySelector(`.bangle-editor-core`)?.dispatchEvent(focusEvent);
   }
 
-  function applyTemplate(_templateId: string) {
-    const template = proposalTemplates?.find((t) => t.id === _templateId);
-    if (template) {
-      const formFields = template.form?.formFields ?? [];
-      const authors = Array.from(new Set([user!.id].concat(template.authors.map((author) => author.userId))));
-      setFormInputs(
-        {
-          authors,
-          content: template.page.content as PageContent,
-          contentText: template.page.contentText,
-          selectedCredentialTemplates: template.selectedCredentialTemplates ?? [],
-          proposalTemplateId: _templateId,
-          headerImage: template.page.headerImage,
-          icon: template.page.icon,
-          evaluations: template.evaluations,
-          fields:
-            {
-              ...template.fields,
-              pendingRewards: template.fields?.pendingRewards?.map((pendingReward) => ({
-                ...pendingReward,
-                reward: {
-                  ...pendingReward.reward,
-                  assignedSubmitters: authors
-                }
-              }))
-            } || {},
-          type: proposalPageType,
-          formId: template.formId ?? undefined,
-          formFields: isTemplate ? formFields.map((formField) => ({ ...formField, id: uuid() })) : formFields,
-          formAnswers: (template?.form?.formFields ?? [])
-            .filter((formField) => formField.type !== 'label')
-            .map((proposalFormField) => ({
-              fieldId: proposalFormField.id,
-              value: getInitialFormFieldValue(proposalFormField) as FieldAnswerInput['value']
+  function setTemplateId(_templateId: string) {
+    setFormInputs({
+      proposalTemplateId: _templateId
+    });
+  }
+  function applyTemplate(template: ProposalWithUsersAndRubric) {
+    const formFields = template.form?.formFields ?? [];
+    const authors = Array.from(new Set([user!.id].concat(template.authors.map((author) => author.userId))));
+    const page = template.page!;
+    setFormInputs(
+      {
+        authors,
+        content: page.content as PageContent,
+        contentText: page.contentText,
+        selectedCredentialTemplates: template.selectedCredentialTemplates ?? [],
+        headerImage: null,
+        icon: null,
+        evaluations: template.evaluations,
+        fields:
+          {
+            ...template.fields,
+            pendingRewards: template.fields?.pendingRewards?.map((pendingReward) => ({
+              ...pendingReward,
+              reward: {
+                ...pendingReward.reward,
+                assignedSubmitters: authors
+              }
             }))
-        },
-        { fromUser: false }
-      );
-      const workflow = workflowOptions?.find((w) => w.id === template.workflowId);
-      if (workflow) {
-        // pass in the template since the formState will not be updated in this instance of applyWorkflow
-        applyWorkflow(workflow, template);
-      }
+          } || {},
+        type: proposalPageType,
+        formId: template.formId ?? undefined,
+        formFields: isTemplate ? formFields.map((formField) => ({ ...formField, id: uuid() })) : formFields,
+        formAnswers: (template?.form?.formFields ?? [])
+          .filter((formField) => formField.type !== 'label')
+          .map((proposalFormField) => ({
+            fieldId: proposalFormField.id,
+            value: getInitialFormFieldValue(proposalFormField) as FieldAnswerInput['value']
+          }))
+      },
+      { fromUser: false }
+    );
+    const workflow = workflowOptions?.find((w) => w.id === template.workflowId);
+    if (workflow) {
+      // pass in the template since the formState will not be updated in this instance of applyWorkflow
+      applyWorkflow(workflow, template);
     }
   }
 
@@ -235,7 +241,7 @@ export function NewProposalPage({
     });
   }
 
-  function applyWorkflow(workflow: ProposalWorkflowTyped, template?: ProposalTemplate) {
+  function applyWorkflow(workflow: ProposalWorkflowTyped, template?: ProposalWithUsersAndRubric) {
     setFormInputs(
       {
         workflowId: workflow.id,
@@ -296,7 +302,7 @@ export function NewProposalPage({
     if (!isLoadingTemplates && !isLoadingWorkflows) {
       // populate with template if selected
       if (templateIdFromUrl) {
-        applyTemplate(templateIdFromUrl);
+        setTemplateId(templateIdFromUrl);
       }
       // populate workflow if not set and template is not selected
       else if (workflowOptions?.length) {
@@ -407,7 +413,7 @@ export function NewProposalPage({
                                       clearTemplate();
                                       // if user has not updated the content, then just overwrite everything
                                     } else if (formInputs.contentText?.length === 0) {
-                                      applyTemplate(page.id);
+                                      setTemplateId(page.id);
                                     } else {
                                       // set value to trigger a prompt
                                       setSelectedProposalTemplateId(page.id);
@@ -610,7 +616,7 @@ export function NewProposalPage({
           secondaryButtonText='Go back'
           question='Are you sure you want to overwrite your current content with the proposal template content?'
           onConfirm={() => {
-            applyTemplate(selectedProposalTemplateId!);
+            setTemplateId(selectedProposalTemplateId!);
             setSelectedProposalTemplateId(null);
           }}
         />

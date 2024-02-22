@@ -10,7 +10,7 @@ import type {
 import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import type { ProposalWithUsersLite } from 'lib/proposal/getProposals';
 import type { RubricProposalsUserInfo } from 'lib/proposal/getProposalsEvaluatedByUser';
-import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
+import type { ProposalTemplateMeta } from 'lib/proposal/getProposalTemplates';
 import type { GoBackToStepRequest } from 'lib/proposal/goBackToStep';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
@@ -35,7 +35,7 @@ export function useGetProposalsBySpace({ spaceId }: Partial<ListProposalsRequest
 }
 
 export function useGetProposalTemplatesBySpace(spaceId: MaybeString) {
-  return useGET<ProposalTemplate[]>(spaceId ? `/api/spaces/${spaceId}/proposal-templates` : null);
+  return useGET<ProposalTemplateMeta[]>(spaceId ? `/api/spaces/${spaceId}/proposal-templates` : null);
 }
 
 export function useGetProposalIdsEvaluatedByUser(spaceId: MaybeString) {

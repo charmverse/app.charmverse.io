@@ -40,8 +40,7 @@ export async function getProposal({
         }
       },
       authors: true,
-      page: { select: { id: true, sourceTemplateId: true, type: true } },
-      reviewers: true,
+      page: { select: { id: true, content: true, contentText: true, sourceTemplateId: true, type: true } },
       rewards: true,
       form: {
         include: {

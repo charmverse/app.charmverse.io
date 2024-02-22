@@ -1,33 +1,22 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import type { SpaceResourcesRequest, ProposalPermissionFlags } from '@charmverse/core/permissions';
-import type { Page } from '@charmverse/core/prisma-client';
+import type { SpaceResourcesRequest } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
-import { mapDbProposalToProposal } from 'lib/proposal/mapDbProposalToProposal';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
-import type { ProposalWithUsersAndRubric } from './interface';
-
-export type ProposalTemplate = Omit<ProposalWithUsersAndRubric, 'permissions'> & { page: Page };
-
-// mock permissions since they dont actually matter
-const mockPermissions: ProposalPermissionFlags = {
-  evaluate: true,
-  comment: true,
-  edit: true,
-  delete: true,
-  view: false,
-  view_notes: false,
-  view_private_fields: true,
-  create_vote: false,
-  make_public: false,
-  archive: false,
-  unarchive: false,
-  move: false
+export type ProposalTemplateMeta = {
+  pageId: string;
+  proposalId: string;
+  contentType: 'free_form' | 'structured';
+  title: string;
+  archived?: boolean;
 };
 
-export async function getProposalTemplates({ spaceId, userId }: SpaceResourcesRequest): Promise<ProposalTemplate[]> {
+export async function getProposalTemplates({
+  spaceId,
+  userId
+}: SpaceResourcesRequest): Promise<ProposalTemplateMeta[]> {
   if (!stringUtils.isUUID(spaceId)) {
     throw new InvalidInputError(`SpaceID is required`);
   }
@@ -41,65 +30,32 @@ export async function getProposalTemplates({ spaceId, userId }: SpaceResourcesRe
     return [];
   }
 
-  const templates = await prisma.proposal.findMany({
+  const templates = await prisma.page.findMany({
     where: {
       spaceId,
-      page: {
-        type: 'proposal_template',
-        deletedAt: null
-      }
+      type: 'proposal_template',
+      deletedAt: null
     },
-    include: {
-      authors: true,
-      reviewers: true,
-      rewards: true, // note that rewards table is not really used by templates, but makes life easier when we call mapDbProposalToProposal()
-      page: true,
-      evaluations: {
-        orderBy: {
-          index: 'asc'
-        },
-        include: {
-          permissions: true,
-          reviewers: true,
-          rubricCriteria: {
-            orderBy: {
-              index: 'asc'
-            }
-          },
-          rubricAnswers: true,
-          draftRubricAnswers: true,
-          vote: true
-        }
-      },
-      draftRubricAnswers: true,
-      rubricAnswers: true,
-      rubricCriteria: {
-        orderBy: {
-          index: 'asc'
-        }
-      },
-      form: {
-        include: {
-          formFields: {
-            orderBy: {
-              index: 'asc'
-            }
-          }
+    select: {
+      id: true,
+      title: true,
+      proposal: {
+        select: {
+          id: true,
+          archived: true,
+          formId: true
         }
       }
     }
   });
 
-  const res = templates.map((proposal) => {
-    const mappedProposal = mapDbProposalToProposal({
-      proposal,
-      permissions: mockPermissions
-    });
-    return {
-      ...mappedProposal,
-      page: proposal.page
-    } as ProposalTemplate;
-  });
+  const res: ProposalTemplateMeta[] = templates.map((page) => ({
+    pageId: page.id,
+    proposalId: page.proposal!.id,
+    contentType: page.proposal!.formId ? 'structured' : 'free_form',
+    title: page.title,
+    archived: page.proposal?.archived || undefined
+  }));
 
   if (!isAdmin) {
     return res.filter((template) => !template.archived);
