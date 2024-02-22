@@ -2,7 +2,6 @@ import type { DateTime } from 'luxon';
 
 import charmClient from 'charmClient';
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import { SelectOptionPopulated } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import type { ViewHeaderRowsMenuProps } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ViewHeaderRowsMenu/ViewHeaderRowsMenu';
 import { ViewHeaderRowsMenu } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ViewHeaderRowsMenu/ViewHeaderRowsMenu';
 import { usePages } from 'hooks/usePages';

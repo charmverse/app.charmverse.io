@@ -227,12 +227,12 @@ function TableRow(props: Props) {
       onClick={(e) => props.onClick?.(e, card)}
       ref={mergeRefs([cardRef, preview, drop])}
       style={{
-        backgroundColor: isNested ? 'var(--input-bg)' : 'transparent',
         ...(isChecked && {
           background: 'rgba(35, 131, 226, 0.14)',
           zIndex: 85
         }),
-        ...style
+        ...style,
+        backgroundColor: isNested ? 'var(--input-bg)' : 'transparent'
       }}
     >
       {!props.readOnly && (

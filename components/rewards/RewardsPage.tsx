@@ -171,15 +171,13 @@ export function RewardsPage({ title }: { title: string }) {
         <Stack gap={0.75}>
           <div className={`ViewHeader ${showViewHeaderRowsMenu ? 'view-header-rows-menu-visible' : ''}`}>
             {showViewHeaderRowsMenu ? (
-              <div style={{ marginBottom: 4 }}>
-                <RewardsHeaderRowsMenu
-                  visiblePropertyIds={activeView?.fields.visiblePropertyIds}
-                  board={activeBoard}
-                  cards={cards as Card[]}
-                  checkedIds={checkedIds}
-                  setCheckedIds={setCheckedIds}
-                />
-              </div>
+              <RewardsHeaderRowsMenu
+                visiblePropertyIds={activeView?.fields.visiblePropertyIds}
+                board={activeBoard}
+                cards={cards as Card[]}
+                checkedIds={checkedIds}
+                setCheckedIds={setCheckedIds}
+              />
             ) : (
               <>
                 <ViewTabs
