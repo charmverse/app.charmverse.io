@@ -44,10 +44,6 @@ export async function upsertProposalFormAnswers({ answers, proposalId }: RubricA
         return null;
       }
 
-      if (field.required && !a.value) {
-        throw new InvalidInputError(`Value for field ${field.name} is required`);
-      }
-
       return a;
     })
     .filter(isTruthy);

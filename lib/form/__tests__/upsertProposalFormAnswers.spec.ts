@@ -260,77 +260,9 @@ describe('upsertFormAnswers', () => {
         answers: [{ fieldId: fieldsInput[0].id, value: '123' }]
       })
     ).rejects.toBeInstanceOf(InvalidInputError);
-  });
 
-  it('should throw an error if not all required fields were provided', async () => {
-    const fieldsInput: FormFieldInput[] = [
-      {
-        id: v4(),
-        type: 'short_text',
-        name: 'name',
-        description: 'description',
-        index: 0,
-        options: [],
-        private: false,
-        required: true
-      },
-      {
-        id: v4(),
-        type: 'long_text',
-        name: 'long name',
-        description: 'another description',
-        index: 1,
-        options: [],
-        private: true,
-        required: true
-      }
-    ];
-
-    const formId = await createForm(fieldsInput);
-
+    // allow draft override
     await prisma.proposal.update({
-      where: { id: proposal.id },
-      data: { formId }
-    });
-
-    await expect(
-      upsertProposalFormAnswers({
-        proposalId: proposal.id,
-        answers: [{ fieldId: fieldsInput[0].id, value: '123' }]
-      })
-    ).rejects.toBeInstanceOf(InvalidInputError);
-  });
-
-  it('should not throw an error if proposal is a draft', async () => {
-    const fieldsInput: FormFieldInput[] = [
-      {
-        id: v4(),
-        type: 'short_text',
-        name: 'name',
-        description: 'description',
-        index: 0,
-        options: [],
-        private: false,
-        required: true
-      }
-    ];
-
-    const formId = await createForm(fieldsInput);
-
-    await prisma.proposal.update({
-      where: { id: proposal.id },
-      data: { formId }
-    });
-
-    await expect(
-      upsertProposalFormAnswers({
-        proposalId: proposal.id,
-        answers: []
-      })
-    ).rejects.toBeInstanceOf(InvalidInputError);
-
-    // set it to a draft
-    const r = await prisma.proposal.update({
       where: { id: proposal.id },
       data: { status: 'draft' }
     });
@@ -338,7 +270,7 @@ describe('upsertFormAnswers', () => {
     await expect(
       upsertProposalFormAnswers({
         proposalId: proposal.id,
-        answers: []
+        answers: [{ fieldId: fieldsInput[0].id, value: '123' }]
       })
     ).resolves.toBeTruthy();
   });
