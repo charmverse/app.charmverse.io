@@ -59,8 +59,9 @@ export async function getValidTokenGateId(tokenGate: TokenGate, walletAddress: s
   const tokenGatesValid = await Promise.all(
     tokenGate.conditions.accessControlConditions?.map(async (condition) =>
       validateTokenGateCondition(condition, walletAddress).catch((error) => {
-        log.debug(`Error validating token gate condition: ${condition}`, error);
-        return false;
+        log.debug(`Error validating token gate condition for address ${walletAddress}`, { error, condition });
+        // If a contract read method fails we don't kick the user out of the space. We should check why the API call has failed.
+        return true;
       })
     ) || []
   );
