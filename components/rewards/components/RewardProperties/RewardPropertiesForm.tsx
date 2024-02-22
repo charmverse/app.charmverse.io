@@ -49,7 +49,10 @@ type Props = {
   isProposalTemplate?: boolean;
 };
 
-function getApplicationType(values: UpdateableRewardFields, forcedApplicationType?: RewardApplicationType) {
+export function getApplicationType(
+  values: Pick<UpdateableRewardFields, 'approveSubmitters' | 'assignedSubmitters'>,
+  forcedApplicationType?: RewardApplicationType
+) {
   if (forcedApplicationType) {
     return forcedApplicationType;
   }

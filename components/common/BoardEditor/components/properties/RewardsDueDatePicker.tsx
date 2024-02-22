@@ -5,11 +5,13 @@ import { DateTimePicker } from 'components/common/DateTimePicker';
 export function RewardsDueDatePicker({
   value,
   disabled,
-  onChange
+  onChange,
+  onAccept
 }: {
-  value: string | number;
+  value: string | number | null;
   disabled?: boolean;
-  onChange: (value: DateTime | null) => void;
+  onChange?: (value: DateTime | null) => void;
+  onAccept?: (value: DateTime | null) => void;
 }) {
   return (
     <DateTimePicker
@@ -18,13 +20,13 @@ export function RewardsDueDatePicker({
       value={
         typeof value === 'number'
           ? DateTime.fromMillis(value)
-          : value.toString()
+          : value?.toString()
           ? DateTime.fromISO(value.toString())
           : null
       }
       disabled={disabled}
       disablePast
-      onAccept={onChange}
+      onAccept={onAccept}
       onChange={onChange}
     />
   );

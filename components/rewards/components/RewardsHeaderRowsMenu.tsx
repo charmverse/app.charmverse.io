@@ -11,12 +11,14 @@ import type { RewardReviewer } from 'lib/rewards/interfaces';
 import { useRewards } from '../hooks/useRewards';
 import { useRewardsBoardAdapter } from '../hooks/useRewardsBoardAdapter';
 
+import { getApplicationType } from './RewardProperties/RewardPropertiesForm';
+
 type Props = Pick<ViewHeaderRowsMenuProps, 'checkedIds' | 'setCheckedIds' | 'cards' | 'board' | 'onChange'> & {
   visiblePropertyIds?: string[];
 };
 export function RewardsHeaderRowsMenu({ board, visiblePropertyIds, cards, checkedIds, setCheckedIds }: Props) {
   const { refreshRewards } = useRewardsBoardAdapter();
-  const { updateReward } = useRewards();
+  const { updateReward, rewards } = useRewards();
   const { pages } = usePages();
   let propertyTemplates: IPropertyTemplate<PropertyType>[] = [];
   if (visiblePropertyIds?.length) {
@@ -65,10 +67,40 @@ export function RewardsHeaderRowsMenu({ board, visiblePropertyIds, cards, checke
     await refreshRewards();
   }
 
+  async function onChangeRewardsMaxSubmissions(pageIds: string[], maxSubmissions: number) {
+    for (const pageId of pageIds) {
+      const page = pages[pageId];
+      const reward = page?.bountyId ? rewards?.find((r) => r.id === page.bountyId) : null;
+      if (reward) {
+        const applicationType = getApplicationType({
+          approveSubmitters: reward.approveSubmitters,
+          assignedSubmitters: reward.assignedSubmitters
+        });
+
+        if (applicationType !== 'assigned') {
+          await updateReward({
+            rewardId: reward.id,
+            updateContent: {
+              maxSubmissions: maxSubmissions <= 0 ? null : maxSubmissions
+            }
+          });
+        }
+      }
+    }
+
+    await refreshRewards();
+  }
+
+  const rewardId = checkedIds.length ? pages[checkedIds[0]]?.bountyId : null;
+  const reward = rewardId ? rewards?.find((r) => r.id === rewardId) : null;
+  const isMaxSubmissionsDisabled = reward ? getApplicationType(reward) === 'assigned' : false;
+
   return (
     <ViewHeaderRowsMenu
       onChangeRewardsDueDate={onChangeRewardsDueDate}
       onChangeRewardsReviewers={onChangeRewardsReviewers}
+      onChangeRewardsMaxSubmissions={onChangeRewardsMaxSubmissions}
+      isMaxSubmissionsDisabled={isMaxSubmissionsDisabled}
       board={board}
       cards={cards}
       checkedIds={checkedIds}

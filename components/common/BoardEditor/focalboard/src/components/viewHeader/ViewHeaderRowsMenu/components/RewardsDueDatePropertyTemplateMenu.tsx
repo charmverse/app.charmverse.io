@@ -11,12 +11,12 @@ import { PropertyMenu } from './PropertyMenu';
 export function RewardsDueDatePropertyTemplateMenu({
   cards,
   propertyTemplate,
-  onChange,
+  onAccept,
   lastChild
 }: {
   cards: Card[];
   propertyTemplate: IPropertyTemplate<PropertyType>;
-  onChange: (value: DateTime | null) => void;
+  onAccept: (value: DateTime | null) => void;
   lastChild: boolean;
 }) {
   const { pages } = usePages();
@@ -32,7 +32,7 @@ export function RewardsDueDatePropertyTemplateMenu({
       {() => {
         return (
           <Box display='flex' py='2px' px='4px'>
-            <RewardsDueDatePicker value={propertyValue as string | number} onChange={onChange} />
+            <RewardsDueDatePicker value={propertyValue as string | number} onAccept={onAccept} />
           </Box>
         );
       }}

@@ -18,10 +18,10 @@ import type { CreateEventPayload } from 'lib/notifications/interfaces';
 import {
   APPLICANT_BLOCK_ID,
   REWARDS_APPLICANTS_BLOCK_ID,
+  REWARDS_AVAILABLE_BLOCK_ID,
   REWARD_APPLICANTS_COUNT,
   REWARD_PROPOSAL_LINK,
-  REWARD_STATUS_BLOCK_ID,
-  defaultRewardPropertyIds
+  REWARD_STATUS_BLOCK_ID
 } from 'lib/rewards/blocks/constants';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
@@ -72,7 +72,8 @@ const invalidPropertyIds = [
   REWARD_PROPOSAL_LINK,
   REWARDS_APPLICANTS_BLOCK_ID,
   APPLICANT_BLOCK_ID,
-  REWARD_STATUS_BLOCK_ID
+  REWARD_STATUS_BLOCK_ID,
+  REWARDS_AVAILABLE_BLOCK_ID
 ];
 
 export type ViewHeaderRowsMenuProps = {
@@ -86,6 +87,7 @@ export type ViewHeaderRowsMenuProps = {
   isStepDisabled?: boolean;
   isStatusDisabled?: boolean;
   isReviewersDisabled?: boolean;
+  isMaxSubmissionsDisabled?: boolean;
   onArchiveProposals?: (archived: boolean) => void;
   onChange?: VoidFunction;
   onChangeProposalsAuthors?: PropertyTemplateMenuProps['onChangeProposalsAuthors'];
@@ -94,6 +96,7 @@ export type ViewHeaderRowsMenuProps = {
   onChangeProposalsSteps?: PropertyTemplateMenuProps['onChangeProposalsSteps'];
   onChangeRewardsDueDate?: PropertyTemplateMenuProps['onChangeRewardsDueDate'];
   onChangeRewardsReviewers?: PropertyTemplateMenuProps['onChangeRewardsReviewers'];
+  onChangeRewardsMaxSubmissions?: PropertyTemplateMenuProps['onChangeRewardsMaxSubmissions'];
   showRewardsBatchPaymentButton?: boolean;
   showTrashIcon?: boolean;
 };
@@ -108,6 +111,7 @@ export function ViewHeaderRowsMenu({
   isStepDisabled,
   isStatusDisabled,
   isReviewersDisabled,
+  isMaxSubmissionsDisabled,
   onArchiveProposals,
   onChange,
   onChangeProposalsAuthors,
@@ -116,6 +120,7 @@ export function ViewHeaderRowsMenu({
   onChangeProposalsSteps,
   onChangeRewardsDueDate,
   onChangeRewardsReviewers,
+  onChangeRewardsMaxSubmissions,
   showRewardsBatchPaymentButton,
   showTrashIcon = !board.fields.sourceType
 }: ViewHeaderRowsMenuProps) {
@@ -254,6 +259,7 @@ export function ViewHeaderRowsMenu({
               onChangeProposalsSteps={onChangeProposalsSteps}
               onChangeRewardsDueDate={onChangeRewardsDueDate}
               onChangeRewardsReviewers={onChangeRewardsReviewers}
+              onChangeRewardsMaxSubmissions={onChangeRewardsMaxSubmissions}
               onPersonPropertyChange={onPersonPropertyChange}
               lastChild={!showTrashIcon && index === filteredPropertyTemplates.length - 1}
               disabledTooltip={
@@ -263,6 +269,8 @@ export function ViewHeaderRowsMenu({
                   ? 'To change multiple proposals, they must be in the same step'
                   : propertyTemplate.type === 'proposalReviewer' && isReviewersDisabled
                   ? `To change multiple proposal's reviewers, they must not be in draft or feedback step`
+                  : propertyTemplate.id === REWARDS_AVAILABLE_BLOCK_ID && isMaxSubmissionsDisabled
+                  ? 'To change multiple rewards, they must not be in assigned application type'
                   : undefined
               }
             />

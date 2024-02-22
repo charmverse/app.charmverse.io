@@ -185,14 +185,90 @@ function PropertyValueElement(props: Props) {
 
   let propertyValueElement: ReactNode = null;
 
-  if (propertyTemplate.id === REWARD_STATUS_BLOCK_ID) {
+  if (propertyTemplate.id === DUE_DATE_ID && reward) {
+    const dueDate = (card.fields.properties[DUE_DATE_ID] ?? null) as number | null;
+    propertyValueElement = (
+      <RewardsDueDatePicker
+        value={dueDate}
+        disabled={readOnly || !isAdmin}
+        onChange={(_value) => {
+          updateReward({
+            rewardId: reward.id,
+            updateContent: {
+              dueDate: _value?.toJSDate() || undefined
+            }
+          });
+        }}
+      />
+    );
+  } else if (propertyTemplate.id === REWARD_REVIEWERS_BLOCK_ID) {
+    const reviewers = (card.fields.properties[REWARD_REVIEWERS_BLOCK_ID] as unknown as RewardReviewer[]) ?? [];
+    propertyValueElement = (
+      <UserAndRoleSelect
+        displayType={displayType}
+        readOnly={readOnly || !isAdmin}
+        onChange={(options) => {
+          if (!reward) {
+            return;
+          }
+          const reviewerOptions = options.filter(
+            (option) => option.group === 'role' || option.group === 'user'
+          ) as RewardReviewer[];
+          updateReward({
+            rewardId: reward.id,
+            updateContent: {
+              reviewers: reviewerOptions.map((option) => ({ group: option.group, id: option.id }))
+            }
+          });
+        }}
+        value={reviewers}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
+      />
+    );
+  } else if (propertyTemplate.id === REWARD_STATUS_BLOCK_ID) {
     if (REWARD_APPLICATION_STATUS_LABELS[propertyValue as ApplicationStatus]) {
       return <RewardApplicationStatusChip status={propertyValue as ApplicationStatus} />;
     }
     return <RewardStatusChip status={propertyValue as RewardStatus} showIcon={false} />;
+  } else if (propertyTemplate.id === REWARD_PROPOSAL_LINK) {
+    if (!Array.isArray(propertyValue) || !propertyValue.length || !propertyValue[0]) {
+      return null;
+    }
+
+    return (
+      <Box sx={{ a: { color: 'inherit' } }}>
+        <Link href={getAbsolutePath(propertyValue[1] as string, domain)}>
+          <BreadcrumbPageTitle sx={{ maxWidth: 160 }}>{propertyValue[0]}</BreadcrumbPageTitle>
+        </Link>
+      </Box>
+    );
   } else if (propertyTemplate.type === 'proposalReviewerNotes') {
     return <ProposalNotesLink pageId={props.card.id} />;
+  } else if (propertyTemplate.type === 'tokenAmount') {
+    const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
+    const chainId = card.fields.properties[REWARD_CHAIN] as string;
+    propertyValueElement = (
+      <TokenAmount amount={displayValue as string} chainId={chainId} symbolOrAddress={symbolOrAddress} />
+    );
+  } else if (propertyTemplate.type === 'tokenChain') {
+    // Note: we wat to display the token symbol, but it should not be part of 'display value' so we pass it in as a prop
+    const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
+    const chainId = card.fields.properties[REWARD_CHAIN] as string;
+    propertyValueElement = <TokenChain chainId={chainId} symbolOrAddress={symbolOrAddress} />;
+  } else if (propertyTemplate.id === REWARD_APPLICANTS_COUNT) {
+    const totalApplicants = card.fields.properties[REWARD_APPLICANTS_COUNT];
+    if (totalApplicants) {
+      return (
+        <Stack flexDirection='row' gap={1} className='octo-propertyvalue readonly'>
+          <Box width={20} display='flex' alignItems='center'>
+            <PersonIcon fontSize='small' />
+          </Box>
+          {totalApplicants}
+        </Stack>
+      );
+    }
   }
+
   // Proposals as datasource use proposalStatus column, whereas the actual proposals table uses STATUS_BLOCK_ID
   // We should migrate over the proposals as datasource blocks to the same format as proposals table
   else if (propertyTemplate.type === 'proposalStatus' || propertyTemplate.id === PROPOSAL_STATUS_BLOCK_ID) {
@@ -256,48 +332,6 @@ function PropertyValueElement(props: Props) {
         propertyValue={propertyValue as string}
         onChange={() => {}}
         displayType={displayType}
-      />
-    );
-  } else if (propertyTemplate.id === REWARD_PROPOSAL_LINK) {
-    if (!Array.isArray(propertyValue) || !propertyValue.length || !propertyValue[0]) {
-      return null;
-    }
-
-    return (
-      <Box sx={{ a: { color: 'inherit' } }}>
-        <Link href={getAbsolutePath(propertyValue[1] as string, domain)}>
-          <BreadcrumbPageTitle sx={{ maxWidth: 160 }}>{propertyValue[0]}</BreadcrumbPageTitle>
-        </Link>
-      </Box>
-    );
-  } else if (propertyTemplate.id === REWARD_REVIEWERS_BLOCK_ID && propertyTemplate.type !== 'proposalReviewer') {
-    if (Array.isArray(propertyValue) && propertyValue.length === 0 && subRowsEmptyValueContent) {
-      return typeof subRowsEmptyValueContent === 'string' ? (
-        <span>{subRowsEmptyValueContent}</span>
-      ) : (
-        subRowsEmptyValueContent ?? null
-      );
-    }
-    return (
-      <UserAndRoleSelect
-        displayType={displayType}
-        readOnly={readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any)}
-        onChange={(options) => {
-          if (!reward) {
-            return;
-          }
-          const reviewerOptions = options.filter(
-            (option) => option.group === 'role' || option.group === 'user'
-          ) as RewardReviewer[];
-          updateReward({
-            rewardId: reward.id,
-            updateContent: {
-              reviewers: reviewerOptions.map((option) => ({ group: option.group, id: option.id }))
-            }
-          });
-        }}
-        value={(propertyValue ?? []) as unknown as RewardReviewer[]}
-        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
       />
     );
   } else if (propertyTemplate.relationData && propertyTemplate.type === 'relation') {
@@ -496,21 +530,6 @@ function PropertyValueElement(props: Props) {
           {displayValue || (showEmptyPlaceholder && <EmptyPlaceholder>{emptyDisplayValue}</EmptyPlaceholder>)}
         </Box>
       );
-    } else if (propertyTemplate.id === DUE_DATE_ID && reward?.id) {
-      propertyValueElement = (
-        <RewardsDueDatePicker
-          value={value as string}
-          disabled={props.readOnly}
-          onChange={(_value) => {
-            updateReward({
-              rewardId: reward.id,
-              updateContent: {
-                dueDate: _value?.toJSDate() || undefined
-              }
-            });
-          }}
-        />
-      );
     } else {
       propertyValueElement = (
         <DateRange
@@ -567,29 +586,6 @@ function PropertyValueElement(props: Props) {
         centerContent={displayType !== 'table'}
       />
     );
-  } else if (propertyTemplate.type === 'tokenAmount') {
-    const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
-    const chainId = card.fields.properties[REWARD_CHAIN] as string;
-    propertyValueElement = (
-      <TokenAmount amount={displayValue as string} chainId={chainId} symbolOrAddress={symbolOrAddress} />
-    );
-  } else if (propertyTemplate.type === 'tokenChain') {
-    // Note: we wat to display the token symbol, but it should not be part of 'display value' so we pass it in as a prop
-    const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
-    const chainId = card.fields.properties[REWARD_CHAIN] as string;
-    propertyValueElement = <TokenChain chainId={chainId} symbolOrAddress={symbolOrAddress} />;
-  } else if (propertyTemplate.id === REWARD_APPLICANTS_COUNT) {
-    const totalApplicants = card.fields.properties[REWARD_APPLICANTS_COUNT];
-    if (totalApplicants) {
-      return (
-        <Stack flexDirection='row' gap={1} className='octo-propertyvalue readonly'>
-          <Box width={20} display='flex' alignItems='center'>
-            <PersonIcon fontSize='small' />
-          </Box>
-          {totalApplicants}
-        </Stack>
-      );
-    }
   }
 
   const commonProps = {
