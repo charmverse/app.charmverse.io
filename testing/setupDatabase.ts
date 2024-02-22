@@ -257,7 +257,8 @@ export async function generateBounty({
   page = {},
   type = 'bounty',
   id,
-  allowMultipleApplications
+  allowMultipleApplications,
+  selectedCredentialTemplates
 }: Pick<Bounty, 'createdBy' | 'spaceId'> &
   Partial<
     Pick<
@@ -271,6 +272,7 @@ export async function generateBounty({
       | 'status'
       | 'approveSubmitters'
       | 'allowMultipleApplications'
+      | 'selectedCredentialTemplates'
     >
   > &
   Partial<Pick<Page, 'title' | 'content' | 'contentText' | 'type'>> & {
@@ -317,6 +319,7 @@ export async function generateBounty({
         spaceId,
         approveSubmitters,
         maxSubmissions,
+        selectedCredentialTemplates,
         page: {
           create: {
             id: pageId,
@@ -447,7 +450,8 @@ export async function generateBountyWithSingleApplication({
   bountyTitle = 'Bounty',
   bountyDescription = 'Bounty description',
   customReward,
-  deletedAt
+  deletedAt,
+  selectedCredentialTemplateIds
 }: {
   customReward?: string;
   applicationStatus: ApplicationStatus;
@@ -460,6 +464,7 @@ export async function generateBountyWithSingleApplication({
   bountyTitle?: string;
   bountyDescription?: string;
   deletedAt?: Date | null;
+  selectedCredentialTemplateIds?: string[];
 }): Promise<Bounty & { applications: Application[]; page: Page }> {
   const createdBounty = (await prisma.bounty.create({
     data: {
@@ -471,6 +476,7 @@ export async function generateBountyWithSingleApplication({
       status: bountyStatus ?? 'open',
       spaceId,
       approveSubmitters: false,
+      selectedCredentialTemplates: selectedCredentialTemplateIds,
       // Important variable
       maxSubmissions: bountyCap,
       page: {

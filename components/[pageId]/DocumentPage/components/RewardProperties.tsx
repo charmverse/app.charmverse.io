@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { useGetPermissions } from 'charmClient/hooks/permissions';
 import { RewardApplications } from 'components/rewards/components/RewardApplications/RewardApplications';
+import { RewardSignupButton } from 'components/rewards/components/RewardProperties/components/RewardSignupButton';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import type { UpdateableRewardFieldsWithType } from 'components/rewards/hooks/useNewReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
@@ -11,8 +12,6 @@ import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
 import debouncePromise from 'lib/utilities/debouncePromise';
-
-import { RewardSignupButton } from '../../../rewards/components/RewardProperties/components/RewardSignupButton';
 
 type RewardsValue = UpdateableRewardFieldsWithType & { id?: string; status?: BountyStatus };
 

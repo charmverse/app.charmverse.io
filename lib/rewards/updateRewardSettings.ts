@@ -20,6 +20,7 @@ export type UpdateableRewardFields = Partial<
     | 'dueDate'
     | 'customReward'
     | 'fields'
+    | 'selectedCredentialTemplates'
   >
 > & {
   reviewers?: RewardReviewer[];
@@ -81,7 +82,8 @@ export async function updateRewardSettings({ rewardId, updateContent }: RewardUp
         allowMultipleApplications: isAssignedReward ? false : updateContent.allowMultipleApplications,
         approveSubmitters: isAssignedReward ? false : updateContent.approveSubmitters,
         maxSubmissions: isAssignedReward ? 1 : updateContent.maxSubmissions,
-        fields: updateContent.fields as any
+        fields: updateContent.fields as any,
+        selectedCredentialTemplates: updateContent.selectedCredentialTemplates
       },
       select: { id: true }
     });

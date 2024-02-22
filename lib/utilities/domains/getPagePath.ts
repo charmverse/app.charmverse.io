@@ -26,3 +26,18 @@ export function getPagePath({
   const pathWithQuery = `${pathname}${search}`;
   return encodeURI(pathWithQuery);
 }
+
+// Given a hostname, space domain, and path, return a path that can be used to open a page.
+export function getSubmissionPagePath({
+  hostName,
+  spaceDomain,
+  submissionId
+}: {
+  hostName?: string;
+  spaceDomain: string;
+  submissionId: string;
+}) {
+  const isDomainInPath = !getCustomDomainFromHost(hostName) && !getSpaceDomainFromHost(hostName);
+  const pathWithDomain = `/${isDomainInPath ? `${spaceDomain}/` : ''}rewards/applications/${submissionId}`;
+  return encodeURI(pathWithDomain);
+}

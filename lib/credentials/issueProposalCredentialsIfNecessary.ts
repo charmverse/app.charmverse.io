@@ -1,4 +1,4 @@
-import { DataNotFoundError } from '@charmverse/core/errors';
+import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { CredentialEventType, CredentialTemplate } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
@@ -19,13 +19,18 @@ export async function issueProposalCredentialsIfNecessary({
   event
 }: {
   proposalId: string;
-  event: CredentialEventType;
+  event: Extract<CredentialEventType, 'proposal_created' | 'proposal_approved'>;
 }): Promise<void> {
   if (disablePublishedCredentials) {
     log.warn('Published credentials are disabled');
     return;
   }
-  const baseProposal = await prisma.proposal.findFirstOrThrow({
+
+  if (event !== 'proposal_approved' && event !== 'proposal_created') {
+    throw new InvalidInputError(`Invalid event type: ${event} for proposal credentials`);
+  }
+
+  const baseProposal = await prisma.proposal.findUniqueOrThrow({
     where: {
       id: proposalId
     },
