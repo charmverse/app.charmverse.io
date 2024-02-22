@@ -9,6 +9,7 @@ import { InlineDatabaseContainer } from 'components/common/CharmEditor/component
 import LoadingComponent from 'components/common/LoadingComponent';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
 import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
+import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
 import { DatabaseStickyHeader } from 'components/common/PageLayout/components/DatabasePageContent';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
@@ -65,20 +66,16 @@ export function ProposalRewardsTable({
 }: Props) {
   const { space } = useCurrentSpace();
   const { boardBlock, isLoading } = useRewardsBoard();
+  const { showPage } = usePageDialog();
 
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
   const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, isSavingReward } = useNewReward();
   const [currentPendingId, setCurrentPendingId] = useState<null | string>(null);
-  const { rewards: allRewards } = useRewards();
+  const { rewards: allRewards, mutateRewards, isLoading: isLoadingRewards } = useRewards();
   const { pages, loadingPages } = usePages();
   const { templates } = useRewardTemplates({ load: !!requiredTemplateId });
 
   const { getFeatureTitle } = useSpaceFeatures();
-  const {
-    updateURLQuery,
-    navigateToSpacePath,
-    router: { query }
-  } = useCharmRouter();
 
   useRewardsNavigation(rewardQueryKey);
 
@@ -151,14 +148,13 @@ export function ProposalRewardsTable({
   }
 
   function openPublishedReward(pageId: string) {
-    // const modalView = !!query.id;
-
-    // if (!modalView) {
-    //   navigateToSpacePath(`/${pageId}`);
-    //   return;
-    // }
-
-    updateURLQuery({ [rewardQueryKey]: pageId });
+    showPage({
+      pageId,
+      onClose: () => {
+        // refresh rewards in case a property was updated
+        mutateRewards();
+      }
+    });
   }
 
   function selectTemplate(template: RewardTemplate | null) {
@@ -190,7 +186,7 @@ export function ProposalRewardsTable({
       publishedRewards.length > 0
         ? getCardsFromPublishedRewards(publishedRewards, pages)
         : getCardsFromPendingRewards(pendingRewards || [], space?.id),
-    [pendingRewards, space?.id, pages]
+    [pendingRewards, space?.id, pages, allRewards]
   );
 
   const rewardTypes = useMemo(() => {
@@ -209,7 +205,7 @@ export function ProposalRewardsTable({
     [space?.id, boardBlock, rewardTypes]
   );
 
-  const loadingData = isLoading;
+  const loadingData = isLoading || isLoadingRewards || loadingPages;
 
   return (
     <>
@@ -373,5 +369,6 @@ function getCardsFromPublishedRewards(rewards: RewardWithUsers[], pages: PagesMa
         });
       })
       .filter(isTruthy)
+      .sort((a, b) => (b.page.createdAt > a.page.updatedAt ? 1 : -1))
   );
 }
