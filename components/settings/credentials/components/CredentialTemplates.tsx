@@ -1,4 +1,5 @@
 import type { AttestationType, CredentialTemplate } from '@charmverse/core/prisma-client';
+import EditIcon from '@mui/icons-material/Edit';
 import { Box, Tooltip } from '@mui/material';
 import Stack from '@mui/material/Stack';
 import { useState } from 'react';
@@ -11,6 +12,7 @@ import { Typography } from 'components/common/Typography';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
+import { capitalize } from 'lib/utilities/strings';
 
 import { CredentialTemplateDialog } from './CredentialTemplateDialog';
 import { CredentialTemplateRow } from './CredentialTemplateRow';
@@ -66,6 +68,22 @@ export function CredentialTemplates() {
         {getFeatureTitle('Rewards').toLowerCase()}
       </Typography>
       <Box>
+        <Box display='flex' alignItems='center' flexDirection='row' justifyContent='space-between'>
+          <Typography variant='subtitle1' sx={{ alignSelf: 'center' }}>
+            {capitalize(getFeatureTitle('proposals'))}
+          </Typography>
+          <Tooltip title={!isAdmin ? 'Only space admins can create credentials' : ''} arrow>
+            <Button
+              onClick={() => openDialog({ newTemplateType: 'proposal' })}
+              variant='text'
+              sx={{ width: 'fit-content' }}
+              dataTest='add-proposal-credential'
+            >
+              + Add a credential
+            </Button>
+          </Tooltip>
+        </Box>
+
         {proposalCredentialTemplates?.map((template) => (
           <CredentialTemplateRow
             key={template.id}
@@ -74,20 +92,24 @@ export function CredentialTemplates() {
             onClickEdit={(credentialTemplate) => openDialog({ template: credentialTemplate })}
           />
         ))}
-
-        <Tooltip title={!isAdmin ? 'Only space admins can create credentials' : ''} arrow>
-          <Button
-            onClick={() => openDialog({ newTemplateType: 'proposal' })}
-            variant='text'
-            sx={{ width: 'fit-content' }}
-            dataTest='add-proposal-credential'
-          >
-            + Add a {getFeatureTitle('proposal')} credential
-          </Button>
-        </Tooltip>
       </Box>
-
       <Box>
+        <Box display='flex' alignItems='center' flexDirection='row' justifyContent='space-between'>
+          <Typography variant='subtitle1' sx={{ alignSelf: 'center' }}>
+            {capitalize(getFeatureTitle('rewards'))}
+          </Typography>
+          <Tooltip title={!isAdmin ? 'Only space admins can create credentials' : ''} arrow>
+            <Button
+              onClick={() => openDialog({ newTemplateType: 'reward' })}
+              variant='text'
+              sx={{ width: 'fit-content' }}
+              dataTest='add-proposal-credential'
+            >
+              + Add a credential
+            </Button>
+          </Tooltip>
+        </Box>
+
         {rewardCredentialTemplates?.map((template) => (
           <CredentialTemplateRow
             key={template.id}
@@ -96,16 +118,6 @@ export function CredentialTemplates() {
             onClickEdit={(credentialTemplate) => openDialog({ template: credentialTemplate })}
           />
         ))}
-        <Tooltip title={!isAdmin ? 'Only space admins can create credentials' : ''} arrow>
-          <Button
-            onClick={() => openDialog({ newTemplateType: 'reward' })}
-            variant='text'
-            sx={{ width: 'fit-content' }}
-            dataTest='add-proposal-credential'
-          >
-            + Add a {getFeatureTitle('reward')} credential
-          </Button>
-        </Tooltip>
       </Box>
       <CredentialTemplateDialog
         newCredentialTemplateType={selectedNewCredentialType}
