@@ -228,7 +228,7 @@ export function ProposalRewardsTable({
           ) : cardPages.length ? (
             <Box className='container-container'>
               <Stack>
-                <Box width='100%'>
+                <Box width='100%' mb={1}>
                   <Table
                     boardType='rewards'
                     hideCalculations
