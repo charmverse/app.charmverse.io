@@ -32,8 +32,6 @@ type PageProps = Partial<
 export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'id' | 'index' | 'title' | 'type'> & {
   reviewers: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[];
   rubricCriteria: RubricDataInput[];
-  // TODO: fix tests that need to pass in permissions
-  permissions?: WorkflowEvaluationJson['permissions'];
   voteSettings?: VoteSettings | null;
 };
 
@@ -111,9 +109,8 @@ export async function createProposal({
   }
 
   // retrieve permissions and apply evaluation ids to reviewers
-  evaluations.forEach(({ id: evaluationId, permissions: providedPermissions, reviewers: evalReviewers }, index) => {
-    const configuredEvaluation = workflow.evaluations[index];
-    const permissions = configuredEvaluation?.permissions || providedPermissions;
+  evaluations.forEach(({ id: evaluationId, reviewers: evalReviewers }, index) => {
+    const permissions = workflow.evaluations[index]?.permissions;
     if (!permissions) {
       throw new Error(
         `Cannot find permissions for evaluation step. Workflow: ${workflowId}. Evaluation: ${evaluationId}`
