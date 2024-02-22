@@ -100,11 +100,11 @@ type OptionalField = 'id' | 'title' | 'permissions';
 export async function generateProposalWorkflow({
   spaceId,
   title,
-  evaluations
+  evaluations = []
 }: {
   spaceId: string;
   title?: string;
-  evaluations: (Omit<WorkflowEvaluationJson, OptionalField> & Partial<Pick<WorkflowEvaluationJson, OptionalField>>)[];
+  evaluations?: (Omit<WorkflowEvaluationJson, OptionalField> & Partial<Pick<WorkflowEvaluationJson, OptionalField>>)[];
 }): Promise<ProposalWorkflowTyped> {
   const existingFlows = await prisma.proposalWorkflow.count({
     where: {

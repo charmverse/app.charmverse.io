@@ -1,17 +1,16 @@
-import type { Space } from '@charmverse/core/prisma';
+import type { Space, User } from '@charmverse/core/prisma';
+import { testUtilsProposals } from '@charmverse/core/test';
 import request from 'supertest';
 
-import { createProposal } from 'lib/proposal/createProposal';
-import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 
-let adminUser: LoggedInUser;
-let nonAdminUser: LoggedInUser;
+let adminUser: User;
+let nonAdminUser: User;
 let space: Space;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken(undefined, true);
+  const generated = await generateUserAndSpace({ isAdmin: true });
 
   adminUser = generated.user;
   space = generated.space;
@@ -23,18 +22,15 @@ describe('DELETE /api/proposals/templates/{templateId} - Delete a proposal templ
   it('should delete a proposal template if the user is a space admin and respond with 200', async () => {
     const adminCookie = await loginUser(adminUser.id);
 
-    const proposalTemplate = await createProposal({
-      evaluations: [],
+    const proposalTemplate = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: adminUser.id,
       authors: [adminUser.id],
-      pageProps: {
-        type: 'proposal_template'
-      }
+      pageType: 'proposal_template'
     });
 
     await request(baseUrl)
-      .delete(`/api/proposals/templates/${proposalTemplate.proposal.id}`)
+      .delete(`/api/proposals/templates/${proposalTemplate.id}`)
       .set('Cookie', adminCookie)
       .expect(200);
   });
@@ -42,18 +38,15 @@ describe('DELETE /api/proposals/templates/{templateId} - Delete a proposal templ
   it('should fail if the user is not a space admin and respond with 401', async () => {
     const nonAdminCookie = await loginUser(nonAdminUser.id);
 
-    const proposalTemplate = await createProposal({
-      evaluations: [],
+    const proposalTemplate = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: adminUser.id,
       authors: [adminUser.id],
-      pageProps: {
-        type: 'proposal_template'
-      }
+      pageType: 'proposal_template'
     });
 
     await request(baseUrl)
-      .delete(`/api/proposals/templates/${proposalTemplate.proposal.id}`)
+      .delete(`/api/proposals/templates/${proposalTemplate.id}`)
       .set('Cookie', nonAdminCookie)
       .expect(401);
   });

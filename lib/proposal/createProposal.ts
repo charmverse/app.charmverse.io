@@ -46,7 +46,7 @@ export type CreateProposalInput = {
   spaceId: string;
   evaluations: ProposalEvaluationInput[];
   fields?: ProposalFields | null;
-  workflowId?: string;
+  workflowId: string;
   formFields?: FormFieldInput[];
   formAnswers?: FieldAnswerInput[];
   formId?: string;
@@ -141,12 +141,6 @@ export async function createProposal({
   // Always create new form for proposal templates
   if (formFields?.length && pageProps?.type === 'proposal_template') {
     proposalFormId = await createForm(formFields);
-  }
-
-  for (const evaluation of evaluations) {
-    if (evaluation.reviewers.length === 0) {
-      throw new Error('No reviewers defined for proposal evaluation step');
-    }
   }
 
   // Using a transaction to ensure both the proposal and page gets created together
