@@ -1,5 +1,5 @@
 import type { ProposalReviewer } from '@charmverse/core/prisma';
-import { Box, Grid, Stack, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { uniqBy } from 'lodash';
 import { useMemo, useState } from 'react';
 import { v4 } from 'uuid';
@@ -21,13 +21,16 @@ import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigat
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePages } from 'hooks/usePages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
+import type { CardPage } from 'lib/focalboard/card';
+import type { PagesMap } from 'lib/pages';
 import type { ProposalPendingReward } from 'lib/proposal/interface';
 import { getProposalRewardsView } from 'lib/rewards/blocks/views';
 import { getRewardErrors } from 'lib/rewards/getRewardErrors';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 import { getRewardType } from 'lib/rewards/getRewardType';
-import type { RewardType, RewardReviewer } from 'lib/rewards/interfaces';
+import type { RewardWithUsers, RewardType, RewardReviewer } from 'lib/rewards/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 
 import { AttachRewardButton } from './AttachRewardButton';
@@ -47,7 +50,6 @@ type Props = {
 };
 
 const rewardQueryKey = 'rewardId';
-
 export function ProposalRewardsTable({
   containerWidth,
   pendingRewards,
@@ -68,6 +70,7 @@ export function ProposalRewardsTable({
   const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, isSavingReward } = useNewReward();
   const [currentPendingId, setCurrentPendingId] = useState<null | string>(null);
   const { rewards: allRewards } = useRewards();
+  const { pages, loadingPages } = usePages();
   const { templates } = useRewardTemplates({ load: !!requiredTemplateId });
 
   const { getFeatureTitle } = useSpaceFeatures();
@@ -79,8 +82,8 @@ export function ProposalRewardsTable({
 
   useRewardsNavigation(rewardQueryKey);
 
-  const publishedRewards = rewardIds?.map((rId) => allRewards?.find((r) => r.id === rId)).filter(isTruthy) || [];
-  const canCreatePendingRewards = !readOnly && !rewardIds?.length;
+  const publishedRewards = (rewardIds || []).map((rId) => allRewards?.find((r) => r.id === rId)).filter(isTruthy);
+  const canCreatePendingRewards = !readOnly && !publishedRewards.length;
 
   function closeDialog() {
     clearRewardValues();
@@ -184,65 +187,10 @@ export function ProposalRewardsTable({
 
   const cardPages = useMemo(
     () =>
-      (pendingRewards || [])?.map(({ reward, page, draftId }) => {
-        return mapRewardToCardPage({
-          spaceId: space?.id || '',
-          reward: {
-            // add fields to satisfy PageMeta type. TODO: We dont need all fields on PageMeta for cards
-            // applications: [], // dont pass in applications or the expanded arrow icons will appear in tableRow
-            assignedSubmitters: [],
-            allowMultipleApplications: false,
-            allowedSubmitterRoles: [],
-            approveSubmitters: false,
-            chainId: null,
-            createdAt: new Date(),
-            createdBy: '',
-            customReward: null,
-            fields: { properties: {} },
-            dueDate: null,
-            id: draftId,
-            maxSubmissions: null,
-            proposalId: null,
-            reviewers: [],
-            rewardAmount: null,
-            rewardToken: null,
-            spaceId: '',
-            status: 'open',
-            submissionsLocked: false,
-            suggestedBy: null,
-            updatedAt: new Date(),
-            ...reward
-          } as BoardReward,
-          rewardPage: {
-            id: draftId,
-            // add fields to satisfy PageMeta type. TODO: We dont need all fields on PageMeta for cards
-            boardId: null,
-            bountyId: null,
-            createdAt: new Date(),
-            createdBy: '',
-            deletedAt: null,
-            deletedBy: null,
-            hasContent: false,
-            headerImage: '',
-            icon: null,
-            type: 'bounty',
-            galleryImage: '',
-            syncWithPageId: null,
-            index: 0,
-            cardId: null,
-            path: '',
-            parentId: null,
-            sourceTemplateId: null,
-            proposalId: null,
-            spaceId: '',
-            title: '',
-            updatedAt: new Date(),
-            updatedBy: '',
-            ...page
-          }
-        });
-      }),
-    [pendingRewards, space?.id]
+      publishedRewards.length > 0
+        ? getCardsFromPublishedRewards(publishedRewards, pages)
+        : getCardsFromPendingRewards(pendingRewards || [], space?.id),
+    [pendingRewards, space?.id, pages]
   );
 
   const rewardTypes = useMemo(() => {
@@ -342,5 +290,88 @@ export function ProposalRewardsTable({
         </NewDocumentPage>
       </NewPageDialog>
     </>
+  );
+}
+
+function getCardsFromPendingRewards(pendingRewards: ProposalPendingReward[], spaceId?: string): CardPage[] {
+  return pendingRewards.map(({ reward, page, draftId }) => {
+    return mapRewardToCardPage({
+      spaceId: spaceId || '',
+      reward: {
+        // add fields to satisfy PageMeta type. TODO: We dont need all fields on PageMeta for cards
+        // applications: [], // dont pass in applications or the expanded arrow icons will appear in tableRow
+        assignedSubmitters: [],
+        allowMultipleApplications: false,
+        allowedSubmitterRoles: [],
+        approveSubmitters: false,
+        chainId: null,
+        createdAt: new Date(),
+        createdBy: '',
+        customReward: null,
+        fields: { properties: {} },
+        dueDate: null,
+        id: draftId,
+        maxSubmissions: null,
+        proposalId: null,
+        reviewers: [],
+        rewardAmount: null,
+        rewardToken: null,
+        spaceId: '',
+        status: 'open',
+        submissionsLocked: false,
+        suggestedBy: null,
+        updatedAt: new Date(),
+        ...reward
+      } as BoardReward,
+      rewardPage: {
+        id: draftId,
+        // add fields to satisfy PageMeta type. TODO: We dont need all fields on PageMeta for cards
+        boardId: null,
+        bountyId: null,
+        createdAt: new Date(),
+        createdBy: '',
+        deletedAt: null,
+        deletedBy: null,
+        hasContent: false,
+        headerImage: '',
+        icon: null,
+        type: 'bounty',
+        galleryImage: '',
+        syncWithPageId: null,
+        index: 0,
+        cardId: null,
+        path: '',
+        parentId: null,
+        sourceTemplateId: null,
+        proposalId: null,
+        spaceId: '',
+        title: '',
+        updatedAt: new Date(),
+        updatedBy: '',
+        ...page
+      }
+    });
+  });
+}
+
+function getCardsFromPublishedRewards(rewards: RewardWithUsers[], pages: PagesMap): CardPage[] {
+  return (
+    rewards
+      // dont pass in applications or the expanded arrow icons will appear in tableRow
+      .map(({ applications, ...reward }) => {
+        const page = pages[reward.id];
+        if (!page) {
+          return null;
+        }
+        return mapRewardToCardPage({
+          spaceId: page.spaceId,
+          reward: {
+            ...reward,
+            fields: reward.fields as any
+          } as BoardReward,
+          rewardPage: page
+        });
+      })
+      .filter(isTruthy)
   );
 }
