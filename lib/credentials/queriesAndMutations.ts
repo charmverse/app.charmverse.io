@@ -166,6 +166,20 @@ export async function getCharmverseCredentialsByWallets({
     select: {
       id: true,
       ceramicId: true,
+      application: {
+        select: {
+          bounty: {
+            select: {
+              space: {
+                select: {
+                  spaceArtwork: true,
+                  credentialLogo: true
+                }
+              }
+            }
+          }
+        }
+      },
       proposal: {
         select: {
           space: {
@@ -195,7 +209,9 @@ export async function getCharmverseCredentialsByWallets({
   return charmverseCredentials.map((credential) => {
     const issuedCredential = issuedCredentials.find((ic) => ic.ceramicId === credential.id);
     const favoriteCredential = favoriteCredentials.find((fc) => fc.issuedCredentialId === issuedCredential?.id);
-    const iconUrl = issuedCredential?.proposal.space.credentialLogo ?? issuedCredential?.proposal.space.spaceArtwork;
+    const iconUrl =
+      (issuedCredential?.proposal ?? issuedCredential?.application?.bounty)?.space.credentialLogo ??
+      (issuedCredential?.proposal ?? issuedCredential?.application?.bounty)?.space.spaceArtwork;
 
     if (favoriteCredential) {
       return {
