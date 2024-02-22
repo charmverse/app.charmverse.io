@@ -42,7 +42,7 @@ export type TypedFormField = Omit<FormField, 'options'> & {
   options: SelectOptionType[];
 };
 
-export type ProposalPendingReward = { reward: UpdateableRewardFields; page: NewPageValues | null; draftId: string };
+export type ProposalPendingReward = { reward: UpdateableRewardFields; page: NewPageValues; draftId: string };
 
 export type ProposalFields = {
   properties?: ProposalPropertiesField;

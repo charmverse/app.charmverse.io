@@ -7,7 +7,7 @@ import Tooltip from '@mui/material/Tooltip';
 import { DateTime } from 'luxon';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { EditorView } from 'prosemirror-view';
-import React from 'react';
+import React, { useRef } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -63,6 +63,7 @@ export function VoteDetail({
   const { deadline, totalVotes, content, id, title, userChoice, voteOptions, aggregatedResult, type, maxChoices } =
     vote;
   const { user } = useUser();
+  const anchorRef = useRef<HTMLElement>(null);
   const { data: userVotes, mutate } = useSWR(detailed ? `/votes/${id}/user-votes` : null, () =>
     charmClient.votes.getUserVotes(id)
   );
@@ -134,11 +135,12 @@ export function VoteDetail({
 
   return (
     <VotesWrapper data-test='vote-container' detailed={detailed} id={`vote.${vote.id}`}>
-      <Box display='flex' justifyContent='space-between' alignItems='center'>
+      <Box ref={anchorRef} display='flex' justifyContent='space-between' alignItems='center'>
         <Typography variant='h6' fontWeight='bold' component='span'>
           {title || 'Poll on this proposal'}
         </Typography>
         <VoteActionsMenu
+          anchorRef={anchorRef}
           deleteVote={deleteVote}
           cancelVote={cancelVote}
           isProposalVote={!!isProposal}

@@ -44,9 +44,6 @@ const spaceHandlers = {
   spaces: rest.get(`/api/spaces`, (req, res, ctx) => {
     return res(ctx.json(spaces));
   }),
-  proposalWorkflows: rest.get(`/api/spaces/:spaceId/proposals/workflows`, (req, res, ctx) => {
-    return res(ctx.json(getDefaultWorkflows(req.params.spaceId)));
-  }),
   spaceBlockCount: rest.get(`/api/spaces/:spaceId/block-count`, (req, res, ctx) => {
     const result: BlockCountInfo = { count: 1000 };
     return res(ctx.json(result));
@@ -56,9 +53,6 @@ const spaceHandlers = {
 const pageHandlers = {
   pageComments: rest.get(`/api/pages/:pageId/comments`, (req, res, ctx) => {
     return res(ctx.json([]));
-  }),
-  proposalTemplates: rest.get(`/api/spaces/:spaceId/proposal-templates`, (req, res, ctx) => {
-    return res(ctx.json(proposalTemplates));
   })
 };
 
@@ -66,7 +60,16 @@ const proposalHandlers = {
   proposalTemplates: rest.get(`/api/spaces/:spaceId/proposal-templates`, (req, res, ctx) => {
     return res(ctx.json(proposalTemplates));
   }),
-  reviewerIds: rest.get(`/api/proposals/:pageId/get-user-reviewerids`, (req, res, ctx) => {
+  proposalWorkflows: rest.get(`/api/spaces/:spaceId/proposals/workflows`, (req, res, ctx) => {
+    return res(ctx.json(getDefaultWorkflows(req.params.spaceId)));
+  })
+};
+
+const rewardHandlers = {
+  rewardBlocks: rest.get(`/api/spaces/:spaceId/rewards/blocks`, (req, res, ctx) => {
+    return res(ctx.json([]));
+  }),
+  rewardTemplates: rest.get(`/api/spaces/:spaceId/reward-templates`, (req, res, ctx) => {
     return res(ctx.json([]));
   })
 };
@@ -84,5 +87,6 @@ export const handlers = {
   ...spaceHandlers,
   ...pageHandlers,
   ...proposalHandlers,
+  ...rewardHandlers,
   ...userHandlers
 };

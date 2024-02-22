@@ -15,16 +15,16 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers';
 import { RPCList, getChainById } from 'connectors/chains';
 import { debounce } from 'lodash';
-import type { DateTime } from 'luxon';
+import { DateTime } from 'luxon';
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { RelationPageListItemsContainer } from 'components/common/BoardEditor/components/properties/PagesAutocomplete';
 import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
+import { DatePicker } from 'components/common/DatePicker';
 import { PageIcon } from 'components/common/PageIcon';
 import PageTitle from 'components/common/PageLayout/components/PageTitle';
 import UserDisplay from 'components/common/UserDisplay';
@@ -422,20 +422,16 @@ function FilterPropertyValue({
   } else if (propertyDataType === 'date') {
     return (
       <DatePicker
-        value={new Date(Number(filter.values[0]))}
+        value={DateTime.fromMillis(parseInt(filter.values[0]))}
         onChange={updateDateValue}
-        renderInput={(props) => (
-          <TextField
-            {...props}
-            inputProps={{
-              ...props.inputProps,
-              sx: { fontSize: 'small' },
-              readOnly: true,
-              placeholder: 'Select a date'
-            }}
-            disabled
-          />
-        )}
+        slotProps={{
+          textField: {
+            placeholder: 'Select a date',
+            inputProps: {
+              sx: { fontSize: 'small' }
+            }
+          }
+        }}
       />
     );
   }

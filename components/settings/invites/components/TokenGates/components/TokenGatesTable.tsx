@@ -8,7 +8,6 @@ import TableHead from '@mui/material/TableHead';
 import Typography from '@mui/material/Typography';
 import { useContext, useState } from 'react';
 
-import useLitProtocol from 'adapters/litProtocol/hooks/useLitProtocol';
 import { useVerifyTokenGate } from 'charmClient/hooks/tokenGates';
 import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import Loader from 'components/common/Loader';
@@ -17,7 +16,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { TokenGate, TokenGateWithRoles } from 'lib/tokenGates/interfaces';
-import { shortenHex } from 'lib/utilities/blockchain';
 
 import { CopyLink } from './CopyLink';
 import type { TestResult } from './TestConnectionModal';
@@ -47,70 +45,27 @@ export default function TokenGatesTable({ isAdmin, isLoading, tokenGates, refres
   const { account, walletAuthSignature, requestSignature } = useWeb3Account();
   const isMobile = useSmallScreen();
   const [testResult, setTestResult] = useState<TestResult>({});
-  const litClient = useLitProtocol();
   const { space } = useCurrentSpace();
   const { connectWallet } = useContext(Web3Connection);
   const { trigger: verifyTokenGate } = useVerifyTokenGate();
 
-  async function testLitTokenGate(tokenGate: TokenGate<'lit'>) {
-    setTestResult({ status: 'loading' });
-    try {
-      if (!litClient) {
-        throw new Error('Lit Protocol client not initialized');
-      }
+  async function testConnect(tokenGate: TokenGate) {
+    if (account) {
       const authSig = walletAuthSignature ?? (await requestSignature());
-      const jwt = await litClient.getSignedToken({
-        resourceId: tokenGate.resourceId,
-        authSig,
-        chain: tokenGate.conditions.chains?.[0],
-        // chain: (tokenGate.conditions).chain || 'ethereum',
-        ...tokenGate.conditions
-      });
 
-      if (account && space?.id) {
-        await verifyTokenGate(
-          {
-            commit: false,
-            spaceId: space.id,
-            tokens: [{ signedToken: jwt, tokenGateId: tokenGate.id }],
-            walletAddress: account
-          },
-          {
-            onSuccess: () => {
-              setTestResult({ status: 'success' });
-            }
-          }
-        );
-      }
-    } catch (error) {
-      log.warn('Error when verifying wallet', error);
-      let message = '';
-      switch ((error as any).errorCode) {
-        case 'NodeNotAuthorized':
-          message = `Your address does not meet requirements: ${shortenHex(account || '')}`;
-          break;
-        case 'rpc_error':
-          message = 'Network error. Please check that the access control conditions are valid.';
-          break;
-        default:
-          message = (error as Error).message || 'Unknown error. Please try again.';
-      }
-      setTestResult({ message, status: 'error' });
-    }
-  }
+      setTestResult({ status: 'loading' });
 
-  async function testOthers(tokenGate: TokenGate<'unlock'> | TokenGate<'hypersub'>) {
-    setTestResult({ status: 'loading' });
-    if (space?.id && account) {
       await verifyTokenGate(
         {
           commit: false,
-          spaceId: space.id,
-          tokens: [{ signedToken: '', tokenGateId: tokenGate.id }],
-          walletAddress: account
+          spaceId: space?.id || '',
+          tokenGateIds: [tokenGate.id],
+          authSig,
+          walletAddress: account || ''
         },
         {
-          onError: () => {
+          onError: (error) => {
+            log.warn('Error when verifying wallet', error);
             setTestResult({ message: 'Your address does not meet the requirements', status: 'error' });
           },
           onSuccess: () => {
@@ -118,16 +73,6 @@ export default function TokenGatesTable({ isAdmin, isLoading, tokenGates, refres
           }
         }
       );
-    }
-  }
-
-  async function testConnect(tokenGate: TokenGate) {
-    if (account) {
-      if (tokenGate.type === 'unlock' || tokenGate.type === 'hypersub') {
-        await testOthers(tokenGate);
-      } else if (tokenGate.type === 'lit') {
-        await testLitTokenGate(tokenGate);
-      }
     } else {
       connectWallet();
     }

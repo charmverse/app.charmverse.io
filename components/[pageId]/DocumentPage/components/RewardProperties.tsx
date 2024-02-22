@@ -76,7 +76,6 @@ export function RewardProperties(props: {
     <Stack flex={1}>
       <RewardPropertiesForm
         pageId={pageId}
-        refreshPermissions={refreshPagePermissionsList}
         values={currentReward}
         onChange={applyRewardUpdates}
         readOnly={readOnly}

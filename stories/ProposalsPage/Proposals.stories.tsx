@@ -13,7 +13,7 @@ import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 
 import { members, userProfile } from '../lib/mockData';
 
-import { ProposalStoryProviders, ProposalsPageStory, withProposalProviders } from './ProposalsPageStory';
+import { ProposalsPageStory, withProposalProviders } from './components/ProposalsPageStory';
 
 export default {
   title: 'Proposals/Views',

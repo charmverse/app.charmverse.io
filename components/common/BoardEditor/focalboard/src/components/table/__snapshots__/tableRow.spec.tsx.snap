@@ -328,6 +328,7 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
                 >
                   <div
                     class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
+                    data-test="select-preview-value-value1"
                   >
                     <span
                       class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
@@ -682,6 +683,7 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
                 >
                   <div
                     class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
+                    data-test="select-preview-value-value1"
                   >
                     <span
                       class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"

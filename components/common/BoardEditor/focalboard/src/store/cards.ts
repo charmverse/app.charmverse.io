@@ -157,7 +157,7 @@ function manualOrder(activeView: BoardView, cardA: CardPage, cardB: CardPage) {
 
 export function sortCards(
   cardPages: CardPage[],
-  board: Board,
+  board: Pick<Board, 'fields'>,
   activeView: BoardView,
   members: Record<string, Member>,
   relationPropertiesCardsRecord: PageListItemsRecord,

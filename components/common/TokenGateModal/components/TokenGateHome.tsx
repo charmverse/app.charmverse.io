@@ -5,6 +5,7 @@ import type { ElementType } from 'react';
 
 import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
+import GitCoindPassportIcon from 'public/images/logos/gitcoin_passport.svg';
 import GrantorIcon from 'public/images/template_icons/grantor_icon.svg';
 import NFTCommunityIcon from 'public/images/template_icons/nft_community_icon.svg';
 import DAOIcon from 'public/images/template_icons/nounish_icon.svg';
@@ -39,9 +40,14 @@ const requirementButton: ButtonProps[] = [
   },
   {
     name: 'dao',
-    title: 'DAO Membership',
+    title: 'Communities',
     icon: DAOIcon,
     iconColor: 'error'
+  },
+  {
+    name: 'gitcoin',
+    title: 'Gitcoin',
+    icon: GitCoindPassportIcon
   }
 ];
 
