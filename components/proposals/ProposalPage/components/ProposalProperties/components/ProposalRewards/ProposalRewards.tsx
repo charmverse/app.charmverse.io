@@ -107,11 +107,11 @@ export function ProposalRewards({
       ? template.reward.allowedSubmitterRoles
       : assignedSubmitters;
 
-    const reward = { ...template?.reward, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters };
+    const newReward = { ...template?.reward, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters };
     if (template?.reward) {
-      (reward as any).rewardType = getRewardType(template.reward);
+      (newReward as any).rewardType = getRewardType(template.reward);
     }
-    setRewardValues(reward, { skipDirty: true });
+    setRewardValues(newReward, { skipDirty: true });
 
     openNewPage({
       ...template?.page,

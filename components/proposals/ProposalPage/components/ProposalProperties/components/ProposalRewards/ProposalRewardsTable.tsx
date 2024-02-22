@@ -117,10 +117,11 @@ export function ProposalRewardsTable({
       ? template.reward.allowedSubmitterRoles
       : assignedSubmitters;
 
-    setRewardValues(
-      { ...template?.reward, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters },
-      { skipDirty: true }
-    );
+    const newReward = { ...template?.reward, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters };
+    if (template?.reward) {
+      (newReward as any).rewardType = getRewardType(template.reward);
+    }
+    setRewardValues(newReward, { skipDirty: true });
 
     openNewPage({
       ...template?.page,
