@@ -92,15 +92,18 @@ export async function createProposal({
   const reviewersInput: Prisma.ProposalReviewerCreateManyInput[] = [];
 
   const errors = getProposalErrors({
-    proposal: {
+    page: {
+      title: pageProps.title ?? '',
       type: pageProps.type,
+      content: pageProps.content
+    },
+    proposal: {
       proposalType: formId ? 'structured' : 'free_form',
-      title: pageProps?.title ?? '',
       authors: authorsList,
-      isDraft,
       formFields,
       evaluations
     },
+    isDraft: !!isDraft,
     requireTemplates: false
   });
 

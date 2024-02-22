@@ -15,7 +15,7 @@ export function ProposalStickyFooter({
   isStructuredProposal
 }: {
   proposal: ProposalWithUsersAndRubric;
-  page: { title: string };
+  page: { title: string; content?: any };
   refreshProposal: VoidFunction;
   isStructuredProposal: boolean;
 }) {
@@ -33,6 +33,7 @@ export function ProposalStickyFooter({
   }
   const disabledTooltip = getProposalErrors({
     page: {
+      content: page.content,
       title: page.title,
       type: 'proposal'
     },
@@ -40,7 +41,6 @@ export function ProposalStickyFooter({
     proposal: {
       proposalType: isStructuredProposal ? 'structured' : 'free_form',
       ...proposal,
-      isDraft: proposal.status === 'draft',
       formFields: proposal.form?.formFields || undefined,
       authors: proposal.authors.map((a) => a.userId)
     },
