@@ -16,21 +16,21 @@ import { defaultRewardViews } from 'lib/rewards/blocks/views';
 
 export function useRewardsBoard() {
   const { space } = useCurrentSpace();
-  const { data: boardBlocks, isLoading, mutate } = useGetRewardBlocks({ spaceId: space?.id, type: 'board' });
+  const { data: blocksFromDB, isLoading, mutate } = useGetRewardBlocks({ spaceId: space?.id, type: 'board' });
   const { trigger: updateRewardBlocks } = useUpdateRewardBlocks(space?.id || '');
   const { showError } = useSnackbar();
 
-  const block = boardBlocks?.find((b): b is RewardsBoardBlock => b.type === 'board');
+  const dbBlock = blocksFromDB?.find((b): b is RewardsBoardBlock => b.type === 'board');
 
   const boardBlock = useMemo(() => {
-    if (block && !block.fields.cardProperties) {
-      block.fields.cardProperties = [];
+    if (dbBlock && !dbBlock.fields.cardProperties) {
+      dbBlock.fields.cardProperties = [];
     }
     const board = getDefaultBoard({
-      storedBoard: block
+      storedBoard: dbBlock
     }) as RewardsBoardFFBlock;
     return board;
-  }, [block]);
+  }, [dbBlock]);
 
   const createProperty = useCallback(
     async (propertyTemplate: IPropertyTemplate) => {
@@ -40,11 +40,11 @@ export function useRewardsBoard() {
 
       try {
         // check if a block already exists
-        if (block) {
-          const newCardProperties = [...(block.fields.cardProperties || []), propertyTemplate];
+        if (dbBlock) {
+          const newCardProperties = [...(dbBlock.fields.cardProperties || []), propertyTemplate];
           const updatedBlock: RewardBlockUpdateInput = {
-            ...block,
-            fields: { ...(block.fields as BoardFields), cardProperties: newCardProperties }
+            ...dbBlock,
+            fields: { ...(dbBlock.fields as BoardFields), cardProperties: newCardProperties }
           };
           await updateRewardBlocks([updatedBlock]);
         } else {
@@ -62,22 +62,22 @@ export function useRewardsBoard() {
         showError(`Failed to create property: ${e.message}`);
       }
     },
-    [block, mutate, showError, space, updateRewardBlocks]
+    [dbBlock, mutate, showError, space, updateRewardBlocks]
   );
 
   const updateProperty = useCallback(
     async (propertyTemplate: IPropertyTemplate) => {
-      if (!space || !block) {
+      if (!space || !dbBlock) {
         return;
       }
 
-      const updatedProperties = block.fields.cardProperties.map((p) =>
+      const updatedProperties = dbBlock.fields.cardProperties.map((p) =>
         p.id === propertyTemplate.id ? propertyTemplate : p
       );
       const updatedBlock = {
-        ...block,
+        ...dbBlock,
         fields: {
-          ...(block.fields as BoardFields),
+          ...(dbBlock.fields as BoardFields),
           cardProperties: updatedProperties
         }
       };
@@ -95,19 +95,19 @@ export function useRewardsBoard() {
         showError(`Failed to update property: ${e.message}`);
       }
     },
-    [block, showError, space, mutate, updateRewardBlocks]
+    [dbBlock, showError, space, mutate, updateRewardBlocks]
   );
 
   const deleteProperty = useCallback(
     async (propertyTemplateId: string) => {
-      if (!space || !block) {
+      if (!space || !dbBlock) {
         return;
       }
 
-      const updatedProperties = block.fields.cardProperties.filter((p) => p.id !== propertyTemplateId);
+      const updatedProperties = dbBlock.fields.cardProperties.filter((p) => p.id !== propertyTemplateId);
       const updatedBlock = {
-        ...block,
-        fields: { ...(block.fields as BoardFields), cardProperties: updatedProperties }
+        ...dbBlock,
+        fields: { ...(dbBlock.fields as BoardFields), cardProperties: updatedProperties }
       };
       try {
         const res = await updateRewardBlocks([updatedBlock]);
@@ -121,7 +121,7 @@ export function useRewardsBoard() {
         showError(`Failed to delete property: ${e.message}`);
       }
     },
-    [block, showError, space, mutate, updateRewardBlocks]
+    [dbBlock, showError, space, mutate, updateRewardBlocks]
   );
 
   return {
