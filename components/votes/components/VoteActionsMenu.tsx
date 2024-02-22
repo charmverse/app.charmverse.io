@@ -8,13 +8,15 @@ import IconButton from '@mui/material/IconButton';
 import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { bindMenu, bindPopover, anchorRef, usePopupState } from 'material-ui-popup-state/hooks';
+import { bindMenu, bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
+import type { RefObject } from 'react';
 
 import ConfirmDeadlinePopover from 'components/common/CharmEditor/components/inlineVote/components/ConfirmDeadlinePopover';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useUser } from 'hooks/useUser';
 
 interface VoteActionsProps {
+  anchorRef: RefObject<HTMLElement>;
   deleteVote?: (voteId: string) => Promise<void>;
   cancelVote?: (voteId: string) => Promise<void>;
   isProposalVote: boolean;
@@ -24,6 +26,7 @@ interface VoteActionsProps {
 }
 
 export function VoteActionsMenu({
+  anchorRef,
   cancelVote,
   deleteVote,
   removeFromPage,
@@ -105,7 +108,7 @@ export function VoteActionsMenu({
           </MenuItem>
         )}
         {vote.status === 'InProgress' && vote.deadline && !hasPassedDeadline && updateDeadline && (
-          <MenuItem dense onClick={(event) => deadlinePopup.open(event)}>
+          <MenuItem dense onClick={() => deadlinePopup.open(anchorRef.current)}>
             <DateRangeIcon fontSize='small' sx={{ mr: 1 }} />
             <ListItemText>Change end date</ListItemText>
           </MenuItem>

@@ -29,9 +29,10 @@ export type GnosisPaymentProps = {
   onSuccess: (results: GnosisProposeTransactionResult) => void;
   safeAddress: string;
   transactions: MetaTransactionDataWithApplicationId[];
+  onError?: (error: SystemError) => void;
 };
 
-export function useMultiGnosisPayment({ chainId, safeAddress, transactions, onSuccess }: GnosisPaymentProps) {
+export function useMultiGnosisPayment({ onError, chainId, safeAddress, transactions, onSuccess }: GnosisPaymentProps) {
   const { account, chainId: connectedChainId, signer } = useWeb3Account();
   const [safe] = useCreateSafes([safeAddress]);
   const network = chainId ? getChainById(chainId) : null;
@@ -75,6 +76,17 @@ export function useMultiGnosisPayment({ chainId, safeAddress, transactions, onSu
         })
       )
     ).filter(isTruthy);
+
+    if (transactionsWithRecipients.length === 0) {
+      onError?.(
+        new SystemError({
+          errorType: 'External service',
+          severity: 'error',
+          message: 'No valid recipients found'
+        })
+      );
+      return;
+    }
 
     const safeTransaction = await safe.createTransaction({
       safeTransactionData: transactionsWithRecipients.map((transaction) => ({

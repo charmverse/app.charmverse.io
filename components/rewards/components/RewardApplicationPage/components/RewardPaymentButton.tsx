@@ -15,7 +15,6 @@ import { parseEther, parseUnits } from 'viem';
 import charmClient from 'charmClient';
 import { OpenWalletSelectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/OpenWalletSelectorButton';
 import { Button } from 'components/common/Button';
-import TokenLogo from 'components/common/TokenLogo';
 import { useGnosisSafes } from 'hooks/useGnosisSafes';
 import { getPaymentErrorMessage } from 'hooks/useMultiGnosisPayment';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
@@ -29,7 +28,6 @@ import { shortenHex } from 'lib/utilities/blockchain';
 import { GnosisSafesList } from './GnosisSafesList';
 
 interface Props {
-  buttonVariant?: ButtonProps['variant'];
   receiver: string;
   amount: string;
   tokenSymbolOrAddress: string;
@@ -50,8 +48,7 @@ export function RewardPaymentButton({
   onError = () => {},
   onSuccess = () => {},
   chainIdToUse,
-  tokenSymbolOrAddress,
-  buttonVariant
+  tokenSymbolOrAddress
 }: Props) {
   const { account, chainId, signer } = useWeb3Account();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -165,14 +162,11 @@ export function RewardPaymentButton({
     );
   }
 
-  const chainInfo = getChainById(chainIdToUse as number);
-
   return (
     <>
       <Button
         loading={sendingTx}
         color='primary'
-        variant={buttonVariant}
         endIcon={hasSafes && !sendingTx ? <KeyboardArrowDownIcon /> : null}
         size='small'
         onClick={(e: MouseEvent<HTMLButtonElement>) => {

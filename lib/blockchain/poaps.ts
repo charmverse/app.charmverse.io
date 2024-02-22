@@ -4,22 +4,49 @@ import type { UserWallet } from '@charmverse/core/prisma';
 
 import type { ExtendedPoap } from './interfaces';
 
-type PoapInResponse = { tokenId: string; owner: string; event?: any; created: string };
+type PoapEvent = {
+  id: number;
+  fancy_id: string;
+  name: string;
+  event_url: string;
+  image_url: string;
+  country: string;
+  city: string;
+  description: string;
+  year: number;
+  start_date: string;
+  end_date: string;
+  expiry_date: string;
+  supply: number;
+};
 
-const getPOAPsURL = (address: string) => `https://api.poap.tech/actions/scan/${address}`;
+type PoapInResponse = {
+  tokenId: string;
+  owner: string;
+  created: string;
+  chain: string;
+  migrated: string;
+  event: PoapEvent;
+};
 
-export async function getPOAPs(wallets: UserWallet[]): Promise<ExtendedPoap[]> {
-  const apiKey = process.env.POAP_API_KEY;
-  if (typeof apiKey !== 'string') {
+const apiKey = process.env.POAP_API_KEY;
+
+export async function getPoapsFromAddress(address: string) {
+  if (typeof apiKey !== 'string' || !apiKey) {
     log.debug('No API key for POAPs');
     return [];
   }
+
+  return GET<PoapInResponse[]>(`https://api.poap.tech/actions/scan/${address}`, undefined, {
+    headers: { 'X-API-Key': apiKey }
+  });
+}
+
+export async function getPOAPs(wallets: UserWallet[]): Promise<ExtendedPoap[]> {
   const addresses = wallets.map((w) => w.address);
 
-  const requests = addresses.map((address) => {
-    return GET<PoapInResponse[]>(getPOAPsURL(address), undefined, {
-      headers: { 'X-API-Key': apiKey }
-    }).catch((err) => {
+  const requests = addresses.map(async (address) => {
+    return getPoapsFromAddress(address).catch((err) => {
       log.warn(`Error retrieving POAPS for address: ${address}`, err);
       return [];
     });
@@ -41,4 +68,15 @@ export async function getPOAPs(wallets: UserWallet[]): Promise<ExtendedPoap[]> {
   }));
 
   return poaps;
+}
+
+export async function getPoapByEventId(eventId: string) {
+  if (typeof apiKey !== 'string' || !apiKey) {
+    log.debug('No API key for POAPs');
+    return null;
+  }
+
+  return GET<PoapEvent>(`https://api.poap.tech/events/id/${eventId}`, undefined, {
+    headers: { 'X-API-Key': apiKey }
+  });
 }

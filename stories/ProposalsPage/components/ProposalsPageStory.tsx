@@ -11,9 +11,9 @@ import { createMockPage } from 'testing/mocks/page';
 import { createMockProposal } from 'testing/mocks/proposal';
 import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 
-import { members, userProfile } from '../lib/mockData';
+import { members, userProfile } from '../../lib/mockData';
 
-export function ProposalStoryProviders({ children }: { children: ReactNode }) {
+export function ProposalsStoryProviders({ children }: { children: ReactNode }) {
   return (
     <ProposalsProvider>
       <ProposalBlocksProvider>
@@ -27,17 +27,17 @@ export function ProposalStoryProviders({ children }: { children: ReactNode }) {
 
 export const withProposalProviders = (Story: any) => {
   return (
-    <ProposalStoryProviders>
+    <ProposalsStoryProviders>
       <Story />
-    </ProposalStoryProviders>
+    </ProposalsStoryProviders>
   );
 };
 
 export function ProposalsPageStory() {
   return (
-    <ProposalStoryProviders>
+    <ProposalsStoryProviders>
       <ProposalsPage title='Proposals' />
-    </ProposalStoryProviders>
+    </ProposalsStoryProviders>
   );
 }
 

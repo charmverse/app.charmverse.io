@@ -1,7 +1,8 @@
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { Box, useMediaQuery } from '@mui/material';
-import { useElementSize } from 'usehooks-ts';
+import { useRef } from 'react';
+import { useResizeObserver } from 'usehooks-ts';
 
 import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
 import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
@@ -18,7 +19,6 @@ import type { NewPageValues } from '../hooks/useNewPage';
 const StyledContainer = styled(PageEditorContainer)`
   margin-bottom: 180px;
 `;
-
 type Props = {
   children: React.ReactNode;
   placeholder?: string;
@@ -40,7 +40,8 @@ export function NewDocumentPage({
   readOnly
 }: Props) {
   newPageValues ||= EMPTY_PAGE_VALUES;
-  const [, { width: containerWidth }] = useElementSize();
+  const containerWidthRef = useRef<HTMLDivElement>(null);
+  const { width: containerWidth = 0 } = useResizeObserver({ ref: containerWidthRef });
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
 
   function focusDocumentEditor() {
@@ -51,7 +52,7 @@ export function NewDocumentPage({
 
   return (
     <div className={`document-print-container ${fontClassName}`}>
-      <Box display='flex' flexDirection='column'>
+      <Box ref={containerWidthRef} display='flex' flexDirection='column'>
         <PageTemplateBanner pageType={newPageValues.type} isNewPage customTitle={headerBannerTitle} />
         {newPageValues.headerImage && <PageBanner headerImage={newPageValues.headerImage} setPage={onChange} />}
         <StyledContainer data-test='page-charmeditor' top={getPageTop(newPageValues)} fullWidth={isSmallScreen}>

@@ -392,15 +392,10 @@ export class Mutator {
 
   async insertPropertyTemplate(
     board: Board,
-    activeView: BoardView,
+    activeView?: BoardView,
     index = -1,
     template?: IPropertyTemplate
   ): Promise<string> {
-    if (!activeView) {
-      Utils.assertFailure('insertPropertyTemplate: no activeView');
-      return '';
-    }
-
     const newTemplate = template || {
       id: Utils.createGuid(IDType.BlockID),
       name: 'New Property',
@@ -418,7 +413,7 @@ export class Mutator {
 
     let description = 'add property';
 
-    if (activeView.fields.viewType === 'table') {
+    if (activeView?.fields.viewType === 'table') {
       oldBlocks.push(activeView);
 
       const newActiveView = createBoardView(activeView);

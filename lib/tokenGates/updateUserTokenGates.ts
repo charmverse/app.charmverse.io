@@ -6,7 +6,6 @@ type UpdateUserTokenGatesProps = { tokenGates: TokenGateResult[]; spaceId: strin
 
 type UpsertTokenGateProps = {
   tokenGateId: string;
-  jwt: string;
   spaceId: string;
   userId: string;
   grantedRoles: string[];
@@ -14,18 +13,18 @@ type UpsertTokenGateProps = {
 type DeleteTokenGateProps = { tokenGateId: string; spaceId: string; userId: string } | { id: string };
 
 export async function updateUserTokenGates({ tokenGates, spaceId, userId }: UpdateUserTokenGatesProps) {
-  const verified = tokenGates.filter((tg) => (tg.verified && tg.type === 'lit' ? !!tg.jwt : true));
+  const verified = tokenGates.filter((tg) => tg.verified);
   const nonVerified = tokenGates.filter((tg) => !tg.verified);
 
   return prisma.$transaction([
     ...verified.map((tg) =>
-      upsertUserTokenGate({ spaceId, tokenGateId: tg.id, userId, jwt: tg.jwt || '', grantedRoles: tg.grantedRoles })
+      upsertUserTokenGate({ spaceId, tokenGateId: tg.id, userId, grantedRoles: tg.grantedRoles })
     ),
     ...nonVerified.map((tg) => deleteUserTokenGate({ spaceId, tokenGateId: tg.id, userId }))
   ]);
 }
 
-function upsertUserTokenGate({ spaceId, tokenGateId, userId, jwt, grantedRoles }: UpsertTokenGateProps) {
+function upsertUserTokenGate({ spaceId, tokenGateId, userId, grantedRoles }: UpsertTokenGateProps) {
   return prisma.userTokenGate.upsert({
     where: {
       tokenGateUserSpace: {
@@ -35,7 +34,6 @@ function upsertUserTokenGate({ spaceId, tokenGateId, userId, jwt, grantedRoles }
       }
     },
     create: {
-      jwt,
       tokenGateConnectedDate: new Date(),
       space: {
         connect: { id: spaceId }
@@ -49,7 +47,6 @@ function upsertUserTokenGate({ spaceId, tokenGateId, userId, jwt, grantedRoles }
       grantedRoles
     },
     update: {
-      jwt,
       tokenGateConnectedDate: new Date()
     }
   });

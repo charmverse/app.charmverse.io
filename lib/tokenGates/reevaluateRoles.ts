@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
-import type { AuthSig } from '@lit-protocol/types';
 
+import type { AuthSig } from 'lib/blockchain/interfaces';
 import { getSpaceMembershipWithRoles } from 'lib/spaces/getSpaceMembershipWithRoles';
 import { applyTokenGates } from 'lib/tokenGates/applyTokenGates';
 import { evaluateTokenGateEligibility } from 'lib/tokenGates/evaluateEligibility';
@@ -39,7 +39,7 @@ export async function reevaluateRoles({
       commit: true,
       joinType: 'token_gate',
       reevaluate: true,
-      tokens: eligibleGates ?? [],
+      tokenGateIds: eligibleGates ?? [],
       walletAddress: authSig.address
     });
 

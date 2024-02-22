@@ -1,7 +1,7 @@
 import { FormHelperText, ListItemIcon, ListItemText, MenuItem, Select } from '@mui/material';
 import type { SelectProps } from '@mui/material/Select';
 import type { IChainDetails } from 'connectors/chains';
-import { getChainById, litChains } from 'connectors/chains';
+import { getChainById, alchemyChains } from 'connectors/chains';
 import { forwardRef } from 'react';
 import type { Ref, ReactNode } from 'react';
 
@@ -12,7 +12,7 @@ function SelectField(
   props: SelectProps<string> & { helperMessage?: ReactNode; chains?: IChainDetails[] },
   ref: Ref<unknown>
 ) {
-  const { helperMessage, children, chains = litChains, ...restProps } = props;
+  const { helperMessage, children, chains = alchemyChains, ...restProps } = props;
 
   return (
     <FieldWrapper label='Blockchain'>

@@ -6,20 +6,20 @@ import * as http from 'adapters/http';
 import { useDeleteRewardBlocks, useGetRewardBlocks, useUpdateRewardBlocks } from 'charmClient/hooks/rewards';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { Board, BoardFields, IPropertyTemplate } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
-import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposal/blocks/constants';
 import type {
   RewardBlockInput,
   RewardBlockUpdateInput,
   RewardBlockWithTypedFields,
-  RewardPropertiesBlock
+  RewardsBoardFFBlock
 } from 'lib/rewards/blocks/interfaces';
-import { defaultRewardViews } from 'lib/rewards/blocks/views';
+
+import { useRewardsBoard } from './useRewardsBoard';
 
 export type RewardBlocksContextType = {
   rewardBlocks: (RewardBlockWithTypedFields | BoardView | Board)[] | undefined;
-  rewardBoardBlock: RewardPropertiesBlock | undefined;
+  rewardsBoardBlock: RewardsBoardFFBlock;
   isLoading: boolean;
   createProperty: (propertyTemplate: IPropertyTemplate) => Promise<string | void>;
   updateProperty: (propertyTemplate: IPropertyTemplate) => Promise<string | void>;
@@ -33,21 +33,7 @@ export type RewardBlocksContextType = {
   getBlock: (blockId: string) => Promise<RewardBlockWithTypedFields | void>;
 };
 
-export const RewardBlocksContext = createContext<Readonly<RewardBlocksContextType>>({
-  rewardBlocks: undefined,
-  rewardBoardBlock: undefined,
-  isLoading: false,
-  createProperty: async () => {},
-  updateProperty: async () => {},
-  deleteProperty: async () => {},
-  updateBlock: async () => {},
-  updateBlocks: async () => {},
-  createBlock: async () => {},
-  createBlocks: async () => {},
-  deleteBlock: async () => {},
-  deleteBlocks: async () => {},
-  getBlock: async () => {}
-});
+export const RewardBlocksContext = createContext<Readonly<RewardBlocksContextType> | null>(null);
 
 export function RewardBlocksProvider({ children }: { children: ReactNode }) {
   const { space } = useCurrentSpace();
@@ -55,6 +41,7 @@ export function RewardBlocksProvider({ children }: { children: ReactNode }) {
   const { trigger: updateRewardBlocks } = useUpdateRewardBlocks(space?.id || '');
   const { trigger: deleteRewardBlocks } = useDeleteRewardBlocks(space?.id || '');
   const { showMessage } = useSnackbar();
+  const { boardBlock: rewardsBoardBlock, createProperty, deleteProperty, updateProperty } = useRewardsBoard();
 
   const getBlock = useCallback(
     async (blockId: string): Promise<RewardBlockWithTypedFields> => {
@@ -90,126 +77,6 @@ export function RewardBlocksProvider({ children }: { children: ReactNode }) {
       );
     },
     [mutate]
-  );
-
-  const rewardBoardBlock = useMemo(() => {
-    const block = rewardBlocks?.find((b): b is RewardPropertiesBlock => b.type === 'board');
-    if (block && !block.fields.cardProperties) {
-      block.fields.cardProperties = [];
-    }
-
-    return block;
-  }, [rewardBlocks]);
-
-  const createProperty = useCallback(
-    async (propertyTemplate: IPropertyTemplate) => {
-      if (!space) {
-        return;
-      }
-
-      try {
-        if (rewardBoardBlock) {
-          const updatedProperties = [...(rewardBoardBlock.fields.cardProperties || []), propertyTemplate];
-          const updatedBlock = {
-            ...rewardBoardBlock,
-            fields: { ...(rewardBoardBlock.fields as BoardFields), cardProperties: updatedProperties }
-          };
-          const res = await updateRewardBlocks([updatedBlock]);
-
-          if (!res) {
-            return;
-          }
-
-          updateBlockCache(res[0]);
-
-          return res[0].id;
-        } else {
-          const propertiesBlock = {
-            id: DEFAULT_BOARD_BLOCK_ID,
-            fields: { cardProperties: [propertyTemplate], viewIds: defaultRewardViews },
-            type: 'board',
-            spaceId: space.id
-          };
-          const res = await updateRewardBlocks([propertiesBlock as RewardBlockInput]);
-
-          if (!res) {
-            return;
-          }
-
-          mutate(
-            (blocks) => {
-              if (!blocks) return blocks;
-              return [...blocks, res[0]];
-            },
-            { revalidate: false }
-          );
-
-          return res[0].id;
-        }
-      } catch (e: any) {
-        showMessage(`Failed to create property: ${e.message}`, 'error');
-      }
-    },
-    [mutate, rewardBoardBlock, showMessage, space, updateBlockCache, updateRewardBlocks]
-  );
-
-  const updateProperty = useCallback(
-    async (propertyTemplate: IPropertyTemplate) => {
-      if (!space || !rewardBoardBlock) {
-        return;
-      }
-
-      const updatedProperties = rewardBoardBlock.fields.cardProperties.map((p) =>
-        p.id === propertyTemplate.id ? propertyTemplate : p
-      );
-      const updatedBlock = {
-        ...rewardBoardBlock,
-        fields: {
-          ...(rewardBoardBlock.fields as BoardFields),
-          cardProperties: updatedProperties
-        }
-      };
-
-      try {
-        const res = await updateRewardBlocks([updatedBlock]);
-
-        if (!res) {
-          return;
-        }
-
-        updateBlockCache(res[0]);
-        return res[0].id;
-      } catch (e: any) {
-        showMessage(`Failed to update property: ${e.message}`, 'error');
-      }
-    },
-    [rewardBoardBlock, showMessage, space, updateBlockCache, updateRewardBlocks]
-  );
-
-  const deleteProperty = useCallback(
-    async (propertyTemplateId: string) => {
-      if (!space || !rewardBoardBlock) {
-        return;
-      }
-
-      const updatedProperties = rewardBoardBlock.fields.cardProperties.filter((p) => p.id !== propertyTemplateId);
-      const updatedBlock = {
-        ...rewardBoardBlock,
-        fields: { ...(rewardBoardBlock.fields as BoardFields), cardProperties: updatedProperties }
-      };
-      try {
-        const res = await updateRewardBlocks([updatedBlock]);
-
-        if (!res) {
-          return;
-        }
-
-        updateBlockCache(res[0]);
-      } catch (e: any) {
-        showMessage(`Failed to delete property: ${e.message}`, 'error');
-      }
-    },
-    [rewardBoardBlock, showMessage, space, updateBlockCache, updateRewardBlocks]
   );
 
   const updateBlocks = useCallback(
@@ -313,7 +180,7 @@ export function RewardBlocksProvider({ children }: { children: ReactNode }) {
   const value = useMemo(
     () => ({
       rewardBlocks,
-      rewardBoardBlock,
+      rewardsBoardBlock,
       isLoading,
       createProperty,
       updateProperty,
@@ -328,7 +195,7 @@ export function RewardBlocksProvider({ children }: { children: ReactNode }) {
     }),
     [
       rewardBlocks,
-      rewardBoardBlock,
+      rewardsBoardBlock,
       isLoading,
       createProperty,
       updateProperty,
@@ -345,4 +212,10 @@ export function RewardBlocksProvider({ children }: { children: ReactNode }) {
   return <RewardBlocksContext.Provider value={value}>{children}</RewardBlocksContext.Provider>;
 }
 
-export const useRewardBlocks = () => useContext(RewardBlocksContext);
+export const useRewardBlocks = () => {
+  const context = useContext(RewardBlocksContext);
+  if (!context) {
+    throw new Error('useRewardBlocks must be used within a RewardBlocksProvider');
+  }
+  return context;
+};

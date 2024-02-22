@@ -72,6 +72,7 @@ function MemberDirectoryGalleryCard({
   }
 
   const social = (member.profile?.social as Social) ?? {};
+
   const content = (
     <Card sx={{ width: '100%' }}>
       {isUserCard && (
@@ -188,22 +189,33 @@ function MemberDirectoryGalleryCard({
                       wordBreak: 'break-word'
                     }}
                   >
-                    <Typography fontWeight='bold' variant='subtitle2'>
+                    <Typography
+                      data-test={`member-property-name-${memberProperty.memberPropertyId}`}
+                      fontWeight='bold'
+                      variant='subtitle2'
+                    >
                       {property.name}
                     </Typography>
-                    <Typography variant='body2'>{memberProperty.value as string}</Typography>
+                    <Typography data-test={`member-property-value-${memberProperty.memberPropertyId}`} variant='body2'>
+                      {memberProperty.value as string}
+                    </Typography>
                   </Stack>
                 )
               );
             }
             case 'select':
             case 'multiselect': {
-              return memberProperty ? (
+              const hasValue =
+                (!!memberProperty?.value && typeof memberProperty.value === 'string') ||
+                (Array.isArray(memberProperty?.value) && memberProperty!.value.length > 0);
+
+              return hasValue ? (
                 <SelectPreview
+                  data-test={`member-property-name-${memberProperty?.memberPropertyId}`}
                   size='small'
                   wrapColumn
                   options={property.options as SelectOptionType[]}
-                  value={memberProperty.value as string | string[]}
+                  value={memberProperty?.value as string | string[]}
                   name={property.name}
                   key={property.id}
                 />

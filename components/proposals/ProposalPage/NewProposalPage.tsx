@@ -5,7 +5,7 @@ import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { Box, Divider, useMediaQuery, Stack, Typography } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
-import { useElementSize } from 'usehooks-ts';
+import { useResizeObserver } from 'usehooks-ts';
 import { v4 as uuid } from 'uuid';
 
 import { useForumPost } from 'charmClient/hooks/forum';
@@ -32,7 +32,6 @@ import { getInitialFormFieldValue, useFormFields } from 'components/common/form/
 import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
-import { ProposalRewards } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewards';
 import { authorSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -40,7 +39,6 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
-import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useUser } from 'hooks/useUser';
 import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
 import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposal/rubric/interfaces';
@@ -49,6 +47,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
 import { getNewCriteria } from './components/ProposalEvaluations/components/Settings/components/RubricCriteriaSettings';
+import { ProposalRewardsTable } from './components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import type { ProposalPropertiesInput } from './components/ProposalProperties/ProposalPropertiesBase';
 import { ProposalPropertiesBase } from './components/ProposalProperties/ProposalPropertiesBase';
 import { TemplateSelect } from './components/TemplateSelect';
@@ -84,7 +83,6 @@ export function NewProposalPage({
   sourcePageId?: string;
   sourcePostId?: string;
 }) {
-  const { getFeatureTitle } = useSpaceFeatures();
   const { navigateToSpacePath } = useCharmRouter();
   const { space: currentSpace } = useCurrentSpace();
   const { data: sourcePage } = useGetPage(sourcePageId);
@@ -110,7 +108,8 @@ export function NewProposalPage({
   });
   const [submittedDraft, setSubmittedDraft] = useState<boolean>(false);
 
-  const [, { width: containerWidth }] = useElementSize();
+  const containerWidthRef = useRef<HTMLDivElement>(null);
+  const { width: containerWidth = 0 } = useResizeObserver({ ref: containerWidthRef });
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const isAdmin = useIsAdmin();
 
@@ -371,6 +370,7 @@ export function NewProposalPage({
               overflow='auto'
               flexGrow={1}
             >
+              <Box ref={containerWidthRef} width='100%' />
               <PageTemplateBanner pageType={formInputs.type} isNewPage />
               {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
               <StyledContainer data-test='page-charmeditor' top={defaultPageTop} fullWidth={isSmallScreen}>
@@ -485,11 +485,9 @@ export function NewProposalPage({
                     />
                   )}
                   {isStructured && formInputs.fields?.enableRewards && (
-                    <Box mb={10}>
-                      <Box my={1}>
-                        <Typography variant='h5'>{getFeatureTitle('Rewards')}</Typography>
-                      </Box>
-                      <ProposalRewards
+                    <Box mt={1}>
+                      <ProposalRewardsTable
+                        containerWidth={containerWidth}
                         pendingRewards={pendingRewards}
                         requiredTemplateId={formInputs.fields?.rewardsTemplateId}
                         reviewers={formInputs.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat()}
@@ -513,7 +511,7 @@ export function NewProposalPage({
                           setFormInputs({
                             fields: {
                               ...formInputs.fields,
-                              pendingRewards: [...(formInputs.fields?.pendingRewards || [])].map((draft) => {
+                              pendingRewards: (formInputs.fields?.pendingRewards || []).map((draft) => {
                                 if (draft.draftId === pendingReward.draftId) {
                                   return pendingReward;
                                 }
@@ -526,7 +524,7 @@ export function NewProposalPage({
                           setFormInputs({
                             fields: {
                               ...formInputs.fields,
-                              pendingRewards: [...(formInputs.fields?.pendingRewards || [])].filter(
+                              pendingRewards: (formInputs.fields?.pendingRewards || []).filter(
                                 (draft) => draft.draftId !== draftId
                               )
                             }

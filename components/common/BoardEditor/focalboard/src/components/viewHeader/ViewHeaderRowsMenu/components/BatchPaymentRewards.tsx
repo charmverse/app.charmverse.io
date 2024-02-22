@@ -79,7 +79,6 @@ export function BatchPaymentRewards({ checkedIds }: { checkedIds: string[] }) {
 
   const safesInChain = Object.values(safesRecord).filter((safe) => safe.chainId === chainId);
 
-  const firstReward = filteredRewards[0];
   const submissions = filteredRewards.flatMap((reward) => reward.submissions);
 
   let disabledTooltip = '';
@@ -88,7 +87,7 @@ export function BatchPaymentRewards({ checkedIds }: { checkedIds: string[] }) {
     disabledTooltip = `No safes found on the ${getChainById(chainId)?.chainName} network`;
   } else if (checkedIds.length === 0) {
     disabledTooltip = 'No rewards selected';
-  } else if (!firstReward) {
+  } else if (filteredRewards.length === 0) {
     disabledTooltip = `Selected rewards are not token rewards or are not on the ${
       getChainById(chainId)?.chainName
     } network`;

@@ -44,6 +44,7 @@ function SafeMenuItem({
     chainId: safeInfo.chainId,
     onSuccess: onPaymentSuccess,
     safeAddress: safeInfo.address,
+    onError,
     transactions: rewards
       .flatMap((reward) => reward.submissions)
       .map((submission) => {
