@@ -17,7 +17,7 @@ export function getProposalErrors({
     proposalType: 'structured' | 'free_form';
   };
   isDraft: boolean;
-  requireTemplates?: boolean;
+  requireTemplates: boolean;
 }) {
   const errors: string[] = [];
 

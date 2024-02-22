@@ -3,6 +3,7 @@ import { Box } from '@mui/material';
 import { usePublishProposal } from 'charmClient/hooks/proposals';
 import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/components/StickyFooterContainer';
 import { Button } from 'components/common/Button';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { getProposalErrors } from 'lib/proposal/getProposalErrors';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
@@ -19,6 +20,7 @@ export function ProposalStickyFooter({
   isStructuredProposal: boolean;
 }) {
   const { showMessage } = useSnackbar();
+  const { space } = useCurrentSpace();
   const { trigger: publishProposal, isMutating } = usePublishProposal({ proposalId: proposal.id });
 
   async function onClick() {
@@ -38,9 +40,11 @@ export function ProposalStickyFooter({
     proposal: {
       proposalType: isStructuredProposal ? 'structured' : 'free_form',
       ...proposal,
+      isDraft: proposal.status === 'draft',
       formFields: proposal.form?.formFields || undefined,
       authors: proposal.authors.map((a) => a.userId)
-    }
+    },
+    requireTemplates: !!space?.requireProposalTemplate
   }).join('\n');
 
   return (
