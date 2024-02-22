@@ -75,7 +75,13 @@ export function useNewProposal({ newProposal }: Props) {
   }
 
   const disabledTooltip = getProposalErrors({
+    page: {
+      title: formInputs.title,
+      type: formInputs.type,
+      content: formInputs.content
+    },
     proposal: formInputs,
+    isDraft: false,
     requireTemplates: !!currentSpace?.requireProposalTemplate
   }).join('\n');
 

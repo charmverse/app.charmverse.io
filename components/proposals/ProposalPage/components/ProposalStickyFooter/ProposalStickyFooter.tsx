@@ -30,10 +30,13 @@ export function ProposalStickyFooter({
     refreshProposal();
   }
   const disabledTooltip = getProposalErrors({
-    proposal: {
-      type: 'proposal',
-      proposalType: isStructuredProposal ? 'structured' : 'free_form',
+    page: {
       title: page.title,
+      type: 'proposal'
+    },
+    isDraft: proposal.status === 'draft',
+    proposal: {
+      proposalType: isStructuredProposal ? 'structured' : 'free_form',
       ...proposal,
       formFields: proposal.form?.formFields || undefined,
       authors: proposal.authors.map((a) => a.userId)
