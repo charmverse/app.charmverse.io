@@ -77,6 +77,11 @@ export async function getProposals({ ids }: { ids: string[] }): Promise<Proposal
           }
         }
       }
+    },
+    orderBy: {
+      page: {
+        title: 'asc'
+      }
     }
   });
 
