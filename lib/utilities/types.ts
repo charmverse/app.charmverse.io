@@ -25,8 +25,8 @@ export type OptionalNullable<T> = T extends any[]
   ? OptionalNullable<T[number]>[]
   : T extends object
   ? {
-      [K in keyof PickNullable<T>]?: OptionalNullable<T[K]>;
+      [K in keyof PickNullable<T>]?: Exclude<T[K], null>;
     } & {
-      [K in keyof PickNotNullable<T>]: OptionalNullable<T[K]>;
+      [K in keyof PickNotNullable<T>]: T[K];
     }
   : T;
