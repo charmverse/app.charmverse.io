@@ -1,7 +1,5 @@
 import type { BountyStatus } from '@charmverse/core/prisma-client';
-import styled from '@emotion/styled';
-import type { TextFieldProps } from '@mui/material';
-import { Box, Collapse, Divider, Stack, TextField, Tooltip } from '@mui/material';
+import { Box, Collapse, Divider, Stack, Tooltip } from '@mui/material';
 import clsx from 'clsx';
 import { DateTime } from 'luxon';
 import type { ChangeEvent } from 'react';
@@ -21,7 +19,7 @@ import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
-import type { Reward, RewardReviewer, RewardWithUsers, RewardType } from 'lib/rewards/interfaces';
+import type { Reward, RewardReviewer, RewardType, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -30,8 +28,8 @@ import type { BoardReward } from '../../hooks/useRewardsBoardAdapter';
 
 import { RewardApplicationType } from './components/RewardApplicationType';
 import { RewardPropertiesHeader } from './components/RewardPropertiesHeader';
-import { RewardTokenProperty } from './components/RewardTokenProperty';
 import type { RewardTokenDetails } from './components/RewardTokenProperty';
+import { RewardTokenProperty } from './components/RewardTokenProperty';
 import { RewardTypeSelect } from './components/RewardTypeSelect';
 import { CustomPropertiesAdapter } from './CustomPropertiesAdapter';
 

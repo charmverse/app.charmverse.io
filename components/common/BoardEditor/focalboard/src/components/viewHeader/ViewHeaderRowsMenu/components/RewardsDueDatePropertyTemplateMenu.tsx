@@ -1,0 +1,41 @@
+import { Box } from '@mui/material';
+import type { DateTime } from 'luxon';
+
+import { RewardsDueDatePicker } from 'components/common/BoardEditor/components/properties/RewardsDueDatePicker';
+import { usePages } from 'hooks/usePages';
+import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { Card } from 'lib/focalboard/card';
+
+import { PropertyMenu } from './PropertyMenu';
+
+export function RewardsDueDatePropertyTemplateMenu({
+  cards,
+  propertyTemplate,
+  onChange,
+  lastChild
+}: {
+  cards: Card[];
+  propertyTemplate: IPropertyTemplate<PropertyType>;
+  onChange?: (value: DateTime | null) => void;
+  lastChild: boolean;
+}) {
+  const { pages } = usePages();
+  const propertyValue = cards[0].fields.properties[propertyTemplate.id] || '';
+  const rewardId = pages[cards[0]?.id]?.bountyId;
+
+  if (!rewardId) {
+    return null;
+  }
+
+  return (
+    <PropertyMenu lastChild={lastChild} propertyTemplate={propertyTemplate}>
+      {() => {
+        return (
+          <Box display='flex' py='2px' px='4px'>
+            <RewardsDueDatePicker rewardId={rewardId} value={propertyValue as string | number} onChange={onChange} />
+          </Box>
+        );
+      }}
+    </PropertyMenu>
+  );
+}

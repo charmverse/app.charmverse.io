@@ -15,7 +15,14 @@ import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/boar
 import type { Card, CardPropertyValue } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
 import type { CreateEventPayload } from 'lib/notifications/interfaces';
-import { defaultRewardPropertyIds } from 'lib/rewards/blocks/constants';
+import {
+  APPLICANT_BLOCK_ID,
+  REWARDS_APPLICANTS_BLOCK_ID,
+  REWARD_APPLICANTS_COUNT,
+  REWARD_PROPOSAL_LINK,
+  REWARD_STATUS_BLOCK_ID,
+  defaultRewardPropertyIds
+} from 'lib/rewards/blocks/constants';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import mutator from '../../../mutator';
@@ -60,7 +67,13 @@ const validPropertyTypes = [
   'relation'
 ] as PropertyType[];
 
-const invalidPropertyIds = [...defaultRewardPropertyIds];
+const invalidPropertyIds = [
+  REWARD_APPLICANTS_COUNT,
+  REWARD_PROPOSAL_LINK,
+  REWARDS_APPLICANTS_BLOCK_ID,
+  APPLICANT_BLOCK_ID,
+  REWARD_STATUS_BLOCK_ID
+];
 
 export type ViewHeaderRowsMenuProps = {
   board: Board;
@@ -79,6 +92,7 @@ export type ViewHeaderRowsMenuProps = {
   onChangeProposalsReviewers?: PropertyTemplateMenuProps['onChangeProposalsReviewers'];
   onChangeProposalsStatuses?: PropertyTemplateMenuProps['onChangeProposalsStatuses'];
   onChangeProposalsSteps?: PropertyTemplateMenuProps['onChangeProposalsSteps'];
+  onChangeRewardsDueDate?: PropertyTemplateMenuProps['onChangeRewardsDueDate'];
   showRewardsBatchPaymentButton?: boolean;
   showTrashIcon?: boolean;
 };
@@ -99,6 +113,7 @@ export function ViewHeaderRowsMenu({
   onChangeProposalsReviewers,
   onChangeProposalsStatuses,
   onChangeProposalsSteps,
+  onChangeRewardsDueDate,
   showRewardsBatchPaymentButton,
   showTrashIcon = !board.fields.sourceType
 }: ViewHeaderRowsMenuProps) {
@@ -222,6 +237,7 @@ export function ViewHeaderRowsMenu({
       {cards.length !== 0
         ? filteredPropertyTemplates.map((propertyTemplate, index) => (
             <PropertyTemplateMenu
+              onChangeRewardsDueDate={onChangeRewardsDueDate}
               isAdmin={isAdmin}
               board={board}
               onRelationPropertyChange={onRelationPropertyChange}

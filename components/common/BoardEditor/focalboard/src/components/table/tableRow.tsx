@@ -69,6 +69,7 @@ type Props = {
   isChecked?: boolean;
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
   proposal?: CardPage['proposal'];
+  reward?: CardPage['reward'];
 };
 
 export const StyledCheckbox = styled(Checkbox, {
@@ -124,7 +125,8 @@ function TableRow(props: Props) {
     subRowsEmptyValueContent,
     isChecked,
     setCheckedIds,
-    proposal
+    proposal,
+    reward
   } = props;
   const { showError } = useSnackbar();
 
@@ -365,6 +367,7 @@ function TableRow(props: Props) {
               syncWithPageId={cardPage?.syncWithPageId}
               card={card}
               proposal={proposal}
+              reward={reward}
               board={board}
               showEmptyPlaceholder={false}
               propertyTemplate={template}

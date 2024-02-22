@@ -110,12 +110,17 @@ export function useRewardsBoardAdapter() {
         const page = getRewardPage(reward.id);
         if (!page || !space) return null;
 
-        return mapRewardToCardPage({
-          reward,
-          spaceId: space.id,
-          rewardPage: page,
-          members: membersRecord
-        }) as CardPage;
+        return {
+          ...mapRewardToCardPage({
+            reward,
+            spaceId: space.id,
+            rewardPage: page,
+            members: membersRecord
+          }),
+          reward: {
+            id: reward.id
+          }
+        } as CardPage;
       })
       .filter(isTruthy);
 

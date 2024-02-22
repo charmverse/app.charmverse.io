@@ -14,6 +14,7 @@ import { useSyncRelationPropertyValue } from 'charmClient/hooks/blocks';
 import { useUpdateProposalEvaluation } from 'charmClient/hooks/proposals';
 import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
 import { RelationPropertyPagesAutocomplete } from 'components/common/BoardEditor/components/properties/RelationPropertyPagesAutocomplete';
+import { RewardsDueDatePicker } from 'components/common/BoardEditor/components/properties/RewardsDueDatePicker';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
@@ -42,6 +43,7 @@ import { PROPOSAL_STATUS_BLOCK_ID, PROPOSAL_STEP_BLOCK_ID } from 'lib/proposal/b
 import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
 import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from 'lib/proposal/interface';
 import {
+  DUE_DATE_ID,
   REWARDS_APPLICANTS_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
   REWARD_APPLICANTS_COUNT,
@@ -87,6 +89,7 @@ type Props = {
   mutator?: Mutator;
   subRowsEmptyValueContent?: ReactElement | string;
   proposal?: CardPage['proposal'];
+  reward?: CardPage['reward'];
   showCard?: (cardId: string | null) => void;
 };
 
@@ -139,7 +142,8 @@ function PropertyValueElement(props: Props) {
     displayType,
     mutator = defaultMutator,
     subRowsEmptyValueContent,
-    proposal
+    proposal,
+    reward
   } = props;
   const { trigger } = useUpdateProposalEvaluation({ proposalId: proposal?.id });
   const { trigger: syncRelationPropertyValue } = useSyncRelationPropertyValue();
@@ -478,6 +482,10 @@ function PropertyValueElement(props: Props) {
         >
           {displayValue || (showEmptyPlaceholder && <EmptyPlaceholder>{emptyDisplayValue}</EmptyPlaceholder>)}
         </Box>
+      );
+    } else if (propertyTemplate.id === DUE_DATE_ID && reward?.id) {
+      propertyValueElement = (
+        <RewardsDueDatePicker rewardId={reward.id} value={value as string} disabled={props.readOnly} />
       );
     } else {
       propertyValueElement = (

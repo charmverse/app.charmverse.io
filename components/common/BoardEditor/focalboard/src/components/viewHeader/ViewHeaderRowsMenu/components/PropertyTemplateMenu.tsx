@@ -1,5 +1,6 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
 import { Box } from '@mui/material';
+import type { DateTime } from 'luxon';
 
 import { RelationPropertyPagesAutocomplete } from 'components/common/BoardEditor/components/properties/RelationPropertyPagesAutocomplete';
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
@@ -10,12 +11,14 @@ import { allMembersSystemRole, authorSystemRole } from 'components/settings/prop
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card, CardPropertyValue } from 'lib/focalboard/card';
 import type { ProposalWithUsersLite } from 'lib/proposal/getProposals';
+import { DUE_DATE_ID } from 'lib/rewards/blocks/constants';
 
 import mutator from '../../../../mutator';
 
 import { DatePropertyTemplateMenu } from './DatePropertyTemplateMenu';
 import { PersonPropertyTemplateMenu } from './PersonPropertyTemplateMenu';
 import { PropertyMenu, StyledMenuItem } from './PropertyMenu';
+import { RewardsDueDatePropertyTemplateMenu } from './RewardsDueDatePropertyTemplateMenu';
 import { SelectPropertyTemplateMenu } from './SelectPropertyTemplateMenu';
 import { TextPropertyTemplateMenu } from './TextPropertyTemplateMenu';
 
@@ -29,6 +32,7 @@ export type PropertyTemplateMenuProps = {
   onChangeProposalsAuthors?: (pageIds: string[], userIds: string[]) => Promise<void>;
   onChangeProposalsReviewers?: (pageIds: string[], options: SelectOption[]) => Promise<void>;
   onChangeProposalsSteps?: (pageIds: string[], evaluationId: string, moveForward: boolean) => Promise<void>;
+  onChangeRewardsDueDate?: (pageIds: string[], dueDate: DateTime | null) => Promise<void>;
   onChangeProposalsStatuses?: (pageIds: string[], result: ProposalEvaluationResult | null) => Promise<void>;
   onRelationPropertyChange: (a: {
     checkedCards: Card[];
@@ -59,6 +63,7 @@ export function PropertyTemplateMenu({
   onChangeProposalsStatuses,
   onPersonPropertyChange,
   onRelationPropertyChange,
+  onChangeRewardsDueDate,
   firstCheckedProposal,
   disabledTooltip,
   lastChild
@@ -173,6 +178,21 @@ export function PropertyTemplateMenu({
     }
 
     case 'date': {
+      if (propertyTemplate.id === DUE_DATE_ID) {
+        return (
+          <RewardsDueDatePropertyTemplateMenu
+            cards={checkedCards}
+            lastChild={lastChild}
+            propertyTemplate={propertyTemplate}
+            onChange={async (value) => {
+              await onChangeRewardsDueDate?.(checkedIds, value);
+              if (onChange) {
+                onChange();
+              }
+            }}
+          />
+        );
+      }
       return (
         <DatePropertyTemplateMenu
           lastChild={lastChild}

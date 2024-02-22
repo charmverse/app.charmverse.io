@@ -30,11 +30,16 @@ export type CardPageProposal = {
   archived: boolean;
 };
 
+export type CardPageReward = {
+  id: string;
+};
+
 export type CardPage<V = CardPropertyValue> = {
   subPages?: CardPage<V>[];
   card: Card<V>;
   page: PageMeta;
   proposal?: CardPageProposal;
+  reward?: CardPageReward;
   isStructuredProposal?: boolean;
 };
 
