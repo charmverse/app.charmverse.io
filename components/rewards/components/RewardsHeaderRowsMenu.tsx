@@ -1,5 +1,6 @@
 import type { DateTime } from 'luxon';
 
+import charmClient from 'charmClient';
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { SelectOptionPopulated } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import type { ViewHeaderRowsMenuProps } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ViewHeaderRowsMenu/ViewHeaderRowsMenu';
@@ -91,23 +92,50 @@ export function RewardsHeaderRowsMenu({ board, visiblePropertyIds, cards, checke
     await refreshRewards();
   }
 
+  async function onMarkRewardsAsPaid() {
+    for (const pageId of checkedIds) {
+      const page = pages[pageId];
+      if (page?.bountyId) {
+        await charmClient.rewards.markRewardAsPaid(page.bountyId);
+      }
+    }
+
+    await refreshRewards();
+  }
+
+  async function onMarkRewardsAsComplete() {
+    for (const pageId of checkedIds) {
+      const page = pages[pageId];
+      const reward = page?.bountyId ? rewards?.find((r) => r.id === page.bountyId) : null;
+      if (reward && reward.status !== 'complete') {
+        await charmClient.rewards.closeReward(reward.id);
+      }
+    }
+
+    await refreshRewards();
+  }
+
   const rewardId = checkedIds.length ? pages[checkedIds[0]]?.bountyId : null;
   const reward = rewardId ? rewards?.find((r) => r.id === rewardId) : null;
-  const isMaxSubmissionsDisabled = reward ? getApplicationType(reward) === 'assigned' : false;
+  const isMarkPaidDisabled = reward ? reward.status === 'paid' : false;
+  const isMarkCompleteDisabled = reward ? reward.status !== 'open' : false;
 
   return (
     <ViewHeaderRowsMenu
       onChangeRewardsDueDate={onChangeRewardsDueDate}
       onChangeRewardsReviewers={onChangeRewardsReviewers}
       onChangeRewardsMaxSubmissions={onChangeRewardsMaxSubmissions}
-      isMaxSubmissionsDisabled={isMaxSubmissionsDisabled}
       board={board}
       cards={cards}
       checkedIds={checkedIds}
       setCheckedIds={setCheckedIds}
       propertyTemplates={propertyTemplates}
       onChange={refreshRewards}
-      showRewardsBatchPaymentButton
+      showRewardsPaymentButton
+      onMarkRewardsAsPaid={onMarkRewardsAsPaid}
+      onMarkRewardsAsComplete={onMarkRewardsAsComplete}
+      isMarkPaidDisabled={isMarkPaidDisabled}
+      isMarkCompleteDisabled={isMarkCompleteDisabled}
     />
   );
 }

@@ -1,6 +1,8 @@
 import styled from '@emotion/styled';
+import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import { Stack, Tooltip, Typography } from '@mui/material';
+import PaidIcon from '@mui/icons-material/Paid';
+import { ListItemText, Stack, Tooltip, Typography } from '@mui/material';
 import type { Dispatch, SetStateAction } from 'react';
 import { useMemo, useState } from 'react';
 
@@ -87,7 +89,8 @@ export type ViewHeaderRowsMenuProps = {
   isStepDisabled?: boolean;
   isStatusDisabled?: boolean;
   isReviewersDisabled?: boolean;
-  isMaxSubmissionsDisabled?: boolean;
+  isMarkPaidDisabled?: boolean;
+  isMarkCompleteDisabled?: boolean;
   onArchiveProposals?: (archived: boolean) => void;
   onChange?: VoidFunction;
   onChangeProposalsAuthors?: PropertyTemplateMenuProps['onChangeProposalsAuthors'];
@@ -97,8 +100,10 @@ export type ViewHeaderRowsMenuProps = {
   onChangeRewardsDueDate?: PropertyTemplateMenuProps['onChangeRewardsDueDate'];
   onChangeRewardsReviewers?: PropertyTemplateMenuProps['onChangeRewardsReviewers'];
   onChangeRewardsMaxSubmissions?: PropertyTemplateMenuProps['onChangeRewardsMaxSubmissions'];
-  showRewardsBatchPaymentButton?: boolean;
+  showRewardsPaymentButton?: boolean;
   showTrashIcon?: boolean;
+  onMarkRewardsAsPaid?: () => Promise<void>;
+  onMarkRewardsAsComplete?: () => Promise<void>;
 };
 
 export function ViewHeaderRowsMenu({
@@ -111,7 +116,8 @@ export function ViewHeaderRowsMenu({
   isStepDisabled,
   isStatusDisabled,
   isReviewersDisabled,
-  isMaxSubmissionsDisabled,
+  isMarkPaidDisabled,
+  isMarkCompleteDisabled,
   onArchiveProposals,
   onChange,
   onChangeProposalsAuthors,
@@ -121,8 +127,10 @@ export function ViewHeaderRowsMenu({
   onChangeRewardsDueDate,
   onChangeRewardsReviewers,
   onChangeRewardsMaxSubmissions,
-  showRewardsBatchPaymentButton,
-  showTrashIcon = !board.fields.sourceType
+  showRewardsPaymentButton,
+  showTrashIcon = !board.fields.sourceType,
+  onMarkRewardsAsComplete,
+  onMarkRewardsAsPaid
 }: ViewHeaderRowsMenuProps) {
   const isAdmin = useIsAdmin();
   const { space } = useCurrentSpace();
@@ -269,15 +277,43 @@ export function ViewHeaderRowsMenu({
                   ? 'To change multiple proposals, they must be in the same step'
                   : propertyTemplate.type === 'proposalReviewer' && isReviewersDisabled
                   ? `To change multiple proposal's reviewers, they must not be in draft or feedback step`
-                  : propertyTemplate.id === REWARDS_AVAILABLE_BLOCK_ID && isMaxSubmissionsDisabled
-                  ? 'To change multiple rewards, they must not be in assigned application type'
                   : undefined
               }
             />
           ))
         : null}
       {onArchiveProposals && <ArchiveProposals onChange={onArchiveProposals} />}
-      {showRewardsBatchPaymentButton && <BatchPaymentRewards checkedIds={checkedIds} />}
+      {onMarkRewardsAsPaid && (
+        <Tooltip title={isMarkPaidDisabled ? 'Selected rewards are already paid' : 'Mark paid'}>
+          <div>
+            <StyledMenuItem onClick={onMarkRewardsAsPaid} disabled={isDeleting || isMarkPaidDisabled}>
+              <PaidIcon
+                fontSize='small'
+                sx={{
+                  mr: 1
+                }}
+              />
+              <ListItemText primary='Mark paid' />
+            </StyledMenuItem>
+          </div>
+        </Tooltip>
+      )}
+      {onMarkRewardsAsComplete && (
+        <Tooltip title={isMarkCompleteDisabled ? `Selected rewards are already completed` : 'Mark complete'}>
+          <div>
+            <StyledMenuItem onClick={onMarkRewardsAsComplete} disabled={isDeleting || isMarkCompleteDisabled}>
+              <CheckCircleOutlinedIcon
+                fontSize='small'
+                sx={{
+                  mr: 1
+                }}
+              />
+              <ListItemText primary='Mark complete' />
+            </StyledMenuItem>
+          </div>
+        </Tooltip>
+      )}
+      {showRewardsPaymentButton && <BatchPaymentRewards checkedIds={checkedIds} />}
       {showTrashIcon && (
         <StyledMenuItem lastChild onClick={deleteCheckedCards} disabled={isDeleting}>
           <Tooltip title='Delete'>
