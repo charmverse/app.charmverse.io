@@ -2,18 +2,13 @@ import type { ViewHeaderRowsMenuProps } from 'components/common/BoardEditor/foca
 import { ViewHeaderRowsMenu } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ViewHeaderRowsMenu/ViewHeaderRowsMenu';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 
+import { useRewardsBoardAdapter } from '../hooks/useRewardsBoardAdapter';
+
 type Props = Pick<ViewHeaderRowsMenuProps, 'checkedIds' | 'setCheckedIds' | 'cards' | 'board' | 'onChange'> & {
   visiblePropertyIds?: string[];
-  refreshRewards: VoidFunction;
 };
-export function RewardsHeaderRowsMenu({
-  board,
-  visiblePropertyIds,
-  cards,
-  checkedIds,
-  setCheckedIds,
-  refreshRewards
-}: Props) {
+export function RewardsHeaderRowsMenu({ board, visiblePropertyIds, cards, checkedIds, setCheckedIds }: Props) {
+  const { refreshRewards } = useRewardsBoardAdapter();
   let propertyTemplates: IPropertyTemplate<PropertyType>[] = [];
   if (visiblePropertyIds?.length) {
     visiblePropertyIds.forEach((propertyId) => {

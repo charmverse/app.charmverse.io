@@ -44,7 +44,7 @@ export type BoardReward = { id?: string } & RewardFieldsProp;
 export function useRewardsBoardAdapter() {
   const { space } = useCurrentSpace();
   const { membersRecord } = useMembers();
-  const { rewards } = useRewards();
+  const { rewards, mutateRewards } = useRewards();
   const { rewardsBoardBlock: board, rewardBlocks } = useRewardBlocks();
   const { getRewardPage } = useRewardPage();
   const hasMilestoneRewards = useMemo(() => rewards?.some((r) => !!r.proposalId), [rewards]);
@@ -153,7 +153,8 @@ export function useRewardsBoardAdapter() {
     cards,
     cardPages,
     activeView,
-    views
+    views,
+    refreshRewards: mutateRewards
   };
 }
 

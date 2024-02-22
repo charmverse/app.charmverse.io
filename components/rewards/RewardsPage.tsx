@@ -178,7 +178,6 @@ export function RewardsPage({ title }: { title: string }) {
                   cards={cards as Card[]}
                   checkedIds={checkedIds}
                   setCheckedIds={setCheckedIds}
-                  refreshRewards={() => {}}
                 />
               </div>
             ) : (
