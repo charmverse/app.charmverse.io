@@ -5,6 +5,7 @@ import { getForumPost } from 'lib/forums/posts/getForumPost';
 import { getPostVoteSummary } from 'lib/forums/posts/getPostMeta';
 import { updateForumPost } from 'lib/forums/posts/updateForumPost';
 import { InvalidStateError } from 'lib/middleware';
+import { requireSuperApiKey } from 'lib/middleware/requireSuperApiKey';
 import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
 import { apiHandler } from 'lib/public-api/handler';
 import { getUserProfile, userProfileSelect } from 'lib/public-api/searchUserProfile';
@@ -13,7 +14,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 import type { PublicApiForumPost } from '../index';
 import { getPublicForumPost } from '../index';
 
-const handler = apiHandler().put(updatePost).get(getProposal).delete(deleteProposal);
+const handler = apiHandler().get(getProposal).use(requireSuperApiKey).put(updatePost).delete(deleteProposal);
 
 type EmptySuccessResponse = { success: true };
 
