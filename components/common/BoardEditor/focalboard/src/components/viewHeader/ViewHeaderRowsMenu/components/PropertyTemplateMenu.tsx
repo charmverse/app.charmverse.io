@@ -1,11 +1,8 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
 import { Box } from '@mui/material';
-import clsx from 'clsx';
 import type { DateTime } from 'luxon';
-import type { ChangeEvent } from 'react';
 
 import { RelationPropertyPagesAutocomplete } from 'components/common/BoardEditor/components/properties/RelationPropertyPagesAutocomplete';
-import { StyledFocalboardTextInput } from 'components/common/BoardEditor/components/properties/TextInput';
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { ControlledProposalStatusSelect } from 'components/proposals/components/ProposalStatusSelect';
@@ -14,7 +11,7 @@ import { allMembersSystemRole, authorSystemRole } from 'components/settings/prop
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card, CardPropertyValue } from 'lib/focalboard/card';
 import type { ProposalWithUsersLite } from 'lib/proposal/getProposals';
-import { DUE_DATE_ID, REWARDS_AVAILABLE_BLOCK_ID, REWARD_REVIEWERS_BLOCK_ID } from 'lib/rewards/blocks/constants';
+import { DUE_DATE_ID, REWARD_REVIEWERS_BLOCK_ID } from 'lib/rewards/blocks/constants';
 import type { RewardReviewer } from 'lib/rewards/interfaces';
 
 import mutator from '../../../../mutator';
@@ -293,34 +290,6 @@ export function PropertyTemplateMenu({
     }
 
     default: {
-      if (propertyTemplate.id === REWARDS_AVAILABLE_BLOCK_ID) {
-        return (
-          <PropertyMenu lastChild={lastChild} disabledTooltip={disabledTooltip} propertyTemplate={propertyTemplate}>
-            <StyledFocalboardTextInput
-              onChange={async (e: ChangeEvent<HTMLInputElement>) => {
-                const updatedValue = Number(e.target.value);
-                await onChangeRewardsMaxSubmissions?.(checkedIds, updatedValue);
-                if (onChange) {
-                  onChange();
-                }
-              }}
-              defaultValue={propertyValue?.toString() ?? ''}
-              type='number'
-              size='small'
-              inputProps={{
-                step: 1,
-                min: 1,
-                style: { height: 'auto' },
-                className: clsx('Editable octo-propertyvalue')
-              }}
-              sx={{
-                width: '100%'
-              }}
-            />
-          </PropertyMenu>
-        );
-      }
-
       return (
         <TextPropertyTemplateMenu
           lastChild={lastChild}

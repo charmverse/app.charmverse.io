@@ -108,7 +108,6 @@ export function RewardsHeaderRowsMenu({ board, visiblePropertyIds, cards, checke
       propertyTemplates={propertyTemplates}
       onChange={refreshRewards}
       showRewardsBatchPaymentButton
-      showTrashIcon={false}
     />
   );
 }
