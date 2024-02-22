@@ -13,7 +13,10 @@ export function getProposalErrors({
   page: Pick<CreateProposalInput['pageProps'], 'title' | 'type'> & {
     content?: any | null;
   };
-  proposal: Pick<CreateProposalInput, 'authors' | 'proposalTemplateId' | 'formFields' | 'evaluations'> & {
+  proposal: Pick<
+    CreateProposalInput,
+    'authors' | 'proposalTemplateId' | 'formFields' | 'evaluations' | 'workflowId'
+  > & {
     proposalType: 'structured' | 'free_form';
   };
   isDraft: boolean;
@@ -26,6 +29,9 @@ export function getProposalErrors({
   }
   if (!page.title) {
     errors.push('Title is required');
+  }
+  if (!proposal.workflowId) {
+    errors.push('Workflow is required');
   }
 
   if (requireTemplates && page.type === 'proposal' && !proposal.proposalTemplateId) {

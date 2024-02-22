@@ -77,14 +77,6 @@ export async function createProposal({
   const defaultAuthorsList = pageProps?.type !== 'proposal_template' ? [userId] : [];
   const authorsList = arrayUtils.uniqueValues([...(authors || []), ...defaultAuthorsList]);
 
-  const workflow = workflowId
-    ? ((await prisma.proposalWorkflow.findUnique({
-        where: {
-          id: workflowId
-        }
-      })) as ProposalWorkflowTyped | null)
-    : null;
-
   const evaluationIds = evaluations.map(() => uuid());
 
   const evaluationPermissionsToCreate: Prisma.ProposalEvaluationPermissionCreateManyInput[] = [];
@@ -101,11 +93,18 @@ export async function createProposal({
       proposalType: formId ? 'structured' : 'free_form',
       authors: authorsList,
       formFields,
-      evaluations
+      evaluations,
+      workflowId
     },
     isDraft: !!isDraft,
     requireTemplates: false
   });
+
+  const workflow = (await prisma.proposalWorkflow.findUniqueOrThrow({
+    where: {
+      id: workflowId
+    }
+  })) as ProposalWorkflowTyped;
 
   if (errors.length > 0) {
     throw new InvalidInputError(errors.join('\n'));
@@ -113,7 +112,7 @@ export async function createProposal({
 
   // retrieve permissions and apply evaluation ids to reviewers
   evaluations.forEach(({ id: evaluationId, permissions: providedPermissions, reviewers: evalReviewers }, index) => {
-    const configuredEvaluation = workflow?.evaluations[index];
+    const configuredEvaluation = workflow.evaluations[index];
     const permissions = configuredEvaluation?.permissions || providedPermissions;
     if (!permissions) {
       throw new Error(
@@ -139,7 +138,7 @@ export async function createProposal({
 
   let proposalFormId = formId;
   // Always create new form for proposal templates
-  if (formFields?.length && pageProps?.type === 'proposal_template') {
+  if (formFields?.length && pageProps.type === 'proposal_template') {
     proposalFormId = await createForm(formFields);
   }
 
