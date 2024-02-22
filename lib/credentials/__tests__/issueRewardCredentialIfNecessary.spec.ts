@@ -145,6 +145,81 @@ describe('issueRewardCredentialIfNecessary', () => {
     );
   });
 
+  it('should target only a specific submission if this parameter is provided credentials once for a unique combination of user, reward submission and credential template', async () => {
+    const { space, user: rewardCreatorAndSubmitter } = await testUtilsUser.generateUserAndSpace({
+      wallet: randomETHWalletAddress(),
+      domain: `cvt-testing-${uuid()}`
+    });
+    const submitter = await testUtilsUser.generateSpaceUser({ spaceId: space.id, wallet: randomETHWalletAddress() });
+    const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
+      spaceId: space.id,
+      credentialEvents: ['reward_submission_approved']
+    });
+
+    const reward = await generateBountyWithSingleApplication({
+      applicationStatus: 'complete',
+      bountyCap: null,
+      spaceId: space.id,
+      userId: rewardCreatorAndSubmitter.id,
+      selectedCredentialTemplateIds: [firstCredentialTemplate.id]
+    });
+
+    const submitterApplication = await generateBountyApplication({
+      applicationStatus: 'complete',
+      bountyId: reward.id,
+      spaceId: space.id,
+      userId: submitter.id
+    });
+
+    const secondSubmitterApplication = await generateBountyApplication({
+      applicationStatus: 'complete',
+      bountyId: reward.id,
+      spaceId: space.id,
+      userId: submitter.id
+    });
+
+    await issueRewardCredentialsIfNecessary({
+      event: 'reward_submission_approved',
+      rewardId: reward.id,
+      submissionId: submitterApplication.id
+    });
+
+    await issueRewardCredentialsIfNecessary({
+      event: 'reward_submission_approved',
+      rewardId: reward.id,
+      submissionId: submitterApplication.id
+    });
+
+    // 1 credential template, and 1 submission targeted
+    expect(mockedSignAndPublishCharmverseCredential).toHaveBeenCalledTimes(1);
+
+    const issuedCredentials = await prisma.issuedCredential.findMany({
+      where: {
+        application: {
+          bounty: {
+            id: reward.id
+          }
+        }
+      }
+    });
+
+    const submitterApplicationId = submitterApplication.id;
+
+    // 1 event types * 2 credential templates * 3 submissions
+    expect(issuedCredentials).toHaveLength(1);
+
+    expect(issuedCredentials).toMatchObject(
+      expect.arrayContaining<Partial<IssuedCredential>>([
+        expect.objectContaining<Partial<IssuedCredential>>({
+          userId: submitter.id,
+          credentialEvent: 'reward_submission_approved',
+          credentialTemplateId: firstCredentialTemplate.id,
+          applicationId: submitterApplicationId
+        })
+      ])
+    );
+  });
+
   it('should only issue credentials if the credential template allows issuing credentials for the event', async () => {
     const { space, user: rewardCreatorAndSubmitter } = await testUtilsUser.generateUserAndSpace({
       wallet: randomETHWalletAddress(),

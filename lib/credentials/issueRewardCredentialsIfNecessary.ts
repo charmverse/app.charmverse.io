@@ -15,10 +15,12 @@ const disablePublishedCredentials = process.env.DISABLE_PUBLISHED_CREDENTIALS ==
 
 export async function issueRewardCredentialsIfNecessary({
   rewardId,
-  event
+  event,
+  submissionId
 }: {
   rewardId: string;
   event: Extract<CredentialEventType, 'reward_submission_approved'>;
+  submissionId?: string;
 }): Promise<void> {
   if (disablePublishedCredentials) {
     log.warn('Published credentials are disabled');
@@ -43,6 +45,7 @@ export async function issueRewardCredentialsIfNecessary({
       },
       applications: {
         where: {
+          id: submissionId,
           status: {
             in: ['complete', 'processing', 'paid']
           }
