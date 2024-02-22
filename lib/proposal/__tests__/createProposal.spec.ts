@@ -1,8 +1,7 @@
-import { InsecureOperationError } from '@charmverse/core/errors';
 import type { ProposalWorkflow, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
-import { testUtilsMembers, testUtilsProposals, testUtilsPages, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsProposals, testUtilsPages } from '@charmverse/core/test';
 import { v4 as uuid, v4 } from 'uuid';
 
 import type { FormFieldInput } from 'components/common/form/interfaces';
@@ -13,6 +12,7 @@ import { generateProposalWorkflow } from 'testing/utils/proposals';
 import type { ProposalEvaluationInput } from '../createProposal';
 import { createProposal } from '../createProposal';
 import type { ProposalWithUsersAndRubric } from '../interface';
+import { getDefaultPermissions } from '../workflows/defaultEvaluation';
 
 let user: User;
 let space: Space;
@@ -145,12 +145,6 @@ describe('Creates a page and proposal with relevant configuration', () => {
       spaceId: space.id,
       authors: [user.id, extraUser.id],
       evaluations: [],
-      // reviewers: [
-      //   {
-      //     group: 'user',
-      //     id: reviewerUser.id
-      //   }
-      // ],
       formFields: formFields.map((item) => ({
         ...item,
         // creating new IDs for the form fields
@@ -187,134 +181,13 @@ describe('Creates a page and proposal with relevant configuration', () => {
         title: 'Feedback',
         id: uuid(),
         type: 'feedback',
-        permissions: [
-          {
-            operation: 'view',
-            systemRole: 'author'
-          },
-          {
-            operation: 'edit',
-            systemRole: 'author'
-          },
-          {
-            operation: 'comment',
-            systemRole: 'author'
-          },
-          {
-            operation: 'move',
-            systemRole: 'author'
-          },
-          {
-            operation: 'view',
-            systemRole: 'space_member'
-          },
-          {
-            operation: 'comment',
-            systemRole: 'space_member'
-          }
-        ]
+        permissions: getDefaultPermissions()
       },
       {
         id: uuid(),
         type: 'pass_fail',
         title: 'Review',
-        permissions: [
-          {
-            operation: 'view',
-            systemRole: 'author'
-          },
-          {
-            operation: 'edit',
-            systemRole: 'author'
-          },
-          {
-            operation: 'comment',
-            systemRole: 'author'
-          },
-          {
-            operation: 'move',
-            systemRole: 'author'
-          },
-          {
-            operation: 'view',
-            systemRole: 'current_reviewer'
-          },
-          {
-            operation: 'comment',
-            systemRole: 'current_reviewer'
-          },
-          {
-            operation: 'move',
-            systemRole: 'current_reviewer'
-          },
-          {
-            operation: 'view',
-            systemRole: 'all_reviewers'
-          },
-          {
-            operation: 'comment',
-            systemRole: 'all_reviewers'
-          },
-          {
-            operation: 'view',
-            systemRole: 'space_member'
-          },
-          {
-            operation: 'comment',
-            systemRole: 'space_member'
-          }
-        ]
-      },
-      {
-        id: '577b1c43-46da-4a00-a3f3-15549610b83e',
-        type: 'vote',
-        title: 'Community vote',
-        permissions: [
-          {
-            operation: 'view',
-            systemRole: 'author'
-          },
-          {
-            operation: 'edit',
-            systemRole: 'author'
-          },
-          {
-            operation: 'comment',
-            systemRole: 'author'
-          },
-          {
-            operation: 'move',
-            systemRole: 'author'
-          },
-          {
-            operation: 'view',
-            systemRole: 'current_reviewer'
-          },
-          {
-            operation: 'comment',
-            systemRole: 'current_reviewer'
-          },
-          {
-            operation: 'move',
-            systemRole: 'current_reviewer'
-          },
-          {
-            operation: 'view',
-            systemRole: 'all_reviewers'
-          },
-          {
-            operation: 'comment',
-            systemRole: 'all_reviewers'
-          },
-          {
-            operation: 'view',
-            systemRole: 'space_member'
-          },
-          {
-            operation: 'comment',
-            systemRole: 'space_member'
-          }
-        ]
+        permissions: getDefaultPermissions()
       }
     ];
     const proposalWorkflow = await prisma.proposalWorkflow.create({

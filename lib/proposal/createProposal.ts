@@ -87,8 +87,8 @@ export async function createProposal({
       type: pageProps.type,
       content: pageProps.content
     },
+    proposalType: formId || formFields ? 'structured' : 'free_form',
     proposal: {
-      proposalType: formId ? 'structured' : 'free_form',
       authors: authorsList,
       formFields,
       evaluations,

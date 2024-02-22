@@ -38,8 +38,8 @@ export function ProposalStickyFooter({
       type: 'proposal'
     },
     isDraft: proposal.status === 'draft',
+    proposalType: isStructuredProposal ? 'structured' : 'free_form',
     proposal: {
-      proposalType: isStructuredProposal ? 'structured' : 'free_form',
       ...proposal,
       formFields: proposal.form?.formFields || undefined,
       authors: proposal.authors.map((a) => a.userId)

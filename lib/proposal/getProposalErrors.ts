@@ -7,6 +7,7 @@ import type { CreateProposalInput, ProposalEvaluationInput } from './createPropo
 export function getProposalErrors({
   page,
   proposal,
+  proposalType,
   isDraft,
   requireTemplates
 }: {
@@ -14,9 +15,9 @@ export function getProposalErrors({
     content?: any | null;
   };
   proposal: Pick<CreateProposalInput, 'authors' | 'proposalTemplateId' | 'formFields' | 'evaluations'> & {
-    proposalType: 'structured' | 'free_form';
     workflowId?: string | null;
   };
+  proposalType: 'structured' | 'free_form';
   isDraft: boolean;
   requireTemplates: boolean;
 }) {
@@ -39,13 +40,9 @@ export function getProposalErrors({
     errors.push('At least one author is required');
   }
 
-  if (proposal.proposalType === 'structured') {
+  if (proposalType === 'structured') {
     errors.push(...[checkFormFieldErrors(proposal.formFields ?? [])].filter(isTruthy));
-  } else if (
-    proposal.proposalType === 'free_form' &&
-    page.type === 'proposal_template' &&
-    checkIsContentEmpty(page.content)
-  ) {
+  } else if (proposalType === 'free_form' && page.type === 'proposal_template' && checkIsContentEmpty(page.content)) {
     errors.push('Content is required for free-form proposals');
   }
 

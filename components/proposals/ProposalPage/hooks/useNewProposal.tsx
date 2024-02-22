@@ -80,6 +80,7 @@ export function useNewProposal({ newProposal }: Props) {
       type: formInputs.type,
       content: formInputs.content
     },
+    proposalType: formInputs.proposalType,
     proposal: formInputs,
     isDraft: false,
     requireTemplates: !!currentSpace?.requireProposalTemplate
