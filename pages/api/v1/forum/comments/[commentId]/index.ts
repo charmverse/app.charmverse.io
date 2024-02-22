@@ -139,7 +139,7 @@ async function updatePostCommentEndpoint(req: NextApiRequest, res: NextApiRespon
  *         in: params
  *         required: true
  *         type: string
- *         description: ID of the comment to update
+ *         description: ID of the comment to delete
  *
  */
 async function deletePostCommentEndpoint(req: NextApiRequest, res: NextApiResponse) {
