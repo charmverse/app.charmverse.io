@@ -217,6 +217,7 @@ function TableRow(props: Props) {
     readOnly: props.readOnly || props.readOnlyTitle,
     spellCheck: true
   };
+
   return (
     <div
       data-test={`database-row-${card.id}`}
@@ -388,7 +389,7 @@ function TableRow(props: Props) {
   );
 }
 
-export function ExpandableTableRow(props: Props & { isNested?: boolean; subPages?: CardPage[] }) {
+function ExpandableTableRow(props: Props & { isNested?: boolean; subPages?: CardPage[] }) {
   return (
     <>
       <TableRow

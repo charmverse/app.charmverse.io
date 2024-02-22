@@ -64,11 +64,8 @@ describe('createCardsFromProposals', () => {
       spaceId: space.id,
       userId: user.id
     });
-
     const cards = await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
-
     expect(cards.length).toBe(1);
-
     expect(
       cards.every(
         (card) =>

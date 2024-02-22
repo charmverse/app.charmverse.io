@@ -1,4 +1,4 @@
-import type { Application, ApplicationComment, PageComment } from '@charmverse/core/prisma-client';
+import type { Application, ApplicationComment } from '@charmverse/core/prisma-client';
 
 import type { BountyPermissionFlags } from 'lib/permissions/bounties/interfaces';
 import type {
@@ -40,8 +40,8 @@ export function useGetRewards({ spaceId }: { spaceId?: string }) {
   return useGET<RewardWithUsers[]>(spaceId ? `/api/rewards?spaceId=${spaceId}` : null);
 }
 
-export function useGetRewardBlocks({ spaceId }: { spaceId?: string }) {
-  return useGET<RewardBlockWithTypedFields[]>(spaceId ? `/api/spaces/${spaceId}/rewards/blocks` : null);
+export function useGetRewardBlocks({ spaceId, type }: { spaceId?: string; type?: 'board' }) {
+  return useGET<RewardBlockWithTypedFields[]>(spaceId ? `/api/spaces/${spaceId}/rewards/blocks` : null, { type });
 }
 
 // // Mutative requests
@@ -49,26 +49,6 @@ export function useGetRewardBlocks({ spaceId }: { spaceId?: string }) {
 export function useCreateReward() {
   return usePOST<Omit<RewardCreationData, 'userId'>>('/api/rewards');
 }
-
-// export function useUpsertRubricCriteria({ rewardId }: { rewardId: string }) {
-//   return usePUT<Pick<RubricCriteriaUpsert, 'rubricCriteria'>>(`/api/rewards/${rewardId}/rubric-criteria`);
-// }
-
-// export function useUpsertRubricCriteriaAnswers({ rewardId }: { rewardId: MaybeString }) {
-//   return usePUT<Pick<RubricAnswerUpsert, 'answers'>>(`/api/rewards/${rewardId}/rubric-answers`);
-// }
-
-// export function useUpsertDraftRubricCriteriaAnswers({ rewardId }: { rewardId: MaybeString }) {
-//   return usePUT<Pick<RubricAnswerUpsert, 'answers'>>(`/api/rewards/${rewardId}/rubric-answers`);
-// }
-
-// export function useDeleteRubricCriteriaAnswers({ rewardId }: { rewardId: MaybeString }) {
-//   return useDELETE<{ isDraft: boolean }>(`/api/rewards/${rewardId}/rubric-answers`);
-// }
-
-// export function useUpdateRewardLensProperties({ rewardId }: { rewardId: string }) {
-//   return usePUT<Omit<UpdateRewardLensPropertiesRequest, 'rewardId'>>(`/api/rewards/${rewardId}/update-lens-properties`);
-// }
 
 export function useGetRewardTemplatesBySpace(spaceId?: string | null) {
   return useGET<RewardTemplate[]>(spaceId ? `/api/spaces/${spaceId}/reward-templates` : null);

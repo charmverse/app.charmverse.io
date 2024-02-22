@@ -26,6 +26,7 @@ import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { UpdateableRewardFieldsWithType } from '../../hooks/useNewReward';
+import type { BoardReward } from '../../hooks/useRewardsBoardAdapter';
 
 import { RewardApplicationType } from './components/RewardApplicationType';
 import { RewardPropertiesHeader } from './components/RewardPropertiesHeader';
@@ -33,7 +34,6 @@ import { RewardTokenProperty } from './components/RewardTokenProperty';
 import type { RewardTokenDetails } from './components/RewardTokenProperty';
 import { RewardTypeSelect } from './components/RewardTypeSelect';
 import { CustomPropertiesAdapter } from './CustomPropertiesAdapter';
-import type { BoardReward } from './hooks/useRewardsBoardAdapter';
 
 type Props = {
   onChange: (values: Partial<UpdateableRewardFieldsWithType>) => void;
@@ -76,7 +76,6 @@ function getRewardType(values: UpdateableRewardFields, isNewReward: boolean, isF
     ? 'token'
     : 'none';
 }
-
 export function RewardPropertiesForm({
   onChange,
   values,

@@ -26,7 +26,7 @@ import {
 import { NewRewardButton } from 'components/rewards/components/NewRewardButton';
 import { useRewardsBoardMutator } from 'components/rewards/components/RewardsBoard/hooks/useRewardsBoardMutator';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
-import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
+import { useRewardsBoardAndBlocks } from 'components/rewards/hooks/useRewardsBoardAndBlocks';
 import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -59,7 +59,7 @@ export function RewardsPage({ title }: { title: string }) {
 
   const isAdmin = useIsAdmin();
 
-  const { board: activeBoard, views, cardPages, activeView, cards } = useRewardsBoard();
+  const { board: activeBoard, views, cardPages, activeView, cards } = useRewardsBoardAndBlocks();
 
   const [showSidebar, setShowSidebar] = useState(false);
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
@@ -76,7 +76,7 @@ export function RewardsPage({ title }: { title: string }) {
 
   const { visible: visibleGroups, hidden: hiddenGroups } = activeView
     ? getVisibleAndHiddenGroups(
-        cardPages as CardPage[],
+        cardPages,
         activeView.fields.visibleOptionIds,
         activeView.fields.hiddenOptionIds,
         groupByProperty
@@ -132,7 +132,7 @@ export function RewardsPage({ title }: { title: string }) {
     updateURLQuery({ viewId });
   };
 
-  if (isLoadingAccess) {
+  if (isLoadingAccess || !activeBoard) {
     return null;
   }
 
@@ -246,7 +246,7 @@ export function RewardsPage({ title }: { title: string }) {
                     }}
                     board={activeBoard}
                     activeView={activeView}
-                    cardPages={cardPages as CardPage[]}
+                    cardPages={cardPages}
                     groupByProperty={groupByProperty}
                     views={views}
                     visibleGroups={[]}
@@ -269,7 +269,7 @@ export function RewardsPage({ title }: { title: string }) {
                 {activeView.fields.viewType === 'calendar' && (
                   <CalendarFullView
                     board={activeBoard}
-                    cards={cards as Card[]}
+                    cards={cards}
                     activeView={activeView}
                     readOnly={!isAdmin}
                     dateDisplayProperty={dateDisplayProperty}
@@ -283,7 +283,7 @@ export function RewardsPage({ title }: { title: string }) {
                   <Kanban
                     board={activeBoard}
                     activeView={activeView}
-                    cards={cards as Card[]}
+                    cards={cards}
                     groupByProperty={groupByProperty}
                     visibleGroups={visibleGroups.filter((g) => !!g.option.id)}
                     hiddenGroups={hiddenGroups.filter((g) => !!g.option.id)}
@@ -314,7 +314,7 @@ export function RewardsPage({ title }: { title: string }) {
                 sidebarView={selectedPropertyId ? 'card-property' : undefined}
                 setSelectedPropertyId={setSelectedPropertyId}
                 selectedPropertyId={selectedPropertyId}
-                cards={cards as Card[]}
+                cards={cards}
                 views={views}
                 board={activeBoard}
                 rootBoard={activeBoard}

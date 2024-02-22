@@ -49,7 +49,14 @@ export function FileUploadForm({ onComplete, align = 'center', disabled }: Props
         )}
       </Box>
 
-      <Button disabled={disabled} loading={isUploading} component='label' variant='contained' onClick={openFilePicker}>
+      <Button
+        size='small'
+        disabled={disabled}
+        loading={isUploading}
+        component='label'
+        variant='contained'
+        onClick={openFilePicker}
+      >
         Choose a file
       </Button>
     </Box>

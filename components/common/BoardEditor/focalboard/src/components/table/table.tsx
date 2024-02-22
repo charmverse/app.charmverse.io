@@ -49,6 +49,7 @@ type Props = {
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
   setSelectedPropertyId?: Dispatch<SetStateAction<string | null>>;
   boardType?: 'proposals' | 'rewards';
+  hideCalculations?: boolean;
 };
 
 const TableRowsContainer = forwardRef<HTMLDivElement, { children: ReactNode }>(({ children }, ref) => {
@@ -416,14 +417,16 @@ function Table(props: Props): JSX.Element {
           )}
         </div>
 
-        <CalculationRow
-          board={board}
-          cards={cardPages.map((c) => c.card)}
-          activeView={activeView}
-          resizingColumn={resizingColumn}
-          offset={offset}
-          readOnly={props.readOnly}
-        />
+        {!props.hideCalculations && (
+          <CalculationRow
+            board={board}
+            cards={cardPages.map((c) => c.card)}
+            activeView={activeView}
+            resizingColumn={resizingColumn}
+            offset={offset}
+            readOnly={props.readOnly}
+          />
+        )}
       </div>
     </div>
   );
