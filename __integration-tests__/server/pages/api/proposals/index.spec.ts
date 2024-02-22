@@ -191,7 +191,8 @@ describe('POST /api/proposals - Create a proposal', () => {
           index: 0,
           rubricCriteria: []
         }
-      ]
+      ],
+      workflowId: workflow.id
     };
     await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(201);
   });
@@ -233,7 +234,8 @@ describe('POST /api/proposals - Create a proposal', () => {
           index: 0,
           rubricCriteria: []
         }
-      ]
+      ],
+      workflowId: workflow.id
     };
     await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(401);
   });
@@ -279,7 +281,8 @@ describe('POST /api/proposals - Create a proposal', () => {
           index: 0,
           rubricCriteria: []
         }
-      ]
+      ],
+      workflowId: workflow.id
     };
     await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(201);
   });

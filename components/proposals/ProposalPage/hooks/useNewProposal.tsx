@@ -60,7 +60,7 @@ export function useNewProposal({ newProposal }: Props) {
         fields: formInputs.fields,
         formId: formInputs.formId,
         formAnswers: formInputs.formAnswers,
-        workflowId: formInputs.workflowId || undefined,
+        workflowId: formInputs.workflowId!,
         isDraft,
         selectedCredentialTemplates: formInputs.selectedCredentialTemplates ?? [],
         sourcePageId: formInputs.sourcePageId,

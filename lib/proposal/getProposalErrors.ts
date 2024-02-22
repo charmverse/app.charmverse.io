@@ -13,11 +13,9 @@ export function getProposalErrors({
   page: Pick<CreateProposalInput['pageProps'], 'title' | 'type'> & {
     content?: any | null;
   };
-  proposal: Pick<
-    CreateProposalInput,
-    'authors' | 'proposalTemplateId' | 'formFields' | 'evaluations' | 'workflowId'
-  > & {
+  proposal: Pick<CreateProposalInput, 'authors' | 'proposalTemplateId' | 'formFields' | 'evaluations'> & {
     proposalType: 'structured' | 'free_form';
+    workflowId?: string | null;
   };
   isDraft: boolean;
   requireTemplates: boolean;
