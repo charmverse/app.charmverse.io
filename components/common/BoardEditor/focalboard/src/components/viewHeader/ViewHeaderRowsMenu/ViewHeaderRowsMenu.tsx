@@ -66,7 +66,9 @@ const validPropertyTypes = [
   'proposalReviewer',
   'proposalStep',
   'proposalStatus',
-  'relation'
+  'relation',
+  'tokenAmount',
+  'tokenChain'
 ] as PropertyType[];
 
 const invalidPropertyIds = [
@@ -99,7 +101,7 @@ export type ViewHeaderRowsMenuProps = {
   onChangeProposalsSteps?: PropertyTemplateMenuProps['onChangeProposalsSteps'];
   onChangeRewardsDueDate?: PropertyTemplateMenuProps['onChangeRewardsDueDate'];
   onChangeRewardsReviewers?: PropertyTemplateMenuProps['onChangeRewardsReviewers'];
-  onChangeRewardsMaxSubmissions?: PropertyTemplateMenuProps['onChangeRewardsMaxSubmissions'];
+  onChangeRewardsToken?: PropertyTemplateMenuProps['onChangeRewardsToken'];
   showRewardsPaymentButton?: boolean;
   showTrashIcon?: boolean;
   onMarkRewardsAsPaid?: () => Promise<void>;
@@ -126,11 +128,11 @@ export function ViewHeaderRowsMenu({
   onChangeProposalsSteps,
   onChangeRewardsDueDate,
   onChangeRewardsReviewers,
-  onChangeRewardsMaxSubmissions,
   showRewardsPaymentButton,
   showTrashIcon = !board.fields.sourceType,
   onMarkRewardsAsComplete,
-  onMarkRewardsAsPaid
+  onMarkRewardsAsPaid,
+  onChangeRewardsToken
 }: ViewHeaderRowsMenuProps) {
   const isAdmin = useIsAdmin();
   const { space } = useCurrentSpace();
@@ -267,8 +269,8 @@ export function ViewHeaderRowsMenu({
               onChangeProposalsSteps={onChangeProposalsSteps}
               onChangeRewardsDueDate={onChangeRewardsDueDate}
               onChangeRewardsReviewers={onChangeRewardsReviewers}
-              onChangeRewardsMaxSubmissions={onChangeRewardsMaxSubmissions}
               onPersonPropertyChange={onPersonPropertyChange}
+              onChangeRewardsToken={onChangeRewardsToken}
               lastChild={!showTrashIcon && index === filteredPropertyTemplates.length - 1}
               disabledTooltip={
                 propertyTemplate.type === 'proposalStep' && isStepDisabled

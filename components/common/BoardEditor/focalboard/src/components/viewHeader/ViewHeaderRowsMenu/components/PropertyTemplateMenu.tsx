@@ -7,14 +7,24 @@ import type { SelectOption } from 'components/common/BoardEditor/components/prop
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { ControlledProposalStatusSelect } from 'components/proposals/components/ProposalStatusSelect';
 import { ControlledProposalStepSelect } from 'components/proposals/components/ProposalStepSelect';
+import { RewardTokenDialog } from 'components/rewards/components/RewardProperties/components/RewardTokenDialog';
 import { allMembersSystemRole, authorSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card, CardPropertyValue } from 'lib/focalboard/card';
 import type { ProposalWithUsersLite } from 'lib/proposal/getProposals';
-import { DUE_DATE_ID, REWARD_REVIEWERS_BLOCK_ID } from 'lib/rewards/blocks/constants';
-import type { RewardReviewer } from 'lib/rewards/interfaces';
+import {
+  DUE_DATE_ID,
+  REWARD_AMOUNT,
+  REWARD_CHAIN,
+  REWARD_REVIEWERS_BLOCK_ID,
+  REWARD_TOKEN
+} from 'lib/rewards/blocks/constants';
+import { getRewardType } from 'lib/rewards/getRewardType';
+import type { RewardReviewer, RewardTokenDetails } from 'lib/rewards/interfaces';
 
 import mutator from '../../../../mutator';
+import { TokenAmount } from '../../../properties/tokenAmount/tokenAmount';
+import { TokenChain } from '../../../properties/tokenChain/tokenChain';
 
 import { DatePropertyTemplateMenu } from './DatePropertyTemplateMenu';
 import { PersonPropertyTemplateMenu } from './PersonPropertyTemplateMenu';
@@ -36,7 +46,7 @@ export type PropertyTemplateMenuProps = {
   onChangeProposalsStatuses?: (pageIds: string[], result: ProposalEvaluationResult | null) => Promise<void>;
   onChangeRewardsDueDate?: (pageIds: string[], dueDate: DateTime | null) => Promise<void>;
   onChangeRewardsReviewers?: (pageIds: string[], options: SelectOption[]) => Promise<void>;
-  onChangeRewardsMaxSubmissions?: (pageIds: string[], maxSubmissions: number) => Promise<void>;
+  onChangeRewardsToken?: (rewardToken: RewardTokenDetails | null) => Promise<void>;
   onRelationPropertyChange: (a: {
     checkedCards: Card[];
     pageListItemIds: string[];
@@ -68,7 +78,7 @@ export function PropertyTemplateMenu({
   onRelationPropertyChange,
   onChangeRewardsDueDate,
   onChangeRewardsReviewers,
-  onChangeRewardsMaxSubmissions,
+  onChangeRewardsToken,
   firstCheckedProposal,
   disabledTooltip,
   lastChild
@@ -287,6 +297,51 @@ export function PropertyTemplateMenu({
         );
       }
       return null;
+    }
+
+    case 'tokenAmount':
+    case 'tokenChain': {
+      const firstTokenRewardCard = checkedCards.find((card) => card.fields.properties[REWARD_TOKEN]);
+      if (!firstTokenRewardCard) {
+        return null;
+      }
+
+      const symbolOrAddress = firstTokenRewardCard.fields.properties[REWARD_TOKEN] as string;
+      const chainId = firstTokenRewardCard.fields.properties[REWARD_CHAIN] as string;
+      const rewardAmount = firstTokenRewardCard.fields.properties[REWARD_AMOUNT] as number;
+
+      return (
+        <PropertyMenu lastChild={lastChild} disabledTooltip={disabledTooltip} propertyTemplate={propertyTemplate}>
+          <Box display='flex' px='4px'>
+            <RewardTokenDialog
+              readOnly={
+                getRewardType({
+                  chainId: Number(chainId),
+                  rewardAmount,
+                  rewardToken: symbolOrAddress
+                }) !== 'token'
+              }
+              currentReward={{
+                chainId: Number(chainId),
+                rewardAmount,
+                rewardToken: symbolOrAddress
+              }}
+              onChange={(rewardToken) => {
+                onChangeRewardsToken?.(rewardToken);
+                if (onChange) {
+                  onChange();
+                }
+              }}
+            >
+              {propertyTemplate.type === 'tokenAmount' ? (
+                <TokenAmount amount={rewardAmount} chainId={chainId} symbolOrAddress={symbolOrAddress} />
+              ) : (
+                <TokenChain chainId={chainId} symbolOrAddress={symbolOrAddress} />
+              )}
+            </RewardTokenDialog>
+          </Box>
+        </PropertyMenu>
+      );
     }
 
     default: {

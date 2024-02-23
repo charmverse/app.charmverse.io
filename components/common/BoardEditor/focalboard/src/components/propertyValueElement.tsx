@@ -27,6 +27,7 @@ import {
   RewardApplicationStatusChip
 } from 'components/rewards/components/RewardApplicationStatusChip';
 import { RewardStatusChip } from 'components/rewards/components/RewardChip';
+import { RewardTokenDialog } from 'components/rewards/components/RewardProperties/components/RewardTokenDialog';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { allMembersSystemRole, authorSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useDateFormatter } from 'hooks/useDateFormatter';
@@ -47,6 +48,7 @@ import {
   DUE_DATE_ID,
   REWARDS_APPLICANTS_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
+  REWARD_AMOUNT,
   REWARD_APPLICANTS_COUNT,
   REWARD_CHAIN,
   REWARD_PROPOSAL_LINK,
@@ -54,6 +56,7 @@ import {
   REWARD_STATUS_BLOCK_ID,
   REWARD_TOKEN
 } from 'lib/rewards/blocks/constants';
+import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardReviewer, RewardStatus } from 'lib/rewards/interfaces';
 import { getAbsolutePath } from 'lib/utilities/browser';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
@@ -185,19 +188,21 @@ function PropertyValueElement(props: Props) {
 
   let propertyValueElement: ReactNode = null;
 
-  if (propertyTemplate.id === DUE_DATE_ID && reward) {
+  if (propertyTemplate.id === DUE_DATE_ID) {
     const dueDate = (card.fields.properties[DUE_DATE_ID] ?? null) as number | null;
     propertyValueElement = (
       <RewardsDueDatePicker
         value={dueDate}
         disabled={readOnly || !isAdmin}
         onChange={(_value) => {
-          updateReward({
-            rewardId: reward.id,
-            updateContent: {
-              dueDate: _value?.toJSDate() || undefined
-            }
-          });
+          if (reward) {
+            updateReward({
+              rewardId: reward.id,
+              updateContent: {
+                dueDate: _value?.toJSDate() || undefined
+              }
+            });
+          }
         }}
       />
     );
@@ -244,17 +249,47 @@ function PropertyValueElement(props: Props) {
     );
   } else if (propertyTemplate.type === 'proposalReviewerNotes') {
     return <ProposalNotesLink pageId={props.card.id} />;
-  } else if (propertyTemplate.type === 'tokenAmount') {
+  } else if (propertyTemplate.type === 'tokenAmount' || propertyTemplate.type === 'tokenChain') {
     const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
     const chainId = card.fields.properties[REWARD_CHAIN] as string;
+    const rewardAmount = card.fields.properties[REWARD_AMOUNT] as number;
     propertyValueElement = (
-      <TokenAmount amount={displayValue as string} chainId={chainId} symbolOrAddress={symbolOrAddress} />
+      <RewardTokenDialog
+        readOnly={
+          readOnly ||
+          !isAdmin ||
+          getRewardType({
+            chainId: Number(chainId),
+            rewardAmount,
+            rewardToken: symbolOrAddress
+          }) !== 'token'
+        }
+        currentReward={{
+          chainId: Number(chainId),
+          rewardAmount,
+          rewardToken: symbolOrAddress
+        }}
+        onChange={(rewardToken) => {
+          if (rewardToken && reward) {
+            updateReward({
+              rewardId: reward.id,
+              updateContent: {
+                chainId: rewardToken.chainId,
+                rewardToken: rewardToken.rewardToken,
+                rewardAmount: Number(rewardToken.rewardAmount),
+                customReward: null
+              }
+            });
+          }
+        }}
+      >
+        {propertyTemplate.type === 'tokenAmount' ? (
+          <TokenAmount amount={rewardAmount} chainId={chainId} symbolOrAddress={symbolOrAddress} />
+        ) : (
+          <TokenChain chainId={chainId} symbolOrAddress={symbolOrAddress} />
+        )}
+      </RewardTokenDialog>
     );
-  } else if (propertyTemplate.type === 'tokenChain') {
-    // Note: we wat to display the token symbol, but it should not be part of 'display value' so we pass it in as a prop
-    const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
-    const chainId = card.fields.properties[REWARD_CHAIN] as string;
-    propertyValueElement = <TokenChain chainId={chainId} symbolOrAddress={symbolOrAddress} />;
   } else if (propertyTemplate.id === REWARD_APPLICANTS_COUNT) {
     const totalApplicants = card.fields.properties[REWARD_APPLICANTS_COUNT];
     if (totalApplicants) {

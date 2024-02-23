@@ -6,12 +6,11 @@ import type { ViewHeaderRowsMenuProps } from 'components/common/BoardEditor/foca
 import { ViewHeaderRowsMenu } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ViewHeaderRowsMenu/ViewHeaderRowsMenu';
 import { usePages } from 'hooks/usePages';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
-import type { RewardReviewer } from 'lib/rewards/interfaces';
+import { getRewardType } from 'lib/rewards/getRewardType';
+import type { RewardReviewer, RewardTokenDetails } from 'lib/rewards/interfaces';
 
 import { useRewards } from '../hooks/useRewards';
 import { useRewardsBoardAdapter } from '../hooks/useRewardsBoardAdapter';
-
-import { getApplicationType } from './RewardProperties/RewardPropertiesForm';
 
 type Props = Pick<ViewHeaderRowsMenuProps, 'checkedIds' | 'setCheckedIds' | 'cards' | 'board' | 'onChange'> & {
   visiblePropertyIds?: string[];
@@ -67,30 +66,6 @@ export function RewardsHeaderRowsMenu({ board, visiblePropertyIds, cards, checke
     await refreshRewards();
   }
 
-  async function onChangeRewardsMaxSubmissions(pageIds: string[], maxSubmissions: number) {
-    for (const pageId of pageIds) {
-      const page = pages[pageId];
-      const reward = page?.bountyId ? rewards?.find((r) => r.id === page.bountyId) : null;
-      if (reward) {
-        const applicationType = getApplicationType({
-          approveSubmitters: reward.approveSubmitters,
-          assignedSubmitters: reward.assignedSubmitters
-        });
-
-        if (applicationType !== 'assigned') {
-          await updateReward({
-            rewardId: reward.id,
-            updateContent: {
-              maxSubmissions: maxSubmissions <= 0 ? null : maxSubmissions
-            }
-          });
-        }
-      }
-    }
-
-    await refreshRewards();
-  }
-
   async function onMarkRewardsAsPaid() {
     for (const pageId of checkedIds) {
       const page = pages[pageId];
@@ -114,6 +89,30 @@ export function RewardsHeaderRowsMenu({ board, visiblePropertyIds, cards, checke
     await refreshRewards();
   }
 
+  async function onChangeRewardsToken(rewardToken: RewardTokenDetails | null) {
+    if (!rewardToken) {
+      return;
+    }
+
+    for (const pageId of checkedIds) {
+      const page = pages[pageId];
+      const reward = page?.bountyId ? rewards?.find((r) => r.id === page.bountyId) : null;
+      if (reward && getRewardType(reward) === 'token') {
+        await updateReward({
+          rewardId: reward.id,
+          updateContent: {
+            chainId: rewardToken.chainId,
+            rewardToken: rewardToken.rewardToken,
+            rewardAmount: Number(rewardToken.rewardAmount),
+            customReward: null
+          }
+        });
+      }
+    }
+
+    await refreshRewards();
+  }
+
   const rewardId = checkedIds.length ? pages[checkedIds[0]]?.bountyId : null;
   const reward = rewardId ? rewards?.find((r) => r.id === rewardId) : null;
   const isMarkPaidDisabled = reward ? reward.status === 'paid' : false;
@@ -123,7 +122,6 @@ export function RewardsHeaderRowsMenu({ board, visiblePropertyIds, cards, checke
     <ViewHeaderRowsMenu
       onChangeRewardsDueDate={onChangeRewardsDueDate}
       onChangeRewardsReviewers={onChangeRewardsReviewers}
-      onChangeRewardsMaxSubmissions={onChangeRewardsMaxSubmissions}
       board={board}
       cards={cards}
       checkedIds={checkedIds}
@@ -133,6 +131,7 @@ export function RewardsHeaderRowsMenu({ board, visiblePropertyIds, cards, checke
       showRewardsPaymentButton
       onMarkRewardsAsPaid={onMarkRewardsAsPaid}
       onMarkRewardsAsComplete={onMarkRewardsAsComplete}
+      onChangeRewardsToken={onChangeRewardsToken}
       isMarkPaidDisabled={isMarkPaidDisabled}
       isMarkCompleteDisabled={isMarkCompleteDisabled}
     />

@@ -36,6 +36,7 @@ import {
 import type { RewardFields, RewardFieldsProp } from 'lib/rewards/blocks/interfaces';
 import { getDefaultView } from 'lib/rewards/blocks/views';
 import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmissionSlots';
+import { getRewardType } from 'lib/rewards/getRewardType';
 import type { ApplicationMeta, RewardWithUsers } from 'lib/rewards/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -118,7 +119,8 @@ export function useRewardsBoardAdapter() {
             members: membersRecord
           }),
           reward: {
-            id: reward.id
+            id: reward.id,
+            rewardType: getRewardType(reward)
           }
         } as CardPage;
       })
