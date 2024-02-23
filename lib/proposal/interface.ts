@@ -1,6 +1,7 @@
 import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
 import type {
   FormField,
+  Page,
   Proposal,
   ProposalAuthor,
   ProposalReviewer,
@@ -66,7 +67,7 @@ export type ProposalWithUsersAndRubric = Omit<Proposal, 'fields'> & {
   rewardIds?: string[] | null;
   evaluations: PopulatedEvaluation[];
   fields: ProposalFields | null;
-  page?: { sourceTemplateId: string | null } | null;
+  page?: Partial<Pick<Page, 'sourceTemplateId' | 'content' | 'contentText' | 'type'>> | null;
   permissions: ProposalPermissionFlags;
   currentEvaluationId?: string;
   form: {

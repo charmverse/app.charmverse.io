@@ -1,25 +1,32 @@
+import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
 import type { permissionsApiClient } from 'lib/permissions/api/client';
 
 import type { ProposalWithUsersAndRubric } from './interface';
 import { mapDbProposalToProposal } from './mapDbProposalToProposal';
 
-type PermissionsMap = Awaited<
-  ReturnType<typeof permissionsApiClient.proposals.computeAllProposalEvaluationPermissions>
->;
+const mockPermissions: ProposalPermissionFlags = {
+  evaluate: true,
+  comment: true,
+  edit: true,
+  delete: true,
+  view: false,
+  view_notes: false,
+  view_private_fields: true,
+  create_vote: false,
+  make_public: false,
+  archive: false,
+  unarchive: false,
+  move: false
+};
 
-export async function getProposal({
-  id,
-  permissionsByStep
-}: {
-  id: string;
-  permissionsByStep: PermissionsMap;
-}): Promise<ProposalWithUsersAndRubric> {
-  const proposal = await prisma.proposal.findUniqueOrThrow({
+export async function getProposalTemplate({ pageId }: { pageId: string }): Promise<ProposalWithUsersAndRubric> {
+  const proposal = await prisma.proposal.findFirstOrThrow({
     where: {
-      id
+      page: {
+        id: pageId
+      }
     },
     include: {
       evaluations: {
@@ -54,20 +61,8 @@ export async function getProposal({
     }
   });
 
-  const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
-
-  const currentPermissions =
-    proposal.status === 'draft'
-      ? permissionsByStep.draft
-      : currentEvaluation && permissionsByStep[currentEvaluation.id];
-
-  if (!currentPermissions) {
-    throw new Error('Could not find permissions for proposal');
-  }
-
   return mapDbProposalToProposal({
     proposal,
-    permissions: currentPermissions,
-    permissionsByStep
+    permissions: mockPermissions
   });
 }

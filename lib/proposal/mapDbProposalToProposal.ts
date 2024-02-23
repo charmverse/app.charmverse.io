@@ -1,6 +1,7 @@
 import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
 import type {
   FormField,
+  Page,
   Proposal,
   ProposalAuthor,
   ProposalReviewer,
@@ -35,12 +36,13 @@ export function mapDbProposalToProposal({
         rubricCriteria: ProposalRubricCriteria[];
         draftRubricAnswers: ProposalRubricCriteriaAnswer[];
       })[];
+      page: Partial<Pick<Page, 'sourceTemplateId' | 'content' | 'contentText' | 'type'>> | null;
       rewards: { id: string }[];
     };
   permissions: ProposalPermissionFlags;
   permissionsByStep?: Record<string, ProposalPermissionFlags>;
 }): ProposalWithUsersAndRubric {
-  const { rewards, form, evaluations, fields, ...rest } = proposal;
+  const { rewards, form, evaluations, fields, page, ...rest } = proposal;
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
   const formFields = getProposalFormFields(form?.formFields, !!permissions.view_private_fields);
   const mappedEvaluations = proposal.evaluations.map((evaluation) => {
@@ -54,9 +56,11 @@ export function mapDbProposalToProposal({
       isReviewer: !!stepPermissions?.evaluate
     } as unknown as PopulatedEvaluation;
   });
+  const pageFields = page?.type === 'proposal_template' ? page : { sourceTemplateId: page?.sourceTemplateId };
 
   const proposalWithUsers: ProposalWithUsersAndRubric = {
     ...rest,
+    page: pageFields,
     fields: fields as ProposalFields,
     evaluations: mappedEvaluations,
     permissions,
