@@ -317,7 +317,7 @@ export function RewardsPage({ title }: { title: string }) {
             ) : (
               <Box sx={{ mt: 3 }}>
                 <EmptyStateVideo
-                  description='Getting started with rewards'
+                  description='Getting started'
                   videoTitle='Rewards | Getting started with CharmVerse'
                   videoUrl='https://tiny.charmverse.io/bounties'
                 />
