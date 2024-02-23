@@ -8,7 +8,7 @@ exports[`components/table/TableRow should match snapshot 1`] = `
     <div
       class="TableRow octo-table-row"
       data-test="database-row-card-1"
-      style="background-color: transparent; opacity: 1; cursor: move;"
+      style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
     >
       <div
         class="MuiStack-root css-1v111ru-MuiStack-root"
@@ -112,7 +112,7 @@ exports[`components/table/TableRow should match snapshot, collapsed tree 1`] = `
     <div
       class="TableRow octo-table-row hidden"
       data-test="database-row-card-1"
-      style="background-color: transparent; opacity: 1; cursor: move;"
+      style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
     >
       <div
         class="MuiStack-root css-1v111ru-MuiStack-root"
@@ -216,7 +216,7 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
     <div
       class="TableRow octo-table-row hidden"
       data-test="database-row-card-1"
-      style="background-color: transparent; opacity: 1; cursor: move;"
+      style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
     >
       <div
         class="MuiStack-root css-1v111ru-MuiStack-root"
@@ -387,7 +387,7 @@ exports[`components/table/TableRow should match snapshot, isSelected 1`] = `
     <div
       class="TableRow octo-table-row selected"
       data-test="database-row-card-1"
-      style="background-color: transparent; opacity: 1; cursor: move;"
+      style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
     >
       <div
         class="MuiStack-root css-1v111ru-MuiStack-root"
@@ -491,7 +491,7 @@ exports[`components/table/TableRow should match snapshot, read-only 1`] = `
     <div
       class="TableRow octo-table-row"
       data-test="database-row-card-1"
-      style="background-color: transparent; opacity: 1; cursor: default;"
+      style="background-color: transparent; z-index: 85; opacity: 1; cursor: default;"
     >
       <div
         class="octo-table-cell title-cell MuiBox-root css-v7v99c"
@@ -571,7 +571,7 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
     <div
       class="TableRow octo-table-row hidden"
       data-test="database-row-card-1"
-      style="background-color: transparent; opacity: 1; cursor: move;"
+      style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
     >
       <div
         class="MuiStack-root css-1v111ru-MuiStack-root"
