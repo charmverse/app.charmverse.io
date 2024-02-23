@@ -37,7 +37,7 @@ export function ProposalStickyFooter({
       title: page.title,
       type: 'proposal'
     },
-    isDraft: proposal.status === 'draft',
+    isDraft: false, // isDraft skips all errors
     proposalType: isStructuredProposal ? 'structured' : 'free_form',
     proposal: {
       ...proposal,
