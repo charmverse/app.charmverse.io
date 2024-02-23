@@ -1,18 +1,21 @@
-import type { Space, User } from '@charmverse/core/prisma';
+import type { ProposalWorkflow, Space, User } from '@charmverse/core/prisma';
 import { testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
 import type { CreateProposalInput } from 'lib/proposal/createProposal';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
+import { generateProposalWorkflow } from 'testing/utils/proposals';
 
 let space: Space;
 let user: User;
+let workflow: ProposalWorkflow;
 
 beforeAll(async () => {
   const generated = await testUtilsUser.generateUserAndSpace({ isAdmin: false, spacePaidTier: 'free' });
   space = generated.space;
   user = generated.user;
+  workflow = await generateProposalWorkflow({ spaceId: space.id });
 });
 
 describe('POST /api/proposals - Create a proposal', () => {
@@ -31,7 +34,8 @@ describe('POST /api/proposals - Create a proposal', () => {
         title: 'Proposal title',
         content: { ...emptyDocument },
         contentText: 'Empty proposal'
-      }
+      },
+      workflowId: workflow.id
     };
 
     await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(201);
@@ -51,7 +55,8 @@ describe('POST /api/proposals - Create a proposal', () => {
         title: 'Proposal title',
         content: { ...emptyDocument },
         contentText: 'Empty proposal'
-      }
+      },
+      workflowId: workflow.id
     };
     await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(401);
   });

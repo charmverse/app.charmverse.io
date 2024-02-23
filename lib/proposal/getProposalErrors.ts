@@ -5,42 +5,51 @@ import { isTruthy } from 'lib/utilities/types';
 import type { CreateProposalInput, ProposalEvaluationInput } from './createProposal';
 
 export function getProposalErrors({
+  page,
   proposal,
+  proposalType,
+  isDraft,
   requireTemplates
 }: {
-  proposal: Pick<CreateProposalInput, 'authors' | 'proposalTemplateId' | 'formFields' | 'evaluations'> &
-    Pick<CreateProposalInput['pageProps'], 'title' | 'type'> & {
-      content?: any | null;
-      proposalType: 'structured' | 'free_form';
-    };
-  requireTemplates?: boolean;
+  page: Pick<CreateProposalInput['pageProps'], 'title' | 'type'> & {
+    content?: any | null;
+  };
+  proposal: Pick<CreateProposalInput, 'authors' | 'proposalTemplateId' | 'formFields' | 'evaluations'> & {
+    workflowId?: string | null;
+  };
+  proposalType: 'structured' | 'free_form';
+  isDraft: boolean;
+  requireTemplates: boolean;
 }) {
-  const errors = [];
-  if (!proposal.title) {
+  const errors: string[] = [];
+
+  if (isDraft) {
+    return errors;
+  }
+  if (!page.title) {
     errors.push('Title is required');
   }
+  if (!proposal.workflowId) {
+    errors.push('Workflow is required');
+  }
 
-  if (requireTemplates && proposal.type === 'proposal' && !proposal.proposalTemplateId) {
+  if (requireTemplates && page.type === 'proposal' && !proposal.proposalTemplateId) {
     errors.push('Template is required');
   }
-  if (proposal.type === 'proposal' && proposal.authors.length === 0) {
+  if (page.type === 'proposal' && proposal.authors.length === 0) {
     errors.push('At least one author is required');
   }
 
-  if (proposal.proposalType === 'structured') {
-    errors.push(checkFormFieldErrors(proposal.formFields ?? []));
-  } else if (
-    proposal.proposalType === 'free_form' &&
-    proposal.type === 'proposal_template' &&
-    checkIsContentEmpty(proposal.content)
-  ) {
+  if (proposalType === 'structured') {
+    errors.push(...[checkFormFieldErrors(proposal.formFields ?? [])].filter(isTruthy));
+  } else if (proposalType === 'free_form' && page.type === 'proposal_template' && checkIsContentEmpty(page.content)) {
     errors.push('Content is required for free-form proposals');
   }
 
   // get the first validation error from the evaluations
   errors.push(...proposal.evaluations.map(getEvaluationFormError).filter(isTruthy));
 
-  return errors.filter(isTruthy);
+  return errors;
 }
 
 export function getEvaluationFormError(evaluation: ProposalEvaluationInput): string | false {

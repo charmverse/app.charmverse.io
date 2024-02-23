@@ -1,4 +1,3 @@
-import type { ProposalEvaluationTestInput } from '@charmverse/core/dist/cjs/lib/testing/proposals';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { test } from '__e2e__/utils/test';
@@ -31,23 +30,7 @@ test('Create a proposal from a linked proposal template /member', async ({ page,
     .generateProposal({
       spaceId: space.id,
       userId: admin.id,
-      workflowId: workflow.id,
-      evaluationInputs: workflow.evaluations.slice(0, 2).map(
-        (evaluation) =>
-          ({
-            ...evaluation,
-            evaluationType: evaluation.type,
-            reviewers: [{ group: 'user', id: admin.id }],
-            id: undefined,
-            permissions: evaluation.permissions.map((p) => ({
-              assignee: {
-                group: p.roleId ? 'role' : p.userId ? 'user' : p.systemRole,
-                id: p.roleId ?? p.userId ?? p.systemRole
-              },
-              operation: p.operation
-            }))
-          } as ProposalEvaluationTestInput)
-      )
+      workflowId: workflow.id
     })
     .then((p) => prisma.page.update({ where: { id: p.id }, data: { type: 'proposal_template' } }));
 
@@ -106,23 +89,7 @@ test('Create a proposal from a linked proposal template / user from outside spac
     .generateProposal({
       spaceId: space.id,
       userId: admin.id,
-      workflowId: workflow.id,
-      evaluationInputs: workflow.evaluations.slice(0, 2).map(
-        (evaluation) =>
-          ({
-            ...evaluation,
-            evaluationType: evaluation.type,
-            reviewers: [{ group: 'user', id: admin.id }],
-            id: undefined,
-            permissions: evaluation.permissions.map((p) => ({
-              assignee: {
-                group: p.roleId ? 'role' : p.userId ? 'user' : p.systemRole,
-                id: p.roleId ?? p.userId ?? p.systemRole
-              },
-              operation: p.operation
-            }))
-          } as ProposalEvaluationTestInput)
-      )
+      workflowId: workflow.id
     })
     .then((p) => prisma.page.update({ where: { id: p.id }, data: { type: 'proposal_template' } }));
 
@@ -185,23 +152,7 @@ test('Try to create a proposal from a linked proposal template / user from outsi
     .generateProposal({
       spaceId: space.id,
       userId: admin.id,
-      workflowId: workflow.id,
-      evaluationInputs: workflow.evaluations.slice(0, 2).map(
-        (evaluation) =>
-          ({
-            ...evaluation,
-            evaluationType: evaluation.type,
-            reviewers: [{ group: 'user', id: admin.id }],
-            id: undefined,
-            permissions: evaluation.permissions.map((p) => ({
-              assignee: {
-                group: p.roleId ? 'role' : p.userId ? 'user' : p.systemRole,
-                id: p.roleId ?? p.userId ?? p.systemRole
-              },
-              operation: p.operation
-            }))
-          } as ProposalEvaluationTestInput)
-      )
+      workflowId: workflow.id
     })
     .then((p) => prisma.page.update({ where: { id: p.id }, data: { type: 'proposal_template' } }));
 
@@ -265,23 +216,7 @@ test('Try to create a proposal from a linked proposal template / new user', asyn
     .generateProposal({
       spaceId: space.id,
       userId: admin.id,
-      workflowId: workflow.id,
-      evaluationInputs: workflow.evaluations.slice(0, 2).map(
-        (evaluation) =>
-          ({
-            ...evaluation,
-            evaluationType: evaluation.type,
-            reviewers: [{ group: 'user', id: admin.id }],
-            id: undefined,
-            permissions: evaluation.permissions.map((p) => ({
-              assignee: {
-                group: p.roleId ? 'role' : p.userId ? 'user' : p.systemRole,
-                id: p.roleId ?? p.userId ?? p.systemRole
-              },
-              operation: p.operation
-            }))
-          } as ProposalEvaluationTestInput)
-      )
+      workflowId: workflow.id
     })
     .then((p) => prisma.page.update({ where: { id: p.id }, data: { type: 'proposal_template' } }));
 

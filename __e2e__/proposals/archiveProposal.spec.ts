@@ -14,8 +14,6 @@ test.describe.serial('Archive Proposal', () => {
   }) => {
     const { space, user: admin } = await generateUserAndSpace({
       isAdmin: true,
-      onboarded: true,
-      skipOnboarding: true,
       spaceDomain: `cvt-${uuid()}`
     });
 

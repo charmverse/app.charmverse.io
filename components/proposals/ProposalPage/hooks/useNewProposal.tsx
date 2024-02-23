@@ -60,7 +60,7 @@ export function useNewProposal({ newProposal }: Props) {
         fields: formInputs.fields,
         formId: formInputs.formId,
         formAnswers: formInputs.formAnswers,
-        workflowId: formInputs.workflowId || undefined,
+        workflowId: formInputs.workflowId!,
         isDraft,
         selectedCredentialTemplates: formInputs.selectedCredentialTemplates ?? [],
         sourcePageId: formInputs.sourcePageId,
@@ -75,7 +75,14 @@ export function useNewProposal({ newProposal }: Props) {
   }
 
   const disabledTooltip = getProposalErrors({
+    page: {
+      title: formInputs.title,
+      type: formInputs.type,
+      content: formInputs.content
+    },
+    proposalType: formInputs.proposalType,
     proposal: formInputs,
+    isDraft: false,
     requireTemplates: !!currentSpace?.requireProposalTemplate
   }).join('\n');
 

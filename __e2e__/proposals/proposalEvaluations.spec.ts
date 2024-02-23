@@ -1,46 +1,20 @@
-import type {
-  Page,
-  Proposal,
-  ProposalEvaluation,
-  ProposalEvaluationPermission,
-  ProposalReviewer,
-  ProposalRubricCriteria,
-  ProposalSystemRole,
-  ProposalWorkflow,
-  Role,
-  Space,
-  User
-} from '@charmverse/core/prisma-client';
+import type { ProposalSystemRole, ProposalWorkflow, Role, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
-import { testUtilsMembers, testUtilsProposals, testUtilsSpaces } from '@charmverse/core/test';
+import { testUtilsMembers, testUtilsSpaces } from '@charmverse/core/test';
 import { expect, test } from '__e2e__/utils/test';
 import { v4 as uuid } from 'uuid';
 
 import { generateUser, generateUserAndSpace, loginBrowserUser } from '../utils/mocks';
 
-test.describe.serial('Proposal Evaluation', () => {
+test.describe.serial('Proposal Evaluations', () => {
   let space: Space;
   let admin: User;
   let member: User;
   let role: Role;
 
-  let templateId: string;
-
-  // This will be setup after the first test to be used in the following test
-  let proposalTemplate: Proposal & {
-    page: Page;
-    evaluations: (ProposalEvaluation & {
-      reviewers: ProposalReviewer[];
-      permissions: ProposalEvaluationPermission[];
-      rubricCriteria: ProposalRubricCriteria[];
-    })[];
-  };
-
   const settingsToTest = {
     proposalTitle: 'Proposal test title',
-    standaloneProposalTitle: 'Standalone proposal test title',
-    proposalTemplateTitle: 'Proposal template e2e test',
     rubricLabel: 'Rubric criteria label',
     rubricDescription: 'Rubric criteria description',
     rubricMinScore: 1,
@@ -97,15 +71,9 @@ test.describe.serial('Proposal Evaluation', () => {
   test.beforeAll(async ({ browser }) => {
     ({ space, user: admin } = await generateUserAndSpace({
       isAdmin: true,
-      onboarded: true,
-      skipOnboarding: true,
-      spaceDomain: `cvt-${uuid()}`
+      spaceDomain: `cvt-${uuid()}`,
+      memberSpacePermissions: ['createProposals', 'reviewProposals']
     }));
-    await testUtilsSpaces.addSpaceOperations({
-      forSpaceId: space.id,
-      spaceId: space.id,
-      operations: ['createProposals']
-    });
     member = await generateUser({ space: { id: space.id, isAdmin: false } });
     workflow = await prisma.proposalWorkflow.create({
       data: {
@@ -120,7 +88,7 @@ test.describe.serial('Proposal Evaluation', () => {
       spaceId: space.id
     });
   });
-  test('An admin can create a template that uses a workflow', async ({
+  test('Create a proposal that uses each type of evaluation', async ({
     proposalListPage,
     documentPage,
     proposalPage
@@ -128,25 +96,21 @@ test.describe.serial('Proposal Evaluation', () => {
     // Initial setup
     await loginBrowserUser({
       browserPage: proposalListPage.page,
-      userId: admin.id
+      userId: member.id
     });
 
     await proposalListPage.goToProposals(space.domain);
 
     await proposalListPage.waitForProposalsList();
 
-    await proposalListPage.proposalTemplateSelect.click();
-
-    await proposalListPage.addNewTemplate.click();
-
-    await proposalListPage.proposalTemplateFreeFormOption.click();
+    await proposalListPage.createProposalButton.click();
 
     await expect(documentPage.charmEditor).toBeVisible();
 
     // Configure proposal settings
     await documentPage.documentTitle.click();
 
-    await documentPage.documentTitle.locator('textarea').first().fill(settingsToTest.proposalTemplateTitle);
+    await documentPage.documentTitle.locator('textarea').first().fill(settingsToTest.proposalTitle);
 
     await documentPage.charmEditor.fill('This is a test proposal');
 
@@ -179,172 +143,12 @@ test.describe.serial('Proposal Evaluation', () => {
     await proposalPage.page.waitForResponse('**/api/proposals');
 
     // Test proposal data at the database level to ensure correct persistence
-    proposalTemplate = (await prisma.proposal.findFirstOrThrow({
-      where: {
-        spaceId: space.id,
-        page: {
-          title: settingsToTest.proposalTemplateTitle,
-          type: 'proposal_template'
-        }
-      },
-      include: {
-        evaluations: {
-          include: {
-            reviewers: true,
-            permissions: true,
-            rubricCriteria: true
-          },
-          orderBy: { index: 'asc' }
-        },
-        page: true
-      }
-    })) as any;
-
-    templateId = proposalTemplate.id;
-
-    expect(proposalTemplate.page?.title).toBe(settingsToTest.proposalTemplateTitle);
-
-    expect(proposalTemplate.workflowId).toBe(workflow.id);
-
-    expect(proposalTemplate.evaluations).toHaveLength(4);
-
-    expect(proposalTemplate.evaluations[0]).toMatchObject(
-      expect.objectContaining({
-        type: 'feedback',
-        index: 0,
-        proposalId: proposalTemplate.id,
-        title: settingsToTest.evaluationFeedbackTitle,
-        reviewers: [
-          {
-            evaluationId: expect.any(String),
-            id: expect.any(String),
-            proposalId: proposalTemplate.id,
-            roleId: null,
-            userId: null,
-            systemRole: 'author'
-          }
-        ],
-        rubricCriteria: []
-      })
-    );
-
-    expect(proposalTemplate.evaluations[1]).toMatchObject(
-      expect.objectContaining({
-        reviewers: [
-          expect.objectContaining({
-            proposalId: proposalTemplate.id,
-            roleId: null,
-            userId: null,
-            systemRole: 'space_member'
-          })
-        ],
-        type: 'rubric',
-        index: 1,
-        proposalId: proposalTemplate.id,
-        title: settingsToTest.evaluationRubricTitle,
-        rubricCriteria: [
-          expect.objectContaining({
-            title: settingsToTest.rubricLabel,
-            description: settingsToTest.rubricDescription,
-            type: 'range',
-            index: 0,
-            proposalId: proposalTemplate.id,
-            parameters: {
-              max: settingsToTest.rubricMaxScore,
-              min: settingsToTest.rubricMinScore
-            }
-          })
-        ]
-      })
-    );
-
-    expect(proposalTemplate.evaluations[2]).toMatchObject({
-      reviewers: [
-        {
-          evaluationId: expect.any(String),
-          id: expect.any(String),
-          proposalId: proposalTemplate.id,
-          roleId: role.id,
-          userId: null,
-          systemRole: null
-        }
-      ],
-      type: 'pass_fail',
-      index: 2,
-      proposalId: proposalTemplate.id,
-      result: null,
-      snapshotExpiry: null,
-      snapshotId: null,
-      title: settingsToTest.evaluationPassFailTitle,
-      rubricCriteria: []
-    });
-
-    expect(proposalTemplate.evaluations[3]).toMatchObject({
-      reviewers: [
-        {
-          evaluationId: expect.any(String),
-          id: expect.any(String),
-          proposalId: proposalTemplate.id,
-          roleId: null,
-          userId: null,
-          systemRole: 'space_member'
-        }
-      ],
-      type: 'vote',
-      index: 3,
-      proposalId: proposalTemplate.id,
-      result: null,
-      snapshotExpiry: null,
-      snapshotId: null,
-      title: settingsToTest.evaluationVoteTitle,
-      voteId: null,
-      voteSettings: {
-        durationDays: settingsToTest.voteDuration,
-        maxChoices: 1,
-        options: ['Yes', 'No', 'Abstain'],
-        publishToSnapshot: false,
-        threshold: settingsToTest.votePassThreshold,
-        type: 'Approval'
-      },
-      rubricCriteria: []
-    });
-  });
-
-  test('A member can create a proposal from a template', async ({ proposalListPage, documentPage, proposalPage }) => {
-    // Initial setup
-    await loginBrowserUser({
-      browserPage: proposalListPage.page,
-      userId: member.id
-    });
-
-    await proposalListPage.goToProposals(space.domain);
-
-    await proposalListPage.waitForProposalsList();
-
-    await proposalListPage.proposalTemplateSelect.click();
-
-    await proposalListPage.getTemplateOptionLocator(templateId).click();
-    await expect(documentPage.charmEditor).toBeVisible();
-
-    // Configure proposal settings
-    await documentPage.documentTitle.click();
-
-    await documentPage.documentTitle.locator('textarea').first().fill(settingsToTest.proposalTitle);
-
-    await documentPage.charmEditor.fill('This is a test proposal');
-
-    proposalPage.saveDraftButton.click();
-
-    await proposalPage.page.waitForResponse('**/api/proposals');
-
-    // Test proposal data at the database level to ensure correct persistence
-    const proposalFromTemplate = (await prisma.proposal.findFirstOrThrow({
+    const proposal = await prisma.proposal.findFirstOrThrow({
       where: {
         spaceId: space.id,
         page: {
           title: settingsToTest.proposalTitle,
-          type: 'proposal',
-          sourceTemplateId: templateId
+          type: 'proposal'
         }
       },
       include: {
@@ -358,36 +162,39 @@ test.describe.serial('Proposal Evaluation', () => {
         },
         page: true
       }
-    })) as any;
+    });
 
-    expect(proposalFromTemplate.evaluations[0]).toMatchObject(
+    expect(proposal.page?.title).toBe(settingsToTest.proposalTitle);
+
+    expect(proposal.workflowId).toBe(workflow.id);
+
+    expect(proposal.evaluations[0]).toMatchObject(
       expect.objectContaining({
         type: 'feedback',
         index: 0,
-        proposalId: proposalFromTemplate.id,
+        proposalId: proposal.id,
         title: settingsToTest.evaluationFeedbackTitle,
         reviewers: [
           {
             evaluationId: expect.any(String),
             id: expect.any(String),
-            proposalId: proposalFromTemplate.id,
+            proposalId: proposal.id,
             roleId: null,
             userId: null,
             systemRole: 'author'
           }
         ],
-        rubricCriteria: [],
         permissions: expect.arrayContaining(
           proposalEvaluationPermissions[0].permissions.map((p) => expect.objectContaining(p))
         )
       })
     );
 
-    expect(proposalFromTemplate.evaluations[1]).toMatchObject(
+    expect(proposal.evaluations[1]).toMatchObject(
       expect.objectContaining({
         reviewers: [
           expect.objectContaining({
-            proposalId: proposalFromTemplate.id,
+            proposalId: proposal.id,
             roleId: null,
             userId: null,
             systemRole: 'space_member'
@@ -398,7 +205,7 @@ test.describe.serial('Proposal Evaluation', () => {
         ),
         type: 'rubric',
         index: 1,
-        proposalId: proposalFromTemplate.id,
+        proposalId: proposal.id,
         title: settingsToTest.evaluationRubricTitle,
         rubricCriteria: [
           expect.objectContaining({
@@ -406,7 +213,7 @@ test.describe.serial('Proposal Evaluation', () => {
             description: settingsToTest.rubricDescription,
             type: 'range',
             index: 0,
-            proposalId: proposalFromTemplate.id,
+            proposalId: proposal.id,
             parameters: {
               max: settingsToTest.rubricMaxScore,
               min: settingsToTest.rubricMinScore
@@ -416,12 +223,12 @@ test.describe.serial('Proposal Evaluation', () => {
       })
     );
 
-    expect(proposalFromTemplate.evaluations[2]).toMatchObject({
+    expect(proposal.evaluations[2]).toMatchObject({
       reviewers: [
         {
           evaluationId: expect.any(String),
           id: expect.any(String),
-          proposalId: proposalFromTemplate.id,
+          proposalId: proposal.id,
           roleId: role.id,
           userId: null,
           systemRole: null
@@ -432,20 +239,19 @@ test.describe.serial('Proposal Evaluation', () => {
       ),
       type: 'pass_fail',
       index: 2,
-      proposalId: proposalFromTemplate.id,
+      proposalId: proposal.id,
       result: null,
       snapshotExpiry: null,
       snapshotId: null,
-      title: settingsToTest.evaluationPassFailTitle,
-      rubricCriteria: []
+      title: settingsToTest.evaluationPassFailTitle
     });
 
-    expect(proposalFromTemplate.evaluations[3]).toMatchObject({
+    expect(proposal.evaluations[3]).toMatchObject({
       reviewers: [
         {
           evaluationId: expect.any(String),
           id: expect.any(String),
-          proposalId: proposalFromTemplate.id,
+          proposalId: proposal.id,
           roleId: null,
           userId: null,
           systemRole: 'space_member'
@@ -456,7 +262,7 @@ test.describe.serial('Proposal Evaluation', () => {
       ),
       type: 'vote',
       index: 3,
-      proposalId: proposalFromTemplate.id,
+      proposalId: proposal.id,
       result: null,
       snapshotExpiry: null,
       snapshotId: null,
@@ -469,8 +275,7 @@ test.describe.serial('Proposal Evaluation', () => {
         publishToSnapshot: false,
         threshold: settingsToTest.votePassThreshold,
         type: 'Approval'
-      },
-      rubricCriteria: []
+      }
     });
   });
 });

@@ -43,8 +43,6 @@ test.describe.serial('Proposal custom properties', () => {
   test.beforeAll(async ({ browser }) => {
     ({ space, user: admin } = await generateUserAndSpace({
       isAdmin: true,
-      onboarded: true,
-      skipOnboarding: true,
       spaceDomain: `cvt-${uuid()}`
     }));
     member = await generateUser({

@@ -1,4 +1,3 @@
-import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/dist/cjs/proposals';
 import type {
   MemberProperty,
   MemberPropertyPermission,
@@ -9,6 +8,7 @@ import type {
   User
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
 import { v4 as uuid } from 'uuid';
 

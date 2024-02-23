@@ -564,8 +564,7 @@ export function NewProposalPage({
               ) : (
                 <>
                   <Button
-                    disabled={Boolean(disabledTooltip) || isCreatingProposal}
-                    disabledTooltip={disabledTooltip}
+                    disabled={isCreatingProposal}
                     loading={isCreatingProposal && submittedDraft}
                     data-test='create-proposal-button'
                     variant='outlined'
