@@ -3,11 +3,11 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { validate } from 'uuid';
 
 import type { AuthSig } from 'lib/blockchain/interfaces';
-import { validateTokenGateCondition } from 'lib/tokenGates/validateTokenGateCondition';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { TokenGate } from './interfaces';
+import { validateTokenGate } from './validateTokenGate';
 
 export type TokenGateEvaluationAttempt = {
   authSig: AuthSig;
@@ -35,7 +35,12 @@ export async function evaluateTokenGateEligibility({
 
 export async function evaluateTokenGate({ authSig, tokenGates }: { authSig: AuthSig; tokenGates: TokenGate[] }) {
   const tokenGateResults = await Promise.all(
-    tokenGates.map(async (tokenGate) => getValidTokenGateId(tokenGate, authSig.address))
+    tokenGates.map(async (tokenGate) =>
+      validateTokenGate(tokenGate, authSig.address).catch((error) => {
+        log.debug(`Error evaluating token gate`, { tokenGateId: tokenGate.id, error });
+        return null;
+      })
+    )
   );
 
   const successGates = tokenGateResults.filter(isTruthy);
@@ -53,28 +58,6 @@ export async function evaluateTokenGate({ authSig, tokenGates }: { authSig: Auth
     walletAddress: authSig.address,
     eligibleGates: successGates
   };
-}
-
-export async function getValidTokenGateId(tokenGate: TokenGate, walletAddress: string) {
-  const tokenGatesValid = await Promise.all(
-    tokenGate.conditions.accessControlConditions?.map(async (condition) =>
-      validateTokenGateCondition(condition, walletAddress).catch((error) => {
-        log.debug(`Error validating token gate condition: ${condition}`, error);
-        return false;
-      })
-    ) || []
-  );
-
-  const allConditionsAreValid = tokenGate.conditions.operator === 'AND' && tokenGatesValid.every((v) => v);
-
-  const someConditionsAreValid =
-    (tokenGate.conditions.operator === 'OR' || !tokenGate.conditions.operator) && tokenGatesValid.some((v) => v);
-
-  if (someConditionsAreValid || allConditionsAreValid) {
-    return tokenGate.id;
-  } else {
-    return null;
-  }
 }
 
 async function validateSpaceWithTokenGates(spaceIdOrDomain: string) {

@@ -153,7 +153,7 @@ const RPC: Record<string, IChainDetails> = {
     chainId: baseSepolia.id,
     viem: baseSepolia,
     chainName: 'Base - Goerli Testnet',
-    alchemyUrl: 'https://base-sepolia.g.alchemy.com/v2',
+    alchemyUrl: 'https://base-sepolia.g.alchemy.com',
     rpcUrls: ['https://sepolia.base.org'],
     gnosisUrl: 'https://safe-transaction-base-sepolia.safe.global',
     blockExplorerUrls: ['https://sepolia-explorer.base.org'],
@@ -301,7 +301,6 @@ const RPC: Record<string, IChainDetails> = {
     chainId: avalanche.id,
     viem: avalanche,
     chainName: 'Avalanche',
-    alchemyUrl: 'https://avalanche.public-rpc.com',
     nativeCurrency: {
       name: 'Avalanche',
       symbol: 'AVAX',
@@ -321,7 +320,6 @@ const RPC: Record<string, IChainDetails> = {
     chainId: bsc.id,
     viem: bsc,
     chainName: 'Binance Smart Chain',
-    alchemyUrl: 'https://bsc-dataseed1.defibit.io',
     nativeCurrency: {
       name: 'Binance Coin',
       symbol: 'BNB',
@@ -341,7 +339,6 @@ const RPC: Record<string, IChainDetails> = {
     chainId: gnosis.id,
     viem: gnosis,
     chainName: 'Gnosis',
-    alchemyUrl: 'wss://rpc.gnosischain.com/wss',
     nativeCurrency: {
       name: 'xDAI',
       symbol: 'XDAI',
@@ -349,7 +346,7 @@ const RPC: Record<string, IChainDetails> = {
       address: '0x0000000000000000000000000000000000000000',
       logoURI: 'https://assets.coingecko.com/coins/images/11062/small/xdai.png?1614727492'
     },
-    rpcUrls: ['https://rpc.xdaichain.com'],
+    rpcUrls: ['https://rpc.gnosischain.com'],
     blockExplorerUrls: ['https://gnosisscan.io'],
     gnosisUrl: 'https://safe-transaction-gnosis-chain.safe.global',
     iconUrl: '/images/cryptoLogos/gnosis-logo.svg',
@@ -360,7 +357,6 @@ const RPC: Record<string, IChainDetails> = {
   FANTOM: {
     chainId: fantom.id,
     viem: fantom,
-    alchemyUrl: 'https://rpc2.fantom.network',
     chainName: 'Fantom Opera',
     nativeCurrency: {
       name: 'Fantom',
@@ -454,7 +450,6 @@ const RPC: Record<string, IChainDetails> = {
     chainId: zkSync.id,
     viem: zkSync,
     chainName: zkSync.name,
-    alchemyUrl: 'https://mainnet.era.zksync.io',
     rpcUrls: zkSync.rpcUrls.public.http,
     blockExplorerUrls: [zkSync.blockExplorers.default.url],
     gnosisUrl: 'https://safe-transaction-zksync.safe.global',
