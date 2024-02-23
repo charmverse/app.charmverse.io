@@ -1,4 +1,5 @@
 import type { DateTime } from 'luxon';
+import { useState } from 'react';
 
 import charmClient from 'charmClient';
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
@@ -6,6 +7,7 @@ import type { ViewHeaderRowsMenuProps } from 'components/common/BoardEditor/foca
 import { ViewHeaderRowsMenu } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ViewHeaderRowsMenu/ViewHeaderRowsMenu';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { usePages } from 'hooks/usePages';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardReviewer, RewardTokenDetails } from 'lib/rewards/interfaces';
@@ -22,6 +24,9 @@ export function RewardsHeaderRowsMenu({ board, visiblePropertyIds, cards, checke
   const { updateReward, rewards } = useRewards();
   const { pages } = usePages();
   const { showConfirmation } = useConfirmationModal();
+  const { showMessage } = useSnackbar();
+  const [isMarkingPaid, setIsMarkingPaid] = useState(false);
+  const [isMarkingComplete, setIsMarkingComplete] = useState(false);
 
   let propertyTemplates: IPropertyTemplate<PropertyType>[] = [];
   if (visiblePropertyIds?.length) {
@@ -36,35 +41,44 @@ export function RewardsHeaderRowsMenu({ board, visiblePropertyIds, cards, checke
   }
 
   async function onChangeRewardsDueDate(pageIds: string[], dueDate: DateTime | null) {
-    for (const pageId of pageIds) {
-      const page = pages[pageId];
-      if (page?.bountyId) {
-        await updateReward({
-          rewardId: page.bountyId,
-          updateContent: {
-            dueDate: dueDate?.toJSDate() || undefined
-          }
-        });
+    try {
+      for (const pageId of pageIds) {
+        const page = pages[pageId];
+        if (page?.bountyId) {
+          await updateReward({
+            rewardId: page.bountyId,
+            updateContent: {
+              dueDate: dueDate?.toJSDate() || undefined
+            }
+          });
+        }
       }
+    } catch (err) {
+      showMessage('Failed to update rewards', 'error');
     }
 
     await refreshRewards();
   }
 
   async function onChangeRewardsReviewers(pageIds: string[], options: SelectOption[]) {
-    for (const pageId of pageIds) {
-      const page = pages[pageId];
-      if (page?.bountyId) {
-        const reviewerOptions = options.filter(
-          (option) => option.group === 'role' || option.group === 'user'
-        ) as RewardReviewer[];
-        await updateReward({
-          rewardId: page.bountyId,
-          updateContent: {
-            reviewers: reviewerOptions.map((option) => ({ group: option.group, id: option.id }))
-          }
-        });
+    const reviewerOptions = options.filter(
+      (option) => option.group === 'role' || option.group === 'user'
+    ) as RewardReviewer[];
+
+    try {
+      for (const pageId of pageIds) {
+        const page = pages[pageId];
+        if (page?.bountyId) {
+          await updateReward({
+            rewardId: page.bountyId,
+            updateContent: {
+              reviewers: reviewerOptions.map((option) => ({ group: option.group, id: option.id }))
+            }
+          });
+        }
       }
+    } catch (err) {
+      showMessage('Failed to update rewards', 'error');
     }
 
     await refreshRewards();
@@ -94,10 +108,16 @@ export function RewardsHeaderRowsMenu({ board, visiblePropertyIds, cards, checke
       return;
     }
 
-    for (const reward of checkedRewards) {
-      await charmClient.rewards.markRewardAsPaid(reward.id);
+    setIsMarkingPaid(true);
+    try {
+      for (const reward of checkedRewards) {
+        await charmClient.rewards.markRewardAsPaid(reward.id);
+      }
+    } catch (err) {
+      showMessage('Failed to mark rewards as paid', 'error');
     }
 
+    setIsMarkingPaid(false);
     await refreshRewards();
   }
 
@@ -123,9 +143,15 @@ export function RewardsHeaderRowsMenu({ board, visiblePropertyIds, cards, checke
     if (!confirmed) {
       return;
     }
-    for (const reward of checkedRewards) {
-      await charmClient.rewards.closeReward(reward.id);
+    setIsMarkingComplete(true);
+    try {
+      for (const reward of checkedRewards) {
+        await charmClient.rewards.closeReward(reward.id);
+      }
+    } catch (err) {
+      showMessage('Failed to mark rewards as complete', 'error');
     }
+    setIsMarkingComplete(false);
     await refreshRewards();
   }
 
@@ -134,20 +160,24 @@ export function RewardsHeaderRowsMenu({ board, visiblePropertyIds, cards, checke
       return;
     }
 
-    for (const pageId of checkedIds) {
-      const page = pages[pageId];
-      const reward = page?.bountyId ? rewards?.find((r) => r.id === page.bountyId) : null;
-      if (reward && getRewardType(reward) === 'token') {
-        await updateReward({
-          rewardId: reward.id,
-          updateContent: {
-            chainId: rewardToken.chainId,
-            rewardToken: rewardToken.rewardToken,
-            rewardAmount: Number(rewardToken.rewardAmount),
-            customReward: null
-          }
-        });
+    try {
+      for (const pageId of checkedIds) {
+        const page = pages[pageId];
+        const reward = page?.bountyId ? rewards?.find((r) => r.id === page.bountyId) : null;
+        if (reward && getRewardType(reward) === 'token') {
+          await updateReward({
+            rewardId: reward.id,
+            updateContent: {
+              chainId: rewardToken.chainId,
+              rewardToken: rewardToken.rewardToken,
+              rewardAmount: Number(rewardToken.rewardAmount),
+              customReward: null
+            }
+          });
+        }
       }
+    } catch (err) {
+      showMessage('Failed to update rewards', 'error');
     }
 
     await refreshRewards();
@@ -162,13 +192,17 @@ export function RewardsHeaderRowsMenu({ board, visiblePropertyIds, cards, checke
       .filter(isTruthy)
       .filter((reward) => getRewardType(reward) === 'custom');
 
-    for (const reward of checkedRewards) {
-      await updateReward({
-        rewardId: reward.id,
-        updateContent: {
-          customReward
-        }
-      });
+    try {
+      for (const reward of checkedRewards) {
+        await updateReward({
+          rewardId: reward.id,
+          updateContent: {
+            customReward
+          }
+        });
+      }
+    } catch (err) {
+      showMessage('Failed to update rewards', 'error');
     }
 
     await refreshRewards();
@@ -176,8 +210,8 @@ export function RewardsHeaderRowsMenu({ board, visiblePropertyIds, cards, checke
 
   const rewardId = checkedIds.length ? pages[checkedIds[0]]?.bountyId : null;
   const reward = rewardId ? rewards?.find((r) => r.id === rewardId) : null;
-  const isMarkPaidDisabled = reward ? reward.status === 'paid' : false;
-  const isMarkCompleteDisabled = reward ? reward.status !== 'open' : false;
+  const isMarkPaidDisabled = isMarkingPaid || (reward ? reward.status === 'paid' : false);
+  const isMarkCompleteDisabled = isMarkingComplete || (reward ? reward.status !== 'open' : false);
 
   return (
     <ViewHeaderRowsMenu
