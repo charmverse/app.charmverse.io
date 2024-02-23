@@ -77,6 +77,12 @@ export async function getProposals({ ids }: { ids: string[] }): Promise<Proposal
           }
         }
       }
+    },
+    // TODO: allow admins to sort by an index
+    orderBy: {
+      page: {
+        title: 'asc'
+      }
     }
   });
 
