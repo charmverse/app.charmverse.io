@@ -420,14 +420,16 @@ test.describe.serial('Create and use Proposal Template', async () => {
     await proposalPage.documentTitleInput.fill(userProposalConfig.title);
 
     // Check that configuration fields are readonly and user cannot edit proposal
-    const reviewerInput = (await proposalPage.getSelectedReviewers()).nth(1);
+    const reviewerInputs = await proposalPage.getSelectedReviewers();
+    await reviewerInputs.nth(1).waitFor();
+    const reviewerInput = reviewerInputs.nth(1);
 
     const value = (await reviewerInput.allInnerTexts())[0].trim();
 
     expect(value).toEqual(role.name);
 
     await expect(proposalPage.editRubricCriteriaLabel).toBeDisabled();
-
+    await proposalPage.charmEditor.waitFor();
     const content = (await proposalPage.charmEditor.allInnerTexts())[0];
 
     expect(content.trim()).toEqual(templatePageContent.description);

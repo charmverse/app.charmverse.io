@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 
-import { useUpdateProposal, useGetProposalDetails } from 'charmClient/hooks/proposals';
+import { useUpdateProposal, useGetProposalTemplate } from 'charmClient/hooks/proposals';
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { ProposalPropertiesBase } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -26,7 +26,7 @@ export function ProposalProperties({
 }: ProposalPropertiesProps) {
   const { trigger: updateProposal } = useUpdateProposal({ proposalId });
   const { showError } = useSnackbar();
-  const { data: sourceTemplate } = useGetProposalDetails(proposal?.page?.sourceTemplateId);
+  const { data: sourceTemplate } = useGetProposalTemplate(proposal?.page?.sourceTemplateId);
 
   const isAdmin = useIsAdmin();
 

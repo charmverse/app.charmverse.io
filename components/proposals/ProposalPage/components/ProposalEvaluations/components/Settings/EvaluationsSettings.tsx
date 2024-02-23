@@ -1,7 +1,7 @@
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { Box, Chip, Collapse, Stack, Switch } from '@mui/material';
 
-import { useGetProposalDetails } from 'charmClient/hooks/proposals';
+import { useGetProposalTemplate } from 'charmClient/hooks/proposals';
 import LoadingComponent from 'components/common/LoadingComponent';
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/ProposalEvaluations/components/Settings/components/EvaluationStepSettings';
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
@@ -40,7 +40,7 @@ export function EvaluationsSettings({
   expanded: expandedContainer,
   isStructuredProposal
 }: Props) {
-  const { data: proposalTemplate } = useGetProposalDetails(templateId);
+  const { data: proposalTemplate } = useGetProposalTemplate(templateId);
   const { mappedFeatures } = useSpaceFeatures();
   const isAdmin = useIsAdmin();
   return (

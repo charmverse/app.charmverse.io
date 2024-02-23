@@ -10,7 +10,7 @@ import { v4 as uuid } from 'uuid';
 
 import { useForumPost } from 'charmClient/hooks/forum';
 import { useGetPage } from 'charmClient/hooks/pages';
-import { useGetProposalDetails } from 'charmClient/hooks/proposals';
+import { useGetProposalTemplate } from 'charmClient/hooks/proposals';
 import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
 import { DocumentColumnLayout, DocumentColumn } from 'components/[pageId]/DocumentPage/components/DocumentColumnLayout';
 import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
@@ -92,7 +92,7 @@ export function NewProposalPage({
   const { user } = useUser();
   const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>([]);
   const { activeView: sidebarView, setActiveView } = usePageSidebar();
-  const { proposalTemplates, isLoadingTemplates } = useProposalTemplates();
+  const { proposalTemplates } = useProposalTemplates();
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>();
   const [, setPageTitle] = usePageTitle();
   const { data: workflowOptions, isLoading: isLoadingWorkflows } = useGetProposalWorkflows(currentSpace?.id);
@@ -108,7 +108,7 @@ export function NewProposalPage({
   } = useNewProposal({
     newProposal: { type: proposalPageType, proposalType }
   });
-  const { data: sourceTemplate } = useGetProposalDetails(formInputs.proposalTemplateId);
+  const { data: sourceTemplate } = useGetProposalTemplate(formInputs.proposalTemplateId);
   const [submittedDraft, setSubmittedDraft] = useState<boolean>(false);
 
   const containerWidthRef = useRef<HTMLDivElement>(null);
@@ -299,7 +299,7 @@ export function NewProposalPage({
   }, []);
 
   useEffect(() => {
-    if (!isLoadingTemplates && !isLoadingWorkflows) {
+    if (!isLoadingWorkflows) {
       // populate with template if selected
       if (templateIdFromUrl) {
         setTemplateId(templateIdFromUrl);
@@ -309,7 +309,7 @@ export function NewProposalPage({
         applyWorkflow(workflowOptions[0]);
       }
     }
-  }, [templateIdFromUrl, isLoadingTemplates, isLoadingWorkflows]);
+  }, [templateIdFromUrl, isLoadingWorkflows]);
 
   // Keep the formAnswers in sync with the formFields using a ref as charmEditor fields uses the initial field value
   const formAnswersRef = useRef(formInputs.formAnswers);
@@ -362,7 +362,7 @@ export function NewProposalPage({
         { fromUser: false }
       );
     }
-  }, [isTemplate]);
+  }, [isTemplate, setFormInputs]);
 
   useEffect(() => {
     if (sourceTemplate) {

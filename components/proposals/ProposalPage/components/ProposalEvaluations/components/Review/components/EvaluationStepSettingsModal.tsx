@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 
-import { useGetProposalDetails } from 'charmClient/hooks/proposals';
+import { useGetProposalTemplate } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { getEvaluationFormError } from 'lib/proposal/getProposalErrors';
@@ -21,7 +21,7 @@ export function EvaluationStepSettingsModal({
   saveEvaluation: (evaluation: ProposalEvaluationValues) => void;
   updateEvaluation: (evaluation: Partial<ProposalEvaluationValues>) => void;
 }) {
-  const { data: proposalTemplate } = useGetProposalDetails(templateId);
+  const { data: proposalTemplate } = useGetProposalTemplate(templateId);
   const evaluationInputError = evaluationInput && getEvaluationFormError(evaluationInput);
   // find matching template step, and allow editing if there were no reviewers set
   const matchingTemplateStep = proposalTemplate?.evaluations?.find((e) => e.title === evaluationInput.title);

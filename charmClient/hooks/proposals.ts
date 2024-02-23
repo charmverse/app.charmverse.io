@@ -38,6 +38,10 @@ export function useGetProposalTemplatesBySpace(spaceId: MaybeString) {
   return useGET<ProposalTemplateMeta[]>(spaceId ? `/api/spaces/${spaceId}/proposal-templates` : null);
 }
 
+export function useGetProposalTemplate(pageId: MaybeString) {
+  return useGET<ProposalWithUsersAndRubric>(pageId ? `/api/proposals/templates/${pageId}` : null);
+}
+
 export function useGetProposalIdsEvaluatedByUser(spaceId: MaybeString) {
   return useGET<RubricProposalsUserInfo>(spaceId ? `/api/spaces/${spaceId}/proposals-evaluated-by-user` : null);
 }
