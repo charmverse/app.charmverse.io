@@ -124,6 +124,9 @@ export function RewardsHeaderRowsMenu({ board, visiblePropertyIds, cards, checke
       onChangeRewardsReviewers={onChangeRewardsReviewers}
       board={board}
       cards={cards}
+      sx={{
+        mb: 0.5
+      }}
       checkedIds={checkedIds}
       setCheckedIds={setCheckedIds}
       propertyTemplates={propertyTemplates}

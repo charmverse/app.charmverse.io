@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import PaidIcon from '@mui/icons-material/Paid';
+import type { SxProps } from '@mui/material';
 import { ListItemText, Stack, Tooltip, Typography } from '@mui/material';
 import type { Dispatch, SetStateAction } from 'react';
 import { useMemo, useState } from 'react';
@@ -108,6 +109,7 @@ export type ViewHeaderRowsMenuProps = {
   showTrashIcon?: boolean;
   onMarkRewardsAsPaid?: () => Promise<void>;
   onMarkRewardsAsComplete?: () => Promise<void>;
+  sx?: SxProps;
 };
 
 export function ViewHeaderRowsMenu({
@@ -134,7 +136,8 @@ export function ViewHeaderRowsMenu({
   showTrashIcon = !board.fields.sourceType,
   onMarkRewardsAsComplete,
   onMarkRewardsAsPaid,
-  onChangeRewardsToken
+  onChangeRewardsToken,
+  sx
 }: ViewHeaderRowsMenuProps) {
   const isAdmin = useIsAdmin();
   const { space } = useCurrentSpace();
@@ -246,7 +249,7 @@ export function ViewHeaderRowsMenu({
   }
 
   return (
-    <StyledStack className='disable-drag-selection'>
+    <StyledStack className='disable-drag-selection' sx={sx}>
       <StyledMenuItem firstChild lastChild={!showTrashIcon && filteredPropertyTemplates.length === 0}>
         <Typography onClick={() => setCheckedIds([])} color='primary' variant='body2'>
           {checkedIds.length} selected
