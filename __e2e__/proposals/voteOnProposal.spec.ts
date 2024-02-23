@@ -303,8 +303,6 @@ test.describe.serial('Proposal Evaluation Votes', () => {
 
     await Promise.all([page.waitForResponse('**/api/votes/**/cast'), yesOption.click()]);
 
-    await page.pause();
-
     const proposalVote = await prisma.vote.findFirstOrThrow({
       where: {
         evaluation: {
