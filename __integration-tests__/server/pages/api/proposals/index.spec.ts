@@ -1,6 +1,6 @@
-import type { ProposalWorkflowTyped } from '@charmverse/core/dist/cjs/proposals';
 import type { Space, User, ProposalWorkflow, Role } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 import { v4 as uuid } from 'uuid';

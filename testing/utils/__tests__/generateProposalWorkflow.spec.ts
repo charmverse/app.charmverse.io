@@ -1,6 +1,6 @@
-import type { ProposalWorkflowTyped } from '@charmverse/core/dist/cjs/proposals';
 import type { ProposalOperation } from '@charmverse/core/prisma-client';
 import { ProposalSystemRole, prisma } from '@charmverse/core/prisma-client';
+import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { testUtilsUser } from '@charmverse/core/test';
 
 import { generateProposalWorkflow } from '../proposals';

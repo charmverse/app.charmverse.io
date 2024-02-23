@@ -1,11 +1,6 @@
 /* eslint-disable camelcase */
 import fs from 'node:fs/promises';
 
-import type {
-  WorkflowEvaluationJson,
-  ProposalWorkflowTyped,
-  PermissionJson
-} from '@charmverse/core/dist/cjs/proposals';
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type {
   Page,
@@ -20,6 +15,7 @@ import type {
   User
 } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { WorkflowEvaluationJson, ProposalWorkflowTyped, PermissionJson } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
