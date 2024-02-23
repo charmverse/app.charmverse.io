@@ -291,7 +291,7 @@ export function ViewHeaderRowsMenu({
         : null}
       {onArchiveProposals && <ArchiveProposals onChange={onArchiveProposals} />}
       {onMarkRewardsAsPaid && (
-        <Tooltip title={isMarkPaidDisabled ? 'Selected rewards are already paid' : 'Mark paid'}>
+        <Tooltip title={isMarkPaidDisabled ? 'Selected rewards are already paid' : 'Mark selected rewards as paid'}>
           <div>
             <StyledMenuItem onClick={onMarkRewardsAsPaid} disabled={isDeleting || isMarkPaidDisabled}>
               <PaidIcon
@@ -300,13 +300,17 @@ export function ViewHeaderRowsMenu({
                   mr: 1
                 }}
               />
-              <ListItemText primary='Mark selected rewards as paid' />
+              <ListItemText primary='Mark paid' />
             </StyledMenuItem>
           </div>
         </Tooltip>
       )}
       {onMarkRewardsAsComplete && (
-        <Tooltip title={isMarkCompleteDisabled ? `Selected rewards are already completed` : 'Mark complete'}>
+        <Tooltip
+          title={
+            isMarkCompleteDisabled ? `Selected rewards are already completed` : 'Mark selected rewards as complete'
+          }
+        >
           <div>
             <StyledMenuItem onClick={onMarkRewardsAsComplete} disabled={isDeleting || isMarkCompleteDisabled}>
               <CheckCircleOutlinedIcon
@@ -315,7 +319,7 @@ export function ViewHeaderRowsMenu({
                   mr: 1
                 }}
               />
-              <ListItemText primary='Mark selected rewards as complete' />
+              <ListItemText primary='Mark complete' />
             </StyledMenuItem>
           </div>
         </Tooltip>
