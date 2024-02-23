@@ -429,7 +429,10 @@ test.describe.serial('Create and use Proposal Template', async () => {
     expect(value).toEqual(role.name);
 
     await expect(proposalPage.editRubricCriteriaLabel).toBeDisabled();
-    await proposalPage.charmEditor.waitFor();
+    await page.waitForFunction(async () => {
+      const content = (await proposalPage.charmEditor.allInnerTexts())[0];
+      return !content.trim();
+    });
     const content = (await proposalPage.charmEditor.allInnerTexts())[0];
 
     expect(content.trim()).toEqual(templatePageContent.description);
