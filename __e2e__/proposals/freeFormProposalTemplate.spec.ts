@@ -429,12 +429,8 @@ test.describe.serial('Create and use Proposal Template', async () => {
     expect(value).toEqual(role.name);
 
     await expect(proposalPage.editRubricCriteriaLabel).toBeDisabled();
-    await page.waitForFunction(() => {
-      return !!document.querySelector('[data-test=page-charmeditor] div[contenteditable]')?.textContent;
-    });
-    const content = (await proposalPage.charmEditor.allInnerTexts())[0];
 
-    expect(content.trim()).toEqual(templatePageContent.description);
+    expect(proposalPage.charmEditor).toHaveText(templatePageContent.description);
 
     await Promise.all([page.waitForResponse('**/api/proposals'), proposalPage.saveDraftButton.click()]);
 
