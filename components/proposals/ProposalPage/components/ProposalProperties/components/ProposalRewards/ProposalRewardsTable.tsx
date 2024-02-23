@@ -1,11 +1,13 @@
 import type { ProposalReviewer } from '@charmverse/core/prisma';
-import { Box, Stack, Typography } from '@mui/material';
+import { DeleteOutlineOutlined as TrashIcon } from '@mui/icons-material';
+import { Box, ListItemIcon, MenuItem, ListItemText, Stack, Typography } from '@mui/material';
 import { uniqBy } from 'lodash';
 import { useMemo, useState } from 'react';
 import { v4 } from 'uuid';
 
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
 import { InlineDatabaseContainer } from 'components/common/CharmEditor/components/inlineDatabase/components/InlineDatabaseContainer';
+import { ContextMenu } from 'components/common/ContextMenu';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
 import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
@@ -205,6 +207,13 @@ export function ProposalRewardsTable({
     }
   }
 
+  function deleteReward() {
+    if (currentPendingId) {
+      onDelete(currentPendingId);
+      closeDialog();
+    }
+  }
+
   return (
     <>
       <InlineDatabaseContainer className='focalboard-body' containerWidth={containerWidth}>
@@ -261,6 +270,20 @@ export function ProposalRewardsTable({
         onSave={saveForm}
         onCancel={closeDialog}
         isSaving={isSavingReward}
+        toolbar={
+          <Box display='flex' justifyContent='flex-end'>
+            {currentPendingId && (
+              <ContextMenu iconColor='secondary' popupId='reward-context'>
+                <MenuItem color='inherit' onClick={deleteReward}>
+                  <ListItemIcon>
+                    <TrashIcon />
+                  </ListItemIcon>
+                  <ListItemText>Delete</ListItemText>
+                </MenuItem>
+              </ContextMenu>
+            )}
+          </Box>
+        }
       >
         <NewDocumentPage
           key={newPageValues?.templateId}
