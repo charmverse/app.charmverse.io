@@ -230,7 +230,7 @@ async function createPost(req: NextApiRequest, res: NextApiResponse<PublicApiFor
   return res.status(200).json(forumPost);
 }
 
-handler.post(requireKeys(['createdBy', 'contentMarkdown', 'title', 'categoryId'], 'body'), createPost);
+handler.post(requireKeys(['userId', 'contentMarkdown', 'title', 'categoryId'], 'body'), createPost);
 
 handler.get(listPosts);
 /**
