@@ -424,13 +424,11 @@ test.describe.serial('Create and use Proposal Template', async () => {
     await reviewerInputs.nth(1).waitFor();
     const reviewerInput = reviewerInputs.nth(1);
 
-    const value = (await reviewerInput.allInnerTexts())[0].trim();
-
-    expect(value).toEqual(role.name);
+    await expect(reviewerInput).toHaveText(role.name);
 
     await expect(proposalPage.editRubricCriteriaLabel).toBeDisabled();
 
-    expect(proposalPage.charmEditor).toHaveText(templatePageContent.description, { timeout: 3000 });
+    await expect(proposalPage.charmEditor).toHaveText(templatePageContent.description);
 
     await Promise.all([page.waitForResponse('**/api/proposals'), proposalPage.saveDraftButton.click()]);
 

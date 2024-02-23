@@ -94,6 +94,7 @@ export function NewProposalPage({
   const { activeView: sidebarView, setActiveView } = usePageSidebar();
   const { proposalTemplates } = useProposalTemplates();
   const [selectedProposalTemplateId, setSelectedProposalTemplateId] = useState<null | string>();
+  const [contentTemplateId, setContentTemplateId] = useState<null | string>(); // used to keep charm editor content up-to-date
   const [, setPageTitle] = usePageTitle();
   const { data: workflowOptions, isLoading: isLoadingWorkflows } = useGetProposalWorkflows(currentSpace?.id);
   const proposalPageType = isTemplate ? 'proposal_template' : 'proposal';
@@ -228,6 +229,7 @@ export function NewProposalPage({
       },
       { fromUser: false }
     );
+    setContentTemplateId(template.id);
     const workflow = workflowOptions?.find((w) => w.id === template.workflowId);
     if (workflow) {
       // pass in the template since the formState will not be updated in this instance of applyWorkflow
@@ -493,7 +495,7 @@ export function NewProposalPage({
                       onContentChange={applyProposalContent}
                       focusOnInit
                       isContentControlled
-                      key={`${formInputs.proposalTemplateId ?? formInputs.sourcePageId ?? formInputs.sourcePostId}`}
+                      key={`${contentTemplateId ?? formInputs.sourcePageId ?? formInputs.sourcePostId}`}
                     />
                   )}
                   {isStructured && formInputs.fields?.enableRewards && (
