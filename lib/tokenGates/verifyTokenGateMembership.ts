@@ -9,8 +9,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { isTruthy } from 'lib/utilities/types';
 
-import { getValidTokenGateId } from './evaluateEligibility';
 import type { TokenGateWithRoles } from './interfaces';
+import { validateTokenGate } from './validateTokenGate';
 
 const log = getLogger('tg-verification');
 
@@ -55,7 +55,7 @@ export async function verifyTokenGateMembership({
     });
 
     const values = await Promise.all(
-      wallets.map(async (w) => getValidTokenGateId(tokenGateWithRoles as any as TokenGateWithRoles, w.address))
+      wallets.map(async (w) => validateTokenGate(tokenGateWithRoles as any as TokenGateWithRoles, w.address))
     );
 
     return {
@@ -72,7 +72,7 @@ export async function verifyTokenGateMembership({
           return r.value;
         }
         if (r.status === 'rejected') {
-          log.warn('Error verifying token gate', { error: r.reason });
+          log.error('Error verifying token gate', { error: r.reason });
         }
         return undefined;
       })

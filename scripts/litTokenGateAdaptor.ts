@@ -7,7 +7,7 @@ import { RPCList } from 'connectors/chains';
 
 import type { Operator, TokenGateConditions } from 'lib/tokenGates/interfaces';
 import { isTruthy } from 'lib/utilities/types';
-import { validateTokenGateConditions } from 'lib/tokenGates/validateTokenGateConditions';
+import { validateTokenGateConditions } from 'lib/tokenGates/validateTokenGateConditionsObject';
 
 const path = './config.json';
 

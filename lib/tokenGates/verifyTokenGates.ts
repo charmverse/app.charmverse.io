@@ -1,11 +1,12 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 
-import { getValidTokenGateId } from './evaluateEligibility';
 import type { TokenGateWithRoles } from './interfaces';
+import { validateTokenGate } from './validateTokenGate';
 
 export type TokenGateResult = TokenGateWithRoles & { grantedRoles: string[]; verified: boolean };
 
@@ -56,7 +57,10 @@ export async function verifyTokenGates({
           return null;
         }
 
-        const verified = await getValidTokenGateId(matchingTokenGate, walletAddress);
+        const verified = await validateTokenGate(matchingTokenGate, walletAddress).catch((error) => {
+          log.debug(`Error verifying token gate`, { tokenGateId: matchingTokenGate.id, error });
+          return null;
+        });
 
         if (!verified) {
           return null;

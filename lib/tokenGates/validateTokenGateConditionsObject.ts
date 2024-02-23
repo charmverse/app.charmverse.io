@@ -13,13 +13,19 @@ const AccessControlSchema = yup.object().shape({
     .string<ConditionType>()
     .required()
     .test('isConditionType', 'Invalid condition type', (value) => ['sol', 'evm'].includes(value)),
-  type: yup.string<AccessType>().required(),
+  type: yup
+    .string<AccessType>()
+    .required()
+    .test('isAccessType', 'Invalid access type', (value) => !!value),
   contractAddress: yup
     .string()
     .test('isContractAddress', 'Invalid contract address', (value) => (value ? isAddress(value) : true)),
   method: yup.string<Method>(),
   tokenIds: yup.array().of(yup.string()),
-  quantity: yup.string().required()
+  quantity: yup
+    .string()
+    .required()
+    .test('isQuantity', 'Invalid quantity', (value) => !!value)
 });
 
 const TokenGateConditionsSchema = yup.object().shape({
@@ -36,6 +42,6 @@ const TokenGateConditionsSchema = yup.object().shape({
   })
 });
 
-export async function validateTokenGateConditions(tokenGate: TokenGate) {
+export async function validateTokenGateConditionsObject(tokenGate: TokenGate) {
   await TokenGateConditionsSchema.validate(tokenGate.conditions);
 }
