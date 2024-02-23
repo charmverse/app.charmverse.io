@@ -68,7 +68,7 @@ export class DocumentPage extends GlobalPage {
     this.deletePermanentlyButton = this.rootSelector.locator('data-test=banner--permanently-delete');
     this.restoreArchivedButton = this.rootSelector.locator('data-test=banner--restore-archived-page');
     this.trashModal = this.rootSelector.locator('data-test=trash-modal');
-    this.charmEditor = this.rootSelector.locator('data-test=page-charmeditor >> div[contenteditable]').first();
+    this.charmEditor = this.rootSelector.locator('data-test=page-charmeditor >> div[contenteditable]');
     this.proposalBanner = this.rootSelector.locator('data-test=proposal-banner');
     this.documentTitle = this.rootSelector.locator(`data-test=editor-page-title`);
     this.documentTitleInput = this.rootSelector.locator(`data-test=editor-page-title >> textarea`).first();

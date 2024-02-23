@@ -430,7 +430,7 @@ test.describe.serial('Create and use Proposal Template', async () => {
 
     await expect(proposalPage.editRubricCriteriaLabel).toBeDisabled();
 
-    expect(proposalPage.charmEditor).toHaveText(templatePageContent.description);
+    expect(proposalPage.charmEditor).toHaveText(templatePageContent.description, { timeout: 3000 });
 
     await Promise.all([page.waitForResponse('**/api/proposals'), proposalPage.saveDraftButton.click()]);
 
