@@ -13,6 +13,10 @@ import { InvalidInputError } from 'lib/utilities/errors';
 import { getPublicForumPost } from '../index';
 import type { PublicApiForumPost } from '../index';
 
+const handler = superApiHandler();
+
+handler.post(requireKeys(['userId', 'upvoted'], 'body'), upvoteDownvotePost);
+
 /**
  * @swagger
  * /forum/posts/{postId}/upvote:
@@ -44,10 +48,6 @@ import type { PublicApiForumPost } from '../index';
  *                $ref: '#/components/schemas/ForumPost'
  *
  */
-
-const handler = superApiHandler();
-
-handler.post(requireKeys(['userId', 'upvoted'], 'body'), upvoteDownvotePost);
 
 /**
  * @swagger

@@ -25,8 +25,9 @@ export function FieldWrapperContainer({
   sx?: SxProps;
   children: ReactNode;
 }) {
+  // 100% width is necessary to contain the charm editor input field inside its width
   return (
-    <Box flex={1} flexDirection={{ xs: 'column', sm: inline ? 'row' : 'column' }} display='flex' sx={sx}>
+    <Box flex={1} flexDirection={{ xs: 'column', sm: inline ? 'row' : 'column' }} display='flex' width='100%' sx={sx}>
       {children}
     </Box>
   );
@@ -79,7 +80,7 @@ export function FieldWrapper({
       )}
       <ReadonlyCharmContent content={description} />
       <Stack gap={1} alignItems={inputEndAdornmentAlignItems} flexDirection='row'>
-        <div style={{ flexGrow: 1 }}>{children}</div>
+        <div style={{ flexGrow: 1, overflowX: 'hidden' }}>{children}</div>
         {inputEndAdornment}
       </Stack>
     </FieldWrapperContainer>

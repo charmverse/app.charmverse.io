@@ -101,7 +101,7 @@ const config = {
       }
     ];
   },
-  webpack(_config, { buildId, nextRuntime, webpack }) {
+  webpack(_config) {
     // Fix for: "Module not found: Can't resolve 'canvas'"
     _config.resolve.alias.canvas = false;
 
@@ -126,22 +126,6 @@ const config = {
         }
       ]
     });
-    if (nextRuntime !== 'nodejs') {
-      /**
-       * Add support for the `node:` scheme available since Node.js 16.
-       *
-       * `@lit-protocol/lit-node-client` imports from `node:buffer`
-       *
-       * @see https://github.com/webpack/webpack/issues/13290
-       */
-      _config.plugins = _config.plugins ?? [];
-      _config.plugins.push(
-        new webpack.NormalModuleReplacementPlugin(/^node:/, (resource) => {
-          resource.request = resource.request.replace(/^node:/, '');
-        })
-      );
-    }
-
     return _config;
   }
 };

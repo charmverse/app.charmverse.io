@@ -18,7 +18,6 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 
 import { mutator } from '../../mutator';
-import { useAppSelector } from '../../store/hooks';
 import IconButton from '../../widgets/buttons/iconButton';
 import AddViewMenu from '../addViewMenu';
 
@@ -161,6 +160,7 @@ function ViewHeader(props: Props) {
             )}
           </>
         )}
+
         <div className='octo-spacer' />
 
         <Box className='view-actions'>

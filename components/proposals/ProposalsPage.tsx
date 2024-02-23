@@ -120,9 +120,7 @@ export function ProposalsPage({ title }: { title: string }) {
                 cards={cards}
                 checkedIds={checkedIds}
                 setCheckedIds={setCheckedIds}
-                onChange={() => {
-                  refreshProposals();
-                }}
+                onChange={refreshProposals}
                 refreshProposals={refreshProposals}
               />
             )}

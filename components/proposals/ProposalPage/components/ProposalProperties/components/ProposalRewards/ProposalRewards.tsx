@@ -79,8 +79,10 @@ export function ProposalRewards({
   }
 
   async function saveForm() {
-    onSave({ reward: rewardValues, page: newPageValues, draftId: currentPendingId || '' });
-    closeDialog();
+    if (newPageValues) {
+      onSave({ reward: rewardValues, page: newPageValues, draftId: currentPendingId || '' });
+      closeDialog();
+    }
   }
 
   function createNewReward() {
@@ -105,11 +107,11 @@ export function ProposalRewards({
       ? template.reward.allowedSubmitterRoles
       : assignedSubmitters;
 
-    const reward = { ...template?.reward, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters };
+    const newReward = { ...template?.reward, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters };
     if (template?.reward) {
-      (reward as any).rewardType = getRewardType(template.reward);
+      (newReward as any).rewardType = getRewardType(template.reward);
     }
-    setRewardValues(reward, { skipDirty: true });
+    setRewardValues(newReward, { skipDirty: true });
 
     openNewPage({
       ...template?.page,
@@ -137,9 +139,9 @@ export function ProposalRewards({
       navigateToSpacePath(`/${getRewardPage(rewardId)?.path || ''}`);
       return;
     }
+    const pageIdToOpen = getRewardPage(rewardId)?.id;
 
-    const pageId = getRewardPage(rewardId)?.id || rewardId;
-    updateURLQuery({ [rewardQueryKey]: pageId });
+    updateURLQuery({ [rewardQueryKey]: pageIdToOpen });
   }
 
   function selectTemplate(template: RewardTemplate | null) {

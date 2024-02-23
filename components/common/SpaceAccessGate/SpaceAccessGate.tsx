@@ -105,13 +105,11 @@ export function SpaceAccessGate({
   const noGateConditions =
     !discordGate.isEnabled && !summonGate.isEnabled && !tokenGate.isEnabled && tokenGate.tokenGates?.length === 0;
 
-  const hasRoles = tokenGate.tokenGateResult?.eligibleGates
-    ?.map((gate) => gate.tokenGateId)
-    .some((id) =>
-      tokenGate.tokenGates?.find((tk) => {
-        return tk.id === id && tk.tokenGateToRoles.length > 0;
-      })
-    );
+  const hasRoles = tokenGate.tokenGateResult?.eligibleGates.some((id) =>
+    tokenGate.tokenGates?.find((tk) => {
+      return tk.id === id && tk.tokenGateToRoles.length > 0;
+    })
+  );
 
   return (
     <>
