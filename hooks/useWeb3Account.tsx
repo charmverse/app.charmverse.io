@@ -8,10 +8,9 @@ import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { mutate } from 'swr';
-import useSWRMutation from 'swr/mutation';
-import { getAddress, parseAbi, recoverMessageAddress } from 'viem';
+import { getAddress, recoverMessageAddress } from 'viem';
 import type { ConnectorData } from 'wagmi';
-import { useAccount, useConnect, useNetwork, usePublicClient, useSignMessage } from 'wagmi';
+import { useAccount, useConnect, useNetwork, useSignMessage } from 'wagmi';
 
 import { useCreateUser, useLogin, useRemoveWallet } from 'charmClient/hooks/profile';
 import { useWeb3Signer } from 'hooks/useWeb3Signer';
@@ -25,12 +24,6 @@ import type { LoggedInUser } from 'models';
 import { PREFIX, useLocalStorage } from './useLocalStorage';
 import { useUser } from './useUser';
 import { useVerifyLoginOtp } from './useVerifyLoginOtp';
-
-const EIP1271_MAGIC_VALUE = '0x1626ba7e';
-
-const eip1271ContractInterface = new utils.Interface([
-  'function isValidSignature(bytes32 _message, bytes _signature) public view returns (bytes4)'
-]);
 
 type IContext = {
   // Web3 account belonging to the current logged in user
@@ -164,7 +157,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       setIsSigning(false);
       throw err;
     }
-  }, [account, chainId, setSignature, signMessageAsync]);
+  }, [account, chainId, activeConnector, setSignature, signMessageAsync]);
 
   const loginFromWeb3Account = useCallback(
     async (authSig?: AuthSig) => {
