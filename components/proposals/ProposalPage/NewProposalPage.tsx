@@ -364,6 +364,12 @@ export function NewProposalPage({
     }
   }, [isTemplate]);
 
+  useEffect(() => {
+    if (sourceTemplate) {
+      applyTemplate(sourceTemplate);
+    }
+  }, [sourceTemplate]);
+
   return (
     <Box display='flex' flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
       <DocumentColumnLayout>
