@@ -430,7 +430,7 @@ test.describe.serial('Create and use Proposal Template', async () => {
 
     await expect(proposalPage.editRubricCriteriaLabel).toBeDisabled();
     await page.waitForFunction(() => {
-      return !!document.querySelector('.bangle-editor')?.textContent;
+      return !!document.querySelector('[data-test=page-charmeditor] div[contenteditable]')?.textContent;
     });
     const content = (await proposalPage.charmEditor.allInnerTexts())[0];
 
