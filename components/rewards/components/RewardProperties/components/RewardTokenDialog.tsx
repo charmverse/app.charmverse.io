@@ -112,7 +112,7 @@ export function RewardTokenDialog({
     if (currentReward) {
       refreshCryptoList(currentReward.chainId || 1, currentReward.rewardToken || undefined);
     }
-  }, [currentReward, reset]);
+  }, [currentReward.chainId, currentReward.rewardToken]);
 
   useEffect(() => {
     if (watchChainId) {

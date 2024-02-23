@@ -29,13 +29,9 @@ export function RewardsDueDatePropertyTemplateMenu({
 
   return (
     <PropertyMenu lastChild={lastChild} propertyTemplate={propertyTemplate}>
-      {() => {
-        return (
-          <Box display='flex' py='2px' px='4px'>
-            <RewardsDueDatePicker value={propertyValue as string | number} onAccept={onAccept} />
-          </Box>
-        );
-      }}
+      <Box display='flex' py='2px' px='4px'>
+        <RewardsDueDatePicker value={propertyValue as string | number} onAccept={onAccept} />
+      </Box>
     </PropertyMenu>
   );
 }
